@@ -1,0 +1,5 @@
+{
+  "name": "Sunken Citadel",
+  "type": "Land — Cave",
+  "oracleText": "This land enters tapped. As it enters, choose a color.\n{T}: Add one mana of the chosen color.\n{T}: Add two mana of the chosen color. Spend this mana only to activate abilities of land sources."
+}

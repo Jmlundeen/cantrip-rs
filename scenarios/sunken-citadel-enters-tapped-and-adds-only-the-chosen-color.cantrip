@@ -1,0 +1,32 @@
+# Sunken Citadel: "This land enters tapped. As it enters, choose a color. {T}: Add one mana of the chosen color."
+# Bot1 plays it on turn 1 and chooses red: it enters tapped, and red is kept on it (CR 614.12a, 607.2d). On turn 3 the
+# color is still red: its first ability offers red and no other color (CR 106.5), and the {R} it adds is unrestricted,
+# so it pays for Lightning Bolt.
+
+[Bot1 Deck]
+Sunken Citadel
+Lightning Bolt
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sunken Citadel.Play
+Bot1.Colors(Red)
+? Bot1.Battlefield.Sunken Citadel.Tapped = true
+? Bot1.Battlefield.Sunken Citadel.ChosenColor = Red
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Sunken Citadel.Activate(Ability: one mana; Color: Blue)
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: one mana; Color: Red)
+? Bot1.Mana = {R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Battlefield.Sunken Citadel.Tapped = true
+Bot1.Battlefield.Sunken Citadel.ChosenColor = Red

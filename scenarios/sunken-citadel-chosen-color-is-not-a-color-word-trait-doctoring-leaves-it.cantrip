@@ -1,0 +1,35 @@
+# "The chosen color" is no color word in Sunken Citadel's text (CR 612.2): the color is a choice made as it entered and
+# kept on the permanent (CR 607.2d), so Trait Doctoring changing "blue" to "red" on it changes nothing it does. It still
+# adds blue, and red is not among the colors it may add.
+
+[Bot1 Deck]
+Sunken Citadel
+Island
+Trait Doctoring
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sunken Citadel.Play
+Bot1.Colors(Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Trait Doctoring.Cast(Bot1.Battlefield.Sunken Citadel)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(Blue)
+Bot1.Colors(Red)
+? Bot1.Graveyard = Trait Doctoring
+! Bot1.Battlefield.Sunken Citadel.Activate(Ability: one mana; Color: Red)
+! Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Red)
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: one mana; Color: Blue)
+
+[Expect]
+Turn = 3
+Bot1.Mana = {U}
+Bot1.Battlefield.Sunken Citadel.ChosenColor = Blue

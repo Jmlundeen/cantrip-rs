@@ -1,0 +1,33 @@
+# Sunken Citadel's two restricted mana may go to the same ability or to two different ones (its ruling; CR 106.6). Here
+# each pays the {U/B} of one Sunken Ruins - a mana ability of a land, an activated ability like any other (CR 605.3a) -
+# and each Ruins adds two unrestricted mana: nothing restricted is left.
+
+[Bot1 Deck]
+Sunken Citadel
+Sunken Ruins
+Sunken Ruins
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Sunken Citadel.Play
+Bot1.Colors(Blue)
+[T3 Bot1.Main1]
+Bot1.Hand.Sunken Ruins.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Sunken Ruins.Play
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Blue)
+Bot1.Battlefield.Sunken Ruins#1.Activate(Ability: {U/B}, {T})
+Bot1.Colors(Black; Black)
+? Bot1.Mana = {B}{B} {U} (LandAbilities)
+Bot1.Battlefield.Sunken Ruins#2.Activate(Ability: {U/B}, {T})
+Bot1.Colors(Blue; Black)
+
+[Expect]
+Turn = 5
+Bot1.Mana = {U}{B}{B}{B}
+Bot1.Battlefield.Sunken Ruins#1.Tapped = true
+Bot1.Battlefield.Sunken Ruins#2.Tapped = true

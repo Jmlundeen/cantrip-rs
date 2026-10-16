@@ -1,0 +1,45 @@
+# Browser
+# What the page shows of Sunken Citadel's restricted mana (CR 106.6), and that a person can spend it where it may go. Its
+# card menu words both mana abilities, the second with what its mana is only for; the {U}{U} it adds sits in the pool as
+# its own chip, captioned "land abilities", beside the Island's plain {U}; and both go, with the Mox's {U}, to Otawara,
+# Soaring City's channel from the hand, an ability of a land source.
+
+[Bot1 Deck]
+Sunken Citadel
+Mox Sapphire
+Otawara, Soaring City
+Island
+Island x3
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Sunken Citadel.Play
+Bot1.Colors(Blue)
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Blue)
+? Client.Bot1.Menu = {T}: Add {U}; {T}: Add {U}{U} (only for abilities of land sources)
+? Client.Bot1.Mana = 2 Blue (land abilities)
+Bot1.Battlefield.Island.Activate
+? Client.Bot1.Mana = 1 Blue; 2 Blue (land abilities)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Otawara, Soaring City.Activate(Bot2.Battlefield.Llanowar Elves; Spend: U LandAbilities, U LandAbilities, U, U)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Graveyard = Otawara, Soaring City
+Bot2.Battlefield = Forest

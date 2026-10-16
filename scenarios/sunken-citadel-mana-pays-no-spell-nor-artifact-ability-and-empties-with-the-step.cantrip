@@ -1,0 +1,65 @@
+# Sunken Citadel's two restricted mana, "Spend this mana only to activate abilities of land sources" (CR 106.6), and the
+# pool emptying at the end of each step and phase (CR 106.4).
+# Turn 3: with only the Citadel's {U}{U} in the pool (the Island tapped for Aether Spellbomb), Ponder can't be cast and
+# neither of the Spellbomb's abilities - an artifact's, not a land's - can be activated. The {U}{U} is lost when the
+# main phase ends. Turn 5: one restricted {U} pays Sunken Ruins' {U/B}, an ability of a land, for {U}{U} of its own;
+# that unrestricted mana casts Ponder and pays the Spellbomb's {U}. The other restricted {U} waits in the pool through
+# Ponder's resolution, the same step, and is gone in the next phase.
+
+[Bot1 Deck]
+Sunken Citadel
+Island
+Aether Spellbomb
+Ponder
+Sunken Ruins
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Sunken Citadel.Play
+Bot1.Colors(Blue)
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Blue)
+? Bot1.Mana = {U}{U} (LandAbilities)
+! Bot1.Hand.Ponder.Cast
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return)
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+[T3 Bot1.Main2]
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Hand.Sunken Ruins.Play
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Blue)
+Bot1.Battlefield.Sunken Ruins.Activate(Ability: {U/B}, {T})
+Bot1.Colors(Blue; Blue)
+? Bot1.Mana = {U}{U} {U} (LandAbilities)
+Bot1.Hand.Ponder.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U} {U} (LandAbilities)
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Return; Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U} (LandAbilities)
+[T5 Bot1.Main2]
+? Bot1.Mana =
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Aether Spellbomb; Ponder
+Bot2.Battlefield = Forest
+Bot2.Hand.Count = 8

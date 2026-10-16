@@ -1,0 +1,51 @@
+# A copy of Sunken Citadel that did not enter the battlefield as one has no chosen color: "as it enters, choose a color"
+# is a replacement effect on entering (CR 614.12a, 707.2), and the choice is not a copiable value (CR 707.2, 607.2d).
+# Shifting Woodland becomes a copy of the Citadel card in Bot1's graveyard (delirium from Wheel of Fortune's discards:
+# land, creature, instant, sorcery). Its "one mana of the chosen color" names no color and adds nothing (CR 106.5), and
+# no color, green included, is on offer.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Wheel of Fortune
+Sunken Citadel
+Llanowar Elves
+Lightning Bolt
+Shifting Woodland
+Black Lotus
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Shifting Woodland.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Shifting Woodland.Activate(Ability: becomes a copy; Bot1.Graveyard.Sunken Citadel)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sunken Citadel.Tapped = false
+! Bot1.Battlefield.Sunken Citadel.Activate(Ability: one mana; Color: Green)
+! Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Green)
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: one mana)
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Battlefield.Sunken Citadel.Tapped = true
+Bot1.Graveyard = Black Lotus; Wheel of Fortune; Lightning Bolt; Llanowar Elves; Sunken Citadel

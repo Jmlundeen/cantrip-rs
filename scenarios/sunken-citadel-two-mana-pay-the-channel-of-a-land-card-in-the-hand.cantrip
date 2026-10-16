@@ -1,0 +1,43 @@
+# Sunken Citadel: "{T}: Add two mana of the chosen color. Spend this mana only to activate abilities of land sources."
+# A land card in a hand is a land source (the ruling: abilities of a land card in your hand or graveyard), so both of the
+# restricted {U}{U} go to one ability: Otawara, Soaring City's channel, {3}{U} from the hand, the Island and the Mox
+# paying the rest (CR 106.6, 602.2b). Llanowar Elves goes back to Bot2's hand and nothing is left in the pool.
+
+[Bot1 Deck]
+Sunken Citadel
+Mox Sapphire
+Otawara, Soaring City
+Island
+Island x3
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Sunken Citadel.Play
+Bot1.Colors(Blue)
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sunken Citadel.Activate(Ability: two mana; Color: Blue)
+? Bot1.Mana = {U}{U} (LandAbilities)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U} {U}{U} (LandAbilities)
+Bot1.Hand.Otawara, Soaring City.Activate(Bot2.Battlefield.Llanowar Elves; Spend: U LandAbilities, U LandAbilities, U, U)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Bot1.Graveyard = Otawara, Soaring City
+Bot2.Battlefield = Forest
+Bot2.Hand.Count = 7
