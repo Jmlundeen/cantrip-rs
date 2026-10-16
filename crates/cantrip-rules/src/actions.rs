@@ -1035,9 +1035,10 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
         }
     }
     cost.phyrexian = [0; 5];
-    // A face cast from the hand (an Adventure, a half, a back face) is judged as that face (CR 715.4, 709.3, 712.8a).
+    // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
+    // 709.3, 712.8a).
     let whole = cx.card(cx.s().obj(card).card);
-    let faces = [whole.adventure, whole.back, whole.bestow, whole.split.map(|s| s.0), whole.split.map(|s| s.1)];
+    let faces = [whole.adventure, whole.omen, whole.back, whole.bestow, whole.split.map(|s| s.0), whole.split.map(|s| s.1)];
     let face = faces.into_iter().flatten().find(|&f| std::ptr::eq(f, def)).map(|f| cx.card_id(f));
     change_with(cx, &available.changers, player, Costed::Spell(card), cost, face)
 }
@@ -1541,15 +1542,16 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
         .min()
 }
 
-/// The faces a card may be cast as (CR 709.3, 715.3, 712.8a), as the face number a granted way names and the face: a split
-/// card's two halves (the card itself is never cast), otherwise the card and its Adventure and its back face, if it has them.
+/// The faces a card may be cast as (CR 709.3, 715.3, 720.3, 712.8a), as the face number a granted way names and the face: a
+/// split card's two halves (the card itself is never cast), otherwise the card and its Adventure or Omen and its back face,
+/// if it has them.
 fn faces_to_cast(def: &'static CardDef) -> Vec<(u8, &'static CardDef)> {
     if let Some((left, right)) = def.split {
         return vec![(GRANTED_FACE_LEFT, left), (GRANTED_FACE_RIGHT, right)];
     }
     let mut faces = vec![(GRANTED_FACE_WHOLE, def)];
-    if let Some(adventure) = def.adventure {
-        faces.push((GRANTED_FACE_ADVENTURE, adventure));
+    for (_, face, inset) in def.inset_faces() {
+        faces.push((face, inset));
     }
     if let Some(back) = def.back
         && back.has_cost
@@ -1846,19 +1848,32 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     options.push(option);
                 }
             }
-            // Its Adventure, from the hand, at the speed of the Adventure's own type (CR 715.3).
-            if zone.is(ZoneKind::Hand)
-                && let Some(adventure) = def.adventure
-                && (adventure.is(CardType::Instant) || adventure.keywords.has(Keyword::Flash) || adventure.types.0 & flash.0 != 0)
-                    == instants
-            {
-                let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_ADVENTURE);
-                if {
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_for(&least_cost(cx, a, player, id, adventure, adventure.cost), spell_kind(adventure))
-                } && offer_spell(cx, &asker, adventure, &mut option)
-                {
-                    options.push(option);
+            // Its Adventure or its Omen (CR 715.3, 720.3): wherever the card itself may be cast - from the hand, or from
+            // elsewhere by a permission or by the card's or an effect's say-so (CR 601.3), for what that permission says to
+            // pay - but not by the permission an Adventure gives a card it exiled (CR 715.3d). At the speed of that face's
+            // own type, and judged by that face alone (CR 715.3a, 720.3a).
+            let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
+            if zone.is(ZoneKind::Hand) || permitted || from_graveyard {
+                for (way, _, inset) in def.inset_faces() {
+                    let face_instant = (inset.is(CardType::Instant) || inset.keywords.has(Keyword::Flash) || inset.types.0 & flash.0 != 0)
+                        && !grant.is_some_and(|g| g.sorcery_speed);
+                    if face_instant != instants {
+                        continue;
+                    }
+                    let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
+                    if {
+                        let a = available.get_or_init(|| self::available(cx, player));
+                        let mut least = least_cost(cx, a, player, id, inset, instead.unwrap_or(inset.cost));
+                        least.generic = least.generic.saturating_add(more);
+                        if any_type {
+                            // Mana of any type pays every symbol of it (CR 609.4b).
+                            least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                        }
+                        a.covers_for(&least, spell_kind(inset))
+                    } && offer_spell(cx, &asker, inset, &mut option)
+                    {
+                        options.push(option);
+                    }
                 }
             }
         }
@@ -2053,7 +2068,7 @@ pub fn describe(cards: &CardTable, state: &GameState, option: &ActionOption) -> 
     {
         let def = cards.get(state.obj(source).card);
         if let Some((_, face_def)) = faces_to_cast(def).into_iter().find(|&(f, _)| f == face)
-            && (face != GRANTED_FACE_WHOLE || def.adventure.is_some() || def.back.is_some_and(|b| b.has_cost))
+            && (face != GRANTED_FACE_WHOLE || def.inset_faces().next().is_some() || def.back.is_some_and(|b| b.has_cost))
         {
             return format!("{}: {}", face_def.name, describe_way(cards, state, option, source)).into();
         }
@@ -2063,8 +2078,8 @@ pub fn describe(cards: &CardTable, state: &GameState, option: &ActionOption) -> 
 
 fn describe_way(cards: &CardTable, state: &GameState, option: &ActionOption, source: ObjectId) -> &'static str {
     match option.kind {
-        ActionKind::CastSpell if option.index == WAY_ADVENTURE => {
-            cards.get(state.obj(source).card).adventure.map_or("", |a| a.name)
+        ActionKind::CastSpell if matches!(option.index, WAY_ADVENTURE | WAY_OMEN) => {
+            cards.get(state.obj(source).card).inset_face(option.index).map_or("", |a| a.name)
         }
         _ if option.index == WAY_BACK_FACE => cards.get(state.obj(source).card).back.map_or("", |b| b.name),
         ActionKind::CastSpell if option.index == WAY_BESTOW => "Bestow",
@@ -2131,8 +2146,13 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             }
         }
         ActionKind::CastSpell => {
-            // Cast from where a permission allows (CR 601.3), for the cost it names instead of the mana cost.
-            let permitted = if action.index == 0 { permission_for(cx, source, player) } else { None };
+            // Cast from where a permission allows (CR 601.3), for the cost it names instead of the mana cost: the card, or its
+            // Adventure or Omen, which is casting the card too (CR 715.3, 720.3).
+            let permitted = match action.index {
+                0 => permission_for(cx, source, player),
+                WAY_ADVENTURE | WAY_OMEN if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player),
+                _ => None,
+            };
             let instead = permitted.and_then(|p| p.grant.instead);
             let any_type = permitted.is_some_and(|p| p.grant.any_type);
             let more = permitted.map_or(0, |p| p.grant.more);
@@ -2225,8 +2245,9 @@ fn cast(
     let way = granted.map_or(way, |(_, face)| granted_face_way(face));
     let printed = cx.s().obj(card).card;
     let whole = cx.card(printed);
-    // Cast as its Adventure (CR 715.3), it is that spell and nothing else on the stack (CR 715.3b).
-    let adventure = if way == WAY_ADVENTURE { whole.adventure } else { None };
+    // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell and nothing else on the stack (CR 715.3b,
+    // 720.3b).
+    let inset = whole.inset_face(way);
     // Retrace (CR 702.81a): cast from the graveyard for its ordinary cost by a card's say-so that is not its own, a land
     // card discarded in addition to paying its other costs.
     let retraced = way == 0
@@ -2245,7 +2266,7 @@ fn cast(
         (WAY_SPLIT_RIGHT, Some((_, right))) => Some(right),
         _ => None,
     };
-    let def = adventure.or(back).or(bestow).or(half).unwrap_or(whole);
+    let def = inset.or(back).or(bestow).or(half).unwrap_or(whole);
     let face = cx.card_id(def);
     // Aftermath (CR 702.127a): exiled instead of put anywhere else as it leaves the stack.
     let exile_after = exile_after || def.aftermath;
@@ -2261,7 +2282,7 @@ fn cast(
             (rule.cost)(q, &asker, card, player).unwrap_or(Cost::mana(def.cost))
         }
         (0, _) => Cost::mana(def.cost),
-        (WAY_ADVENTURE | WAY_BACK_FACE | WAY_BESTOW | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT, _) => Cost::mana(def.cost),
+        (WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_BESTOW | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT, _) => Cost::mana(def.cost),
         (WAY_OVERLOAD, _) => Cost::mana(whole.overload.unwrap_or(def.cost)),
         _ => whole.ways[way as usize - 1].cost,
     };
@@ -2298,7 +2319,7 @@ fn cast(
     if !cx.s().permissions.is_empty() {
         cx.st().permissions_retain(|p| p.card != card);
     }
-    if adventure.is_some() || back.is_some() || bestow.is_some() || half.is_some() {
+    if inset.is_some() || back.is_some() || bestow.is_some() || half.is_some() {
         cx.st().update_obj(spell, |o| {
             o.copy = Some(Copiable::of(face))
         });
@@ -2348,11 +2369,12 @@ fn cast(
 
     // CR 601.2b: X, and how many times it is kicked, are announced, and the total cost follows (CR 601.2f).
     // CR 107.3a, 601.2b: X is announced for a cost that includes it. A way that casts the face itself (an Adventure,
-    // CR 715.3b; a back face, CR 712.8a; one half of a split card, CR 709.3) pays that face's own mana cost, X included;
+    // CR 715.3b; an Omen, CR 720.3b; a back face, CR 712.8a; one half of a split card, CR 709.3) pays that face's own mana
+    // cost, X included;
     // an alternative cost is not that cost, so X is 0 (CR 107.3b).
     // A way a permanent grants (Lurrus, Underworld Breach's escape, mayhem) casts the face for its mana cost, or a cost that
     // includes it, so X is announced (CR 107.3a). Cast without paying its mana cost (`instead`, CR 118.9), X is 0 (CR 107.3b).
-    let x_symbols = if instead.is_none() && (way == 0 || matches!(way, WAY_ADVENTURE | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT)) { def.cost.x } else { 0 };
+    let x_symbols = if instead.is_none() && (way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT)) { def.cost.x } else { 0 };
     let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_)));
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
         let base = cost.mana;
@@ -2640,7 +2662,8 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 
 /// Each way the resolving effect's controller could cast `card` now (CR 608.2g), each face judged alone (CR 709.3a, 715.3a,
 /// 712.8a): the card itself unless it is a land or a split card (whose halves are what is cast, CR 709.3), a split card's two
-/// halves (an aftermath half only from a graveyard, CR 702.127a), an Adventurer's Adventure, and a modal double-faced card's
+/// halves (an aftermath half only from a graveyard, CR 702.127a), an Adventurer's Adventure, an omen card's Omen (CR 720.3a),
+/// and a modal double-faced card's
 /// back face. Fuse is not among them: it applies only in a hand (CR 702.102a).
 pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
@@ -2672,10 +2695,10 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     if !def.is(CardType::Land) && castable(def) {
         ways.push(CastWay { way: 0, face: obj.card, mana_value: cx.mana_value(card) });
     }
-    if let Some(adventure) = def.adventure
-        && castable(adventure)
-    {
-        ways.push(CastWay { way: WAY_ADVENTURE, face: cx.card_id(adventure), mana_value: adventure.cost.mana_value() });
+    for (way, _, inset) in def.inset_faces() {
+        if castable(inset) {
+            ways.push(CastWay { way, face: cx.card_id(inset), mana_value: inset.cost.mana_value() });
+        }
     }
     if let Some(back) = def.back
         && back.has_cost

@@ -5,7 +5,8 @@ use cantrip_api::*;
 use crate::layers::{self, live};
 use crate::{Cx, Flow, R, ops};
 
-/// The card whose characteristics a spell on the stack has: its Adventure's while it is cast as one (CR 715.3b).
+/// The card whose characteristics a spell on the stack has: its Adventure's or Omen's while it is cast as one (CR 715.3b,
+/// 720.3b).
 fn face(state: &GameState, spell: ObjectId) -> CardId {
     let obj = state.obj(spell);
     obj.copy.map_or(obj.card, |c| c.card)
@@ -246,12 +247,26 @@ impl Query for Reader<'_> {
 }
 
 /// Where a spell goes as it leaves the stack other than to the battlefield: its owner's graveyard, or exile when it
-/// was cast with flashback (CR 702.34a).
+/// was cast with flashback (CR 702.34a), or on an Adventure (CR 715.4), or its owner's library for an Omen (CR 720.3d).
 fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
     if item.kind != StackKind::Spell {
         return;
     }
     let obj = *cx.s().obj(item.object);
+    // An Omen spell that resolves is shuffled into its owner's library by its controller instead of going to the graveyard
+    // (CR 720.3d); countered, or its targets gone, it is put into the graveyard like any spell. A copy of one is an Omen too
+    // (CR 720.3c): its owner's library is still shuffled, and the copy, in no zone it can be in, ceases to exist (CR
+    // 707.10a, 704.5e).
+    if item.way == WAY_OMEN && reason == ZoneReason::Resolve {
+        if obj.card_copy {
+            cx.st().zone_remove(Zone::STACK, item.object);
+            cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
+        } else {
+            ops::move_to_for(cx, item.object, Zone::library(obj.owner), reason);
+        }
+        crate::turn::shuffle(cx.st(), Zone::library(obj.owner));
+        return;
+    }
     // A copy of a card leaves the stack for nowhere: it ceases to exist (CR 707.10a, 722.3c).
     if obj.card_copy {
         cx.st().zone_remove(Zone::STACK, item.object);

@@ -1,0 +1,66 @@
+# An adventurer card may be cast as its Adventure wherever the card may be cast (CR 715.3, 601.3). Bot1's Petty Theft is
+# countered on turn 3, so Brazen Borrower is in Bot1's graveyard. On turn 5, with mana open, nothing lets Bot1 cast it from
+# there; then Yawgmoth's Will does, and Bot1 casts Petty Theft from the graveyard at Bot2's Mox Sapphire. It resolves: the
+# Mox goes back to Bot2's hand and the Borrower is exiled on its adventure (CR 715.3d), from where Bot1 casts the creature
+# (Black Lotus for blue). Yawgmoth's Will and the sacrificed Lotus, bound for the graveyard, are exiled instead.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Sol Ring
+Brazen Borrower
+Yawgmoth's Will
+Black Lotus
+Island
+Island
+Island x8
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Brazen Borrower.Cast(Bot2.Battlefield.Mox Sapphire; Ability: Adventure)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Petty Theft)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Brazen Borrower
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Graveyard.Brazen Borrower.Cast
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Graveyard.Brazen Borrower.Cast(Bot2.Battlefield.Mox Sapphire; Ability: Adventure)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Black Lotus.Cast
+? Exile = Brazen Borrower; Yawgmoth's Will
+Bot1.Exile.Brazen Borrower.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Island; Mox Sapphire; Mox Jet; Sol Ring; Brazen Borrower
+Bot1.Graveyard.Count = 0
+Exile = Yawgmoth's Will; Black Lotus
+Bot2.Hand.Count = 7
+Bot2.Battlefield = Island
+Bot2.Graveyard = Counterspell

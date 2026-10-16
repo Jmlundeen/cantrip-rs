@@ -13,7 +13,7 @@ pub fn chars(cards: &CardTable, state: &GameState, id: ObjectId) -> Chars {
 }
 
 /// An object's characteristics as if it were the face `face` of its card (CR 715.4, 709.3, 712.8a): a card in hand
-/// judged as the Adventure, half or back face it would be cast as. The face's own printed values replace the card's.
+/// judged as the Adventure, Omen, half or back face it would be cast as. The face's own printed values replace the card's.
 pub fn chars_as_face(cards: &CardTable, state: &GameState, id: ObjectId, face: CardId) -> Chars {
     let mut chars = chars(cards, state, id);
     let printed = initial(cards, face, None);

@@ -30,6 +30,9 @@ pub struct CardId(pub u16);
 /// How a spell cast as its Adventure is cast (CR 715.3), as a way number: after every alternative cost.
 pub const WAY_ADVENTURE: u8 = 254;
 
+/// How a spell cast as its Omen is cast (CR 720.3), as a way number: beside the Adventure, after every alternative cost.
+pub const WAY_OMEN: u8 = 249;
+
 /// How a modal double-faced card is cast as its back face (CR 712.2, 712.8a), as a way number: beside the front face's
 /// casts, after every alternative cost.
 pub const WAY_BACK_FACE: u8 = 253;
@@ -42,17 +45,19 @@ pub const WAY_BESTOW: u8 = 251;
 /// `WAY_GRANTED + k * WAY_GRANTED_STRIDE + face` for the kth way the battlefield grants, in the order the permanents and
 /// their rules are listed, and the face of the card it is cast as (`GRANTED_FACE_*`): a way is judged on the face it
 /// casts, never on the card as a whole (CR 709.3, 715.3, 712.8a). The band lies below the special ways and above any a card
-/// prints; a cast decodes it and goes on as that face's way (0, a split half, the Adventure, the back face).
+/// prints; a cast decodes it and goes on as that face's way (0, a split half, the Adventure, the back face, the Omen).
 pub const WAY_GRANTED: u8 = 128;
 /// How many ways a battlefield may grant at once, and how many numbers each takes.
 pub const WAY_GRANTED_SLOTS: u8 = 8;
-pub const WAY_GRANTED_STRIDE: u8 = 5;
-/// The faces a granted cast names: the card itself, a split card's left half and right half, the Adventure, the back face.
+pub const WAY_GRANTED_STRIDE: u8 = 6;
+/// The faces a granted cast names: the card itself, a split card's left half and right half, the Adventure, the back face,
+/// the Omen.
 pub const GRANTED_FACE_WHOLE: u8 = 0;
 pub const GRANTED_FACE_LEFT: u8 = 1;
 pub const GRANTED_FACE_RIGHT: u8 = 2;
 pub const GRANTED_FACE_ADVENTURE: u8 = 3;
 pub const GRANTED_FACE_BACK: u8 = 4;
+pub const GRANTED_FACE_OMEN: u8 = 5;
 
 /// The way number of the kth granted way cast as `face`.
 pub fn granted_way(k: usize, face: u8) -> u8 {
@@ -72,6 +77,7 @@ pub fn granted_face_way(face: u8) -> u8 {
         GRANTED_FACE_RIGHT => WAY_SPLIT_RIGHT,
         GRANTED_FACE_ADVENTURE => WAY_ADVENTURE,
         GRANTED_FACE_BACK => WAY_BACK_FACE,
+        GRANTED_FACE_OMEN => WAY_OMEN,
         _ => 0,
     }
 }

@@ -1321,6 +1321,10 @@ pub struct CardDef {
     /// Its Adventure (CR 715): a second set of characteristics it can be cast with from hand. The definition must be
     /// in the card table (listed in the card's `EXTRA`).
     pub adventure: Option<&'static CardDef>,
+    /// Its Omen (CR 720): the alternative characteristics it may be cast with as an Omen instant or sorcery (CR 720.2,
+    /// 720.3), the only ones it has on the stack (CR 720.3b), and shuffled into its owner's library as it resolves (CR
+    /// 720.3d). The definition must be in the card table (listed in the card's `EXTRA`).
+    pub omen: Option<&'static CardDef>,
     /// Bestow (CR 702.103): the Aura it is while it is bestowed, an Aura enchantment with "enchant creature" and the bestow
     /// cost as its mana cost, which it is on the stack and on the battlefield until it ceases to be bestowed (CR 702.103e-f).
     /// The definition must be in the card table (listed in the card's `EXTRA`), and gives the Aura everything it has that the
@@ -1483,6 +1487,7 @@ impl CardDef {
         foretell: None,
         suspend: None,
         adventure: None,
+        omen: None,
         bestow: None,
         rebound: false,
         paradigm: None,
@@ -1529,6 +1534,22 @@ impl CardDef {
 
     pub fn colors(&self) -> ColorSet {
         self.colors.unwrap_or_else(|| self.cost.colors())
+    }
+
+    /// The spells printed in an inset frame that it may be cast as instead of itself (CR 715.2, 720.2): its Adventure, cast
+    /// with `WAY_ADVENTURE`, and its Omen, cast with `WAY_OMEN`, each with the face a granted way names it by.
+    pub fn inset_faces(&self) -> impl Iterator<Item = (u8, u8, &'static CardDef)> {
+        [
+            self.adventure.map(|a| (crate::WAY_ADVENTURE, crate::GRANTED_FACE_ADVENTURE, a)),
+            self.omen.map(|o| (crate::WAY_OMEN, crate::GRANTED_FACE_OMEN, o)),
+        ]
+        .into_iter()
+        .flatten()
+    }
+
+    /// The face it is cast as by an inset way (`WAY_ADVENTURE` or `WAY_OMEN`), if it has one.
+    pub fn inset_face(&self, way: u8) -> Option<&'static CardDef> {
+        self.inset_faces().find(|&(w, _, _)| w == way).map(|(_, _, f)| f)
     }
 
     /// A Room (CR 709.5): a split card whose halves share a type line, each half a door.

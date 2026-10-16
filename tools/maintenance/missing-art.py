@@ -98,7 +98,7 @@ def faces(card):
     # A split card is drawn as its halves, each with its own art (CardFace.ArtNames).
     halves = card.get("halves") or []
     names = [half["name"] for half in halves] if halves else [card["name"]]
-    for key in ("backFace", "adventure", "prepare"):
+    for key in ("backFace", "adventure", "omen", "prepare"):
         if isinstance(card.get(key), dict) and card[key].get("name"):
             names.append(card[key]["name"])
     return names

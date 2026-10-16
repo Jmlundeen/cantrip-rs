@@ -99,16 +99,20 @@ fn main() {
                 combined.insert("split".into(), Value::Bool(true));
                 card = combined;
             }
-            // An Adventure (CR 715) is a second set of characteristics: its own constant, which the card's file points
-            // `adventure:` at.
-            let adventure = card.get("adventure").and_then(Value::as_object).map(|a| {
-                let mut part = pick(a, &["name", "manaCost", "type", "oracleText"]);
-                part.insert("part".into(), Value::Bool(true));
-                part
-            });
+            // An Adventure (CR 715) or an Omen (CR 720) is a second set of characteristics: its own constant, which the
+            // card's file points `adventure:` or `omen:` at.
+            let insets: Vec<Card> = ["adventure", "omen"]
+                .iter()
+                .filter_map(|key| card.get(*key).and_then(Value::as_object))
+                .map(|a| {
+                    let mut part = pick(a, &["name", "manaCost", "type", "oracleText"]);
+                    part.insert("part".into(), Value::Bool(true));
+                    part
+                })
+                .collect();
             cards.push((card, source.clone()));
-            if let Some(part) = adventure {
-                cards.push((part, source));
+            for part in insets {
+                cards.push((part, source.clone()));
             }
         }
     }
@@ -297,7 +301,7 @@ fn is_plain(card: &Card) -> bool {
     if card.get("part") == Some(&Value::Bool(true)) {
         return true;
     }
-    if ["backFace", "adventure", "prepare", "halves", "split"].iter().any(|k| card.contains_key(*k)) {
+    if ["backFace", "adventure", "omen", "prepare", "halves", "split"].iter().any(|k| card.contains_key(*k)) {
         return false;
     }
     let mut text = String::new();

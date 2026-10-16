@@ -326,6 +326,21 @@ nothing of this cost is still offered (CR 601.2g) and is marked `pays_nothing`, 
 mana goes where the player sends it: two mana of one restriction may pay one ability or two. The pool empties at the end
 of each step and phase as any mana does (CR 106.4).
 
+### Spells in an inset frame: Adventures and Omens
+
+An adventurer card (CR 715) and an omen card (CR 720) print a second set of characteristics in an inset frame:
+`CardDef::adventure` and `CardDef::omen`, from the content keys `adventure` and `omen`, and `CardDef::inset_faces` names
+either with the way it is cast by (`WAY_ADVENTURE`, `WAY_OMEN`) and the face a granted way names it by. The card is cast as
+that face wherever the card itself may be cast - from the hand, or from elsewhere by a permission, by its own say-so or by an
+effect's (Yawgmoth's Will), for what the permission says to pay (CR 601.3, 715.3, 720.3) - but not as an Adventure by the
+permission an Adventure gives the card it exiled (CR 715.3d). Only the face is judged to see whether it can be cast, at its own
+speed (CR 715.3a, 720.3a), and on the stack it is that face alone (`Obj::copy`, CR 715.3b, 720.3b), which a copy of it and a
+choice of new targets for it read too (CR 715.3c, 720.3c). As it resolves, an Adventure is exiled on its adventure (CR 715.3d)
+and an Omen is shuffled into its owner's library by its controller (CR 720.3d); a copy of an Omen still shuffles its owner's
+library and ceases to exist. Countered, or with every target gone, either goes to the graveyard. The host sends the face as
+`ObjectView::inset_spell`, printed beside the card. Not built: casting the face from the top of a library
+(`PlayRule::LibraryTopSpells`, which offers only the card itself).
+
 ### Legal moves as a first-class output
 
 Every pending request comes with its legal answers enumerated, cheaply and in a stable order. The client's prompt

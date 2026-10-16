@@ -57,13 +57,13 @@ pub struct CastTerms {
     /// ceases to exist when it leaves the stack or the cast is given up.
     pub copy: bool,
     /// The way it is cast (CR 709.3, 715.3, 712.8a): one of `CastWay::way` from `cast_ways_during_resolution`, for a card that
-    /// can be cast as a half, its Adventure or its back face. Left out, a card with one way is cast that way and one with
+    /// can be cast as a half, its Adventure or Omen, or its back face. Left out, a card with one way is cast that way and one with
     /// several asks its caster which, as they choose it as they cast it.
     pub way: Option<u8>,
 }
 
 /// One way a card could be cast as an effect resolves (CR 608.2g): the card as itself, one half of a split card (CR 709.3),
-/// its Adventure (CR 715.3) or the back face of a modal double-faced card (CR 712.8a). Only that face is evaluated to see if
+/// its Adventure (CR 715.3) or Omen (CR 720.3), or the back face of a modal double-faced card (CR 712.8a). Only that face is evaluated to see if
 /// it can be cast (CR 709.3a, 715.3a, 712.8a) and only it is on the stack (CR 709.3b), so its mana value is the spell's.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CastWay {
@@ -639,8 +639,8 @@ pub trait Game: Query {
     /// is cast (CR 707.10a, 704.5e).
     fn create_copy_in_exile(&mut self, of: ObjectId, player: PlayerId) -> ObjectId;
     /// Each way the resolving effect's controller could cast `card` now (CR 608.2g), the faces it offers judged one at a time
-    /// (CR 709.3a, 715.3a): a split card's halves, an aftermath half only from a graveyard (CR 702.127a); an Adventurer as itself
-    /// and as its Adventure; a modal double-faced card's two faces. Fuse is no way here: it applies in a hand only
+    /// (CR 709.3a, 715.3a): a split card's halves, an aftermath half only from a graveyard (CR 702.127a); an Adventurer or omen card as itself
+    /// and as its Adventure or Omen; a modal double-faced card's two faces. Fuse is no way here: it applies in a hand only
     /// (CR 702.102a). Empty when `could_cast_during_resolution` is false.
     fn cast_ways_during_resolution(&self, card: ObjectId) -> Vec<CastWay>;
     /// `player` may play or cast `card` from where it is (CR 601.3, 305.1) under `grant`: a card in exile or a

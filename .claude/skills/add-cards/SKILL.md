@@ -111,7 +111,7 @@ calling, means it was not the same thing. Leave that in its own card.
    characteristics only: `name`, `manaCost`, `type`, `power`/`toughness`, `loyalty` or `defense`, `oracleText` exactly
    as current Oracle text, core `keywords` (`Flying`, `FirstStrike`, ... - the list is in
    `crates/cantrip-oracle/build.rs`), `colorIndicator`, `convoke`/`delve`/`improvise`, and faces (`backFace`,
-   `adventure`, `halves`, `aftermath`). Nothing else: what a card does is Rust. The build generates its constant;
+   `adventure`, `omen`, `halves`, `aftermath`). Nothing else: what a card does is Rust. The build generates its constant;
    there is no generator to run and no shared file to edit. A card whose Oracle text is only core keywords needs no
    Rust file.
 3. **Start the file.** `python tools\maintenance\new-card.py "Card Name"` prints the JSON and every scenario that holds

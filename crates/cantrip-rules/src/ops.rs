@@ -1098,8 +1098,9 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
 fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, chooser: PlayerId) -> R<StackItem> {
     let mut item = cx.s().stack[top];
     let obj = *cx.s().obj(object);
-    // An instant's or sorcery's targets, or a permanent spell's: an Aura's is its enchant ability (CR 303.4a, 707.10c).
-    let specs = cx.card(obj.card).spell_targets();
+    // An instant's or sorcery's targets, or a permanent spell's: an Aura's is its enchant ability (CR 303.4a, 707.10c). Those
+    // of the face it is on the stack as - an Adventure, an Omen, a half (CR 715.3b, 720.3b, 709.3b) - not of its card.
+    let specs = cx.card(obj.copy.map_or(obj.card, |c| c.card)).spell_targets();
     let asker = Asker { source: object, controller: chooser };
     let count = item.target_count as usize;
     let mut slot_start = 0;

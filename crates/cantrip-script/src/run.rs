@@ -1761,10 +1761,11 @@ impl<'s> Run<'s> {
                 offered.retain(|o| o.index as usize == n - 1);
             } else {
                 offered.retain(|o| {
-                    // An Adventure says which half of the card is cast, as the C# engine's description does.
+                    // An Adventure or an Omen says which face of the card is cast, as the C# engine's description does.
                     let text = describe(g.cards, &g.state, o);
                     let text = match o.index {
                         WAY_ADVENTURE => format!("as its Adventure, {text}"),
+                        WAY_OMEN => format!("as its Omen, {text}"),
                         WAY_BACK_FACE => format!("as its back face, {text}"),
                         _ => text.to_string(),
                     };
