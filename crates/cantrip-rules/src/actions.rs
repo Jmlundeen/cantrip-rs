@@ -894,7 +894,12 @@ fn change_with(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, 
 /// (CR 601.2f). The reduced symbols are the cost's plain ones of that type: no cost a colored reduction meets has a
 /// hybrid or Phyrexian symbol of its color yet.
 fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
-    debug_assert!(by.hybrid.iter().all(Option::is_none), "a reduction by hybrid mana is chosen as it is applied (CR 118.7e): not built");
+    // A hybrid symbol in a reduction is split by the payer as the reduction is applied (CR 118.7e), a choice not built:
+    // refused in every build rather than reduced some other way.
+    assert!(
+        by.hybrid.iter().all(Option::is_none),
+        "a cost reduction by hybrid mana needs the payer's choice of half (CR 118.7e), which is not built"
+    );
     let mut excess = by.generic as u32;
     for i in 0..6 {
         let mut n = by.symbols[i] as u32;
@@ -3933,6 +3938,13 @@ mod tests {
         assert_eq!(reduce(mana("{2}{C}"), &mana("{C}{C}")), mana("{1}"));
         // CR 118.7f: a Phyrexian symbol takes off mana of its color.
         assert_eq!(reduce(mana("{1}{G}"), &mana("{G/P}")), mana("{1}"));
+    }
+
+    #[test]
+    #[should_panic(expected = "CR 118.7e")]
+    fn a_reduction_by_hybrid_mana_is_refused() {
+        // CR 118.7e: the payer would choose a half as the reduction is applied; that choice is not built.
+        reduce(mana("{3}{G}{W}"), &mana("{2}{G/W}"));
     }
 
     #[test]
