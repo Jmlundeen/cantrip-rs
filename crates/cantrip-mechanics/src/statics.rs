@@ -28,6 +28,45 @@ pub fn entering(event: &Event) -> Option<ObjectId> {
     }
 }
 
+/// Whether an event is a creature dying that causes this ability to trigger (CR 700.4, 603.10a): a creature put into a
+/// graveyard from the battlefield, judged as it last existed there (a land that had become a creature dies as a creature).
+/// Two abilities the event matches are not caused by the dying (the rulings of Hushbringer, Teysa Karlov and Drivnod): one
+/// whose trigger event is the sacrifice that caused it (CR 701.21a, "whenever you sacrifice a creature"), and the dying card's
+/// own ability that triggers when it is put into a graveyard from anywhere, which functions from the graveyard it reached.
+/// Hushbringer ("creatures ... dying don't cause abilities to trigger"), Teysa Karlov and Drivnod, Carnage Dominus ("if a
+/// creature dying causes a triggered ability ... to trigger") ask it.
+pub fn creature_dying(q: &dyn Query, event: &Event, triggering: &Triggering) -> bool {
+    match *event {
+        Event::ZoneChange { old, new, from, to, .. } if from.is(ZoneKind::Battlefield) && to.is(ZoneKind::Graveyard) => {
+            q.chars(old).is(CardType::Creature) && !triggering.def.on_sacrifice && triggering.source != new
+        }
+        _ => false,
+    }
+}
+
+/// "If a permanent entering causes a triggered ability of a permanent you control to trigger, that ability triggers an
+/// additional time" (CR 603.2d, 603.6a) as a `CardDef::additional_triggers` entry: the permanent's own enters abilities and
+/// every other ability its entering triggers, whoever controls the permanent (the rulings). Elesh Norn, Mother of Machines,
+/// Yarok, the Desecrated, Starfield Vocalist and Virtue of Knowledge print it.
+pub fn permanent_entering_triggers_again(_: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool {
+    entering(event).is_some() && triggering.of_a_permanent_controlled_by(asker.controller)
+}
+
+/// "If a creature dying causes a triggered ability of a permanent you control to trigger, that ability triggers an additional
+/// time" (CR 603.2d) as a `CardDef::additional_triggers` entry; what counts as the dying is [`creature_dying`]. Teysa Karlov
+/// and Drivnod, Carnage Dominus print it.
+pub fn creature_dying_triggers_again(q: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool {
+    triggering.of_a_permanent_controlled_by(asker.controller) && creature_dying(q, event, triggering)
+}
+
+/// "If a creature attacking causes a triggered ability of a permanent you control to trigger, that ability triggers an
+/// additional time" (CR 603.2d, 508.2a) as a `CardDef::additional_triggers` entry: abilities whose trigger is a creature being
+/// declared as an attacker, "whenever [this] attacks" and "whenever you attack" alike, not one that triggers on something else
+/// attacking does, such as becoming tapped (the rulings). Isshin, Two Heavens as One and Windcrag Siege (Mardu) print it.
+pub fn creature_attacking_triggers_again(_: &dyn Query, asker: &Asker, event: &Event, triggering: &Triggering) -> bool {
+    matches!(event, Event::Attacks { .. } | Event::AttackersDeclared { .. }) && triggering.of_a_permanent_controlled_by(asker.controller)
+}
+
 /// "Creatures entering don't cause abilities to trigger" (CR 603.2, 603.6a) as a `CardDef::trigger_rules` entry: an
 /// event that puts a creature onto the battlefield triggers no ability, the creature's own enters abilities included and
 /// whoever controls them. Replacement effects and "as [this] enters" are not triggered abilities (CR 614.1c) and still

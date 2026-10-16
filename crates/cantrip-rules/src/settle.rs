@@ -590,9 +590,13 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
     Ok(())
 }
 
-type Found = Vec<(PendingTrigger, &'static TriggeredDef)>;
+/// The static abilities that made one triggering trigger additional times (CR 603.2d): each the permanent and the index of its
+/// `CardDef::additional_triggers` entry, so the same one met again among a batch's events adds nothing more.
+pub(crate) type Again = Vec<(ObjectId, u8)>;
 
-fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: EventMask, stoppers: &mut Stoppers, found: &mut Found) {
+type Found = Vec<(PendingTrigger, &'static TriggeredDef, Again)>;
+
+fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: EventMask, statics: &mut TriggerStatics, found: &mut Found) {
     let chars = layers::chars(cx.cards(), cx.s(), source);
     let controller = cx.s().obj(source).controller;
     for ability in chars.abilities() {
@@ -609,12 +613,16 @@ fn consider(cx: &Cx, source: ObjectId, look_back: bool, event: &Event, mask: Eve
             if t.ward && layers::targeting_rule(cx.cards(), cx.s(), TargetingRuleKind::SuppressWard, source) {
                 continue;
             }
-            if stoppers.stop(cx, event, &Triggering { source, controller, def: t }) {
+            let triggering = Triggering { source, controller, def: t, permanent: true };
+            if statics.stop(cx, event, &triggering) {
                 continue;
             }
+            let mut again = Again::new();
+            statics.additional(cx, event, &triggering, &mut again);
             found.push((
                 PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default() },
                 t,
+                again,
             ));
         }
     }
@@ -632,38 +640,58 @@ fn chapter_reached(cx: &Cx, source: ObjectId, chapter: u8, event: &Event) -> Opt
     }
 }
 
-/// The permanents with static abilities that stop abilities from triggering (CR 603.2, `CardDef::trigger_rules`): found from
-/// the board, once per batch and only when an ability has matched, so a batch that triggers nothing pays nothing. An
-/// ability that triggers on the board as it is after the events asks those on the battlefield now; a leaves-the-battlefield
-/// ability, which looks back (CR 603.10a), asks those that were there before, the ones leaving with the event included.
-struct Stoppers<'a> {
+/// The permanents with static abilities that stop abilities from triggering (CR 603.2, `CardDef::trigger_rules`) or make them
+/// trigger additional times (CR 603.2d, `CardDef::additional_triggers`): found from the board, once per batch and only when an
+/// ability has matched, so a batch that triggers nothing pays nothing. An ability that triggers on the board as it is after the
+/// events asks those on the battlefield now; a leaves-the-battlefield ability, which looks back (CR 603.10a), asks those that
+/// were there before, the ones leaving with the event included.
+pub(crate) struct TriggerStatics<'a> {
     before: Option<&'a [ObjectId]>,
     now: Option<Vec<ObjectId>>,
     then: Option<Vec<ObjectId>>,
 }
 
-impl<'a> Stoppers<'a> {
-    fn new(before: Option<&'a [ObjectId]>) -> Self {
-        Stoppers { before, now: None, then: None }
+impl<'a> TriggerStatics<'a> {
+    pub(crate) fn new(before: Option<&'a [ObjectId]>) -> Self {
+        TriggerStatics { before, now: None, then: None }
     }
 
-    /// Whether a static ability stops this ability triggering on this event.
-    fn stop(&mut self, cx: &Cx, event: &Event, triggering: &Triggering) -> bool {
-        let sources = if triggering.def.look_back && self.before.is_some() {
+    /// The permanents whose rules apply to this triggering (CR 603.10).
+    fn sources(&mut self, cx: &Cx, triggering: &Triggering) -> &[ObjectId] {
+        if triggering.def.look_back && self.before.is_some() {
             let before = self.before.unwrap_or_default();
             self.then.get_or_insert_with(|| trigger_rule_sources(cx, before))
         } else {
             self.now.get_or_insert_with(|| trigger_rule_sources(cx, cx.s().battlefield()))
-        };
-        sources.iter().any(|&id| {
+        }
+    }
+
+    /// Whether a static ability stops this ability triggering on this event.
+    pub(crate) fn stop(&mut self, cx: &Cx, event: &Event, triggering: &Triggering) -> bool {
+        self.sources(cx, triggering).iter().any(|&id| {
             let obj = cx.s().obj(id);
             let asker = Asker { source: id, controller: obj.controller };
             cx.card(cx.cards().current(obj)).trigger_rules.iter().any(|rule| rule(cx, &asker, event, triggering))
         })
     }
+
+    /// The static abilities that make this ability, which this event triggered, trigger an additional time (CR 603.2d): one
+    /// more for each, added to `again` unless already there.
+    pub(crate) fn additional(&mut self, cx: &Cx, event: &Event, triggering: &Triggering, again: &mut Again) {
+        for &id in self.sources(cx, triggering) {
+            let obj = cx.s().obj(id);
+            let asker = Asker { source: id, controller: obj.controller };
+            for (n, rule) in cx.card(cx.cards().current(obj)).additional_triggers.iter().enumerate() {
+                if rule(cx, &asker, event, triggering) && !again.contains(&(id, n as u8)) {
+                    again.push((id, n as u8));
+                }
+            }
+        }
+    }
 }
 
-/// Those of `ids` whose card has a rule that stops abilities from triggering, and has not lost its abilities (CR 613.1f).
+/// Those of `ids` whose card has a rule that stops abilities from triggering or makes them trigger again, and has not lost
+/// its abilities (CR 613.1f).
 fn trigger_rule_sources(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     ids.iter()
         .copied()
@@ -683,7 +711,7 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<&[ObjectId]>)
 /// turn, a triggering that happens being noted in the history.
 pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>) {
     let mut found: Found = Vec::new();
-    let mut stoppers = Stoppers::new(before);
+    let mut statics = TriggerStatics::new(before);
     for event in events {
         let mask = EventMask::of(event);
         if mask.0 == 0 {
@@ -691,15 +719,15 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
         }
         let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
         for &id in before.unwrap_or(&now) {
-            consider(cx, id, true, event, mask, &mut stoppers, &mut found);
+            consider(cx, id, true, event, mask, &mut statics, &mut found);
         }
         for &id in &now {
-            consider(cx, id, false, event, mask, &mut stoppers, &mut found);
+            consider(cx, id, false, event, mask, &mut statics, &mut found);
         }
         // An emblem's triggered abilities function in the command zone (CR 114.4).
         if !cx.s().zone(Zone::COMMAND).is_empty() {
             for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                consider(cx, id, false, event, mask, &mut stoppers, &mut found);
+                consider(cx, id, false, event, mask, &mut statics, &mut found);
             }
         }
         // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
@@ -712,9 +740,10 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                     // The end of an "until" exile is no triggered ability but the second one-shot effect the rules create
                     // immediately after the event (CR 610.3), so nothing that stops abilities triggering stops it, and the
                     // event that ends the wait always uses it up below. A "this turn" delayed ability is a triggered ability
-                    // (CR 603.7b) and is stopped like any other.
+                    // (CR 603.7b) and is stopped like any other. It is no ability of a permanent, and nothing makes it trigger an
+                    // additional time (CR 603.2d).
                     && (d.when == DelayedWhen::UntilEvent
-                        || !stoppers.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t }))
+                        || !statics.stop(cx, event, &Triggering { source: d.source, controller: d.controller, def: t, permanent: false }))
                 {
                     found.push((
                         PendingTrigger {
@@ -726,6 +755,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                             members: Span::default(),
                         },
                         t,
+                        Again::new(),
                     ));
                     // "Until" is used up by the event that ends the wait (CR 603.7b).
                     if d.when == DelayedWhen::UntilEvent
@@ -770,12 +800,16 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                     {
                         continue;
                     }
-                    if stoppers.stop(cx, event, &Triggering { source: id, controller, def: t }) {
+                    let triggering = Triggering { source: id, controller, def: t, permanent: false };
+                    if statics.stop(cx, event, &triggering) {
                         continue;
                     }
+                    let mut again = Again::new();
+                    statics.additional(cx, event, &triggering, &mut again);
                     found.push((
                         PendingTrigger { source: id, ability, controller, subject: fired.subject, data: fired.data, members: Span::default() },
                         t,
+                        again,
                     ));
                 }
             }
@@ -785,12 +819,13 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
         return;
     }
 
-    // One trigger per "one or more" ability and source for the batch, keeping the first; the rest add their subjects.
-    let mut kept: Vec<(PendingTrigger, &'static TriggeredDef, Vec<ObjectId>)> = Vec::with_capacity(found.len());
-    for (trigger, def) in found {
+    // One trigger per "one or more" ability and source for the batch, keeping the first; the rest add their subjects, and the
+    // static abilities that make it trigger again for their events (CR 603.2d).
+    let mut kept: Vec<(PendingTrigger, &'static TriggeredDef, Vec<ObjectId>, Again)> = Vec::with_capacity(found.len());
+    for (trigger, def, again) in found {
         if def.once_per_batch
             && let Some(existing) =
-                kept.iter_mut().find(|(k, d, _)| {
+                kept.iter_mut().find(|(k, d, _, _)| {
                     d.once_per_batch
                         && k.source == trigger.source
                         && k.ability == trigger.ability
@@ -802,14 +837,16 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
             {
                 existing.2.push(member);
             }
+            add_again(&mut existing.3, again);
             continue;
         }
         if def.sums_per_subject
-            && let Some(existing) = kept.iter_mut().find(|(k, d, _)| {
+            && let Some(existing) = kept.iter_mut().find(|(k, d, _, _)| {
                 d.sums_per_subject && k.source == trigger.source && k.ability == trigger.ability && k.subject == trigger.subject
             })
         {
             existing.0.data[0] += trigger.data[0];
+            add_again(&mut existing.3, again);
             continue;
         }
         let mut members = Vec::new();
@@ -818,20 +855,34 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
         {
             members.push(member);
         }
-        kept.push((trigger, def, members));
+        kept.push((trigger, def, members, again));
     }
 
-    for (mut trigger, def, members) in kept {
-        if def.triggers_each_turn > 0 {
-            if cx.history().triggerings(trigger.source, trigger.ability) >= def.triggers_each_turn as usize {
-                continue;
+    for (mut trigger, def, members, again) in kept {
+        // It triggers once, and once more for each static ability that says so (CR 603.2d): each a triggering of its own,
+        // counted against a limit on how often it triggers each turn (CR 603.2h).
+        for n in 0..=again.len() {
+            if def.triggers_each_turn > 0 {
+                if cx.history().triggerings(trigger.source, trigger.ability) >= def.triggers_each_turn as usize {
+                    break;
+                }
+                cx.record(Event::Triggered { source: trigger.source, ability: trigger.ability });
             }
-            cx.record(Event::Triggered { source: trigger.source, ability: trigger.ability });
+            if n == 0 && !members.is_empty() {
+                trigger.members = cx.st().members_push(&members);
+            }
+            cx.st().trigger_push(trigger);
         }
-        if !members.is_empty() {
-            trigger.members = cx.st().members_push(&members);
+    }
+}
+
+/// The static abilities that make a "one or more" or summed ability trigger again for one more of its batch's events, added
+/// to those already found for it: each counts once for the batch (CR 603.2c, 603.2d).
+fn add_again(into: &mut Again, again: Again) {
+    for a in again {
+        if !into.contains(&a) {
+            into.push(a);
         }
-        cx.st().trigger_push(trigger);
     }
 }
 

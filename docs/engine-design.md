@@ -230,6 +230,18 @@ are never asked about, and neither is the end of an "until" exile (CR 610.3, a o
 `TriggeredDef::on_sacrifice` (Hushbringer's ruling). The sources are found from the board, once per batch and only once
 something has matched.
 
+A static ability that makes triggered abilities trigger an additional time (CR 603.2d: Elesh Norn, Mother of Machines,
+Panharmonicon, Teysa Karlov, Harmonic Prodigy) is a `CardDef::additional_triggers` entry, the same shape asked of the same
+permanents (CR 603.10) after the suppressing rules: a triggering they stop is never doubled. Each entry that says yes adds
+one triggering (two Elesh Norns make three), so a "one or more" ability triggered once for a batch triggers once more for
+each such ability that applies to any of the batch's events. The triggerings are separate (`collect_batch` pushes the
+pending trigger that many times): each is ordered, gets its modes and targets as it goes on the stack, checks its
+intervening "if" again as it resolves (CR 603.4), and counts against "triggers only N times each turn" (CR 603.2h), so a
+once-each-turn ability under a doubler still triggers once. `Triggering::permanent` says the ability is a permanent's: a
+delayed triggered ability is no ability of the object (CR 603.2d, 603.7) and is never asked about, and an ability of a
+card in another zone or of an emblem is not "of a permanent". Triggered mana abilities (CR 605.1b) are asked too, each
+triggering resolving at once.
+
 ### Ending the turn and the cleanup step
 
 "End the turn" (CR 724.1) is `Game::end_the_turn`, called by a resolving spell or ability (`turn::end_the_turn`): the

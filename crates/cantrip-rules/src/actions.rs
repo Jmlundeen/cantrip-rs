@@ -3409,6 +3409,7 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId) {
             cx.cards().mana_triggers[obj.copy.map_or(obj.card, |c| c.card).0 as usize]
         })
         .collect();
+    let mut statics = crate::settle::TriggerStatics::new(None);
     for id in holders {
         let controller = cx.s().obj(id).controller;
         for ability in cx.chars(id).abilities().collect::<Vec<_>>() {
@@ -3417,11 +3418,21 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId) {
                 continue;
             }
             if let Some(fired) = (t.matches)(&*cx, id, &event) {
+                // Static abilities that stop it triggering or make it trigger again apply to it as to any triggered ability
+                // (CR 603.2, 603.2d): each triggering resolves at once.
+                let triggering = Triggering { source: id, controller, def: t, permanent: true };
+                if statics.stop(cx, &event, &triggering) {
+                    continue;
+                }
+                let mut again = crate::settle::Again::new();
+                statics.additional(cx, &event, &triggering, &mut again);
                 let mut item = stack_item(StackKind::Triggered, id, ability, controller, &[]);
                 item.subject = fired.subject;
                 item.data = fired.data;
-                // A mana ability asks nothing (CR 605.1b): there is no one to answer.
-                let _ = (t.effect)(cx, &item);
+                for _ in 0..=again.len() {
+                    // A mana ability asks nothing (CR 605.1b): there is no one to answer.
+                    let _ = (t.effect)(cx, &item);
+                }
             }
         }
     }

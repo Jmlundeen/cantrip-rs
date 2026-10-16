@@ -1010,13 +1010,27 @@ pub struct TargetingRule {
     pub applies: fn(&dyn LayerQuery, ObjectId, ObjectId) -> bool,
 }
 
-/// A triggered ability that an event would trigger, as a [`TriggerRule`] is asked about it: its source (a permanent, or a
-/// card in another zone whose ability functions there), the player who would control it, and its definition.
+/// A triggered ability that an event would trigger, as a [`TriggerRule`] or an [`AdditionalTrigger`] is asked about it: its
+/// source (a permanent, or a card in another zone whose ability functions there), the player who would control it, and its
+/// definition.
 #[derive(Clone, Copy)]
 pub struct Triggering<'a> {
     pub source: ObjectId,
     pub controller: PlayerId,
     pub def: &'a TriggeredDef,
+    /// It is an ability of a permanent: its source is on the battlefield, or was there as it last existed for an ability
+    /// that looks back (CR 603.10a). What "a triggered ability of a permanent you control" and "abilities of permanents your
+    /// opponents control" ask. False for a card in another zone, an emblem (CR 114.4), and a delayed triggered ability,
+    /// which is no ability the object has (CR 603.2d, 603.7).
+    pub permanent: bool,
+}
+
+impl Triggering<'_> {
+    /// Whether it is "a triggered ability of a permanent [`player`] controls" (CR 603.2d): the permanent as it is now, or as it
+    /// last existed for an ability that looks back.
+    pub fn of_a_permanent_controlled_by(&self, player: PlayerId) -> bool {
+        self.permanent && self.controller == player
+    }
 }
 
 /// A static ability that stops abilities from triggering (CR 603.2, 603.2g, 604.1): "Creatures entering don't cause abilities
@@ -1035,6 +1049,18 @@ pub struct Triggering<'a> {
 /// (`Query::chars` of the old object). Replacement effects and "as [this] enters" (CR 614.1c, 614.12) are not triggered
 /// abilities and are never asked about.
 pub type TriggerRule = fn(&dyn Query, &Asker, &Event, &Triggering) -> bool;
+
+/// A static ability that makes triggered abilities trigger an additional time (CR 603.2d): "If a permanent entering causes a
+/// triggered ability of a permanent you control to trigger, that ability triggers an additional time" (Elesh Norn, Mother of
+/// Machines, Yarok, Panharmonicon), "If a creature dying causes ..." (Teysa Karlov), "If a triggered ability of a Shaman or
+/// another Wizard you control triggers ..." (Harmonic Prodigy). Asked as a [`TriggerRule`] is, of one event and one triggered
+/// ability that event triggered and nothing stopped; true makes that ability trigger once more on that event. Each such
+/// static ability adds one: two Elesh Norns make three (the rulings), and a "one or more" ability that triggers once for a
+/// batch (CR 603.2c) triggers once more for each ability that applies to any of the batch's events. "That many times" is
+/// each a separate triggering (CR 603.2d): each is put on the stack with its own modes and targets, and each is counted
+/// against "triggers only N times each turn" (CR 603.2h). Which static abilities are asked follows CR 603.10 as for
+/// `TriggerRule` (one entering or dying with the event applies), and a delayed triggered ability is never asked about.
+pub type AdditionalTrigger = fn(&dyn Query, &Asker, &Event, &Triggering) -> bool;
 
 /// A replacement of a turn beginning (CR 614.10, 500.11): "if you would begin your turn while [condition], you may skip
 /// that turn instead. If you do, [on_skip]". Time Vault. A skipped turn is not taken: its steps, its untap and its
@@ -1311,6 +1337,9 @@ pub struct CardDef {
     pub activation_rules: &'static [ActivationRule],
     /// Its static abilities that stop abilities from triggering (CR 603.2), while it is on the battlefield: Torpor Orb.
     pub trigger_rules: &'static [TriggerRule],
+    /// Its static abilities that make triggered abilities trigger an additional time (CR 603.2d), while it is on the
+    /// battlefield: Elesh Norn, Mother of Machines, Panharmonicon, Teysa Karlov.
+    pub additional_triggers: &'static [AdditionalTrigger],
     /// Gift (CR 702.174): an optional additional cost of promising an opponent a gift, given as it resolves, before its
     /// other effects (an instant or sorcery), or when it enters (a permanent).
     pub gift: Option<GiftDef>,
@@ -1405,6 +1434,7 @@ impl CardDef {
         flash_rules: &[],
         activation_rules: &[],
         trigger_rules: &[],
+        additional_triggers: &[],
         gift: None,
     };
 
@@ -1476,7 +1506,8 @@ pub struct CardTable {
     pub cost_changes: Vec<bool>,
     /// Which cards forbid activating abilities (CR 602.5): their sources are found on the board, as cost changes' are.
     pub activation_rules: Vec<bool>,
-    /// Which cards stop abilities from triggering (CR 603.2): their sources are found on the board when something triggers.
+    /// Which cards stop abilities from triggering (CR 603.2) or make them trigger additional times (CR 603.2d): their sources
+    /// are found on the board when something triggers.
     pub trigger_rules: Vec<bool>,
     /// The rules' own abilities (`crate::intrinsic`): what a basic land type gives a land (CR 305.6).
     pub intrinsic: CardId,
@@ -1533,7 +1564,7 @@ impl CardTable {
         let any_cast_limit = cards.iter().any(|c| c.cast_limit > 0);
         let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty() || !c.ability_discounts.is_empty()).collect();
         let activation_rules: Vec<bool> = cards.iter().map(|c| !c.activation_rules.is_empty()).collect();
-        let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty()).collect();
+        let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let mana_triggers: Vec<bool> =
