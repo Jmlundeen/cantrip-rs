@@ -1,0 +1,52 @@
+# Pavitr's Seva targets a creature you control; if it is gone when the ability resolves, the ability does nothing (CR
+# 608.2b). Bot1, with Spider-Man India and Birds of Paradise, casts Llanowar Elves; the trigger targets the Birds, and
+# Bot2 bolts the Birds in response. No counter is put on anything, and nothing gains flying. Bot2's Ornithopter, a
+# creature Bot1 doesn't control, could not be targeted.
+
+[Bot1 Deck]
+Forest
+Birds of Paradise
+Mox Emerald
+Mox Pearl
+Black Lotus
+Spider-Man India
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Spider-Man India.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Birds of Paradise)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Birds of Paradise)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Spider-Man India; Llanowar Elves
+Bot1.Battlefield.Spider-Man India.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Birds of Paradise; Black Lotus
+Bot2.Graveyard = Lightning Bolt

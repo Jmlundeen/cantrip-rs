@@ -1,0 +1,43 @@
+# Spider-Man India: "Web-slinging {1}{G}{W}"; "Pavitr's Seva - Whenever you cast a creature spell, put a +1/+1 counter on
+# target creature you control. It gains flying until end of turn." Bot1 web-slings it on turn 3 for {1}{G}{W} (Forest,
+# Plains, and Llanowar Elves tapped for {G} and returned, CR 601.2g, 702.188a), then casts the Elves again with Mox
+# Emerald: the trigger targets Spider-Man India, the only creature Bot1 controls (the Elves are still a spell), and it
+# becomes a 5/5 flier. On turn 5 the counter stays.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Spider-Man India
+Plains
+Mox Emerald
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Spider-Man India.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.End]
+? Bot1.Battlefield.Spider-Man India.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Spider-Man India.Keywords = Flying
+? Bot1.Battlefield.Spider-Man India.Power = 5
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Forest; Plains; Spider-Man India; Mox Emerald; Llanowar Elves
+Bot1.Battlefield.Spider-Man India.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spider-Man India.Toughness = 5
