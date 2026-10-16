@@ -1,7 +1,7 @@
 # Nova Hellkite cast for its warp cost {2}{R} on turn 3 (CR 702.185a): its enters trigger pings Bot2's Llanowar Elves, haste
 # and flying let it hit for 4, and at the beginning of the end step it is exiled. On turn 5 Bot1 may cast it from exile, but
 # for its mana cost, and it pings Elvish Mystic and hits again, and stays: a card cast from exile for its mana cost makes no
-# new exile trigger. (That warp's cost is not offered again from exile is the known-bug scenario beside this one.)
+# new exile trigger. (That warp's cost is not offered again from exile is the warp-cost scenario beside this one.)
 
 [Bot1 Deck]
 Mountain

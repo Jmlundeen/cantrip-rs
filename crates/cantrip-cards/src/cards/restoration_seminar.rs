@@ -12,7 +12,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::NONLAND_PERMANENT_CARD_IN_YOUR_GRAVEYARD], effect),
-    paradigm: true,
-    abilities: &[paradigm::TRIGGER],
+    paradigm: Some(paradigm::SPELL_ABILITY),
+    delayed: &[paradigm::TRIGGER],
     ..oracle::RESTORATION_SEMINAR
 };
