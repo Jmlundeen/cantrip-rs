@@ -1,0 +1,38 @@
+# Invigorated Rampage's second mode takes exactly two target creatures (CR 601.2c) and each gets +2/+0 and trample until end of
+# turn: Llanowar Elves and an Ornithopter become 3/1 and 2/2 tramplers. With two creatures both modes are on offer.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Llanowar Elves
+Mountain
+Invigorated Rampage
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Invigorated Rampage.Cast
+Bot1.Modes(2)
+Bot1.Target(Llanowar Elves; Ornithopter)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Graveyard = Invigorated Rampage
