@@ -80,6 +80,18 @@ pub const CREATURE_OR_PLANESWALKER: TargetSpec = target(creature_or_planeswalker
 pub const PLAYER: TargetSpec = target(player_filter);
 pub const OPPONENT: TargetSpec = target(opponent_filter);
 pub const SPELL: TargetSpec = target(spell_filter);
+fn spell_or_ability_with_a_single_target_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    let stack = &q.state().stack;
+    match t {
+        Target::Object(id) => stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id && i.target_count == 1),
+        Target::Ability(serial) => stack.iter().any(|i| i.kind != StackKind::Spell && i.serial == serial && i.target_count == 1),
+        _ => false,
+    }
+}
+
+/// "Target spell or ability with a single target" (CR 115.1, 115.7a): exactly one target across every slot, counted with
+/// repeats, as the item was announced; re-asked as the spell resolves (CR 608.2b). Untimely Malfunction and Bolt Bend print it.
+pub const SPELL_OR_ABILITY_WITH_A_SINGLE_TARGET: TargetSpec = target(spell_or_ability_with_a_single_target_filter);
 /// "Target spell or permanent" (CR 115.1): Artificial Evolution and Venser, Shaper Savant print it.
 pub const SPELL_OR_PERMANENT: TargetSpec = target(spell_or_permanent_filter);
 

@@ -6,11 +6,7 @@ use cantrip_oracle as oracle;
 /// or greater, counter that spell instead. Ferocious is judged once, as the spell resolves (CR 608.2c): only the
 /// upgraded effect happens, never both.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let ferocious = g
-        .permanents_of(item.controller)
-        .into_iter()
-        .any(|id| g.chars(id).is(CardType::Creature) && g.chars(id).power.is_some_and(|p| p >= 4));
-    if ferocious {
+    if cantrip_mechanics::ferocious::you_control(g, item.controller) {
         counter_target(g, item, 0);
         return Ok(());
     }

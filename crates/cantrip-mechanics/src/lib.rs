@@ -45,6 +45,7 @@ pub mod empower;
 pub mod enduring;
 pub mod escalate;
 pub mod fading;
+pub mod ferocious;
 pub mod escape;
 pub mod eternalize;
 pub mod evoke;

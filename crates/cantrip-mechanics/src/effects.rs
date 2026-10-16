@@ -214,6 +214,17 @@ pub fn return_first_target_to_hand(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
+/// "Change the target of target spell or ability with a single target" (CR 115.7a): the first target of the resolving spell or
+/// ability is a spell or ability on the stack whose target its controller changes to another legal one as this resolves, and
+/// the target is not changed if there is no other legal choice. Nothing happens if this item's own target is no longer legal
+/// (CR 608.2b). Untimely Malfunction and Bolt Bend print it.
+pub fn change_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if g.target_legal(item, 0) {
+        g.change_target(item.targets[0], item.controller)?;
+    }
+    Ok(())
+}
+
 /// "[This spell] deals `n` damage to each creature" (Pyroclasm, Fiery Confluence, Avengers Disassembled): one damage event
 /// for every creature on the battlefield as the effect is carried out (CR 608.2c), dealt simultaneously (CR 120.2, 603.2c).
 pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {

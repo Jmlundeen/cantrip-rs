@@ -4,10 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Activate only if you control a creature with power 4 or greater."
 fn ferocious(q: &dyn Query, asker: &Asker) -> bool {
-    q.permanents_of(asker.controller).into_iter().any(|id| {
-        let c = q.chars(id);
-        c.is(CardType::Creature) && c.power.is_some_and(|p| p >= 4)
-    })
+    cantrip_mechanics::ferocious::you_control(q, asker.controller)
 }
 
 pub static CARD: CardDef = CardDef {
