@@ -1,7 +1,8 @@
 # Immolation Shaman: "Whenever an opponent activates an ability of an artifact, creature, or land that isn't a mana ability, this
 # creature deals 1 damage to that player." On turn 2 Bot2 cracks Wooded Foothills (pay 1 life, sacrifice it): a land's ability, the
 # land gone once the cost is paid and judged as it last was (CR 113.7a). The trigger is above the fetch (Stack.Count = 2) and
-# resolves first: Bot2 is at 18 before searching. Moxen tapped for mana trigger nothing. On turn 3 Bot1 activates the Shaman's own
+# resolves first: Bot2 is at 18 before searching. Moxen tapped for mana trigger nothing
+# (mana abilities are excluded, CR 605.1a, and the engine only records their activation). On turn 3 Bot1 activates the Shaman's own
 # "{3}{R}{R}: +3/+3 and menace" (his own ability, no opponent's: Bot1 stays at 20). On turn 4 Bot2 activates Figure of Destiny (a
 # creature's ability) and, with the trigger on the stack, Lightning Bolts the Shaman: the trigger still resolves, the damage dealt by
 # the Shaman as it last was on the battlefield (CR 113.7a, 608.2h): Bot2 at 17.

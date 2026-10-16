@@ -595,6 +595,19 @@ pub fn activation(q: &dyn Query, event: &Event) -> Option<(ObjectId, PlayerId, &
     q.activated_ability(ability).map(|def| (source, player, def))
 }
 
+/// "Whenever you activate a loyalty ability [of ...]" (CR 606.2, 603.2): the permanent whose loyalty ability the controller
+/// of `source` activated, for a condition on it ("of a Chandra planeswalker"), read as it was when the costs were paid or
+/// as it last was if paying them took it away. Ajani Unrelenting and Keral Keep Disciples print it.
+pub fn loyalty_ability_you_activated(q: &dyn Query, source: ObjectId, event: &Event) -> Option<ObjectId> {
+    let (object, player, def) = activation(q, event)?;
+    (def.is_loyalty_ability() && player == q.controller(source)).then_some(object)
+}
+
+/// "Whenever you activate a loyalty ability": any permanent's, by this ability's controller (Ajani Unrelenting).
+pub fn you_activate_a_loyalty_ability(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    loyalty_ability_you_activated(q, source, event).and(Fired::PLAIN)
+}
+
 /// "Whenever an opponent activates an ability of an artifact, creature, or land [on the battlefield] that isn't a mana
 /// ability, ... to that player" (CR 602.2, 603.2): a permanent's ability (one that functions on the battlefield, not
 /// cycling from a hand or embalm from a graveyard), the permanent an artifact, creature or land as it was when the costs
@@ -639,3 +652,4 @@ pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAG
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player);
 pub const OPPONENT_ACTIVATES_ABILITY_OF_ARTIFACT_CREATURE_OR_LAND: Trigger =
     when(EventMask::ABILITY_ACTIVATED, opponent_activates_ability_of_artifact_creature_or_land);
+pub const YOU_ACTIVATE_A_LOYALTY_ABILITY: Trigger = when(EventMask::ABILITY_ACTIVATED, you_activate_a_loyalty_ability);

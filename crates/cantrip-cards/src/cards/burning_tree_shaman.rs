@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers;
+use cantrip_mechanics::{effects, triggers};
 use cantrip_oracle as oracle;
 
 /// "Whenever a player activates an ability that isn't a mana ability" (CR 602.2, 603.2): any player's activation of any
@@ -10,19 +10,10 @@ fn player_activates_non_mana_ability(q: &dyn Query, _: ObjectId, event: &Event) 
     if def.is_mana_ability() { None } else { Fired::about(Target::Player(player)) }
 }
 
-/// "This creature deals 1 damage to that player", as it last was if it has left (CR 113.7a). The ability resolves before
-/// the activated one.
-fn one_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Player(p) = item.subject {
-        g.damage(item.object, Target::Player(p), 1);
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         when(EventMask::ABILITY_ACTIVATED, player_activates_non_mana_ability),
-        one_damage,
+        |g, item| effects::damage_that_player(g, item, 1),
         "Whenever a player activates an ability that isn't a mana ability, this creature deals 1 damage to that player.",
     )],
     ..oracle::BURNING_TREE_SHAMAN

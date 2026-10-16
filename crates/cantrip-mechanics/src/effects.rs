@@ -151,6 +151,16 @@ pub fn damage_each_creature(g: &mut dyn Game, item: &StackItem, n: u16) {
     g.damage_together(&hits);
 }
 
+/// "[This] deals `n` damage to that player": the player a trigger fired about (`Fired::about(Target::Player(..))`, its
+/// subject), dealt by the ability's source, as it last was if it has left (CR 113.7a, 608.2h). Burning-Tree Shaman, Harsh
+/// Mentor and Immolation Shaman print it.
+pub fn damage_that_player(g: &mut dyn Game, item: &StackItem, n: u16) -> Result<(), Suspend> {
+    if let Target::Player(p) = item.subject {
+        g.damage(item.object, Target::Player(p), n);
+    }
+    Ok(())
+}
+
 /// "`target` gains hexproof until end of turn" (CR 702.11b, 611.2a): a layer 6 keyword for the rest of the turn, from the
 /// effect's source. Liliana the Faultless, Octopus Form, Shore Up and Snakeskin Veil print it.
 pub fn gain_hexproof_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {

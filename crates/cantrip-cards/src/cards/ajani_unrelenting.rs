@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{creatures_you_control, haste_until_end_of_turn, pump, tokens, triggers};
+use cantrip_mechanics::{creatures_you_control, effects, haste_until_end_of_turn, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// The 2/2 colorless Wizard Soldier creature token named Cadet (CR 111.4).
@@ -13,15 +13,9 @@ pub static CADET: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// "Whenever you activate a loyalty ability" (CR 606.2, 603.2): any permanent's, not only this one's, by the controller of
-/// this permanent. The activation is the event that triggers it (CR 602.2), so the trigger goes on the stack above the
-/// ability and its token is on the battlefield before that ability resolves (the ruling).
-fn you_activate_a_loyalty_ability(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    let (_, player, def) = triggers::activation(q, event)?;
-    if def.is_loyalty_ability() && player == q.controller(source) { Fired::PLAIN } else { None }
-}
-
-/// "Create a 2/2 colorless Wizard Soldier creature token named Cadet."
+/// "Whenever you activate a loyalty ability, create a 2/2 colorless Wizard Soldier creature token named Cadet." Any
+/// permanent's loyalty ability, by this one's controller (CR 606.2, 603.2). The activation triggers it (CR 602.2), so the
+/// trigger goes on the stack above the ability and the Cadet is on the battlefield before that ability resolves (the ruling).
 fn make_cadet(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     tokens::create(g, item.controller, &CADET, 1)?;
     Ok(())
@@ -30,11 +24,8 @@ fn make_cadet(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// +1: "Creatures you control get +1/+0 and gain haste until end of turn": the creatures there are as it resolves
 /// (CR 611.2c), the Cadet this activation made among them.
 fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for id in g.permanents_of(item.controller) {
-        if g.chars(id).is(CardType::Creature) {
-            pump(g, item.object, id, 1, 0);
-            haste_until_end_of_turn(g, item.object, id);
-        }
+    for id in effects::pump_creatures_you_control(g, item, 1, 0) {
+        haste_until_end_of_turn(g, item.object, id);
     }
     Ok(())
 }
@@ -67,7 +58,7 @@ pub static EXTRA: &[&CardDef] = &[&CADET];
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when(EventMask::ABILITY_ACTIVATED, you_activate_a_loyalty_ability),
+            triggers::YOU_ACTIVATE_A_LOYALTY_ABILITY,
             make_cadet,
             "Whenever you activate a loyalty ability, create a 2/2 colorless Wizard Soldier creature token named Cadet.",
         ),

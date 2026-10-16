@@ -1,0 +1,86 @@
+# Harsh Mentor: "Whenever an opponent activates an ability of an artifact, creature, or land on the battlefield, if it isn't a
+# mana ability, this creature deals 2 damage to that player." On turn 2 Bot2 cracks Wooded Foothills - a land's ability, the land
+# sacrificed to pay for it and judged as it last was (CR 113.7a): 1 life paid and 2 damage, Bot2 at 17. He loots Fanatic of Rhonas
+# into his graveyard and eternalizes it: an ability of a creature card in a graveyard, not of a creature on the battlefield (the
+# ruling), so nothing (the eternalize alone on the stack, Bot2 still at 17). Then Figure of Destiny's ability, a creature's on the
+# battlefield: 2 more, Bot2 at 15.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Harsh Mentor
+Mountain x20
+
+[Bot2 Deck]
+Wooded Foothills
+Mox Ruby
+Mox Emerald
+Black Lotus
+Faithless Looting
+Sol Ring
+Fanatic of Rhonas
+Figure of Destiny
+Forest
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Harsh Mentor.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Wooded Foothills.Play
+Bot2.Battlefield.Wooded Foothills.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 17
+Bot2.Search(Forest)
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Fanatic of Rhonas; Island)
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Figure of Destiny.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Graveyard.Fanatic of Rhonas.Activate(Ability: Eternalize)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 17
+? Bot2.Battlefield.Fanatic of Rhonas.Power = 4
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Figure of Destiny.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 15
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 15
+Exile = Fanatic of Rhonas
+Bot2.Battlefield.Figure of Destiny.Power = 2
+Stack.Count = 0
