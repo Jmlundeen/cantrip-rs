@@ -1,0 +1,44 @@
+# Pyroclasm: "deals 2 damage to each creature." Bot1 has an Ornithopter (0/2) and a Fanatic of Rhonas (1/4); Bot2 casts
+# Pyroclasm with its own Ornithopter in play. Both Ornithopters die (2 is lethal to toughness 2, whoever controls them), the
+# Fanatic survives with 2 damage marked (2 is not lethal to 4), and neither player nor any Mox (artifacts that are not
+# creatures) is touched.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Ornithopter
+Fanatic of Rhonas
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Ornithopter
+Pyroclasm
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fanatic of Rhonas.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Pyroclasm.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Fanatic of Rhonas
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield.Fanatic of Rhonas.Damage = 2
+Bot1.Life = 20
+Bot2.Battlefield = Mox Ruby; Mox Jet
+Bot2.Graveyard = Ornithopter; Pyroclasm
+Bot2.Life = 20

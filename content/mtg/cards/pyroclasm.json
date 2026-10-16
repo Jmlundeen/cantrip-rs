@@ -1,0 +1,6 @@
+{
+  "name": "Pyroclasm",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery",
+  "oracleText": "Pyroclasm deals 2 damage to each creature."
+}
