@@ -1,0 +1,33 @@
+# Walking Ballista's {X}{X} cost has X = 0 in the graveyard, so its mana value there is 0 (ruling 2026-03-20, CR 107.3b)
+# and it is a legal target; Lightning Bolt, a noncreature card of mana value 1 in the same graveyard, is refused ("target
+# creature card", CR 115.1, 601.2c). Helping Hand returns the Ballista tapped; entering with X = 0 it has no counters
+# and is put into the graveyard again as a 0/0 (CR 704.5f).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Walking Ballista
+Lightning Bolt
+Faithless Looting
+Helping Hand
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Walking Ballista; Lightning Bolt)
+! Bot1.Hand.Helping Hand.Cast(Bot1.Graveyard.Lightning Bolt)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Helping Hand.Cast(Bot1.Graveyard.Walking Ballista)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl
+Bot1.Graveyard = Walking Ballista; Helping Hand; Faithless Looting; Lightning Bolt
