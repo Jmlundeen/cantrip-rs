@@ -1,0 +1,68 @@
+# Evendo, Waking Haven: station's charge counters add up over turns. Lake-town Mariners (6 power), cast on turn 1, stations
+# at once (its cost taps a creature, not {T}: CR 107.5, 302.6) for six counters, though Evendo itself entered tapped (station
+# has no {T} of its own). On turn 3, with six counters, the 12+ ability is not there (CR 721.2a: "as long as this permanent
+# has N or more charge counters"), though Evendo is untapped and Mox Emerald could pay its {G}; the Mariners station again
+# for six more, and at twelve it is: {G}, {T} adds {G} for each creature Bot1 controls - the Mariners and the Llanowar
+# Elves (CR 106.5). Past its last threshold station is still there (CR 721.4; ruling: "you can still activate its station
+# ability"), and a third station makes eighteen.
+
+[Bot1 Deck]
+Evendo, Waking Haven
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Lake-town Mariners
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Evendo, Waking Haven.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lake-town Mariners.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+? Bot1.Battlefield.Evendo, Waking Haven.Tapped = true
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 6
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: for each creature)
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 12
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: {T}: Add {G}.)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: for each creature)
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Mana = {G}{G}
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Evendo, Waking Haven; Mox Sapphire; Mox Emerald; Mox Jet; Lake-town Mariners; Llanowar Elves
+Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 18
+Bot1.Battlefield.Lake-town Mariners.Tapped = true
+Bot1.Battlefield.Evendo, Waking Haven.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = true

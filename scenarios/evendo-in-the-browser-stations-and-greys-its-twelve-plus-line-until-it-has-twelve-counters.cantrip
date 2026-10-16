@@ -1,0 +1,56 @@
+# Browser
+# Evendo, Waking Haven played at a table: its station ability is an action on its menu, worded with its cost ("Tap another
+# creature you control") and offered though Evendo entered tapped (it has no {T}), and the creature it taps is chosen on the
+# board (CR 702.184a). Its charge
+# counters are drawn on it, and its 12+ striation is greyed while it has fewer than twelve (CR 721.2a: "as long as this
+# permanent has N or more charge counters on it, it has [abilities]"): at six it is grey, at twelve it is not, and the
+# ability it gives is listed as had.
+
+[Bot1 Deck]
+Evendo, Waking Haven
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Lake-town Mariners
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Evendo, Waking Haven.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lake-town Mariners.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+? Client.Bot1.Battlefield.Evendo, Waking Haven.Rules = This land enters tapped. / {T}: Add {G}. / Station (Tap another creature you control: Put charge counters equal to its power on this Planet. Station only as a sorcery.) / (grey) 12+ | {G}, {T}: Add {G} for each creature you control.
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+? Client.Bot1.Menu = Station (Tap another creature you control: Put charge counters equal to its power on this Planet. Station only as a sorcery.)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 6
+? Client.Bot1.Battlefield.Evendo, Waking Haven.Counters = 6 × charge
+? Client.Bot1.Battlefield.Evendo, Waking Haven.Rules = This land enters tapped. / {T}: Add {G}. / Station (Tap another creature you control: Put charge counters equal to its power on this Planet. Station only as a sorcery.) / (grey) 12+ | {G}, {T}: Add {G} for each creature you control.
+[T3 Bot1.Main1]
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Battlefield.Evendo, Waking Haven.Counters = 12 × charge
+? Client.Bot1.Battlefield.Evendo, Waking Haven.Rules = This land enters tapped. / {T}: Add {G}. / Station (Tap another creature you control: Put charge counters equal to its power on this Planet. Station only as a sorcery.) / 12+ | {G}, {T}: Add {G} for each creature you control. / {G}, {T}: Add {G} for each creature you control.
+
+[Expect]
+Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 12
+Bot1.Battlefield.Lake-town Mariners.Tapped = true

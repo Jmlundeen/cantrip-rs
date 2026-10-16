@@ -1,0 +1,79 @@
+# Evendo, Waking Haven's station (CR 702.184a) and what may pay its cost. With no creature Bot1 controls, station is not
+# offered: its cost taps another untapped creature (CR 602.2b, 601.2h). Llanowar Elves, cast this turn, stations for one
+# counter (not the {T} symbol: CR 107.5, 302.6). A second activation may not tap the Elves again - only an untapped creature
+# pays - so it is taken back. In Bot2's turn the untapped Ornithopter could pay, but station is "only as a sorcery"
+# (CR 702.184a, 307.1); in Bot1's next main phase it stations, and its 0 power adds nothing. Then Animate Dead returns the
+# other Ornithopter (Fatal Pushed on turn 1) as a -1/2: station adds nothing for a negative power and removes nothing either
+# (ruling 2025-07-25: "no charge counters are put onto or removed from the permanent"). Evendo keeps its one counter.
+
+[Bot1 Deck]
+Evendo, Waking Haven
+Mox Jet
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Ornithopter
+Fatal Push
+Animate Dead
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Evendo, Waking Haven.Play
+! Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Fatal Push.Cast(Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Fatal Push; Ornithopter
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 1
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+! Bot1.Choose(Llanowar Elves)
+Bot1.Cancel
+? Stack.Count = 0
+? Bot1.Battlefield.Ornithopter.Tapped = false
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 1
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#2.Power = -1
+Bot1.Battlefield.Evendo, Waking Haven.Activate(Ability: Station)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Evendo, Waking Haven; Mox Jet; Mox Emerald; Llanowar Elves; Ornithopter; Ornithopter; Animate Dead
+Bot1.Battlefield.Evendo, Waking Haven.Counters.Charge = 1
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Power = -1
+Bot1.Battlefield.Llanowar Elves.Tapped = false
