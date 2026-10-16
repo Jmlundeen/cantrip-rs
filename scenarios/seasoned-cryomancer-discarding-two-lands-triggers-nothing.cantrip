@@ -1,0 +1,42 @@
+# Seasoned Cryomancer: Bot1 discards two Islands, no nonland card, so "when you discard one or more nonland cards this
+# way" does not happen and the reflexive ability does not trigger (CR 603.12): no target is asked for and the
+# Ornithopters stay untapped. The scenarios discarding nonland cards are the positive control.
+
+[Bot1 Deck]
+Island
+Island
+Black Lotus
+Seasoned Cryomancer
+Lightning Bolt
+Brainstorm
+Island
+Island
+Force of Will
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seasoned Cryomancer.Cast
+Bot1.Choose(Island; Island)
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island; Island; Black Lotus
+Bot1.Hand = Lightning Bolt; Brainstorm; Force of Will; Dark Ritual
+Bot2.Battlefield.Ornithopter#1.Tapped = false
+Bot2.Battlefield.Ornithopter#2.Tapped = false
+Stack.Count = 0

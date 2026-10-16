@@ -1,0 +1,47 @@
+# Seasoned Cryomancer: the reflexive ability targets two Ornithopters; with it on the stack Bot1 bolts the first. As it
+# resolves the dead one is no longer a legal target, and the other is still tapped and stunned (CR 608.2b: the
+# ability is not countered while one target is legal). Its targets were chosen as it was put on the stack (CR 603.12,
+# 603.3d), so the bolt cannot change how many.
+
+[Bot1 Deck]
+Mountain
+Island
+Black Lotus
+Seasoned Cryomancer
+Lightning Bolt
+Brainstorm
+Island
+Island
+Force of Will
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seasoned Cryomancer.Cast
+Bot1.Choose(Brainstorm; Force of Will)
+Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Ornithopter#1.Tapped = true
+Bot2.Battlefield.Ornithopter#1.Counters.Stun = 1
+Bot2.Battlefield.Ornithopter#2.Tapped = false
+Bot2.Battlefield.Ornithopter#2.Counters.Stun = (absent)

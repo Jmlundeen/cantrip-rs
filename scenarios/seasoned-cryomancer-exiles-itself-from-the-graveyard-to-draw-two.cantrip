@@ -1,0 +1,44 @@
+# Seasoned Cryomancer: the first discards a second Seasoned Cryomancer and an Island; the one nonland card triggers the
+# reflexive ability, whose one target Bot1 declines ("up to"). On turn 3 Bot1 has {3}{U}{U}: the ability is not
+# offered by the Cryomancer on the battlefield (it works only from the graveyard), and the one in the graveyard is
+# exiled to draw two cards.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Seasoned Cryomancer
+Black Lotus
+Island
+Lightning Bolt
+Brainstorm
+Seasoned Cryomancer
+Island
+Force of Will
+Dark Ritual
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seasoned Cryomancer.Cast
+Bot1.Choose(Seasoned Cryomancer; Island)
+Bot1.Target()
+? Bot1.Battlefield.Seasoned Cryomancer.Tapped = false
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+! Bot1.Battlefield.Seasoned Cryomancer.Activate
+Bot1.Graveyard.Seasoned Cryomancer.Activate
+
+[Expect]
+Exile = Seasoned Cryomancer
+Bot1.Hand = Lightning Bolt; Brainstorm; Force of Will; Dark Ritual; Dark Ritual
+Bot1.Battlefield.Seasoned Cryomancer.Tapped = false

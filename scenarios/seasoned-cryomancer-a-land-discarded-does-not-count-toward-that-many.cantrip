@@ -1,0 +1,44 @@
+# Seasoned Cryomancer: Bot1 discards Lightning Bolt and an Island. Only the nonland card counts (CR 603.12, "that many"
+# nonland cards), so the reflexive ability takes up to one target: two Ornithopters are refused as more than it takes,
+# and one is tapped and stunned while the other stays untapped.
+
+[Bot1 Deck]
+Island
+Island
+Black Lotus
+Seasoned Cryomancer
+Lightning Bolt
+Brainstorm
+Island
+Island
+Force of Will
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seasoned Cryomancer.Cast
+Bot1.Choose(Lightning Bolt; Island)
+! Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#2)
+Bot1.Target(Bot2.Battlefield.Ornithopter#2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island; Lightning Bolt; Black Lotus
+Bot1.Hand = Island; Brainstorm; Force of Will; Dark Ritual
+Bot2.Battlefield.Ornithopter#1.Tapped = false
+Bot2.Battlefield.Ornithopter#1.Counters.Stun = (absent)
+Bot2.Battlefield.Ornithopter#2.Tapped = true
+Bot2.Battlefield.Ornithopter#2.Counters.Stun = 1

@@ -1,0 +1,47 @@
+# Seasoned Cryomancer: with its enters ability on the stack, Bot1 bolts the Cryomancer. The ability resolves without its
+# source (CR 113.7a): Bot1 still draws two and discards two, and the reflexive ability triggers from the gone source
+# and taps and stuns both Ornithopters.
+
+[Bot1 Deck]
+Mountain
+Island
+Black Lotus
+Seasoned Cryomancer
+Lightning Bolt
+Brainstorm
+Island
+Island
+Force of Will
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seasoned Cryomancer.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Seasoned Cryomancer)
+Bot1.Choose(Brainstorm; Force of Will)
+? Bot1.Graveyard = Force of Will; Brainstorm; Seasoned Cryomancer; Lightning Bolt; Black Lotus
+Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Dark Ritual
+Bot2.Battlefield.Ornithopter#1.Tapped = true
+Bot2.Battlefield.Ornithopter#1.Counters.Stun = 1
+Bot2.Battlefield.Ornithopter#2.Tapped = true
+Bot2.Battlefield.Ornithopter#2.Counters.Stun = 1

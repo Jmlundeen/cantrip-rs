@@ -1,0 +1,38 @@
+# Seasoned Cryomancer: two nonland cards discarded make "up to two target creatures", but the only creature is the
+# Cryomancer itself. The ability still goes on the stack with the targets there are (CR 603.3d: "up to" needs none),
+# and the Cryomancer taps itself and gets the stun counter; on Bot1's next untap step the counter comes off instead
+# (CR 122.1g).
+
+[Bot1 Deck]
+Island
+Island
+Black Lotus
+Seasoned Cryomancer
+Lightning Bolt
+Brainstorm
+Island
+Island
+Force of Will
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seasoned Cryomancer.Cast
+Bot1.Choose(Lightning Bolt; Brainstorm)
+Bot1.Target(Seasoned Cryomancer)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Seasoned Cryomancer.Tapped = true
+? Bot1.Battlefield.Seasoned Cryomancer.Counters.Stun = 1
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Seasoned Cryomancer.Tapped = true
+Bot1.Battlefield.Seasoned Cryomancer.Counters.Stun = (absent)

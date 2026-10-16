@@ -1,0 +1,8 @@
+{
+  "name": "Seasoned Cryomancer",
+  "manaCost": "{1}{U}{U}",
+  "type": "Creature — Human Wizard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters, draw two cards, then discard two cards. When you discard one or more nonland cards this way, tap up to that many target creatures and put a stun counter on each of them.\n{3}{U}{U}, Exile this card from your graveyard: Draw two cards."
+}

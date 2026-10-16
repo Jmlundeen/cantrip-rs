@@ -1,0 +1,57 @@
+# Seasoned Cryomancer: entering, Bot1 draws two (Force of Will, Dark Ritual), then discards two nonland cards (Lightning
+# Bolt, Brainstorm). The reflexive ability triggers (CR 603.12) with "that many" two: "up to two target creatures". Three
+# targets are refused (the number), and one Ornithopter named twice is refused (CR 115.3: one object is not chosen twice
+# for one word "target"); two different Ornithopters are taken. Both are tapped and get a stun counter, the third is left
+# alone. On Bot2's turn the stun counter is removed instead of the first one untapping (CR 122.1g).
+
+[Bot1 Deck]
+Island
+Island
+Black Lotus
+Seasoned Cryomancer
+Lightning Bolt
+Brainstorm
+Island
+Island
+Force of Will
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Seasoned Cryomancer.Cast
+Bot1.Choose(Lightning Bolt; Brainstorm)
+? Bot1.Hand = Island; Island; Force of Will; Dark Ritual
+! Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#2; Bot2.Battlefield.Ornithopter#3)
+! Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#1)
+Bot1.Target(Bot2.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter#2)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter#1.Tapped = true
+? Bot2.Battlefield.Ornithopter#1.Counters.Stun = 1
+? Bot2.Battlefield.Ornithopter#2.Tapped = true
+? Bot2.Battlefield.Ornithopter#2.Counters.Stun = 1
+? Bot2.Battlefield.Ornithopter#3.Tapped = false
+? Bot2.Battlefield.Ornithopter#3.Counters.Stun = (absent)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Brainstorm; Lightning Bolt; Black Lotus
+Bot2.Battlefield.Ornithopter#1.Tapped = true
+Bot2.Battlefield.Ornithopter#1.Counters.Stun = (absent)
+Bot2.Battlefield.Ornithopter#2.Tapped = true
+Bot2.Battlefield.Ornithopter#2.Counters.Stun = (absent)
+Bot2.Battlefield.Ornithopter#3.Tapped = false
