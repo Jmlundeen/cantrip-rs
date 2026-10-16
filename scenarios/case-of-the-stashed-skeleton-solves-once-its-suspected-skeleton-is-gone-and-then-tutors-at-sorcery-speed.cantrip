@@ -1,0 +1,60 @@
+# Case of the Stashed Skeleton. As it enters it makes a 2/1 black Skeleton token and suspects it (CR 701.60a): the token is
+# suspected, and so has menace and "This creature can't block" (CR 701.60c). At the beginning of Bot1's turn-1 end step it
+# controls a suspected Skeleton, so "To solve - You control no suspected Skeletons" does not trigger. Bot2 bolts the Skeleton
+# on turn 2; at the turn-3 end step there is none, so the Case becomes solved (CR 719.3a). Before that, on turn 3, its
+# "Solved" ability is not offered though {1}{B} is there to pay (CR 702.169d); once solved it is still not offered on Bot2's
+# turn (activate only as a sorcery), and on turn 5 Bot1 sacrifices the Case and searches its library for Black Lotus.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Case of the Stashed Skeleton
+Swamp x4
+Swamp
+Swamp
+Black Lotus
+Swamp x8
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Stashed Skeleton.Cast
+[T1 Bot1.End]
+? Stack.Count = 0
+? Bot1.Battlefield.Skeleton.Suspected = true
+? Bot1.Battlefield.Skeleton.Keywords = CantBlock; Menace
+? Bot1.Battlefield.Skeleton.Token = true
+? Bot1.Battlefield.Skeleton.Power = 2
+? Bot1.Battlefield.Skeleton.Toughness = 1
+? Bot1.Battlefield.Skeleton.Colors = Black
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Skeleton)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Case of the Stashed Skeleton.Activate
+[T3 Bot1.End]
+? Stack.Count = 1
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Case of the Stashed Skeleton.Solved = true
+Bot2.Pass
+! Bot1.Battlefield.Case of the Stashed Skeleton.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Case of the Stashed Skeleton.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Search(Black Lotus)
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Swamp
+Bot1.Graveyard = Case of the Stashed Skeleton
+Bot1.Hand = Black Lotus; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot1.Library.Count = 8

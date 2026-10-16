@@ -1,0 +1,50 @@
+# The Skeleton Case of the Stashed Skeleton suspects has menace and "This creature can't block" while it is suspected (CR
+# 701.60c). On turn 4 Bot2 attacks with Llanowar Elves: the Skeleton may not block them, while Bot1's Ornithopter may (the
+# positive control). On turn 5 the Skeleton attacks: one Ornithopter alone may not block it (menace, CR 702.110b), two together
+# may. The Skeleton deals its 2 damage to the first blocker, which dies, and the 0-power Ornithopters deal none back.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Case of the Stashed Skeleton
+Ornithopter
+Swamp x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Stashed Skeleton.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+! Bot1.Block(Skeleton > Llanowar Elves)
+Bot1.Block(Ornithopter > Llanowar Elves)
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Skeleton > Bot2)
+! Bot2.Block(Ornithopter > Skeleton)
+Bot2.Block(Ornithopter#1 > Skeleton; Ornithopter#2 > Skeleton)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Skeleton.Suspected = true
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Case of the Stashed Skeleton; Mox Jet; Ornithopter; Skeleton; Swamp
+Bot2.Battlefield = Forest; Llanowar Elves; Ornithopter
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Skeleton.Keywords = CantBlock; Menace

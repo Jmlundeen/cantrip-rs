@@ -1,0 +1,42 @@
+# "Skeletons" in "To solve - You control no suspected Skeletons" is a word of the Case's text (CR 612.1). After its enters
+# ability has made and suspected the Skeleton token, Artificial Evolution changes Skeleton to Goblin in the Case's text: at
+# the beginning of Bot1's turn-1 end step it controls no suspected Goblin, so the Case becomes solved though the suspected
+# Skeleton is still there. As printed (the scenario where the Skeleton is bolted) nothing triggers while it is. At the turn-3
+# end step the condition still holds, but the Case is solved already ("if ... this Case is not solved"): nothing triggers.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Case of the Stashed Skeleton
+Mox Sapphire
+Artificial Evolution
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Stashed Skeleton.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Case of the Stashed Skeleton)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Skeleton)
+Bot1.Modes(Goblin)
+[T1 Bot1.End]
+? Bot1.Battlefield.Skeleton.Suspected = true
+? Stack.Count = 1
+[T3 Bot1.End]
+? Bot1.Battlefield.Case of the Stashed Skeleton.Solved = true
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Case of the Stashed Skeleton.Solved = true
+Bot1.Battlefield.Skeleton.Suspected = true
+Bot1.Battlefield.Skeleton.Subtypes = Skeleton
+Bot1.Graveyard = Artificial Evolution

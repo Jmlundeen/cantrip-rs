@@ -1,0 +1,28 @@
+# Browser
+# What the page shows of a suspected creature (CR 701.60): the Skeleton Case of the Stashed Skeleton makes and suspects says
+# SUSPECTED at its foot, and the menace and "This creature can't block" the designation gives it (CR 701.60c) are written
+# among its rules; the Case, unsolved while the Skeleton is there, says nothing at its foot.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Case of the Stashed Skeleton
+Swamp x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Stashed Skeleton.Cast
+[T2 Bot2.Upkeep]
+? Client.Bot1.Battlefield.Skeleton.Status = SUSPECTED
+? Client.Bot1.Battlefield.Skeleton.Rules = Menace / This creature can't block.
+? Client.Bot1.Battlefield.Case of the Stashed Skeleton.Status =
+
+[Expect]
+Bot1.Battlefield.Skeleton.Suspected = true
+Bot1.Battlefield.Case of the Stashed Skeleton.Solved = (absent)

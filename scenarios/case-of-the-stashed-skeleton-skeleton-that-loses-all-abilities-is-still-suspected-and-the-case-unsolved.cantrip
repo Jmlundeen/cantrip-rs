@@ -1,0 +1,55 @@
+# A suspected creature that loses all abilities loses menace and "This creature can't block" but stays suspected (Case of
+# the Stashed Skeleton's rulings; CR 701.60b-c, 613.1f). On turn 2 Bot2's The Wondrous Wasp taps the suspected Skeleton and
+# takes its abilities: it has no keywords, but it is still suspected, so at Bot1's turn-3 end step "To solve - You control no
+# suspected Skeletons" does not trigger. On turn 4 the Skeleton blocks Bot2's Llanowar Elves (it can block now) and both die;
+# at the turn-5 end step Bot1 controls no suspected Skeleton and the Case becomes solved.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Case of the Stashed Skeleton
+Swamp x17
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+The Wondrous Wasp
+Llanowar Elves
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Case of the Stashed Skeleton.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.The Wondrous Wasp.Cast
+Bot2.Target(Skeleton)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Skeleton.Suspected = true
+? Bot1.Battlefield.Skeleton.Keywords = (absent)
+[T3 Bot1.End]
+? Stack.Count = 0
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Block(Skeleton > Llanowar Elves)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Case of the Stashed Skeleton.Solved = (absent)
+[T5 Bot1.End]
+? Stack.Count = 1
+
+[Expect]
+Bot1.Battlefield = Case of the Stashed Skeleton; Mox Jet; Swamp
+Bot1.Battlefield.Case of the Stashed Skeleton.Solved = true
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Island; Mox Emerald; Mox Sapphire; The Wondrous Wasp
+Bot1.Life = 20
