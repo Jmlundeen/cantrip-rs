@@ -22,7 +22,7 @@ pub fn effect<const N: i16>(g: &mut dyn Game, item: &StackItem) -> Result<(), Su
     let o = *g.obj(item.object);
     let card = o.copy.map(|c| c.card).unwrap_or(o.card);
     g.add_effect(item.object, land, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), Duration::Indefinite);
-    g.add_effect(item.object, land, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    crate::effects::gain_haste(g, item.object, land);
     g.add_effect(item.object, land, EffectKind::SetPt(0, 0), Duration::Indefinite);
     g.add_effect(item.object, land, EffectKind::AddAbility(AbilityRef::delayed(card, 0)), Duration::Indefinite);
     g.add_counters(land, CounterKind::PlusOne, N);

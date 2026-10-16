@@ -17,12 +17,7 @@ fn enters(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// the same two counters. Nothing happens if the target is no longer legal (CR 608.2b).
 fn spend(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    g.add_effect(
-        item.object,
-        creature,
-        EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])),
-        Duration::EndOfTurn,
-    );
+    cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
     g.add_counters(creature, CounterKind::PlusOne, 1);
     g.add_counters(creature, CounterKind::Lifelink, 1);
     g.add_counters(item.object, CounterKind::PlusOne, 1);

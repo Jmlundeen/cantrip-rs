@@ -32,3 +32,5 @@ Bot1.Pass
 [Expect]
 Bot1.Battlefield = Plains; Mox Pearl; Astelli Reclaimer; Memory Jar
 Bot1.Graveyard = Lion's Eye Diamond; Ornithopter; Obelisk of Urd
+Bot1.Hand.Count = 0
+Exile.Count = 0

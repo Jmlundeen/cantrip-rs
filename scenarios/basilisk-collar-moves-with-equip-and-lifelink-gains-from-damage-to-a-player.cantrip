@@ -44,3 +44,8 @@ Bot1.Pass
 
 [Expect]
 Bot1.Battlefield.Basilisk Collar.AttachedTo = Ornithopter
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield = Basilisk Collar; Llanowar Elves; Mox Emerald; Mox Jet; Ornithopter
+Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying; Lifelink
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)

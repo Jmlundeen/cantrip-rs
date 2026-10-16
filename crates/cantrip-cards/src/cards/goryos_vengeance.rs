@@ -20,7 +20,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let controller = item.controller;
     let creature = g.put_onto_battlefield(card, controller, false)?;
     if creature != card || g.obj(creature).zone.is(ZoneKind::Battlefield) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+        cantrip_mechanics::effects::gain_haste(g, item.object, creature);
         g.delayed_trigger(
             DelayedWhen::Step { step: Step::End, on_turn_of: None },
             item.object,

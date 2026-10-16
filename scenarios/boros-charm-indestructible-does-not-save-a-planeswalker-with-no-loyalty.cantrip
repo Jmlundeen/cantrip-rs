@@ -1,0 +1,52 @@
+# Boros Charm's second mode gives Bot1's permanents indestructible, Liliana of the Veil among them. Bot2's Lightning Bolt then
+# removes all her loyalty (damage dealt to a planeswalker removes that many loyalty counters, CR 120.3c), and a planeswalker
+# with no loyalty counters is put into its owner's graveyard by a state-based action that does not destroy it (CR 704.5i):
+# indestructible does not help. The Ornithopter beside her, hit by nothing, simply keeps its indestructible.
+
+[Bot1 Deck]
+Black Lotus
+Liliana of the Veil
+Boros Charm
+Mox Ruby
+Mox Pearl
+Ornithopter
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(Permanents you control gain indestructible)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Liliana of the Veil.Keywords = Indestructible
+[T3 Bot1.DeclareAttackers]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Ornithopter
+Bot1.Graveyard = Liliana of the Veil; Boros Charm; Black Lotus
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+Bot2.Graveyard = Lightning Bolt
+Bot2.Life = 20
+Bot1.Life = 20

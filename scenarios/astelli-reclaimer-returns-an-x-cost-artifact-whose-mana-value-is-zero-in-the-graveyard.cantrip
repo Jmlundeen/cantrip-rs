@@ -1,0 +1,31 @@
+# An {X} in a card's mana cost is 0 in the graveyard (CR 202.3e, its ruling): Engineered Explosives ({X}) has mana value 0 and is a legal
+# target for Astelli Reclaimer cast for its warp cost (X = 3), beside Door of Destinies (mana value 4), which is not. The Explosives
+# enters the battlefield without having been cast, so with no charge counters.
+
+[Bot1 Deck]
+Lion's Eye Diamond
+Astelli Reclaimer
+Engineered Explosives
+Door of Destinies
+Mountain
+Lightning Bolt
+Sol Ring
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Hand.Astelli Reclaimer.Cast(Ability: Warp)
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: White)
+! Bot1.Target(Door of Destinies)
+Bot1.Target(Engineered Explosives)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Astelli Reclaimer; Engineered Explosives
+Bot1.Graveyard = Lion's Eye Diamond; Sol Ring; Lightning Bolt; Mountain; Door of Destinies
+Bot1.Hand.Count = 0
+Exile.Count = 0

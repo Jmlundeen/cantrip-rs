@@ -17,7 +17,7 @@ fn unearth(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.is_on_battlefield(returned) {
         return Ok(());
     }
-    g.add_effect(item.object, returned, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    crate::effects::gain_haste(g, item.object, returned);
     g.exile_on_leave(returned);
     let this = g.obj(returned).card;
     g.delayed_trigger(

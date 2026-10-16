@@ -43,3 +43,6 @@ Bot1.Pass
 
 [Expect]
 Bot1.Battlefield.Count = 5
+Bot1.Hand.Count = 3
+Exile.Count = 0
+Bot1.Graveyard = Chromatic Star; Mishra's Bauble

@@ -41,7 +41,7 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     g.add_counters(returned, CounterKind::Finality, 1);
-    g.add_effect(item.object, returned, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    cantrip_mechanics::effects::gain_haste(g, item.object, returned);
     cantrip_mechanics::delayed::at_next_end_step(g, item, 0, Target::Object(returned));
     Ok(())
 }

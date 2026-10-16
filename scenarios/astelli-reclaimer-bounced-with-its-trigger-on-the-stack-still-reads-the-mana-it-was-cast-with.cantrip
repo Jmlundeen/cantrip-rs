@@ -1,0 +1,48 @@
+# Astelli Reclaimer cast for its warp cost, paid with Lion's Eye Diamond's three white mana (X = 3). With its enters trigger targeting
+# Basalt Monolith (mana value 3) on the stack, Bot2 returns the Reclaimer to Bot1's hand with Into the Flood Maw. The trigger still
+# resolves, and "the amount of mana spent to cast this creature" is read from the creature as it last was (CR 113.7a, 608.2h,
+# 400.7d): 3, so the Monolith is still a legal target and enters the battlefield. (The warp exile does nothing: the Reclaimer
+# is in hand.)
+
+[Bot1 Deck]
+Lion's Eye Diamond
+Mountain
+Mountain
+Astelli Reclaimer
+Basalt Monolith
+Sol Ring
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Mox Sapphire
+Into the Flood Maw
+Island x20
+
+[Actions]
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Astelli Reclaimer.Cast(Ability: Warp)
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: White)
+Bot1.Target(Basalt Monolith)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Into the Flood Maw.Cast
+Bot2.Decline
+Bot2.Target(Bot1.Battlefield.Astelli Reclaimer)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Mountain; Basalt Monolith
+Bot1.Hand = Astelli Reclaimer
+Bot1.Graveyard.Count = 5
+Exile.Count = 0
+Bot1.Graveyard = Lion's Eye Diamond; Mountain; Mountain; Sol Ring; Mountain

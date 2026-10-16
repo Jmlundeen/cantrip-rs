@@ -14,7 +14,7 @@ fn put_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.is_on_battlefield(returned) {
         return Ok(());
     }
-    g.add_effect(item.object, returned, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    cantrip_mechanics::effects::gain_haste(g, item.object, returned);
     cantrip_mechanics::delayed::at_next_end_step(g, item, 0, Target::Object(returned));
     Ok(())
 }

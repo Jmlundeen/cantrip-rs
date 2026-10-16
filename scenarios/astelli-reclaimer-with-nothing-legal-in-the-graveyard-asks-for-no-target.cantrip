@@ -28,3 +28,5 @@ Bot1.Pass
 
 [Expect]
 Bot1.Graveyard.Count = 0
+Exile.Count = 0
+Bot1.Hand = Island; Island; Island

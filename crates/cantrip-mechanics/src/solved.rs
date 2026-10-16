@@ -47,7 +47,7 @@ pub const TO_SOLVE: Trigger = when_asked(EventMask::STEP_BEGAN, end_step_while_u
 /// 603.4) still true. A Case that has left the battlefield is a new object and becomes nothing; one already solved stays so.
 pub fn become_solved(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let case = item.object;
-    if is_live(g, case) && g.is_on_battlefield(case) && !is_solved(g, case) {
+    if crate::targets::permanent(g, case) && !is_solved(g, case) {
         let marker = marker_of(g, case);
         g.add_effect(case, case, EffectKind::AddAbility(marker), Duration::Indefinite);
     }

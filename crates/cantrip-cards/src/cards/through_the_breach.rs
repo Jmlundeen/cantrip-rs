@@ -16,7 +16,7 @@ fn put_creature_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !is_live(g, returned) || !g.is_on_battlefield(returned) {
         return Ok(());
     }
-    g.add_effect(item.object, returned, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
+    cantrip_mechanics::effects::gain_haste(g, item.object, returned);
     let this = g.card_id(&CARD);
     g.delayed_trigger(
         DelayedWhen::Step { step: Step::End, on_turn_of: None },

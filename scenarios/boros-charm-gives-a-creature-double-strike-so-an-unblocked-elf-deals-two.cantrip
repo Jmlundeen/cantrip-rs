@@ -45,3 +45,6 @@ Bot1.Attack(Llanowar Elves > Bot2)
 
 [Expect]
 Bot2.Life = 18
+Bot1.Battlefield = Llanowar Elves; Mox Emerald; Mox Pearl; Mox Ruby; Ornithopter
+Bot1.Graveyard = Boros Charm
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)

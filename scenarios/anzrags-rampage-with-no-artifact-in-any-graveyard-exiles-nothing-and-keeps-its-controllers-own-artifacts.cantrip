@@ -41,3 +41,6 @@ Bot1.Pass
 Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl
 Bot1.Graveyard = Anzrag's Rampage
 Bot2.Battlefield.Count = 0
+Exile.Count = 0
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 11

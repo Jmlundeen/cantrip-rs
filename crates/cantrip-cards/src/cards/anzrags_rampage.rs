@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, delayed, targets, top_of_library};
+use cantrip_mechanics::{choose, delayed, top_of_library};
 use cantrip_oracle as oracle;
 
 /// "The number of artifacts that were put into graveyards from the battlefield this turn" (CR 700.4): every move from the
@@ -29,27 +29,13 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         exiled.iter().copied().filter(|&c| g.obj(c).zone.is(ZoneKind::Exile) && g.chars(c).is(CardType::Creature)).collect();
     let Some(&card) = choose::cards(g, you, item.object, Purpose::PutOntoBattlefield, creatures, 1, true)?.first() else { return Ok(()) };
     let creature = g.put_onto_battlefield(card, you, false)?;
-    if targets::permanent(g, creature) {
-        g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(&[Keyword::Haste])), Duration::Indefinite);
-        delayed::at_next_end_step(g, item, 0, Target::Object(creature));
-    }
-    Ok(())
-}
-
-/// "Return it to your hand": the creature, if it is still the object that came onto the battlefield (CR 603.7c, 400.7) and
-/// still there, whoever controls it now (CR 400.3: it goes to its owner's hand, which is the player whose library it
-/// was exiled from).
-fn return_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(it) = item.subject
-        && targets::permanent(g, it)
-    {
-        g.return_to_hand(&[it]);
-    }
+    cantrip_mechanics::effects::gain_haste(g, item.object, creature);
+    delayed::at_next_end_step(g, item, 0, Target::Object(creature));
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    delayed: &[delayed_trigger(return_it, "Return it to your hand.")],
+    delayed: &[delayed_trigger(delayed::return_subject_to_hand, "Return it to your hand.")],
     ..oracle::ANZRAGS_RAMPAGE
 };

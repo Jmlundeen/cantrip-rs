@@ -62,3 +62,8 @@ Bot1.Choose(Llanowar Elves)
 
 [Expect]
 Bot1.Library.Count = 10
+Bot1.Battlefield = Llanowar Elves; Mountain; Mountain; Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Graveyard = Anzrag's Rampage
+Bot2.Battlefield = Island; Sol Ring
+Bot2.Graveyard = Mox Jet; Mox Pearl; Mind Stone
+Exile = Bofur, Reliable Guardian; Lightning Bolt; Ragavan, Nimble Pilferer

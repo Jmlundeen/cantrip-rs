@@ -49,3 +49,7 @@ Bot1.Pass
 [Expect]
 Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl
 Bot2.Battlefield = Island
+Exile = Lightning Bolt
+Bot1.Library.Count = 0
+Bot1.Graveyard = Anzrag's Rampage
+Bot2.Graveyard = Mind Stone; Sol Ring

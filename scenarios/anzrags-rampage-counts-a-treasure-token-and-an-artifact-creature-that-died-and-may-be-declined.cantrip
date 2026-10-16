@@ -62,3 +62,7 @@ Bot1.Choose()
 Bot2.Graveyard = Ornithopter; Island
 Bot1.Battlefield = Mountain; Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Mox Emerald
 Bot1.Graveyard = Anzrag's Rampage; Blooming Blast
+Exile = Llanowar Elves; Ragavan, Nimble Pilferer
+Bot2.Life = 17
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 10

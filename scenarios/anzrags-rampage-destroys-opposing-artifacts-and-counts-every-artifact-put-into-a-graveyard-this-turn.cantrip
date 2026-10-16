@@ -60,3 +60,8 @@ Bot1.Attack(Llanowar Elves > Bot2)
 Bot2.Life = 19
 Bot1.Battlefield = Mox Jet
 Bot1.Hand.Count = 5
+Bot1.Graveyard = Anzrag's Rampage; Black Lotus; Black Lotus
+Bot2.Graveyard = Mind Stone; Sol Ring
+Exile = Lightning Bolt; Mountain; Ragavan, Nimble Pilferer
+Bot1.Library.Count = 10
+Bot2.Battlefield.Count = 1

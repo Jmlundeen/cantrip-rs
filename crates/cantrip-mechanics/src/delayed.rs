@@ -116,3 +116,12 @@ pub fn return_subject_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Resu
     Ok(())
 }
 
+/// "Return it to your hand": the delayed ability's subject, if it is still the object it was on the battlefield (CR 603.7c,
+/// 400.7); it goes to its owner's hand (CR 400.3), and `return_to_hand` leaves an object that has changed zones alone.
+/// Anzrag's Rampage prints it at the next end step.
+pub fn return_subject_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Target::Object(it) = item.subject {
+        g.return_to_hand(&[it]);
+    }
+    Ok(())
+}

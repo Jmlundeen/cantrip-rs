@@ -40,4 +40,7 @@ Bot1.Pass
 ? Bot1.Graveyard.Count = 5
 
 [Expect]
-Bot1.Battlefield.Count = 2
+Bot1.Battlefield = Mountain; Astelli Reclaimer
+Exile = Basalt Monolith
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Lion's Eye Diamond; Mountain; Mountain; Sol Ring; Mountain

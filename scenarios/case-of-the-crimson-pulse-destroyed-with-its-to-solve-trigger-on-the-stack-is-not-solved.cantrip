@@ -56,4 +56,9 @@ Bot1.Pass
 
 [Expect]
 Stack.Count = 0
-Bot1.Battlefield.Count = 8
+Bot1.Battlefield = Mountain; Mox Jet; Mox Ruby; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Hand = Ornithopter
+Bot1.Graveyard = Case of the Crimson Pulse; Ornithopter
+Bot2.Graveyard = Cathar Commando
+Bot2.Battlefield = Mox Jet; Mox Pearl; Mox Ruby
+Bot1.Library.Count = 8

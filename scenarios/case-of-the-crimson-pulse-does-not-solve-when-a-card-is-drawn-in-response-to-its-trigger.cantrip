@@ -48,4 +48,7 @@ Bot1.Battlefield.Chromatic Star.Activate(Color: Red)
 ? Bot1.Hand.Count = 2
 
 [Expect]
-Bot1.Battlefield.Count = 9
+Bot1.Battlefield = Case of the Crimson Pulse; Mountain; Mountain; Mox Jet; Mox Ruby; Ornithopter; Ornithopter; Ornithopter; Ornithopter
+Bot1.Hand = Ornithopter; Ornithopter
+Bot1.Graveyard = Chromatic Star
+Bot1.Library.Count = 2

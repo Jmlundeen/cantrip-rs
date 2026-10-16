@@ -33,4 +33,6 @@ Bot1.Pass
 
 [Expect]
 Bot1.Battlefield = Basalt Monolith
-Bot1.Graveyard.Count = 5
+Exile = Astelli Reclaimer
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Lion's Eye Diamond; Sol Ring; Lightning Bolt; Mountain; Door of Destinies
