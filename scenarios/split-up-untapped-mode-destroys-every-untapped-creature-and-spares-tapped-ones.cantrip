@@ -1,0 +1,52 @@
+# Split Up, second mode: the untapped creatures die and the tapped ones live, whoever controls them. Bot1's Llanowar Elves,
+# tapped for mana to pay for it, and Bot2's, tapped on its own turn, survive; both Ornithopters are untapped and die. Lands are
+# not creatures and stay.
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Plains
+Plains
+Split Up
+Ornithopter
+Plains
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest
+Forest x4
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Split Up.Cast
+Bot1.Modes(2)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Split Up; Ornithopter
+Bot1.Battlefield = Forest; Plains; Plains; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Forest; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Tapped = true

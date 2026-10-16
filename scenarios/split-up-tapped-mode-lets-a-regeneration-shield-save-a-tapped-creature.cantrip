@@ -1,0 +1,52 @@
+# Split Up destroys, it does not say "can't be regenerated": Bot2's tapped Llanowar Elves are saved by a regeneration shield from
+# Yavimaya Hollow, activated in response (CR 701.19), and stay tapped on the battlefield. Bot1's tapped Elves, with no shield, die.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Plains
+Plains
+Split Up
+Ornithopter
+Plains
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Yavimaya Hollow
+Forest x4
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Split Up.Cast
+Bot1.Modes(1)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Regenerate)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Split Up; Llanowar Elves
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Yavimaya Hollow; Ornithopter; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Tapped = true

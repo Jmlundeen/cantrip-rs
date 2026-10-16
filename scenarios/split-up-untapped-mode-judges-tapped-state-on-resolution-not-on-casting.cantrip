@@ -1,0 +1,51 @@
+# Which creatures are untapped is judged as Split Up resolves (CR 608.2): Bot2's Llanowar Elves are untapped when the second mode
+# is chosen, and Bot2 taps them for mana in response, so they are tapped on resolution and survive. Bot2's Ornithopter, untapped
+# throughout, dies.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Plains
+Plains
+Split Up
+Ornithopter
+Plains
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest
+Forest x4
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Split Up.Cast
+Bot1.Modes(2)
+Bot2.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Turn = 5
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Forest; Forest; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Graveyard = Split Up; Ornithopter
