@@ -1,0 +1,49 @@
+# Colorstorm Stallion's opus is "Whenever you CAST an instant or sorcery spell"; a copy is never cast (CR 707.10a). With Leyline of
+# Resonance on the battlefield, Bot1 casts Lightning Bolt at its own Stallion: the Leyline copies the Bolt (aimed at Bot2), but only the
+# cast triggers the opus. The Stallion is a 4/4 - not a 5/5 - and takes the Bolt's three damage and lives; the copy's three go to Bot2
+# (20 to 17). One mana was spent, so there is only the one Stallion.
+
+[Bot1 Deck]
+Leyline of Resonance
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Colorstorm Stallion
+Lightning Bolt
+Mountain
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colorstorm Stallion.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Colorstorm Stallion)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield.Colorstorm Stallion.Power = 4
+Bot1.Battlefield.Colorstorm Stallion.Toughness = 4
+Bot1.Battlefield.Colorstorm Stallion.Damage = 3
+Bot1.Battlefield.Count = 6
+Bot2.Life = 17

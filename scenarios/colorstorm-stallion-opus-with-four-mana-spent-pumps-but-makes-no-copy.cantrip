@@ -1,0 +1,48 @@
+# Colorstorm Stallion's opus checks "five or more mana was spent": Mind Twist for X = 3 costs {3}{B}, four mana - one short. The
+# Stallion is a 4/4 until end of turn (the instant-or-sorcery cast is what pumps it, whatever it cost) but no copy is made: the
+# control is the scenario in which X = 4, five mana, does make one. The Moxen's fifth mana stays in the pool unspent (the tap is
+# not a cost of the spell).
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Colorstorm Stallion
+Mind Twist
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colorstorm Stallion.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 3)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Colorstorm Stallion.Power = 4
+Bot1.Battlefield.Colorstorm Stallion.Toughness = 4
+Bot1.Battlefield.Colorstorm Stallion.Token = (absent)
+Bot1.Battlefield.Count = 6
+# Bot2 had 7 cards at the Mind Twist (8 after its draw, one discarded to hand size): 3 discarded.
+Bot2.Graveyard.Count = 4

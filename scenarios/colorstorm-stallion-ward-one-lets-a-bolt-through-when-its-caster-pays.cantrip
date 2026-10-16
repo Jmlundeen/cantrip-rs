@@ -1,0 +1,45 @@
+# Colorstorm Stallion has ward {1}: this time Bot2 has two mana (Mountain and its own Mox Ruby), pays the {1} the ward trigger asks,
+# and the Lightning Bolt resolves: three damage kills the 3/3 Stallion (the control for the scenario in which Bot2 cannot pay).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Colorstorm Stallion
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colorstorm Stallion.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Colorstorm Stallion)
+Bot2.PayCost
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet
+Bot1.Graveyard = Colorstorm Stallion
+Bot2.Graveyard = Lightning Bolt

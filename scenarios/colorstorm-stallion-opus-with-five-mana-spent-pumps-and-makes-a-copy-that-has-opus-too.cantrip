@@ -1,0 +1,71 @@
+# Colorstorm Stallion's opus: "Whenever you cast an instant or sorcery spell, this creature gets +1/+1 until end of turn. If five or more
+# mana was spent to cast that spell, create a token that's a copy of this creature." Turn 3: Bot1 casts Mind Twist for X = 4, five mana
+# ({4}{B}: Swamp, Mountain and the three Moxen). The Stallion is a 4/4 until end of turn, and a token copy enters as a 3/3: the token
+# copies the copiable values and not the +1/+1 (CR 707.2), has haste (a copiable keyword) and the opus. Mind Twist makes Bot2 discard 4
+# of its 7 cards. On turn 5 Lightning Bolt (one mana) is cast: both Stallions trigger, each 4/4 until end of turn and no third
+# Stallion, since only one mana was spent.
+
+[Bot1 Deck]
+Mountain
+Swamp
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Colorstorm Stallion
+Mind Twist
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colorstorm Stallion.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 4)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Colorstorm Stallion#1.Power = 4
+? Bot1.Battlefield.Colorstorm Stallion#2.Power = 3
+? Bot1.Battlefield.Colorstorm Stallion#2.Token = true
+? Bot1.Battlefield.Colorstorm Stallion#2.Keywords = Haste
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Colorstorm Stallion#1.Power = 4
+Bot1.Battlefield.Colorstorm Stallion#1.Toughness = 4
+Bot1.Battlefield.Colorstorm Stallion#2.Power = 4
+Bot1.Battlefield.Colorstorm Stallion#2.Toughness = 4
+Bot1.Battlefield.Colorstorm Stallion#2.Token = true
+Bot1.Battlefield.Colorstorm Stallion#1.Token = (absent)
+# Mountain, Swamp, three Moxen and two Stallions.
+Bot1.Battlefield.Count = 7
+# Bot2 drew on turn 2 (8 cards) and discarded one at cleanup (7), lost four to Mind Twist (3) and drew on turn 4 (4).
+Bot2.Hand.Count = 4
+Bot2.Graveyard.Count = 5
+Bot2.Life = 17

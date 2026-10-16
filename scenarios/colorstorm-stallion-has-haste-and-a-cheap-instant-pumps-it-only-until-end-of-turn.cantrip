@@ -1,0 +1,44 @@
+# Colorstorm Stallion has haste: cast on turn 1 with the three Moxen, it attacks at once. Lightning Bolt (one mana, an instant)
+# at Bot2's face before combat makes it a 4/4 until end of turn: it deals 4 combat damage, Bolt 3, so Bot2 goes 20 to 13; no
+# copy is made for one mana. On turn 3, the turn after, the pump has ended: it is a 3/3 again.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Colorstorm Stallion
+Lightning Bolt
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Colorstorm Stallion.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Colorstorm Stallion.Power = 4
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Colorstorm Stallion > Bot2)
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot2.Life = 13
+Bot1.Battlefield.Colorstorm Stallion.Power = 3
+Bot1.Battlefield.Colorstorm Stallion.Toughness = 3
+Bot1.Battlefield.Count = 5
