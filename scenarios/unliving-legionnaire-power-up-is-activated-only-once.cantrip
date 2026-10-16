@@ -1,0 +1,51 @@
+# Unliving Legionnaire's power-up is activated only once (CR 702.193a). It enters on turn 3 and its power-up, {5}{B}{B} less its mana
+# cost {3}{B}, costs {2}{B} (CR 702.193b, 118.7); once that has resolved, the Swamp's {B}, Sol Ring and Mana Crypt are still untapped,
+# enough for {2}{B} again, and the ability is not offered a second time.
+
+[Bot1 Deck]
+Ancient Tomb
+Mana Crypt
+Sol Ring
+Mox Jet
+Mox Ruby
+Unliving Legionnaire
+Black Lotus
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x14
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unliving Legionnaire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Unliving Legionnaire.Activate
+? Bot1.Mana =
+Bot1.Pass
+! Bot1.Battlefield.Unliving Legionnaire.Activate
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Unliving Legionnaire.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Mana Crypt.Tapped = false

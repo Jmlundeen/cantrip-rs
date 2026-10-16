@@ -1,0 +1,58 @@
+# Unliving Legionnaire's power-up targets the Ornithopter Entomb put in Bot1's graveyard, and in response Bot1 exiles
+# it with Deathrite Shaman. The ability's only target is gone as it would resolve, so it does not resolve (CR 608.2b):
+# nothing returns, and the Legionnaire gets no counters. (Entomb shuffles the library, which is all Forests, so turn
+# 3 draws a Forest.)
+
+[Bot1 Deck]
+Swamp
+Entomb
+Deathrite Shaman
+Mox Jet
+Mana Crypt
+Unliving Legionnaire
+Black Lotus
+Ornithopter
+Forest x10
+
+[Bot2 Deck]
+Island x12
+
+[Dice]
+1
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Unliving Legionnaire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Unliving Legionnaire.Activate(Ornithopter)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Deathrite Shaman.Activate(Ornithopter; Ability: creature card)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Life = 22
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Unliving Legionnaire.Counters.PlusOnePlusOne = (absent)

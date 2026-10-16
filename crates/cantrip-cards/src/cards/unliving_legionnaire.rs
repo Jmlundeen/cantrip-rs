@@ -3,7 +3,8 @@ use cantrip_mechanics::{power_up, targets};
 use cantrip_oracle as oracle;
 
 /// "Return up to one target creature card from your graveyard to your hand. Put two +1/+1 counters on this creature."
-/// A target no longer there is left alone (CR 608.2b); the counters are put on all the same.
+/// With no target chosen it resolves and puts the counters on; with a target that is gone as it would resolve, it does
+/// not resolve at all (CR 608.2b), which the core decides.
 fn return_and_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
         g.return_to_hand(&[card]);
