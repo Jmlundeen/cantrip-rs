@@ -3,7 +3,7 @@ use cantrip_oracle as oracle;
 
 /// This spell costs {X} less to cast, where X is the greatest power among creatures you control (CR 601.2f): generic
 /// mana only; a creature with negative power reduces nothing, and with no creatures there is no reduction.
-fn cheaper_by_greatest_power(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+fn cheaper_by_greatest_power(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     if !matches!(costed, Costed::Spell(_)) {
         return CostDelta::NONE;
     }

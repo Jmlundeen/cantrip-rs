@@ -29,7 +29,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
 /// Spells your opponents cast with the chosen name cost {2} more to cast. Activated abilities of sources with the
 /// chosen name cost {2} more to activate unless they're mana abilities (CR 601.2f, 602.2b): the rules ask this only of
 /// the abilities that use the stack.
-fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     let Some(chosen) = q.obj(source).marks.chosen_card else { return CostDelta::NONE };
     let (object, spell) = match costed {
         Costed::Spell(id) => (id, true),

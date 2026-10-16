@@ -9,7 +9,7 @@ use cantrip_oracle as oracle;
 
 /// This spell costs {1} less to cast for each attacking creature you control (CR 601.2f, 506.4): generic mana only,
 /// and nothing outside combat.
-fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+fn cheaper_per_attacker(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     if !matches!(costed, Costed::Spell(_)) {
         return CostDelta::NONE;
     }

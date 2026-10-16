@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_oracle as oracle;
 
 /// "During turns other than yours, this spell costs {3} more to cast." (CR 601.2f): `player` is the one casting it.
-fn three_more_on_other_turns(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+fn three_more_on_other_turns(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     if matches!(costed, Costed::Spell(_)) && q.state().turn.active != player { CostDelta::more(3) } else { CostDelta::NONE }
 }
 

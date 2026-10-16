@@ -323,6 +323,21 @@ card-table test (`every_activated_ability_has_a_cost_activation_can_pay`) and an
 client's payment caption for a web-slinging cast says to tap a creature for mana while none is tapped; the cast that
 leaves none is still taken back after it is paid.
 
+### Costs that depend on the targets
+
+The total cost of a spell or ability is determined once its modes, X and targets are announced (CR 601.2b-c, 601.2f,
+602.2b), so every cost change (`CostChange`) is handed the targets announced, in slot order, and the total is locked in
+there: what happens to a target later changes nothing paid. Casting and activating apply the changes after the targets
+are chosen (`actions::cast`, `activate`), and the payment asks for that total, which is what the client's payment shows;
+an action's menu row reads the cost as printed. Whether an action is worth offering is judged before anything is
+announced: where its one target is announced with the action (equip, most single-target spells) and something could
+change the cost, it is judged for each candidate, and only the candidates it could be paid for are offered. Where the
+targets are chosen later (several slots, a modal spell), a change that reads them is not counted in that advice, so a
+reduction that only a target would bring does not make the action offered: no card in content has one. Dwarven Mauler,
+Helitrooper and Fervent Champion ("equip abilities you activate that target this creature cost {N} less"), Dragonfire
+Blade ("{1} less for each color of the creature it targets") and Ghostfire Blade ("{2} less if it targets a colorless
+creature") read them.
+
 ### Restricted mana
 
 Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction

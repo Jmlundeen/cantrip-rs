@@ -3,7 +3,7 @@ use cantrip_oracle as oracle;
 
 /// "During your turn, this spell costs {2}{U}{U} less to cast." (CR 601.2f, 118.7): `player` is the one casting it; the
 /// two blue come off its blue symbols (118.7b), so on its caster's turn it costs {1}{U}.
-fn cheaper_on_your_turn(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+fn cheaper_on_your_turn(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     if matches!(costed, Costed::Spell(_)) && q.state().turn.active == player {
         CostDelta::less_mana(mana("{2}{U}{U}"))
     } else {

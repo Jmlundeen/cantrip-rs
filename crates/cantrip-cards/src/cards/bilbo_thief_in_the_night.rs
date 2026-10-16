@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Spells you cast from anywhere other than your hand cost {1} less to cast (CR 601.2f): the zone a spell is in as its
 /// cost is worked out, or the one it was cast from once it is on the stack.
-fn outside_hand_costs_one_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+fn outside_hand_costs_one_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     let Costed::Spell(spell) = costed else { return CostDelta::NONE };
     if player != q.controller(source) {
         return CostDelta::NONE;

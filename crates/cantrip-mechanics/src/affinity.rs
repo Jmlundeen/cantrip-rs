@@ -3,7 +3,7 @@
 use cantrip_api::*;
 
 /// This spell costs {1} less to cast for each artifact you control.
-pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+pub fn for_artifacts(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     if !matches!(costed, Costed::Spell(_)) {
         return CostDelta::NONE;
     }

@@ -13,7 +13,7 @@ fn non_lemur_flying_creature_spell(q: &dyn Query, source: ObjectId, spell: Objec
 /// (CR 601.2f). It is the first such spell whether or not the reduction found generic mana to take (a spell with no
 /// generic mana in its cost uses the "first" up: the official ruling), so it is judged on the history of casts this turn,
 /// and only on the active player's own turn.
-fn first_flying_non_lemur_costs_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed) -> CostDelta {
+fn first_flying_non_lemur_costs_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
     let Costed::Spell(spell) = costed else { return CostDelta::NONE };
     if player != q.controller(source) || q.state().turn.active != player || !non_lemur_flying_creature_spell(q, source, spell) {
         return CostDelta::NONE;

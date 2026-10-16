@@ -236,7 +236,14 @@ impl CostDelta {
 /// A static ability that changes what something costs (CR 601.2f, 118.7): what it does to the cost of `costed` when
 /// `player` pays, by the permanent `source` that has it (`CostDelta::NONE` when it does not apply). Every increase is
 /// applied first, then every reduction, and no part of the cost goes below zero (CR 601.2f).
-pub type CostChange = fn(&dyn Query, ObjectId, PlayerId, Costed) -> CostDelta;
+///
+/// `targets` are the targets announced for it, in slot order: the total cost is determined after the targets are
+/// chosen (CR 601.2c, 601.2f, 602.2b), so "equip abilities you activate that target this creature cost {2} less" and
+/// "costs {1} less for each color of the creature it targets" read them. Once determined the cost is locked in, so what
+/// happens to a target afterwards changes nothing. When a cost is judged before anything is announced (whether an action
+/// is worth offering), they are the candidate target the action would be announced with, or empty when its targets are
+/// chosen later; a change that depends on them then does not apply.
+pub type CostChange = fn(&dyn Query, ObjectId, PlayerId, Costed, &[Target]) -> CostDelta;
 
 /// A static ability that makes abilities cost less to activate, but never below one mana (CR 601.2f, 118.7): how much
 /// generic mana less the ability `ability` of `permanent` costs `player` to activate, by the permanent `source` that has

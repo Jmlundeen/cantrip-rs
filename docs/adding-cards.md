@@ -281,7 +281,11 @@ shapes have an example:
 - **Cost changes** are `CardDef.cost_changes` (Thalia-likes, Bilbo, Anointed Peacekeeper), a spell's own
   `own_cost_changes` (affinity), and an ability's own `.cost_change(f)` ("this ability costs ... less", power-up). Each
   returns a `CostDelta`: `more(n)` generic, `less(n)` generic, or `less_mana(cost)` for an amount that may be colored,
-  whose colored part comes off that color and any excess off generic (CR 118.7). "Activate only once" is `.once()`;
+  whose colored part comes off that color and any excess off generic (CR 118.7). Each is also handed the targets announced for the
+  spell or ability (CR 601.2c): the total cost is determined after them (CR 601.2f), so "equip abilities you activate
+  that target this creature cost {2} less" (`attach::equip_targeting_this_costs_less::<2>`, Dwarven Mauler) and "costs
+  {1} less for each color of the creature it targets" (Dragonfire Blade) read them; an action whose target is announced
+  with it is offered only with the targets its cost could then be paid for. "Activate only once" is `.once()`;
   **cast limits and bans** are
   `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster, from: ZoneKind) -> bool`, false forbids casting from that zone:
   Teferi, Drannith Magistrate's "from anywhere other than their hands"), and a resolved spell's bar on a player casting from

@@ -859,9 +859,10 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
 }
 
 /// A cost with the static abilities that change it applied (CR 601.2f, 118.7): increases first, then reductions, a
-/// reduction taking nothing below zero generic mana (CR 118.7c).
-pub fn apply_cost_changes(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost) -> ManaCost {
-    change_with(cx, &cost_change_sources(cx), player, costed, cost, None)
+/// reduction taking nothing below zero generic mana (CR 118.7c). `targets` are those announced for the spell or ability
+/// (CR 601.2c), which the total cost is determined after.
+pub fn apply_cost_changes(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> ManaCost {
+    change_with(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
 }
 
 /// The permanents on the battlefield whose cards change costs: found from the board, not from the card table (which
@@ -912,7 +913,21 @@ impl Query for AsFace<'_> {
     }
 }
 
-fn change_with(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, mut cost: ManaCost, face: Option<CardId>) -> ManaCost {
+/// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's.
+fn own_cost_changes(cx: &Cx, id: ObjectId) -> &'static [CostChange] {
+    let obj = cx.s().obj(id);
+    cx.card(obj.copy.map_or(obj.card, |c| c.card)).own_cost_changes
+}
+
+fn change_with(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    mut cost: ManaCost,
+    face: Option<CardId>,
+    targets: &[Target],
+) -> ManaCost {
     let view;
     let q: &dyn Query = match (face, costed) {
         (Some(face), Costed::Spell(spell)) => {
@@ -926,9 +941,9 @@ fn change_with(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, 
         Costed::Spell(id) => (id, None),
         Costed::Ability(id, ability) => (id, Some(ability)),
     };
-    let own: &[CostChange] = {
-        let obj = cx.s().obj(id);
-        match face { Some(face) => cx.card(face), None => cx.card(obj.copy.map_or(obj.card, |c| c.card)) }.own_cost_changes
+    let own: &[CostChange] = match face {
+        Some(face) => cx.card(face).own_cost_changes,
+        None => own_cost_changes(cx, id),
     };
     // The ability's own change ("this ability costs ... less", power-up), asked for this ability alone.
     let ability_own = ability.and_then(|a| activated(cx, a)).and_then(|d| d.cost_change);
@@ -942,17 +957,17 @@ fn change_with(cx: &Cx, sources: &[ObjectId], player: PlayerId, costed: Costed, 
         less = less.plus(&delta.less);
     };
     for change in own {
-        add(change(q, id, player, costed));
+        add(change(q, id, player, costed, targets));
     }
     if let Some(change) = ability_own {
-        add(change(q, id, player, costed));
+        add(change(q, id, player, costed, targets));
     }
     let mut discount = 0u32;
     for &source in sources {
         let obj = cx.s().obj(source);
         let def = cx.card(cx.cards().current(obj));
         for change in def.cost_changes {
-            add(change(q, source, player, costed));
+            add(change(q, source, player, costed, targets));
         }
         if let Some(ability) = ability {
             for d in def.ability_discounts {
@@ -1000,8 +1015,9 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
 
 /// The least mana a spell could be cast for with this base cost, for the advice that a cast that cannot be paid is
 /// not offered (CR 601.2, 118.3): X at 0, no kicker, the cheapest modes it must choose, Phyrexian symbols paid with
-/// life where the life total allows.
-fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost) -> ManaCost {
+/// life where the life total allows. `targets` are the candidate it would be announced with, where its target is announced
+/// with the cast, or none (CR 601.2c, 601.2f).
+fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target]) -> ManaCost {
     let mut cost = base;
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
@@ -1040,7 +1056,7 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
     let whole = cx.card(cx.s().obj(card).card);
     let faces = [whole.adventure, whole.omen, whole.back, whole.bestow, whole.split.map(|s| s.0), whole.split.map(|s| s.1)];
     let face = faces.into_iter().flatten().find(|&f| std::ptr::eq(f, def)).map(|f| cx.card_id(f));
-    change_with(cx, &available.changers, player, Costed::Spell(card), cost, face)
+    change_with(cx, &available.changers, player, Costed::Spell(card), cost, face, targets)
 }
 
 /// Whether `player` could pay `cost` from the mana pool and what the mana abilities they could activate add (advice,
@@ -1338,6 +1354,14 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             if !can_pay_other(cx, id, player, &def.cost) {
                 continue;
             }
+            let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
+            let possible = match def.modal {
+                Some(modal) => modes_possible(cx, &asker, modal),
+                None => with_targets(cx, &asker, def.targets, &mut option),
+            };
+            if !possible {
+                continue;
+            }
             // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
             // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
             let owed = if def.special_action { special_action_cost(cx, id, ability, def) } else { def.cost.mana };
@@ -1345,28 +1369,42 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
                 // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
                 let own = (def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
                 let a = own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player)));
-                // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
-                // touch it, and `special_action` pays the cost as it stands.
-                let mut cost = if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None) };
-                // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
-                if static_rules::spend_any_color_for(cx, player, id) {
-                    cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
-                }
                 // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2,
                 // 106.6).
                 let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types } };
-                if !a.covers_for(&cost, payment) && static_rules::activation_alternative(cx, player, id, def).is_none() {
+                let covered = |targets: &[Target]| {
+                    // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does
+                    // not touch it, and `special_action` pays the cost as it stands.
+                    let mut cost =
+                        if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
+                    // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
+                    if static_rules::spend_any_color_for(cx, player, id) {
+                        cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                    }
+                    a.covers_for(&cost, payment)
+                };
+                // The total cost is determined once the targets are announced (CR 601.2c, 601.2f, 602.2b), so a change that
+                // reads them ("equip abilities that target this creature cost {2} less") is judged for each candidate a
+                // target announced with the action could be: only those the cost could then be paid for are offered. Asked
+                // only where something could change the cost, since nearly nothing does. A static ability that lets the
+                // player pay another cost instead (CR 118.9) leaves every target on offer.
+                if targets_with_action(def.targets)
+                    && !def.special_action
+                    && def.modal.is_none()
+                    && (!a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty())
+                {
+                    let kept: Vec<Target> = option.target_candidates.iter().copied().filter(|&t| covered(&[t])).collect();
+                    if kept.len() != option.target_candidates.len() && static_rules::activation_alternative(cx, player, id, def).is_none() {
+                        if kept.is_empty() && !(option.targets_optional && covered(&[])) {
+                            continue;
+                        }
+                        option.target_candidates = kept;
+                    }
+                } else if !covered(&[]) && static_rules::activation_alternative(cx, player, id, def).is_none() {
                     continue;
                 }
             }
-            let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
-            let possible = match def.modal {
-                Some(modal) => modes_possible(cx, &asker, modal),
-                None => with_targets(cx, &asker, def.targets, &mut option),
-            };
-            if possible {
-                options.push(option);
-            }
+            options.push(option);
         }
     }
 }
@@ -1677,19 +1715,30 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     && def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
                     && (def.additional_choice.is_empty()
                         || def.additional_choice.iter().any(|c| can_pay_other(cx, id, player, &c.cost)))
-                    && {
-                        let a = available.get_or_init(|| self::available(cx, player));
-                        let mut least = least_cost(cx, a, player, id, def, instead.unwrap_or(def.cost));
+                {
+                    let a = available.get_or_init(|| self::available(cx, player));
+                    let covered = |targets: &[Target]| {
+                        let mut least = least_cost(cx, a, player, id, def, instead.unwrap_or(def.cost), targets);
                         least.generic = least.generic.saturating_add(more);
                         if any_type {
                             // Mana of any type pays every symbol of it (CR 609.4b).
                             least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
                         }
                         covers_total(cx, a, player, id, def, least, 0)
-                    }
-                {
+                    };
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
-                    if offer_spell(cx, &asker, def, &mut option) {
+                    // The total cost is determined once the target is announced (CR 601.2c, 601.2f): where it is announced
+                    // with the cast and something could change the cost, the cast is judged for each candidate, and only
+                    // those it could be paid for are offered.
+                    if targets_with_cast(def) && (!a.changers.is_empty() || !def.own_cost_changes.is_empty()) {
+                        if offer_spell(cx, &asker, def, &mut option) {
+                            let none_covered = option.targets_optional && covered(&[]);
+                            option.target_candidates.retain(|&t| covered(&[t]));
+                            if !option.target_candidates.is_empty() || none_covered {
+                                options.push(option);
+                            }
+                        }
+                    } else if covered(&[]) && offer_spell(cx, &asker, def, &mut option) {
                         options.push(option);
                     }
                 }
@@ -1726,7 +1775,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     && zone.is(ZoneKind::Hand)
                 {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    let cost = least_cost(cx, a, player, id, def, overload);
+                    let cost = least_cost(cx, a, player, id, def, overload, &[]);
                     if covers_total(cx, a, player, id, def, cost, 0) {
                         options.push(ActionOption::on(ActionKind::CastSpell, id, WAY_OVERLOAD));
                     }
@@ -1784,7 +1833,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                                 continue;
                             }
                             let a = available.get_or_init(|| self::available(cx, player));
-                            let least = least_cost(cx, a, player, id, face_def, cost.mana);
+                            let least = least_cost(cx, a, player, id, face_def, cost.mana, &[]);
                             if !covers_total(cx, a, player, id, face_def, least, cost.exile_from_graveyard) {
                                 continue;
                             }
@@ -1810,7 +1859,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
                     if {
                         let a = available.get_or_init(|| self::available(cx, player));
-                        a.covers_for(&least_cost(cx, a, player, id, half, half.cost), spell_kind(half))
+                        a.covers_for(&least_cost(cx, a, player, id, half, half.cost, &[]), spell_kind(half))
                     } && offer_spell(cx, &asker, half, &mut option)
                     {
                         options.push(option);
@@ -1827,7 +1876,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_for(&least_cost(cx, a, player, id, back, back.cost), spell_kind(back))
+                    a.covers_for(&least_cost(cx, a, player, id, back, back.cost, &[]), spell_kind(back))
                 } && offer_spell(cx, &asker, back, &mut option)
                 {
                     options.push(option);
@@ -1842,7 +1891,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BESTOW);
                 if {
                     let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_for(&least_cost(cx, a, player, id, bestow, bestow.cost), spell_kind(bestow))
+                    a.covers_for(&least_cost(cx, a, player, id, bestow, bestow.cost, &[]), spell_kind(bestow))
                 } && offer_spell(cx, &asker, bestow, &mut option)
                 {
                     options.push(option);
@@ -1863,7 +1912,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
                     if {
                         let a = available.get_or_init(|| self::available(cx, player));
-                        let mut least = least_cost(cx, a, player, id, inset, instead.unwrap_or(inset.cost));
+                        let mut least = least_cost(cx, a, player, id, inset, instead.unwrap_or(inset.cost), &[]);
                         least.generic = least.generic.saturating_add(more);
                         if any_type {
                             // Mana of any type pays every symbol of it (CR 609.4b).
@@ -1897,7 +1946,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
         if allowed && !land_rules(cx, player).3 && !def.is(CardType::Land) && def.has_cost && instant == instants {
             let a = available.get_or_init(|| self::available(cx, player));
             let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
-            if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, def.cost), 0)
+            if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, def.cost, &[]), 0)
                 && offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option)
             {
                 options.push(option);
@@ -1948,7 +1997,7 @@ fn reduction_of(cx: &Cx, creature: ObjectId) -> u8 {
 /// richest sacrifice, is covered; or, for harmonize (CR 702.180a), is covered once some untapped creature is tapped for
 /// its power, that creature then not tapping for mana.
 fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost) -> bool {
-    let mut cost = least_cost(cx, a, player, card, def, way.mana);
+    let mut cost = least_cost(cx, a, player, card, def, way.mana, &[]);
     cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
     if covers_total(cx, a, player, card, def, cost, way.exile_from_graveyard) {
         return true;
@@ -1978,7 +2027,8 @@ fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) 
     if eligible.is_empty() {
         return Ok(None);
     }
-    let generic = apply_cost_changes(cx, player, Costed::Spell(source), cost.mana).generic;
+    // Before any target is chosen (CR 601.2b), so a change that reads the targets is not in it.
+    let generic = apply_cost_changes(cx, player, Costed::Spell(source), cost.mana, &[]).generic;
     let powers = eligible.iter().map(|&c| reduction_of(cx, c).min(generic)).collect();
     let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0 };
     match cx.ask_core(player, ask, true)? {
@@ -2461,13 +2511,6 @@ fn cast(
 
     // CR 601.2b, 107.4f: which Phyrexian symbols are paid with life is announced before any target.
     let life = announce_life(cx, player, spell, &mut cost.mana)?;
-    // CR 601.2f: the total cost, with what increases or reduces it.
-    cost.mana = apply_cost_changes(cx, player, Costed::Spell(spell), cost.mana);
-    // CR 702.180a, 601.2f: the total cost comes down by generic mana equal to the tapped creature's power, read as the total
-    // cost is determined, after what raises it; colored mana never comes down.
-    if let Some(creature) = reducer {
-        cost.mana.generic = cost.mana.generic.saturating_sub(reduction_of(cx, creature));
-    }
     // CR 601.2b, 702.174a: gift is an optional additional cost, announced, with the opponent it is promised to, before
     // the targets (CR 702.174m): what may be targeted can depend on it. The opponent is the only one without asking.
     if let Some(gift) = def.gift
@@ -2542,6 +2585,16 @@ fn cast(
             targets = all;
             set_item_targets(cx, &targets, &of);
         }
+    }
+
+    // CR 601.2f: the total cost, with what increases or reduces it, once the targets are announced (CR 601.2c): a change may
+    // read them ("costs {2} less if it targets ..."). It is locked in here, so nothing that happens to a target later changes
+    // what is paid.
+    cost.mana = apply_cost_changes(cx, player, Costed::Spell(spell), cost.mana, &targets);
+    // CR 702.180a, 601.2f: the total cost comes down by generic mana equal to the tapped creature's power, read as the total
+    // cost is determined, after what raises it; colored mana never comes down.
+    if let Some(creature) = reducer {
+        cost.mana.generic = cost.mana.generic.saturating_sub(reduction_of(cx, creature));
     }
 
     // Mana of any type may pay for it (CR 609.4b).
@@ -3270,7 +3323,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         item.x = n;
     }
     let life = announce_life(cx, player, source, &mut mana)?;
-    mana = apply_cost_changes(cx, player, Costed::Ability(source, ability), mana);
     cx.st().stack_push(item);
 
     let mut targets: Vec<Target> = targets.to_vec();
@@ -3285,6 +3337,10 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         (targets, of) = choose_slots(cx, player, source, def.targets, item.x, 0)?;
         set_item_targets(cx, &targets, &of);
     }
+    // CR 601.2f by way of 602.2b: the total cost, with what increases or reduces it, once the targets are announced: a
+    // change may read them ("equip abilities you activate that target this creature cost {2} less"). It is locked in
+    // here, so nothing that happens to a target later changes what is paid.
+    mana = apply_cost_changes(cx, player, Costed::Ability(source, ability), mana, &targets);
 
     // Behold and blight are paid when a spell is cast only (CR 701.4a, 701.68a): an activated ability that had them would
     // get the cost for free.
