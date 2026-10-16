@@ -18,7 +18,7 @@
 //! | `SpellCast`                                       | `SpellCastEvent` (targets, X, modes, kicks)         |
 //! | `Revealed`                                        | `CardsRevealedEvent`                                |
 //! | `Looked` (those of one player in a row together)  | `CardsLookedAtEvent`, the cards known to the looker alone |
-//! | `CountersPut` (lore only, as the engine reports)  | `CountersPutEvent`                                  |
+//! | `CountersPut` (every kind, by its name)           | `CountersPutEvent`                                  |
 //! | `Transformed`                                     | `TransformedEvent`                                  |
 //! | a new activated/triggered item on the stack       | `AbilityActivatedEvent`                             |
 //! | an ability item gone from the stack               | `AbilityResolvedEvent`                              |

@@ -88,6 +88,22 @@ pub fn cast_this_spell(_: &dyn Query, source: ObjectId, event: &Event) -> Option
     }
 }
 
+/// "When the Nth [kind] counter is put on this permanent" (CR 122.6, 603.2): counters of kind `KIND` (`CounterKind::Plan
+/// as u8`) were put on it and the Nth was among them - it had fewer than N before and has N or more now, as the event
+/// records (`total`). So it triggers once however many are put at once (CR 603.2c), not for a counter after the Nth,
+/// whatever a replacement made the number (doubling), for a permanent that enters with N or more of them (CR 122.6), and
+/// again if counters were removed and the Nth is put once more, as a Saga's chapters count (CR 714.2b). Political
+/// Triumph, Death to Our Enemies and the other Plans print it with plan counters; Shang-Chi and the Ten Rings with +1/+1
+/// counters.
+pub fn nth_counter_put_on_this<const KIND: u8, const N: i16>(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::CountersPut { object, kind, amount, total, .. } if *object == source && *kind as u8 == KIND && total - amount < N && *total >= N => {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// Cascade's effect (CR 702.85a): exile cards from the top of the library until a nonland card with a lesser mana
 /// value than the spell's; its controller may cast it without paying its mana cost; then every card exiled and not
 /// cast goes to the bottom of the library in a random order. The spell's mana value is its card's, X included, as it

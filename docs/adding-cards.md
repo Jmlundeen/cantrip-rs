@@ -309,7 +309,12 @@ shapes have an example:
   did ("tap up to that many target creatures") is `Game::reflexive_trigger_counted(.., count)`, and its slot's
   `TargetSpec::COUNTED` bound and its stack item's `x` are that count (Seasoned Cryomancer, Miasma Demon, Loamcrafter
   Faun, Swashbuckler Extraordinaire).
-- **Counters**: `Event::CountersPut` carries `by` (CR 122.6a), the player who put them. **Costs**: `Cost.unattach_self`.
+- **Counters**: `Event::CountersPut` carries `by` (CR 122.6a), the player who put them, and `total`, how many of the kind
+  the permanent has once they are on it; a permanent entering with counters announces each kind it has, lore included.
+  "When the Nth [kind] counter is put on this" (the Plans, Shang-Chi and the Ten Rings) is
+  `when(EventMask::COUNTERS, triggers::nth_counter_put_on_this::<{ CounterKind::Plan as u8 }, 4>)`. A new kind of counter
+  is one line in `counter_kinds!` (`cantrip-state/src/vocab.rs`); the host and the client name it from there.
+  **Costs**: `Cost.unattach_self`.
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `CardDef.turn_begin` skips a turn (Time Vault, CR 614.10); "end the
   turn" is `g.end_the_turn()?` (CR 724.1, Time Stop), after which the rest of the effect still runs (Glorious End), and
   "the player whose turn it is may end the turn" asks with `Purpose::EndTurn` (Obeka). "Activate only during your turn"

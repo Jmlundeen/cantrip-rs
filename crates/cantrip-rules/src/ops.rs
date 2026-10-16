@@ -206,9 +206,8 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             new.copy = old.copy;
             new.face_down = true;
         }
-        let mut lore = false;
         if entering {
-            lore = enters_with_intrinsic_counters(cx.cards(), &mut new);
+            enters_with_intrinsic_counters(cx.cards(), &mut new);
             // Counters it enters with are counters put on it (CR 122.6, 614.1a): replacements that change how many
             // apply to them, the permanent judged as it would exist on the battlefield (CR 614.12).
             new.counters = replace::counters(cx, m.id, new.controller, true, new.counters);
@@ -258,9 +257,6 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         // CR 709.5h: a door unlocked as the Room enters is unlocked all the same ("when you unlock this door" triggers).
         if entering && cx.s().obj(new_id).marks.doors != 0 {
             events.push(Event::DoorUnlocked { permanent: new_id, door: cx.s().obj(new_id).marks.doors, player: cx.s().obj(new_id).controller });
-        }
-        if lore {
-            events.push(Event::CountersPut { object: new_id, kind: CounterKind::Lore, amount: 1, by: Some(cx.s().obj(new_id).controller) });
         }
         // The counters a permanent enters with were put on it (CR 122.6).
         if entering {
@@ -642,8 +638,8 @@ pub fn put_onto_battlefield_as(
 }
 
 /// What a permanent enters with because of what it is: a planeswalker its printed loyalty (CR 306.5b), a Saga a lore
-/// counter (CR 714.3a). Whether it got a lore counter, which is announced once the permanent is there.
-fn enters_with_intrinsic_counters(cards: &CardTable, new: &mut Obj) -> bool {
+/// counter (CR 714.3a), announced with the rest of the counters it enters with once it is there.
+fn enters_with_intrinsic_counters(cards: &CardTable, new: &mut Obj) {
     let card = new.copy.map(|c| c.card).unwrap_or_else(|| cards.face(new.card, new.transformed));
     let def = cards.get(card);
     if let Some(loyalty) = def.loyalty {
@@ -657,7 +653,6 @@ fn enters_with_intrinsic_counters(cards: &CardTable, new: &mut Obj) -> bool {
     if saga {
         new.counters[CounterKind::Lore as usize] += 1;
     }
-    saga
 }
 
 /// Transforms a permanent (CR 701.28): its other face is up. The same object, so nothing about it is new (CR 701.28f).
@@ -911,16 +906,13 @@ pub fn create_tokens_worded(
         note_statics(cx, id);
         // A token copy of a planeswalker or a Saga enters with its loyalty or lore counter too.
         let mut with = *cx.s().obj(id);
-        let lore = enters_with_intrinsic_counters(cx.cards(), &mut with);
+        enters_with_intrinsic_counters(cx.cards(), &mut with);
         cx.st().update_obj(id, |o| o.counters = with.counters);
         cx.st().zone_push(Zone::BATTLEFIELD, id);
         events.push(match spell {
             Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
             None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, reason: ZoneReason::Created },
         });
-        if lore {
-            events.push(Event::CountersPut { object: id, kind: CounterKind::Lore, amount: 1, by: Some(controller) });
-        }
         counters_entered_with(&mut events, id, controller, &with.counters);
         created.push(id);
     }
@@ -928,13 +920,13 @@ pub fn create_tokens_worded(
     Ok(created)
 }
 
-/// Announces the counters a permanent entered with, as counters put on it (CR 122.6): every kind but lore, whose arrival is
-/// announced on its own.
+/// Announces the counters a permanent entered with, as counters put on it (CR 122.6): a Saga's lore counter too, so its
+/// first chapter triggers (CR 714.3a, 714.2b), and all of them, so "when the Nth ... counter is put" sees each it entered with.
 fn counters_entered_with(events: &mut Vec<Event>, object: ObjectId, by: PlayerId, counters: &[i16; CounterKind::COUNT]) {
     for kind in CounterKind::ALL {
         let amount = counters[kind as usize];
-        if amount > 0 && kind != CounterKind::Lore {
-            events.push(Event::CountersPut { object, kind, amount, by: Some(by) });
+        if amount > 0 {
+            events.push(Event::CountersPut { object, kind, amount, total: amount, by: Some(by) });
         }
     }
 }
@@ -1669,7 +1661,8 @@ pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
     let put = counts[kind as usize];
     if put > 0 {
         let by = cx.actor();
-        cx.emit(Event::CountersPut { object: id, kind, amount: put, by });
+        let total = cx.s().obj(id).counters(kind);
+        cx.emit(Event::CountersPut { object: id, kind, amount: put, total, by });
     }
 }
 

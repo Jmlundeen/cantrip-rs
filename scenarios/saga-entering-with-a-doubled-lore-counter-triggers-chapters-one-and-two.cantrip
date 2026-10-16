@@ -1,0 +1,55 @@
+# A Saga entering with two lore counters triggers both chapter I and chapter II (CR 714.3a, 714.2b, 122.6): Innkeeper's
+# Talent at level 3 doubles the lore counter Fable of the Mirror-Breaker is given as it enters (CR 614.1c), so the count
+# goes from none to two in one event and both chapters it passes trigger. Chapter I makes the Goblin Shaman; chapter II
+# lets Bot1 discard the Island it drew this turn and draw the Swamp. The Talent's level-1 combat trigger has no creature
+# to target on turn 1 and is removed.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Innkeeper's Talent
+Mox Emerald
+Mox Ruby
+Fable of the Mirror-Breaker
+Island
+Swamp
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot1.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Fable of the Mirror-Breaker.Counters.Lore = 2
+Bot1.Battlefield.Goblin Shaman.Token = true
+Bot1.Hand = Swamp
+Bot1.Graveyard = Island; Black Lotus

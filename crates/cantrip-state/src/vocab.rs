@@ -665,121 +665,75 @@ impl fmt::Debug for Keywords {
     }
 }
 
-/// Counters an object can have (CR 122), by kind.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-#[repr(u8)]
-pub enum CounterKind {
-    PlusOne = 0,
-    MinusOne = 1,
-    Loyalty = 2,
-    Time = 3,
-    Lore = 4,
-    Stun = 5,
-    Charge = 6,
-    Defense = 7,
-    Finality = 8,
-    Flying = 9,
-    Lifelink = 10,
-    Indestructible = 11,
-    Hexproof = 12,
-    Corpse = 13,
-    Fade = 14,
-    Level = 15,
-    Story = 16,
-    Wish = 17,
-    Rev = 18,
-    Mining = 19,
-    Influence = 20,
-    Oil = 21,
-    Shield = 22,
-    Fellowship = 23,
-    Hope = 24,
-    Void = 25,
-    Luck = 26,
-    Silver = 27,
-    Chorus = 28,
-    Burden = 29,
-    Incubation = 30,
+/// Counters an object can have (CR 122), by kind: one line each - the kind, its index in an object's dense counter array,
+/// its name as Oracle text writes it (CR 122.1), and the token the scenario dump names it by (`Counters.PlusOnePlusOne`).
+/// A kind a new card prints is one more line at the end: the host's view and events, proliferate, "remove all counters"
+/// and the client's pills all walk `CounterKind::ALL` and name the kind, so nothing else changes.
+macro_rules! counter_kinds {
+    ($($kind:ident = $n:literal, $name:literal, $token:literal;)*) => {
+        #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+        #[repr(u8)]
+        pub enum CounterKind {
+            $($kind = $n,)*
+        }
+
+        impl CounterKind {
+            pub const ALL: [CounterKind; [$($n),*].len()] = [$(CounterKind::$kind),*];
+            pub const COUNT: usize = Self::ALL.len();
+
+            /// The counter's name as Oracle text writes it (CR 122.1).
+            pub fn name(self) -> &'static str {
+                match self {
+                    $(CounterKind::$kind => $name,)*
+                }
+            }
+
+            /// As the scenario dump names it: `Counters.PlusOnePlusOne`.
+            pub fn token(self) -> &'static str {
+                match self {
+                    $(CounterKind::$kind => $token,)*
+                }
+            }
+        }
+    };
+}
+
+counter_kinds! {
+    PlusOne = 0, "+1/+1", "PlusOnePlusOne";
+    MinusOne = 1, "-1/-1", "MinusOneMinusOne";
+    Loyalty = 2, "loyalty", "Loyalty";
+    Time = 3, "time", "Time";
+    Lore = 4, "lore", "Lore";
+    Stun = 5, "stun", "Stun";
+    Charge = 6, "charge", "Charge";
+    Defense = 7, "defense", "Defense";
+    Finality = 8, "finality", "Finality";
+    Flying = 9, "flying", "Flying";
+    Lifelink = 10, "lifelink", "Lifelink";
+    Indestructible = 11, "indestructible", "Indestructible";
+    Hexproof = 12, "hexproof", "Hexproof";
+    Corpse = 13, "corpse", "Corpse";
+    Fade = 14, "fade", "Fade";
+    Level = 15, "level", "Level";
+    Story = 16, "story", "Story";
+    Wish = 17, "wish", "Wish";
+    Rev = 18, "rev", "Rev";
+    Mining = 19, "mining", "Mining";
+    Influence = 20, "influence", "Influence";
+    Oil = 21, "oil", "Oil";
+    Shield = 22, "shield", "Shield";
+    Fellowship = 23, "fellowship", "Fellowship";
+    Hope = 24, "hope", "Hope";
+    Void = 25, "void", "Void";
+    Luck = 26, "luck", "Luck";
+    Silver = 27, "silver", "Silver";
+    Chorus = 28, "chorus", "Chorus";
+    Burden = 29, "burden", "Burden";
+    Incubation = 30, "incubation", "Incubation";
+    Plan = 31, "plan", "Plan";
 }
 
 impl CounterKind {
-    pub const COUNT: usize = 31;
-    pub const ALL: [CounterKind; 31] = [CounterKind::PlusOne, CounterKind::MinusOne, CounterKind::Loyalty, CounterKind::Time, CounterKind::Lore, CounterKind::Stun, CounterKind::Charge, CounterKind::Defense, CounterKind::Finality, CounterKind::Flying, CounterKind::Lifelink, CounterKind::Indestructible, CounterKind::Hexproof, CounterKind::Corpse, CounterKind::Fade, CounterKind::Level, CounterKind::Story, CounterKind::Wish, CounterKind::Rev, CounterKind::Mining, CounterKind::Influence, CounterKind::Oil, CounterKind::Shield, CounterKind::Fellowship, CounterKind::Hope, CounterKind::Void, CounterKind::Luck, CounterKind::Silver, CounterKind::Chorus, CounterKind::Burden, CounterKind::Incubation];
-
-    /// The counter's name as Oracle text writes it (CR 122.1).
-    pub fn name(self) -> &'static str {
-        match self {
-            CounterKind::PlusOne => "+1/+1",
-            CounterKind::MinusOne => "-1/-1",
-            CounterKind::Loyalty => "loyalty",
-            CounterKind::Time => "time",
-            CounterKind::Lore => "lore",
-            CounterKind::Stun => "stun",
-            CounterKind::Charge => "charge",
-            CounterKind::Defense => "defense",
-            CounterKind::Finality => "finality",
-            CounterKind::Flying => "flying",
-            CounterKind::Lifelink => "lifelink",
-            CounterKind::Indestructible => "indestructible",
-            CounterKind::Hexproof => "hexproof",
-            CounterKind::Corpse => "corpse",
-            CounterKind::Fade => "fade",
-            CounterKind::Level => "level",
-            CounterKind::Story => "story",
-            CounterKind::Wish => "wish",
-            CounterKind::Rev => "rev",
-            CounterKind::Mining => "mining",
-            CounterKind::Influence => "influence",
-            CounterKind::Oil => "oil",
-            CounterKind::Shield => "shield",
-            CounterKind::Fellowship => "fellowship",
-            CounterKind::Hope => "hope",
-            CounterKind::Void => "void",
-            CounterKind::Luck => "luck",
-            CounterKind::Silver => "silver",
-            CounterKind::Chorus => "chorus",
-            CounterKind::Burden => "burden",
-            CounterKind::Incubation => "incubation",
-        }
-    }
-
-    /// As the scenario dump names it: `Counters.PlusOnePlusOne`.
-    pub fn token(self) -> &'static str {
-        match self {
-            CounterKind::PlusOne => "PlusOnePlusOne",
-            CounterKind::MinusOne => "MinusOneMinusOne",
-            CounterKind::Loyalty => "Loyalty",
-            CounterKind::Time => "Time",
-            CounterKind::Lore => "Lore",
-            CounterKind::Stun => "Stun",
-            CounterKind::Charge => "Charge",
-            CounterKind::Defense => "Defense",
-            CounterKind::Finality => "Finality",
-            CounterKind::Flying => "Flying",
-            CounterKind::Lifelink => "Lifelink",
-            CounterKind::Indestructible => "Indestructible",
-            CounterKind::Hexproof => "Hexproof",
-            CounterKind::Corpse => "Corpse",
-            CounterKind::Fade => "Fade",
-            CounterKind::Level => "Level",
-            CounterKind::Story => "Story",
-            CounterKind::Wish => "Wish",
-            CounterKind::Rev => "Rev",
-            CounterKind::Mining => "Mining",
-            CounterKind::Influence => "Influence",
-            CounterKind::Oil => "Oil",
-            CounterKind::Shield => "Shield",
-            CounterKind::Fellowship => "Fellowship",
-            CounterKind::Hope => "Hope",
-            CounterKind::Void => "Void",
-            CounterKind::Luck => "Luck",
-            CounterKind::Silver => "Silver",
-            CounterKind::Chorus => "Chorus",
-            CounterKind::Burden => "Burden",
-            CounterKind::Incubation => "Incubation",
-        }
-    }
-
     /// The keyword counters (CR 122.1b).
     pub const KEYWORDS: [CounterKind; 4] =
         [CounterKind::Flying, CounterKind::Lifelink, CounterKind::Indestructible, CounterKind::Hexproof];

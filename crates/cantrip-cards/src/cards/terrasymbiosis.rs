@@ -14,7 +14,7 @@ fn draw_ability(q: &dyn Query, source: ObjectId) -> AbilityRef {
 /// (CR 603.2h). The counters put at once carry as the number to draw.
 fn you_put_plus_one_counters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::CountersPut { object, kind: CounterKind::PlusOne, amount, by }
+        Event::CountersPut { object, kind: CounterKind::PlusOne, amount, by, .. }
             if *amount > 0
                 && *by == Some(q.controller(source))
                 && q.controller(*object) == q.controller(source)

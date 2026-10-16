@@ -626,7 +626,7 @@ fn consider(
     for ability in chars.abilities() {
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
             && (later.is_some() || t.look_back == look_back)
-            && let Some(fired) = if t.chapter > 0 { chapter_reached(cx, source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
+            && let Some(fired) = if t.chapter > 0 { chapter_reached(source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
         {
             if let Some(condition) = t.condition
                 && !condition(cx, &Asker { source, controller })
@@ -658,11 +658,10 @@ fn consider(
 
 /// A Saga's chapter ability (CR 714.2b) triggers when lore counters are put on it and their number becomes at least
 /// its chapter number, having been less than it.
-fn chapter_reached(cx: &Cx, source: ObjectId, chapter: u8, event: &Event) -> Option<Fired> {
+fn chapter_reached(source: ObjectId, chapter: u8, event: &Event) -> Option<Fired> {
     match event {
-        Event::CountersPut { object, kind: CounterKind::Lore, amount, .. } if *object == source => {
-            let now = cx.s().obj(source).counters(CounterKind::Lore);
-            if now - *amount < chapter as i16 && now >= chapter as i16 { Fired::PLAIN } else { None }
+        Event::CountersPut { object, kind: CounterKind::Lore, amount, total, .. } if *object == source => {
+            if total - amount < chapter as i16 && *total >= chapter as i16 { Fired::PLAIN } else { None }
         }
         _ => None,
     }

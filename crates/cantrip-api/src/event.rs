@@ -52,10 +52,13 @@ pub enum Event {
     /// A permanent became monstrous (CR 701.37a).
     Monstrous { permanent: ObjectId },
     StepBegan { step: Step },
-    /// Counters were put on a permanent. Only lore counters are announced (CR 714.2b: a Saga's chapters). `by` is the
-    /// player who put them (CR 122.6a): the controller of the spell or ability whose effect did it, the player whose
-    /// action it was, or the controller of a permanent that enters with them; none for the rules themselves.
-    CountersPut { object: ObjectId, kind: CounterKind, amount: i16, by: Option<PlayerId> },
+    /// `amount` counters of `kind` were put on a permanent (CR 122.6), as many as the replacement effects left (CR 614.1a),
+    /// or it entered with them. `total` is how many of that kind it has once they are on it, so "when the fourth plan
+    /// counter is put on this" (the counters numbered `total - amount + 1` to `total`) and a Saga's chapters (CR 714.2b)
+    /// read the event, never the permanent as it is later. `by` is the player who put them (CR 122.6a): the controller
+    /// of the spell or ability whose effect did it, the player whose action it was, or the controller of a permanent that
+    /// enters with them; none for the rules themselves.
+    CountersPut { object: ObjectId, kind: CounterKind, amount: i16, total: i16, by: Option<PlayerId> },
     /// A permanent transformed (CR 701.28): its other face is up now.
     Transformed { object: ObjectId },
     /// `player` gave a gift (CR 702.174c) to `to`: an instant or sorcery spell they control whose gift cost was paid
