@@ -100,3 +100,13 @@ pub fn creatures_died_this_turn(q: &dyn Query, under: Option<PlayerId>) -> usize
 pub fn gained_life_this_turn(q: &dyn Query, player: PlayerId) -> bool {
     q.history().life_gained(player) > 0
 }
+
+/// Whether `player` has activated an equip ability this turn (CR 702.6a, 602.2): what "the first equip ability you activate
+/// [during each of your turns / each turn]" asks of an equip ability being announced, which is not yet in the history.
+/// Forge Anew and Kíli the Resourceful print it.
+pub fn activated_an_equip_ability_this_turn(q: &dyn Query, player: PlayerId) -> bool {
+    q.history().this_turn().iter().any(|r| {
+        matches!(r.event, Event::AbilityActivated { ability, player: p, .. }
+            if p == player && q.activated_ability(ability).is_some_and(|d| d.equip))
+    })
+}

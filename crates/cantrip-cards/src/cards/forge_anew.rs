@@ -35,10 +35,7 @@ fn free_first_equip(q: &dyn Query, asker: &Asker, activator: PlayerId, _: Object
     if !def.equip || activator != asker.controller || q.state().turn.active != asker.controller {
         return None;
     }
-    let activated_one = q.history().this_turn().iter().any(|r| {
-        matches!(r.event, Event::AbilityActivated { ability, player, .. } if player == activator && is_equip(q, ability))
-    });
-    if activated_one { None } else { Some(ManaCost::ZERO) }
+    if cantrip_mechanics::history::activated_an_equip_ability_this_turn(q, activator) { None } else { Some(ManaCost::ZERO) }
 }
 
 pub static CARD: CardDef = CardDef {
