@@ -12,8 +12,7 @@ fn surveil_then_burst(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     effects::surveil(g, item, 1)?;
     if g.state().zone(Zone::graveyard(you)).len() >= 7 {
         g.sacrifice(&[item.object]);
-        let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(you).map(|p| (item.object, Target::Player(p), 2)).collect();
-        g.damage_together(&hits);
+        cantrip_mechanics::effects::damage_each_opponent(g, item, 2);
         g.gain_life(you, 2);
     }
     Ok(())

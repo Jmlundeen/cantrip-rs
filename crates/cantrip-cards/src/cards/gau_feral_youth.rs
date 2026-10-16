@@ -14,8 +14,7 @@ fn card_left(q: &dyn Query, asker: &Asker) -> bool {
 /// Gau deals damage equal to its power to each opponent: its power as the ability resolves, or as it last was.
 fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let power = g.chars(item.object).power.unwrap_or(0).max(0) as u16;
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), power)).collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_opponent(g, item, power);
     Ok(())
 }
 

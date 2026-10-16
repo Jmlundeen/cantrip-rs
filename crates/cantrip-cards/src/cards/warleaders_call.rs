@@ -8,8 +8,7 @@ fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Ch
 
 /// This enchantment deals 1 damage to each opponent.
 fn strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), 1)).collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_opponent(g, item, 1);
     Ok(())
 }
 

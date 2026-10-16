@@ -5,8 +5,7 @@ use cantrip_oracle as oracle;
 
 /// It deals 1 damage to each opponent, then creates a Blood token.
 fn ping_and_blood(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), 1)).collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_opponent(g, item, 1);
     tokens::create_blood(g, item.controller)
 }
 

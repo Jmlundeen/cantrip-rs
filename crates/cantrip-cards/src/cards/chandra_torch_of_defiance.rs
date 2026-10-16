@@ -18,8 +18,7 @@ fn impulse(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         }
     }
     if !cast {
-        let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(you).map(|p| (item.object, Target::Player(p), 2)).collect();
-        g.damage_together(&hits);
+        cantrip_mechanics::effects::damage_each_opponent(g, item, 2);
     }
     Ok(())
 }

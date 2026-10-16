@@ -11,8 +11,7 @@ fn creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Fiery Confluence deals 2 damage to each opponent.
 fn opponents(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), 2)).collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_opponent(g, item, 2);
     Ok(())
 }
 

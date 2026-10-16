@@ -103,6 +103,14 @@ pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspe
     Ok(())
 }
 
+/// "[This source] deals `n` damage to each opponent" (CR 120.3, 102.2): one damage event for each opponent still in the game,
+/// dealt together (CR 120.2), by the resolving object as it last was if it has left (CR 113.7a). Chandra, Torch of Defiance,
+/// Eye of Jace, Fiery Confluence, Impact Tremors, Warleader's Call, Vivi Ornitier and Quintorius Kand print it.
+pub fn damage_each_opponent(g: &mut dyn Game, item: &StackItem, n: u16) {
+    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), n)).collect();
+    g.damage_together(&hits);
+}
+
 /// "Surveil N" (CR 701.25) for the ability's controller. The surveil lands and Dragon's Rage Channeler print it.
 pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend> {
     crate::surveil(g, item.controller, item.object, n)

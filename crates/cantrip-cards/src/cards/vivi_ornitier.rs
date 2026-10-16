@@ -21,8 +21,7 @@ fn add_x_mana(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), S
 
 fn grow_and_ping(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 1);
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), 1)).collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_opponent(g, item, 1);
     Ok(())
 }
 

@@ -13,8 +13,7 @@ fn you_activate_chandra_loyalty_ability(q: &dyn Query, me: &Asker, event: &Event
 /// "This creature deals 1 damage to each opponent": one damage event to each, dealt at once (CR 120.2), by this creature as
 /// it last was if it has left (CR 113.7a).
 fn ping_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let hits: Vec<(ObjectId, Target, u16)> = g.state().opponents(item.controller).map(|p| (item.object, Target::Player(p), 1)).collect();
-    g.damage_together(&hits);
+    cantrip_mechanics::effects::damage_each_opponent(g, item, 1);
     Ok(())
 }
 
