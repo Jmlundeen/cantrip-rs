@@ -1,0 +1,41 @@
+# Spiders-Man, Heroic Horde: "Web-slinging {4}{G}{G}", and "When Spiders-Man enters, if they were cast using
+# web-slinging, you gain 3 life and create two 2/1 green Spider creature tokens with reach." Bot1 web-slings it on turn 3
+# for {4}{G}{G}: Black Lotus, two Forests and Llanowar Elves, tapped for {G} while paying and then returned (CR 601.2g,
+# 702.188a). It was cast using web-slinging, so the trigger's "if" holds (CR 603.4): Bot1 gains 3 and gets two Spiders.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Spiders-Man, Heroic Horde
+Forest
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Spiders-Man, Heroic Horde.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 23
+Bot1.Battlefield = Forest; Forest; Spiders-Man, Heroic Horde; Spider; Spider
+Bot1.Battlefield.Spider#1.Power = 2
+Bot1.Battlefield.Spider#1.Toughness = 1
+Bot1.Battlefield.Spider#1.Colors = Green
+Bot1.Battlefield.Spider#1.Keywords = Reach
+Bot1.Hand = Llanowar Elves; Plains; Plains; Plains

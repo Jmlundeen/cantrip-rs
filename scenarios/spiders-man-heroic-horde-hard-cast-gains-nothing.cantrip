@@ -1,0 +1,30 @@
+# Spiders-Man, Heroic Horde cast for its mana cost {1}{G} was not cast using web-slinging, so its enters trigger's
+# intervening "if" is false and the ability doesn't trigger at all (CR 603.4): no life, no Spiders, even with a tapped
+# creature (Llanowar Elves, tapped for the {G}) that could have paid web-slinging's return.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Spiders-Man, Heroic Horde
+Forest
+Plains x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Spiders-Man, Heroic Horde.Cast
+? Stack = Spiders-Man, Heroic Horde
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield = Forest; Llanowar Elves; Spiders-Man, Heroic Horde

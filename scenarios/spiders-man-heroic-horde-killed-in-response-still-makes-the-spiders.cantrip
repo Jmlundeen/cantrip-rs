@@ -1,0 +1,44 @@
+# The intervening "if" of Spiders-Man's enters trigger is checked again as it resolves (CR 603.4), and it asks how the
+# spell was cast, which stays true once Spiders-Man has left: Bot2 bolts the web-slung Spiders-Man with its trigger on the
+# stack, and the trigger still gains Bot1 3 life and makes two Spiders (CR 113.7a, 603.10).
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Spiders-Man, Heroic Horde
+Forest
+Plains x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Spiders-Man, Heroic Horde.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+? Stack = Spiders-Man, Heroic Horde
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spiders-Man, Heroic Horde)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 23
+Bot1.Battlefield = Forest; Forest; Spider; Spider
+Bot1.Graveyard = Spiders-Man, Heroic Horde; Black Lotus
