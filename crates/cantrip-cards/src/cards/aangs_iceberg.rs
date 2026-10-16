@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{scry, triggers::THIS_ENTERS, targets, exile_target_until_leaves};
 use cantrip_oracle as oracle;
 
-/// "Up to one other target nonland permanent" (CR 115.1).
-fn other_nonland_permanent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if id != asker.source) && (targets::NONLAND_PERMANENT.filter)(q, asker, t)
-}
-
 /// "Exile up to one other target nonland permanent until this enchantment leaves the battlefield" (CR 610.3).
 fn exile_until_it_leaves(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     exile_target_until_leaves(g, item, 0);
@@ -30,7 +25,7 @@ fn sacrifice_and_scry(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, exile_until_it_leaves, "When this enchantment enters, exile up to one other target nonland permanent until this enchantment leaves the battlefield.")
-            .targets(&[up_to_one(other_nonland_permanent)]),
+            .targets(&[up_to_one(targets::other_nonland_permanent_filter)]),
         ability(cost("{3}"), sacrifice_and_scry, "Waterbend {3}: Sacrifice this enchantment. If you do, scry 2. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}.)")
             .waterbend(),
     ],

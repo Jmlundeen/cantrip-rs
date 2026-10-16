@@ -4,11 +4,6 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-/// "Up to one other target nonland permanent."
-fn other_nonland_permanent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::NONLAND_PERMANENT.filter)(q, asker, t) && t != Target::Object(asker.source)
-}
-
 /// Exile it, then schedule the return at the next end step (CR 603.7), carrying the exiled card as the delayed
 /// ability's subject. The delayed ability exists whether or not anything was exiled (CR 603.7d).
 fn exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -43,7 +38,7 @@ fn give_back(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::THIS_ATTACKS, exile, "Whenever Phelia attacks, exile up to one other target nonland permanent. At the beginning of the next end step, return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.")
-        .targets(&[up_to_one(other_nonland_permanent)])],
+        .targets(&[up_to_one(targets::other_nonland_permanent_filter)])],
     delayed: &[delayed_trigger(give_back, "Return that card to the battlefield under its owner's control. If it entered under your control, put a +1/+1 counter on Phelia.")],
     ..oracle::PHELIA_EXUBERANT_SHEPHERD
 };

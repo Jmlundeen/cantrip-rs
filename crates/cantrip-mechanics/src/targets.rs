@@ -181,6 +181,12 @@ pub fn nonland_permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Tar
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
 }
 
+/// "Other target nonland permanent" as a filter (CR 115.1): a nonland permanent that is not the source of the ability, for a
+/// slot of "up to one" or "up to two". Aang's Iceberg, Phelia, Exuberant Shepherd and Marang River Regent print it.
+pub fn other_nonland_permanent_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    nonland_permanent_filter(q, asker, t) && t != Target::Object(asker.source)
+}
+
 fn nonland_permanent_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
 }
