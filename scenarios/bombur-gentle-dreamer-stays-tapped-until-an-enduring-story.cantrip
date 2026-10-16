@@ -1,0 +1,45 @@
+# Bombur, Gentle Dreamer (CR 502.3, 702.195b): "Bombur doesn't untap during your untap step unless you have an enduring
+# story." Bombur is Bot1's only permanent that is an artifact, Saga or legendary; it attacks on turn seven and is still
+# tapped on turn nine. That turn Bot1 casts Mox Pearl and Mox Jet, the second and third, and has the story, so Bombur
+# untaps in turn eleven's untap step.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Bombur, Gentle Dreamer
+Mox Pearl
+Mox Jet
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Bombur, Gentle Dreamer.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+[T7 Bot1.Main1]
+Bot1.Attack(Bombur, Gentle Dreamer)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Bombur, Gentle Dreamer.Tapped = true
+? Bot1.Battlefield.Mountain#1.Tapped = false
+? Bot2.Life = 15
+? Bot1.EnduringStory = (absent)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T9 Bot1.Main2]
+? Bot1.EnduringStory = true
+? Bot1.Battlefield.Bombur, Gentle Dreamer.Tapped = true
+[T11 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Bombur, Gentle Dreamer.Tapped = false
+Bot1.Battlefield.Bombur, Gentle Dreamer.Keywords = (absent)
