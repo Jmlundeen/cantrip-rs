@@ -1,0 +1,53 @@
+# Gift a card promised. With both of Scrapshooter's enters abilities on the stack Bot2 bounces it with Into the Flood Maw, so it has left the battlefield when they resolve: the gift is
+# still given (the ability carries what was true as it triggered, CR 603.10, 702.174b) and Bot2 draws, and the destroy ability, whose "if the gift was promised" is read
+# as Scrapshooter last was, still destroys Bot2's Mox Pearl.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Scrapshooter
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Island
+Into the Flood Maw
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Scrapshooter.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Into the Flood Maw.Cast
+Bot2.Decline
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 5
+Bot2.Battlefield = Island
+Bot2.Hand.Count = 6
+Bot2.Graveyard = Mox Pearl; Into the Flood Maw

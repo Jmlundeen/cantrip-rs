@@ -1,0 +1,11 @@
+{
+  "name": "Scrapshooter",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Raccoon Archer",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Gift a card (You may promise an opponent a gift as you cast this spell. If you do, when it enters, they draw a card.)\nReach\nWhen this creature enters, if the gift was promised, destroy target artifact or enchantment an opponent controls.",
+  "keywords": [
+    "Reach"
+  ]
+}

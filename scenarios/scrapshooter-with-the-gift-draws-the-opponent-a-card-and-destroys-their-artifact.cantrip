@@ -1,0 +1,51 @@
+# Gift a card promised (CR 702.174e) on a permanent spell: nothing is given as it is cast; when Scrapshooter enters, its gift triggered ability makes Bot2 draw (CR 702.174b), and
+# its own "if the gift was promised" ability destroys target artifact or enchantment an opponent controls: Bot2's Mox Pearl. Not Bot1's own artifacts (Mox Emerald), not a land.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Scrapshooter
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Scrapshooter.Cast
+Bot1.Accept
+? Bot2.Hand.Count = 5
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Mox Emerald)
+! Bot1.Target(Bot2.Battlefield.Plains)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Scrapshooter
+Bot2.Battlefield = Plains; Ornithopter
+Bot2.Graveyard = Mox Pearl
+Bot2.Hand.Count = 6

@@ -1,0 +1,44 @@
+# Gift not promised: Scrapshooter enters, the opponent draws nothing, and its "if the gift was promised" ability doesn't trigger, so no target is chosen and Bot2's artifacts stay.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Scrapshooter
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Scrapshooter.Cast
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Scrapshooter
+Bot2.Battlefield = Plains; Mox Pearl; Ornithopter
+Bot2.Hand.Count = 5
