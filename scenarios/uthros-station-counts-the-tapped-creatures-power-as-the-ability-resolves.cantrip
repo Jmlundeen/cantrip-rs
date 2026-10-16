@@ -1,0 +1,61 @@
+# Uthros, Titanic Godcore's station (CR 702.184a): "Put a number of charge counters on this permanent equal to the tapped
+# creature's power" reads the power as the ability resolves (ruling 2025-07-25), so Berserk cast in response, doubling
+# Lake-town Mariners from 6 to 12 power, makes it twelve counters, not six. The Mariners were cast this turn: the cost taps
+# a creature, not the {T} symbol (CR 107.5, 302.6), so a summoning-sick creature stations. With no counters Uthros has no
+# 12+ ability (refused, with the Mox Sapphire to pay its {U} untapped); at twelve it has it (CR 721.2a), and it adds {U} for
+# each of the three Moxes, the one tapped to pay included (CR 106.5).
+
+[Bot1 Deck]
+Uthros, Titanic Godcore
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Lake-town Mariners
+Berserk
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Uthros, Titanic Godcore.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lake-town Mariners.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Uthros, Titanic Godcore.Activate(Ability: for each artifact)
+Bot1.Battlefield.Uthros, Titanic Godcore.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+? Stack.Count = 1
+? Bot1.Battlefield.Lake-town Mariners.Tapped = true
+Bot1.Hand.Berserk.Cast(Lake-town Mariners)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lake-town Mariners.Power = 12
+? Bot1.Battlefield.Uthros, Titanic Godcore.Counters.Charge = (absent)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Uthros, Titanic Godcore.Counters.Charge = 12
+Bot1.Battlefield.Uthros, Titanic Godcore.Activate(Ability: for each artifact)
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {U}{U}{U}
+
+[Expect]
+Bot1.Battlefield = Uthros, Titanic Godcore; Mox Sapphire; Mox Emerald; Mox Jet; Lake-town Mariners
+Bot1.Battlefield.Uthros, Titanic Godcore.Counters.Charge = 12
+Bot1.Battlefield.Uthros, Titanic Godcore.Tapped = true
+Bot1.Battlefield.Lake-town Mariners.Tapped = true
+Bot1.Graveyard = Berserk; Black Lotus
