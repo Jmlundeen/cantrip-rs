@@ -1,0 +1,58 @@
+# Devastating Onslaught {X}{X}{R} with X=2 costs five mana (all five Moxen) and creates TWO tokens that are copies of
+# Bot1's Llanowar Elves (X tokens, not one). The tokens gain haste until end of turn, so both attack the turn they are made
+# (summoning sick otherwise, CR 302.6) together with the original that has been in play since turn 1: 3 x 1 = 3 damage
+# (20 -> 17). They are sacrificed at the beginning of the next end step (CR 603.7c); the original stays.
+# The Elves is cast on turn 1 with Mox Emerald; all five Moxen are untapped again on turn 3.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Llanowar Elves
+Devastating Onslaught
+Island x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Llanowar Elves; X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 8
+? Bot1.Battlefield.Llanowar Elves#1.Token = (absent)
+? Bot1.Battlefield.Llanowar Elves#2.Token = true
+? Bot1.Battlefield.Llanowar Elves#3.Token = true
+? Bot1.Battlefield.Llanowar Elves#2.Keywords = Haste
+? Bot1.Battlefield.Llanowar Elves#3.Keywords = Haste
+? Bot1.Battlefield.Llanowar Elves#1.Keywords = (absent)
+? Bot1.Battlefield.Llanowar Elves#2.SummoningSick = false
+Bot1.Attack(Llanowar Elves#1; Llanowar Elves#2; Llanowar Elves#3 > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Ruby; Mox Jet; Mox Sapphire; Llanowar Elves
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard = Devastating Onslaught
+Stack.Count = 0

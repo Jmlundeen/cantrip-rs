@@ -1,0 +1,8 @@
+{
+  "name": "Doc Aurlock, Grizzled Genius",
+  "manaCost": "{G}{U}",
+  "type": "Legendary Creature — Bear Druid",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Spells you cast from your graveyard or from exile cost {2} less to cast.\nPlotting cards from your hand costs {2} less."
+}

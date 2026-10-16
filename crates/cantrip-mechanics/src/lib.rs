@@ -508,7 +508,7 @@ pub fn pump(g: &mut dyn Game, source: ObjectId, creature: ObjectId, power: i16, 
     }
 }
 
-/// "[It] gains haste until end of turn" (CR 611.2, 702.10): a continuous effect from the resolving ability's source.
+/// "[It] gains haste until end of turn" (CR 611.2, 702.10): a continuous effect from the resolving ability's source. Devastating Onslaught and Song of Totentanz print it.
 pub fn haste_until_end_of_turn(g: &mut dyn Game, source: ObjectId, creature: ObjectId) {
     if !g.is_on_battlefield(creature) {
         return;

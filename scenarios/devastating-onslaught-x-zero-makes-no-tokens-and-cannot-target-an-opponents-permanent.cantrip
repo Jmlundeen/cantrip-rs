@@ -1,0 +1,33 @@
+# Devastating Onslaught's target is "artifact or creature YOU control": Bot2's Mox Pearl is refused (the cast naming it is
+# not offered) while Bot1's own Mox Jet, the positive control, is. X=0 costs only {R}: no tokens are created (CR 107.3b, "create
+# X tokens" of zero), nothing is left to sacrifice, and the spell goes to the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Devastating Onslaught
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Devastating Onslaught.Cast(Bot2.Battlefield.Mox Pearl)
+Bot1.Hand.Devastating Onslaught.Cast(Bot1.Battlefield.Mox Jet; X: 0)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Jet
+Bot1.Battlefield.Count = 2
+Bot2.Battlefield = Mox Pearl
+Bot1.Graveyard = Devastating Onslaught
+Stack.Count = 0

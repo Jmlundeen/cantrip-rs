@@ -1,0 +1,13 @@
+{
+  "name": "Dragon Sniper",
+  "manaCost": "{G}",
+  "type": "Creature — Human Archer",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Reach, vigilance, deathtouch",
+  "keywords": [
+    "Reach",
+    "Vigilance",
+    "Deathtouch"
+  ]
+}

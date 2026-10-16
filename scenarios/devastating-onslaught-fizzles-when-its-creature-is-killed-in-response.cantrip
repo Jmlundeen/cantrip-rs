@@ -1,0 +1,46 @@
+# CR 608.2b: Devastating Onslaught has one target; Bot2 kills the Llanowar Elves with Lightning Bolt in response, so the
+# spell is not resolved - no tokens are created even though X=1 was paid (the Elves is not copied from its last-known
+# information) and no sacrifice is set up. The Elves is in Bot1's graveyard with the countered-by-the-rules Onslaught.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Llanowar Elves
+Devastating Onslaught
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Llanowar Elves; X: 1)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Llanowar Elves
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Jet
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard = Devastating Onslaught; Llanowar Elves
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

@@ -1,0 +1,11 @@
+{
+  "name": "Dream Beavers",
+  "manaCost": "{B}",
+  "type": "Creature — Beaver Nightmare",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Flying\nWhen this creature enters, each opponent loses 1 life and you gain 1 life. Scry 1. (Look at the top card of your library. You may put that card on the bottom.)",
+  "keywords": [
+    "Flying"
+  ]
+}

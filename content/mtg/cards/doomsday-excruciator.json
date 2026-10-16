@@ -1,0 +1,11 @@
+{
+  "name": "Doomsday Excruciator",
+  "manaCost": "{B}{B}{B}{B}{B}{B}",
+  "type": "Creature — Demon",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Flying\nWhen this creature enters, if it was cast, each player exiles all but the bottom six cards of their library face down.\nAt the beginning of your upkeep, draw a card.",
+  "keywords": [
+    "Flying"
+  ]
+}
