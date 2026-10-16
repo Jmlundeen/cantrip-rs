@@ -1,0 +1,77 @@
+# "Return all attacking creatures to their owner's hand.": on turn 3 Bot1 attacks with Hero of Bladehold and an Ornithopter,
+# keeping a second Ornithopter home. Hero's trigger puts two Soldier tokens onto the battlefield attacking; once both Soldiers
+# are there Bot2 casts Aetherize. Every attacker goes back to its owner's hand - Hero, the attacking Ornithopter and (CR 111.7)
+# the tokens, which cease to exist rather than reach a hand - while the Ornithopter that did not attack, and Bot2's own
+# non-attacking Ornithopter, stay (CR 506.4: only creatures attacking this combat). Nobody is dealt combat damage.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Hero of Bladehold
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Aetherize
+Ornithopter
+Plains
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hero of Bladehold.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Hero of Bladehold; Ornithopter)
+Bot1.Triggers(Soldier; battle cry)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers.Count = 4
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Aetherize.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Hero of Bladehold; Ornithopter; Plains
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Graveyard = Aetherize
+Bot2.Life = 20

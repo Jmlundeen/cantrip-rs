@@ -1,0 +1,51 @@
+# "Return all attacking creatures to their owner's hand.": "there's no such thing as an attacking creature outside of the
+# combat phase". Bot1's Ornithopter attacks on turn 3, but Bot2 casts Aetherize only in Bot1's second main phase, when
+# nothing is attacking, so nothing returns (the Ornithopter that attacked, the one that stayed home and Bot2's own all
+# stay). A control: the first scenario shows the same card returning attackers during the declare attackers step.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Island x25
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Aetherize
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Aetherize.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Ornithopter; Ornithopter
+Bot2.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Graveyard = Aetherize
+Bot2.Life = 20
