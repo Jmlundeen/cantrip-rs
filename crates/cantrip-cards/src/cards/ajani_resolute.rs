@@ -1,15 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens;
+use cantrip_mechanics::triggers::YOU_GAIN_LIFE;
 use cantrip_oracle as oracle;
-
-/// "Whenever you gain life" (CR 119.3, 603.2): one event for each time life is gained, and none when none is (a gain of 0,
-/// or life that can't be gained, CR 119.7). Both Ajani and his Pridemate token trigger on it.
-fn you_gain_life(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::LifeChange { player, delta } if *delta > 0 && *player == q.controller(source) => Fired::PLAIN,
-        _ => None,
-    }
-}
 
 /// "Put a loyalty counter on Ajani" (CR 122.1, 306.5b).
 fn loyalty_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -40,7 +32,7 @@ pub static PRIDEMATE: CardDef = CardDef {
     power: Some(2),
     toughness: Some(2),
     abilities: &[triggered(
-        when(EventMask::LIFE_CHANGE, you_gain_life),
+        YOU_GAIN_LIFE,
         grow,
         "Whenever you gain life, put a +1/+1 counter on this token.",
     )],
@@ -83,7 +75,7 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::LIFE_CHANGE, you_gain_life), loyalty_counter, "Whenever you gain life, put a loyalty counter on Ajani."),
+        triggered(YOU_GAIN_LIFE, loyalty_counter, "Whenever you gain life, put a loyalty counter on Ajani."),
         ability(loyalty(0), gain_one, "0: You gain 1 life."),
         ability(
             loyalty(-4),

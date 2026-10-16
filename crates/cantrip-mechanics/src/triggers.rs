@@ -97,6 +97,16 @@ pub fn you_draw_a_card(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired
     }
 }
 
+/// "Whenever you gain life" (CR 119.3, 603.2): one trigger for each time the source's controller gains life, and none
+/// when none is gained (a gain of 0, or life that can't be gained, CR 119.7). Ajani Resolute (and its Pridemate token) and
+/// Amalia Benavides Aguirre print it.
+pub fn you_gain_life(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::LifeChange { player, delta } if *delta > 0 && *player == me.controller => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "When the Nth [kind] counter is put on this permanent" (CR 122.6, 603.2): counters of kind `KIND` (`CounterKind::Plan
 /// as u8`) were put on it and the Nth was among them - it had fewer than N before and has N or more now, as the event
 /// records (`total`). So it triggers once however many are put at once (CR 603.2c), not for a counter after the Nth,
@@ -856,6 +866,7 @@ pub const YOU_SCRY: Trigger = when_asked(EventMask::SCRIED, you_scry);
 pub const YOU_SURVEIL: Trigger = when_asked(EventMask::SURVEILLED, you_surveil);
 pub const YOU_SCRY_OR_SURVEIL: Trigger = when_asked(EventMask(EventMask::SCRIED.0 | EventMask::SURVEILLED.0), you_scry_or_surveil);
 pub const YOU_DRAW_A_CARD: Trigger = when_asked(EventMask::DREW, you_draw_a_card);
+pub const YOU_GAIN_LIFE: Trigger = when_asked(EventMask::LIFE_CHANGE, you_gain_life);
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks);

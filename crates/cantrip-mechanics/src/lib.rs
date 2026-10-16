@@ -638,21 +638,26 @@ pub fn same_name(q: &dyn Query, a: ObjectId, b: ObjectId) -> bool {
 }
 
 /// Explore (CR 701.44): the permanent's controller reveals the top card of their library; a land goes into their hand,
-/// otherwise the permanent gets a +1/+1 counter (if it is still the permanent it was) and they may put the card into
-/// their graveyard. Fanatical Offering's Map token and Seasoned Dungeoneer explore it.
+/// otherwise (a nonland card, or no card at all) the permanent gets a +1/+1 counter (if it is still the permanent it was) and they
+/// may put the card into their graveyard. Fanatical Offering's Map token, Seasoned Dungeoneer and Amalia Benavides Aguirre explore it.
 pub fn explore(g: &mut dyn Game, permanent: ObjectId) -> Result<(), Suspend> {
     let who = g.obj(permanent).controller;
-    let Some(&top) = top_of_library(g, who, 1).first() else { return Ok(()) };
-    g.reveal(who, &[top]);
-    if g.chars(top).is(CardType::Land) {
-        g.move_to(top, Zone::hand(who));
-        return Ok(());
+    let top = top_of_library(g, who, 1).first().copied();
+    if let Some(top) = top {
+        g.reveal(who, &[top]);
+        if g.chars(top).is(CardType::Land) {
+            g.move_to(top, Zone::hand(who));
+            return Ok(());
+        }
     }
+    // "Otherwise": a nonland card, or no card at all when the library is empty (CR 701.44a-b).
     if is_live(g, permanent) && g.is_on_battlefield(permanent) {
         g.add_counters(permanent, CounterKind::PlusOne, 1);
     }
-    if matches!(g.ask(who, RequestKind::May { source: top, purpose: Purpose::PutIntoGraveyard })?, Answer::Yes) {
-        g.move_to(top, Zone::graveyard(who));
+    if let Some(top) = top {
+        if matches!(g.ask(who, RequestKind::May { source: top, purpose: Purpose::PutIntoGraveyard })?, Answer::Yes) {
+            g.move_to(top, Zone::graveyard(who));
+        }
     }
     Ok(())
 }
