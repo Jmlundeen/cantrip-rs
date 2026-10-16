@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::same_name;
 use cantrip_oracle as oracle;
 
 /// "Whenever a player casts a creature spell": any player's, read as it stands on the stack. The spell rides along as
@@ -15,14 +16,10 @@ fn creature_spell_cast(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fire
 /// was if it has left the stack (CR 608.2h).
 fn return_same_name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(spell) = item.subject else { return Ok(()) };
-    let name = g.card(g.chars(spell).card).name;
-    if name.is_empty() {
-        return Ok(());
-    }
     let mut returning: Vec<(ObjectId, PlayerId)> = Vec::new();
     for player in g.state().seats().collect::<Vec<_>>() {
         for &card in g.state().zone(Zone::graveyard(player)) {
-            if g.card(g.chars(card).card).name == name {
+            if same_name(g, spell, card) {
                 returning.push((card, player));
             }
         }

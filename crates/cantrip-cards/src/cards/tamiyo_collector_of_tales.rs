@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, top_of_library};
+use cantrip_mechanics::{library::object_has_name, targets, top_of_library};
 use cantrip_oracle as oracle;
 
 /// "Spells and abilities your opponents control can't cause you to discard cards or sacrifice permanents" (CR 101.2):
@@ -14,7 +14,6 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let ask = RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, nonland_only: true };
     let Answer::Name(Some(name)) = g.ask(you, ask)? else { return Ok(()) };
-    let name = g.card(name).name;
     // The four, bottom of them first (as the C# engine lists them).
     let mut top = top_of_library(g, you, 4);
     if top.is_empty() {
@@ -22,7 +21,7 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     top.reverse();
     g.reveal(you, &top);
-    let matches: Vec<ObjectId> = top.iter().copied().filter(|&c| g.card(g.chars(c).card).name == name).collect();
+    let matches: Vec<ObjectId> = top.iter().copied().filter(|&c| object_has_name(g, c, name)).collect();
     let mut rest: Vec<ObjectId> = top.iter().copied().filter(|c| !matches.contains(c)).collect();
     if rest.len() > 1 {
         let ask = RequestKind::DistributeCards {

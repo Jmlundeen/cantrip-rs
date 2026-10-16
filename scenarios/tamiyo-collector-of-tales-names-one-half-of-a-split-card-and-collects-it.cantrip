@@ -1,0 +1,41 @@
+# Tamiyo, Collector of Tales' +1 names Leave, one of the two names of Leave // Chance (CR 709.4a: a split card is named by one of
+# its names, never both), and reveals the top four cards: the split card has that name (CR 201.2a), so it goes to the hand with
+# nothing else, and the other three to the graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Sol Ring
+Tamiyo, Collector of Tales
+Island
+Island
+Island
+Island
+Leave // Chance
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tamiyo, Collector of Tales.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Tamiyo, Collector of Tales.Activate(Ability: Choose a nonland card name)
+Bot1.Name(Leave)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Hand = Island; Island; Island; Leave // Chance
+Bot1.Graveyard.Count = 3

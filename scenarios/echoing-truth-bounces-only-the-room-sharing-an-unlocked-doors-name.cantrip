@@ -1,0 +1,54 @@
+# "Same name" on the battlefield (CR 201.2, 709.5): a Room has the names of its unlocked doors alone. Bot2's two Rooms were cast on
+# turn 2 as Unholy Annex and as Ritual Chamber, so they share no name though they are the same card; Bot1's Echoing Truth on the
+# Annex returns it and leaves the Ritual Chamber (and its Demon) where it is. By the card's combined name both would have gone.
+
+[Bot1 Deck]
+Island
+Island
+Echoing Truth
+Island x30
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Unholy Annex // Ritual Chamber
+Unholy Annex // Ritual Chamber
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot2.Pass
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Battlefield.Mox Jet#4.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Ritual Chamber)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Echoing Truth.Cast(Bot2.Battlefield.Unholy Annex)
+
+[Expect]
+Bot2.Battlefield = Demon; Mox Jet; Mox Jet; Mox Jet; Mox Jet; Ritual Chamber; Swamp
+Bot2.Hand = Swamp; Unholy Annex // Ritual Chamber
+Bot1.Graveyard = Echoing Truth
