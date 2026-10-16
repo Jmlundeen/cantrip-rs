@@ -1,0 +1,64 @@
+# Bloodthirsty Conqueror triggers when an opponent LOSES life, and prevented damage causes none. Bot2's The One Ring gives it
+# protection from everything until its next turn (CR 702.16j), which prevents all damage to it (CR 702.16e), so Bot1's
+# Boltwave (damage to each opponent, no target) hurts nobody: Bot2 stays at 20, no life is lost and the Conqueror does not
+# trigger - Bot1 stays at 20 and the stack is empty. (The control, where the same Boltwave costs 3 and gains 3:
+# bloodthirsty-conqueror-triggers-for-each-opponent-that-loses-life.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bloodthirsty Conqueror
+Boltwave
+Swamp x13
+
+[Bot2 Deck]
+Volcanic Island
+Black Lotus
+The One Ring
+Island
+Island
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bloodthirsty Conqueror.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Volcanic Island.Activate(Ability: {U})
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.The One Ring.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boltwave.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Boltwave

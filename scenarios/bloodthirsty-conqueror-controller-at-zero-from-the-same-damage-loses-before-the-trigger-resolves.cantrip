@@ -1,0 +1,71 @@
+# Bloodthirsty Conqueror, ruling 2024-11-08: "If you and an opponent both lose life simultaneously, and this causes your life
+# total to become 0 or less, you'll lose the game before Bloodthirsty Conqueror's triggered ability can resolve." Bot1 starts
+# at 1 life with the Conqueror and an Underground Sea; Bot2's Sunspine Lynx deals damage to each player equal to the
+# nonbasic lands that player controls - 1 to Bot1 (Underground Sea) and 1 to Bot2 (Badlands) at once (CR 120.2). Bot1 is at 0
+# and loses (CR 704.5a) before anything resolves, so Bot2 wins at 19 life. Control: with Bot1 at 2 life instead, the same
+# damage leaves it alive (bloodthirsty-conqueror-simultaneous-loss-that-leaves-the-controller-alive-triggers). Caveat: the
+# Lynx also stops life gain (CR 119.7), so this cannot tell "lost before the trigger resolved" from "trigger resolved and
+# gained nothing"; no other card here makes two players lose life at once.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Underground Sea
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bloodthirsty Conqueror
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Badlands
+Mox Ruby
+Mox Ruby
+Mox Jet
+Sunspine Lynx
+Mountain
+Mountain x14
+
+[Actions]
+Bot1.Hand.Underground Sea.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Underground Sea.Activate(Ability: {B})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bloodthirsty Conqueror.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Badlands.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Badlands.Activate(Ability: {R})
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Sunspine Lynx.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost
+Bot2.Life = 19
+Stack.Count = 0

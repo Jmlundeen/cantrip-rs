@@ -1,0 +1,72 @@
+# Bloodthirsty Conqueror only answers an opponent LOSING life. On turn 2 Bot2 exiles its own Iron-Shield Elf (power 3) with
+# Swords to Plowshares and so gains 3 (20 -> 23): no trigger, Bot1 stays at 20 (checked there). The positive control, the same
+# opponent in the same game: on turn 3 Bot1's Lightning Bolt takes Bot2 from 23 to 20 and the Conqueror gains Bot1 3 (23).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Bloodthirsty Conqueror
+Lightning Bolt
+Swamp x13
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Island
+Iron-Shield Elf
+Swords to Plowshares
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bloodthirsty Conqueror.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Iron-Shield Elf)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 23
+? Bot1.Life = 20
+? Stack.Count = 0
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 20
+Bot1.Life = 23
+Exile.Count = 1
