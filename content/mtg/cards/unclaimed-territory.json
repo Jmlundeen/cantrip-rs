@@ -1,0 +1,5 @@
+{
+  "name": "Unclaimed Territory",
+  "type": "Land",
+  "oracleText": "As this land enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type."
+}

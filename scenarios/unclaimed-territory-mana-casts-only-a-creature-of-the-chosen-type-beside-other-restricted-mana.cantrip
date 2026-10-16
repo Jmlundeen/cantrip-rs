@@ -1,0 +1,49 @@
+# Unclaimed Territory names Elf as it enters. Its any-color mana is "only to cast a creature spell of the chosen type"
+# (CR 106.6, 205.3m). Turn 1: its {G} with Mox Jet's and Mox Pearl's mana can't cast Firdoch Core - an Elf spell by
+# changeling, but no creature spell - and does cast Llanowar Elves. Turn 3: two kinds of restricted green mana are in the
+# pool, the Territory's and Maelstrom of the Spirit Dragon's (Dragon or Omen spells), each its own (CR 106.6): the second
+# Llanowar Elves is paid with the Territory's, and the Maelstrom's {G} is left.
+
+[Bot1 Deck]
+Unclaimed Territory
+Mox Jet
+Mox Pearl
+Firdoch Core
+Llanowar Elves
+Llanowar Elves
+Maelstrom of the Spirit Dragon
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Unclaimed Territory.Play
+Bot1.Modes(Elf)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Unclaimed Territory.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} (ElfCreatureSpells)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Firdoch Core.Cast
+Bot1.Hand.Llanowar Elves.Cast
+? Bot1.Mana = {W}{B}
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Maelstrom of the Spirit Dragon.Play
+Bot1.Battlefield.Unclaimed Territory.Activate(Ability: any color; Color: Green)
+Bot1.Battlefield.Maelstrom of the Spirit Dragon.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} (ElfCreatureSpells) {G} (DragonOrOmenSpells)
+Bot1.Hand.Llanowar Elves.Cast
+? Bot1.Mana = {G} (DragonOrOmenSpells)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Unclaimed Territory; Mox Jet; Mox Pearl; Llanowar Elves; Maelstrom of the Spirit Dragon; Llanowar Elves
+Bot1.Hand = Firdoch Core; Island
+Bot1.Mana = {G} (DragonOrOmenSpells)

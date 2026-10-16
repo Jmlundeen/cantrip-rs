@@ -1,0 +1,59 @@
+# A copy of Unclaimed Territory that did not enter the battlefield as one has no chosen type: "as this land enters,
+# choose a creature type" is a replacement effect on entering (CR 614.12a) and the choice is not copiable (CR 707.2,
+# 607.2d). Shifting Woodland becomes a copy of the Territory card in Bot1's graveyard (delirium from Wheel of Fortune's
+# discards). Its any-color mana is "only to cast a creature spell of the chosen type" with no type chosen (CR 106.6): the
+# {G} in the pool can't cast Llanowar Elves, or any creature spell. The control: the Forest's {G}, tapped after, casts
+# The control: Mox Emerald, cast after, adds the {G} that casts the same Llanowar Elves, and the Territory copy's {G} is
+# still in the pool though restricted mana that may pay is spent first.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Jet
+Wheel of Fortune
+Unclaimed Territory
+Llanowar Elves
+Lightning Bolt
+Shifting Woodland
+Black Lotus
+Llanowar Elves
+Mox Emerald
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Shifting Woodland.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Shifting Woodland.Activate(Ability: becomes a copy; Bot1.Graveyard.Unclaimed Territory)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Unclaimed Territory.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} (NoTypeCreatureSpells)
+! Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana = {G} (NoTypeCreatureSpells)
+Bot1.Battlefield = Forest; Mox Ruby; Mox Jet; Unclaimed Territory; Mox Emerald; Llanowar Elves
+Bot1.Graveyard = Black Lotus; Wheel of Fortune; Lightning Bolt; Llanowar Elves; Unclaimed Territory
