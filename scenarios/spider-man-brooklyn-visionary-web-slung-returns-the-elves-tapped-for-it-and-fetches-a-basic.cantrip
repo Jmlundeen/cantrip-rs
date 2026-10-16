@@ -1,0 +1,44 @@
+# Spider-Man, Brooklyn Visionary: "Web-slinging {2}{G}", and "When Spider-Man enters, search your library for a basic
+# land card, put it onto the battlefield tapped, then shuffle." Bot1 web-slings it on turn 3 for {2}{G}: two Forests and
+# Llanowar Elves, untapped as the cast begins and tapped for the {G} (CR 601.2g), which are then returned (CR 702.188a;
+# ruling 2025-09-19). The enters trigger finds a Forest, which enters tapped; Tropical Island, a nonbasic land, can't be
+# found (CR 205.4c).
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Spider-Man, Brooklyn Visionary
+Forest
+Plains
+Plains
+Plains
+Plains
+Tropical Island
+Forest
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Spider-Man, Brooklyn Visionary.Cast(Ability: Web-slinging)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Choose(Llanowar Elves)
+! Bot1.Search(Tropical Island)
+Bot1.Search(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Spider-Man, Brooklyn Visionary; Forest
+Bot1.Battlefield.Forest#3.Tapped = true
+Bot1.Hand = Plains; Plains; Plains; Plains; Llanowar Elves
+Bot1.Library.Count = 11
