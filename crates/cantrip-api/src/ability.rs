@@ -81,6 +81,11 @@ pub const fn exile_from_graveyard(n: u8) -> Cost {
     Cost { exile_from_graveyard: n, ..Cost::NONE }
 }
 
+/// "Exile N [quality] cards from your graveyard" other than this one: "Exile three creature cards from your graveyard".
+pub const fn exile_from_graveyard_of(n: u8, filter: ObjectFilter) -> Cost {
+    Cost { exile_from_graveyard: n, exile_from_graveyard_of: Some(filter), ..Cost::NONE }
+}
+
 /// A cost written in mana symbols as printed: `cost("{2}{G}")`, `cost("{X}{R}")`, `cost("{W/U}")`, `cost("{G/P}")`,
 /// `cost("{1}, {T}")`. Read as the card is compiled: a symbol it doesn't know fails the build.
 pub const fn cost(symbols: &str) -> Cost {

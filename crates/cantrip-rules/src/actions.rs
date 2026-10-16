@@ -101,9 +101,7 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
             return false;
         }
     }
-    if cost.exile_from_graveyard > 0
-        && cx.s().zone(Zone::graveyard(controller)).iter().filter(|&&c| c != source).count() < cost.exile_from_graveyard as usize
-    {
+    if cost.exile_from_graveyard > 0 && graveyard_exiles(cx, controller, source, cost).len() < cost.exile_from_graveyard as usize {
         return false;
     }
     // Collect evidence N (CR 701.59a): payable only if the graveyard's cards, the source apart, add up to N.
@@ -320,17 +318,28 @@ fn choose_evidence(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost)
     }
 }
 
+/// The cards of `player`'s graveyard a cost may exile: any but the source, or those of the quality it names (CR 601.2h).
+fn graveyard_exiles(cx: &Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> Vec<ObjectId> {
+    let asker = Asker { source, controller: player };
+    cx.s()
+        .zone(Zone::graveyard(player))
+        .iter()
+        .copied()
+        .filter(|&c| c != source && cost.exile_from_graveyard_of.is_none_or(|f| f(cx, &asker, c)))
+        .collect()
+}
+
 /// Chooses the cards a cost exiles from the graveyard (CR 601.2h), always asked, even when the choice is forced.
 fn choose_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     if cost.exile_from_graveyard == 0 {
         return choose_evidence(cx, player, source, cost);
     }
-    let cards: Vec<ObjectId> = cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect();
+    let eligible = graveyard_exiles(cx, player, source, cost);
     let ask = RequestKind::ChooseCards {
         source,
         purpose: Purpose::ExileToPay,
-        cards: cards.clone(),
-        eligible: cards,
+        cards: cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect(),
+        eligible,
         count: cost.exile_from_graveyard,
         up_to: false, kind: "" };
     match cx.ask_core(player, ask, true)? {

@@ -331,6 +331,9 @@ pub struct Cost {
     /// Exile this many cards from your graveyard, other than the source (CR 702.138a escape, and "exile three cards
     /// from your graveyard"), chosen as the cost is chosen (CR 601.2h).
     pub exile_from_graveyard: u8,
+    /// The cards `exile_from_graveyard` exiles must pass this filter: "Exile three creature cards from your graveyard"
+    /// (Drivnod, Carnage Dominus). `None` takes any card.
+    pub exile_from_graveyard_of: Option<ObjectFilter>,
     /// Exert this permanent (CR 701.43a): it won't untap during its controller's next untap step.
     pub exert: bool,
     /// Tap any number of untapped creatures you control, other than the source, with total power N or more
@@ -471,6 +474,9 @@ impl Cost {
         }
         c.life += other.life;
         c.exile_from_graveyard += other.exile_from_graveyard;
+        if c.exile_from_graveyard_of.is_none() {
+            c.exile_from_graveyard_of = other.exile_from_graveyard_of;
+        }
         c.exile_from_hand = match (self.exile_from_hand, other.exile_from_hand) {
             (Some((a, f)), Some((b, _))) => Some((a + b, f)),
             (None, b) => b,
@@ -525,6 +531,7 @@ impl Cost {
             discard: None,
             pay_x_life: false,
             exile_from_graveyard: 0,
+            exile_from_graveyard_of: None,
             exert: false,
             tap_creatures: None,
             emerge: false,
