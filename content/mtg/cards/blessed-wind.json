@@ -1,0 +1,6 @@
+{
+  "name": "Blessed Wind",
+  "manaCost": "{7}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Target player's life total becomes 20."
+}
