@@ -1,0 +1,50 @@
+# Planetarium of Wan Shi Tong with an empty library: the scry is still a scry, and "whenever you scry" triggers once it is
+# done "even if some or all of those actions were impossible" (CR 701.22d). Bot1's deck is its opening hand and nothing
+# else. Bot1 puts the Planetarium out on turn 1 (Sol Ring, Black Lotus, Mox Jet) and activates it with Mox Pearl: the
+# scry 2 looks at nothing (`! Bot1.Arrange`), the ability triggers all the same (`Stack.Count = 1`), and as it resolves
+# there is no top card to look at or cast (`! Bot1.Accept`, `Bot1.Looked` absent).
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Mox Pearl
+Planetarium of Wan Shi Tong
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+! Bot1.Arrange
+? Stack.Count = 1
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Library.Count = 0
+Bot1.Looked = (absent)
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Tapped = true
+Bot1.Hand = Island

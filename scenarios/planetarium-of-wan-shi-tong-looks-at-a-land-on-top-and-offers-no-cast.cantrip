@@ -1,0 +1,53 @@
+# Planetarium of Wan Shi Tong: "You may cast that card" - a land is never cast (CR 305.9, 601.2), so with a land on top
+# of the library the trigger looks at it and asks nothing. Bot1 puts the Planetarium out on turn 1 with Sol Ring, Black
+# Lotus and Mox Jet, activates it with Mox Pearl and scries 2, keeping Island on top and putting Counterspell on the
+# bottom. The trigger looks at the Island (`Bot1.Looked`) and no "may cast" is asked (`! Bot1.Accept`; the scenarios in
+# which a nonland card is on top are asked). The Island stays on top.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Planetarium of Wan Shi Tong
+Mox Pearl
+Island
+Island
+Counterspell
+Misshapen Fiend x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Island | Counterspell)
+? Stack.Count = 1
+Bot1.Pass
+! Bot1.Accept
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Looked = Island
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Jet; Mox Pearl; Planetarium of Wan Shi Tong
+Bot1.Hand = Island
+Bot1.Library = Island; Misshapen Fiend; Misshapen Fiend; Misshapen Fiend; Misshapen Fiend; Misshapen Fiend; Counterspell

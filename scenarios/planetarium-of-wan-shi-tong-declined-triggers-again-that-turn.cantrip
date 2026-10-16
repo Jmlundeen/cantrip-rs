@@ -1,0 +1,61 @@
+# Planetarium of Wan Shi Tong: "Do this only once each turn" counts a card cast, not a look (CR 603.2h; the ruling: "Once
+# you choose to cast the top card of your library, Planetarium of Wan Shi Tong's ability won't trigger again that turn").
+# Bot1 puts the Planetarium out on turn 1 with Sol Ring, Black Lotus and Mox Jet, activates it with Mox Pearl and scries
+# 2, keeping Misshapen Fiend on top and putting Island on the bottom. The trigger looks at the Fiend and Bot1 declines to
+# cast it. Then Meticulous Archive enters and surveils 1, keeping the Fiend: the Planetarium triggers again, since nothing
+# was cast with it yet, and this time Bot1 casts the Fiend free. The Fiend was looked at twice.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Planetarium of Wan Shi Tong
+Meticulous Archive
+Mox Pearl
+Misshapen Fiend
+Island
+Counterspell x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Misshapen Fiend | Island)
+Bot1.Pass
+Bot1.Decline
+? Bot1.Library.Count = 7
+Bot1.Hand.Meticulous Archive.Play
+Bot1.Pass
+Bot1.Arrange(Misshapen Fiend |)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Looked = Misshapen Fiend; Misshapen Fiend
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Jet; Mox Pearl; Planetarium of Wan Shi Tong; Meticulous Archive; Misshapen Fiend
+Bot1.Graveyard = Black Lotus
+Bot1.Library = Counterspell; Counterspell; Counterspell; Counterspell; Counterspell; Island

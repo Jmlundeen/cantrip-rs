@@ -1,0 +1,63 @@
+# Planetarium of Wan Shi Tong triggers on a surveil made by another permanent's triggered ability, and "do this only
+# once each turn" (CR 603.2h). Bot1 puts the Planetarium out on turn 1 with Sol Ring, Black Lotus and Mox Jet, then plays
+# Meticulous Archive: its enters trigger surveils 1 and keeps Misshapen Fiend on top. The surveil triggers the
+# Planetarium (CR 701.25d): Bot1 looks at the Fiend and casts it without paying its mana cost. Then Bot1 activates the
+# Planetarium with Mox Pearl and scries 2, keeping Ornithopter on top: having cast a card with it this turn, the ability
+# does not trigger at all (the ruling), so nothing goes on the stack after the scry and Ornithopter stays on top of the
+# library, never looked at.
+
+[Bot1 Deck]
+Mox Sapphire
+Sol Ring
+Mox Jet
+Black Lotus
+Planetarium of Wan Shi Tong
+Meticulous Archive
+Mox Pearl
+Misshapen Fiend
+Ornithopter
+Island
+Island x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Hand.Meticulous Archive.Play
+Bot1.Pass
+Bot1.Arrange(Misshapen Fiend |)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Ornithopter; Island |)
+? Stack.Count = 0
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Looked = Misshapen Fiend
+Bot1.Battlefield = Mox Sapphire; Sol Ring; Mox Jet; Mox Pearl; Planetarium of Wan Shi Tong; Meticulous Archive; Misshapen Fiend
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Tapped = true
+Bot1.Graveyard = Black Lotus
+Bot1.Hand.Count = 0
+Bot1.Library = Ornithopter; Island; Island; Island; Island; Island; Island

@@ -1,0 +1,56 @@
+# Planetarium of Wan Shi Tong: "{1}, {T}: Scry 2." and "Whenever you scry or surveil, look at the top card of your library.
+# You may cast that card without paying its mana cost." Bot1 puts the Planetarium out on turn 1 with Sol Ring, Black
+# Lotus and Mox Jet, and activates it with Mox Sapphire. The scry sees Counterspell and Misshapen Fiend: the Fiend stays
+# on top and Counterspell goes to the bottom. Once the scry is complete the ability triggers (CR 701.22d, 603.2): Bot1
+# looks at the top card (the Fiend, `Bot1.Looked`) and casts it with no mana left in the pool, so it was cast without
+# paying its mana cost (CR 118.9). Counterspell at the bottom proves the scry put it there.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Jet
+Black Lotus
+Mox Sapphire
+Planetarium of Wan Shi Tong
+Island
+Counterspell
+Misshapen Fiend
+Island x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Misshapen Fiend | Counterspell)
+? Stack.Count = 1
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Looked = Misshapen Fiend
+Bot1.Battlefield = Island; Sol Ring; Mox Jet; Mox Sapphire; Planetarium of Wan Shi Tong; Misshapen Fiend
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Tapped = true
+Bot1.Graveyard = Black Lotus
+Bot1.Hand = Island
+Bot1.Library = Island; Island; Island; Island; Island; Counterspell

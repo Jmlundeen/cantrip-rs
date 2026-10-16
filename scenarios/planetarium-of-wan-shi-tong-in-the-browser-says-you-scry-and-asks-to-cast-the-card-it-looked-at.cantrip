@@ -1,0 +1,64 @@
+# Browser
+# Planetarium of Wan Shi Tong at a table: Bot1's page activates it, arranges the scry (Misshapen Fiend on top, Counterspell
+# to the bottom), and its log says "You scry 2." (CR 701.22). The trigger looks at the top card and asks whether to cast it
+# free, naming the card Bot1 looked at; Bot1 casts it. Later Bot2 surveils with Consider, and Bot1's log says "Bot2
+# surveils 1." (CR 701.25) - the Planetarium is Bot1's, so Bot2's surveil triggers nothing.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Jet
+Black Lotus
+Mox Sapphire
+Planetarium of Wan Shi Tong
+Island
+Counterspell
+Misshapen Fiend
+Island x5
+
+[Bot2 Deck]
+Island
+Consider
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planetarium of Wan Shi Tong.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Planetarium of Wan Shi Tong.Activate
+Bot1.Pass
+Bot1.Arrange(Misshapen Fiend | Counterspell)
+? Client.Bot1.Log.Has = You scry 2.
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Cast Misshapen Fiend without paying its mana cost?
+Bot1.Accept
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Consider.Cast
+Bot2.Pass
+Bot2.Arrange( | Island)
+? Client.Bot1.Log.Has = Bot2 surveils 1.
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Looked = Misshapen Fiend
+Bot1.Battlefield = Island; Sol Ring; Mox Jet; Mox Sapphire; Planetarium of Wan Shi Tong; Misshapen Fiend
+Bot1.Library = Island; Island; Island; Island; Island; Counterspell
+Bot2.Graveyard = Consider; Island
