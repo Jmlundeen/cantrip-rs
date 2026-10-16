@@ -385,6 +385,13 @@ Unstable Glyphbridge (Sandswirl Wanderglyph's "they can't attack you or planeswa
 Guide-Mural (Master's Manufactory asks whether an artifact entered under your control this turn, whatever happened to it
 since: the history does not keep the controller or the types an object entered with).
 
+### Effects that end when a card is cast from exile
+
+"Until this card is cast from exile" (CR 611.2a, 400.7) is `Duration::UntilCastFromExile(card)`, the object in exile.
+`actions::cast` drops those effects as that object becomes cast (CR 601.2i), after its costs are paid, so a mana ability
+the effect grants may pay for the cast (Emrakul, the Exigent Doom's ruling). The card leaving exile any other way is a
+new object that is never cast as this one, and the effect lasts as long as its affected object.
+
 ### Restricted mana
 
 Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction present
