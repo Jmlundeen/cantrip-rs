@@ -124,6 +124,42 @@ public sealed class TacticalPromptsTests
         Assert.Single(answer.Modes);
     }
 
+    // --- Chandra, Spark Hunter's +2: "You may sacrifice an artifact or discard a card. If you do, draw a card." ---------
+
+    private static ChooseModesPromptMessage SacrificeOrDiscard() => new()
+    {
+        Player = Me,
+        Modes = ["Sacrifice an artifact", "Discard a card", "Neither"],
+        Eligible = [0, 1, 2],
+        Count = 1,
+    };
+
+    [Fact]
+    public void Declines_the_optional_sacrifice_or_discard_with_a_small_hand()
+    {
+        GameClient client = Seated([InHand(1, "Island", CardTypeView.Land, 0, ""), InHand(2, "Island", CardTypeView.Land, 0, "")]);
+
+        Assert.Equal([2], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, SacrificeOrDiscard())).Modes);
+    }
+
+    [Fact]
+    public void Discards_a_spare_card_for_the_draw_when_the_hand_is_full_but_never_sacrifices()
+    {
+        GameClient client = Seated([.. Enumerable.Range(1, 5).Select(n => InHand(n, "Island", CardTypeView.Land, 0, ""))]);
+
+        Assert.Equal([1], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, SacrificeOrDiscard())).Modes);
+    }
+
+    [Fact]
+    public void Takes_neither_with_a_full_hand_when_there_is_nothing_to_discard_offered()
+    {
+        GameClient client = Seated([.. Enumerable.Range(1, 5).Select(n => InHand(n, "Island", CardTypeView.Land, 0, ""))]);
+        ChooseModesPromptMessage prompt = SacrificeOrDiscard();
+        prompt.Eligible = [0, 2];
+
+        Assert.Equal([2], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, prompt)).Modes);
+    }
+
     // --- The faces a card may be cast as ----------------------------------------------------------------------------
 
     private static ChooseModesPromptMessage Faces() => new()

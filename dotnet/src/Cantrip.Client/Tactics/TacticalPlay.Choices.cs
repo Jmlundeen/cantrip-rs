@@ -196,6 +196,17 @@ public sealed partial class TacticalPlay
             return new ModesChosenAnswer { Modes = [1] };
         }
 
+        // "You may sacrifice an artifact or discard a card. If you do, draw a card" (Chandra, Spark Hunter's +2): never worth an
+        // artifact, and a card of the hand only when the hand is full enough that the worst of it is a spare; otherwise Neither.
+        if (!prompt.AdditionalCost && prompt.Heading.Length == 0 && prompt.Count == 1
+            && prompt.Modes.FindIndex(mode => mode == "Neither") is int neither and >= 0
+            && prompt.Modes.Exists(mode => mode == "Sacrifice an artifact" || mode == "Discard a card"))
+        {
+            int discard = prompt.Modes.FindIndex(mode => mode == "Discard a card");
+            bool spare = discard >= 0 && prompt.Eligible.Contains(discard) && client.MyHand().Count >= 5;
+            return new ModesChosenAnswer { Modes = [spare ? discard : neither] };
+        }
+
         // Discarding one card instead of two (Steamcore Scholar): the cheaper discard, whenever it is offered.
         if (!prompt.AdditionalCost && prompt.Count == 1 && prompt.Modes.Count == 2 && prompt.Eligible.Contains(0)
             && prompt.Modes[0].StartsWith("Discard an instant or sorcery", StringComparison.Ordinal))
