@@ -1,0 +1,48 @@
+# Blood Hustler's ruling: "If the target opponent is an illegal target as Blood Hustler's activated ability tries to
+# resolve, it won't resolve and none of its effects will happen. You won't gain life." Bot1 activates it at Bot2 (a
+# crime: the counter trigger goes on the stack above it); Bot2 answers with Dawn's Truce, gaining hexproof. The counter
+# trigger resolves (the crime was committed), and the drain does not (CR 608.2b): both stay at 20.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Blood Hustler
+Swamp
+Black Lotus
+Swamp x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dawn's Truce
+Plains x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Blood Hustler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Blood Hustler.Activate(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Crimes = Blood Hustler
+Bot1.Battlefield.Blood Hustler.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Dawn's Truce
+Bot2.Life = 20
+Bot1.Life = 20
