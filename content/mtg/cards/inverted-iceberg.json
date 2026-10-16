@@ -1,0 +1,16 @@
+{
+  "name": "Inverted Iceberg",
+  "manaCost": "{1}{U}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, mill a card, then draw a card. (To mill a card, put the top card of your library into your graveyard.)\nCraft with artifact {4}{U}{U} ({4}{U}{U}, Exile this artifact, Exile another artifact you control or an artifact card from your graveyard: Return this card transformed under its owner's control. Craft only as a sorcery.)",
+  "backFace": {
+    "name": "Iceberg Titan",
+    "type": "Artifact Creature — Golem",
+    "power": 6,
+    "toughness": 6,
+    "colorIndicator": [
+      "Blue"
+    ],
+    "oracleText": "Whenever this creature attacks, you may tap or untap target artifact or creature."
+  }
+}
