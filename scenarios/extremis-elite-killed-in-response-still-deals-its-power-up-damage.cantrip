@@ -1,0 +1,41 @@
+# Extremis Elite's power-up targets Bot2, and Bot1 kills the Elite with Lightning Bolt in response. The ability still
+# resolves (its target is legal, CR 608.2b): there is no creature to put counters on (CR 400.7), but "it deals 1 damage"
+# is dealt by the Elite as it last existed (CR 608.2h), and Bot2 loses 1 life.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Black Lotus
+Extremis Elite
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extremis Elite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Extremis Elite.Activate(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Extremis Elite)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 19

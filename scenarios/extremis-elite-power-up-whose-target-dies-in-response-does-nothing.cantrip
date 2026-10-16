@@ -1,0 +1,48 @@
+# Extremis Elite's power-up targets Bot2's Ornithopter, and Bot1 kills the Ornithopter with Lightning Bolt in response.
+# The ability's only target is illegal as it would resolve, so it does not resolve at all (CR 608.2b): no damage, and no
+# counters on the Elite either.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Black Lotus
+Extremis Elite
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Extremis Elite.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Extremis Elite.Activate(Ornithopter)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Extremis Elite.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Extremis Elite.Power = 2
+Bot1.Battlefield.Extremis Elite.Damage = 0
