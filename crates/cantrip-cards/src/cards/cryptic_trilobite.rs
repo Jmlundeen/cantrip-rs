@@ -2,11 +2,10 @@ use cantrip_api::*;
 use cantrip_mechanics::effects::enters_with_x_counters;
 use cantrip_oracle as oracle;
 
-/// "{1}, {T}: Put a +1/+1 counter on this creature." Nothing if it has left the battlefield (CR 400.7).
+/// "{1}, {T}: Put a +1/+1 counter on this creature." Nothing if it has left the battlefield (CR 400.7): `add_counters`
+/// puts none on an object that is gone.
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if is_live(g, item.object) && g.is_on_battlefield(item.object) {
-        g.add_counters(item.object, CounterKind::PlusOne, 1);
-    }
+    g.add_counters(item.object, CounterKind::PlusOne, 1);
     Ok(())
 }
 

@@ -16,9 +16,7 @@ fn four_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// battlefield (CR 400.7).
 fn x_damage_and_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     damage_target(g, item, 0, item.x);
-    if is_live(g, item.object) && g.is_on_battlefield(item.object) {
-        g.add_counters(item.object, CounterKind::PlusOne, 1);
-    }
+    g.add_counters(item.object, CounterKind::PlusOne, 1);
     Ok(())
 }
 

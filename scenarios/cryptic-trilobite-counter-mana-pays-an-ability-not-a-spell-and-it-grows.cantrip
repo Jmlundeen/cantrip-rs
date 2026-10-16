@@ -2,7 +2,8 @@
 # {C}{C}. Spend this mana only to activate abilities. {1}, {T}: Put a +1/+1 counter on this creature."
 # Turn 1 it is cast for X=2 ({X}{X} is {4}) and enters with two counters. With every other source spent but Mox Jet, a
 # counter removed - no {T}, so not held back by summoning sickness - gives {C}{C} that pays Aether Spellbomb's
-# "{1}, Sacrifice: Draw a card" but not Karn, Scion of Urza's {4}, a spell (CR 106.6). Turn 3 four untapped sources cast
+# "{1}, Sacrifice: Draw a card" but not Karn, Scion of Urza's {4}, a spell (CR 106.6), though with the Mox and the {C}{C}
+# its last counter would make there would be five mana. Turn 3 four untapped sources cast
 # Karn (the control); turn 5 an Island pays its "{1}, {T}" and the counter it lost comes back.
 
 [Bot1 Deck]
