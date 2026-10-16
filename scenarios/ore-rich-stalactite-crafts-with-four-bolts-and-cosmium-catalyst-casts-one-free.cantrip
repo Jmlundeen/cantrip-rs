@@ -1,0 +1,92 @@
+# Ore-Rich Stalactite // Cosmium Catalyst. The Stalactite's {R}, spent only on instant and sorcery spells, pays for Lightning
+# Bolts. "Craft with four or more red instant and/or sorcery cards {3}{R}{R}" (CR 702.167a-b) takes cards from the
+# graveyard alone: with three Bolts there it is not offered (refused); with four it is, and all four are exiled. Cosmium
+# Catalyst's "{1}{R}, {T}: Choose an exiled card used to craft this artifact at random. You may cast that card without
+# paying its mana cost" picks one of them (the die says the second) and Bot1 casts it for nothing at Bot2 (CR 702.167c,
+# 608.2g); on turn eleven Bot1 declines to cast the one it picks. A Phyrexian Metamorph copying the Catalyst has its
+# ability but no cards used to craft it: activated, it chooses nothing and casts nothing.
+
+[Bot1 Deck]
+Mountain
+Ore-Rich Stalactite
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mox Ruby
+Mountain
+Mountain
+Mountain
+Mountain
+Mox Sapphire
+Phyrexian Metamorph
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Dice]
+2
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ore-Rich Stalactite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Ore-Rich Stalactite.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Battlefield.Ore-Rich Stalactite.Activate(Ability: Craft)
+Bot1.Battlefield.Ore-Rich Stalactite.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Ore-Rich Stalactite.Activate(Ability: Craft)
+Bot1.Choose(Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T9 Bot1.Main1]
+? Exile.Count = 4
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Cosmium Catalyst.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Accept
+Bot1.Target(Bot2)
+[T9 Bot1.Main2]
+? Bot2.Life = 5
+[T11 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Cosmium Catalyst.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Decline
+[T13 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Cosmium Catalyst)
+Bot1.Battlefield.Cosmium Catalyst#2.Activate
+Bot1.Battlefield.Mountain#4.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Accept
+[T13 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 5
+Exile = Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Graveyard = Lightning Bolt
