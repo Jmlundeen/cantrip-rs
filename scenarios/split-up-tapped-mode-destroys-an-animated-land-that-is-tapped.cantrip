@@ -1,0 +1,39 @@
+# Restless Anchorage enters tapped. Bot1 animates it ({1}{W}{U} from three Moxen): until end of turn it is a tapped 2/3 Bird land
+# creature (CR 613.1d). Split Up's first mode, cast with the Lotus's white, destroys all tapped creatures as it resolves
+# and the Anchorage is one (CR 701.8a): it goes to the graveyard.
+
+[Bot1 Deck]
+Restless Anchorage
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Split Up
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Restless Anchorage.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Restless Anchorage.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Anchorage.Types = Land; Creature
+? Bot1.Battlefield.Restless Anchorage.Tapped = true
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Split Up.Cast
+Bot1.Modes(1)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Split Up; Restless Anchorage; Black Lotus
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet
