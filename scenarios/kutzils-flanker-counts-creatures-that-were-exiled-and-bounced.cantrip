@@ -1,0 +1,54 @@
+# Kutzil's Flanker, first mode: "left the battlefield" is any departure, not only dying. On turn 3 Bot1 returns one of its
+# Ornithopters to hand with Aether Spellbomb and exiles the other with Path to Exile; the Flanker gets two counters
+# (the sacrificed Spellbomb, a noncreature, adds none): a 5/3.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Path to Exile
+Aether Spellbomb
+Black Lotus
+Mox Sapphire
+Mox Jet
+Kutzil's Flanker
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Aether Spellbomb.Activate(Bot1.Battlefield.Ornithopter#1; Ability: Return target creature)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Path to Exile.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Ornithopter
+Bot1.Hand = Ornithopter
+Bot1.Battlefield.Kutzil's Flanker.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Kutzil's Flanker.Power = 5
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 3

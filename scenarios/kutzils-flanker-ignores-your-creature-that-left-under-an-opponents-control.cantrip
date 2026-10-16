@@ -1,0 +1,61 @@
+# Kutzil's Flanker, first mode, the reverse of the stolen-creature scenario: Bot1's own Ornithopter is stolen by Bot2's
+# kicked Thieving Skydiver on turn 2, and Bot1 Bolts it. It left under Bot2's control, so it does not count for Bot1:
+# the Flanker, flashed in the same turn, stays a 3/1. Its owner is Bot1, whose graveyard receives it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Ornithopter
+Lightning Bolt
+Kutzil's Flanker
+Island
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Thieving Skydiver
+Island x3
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot2.Pass
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
+Bot1.Battlefield.Kutzil's Flanker.Power = 3
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 1

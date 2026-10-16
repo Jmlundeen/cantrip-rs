@@ -44,3 +44,5 @@ Turn = 1
 Stack.Count = 0
 Bot1.Graveyard =
 Exile = Ornithopter; Lightning Bolt
+Bot1.Battlefield.Kutzil's Flanker.Power = 3
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 1

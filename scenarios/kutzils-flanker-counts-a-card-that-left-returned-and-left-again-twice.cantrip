@@ -1,0 +1,47 @@
+# Kutzil's Flanker, first mode: "for each creature that left the battlefield". A flickered Ornithopter returns as a new
+# object (CR 400.7), so when it is then Bolted two creatures have left, not one. On turn 3 Bot1 blinks its Ornithopter
+# with Ephemerate, Bolts it, and flashes in the Flanker: two counters, a 5/3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Ornithopter
+Ephemerate
+Lightning Bolt
+Island
+Kutzil's Flanker
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Kutzil's Flanker.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Kutzil's Flanker.Power = 5
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 3

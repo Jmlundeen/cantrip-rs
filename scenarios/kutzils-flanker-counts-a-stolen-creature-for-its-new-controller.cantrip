@@ -1,0 +1,58 @@
+# Kutzil's Flanker, first mode: "under your control" is the controller as the creature left. Bot2's Ornithopter is
+# stolen with a kicked Thieving Skydiver (X = 1) on turn 3, and Bot1 Bolts it: it left under Bot1's control, so the
+# Flanker gets one counter, a 4/2. Its owner is Bot2, whose graveyard receives it. The neighbouring scenario is the reverse.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Jet
+Thieving Skydiver
+Lightning Bolt
+Kutzil's Flanker
+Island x11
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Pass
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Kutzil's Flanker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Kutzil's Flanker.Power = 4
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 2

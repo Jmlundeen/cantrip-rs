@@ -1,0 +1,50 @@
+# Kutzil's Flanker, first mode: a token that dies is a creature that left the battlefield even though it has ceased to
+# exist (last known information, CR 113.7a, 111.7). On turn 3 Bot1 makes two Spirit tokens with Lingering Souls and Bolts
+# one; the Flanker gets exactly one counter (the surviving token adds none): a 4/2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Lingering Souls
+Lightning Bolt
+Kutzil's Flanker
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Spirit)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Kutzil's Flanker.Cast
+Bot1.Pass
+Bot1.Modes(Put a +1/+1 counter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Kutzil's Flanker.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Kutzil's Flanker.Power = 4
+Bot1.Battlefield.Kutzil's Flanker.Toughness = 2
