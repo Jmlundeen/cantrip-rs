@@ -1,0 +1,82 @@
+# Quintorius Kand's -6 on turn 9 targets Strip Mine, Lightning Bolt and a Dark Ritual in Bot1's graveyard. In response Bot2's
+# Lion Sash exiles the Lightning Bolt (CR 608.2b): that target is illegal when the ability resolves, the other two are not.
+# Only the cards really exiled count: Strip Mine and the Dark Ritual are exiled and may be played, {R}{R} is added (not
+# three), and the Bolt is in Bot2's exile pile, not Bot1's to play (the second Dark Ritual stays in the graveyard).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Strip Mine
+Island
+Lightning Bolt
+Dark Ritual
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Lion Sash
+Plains
+Plains
+Plains
+Plains x8
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lion Sash.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy target land; Bot2.Battlefield.Plains)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Create a 3/2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Create a 3/2)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Create a 3/2)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+[T9 Bot1.Main2]
+? Bot1.Graveyard.Count = 4
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Exile any number)
+Bot1.Target(Strip Mine; Lightning Bolt; Dark Ritual#1)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Lion Sash.Activate(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}
+? Exile.Count = 3
+? Bot1.Graveyard.Count = 1
+Bot1.Exile.Strip Mine.Play
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Battlefield.Strip Mine.Tapped = false
+Bot1.Graveyard = Dark Ritual
+Bot2.Life = 17

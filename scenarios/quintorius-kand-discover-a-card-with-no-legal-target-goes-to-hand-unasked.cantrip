@@ -1,0 +1,42 @@
+# Discover 4 finds Swords to Plowshares, but there is no creature on the battlefield to target, so it cannot be cast
+# (CR 601.2c): nothing is asked (`! Bot1.Accept`, rulings: "If you can't cast the discovered card, you'll put it into your
+# hand") and it goes into Bot1's hand. No spell was cast, so Quintorius does not trigger.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Mountain
+Island
+Swords to Plowshares
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
+! Bot1.Accept
+[T4 Bot2.Main1]
+? Bot2.Life = 20
+? Bot1.Life = 20
+? Exile.Count = 0
+
+[Expect]
+Bot1.Hand = Mountain; Island; Swords to Plowshares
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1

@@ -1,0 +1,47 @@
+# Discover 4 compares mana value to N inclusively (CR 701.57a): Nova Hellkite (mana value 5) is exiled and passed over, and
+# Panharmonicon (mana value exactly 4) is the discovered card. It is cast without paying its mana cost and enters the
+# battlefield, a spell cast from exile, which triggers Quintorius Kand (2 damage to Bot2, 2 life for Bot1). The Hellkite goes
+# to the bottom of the library; it was never cast or put into a hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Mountain
+Island
+Nova Hellkite
+Panharmonicon
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
+Bot1.Accept
+[T4 Bot2.Main1]
+? Bot2.Life = 18
+? Bot1.Life = 22
+? Exile.Count = 0
+? Bot1.Library.Count = 11
+? Bot1.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Nova Hellkite
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Jet; Mox Sapphire; Mox Emerald; Quintorius Kand; Panharmonicon
+Bot1.Hand = Mountain; Island
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1

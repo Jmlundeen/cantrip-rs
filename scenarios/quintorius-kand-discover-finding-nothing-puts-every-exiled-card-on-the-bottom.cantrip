@@ -1,0 +1,43 @@
+# Discover 4 with no nonland card of mana value 4 or less to find (CR 701.57a): the library is a Mountain and a Nova Hellkite
+# (mana value 5), so cards are exiled until the library is empty, nothing is cast or put into the hand (`! Bot1.Accept`),
+# and both go back to the bottom of the library in a random order. It has still been discovered (CR 701.57b), and Quintorius
+# Kand's loyalty fell by 3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Mountain
+Island
+Mountain
+Nova Hellkite
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
+! Bot1.Accept
+[T4 Bot2.Main1]
+? Exile.Count = 0
+? Bot1.Library.Count = 2
+
+[Expect]
+Bot1.Hand = Mountain; Island
+Bot1.Library.Count = 2
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1

@@ -1,0 +1,42 @@
+# Quintorius Kand: five Moxen pay {3}{R}{W} on turn 3, and its +1 makes a 3/2 red and white Spirit creature token and
+# raises its loyalty from 4 to 5 (CR 606.4). Only one loyalty ability can be activated each turn (CR 606.3), so a second
+# is refused (`! ... Activate(Ability: Discover)`) beside the +1 just used.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Create a 3/2)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
+
+[Expect]
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 5
+Bot1.Battlefield.Spirit.Token = true
+Bot1.Battlefield.Spirit.Power = 3
+Bot1.Battlefield.Spirit.Toughness = 2
+Bot1.Battlefield.Spirit.Types = Creature
+Bot1.Battlefield.Spirit.Subtypes = Spirit
+Bot1.Battlefield.Spirit.Colors = Red; White

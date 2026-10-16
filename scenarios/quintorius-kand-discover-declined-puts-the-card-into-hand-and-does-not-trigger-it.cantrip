@@ -1,0 +1,44 @@
+# Discover 4 with the answer "don't cast" (CR 701.57a): the discovered Panharmonicon is put into Bot1's hand instead. Nothing
+# was cast, so Quintorius Kand's "whenever you cast a spell from exile" does not trigger (life stays 20 for both), and the
+# Nova Hellkite exiled before it (mana value 5) goes to the bottom of the library.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Mountain
+Island
+Nova Hellkite
+Panharmonicon
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
+Bot1.Decline
+[T4 Bot2.Main1]
+? Bot2.Life = 20
+? Bot1.Life = 20
+? Exile.Count = 0
+? Bot1.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Nova Hellkite
+
+[Expect]
+Bot1.Hand = Mountain; Island; Panharmonicon
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1

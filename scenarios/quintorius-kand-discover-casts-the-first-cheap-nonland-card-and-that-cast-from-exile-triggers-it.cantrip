@@ -1,0 +1,57 @@
+# Quintorius Kand's -3, Discover 4 (CR 701.57a). Turn 3: Quintorius is cast, then a Lightning Bolt from the HAND at Bot2:
+# a spell cast from hand does not trigger "whenever you cast a spell from exile" (life stays 20 and 17). Then the -3: the top
+# of the library is two Mountains (exiled; lands are skipped) and a Lightning Bolt (mana value 1, 4 or less): it is cast
+# without paying, from exile, and so triggers Quintorius (CR 601.2a): 2 damage to Bot2 and 2 life for Bot1, on top of the
+# Bolt's 3. The two Mountains go on the bottom of the library, in a random order, which two equal cards make certain.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Quintorius Kand
+Lightning Bolt
+Mountain
+Mountain
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Life = 20
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Discover)
+Bot1.Accept
+Bot1.Target(Bot2)
+[T4 Bot2.Main1]
+? Bot2.Life = 12
+? Bot1.Life = 22
+? Exile.Count = 0
+? Bot1.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Mountain; Mountain
+
+[Expect]
+Bot2.Life = 12
+Bot1.Life = 22
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1

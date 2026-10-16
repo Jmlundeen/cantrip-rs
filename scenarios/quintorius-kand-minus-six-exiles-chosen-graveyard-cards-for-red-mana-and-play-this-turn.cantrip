@@ -1,0 +1,75 @@
+# Quintorius Kand's -6 (loyalty 4, then +1 on turns 3, 5 and 7 makes 7). Turn 9 Bot1's graveyard holds Strip Mine, Lightning
+# Bolt and two Dark Rituals. The -6 targets three of them (any number): Strip Mine, Lightning Bolt and one Dark Ritual are
+# exiled, one {R} is added for each (3), and the fourth card, a Dark Ritual not targeted, stays in the graveyard. This turn:
+# the Bolt is cast from exile with one of that mana (a spell cast from exile, which triggers Quintorius at loyalty 1: 2
+# more damage, 2 life) leaving {R}{R}, and the Strip Mine is played as a land from exile. The exiled Dark Ritual is not cast
+# this turn; on turn 11 the permission has run out (`! Bot1.Exile.Dark Ritual.Cast`) though the Bolt's was used the same way.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Quintorius Kand
+Strip Mine
+Island
+Lightning Bolt
+Dark Ritual
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+Bot1.Battlefield.Strip Mine.Activate(Ability: Destroy target land; Bot2.Battlefield.Island)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Quintorius Kand.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Create a 3/2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Create a 3/2)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Create a 3/2)
+[T9 Bot1.Main1]
+? Bot1.Graveyard.Count = 3
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+[T9 Bot1.Main2]
+? Bot1.Graveyard.Count = 4
+Bot1.Battlefield.Quintorius Kand.Activate(Ability: Exile any number)
+Bot1.Target(Strip Mine; Lightning Bolt; Dark Ritual#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}{R}
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Exile.Strip Mine.Play
+[T9 Bot1.End]
+? Bot2.Life = 12
+? Bot1.Life = 22
+? Bot1.Mana =
+? Bot1.Battlefield.Quintorius Kand.Counters.Loyalty = 1
+? Exile = Dark Ritual
+? Bot1.Graveyard = Lightning Bolt; Dark Ritual
+[T11 Bot1.Main1]
+! Bot1.Exile.Dark Ritual.Cast
+
+[Expect]
+Bot1.Battlefield.Strip Mine.Tapped = false
