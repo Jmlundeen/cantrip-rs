@@ -3,11 +3,6 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::{connive_n, triggers};
 use cantrip_oracle as oracle;
 
-/// "Target attacking creature" (CR 115.1, 506.4): attacking as the trigger resolves too, or it fizzles.
-fn attacking_creature(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.is_attacking(id))
-}
-
 /// The target connives X, where X is the number of attacking creatures, counted as the ability resolves over every
 /// attacking creature, not only its controller's.
 fn connive_x(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -23,7 +18,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggers::ward::<1>("Ward {1} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {1}.)"),
         triggered(triggers::YOU_ATTACK, connive_x, "Whenever you attack, target attacking creature connives X, where X is the number of attacking creatures.")
-            .targets(&[target(attacking_creature)]),
+            .targets(&[targets::ATTACKING_CREATURE]),
     ],
     ..oracle::RAFFINE_SCHEMING_SEER
 };

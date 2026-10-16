@@ -311,42 +311,83 @@ pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
         .ward()
 }
 
+const WARD_LIFE_DETAIL: &str = "Ward: what it targeted can't be targeted for free";
+
 /// What ward's life cost asks the player whose spell or ability targeted, the question on that spell or ability: pay it,
-/// or have it countered.
+/// or have it countered. A static question for each amount from 0 to 60, which says the number in its words and carries
+/// it for the client; an amount beyond that (a ward that pays life equal to a power) is asked without the number.
 fn ward_life_question(n: u8) -> &'static Question {
-    const DETAIL: &str = "Ward: what it targeted can't be targeted for free";
-    const TWO: Question =
-        Question::new("PayLifeUnlessCountered", "Pay 2 life, or {source} is countered?", DETAIL, "Pay 2 life", "Let it be countered").amount(2).no_default();
-    const THREE: Question =
-        Question::new("PayLifeUnlessCountered", "Pay 3 life, or {source} is countered?", DETAIL, "Pay 3 life", "Let it be countered").amount(3).no_default();
-    const ANY: Question =
-        Question::new("PayLifeUnlessCountered", "Pay the life, or {source} is countered?", DETAIL, "Pay the life", "Let it be countered").no_default();
-    match n {
-        2 => &TWO,
-        3 => &THREE,
-        _ => &ANY,
+    const ANY: Question = Question::new(
+        "PayLifeUnlessCountered",
+        "Pay the life, or {source} is countered?",
+        WARD_LIFE_DETAIL,
+        "Pay the life",
+        "Let it be countered",
+    )
+    .no_default();
+    macro_rules! amounts {
+        ($($i:literal)*) => {
+            match n {
+                $($i => {
+                    const Q: Question = Question::new(
+                        "PayLifeUnlessCountered",
+                        concat!("Pay ", $i, " life, or {source} is countered?"),
+                        WARD_LIFE_DETAIL,
+                        concat!("Pay ", $i, " life"),
+                        "Let it be countered",
+                    )
+                    .amount($i)
+                    .no_default();
+                    &Q
+                })*
+                _ => &ANY,
+            }
+        };
     }
+    amounts!(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+        41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60)
 }
 
-fn ward_life_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+/// Ward's life cost, paid or not (CR 702.21a, 118.12): the payer is asked whether to pay `amount` life when they have that
+/// much (CR 119.4), and the spell or ability that targeted is countered unless they do.
+fn ward_pay_life(g: &mut dyn Game, item: &StackItem, amount: i32) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
     // A cost of life is paid only by a player with that much (CR 119.4), so nobody else is asked; the payer says whether
     // to pay, as the C# engine's unlessPaysLife asked it.
-    let paid = g.state().player(payer).life >= N as i32
-        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_life_question(N)) })? == Answer::Yes;
+    let paid = g.state().player(payer).life >= amount
+        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_life_question(amount.clamp(0, 255) as u8)) })? == Answer::Yes;
     if paid {
-        g.lose_life(payer, N as i32);
+        g.lose_life(payer, amount);
     } else {
         g.counter_item(by, item.data[1] as usize);
     }
     Ok(())
 }
 
+fn ward_life_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    ward_pay_life(g, item, N as i32)
+}
+
 /// Ward--Pay N life (CR 702.21a): "Whenever this becomes the target of a spell or ability an opponent controls, counter it
 /// unless that player pays N life." Sedgemoor Witch prints it with 3.
 pub const fn ward_life<const N: u8>(text: &'static str) -> AbilityDef {
     triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_life_effect::<N>, text)
+        .ward()
+}
+
+fn ward_life_equal_to_power_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    // The ward source's power as the ward ability resolves, or as it last was on the battlefield (CR 113.7a, 608.2h).
+    let power = i32::from(g.chars(item.object).power.unwrap_or(0)).max(0);
+    ward_pay_life(g, item, power)
+}
+
+/// Ward--Pay life equal to this creature's power (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or
+/// ability an opponent controls, counter it unless that player pays life equal to its power." The power is worked out as the
+/// ward ability resolves, from the creature as it last existed if it has left the battlefield. Raubahn, Bull of Ala Mhigo
+/// prints it.
+pub const fn ward_life_equal_to_power(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_life_equal_to_power_effect, text)
         .ward()
 }
 
