@@ -35,10 +35,6 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- The emblem ---------------------------------------------------------------------------------------------------
 
-fn opponents_permanent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if is_live(q, id) && q.is_on_battlefield(id) && q.controller(id) != asker.controller)
-}
-
 fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     exile_target(g, item, 0);
     Ok(())
@@ -48,7 +44,7 @@ pub static EMBLEM: CardDef = CardDef {
     name: "Teferi, Hero of Dominaria emblem",
     has_cost: false,
     abilities: &[triggered(cantrip_mechanics::triggers::YOU_DRAW_A_CARD, exile_it, "Whenever you draw a card, exile target permanent an opponent controls.")
-        .targets(&[target(opponents_permanent)])],
+        .targets(&[targets::PERMANENT_AN_OPPONENT_CONTROLS])],
     text: "Whenever you draw a card, exile target permanent an opponent controls.",
     ..CardDef::BLANK
 };

@@ -279,6 +279,12 @@ pub const PERMANENT: TargetSpec = target(permanent_filter);
 pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);
 /// "Target artifact or enchantment an opponent controls". Cathartic Parting, Witch Enchanter, Wistfulness and Scrapshooter print it.
 pub const ARTIFACT_OR_ENCHANTMENT_AN_OPPONENT_CONTROLS: TargetSpec = target(artifact_or_enchantment_an_opponent_controls_filter);
+fn permanent_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
+}
+
+/// "Target permanent an opponent controls" (CR 115.1). Assassin's Trophy and the emblem of Teferi, Hero of Dominaria print it.
+pub const PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec = target(permanent_an_opponent_controls_filter);
 /// "Target nonland permanent an opponent controls". Conclave Tribunal and Sheltered by Ghosts print it.
 pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec =
     target(nonland_permanent_an_opponent_controls_filter);
