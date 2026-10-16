@@ -1,0 +1,42 @@
+# Viv Vision, Teen Synthezoid's Cybernetic Senses reads her power as it resolves, not as it triggers (CR 608.2c): she
+# attacks as a 2/2, and with the trigger on the stack Bot1 casts Turn Inside Out on her (+3/+0). The trigger then
+# resolves with her power 5 and Bot1 draws.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Sol Ring
+Mox Ruby
+Viv Vision, Teen Synthezoid
+Turn Inside Out
+Island
+Island x10
+
+[Bot2 Deck]
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Viv Vision, Teen Synthezoid.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Viv Vision, Teen Synthezoid)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Turn Inside Out.Cast(Viv Vision, Teen Synthezoid)
+? Stack.Count = 2
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 3
+Bot2.Life = 15
