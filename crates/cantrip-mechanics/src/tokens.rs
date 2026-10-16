@@ -337,6 +337,32 @@ pub fn create(g: &mut dyn Game, controller: PlayerId, def: &'static CardDef, cou
     g.create_tokens(def, controller, count, false)
 }
 
+fn fetch_basic_land_tapped(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    crate::lands::search_basic_land_to_battlefield(g, item.controller, item.object, true)
+}
+
+/// A colorless Lander artifact token with "{2}, {T}, Sacrifice this token: Search your library for a basic land card, put
+/// it onto the battlefield tapped, then shuffle." (CR 111.10u). Biotech Specialist makes it.
+pub static LANDER: CardDef = CardDef {
+    name: "Lander Token",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Artifact]),
+    subtypes: SubtypeSet::of(&[Subtype::Lander]),
+    abilities: &[ability(
+        cost("{2}").and(TAP).and(SACRIFICE_THIS),
+        fetch_basic_land_tapped,
+        "{2}, {T}, Sacrifice this token: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+    )],
+    text: "{2}, {T}, Sacrifice this token: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+    ..CardDef::BLANK
+};
+
+/// Creates a Lander token (CR 111.10u) under `controller`.
+pub fn create_lander(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
+    create(g, controller, &LANDER, 1)?;
+    Ok(())
+}
+
 /// Creates a Blood token (CR 111.10g) under `controller`. Bloodtithe Harvester and Ivora, Insatiable Heir make it.
 pub fn create_blood(g: &mut dyn Game, controller: PlayerId) -> Result<(), Suspend> {
     create(g, controller, &BLOOD, 1)?;

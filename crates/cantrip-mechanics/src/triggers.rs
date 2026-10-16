@@ -157,6 +157,16 @@ pub fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
     }
 }
 
+/// "Whenever you sacrifice [a permanent]" (CR 701.21a): the permanent `player` sacrificed, as it last was on the
+/// battlefield, for the card to judge the quality it names. The ability is `.on_sacrifice().look_back()`. Tireless Tracker
+/// (a Clue) and Biotech Specialist (an artifact) print it.
+pub fn sacrificed_by(q: &dyn Query, player: PlayerId, event: &Event) -> Option<ObjectId> {
+    match event {
+        Event::ZoneChange { old, from, reason: ZoneReason::Sacrifice, .. } if from.is(ZoneKind::Battlefield) && q.controller(*old) == player => Some(*old),
+        _ => None,
+    }
+}
+
 /// "Whenever this creature attacks or blocks" (CR 508.1m, 509.1, 603.2): its own attack or its own block of any
 /// attacker. Smuggler's Copter and Bebop & Rocksteady print it.
 pub fn this_attacks_or_blocks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
