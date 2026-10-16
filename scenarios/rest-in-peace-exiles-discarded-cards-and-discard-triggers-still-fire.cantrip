@@ -1,0 +1,50 @@
+# Bot1 has Rest in Peace out on turn 1 and Marauding Mako ("whenever you discard one or more cards, put that many +1/+1
+# counters on it") on turn 3. On turn 5 Faithless Looting makes Bot1 discard two Mountains: each is exiled instead of put
+# into the graveyard (CR 614.1a), but it was still discarded (CR 701.9), so the Mako gets two counters. Looting itself is
+# exiled too, flashback or not.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Marauding Mako
+Faithless Looting
+Mountain
+Mountain
+Mountain
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marauding Mako.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Mountain; Mountain)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard.Count = 0
+Exile = Mountain; Mountain; Faithless Looting
+Bot1.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 2

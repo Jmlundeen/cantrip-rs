@@ -1,0 +1,43 @@
+# Bot1 has Rest in Peace out on turn 1. Bot2 destroys it with Disenchant on turn 4. Rest in Peace is put into the graveyard
+# only after it is gone from the battlefield, so it is exiled (CR 614.1a, 400.7) - the replacement applies as it leaves, per
+# its rulings. Disenchant, which finishes resolving after Rest in Peace has left, goes to Bot2's graveyard normally.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain x4
+Mountain x13
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x4
+Plains x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Rest in Peace)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Exile = Rest in Peace
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Disenchant

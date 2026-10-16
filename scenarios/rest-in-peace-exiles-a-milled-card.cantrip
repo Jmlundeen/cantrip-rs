@@ -1,0 +1,40 @@
+# Bot1 has Rest in Peace out on turn 1. Bot2's Thought Scour on turn 2 makes Bot1 mill two cards, Swamp and Forest: milling
+# puts them into the graveyard (CR 701.17a), so each is exiled instead, and so is the Thought Scour.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain x4
+Swamp
+Forest
+Mountain x11
+
+[Bot2 Deck]
+Island
+Thought Scour
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Thought Scour.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 2
+Exile = Swamp; Forest; Thought Scour
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Library.Count = 11

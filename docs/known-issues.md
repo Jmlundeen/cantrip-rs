@@ -41,6 +41,7 @@ keeps it).
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 | [KI-6](#ki-6-tokens-do-not-enter-tapped-under-an-enter-tapped-replacement) | Tokens do not enter tapped under an enter-tapped replacement | Medium | Open |
+| [KI-8](#ki-8-madness-is-lost-when-a-discarded-card-is-also-replaced-by-rest-in-peace) | Madness is lost when a discarded card is also replaced by Rest in Peace | Medium | Open |
 
 ## Issues
 
@@ -142,3 +143,17 @@ opponent of such a permanent enters untapped. The enters trigger is unaffected (
 
 **Scenarios.**
 - [`scenarios/authority-of-the-consuls-taps-a-token-created-under-an-opponent.cantrip`](../scenarios/authority-of-the-consuls-taps-a-token-created-under-an-opponent.cantrip) - two Spirit tokens must enter tapped (marked `# Known bug`).
+### KI-8: Madness is lost when a discarded card is also replaced by Rest in Peace
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-16, review of Rest in Peace |
+
+**Notes.** A card with madness discarded while Rest in Peace (or any "exile instead of graveyard" replacement) is on the
+battlefield should let its owner choose the order of the two replacements (CR 616.1, 702.35a); the Rest in Peace ruling
+says madness still works. `crates/cantrip-rules/src/ops.rs` (about lines 104-112) computes `madness` only if the
+destination after `replace::zone_change` is still the graveyard, so the card is just exiled and never cast. A fix has to
+offer madness as a replacement the affected player orders with the other.
+
+**Scenarios.**
+- [`scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip`](../scenarios/rest-in-peace-lets-a-discarded-madness-card-be-cast-by-choosing-madness-first.cantrip) - Basking Rootwalla discarded under Rest in Peace is cast for {0} (marked `# Known bug`).

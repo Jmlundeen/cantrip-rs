@@ -1,0 +1,42 @@
+# Known bug: a card with madness discarded under Rest in Peace is not given madness; ops.rs computes it only when the destination is still the graveyard (CR 616.1, 702.35a).
+# Bot1 has Rest in Peace out on turn 1. On turn 3 Faithless Looting makes Bot1 discard Basking Rootwalla and a Mountain.
+# Both madness (CR 702.35a: discard it into exile instead) and Rest in Peace (exile it instead of the graveyard) replace the
+# discard; the affected player chooses the order (CR 616.1), and per the Rest in Peace ruling may apply madness first. Its
+# trigger then lets Bot1 cast the Rootwalla for {0}, so it ends on the battlefield. The Mountain is plainly exiled.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Faithless Looting
+Basking Rootwalla
+Mountain
+Mountain
+Mountain
+Mountain x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Basking Rootwalla; Mountain)
+Bot1.Accept
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mountain; Rest in Peace; Basking Rootwalla
+Bot1.Graveyard.Count = 0
+Exile = Mountain; Faithless Looting

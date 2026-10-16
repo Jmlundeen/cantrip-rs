@@ -1,0 +1,51 @@
+# Bot1 has Rest in Peace out on turn 1. On turn 3 Bot1 casts Lightning Bolt at Bot2, who counters it with Counterspell
+# (an Island and a Mox Sapphire). A countered spell is put into its owner's graveyard (CR 701.6a) and is exiled instead;
+# the Counterspell, finishing its resolution, is exiled too.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Lightning Bolt
+Mountain x2
+Mountain x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x4
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Exile = Lightning Bolt; Counterspell
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0

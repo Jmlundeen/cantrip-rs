@@ -1,0 +1,69 @@
+# Bot2's Pest Infestation (X = 1) makes two Pest tokens ("when this token dies, you gain 1 life"). With no Rest in Peace out,
+# Bot1's first Lightning Bolt kills a Pest: it dies and Bot2 gains 1 (21). Bot1 then casts Rest in Peace (its enters trigger
+# exiles the graveyards) and Bolts the other Pest: a token would be put into a graveyard, so it is exiled instead
+# (CR 614.1a) and never dies, and Bot2 stays at 21.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Pest Infestation
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Forest#3.Activate
+Bot2.Hand.Pest Infestation.Cast(X: 1)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Pest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 21
+? Bot2.Graveyard = Pest Infestation
+? Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Pest)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot2.Life = 21
+Bot2.Battlefield.Count = 3
+Exile = Pest Infestation; Lightning Bolt; Lightning Bolt
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard.Count = 0
