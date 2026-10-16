@@ -1,0 +1,36 @@
+# Bargained, Torch the Tower deals exactly 3 damage, Liliana of the Veil's whole loyalty: she has 0 loyalty counters and
+# would die (CR 704.5i), so she is exiled instead rather than put into the graveyard. Mox Ruby, an artifact, is sacrificed
+# for bargain (CR 702.166a). Bot1 scries 1 and keeps the card on top (an empty bottom).
+
+[Bot1 Deck]
+Mox Ruby
+Torch the Tower
+Mountain x18
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Torch the Tower.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Choose(Mox Ruby)
+Bot1.Arrange(Mountain | )
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Liliana of the Veil
+Bot2.Graveyard = Black Lotus
+Bot1.Graveyard = Torch the Tower; Mox Ruby

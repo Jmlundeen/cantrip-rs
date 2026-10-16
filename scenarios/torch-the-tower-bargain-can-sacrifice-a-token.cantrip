@@ -1,0 +1,46 @@
+# Bargain may sacrifice a token (CR 702.166a): The Last Ronin's Technique makes three Ninja Turtle Spirit tokens in turn 1,
+# and in turn 3 one of them is sacrificed to bargain Torch the Tower, which deals 3 damage to Keen-Eyed Curator (a 3/3):
+# exiled instead of dying. Two tokens remain.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+The Last Ronin's Technique
+Torch the Tower
+Plains
+Plains
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Keen-Eyed Curator
+Forest x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.The Last Ronin's Technique.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Keen-Eyed Curator.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Torch the Tower.Cast(Bot2.Battlefield.Keen-Eyed Curator)
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Choose(Ninja Turtle Spirit)
+Bot1.Arrange(Mountain | )
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Keen-Eyed Curator
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Count = 5

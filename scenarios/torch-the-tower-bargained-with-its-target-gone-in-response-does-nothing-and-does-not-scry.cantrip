@@ -1,0 +1,42 @@
+# CR 608.2b: Bot1 casts Torch the Tower bargained (sacrificing Mox Ruby) at Llanowar Elves; Bot2 responds with Lightning
+# Bolt on its own Elves. The only target is illegal, so the spell does not resolve: no damage, no scry (Bot1 is never asked to
+# arrange), and the Elves went to the graveyard by the Bolt, not exile. The bargain cost stays paid.
+
+[Bot1 Deck]
+Mox Ruby
+Torch the Tower
+Mountain x18
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Torch the Tower.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Modes(Bargain:)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Choose(Mox Ruby)
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot1.Graveyard = Torch the Tower; Mox Ruby
+Stack.Count = 0

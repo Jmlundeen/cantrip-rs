@@ -1,0 +1,38 @@
+# Torch the Tower deals 2 damage to Liliana of the Veil (loyalty 3): she is left at 1 loyalty, not dead (the boundary below
+# her loyalty), and was dealt damage by the spell, so when Lightning Bolt takes her last loyalty (CR 704.5i, dies, CR 700.4)
+# the replacement exiles her instead of putting her into the graveyard (ruling: for any reason, not only lethal damage).
+
+[Bot1 Deck]
+Mox Ruby
+Torch the Tower
+Lightning Bolt
+Mountain x17
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Torch the Tower.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Battlefield.Mountain.Activate
+
+[Expect]
+Exile = Liliana of the Veil
+Bot2.Graveyard = Black Lotus
+Bot1.Graveyard = Lightning Bolt; Torch the Tower

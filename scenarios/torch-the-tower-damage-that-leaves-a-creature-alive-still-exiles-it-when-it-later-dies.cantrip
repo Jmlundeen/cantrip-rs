@@ -1,0 +1,53 @@
+# Torch the Tower deals 2 damage to Keen-Eyed Curator (a 3/3), which survives; the spell's replacement effect (CR 611.2c,
+# 614.1a) stays on it for the turn, so when a Lightning Bolt then kills it, it is exiled instead of dying. Llanowar Elves
+# was never dealt damage by Torch the Tower, so the Bolt that kills it puts it into the graveyard (the negative control).
+
+[Bot1 Deck]
+Mox Ruby
+Torch the Tower
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Keen-Eyed Curator
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Keen-Eyed Curator.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Torch the Tower.Cast(Bot2.Battlefield.Keen-Eyed Curator)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Keen-Eyed Curator.Damage = 2
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Keen-Eyed Curator)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Ruby.Activate
+
+[Expect]
+Exile = Keen-Eyed Curator
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Count = 3
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Torch the Tower
