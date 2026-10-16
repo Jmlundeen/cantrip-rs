@@ -605,6 +605,10 @@ type Found = Vec<(PendingTrigger, &'static TriggeredDef, Again)>;
 
 /// `permanent`: the source is on the battlefield (or was, for a look-back ability); false for an emblem in the command zone,
 /// which is no permanent (CR 114.4), so "a triggered ability of a permanent" does not mean its abilities.
+/// The triggered abilities of `source` that `event` triggers, onto `found`: those that look back (CR 603.10a) or those that
+/// don't, as `look_back` says. With `later`, both, the object's characteristics found once: the look-back ones onto `found`,
+/// the others onto `later`.
+#[allow(clippy::too_many_arguments)]
 fn consider(
     cx: &Cx,
     source: ObjectId,
@@ -614,12 +618,13 @@ fn consider(
     mask: EventMask,
     statics: &mut TriggerStatics,
     found: &mut Found,
+    mut later: Option<&mut Found>,
 ) {
     let chars = layers::chars(cx.cards(), cx.s(), source);
     let controller = cx.s().obj(source).controller;
     for ability in chars.abilities() {
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
-            && t.look_back == look_back
+            && (later.is_some() || t.look_back == look_back)
             && let Some(fired) = if t.chapter > 0 { chapter_reached(cx, source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
         {
             if let Some(condition) = t.condition
@@ -637,7 +642,11 @@ fn consider(
             }
             let mut again = Again::new();
             statics.additional(cx, event, &triggering, &mut again);
-            found.push((
+            let into = match later.as_deref_mut() {
+                Some(later) if !t.look_back => later,
+                _ => &mut *found,
+            };
+            into.push((
                 PendingTrigger { source, ability, controller, subject: fired.subject, data: fired.data, members: Span::default(), count: None },
                 t,
                 again,
@@ -736,16 +745,26 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
             continue;
         }
         let now: Vec<ObjectId> = cx.s().battlefield().to_vec();
-        for &id in before.unwrap_or(&now) {
-            consider(cx, id, true, true, event, mask, &mut statics, &mut found);
-        }
-        for &id in &now {
-            consider(cx, id, false, true, event, mask, &mut statics, &mut found);
+        if let Some(before) = before {
+            for &id in before {
+                consider(cx, id, true, true, event, mask, &mut statics, &mut found, None);
+            }
+            for &id in &now {
+                consider(cx, id, false, true, event, mask, &mut statics, &mut found, None);
+            }
+        } else {
+            // The same permanents for both: each one's characteristics are found once, and the abilities that don't look
+            // back come after every one that does, as they would from two passes.
+            let mut later: Found = Vec::new();
+            for &id in &now {
+                consider(cx, id, true, true, event, mask, &mut statics, &mut found, Some(&mut later));
+            }
+            found.append(&mut later);
         }
         // An emblem's triggered abilities function in the command zone (CR 114.4).
         if !cx.s().zone(Zone::COMMAND).is_empty() {
             for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                consider(cx, id, false, false, event, mask, &mut statics, &mut found);
+                consider(cx, id, false, false, event, mask, &mut statics, &mut found, None);
             }
         }
         // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
