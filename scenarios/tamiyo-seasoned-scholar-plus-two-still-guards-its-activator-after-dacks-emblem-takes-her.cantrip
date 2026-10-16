@@ -1,0 +1,86 @@
+# A delayed triggered ability is controlled by the player who controlled the ability that created it (CR 603.7d-e), whoever
+# controls its source afterwards. On turn 13 Bot1's Tamiyo, Inquisitive Student makes her third draw (the draw step, Ponder,
+# Brainstorm), returns as Tamiyo, Seasoned Scholar, and Bot1 activates her +2: "until your next turn, whenever a creature
+# attacks you or a planeswalker you control, it gets -1/-0". Bot2, holding Dack Fayden's emblem since turn 12, casts
+# Restoration Magic's Cure on her and the emblem gives Bot2 Tamiyo (checked). "You" is still Bot1: Bot2's Ragavan attacking
+# Bot1 on turn 14 is weakened to 1 power, so Bot1 goes to 19, not 18.
+
+[Bot1 Deck]
+Island
+Tamiyo, Inquisitive Student
+Island
+Island
+Ponder
+Brainstorm
+Island
+Island x30
+
+[Bot2 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Restoration Magic
+Ragavan, Nimble Pilferer
+Swamp x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tamiyo, Inquisitive Student.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot2.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot2.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot2.Hand.Dack Fayden.Cast
+[T6 Bot2.Main2]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {R})
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+[T10 Bot2.Main1]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T12 Bot2.Main1]
+? Bot2.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot2.Battlefield.Dack Fayden.Activate(Ability: emblem)
+[T13 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Ponder.Cast
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Tamiyo, Seasoned Scholar.Activate(Ability: Until your next turn)
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Restoration Magic.Cast
+Bot2.Modes(Cure)
+Bot2.Target(Bot1.Battlefield.Tamiyo, Seasoned Scholar)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 4
+[T14 Bot2.Main1]
+Bot2.Attack(Ragavan, Nimble Pilferer > Bot1)
+[T14 Bot2.Main2]
+
+[Expect]
+Turn = 14
+Bot2.Emblems.Count = 1
+Bot2.Battlefield.Tamiyo, Seasoned Scholar.Counters.Loyalty = 4
+Bot1.Life = 19

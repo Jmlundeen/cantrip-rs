@@ -29,10 +29,11 @@ fn exile_until_crowned(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     Ok(())
 }
 
-/// "Until an opponent becomes the monarch": any opponent will do, and becoming it is the whole condition.
-fn opponent_became_monarch(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+/// "Until an opponent becomes the monarch": any opponent of the ability's controller (who controlled the Jailer's ability
+/// as it resolved, CR 603.7d-e) will do, and becoming it is the whole condition.
+fn opponent_became_monarch(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::BecameMonarch { player } if *player != q.controller(source) => Fired::PLAIN,
+        Event::BecameMonarch { player } if *player != me.controller => Fired::PLAIN,
         _ => None,
     }
 }
@@ -52,6 +53,6 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, exile_until_crowned, "When this creature enters, exile target creature an opponent controls until an opponent becomes the monarch.")
             .targets(&[cantrip_mechanics::targets::CREATURE_AN_OPPONENT_CONTROLS]),
     ],
-    delayed: &[triggered(when(EventMask::BECAME_MONARCH, opponent_became_monarch), return_it, "Until an opponent becomes the monarch, the exiled card stays exiled.")],
+    delayed: &[triggered(when_asked(EventMask::BECAME_MONARCH, opponent_became_monarch), return_it, "Until an opponent becomes the monarch, the exiled card stays exiled.")],
     ..oracle::PALACE_JAILER
 };

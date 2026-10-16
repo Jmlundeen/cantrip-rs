@@ -36,7 +36,7 @@ fn landfall(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, |g, item| effects::draw(g, item, 1), "When Omnath enters, draw a card."),
-        triggered(when(EventMask::ZONE_CHANGE, triggers::landfall), landfall, "Landfall \u{2014} Whenever a land you control enters, you gain 4 life if this is the first time this ability has resolved this turn. If it's the second time, add {R}{G}{W}{U}. If it's the third time, Omnath deals 4 damage to each opponent and each planeswalker you don't control."),
+        triggered(when_asked(EventMask::ZONE_CHANGE, triggers::landfall), landfall, "Landfall \u{2014} Whenever a land you control enters, you gain 4 life if this is the first time this ability has resolved this turn. If it's the second time, add {R}{G}{W}{U}. If it's the third time, Omnath deals 4 damage to each opponent and each planeswalker you don't control."),
     ],
     ..oracle::OMNATH_LOCUS_OF_CREATION
 };

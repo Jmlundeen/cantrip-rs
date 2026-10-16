@@ -46,10 +46,10 @@ fn grant_growth(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
 
 /// "Whenever you cast a noncreature spell and whenever you draw your third card each turn" (CR 603.2, 121.2): the
 /// history as it was just before the draw holds the two earlier ones.
-fn cast_noncreature_or_draw_third(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+fn cast_noncreature_or_draw_third(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { .. } => cantrip_mechanics::triggers::noncreature_spell_you_cast(q, source, event),
-        Event::Drew { player, .. } if *player == q.controller(source) && q.history().drawn(*player) == 2 => Fired::PLAIN,
+        Event::SpellCast { .. } => cantrip_mechanics::triggers::noncreature_spell_you_cast(q, me, event),
+        Event::Drew { player, .. } if *player == me.controller && q.history().drawn(*player) == 2 => Fired::PLAIN,
         _ => None,
     }
 }
@@ -66,7 +66,7 @@ pub static CARD: CardDef = CardDef {
         triggered(THIS_ENTERS, job_select, "Job select (When this Equipment enters, create a 1/1 colorless Hero creature token, then attach this to it.)"),
         equip(mana("{2}"), "Diana \u{2014} Equip {2}"),
     ],
-    delayed: &[triggered(when(EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0), cast_noncreature_or_draw_third), grow, "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.")],
+    delayed: &[triggered(when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0), cast_noncreature_or_draw_third), grow, "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.")],
     statics: &[
         static_ability(Layer::Type, attached_object, wizard, "Equipped creature is a Wizard in addition to its other types."),
         static_ability(Layer::Ability, attached_object, grant_growth, "Equipped creature has \"Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.\""),

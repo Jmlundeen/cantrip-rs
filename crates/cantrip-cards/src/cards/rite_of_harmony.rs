@@ -5,10 +5,10 @@ use cantrip_oracle as oracle;
 
 /// Whenever a creature or enchantment you control enters this turn, draw a card: the delayed ability this spell makes
 /// (CR 603.7b). Each permanent entering triggers it once, judged as it exists on the battlefield (CR 603.6a, 603.10).
-fn creature_or_enchantment_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+fn creature_or_enchantment_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield) && q.controller(*new) == q.controller(source) && {
+            if to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && {
                 let c = q.chars(*new);
                 c.is(CardType::Creature) || c.is(CardType::Enchantment)
             } =>
@@ -27,6 +27,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
     ways: &[flashback::way(cost("{2}{W}{G}"), "Flashback {2}{G}{W}")],
-    delayed: &[triggered(when(EventMask::ZONE_CHANGE, creature_or_enchantment_you_control_enters), |g, item| effects::draw(g, item, 1), "Whenever a creature or enchantment you control enters this turn, draw a card.")],
+    delayed: &[triggered(when_asked(EventMask::ZONE_CHANGE, creature_or_enchantment_you_control_enters), |g, item| effects::draw(g, item, 1), "Whenever a creature or enchantment you control enters this turn, draw a card.")],
     ..oracle::RITE_OF_HARMONY
 };

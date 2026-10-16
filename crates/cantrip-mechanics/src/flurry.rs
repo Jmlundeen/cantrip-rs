@@ -18,5 +18,5 @@ pub const fn trigger(text: &'static str, effect: fn(&mut dyn Game, &StackItem) -
 
 /// The same trigger with modes, chosen as it is put on the stack (CR 603.3c, 700.2b).
 pub const fn modal_trigger(modes: &'static ModalDef, text: &'static str) -> AbilityDef {
-    modal_triggered(Trigger { listens: EventMask::SPELL_CAST, matches: your_second_spell }, modes, text)
+    modal_triggered(when(EventMask::SPELL_CAST, your_second_spell), modes, text)
 }

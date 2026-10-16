@@ -620,7 +620,7 @@ fn consider(
     for ability in chars.abilities() {
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
             && t.look_back == look_back
-            && let Some(fired) = if t.chapter > 0 { chapter_reached(cx, source, t.chapter, event) } else if t.listens.intersects(mask) { (t.matches)(cx, source, event) } else { None }
+            && let Some(fired) = if t.chapter > 0 { chapter_reached(cx, source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
         {
             if let Some(condition) = t.condition
                 && !condition(cx, &Asker { source, controller })
@@ -751,10 +751,15 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
         // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
         if cx.s().delayed.iter().any(|d| d.when.is_event()) {
             for d in cx.s().delayed.clone() {
+                // "You" in its trigger event is its own controller, the player who controlled the spell or ability that
+                // created it (CR 603.7d-e), whoever controls its source now and wherever the source has gone. So is "you"
+                // in an intervening "if" (CR 603.4).
+                let asker = Asker { source: d.source, controller: d.controller };
                 if d.when.is_event()
                     && let AbilityDef::Triggered(t) = cx.cards().ability(d.ability)
                     && t.listens.intersects(mask)
-                    && let Some(fired) = (t.matches)(cx, d.source, event)
+                    && let Some(fired) = t.fires(cx, &asker, event)
+                    && t.condition.is_none_or(|condition| condition(cx, &asker))
                     // The end of an "until" exile is no triggered ability but the second one-shot effect the rules create
                     // immediately after the event (CR 610.3), so nothing that stops abilities triggering stops it, and the
                     // event that ends the wait always uses it up below. A "this turn" delayed ability is a triggered ability
@@ -806,7 +811,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                 if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                     && t.anywhere
                     && t.listens.intersects(mask)
-                    && let Some(fired) = (t.matches)(cx, id, event)
+                    && let Some(fired) = t.fires(cx, &Asker { source: id, controller: cx.s().obj(id).controller }, event)
                 {
                     // A spell is controlled by whoever cast it; a card in another zone answers to its owner.
                     let controller = if cx.s().obj(id).zone.is(ZoneKind::Stack) {

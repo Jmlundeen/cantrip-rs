@@ -20,7 +20,7 @@ fn plus_two_plus_two(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::ZONE_CHANGE, triggers::token_you_control_enters), |g, item| effects::draw(g, item, 1), "Whenever one or more tokens you control enter, draw a card. This ability triggers only once each turn.")
+        triggered(when_asked(EventMask::ZONE_CHANGE, triggers::token_you_control_enters), |g, item| effects::draw(g, item, 1), "Whenever one or more tokens you control enter, draw a card. This ability triggers only once each turn.")
             .triggers_each_turn(1)
             .once_per_batch(),
         class::level_two("{W}", "{W}: Level 2"),

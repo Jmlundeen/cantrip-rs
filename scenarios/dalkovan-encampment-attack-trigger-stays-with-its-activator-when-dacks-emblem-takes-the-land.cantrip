@@ -1,0 +1,88 @@
+# A delayed triggered ability is controlled by the player who controlled the ability that created it (CR 603.7d), whoever
+# controls its source afterwards. On turn 13 Bot1 activates Dalkovan Encampment: "whenever you attack this turn" is Bot1's.
+# Bot2, who took Dack Fayden to 6 loyalty and used his -6 on turn 12, then casts Restoration Magic's Cure on the land, and
+# Dack's emblem gives Bot2 the Encampment (checked). Bot1 attacking with Ornithopter still triggers the ability: two tapped
+# and attacking Warriors for Bot1, and Bot2 takes 2.
+
+[Bot1 Deck]
+Mountain
+Dalkovan Encampment
+Mox Pearl
+Mox Jet
+Mox Ruby
+Ornithopter
+Plains
+Plains x30
+
+[Bot2 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Restoration Magic
+Swamp
+Swamp x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Dalkovan Encampment.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot2.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot2.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot2.Hand.Dack Fayden.Cast
+[T6 Bot2.Main2]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T10 Bot2.Main1]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T12 Bot2.Main1]
+? Bot2.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot2.Battlefield.Dack Fayden.Activate(Ability: emblem)
+[T13 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Dalkovan Encampment.Activate(Ability: Whenever you attack)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Restoration Magic.Cast
+Bot2.Modes(Cure)
+Bot2.Target(Bot1.Battlefield.Dalkovan Encampment)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Dalkovan Encampment.Tapped = true
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mountain; Mox Pearl; Mox Jet; Mox Ruby; Ornithopter; Warrior; Warrior
+[T13 Bot1.Main2]
+
+[Expect]
+Turn = 13
+Bot2.Emblems.Count = 1
+Bot2.Battlefield.Dalkovan Encampment.Tapped = true
+Bot2.Life = 18

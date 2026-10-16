@@ -43,7 +43,7 @@ fn that_player_loses(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
 pub static EMBLEM: CardDef = CardDef {
     name: "Vraska, Golgari Queen emblem",
     has_cost: false,
-    abilities: &[triggered(when(EventMask::DAMAGE, cantrip_mechanics::triggers::creature_you_control_deals_combat_damage_to_player), that_player_loses, "Whenever a creature you control deals combat damage to a player, that player loses the game.")],
+    abilities: &[triggered(when_asked(EventMask::DAMAGE, cantrip_mechanics::triggers::creature_you_control_deals_combat_damage_to_player), that_player_loses, "Whenever a creature you control deals combat damage to a player, that player loses the game.")],
     text: "Whenever a creature you control deals combat damage to a player, that player loses the game.",
     ..CardDef::BLANK
 };

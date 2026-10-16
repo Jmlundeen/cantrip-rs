@@ -18,6 +18,6 @@ fn token_enters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, triggers::token_you_control_enters), token_enters, "Whenever a token you control enters, you gain 1 life if this is the first time this ability has resolved this turn. If it's the second time, draw a card. If it's the third time, put a +1/+1 counter on each creature you control.")],
+    abilities: &[triggered(when_asked(EventMask::ZONE_CHANGE, triggers::token_you_control_enters), token_enters, "Whenever a token you control enters, you gain 1 life if this is the first time this ability has resolved this turn. If it's the second time, draw a card. If it's the third time, put a +1/+1 counter on each creature you control.")],
     ..oracle::BELLADONNA_TOOK
 };

@@ -35,9 +35,9 @@ fn animate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Whenever you cast your fourth noncreature spell each turn" (CR 601.2i, 603.2): counted in the event history, which
 /// holds this cast and the ones before it whether they resolved or were countered. Abilities are not spells.
-fn fourth_noncreature_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    noncreature_spell_you_cast(q, source, event)?;
-    let you = q.controller(source);
+fn fourth_noncreature_spell(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    noncreature_spell_you_cast(q, me, event)?;
+    let you = me.controller;
     let noncreature = q.history().casts_by(you).filter(|c| !c.is(CardType::Creature)).count();
     if noncreature == 4 { Fired::PLAIN } else { None }
 }
@@ -67,7 +67,7 @@ fn sacrifice_and_create(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(NONCREATURE_SPELL_YOU_CAST, animate, "Whenever you cast a noncreature spell, you may have The Fantasticar become an artifact creature until end of turn."),
-        triggered(when(EventMask::SPELL_CAST, fourth_noncreature_spell), sacrifice_and_create, "Whenever you cast your fourth noncreature spell each turn, you may sacrifice The Fantasticar. If you do, create four 4/4 colorless Construct artifact creature tokens with flying and haste."),
+        triggered(when_asked(EventMask::SPELL_CAST, fourth_noncreature_spell), sacrifice_and_create, "Whenever you cast your fourth noncreature spell each turn, you may sacrifice The Fantasticar. If you do, create four 4/4 colorless Construct artifact creature tokens with flying and haste."),
     ],
     ..oracle::THE_FANTASTICAR
 };

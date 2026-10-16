@@ -17,6 +17,12 @@ pub type TargetFilter = fn(&dyn Query, &Asker, Target) -> bool;
 /// Whether an event triggers an ability of `source` (CR 603.2), and what the ability should carry of it.
 pub type TriggerMatch = fn(&dyn Query, ObjectId, &Event) -> Option<Fired>;
 
+/// Whether an event triggers an ability (CR 603.2), asked with the ability's source and its controller: a trigger event
+/// that says "you" reads `controller`. For an ability of a permanent that is the permanent's controller; for a delayed
+/// triggered ability it is the player who controlled the spell or ability that created it (CR 603.7d-e), whoever controls
+/// its source now and wherever the source has gone. Any matcher a delayed ability can use that says "you" is written so.
+pub type AskedMatch = fn(&dyn Query, &Asker, &Event) -> Option<Fired>;
+
 /// What a triggered ability carries of the event that triggered it.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub struct Fired {
@@ -708,7 +714,7 @@ fn no_effect(_: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn no_match(_: &dyn Query, _: ObjectId, _: &Event) -> Option<Fired> {
+pub(crate) fn no_match(_: &dyn Query, _: ObjectId, _: &Event) -> Option<Fired> {
     None
 }
 
@@ -757,10 +763,21 @@ impl ActivatedDef {
 }
 
 impl TriggeredDef {
+    /// Whether `event` is this ability's trigger event (CR 603.2), for the ability `asker` names: its source and the player
+    /// who controls the ability.
+    #[inline]
+    pub fn fires(&self, q: &dyn Query, asker: &Asker, event: &Event) -> Option<Fired> {
+        match self.asked {
+            Some(asked) => asked(q, asker, event),
+            None => (self.matches)(q, asker.source, event),
+        }
+    }
+
     pub const BLANK: TriggeredDef = TriggeredDef {
         text: "",
         listens: EventMask(0),
         matches: no_match,
+        asked: None,
         targets: &[],
         effect: no_effect,
         look_back: false,
@@ -786,6 +803,8 @@ pub struct TriggeredDef {
     pub text: &'static str,
     pub listens: EventMask,
     pub matches: TriggerMatch,
+    /// The trigger event asked with the ability's controller (`AskedMatch`), in place of `matches` when set.
+    pub asked: Option<AskedMatch>,
     pub targets: &'static [TargetSpec],
     pub effect: Effect,
     /// A leaves-the-battlefield ability (CR 603.10a): judged on the board as it was before the event, so it sees

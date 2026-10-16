@@ -38,10 +38,10 @@ pub fn this_is_on_the_battlefield(q: &dyn Query, asker: &Asker) -> bool {
 /// source's controller's control as it entered, however it was made (created, or a copy of a permanent spell). The event's
 /// subject is the token, so a batch that entered together is the subjects of the matching events (CR 603.2c). Belladonna
 /// Took and Caretaker's Talent print it.
-pub fn token_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn token_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield) && q.obj(*new).token && q.controller(*new) == q.controller(source) =>
+            if to.is(ZoneKind::Battlefield) && q.obj(*new).token && q.controller(*new) == me.controller =>
         {
             Fired::about(Target::Object(*new))
         }
@@ -51,10 +51,10 @@ pub fn token_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) 
 
 /// Landfall (CR 207.2c): a land entering the battlefield under your control, by any means. Icetill Explorer and
 /// Tireless Tracker print it.
-pub fn landfall(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn landfall(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield) && q.controller(*new) == q.controller(source) && q.chars(*new).is(CardType::Land) =>
+            if to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && q.chars(*new).is(CardType::Land) =>
         {
             Fired::PLAIN
         }
@@ -186,9 +186,9 @@ pub fn enchanted_player_attacked(q: &dyn Query, source: ObjectId, event: &Event)
 
 /// "Whenever you attack" (CR 508.1m): the controller declares attackers, whatever their number. Guide of Souls and Inti,
 /// Seneschal of the Sun print it.
-pub fn you_attack(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn you_attack(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::AttackersDeclared { player, .. } if *player == q.controller(source) => Fired::PLAIN,
+        Event::AttackersDeclared { player, .. } if *player == me.controller => Fired::PLAIN,
         _ => None,
     }
 }
@@ -353,9 +353,9 @@ pub const fn ward_discard(text: &'static str) -> AbilityDef {
 }
 
 /// "Whenever you cast a noncreature spell" (CR 603.2): prowess, Displacer Kitten and Dragon's Rage Channeler print it.
-pub fn noncreature_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && !q.chars(*spell).is(CardType::Creature) => {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && !q.chars(*spell).is(CardType::Creature) => {
             Fired::PLAIN
         }
         _ => None,
@@ -369,7 +369,7 @@ fn prowess_pump(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// Prowess (CR 702.108a): "Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn", as a
 /// real triggered ability. The Otter token of Stormchaser's Talent and the Monk token of Cori-Steel Cutter carry it.
-pub const PROWESS: AbilityDef = triggered(when(EventMask::SPELL_CAST, noncreature_spell_you_cast), prowess_pump, "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)");
+pub const PROWESS: AbilityDef = triggered(when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast), prowess_pump, "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)");
 
 /// The instant or sorcery spell `player` cast or copied, if this event is one (CR 601.2i, 707.10): magecraft's trigger event,
 /// and what Veyran, Voice of Duality's "you casting or copying an instant or sorcery spell" names. A copy of a spell is not
@@ -387,9 +387,9 @@ pub fn instant_or_sorcery_cast_or_copied(q: &dyn Query, event: &Event) -> Option
 
 /// Magecraft (CR 207.2c, an ability word): "Whenever you cast or copy an instant or sorcery spell", one ability that triggers
 /// on either. Witherbloom Apprentice, Sedgemoor Witch and Veyran, Voice of Duality print it.
-pub fn you_cast_or_copy_instant_or_sorcery(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn you_cast_or_copy_instant_or_sorcery(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match instant_or_sorcery_cast_or_copied(q, event) {
-        Some((_, player)) if player == q.controller(source) => Fired::PLAIN,
+        Some((_, player)) if player == me.controller => Fired::PLAIN,
         _ => None,
     }
 }
@@ -415,26 +415,26 @@ pub fn this_leaves(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fir
 }
 
 /// "At the beginning of your [step]" (CR 503.1a, 603.2): `step` began on its controller's turn.
-fn your_step(q: &dyn Query, source: ObjectId, event: &Event, step: Step) -> Option<Fired> {
+fn your_step(q: &dyn Query, me: &Asker, event: &Event, step: Step) -> Option<Fired> {
     match event {
-        Event::StepBegan { step: began } if *began == step && q.state().turn.active == q.controller(source) => Fired::PLAIN,
+        Event::StepBegan { step: began } if *began == step && q.state().turn.active == me.controller => Fired::PLAIN,
         _ => None,
     }
 }
 
 /// "At the beginning of your upkeep" (CR 503.1a). Dark Confidant and Court of Garenbrig print it.
-pub fn your_upkeep(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    your_step(q, source, event, Step::Upkeep)
+pub fn your_upkeep(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    your_step(q, me, event, Step::Upkeep)
 }
 
 /// "At the beginning of combat on your turn" (CR 507.1). Luminarch Aspirant and Ouroboroid print it.
-pub fn beginning_of_your_combat(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    your_step(q, source, event, Step::BeginCombat)
+pub fn beginning_of_your_combat(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    your_step(q, me, event, Step::BeginCombat)
 }
 
 /// "At the beginning of your end step" (CR 513.1). Dawn of a New Age and Feywild Caretaker print it.
-pub fn your_end_step(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    your_step(q, source, event, Step::End)
+pub fn your_end_step(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    your_step(q, me, event, Step::End)
 }
 
 /// "At the beginning of each end step" (CR 513.1, 603.2): any player's end step began. Gau, Feral Youth and Octomancer print it.
@@ -447,10 +447,10 @@ pub fn each_end_step(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
 
 /// "Whenever a creature you control enters" (CR 603.6a): any creature, this one included, under your control as it
 /// entered. Aura Shards and Warleader's Call print it.
-pub fn creature_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield) && q.controller(*new) == q.controller(source) && q.chars(*new).is(CardType::Creature) =>
+            if to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && q.chars(*new).is(CardType::Creature) =>
         {
             Fired::PLAIN
         }
@@ -460,12 +460,12 @@ pub fn creature_you_control_enters(q: &dyn Query, source: ObjectId, event: &Even
 
 /// "Whenever another creature you control enters" (CR 603.6a): a creature other than this permanent, under your control
 /// as it entered. The entering creature is the trigger's subject. Aunt May and Guide of Souls print it.
-pub fn another_creature_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn another_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { new, to, .. }
-            if *new != source
+            if *new != me.source
                 && to.is(ZoneKind::Battlefield)
-                && q.controller(*new) == q.controller(source)
+                && q.controller(*new) == me.controller
                 && q.chars(*new).is(CardType::Creature) =>
         {
             Fired::about(Target::Object(*new))
@@ -491,13 +491,13 @@ pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
 /// "Whenever a creature you control dies" (CR 700.4, 603.10a), looked back on: the creature as it last was on the
 /// battlefield, under the controller it last had. Use with `look_back: true`. Grave Venerations and Warhost's Frenzy
 /// print it.
-pub fn creature_you_control_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn creature_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, to, .. }
             if from.is(ZoneKind::Battlefield)
                 && to.is(ZoneKind::Graveyard)
                 && q.chars(*old).is(CardType::Creature)
-                && q.obj(*old).controller == q.controller(source) =>
+                && q.obj(*old).controller == me.controller =>
         {
             Fired::PLAIN
         }
@@ -508,9 +508,9 @@ pub fn creature_you_control_dies(q: &dyn Query, source: ObjectId, event: &Event)
 /// "Whenever you cast a creature spell" (CR 603.2): its controller's spells only, judged on the spell as it is on the stack
 /// (CR 601.2i), so a card that is a creature only there counts. Bontu's Monument, Glimpse of Nature, Silk, Web Weaver and
 /// Spider-Man India print it.
-pub fn creature_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn creature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && q.chars(*spell).is(CardType::Creature) => {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && q.chars(*spell).is(CardType::Creature) => {
             Fired::PLAIN
         }
         _ => None,
@@ -518,9 +518,9 @@ pub fn creature_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -
 }
 
 /// "Whenever you cast an artifact spell" (CR 603.2). Pinnacle Emissary and Ravenous Robots print it.
-pub fn artifact_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn artifact_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::SpellCast { spell, player, .. } if *player == q.controller(source) && q.chars(*spell).is(CardType::Artifact) => {
+        Event::SpellCast { spell, player, .. } if *player == me.controller && q.chars(*spell).is(CardType::Artifact) => {
             Fired::PLAIN
         }
         _ => None,
@@ -551,10 +551,10 @@ pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Ev
 
 /// "Whenever a creature you control deals combat damage to a player" (CR 510.2, 603.2): one trigger for each creature and
 /// player, with "that player" fixed as the trigger's subject. Vraska, Golgari Queen's emblem and Enduring Curiosity print it.
-pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::Damage { source: from, target: Target::Player(p), amount, combat: true }
-            if *amount > 0 && q.controller(*from) == q.controller(source) && q.chars(*from).is(CardType::Creature) =>
+            if *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
         {
             Fired::about(Target::Player(*p))
         }
@@ -563,25 +563,25 @@ pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, source:
 }
 
 /// "Whenever you flip a coin" (CR 705.1): any flip its controller makes, won or lost.
-pub fn you_flip_a_coin(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn you_flip_a_coin(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::CoinFlipped { player, .. } if *player == q.controller(source) => Fired::PLAIN,
+        Event::CoinFlipped { player, .. } if *player == me.controller => Fired::PLAIN,
         _ => None,
     }
 }
 
 /// "Whenever you win a coin flip" (CR 705.2): a flip its controller wins.
-pub fn you_win_a_flip(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn you_win_a_flip(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::CoinFlipped { player, won: true } if *player == q.controller(source) => Fired::PLAIN,
+        Event::CoinFlipped { player, won: true } if *player == me.controller => Fired::PLAIN,
         _ => None,
     }
 }
 
 /// "Whenever you roll a die" (CR 706.2): a die its controller rolls, whatever its sides.
-pub fn you_roll_a_die(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+pub fn you_roll_a_die(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::DieRolled { player, .. } if *player == q.controller(source) => Fired::PLAIN,
+        Event::DieRolled { player, .. } if *player == me.controller => Fired::PLAIN,
         _ => None,
     }
 }
@@ -590,27 +590,27 @@ pub fn you_roll_a_die(q: &dyn Query, source: ObjectId, event: &Event) -> Option<
 
 pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
 pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);
-pub const LANDFALL: Trigger = when(EventMask::ZONE_CHANGE, landfall);
+pub const LANDFALL: Trigger = when_asked(EventMask::ZONE_CHANGE, landfall);
 pub const YOU_UNLOCK_THIS_RIGHT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_right_door);
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
-pub const MAGECRAFT: Trigger = when(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
+pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
 pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks_subject);
 pub const ENCHANTED_PLAYER_ATTACKED: Trigger = when(EventMask::ATTACKS, enchanted_player_attacked);
-pub const YOU_ATTACK: Trigger = when(EventMask::ATTACKERS_DECLARED, you_attack);
-pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, noncreature_spell_you_cast);
+pub const YOU_ATTACK: Trigger = when_asked(EventMask::ATTACKERS_DECLARED, you_attack);
+pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
-pub const YOUR_UPKEEP: Trigger = when(EventMask::STEP_BEGAN, your_upkeep);
-pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when(EventMask::STEP_BEGAN, beginning_of_your_combat);
-pub const YOUR_END_STEP: Trigger = when(EventMask::STEP_BEGAN, your_end_step);
+pub const YOUR_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_upkeep);
+pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, beginning_of_your_combat);
+pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
-pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_enters);
+pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
 pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
-pub const CREATURE_YOU_CONTROL_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_you_control_dies);
-pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, artifact_spell_you_cast);
-pub const CREATURE_SPELL_YOU_CAST: Trigger = when(EventMask::SPELL_CAST, creature_spell_you_cast);
+pub const CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_dies);
+pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, artifact_spell_you_cast);
+pub const CREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, creature_spell_you_cast);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_SUBJECT: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player_subject);
 pub const DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_player);

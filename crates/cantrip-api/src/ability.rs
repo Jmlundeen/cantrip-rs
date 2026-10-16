@@ -218,16 +218,24 @@ pub const fn mana_ability(cost: Cost, adds: Adds, text: &'static str) -> Ability
 pub struct Trigger {
     pub listens: EventMask,
     pub matches: TriggerMatch,
+    /// The trigger event asked with the ability's controller, in place of `matches` when set (`when_asked`).
+    pub asked: Option<AskedMatch>,
 }
 
 /// The trigger of a triggered ability: `when(EventMask::ZONE_CHANGE, this_enters)`.
 pub const fn when(listens: EventMask, matches: TriggerMatch) -> Trigger {
-    Trigger { listens, matches }
+    Trigger { listens, matches, asked: None }
+}
+
+/// The trigger of a triggered ability whose trigger event says "you": `matches` is told the ability's controller
+/// (`AskedMatch`), which a delayed triggered ability keeps from the spell or ability that created it (CR 603.7d-e).
+pub const fn when_asked(listens: EventMask, matches: AskedMatch) -> Trigger {
+    Trigger { listens, matches: crate::card::no_match, asked: Some(matches) }
 }
 
 /// A triggered ability (CR 603): when `trigger` triggers, `effect` as it resolves.
 pub const fn triggered(trigger: Trigger, effect: Effect, text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, effect, ..TriggeredDef::BLANK })
+    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, asked: trigger.asked, effect, ..TriggeredDef::BLANK })
 }
 
 /// A modal activated ability (CR 700.2): pay `cost`, choose among `modes` as it is activated (CR 602.2b).
@@ -244,7 +252,7 @@ pub const fn modal_ability(cost: Cost, modes: &'static ModalDef, text: &'static 
 /// A modal triggered ability (CR 700.2): when `trigger` triggers, its modes are chosen as it is put on the stack
 /// (CR 603.3c).
 pub const fn modal_triggered(trigger: Trigger, modes: &'static ModalDef, text: &'static str) -> AbilityDef {
-    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, modal: Some(modes), ..TriggeredDef::BLANK })
+    AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, asked: trigger.asked, modal: Some(modes), ..TriggeredDef::BLANK })
 }
 
 /// A delayed triggered ability (CR 603.7), listed in a card's `delayed`: the effect that created it says when it

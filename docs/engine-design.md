@@ -242,6 +242,12 @@ delayed triggered ability is no ability of the object (CR 603.2d, 603.7) and is 
 card in another zone or of an emblem (CR 114.4) is not "of a permanent". Triggered mana abilities (CR 605.1b) are asked too, each
 triggering resolving at once.
 
+A trigger event is asked of the ability's source and controller (`TriggeredDef::fires`, an `Asker`): a matcher that says
+"you" is written `when_asked` and reads the controller it is given. For an ability of a permanent that is the permanent's
+controller; for a delayed triggered ability it is the delayed ability's own controller, the player who controlled the spell
+or ability that created it (CR 603.7d-e), whoever controls its source afterwards and wherever the source has gone. Its
+intervening "if" is asked with the same controller as it triggers.
+
 ### Life: gaining it, and damage that can't be prevented
 
 Every gain and loss of life goes through `ops::change_life` (CR 119.3): an effect's, a cost's (CR 119.4), damage (CR

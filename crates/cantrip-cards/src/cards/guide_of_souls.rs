@@ -44,7 +44,7 @@ fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::ZONE_CHANGE, cantrip_mechanics::triggers::another_creature_you_control_enters), bank, "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter)."),
+        triggered(when_asked(EventMask::ZONE_CHANGE, cantrip_mechanics::triggers::another_creature_you_control_enters), bank, "Whenever another creature you control enters, you gain 1 life and get {E} (an energy counter)."),
         triggered(cantrip_mechanics::triggers::YOU_ATTACK, pay_energy, "Whenever you attack, you may pay {E}{E}{E}. When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types."),
     ],
     delayed: &[delayed_trigger(empower, "When you do, put two +1/+1 counters and a flying counter on target attacking creature. It becomes an Angel in addition to its other types.")

@@ -41,11 +41,10 @@ fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// (CR 607.2d), read from it even once it has left (its last-known row); "you" is the delayed ability's controller
 /// (CR 603.7e). The history this sees is the one before the cast (`docs/adding-cards.md`), so an earlier spell of that
 /// name cast this turn - before or after the ability was set up - means this is not the first time.
-fn first_named_spell_you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+fn first_named_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     let Event::SpellCast { spell, player, .. } = *event else { return None };
-    let me = q.card_id(&CARD);
-    let you = q.state().delayed.iter().find(|d| d.source == source && d.ability == AbilityRef::delayed(me, 0))?.controller;
-    let name = q.obj(source).marks.chosen_card?;
+    let you = me.controller;
+    let name = q.obj(me.source).marks.chosen_card?;
     let earlier = q.history().casts_by(you).any(|c| c.spell != spell && object_has_name(q, c.spell, name));
     if player == you && object_has_name(q, spell, name) && !earlier { Fired::PLAIN } else { None }
 }
@@ -65,7 +64,7 @@ pub static CARD: CardDef = CardDef {
         chapter(4, chapter_four, "IV \u{2014} Look at the top card of each player's library."),
     ],
     delayed: &[triggered(
-        when(EventMask::SPELL_CAST, first_named_spell_you_cast),
+        when_asked(EventMask::SPELL_CAST, first_named_spell_you_cast),
         |g, item| effects::draw(g, item, 2),
         "When you cast a spell with the chosen name for the first time this turn, draw two cards.",
     )],

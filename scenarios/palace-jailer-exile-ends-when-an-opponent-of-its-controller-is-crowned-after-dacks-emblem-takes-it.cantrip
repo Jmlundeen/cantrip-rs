@@ -1,0 +1,93 @@
+# A delayed triggered ability is controlled by the player who controlled the ability that created it (CR 603.7d-e), whoever
+# controls its source afterwards. On turn 13 Bot1's Palace Jailer makes Bot1 the monarch and exiles Bot2's Dragon's Rage
+# Channeler "until an opponent becomes the monarch" - an opponent of Bot1, whose ability that is. Bot2, holding Dack Fayden's
+# emblem since turn 12, casts Restoration Magic's Cure on the Jailer and the emblem gives Bot2 the Jailer (checked). On
+# turn 14 Bot2's Ragavan deals combat damage to Bot1, the monarch, so Bot2, Bot1's opponent, becomes the monarch, and the
+# Channeler returns to the battlefield.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Plains
+Palace Jailer
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Restoration Magic
+Ragavan, Nimble Pilferer
+Dragon's Rage Channeler
+Swamp x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot2.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot2.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot2.Hand.Dack Fayden.Cast
+[T6 Bot2.Main2]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {R})
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot2.Hand.Dragon's Rage Channeler.Cast
+[T10 Bot2.Main1]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T12 Bot2.Main1]
+? Bot2.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot2.Battlefield.Dack Fayden.Activate(Ability: emblem)
+[T13 Bot1.Main1]
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Palace Jailer.Cast
+Bot1.Target(Bot2.Battlefield.Dragon's Rage Channeler)
+[T13 Bot1.Main2]
+? Monarch = Bot1
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Restoration Magic.Cast
+Bot2.Modes(Cure)
+Bot2.Target(Bot1.Battlefield.Palace Jailer)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Palace Jailer.Power = 2
+? Exile = Dragon's Rage Channeler
+[T14 Bot2.Main1]
+Bot2.Attack(Ragavan, Nimble Pilferer > Bot1)
+[T14 Bot2.Main2]
+
+[Expect]
+Turn = 14
+Monarch = Bot2
+Bot2.Battlefield.Palace Jailer.Power = 2
+Bot2.Battlefield.Dragon's Rage Channeler.Power = 1
+Bot1.Life = 18

@@ -77,7 +77,10 @@ abilities: &[
   mana ability does more writes the effect itself with `.by(f)` (the listing then only says what it can add) or
   `add_by(f)` when nothing can be listed (Gaea's Cradle).
 - **Triggers**: `cantrip_mechanics::triggers` names the common ones (`THIS_ENTERS`, `THIS_DIES`, `YOUR_UPKEEP`, ...); a
-  card's own is `when(EventMask::DAMAGE, my_match_fn)`. A Saga's chapter is `chapter(n, effect, text)`.
+  card's own is `when(EventMask::DAMAGE, my_match_fn)`. A Saga's chapter is `chapter(n, effect, text)`. A trigger event
+  that says "you" is `when_asked(mask, f)`, `f` taking the `Asker` and reading `me.controller`, never
+  `q.controller(source)`: a delayed triggered ability's "you" is the player who controlled the spell or ability that made
+  it (CR 603.7d-e), whoever controls its source now or wherever it has gone.
 - **The rest** is a method after the call: `.targets(..)`, `.sorcery_speed()`, `.once_each_turn()`, `.condition(..)`
   (an activation restriction, or a trigger's intervening "if"), `.modal(..)`, `.look_back()`, `.anywhere()`, and the
   others in `ability.rs`. A loyalty ability is already sorcery speed (CR 606.3).

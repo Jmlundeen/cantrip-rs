@@ -3514,7 +3514,7 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId) {
             if !t.mana_ability {
                 continue;
             }
-            if let Some(fired) = (t.matches)(&*cx, id, &event) {
+            if let Some(fired) = t.fires(&*cx, &Asker { source: id, controller }, &event) {
                 // Static abilities that stop it triggering or make it trigger again apply to it as to any triggered ability
                 // (CR 603.2, 603.2d): each triggering resolves at once.
                 let triggering = Triggering { source: id, controller, def: t, permanent: true };

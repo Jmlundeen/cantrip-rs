@@ -24,11 +24,12 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// "Whenever one or more creatures you control deal combat damage to one or more players this turn" (CR 603.2c): any
-/// combat damage above zero to a player from a creature of the ability's controller; one trigger for the whole batch.
-fn creature_deals_combat_damage_to_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+/// combat damage above zero to a player from a creature of the ability's controller (the spell's, CR 603.7d); one trigger
+/// for the whole batch.
+fn creature_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::Damage { source: from, target: Target::Player(_), amount, combat: true }
-            if *amount > 0 && q.controller(*from) == q.controller(source) && q.chars(*from).is(CardType::Creature) =>
+            if *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
         {
             Fired::PLAIN
         }
@@ -38,7 +39,7 @@ fn creature_deals_combat_damage_to_player(q: &dyn Query, source: ObjectId, event
 
 pub static CARD: CardDef = CardDef {
     spell: spell(&[], effect),
-    delayed: &[triggered(when(EventMask::DAMAGE, creature_deals_combat_damage_to_player), cantrip_mechanics::effects::become_monarch, "Whenever one or more creatures you control deal combat damage to one or more players this turn, you become the monarch.")
+    delayed: &[triggered(when_asked(EventMask::DAMAGE, creature_deals_combat_damage_to_player), cantrip_mechanics::effects::become_monarch, "Whenever one or more creatures you control deal combat damage to one or more players this turn, you become the monarch.")
         .once_per_batch()],
     ..oracle::FORTH_EORLINGAS
 };

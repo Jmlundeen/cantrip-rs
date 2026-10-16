@@ -23,11 +23,12 @@ fn transform_her(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- Tamiyo, Seasoned Scholar -------------------------------------------------------------------------------------
 
-/// "Whenever a creature attacks you or a planeswalker you control" (CR 508.1): each creature, separately.
-fn creature_attacks_you_or_your_planeswalker(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+/// "Whenever a creature attacks you or a planeswalker you control" (CR 508.1): each creature, separately. "You" is the
+/// delayed ability's controller, who activated the +2 (CR 603.7d), whoever controls Tamiyo now or wherever she is.
+fn creature_attacks_you_or_your_planeswalker(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::Attacks { attacker, defender } => {
-            let you = q.controller(source);
+            let you = me.controller;
             let at_you = match defender {
                 Target::Player(p) => *p == you,
                 Target::Object(id) => q.controller(*id) == you && q.chars(*id).is(CardType::Planeswalker),
@@ -89,7 +90,7 @@ pub static BACK: CardDef = CardDef {
             .targets(&[targets::INSTANT_OR_SORCERY_IN_YOUR_GRAVEYARD]),
         ability(loyalty(-7), minus_seven, "\u{2212}7: Draw cards equal to half the number of cards in your library, rounded up. You get an emblem with \"You have no maximum hand size.\""),
     ],
-    delayed: &[triggered(when(EventMask::ATTACKS, creature_attacks_you_or_your_planeswalker), attacker_weakens, "Whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn.")],
+    delayed: &[triggered(when_asked(EventMask::ATTACKS, creature_attacks_you_or_your_planeswalker), attacker_weakens, "Whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn.")],
     ..oracle::TAMIYO_SEASONED_SCHOLAR
 };
 

@@ -1,0 +1,85 @@
+# A delayed triggered ability is controlled by the player who controlled the ability that created it (CR 603.7d-e), whoever
+# controls its source afterwards. Bot1's Showdown of the Skalds reaches chapter II on turn 13: "whenever you cast a spell this
+# turn, put a +1/+1 counter on target creature you control" is Bot1's. Bot2, who took Dack Fayden to 6 loyalty and used his
+# -6 on turn 12, then casts Restoration Magic's Cure on the Saga, and Dack's emblem gives Bot2 the Saga (checked). Bot1's
+# Mox Jet still triggers the chapter's ability, which puts the counter on Bot1's Llanowar Elves.
+
+[Bot1 Deck]
+Mountain
+Plains
+Forest
+Llanowar Elves
+Mountain
+Showdown of the Skalds
+Mox Jet
+Forest x30
+
+[Bot2 Deck]
+Volcanic Island
+Volcanic Island
+Volcanic Island
+Dack Fayden
+Plains
+Restoration Magic
+Swamp
+Swamp x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Volcanic Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot2.Hand.Volcanic Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Volcanic Island.Play
+Bot2.Battlefield.Volcanic Island#1.Activate(Ability: Add {U})
+Bot2.Battlefield.Volcanic Island#2.Activate(Ability: Add {R})
+Bot2.Battlefield.Volcanic Island#3.Activate(Ability: Add {U})
+Bot2.Hand.Dack Fayden.Cast
+[T6 Bot2.Main2]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T10 Bot2.Main1]
+Bot2.Battlefield.Dack Fayden.Activate(Bot2; Ability: draws two)
+Bot2.Choose(Swamp; Swamp)
+[T11 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Showdown of the Skalds.Cast
+[T12 Bot2.Main1]
+? Bot2.Battlefield.Dack Fayden.Counters.Loyalty = 6
+Bot2.Battlefield.Dack Fayden.Activate(Ability: emblem)
+[T13 Bot1.Main1]
+Bot1.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Restoration Magic.Cast
+Bot2.Modes(Cure)
+Bot2.Target(Bot1.Battlefield.Showdown of the Skalds)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Showdown of the Skalds.Counters.Lore = 2
+Bot1.Hand.Mox Jet.Cast
+[T13 Bot1.Main2]
+
+[Expect]
+Turn = 13
+Bot2.Emblems.Count = 1
+Bot2.Battlefield.Showdown of the Skalds.Counters.Lore = 2
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Mox Jet.Types = Artifact

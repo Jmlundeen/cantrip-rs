@@ -1,0 +1,52 @@
+# A delayed triggered ability is controlled by the player who controlled the spell that created it (CR 603.7d), wherever
+# that spell has gone. Bot1's dashed Ragavan hits Bot2 and exiles the top of Bot2's library, Rite of Harmony, which Bot1
+# casts with the Treasure and Mox Pearl. The Rite resolves into its owner Bot2's graveyard (checked), but "you" in its
+# "whenever a creature or enchantment you control enters this turn" is still Bot1: Bot1's Llanowar Elves entering draws
+# Bot1 the Lightning Bolt on top of their library. (The dashed Ragavan goes back to Bot1's hand at the end step.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Ragavan, Nimble Pilferer
+Llanowar Elves
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Rite of Harmony
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast(Ability: Dash)
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot1.Exile.Rite of Harmony.Cast
+Bot1.Battlefield.Treasure Token.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Llanowar Elves.Cast
+? Bot2.Graveyard = Rite of Harmony
+Bot1.Battlefield.Mox Emerald.Activate
+[Bot1.End]
+
+[Expect]
+Turn = 1
+Bot2.Life = 18
+Bot2.Graveyard = Rite of Harmony
+Bot1.Hand = Island; Lightning Bolt; Ragavan, Nimble Pilferer
+Bot1.Battlefield = Mox Ruby; Mox Sapphire; Mox Emerald; Mox Pearl; Llanowar Elves

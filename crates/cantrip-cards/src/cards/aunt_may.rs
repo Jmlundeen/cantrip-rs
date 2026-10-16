@@ -16,7 +16,7 @@ fn welcome(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
-        when(EventMask::ZONE_CHANGE, cantrip_mechanics::triggers::another_creature_you_control_enters),
+        when_asked(EventMask::ZONE_CHANGE, cantrip_mechanics::triggers::another_creature_you_control_enters),
         welcome,
         "Whenever another creature you control enters, you gain 1 life. If it's a Spider, put a +1/+1 counter on it.",
     )],
