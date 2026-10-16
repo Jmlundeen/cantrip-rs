@@ -1,0 +1,50 @@
+# Menace: Bot2's lone Elvish Mystic can't block the Inspector (refusal), but the Mystic and the Llanowar Elves together
+# can, and do. Bot1 assigns the Inspector's 1 combat damage to the Mystic; the blockers' 2 damage kill the Inspector, which
+# deals 1 damage to Bot1 (19) and leaves a Clue. The Mystic is dead, the Elves alive.
+
+[Bot1 Deck]
+Swamp
+Callous Inspector
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Elvish Mystic
+Llanowar Elves
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Callous Inspector.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Callous Inspector > Bot2)
+! Bot2.Block(Elvish Mystic > Callous Inspector)
+Bot2.Block(Elvish Mystic > Callous Inspector; Llanowar Elves > Callous Inspector)
+Bot1.AssignDamage(Callous Inspector > Elvish Mystic: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Callous Inspector
+Bot1.Battlefield = Swamp; Swamp; Clue Token
+Bot2.Graveyard = Elvish Mystic
+Bot2.Battlefield = Forest; Mox Emerald; Llanowar Elves
+Bot2.Life = 20
