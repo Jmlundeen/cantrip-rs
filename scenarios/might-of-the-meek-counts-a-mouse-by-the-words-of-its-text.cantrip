@@ -1,6 +1,6 @@
 # Words of the spell's text (CR 612): Bot1 controls a Goblin Welder and no Mouse. In response to Might of the Meek targeting
 # it, Bot1 casts Artificial Evolution on Might itself, changing Mouse to Goblin, so "if you control a Goblin" is true and
-# the Guide gets +1/+0 (1/1...  and trample - it would not without the text change.
+# the Welder gets +1/+0 (2/1) and trample - it would not without the text change.
 
 [Bot1 Deck]
 Mox Ruby
