@@ -645,6 +645,10 @@ public sealed partial class TacticalPlay
             "PayLifeToReturn" => life - prompt.Amount >= 5,
             "DiscardUnlessCountered" => client.MyHand().Count > prompt.Amount,
 
+            // Ward—Sacrifice N permanents (Emrakul, the Exigent Doom; Ulamog, the Defiler): a price paid only out of a wide
+            // board, which still holds four permanents afterwards.
+            "SacrificeUnlessCountered" => client.BattlefieldOf(client.Seat).Count() - prompt.Amount >= 4,
+
             // Ad Nauseam: the next card's price is unknown, so keep going only while one more costly card cannot
             // kill — life loss is not a payment and nothing stops a player revealing past zero.
             "RevealAgain" => life >= 10,
