@@ -1,6 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers;
-use cantrip_mechanics::{Animation, animate, mana, pump};
+use cantrip_mechanics::{effects, triggers};
+use cantrip_mechanics::{Animation, animate, mana};
 use cantrip_oracle as oracle;
 
 /// "This land becomes a 3/3 green and white Llama creature until end of turn. It's still a land." (CR 613.1d, 613.4b, 613.1e)
@@ -22,11 +22,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Whenever this land attacks, other creatures you control get +1/+1 until end of turn." The creatures are those its controller
 /// controls as it resolves, not this land, and none that enters later (CR 611.2c).
 fn pump_others(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let others: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| id != item.object && g.chars(id).is(CardType::Creature)).collect();
-    for creature in others {
-        pump(g, item.object, creature, 1, 1);
-    }
+    effects::pump_other_creatures_you_control(g, item, 1, 1);
     Ok(())
 }
 
