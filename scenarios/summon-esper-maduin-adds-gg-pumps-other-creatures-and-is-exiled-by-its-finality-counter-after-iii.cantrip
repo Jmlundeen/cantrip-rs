@@ -1,0 +1,64 @@
+# Summon: Esper Maduin, put onto the battlefield by Esper Origins's flashback with a finality counter, through its three
+# chapters. I: the top card, Lightning Bolt, is revealed and, not a permanent card, stays on top (Bot1 draws it on turn 3).
+# II (turn 3, after the draw step, CR 714.3b): "Add {G}{G}" - a triggered ability that uses the stack - and the mana pays
+# for Llanowar Elves, one {G} left over. III (turn 5): "Other creatures you control get +2/+2 and gain trample until end of
+# turn": the Elves are a 3/3 trampler. Then the Saga, its lore counters at its final chapter, is sacrificed (CR 714.4,
+# 704.5s), and its finality counter exiles it instead of letting it reach the graveyard (CR 122.1h): the card is in exile and
+# not in Bot1's graveyard.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Esper Origins
+Llanowar Elves
+Island
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange( | Island; Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Arrange(Lightning Bolt; Island | )
+[T1 Bot1.Main2]
+? Bot1.Revealed = Lightning Bolt
+? Bot1.Hand = Island; Llanowar Elves
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+[T3 Bot1.Main1]
+? Stack = Summon: Esper Maduin
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {G}{G}
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 2
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+? Stack = Summon: Esper Maduin
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+Bot1.Battlefield = Forest; Sol Ring; Mox Emerald; Llanowar Elves
+Exile = Esper Origins
+Bot1.Graveyard = Black Lotus; Island; Island
+LeftBattlefield = Black Lotus (tapped); Summon: Esper Maduin
+Bot1.Hand = Island; Lightning Bolt; Island

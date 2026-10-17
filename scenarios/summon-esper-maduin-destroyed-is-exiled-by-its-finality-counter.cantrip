@@ -1,0 +1,54 @@
+# Summon: Esper Maduin entered from Esper Origins's flashback with a finality counter on it: "If a creature with a finality
+# counter on it would die, exile it instead" (CR 122.1h). On Bot2's turn Bitter Triumph (3 life paid) destroys it: it leaves
+# the battlefield and is exiled instead of being put into Bot1's graveyard - the card is in exile, front face up (CR 712.8a),
+# and Bot1's graveyard holds only what the turn put there.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Esper Origins
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Bitter Triumph
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange( | Island; Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Arrange(Lightning Bolt; Island | )
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Bitter Triumph.Cast(Bot1.Battlefield.Summon: Esper Maduin)
+Bot2.Modes(Pay 3 life)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 17
+Exile = Esper Origins
+Bot1.Graveyard = Black Lotus; Island; Island
+Bot1.Battlefield = Forest; Sol Ring; Mox Emerald
+LeftBattlefield = Black Lotus (tapped); Summon: Esper Maduin
