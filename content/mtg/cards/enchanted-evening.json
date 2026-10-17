@@ -1,0 +1,6 @@
+{
+  "name": "Enchanted Evening",
+  "manaCost": "{3}{W/U}{W/U}",
+  "type": "Enchantment",
+  "oracleText": "All permanents are enchantments in addition to their other types."
+}

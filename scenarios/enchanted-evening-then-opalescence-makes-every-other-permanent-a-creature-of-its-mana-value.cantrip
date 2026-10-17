@@ -1,0 +1,63 @@
+# Enchanted Evening ("All permanents are enchantments in addition to their other types"), then Opalescence ("Each other
+# non-Aura enchantment is a creature ... with base power and base toughness each equal to its mana value"). Layer 4: both
+# effects apply there, and Opalescence's depends on Enchanted Evening's - applying Evening's changes what Opalescence's
+# applies to (CR 613.8a) - so Evening's applies first whatever the timestamps; here it is the earlier one as well (the other
+# order is enchanted-evening-after-opalescence-...). Every permanent but Opalescence is then a non-Aura enchantment, and a
+# creature. Layer 7b: each has base power and toughness equal to its mana value (CR 202.3). The lands and the Moxes (mana
+# value 0) are 0/0 and are put into their owners' graveyards (CR 704.5f): Bot1's Plains and Moxes, Bot2's Islands and its
+# Ornithopter (a 0/2 artifact creature of mana value 0, now 0/0). Enchanted Evening is a 5/5 ({3}{W/U}{W/U}: CR 202.3e,
+# a hybrid symbol counts one). Opalescence is no creature ("other"), so it stays a plain enchantment.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Plains
+Enchanted Evening
+Opalescence
+Plains
+Plains x15
+
+[Bot2 Deck]
+Ornithopter
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Enchanted Evening.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Plains.Types = Land; Enchantment
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+? Bot2.Battlefield.Island.Types = Land; Enchantment
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Opalescence.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Enchanted Evening; Opalescence
+Bot1.Battlefield.Enchanted Evening.Types = Enchantment; Creature
+Bot1.Battlefield.Enchanted Evening.Power = 5
+Bot1.Battlefield.Enchanted Evening.Toughness = 5
+Bot1.Battlefield.Opalescence.Types = Enchantment
+Bot1.Graveyard.Count = 6
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard.Count = 2

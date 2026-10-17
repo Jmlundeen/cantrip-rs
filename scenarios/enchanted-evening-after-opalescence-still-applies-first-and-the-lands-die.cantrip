@@ -1,0 +1,60 @@
+# Opalescence, then Enchanted Evening: the order of enchanted-evening-then-opalescence-... reversed. Opalescence's layer-4
+# effect has the earlier timestamp, but it depends on Enchanted Evening's (CR 613.8a: applying Evening's changes what
+# Opalescence's applies to - a land or a Mox becomes a non-Aura enchantment), so Opalescence's waits until just after it
+# (CR 613.8b) and the outcome is the same: every permanent but Opalescence is an enchantment creature with base power and
+# toughness equal to its mana value. The lands and Moxes, of mana value 0, die (CR 704.5f); Bot1's Mox Pearl, which stayed
+# a plain artifact while only Opalescence was out (the positive control: an artifact is no enchantment), dies with them.
+# Enchanted Evening is 5/5. Were the effects applied in timestamp order alone, no land would be a creature.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Plains
+Opalescence
+Enchanted Evening
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Opalescence.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mox Pearl.Types = Artifact
+? Bot1.Battlefield.Plains.Types = Land
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Enchanted Evening.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Opalescence; Enchanted Evening
+Bot1.Battlefield.Enchanted Evening.Types = Enchantment; Creature
+Bot1.Battlefield.Enchanted Evening.Power = 5
+Bot1.Battlefield.Enchanted Evening.Toughness = 5
+Bot1.Battlefield.Opalescence.Types = Enchantment
+Bot1.Graveyard.Count = 6
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Island

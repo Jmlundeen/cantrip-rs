@@ -1,0 +1,77 @@
+# Opalescence (turn 1), Humility (turn 3), Enchanted Evening (turn 5), worked out layer by layer (CR 613.1):
+# - Layer 4: Evening makes every permanent an enchantment, and Opalescence's effect, though older, depends on it and applies
+#   after it (CR 613.8a-b): every permanent but Opalescence is an enchantment creature. Evening's timestamp decides nothing.
+# - Layer 6: Humility takes all their abilities (CR 613.1f): the lands' mana abilities (CR 305.6) among them, so no Plains or
+#   Island of either player can be tapped for mana any more; Opalescence, no creature, keeps its own.
+# - Layer 7b: Opalescence's part, then Humility's, in timestamp order (CR 613.7): Humility's comes last, so every one of
+#   them is 1/1 - the lands and Moxes are 1/1 creatures and live, Evening and Humility are 1/1.
+# Before Evening, the Plains taps for {W} (the positive control of the mana ability being lost) and Humility, an enchantment
+# Opalescence made a creature, is already 1/1. Bot2's Island taps for {U} on turn 4 and not on turn 6.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Plains
+Opalescence
+Humility
+Plains
+Enchanted Evening
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Opalescence.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Humility.Power = 1
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Hand.Enchanted Evening.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Plains#1.Types = Land; Enchantment; Creature
+[T6 Bot2.Main1]
+! Bot2.Battlefield.Island.Activate
+
+[Expect]
+Turn = 6
+Bot1.Battlefield = Opalescence; Humility; Enchanted Evening; Plains; Plains; Mox Pearl; Mox Sapphire; Mox Jet
+Bot1.Battlefield.Enchanted Evening.Power = 1
+Bot1.Battlefield.Enchanted Evening.Toughness = 1
+Bot1.Battlefield.Humility.Power = 1
+Bot1.Battlefield.Plains#1.Power = 1
+Bot1.Battlefield.Plains#1.Toughness = 1
+Bot1.Battlefield.Mox Jet.Power = 1
+Bot1.Battlefield.Opalescence.Types = Enchantment
+Bot2.Battlefield.Island.Types = Land; Enchantment; Creature
+Bot2.Battlefield.Island.Power = 1

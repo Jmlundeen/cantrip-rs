@@ -1,0 +1,74 @@
+# Enchanted Evening (turn 1), Humility (turn 3), Opalescence (turn 5), worked out layer by layer (CR 613.1):
+# - Layer 4: Evening makes every permanent an enchantment; Opalescence's "each other non-Aura enchantment is a creature"
+#   depends on it (CR 613.8a) and applies after it. Every permanent but Opalescence is an enchantment creature: Evening,
+#   Humility, the lands and the Moxes, Bot1's and Bot2's.
+# - Layer 6: Humility's "all creatures lose all abilities" takes the abilities of all of them - Evening's own among them,
+#   whose layer-4 effect has already applied and goes on applying (CR 613.6), Humility's own (its effect goes on too), and
+#   the lands' mana abilities, which they have from layer 6's start (CR 305.6). Opalescence, no creature, keeps its ability.
+# - Layer 7b: Humility's "base power and toughness 1/1" and Opalescence's "base power and toughness equal to its mana value"
+#   are independent and apply in timestamp order (CR 613.7): Humility's first, Opalescence's last, so each is the size of
+#   its mana value. The lands and Moxes are 0/0 and die (CR 704.5f); Evening is 5/5 and Humility 4/4.
+# (humility-last-under-enchanted-evening-and-opalescence-... is the order where Humility's 7b part comes last.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Plains
+Enchanted Evening
+Humility
+Plains
+Opalescence
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Enchanted Evening.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Humility.Types = Enchantment
+[T5 Bot1.Main1]
+Bot1.Hand.Opalescence.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Enchanted Evening; Humility; Opalescence
+Bot1.Battlefield.Enchanted Evening.Types = Enchantment; Creature
+Bot1.Battlefield.Enchanted Evening.Power = 5
+Bot1.Battlefield.Enchanted Evening.Toughness = 5
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Power = 4
+Bot1.Battlefield.Humility.Toughness = 4
+Bot1.Battlefield.Opalescence.Types = Enchantment
+Bot1.Graveyard.Count = 6
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard.Count = 2
