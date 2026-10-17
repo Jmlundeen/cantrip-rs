@@ -922,6 +922,13 @@ impl<'a> Projector<'a> {
                 view.lost_abilities.push(hexproof_from_text(lost));
             }
         }
+        // Protection (CR 702.16) an effect or another permanent's static ability gave it (Mother of Runes, Akroma's Memorial):
+        // no line of its own says so. One its own text prints (Progenitus, a leveled Hexdrinker, True-Name Nemesis) is that line.
+        if !view.oracle_text.to_lowercase().contains("protection from")
+            && let Some(text) = self.protection_text(c)
+        {
+            view.granted_abilities.push(AbilityTextView { text, spent: false });
+        }
         let printed = |ability: AbilityRef| {
             (ability.card == c.card && usize::from(ability.index) < def.abilities.len())
                 // A Room's abilities are its doors' (CR 709.5): the layers give the unlocked ones.
@@ -963,6 +970,34 @@ impl<'a> Projector<'a> {
             let rest: Vec<String> =
                 view.oracle_text.split('\n').filter(|line| !line.trim().is_empty() && !judged(line)).map(str::to_string).collect();
             view.lost_abilities.extend(rest);
+        }
+    }
+
+    /// The qualities an object has protection from (CR 702.16a), worded as printed cards word them: "Protection from
+    /// everything", "Protection from black and from red", "Protection from creatures", "Protection from <player>". None when
+    /// it has none.
+    fn protection_text(&self, c: &Chars) -> Option<String> {
+        if c.protection_everything {
+            return Some("Protection from everything".to_string());
+        }
+        let mut words: Vec<String> = c.protection.iter().map(|color| color.name().to_lowercase()).collect();
+        if c.protection_colorless {
+            words.push("colorless".to_string());
+        }
+        if c.protection_colored_spells {
+            words.push("colored spells".to_string());
+        }
+        words.extend(c.protection_types.iter().map(|t| format!("{}s", t.name().to_lowercase())));
+        for p in 0..8u8 {
+            if c.protection_players & (1 << p) != 0 {
+                words.push(self.names.get(p as usize).cloned().unwrap_or_else(|| format!("player {}", p + 1)));
+            }
+        }
+        match words.len() {
+            0 => None,
+            1 => Some(format!("Protection from {}", words[0])),
+            2 => Some(format!("Protection from {} and from {}", words[0], words[1])),
+            n => Some(format!("Protection from {}, and from {}", words[..n - 1].join(", from "), words[n - 1])),
         }
     }
 
