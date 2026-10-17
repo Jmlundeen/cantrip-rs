@@ -1,0 +1,42 @@
+# Resonating Lute: "{T}: Draw a card. Activate only if you have seven or more cards in your hand" (CR 602.5b). Four Moxen and the
+# Lute leave Bot1 two Islands in hand on turn 1; only draw steps add to it, so the hand is 6 on turn 9 (the refusal: the ability is
+# not offered) and 7 on turn 11, where activating it is offered and draws, making 8.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Resonating Lute
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Resonating Lute.Cast
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+? Bot1.Hand.Count = 6
+! Bot1.Battlefield.Resonating Lute.Activate(Ability: Draw)
+[T11 Bot1.Main1]
+? Bot1.Hand.Count = 7
+Bot1.Battlefield.Resonating Lute.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 11
+Bot1.Hand.Count = 8
+Bot1.Battlefield.Resonating Lute.Tapped = true

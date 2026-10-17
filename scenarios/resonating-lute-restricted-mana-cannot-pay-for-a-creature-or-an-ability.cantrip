@@ -1,0 +1,42 @@
+# Resonating Lute's land mana is "Spend this mana only to cast instant and sorcery spells" (CR 106.6): the Island's restricted
+# {R}{R} pays neither for a creature spell nor for an activated ability. A second Mox Ruby's unrestricted {R} casts Blazing
+# Rootwalla (the control that the creature is castable at all); then, with only the restricted {R}{R} left in the pool and every
+# permanent tapped, the Rootwalla's "{R}: +2/+0" can't be activated.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mana Crypt
+Resonating Lute
+Island
+Mox Ruby
+Blazing Rootwalla
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Resonating Lute.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate(Ability: two mana; Color: Red)
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} (InstantOrSorcerySpells)
+! Bot1.Battlefield.Blazing Rootwalla.Activate
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Ruby; Mana Crypt; Resonating Lute; Island; Blazing Rootwalla
+Bot1.Battlefield.Blazing Rootwalla.Power = 1
