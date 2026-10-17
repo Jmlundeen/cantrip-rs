@@ -284,7 +284,11 @@ player, the attacker is attacking that player, and no such block was made; other
 The pairs of one refusal are one declaration: `! Bot2.Block(Bear > Moonshadow)` holds for an attacker with menace (a lone blocker is not
 legal, CR 702.110b), while naming two blockers for it, `! Bot2.Block(Bear#1 > Moonshadow; Bear#2 > Moonshadow)`, would fail.
 Pairs each allowed alone are judged together by the engine's own check of the declaration: `! Bot2.Block(Bear#1 > Rover; Bear#2 >
-Rover)` holds for an attacker that "can't be blocked by more than one creature" (CR 509.1b).
+Rover)` holds for an attacker that "can't be blocked by more than one creature" (CR 509.1b). Where an effect requires blocks
+(CR 509.1c: Lure's "all creatures able to block enchanted creature do so"), a line of blocks each allowed alone holds when the
+engine's own check refuses the declaration as a whole - it obeys fewer of the requirements than a declaration could - and
+`! Bot2.Block(Count: 0)` says declaring no blockers at all is refused at the next declaration. The default answer to a
+declaration with requirements is the engine's own, which obeys them.
 
 `! Bot1.Attack()` says declaring no attackers at all is refused at the next declaration (a creature must attack, CR 508.1d).
 `! Bot1.Battlefield.Llanowar Elves.Activate` right after an `Attack` line is checked while that declaration's cost to attack is

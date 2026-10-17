@@ -851,6 +851,12 @@ public sealed class Decisions
             }
         }
 
+        // Blocks an effect requires (CR 509.1c: Lure) that this left out: the engine's own declaration, which obeys them.
+        if (!prompt.ObeysRequirements(answer.Blocks))
+        {
+            return (BlockersDeclaredAnswer)prompt.Default();
+        }
+
         return answer;
     }
 

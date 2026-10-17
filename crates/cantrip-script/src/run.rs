@@ -1046,7 +1046,8 @@ impl<'s> Run<'s> {
             }
             RequestKind::DeclareAttackers { .. } => Answer::Attack(Vec::new()),
             RequestKind::AssignCombatDamage { divisions } => Answer::Shares(DamageDivision::suggested_shares(divisions)),
-            RequestKind::DeclareBlockers { .. } => Answer::Block(Vec::new()),
+            // No blocks, or where an effect requires blocks (CR 509.1c) the engine's own declaration, which obeys them.
+            RequestKind::DeclareBlockers { requirements, .. } => Answer::Block(requirements.suggested.clone()),
             // The first eligible modes, the affordable ones first where the question advises (`FirstEligible`).
             // The first eligible mode as many times as are wanted, where a mode may be chosen more than once.
             RequestKind::ChooseModes { eligible, count, repeat: true, .. } => {
@@ -1158,7 +1159,7 @@ impl<'s> Run<'s> {
                 let both: Vec<ObjectId> = planeswalkers.iter().chain(battles.iter()).copied().collect();
                 self.attack(step, eligible, players, &both)?
             },
-            (V::Block, RequestKind::DeclareBlockers { eligible, attackers, allowed }) => self.block(step, eligible, attackers, allowed)?,
+            (V::Block, RequestKind::DeclareBlockers { eligible, attackers, allowed, .. }) => self.block(step, eligible, attackers, allowed)?,
             (V::AssignDamage, RequestKind::AssignCombatDamage { divisions }) => self.assign_damage(step, divisions)?,
             // "Choose odd or even" is a name in the C# engine's scripts: `Name(Odd)`.
             (V::Modes | V::Name, RequestKind::ChooseModes { modes, eligible, count, at_most, .. }) => {
@@ -1418,7 +1419,14 @@ impl<'s> Run<'s> {
     /// proves nothing.
     fn check_refused_declaration(&self, action: &ActionStep, line: usize, text: &str, request: &Request) -> R<()> {
         match &request.kind {
-            RequestKind::DeclareBlockers { eligible, attackers, allowed } => {
+            RequestKind::DeclareBlockers { eligible, attackers, allowed, .. } => {
+                // `! Bot2.Block()`: declaring no blockers at all is refused, because some creature must block (CR 509.1c).
+                if action.positional().next().is_none() {
+                    if check_answer(&self.game, request, &Answer::Block(Vec::new())).is_ok() {
+                        return fail(format!("line {line} says {text} must not be allowed, but declaring no blockers is"));
+                    }
+                    return Ok(());
+                }
                 // The line names a whole declaration: an attacker that needs several blockers (menace, CR 702.110b) is not
                 // legally blocked by fewer of them than the line gives it, however each pair stands alone.
                 let mut given: Vec<(ObjectId, usize)> = Vec::new();
@@ -1441,6 +1449,15 @@ impl<'s> Run<'s> {
                     {
                         pairs.push((b, a));
                     }
+                }
+                // A declaration of blocks each allowed alone that the engine's own check refuses as a whole holds: one that
+                // obeys fewer of the blocks effects require than a declaration could (CR 509.1c: Lure).
+                if pairs.len() == action.positional().count()
+                    && pairs.iter().all(|p| allowed.contains(p))
+                    && matches!(&request.kind, RequestKind::DeclareBlockers { requirements, .. } if requirements.most > 0)
+                    && check_answer(&self.game, request, &Answer::Block(pairs.clone())).is_err()
+                {
+                    return Ok(());
                 }
                 for spec in action.positional() {
                     let parts: Vec<&str> = spec.split('>').collect();

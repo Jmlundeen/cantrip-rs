@@ -1495,6 +1495,13 @@ pub type SpellRule = fn(&dyn Query, &Asker, PlayerId, ObjectId) -> bool;
 /// Lookout).
 pub type BlockRule = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
 
+/// A static ability that requires a creature to block a particular attacker if able (CR 509.1c): asked, while the object that
+/// has it is on the battlefield with its abilities, of each block the restrictions allow - the object as `source`, then the
+/// blocker and the attacker; true makes that block a requirement. "All creatures able to block enchanted creature do so"
+/// (Lure: every creature able to block the creature it enchants has a requirement to block it). The defending player's
+/// declaration must obey as many requirements as any declaration that obeys every restriction could (CR 509.1c).
+pub type BlockRequirement = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
+
 /// A static ability that says a creature can't attack (CR 508.1c), usually unless something holds: asked, while the object
 /// that has it is on the battlefield with its abilities, of each creature that could otherwise be declared an attacker (the
 /// object itself or another), with the object as `source`; false keeps the creature from attacking at all. "Delirium - This
@@ -2009,6 +2016,8 @@ pub struct CardDef {
     pub spell_rules: &'static [SpellRule],
     /// Its static abilities that limit blocking (CR 509.1b), while it is on the battlefield.
     pub block_rules: &'static [BlockRule],
+    /// Its static abilities that require creatures to block (CR 509.1c), while it is on the battlefield.
+    pub block_requirements: &'static [BlockRequirement],
     /// Its static abilities that keep creatures from attacking (CR 508.1c), while it is on the battlefield.
     pub attack_rules: &'static [AttackRule],
     /// Its static abilities that make attacking cost something (CR 508.1d, 508.1h), while it is on the battlefield.
@@ -2196,6 +2205,7 @@ impl CardDef {
         cast_rules: &[],
         spell_rules: &[],
         block_rules: &[],
+        block_requirements: &[],
         attack_rules: &[],
         attack_costs: &[],
         attacks_despite_defender: &[],

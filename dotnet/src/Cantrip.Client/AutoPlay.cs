@@ -215,7 +215,8 @@ public static class AutoPlay
             }
         }
 
-        return answer;
+        // Blocks an effect requires (CR 509.1c: Lure) that this left out: the engine's own declaration, which obeys them.
+        return prompt.ObeysRequirements(answer.Blocks) ? answer : (BlockersDeclaredAnswer)prompt.Default();
     }
 
     /// <summary>

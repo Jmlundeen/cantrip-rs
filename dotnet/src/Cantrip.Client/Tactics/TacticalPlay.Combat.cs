@@ -594,6 +594,18 @@ public sealed partial class TacticalPlay
             Note($"the attack, so blocked, is worth {Num(result.Value)} to the attacker and deals me {result.Damage}");
         }
 
+        // Blocks an effect requires (CR 509.1c: Lure) that the best blocks leave out are not mine to decline: the engine's
+        // own declaration obeys them.
+        if (!prompt.ObeysRequirements(answer.Blocks))
+        {
+            if (Narrating)
+            {
+                Note("an effect requires blocks these leave out, so I block as it requires");
+            }
+
+            return (BlockersDeclaredAnswer)prompt.Default();
+        }
+
         return answer;
     }
 }

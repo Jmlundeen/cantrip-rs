@@ -489,13 +489,18 @@ left it (CR 616.1f). There are three kinds besides protection's (CR 702.16e, `re
 
 - a static ability's, `CardDef::preventions` (`PreventionDef`: a hint and an `applies` over the `DamageEvent`), functioning
   while its permanent is on the battlefield and gone with its abilities (CR 613.1f): Black Panther, Hope Enduring's "Prevent
-  all damage that would be dealt to Black Panther". It prevents all of what it applies to;
+  all damage that would be dealt to Black Panther". It prevents all of what it applies to, or as much as its `amount` says
+  of the damage as it now is (Gisela, Blade of Goldnight's "prevent half that damage, rounded up"), which is then ordered with
+  the others like a shield;
 - one a resolving spell or ability made (CR 615.3, 611.2), `EffectKind::Prevention { card, index, to, shield }`: of damage to an
   object (which it ends with, CR 400.7), to a player, or to anyone (`Target::None`), and of the damage the making card's
   `granted_preventions[index]` describes (any damage, combat damage: `cantrip_mechanics::prevention::ANY_DAMAGE`,
   `COMBAT_DAMAGE`). `Shield::All` prevents all of it while it lasts (Fog's "all combat damage that would be dealt this
   turn"); `Shield::Next(n)` is a shield (CR 615.7), reduced by what it prevents (`GameState::effect_set`) and gone at 0
-  (Healing Salve's "the next 3 damage that would be dealt to any target this turn");
+  (Healing Salve's "the next 3 damage that would be dealt to any target this turn"). The definition's `applies` is handed the
+  object the effect is about, so one about no recipient can name the damage by its object: Maze of Ith's "all combat damage
+  that would be dealt to and dealt by that creature" (`to: Target::None`, the creature the affected object, `of_it` how the
+  creature's face words it);
 - where two or more sources would deal damage to a shielded permanent or player at the same time (combat damage,
   `damage_together`), its player or controller chooses whose damage the shield prevents first (CR 615.7,
   `ops::order_for_shields`, a `ChooseCards` of the sources with `Purpose::PreventDamageFrom(left)`), asked whenever the
@@ -1073,6 +1078,27 @@ the restrictions are cumulative) is offered no block at all (`turn::declare_bloc
 (`DeclareBlockersPrompt::maximum_blockers`, 0 for any number); the web client sends at most that many of the creatures picked up
 at the attacker clicked and says why the rest are still held; the tactical, random, automatic and language-model seats never
 declare more. A multi-pair refusal in a scenario is judged by the engine's check of that declaration.
+
+### Blocks an effect requires
+
+A requirement to block (CR 509.1c) is a `CardDef::block_requirements` entry (`BlockRequirement`), asked of each block the
+restrictions allow, with the permanent as its source: Lure's "all creatures able to block enchanted creature do so" requires
+every creature able to block the creature it enchants to block it. `static_rules::block_requirements` collects the required
+pairs only while a permanent with one is on the battlefield with its abilities; `turn::most_requirements` then finds the most
+of them any declaration that breaks no restriction obeys (each blocker blocks one attacker, every block allowed, each attacker
+blocked within its minimum and maximum: menace) by a cut search over the blocks of the required attackers, with one such
+declaration. The question carries all three (`BlockRequirements`: pairs, most, suggested), `validate` refuses a declaration
+that obeys fewer, and the suggestion is every seat's fallback: the script's default, the bench's, `DeclareBlockersPrompt`'s
+`Default()`, and the tactical, random, automatic and language-model seats when their own blocks obey too few. The web dock names
+a creature that must block and holds the button until the declaration obeys enough. Not built, as no card in content needs
+it: "blocks each combat if able", a requirement to block any attacker (a pair with no attacker), and costs to block (CR 509.1d).
+
+### The regular combat damage step
+
+CR 510.4: the regular combat damage step after a first-strike step is for the attackers and blockers that had neither first
+strike nor double strike as the first-strike step began, and those that have double strike now. `Attacker::first_strike` and
+`Block::first_strike` record which had one of them as that step began; a creature that loses first strike after dealing
+first-strike damage deals no more, and one that gains it only afterwards deals its damage in the regular step.
 
 ### Landwalk
 

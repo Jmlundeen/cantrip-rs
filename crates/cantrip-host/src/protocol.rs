@@ -911,6 +911,15 @@ pub struct DeclareBlockersPrompt {
     /// than one creature", 0 for any number.
     #[serde(default)]
     pub maximum_blockers: Vec<i32>,
+    /// The blocks an effect requires if able (CR 509.1c: Lure's "all creatures able to block enchanted creature do so").
+    #[serde(default)]
+    pub requirements: Vec<BlockMessage>,
+    /// How many of `requirements` the declaration must obey: the most any declaration that obeys every restriction does.
+    #[serde(default)]
+    pub most_requirements: i32,
+    /// A declaration that obeys that many, the engine's own; empty where nothing is required.
+    #[serde(default)]
+    pub suggested: Vec<BlockMessage>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1500,7 +1509,10 @@ impl PromptPayload {
                     })
                     .collect(),
             }),
-            PromptPayload::DeclareBlockersPromptMessage(_) => AnswerPayload::BlockersDeclaredAnswer(BlockersDeclaredAnswer::default()),
+            // No blocks, or the engine's own declaration where an effect requires blocks (CR 509.1c).
+            PromptPayload::DeclareBlockersPromptMessage(p) => {
+                AnswerPayload::BlockersDeclaredAnswer(BlockersDeclaredAnswer { blocks: p.suggested.clone() })
+            }
             PromptPayload::AssignCombatDamagePromptMessage(p) => {
                 let mut shares = Vec::new();
                 for division in &p.divisions {

@@ -364,8 +364,9 @@ pub enum RequestKind {
     },
     /// How creatures divide their combat damage (CR 510.1c-d): one division per creature with a choice.
     AssignCombatDamage { divisions: Vec<DamageDivision> },
-    /// Declare blockers (CR 509.1): `allowed` lists every (blocker, attacker) pair the rules allow.
-    DeclareBlockers { eligible: Vec<ObjectId>, attackers: Vec<ObjectId>, allowed: Vec<(ObjectId, ObjectId)> },
+    /// Declare blockers (CR 509.1): `allowed` lists every (blocker, attacker) pair the rules allow, and `requirements` the
+    /// blocks effects require if able (CR 509.1c).
+    DeclareBlockers { eligible: Vec<ObjectId>, attackers: Vec<ObjectId>, allowed: Vec<(ObjectId, ObjectId)>, requirements: BlockRequirements },
     /// Discard down to maximum hand size (CR 514.1).
     DiscardToHandSize { count: u8, hand: Vec<ObjectId> },
     /// Keep the opening hand or take a mulligan (CR 103.5).
@@ -462,6 +463,24 @@ impl AttackCost {
     /// Whether `attacker` attacking `target` costs nothing to declare.
     pub fn free(costs: &[AttackCost], attacker: ObjectId, target: Target) -> bool {
         !costs.iter().any(|c| c.attacker == attacker && c.target == target)
+    }
+}
+
+/// The requirements on a declaration of blockers (CR 509.1c): each block an effect requires if able ("all creatures able to
+/// block enchanted creature do so"), among the blocks the restrictions allow; the most of them any declaration that obeys
+/// every restriction obeys, which the declaration must obey too; and one such declaration, the engine's suggestion. Empty
+/// where no effect requires a block.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
+pub struct BlockRequirements {
+    pub pairs: Vec<(ObjectId, ObjectId)>,
+    pub most: u8,
+    pub suggested: Vec<(ObjectId, ObjectId)>,
+}
+
+impl BlockRequirements {
+    /// How many of the requirements a declaration obeys: each required block it makes.
+    pub fn obeyed(&self, blocks: &[(ObjectId, ObjectId)]) -> u8 {
+        blocks.iter().filter(|b| self.pairs.contains(b)).count() as u8
     }
 }
 

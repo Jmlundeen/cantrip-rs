@@ -217,6 +217,8 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             Answer::Attack(attackers.into_iter().map(|a| (a, Target::Player(players[random.below(players.len())]))).collect())
         }
         RequestKind::AssignCombatDamage { divisions } => Answer::Shares(DamageDivision::suggested_shares(divisions)),
+        // A declaration an effect makes requirements of (CR 509.1c): the engine's own, which obeys them.
+        RequestKind::DeclareBlockers { requirements, .. } if requirements.most > 0 => Answer::Block(requirements.suggested.clone()),
         RequestKind::DeclareBlockers { allowed, .. } => {
             let mut blocks: Vec<(ObjectId, ObjectId)> = Vec::new();
             for pair in random.some(allowed, allowed.len()) {

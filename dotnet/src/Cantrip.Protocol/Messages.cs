@@ -2504,6 +2504,41 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     [Key(5)]
     public List<int> MaximumBlockers { get; set; } = [];
 
+    /// <summary>
+    /// The blocks an effect requires if able (CR 509.1c): Lure's "all creatures able to block enchanted creature do so" makes
+    /// one of each creature able to block the creature it enchants. Empty where nothing is required.
+    /// </summary>
+    [Key(6)]
+    public List<BlockMessage> Requirements { get; set; } = [];
+
+    /// <summary>
+    /// How many of <see cref="Requirements"/> the declaration must obey: the most any declaration that obeys every
+    /// restriction does (CR 509.1c). A declaration that obeys fewer is refused.
+    /// </summary>
+    [Key(7)]
+    public int MostRequirements { get; set; }
+
+    /// <summary>A declaration that obeys <see cref="MostRequirements"/> of them, the engine's own; empty where nothing is required.</summary>
+    [Key(8)]
+    public List<BlockMessage> Suggested { get; set; } = [];
+
+    /// <summary>How many of <see cref="Requirements"/> <paramref name="blocks"/> obeys: each required block it makes.</summary>
+    public int Obeyed(IEnumerable<BlockMessage> blocks) =>
+        blocks.Count(block => Requirements.Exists(r => r.Blocker == block.Blocker && r.Attacker == block.Attacker));
+
+    /// <summary>Whether <paramref name="blocks"/> obeys as many of the requirements as the declaration must (CR 509.1c).</summary>
+    public bool ObeysRequirements(IEnumerable<BlockMessage> blocks) => Obeyed(blocks) >= MostRequirements;
+
+    /// <summary>
+    /// A requirement <paramref name="blocks"/> leaves unobeyed by a creature that blocks nothing required: the one to name
+    /// when the declaration obeys too few. Null when it obeys enough.
+    /// </summary>
+    public BlockMessage? UnmetRequirement(IReadOnlyCollection<BlockMessage> blocks) =>
+        ObeysRequirements(blocks)
+            ? null
+            : Requirements.FirstOrDefault(r => !blocks.Any(b => b.Blocker == r.Blocker && Requirements.Exists(q => q.Blocker == b.Blocker && q.Attacker == b.Attacker)))
+              ?? Requirements.FirstOrDefault();
+
     /// <summary>The fewest creatures that may block the attacker at <paramref name="index"/>, at least 1.</summary>
     public int MinimumFor(int index) => index >= 0 && index < MinimumBlockers.Count ? Math.Max(MinimumBlockers[index], 1) : 1;
 
@@ -2511,8 +2546,8 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     public int MaximumFor(int index) =>
         index >= 0 && index < MaximumBlockers.Count && MaximumBlockers[index] > 0 ? MaximumBlockers[index] : int.MaxValue;
 
-    /// <summary>Blocking with nobody.</summary>
-    public override AnswerPayload Default() => new BlockersDeclaredAnswer();
+    /// <summary>Blocking with nobody, or where an effect requires blocks (CR 509.1c) the engine's own declaration, which obeys them.</summary>
+    public override AnswerPayload Default() => new BlockersDeclaredAnswer { Blocks = [.. Suggested] };
 }
 
 /// <summary>

@@ -694,7 +694,10 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .collect();
     allowed.retain(|p| !menace.contains(&p.1));
     if !allowed.is_empty() {
-        let answer = cx.ask_core(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed }, false)?;
+        // CR 509.1c: the blocks effects require if able, and the most of them a declaration can obey.
+        let pairs = crate::static_rules::block_requirements(cx, &allowed);
+        let requirements = if pairs.is_empty() { BlockRequirements::default() } else { most_requirements(cx, &allowed, pairs) };
+        let answer = cx.ask_core(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements }, false)?;
         if let Answer::Block(blocks) = answer {
             let mut list = Vec::new();
             let mut attackers = cx.s().attackers.clone();
@@ -740,6 +743,96 @@ fn strikes_first(cx: &Cx, id: ObjectId) -> bool {
 /// With no first-strike step, every creature does.
 fn deals_now(cx: &Cx, id: ObjectId, had_first_strike: bool, first_strike_step: bool) -> bool {
     if first_strike_step { strikes_first(cx, id) } else { !had_first_strike || cx.chars(id).has(Keyword::DoubleStrike) }
+}
+
+/// The most of the required blocks `pairs` (CR 509.1c) any declaration of blockers obeys without disobeying a restriction,
+/// with one declaration that does. A declaration is legal in its restrictions where each blocker blocks at most one attacker,
+/// each block is among `allowed` (CR 509.1b), and each attacker blocked has at least as many blockers as it requires and no
+/// more than it allows (menace, "can't be blocked by more than one creature", CR 509.1b). Only blocks of an attacker some
+/// requirement names can obey one or help another be obeyed (by making up a minimum), so only those are searched, the
+/// blockers with a requirement first and their required blocks tried first; a branch that cannot beat the best found is cut.
+fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(ObjectId, ObjectId)>) -> BlockRequirements {
+    let mut targets: Vec<ObjectId> = Vec::new();
+    for &(_, a) in &pairs {
+        if !targets.contains(&a) {
+            targets.push(a);
+        }
+    }
+    let limits: Vec<(usize, usize)> = targets
+        .iter()
+        .map(|&a| {
+            let c = cx.chars(a);
+            (c.minimum_blockers() as usize, usize::from(c.maximum_blockers()))
+        })
+        .collect();
+    // Each blocker that could block one of `targets`, with the attackers it may block, required ones first.
+    let mut blockers: Vec<(ObjectId, Vec<usize>)> = Vec::new();
+    for &(b, a) in allowed {
+        let Some(t) = targets.iter().position(|&x| x == a) else { continue };
+        match blockers.iter_mut().find(|e| e.0 == b) {
+            Some(e) => e.1.push(t),
+            None => blockers.push((b, vec![t])),
+        }
+    }
+    for (b, options) in &mut blockers {
+        options.sort_by_key(|&t| !pairs.contains(&(*b, targets[t])));
+    }
+    blockers.sort_by_key(|(b, _)| !pairs.iter().any(|p| p.0 == *b));
+    let required_after: Vec<usize> = (0..=blockers.len())
+        .map(|i| blockers[i..].iter().filter(|(b, _)| pairs.iter().any(|p| p.0 == *b)).count())
+        .collect();
+
+    struct Search<'a> {
+        blockers: &'a [(ObjectId, Vec<usize>)],
+        targets: &'a [ObjectId],
+        limits: &'a [(usize, usize)],
+        pairs: &'a [(ObjectId, ObjectId)],
+        required_after: &'a [usize],
+        counts: Vec<usize>,
+        chosen: Vec<Option<usize>>,
+        best: Option<(usize, Vec<Option<usize>>)>,
+    }
+    impl Search<'_> {
+        fn go(&mut self, i: usize, obeyed: usize) {
+            if self.best.as_ref().is_some_and(|(n, _)| obeyed + self.required_after[i] <= *n) {
+                return;
+            }
+            if i == self.blockers.len() {
+                let legal = self.counts.iter().zip(self.limits).all(|(&n, &(least, most))| n == 0 || (least <= n && n <= most));
+                if legal {
+                    self.best = Some((obeyed, self.chosen.clone()));
+                }
+                return;
+            }
+            let (b, options) = &self.blockers[i];
+            for &t in options {
+                if self.counts[t] == self.limits[t].1 {
+                    continue;
+                }
+                self.counts[t] += 1;
+                self.chosen[i] = Some(t);
+                let gain = usize::from(self.pairs.contains(&(*b, self.targets[t])));
+                self.go(i + 1, obeyed + gain);
+                self.counts[t] -= 1;
+            }
+            self.chosen[i] = None;
+            self.go(i + 1, obeyed);
+        }
+    }
+    let mut search = Search {
+        blockers: &blockers,
+        targets: &targets,
+        limits: &limits,
+        pairs: &pairs,
+        required_after: &required_after,
+        counts: vec![0; targets.len()],
+        chosen: vec![None; blockers.len()],
+        best: None,
+    };
+    search.go(0, 0);
+    let (most, chosen) = search.best.unwrap_or_default();
+    let suggested = blockers.iter().zip(chosen).filter_map(|((b, _), t)| t.map(|t| (*b, targets[t]))).collect();
+    BlockRequirements { pairs, most: most as u8, suggested }
 }
 
 /// Combat damage (CR 510): every attacker and blocker deals its damage at once. A blocked attacker with a choice divides

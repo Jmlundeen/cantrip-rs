@@ -2155,6 +2155,19 @@ public sealed partial class MainPage
         // The attacker the last click sent too many blockers at (CR 509.1b): those over its most are still picked up.
         int limitIndex = _blockLimit >= 0 && _blockLimit < prompt.Attackers.Count && _pending.Count > 0 ? _blockLimit : -1;
 
+        List<BlockMessage> declared =
+        [
+            .. _blocking.Select(pair => new BlockMessage
+            {
+                Blocker = new ViewHandle(pair.Key),
+                Attacker = prompt.Attackers[pair.Value],
+            }),
+        ];
+
+        // A creature an effect requires to block (CR 509.1c: Lure), left out of a declaration that obeys too few: what the
+        // server would refuse, so the button waits and the dock says which.
+        BlockMessage? unmet = prompt.UnmetRequirement(declared);
+
         Prompt(
             "Declare blockers",
             limitIndex >= 0
@@ -2163,22 +2176,14 @@ public sealed partial class MainPage
                 ? $"Choose an attacker to block ({_pending.Count} selected)"
                 : shortIndex >= 0
                     ? $"{client.Object(prompt.Attackers[shortIndex])?.Name} needs {prompt.MinimumBlockers[shortIndex]} or more blockers"
-                    : $"{prompt.Attackers.Count} attacking  ·  {_blocking.Count} blocking");
+                    : unmet is not null
+                        ? $"{client.Object(unmet.Blocker)?.Name ?? "A creature"} is able to block {client.Object(unmet.Attacker)?.Name ?? "an attacker"} and must"
+                        : $"{prompt.Attackers.Count} attacking  ·  {_blocking.Count} blocking");
 
         AddButton(
             _blocking.Count == 0 ? "No blocks" : $"Block with {_blocking.Count}",
-            () => Send(client, new BlockersDeclaredAnswer
-            {
-                Blocks =
-                [
-                    .. _blocking.Select(pair => new BlockMessage
-                    {
-                        Blocker = new ViewHandle(pair.Key),
-                        Attacker = prompt.Attackers[pair.Value],
-                    }),
-                ],
-            }),
-            enabled: shortIndex < 0,
+            () => Send(client, new BlockersDeclaredAnswer { Blocks = declared }),
+            enabled: shortIndex < 0 && unmet is null,
             primary: true).Tooltip = "Lock in the blocks" + Suffix(PassKey);
 
         if (_pending.Count > 0)

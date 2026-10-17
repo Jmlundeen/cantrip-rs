@@ -277,7 +277,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             }
             Ok(())
         }
-        (RequestKind::DeclareBlockers { allowed, .. }, Answer::Block(blocks)) => {
+        (RequestKind::DeclareBlockers { allowed, requirements, .. }, Answer::Block(blocks)) => {
             let ids: Vec<ObjectId> = blocks.iter().map(|b| b.0).collect();
             if !distinct(&ids) || !blocks.iter().all(|b| allowed.contains(b)) {
                 no("not a legal declaration of blockers")
@@ -291,6 +291,9 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 blocks.iter().filter(|b| b.1 == a).count() > usize::from(game.chars(a).maximum_blockers())
             }) {
                 no("a creature can't be blocked by more creatures than it allows (CR 509.1b)")
+            } else if requirements.obeyed(blocks) < requirements.most {
+                // CR 509.1c: as many requirements obeyed as any declaration that disobeys no restriction obeys.
+                no("a creature able to block where an effect requires it to does not (CR 509.1c)")
             } else {
                 Ok(())
             }

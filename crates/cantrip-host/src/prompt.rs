@@ -98,7 +98,7 @@ pub fn request_objects(request: &Request) -> HashSet<ObjectId> {
                 }
             }
         }
-        RequestKind::DeclareBlockers { eligible, attackers, allowed } => {
+        RequestKind::DeclareBlockers { eligible, attackers, allowed, .. } => {
             add(eligible);
             add(attackers);
             add(&allowed.iter().flat_map(|(a, b)| [*a, *b]).collect::<Vec<_>>());
@@ -677,6 +677,11 @@ fn handles_of(handles: &mut HandleSpace, ids: &[ObjectId]) -> Vec<ViewHandle> {
     ids.iter().map(|&id| handles.handle(id)).collect()
 }
 
+/// Blocks, (blocker, attacker), as the wire names them.
+fn blocks(handles: &mut HandleSpace, pairs: &[(ObjectId, ObjectId)]) -> Vec<BlockMessage> {
+    pairs.iter().map(|&(blocker, attacker)| BlockMessage { blocker: handles.handle(blocker), attacker: handles.handle(attacker) }).collect()
+}
+
 /// The prompt a request is, and whether the seat may give the announcement up.
 pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Result<(PromptPayload, bool), String> {
     let player = seat(request.player);
@@ -1060,7 +1065,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 })
                 .collect(),
         }),
-        RequestKind::DeclareBlockers { eligible, attackers, allowed } => {
+        RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements } => {
             PromptPayload::DeclareBlockersPromptMessage(DeclareBlockersPrompt {
                 player,
                 eligible: handles_of(handles, eligible),
@@ -1077,6 +1082,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         most => i32::from(most),
                     })
                     .collect(),
+                requirements: blocks(handles, &requirements.pairs),
+                most_requirements: i32::from(requirements.most),
+                suggested: blocks(handles, &requirements.suggested),
             })
         }
         RequestKind::DiscardToHandSize { count, hand } => PromptPayload::DiscardPromptMessage(DiscardPrompt {
