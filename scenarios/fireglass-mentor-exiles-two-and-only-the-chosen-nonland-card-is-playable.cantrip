@@ -1,0 +1,46 @@
+# Fireglass Mentor: "At the beginning of your second main phase, if an opponent lost life this turn, exile the top two
+# cards of your library. Choose one of them. Until end of turn, you may play that card." Bot1 bolts Bot2 in its first
+# main phase, so the trigger happens: Mountain and Lightning Bolt are exiled, Bot1 chooses the Bolt and casts it from
+# exile with Mox Ruby (Bot2 20 -> 17 -> 14). The Mountain, not chosen, cannot be played even though Bot1 has its land
+# drop (the refusal beside the Bolt, which is the positive control).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Fireglass Mentor
+Lightning Bolt
+Island x2
+Mountain
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fireglass Mentor.Cast
+Bot1.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+Bot1.Choose(Lightning Bolt)
+? Exile = Mountain; Lightning Bolt
+! Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 14
+Exile = Mountain
+Bot1.Library.Count = 12
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Ruby; Fireglass Mentor

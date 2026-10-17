@@ -1,0 +1,62 @@
+# Fireglass Mentor: "if an opponent lost life this turn" - lost life, not a lower life total (ruling). Turn 1: Bot1 casts the
+# Mentor and no opponent has lost life, so its second main phase exiles nothing (the negative control: library and exile
+# untouched). Turn 3: Bolt takes 3 from Bot2 (20 -> 17), then Swords to Plowshares on Bot2's Ulvenwald Oddity gives Bot2
+# 4 life (21): Bot2 ends above 20, yet lost life this turn, so the trigger happens. Mountain and Island are exiled, Bot1
+# chooses the Mountain and plays it from exile (a land, with its land drop; CR 305.1). The Island cannot be played.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Fireglass Mentor
+Lightning Bolt
+Swords to Plowshares
+Island
+Island
+Mountain
+Island x2
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Ulvenwald Oddity
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fireglass Mentor.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T1 Bot1.Main2]
+? Exile.Count = 0
+? Bot1.Library.Count = 14
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ulvenwald Oddity)
+Bot1.Pass
+[T3 Bot1.Main2]
+Bot1.Choose(Mountain)
+? Exile = Island; Mountain; Ulvenwald Oddity
+! Bot1.Exile.Island.Play
+Bot1.Exile.Mountain.Play
+
+[Expect]
+Bot2.Life = 21
+Exile = Island; Ulvenwald Oddity
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Fireglass Mentor; Mountain

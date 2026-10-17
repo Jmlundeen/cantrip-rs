@@ -1,0 +1,42 @@
+# Fireglass Mentor: "Until end of turn, you may play that card." Bot1 chooses the Lightning Bolt and does not cast it in
+# its second main phase. On its next turn it is still in exile, with Mox Ruby untapped and Bot2 a legal target, but can no
+# longer be cast (the refusal; the positive control is the scenario that casts it the turn it was exiled).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Fireglass Mentor
+Lightning Bolt
+Island x2
+Mountain
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fireglass Mentor.Cast
+Bot1.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+Bot1.Choose(Lightning Bolt)
+? Exile = Mountain; Lightning Bolt
+[T3 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Exile = Mountain; Lightning Bolt
+Bot1.Battlefield.Mox Ruby.Tapped = false
