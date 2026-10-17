@@ -1,0 +1,55 @@
+# Traveling Chocobo: "If a land or Bird you control entering the battlefield causes a triggered ability of a permanent you
+# control to trigger, that ability triggers an additional time" (CR 603.2d). Aunt May ("Whenever another creature you
+# control enters, you gain 1 life") is on the battlefield as the Chocobo, a Bird, enters: its own entering counts (the
+# ruling), 2 life. In turn 3 Tireless Tracker, no Bird, enters: Aunt May gains 1 only. The Forest played makes Tracker's
+# landfall investigate twice (two Clues), and Birds of Paradise cast from the top of the library gains 2 more: 25 life.
+
+[Bot1 Deck]
+Black Lotus
+Traveling Chocobo
+Mox Pearl
+Aunt May
+Mox Emerald
+Mox Ruby
+Tireless Tracker
+Forest
+Birds of Paradise
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Traveling Chocobo.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 22
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Tireless Tracker.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Aunt May
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Library.Birds of Paradise.Cast
+
+[Expect]
+Turn = 3
+Bot1.Life = 25
+Bot1.Battlefield = Aunt May; Birds of Paradise; Clue Token; Clue Token; Forest; Mox Emerald; Mox Pearl; Mox Ruby; Tireless Tracker; Traveling Chocobo
