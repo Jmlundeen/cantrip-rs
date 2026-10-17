@@ -200,6 +200,10 @@ pub const TRIOME_CYCLING: AbilityDef = triggers::cycling(mana("{3}"), "Cycling {
 /// Archive and Undercity Sewers.
 pub const SURVEIL_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, |g, item| effects::surveil(g, item, 1), "When this land enters, surveil 1.");
 
+/// The scry lands' "When this land enters, scry 1" (CR 701.22): Crystal Grotto (untapped) and, with
+/// `enters: Some(mana::enters_tapped)`, Temple of Deceit.
+pub const SCRY_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, |g, item| effects::scry(g, item, 1), "When this land enters, scry 1.");
+
 /// A horizon land's mana ability: "{T}, Pay 1 life: Add {A} or {B}." (`text` is its full text), the color named as it is
 /// activated (CR 106.5). Horizon Canopy and Fiery Islet print it.
 pub const fn pay_life_for_either(a: Color, b: Color, text: &'static str) -> AbilityDef {

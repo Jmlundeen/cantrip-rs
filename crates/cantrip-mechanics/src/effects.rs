@@ -226,6 +226,11 @@ pub fn surveil(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspe
     crate::surveil(g, item.controller, item.object, n)
 }
 
+/// "Scry N" (CR 701.22) for the ability's controller. The scry lands (Crystal Grotto, Temple of Deceit) print it.
+pub fn scry(g: &mut dyn Game, item: &StackItem, n: usize) -> Result<(), Suspend> {
+    crate::scry(g, item.controller, item.object, n)
+}
+
 /// "You become the monarch" (CR 725.1). Aragorn, King of Gondor and Court of Garenbrig print it.
 pub fn become_monarch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.become_monarch(item.controller);
