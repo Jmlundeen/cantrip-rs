@@ -224,8 +224,8 @@ fn untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> 
     q.controller(id) == asker.controller && !q.obj(id).tapped && q.chars(id).is(CardType::Creature)
 }
 
-/// Delirium (CR 702.138a): four or more card types among the cards in `player`'s graveyard. Fear of Missing Out and
-/// Unholy Heat read it.
+/// Delirium (an ability word, CR 207.2c): four or more card types among the cards in `player`'s graveyard. Fear of Missing Out and
+/// Unholy Heat read it; a static ability asks the same of a `LayerQuery` with `statics::itself_with_delirium`.
 pub fn delirium(q: &dyn Query, player: PlayerId) -> bool {
     let mut types = TypeSet::NONE;
     for &id in q.state().zone(Zone::graveyard(player)) {

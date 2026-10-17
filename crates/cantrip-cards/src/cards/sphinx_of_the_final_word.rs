@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Instant and sorcery spells you control": an instant spell or a sorcery spell on the stack controlled by the player who
 /// controls this permanent.
-const INSTANT_OR_SORCERY: u16 = (1 << CardType::Instant as u16) | (1 << CardType::Sorcery as u16);
+const INSTANT_OR_SORCERY: u16 = TypeSet::of(&[CardType::Instant, CardType::Sorcery]).0;
 
 pub static CARD: CardDef = CardDef {
     statics: &[static_ability(Layer::Ability, your_spells_of_types::<INSTANT_OR_SORCERY>, cant_be_countered, "Instant and sorcery spells you control can't be countered.").everywhere()],

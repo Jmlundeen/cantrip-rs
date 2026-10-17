@@ -12,7 +12,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[WARD],
     delayed: &[WARD],
     statics: &[
-        static_ability(Layer::Ability, cantrip_mechanics::statics::your_spells_of_types::<0>, cantrip_mechanics::statics::cant_be_countered, "Spells you control can't be countered.")
+        static_ability(Layer::Ability, cantrip_mechanics::statics::your_spells_of_types::<{ cantrip_mechanics::statics::ANY_SPELL }>, cantrip_mechanics::statics::cant_be_countered, "Spells you control can't be countered.")
             .everywhere(),
         static_ability(Layer::Ability, other_creatures_you_control, cantrip_mechanics::statics::grant_delayed_ability, "Other creatures you control have \"Ward\u{2014}Pay 2 life.\""),
     ],

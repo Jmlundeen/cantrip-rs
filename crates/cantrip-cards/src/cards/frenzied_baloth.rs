@@ -3,7 +3,7 @@ use cantrip_mechanics::statics::{cant_be_countered, your_spells_of_types};
 use cantrip_oracle as oracle;
 
 /// "Creature spells you control": a creature spell on the stack controlled by the player who controls this permanent.
-const CREATURE: u16 = 1 << CardType::Creature as u16;
+const CREATURE: u16 = TypeSet::of(&[CardType::Creature]).0;
 
 /// "Combat damage can't be prevented" (CR 615.12): the combat damage of every source, whoever controls it.
 fn combat_damage(_: &dyn Query, _: &Asker, _: ObjectId, combat: bool) -> bool {

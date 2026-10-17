@@ -34,6 +34,9 @@ pub fn your_creature_tokens(q: &dyn LayerQuery, source: ObjectId, affected: Obje
     q.state().obj(affected).token && your_creatures(q, source, affected, so_far)
 }
 
+/// `your_spells_of_types::<ANY_SPELL>`: every spell, whatever its card types (Hexing Squelcher).
+pub const ANY_SPELL: u16 = 0;
+
 /// "[Creature / Instant and sorcery / No qualifier] spells you control" (CR 113.6, 601.2i, layer 6) as the `StaticDef::affects` of a
 /// static ability declared `.everywhere()`: a spell on the stack (an ability on the stack has no card types) controlled by the
 /// source's controller that has one of the card types in `TYPES`, a bitset of `CardType as u16` positions (`TypeSet.0`), judged on
@@ -55,7 +58,8 @@ pub fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Char
 /// "Delirium - This creature gets/has ... as long as there are four or more card types among cards in your graveyard"
 /// (CR 207.2c, 604.1, 611.3a) as a static ability's `StaticDef::affects`: only the source itself, and only while four or more
 /// card types are among the cards in its controller's graveyard, each judged as the layers make it (the types are asked
-/// again whenever characteristics are computed). Dragon's Rage Channeler and Wildfire Wickerfolk use it.
+/// again whenever characteristics are computed). Dragon's Rage Channeler and Wildfire Wickerfolk use it; a spell or an
+/// ability asked at a `Query` uses `cantrip_mechanics::delirium`.
 pub fn itself_with_delirium(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
     if source != affected {
         return false;
