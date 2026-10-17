@@ -1,5 +1,5 @@
 //! Offspring [cost] (CR 702.175a): "You may pay an additional [cost] as you cast this spell. If you do, when this
-//! creature enters, create a 1/1 token that's a copy of it." Thundertrap Trainer prints it.
+//! creature enters, create a 1/1 token that's a copy of it." Thundertrap Trainer and Pawpatch Recruit print it.
 //!
 //! A card with offspring gives `kicker(cost)` as its `kicker` and lists `trigger(text)` among its `abilities`.
 
