@@ -1,0 +1,39 @@
+# Elegy Acolyte: "Whenever ONE OR MORE creatures you control deal combat damage to a player" (CR 603.2c): the Acolyte (4)
+# and a Llanowar Elves (1) both unblocked on Bot2 are one batch of damage to one player, so one trigger: one card, one
+# life lost - not two. Bot2: 20 - 5 = 15; Bot1: 20 + 4 lifelink (only the Acolyte has it) - 1 = 23. Hand: an Island
+# left from turn 1, the turn-3 draw, and the one trigger's card = 3.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Mox Ruby
+Mox Emerald
+Elegy Acolyte
+Llanowar Elves
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elegy Acolyte.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Elegy Acolyte > Bot2; Llanowar Elves > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Life = 23
+Bot1.Hand.Count = 3

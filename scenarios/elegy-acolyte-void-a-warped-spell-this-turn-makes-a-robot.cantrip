@@ -1,0 +1,38 @@
+# Elegy Acolyte's Void, second clause: "a spell was warped this turn" (CR 702.185c) - a spell cast for its warp cost.
+# Turn 1 puts the Acolyte out with no departure (no Robot, as in the first scenario). Turn 3 Bot1 does nothing but warp
+# Pinnacle Emissary (paid with the Mox Ruby): nothing has left the battlefield at the beginning of the end step, when
+# the Void "if" is checked, so only the warp makes it true. The Robot token is created, and the warped Emissary is
+# exiled by its own end-step trigger (it left the battlefield only after Void's condition had been satisfied).
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Mox Ruby
+Elegy Acolyte
+Pinnacle Emissary
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elegy Acolyte.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield = Mox Jet; Mox Ruby; Elegy Acolyte
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Elegy Acolyte; Robot
+Exile = Pinnacle Emissary
+Bot1.Battlefield.Robot.Token = true

@@ -1,0 +1,39 @@
+# Elegy Acolyte (4/4 lifelink). Turn 1: Dark Ritual (an instant, which leaves the stack, not the battlefield) and two
+# Moxen pay for it; nothing nonland leaves the battlefield and no spell is warped, so the Void ability finds its
+# "if" false at the beginning of Bot1's end step and no Robot appears (checked at Bot2's turn). Turn 3: the Acolyte
+# is unblocked and deals 4 combat damage to Bot2: lifelink gains 4 and "whenever one or more creatures you control
+# deal combat damage to a player" draws one card and loses 1 life: 20 + 4 - 1 = 23, Bot2 at 16. Hand: three Islands
+# left on turn 1, one drawn for the turn, one drawn by the trigger = 5.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Mox Ruby
+Elegy Acolyte
+Island x3
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elegy Acolyte.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield = Mox Jet; Mox Ruby; Elegy Acolyte
+? Bot1.Life = 20
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Elegy Acolyte > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 23
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Mox Jet; Mox Ruby; Elegy Acolyte

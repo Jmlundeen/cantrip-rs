@@ -1,0 +1,44 @@
+# Elegy Acolyte in a three-player game: the Acolyte hits Bot2 and a Llanowar Elves hits Bot3 in the same combat damage
+# step. The trigger is "deal combat damage to A player" - one trigger for each player the batch damaged (CR 603.2c) - so
+# two cards are drawn and two life lost: Bot1 20 + 4 (lifelink) - 2 = 22. Bot2 16, Bot3 19. Hand: one Island left over
+# from turn 1, the first player's turn-1 draw (CR 103.8a, more than two players), the turn-4 draw and the two triggers'
+# cards = 5. (Bot1's next turn after the first is turn 4.)
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Mox Ruby
+Mox Emerald
+Elegy Acolyte
+Llanowar Elves
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elegy Acolyte.Cast
+Bot1.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Elegy Acolyte > Bot2; Llanowar Elves > Bot3)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot3.Life = 19
+Bot1.Life = 22
+Bot1.Hand.Count = 5

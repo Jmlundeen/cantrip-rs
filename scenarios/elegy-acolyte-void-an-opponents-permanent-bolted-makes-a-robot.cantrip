@@ -1,0 +1,38 @@
+# Elegy Acolyte's Void counts any player's permanent, not only Bot1's: on turn 3 Bot1 destroys Bot2's Ornithopter (a
+# nonland artifact creature, which Bot2 cast on turn 2) with Lightning Bolt paid by the Mox Ruby, so at the beginning of
+# Bot1's end step a nonland permanent has left the battlefield this turn and the Robot token is created. (The control,
+# where only lands leave, is elegy-acolyte-void-lands-leaving-the-battlefield-do-not-count.)
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Mox Ruby
+Elegy Acolyte
+Lightning Bolt
+Island x2
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elegy Acolyte.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Elegy Acolyte; Robot
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 0
