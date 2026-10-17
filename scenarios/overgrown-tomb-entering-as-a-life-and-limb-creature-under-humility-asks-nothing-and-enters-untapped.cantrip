@@ -1,4 +1,3 @@
-# Known bug: a permanent entering is judged by its own card, not with other objects' type-changing effects, so Humility does not strip the "as this enters" of a land Life and Limb would make a creature (CR 614.12; KI-52).
 # Overgrown Tomb (Land - Swamp Forest: "As this land enters, you may pay 2 life. If you don't, it enters tapped.") played
 # under Life and Limb and Humility. CR 614.12: its replacement effects are judged on it as it would exist on the
 # battlefield, "taking into account ... continuous effects that already exist and would apply to the permanent". There it

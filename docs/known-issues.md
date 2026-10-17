@@ -67,7 +67,7 @@ keeps it).
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
-| [KI-52](#ki-52-which-lands-lost-their-rules-text-to-a-subtype-setting-effect-is-judged-on-layers-1-to-3) | Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3 | Low | Known bug (entering) |
+| [KI-52](#ki-52-which-lands-lost-their-rules-text-to-a-subtype-setting-effect-is-judged-on-layers-1-to-3) | Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3 | Low | Unexercised |
 | [KI-53](#ki-53-a-copy-holds-at-most-four-abilities-added-by-exceptions) | A copy holds at most four abilities added by exceptions | Low | Unexercised |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-has-no-shortcut-and-a-seat-that-never-stops-it-goes-round-forever) | A loop a player could stop has no shortcut, and a seat that never stops it goes round forever | Medium | Open |
 | [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
@@ -615,7 +615,7 @@ clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: t
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Known bug (a permanent entering); unexercised (on the battlefield) | engine | 2026-10-17, Magus of the Moon |
+| Low | Unexercised | engine | 2026-10-17, Magus of the Moon |
 
 **Notes.** `layers::land_text_lost` finds the lands a "nonbasic lands are Mountains" effect takes the rules text of by asking the
 effect's `affects` of each permanent as layers 1 to 3 left it, as `lost_to_statics` does for layer 6, so that the question never
@@ -635,8 +635,13 @@ and Humility still gets its charge counters; Enchanted Evening, Opalescence and 
 with an "enters" replacement. A fix applies the other objects' effects of layers 1 to 4 to the entering object, as it would
 exist on the battlefield, before asking.
 
-**Scenarios.** overgrown-tomb-entering-as-a-life-and-limb-creature-under-humility-asks-nothing-and-enters-untapped (`# Known
-bug`); on the battlefield none differs yet.
+**Update.** The "loses all abilities" half of the entering case is fixed: `ops::prepare_entry` (`enters_without_abilities`,
+CR 614.12) puts the object on the battlefield for the question and asks whether a "loses all abilities" static would take its
+abilities there, so the Overgrown Tomb scenario passes. What remains is the subtype-setting half for an object that only another
+effect would make a nonbasic land as it enters, and the on-battlefield case above.
+
+**Scenarios.** overgrown-tomb-entering-as-a-life-and-limb-creature-under-humility-asks-nothing-and-enters-untapped (passes);
+on the battlefield none differs yet.
 
 ### KI-53: A copy holds at most four abilities added by exceptions
 
