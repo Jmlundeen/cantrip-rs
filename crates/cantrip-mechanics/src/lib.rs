@@ -76,6 +76,7 @@ pub mod plot;
 pub mod power_up;
 pub mod prepare;
 pub mod prevention;
+pub mod protection;
 pub mod ravenous;
 pub mod recruit;
 pub mod reconfigure;
