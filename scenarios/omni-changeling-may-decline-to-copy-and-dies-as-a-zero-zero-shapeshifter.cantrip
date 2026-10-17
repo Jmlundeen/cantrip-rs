@@ -1,0 +1,34 @@
+# Omni-Changeling: "You may have this creature enter as a copy" is optional (CR 614.1c; the ruling: "You can choose not to have
+# Omni-Changeling enter as a copy of another creature. If you do, it will just be a 0/0 Shapeshifter with changeling"). Bot1 declines
+# with three Ornithopters out to copy, so the card stays a 0/0 and is put into the graveyard as a state-based action (CR 704.5f).
+# The control is the scenario where the choice is accepted: there it survives as a 0/2.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Omni-Changeling
+Island
+Island x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Omni-Changeling.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Decline
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Omni-Changeling
+Bot1.Battlefield.Count = 5

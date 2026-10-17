@@ -1,0 +1,46 @@
+# Omni-Changeling: the exception "it has changeling" is part of the copy's own copiable values (CR 707.9b), so a later copy of it has
+# changeling as well, though the Ornithopter it copied has none. Turn 1: Omni-Changeling convokes three Ornithopters and enters as a copy of
+# one (the fourth Ornithopter). Turn 3: Phantasmal Image enters as a copy of that fourth Ornithopter, an Illusion in addition to its other
+# types, with changeling and the Image's own sacrifice ability: it is every creature type (a plain third Ornithopter is only a Thopter).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Omni-Changeling
+Phantasmal Image
+Island
+Island x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Omni-Changeling.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Accept
+Bot1.Target(Ornithopter#1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Accept
+Bot1.Target(Ornithopter#4)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#5.Keywords = Changeling; Flying
+Bot1.Battlefield.Ornithopter#5.Subtypes = (every creature type)
+Bot1.Battlefield.Ornithopter#1.Subtypes = Thopter
+Bot1.Battlefield.Ornithopter#4.Subtypes = (every creature type)

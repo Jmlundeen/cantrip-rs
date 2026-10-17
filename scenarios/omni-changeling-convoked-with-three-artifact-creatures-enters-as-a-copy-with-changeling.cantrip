@@ -1,0 +1,44 @@
+# Omni-Changeling: Convoke (CR 702.51) lets Bot1 tap three Ornithopters (two of them summoning sick: convoke ignores that, the ruling) to pay
+# {3}, and Mox Sapphire and an Island pay {U}{U}. As it enters, "you may have this creature enter as a copy of any creature on the
+# battlefield, except it has changeling" (CR 614.1c, 707.2, 707.9b): the choice is accepted and the copied creature is an Ornithopter,
+# so the permanent is a 0/2 Ornithopter with flying, and with changeling it is every creature type (CR 702.73a), where the
+# Ornithopters it copied are only Thopters. It does not die as a 0/0. The three Ornithopters stay tapped.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Omni-Changeling
+Island
+Island x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Omni-Changeling.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Accept
+Bot1.Target(Ornithopter#1)
+Bot2.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#1.Tapped = true
+? Bot1.Battlefield.Ornithopter#2.Tapped = true
+? Bot1.Battlefield.Ornithopter#3.Tapped = true
+
+[Expect]
+Bot1.Battlefield.Ornithopter#4.Power = 0
+Bot1.Battlefield.Ornithopter#4.Toughness = 2
+Bot1.Battlefield.Ornithopter#4.Keywords = Changeling; Flying
+Bot1.Battlefield.Ornithopter#4.Subtypes = (every creature type)
+Bot1.Battlefield.Ornithopter#4.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter#4.Colors = (absent)
+Bot1.Graveyard.Count = 0

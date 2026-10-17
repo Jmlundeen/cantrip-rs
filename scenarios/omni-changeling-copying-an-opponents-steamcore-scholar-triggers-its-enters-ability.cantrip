@@ -1,0 +1,58 @@
+# Omni-Changeling: "any creature on the battlefield" includes an opponent's creature (a choice, not a target, CR 608.2d), and the
+# copied creature's "enters" ability triggers (the ruling: "any enters abilities of the copied creature will trigger when
+# Omni-Changeling enters"). Bot2's Steamcore Scholar is on the battlefield on turn 2; on turn 3 Bot1 convokes three Ornithopters and
+# enters as a copy of it: a 2/2 Steamcore Scholar with flying, vigilance and changeling that draws two cards and then discards two
+# (no instant, sorcery or flying creature card in hand, so no choice offered). The copy is Bot1's, the original stays Bot2's.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Ornithopter
+Ornithopter
+Omni-Changeling
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Steamcore Scholar
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Steamcore Scholar.Cast
+Bot1.Pass
+Bot2.Choose(Plains; Plains)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Omni-Changeling.Cast(Convoke: Ornithopter, Ornithopter, Ornithopter)
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Steamcore Scholar)
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Steamcore Scholar.Power = 2
+Bot1.Battlefield.Steamcore Scholar.Toughness = 2
+Bot1.Battlefield.Steamcore Scholar.Keywords = Changeling; Flying; Vigilance
+Bot1.Battlefield.Steamcore Scholar.Subtypes = (every creature type)
+Bot2.Battlefield.Steamcore Scholar.Subtypes = Detective; Weird
+Bot1.Graveyard = Island; Island
+Bot1.Hand.Count = 2
