@@ -1026,8 +1026,8 @@ Landwalk (CR 702.14) is an evasion ability, a keyword per basic land type: `Keyw
 (`Keyword::LANDWALKS`): no creature of a defending player who controls a land of that type, as the layers have it now, may
 block it (CR 702.14c), whatever landwalk the blocker has (702.14d). An ability that grants one names its land type through
 its source's words (CR 612.2: Lord of Atlantis with Island changed to Swamp grants swampwalk, `Keyword::landwalk`). A
-printed landwalk's land type a text change replaces is not followed (no card in content prints landwalk; known issue
-KI-58). Another kind of landwalk (nonbasic, snow) is another keyword.
+printed landwalk follows a text change of its land type in layer 3 (Magical Hack's "swampwalk" to "plainswalk" on Bog
+Wraith). Another kind of landwalk (nonbasic, snow) is another keyword.
 
 ### Can't attack unless
 
