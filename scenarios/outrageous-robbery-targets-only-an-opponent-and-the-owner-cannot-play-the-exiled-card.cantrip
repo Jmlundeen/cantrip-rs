@@ -1,0 +1,42 @@
+# "Target opponent": Bot1 cannot aim Outrageous Robbery at itself (refusal), while the cast at Bot2 (the control) is offered
+# and exiles Bot2's top card, a Plains, with X = 1. Only the caster gets to play it: on turn 4 Bot2, the card's owner,
+# is refused the Plains from exile (CR 406.3: face down, and no permission is held by Bot2) while the Island from its hand,
+# the control, can be played.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Outrageous Robbery
+Swamp x12
+
+[Bot2 Deck]
+Island x8
+Plains
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+! Bot1.Hand.Outrageous Robbery.Cast(Bot1; X: 1)
+Bot1.Hand.Outrageous Robbery.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Exile.FaceDown = Plains
+[T4 Bot2.Main1]
+! Bot2.Exile.Plains.Play
+Bot2.Hand.Island.Play
+
+[Expect]
+Bot2.Battlefield = Island
+Exile.Count = 1
+Exile.FaceDown = Plains

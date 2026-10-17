@@ -1,0 +1,50 @@
+# Two casts at Bot2, whose deck is ten cards (seven in hand, a draw on turn 2). The first, on turn 1, has X = 0 and exiles
+# nothing: the library keeps its three cards and no card can be played from exile. The second, on turn 3, has X = 3 while only
+# two cards are left: the opponent exiles as many as there are, and Bot1 may play the Swamp among them as a land (the control
+# that the exiled cards are playable). Bot2 loses nothing for the empty library until it next draws.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Outrageous Robbery
+Outrageous Robbery
+Swamp x12
+
+[Bot2 Deck]
+Island x8
+Swamp
+Island
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Outrageous Robbery.Cast(Bot2; X: 0)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 0
+? Bot2.Library.Count = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Battlefield.Mox Jet#5.Activate
+Bot1.Hand.Outrageous Robbery.Cast(Bot2; X: 3)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 2
+? Bot2.Library.Count = 0
+Bot1.Exile.Swamp.Play
+
+[Expect]
+Bot2.Library.Count = 0
+Exile.Count = 1
+Bot1.Battlefield.Swamp.Tapped = false

@@ -1,0 +1,61 @@
+# Outrageous Robbery for X = 3 (five Mox Jets: {3}{B}{B}) on turn 3 exiles Bot2's top three cards face down: Lightning Helix,
+# Plains and Ornithopter. Bot1 may play them as long as they remain exiled: the Helix is cast on turn 3 with the two
+# remaining Mox Jets, black mana standing in for its {R}{W} (CR 609.4b), and Ornithopter is cast with its {0}. The Plains,
+# kept, is played on turn 5, two turns later - the permission has no end but leaving exile. Bot2's library lost exactly
+# three cards, and Bot2 (the owner) took 3 from its own Helix.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Outrageous Robbery
+Swamp x12
+
+[Bot2 Deck]
+Island x8
+Lightning Helix
+Plains
+Ornithopter
+Island x9
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Battlefield.Mox Jet#5.Activate
+Bot1.Hand.Outrageous Robbery.Cast(Bot2; X: 3)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 3
+? Bot2.Library.Count = 9
+Bot1.Battlefield.Mox Jet#6.Activate
+Bot1.Battlefield.Mox Jet#7.Activate
+Bot1.Exile.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T5 Bot1.Main1]
+Bot1.Exile.Plains.Play
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Plains.Tapped = false
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Library.Count = 8
+Exile.Count = 0

@@ -1,0 +1,41 @@
+# Bot2 answers Outrageous Robbery (X = 1) with Dawn's Truce: it gains hexproof, so the Robbery's only target is illegal as it
+# tries to resolve and it does not resolve (CR 608.2b). Nothing is exiled and Bot2's library keeps its card; the Robbery is
+# still put into Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Outrageous Robbery
+Swamp x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Dawn's Truce
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Outrageous Robbery.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Outrageous Robbery
+Bot2.Graveyard = Dawn's Truce

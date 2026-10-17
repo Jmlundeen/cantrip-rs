@@ -1,0 +1,46 @@
+# Browser
+# Hidden information and permission (CR 406.3, 609.4b): Outrageous Robbery (X = 1) exiles Bot2's top card, a Lightning Helix,
+# face down. Bot1's page, the caster, sees a face-down card in the opponent's exile with no face of its own, marked "Playable
+# while it stays here" (the permission has no end), and then casts it from there with black mana standing in for its colors.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Outrageous Robbery
+Swamp x12
+
+[Bot2 Deck]
+Island x8
+Lightning Helix
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Outrageous Robbery.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 1
+? Client.Bot1.OpponentExile.(hidden).Annotation = Playable while it stays here
+? Client.Bot1.OpponentExile.(hidden).TypeLine =
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Battlefield.Mox Jet#5.Activate
+Bot1.Exile.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Exile.Count = 0
