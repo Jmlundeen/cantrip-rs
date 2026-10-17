@@ -1,0 +1,79 @@
+# Ashling's "transforms into" abilities are about Ashling alone ("whenever this creature transforms", CR 701.27e).
+# Turn 3: with Ashling, Rekindled on the battlefield and the {U} not paid, Concealing Curtains turns into Revealing Eye:
+# Rekindled's rummage is not asked. Turn 5: Ashling becomes Ashling, Rimebound and adds {B}{B}; then a second Concealing
+# Curtains transforms, and Rimebound adds nothing more and asks no color.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ashling, Rekindled
+Concealing Curtains
+Concealing Curtains
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Concealing Curtains#1.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+Bot1.Pass
+? Bot1.Battlefield.Ashling, Rekindled.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+? Bot1.Mana = {B}{B} (ManaValue4OrGreaterSpells)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Colors
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Swamp; Mox Ruby; Mox Jet; Mox Pearl; Ashling, Rimebound; Revealing Eye; Revealing Eye; Island
+Bot1.Mana = {B}{B} (ManaValue4OrGreaterSpells)
+Bot1.Graveyard =

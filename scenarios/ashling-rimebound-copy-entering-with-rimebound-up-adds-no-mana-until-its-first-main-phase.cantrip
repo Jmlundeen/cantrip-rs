@@ -1,0 +1,70 @@
+# A permanent that enters with Ashling, Rimebound's characteristics has not transformed (CR 701.27e, 712.14; the token
+# copying a permanent whose back face is up enters back face up, Ashling's ruling). Turn 3: Ashling turns into Rimebound
+# and its {B}{B} pays two of Fractured Identity's {3}{W}{U} (mana value 5), which exiles it and gives Bot2 a token copy:
+# the token entering triggers neither "whenever this creature transforms into Ashling, Rimebound" (no color is asked of
+# Bot2) nor Rekindled's "whenever this creature enters" (no discard is asked). Turn 4: at Bot2's first main phase the
+# token's own abilities trigger for Bot2 - its two mana, and the {R} Bot2 cannot pay.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Ashling, Rekindled
+Fractured Identity
+Island
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fractured Identity.Cast(Bot1.Battlefield.Ashling, Rimebound)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+! Bot2.Colors
+! Bot2.Choose
+Bot1.Pass
+? Bot2.Battlefield = Ashling, Rimebound
+? Stack.Count = 0
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Colors(Green)
+? Bot2.Mana = {G}{G} (ManaValue4OrGreaterSpells)
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Exile = Ashling, Rekindled
+Bot2.Battlefield = Ashling, Rimebound
+Bot2.Battlefield.Ashling, Rimebound.Token = true
+Bot2.Mana = {G}{G} (ManaValue4OrGreaterSpells)

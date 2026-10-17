@@ -1,0 +1,18 @@
+{
+  "name": "Ashling, Rekindled",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature — Elemental Sorcerer",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Whenever this creature enters or transforms into Ashling, Rekindled, you may discard a card. If you do, draw a card.\nAt the beginning of your first main phase, you may pay {U}. If you do, transform Ashling.",
+  "backFace": {
+    "name": "Ashling, Rimebound",
+    "colorIndicator": [
+      "Blue"
+    ],
+    "type": "Legendary Creature — Elemental Wizard",
+    "power": 1,
+    "toughness": 3,
+    "oracleText": "Whenever this creature transforms into Ashling, Rimebound and at the beginning of your first main phase, add two mana of any one color. Spend this mana only to cast spells with mana value 4 or greater.\nAt the beginning of your first main phase, you may pay {R}. If you do, transform Ashling."
+  }
+}

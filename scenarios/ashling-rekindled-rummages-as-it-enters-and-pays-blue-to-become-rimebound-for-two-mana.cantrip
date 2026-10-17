@@ -1,0 +1,65 @@
+# Ashling, Rekindled. Turn 1: "whenever this creature enters ..., you may discard a card. If you do, draw a card" -
+# Lightning Bolt is discarded and Brainstorm drawn. Turn 3: "at the beginning of your first main phase, you may pay {U}.
+# If you do, transform Ashling" - Mox Sapphire pays it as the ability resolves, and Ashling turns over (CR 701.27a).
+# Ashling, Rimebound's "whenever this creature transforms into Ashling, Rimebound ..., add two mana of any one color"
+# triggers on the transform (CR 701.27e) and adds {B}{B} that pays only for spells with mana value 4 or greater
+# (CR 106.6). Rimebound's own "at the beginning of your first main phase" abilities were not there as the phase began,
+# so they did not trigger. The mana stays through the main phase and is gone at the beginning of combat (CR 106.4).
+# Ashling is the same object (CR 701.27a): no summoning sickness again, and a 1/3 legendary Elemental Wizard now.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Ashling, Rekindled
+Lightning Bolt
+Island
+Island
+Brainstorm
+Ponder
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+? Bot1.Hand = Island; Island; Brainstorm
+? Bot1.Graveyard = Lightning Bolt
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+? Bot1.Mana = {B}{B} (ManaValue4OrGreaterSpells)
+? Stack.Count = 0
+? Bot1.Battlefield.Ashling, Rimebound.Subtypes = Elemental; Wizard
+? Bot1.Battlefield.Ashling, Rimebound.Colors = Blue
+? Bot1.Battlefield.Ashling, Rimebound.SummoningSick = false
+[T3 Bot1.BeginCombat]
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Sapphire; Ashling, Rimebound
+Bot1.Battlefield.Ashling, Rimebound.Power = 1
+Bot1.Battlefield.Ashling, Rimebound.Toughness = 3
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Hand = Island; Island; Brainstorm; Ponder
+Bot1.Graveyard = Lightning Bolt
+Bot1.Mana =

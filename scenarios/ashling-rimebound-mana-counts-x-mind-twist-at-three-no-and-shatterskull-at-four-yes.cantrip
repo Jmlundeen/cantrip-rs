@@ -1,0 +1,86 @@
+# A spell's mana value on the stack counts X as announced (CR 202.3e, 107.3; Ashling's ruling). Turn 3: Mind Twist with
+# X of 2 is a spell of mana value 3, so Ashling, Rimebound's {R}{R} for "spells with mana value 4 or greater" can't pay
+# for it (CR 106.6): the Mox Jet, Mox Pearl and Island mana does, and the {R}{R} stays in the pool. Turn 5: Rimebound's two
+# "at the beginning of your first main phase" abilities trigger, the {R} to transform back is declined, and Mox Ruby's {R}
+# goes to Lightning Bolt. The new {R}{R} with Mox Jet and Mox Pearl then casts Shatterskull Smashing - the front face of a
+# modal double-faced card, a spell of mana value 2 + X (CR 712.8f) - with X of 2. It is offered with no other red mana
+# left though at X of 0 its {R}{R} (mana value 2) could not be paid with that mana: X is still to be announced (CR 601.2b).
+# It deals 2 damage to Ashling, which survives.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Ashling, Rekindled
+Lightning Bolt
+Mind Twist
+Shatterskull Smashing
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+? Bot1.Mana = {R}{R} (ManaValue4OrGreaterSpells)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} (ManaValue4OrGreaterSpells)
+? Bot2.Hand.Count = 5
+[T5 Bot1.Main1]
+Bot1.Triggers(add two mana; you may pay)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+? Bot1.Mana = {R}{R} (ManaValue4OrGreaterSpells)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} (ManaValue4OrGreaterSpells)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shatterskull Smashing.Cast(X: 2)
+Bot1.Divide(Ashling, Rimebound: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Ruby; Mox Sapphire; Mox Jet; Mox Pearl; Ashling, Rimebound
+Bot1.Battlefield.Ashling, Rimebound.Damage = 2
+Bot1.Graveyard = Shatterskull Smashing; Lightning Bolt; Mind Twist
+Bot1.Mana =
+Bot2.Life = 17
+Bot2.Hand.Count = 6

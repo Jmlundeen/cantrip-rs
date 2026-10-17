@@ -1,0 +1,56 @@
+# Ashling, Rekindled: both "you may" are the controller's. Turn 1: no card is chosen to discard, so none is drawn ("if you
+# do"). Turn 3: the {U} is not paid though Mox Sapphire could pay it, so Ashling stays Ashling, Rekindled (nothing turns it
+# over, and no Rimebound mana is added). Turn 5: the ability triggers again at the next first main phase, and is paid.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Ashling, Rekindled
+Lightning Bolt
+Island
+Island
+Brainstorm
+Ponder
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+? Bot1.Hand = Lightning Bolt; Island; Island
+? Bot1.Graveyard =
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Stack.Count = 0
+? Bot1.Battlefield.Ashling, Rekindled.Subtypes = Elemental; Sorcerer
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Green)
+? Bot1.Mana = {G}{G} (ManaValue4OrGreaterSpells)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Sapphire; Ashling, Rimebound
+Bot1.Hand = Lightning Bolt; Island; Island; Brainstorm; Ponder
+Bot1.Graveyard =

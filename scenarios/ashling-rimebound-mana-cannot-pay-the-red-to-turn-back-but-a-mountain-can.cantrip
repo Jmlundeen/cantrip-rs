@@ -1,0 +1,79 @@
+# Ashling, Rimebound's {R}{R} is only for casting spells with mana value 4 or greater (CR 106.6), and paying "you may pay
+# {R}" as an ability resolves is no spell (CR 601.2g). Turn 5: both of Rimebound's "at the beginning of your first main
+# phase" abilities trigger and are put on the stack with the mana ability on top; its {R}{R} is in the pool when the {R}
+# is asked for, but with only an Island untapped and no other red mana, paying is not offered, and Ashling stays as it is.
+# Turn 7: the same, and the Mountain played on turn 5 pays the {R}: Ashling transforms into Ashling, Rekindled, whose
+# "whenever this creature ... transforms into Ashling, Rekindled, you may discard a card. If you do, draw a card"
+# triggers (CR 701.27e): Mind Twist is discarded and a Mountain drawn. The restricted {R}{R} was not spent on the {R}.
+
+[Bot1 Deck]
+Island
+Lotus Petal
+Ashling, Rekindled
+Mind Twist
+Island
+Swamp
+Swamp
+Mountain
+Swamp
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Triggers(you may pay; add two mana)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+? Bot1.Mana = {R}{R} (ManaValue4OrGreaterSpells)
+Bot1.Pass
+Bot2.Pass
+! Bot1.PayCost
+Bot1.Decline
+? Stack.Count = 0
+? Bot1.Battlefield.Ashling, Rimebound.Tapped = false
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Triggers(you may pay; add two mana)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.PayCost
+? Bot1.Mana = {R}{R} (ManaValue4OrGreaterSpells)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mind Twist)
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Battlefield = Island; Ashling, Rekindled; Swamp; Mountain
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Graveyard = Mind Twist; Lotus Petal
+Bot1.Hand = Island; Swamp; Swamp; Mountain; Mountain
+Bot1.Mana = {R}{R} (ManaValue4OrGreaterSpells)

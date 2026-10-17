@@ -1,0 +1,76 @@
+# "If an activated or triggered ability of a permanent ... tries to transform it, the permanent does so only if it hasn't
+# transformed ... since the ability was put onto the stack" (CR 701.27f; Ashling's ruling names this case). Delney,
+# Streetwise Lookout makes Ashling's (power 1) "at the beginning of your first main phase, you may pay {U}. If you do,
+# transform Ashling" trigger an additional time on turn 5. The first is paid with the Island and Ashling transforms;
+# Ashling, Rimebound's "whenever this creature transforms into Ashling, Rimebound" triggers twice too (Delney), adding
+# {B}{B} twice. The second is then paid with Mox Sapphire, but Ashling has transformed since that ability was put on
+# the stack, so it stays Ashling, Rimebound - it does not turn back, and Rekindled's rummage never triggers.
+
+[Bot1 Deck]
+Island
+Lotus Petal
+Ashling, Rekindled
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Delney, Streetwise Lookout
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: Red)
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Delney, Streetwise Lookout.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Triggers(you may pay; you may pay)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.PayCost
+Bot1.Triggers(add two mana; add two mana)
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+? Bot1.Mana = {B}{B}{B}{B} (ManaValue4OrGreaterSpells)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Pearl; Mox Jet; Mox Sapphire; Ashling, Rimebound; Delney, Streetwise Lookout
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Hand = Island; Island
+Bot1.Graveyard = Lotus Petal
+Bot1.Mana = {B}{B}{B}{B} (ManaValue4OrGreaterSpells)

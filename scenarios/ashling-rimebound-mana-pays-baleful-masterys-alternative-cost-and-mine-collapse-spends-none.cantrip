@@ -1,0 +1,64 @@
+# An alternative cost changes what is paid, never the spell's mana value (CR 118.9c, 202.3). Mine Collapse cast by
+# sacrificing a Mountain rather than paying its mana cost spends no mana at all (CR 118.9), so Ashling, Rimebound's
+# {B}{B} stays in the pool. Baleful Mastery cast for its alternative {1}{B} is still a spell of mana value 4, so that
+# {B}{B} - "only to cast spells with mana value 4 or greater" (CR 106.6) - pays all of it, and an opponent draws a card.
+# Each exiles or kills one of Bot2's Ornithopters.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Ashling, Rekindled
+Mine Collapse
+Baleful Mastery
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+? Bot1.Mana = {B}{B} (ManaValue4OrGreaterSpells)
+Bot1.Hand.Mine Collapse.Cast(Bot2.Battlefield.Ornithopter#1; Ability: sacrifice a Mountain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B} (ManaValue4OrGreaterSpells)
+? Bot2.Battlefield = Ornithopter
+Bot1.Hand.Baleful Mastery.Cast(Bot2.Battlefield.Ornithopter; Ability: {1}{B})
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Sapphire; Ashling, Rimebound
+Bot1.Graveyard = Baleful Mastery; Mine Collapse; Mountain
+Bot1.Mana =
+Bot2.Battlefield =
+Bot2.Graveyard = Ornithopter
+Exile = Ornithopter
+Bot2.Hand.Count = 7

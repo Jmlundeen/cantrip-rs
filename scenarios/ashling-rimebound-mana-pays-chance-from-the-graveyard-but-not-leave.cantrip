@@ -1,0 +1,67 @@
+# A split card's mana value on the stack is that of the half cast (CR 202.3d, 709.3b), not the whole card's. Leave // Chance
+# has mana value 6 in the hand, but Leave cast from it is a spell of mana value 2: Ashling, Rimebound's {W}{W} for "spells with
+# mana value 4 or greater" may not pay for it (CR 106.6), so the Mox Pearl and Mox Jet mana does and the {W}{W} stays in the
+# pool. Chance, cast by aftermath from the graveyard (CR 702.127a), is a spell of mana value 4: the {W}{W} pays two of its
+# {3}{R} with the Mountain and Mox Ruby's {R}{R}. Leave returns the tapped Mox Sapphire to its owner's hand.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Ashling, Rekindled
+Leave // Chance
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(White)
+? Bot1.Mana = {W}{W} (ManaValue4OrGreaterSpells)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Leave // Chance.Cast(Ability: Leave)
+Bot1.Target(Mox Sapphire)
+? Bot1.Mana = {W}{W} (ManaValue4OrGreaterSpells)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Island; Mox Sapphire
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Leave // Chance.Cast(Ability: Chance)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; Mox Jet; Ashling, Rimebound
+Bot1.Hand = Island; Mox Sapphire
+Bot1.Graveyard =
+Exile = Leave // Chance
+Bot1.Mana =

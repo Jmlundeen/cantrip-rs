@@ -1,0 +1,71 @@
+# A transformed permanent has only its back face's characteristics, but its mana value is calculated from its front face's
+# mana cost (CR 202.3b, 712.8e; Ashling's ruling: "the mana value of a nonmodal double-faced card is the mana value of its
+# front face, no matter which face is up"). Ashling, Rimebound has no mana cost and mana value 2 ({1}{R}). Bot2's
+# Prismatic Ending with X of 1, paid with two Plains, had one color of mana spent on it, so it exiles nothing of mana value
+# 2. The second, with X of 2 paid with white, black and green mana, had three, and exiles Ashling.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Ashling, Rekindled
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Plains
+Mox Pearl
+Mox Jet
+Mox Emerald
+Prismatic Ending
+Prismatic Ending
+Plains x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Prismatic Ending.Cast(Bot1.Battlefield.Ashling, Rimebound; X: 1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield = Mountain; Mox Ruby; Mox Sapphire; Ashling, Rimebound
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Prismatic Ending.Cast(Bot1.Battlefield.Ashling, Rimebound; X: 2)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Sapphire
+Exile = Ashling, Rekindled
+Bot2.Graveyard = Prismatic Ending; Prismatic Ending

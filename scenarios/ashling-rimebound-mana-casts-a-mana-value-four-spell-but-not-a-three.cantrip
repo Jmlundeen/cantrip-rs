@@ -1,0 +1,57 @@
+# Ashling, Rimebound's {B}{B} is "only to cast spells with mana value 4 or greater" (CR 106.6, 202.3). With it and the
+# untapped Mountain and Mox Ruby, Wheel of Fortune (mana value 3) can't be cast: the two lands' mana alone is too little and
+# the black mana may not pay for it. Damnation (mana value 4) is cast with the same mana - the two black from the pool, the
+# two generic from the Mountain and the Mox - and destroys Ashling with the rest.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Ashling, Rekindled
+Wheel of Fortune
+Damnation
+Island
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Ashling, Rekindled.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+? Bot1.Mana = {B}{B} (ManaValue4OrGreaterSpells)
+! Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}{R} {B}{B} (ManaValue4OrGreaterSpells)
+! Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Damnation.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Sapphire
+Bot1.Graveyard = Damnation; Ashling, Rekindled
+Bot1.Hand = Island; Island; Wheel of Fortune
+Bot1.Mana =
