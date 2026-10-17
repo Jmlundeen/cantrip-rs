@@ -1,0 +1,75 @@
+# March of the Machines (Bot2, turn 2), then Mycosynth Lattice (Bot1, turn 7): the order of march-of-the-machines-after-
+# mycosynth-lattice-... reversed. March alone makes the Moxes 0/0 artifact creatures that die at once and Sol Ring a 1/1,
+# while the lands, no artifacts, stay lands (the positive control, turn 3). Once the Lattice is out, March's layer-4
+# effect, though older, depends on the Lattice's and applies after it (CR 613.8a-b), so the outcome is the order-free one:
+# every land is a 0/0 artifact creature and dies (Bot1's four Plains, Bot2's Island), March is a 4/4 artifact enchantment
+# creature, the Lattice a 6/6 and Sol Ring 1/1. Applied in timestamp order alone, March would not reach the lands.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Sol Ring
+Plains
+Plains
+Plains
+Mycosynth Lattice
+Plains x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+March of the Machines
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.March of the Machines.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield = Plains; Sol Ring
+? Bot1.Battlefield.Sol Ring.Power = 1
+? Bot1.Battlefield.Plains.Types = Land
+? Bot2.Battlefield = Island; March of the Machines
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Sol Ring; Mycosynth Lattice
+Bot1.Battlefield.Mycosynth Lattice.Types = Artifact; Creature
+Bot1.Battlefield.Mycosynth Lattice.Power = 6
+Bot1.Battlefield.Mycosynth Lattice.Toughness = 6
+Bot1.Battlefield.Sol Ring.Power = 1
+Bot2.Battlefield = March of the Machines
+Bot2.Battlefield.March of the Machines.Types = Enchantment; Artifact; Creature
+Bot2.Battlefield.March of the Machines.Power = 4
+Bot2.Battlefield.March of the Machines.Toughness = 4
+Bot1.Graveyard.Count = 5

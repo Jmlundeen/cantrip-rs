@@ -1,0 +1,62 @@
+# Mycosynth Lattice (turn 1), then March of the Machines (turn 3). Layer 4: the Lattice makes every permanent an artifact;
+# March's "each noncreature artifact is an artifact creature" depends on it (CR 613.8a: applying the Lattice's effect changes
+# what March's applies to - a land becomes a noncreature artifact) and applies after it. Every noncreature permanent is then
+# an artifact creature, March itself among them (it is an artifact now, and March says "each", not "each other"). Layer 7b:
+# each has power and toughness equal to its mana value. The lands (mana value 0) and the Moxes are 0/0 and die (CR 704.5f,
+# March's ruling of artifact lands): Bot1's Plains and Moxes, Bot2's Island. Sol Ring is 1/1, March 4/4, the Lattice 6/6.
+# March is paid {3}{U} with no blue mana at all - the Lattice lets colorless, white and black pay it (CR 609.4b).
+# (march-of-the-machines-then-mycosynth-lattice-... is the other order, with the same outcome.)
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sol Ring
+Mycosynth Lattice
+March of the Machines
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.March of the Machines.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Sol Ring; Mycosynth Lattice; March of the Machines
+Bot1.Battlefield.Mycosynth Lattice.Types = Artifact; Creature
+Bot1.Battlefield.Mycosynth Lattice.Power = 6
+Bot1.Battlefield.Mycosynth Lattice.Toughness = 6
+Bot1.Battlefield.March of the Machines.Types = Enchantment; Artifact; Creature
+Bot1.Battlefield.March of the Machines.Power = 4
+Bot1.Battlefield.Sol Ring.Power = 1
+Bot1.Graveyard.Count = 5
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Island

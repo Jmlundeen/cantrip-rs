@@ -1,0 +1,69 @@
+# Mycosynth Lattice, its three abilities:
+# - "All permanents are artifacts in addition to their other types" (layer 4): Bot2's Island is a Land Artifact, Llanowar
+#   Elves an artifact creature; cards in hands are no permanents and gain no type.
+# - "All cards that aren't on the battlefield, spells, and permanents are colorless" (layer 5, every zone - the ruling):
+#   Bot2's Llanowar Elves is green in hand before the Lattice (the positive control) and colorless in hand after it, on the
+#   battlefield, and in the graveyard; Bot1's Lightning Bolt is colorless in hand.
+# - "Players may spend mana as though it were mana of any color" (CR 609.4b), colorless mana too (the ruling), for every
+#   player: Bot2 casts Llanowar Elves ({G}) with an Island's {U}, and Bot1 casts Lightning Bolt ({R}) with Sol Ring's {C}.
+#   The costs are unchanged: each spell still has its mana value.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Sol Ring
+Mycosynth Lattice
+Lightning Bolt
+Plains x15
+
+[Bot2 Deck]
+Llanowar Elves
+Island
+Island x30
+
+[Actions]
+? Bot2.Hand.Llanowar Elves.Colors = Green
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Hand.Llanowar Elves.Colors =
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Bot2.Battlefield.Island.Types = Land; Artifact
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Colors = (absent)
+? Bot2.Battlefield.Llanowar Elves.Types = Creature; Artifact
+[T3 Bot1.Main1]
+? Bot1.Hand.Lightning Bolt.Colors =
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {C}{C}
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Mana = {C}
+Bot2.Graveyard = Llanowar Elves
+Bot2.Graveyard.Llanowar Elves.Colors =
+Bot1.Graveyard = Lightning Bolt
+Bot1.Graveyard.Lightning Bolt.Colors =
+Bot1.Battlefield.Mycosynth Lattice.Types = Artifact
