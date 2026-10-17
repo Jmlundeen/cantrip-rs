@@ -1,0 +1,35 @@
+# Pia may discard a card to search for an enchantment, reveal it, and put it into hand (CR 603.3, 701. search).
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Pia, Aether Ascetic
+Island
+Island
+Island
+Island x3
+Rancor
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T1 Bot1.Main2]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Hand.Pia, Aether Ascetic.Cast
+Bot1.Choose(Island)
+Bot1.Search(Rancor)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Island
+Bot1.Battlefield = Forest; Forest; Forest; Pia, Aether Ascetic
+Bot1.Hand = Island; Island; Island; Island; Rancor
