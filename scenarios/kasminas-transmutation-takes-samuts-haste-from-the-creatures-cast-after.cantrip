@@ -1,0 +1,62 @@
+# Kasmina's Transmutation: "Enchanted creature loses all abilities and has base power and toughness 1/1." Bot2's Samut,
+# Hazoret's Champion ("Creatures you control have haste") loses its static ability, so it gives nothing to anything (CR
+# 613.1f, 611.3a): on turn 2 Bot2's Llanowar Elves, cast that turn, attacks with haste beside Samut (the positive control,
+# 3 damage), but the Elves Bot2 casts on turn 4, after the Aura, are summoning sick and can't attack (CR 302.6). Samut keeps
+# its types and color - the Aura changes nothing else (unlike Eaten by Piranhas) - and is a 1/1: it attacks for 1.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Kasmina's Transmutation
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Samut, Hazoret's Champion
+Llanowar Elves
+Llanowar Elves
+Mountain
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Samut, Hazoret's Champion.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Attack(Llanowar Elves; Samut, Hazoret's Champion > Bot1)
+[T2 Bot2.Main2]
+? Bot1.Life = 17
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Kasmina's Transmutation.Cast(Samut, Hazoret's Champion)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+! Bot2.Attack(Llanowar Elves#2 > Bot1)
+Bot2.Attack(Samut, Hazoret's Champion > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot1.Battlefield.Kasmina's Transmutation.AttachedTo = Samut, Hazoret's Champion
+Bot2.Battlefield.Samut, Hazoret's Champion.Power = 1
+Bot2.Battlefield.Samut, Hazoret's Champion.Toughness = 1
+Bot2.Battlefield.Samut, Hazoret's Champion.Supertypes = Legendary
+Bot2.Battlefield.Samut, Hazoret's Champion.Types = Creature
+Bot2.Battlefield.Samut, Hazoret's Champion.Subtypes = Cleric; Human; Warrior
+Bot2.Battlefield.Samut, Hazoret's Champion.Colors = Red
+Bot2.Battlefield.Llanowar Elves#2.SummoningSick = true
