@@ -960,6 +960,23 @@ public sealed partial class TacticalPlay
             return new Candidate(option, sneak - price, cost, [], Kick: false, Permanent: false, Hostile: false);
         }
 
+        // "When you next cast an instant or sorcery spell [with mana value less than or equal to <this>'s power] this turn, copy
+        // that spell" (Loki Laufeyson): a copy is worth having only for a spell this seat holds and can still pay for once the
+        // ability is paid, in its own main phase, where it casts its spells. It is taken before them, as a permanent is, so the
+        // spell it is for is cast once it waits (Best).
+        if (plain.StartsWith("when you next cast an instant or sorcery spell", StringComparison.Ordinal)
+            && plain.Contains("copy that spell", StringComparison.Ordinal))
+        {
+            int? most = plain.Contains("less than or equal to", StringComparison.Ordinal) && plain.Contains("power", StringComparison.Ordinal)
+                ? source.Power ?? 0
+                : null;
+            int left = Mana(client) - cost;
+            bool fits = view.ActivePlayer == client.Seat && view.Step is TurnStepView.PrecombatMain or TurnStepView.PostcombatMain
+                && client.MyHand().Any(card => (card.CardTypes.Contains(CardTypeView.Instant) || card.CardTypes.Contains(CardTypeView.Sorcery))
+                    && CardReading.ManaValue(card.ManaCost) <= Math.Min(left, most ?? int.MaxValue));
+            return fits ? new Candidate(option, (0.5 * _model.Card) - price, cost, [], Kick: false, Permanent: true, Hostile: false) : null;
+        }
+
         double gain;
         if (source.CardTypes.Contains(CardTypeView.Planeswalker) && described.TrimStart().StartsWith('+'))
         {
@@ -984,8 +1001,7 @@ public sealed partial class TacticalPlay
         {
             gain = tokens.Count * Token(tokens.Power, tokens.Toughness);
         }
-        else if (plain.Contains("becomes", StringComparison.Ordinal) || plain.Contains("+1/+1 counter on this", StringComparison.Ordinal)
-            || (name.Length > 0 && plain.Contains("+1/+1 counter on " + name, StringComparison.Ordinal)))
+        else if (plain.Contains("becomes", StringComparison.Ordinal) || GrowsItself(plain, name))
         {
             // "If this creature is a Spirit, it becomes…" does nothing for one that is not.
             if (CardReading.RequiredType(effectText) is { } type
@@ -1018,6 +1034,21 @@ public sealed partial class TacticalPlay
         }
 
         return new Candidate(option, gain - price, cost, [], Kick: false, Permanent: false, Hostile: false);
+    }
+
+    /// <summary>
+    /// Whether an ability's effect puts +1/+1 counters on its own source: "a +1/+1 counter on this creature", "two +1/+1
+    /// counters on this creature" (power-up), or on it by name - the full name, or the first word of it a card's text uses
+    /// for itself ("Put two +1/+1 counters on Loki").
+    /// </summary>
+    private static bool GrowsItself(string plain, string name)
+    {
+        string first = name.Split(' ', ',')[0];
+        return plain.Contains("+1/+1 counter on this", StringComparison.Ordinal) || plain.Contains("+1/+1 counters on this", StringComparison.Ordinal)
+            || (name.Length > 0 && (plain.Contains("+1/+1 counter on " + name, StringComparison.Ordinal)
+                || plain.Contains("+1/+1 counters on " + name, StringComparison.Ordinal)
+                || plain.Contains("+1/+1 counter on " + first + ".", StringComparison.Ordinal)
+                || plain.Contains("+1/+1 counters on " + first + ".", StringComparison.Ordinal)));
     }
 
     /// <summary>
