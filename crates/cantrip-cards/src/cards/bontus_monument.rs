@@ -13,15 +13,8 @@ fn black_creature_spells_cost_less(q: &dyn Query, source: ObjectId, player: Play
     if chars.is(CardType::Creature) && chars.colors.has(q.words(source).color(Color::Black)) { CostDelta::less(1) } else { CostDelta::NONE }
 }
 
-/// Each opponent loses 1 life and you gain 1 life.
-fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.each_opponent_loses_life(item.controller, 1);
-    g.gain_life(item.controller, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     cost_changes: &[black_creature_spells_cost_less],
-    abilities: &[triggered(CREATURE_SPELL_YOU_CAST, drain, "Whenever you cast a creature spell, each opponent loses 1 life and you gain 1 life.")],
+    abilities: &[triggered(CREATURE_SPELL_YOU_CAST, cantrip_mechanics::effects::each_opponent_loses_1_life_you_gain_1, "Whenever you cast a creature spell, each opponent loses 1 life and you gain 1 life.")],
     ..oracle::BONTUS_MONUMENT
 };

@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::evoke;
-use cantrip_mechanics::hand::discard_chosen_from_revealed_hand_of_kind;
+use cantrip_mechanics::hand::discard_chosen_nonland_from_revealed_hand;
 use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
@@ -12,7 +12,7 @@ fn black_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
 /// the hand is eligible: looking at the hand is part of the ability.
 fn discard_nonland(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.targets[0].player() else { return Ok(()) };
-    discard_chosen_from_revealed_hand_of_kind(g, item, opponent, Purpose::Discard, "nonland", |q, c| !q.chars(c).is(CardType::Land))?;
+    discard_chosen_nonland_from_revealed_hand(g, item, opponent)?;
     Ok(())
 }
 

@@ -151,6 +151,24 @@ pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspe
     Ok(())
 }
 
+/// "Each opponent loses 1 life and you gain 1 life" (CR 119.3): every opponent still in the game loses it together, and the
+/// ability's controller gains 1. Bontus's Monument, Doom Reigns Supreme, Grave Venerations, Raven of Fell Omens, Thunder of
+/// Unity, Tithing Blade, Witherbloom Apprentice and Dream Beavers print it.
+pub fn each_opponent_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.each_opponent_loses_life(item.controller, 1);
+    g.gain_life(item.controller, 1);
+    Ok(())
+}
+
+/// "Target opponent loses 1 life and you gain 1 life" (CR 119.3): the first target, a player; with it gone the ability does not
+/// resolve (CR 608.2b), so nothing is gained. Blood Hustler and Down, Down to Goblin-town print it.
+pub fn target_opponent_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
+    g.lose_life(opponent, 1);
+    g.gain_life(item.controller, 1);
+    Ok(())
+}
+
 /// "[This source] deals `n` damage to each opponent" (CR 120.3, 102.2): one damage event for each opponent still in the game,
 /// dealt together (CR 120.2), by the resolving object as it last was if it has left (CR 113.7a). Chandra, Torch of Defiance,
 /// Eye of Jace, Fiery Confluence, Impact Tremors, Warleader's Call, Vivi Ornitier, Gau, Keral Keep Disciples, Voldaren

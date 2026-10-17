@@ -20,8 +20,7 @@ fn villain_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Optio
 /// "Each opponent loses 1 life and you gain 1 life. Put a plan counter on this enchantment." The counter goes only on the
 /// enchantment that triggered, if it is still there (CR 400.7).
 fn drain_and_plan(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.each_opponent_loses_life(item.controller, 1);
-    g.gain_life(item.controller, 1);
+    cantrip_mechanics::effects::each_opponent_loses_1_life_you_gain_1(g, item)?;
     g.add_counters(item.object, CounterKind::Plan, 1);
     Ok(())
 }
