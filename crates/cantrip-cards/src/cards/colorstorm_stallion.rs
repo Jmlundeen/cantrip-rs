@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{pump, triggers};
+use cantrip_mechanics::{pump, spent, triggers};
 use cantrip_oracle as oracle;
 
 /// Opus (an ability word, CR 207.2c): "Whenever you cast an instant or sorcery spell, this creature gets +1/+1 until end of turn. If
@@ -9,9 +9,7 @@ use cantrip_oracle as oracle;
 /// values, or its last known ones if it has left (CR 707.2, 608.2h), so it has none of the +1/+1 and has the opus too.
 fn opus(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     pump(g, item.object, item.object, 1, 1);
-    if let Target::Object(spell) = item.subject
-        && g.obj(spell).spent.total() >= 5
-    {
+    if spent::five_or_more_mana_spent_on_the_spell(g, item) {
         g.create_token_copies(item.object, item.controller, 1)?;
     }
     Ok(())

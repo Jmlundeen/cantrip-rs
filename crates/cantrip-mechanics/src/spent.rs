@@ -12,3 +12,11 @@ use cantrip_api::*;
 pub fn two<const M: u8>(q: &dyn Query, asker: &Asker) -> bool {
     q.obj(asker.source).spent.get(Mana::ALL[M as usize]) >= 2
 }
+
+/// Opus (an ability word, CR 207.2c): "if five or more mana was spent to cast that spell", where the spell is the one the
+/// ability triggered on (`item.subject`). Its mana spent (CR 601.2h) is read from the spell's own object, so it still answers once
+/// the spell has been countered or has left the stack (CR 608.2h); a spell cast without paying its mana cost has had none spent.
+/// Colorstorm Stallion and Molten-Core Maestro print it.
+pub fn five_or_more_mana_spent_on_the_spell(q: &dyn Query, item: &StackItem) -> bool {
+    matches!(item.subject, Target::Object(spell) if q.obj(spell).spent.total() >= 5)
+}
