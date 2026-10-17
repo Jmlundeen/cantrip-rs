@@ -1,0 +1,8 @@
+{
+  "name": "Kor Firewalker",
+  "manaCost": "{W}{W}",
+  "type": "Creature — Kor Soldier",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Protection from red\nWhenever a player casts a red spell, you may gain 1 life."
+}

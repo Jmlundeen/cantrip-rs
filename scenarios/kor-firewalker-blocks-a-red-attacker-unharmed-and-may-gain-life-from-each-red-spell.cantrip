@@ -1,0 +1,62 @@
+# Kor Firewalker: "Protection from red. Whenever a player casts a red spell, you may gain 1 life." Bot2's Firewalker blocks
+# Bot1's red Embereth Shieldbreaker (2/1) on turn 3: protection prevents the Shieldbreaker's 2 (CR 702.16e, recorded as the
+# Firewalker's), and the Firewalker's 2 kills it. After combat Bot1 can't target the Firewalker with Lightning Bolt
+# (CR 702.16b) but Bolts Bot2 - the positive control. Each Bolt is a red spell an opponent cast: the trigger resolves before it
+# (the ruling), Bot2 takes the 1 life the first time and declines the second. Bot2 ends at 20 + 1 - 3 - 3 = 15. Bot1's own
+# Shieldbreaker, cast before the Firewalker was on the battlefield, triggered nothing, and nor does a colorless Mox
+# Jet cast with it there.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Lightning Bolt
+Lightning Bolt
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Kor Firewalker
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Kor Firewalker.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+! Bot2.Accept
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Embereth Shieldbreaker > Bot2)
+Bot2.Block(Kor Firewalker > Embereth Shieldbreaker)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Kor Firewalker.Damage = 0
+? Bot1.Graveyard = Embereth Shieldbreaker
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Kor Firewalker)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Accept
+? Bot2.Life = 21
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Decline
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Life = 15
+Prevented = 2 Embereth Shieldbreaker > Kor Firewalker by Kor Firewalker
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Embereth Shieldbreaker
+Bot2.Battlefield = Kor Firewalker; Mox Pearl; Plains
