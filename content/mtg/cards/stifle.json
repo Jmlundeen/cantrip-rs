@@ -1,0 +1,6 @@
+{
+  "name": "Stifle",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Counter target activated or triggered ability. (Mana abilities can't be targeted.)"
+}

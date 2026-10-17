@@ -1,0 +1,46 @@
+# Stifle can target a delayed triggered ability (CR 603.7, the ruling) once it has triggered and is on the stack. Bot1 casts
+# Glorious End on its turn 1, ending it; "at the beginning of your next end step, you lose the game" triggers in Bot1's turn-3
+# end step, and Bot1 Stifles it: countered, it does nothing, and a delayed ability triggers only once (CR 603.7c), so Bot1 does
+# not lose then or at any later end step.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Glorious End
+Stifle
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glorious End.Cast
+[T3 Bot1.End]
+? Stack.Count = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stifle.Cast(Stack.Glorious End)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+[T6 Bot2.Upkeep]
+
+[Expect]
+Turn = 6
+Result = InProgress
+Bot1.Status = (absent)
+Delayed.Count = 0
+Bot1.Graveyard = Stifle
+Exile = Glorious End

@@ -1,0 +1,46 @@
+# Stifle: "Counter target activated or triggered ability" (CR 701.6, 115.1). While Bot2's Flametongue Kavu is a spell on the
+# stack, paid for with mana abilities (which never use the stack, CR 605.3a), there is no ability for Stifle to target and Bot1
+# can't cast it (the refusal). Once the Kavu enters, its "deals 4 damage to target creature" triggers aimed at Bot1's
+# Ornithopter; Bot1 Stifles that (the positive control): the ability is countered and does nothing, and the Kavu stays.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Stifle
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Flametongue Kavu
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flametongue Kavu.Cast
+? Stack = Flametongue Kavu
+! Bot1.Hand.Stifle.Cast
+Bot1.Pass
+Bot2.Target(Ornithopter)
+? Stack.Count = 1
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Stifle.Cast(Stack.Flametongue Kavu)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Graveyard = Stifle
+Bot2.Battlefield = Mountain; Flametongue Kavu

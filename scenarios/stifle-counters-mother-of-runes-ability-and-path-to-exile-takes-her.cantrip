@@ -1,0 +1,45 @@
+# Stifle counters an activated ability (CR 701.6, 602.2): its cost stays paid and its effect never happens. On Bot2's turn 4
+# Bot2 casts Path to Exile at Bot1's Mother of Runes; Bot1 taps her to give herself protection (from white, the color that
+# would stop the Path), and Bot2 Stifles that ability. With no protection the Path resolves and Mother is exiled, tapped as her
+# cost left her; Bot1 declines the basic land search.
+
+[Bot1 Deck]
+Plains
+Mother of Runes
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Path to Exile
+Stifle
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mother of Runes.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Path to Exile.Cast(Mother of Runes)
+Bot1.Battlefield.Mother of Runes.Activate(Mother of Runes)
+? Stack.Count = 2
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Stifle.Cast(Stack.Mother of Runes)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+LeftBattlefield = Mother of Runes (tapped)
+Exile = Mother of Runes
+Bot2.Graveyard = Path to Exile; Stifle
