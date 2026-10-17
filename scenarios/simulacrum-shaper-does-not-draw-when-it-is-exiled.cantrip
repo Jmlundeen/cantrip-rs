@@ -1,0 +1,39 @@
+# Negative control for "when this creature dies": Swords to Plowshares exiles the Shaper, which is not dying (CR 700.4:
+# only a put into a graveyard from the battlefield), so Bot1 draws nothing: its hand stays at 3 (Bot1 gets Swords' life
+# gain: 20 + 2 = 22). Bot1 declines the enters search.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Simulacrum Shaper
+Island x3
+Plains
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Simulacrum Shaper.Cast
+Bot1.Decline
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Simulacrum Shaper)
+[T2 Bot2.End]
+
+[Expect]
+Exile = Simulacrum Shaper
+Bot1.Hand.Count = 3
+Bot1.Life = 22

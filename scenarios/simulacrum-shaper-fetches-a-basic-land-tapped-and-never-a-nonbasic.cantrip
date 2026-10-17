@@ -1,0 +1,35 @@
+# Simulacrum Shaper: "When this creature enters, you may search your library for a basic land card, put that card onto
+# the battlefield tapped, then shuffle." Bot1 casts it on turn 1 with Forest, Mox Emerald and Mox Ruby, accepts, and
+# searches: the Savannah (a nonbasic land with basic land types) is refused (`! Bot1.Search(Savannah)`), the Plains is found
+# (positive control) and enters tapped.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Simulacrum Shaper
+Island x3
+Savannah
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Simulacrum Shaper.Cast
+Bot1.Accept
+! Bot1.Search(Savannah)
+Bot1.Search(Plains)
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Ruby; Simulacrum Shaper; Plains
+Bot1.Battlefield.Plains.Tapped = true
+Bot1.Library.Count = 11

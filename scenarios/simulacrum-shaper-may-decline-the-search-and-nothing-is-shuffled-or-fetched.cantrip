@@ -1,0 +1,30 @@
+# "You may search": Bot1 declines, so no land arrives and the library keeps all of its 12 cards (the Plains in it too).
+# The same cast in the accepting scenario fetches a Plains.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Simulacrum Shaper
+Island x3
+Plains
+Island x11
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Simulacrum Shaper.Cast
+Bot1.Decline
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Ruby; Simulacrum Shaper
+Bot1.Library.Count = 12
