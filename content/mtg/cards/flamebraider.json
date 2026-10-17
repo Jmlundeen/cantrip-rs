@@ -1,0 +1,8 @@
+{
+  "name": "Flamebraider",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Elemental Bard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{T}: Add two mana in any combination of colors. Spend this mana only to cast Elemental spells or activate abilities of Elemental sources."
+}

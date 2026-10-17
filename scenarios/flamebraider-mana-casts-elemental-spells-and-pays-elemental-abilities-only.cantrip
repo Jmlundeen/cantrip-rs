@@ -1,0 +1,62 @@
+# Flamebraider: "{T}: Add two mana in any combination of colors. Spend this mana only to cast Elemental spells or activate
+# abilities of Elemental sources" (CR 106.6, 602.2b). Turn 1 Black Lotus and the Mountain pay for Flamebraider and Bramble
+# Familiar (an Elemental Raccoon). Turn 3 the Mountain casts Blazing Rootwalla (a Lizard), so the Flamebraider's {R}{G} is
+# the only red mana: it can't cast Lightning Bolt (no Elemental spell) nor pay the Rootwalla's "{R}: +2/+0" (a Lizard
+# source) - the refusals - but pays the Familiar's "{1}{G}, {T}, Discard a card: Return this creature to its owner's hand",
+# an ability of an Elemental source. Turn 5 the {G}{G} casts the Familiar again, an Elemental spell, the lands left untapped.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Flamebraider
+Bramble Familiar
+Forest
+Blazing Rootwalla
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Flamebraider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Bramble Familiar.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Flamebraider.Activate
+Bot1.Colors(Red; Green)
+? Bot1.Mana = {R} (ElementalSpellsOrAbilities) {G} (ElementalSpellsOrAbilities)
+! Bot1.Hand.Lightning Bolt.Cast
+! Bot1.Battlefield.Blazing Rootwalla.Activate
+Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return; Spend: R ElementalSpellsOrAbilities, G ElementalSpellsOrAbilities)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Hand = Bramble Familiar; Lightning Bolt
+[T5 Bot1.Main1]
+Bot1.Battlefield.Flamebraider.Activate
+Bot1.Colors(Green; Green)
+Bot1.Hand.Bramble Familiar.Cast(Spend: G ElementalSpellsOrAbilities, G ElementalSpellsOrAbilities)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Mana =
+Bot1.Battlefield = Blazing Rootwalla; Bramble Familiar; Flamebraider; Forest; Mountain
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Graveyard = Island; Black Lotus
