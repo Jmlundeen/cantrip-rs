@@ -57,6 +57,7 @@ keeps it).
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
 | [KI-23](#ki-23-a-creature-fighting-itself-cr-70114c-is-implemented-but-no-scenario-can-reach-it) | A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it | Low | Unexercised |
 | [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
+| [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 
 ## Issues
 
@@ -425,3 +426,21 @@ such a card exists each needs a scenario (Royal Treatment on a creature with pro
 counter on a land that can't have counters put on it), and this entry is deleted.
 
 **Scenarios.** None yet.
+
+### KI-41: A dependency through another object is judged on the object being worked out
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | core (layers) | 2026-10-16, the dependency system (`layers::by_dependency`, CR 613.8) |
+
+**Notes.** CR 613.8a asks whether applying one effect would change what another applies to, which is a set of objects.
+The layers work out one object at a time, so `layers::ready` asks it of that object: whether applying the other changes
+whether the first applies to it, now or once the other's own prerequisites have applied (which covers a chain such as
+"creatures are artifacts" after "lands are creatures"). An effect that depends on another only through some other object
+- the other changes the first's reach on that object and not on this one - is applied to this one in timestamp order. The
+result differs only where the two do not commute on this object (one sets what the other adds), and no two cards the
+engine has meet that way: every multi-object static ability it has adds types, abilities or power, and the resolved
+effects that set types (Oko's Elk) name their object. A fix asks the question over every object the first could affect,
+at the cost of their characteristics part-way through the layer.
+
+**Scenarios.** None: no pair of implemented cards reaches it.
