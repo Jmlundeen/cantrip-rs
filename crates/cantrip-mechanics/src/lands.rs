@@ -271,3 +271,15 @@ pub const FETCH_BASIC_TAPPED: Question = Question::new(
     "Search",
     "Don't search",
 );
+
+/// "The number of [lands] you control", the value of a characteristic-defining ability (CR 604.3, 613.1): the permanents on the
+/// battlefield `counts` accepts, read through the layers before the one being applied (so a land made an Island in layer 4 is
+/// counted by a layer 7a ability). "You" is the controller while `source` is on the battlefield and its owner anywhere else,
+/// where it has no controller (CR 108.4): Lumbering Worldwagon's power, Sandman's power and toughness ("works in all zones")
+/// and Eluge's count lands; `counts` is `|c| c.is(CardType::Land)` for them.
+pub fn count_you_control(q: &dyn LayerQuery, source: ObjectId, counts: &dyn Fn(&Chars) -> bool) -> i16 {
+    let state = q.state();
+    let obj = state.obj(source);
+    let who = if obj.zone.is(ZoneKind::Battlefield) { obj.controller } else { obj.owner };
+    state.battlefield().iter().filter(|&&id| state.obj(id).controller == who && counts(&q.chars(id))).count() as i16
+}
