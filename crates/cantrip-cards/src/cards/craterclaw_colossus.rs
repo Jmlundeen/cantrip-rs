@@ -1,7 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::pump_creatures_you_control;
+use cantrip_mechanics::effects::pump_and_trample_creatures_you_control;
 use cantrip_mechanics::triggers::THIS_ENTERS;
-use cantrip_mechanics::{artifacts_you_control, trample_until_end_of_turn};
+use cantrip_mechanics::artifacts_you_control;
 use cantrip_oracle as oracle;
 
 /// "When this creature enters, creatures you control gain trample and get +X/+0 until end of turn, where X is the number of
@@ -10,9 +10,7 @@ use cantrip_oracle as oracle;
 /// if it is still there. Haste is the core keyword of its JSON.
 fn pump_and_trample(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let x = artifacts_you_control(g, item.controller) as i16;
-    for creature in pump_creatures_you_control(g, item, x, 0) {
-        trample_until_end_of_turn(g, item.object, creature);
-    }
+    pump_and_trample_creatures_you_control(g, item, x, 0);
     Ok(())
 }
 

@@ -22,6 +22,17 @@ pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16
     creatures
 }
 
+/// "Creatures you control gain trample and get +P/+T until end of turn" (CR 611.2c): `pump_creatures_you_control` and trample for
+/// each of them, the creatures being those on the battlefield as it resolves. The creatures, for what the rest of the sentence does
+/// to them. Craterclaw Colossus (+X/+0, X the artifacts you control) and Craterhoof Behemoth (+X/+X, X the creatures) print it.
+pub fn pump_and_trample_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
+    let creatures = pump_creatures_you_control(g, item, power, toughness);
+    for &creature in &creatures {
+        crate::trample_until_end_of_turn(g, item.object, creature);
+    }
+    creatures
+}
+
 /// "Put `n` `kind` counters on each creature you control": on the creatures `player` controls as it is read, one after the
 /// other. The creatures, for what the rest of the sentence does to "those creatures". Abandoned Air Temple, Elspeth,
 /// Storm Slayer, Anduril, Narsil Reforged, Gavony Township, Germination Practicum, Ouroboroid and The Theorist, Jace
