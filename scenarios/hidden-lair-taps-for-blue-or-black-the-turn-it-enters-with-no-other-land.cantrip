@@ -1,0 +1,18 @@
+# Hidden Lair: "{T}: Add {C}." and "{T}: Add {U} or {B}. Activate only if this land entered this turn or if you control a
+# basic land." Played on turn 1 with no other land it entered this turn, so {U} or {B} is offered: Bot1 taps it for {B}.
+# On Bot2's side nothing is affected (Bot2's Island is not Bot1's basic land).
+
+[Bot1 Deck]
+Hidden Lair
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Hidden Lair.Play
+Bot1.Battlefield.Hidden Lair.Activate(Ability: or; Color: Black)
+
+[Expect]
+Bot1.Mana = {B}
+Bot1.Battlefield.Hidden Lair.Tapped = true
