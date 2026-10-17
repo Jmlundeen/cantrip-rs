@@ -2,30 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, targets, tokens, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
-/// "This token can't block or be blocked by non-Spirit creatures" (CR 509.1b): of any possible block it is in, the other
-/// creature must be a Spirit.
-fn spirit_blocking(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
-    if source != blocker && source != attacker {
-        return true;
-    }
-    let other = if source == blocker { attacker } else { blocker };
-    q.chars(other).has_subtype(q.words(source).subtype(Subtype::Spirit))
-}
-
-/// The 1/1 colorless Spirit creature token with "This token can't block or be blocked by non-Spirit creatures."
-pub static SPIRIT: CardDef = CardDef {
-    name: "Spirit",
-    has_cost: false,
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Spirit]),
-    power: Some(1),
-    toughness: Some(1),
-    block_rules: &[spirit_blocking],
-    shares_name: true,
-    text: "This token can't block or be blocked by non-Spirit creatures.",
-    ..CardDef::BLANK
-};
-
 /// Target nonland permanent's owner puts it into their library second from the top or on the bottom: their choice.
 fn put_into_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(permanent) = targets::object(g, item, 0) else { return Ok(()) };
@@ -48,7 +24,7 @@ fn cards_into_a_library(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fir
 }
 
 fn make_spirits(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &SPIRIT, 2)?;
+    tokens::create(g, item.controller, &tokens::SPIRIT, 2)?;
     Ok(())
 }
 
@@ -65,4 +41,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::WAN_SHI_TONG_ALL_KNOWING
 };
 
-pub static EXTRA: &[&CardDef] = &[&SPIRIT];
+pub static EXTRA: &[&CardDef] = &[&tokens::SPIRIT];

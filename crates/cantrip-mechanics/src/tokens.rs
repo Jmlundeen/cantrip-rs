@@ -559,3 +559,28 @@ pub static BAT: CardDef = CardDef {
     keywords: Keywords::of(&[Keyword::Flying]),
     ..CardDef::BLANK
 };
+
+/// "This token can't block or be blocked by non-Spirit creatures" (CR 509.1b): of any possible block it is in, the other
+/// creature must be a Spirit, read through the token's words (CR 612).
+fn spirit_blocking(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
+    if source != blocker && source != attacker {
+        return true;
+    }
+    let other = if source == blocker { attacker } else { blocker };
+    q.chars(other).has_subtype(q.words(source).subtype(Subtype::Spirit))
+}
+
+/// The 1/1 colorless Spirit creature token with "This token can't block or be blocked by non-Spirit creatures." Wan Shi
+/// Tong, All-Knowing and Realm of Koh make it.
+pub static SPIRIT: CardDef = CardDef {
+    name: "Spirit",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Spirit]),
+    power: Some(1),
+    toughness: Some(1),
+    block_rules: &[spirit_blocking],
+    shares_name: true,
+    text: "This token can't block or be blocked by non-Spirit creatures.",
+    ..CardDef::BLANK
+};
