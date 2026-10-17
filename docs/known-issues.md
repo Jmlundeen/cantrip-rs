@@ -85,6 +85,7 @@ keeps it).
 | [KI-72](#ki-72-a-face-down-permanent-may-be-unable-to-turn-face-up-under-humility) | A face-down permanent may be unable to turn face up under Humility | Low | Suspected |
 | [KI-73](#ki-73-older-you-may-draw-cards-offer-a-draw-a-cant-draw-rule-forbids) | Older "you may draw" cards offer a draw a can't-draw rule forbids | Low | Open |
 | [KI-74](#ki-74-a-question-a-replacement-asks-mid-run-is-not-watched-for-loops) | A question a replacement asks mid-run is not watched for loops | Low | Suspected |
+| [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 
 ## Issues
 
@@ -943,3 +944,16 @@ permanent face down (CR 708.2a) and no "manifested" mark, so a creature an effec
 offered turning face up for its mana cost (CR 701.40b, 702.37e). Neither is reachable by a card in content today.
 
 **Scenarios.** none yet: a face-down creature under Humility is the first to write.
+
+### KI-75: Words of Wind's "return a permanent" question may be captioned as a cost
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | client | 2026-10-17, draw-replacement batch |
+
+**Notes.** Words of Wind's replacement ("each player returns a permanent they control to its owner's hand instead") asks with
+`Purpose::ReturnToHand`, which the server's prompt captioning treats as a cost (the karoo lands' "return a land you control ...
+to pay for it"). The caption would then say the return pays for something, which it does not. A fix gives the effect's return its
+own purpose or caption. Not checked in the browser.
+
+**Scenarios.** none yet.
