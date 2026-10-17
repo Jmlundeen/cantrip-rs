@@ -1,0 +1,36 @@
+# Flamecache Gecko: with no opponent having lost life this turn its enters trigger does not happen (the intervening "if",
+# CR 603.4): nothing is added (the control is the Bolt scenario, where {B}{R} appears), so the pool ends empty after the
+# next ability is paid. "{1}{R}, Discard a card: Draw a card": Bot1 pays {1}{R} with the Lotus's last red and Mox Ruby,
+# discards an Island and draws the top card, a Mountain. Had the trigger added {B}{R}, that mana would still be in the pool.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Black Lotus
+Flamecache Gecko
+Island x3
+Mountain
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Flamecache Gecko.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Flamecache Gecko.Activate
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Hand = Island; Island; Mountain
+Bot1.Graveyard.Count = 2
+Bot2.Life = 20
+Bot1.Mana =

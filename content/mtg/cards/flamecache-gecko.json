@@ -1,0 +1,8 @@
+{
+  "name": "Flamecache Gecko",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Lizard Warlock",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When this creature enters, if an opponent lost life this turn, add {B}{R}.\n{1}{R}, Discard a card: Draw a card."
+}

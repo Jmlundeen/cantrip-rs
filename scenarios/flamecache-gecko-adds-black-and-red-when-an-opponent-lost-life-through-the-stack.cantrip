@@ -1,0 +1,34 @@
+# Flamecache Gecko: "When this creature enters, if an opponent lost life this turn, add {B}{R}." Bot1 bolts Bot2 first
+# (20 -> 17), then casts the Gecko with the rest of the Black Lotus's red. The enters trigger is not a mana ability (the
+# ruling): after the Gecko resolves it sits on the stack (Stack.Count = 1, pool still empty) and can be responded to.
+# Resolving it fills the pool with {B}{R}, and the {R} is the only mana that can pay a second Bolt (17 -> 14); the {B} stays.
+
+[Bot1 Deck]
+Black Lotus
+Flamecache Gecko
+Lightning Bolt
+Lightning Bolt
+Island x3
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Flamecache Gecko.Cast
+Bot1.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Bot1.Mana =
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot1.Mana = {B}
+Bot1.Battlefield = Flamecache Gecko
