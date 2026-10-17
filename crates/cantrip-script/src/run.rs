@@ -397,8 +397,9 @@ impl<'s> Run<'s> {
                     .collect();
                 format!("{} [{}]", kind_name(&r.kind), list.join(" | "))
             }
-            RequestKind::ChooseCards { eligible, count, .. } => {
-                format!("ChooseCards {count} of [{}]", eligible.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
+            RequestKind::ChooseCards { eligible, count, total, .. } => {
+                let within = total.as_ref().map(|t| format!(" with total mana value {} or less", t.most)).unwrap_or_default();
+                format!("ChooseCards {count} of [{}]{within}", eligible.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
             }
             RequestKind::Craft { cards, minimum, maximum, .. } => {
                 format!("Craft {minimum} to {maximum} of [{}]", cards.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
@@ -989,6 +990,7 @@ impl<'s> Run<'s> {
             // Craft's materials (CR 702.167a): the fewest it takes, the first offered - the permanents before the graveyard.
             RequestKind::Craft { cards, minimum, .. } => Answer::Cards(cards.iter().take(*minimum as usize).copied().collect()),
             RequestKind::DiscardToHandSize { count, hand } => Answer::Cards(hand[hand.len() - *count as usize..].to_vec()),
+            RequestKind::ChooseCards { eligible, count, total: Some(t), .. } => Answer::Cards(t.first_fitting(eligible, *count as usize)),
             RequestKind::ChooseCards { eligible, count, .. } => Answer::Cards(eligible.iter().take(*count as usize).copied().collect()),
             // A creature that attacks each combat if able attacks whether or not the script says so (CR 508.1d): the first
             // player, planeswalker or battle it may attack without paying a cost to attack, which is never required.

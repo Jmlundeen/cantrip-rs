@@ -172,9 +172,17 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             }
             Answer::Act(Action::of(options.iter().find(|o| o.kind == ActionKind::DeclineCost).expect("decline")))
         }
-        RequestKind::ChooseCards { eligible, count, up_to, .. } => {
+        RequestKind::ChooseCards { eligible, count, up_to, total, .. } => {
             let n = if *up_to { random.below(*count as usize + 1) } else { *count as usize };
-            Answer::Cards(random.some(eligible, n))
+            let chosen = random.some(eligible, n);
+            // "With total mana value N or less": a random choice over it is cut back to the cards that fit, in the order drawn.
+            match total {
+                Some(t) => {
+                    let values: Vec<u16> = chosen.iter().map(|c| t.values[eligible.iter().position(|e| e == c).unwrap_or(0)]).collect();
+                    Answer::Cards(TotalAtMost { values, most: t.most }.first_fitting(&chosen, chosen.len()))
+                }
+                None => Answer::Cards(chosen),
+            }
         }
         RequestKind::ChooseTarget { candidates, least, count, .. } => {
             let n = *least as usize + random.below((*count - *least) as usize + 1);

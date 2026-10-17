@@ -1203,7 +1203,7 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(11)]
     public int MinimumManaValue { get; set; }
 
-    /// <summary>The mana value of each card in <see cref="Eligible"/>, index for index, when <see cref="MinimumManaValue"/> is set.</summary>
+    /// <summary>The mana value of each card in <see cref="Eligible"/>, index for index, when <see cref="MinimumManaValue"/> or <see cref="MaximumTotalManaValue"/> is set.</summary>
     [Key(12)]
     public List<int> ManaValues { get; set; } = [];
 
@@ -1230,11 +1230,21 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     public int Minimum { get; set; }
 
     /// <summary>
+    /// "With total mana value N or less" (CR 202.3): the most the chosen cards' <see cref="ManaValues"/> may add up to,
+    /// as Michelangelo's Technique's "up to two creature cards with total mana value 6 or less". Null when the choice asks
+    /// nothing of them. <c>Cantrip.Core.Decisions.TotalManaValue.Within</c> is the rule; the engine refuses a choice over it.
+    /// </summary>
+    [Key(17)]
+    public int? MaximumTotalManaValue { get; set; }
+
+    /// <summary>
     /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
     /// offered "up to" every candidate, so taking them all meets it whenever anything can; one with a <see cref="Minimum"/>
-    /// takes that many.
+    /// takes that many; one limited to a total mana value takes the first that fit together within it.
     /// </summary>
-    public override AnswerPayload Default() => new CardsChosenAnswer { Cards = [.. Eligible.Take(Minimum > 0 ? Minimum : Count)] };
+    public override AnswerPayload Default() => MaximumTotalManaValue is { } most
+        ? new CardsChosenAnswer { Cards = Cantrip.Core.Decisions.TotalManaValue.FirstFitting(Eligible, ManaValues, Count, most) }
+        : new CardsChosenAnswer { Cards = [.. Eligible.Take(Minimum > 0 ? Minimum : Count)] };
 }
 
 /// <summary>

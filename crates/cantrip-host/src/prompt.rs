@@ -674,7 +674,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             yes: question.yes.into(),
             no: question.no.into(),
         }),
-        RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, kind } => {
+        RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, kind, total } => {
             let owner = if *purpose == Purpose::TakeFromHand {
                 cards.first().map_or(request.player, |c| game.state.obj(*c).owner)
             } else {
@@ -710,6 +710,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     Purpose::PutCounters(_, n) => i32::from(*n),
                     _ => 0,
                 },
+                // "With total mana value N or less": each eligible card's mana value, and the most they may add up to.
+                mana_values: total.as_ref().map_or_else(Vec::new, |t| t.values.iter().map(|&v| i32::from(v)).collect()),
+                maximum_total_mana_value: total.as_ref().map(|t| i32::from(t.most)),
                 ..Default::default()
             })
         }
@@ -1088,6 +1091,7 @@ mod tests {
                     count: 1,
                     up_to: false,
                     kind,
+                    total: None,
                 },
                 may_cancel: false,
             };
@@ -1100,6 +1104,37 @@ mod tests {
         assert_eq!(kind_of("artifact or creature"), "artifact or creature");
         // Only creatures were eligible, and nothing was said: nothing is claimed.
         assert_eq!(kind_of(""), "");
+    }
+
+    /// "With total mana value N or less" reaches the client as the most the chosen cards may add up to and each eligible card's
+    /// mana value, index for index; a choice without it says nothing of either.
+    #[test]
+    fn a_choice_within_a_total_mana_value_sends_the_limit_and_each_cards_value() {
+        let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Forest"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let ask = |total: Option<TotalAtMost>| {
+            let request = Request {
+                id: 1,
+                player: seat,
+                kind: RequestKind::ChooseCards {
+                    source: hand[0],
+                    purpose: Purpose::PutOntoBattlefield,
+                    cards: hand.clone(),
+                    eligible: hand[..2].to_vec(),
+                    count: 2,
+                    up_to: true,
+                    kind: "creature",
+                    total,
+                },
+                may_cancel: false,
+            };
+            match prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
+                PromptPayload::ChooseCardsPromptMessage(p) => (p.maximum_total_mana_value, p.mana_values),
+                other => panic!("{other:?}"),
+            }
+        };
+        assert_eq!(ask(Some(TotalAtMost { values: vec![1, 0], most: 6 })), (Some(6), vec![1, 0]));
+        assert_eq!(ask(None), (None, Vec::new()));
     }
 
     #[test]

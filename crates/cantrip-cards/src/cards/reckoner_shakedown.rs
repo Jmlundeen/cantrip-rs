@@ -19,7 +19,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             cards: hand,
             eligible,
             count,
-            up_to: true, kind: "" };
+            up_to: true, kind: "", total: None };
         if let Answer::Cards(cards) = g.ask(item.controller, ask)? {
             chosen = cards;
         }

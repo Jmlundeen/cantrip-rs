@@ -285,8 +285,10 @@ pub enum RequestKind {
     },
     /// Choose `count` (or up to `count`) of `eligible`, from among `cards` (all of which the player sees).
     /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
-    /// "nonland"), empty otherwise: the dock words the choice as the card does.
-    ChooseCards { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, up_to: bool, kind: &'static str },
+    /// "nonland"), empty otherwise: the dock words the choice as the card does. `total`, when the cards chosen together are
+    /// limited to a total mana value ("up to two creature cards with total mana value 6 or less"), is that limit: the core
+    /// refuses a choice whose mana values add up to more.
+    ChooseCards { source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, eligible: Vec<ObjectId>, count: u8, up_to: bool, kind: &'static str, total: Option<TotalAtMost> },
     /// `least` to `count` targets are chosen (a range, "one or two target creatures", CR 601.2c); `optional` is `least == 0`.
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
     /// `label` is what the slot is for as its card words it (`TargetSpec::label`, empty when it has nothing to add), and
@@ -468,6 +470,47 @@ impl DamageDivision {
             }
         }
         shares
+    }
+}
+
+/// "[Cards] with total mana value N or less" (CR 202.3): the mana values of the cards chosen together add up to at most
+/// `most`. `values` is each eligible card's mana value, index for index with the question's `eligible`, read as it is asked
+/// (where the card is: an {X} in a library or graveyard counts as 0, CR 202.3e), so whoever answers needs to know no card.
+/// Michelangelo's Technique, Lively Dirge and Ao, the Dawn Sky print it.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct TotalAtMost {
+    pub values: Vec<u16>,
+    pub most: u16,
+}
+
+impl TotalAtMost {
+    /// The total mana value of `chosen`, each read at its index in `eligible` (a card not eligible adds nothing).
+    pub fn of(&self, eligible: &[ObjectId], chosen: &[ObjectId]) -> u32 {
+        chosen
+            .iter()
+            .filter_map(|c| eligible.iter().position(|e| e == c))
+            .map(|i| u32::from(self.values.get(i).copied().unwrap_or(0)))
+            .sum()
+    }
+
+    /// Whether `chosen` is within the limit.
+    pub fn allows(&self, eligible: &[ObjectId], chosen: &[ObjectId]) -> bool {
+        self.of(eligible, chosen) <= u32::from(self.most)
+    }
+
+    /// The first of `eligible`, in order, that fit together within the limit, at most `count` of them: an answer always
+    /// accepted, for a player who answers without reading the cards.
+    pub fn first_fitting(&self, eligible: &[ObjectId], count: usize) -> Vec<ObjectId> {
+        let mut left = u32::from(self.most);
+        let mut taken = Vec::new();
+        for (i, &card) in eligible.iter().enumerate() {
+            let value = u32::from(self.values.get(i).copied().unwrap_or(0));
+            if taken.len() < count && value <= left {
+                left -= value;
+                taken.push(card);
+            }
+        }
+        taken
     }
 }
 

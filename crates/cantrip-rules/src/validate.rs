@@ -106,12 +106,14 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
         | (RequestKind::UnlessPays { options, .. }, Answer::Act(action)) => {
             if options.iter().any(|o| fits(o, action)) { Ok(()) } else { no("that action is not one of the options") }
         }
-        (RequestKind::ChooseCards { eligible, count, up_to, .. }, Answer::Cards(cards)) => {
+        (RequestKind::ChooseCards { eligible, count, up_to, total, .. }, Answer::Cards(cards)) => {
             let n = cards.len() as u8;
             if !distinct(cards) || !cards.iter().all(|c| eligible.contains(c)) {
                 no("not among the cards that may be chosen")
             } else if n > *count || (!up_to && n != *count) {
                 no(format!("{n} chosen, {count} wanted"))
+            } else if let Some(t) = total.as_ref().filter(|t| !t.allows(eligible, cards)) {
+                no(format!("total mana value {}, {} or less wanted (CR 202.3)", t.of(eligible, cards), t.most))
             } else {
                 Ok(())
             }

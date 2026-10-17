@@ -180,6 +180,15 @@ answers so far replayed, and continues past the question. The mutations it made 
 and rolled back before the re-run, and card code is deterministic, so this is exact. It costs about 0.2 us per
 question over writing each card as explicit stages, which the spike measured, and keeps every card readable.
 
+Every answer is checked against its question before the card sees it (`cantrip-rules/src/validate.rs`): a card that was
+not offered, the wrong number, an over-budget total is refused and asked again, so a card's file reads the choice and
+nothing else. A limit on what the cards chosen together add up to is part of the question: "up to two creature cards with
+total mana value 6 or less" (CR 202.3) is a `ChooseCards` with `total: Some(TotalAtMost { values, most })`, each eligible
+card's mana value read as the question is asked (`choose::cards_within_total`), and the client shows the running total and
+refuses a card that would go over by the same numbers. Michelangelo's Technique asks it, through
+`library::look_at_top_onto_battlefield` (which Aang, at the Crossroads and United Battlefront use without a total); Lively
+Dirge and Ao, the Dawn Sky print the same choice.
+
 ### Characteristics
 
 - **Computed on query** (`chars()`), through the layers (613), from the object's card, its counters and the

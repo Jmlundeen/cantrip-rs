@@ -942,6 +942,9 @@ pub struct ChooseCardsPrompt {
     /// The fewest that may be chosen when `UpTo` makes `Count` a maximum: craft's "one or more" (CR 702.167a). Zero when
     /// any number up to `Count` will do.
     pub minimum: i32,
+    /// "With total mana value N or less" (CR 202.3): the most the chosen cards' `mana_values` may add up to; none when the
+    /// choice asks nothing of them.
+    pub maximum_total_mana_value: Option<i32>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1395,7 +1398,22 @@ impl PromptPayload {
                 AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::CancelCasting, ViewHandle::NONE))
             }
             PromptPayload::ChooseCardsPromptMessage(p) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer {
-                cards: p.eligible.iter().take(p.count.max(0) as usize).copied().collect(),
+                cards: match p.maximum_total_mana_value {
+                    // "With total mana value N or less": the first cards that fit together, in order.
+                    Some(most) => {
+                        let mut left = most;
+                        let mut taken = Vec::new();
+                        for (i, &card) in p.eligible.iter().enumerate() {
+                            let value = p.mana_values.get(i).copied().unwrap_or(0);
+                            if taken.len() < p.count.max(0) as usize && value <= left {
+                                left -= value;
+                                taken.push(card);
+                            }
+                        }
+                        taken
+                    }
+                    None => p.eligible.iter().take(p.count.max(0) as usize).copied().collect(),
+                },
             }),
             PromptPayload::UnlessPaysPromptMessage(_) => {
                 AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::DeclineCost, ViewHandle::NONE))

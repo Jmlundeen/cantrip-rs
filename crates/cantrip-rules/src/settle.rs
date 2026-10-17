@@ -317,7 +317,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                     cards: group.clone(),
                     eligible: group.clone(),
                     count: 1,
-                    up_to: false, kind: "" };
+                    up_to: false, kind: "", total: None };
                 let keep = match cx.ask_core(p, ask, false)? {
                     Answer::Cards(cards) => cards.first().copied().unwrap_or(group[0]),
                     _ => group[0],

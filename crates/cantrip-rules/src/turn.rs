@@ -195,7 +195,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
                                 cards: hand.clone(),
                                 eligible: hand,
                                 count: mulligans,
-                                up_to: false, kind: "" },
+                                up_to: false, kind: "", total: None },
                             false,
                         )?;
                         if let Answer::Cards(bottom) = answer {
@@ -239,7 +239,7 @@ pub fn opening(cx: &mut Cx) -> R<Flow> {
             let hand = cx.s().zone(Zone::hand(p)).to_vec();
             if action.exile_from_hand > 0 && !hand.is_empty() {
                 let count = action.exile_from_hand.min(hand.len() as u8);
-                let ask = RequestKind::ChooseCards { source: card, purpose: Purpose::Exile, cards: hand.clone(), eligible: hand, count, up_to: false, kind: "" };
+                let ask = RequestKind::ChooseCards { source: card, purpose: Purpose::Exile, cards: hand.clone(), eligible: hand, count, up_to: false, kind: "", total: None };
                 if let Answer::Cards(cards) = cx.ask_core(p, ask, false)? {
                     for c in cards {
                         ops::move_to_for(cx, c, Zone::exile(p), ZoneReason::Exile);

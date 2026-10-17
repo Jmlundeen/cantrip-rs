@@ -38,10 +38,48 @@ pub fn cards_from_kind(
     if eligible.is_empty() || count == 0 {
         return Ok(Vec::new());
     }
-    // "Any number" (`u8::MAX`, up to) stays the number the question was asked with, so it can say "any number of": a client
-    // told "up to 2" of two cards could not tell it from "up to two".
-    let count = if up_to && count == u8::MAX { count } else { count.min(eligible.len().min(u8::MAX as usize) as u8) };
-    match g.ask(player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to, kind })? {
+    ask_cards(g, player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to, kind, total: None })
+}
+
+/// Up to `count` of `eligible` "with total mana value `most` or less" (CR 202.3), chosen from among `shown`: the mana values
+/// of the cards chosen together add up to at most `most`, each read where the card is now (an {X} in a library or graveyard
+/// is 0, CR 202.3e). A card worth more than `most` by itself is not eligible; the core refuses a choice whose total is too
+/// much. Nothing is asked when nothing is eligible. Michelangelo's Technique (up to two, 6), Lively Dirge (up to two, 4)
+/// and Ao, the Dawn Sky (any number, 4) print it.
+pub fn cards_within_total(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Purpose,
+    kind: &'static str,
+    shown: Vec<ObjectId>,
+    eligible: Vec<ObjectId>,
+    count: u8,
+    most: u32,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let (eligible, values): (Vec<ObjectId>, Vec<u16>) = eligible
+        .into_iter()
+        .map(|c| (c, g.mana_value(c)))
+        .filter(|&(_, value)| value <= most)
+        .map(|(c, value)| (c, value.min(u32::from(u16::MAX)) as u16))
+        .unzip();
+    if eligible.is_empty() || count == 0 {
+        return Ok(Vec::new());
+    }
+    let total = Some(TotalAtMost { values, most: most.min(u32::from(u16::MAX)) as u16 });
+    ask_cards(g, player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to: true, kind, total })
+}
+
+/// Asks a `ChooseCards` question, its count no more than there are eligible cards (but "any number", `u8::MAX` up to, stays the
+/// number the question was asked with, so it can say "any number of": a client told "up to 2" of two cards could not tell it
+/// from "up to two").
+fn ask_cards(g: &mut dyn Game, player: PlayerId, mut ask: RequestKind) -> Result<Vec<ObjectId>, Suspend> {
+    if let RequestKind::ChooseCards { eligible, count, up_to, .. } = &mut ask {
+        if !(*up_to && *count == u8::MAX) {
+            *count = (*count).min(eligible.len().min(u8::MAX as usize) as u8);
+        }
+    }
+    match g.ask(player, ask)? {
         Answer::Cards(chosen) => Ok(chosen),
         _ => Ok(Vec::new()),
     }
