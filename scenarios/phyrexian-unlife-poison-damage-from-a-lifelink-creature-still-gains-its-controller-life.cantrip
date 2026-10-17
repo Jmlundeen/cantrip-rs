@@ -1,0 +1,53 @@
+# Phyrexian Unlife with an opposing lifelink creature (CR 702.15b, 702.90b): Bot1, Bolted from 1 to -2, is dealt 1 combat
+# damage by Bot2's Bofur, Reliable Guardian. It is dealt as though Bofur had infect - a poison counter, and Bot1's life
+# stays at -2 - and it is still damage dealt by a source with lifelink, so Bot2 gains 1 life.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Phyrexian Unlife
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mountain
+Bofur, Reliable Guardian
+Lightning Bolt
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Bofur, Reliable Guardian.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Attack(Bofur, Reliable Guardian > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Life = -2
+Bot1.Poison = 1
+Bot2.Life = 21

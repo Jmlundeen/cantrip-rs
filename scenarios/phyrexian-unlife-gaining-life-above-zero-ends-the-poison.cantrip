@@ -1,0 +1,61 @@
+# Phyrexian Unlife's second ability lasts only "as long as you have 0 or less life" (CR 611.3a): Bot1 is Bolted from 1 to -2,
+# then casts Healing Salve on itself, gaining 3 life, back to 1. The next Bolt is dealt as ordinary damage - life loss, to -2,
+# and no poison counters - since Bot1 had more than 0 life as it was dealt.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Phyrexian Unlife
+Healing Salve
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+? Bot1.Life = -2
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+[T6 Bot2.Main1]
+? Bot1.Life = 1
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Life = -2
+Bot1.Poison = 0
+Bot1.Status = (absent)

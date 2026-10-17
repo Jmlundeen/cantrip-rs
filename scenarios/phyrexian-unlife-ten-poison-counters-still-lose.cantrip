@@ -1,0 +1,58 @@
+# Phyrexian Unlife keeps its controller in only for having 0 or less life (CR 104.3d, 704.5c; the 2011-06-01 ruling).
+# Bot1 begins at 1 life with nine poison counters; Bot2's first Bolt takes Bot1 to -2 (life loss, no poison), and its second
+# is dealt as though it had infect: three more poison counters, twelve, and Bot1 loses to them - not to its life total.
+
+[Life]
+Bot1: 1
+
+[Poison]
+Bot1: 9
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Phyrexian Unlife
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main2]
+? Bot1.Poison = 9
+? Bot1.Life = -2
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost
+Bot1.LostTo = Poison
+Bot1.Poison = 12
+Bot1.Life = -2

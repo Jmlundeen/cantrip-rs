@@ -1,0 +1,51 @@
+# Phyrexian Unlife and double strike (CR 510.4, 702.4b, 702.90b): Bot1, at 1 life, is attacked by Bot2's Giott, King of the
+# Dwarves, a 1/1 with double strike. Its first-strike damage is dealt while Bot1 has 1 life: life loss, to 0. Its regular
+# damage, in the second combat damage step, is dealt while Bot1 has 0 life: as though Giott had infect, one poison counter.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Phyrexian Unlife
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Giott, King of the Dwarves
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Giott, King of the Dwarves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Giott, King of the Dwarves > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Life = 0
+Bot1.Poison = 1

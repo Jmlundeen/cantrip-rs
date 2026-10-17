@@ -1,0 +1,56 @@
+# Phyrexian Unlife and simultaneous damage (CR 510.2, 120.2): Bot1, at 1 life, is attacked by Bot2's Shattered Acolyte (2/2)
+# and Bofur, Reliable Guardian (1/1). Their combat damage is dealt at once, while Bot1 has 1 life, so all of it is ordinary
+# damage: Bot1 goes to -2 and gets no poison counter - whichever were dealt first, dealing them one after the other would
+# have made the second poison. Both have lifelink, so Bot2 gains 3.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Phyrexian Unlife
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Plains
+Bofur, Reliable Guardian
+Shattered Acolyte
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Bofur, Reliable Guardian.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Shattered Acolyte.Cast
+[T6 Bot2.Main1]
+Bot2.Attack(Bofur, Reliable Guardian > Bot1; Shattered Acolyte > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Life = -2
+Bot1.Poison = 0
+Bot2.Life = 23

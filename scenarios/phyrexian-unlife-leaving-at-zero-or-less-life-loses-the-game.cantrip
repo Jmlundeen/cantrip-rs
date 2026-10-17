@@ -1,0 +1,56 @@
+# Phyrexian Unlife (CR 104.3b, 704.5a): Bot1 is Bolted from 1 life to -2 and stays in the game while Unlife is on the
+# battlefield. When Bot2 Disenchants it, the next state-based action check finds Bot1 at 0 or less life with nothing saying
+# they don't lose, and Bot1 loses (the 2011-06-01 ruling).
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Phyrexian Unlife
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Plains
+Plains
+Lightning Bolt
+Disenchant
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = -2
+? Result = InProgress
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Phyrexian Unlife)
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost
+Bot1.LostTo = Life

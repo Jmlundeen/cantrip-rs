@@ -1,0 +1,57 @@
+# Phyrexian Unlife (CR 702.90b, 104.3b): damage that takes a positive life total to 0 or less is dealt as ordinary damage,
+# since Bot1 has more than 0 life as it is dealt (the 2011-06-01 ruling): Bot1, at 1 life, is Bolted to -2 and has no poison
+# counters, and doesn't lose for having 0 or less life. The next damage, a second Bolt, is dealt as though its source had
+# infect: three poison counters, and Bot1's life stays at -2.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Phyrexian Unlife
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = -2
+? Bot1.Poison = 0
+? Result = InProgress
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.End]
+
+[Expect]
+Result = InProgress
+Bot1.Life = -2
+Bot1.Poison = 3
+Bot1.Status = (absent)
