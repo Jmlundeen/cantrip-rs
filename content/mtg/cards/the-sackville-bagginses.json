@@ -1,0 +1,8 @@
+{
+  "name": "The Sackville-Bagginses",
+  "manaCost": "{1}{B}",
+  "type": "Legendary Creature — Halfling Citizen",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When The Sackville-Bagginses enter, you may sacrifice another creature or artifact. If you do, draw a card and create a Treasure token.\nWhenever you sacrifice a token, target opponent loses 1 life."
+}

@@ -1,0 +1,31 @@
+# The Sackville-Bagginses enters with no other creature or artifact under Bot1's control (Bot2's Mox Ruby is not Bot1's to
+# sacrifice, and Bot1's lands are neither): nobody is asked what to sacrifice (`! Bot1.Choose`), no card is drawn and no
+# Treasure is made.
+
+[Bot1 Deck]
+Swamp
+Swamp
+The Sackville-Bagginses
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.The Sackville-Bagginses.Cast
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; The Sackville-Bagginses
+Bot1.Hand.Count = 5
+Bot2.Battlefield = Mox Ruby
+Bot2.Life = 20

@@ -1,0 +1,29 @@
+# The Sackville-Bagginses sacrifices "another creature or ARTIFACT": with no creature, Bot1 sacrifices a Mox Ruby (a nontoken
+# artifact), so it draws a card and gets a Treasure but nobody loses life ("Whenever you sacrifice a TOKEN").
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Ruby
+The Sackville-Bagginses
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.The Sackville-Bagginses.Cast
+Bot1.Choose(Mox Ruby)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield = Swamp; Swamp; The Sackville-Bagginses; Treasure Token
+Bot1.Graveyard = Mox Ruby
+Bot1.Hand.Count = 5

@@ -1,0 +1,30 @@
+# The Sackville-Bagginses: the sacrifice is a "may". Bot1 has an Elvish Mystic it could sacrifice and declines (the empty answer):
+# no card is drawn, no Treasure token is created ("if you do"), the Mystic stays and nobody loses life.
+
+[Bot1 Deck]
+Forest
+Swamp
+Elvish Mystic
+The Sackville-Bagginses
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Elvish Mystic.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.The Sackville-Bagginses.Cast
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield = Forest; Swamp; Elvish Mystic; The Sackville-Bagginses
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 0

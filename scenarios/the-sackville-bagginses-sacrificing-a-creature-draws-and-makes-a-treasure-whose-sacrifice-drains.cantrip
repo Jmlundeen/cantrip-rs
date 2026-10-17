@@ -1,0 +1,37 @@
+# The Sackville-Bagginses: "When The Sackville-Bagginses enter, you may sacrifice another creature or artifact. If you do, draw a
+# card and create a Treasure token." On turn 3 Bot1 taps its Llanowar Elves for mana, casts the Sackville-Bagginses with it and a
+# Swamp, and sacrifices the Elves (a nontoken creature: no life is lost, "Whenever you sacrifice a TOKEN"). It draws a card and
+# gets a Treasure. Sacrificing that Treasure token for mana (a cost sacrifice, CR 701.21a) triggers the second ability:
+# Bot2 loses 1 life.
+
+[Bot1 Deck]
+Forest
+Swamp
+Llanowar Elves
+The Sackville-Bagginses
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.The Sackville-Bagginses.Cast
+Bot1.Choose(Llanowar Elves)
+[Bot1.Main2]
+? Bot2.Life = 20
+? Bot1.Battlefield = Forest; Swamp; The Sackville-Bagginses; Treasure Token
+Bot1.Battlefield.Treasure Token.Activate(Color: Black)
+[Bot1.End]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Llanowar Elves
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Forest; Swamp; The Sackville-Bagginses
