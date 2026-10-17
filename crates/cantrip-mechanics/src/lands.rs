@@ -254,6 +254,7 @@ pub fn becomes_creature_until_end_of_turn(
         types: TypeSet::NONE,
         subtypes: &[words.subtype(subtype)],
         all_creature_types: false,
+        replaces_creature_types: false,
         keywords,
         ability: None,
     };

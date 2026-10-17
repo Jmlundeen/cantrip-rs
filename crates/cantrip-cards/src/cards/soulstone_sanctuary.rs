@@ -15,6 +15,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         types: TypeSet::NONE,
         subtypes: &[],
         all_creature_types: true,
+        replaces_creature_types: false,
         keywords: Keywords::of(&[Keyword::Vigilance]),
         ability: None,
     };

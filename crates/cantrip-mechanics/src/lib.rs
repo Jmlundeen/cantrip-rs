@@ -705,6 +705,11 @@ pub struct Animation<'a> {
     pub subtypes: &'a [Subtype],
     /// "with all creature types" (CR 205.3m): Mutavault, Soulstone Sanctuary.
     pub all_creature_types: bool,
+    /// The text makes it "a [creature types] artifact creature" and does not say it is still what it was, so the creature
+    /// types it names replace those it had, while its card types and other subtypes stay (CR 205.1b): Iron Man Armor ("a
+    /// 0/0 Construct Hero artifact creature"), Chimeric Staff ("an X/X Construct artifact creature"). A text that says "It's
+    /// still a land" (Inkmoth Nexus, Mishra's Factory) keeps all its subtypes and leaves this false.
+    pub replaces_creature_types: bool,
     pub keywords: Keywords,
     /// A triggered or activated ability the permanent is given for the duration (CR 613.1f), if the text gives one.
     pub ability: Option<AbilityRef>,
@@ -722,6 +727,9 @@ pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Anim
         return;
     }
     g.add_effect(source, permanent, EffectKind::AddTypes(a.types.with(CardType::Creature)), duration);
+    if a.replaces_creature_types {
+        g.add_effect(source, permanent, EffectKind::LoseAllCreatureTypes, duration);
+    }
     for &subtype in a.subtypes {
         g.add_effect(source, permanent, EffectKind::AddSubtype(subtype), duration);
     }

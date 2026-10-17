@@ -11,9 +11,9 @@ fn plus_two_plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 
 /// "{2}: If this Equipment isn't a creature, it becomes a 0/0 Construct Hero artifact creature with flying and 'This creature
 /// gets +1/+1 for each artifact you control' until end of turn." The check is made as the ability resolves (CR 608.2c), so a second activation
-/// in one turn does nothing. It is an artifact already, and an Equipment, and keeps both: Artifact and Creature are added to its
-/// types and Construct and Hero (read through its words, CR 612) to its creature types (layer 4), its base power and toughness
-/// are set (7b) and the flying and the quoted ability granted (6), so the Armor counts itself among the artifacts. An
+/// in one turn does nothing. It is an artifact already, and an Equipment, and keeps both: Artifact and Creature are added to
+/// its types, and Construct and Hero (read through its words, CR 612) replace any creature types it had, since the text
+/// does not say it is still what it was (CR 205.1b; layer 4); its base power and toughness are set (7b) and the flying and the quoted ability granted (6), so the Armor counts itself among the artifacts. An
 /// Equipment that has left the battlefield is a new object the ability does not affect (CR 400.7).
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let me = item.object;
@@ -29,6 +29,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         types: TypeSet::of(&[CardType::Artifact]),
         subtypes: &[words.subtype(Subtype::Construct), words.subtype(Subtype::Hero)],
         all_creature_types: false,
+        replaces_creature_types: true,
         keywords: Keywords::of(&[Keyword::Flying]),
         ability: Some(AbilityRef::delayed(card, 0)),
     };

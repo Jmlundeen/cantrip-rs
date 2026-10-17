@@ -18,6 +18,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         types: TypeSet::of(&[CardType::Artifact]),
         subtypes: &[words.subtype(Subtype::Phyrexian), words.subtype(Subtype::Blinkmoth)],
         all_creature_types: false,
+        replaces_creature_types: false,
         keywords: Keywords::of(&[Keyword::Flying, Keyword::Infect]),
         ability: None,
     };
