@@ -1,0 +1,54 @@
+# Kiki-Jiki has haste, so it taps the turn it arrives (CR 702.10, 302.6), and makes a token copy of Bot1's Llanowar Elves
+# "except it has haste" (CR 707.2, 707.9b): the token taps for {G} at once. "Sacrifice it at the beginning of the next end step" is
+# a delayed triggered ability (CR 603.7): at the end step of turn 3 the token is sacrificed and, a token, ceases to exist
+# (CR 111.7); nothing waits after it.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Black Lotus
+Plains
+Plains
+Kiki-Jiki, Mirror Breaker
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves#2.Token = true
+? Bot1.Battlefield.Llanowar Elves#2.Keywords = Haste
+? Bot1.Battlefield.Llanowar Elves#1.Keywords = (absent)
+? Delayed = Kiki-Jiki, Mirror Breaker
+Bot1.Battlefield.Llanowar Elves#2.Activate
+? Bot1.Mana = {G}
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Emerald; Llanowar Elves; Kiki-Jiki, Mirror Breaker
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Tapped = true
+Bot1.Graveyard = Black Lotus
+Delayed.Count = 0
+LeftBattlefield = Black Lotus (tapped); Llanowar Elves (tapped)

@@ -1,0 +1,11 @@
+{
+  "name": "Kiki-Jiki, Mirror Breaker",
+  "manaCost": "{2}{R}{R}{R}",
+  "type": "Legendary Creature — Goblin Shaman",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Haste\n{T}: Create a token that's a copy of target nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step.",
+  "keywords": [
+    "Haste"
+  ]
+}

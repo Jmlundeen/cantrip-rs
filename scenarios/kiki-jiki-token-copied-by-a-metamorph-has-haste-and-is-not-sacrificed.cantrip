@@ -1,0 +1,63 @@
+# A copy of Kiki-Jiki's token copies its copiable values, the Llanowar Elves "except it has haste" (CR 707.9b; the ruling: "If
+# another creature ... enters the battlefield as a copy of, the token, that creature will copy the creature card the token is
+# copying, except it will also have haste. However, you won't sacrifice the new copy"). Phyrexian Metamorph enters as a copy
+# of the token: an artifact Llanowar Elves with haste, tapped for mana the turn it arrives. At the end step only the token is
+# sacrificed; the Metamorph stays.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Phyrexian Metamorph
+Kiki-Jiki, Mirror Breaker
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Llanowar Elves#1.Activate
+Bot1.Battlefield.Llanowar Elves#2.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Llanowar Elves#2)
+? Bot1.Battlefield.Llanowar Elves#3.Keywords = Haste
+Bot1.Battlefield.Llanowar Elves#3.Activate
+? Bot1.Mana = {G}
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Llanowar Elves; Mox Sapphire; Mox Pearl; Kiki-Jiki, Mirror Breaker; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves#2.Keywords = Haste
+Bot1.Battlefield.Llanowar Elves#2.Types = Creature; Artifact
+Bot1.Battlefield.Llanowar Elves#2.Token = (absent)
+Bot1.Battlefield.Llanowar Elves#1.Keywords = (absent)
+Delayed.Count = 0

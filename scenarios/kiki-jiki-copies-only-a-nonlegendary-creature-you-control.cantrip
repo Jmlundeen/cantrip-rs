@@ -1,0 +1,57 @@
+# Kiki-Jiki's target is "nonlegendary creature you control" (CR 115.1, 205.4a): not Bot1's legendary Bofur, not Kiki-Jiki itself,
+# not Bot2's Guerrilla Gorilla - the refusals - and Bot1's Llanowar Elves, the positive control, is copied.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Mox Pearl
+Bofur, Reliable Guardian
+Black Lotus
+Kiki-Jiki, Mirror Breaker
+Plains x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Bofur, Reliable Guardian)
+! Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Kiki-Jiki, Mirror Breaker)
+! Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Emerald; Llanowar Elves; Mox Pearl; Bofur, Reliable Guardian; Kiki-Jiki, Mirror Breaker; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves#2.Token = true
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Tapped = true

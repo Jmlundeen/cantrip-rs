@@ -1,0 +1,50 @@
+# Kiki-Jiki may target Bot1's Mutavault while it is a 2/2 creature, but the token copies only its copiable values (CR 707.2; the
+# ruling: "if the target creature isn't normally a creature, the copy won't be a creature"): a Land token named Mutavault, with
+# haste and no creature type, which is still sacrificed at the end step (CR 603.7).
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Emerald
+Black Lotus
+Plains
+Plains
+Plains
+Kiki-Jiki, Mirror Breaker
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot1.Battlefield.Mutavault.Activate(Ability: {C})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Mutavault)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault#2.Token = true
+? Bot1.Battlefield.Mutavault#2.Types = Land
+? Bot1.Battlefield.Mutavault#2.Keywords = Haste
+? Bot1.Battlefield.Mutavault#1.Types = Land; Creature
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mutavault; Mox Ruby; Mox Emerald; Kiki-Jiki, Mirror Breaker
+Delayed.Count = 0
