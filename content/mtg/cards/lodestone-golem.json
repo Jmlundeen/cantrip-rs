@@ -1,0 +1,8 @@
+{
+  "name": "Lodestone Golem",
+  "manaCost": "{4}",
+  "type": "Artifact Creature — Golem",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "Nonartifact spells cost {1} more to cast."
+}
