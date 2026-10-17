@@ -1,0 +1,22 @@
+# "You control an Island or a Swamp": an Island of its own enables {B} (the other half of the "or"); the opponent's Swamp
+# (turn 2) does not.
+
+[Bot1 Deck]
+Gloomlake Verge
+Island
+Forest x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Gloomlake Verge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Gloomlake Verge.Activate(Ability: {B})
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Gloomlake Verge.Activate(Ability: {B})
+
+[Expect]
+Bot1.Mana = {B}

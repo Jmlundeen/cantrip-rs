@@ -1,0 +1,27 @@
+# Gloomlake Verge: its {B} ability is offered only while you control an Island or a Swamp (CR 602.5b). Alone it makes
+# {U}; a Forest beside it does not unlock {B} (negative control); a Swamp does, and the Verge itself, which has no basic
+# land types, does not count.
+
+[Bot1 Deck]
+Gloomlake Verge
+Forest
+Swamp
+Swamp x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Gloomlake Verge.Play
+! Bot1.Battlefield.Gloomlake Verge.Activate(Ability: {B})
+Bot1.Battlefield.Gloomlake Verge.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Gloomlake Verge.Activate(Ability: {B})
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Gloomlake Verge.Activate(Ability: {B})
+
+[Expect]
+Bot1.Mana = {B}
