@@ -1,0 +1,67 @@
+# "The ability doesn't care whether Old Man of the Sea remains under your control, only that Old Man of the Sea remains
+# tapped and its power remains large enough" (its ruling; CR 611.2b). Bot1's Old Man takes Bot2's Llanowar Elves; Bot2 then
+# takes the tapped Old Man with Mind Control (CR 613.1b). The effect's controller is still Bot1, so Bot1 keeps the Elves. In
+# Bot2's next untap step it is Bot2, Old Man's controller now, who is asked whether it untaps (CR 502.3); Bot2 leaves it
+# tapped, and Bot1 still has the Elves, which taps for {G} on Bot1's turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Island
+Mind Control
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Mind Control.Cast(Bot1.Battlefield.Old Man of the Sea)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Old Man of the Sea.Tapped = true
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Decline
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Old Man of the Sea.Tapped = true
+[T7 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Island; Llanowar Elves
+Bot2.Battlefield = Forest; Island; Mox Sapphire; Mox Jet; Mox Pearl; Mox Ruby; Mind Control; Old Man of the Sea
+Bot2.Battlefield.Mind Control.AttachedTo = Old Man of the Sea

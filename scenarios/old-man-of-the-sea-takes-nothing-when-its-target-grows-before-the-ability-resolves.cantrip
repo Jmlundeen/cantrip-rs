@@ -1,0 +1,48 @@
+# "The same is true if the targeted creature's power becomes greater than Old Man of the Sea's power before the ability
+# resolves" (its ruling): the target restriction is checked again as the ability resolves (CR 608.2b), and the creature is no
+# longer a legal target. Bot1's Old Man targets Bot2's Llanowar Elves; in response Bot2 casts Turn Inside Out on the Elves
+# (4/1). The ability does nothing: the Elves stays Bot2's.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Turn Inside Out
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Turn Inside Out.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Power = 4
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Island; Old Man of the Sea
+Bot1.Battlefield.Old Man of the Sea.Tapped = true
+Bot2.Battlefield = Forest; Mox Ruby; Llanowar Elves
+Stack.Count = 0

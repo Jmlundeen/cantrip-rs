@@ -1,0 +1,46 @@
+# Browser
+# Bot1's page shows what Old Man of the Sea's control effect is: the Llanowar Elves it took says on its face who controls
+# it, for how long and why - "You control it for as long as Old Man of the Sea remains tapped and its power
+# remains less than or equal to Old Man of the Sea's power" (CR 611.2b, 613.1b). In Bot1's next untap step the page asks
+# "Old Man of the Sea: untap it during this untap step?" (CR 502.3), and Bot1 leaves it tapped, keeping the Elves.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Battlefield.Llanowar Elves.Rules = {T}: Add {G}. / You control it for as long as Old Man of the Sea remains tapped and its power remains less than or equal to Old Man of the Sea's power (Old Man of the Sea).
+[T4 Bot2.End]
+Bot2.Pass
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Old Man of the Sea: untap it during this untap step?
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Old Man of the Sea.Tapped = true
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Island; Old Man of the Sea; Llanowar Elves
+Bot1.Battlefield.Old Man of the Sea.Tapped = true

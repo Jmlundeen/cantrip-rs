@@ -1,0 +1,55 @@
+# "If Old Man of the Sea stops being tapped before its ability resolves - even if it becomes tapped again right away - you
+# won't gain control of the targeted creature at all" (its ruling; CR 611.2b: a "for as long as" duration that has ended
+# before the effect would first apply does nothing). Bot1 activates Old Man of the Sea targeting Bot2's Llanowar Elves, and
+# in response flashes in Pestermite to untap Old Man. The ability resolves with Old Man untapped: the Elves stays Bot2's.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Mox Pearl
+Island
+Pestermite
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pestermite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Old Man of the Sea)
+Bot1.Modes(Untap)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Old Man of the Sea.Tapped = false
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Pearl; Island; Island; Old Man of the Sea; Pestermite
+Bot1.Battlefield.Old Man of the Sea.Tapped = false
+Bot2.Battlefield = Forest; Llanowar Elves
+Stack.Count = 0

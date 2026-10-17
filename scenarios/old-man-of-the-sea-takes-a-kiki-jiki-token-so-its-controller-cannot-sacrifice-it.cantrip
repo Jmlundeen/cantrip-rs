@@ -1,0 +1,74 @@
+# Kiki-Jiki's token copy is to be sacrificed "at the beginning of the next end step" by the delayed ability's controller,
+# Bot1; a player can't sacrifice a permanent they don't control (CR 701.21a). With that ability on the stack in Bot1's end
+# step, Bot2 takes the token with Old Man of the Sea (Bot2 has controlled Old Man since their turn began, CR 302.6; the
+# ability works at instant speed; the token's power 1 is no more than Old Man's 2). The delayed ability resolves and
+# sacrifices nothing: the token stays Bot2's for as long as Old Man stays tapped (CR 611.2b), which Bot2 chooses in their
+# untap step (CR 502.3). It is a token, with the haste its copy effect gave it (CR 707.9b), whoever controls it.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Llanowar Elves
+Mountain
+Kiki-Jiki, Mirror Breaker
+Mountain x12
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Old Man of the Sea.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves#2.Token = true
+[T5 Bot1.End]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Llanowar Elves#2)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Token = true
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Old Man of the Sea.Tapped = true
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl; Llanowar Elves; Kiki-Jiki, Mirror Breaker
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Island; Old Man of the Sea; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Token = true
+Bot2.Battlefield.Llanowar Elves.Keywords = Haste
+Delayed.Count = 0

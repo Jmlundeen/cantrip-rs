@@ -1,0 +1,51 @@
+# No player gets priority in the untap step (CR 502.4), but an effect "for as long as this creature remains tapped" ends
+# the moment Old Man of the Sea untaps (CR 611.2b), not at the next check of state-based actions. Bot1's Old Man has taken
+# Bot2's Dark Confidant; in Bot1's next untap step Bot1 untaps Old Man, so when Bot1's upkeep begins the Confidant is Bot2's
+# again and its "at the beginning of your upkeep" ability does not trigger for Bot1 (CR 503.1a, 603.2): Bot1 does not reveal
+# the Lightning Bolt on top of its library or lose 1 life for it, and draws the Bolt in its draw step instead.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x11
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Dark Confidant
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Dark Confidant)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dark Confidant.Power = 2
+Bot1.Accept
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Old Man of the Sea.Tapped = false
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Island; Island; Island; Island; Lightning Bolt
+Bot2.Battlefield = Swamp; Mox Jet; Dark Confidant

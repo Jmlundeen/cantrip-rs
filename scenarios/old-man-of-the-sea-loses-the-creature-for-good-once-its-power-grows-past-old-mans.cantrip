@@ -1,0 +1,54 @@
+# Old Man of the Sea's control effect lasts "for as long as this creature remains tapped and that creature's power remains less
+# than or equal to this creature's power" (CR 611.2b): a duration of a layer-2 effect (CR 613.1b) that ends on a value of
+# layer 7 (CR 613.4c). Bot1's Old Man (2/3) takes Bot2's Llanowar Elves (1/1). Bot2 then casts Turn Inside Out on the Elves:
+# at 4/1 its power is greater than Old Man's 2, so the effect ends and the Elves is Bot2's again. When the +3/+0 wears off at
+# end of turn the Elves is 1/1 and Old Man is still tapped (Bot1 leaves it tapped in their untap step), but an effect whose
+# duration has ended never comes back (CR 611.2b): the Elves stays Bot2's into Bot1's next turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mountain
+Turn Inside Out
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Turn Inside Out.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Power = 4
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Old Man of the Sea.Tapped = true
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Island; Old Man of the Sea
+Bot1.Battlefield.Old Man of the Sea.Tapped = true
+Bot2.Battlefield = Forest; Mountain; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Power = 1

@@ -1,0 +1,68 @@
+# "If it stops being a creature, its power is considered to be 0" (Old Man of the Sea's ruling; CR 611.2b). Bot2 crews
+# Smuggler's Copter (a 3/3 artifact creature until end of turn). Bot1 pumps Old Man to 4/5 with Battlefield Improvisation
+# and, with the Copter's power 3 no more than Old Man's 4, takes it. When the turn ends both effects end together: Old Man
+# is 2/3 again and the Copter no Vehicle creature, so its power counts as 0 - not its printed 3 - and Bot1 keeps it,
+# still holding it on Bot1's turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Mox Pearl
+Plains
+Battlefield Improvisation
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Jet
+Mox Ruby
+Smuggler's Copter
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Smuggler's Copter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Smuggler's Copter.Power = 3
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Bot1.Battlefield.Old Man of the Sea)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Old Man of the Sea.Power = 4
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Smuggler's Copter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Smuggler's Copter.Types = Artifact; Creature
+Bot1.Decline
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Old Man of the Sea.Power = 2
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Pearl; Island; Plains; Old Man of the Sea; Smuggler's Copter
+Bot1.Battlefield.Smuggler's Copter.Types = Artifact
+Bot2.Battlefield = Forest; Mox Jet; Mox Ruby; Llanowar Elves
