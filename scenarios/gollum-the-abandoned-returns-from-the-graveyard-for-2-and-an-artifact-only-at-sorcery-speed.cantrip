@@ -1,0 +1,58 @@
+# "{2}, Sacrifice an artifact or creature: Return this card from your graveyard to your hand. Activate only as a sorcery."
+# Bot2 kills Gollum with Dismember on turn 2. At the end of that turn (not Bot1's main phase, with Mox Pearl and Mox
+# Emerald untapped to pay and artifacts to sacrifice) the ability is not offered: sorcery speed (CR 602.5d). On Bot1's turn 3 the
+# same ability is offered: Bot1 pays {2} with the two Moxes, sacrifices Mox Ruby (an artifact) and Gollum returns to hand.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Gollum the Abandoned
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Gollum the Abandoned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Gollum the Abandoned)
+Bot2.Modes()
+[T2 Bot2.End]
+! Bot1.Graveyard.Gollum the Abandoned.Activate
+[T3 Bot1.Main1]
+Bot1.Graveyard.Gollum the Abandoned.Activate
+Bot1.Choose(Mox Ruby)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Hand = Gollum the Abandoned; Swamp; Swamp
+Bot1.Graveyard = Mox Ruby
+Bot2.Life = 18

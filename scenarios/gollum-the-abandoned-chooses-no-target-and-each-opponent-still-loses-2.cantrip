@@ -1,0 +1,39 @@
+# "Up to one target": Bot1 chooses none (`Bot1.Target()`), so Bot2's Lotus Petal stays in its graveyard, and each opponent
+# loses 2 life all the same (the ruling: the life loss does not depend on a target).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Gollum the Abandoned
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Lotus Petal
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Battlefield.Lotus Petal.Activate(Color: Black)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Gollum the Abandoned.Cast
+Bot1.Target()
+
+[Expect]
+Bot2.Graveyard = Lotus Petal
+Exile.Count = 0
+Bot2.Life = 18

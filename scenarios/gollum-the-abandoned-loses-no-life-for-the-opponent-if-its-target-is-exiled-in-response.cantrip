@@ -1,0 +1,45 @@
+# The ruling: "if you do [choose a target] and that target becomes illegal by the time the ability tries to resolve, it will
+# not resolve. Each opponent will not lose 2 life." (CR 608.2b: the only target is illegal.) Gollum's trigger targets Bot2's
+# spent Bloodstained Mire; in response Bot1's Deathrite Shaman exiles it. Bot2 is at 19 (the Mire's life payment), and stays there.
+
+[Bot1 Deck]
+Swamp
+Deathrite Shaman
+Gollum the Abandoned
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Bloodstained Mire
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Deathrite Shaman.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Bloodstained Mire.Play
+Bot2.Battlefield.Bloodstained Mire.Activate
+Bot2.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Gollum the Abandoned.Cast
+Bot1.Target(Bot2.Graveyard.Bloodstained Mire)
+Bot1.Battlefield.Deathrite Shaman.Activate(Bot2.Graveyard.Bloodstained Mire; Ability: land card)
+Bot1.Pass
+
+[Expect]
+Exile = Bloodstained Mire
+Bot2.Life = 19
+Bot1.Battlefield.Gollum the Abandoned.Tapped = false

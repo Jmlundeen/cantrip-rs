@@ -1,0 +1,53 @@
+# The return ability's cost is {2} and "Sacrifice an artifact or creature". On turn 3 Bot1 has only two untapped Swamps (the
+# Lotus Petal that helped cast Gollum was sacrificed), so the ability is not offered: lands are neither. Once it casts an
+# Ornithopter (a creature, and an artifact) the same ability is offered, and Bot1 sacrifices the Ornithopter to pay
+# for it and gets Gollum back.
+
+[Bot1 Deck]
+Swamp
+Lotus Petal
+Gollum the Abandoned
+Ornithopter
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Gollum the Abandoned.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Gollum the Abandoned)
+Bot2.Modes()
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Graveyard.Gollum the Abandoned.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Graveyard.Gollum the Abandoned.Activate
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+
+[Expect]
+Bot1.Hand = Gollum the Abandoned; Swamp; Swamp; Swamp
+Bot1.Graveyard = Ornithopter; Lotus Petal
+Bot1.Battlefield.Count = 2
