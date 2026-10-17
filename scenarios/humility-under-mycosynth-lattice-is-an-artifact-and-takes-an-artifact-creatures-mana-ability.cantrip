@@ -1,8 +1,8 @@
 # Mycosynth Lattice, then Humility. Layer 4: the Lattice makes every permanent an artifact, Humility (an Artifact
 # Enchantment now, no creature) and Bot2's Llanowar Elves (an artifact creature) among them. Layer 5: everything is
-# colorless. Layer 6: Humility takes the Elves' "{T}: Add {G}" (CR 613.1f), so on turn 4 Bot2 can't tap it for mana, though
-# it could on turn 2 (the positive control, paying for nothing - the Lattice lets the Island's {U} cast it). Layer 7b: the
-# Elves are 1/1. The Lattice is no creature and keeps its abilities, so Humility's {2}{W}{W} is paid with Sol Ring's {C}{C}
+# colorless. Layer 6: Humility takes the Elves' "{T}: Add {G}" (CR 613.1f), so on turn 6 Bot2 can't tap it for mana, though
+# it could on turn 4, before Humility (the positive control; the Lattice let the Island's {U} cast it on turn 2). Layer 7b:
+# the Elves are 1/1. The Lattice is no creature and keeps its abilities, so Humility's {2}{W}{W} is paid with Sol Ring's {C}{C}
 # and the Moxes' {B}{R} (CR 609.4b).
 
 [Bot1 Deck]
@@ -43,7 +43,10 @@ Bot2.Hand.Llanowar Elves.Cast
 Bot2.Battlefield.Island.Activate
 Bot2.Pass
 Bot1.Pass
-[T3 Bot1.Main1]
+[T4 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+? Bot2.Mana = {G}
+[T5 Bot1.Main1]
 Bot1.Hand.Humility.Cast
 Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Mox Jet.Activate
@@ -51,11 +54,11 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Battlefield.Humility.Types = Enchantment; Artifact
-[T4 Bot2.Main1]
+[T6 Bot2.Main1]
 ! Bot2.Battlefield.Llanowar Elves.Activate
 
 [Expect]
-Turn = 4
+Turn = 6
 Bot2.Battlefield.Llanowar Elves.Types = Creature; Artifact
 Bot2.Battlefield.Llanowar Elves.Power = 1
 Bot2.Battlefield.Llanowar Elves.Toughness = 1

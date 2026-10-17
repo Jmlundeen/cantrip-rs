@@ -1,0 +1,43 @@
+# Vesuva ("You may have this land enter tapped as a copy of any land on the battlefield") played under Blood Moon. Its copy
+# ability modifies how it enters, and a nonbasic land under Blood Moon loses such abilities before they can apply (Magus
+# of the Moon's ruling names Vesuva; CR 614.12, 305.7): Bot1 is not asked, Vesuva copies nothing and enters untapped as
+# itself, a Land - Mountain that taps for {R}. Bot2's Island is on the battlefield to be copied (the positive control of
+# a copy is vesuva-copying-an-untapped-island-enters-tapped-as-a-basic-island).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Blood Moon
+Vesuva
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+! Bot1.Accept
+? Bot1.Battlefield.Vesuva.Tapped = false
+Bot1.Battlefield.Vesuva.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Vesuva.Subtypes = Mountain
+Bot1.Battlefield.Vesuva.Types = Land

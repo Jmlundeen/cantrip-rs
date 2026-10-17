@@ -1,0 +1,77 @@
+# Mycosynth Lattice's "Players may spend mana as though it were mana of any color" (CR 609.4b) for an activation and a
+# hybrid cost, and its ruling that "it doesn't remove restrictions on the mana".
+# - Turn 5: Cavern of Souls (Elf chosen) adds a green mana spendable only on an Elf creature spell. Basking Rootwalla, a
+#   Lizard, is cast for {G}: the Cavern's mana can't pay it - the restriction stands - so Sol Ring's colorless pays it, and
+#   the Cavern's {G} stays in the pool. Rootwalla's "{1}{G}: +2/+2" is then paid with the Sol Ring's other {C} and Mox
+#   Jet's {B}: an activation's colored symbol paid with off-color mana. The Cavern's {G} is still unspent.
+# - Turn 7: Llanowar Elves, an Elf, is cast with a Cavern {G} (the positive control of the restricted mana paying what it may).
+# - Turn 9: Leyline of the Guildpact's {G/W}{G/U}{B/G}{R/G} is paid with Sol Ring's {C}{C}, Mox Jet's {B} and Mox Pearl's {W}:
+#   colorless pays hybrid symbols too.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Sol Ring
+Mycosynth Lattice
+Cavern of Souls
+Basking Rootwalla
+Llanowar Elves
+Leyline of the Guildpact
+Plains x15
+
+[Bot2 Deck]
+Island x40
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Cavern of Souls.Play
+Bot1.Modes(Elf)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C} {G} (ElfCreatureSpells, CantBeCountered)
+Bot1.Battlefield.Basking Rootwalla.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 3
+? Bot1.Mana = {G} (ElfCreatureSpells, CantBeCountered)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Cavern of Souls.Activate(Ability: any color; Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = 
+[T9 Bot1.Main1]
+Bot1.Hand.Leyline of the Guildpact.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 9
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Sol Ring; Mycosynth Lattice; Cavern of Souls; Basking Rootwalla; Llanowar Elves; Leyline of the Guildpact
+Bot1.Mana = 

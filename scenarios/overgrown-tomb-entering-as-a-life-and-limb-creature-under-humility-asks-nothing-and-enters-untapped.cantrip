@@ -1,0 +1,55 @@
+# Known bug: a permanent entering is judged by its own card, not with other objects' type-changing effects, so Humility does not strip the "as this enters" of a land Life and Limb would make a creature (CR 614.12; KI-52).
+# Overgrown Tomb (Land - Swamp Forest: "As this land enters, you may pay 2 life. If you don't, it enters tapped.") played
+# under Life and Limb and Humility. CR 614.12: its replacement effects are judged on it as it would exist on the
+# battlefield, "taking into account ... continuous effects that already exist and would apply to the permanent". There it
+# is a Forest, so Life and Limb makes it a 1/1 green Saproling creature (layer 4), and Humility takes all its abilities
+# (layer 6) - the "as this enters" among them. So Bot1 is asked nothing, pays no life and the Tomb enters untapped (a
+# creature that lost its mana abilities, it can't tap for mana anyway).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Life and Limb
+Humility
+Plains
+Overgrown Tomb
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Overgrown Tomb.Play
+! Bot1.Accept
+
+[Expect]
+Turn = 5
+Bot1.Life = 20
+Bot1.Battlefield.Overgrown Tomb.Tapped = false
+Bot1.Battlefield.Overgrown Tomb.Types = Land; Creature
+Bot1.Battlefield.Overgrown Tomb.Power = 1
