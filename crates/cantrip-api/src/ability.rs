@@ -87,8 +87,7 @@ pub const fn remove_counters_among(n: u8, filter: ObjectFilter) -> Cost {
     Cost { remove_counters_among: Some((n, filter)), ..Cost::NONE }
 }
 
-/// "Put N [kind] counters on this [permanent]" as a cost (CR 118.3, 602.2b): Mazemind Tome's page counter, Devoted Druid's
-/// -1/-1 counter.
+/// "Put N [kind] counters on this [permanent]" as a cost (CR 118.3, 602.2b): Mazemind Tome's page counter.
 pub const fn put_counters(kind: CounterKind, n: u8) -> Cost {
     Cost { put_counters: Some((kind, n)), ..Cost::NONE }
 }

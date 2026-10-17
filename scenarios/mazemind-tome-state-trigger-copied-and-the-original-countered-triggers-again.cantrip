@@ -1,0 +1,106 @@
+# Mazemind Tome's state trigger ("When there are four or more page counters on this artifact, exile it. If you do, you
+# gain 4 life") "doesn't trigger again until the ability has resolved, has been countered, or has otherwise left the
+# stack" (CR 603.8) - the ability that triggered, not a copy of it: a copy was never triggered (CR 707.10). Bot1 puts
+# the fourth page counter on turn 7; Bot2 copies the trigger with Return the Favor and then counters the original under
+# the copy with Ertai Resurrected (Bot1, its controller, draws). With only the copy left on the stack the Tome, still
+# with four counters, triggers again at once, above the copy: that trigger exiles the Tome and Bot1 gains 4 life, and
+# Bot2's copy then finds no Tome to exile - Bot2 gains nothing.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mazemind Tome
+Island x4
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Ertai Resurrected
+Return the Favor
+Mountain
+Island
+Swamp
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mazemind Tome.Cast
+Bot1.Pass
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Return the Favor.Cast
+Bot2.Modes(Copy target)
+Bot2.Target(Stack.Mazemind Tome)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Ertai Resurrected.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Modes(1)
+Bot2.Target(Stack.Mazemind Tome#2)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 3
+? Bot1.Life = 20
+Bot1.Pass
+Bot2.Pass
+? Exile = Mazemind Tome
+? Bot1.Life = 24
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+
+[Expect]
+Stack.Count = 0
+Exile = Mazemind Tome
+Bot1.Life = 24
+Bot2.Life = 20
+Bot2.Battlefield.Ertai Resurrected.Types = Creature

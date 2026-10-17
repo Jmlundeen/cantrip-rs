@@ -1229,6 +1229,7 @@ pub fn copy_ability(cx: &mut Cx, ability: Target, copier: PlayerId, new_targets:
     }
     item.controller = copier;
     item.serial = 0;
+    item.copied = true;
     // A copy is put onto the stack as it is created (CR 707.10).
     item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);

@@ -52,6 +52,7 @@ keeps it).
 | [KI-36](#ki-36-an-ability-that-loses-its-sources-abilities-stops-applying-in-its-later-layers) | An ability that loses its source's abilities stops applying in its later layers | Low | Open |
 | [KI-37](#ki-37-a-sideboard-card-the-engine-does-not-have-is-left-out-of-the-game) | A sideboard card the engine does not have is left out of the game | Low | Open |
 | [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
+| [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
 
 ## Issues
 
@@ -386,3 +387,18 @@ the activation path chooses the counters after the mana, as blight's, and remove
 it is added, its scenarios exercise this path.
 
 **Scenarios.** None yet: no card in content has the cost on an activated ability.
+### KI-39: A state that is true only in the middle of a resolution, with no event, misses its state trigger
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-16, review of the state triggers |
+
+**Notes.** CR 603.8: a state trigger "triggers as soon as the game state matches the condition". The engine asks a state
+trigger's condition after every event (`settle::consider`, inside `collect_batch`) and each time a player would receive
+priority (`settle::state_triggers`). A state that becomes true and false again within one resolution through changes that
+record no event - a continuous effect starting and ending, a characteristic changing in the layers - is never seen, so the
+ability doesn't trigger where the rules say it has. No card in content reaches it: Mazemind Tome's state changes only by
+counters, which are events. A fix asks the conditions after every change to the game state, or makes every such change
+an event.
+
+**Scenarios.** None can be written with the cards in content.

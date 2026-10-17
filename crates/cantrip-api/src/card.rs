@@ -387,8 +387,9 @@ pub struct Cost {
     /// Remove this many counters of this kind from the source (CR 602.1, 118.3).
     pub remove_counters: Option<(CounterKind, u8)>,
     /// Put this many counters of this kind on the source (CR 118.3, 602.2b): "{T}, Put a page counter on this artifact"
-    /// (Mazemind Tome), "Put a -1/-1 counter on this creature" (Devoted Druid). Always payable; they are put by the
-    /// activating player, so replacement effects on counters being put apply (CR 614.1a).
+    /// (Mazemind Tome). Payable as long as nothing says counters can't be put on it - no effect in the engine does yet (a
+    /// Solemnity would make it unpayable, CR 118.3); they are put by the activating player, so replacement effects on
+    /// counters being put apply (CR 614.1a).
     pub put_counters: Option<(CounterKind, u8)>,
     /// Remove a counter of any kind from the source (CR 118.3): the payer names the kind when it has more than one.
     pub remove_any_counter: bool,

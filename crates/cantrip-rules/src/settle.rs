@@ -609,6 +609,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         flashback: false,
         // Put on the stack now, or, a delayed triggered ability, created when its `Delayed` was (CR 701.27f).
         since: trigger.since.unwrap_or(cx.g.log.len() as u32),
+        copied: false,
     };
     item.targets[..targets.len()].copy_from_slice(&targets);
     item.spec_of[..of.len()].copy_from_slice(&of);
@@ -698,13 +699,14 @@ fn state_trigger(source: ObjectId, ability: AbilityRef, controller: PlayerId) ->
 }
 
 /// Whether a state trigger of `source` has triggered and not yet left the stack (CR 603.8): found for this batch, waiting
-/// to be put on the stack, or on it. Until then it doesn't trigger again. An object that has changed zones is a new object
-/// (CR 400.7), whose ability is another.
+/// to be put on the stack, or on it. Until then it doesn't trigger again. A copy of it on the stack (Return the Favor) is
+/// not it: it was not triggered (CR 707.10). An object that has changed zones is a new object (CR 400.7), whose ability
+/// is another.
 fn state_trigger_waiting(cx: &Cx, source: ObjectId, ability: AbilityRef, found: &Found, later: Option<&Found>) -> bool {
     let this = |t: &PendingTrigger| t.source == source && t.ability == ability;
     found.iter().chain(later.into_iter().flatten()).any(|(t, _, _)| this(t))
         || cx.s().triggers.iter().any(this)
-        || cx.s().stack.iter().any(|i| i.kind == StackKind::Triggered && i.object == source && i.ability == ability)
+        || cx.s().stack.iter().any(|i| i.kind == StackKind::Triggered && !i.copied && i.object == source && i.ability == ability)
 }
 
 /// The state triggers whose states are true each time a player would receive priority (CR 603.8, 117.5): of the permanents

@@ -419,6 +419,10 @@ pub struct StackItem {
     /// delayed triggered ability, after that ability was created (`Delayed::since`): what an instruction to transform its
     /// source asks the history about (CR 701.27f).
     pub since: u32,
+    /// A copy of an ability (CR 707.10): it was neither activated nor triggered, so it is not the instance of a state
+    /// trigger that has triggered and not yet left the stack (CR 603.8). A copy of a spell is told by its object
+    /// (`Obj::card_copy`).
+    pub copied: bool,
 }
 
 impl StackItem {

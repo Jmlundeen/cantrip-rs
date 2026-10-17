@@ -2859,6 +2859,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         exile_after: false,
         flashback: false,
         since: 0,
+        copied: false,
     };
     item.targets[..targets.len()].copy_from_slice(targets);
     item
