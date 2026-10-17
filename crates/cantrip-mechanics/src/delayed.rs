@@ -3,11 +3,19 @@
 
 use cantrip_api::*;
 
+/// The card whose `delayed` list the resolving object's delayed ability is in: the card it copies, if it is a copy (CR 707.2),
+/// else its own.
+fn ability_card(g: &dyn Game, item: &StackItem) -> CardId {
+    let o = g.obj(item.object);
+    o.copy.map(|c| c.card).unwrap_or(o.card)
+}
+
 /// Sets up the card's delayed ability number `ability` (an index into its `delayed` list) to trigger at the beginning of
 /// the next end step (CR 603.7), about `subject`, controlled by the resolving ability's controller. Sneak Attack, Through
-/// the Breach, Flickerwisp and Daretti, Scrap Savant's emblem use it.
+/// the Breach, Flickerwisp and Daretti, Scrap Savant's emblem use it. The ability is the card's as the source has it now:
+/// the card it copies, for a copy (Phantasmal Image as Flickerwisp, CR 707.2).
 pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject: Target) {
-    let this = g.obj(item.object).card;
+    let this = ability_card(g, item);
     g.delayed_trigger(
         DelayedWhen::Step { step: Step::End, on_turn_of: None },
         item.object,
@@ -22,9 +30,10 @@ pub fn at_next_end_step(g: &mut dyn Game, item: &StackItem, ability: u8, subject
 /// ability's `matches` is asked of: the spell for "whenever a creature you control dies this turn", the creature it
 /// is about for "when it dies this turn". A `matches` that says "you" is written `when_asked`: the ability's controller it
 /// is told is this resolving ability's controller (CR 603.7d-e), whoever controls `source` later. Forth Eorlingas!, Glimpse of Nature, Rite of Harmony, Showdown of the Skalds,
-/// Thunder of Unity, Warhost's Frenzy, Okoye and Turn Inside Out use it.
+/// Thunder of Unity, Warhost's Frenzy, Okoye and Turn Inside Out use it. The ability is the card's as the resolving object has
+/// it now, the card it copies for a copy.
 pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
-    let this = g.obj(item.object).card;
+    let this = ability_card(g, item);
     g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(this, 0), Target::None);
 }
 
@@ -34,8 +43,7 @@ pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
 /// separate ability, so two activations both trigger on the same next event. The ability is the card as the source has it
 /// now, or the card it copies. Loki Laufeyson uses it; Doublecast, Teach by Example and Galvanic Iteration print it.
 pub fn next_this_turn(g: &mut dyn Game, item: &StackItem, ability: u8, source: ObjectId) {
-    let o = *g.obj(item.object);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let card = ability_card(g, item);
     g.delayed_trigger(DelayedWhen::NextThisTurn, source, item.controller, AbilityRef::delayed(card, ability), Target::None);
 }
 
@@ -43,8 +51,7 @@ pub fn next_this_turn(g: &mut dyn Game, item: &StackItem, ability: u8, source: O
 /// controller's turn that has not begun yet, which is this turn's when the ability resolves before it. Dragonhawk, Fate's
 /// Tempest uses it for the cards it exiled.
 pub fn at_your_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: u8, created: &[ObjectId]) {
-    let o = *g.obj(item.object);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let card = ability_card(g, item);
     g.delayed_trigger_about(
         DelayedWhen::Step { step: Step::End, on_turn_of: Some(item.controller) },
         item.object,
@@ -59,8 +66,7 @@ pub fn at_your_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: 
 /// The ability is the card as the source has it now, or the card it copies. Mobilize's Warriors and Dalkovan Encampment's
 /// use it with `sacrifice_created`.
 pub fn at_next_end_step_about(g: &mut dyn Game, item: &StackItem, ability: u8, created: &[ObjectId]) {
-    let o = *g.obj(item.object);
-    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    let card = ability_card(g, item);
     g.delayed_trigger_about(
         DelayedWhen::Step { step: Step::End, on_turn_of: None },
         item.object,

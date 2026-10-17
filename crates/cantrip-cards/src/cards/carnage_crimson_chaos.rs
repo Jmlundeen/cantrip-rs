@@ -12,7 +12,8 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     g.add_effect(item.object, returned, EffectKind::MustAttack, Duration::Indefinite);
-    let this = g.obj(item.object).card;
+    let o = g.obj(item.object);
+    let this = o.copy.map(|c| c.card).unwrap_or(o.card);
     g.add_effect(item.object, returned, EffectKind::AddAbility(AbilityRef::delayed(this, 0)), Duration::Indefinite);
     Ok(())
 }

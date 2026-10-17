@@ -1,0 +1,50 @@
+# A copy's delayed ability is the copied card's (CR 707.2, 603.7): Phantasmal Image entering as a copy of Bot2's Flickerwisp
+# exiles Bot2's Mox Pearl, and the copied "return the exiled card at the beginning of the next end step" brings it back
+# under its owner's control at Bot1's end step. (Before the fix the copy looked the delayed ability up on Phantasmal Image's
+# own card, which has none, and the engine panicked.)
+
+[Bot1 Deck]
+Island
+Black Lotus
+Phantasmal Image
+Mox Jet
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Flickerwisp
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Flickerwisp.Cast
+Bot2.Pass
+Bot2.Target(Mox Jet)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Target(Mox Pearl)
+Bot1.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield = Flickerwisp; Mox Pearl; Plains
+Bot1.Battlefield.Flickerwisp.Power = 3
+Exile.Count = 0

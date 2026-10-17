@@ -26,7 +26,9 @@ pub fn resolve(g: &mut dyn Game, item: &StackItem, n: i16, keywords: &[Keyword],
         if creature != item.object {
             g.add_effect(item.object, creature, EffectKind::AddKeywords(Keywords::of(keywords)), Duration::EndOfTurn);
             if let Some(index) = ability {
-                let this = g.obj(item.object).card;
+                // A copy's ability is the one of the card it copies (CR 707.2).
+                let o = g.obj(item.object);
+                let this = o.copy.map(|c| c.card).unwrap_or(o.card);
                 g.add_effect(item.object, creature, EffectKind::AddAbility(AbilityRef::delayed(this, index)), Duration::EndOfTurn);
             }
         }
