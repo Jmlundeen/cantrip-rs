@@ -1,0 +1,57 @@
+# "Instant and sorcery spells you control can't be countered": Bot1's Sphinx of the Final Word is cast in turn 1 (an Island, Black Lotus for
+# three and Mox Ruby, Mox Jet and Mox Pearl pay {5}{U}{U}). In turn 3 Bot1 casts Lightning Bolt at Bot2, which answers with Counterspell:
+# it may target the Bolt but the Bolt can't be countered, so Bot2 takes 3 (20 -> 17). The control, a creature spell countered with the Sphinx
+# in play, is the other scenario; the Sphinx also protects a sorcery, in the third.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Jet
+Black Lotus
+Mox Pearl
+Island
+Sphinx of the Final Word
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sphinx of the Final Word.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Counterspell
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Battlefield.Sphinx of the Final Word.Power = 5

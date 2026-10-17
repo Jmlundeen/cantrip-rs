@@ -1,0 +1,53 @@
+# Sphinx of the Final Word: "This spell can't be countered" (CR 101.2, 701.5a). In turn 3 Bot1 casts it ({5}{U}{U}: two Islands,
+# Black Lotus for three, Mox Ruby and Mox Jet) into Bot2's two open blue mana (Island, Mox Sapphire) and Counterspell. Counterspell may
+# still be cast at it - the spell is a legal target - but does nothing: the Sphinx resolves, a 5/5 flier with hexproof, and the Counterspell is
+# spent in Bot2's graveyard.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Jet
+Black Lotus
+Mox Pearl
+Island
+Sphinx of the Final Word
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sphinx of the Final Word.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Sphinx of the Final Word)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sphinx of the Final Word.Power = 5
+Bot1.Battlefield.Sphinx of the Final Word.Toughness = 5
+Bot1.Battlefield.Sphinx of the Final Word.Keywords = CantBeCountered; Flying; Hexproof
+Bot2.Graveyard = Counterspell
+Bot1.Graveyard.Count = 1

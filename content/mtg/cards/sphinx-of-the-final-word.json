@@ -1,0 +1,13 @@
+{
+  "name": "Sphinx of the Final Word",
+  "manaCost": "{5}{U}{U}",
+  "type": "Creature — Sphinx",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "This spell can't be countered.\nFlying\nHexproof (This creature can't be the target of spells or abilities your opponents control.)\nInstant and sorcery spells you control can't be countered.",
+  "keywords": [
+    "CantBeCountered",
+    "Flying",
+    "Hexproof"
+  ]
+}

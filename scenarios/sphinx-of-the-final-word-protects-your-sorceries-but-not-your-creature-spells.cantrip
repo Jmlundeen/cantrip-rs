@@ -1,0 +1,68 @@
+# The Sphinx protects "instant and sorcery spells you control" and nothing else (CR 101.2, 701.5a). Same turn 1 as the instant scenario.
+# Turn 3: Bot1 casts Ponder (a sorcery, paid with the Island) and Bot2's Counterspell (Island and Mox Sapphire) targets it: the Ponder
+# resolves - Bot1 puts the Ornithopter on top and draws it. Turn 5: that Ornithopter, a creature spell, is countered by Bot2's second
+# Counterspell, the positive control that the Counterspells work with the Sphinx in play (the Ornithopter ends in Bot1's graveyard).
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Jet
+Black Lotus
+Mox Pearl
+Island
+Sphinx of the Final Word
+Ponder
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Counterspell
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Sphinx of the Final Word.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ponder.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Ponder)
+Bot1.Pass
+Bot1.Arrange(Ornithopter; Island; Island)
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Ornithopter)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Ponder; Black Lotus
+Bot2.Graveyard = Counterspell; Counterspell
+Bot1.Battlefield.Sphinx of the Final Word.Power = 5
