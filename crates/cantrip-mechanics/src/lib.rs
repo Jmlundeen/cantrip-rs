@@ -236,6 +236,13 @@ pub fn delirium(q: &dyn Query, player: PlayerId) -> bool {
     types.iter().count() >= 4
 }
 
+/// "As an additional cost to cast this spell, pay {4} or sacrifice an artifact or creature" (CR 601.2b, 118.8): the two ways
+/// of paying it, for a card's `additional_choice`. Deadly Precision and Stir Up Trouble print it.
+pub static PAY_FOUR_OR_SACRIFICE_AN_ARTIFACT_OR_CREATURE: [ExtraCost; 2] = [
+    ExtraCost { text: "Pay {4}", cost: Cost { mana: mana("{4}"), ..Cost::NONE } },
+    ExtraCost { text: "Sacrifice an artifact or creature", cost: Cost::sacrifice(1, targets::filters::artifact_or_creature) },
+];
+
 /// Threshold (ability word, CR 207.2c): seven or more cards in `player`'s graveyard, counted as the question is asked.
 /// Cabal Ritual's "threshold" (the resolving spell is on the stack, so not counted) and Proft, Sinister Mastermind's
 /// "can't cast this spell unless there are seven or more cards in your graveyard" read it.
