@@ -1,6 +1,6 @@
 //! Paradigm (CR 702.192a): "If this is the first time a spell you control with this spell's name has resolved this game, at the
 //! beginning of each of your precombat main phases for the rest of the game, create a copy of this object in exile. You may
-//! cast the copy without paying its mana cost" and "Exile this spell." Germination Practicum and Improvisation Capstone print it.
+//! cast the copy without paying its mana cost" and "Exile this spell." Germination Practicum, Improvisation Capstone, Restoration Seminar and Decorum Dissertation print it.
 //!
 //! A card with paradigm sets `paradigm: Some(paradigm::SPELL_ABILITY)`, which the core runs after the card's own effect (and
 //! then exiles the spell as it leaves the stack), and lists `paradigm::TRIGGER` first among its `delayed` abilities. The

@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// when nothing in the hand is eligible: looking at the hand is part of the ability.
 fn discard_nonland(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.targets[0].player() else { return Ok(()) };
-    discard_chosen_nonland_from_revealed_hand(g, item, opponent, Purpose::Discard)?;
+    discard_chosen_nonland_from_revealed_hand(g, item, opponent)?;
     Ok(())
 }
 
