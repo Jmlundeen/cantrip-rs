@@ -1,0 +1,26 @@
+# Sleight of Hand with an empty library: there is nothing to look at, so nothing is asked and nothing happens (and the
+# game goes on; nothing was drawn).
+
+[Bot1 Deck]
+Island
+Sleight of Hand
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sleight of Hand.Cast
+! Bot1.Arrange
+[Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Graveyard = Sleight of Hand
+Bot1.Hand.Count = 5

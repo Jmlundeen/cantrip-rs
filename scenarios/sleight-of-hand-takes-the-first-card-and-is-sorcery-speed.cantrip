@@ -1,0 +1,41 @@
+# Sleight of Hand is a sorcery: Bot1's second copy cannot be cast on Bot2's turn 2 (the refusal), and the turn-3 cast
+# with an empty stack, the positive control, works. The top two are Black Lotus and Lightning Bolt: this time Bot1 takes
+# the Lotus and the Bolt goes to the bottom. Two copies in the deck: the first is cast on turn 1 taking an Island, as
+# the default would (the first card).
+
+[Bot1 Deck]
+Island
+Sleight of Hand
+Sleight of Hand
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Black Lotus
+Lightning Bolt
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sleight of Hand.Cast
+Bot1.Arrange(Island | Island)
+[T2 Bot2.Main1]
+! Bot1.Hand.Sleight of Hand.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sleight of Hand.Cast
+Bot1.Arrange(Black Lotus | Lightning Bolt)
+
+[Expect]
+Bot1.Graveyard = Sleight of Hand; Sleight of Hand
+Bot1.Hand = Island; Island; Island; Island; Island; Black Lotus
+Bot1.Library.Count = 4

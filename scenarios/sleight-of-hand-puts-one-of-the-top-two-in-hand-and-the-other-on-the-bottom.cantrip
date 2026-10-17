@@ -1,0 +1,32 @@
+# Sleight of Hand: the top two cards are Black Lotus and Lightning Bolt. Bot1 takes the Bolt (the second card) into hand
+# and the Lotus goes to the bottom: the library is left Island, Island, Black Lotus. Taking both is refused ("one of
+# them"), and so is leaving both for the bottom.
+
+[Bot1 Deck]
+Island
+Sleight of Hand
+Island
+Island
+Island
+Island
+Island
+Black Lotus
+Lightning Bolt
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sleight of Hand.Cast
+! Bot1.Arrange(Black Lotus; Lightning Bolt | )
+! Bot1.Arrange( | Black Lotus; Lightning Bolt)
+Bot1.Arrange(Lightning Bolt | Black Lotus)
+
+[Expect]
+Bot1.Graveyard = Sleight of Hand
+Bot1.Hand = Island; Island; Island; Island; Island; Lightning Bolt
+Bot1.Library = Island; Island; Black Lotus
