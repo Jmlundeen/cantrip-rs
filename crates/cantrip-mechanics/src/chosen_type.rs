@@ -33,6 +33,28 @@ pub fn creatures_you_control_of_chosen_type(q: &dyn LayerQuery, source: ObjectId
         && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// "Creatures you control ... The same is true for creature spells you control and creature cards you own that aren't on
+/// the battlefield" (CR 611.3a, 613.1d): the `affects` of a static ability declared `.everywhere()`, judged on what the layers
+/// before made the object - a creature on the battlefield under the source's controller, a creature spell on the stack they
+/// control, and a creature card they own anywhere else that is not the battlefield (a hand, a library, a graveyard, exile,
+/// the stack under another player's control: a spell is a card there, CR 112.1, 108.2). A token or a copy of a card off
+/// the battlefield is no card; a card outside the game the layers leave alone (CR 400.11c). Arcane Adaptation, Conspiracy
+/// and Maskwood Nexus print it.
+pub fn your_creatures_spells_and_cards(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    if !so_far.is(CardType::Creature) {
+        return false;
+    }
+    let s = q.state();
+    let o = s.obj(affected);
+    let you = s.obj(source).controller;
+    let your_card = o.owner == you && !o.token && !o.card_copy;
+    match o.zone.kind() {
+        ZoneKind::Battlefield => o.controller == you,
+        ZoneKind::Stack => o.controller == you || your_card,
+        _ => your_card,
+    }
+}
+
 /// "Whenever you cast a spell of the chosen type" (CR 603.2): the spell's own subtypes on the stack (CR 205.3). Chronicle
 /// of Victory and Door of Destinies print it.
 pub fn you_cast_chosen_type(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
