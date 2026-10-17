@@ -1,0 +1,35 @@
+# Greenbelt Rampager pays {E}{E} from the energy Rogue Refiner created, so it stays on the battlefield and the energy is spent (CR 603.3, 701.15).
+
+[Bot1 Deck]
+Forest
+Island
+Forest
+Rogue Refiner
+Forest
+Greenbelt Rampager
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T1 Bot1.Main2]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Rogue Refiner.Cast
+[T5 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Greenbelt Rampager.Cast
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 0
+Bot1.Battlefield = Forest; Forest; Forest; Island; Rogue Refiner; Greenbelt Rampager
+Bot1.Graveyard =

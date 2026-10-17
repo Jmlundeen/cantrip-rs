@@ -1,0 +1,8 @@
+{
+  "name": "Greenbelt Rampager",
+  "manaCost": "{G}",
+  "type": "Creature — Elephant",
+  "oracleText": "When this creature enters, pay {E}{E}. If you can't, return this creature to its owner's hand and you get {E}.",
+  "power": "3",
+  "toughness": "4"
+}

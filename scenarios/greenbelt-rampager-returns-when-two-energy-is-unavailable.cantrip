@@ -1,0 +1,19 @@
+# With no energy, the mandatory entrance trigger returns Greenbelt Rampager and gives its controller one energy (CR 603.3, 701.15).
+
+[Bot1 Deck]
+Greenbelt Rampager
+Forest x2
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Greenbelt Rampager.Cast
+Bot1.Battlefield.Forest.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest; Greenbelt Rampager; Island; Island; Island; Island
+Bot1.Energy = 1
