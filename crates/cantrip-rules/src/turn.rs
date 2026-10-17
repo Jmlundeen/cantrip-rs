@@ -875,23 +875,31 @@ fn cleanup(cx: &mut Cx) -> R<()> {
             .filter(|e| e.duration == Duration::EndOfTurn && matches!(e.kind, EffectKind::Control(_)))
             .map(|e| e.affected)
             .collect();
-        // A permanent that was only a copy until end of turn is what it was again (CR 707.2, 611.2b): the latest copy effect
-        // first, so the oldest one's prior values are what is left.
-        let restored: Vec<(ObjectId, Option<Copiable>)> = cx
-            .s()
-            .effects
-            .iter()
-            .rev()
-            .filter(|e| e.duration == Duration::EndOfTurn)
-            .filter_map(|e| match e.kind {
-                EffectKind::RestoreCopy(prior) if live(cx.s(), e.affected) => Some((e.affected, prior)),
-                _ => None,
-            })
-            .collect();
-        cx.st().effects_retain(|e| e.duration != Duration::EndOfTurn);
-        for (id, prior) in restored {
-            cx.st().update_obj(id, |o| o.copy = prior);
+        // A permanent that was only a copy until end of turn is what it was again (CR 707.2, 611.2b), as far as the copy
+        // effects that are left say: they apply in timestamp order (CR 613.2a, 613.7), so a later one that lasts is still
+        // what it is a copy of, now on top of what the ended one was on top of. Taken latest first, so the oldest ended one's
+        // prior values are what is left where nothing lasts above them.
+        if cx.s().effects.iter().any(|e| e.duration == Duration::EndOfTurn && matches!(e.kind, EffectKind::RestoreCopy(_))) {
+            for at in (0..cx.s().effects.len()).rev() {
+                let e = cx.s().effects[at];
+                let EffectKind::RestoreCopy(prior) = e.kind else { continue };
+                if e.duration != Duration::EndOfTurn || !live(cx.s(), e.affected) {
+                    continue;
+                }
+                let lasting = (at + 1..cx.s().effects.len()).find(|&later| {
+                    let l = cx.s().effects[later];
+                    l.affected == e.affected && l.duration != Duration::EndOfTurn && matches!(l.kind, EffectKind::RestoreCopy(_))
+                });
+                match lasting {
+                    Some(later) => {
+                        let l = cx.s().effects[later];
+                        cx.st().effect_set(later, ContinuousEffect { kind: EffectKind::RestoreCopy(prior), ..l });
+                    }
+                    None => cx.st().update_obj(e.affected, |o| o.copy = prior),
+                }
+            }
         }
+        cx.st().effects_retain(|e| e.duration != Duration::EndOfTurn);
         for id in controlled {
             ops::refresh_control(cx, id);
         }
