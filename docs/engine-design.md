@@ -258,6 +258,21 @@ would go over unclickable.
   would take another's source's applies first (613.8a dependency), each taking the other's in timestamp order (613.8b); no
   card in content can make two of them meet (an Aura is no creature), so that order has no scenario. The host lists every
   rules line of an object that lost all abilities as lost, not only its keywords and activated and triggered abilities.
+- **Setting a land's subtype (305.7, layer 4)** is a static ability made with `sets_land_subtypes(affects, apply, text)`
+  (`StaticDef::sets_land_subtypes`: Magus of the Moon, Multiversal Passage; Blood Moon, Spreading Seas and Evil Presence print
+  the same), whose `apply` calls `Chars::set_land_subtypes`: the land's land types are replaced (its other subtypes, an animated
+  land's creature types, stay) and every ability it has in layer 4 - its rules text's and its copy effects' - is taken; the
+  basic land type's mana ability follows in layer 6 (305.6), and what other effects grant it after. `layers::land_text_lost`
+  finds, once per position and history, the lands such abilities took the rules text of, judged on layers 1 to 3 (KI-52), and
+  orders the abilities whose sources are lands as `lost_to_statics` does. Such a land's static abilities apply in no layer from
+  4 on - each depends on the setting effect, which applies first whatever the timestamps (613.8a: Urborg under Magus makes
+  nothing a Swamp, either order) - and `Query::lost_all_abilities` answers for it, so every rule its card prints is gone. The
+  setting ability itself applies whatever its source loses in layer 6 (613.6: Magus under Eaten by Piranhas), and a land's own
+  ability that sets its own subtype (Multiversal Passage) goes on applying and does not count it as having lost its text. A land
+  about to enter is judged as it would be on the battlefield (614.12, `layers::loses_rules_text_entering`): under such an
+  effect its own `enters` replacements - "enters tapped", "as this enters" - do not apply. A resolved effect that sets a land's
+  subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
+  such a land other than abilities stay (KI-51).
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.

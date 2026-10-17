@@ -104,6 +104,23 @@ impl Chars {
         self.abilities = [None; MAX_ABILITIES];
     }
 
+    /// "[This land] is a [basic land type]" (CR 305.7, layer 4): an effect that sets a land's subtype to basic land
+    /// types. It has `types`' land types and no other (its other subtypes, an animated land's creature types, stay), and it
+    /// loses the abilities its rules text and copy effects give it - every ability it has in layer 4, before any effect
+    /// grants one in layer 6. The mana ability of each basic land type follows from the type in layer 6 (CR 305.6), and
+    /// abilities other effects grant come after. Its card types and supertypes are not changed. For a static ability made
+    /// with `sets_land_subtypes`, whose `apply` this is: the layers read that flag to know which lands lost their rules
+    /// text, and so which of their static abilities, replacement effects and other printed rules no longer apply.
+    /// Called from any other static ability, the land would lose the abilities among its abilities but keep those rules.
+    /// Nothing for an object that is not a land: land types belong to lands (CR 205.3d).
+    pub fn set_land_subtypes(&mut self, types: SubtypeSet) {
+        if !self.is(CardType::Land) {
+            return;
+        }
+        self.subtypes = self.subtypes.minus(SubtypeSet::LAND_TYPES).union(types);
+        self.lose_all_abilities();
+    }
+
     /// The most creatures that may block it (CR 509.1b): one for "can't be blocked by more than one creature", otherwise
     /// any number. With a minimum above it (menace as well), it can't be blocked at all.
     pub fn maximum_blockers(&self) -> u8 {

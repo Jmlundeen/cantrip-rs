@@ -158,7 +158,8 @@ pub trait Query {
     /// Whether `id` has lost all its abilities (CR 613.1f), to a resolved effect or a static ability, so that the
     /// abilities its card prints are gone: the one answer every rule read off a card is judged by - static abilities
     /// from layer 6 on, play rules, cost changes, replacement effects, trigger and block rules - so that they agree with
-    /// layer 6. Abilities granted after the loss are the object's own and do not come back through the card.
+    /// layer 6. Abilities granted after the loss are the object's own and do not come back through the card. A land an effect
+    /// sets the subtype of has lost the abilities of its rules text (CR 305.7), and answers so too.
     fn lost_all_abilities(&self, id: ObjectId) -> bool;
 
     /// The words an object's text has now (CR 612): every color word, basic land type and creature type its rules text

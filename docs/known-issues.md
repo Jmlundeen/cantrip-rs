@@ -66,6 +66,8 @@ keeps it).
 | [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
+| [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Unexercised |
+| [KI-52](#ki-52-which-lands-lost-their-rules-text-to-a-subtype-setting-effect-is-judged-on-layers-1-to-3) | Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3 | Low | Unexercised |
 
 ## Issues
 
@@ -581,3 +583,40 @@ creature types of its own to lose, so no scenario shows a creature type being re
 creature type before it animates (an effect that gives every permanent a creature type), which no card in content does.
 
 **Scenarios.** none yet: Iron Man Armor could reach it with such an effect.
+
+### KI-51: A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, Magus of the Moon |
+
+**Notes.** CR 305.7: a land whose subtype an effect sets "loses all abilities generated from its rules text, its old land types,
+and any copiable effects affecting that land". `Chars::set_land_subtypes` takes, in layer 4, every ability the land has by then:
+its card's and those a copy effect gave it (the copied card's abilities and keywords, a copy's "except it has ..."), which is the
+part of a copy effect that is abilities. What else a copy effect made of it - the name, mana cost, colors, card types and power and
+toughness of what it copies (CR 707.2) - stays, as layer 1 applied it. Whether "loses any copiable effects" takes those too (a
+land copying an animated Mutavault, or Vesuva copying a land on the battlefield before Blood Moon arrives) is not settled by any
+ruling of a card the engine has; a copy entering under the effect does not copy at all (the "as enters" choice is lost, CR
+614.12), which is the case the rulings name. A fix, if a ruling says the copy effect goes entirely, starts the land's
+characteristics from its own card when `layers::land_text_lost` holds it.
+
+**Scenarios.** none: no card in content copies a land already on the battlefield.
+
+### KI-52: Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, Magus of the Moon |
+
+**Notes.** `layers::land_text_lost` finds the lands a "nonbasic lands are Mountains" effect takes the rules text of by asking the
+effect's `affects` of each permanent as layers 1 to 3 left it, as `lost_to_statics` does for layer 6, so that the question never
+asks for the layer it is answering. The layer-4 effect itself is applied to each land in its place in layer 4 (CR 613.7, 613.8),
+and takes the land's abilities there. The two disagree only for an object a layer-4 effect makes a land or stops being one (Hydro-
+Man, Fluid Felon becoming a land; a land animated into a non-land by an effect that sets its types): such an object under Magus of
+the Moon is a Mountain and loses the abilities among its abilities, but `Query::lost_all_abilities` does not say so, so the rules
+its card prints apart from its abilities (replacement effects, cost changes, static abilities of other objects) would still apply.
+Hydro-Man prints none. Likewise a land about to enter (`layers::loses_rules_text_entering`, CR 614.12) is judged by its own card or
+the copy it enters as, without the layer 1-3 effects of other objects: none in content changes a land's supertypes or types as it
+enters. A fix applies the object's own layer-4 effects that change its card types before asking.
+
+**Scenarios.** none: no card in content reaches it.

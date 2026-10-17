@@ -598,7 +598,14 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     }
     choose_protector(cx, entering)?;
     let card = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
-    if let Some(enters) = cx.cards().get(card).enters {
+    // CR 305.7, 614.12: a land that would lose the abilities of its rules text on the battlefield to an effect that sets
+    // its subtype ("nonbasic lands are Mountains") has none of its own entering replacements: it is judged as it would
+    // exist there (Blood Moon's ruling: it does not enter tapped, nor choose "as" it enters).
+    let object = entering.object;
+    let lost = |cx: &Cx, card: CardId, copy: Option<&Copiable>| layers::loses_rules_text_entering(cx.cards(), cx.s(), &cx.g.log, object, card, copy);
+    if let Some(enters) = cx.cards().get(card).enters
+        && !lost(cx, card, entering.copy.as_ref())
+    {
         enters(cx, entering)?;
     }
     // CR 707.9a: what it entered as a copy of has its own "enters with" and "enters tapped" to apply, as the copy
@@ -606,6 +613,7 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     if let Some(copy) = entering.copy
         && copy.card != card
         && let Some(enters) = cx.cards().get(copy.card).enters
+        && !lost(cx, copy.card, Some(&copy))
     {
         enters(cx, entering)?;
     }

@@ -18,16 +18,16 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "This land is the chosen type" (CR 305.7): replaces its subtypes; the mana ability follows from the subtype (CR 305.6).
+/// "This land is the chosen type" (CR 305.7): sets its land subtype; the mana ability follows from the subtype (CR 305.6).
 fn apply(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     if let Some(chosen) = q.state().obj(source).chosen_subtype {
-        chars.subtypes = SubtypeSet::NONE.with(chosen);
+        chars.set_land_subtypes(SubtypeSet::NONE.with(chosen));
     }
 }
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),
     labels: &["Plains", "Island", "Swamp", "Mountain", "Forest"],
-    statics: &[static_ability(Layer::Type, itself, apply, "This land is the chosen type.")],
+    statics: &[sets_land_subtypes(itself, apply, "This land is the chosen type.")],
     ..oracle::MULTIVERSAL_PASSAGE
 };

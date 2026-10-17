@@ -736,6 +736,18 @@ fn lose_all_abilities(_: &dyn LayerQuery, _: ObjectId, chars: &mut crate::Chars)
     chars.lose_all_abilities();
 }
 
+/// A static ability that sets the land subtypes of every land `affects` accepts (CR 305.7, layer 4): "nonbasic lands are
+/// Mountains" (Blood Moon, Magus of the Moon), "enchanted land is an Island" (Spreading Seas, Convincing Mirage), "this
+/// land is the chosen type" (Multiversal Passage). `apply` sets them with `Chars::set_land_subtypes`, which takes away
+/// the abilities of the land's rules text. Such a land's own static abilities from layer 4 on no longer apply (CR
+/// 613.8a: each depends on this effect, which applies first whatever their timestamps), nor do its replacement effects,
+/// cost changes and the other rules a card prints (`Query::lost_all_abilities`); a land entering is judged as it would
+/// be on the battlefield (CR 614.12), so its own "enters tapped" and "as this enters" do not apply. This effect itself,
+/// a layer-4 one, goes on applying when its source loses its abilities in layer 6 (CR 613.6, Magus of the Moon's ruling).
+pub const fn sets_land_subtypes(affects: StaticAffects, apply: StaticApply, text: &'static str) -> StaticDef {
+    StaticDef { text, layer: Layer::Type, affects, apply, sets_land_subtypes: true, ..StaticDef::BLANK }
+}
+
 /// A static ability an effect gives an object (CR 613.1f), to be granted with `EffectKind::AddAbility` from the card's
 /// `delayed` list: the object itself is its source, so "you" and "your" are its controller's (CR 113.6, 109.5), and it
 /// applies in `layer` (which must be `Layer::PtDefine` or later) at the later of the object's timestamp and the

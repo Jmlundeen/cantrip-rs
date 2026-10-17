@@ -506,6 +506,26 @@ impl SubtypeSet {
     /// Every creature type (CR 205.3m): what Changeling makes an object (CR 702.73a), and what "all creature types"
     /// gives one (Mutavault).
     pub const CREATURE_TYPES: SubtypeSet = SubtypeSet::of(&Subtype::CREATURE_TYPES);
+    /// Every land type (CR 205.3i): what an effect that sets a land's subtype replaces (CR 305.7).
+    pub const LAND_TYPES: SubtypeSet = SubtypeSet::of(&[
+        Subtype::Cave,
+        Subtype::Desert,
+        Subtype::Forest,
+        Subtype::Gate,
+        Subtype::Island,
+        Subtype::Lair,
+        Subtype::Locus,
+        Subtype::Mine,
+        Subtype::Mountain,
+        Subtype::Plains,
+        Subtype::Planet,
+        Subtype::PowerPlant,
+        Subtype::Sphere,
+        Subtype::Swamp,
+        Subtype::Tower,
+        Subtype::Town,
+        Subtype::Urzas,
+    ]);
 
     pub const fn of(subtypes: &[Subtype]) -> SubtypeSet {
         let mut bits = [0u64; SUBTYPE_WORDS];
@@ -540,6 +560,15 @@ impl SubtypeSet {
 
     pub fn is_empty(self) -> bool {
         self.0.iter().all(|&w| w == 0)
+    }
+
+    /// These subtypes but none of `other`'s.
+    pub fn minus(self, other: SubtypeSet) -> SubtypeSet {
+        let mut bits = self.0;
+        for (a, b) in bits.iter_mut().zip(other.0) {
+            *a &= !b;
+        }
+        SubtypeSet(bits)
     }
 
     pub fn without(self, s: Subtype) -> SubtypeSet {

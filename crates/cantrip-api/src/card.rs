@@ -206,6 +206,10 @@ pub struct StaticDef {
     /// part applied to as the object's characteristics were worked out, whatever its own `affects` would say by then, and
     /// it goes on applying though its source loses its abilities in a layer between them (`layers.rs`).
     pub continues: bool,
+    /// It sets the land subtypes of what it affects (CR 305.7, layer 4): `sets_land_subtypes`. The layers read it to know
+    /// which lands have lost the abilities of their rules text, from layer 4 on, so that their static abilities from layer
+    /// 4 on (CR 613.8a: they depend on it), replacement effects, cost changes and other printed rules agree with it.
+    pub sets_land_subtypes: bool,
 }
 
 fn affects_nothing(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, _: &Chars) -> bool {
@@ -228,6 +232,7 @@ impl StaticDef {
             lost_pt: None,
             loses_all: false,
             continues: false,
+            sets_land_subtypes: false,
         };
 }
 
@@ -2157,6 +2162,10 @@ impl CardTable {
                     "{}: a static ability that continues an effect follows its earlier part, in a later layer (CR 613.6)",
                     card.name
                 );
+            }
+            // And what one that sets land subtypes took (`layers::land_text_lost`): it affects lands on the battlefield.
+            for s in card.statics.iter().filter(|s| s.sets_land_subtypes) {
+                assert!(!s.everywhere && !s.own && s.layer == Layer::Type, "{}: a static ability that sets land subtypes affects permanents in layer 4", card.name);
             }
         }
         let anywhere = cards

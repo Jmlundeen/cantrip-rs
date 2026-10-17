@@ -131,6 +131,10 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     // The permanents given a static ability that affects other objects.
     let others: &[ObjectId] = found.as_ref().map_or(&[], |f| &f.granted);
     let has_hone = on_battlefield && honed.iter().any(|&e| state.obj(e).attached_to == Some(id));
+    // The lands an effect that sets their subtype took the abilities of their rules text from (CR 305.7), which layers 4
+    // on read: found once for every layer, and only where such an effect could be in play.
+    let text_lost: Vec<ObjectId> =
+        if stop > Layer::Type && found.as_ref().is_some_and(|f| !f.setters.is_empty()) { land_text_lost(cards, state, log) } else { Vec::new() };
     if !has_effects && !has_counters && !has_own && sources.is_empty() && others.is_empty() && !has_hone {
         if obj.copy.is_none() && !spell && !room {
             // Nothing acts on it: the card's own values, made once.
@@ -193,7 +197,7 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
         // CR 613.7, 613.8: within a layer, static abilities and other continuous effects apply in timestamp order,
         // interleaved, unless one depends on another.
         let givers = (sources, others);
-        statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), givers, on_battlefield, layer, &fx, &granted, &mut begun, &mut chars);
+        statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), givers, on_battlefield, layer, &fx, &granted, &text_lost, &mut begun, &mut chars);
         if layer == Layer::Ability {
             intrinsic_keyword_abilities(cards, &mut chars);
         }
@@ -277,6 +281,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         let mut made = state.static_sources.borrow_mut();
         made.list.clear();
         made.strippers.clear();
+        made.setters.clear();
         made.honed.clear();
         // A permanent that has lost all its abilities to an effect keeps the effects its static abilities had applied in
         // layers 1 to 5 by the time layer 6 took them (CR 613.6, Humility with Magus of the Moon); from layer 6 on it has
@@ -316,14 +321,20 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         }
         // CR 613.7: static abilities apply in the timestamp order of the objects that have them.
         made.list.sort_by_key(|&(source, _, _)| state.obj(source).timestamp);
-        let strippers: Vec<(ObjectId, ZoneKind)> = made
-            .list
-            .iter()
-            .filter(|&&(source, from, lost)| !lost && cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.loses_all && s.from == from))
-            .map(|&(source, from, _)| (source, from))
-            .collect();
+        let (mut strippers, mut setters) = (Vec::new(), Vec::new());
+        for &(source, from, lost) in &made.list {
+            let statics = cards.get(cards.current(state.obj(source))).statics;
+            if !lost && statics.iter().any(|s| s.loses_all && s.from == from) {
+                strippers.push((source, from));
+            }
+            // CR 305.7, 613.6: an ability that sets land subtypes applies in layer 4, whatever its source loses in layer 6.
+            if statics.iter().any(|s| s.sets_land_subtypes && s.from == from) {
+                setters.push((source, from));
+            }
+        }
         made.strippers = strippers;
         made.continuing = made.list.iter().any(|&(source, _, _)| cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.continues));
+        made.setters = setters;
         made.granted.clear();
         for e in &state.effects {
             if let EffectKind::AddAbility(ability) = e.kind
@@ -503,12 +514,15 @@ fn statics(
     layer: Layer,
     fx: &[ContinuousEffect],
     granted: &[(u32, &'static StaticDef)],
+    text_lost: &[ObjectId],
     begun: &mut Begun,
     chars: &mut Chars,
 ) {
     let view = View { cards, state, log, stop: layer };
     // From layer 6 on, the permanents a "loses all abilities" static ability has taken everything from (CR 613.1f).
     let stripped = if layer >= Layer::Ability { lost_to_statics(cards, state, log) } else { Stripped::default() };
+    // From layer 4 on, the lands an effect that sets their subtype took the abilities of their rules text from (CR 305.7).
+    let text_lost = if layer >= Layer::Type { text_lost } else { &[] };
     // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
     // ability that would define them.
     let overridden = (layer == Layer::Color && overrides.0) || (layer == Layer::PtDefine && overrides.1);
@@ -519,7 +533,11 @@ fn statics(
         if overridden {
             continue;
         }
-        if layer >= Layer::Ability && (state.lost_all_abilities_to_an_effect(id) || stripped.lost.contains(&id)) {
+        // CR 305.7: a land whose subtype an effect sets has lost them in layer 4, after its own characteristic-defining
+        // abilities of layer 4 applied first (CR 613.3).
+        if (layer >= Layer::Ability && (state.lost_all_abilities_to_an_effect(id) || stripped.lost.contains(&id)))
+            || (layer > Layer::Type && text_lost.contains(&id))
+        {
             if let Some((power, toughness)) = st.lost_pt {
                 chars.power = Some(power);
                 chars.toughness = Some(toughness);
@@ -536,7 +554,7 @@ fn statics(
     let mut given: Vec<(u32, ObjectId, &'static StaticDef)> =
         if on_battlefield { others.iter().flat_map(|&holder| granted_to_others(cards, state, log, holder, layer)).collect() } else { Vec::new() };
     given.sort_by_key(|&(timestamp, _, _)| timestamp);
-    let merge = Merge::new(cards, state, layer, on_battlefield, fx, granted, &given, sources, &stripped, &begun.parts);
+    let merge = Merge::new(cards, state, layer, on_battlefield, fx, granted, &given, sources, &stripped, &begun.parts, text_lost);
     let mut noted = Noted { on: begun.noting, parts: Vec::new() };
     in_order(&view, id, merge, &mut noted, chars);
     begun.parts.append(&mut noted.parts);
@@ -761,6 +779,8 @@ struct Merge<'a> {
     stripped: &'a Stripped,
     /// The parts of effects that began to apply to the object in the layers before this one (`Begun`).
     begun: &'a [(ObjectId, *const StaticDef)],
+    /// From layer 4 on, the lands that have lost the abilities of their rules text to an effect that sets their subtype.
+    text_lost: &'a [ObjectId],
     /// The next of each: source, given, effect, granted.
     next: [usize; 4],
     /// The current source's static abilities, and the next of them.
@@ -787,6 +807,7 @@ impl<'a> Merge<'a> {
         sources: &'a [(ObjectId, ZoneKind, bool)],
         stripped: &'a Stripped,
         begun: &'a [(ObjectId, *const StaticDef)],
+        text_lost: &'a [ObjectId],
     ) -> Merge<'a> {
         Merge {
             cards,
@@ -799,6 +820,7 @@ impl<'a> Merge<'a> {
             sources,
             stripped,
             begun,
+            text_lost,
             next: [0; 4],
             statics: None,
             within: 0,
@@ -820,7 +842,11 @@ impl<'a> Merge<'a> {
                         None => {
                             let gone = layer >= Layer::Ability && (lost || self.stripped.lost.contains(&source));
                             self.lost = (gone, gone && self.stripped.applying.contains(&source));
-                            let statics = self.source_statics(source);
+                            // CR 305.7, 613.8a: a land another effect sets the subtype of has none of its rules text's
+                            // static abilities from layer 4 on, the layer that effect applies in: each of them depends
+                            // on it (applying it changes their existence), so it applies first, and they are gone.
+                            let text_gone = layer >= Layer::Type && self.text_lost.contains(&source);
+                            let statics: &'static [StaticDef] = if text_gone { &[] } else { self.source_statics(source) };
                             self.statics = Some(statics);
                             statics
                         }
@@ -1305,8 +1331,107 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
 
 /// Whether `id` has lost all its abilities (CR 613.1f): to a resolved effect, or to a static ability
 /// (`StaticDef::loses_all`, which `lost_to_statics` works out). `Query::lost_all_abilities` is this.
+///
+/// A land an effect sets the subtype of has lost every ability its rules text gives it (CR 305.7): every rule read off its
+/// card is gone as it is for a loss of all abilities, though abilities other effects grant it stay.
 pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> bool {
-    state.lost_all_abilities_to_an_effect(id) || (state.statics_seen && lost_to_statics(cards, state, log).lost.contains(&id))
+    if state.lost_all_abilities_to_an_effect(id) {
+        return true;
+    }
+    if !state.statics_seen {
+        return false;
+    }
+    // Most positions have neither kind of ability in play: one look at the sources says so.
+    let (strippers, setters) = {
+        let found = static_sources(cards, state);
+        (!found.strippers.is_empty(), !found.setters.is_empty())
+    };
+    (strippers && lost_to_statics(cards, state, log).lost.contains(&id)) || (setters && land_text_lost(cards, state, log).contains(&id))
+}
+
+/// The lands on the battlefield that have lost the abilities of their rules text (CR 305.7) to a static ability that
+/// sets land subtypes (`StaticDef::sets_land_subtypes`), found once per position and history, and empty, at the cost of a
+/// look at the source list, while no such ability is on the battlefield.
+///
+/// Each such ability applies in layer 4 to what its `affects` accepts, judged on the characteristics layers 1 to 3 made
+/// (CR 613.1). It applies whatever its source loses in layer 6 (CR 613.6: Magus of the Moon's ruling). One that would
+/// take the abilities of another such ability's source - a land - is applied first, since the other's existence depends
+/// on it (CR 613.8a), and the abilities it takes no longer apply; where each would take the other's, the earlier timestamp
+/// goes first (CR 613.8b). A land whose own ability sets its own subtype (Multiversal Passage's "this land is the chosen
+/// type") keeps that ability applying (CR 613.6), and is not counted here for it: it has no other rules text.
+fn land_text_lost(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<ObjectId> {
+    if !state.statics_seen || static_sources(cards, state).setters.is_empty() {
+        return Vec::new();
+    }
+    let key = (state.epoch, log.len());
+    {
+        let have = state.land_text_lost.borrow();
+        if have.finding {
+            return Vec::new();
+        }
+        if have.key == key {
+            return have.objects.clone();
+        }
+    }
+    let setters = static_sources(cards, state).setters.clone();
+    state.land_text_lost.borrow_mut().finding = true;
+    let view = View { cards, state, log, stop: Layer::Type };
+    let strips = |(source, from): (ObjectId, ZoneKind), id: ObjectId| -> bool {
+        let obj = state.obj(id);
+        if !obj.zone.is(ZoneKind::Battlefield) || obj.became.is_some() {
+            return false;
+        }
+        let so_far = chars_before(cards, state, log, id, Layer::Type);
+        so_far.is(CardType::Land)
+            && cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, id, &so_far))
+    };
+    let mut pending = setters;
+    let mut applied: Vec<(ObjectId, ZoneKind)> = Vec::new();
+    while !pending.is_empty() {
+        // The first, in timestamp order, that no other one still waiting would take away; failing that, the first.
+        let next = (0..pending.len()).find(|&i| !pending.iter().any(|&other| other.0 != pending[i].0 && strips(other, pending[i].0))).unwrap_or(0);
+        let ability = pending.remove(next);
+        pending.retain(|&other| !strips(ability, other.0));
+        applied.push(ability);
+    }
+    let objects: Vec<ObjectId> =
+        state.battlefield().iter().copied().filter(|&id| applied.iter().any(|&ability| ability.0 != id && strips(ability, id))).collect();
+    let mut have = state.land_text_lost.borrow_mut();
+    have.key = key;
+    have.objects = objects.clone();
+    have.finding = false;
+    objects
+}
+
+/// Whether a land about to enter the battlefield would lose the abilities of its rules text there to a static ability
+/// that sets land subtypes (CR 305.7), judged as it would exist on the battlefield (CR 614.12) - as `card`, with the copy
+/// effect it enters with if any: then its own "enters tapped" and "as this enters" replacements do not apply (Blood
+/// Moon's and Magus of the Moon's rulings). Only the abilities of permanents that have not lost theirs to another such
+/// ability apply (`land_text_lost`).
+pub fn loses_rules_text_entering(cards: &CardTable, state: &GameState, log: &[Record], object: ObjectId, card: CardId, copy: Option<&Copiable>) -> bool {
+    if !state.statics_seen {
+        return false;
+    }
+    let setters = {
+        let found = static_sources(cards, state);
+        if found.setters.is_empty() {
+            return false;
+        }
+        found.setters.clone()
+    };
+    let so_far = match copy {
+        Some(c) => initial(cards, c.card, Some(c)),
+        None => *printed(cards, card, false),
+    };
+    if !so_far.is(CardType::Land) {
+        return false;
+    }
+    let lost = land_text_lost(cards, state, log);
+    let view = View { cards, state, log, stop: Layer::Type };
+    setters.iter().any(|&(source, from)| {
+        !lost.contains(&source)
+            && cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, object, &so_far))
+    })
 }
 
 /// What `lost_to_statics` found: the permanents that lost all their abilities to a static ability, and the sources whose

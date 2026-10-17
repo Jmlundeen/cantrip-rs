@@ -75,6 +75,10 @@ pub struct GameState {
     /// The permanents that have lost all their abilities to a static ability (CR 613.1f), found by the layers for one
     /// position and history (a function of both: such an ability may read the past).
     pub lost_to_statics: std::cell::RefCell<LostToStatics>,
+    /// The lands that have lost the abilities of their rules text to an effect that sets their subtype (CR 305.7), found by
+    /// the layers for one position and history, as `lost_to_statics` is (`applying` unused: a land's own such ability keeps
+    /// applying and is not counted).
+    pub land_text_lost: std::cell::RefCell<LostToStatics>,
 }
 
 /// The layers' list of the permanents a "loses all abilities" static ability took everything from, made for one epoch
@@ -109,6 +113,9 @@ pub struct StaticSources {
     /// Those of `list` with a static ability that makes objects lose all abilities (`StaticDef::loses_all`), which no
     /// resolved effect has taken away, in timestamp order.
     pub strippers: Vec<(ObjectId, ZoneKind)>,
+    /// Those of `list` with a static ability that sets the land subtypes of what it affects (`StaticDef::sets_land_subtypes`,
+    /// CR 305.7), whatever abilities they have lost in layer 6 (CR 613.6), in timestamp order.
+    pub setters: Vec<(ObjectId, ZoneKind)>,
     /// The permanents with hone counters on them (CR 122.1j), in battlefield order: what each gives the creature it is
     /// attached to is no ability of it, so it is found apart from `list`, whatever abilities the permanent has lost.
     pub honed: Vec<ObjectId>,
@@ -295,8 +302,9 @@ impl GameState {
             unsettled: true,
             journal: Journal::default(),
             epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), honed: Vec::new(), granted: Vec::new(), continuing: false }),
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), honed: Vec::new(), granted: Vec::new(), continuing: false }),
             lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
+            land_text_lost: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
         }
     }
 
