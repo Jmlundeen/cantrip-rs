@@ -1,0 +1,33 @@
+# "You draw a card and lose 1 life", in that order: at 1 life, Bot1's upkeep trigger draws the card and then the life
+# loss (1 -> 0) makes it lose the game as a state-based action (CR 704.5a). The hand shows the card was drawn first: 3 cards
+# left after turn 1's plays, +1 from Arena = 4 (the draw step is never reached).
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Phyrexian Arena
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Arena.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+
+[Expect]
+Result = Bot2 won
+Bot1.Hand.Count = 4
+Bot1.Life = 0

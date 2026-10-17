@@ -1,0 +1,39 @@
+# Two Phyrexian Arenas are two triggered abilities (CR 603.2): in Bot1's turn-3 upkeep only the first is out (19 life), the
+# second is cast in the main phase; in the turn-5 upkeep both trigger, each drawing a card and losing 1 life (19 - 2 = 17).
+# Hand: 1 card (Island) after turn 3's plays, +1 (T3 Arena) +1 (T3 draw) = 3 at the end of turn 3's main phase,
+# +2 (T5 Arenas) +1 (T5 draw) = 6.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Ruby
+Phyrexian Arena
+Phyrexian Arena
+Island
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phyrexian Arena.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Phyrexian Arena.Cast
+[T5 Bot1.Draw]
+? Bot1.Life = 17
+? Bot1.Hand.Count = 6
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Count = 6
