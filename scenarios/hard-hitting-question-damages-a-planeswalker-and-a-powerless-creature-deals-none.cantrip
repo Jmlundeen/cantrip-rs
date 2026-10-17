@@ -1,0 +1,63 @@
+# Hard-Hitting Question may target a planeswalker the caster doesn't control (CR 115.1): Bot1's Hercules (power 3) hits Bot2's
+# Oko, Thief of Crowns (loyalty 4), removing 3 loyalty counters (CR 120.3c): 1 is left. A creature with no power deals none
+# (CR 120.8): on turn 5 Bot1's Ornithopter (power 0) aimed at Bot2's Elvish Mystic leaves it undamaged, the positive
+# control being the Hercules hit above.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Ornithopter
+Hard-Hitting Question
+Hard-Hitting Question
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Oko, Thief of Crowns
+Elvish Mystic
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Hard-Hitting Question.Cast
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Target(Oko, Thief of Crowns)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 1
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Hard-Hitting Question.Cast
+Bot1.Target(Ornithopter)
+Bot1.Target(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 1
+Bot2.Battlefield.Elvish Mystic.Damage = 0
+Bot1.Graveyard = Hard-Hitting Question; Hard-Hitting Question

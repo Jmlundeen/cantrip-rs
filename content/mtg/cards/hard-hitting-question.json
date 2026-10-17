@@ -1,0 +1,6 @@
+{
+  "name": "Hard-Hitting Question",
+  "manaCost": "{G}",
+  "type": "Sorcery",
+  "oracleText": "Target creature you control deals damage equal to its power to target creature or planeswalker you don't control."
+}

@@ -1,0 +1,50 @@
+# Hard-Hitting Question's first target is the one that deals the damage. Bot2 destroys it in response (Get Lost on Hercules): it
+# is no longer a legal target as the spell resolves (CR 608.2b) and cannot deal damage, though the other target is still
+# legal - so Bot2's Ornithopter (power 0, toughness 2: any damage from the Question would be marked) is undamaged, and the
+# Question still goes to the graveyard. Hercules is gone and Bot1 got Get Lost's two Map tokens.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Hard-Hitting Question
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Get Lost
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Hard-Hitting Question.Cast
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Get Lost.Cast(Hercules, Prince of Power)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Graveyard = Hard-Hitting Question; Hercules, Prince of Power
+Bot1.Battlefield.Map Token#1.Token = true

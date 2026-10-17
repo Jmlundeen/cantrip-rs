@@ -1,0 +1,50 @@
+# The second target is also checked as the spell resolves: Bot2 flickers its own Elvish Mystic with Ephemerate in response, and
+# it returns as a new object (CR 400.7) that is not the one targeted (CR 608.2b). No damage is dealt to it, and Hercules,
+# whose target is still legal, takes none either: the Mystic is alive and undamaged.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Hard-Hitting Question
+Island x15
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Elvish Mystic
+Ephemerate
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Hard-Hitting Question.Cast
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Target(Elvish Mystic)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ephemerate.Cast(Elvish Mystic)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Elvish Mystic.Damage = 0
+Bot2.Battlefield.Elvish Mystic.SummoningSick = true
+Bot1.Battlefield.Hercules, Prince of Power.Damage = 0
+Bot1.Graveyard = Hard-Hitting Question

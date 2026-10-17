@@ -1,0 +1,50 @@
+# Hard-Hitting Question: Bot1's Hercules, Prince of Power (3/3) deals damage equal to its power (3) to Bot2's Picklock Prankster
+# (1/3, flying), which dies - and Hercules takes nothing back: unlike a fight (Bushwhack, CR 701.14), only the first target deals
+# damage. The second target must be a creature or planeswalker Bot1 doesn't control: Bot1's own Elvish Mystic is refused
+# (beside the Prankster, the positive control), and so is a creature of the opponent's as the FIRST target.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Elvish Mystic
+Hard-Hitting Question
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Picklock Prankster
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Picklock Prankster.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Hard-Hitting Question.Cast
+! Bot1.Target(Bot2.Battlefield.Picklock Prankster)
+Bot1.Target(Hercules, Prince of Power)
+! Bot1.Target(Bot1.Battlefield.Elvish Mystic)
+Bot1.Target(Picklock Prankster)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Picklock Prankster
+Bot1.Battlefield.Hercules, Prince of Power.Damage = 0
+Bot1.Graveyard = Hard-Hitting Question
