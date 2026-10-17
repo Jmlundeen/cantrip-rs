@@ -1,0 +1,52 @@
+# "The OWNER of target attacking creature you don't control puts it on their choice": Bot2 steals Bot1's Ornithopter with a
+# kicked Thieving Skydiver (X 1) on turn 2 and attacks with it on turn 4. Bot1 casts Lagoon Breach on it (Bot1 doesn't control
+# it). Bot1, the owner, is asked (not Bot2, the controller) and puts it on top of ITS OWN library (CR 400.3, 401.4: a card
+# goes to its owner's library); Bot2's library is untouched.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Ornithopter
+Horned Loch-Whale
+Island
+Island
+Island
+Island x5
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Thieving Skydiver
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Horned Loch-Whale.Cast(Bot2.Battlefield.Ornithopter; Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+
+[Expect]
+Bot1.Library = Ornithopter; Island; Island; Island; Island
+Bot2.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Thieving Skydiver
+Exile = Horned Loch-Whale

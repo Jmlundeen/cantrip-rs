@@ -1,0 +1,42 @@
+# Lagoon Breach targets only "an attacking creature you don't control" (CR 115.1, 506.4). On Bot1's turn 3 Bot1 attacks with its
+# own Ornithopter while Bot2's Llanowar Elves stay home: no creature qualifies (the attacker is Bot1's own, the other is not
+# attacking), so the Adventure is not offered although Bot1 has the mana. On turn 4 the Elves attack and the same cast is
+# offered (the positive control, in the neighbouring Lagoon Breach scenarios) - here it is taken to prove the first refusal
+# was for the target and not for the mana.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Horned Loch-Whale
+Ornithopter
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+! Bot1.Hand.Horned Loch-Whale.Cast(Ability: Adventure)
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Horned Loch-Whale.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+Bot2.Accept
+
+[Expect]
+Bot2.Battlefield.Count = 1
+Bot2.Library = Llanowar Elves; Forest; Forest; Forest
+Exile = Horned Loch-Whale

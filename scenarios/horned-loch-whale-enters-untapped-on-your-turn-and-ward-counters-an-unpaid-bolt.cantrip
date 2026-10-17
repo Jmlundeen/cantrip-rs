@@ -1,0 +1,45 @@
+# Horned Loch-Whale cast on Bot1's own turn 1 enters untapped ("enters tapped unless it's your turn", CR 614.1c): a 6/6.
+# On turn 2 Bot2's Lightning Bolt targets it; Ward {2} triggers (CR 702.21a) and Bot2, with only the Mountain that paid for the
+# Bolt, cannot pay and declines, so the Bolt is countered and the Whale has no damage on it (it would have 3 without the ward).
+# Mana: Black Lotus for {U}{U}{U}, Mox Sapphire, Mox Pearl and Mox Jet.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Horned Loch-Whale
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Horned Loch-Whale.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Horned Loch-Whale.Tapped = false
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Horned Loch-Whale)
+Bot2.Pass
+Bot1.Pass
+Bot2.Decline
+
+[Expect]
+Bot1.Battlefield.Horned Loch-Whale.Power = 6
+Bot1.Battlefield.Horned Loch-Whale.Toughness = 6
+Bot1.Battlefield.Horned Loch-Whale.Damage = 0
+Bot1.Battlefield.Horned Loch-Whale.Tapped = false
+Bot2.Graveyard = Lightning Bolt

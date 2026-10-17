@@ -1,0 +1,38 @@
+# Flash (CR 702.8a): Bot1 casts Horned Loch-Whale during Bot2's turn 2 with five Moxen and an Island (it is not Bot1's turn),
+# and it enters tapped (CR 614.1c). The turn-1 scenario, cast on Bot1's own turn, is the positive control (untapped).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Horned Loch-Whale
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Horned Loch-Whale.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Horned Loch-Whale.Tapped = true
+Bot1.Battlefield.Horned Loch-Whale.Power = 6

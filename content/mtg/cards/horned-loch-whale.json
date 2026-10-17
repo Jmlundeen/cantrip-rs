@@ -1,0 +1,17 @@
+{
+  "name": "Horned Loch-Whale",
+  "manaCost": "{4}{U}{U}",
+  "type": "Creature — Whale",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Flash\nWard {2}\nThis creature enters tapped unless it's your turn.",
+  "keywords": [
+    "Flash"
+  ],
+  "adventure": {
+    "name": "Lagoon Breach",
+    "manaCost": "{1}{U}",
+    "type": "Instant — Adventure",
+    "oracleText": "The owner of target attacking creature you don't control puts it on their choice of the top or bottom of their library. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}
