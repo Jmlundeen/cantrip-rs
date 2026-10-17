@@ -1,0 +1,54 @@
+# Chains of Mephistopheles and dredge (CR 702.52a) both replace a draw of Bot1's outside its draw step, and Bot1 orders
+# them (CR 616.1). Entomb puts Golgari Grave-Troll (dredge 6) into Bot1's graveyard, and Bot1 casts Ancestral Recall with
+# an empty hand:
+# - the first draw: Bot1 applies the dredge first and takes it - six cards milled, the Troll back in hand - and Chains has
+#   no draw left to replace (CR 614.6), so nothing is discarded;
+# - the second: the Troll is in hand, so only Chains applies; Bot1 discards the Troll and so draws a card, a draw Chains has
+#   had its opportunity at (CR 614.5) but the Troll's dredge, back in the graveyard, has not - Bot1 dredges again;
+# - the third: the same, but Bot1 declines the dredge, and draws a Forest.
+# Twelve cards were milled and one drawn from the twenty-five left after the Entomb; the Troll is in the graveyard.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Chains of Mephistopheles
+Entomb
+Ancestral Recall
+Mox Jet
+Golgari Grave-Troll
+Forest x25
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Golgari Grave-Troll)
+? Bot1.Graveyard = Entomb; Golgari Grave-Troll; Black Lotus
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Golgari Grave-Troll)
+Bot1.Accept
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Accept
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest
+Bot1.Library.Count = 12
+Bot1.Graveyard.Count = 16
+Bot1.Graveyard.Golgari Grave-Troll.Power = 0

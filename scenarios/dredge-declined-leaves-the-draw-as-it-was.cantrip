@@ -1,0 +1,30 @@
+# Dredge is "you may" (CR 702.52a, 614.1a): Bot1 is asked as its turn 3 draw would be replaced by Golgari Grave-Troll's
+# dredge 6, declines, and draws the card as usual (CR 616.1): nothing is milled and the Troll stays in its graveyard.
+
+[Bot1 Deck]
+Swamp
+Thoughtseize
+Golgari Grave-Troll
+Plains
+Plains
+Plains
+Plains
+Forest
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains; Forest
+Bot1.Graveyard = Thoughtseize; Golgari Grave-Troll
+Bot1.Library.Count = 20

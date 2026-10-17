@@ -1,0 +1,41 @@
+# Dredge 6 (CR 702.52a): "As long as you have at least N cards in your library, if you would draw a card, you may instead mill N
+# cards and return this card from your graveyard to your hand" - a static ability of the card in the graveyard, and dredge
+# "can replace any card draw", the draw step's too (its rulings). Bot1 makes itself discard Golgari Grave-Troll with
+# Thoughtseize on turn 1. Its turn 3 draw for the turn is replaced: Bot1 is asked, dredges, and mills six cards, and the Troll
+# comes back to its hand; it draws no card. On turn 5 the Troll is in hand, not in the graveyard, so nothing replaces the draw.
+
+[Bot1 Deck]
+Swamp
+Thoughtseize
+Golgari Grave-Troll
+Plains
+Plains
+Plains
+Plains
+Forest x6
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+[T3 Bot1.Upkeep]
+? Bot1.Graveyard = Thoughtseize; Golgari Grave-Troll
+Bot1.Accept
+[T3 Bot1.Main1]
+? Bot1.Hand = Golgari Grave-Troll; Plains; Plains; Plains; Plains
+? Bot1.Graveyard = Forest; Forest; Forest; Forest; Forest; Forest; Thoughtseize
+? Bot1.Library.Count = 20
+[T5 Bot1.Upkeep]
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Golgari Grave-Troll; Plains; Plains; Plains; Plains; Island
+Bot1.Library.Count = 19
+Bot1.Life = 18

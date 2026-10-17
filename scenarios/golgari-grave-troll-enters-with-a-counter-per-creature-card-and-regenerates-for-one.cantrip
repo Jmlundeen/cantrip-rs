@@ -1,0 +1,67 @@
+# Golgari Grave-Troll: "This creature enters with a +1/+1 counter on it for each creature card in your graveyard" (CR 614.1c,
+# 122.6) and "{1}, Remove a +1/+1 counter from this creature: Regenerate this creature" (CR 701.19a). Its turn 3 dredge mills
+# two Ornithoppers among four Forests, so it enters as a 2/2 when cast from hand (it is not in the graveyard as it enters).
+# Bot1 pays {1} and a counter for a regeneration shield, leaving a 1/1; Bot2's Lightning Bolt deals it lethal damage and the
+# shield regenerates it (CR 701.19b): it stays, tapped, with the damage removed and the one counter it had left.
+
+[Bot1 Deck]
+Swamp
+Thoughtseize
+Black Lotus
+Mox Jet
+Mox Emerald
+Plains
+Golgari Grave-Troll
+Forest
+Ornithopter
+Forest
+Ornithopter
+Forest
+Forest
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Upkeep]
+Bot1.Accept
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Forest; Forest; Ornithopter; Forest; Ornithopter; Forest; Thoughtseize
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Golgari Grave-Troll.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+? Bot1.Battlefield.Golgari Grave-Troll.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Golgari Grave-Troll.Power = 2
+Bot1.Battlefield.Golgari Grave-Troll.Activate
+? Bot1.Battlefield.Golgari Grave-Troll.Toughness = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Golgari Grave-Troll)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Golgari Grave-Troll.Tapped = true
+Bot1.Battlefield.Golgari Grave-Troll.Damage = 0
+Bot1.Battlefield.Golgari Grave-Troll.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Golgari Grave-Troll.Power = 1
+Bot2.Graveyard = Lightning Bolt

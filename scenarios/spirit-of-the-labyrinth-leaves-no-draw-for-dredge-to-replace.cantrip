@@ -1,0 +1,55 @@
+# Spirit of the Labyrinth (Bot1's) and dredge (Bot2's Golgari Grave-Troll): "if a replacement effect would try to replace a
+# card that you can't draw, that effect can't apply" (Spirit's ruling; CR 614.17c). Bot2 draws its card for turn 2, then
+# Entombs the Troll and casts Ancestral Recall: its three draws can't happen, so dredge is not offered for any of them (Bot2 is
+# asked nothing as the spell resolves). On turn 4 the draw for the turn is Bot2's first card of the turn, so dredge may
+# replace it, and Bot2 dredges: six cards milled and the Troll back in hand.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Spirit of the Labyrinth
+Plains x4
+Plains x20
+
+[Bot2 Deck]
+Swamp
+Mox Sapphire
+Entomb
+Ancestral Recall
+Swamp x3
+Swamp
+Golgari Grave-Troll
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+[T2 Bot2.Main1]
+? Bot2.Hand.Count = 8
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Pass
+Bot2.Search(Golgari Grave-Troll)
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Pass
+! Bot2.Accept
+[T2 Bot2.Main2]
+? Bot2.Hand.Count = 4
+? Bot2.Graveyard = Ancestral Recall; Entomb; Golgari Grave-Troll
+[T4 Bot2.Upkeep]
+Bot2.Accept
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Hand.Count = 5
+Bot2.Hand.Golgari Grave-Troll.Power = 0
+Bot2.Library.Count = 14
+Bot2.Graveyard.Count = 8

@@ -1,0 +1,47 @@
+# Browser
+# Draw replacements played by Bot1's page. Bot1 makes itself discard Golgari Grave-Troll with Thoughtseize. Golgari Grave-Troll's dredge and Chains of Mephistopheles both replace Ancestral
+# Recall's first draw, and the page asks which applies first, saying the event is a card Bot1 would draw (CR 616.1, 121.6);
+# Bot1 takes the dredge, and the page asks in dredge's words whether to mill six and return the Troll instead (CR 702.52a).
+# Bot1 dredges; the second draw meets Chains alone (the Troll is in hand) - Bot1 discards the Troll and the draw that follows
+# is dredged again; the third the same, declined, and drawn.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Chains of Mephistopheles
+Thoughtseize
+Ancestral Recall
+Golgari Grave-Troll
+Forest x25
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+? Client.Bot1.Prompt.Title = You would draw a card: which applies first?
+Bot1.Replace(Golgari Grave-Troll)
+Bot1.Accept
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Accept
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Forest
+Bot1.Library.Count = 12
+Bot1.Graveyard.Count = 16

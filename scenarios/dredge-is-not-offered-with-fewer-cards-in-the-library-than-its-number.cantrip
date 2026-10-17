@@ -1,0 +1,33 @@
+# Dredge: "A player with fewer cards in their library than the number required by a dredge ability can't mill any of them this
+# way" (CR 702.52b) - "you can't attempt to use a dredge ability if you don't have enough cards in your library" (its ruling).
+# Bot1's library holds five cards when its turn 3 draw comes, and Golgari Grave-Troll's is dredge 6: Bot1 is not asked, and
+# draws as usual. (The scenario beside this one, with six or more, asks.)
+
+[Bot1 Deck]
+Swamp
+Thoughtseize
+Golgari Grave-Troll
+Plains
+Plains
+Plains
+Plains
+Forest x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+[T3 Bot1.Upkeep]
+? Bot1.Library.Count = 5
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains; Forest
+Bot1.Graveyard = Thoughtseize; Golgari Grave-Troll
+Bot1.Library.Count = 4

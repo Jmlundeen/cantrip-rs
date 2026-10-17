@@ -1,0 +1,36 @@
+# Golgari Grave-Troll: "If you return Golgari Grave-Troll from your graveyard directly to the battlefield, its first ability
+# counts itself" (its ruling; CR 614.12): the counters are counted as it would enter, while it is still in the graveyard.
+# Reanimate brings it back from a graveyard where it is the only creature card: one +1/+1 counter, a 1/1 (counted from
+# elsewhere it would be a 0/0, put into the graveyard at once). Bot1 loses 2 life to Thoughtseize and 5, the Troll's mana
+# value, to Reanimate.
+
+[Bot1 Deck]
+Swamp
+Thoughtseize
+Mox Jet
+Reanimate
+Golgari Grave-Troll
+Plains
+Plains
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Golgari Grave-Troll)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Golgari Grave-Troll.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Golgari Grave-Troll.Power = 1
+Bot1.Battlefield.Golgari Grave-Troll.Toughness = 1
+Bot1.Graveyard = Reanimate; Thoughtseize
+Bot1.Life = 13
