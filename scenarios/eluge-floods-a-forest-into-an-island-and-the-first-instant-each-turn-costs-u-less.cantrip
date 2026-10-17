@@ -1,0 +1,58 @@
+# Eluge, the Shoreless Sea enters with one Island under Bot1, so it is a 1/1 (CR 604.3: its power and toughness are the
+# number of Islands its controller controls). Its enters trigger puts a flood counter on Bot1's Forest, which is then an
+# Island as well as a Forest (CR 305.7, 611.2b): it taps for {U} (CR 305.6) and Eluge is a 2/2. With one land with a
+# flood counter, the first instant Bot1 casts this turn, Opt, costs {U} less - nothing - so the {U} the Forest made is
+# still in the pool once it is cast; the second Opt is not the first and costs its full {U}, which empties the pool.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Eluge, the Shoreless Sea
+Opt
+Opt
+Island
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Forest)
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 2
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 2
+? Bot1.Battlefield.Forest.Subtypes = Forest; Island
+? Bot1.Battlefield.Forest.Counters.Flood = 1
+Bot1.Battlefield.Forest.Activate(Ability: {U})
+Bot1.Hand.Opt.Cast
+? Bot1.Mana = {U}
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Opt.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Forest; Eluge, the Shoreless Sea
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 2
+Bot1.Battlefield.Forest.Subtypes = Forest; Island
+Bot1.Battlefield.Forest.Counters.Flood = 1
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Graveyard = Opt; Opt; Black Lotus
+Bot1.Mana =

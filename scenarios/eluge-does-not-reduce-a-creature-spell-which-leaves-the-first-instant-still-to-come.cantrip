@@ -1,0 +1,49 @@
+# Eluge's reduction is for instant and sorcery spells only: with a flooded Forest, Picklock Prankster ({1}{U}, cast as the
+# creature) costs its full {1}{U}, which empties Bot1's pool of the {U}{U} from Mox Sapphire and the Forest. A creature
+# spell is not "the first instant or sorcery spell", so the Opt cast after it still is, and costs {U} less: nothing, with
+# the pool empty.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Eluge, the Shoreless Sea
+Picklock Prankster
+Opt
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate(Ability: {U})
+Bot1.Hand.Picklock Prankster.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Forest; Mox Sapphire; Eluge, the Shoreless Sea; Picklock Prankster
+Bot1.Graveyard = Opt; Black Lotus
+Bot1.Mana =

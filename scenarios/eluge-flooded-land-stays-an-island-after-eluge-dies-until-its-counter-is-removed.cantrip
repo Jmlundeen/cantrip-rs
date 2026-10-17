@@ -1,0 +1,63 @@
+# The flooded land is an Island "for as long as it has a flood counter on it" (CR 611.2b), not for as long as Eluge is
+# around: Bot2's Lightning Bolt kills the 2/2 Eluge and Bot1's Forest is still an Island (the ruling). Then Vampire
+# Hexmage removes all counters from the Forest, and the moment its flood counter is gone it is a Forest alone again,
+# with no {U} ability (CR 305.6).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Eluge, the Shoreless Sea
+Vampire Hexmage
+Island
+Island
+Forest
+Swamp
+Island x11
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Eluge, the Shoreless Sea)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Eluge, the Shoreless Sea; Black Lotus
+? Bot1.Battlefield.Forest.Subtypes = Forest; Island
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Forest.Activate(Ability: {U})
+Bot1.Battlefield.Forest.Activate(Ability: {G})
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Forest.Subtypes = Forest
+Bot1.Battlefield.Forest.Counters.Flood = (absent)
+Bot1.Graveyard = Vampire Hexmage; Eluge, the Shoreless Sea; Black Lotus
+Bot1.Mana = {G}

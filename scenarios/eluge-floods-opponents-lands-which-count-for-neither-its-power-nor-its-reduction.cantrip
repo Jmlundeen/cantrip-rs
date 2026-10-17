@@ -1,0 +1,68 @@
+# Eluge's flood counters may go on an opponent's lands ("target land"): as it enters and as it attacks, Bot1 floods
+# Bot2's Mountains, which become Islands under Bot2 and tap for {U}. They are not Islands Bot1 controls, so Eluge stays
+# a 2/2 for Bot1's two Islands and deals 2 (CR 604.3); and they are not lands Bot1 controls with flood counters, so
+# Bot1's first instant, Opt, costs its full {U}. Nor does Eluge reduce Bot2's spells: Bot2's Mana Leak at the Opt,
+# paid with the two flooded Mountains' {U}{U}, costs its full {1}{U}, so Bot2's pool is empty. Bot1 does not pay, and
+# the Opt is countered.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Eluge, the Shoreless Sea
+Opt
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mana Leak
+Mountain x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Mountain)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Mountain.Subtypes = Island; Mountain
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Eluge, the Shoreless Sea > Bot2)
+Bot1.Target(Bot2.Battlefield.Mountain#2)
+[T5 Bot1.Main2]
+? Bot2.Life = 18
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Opt.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Battlefield.Mountain#1.Activate(Ability: {U})
+Bot2.Battlefield.Mountain#2.Activate(Ability: {U})
+Bot2.Hand.Mana Leak.Cast(Stack.Opt)
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 2
+Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 2
+Bot2.Battlefield.Mountain#1.Subtypes = Island; Mountain
+Bot2.Battlefield.Mountain#2.Subtypes = Island; Mountain
+Bot2.Battlefield.Mountain#2.Counters.Flood = 1
+Bot2.Life = 18
+Bot1.Graveyard = Opt; Black Lotus
+Bot2.Graveyard = Mana Leak

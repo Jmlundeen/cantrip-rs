@@ -1,0 +1,63 @@
+# Eluge's reduction is {U} for each land Bot1 controls with a flood counter, and the {U} a cost has no {U} for takes {1}
+# instead (CR 118.7d, the rulings). With one flooded Forest, Abrade ({1}{R}), the first instant of Bot1's turn, costs {R}:
+# Bot1 pays it with Mox Ruby alone, leaving Mox Jet untapped. On Bot2's next turn the reduction is back for Bot1's first
+# instant of that turn ("each turn"), and a cost with a {U} loses the {U} first: Mana Leak ({1}{U}) costs {1}, paid with
+# Mox Jet's {B}, which could not pay a {U}. Ornithopter is destroyed by Abrade, Bot2's second one countered by Mana Leak.
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Jet
+Black Lotus
+Eluge, the Shoreless Sea
+Abrade
+Mana Leak
+Forest
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Abrade.Cast
+Bot1.Modes(Destroy target artifact)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mana Leak.Cast(Stack.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Forest.Subtypes = Forest; Island
+Bot1.Graveyard = Mana Leak; Abrade; Black Lotus
+Bot2.Graveyard = Ornithopter; Ornithopter
+Bot2.Battlefield =

@@ -1,0 +1,32 @@
+# Eluge cast with no Island under Bot1 is a 0/0 (CR 604.3) and goes to the graveyard as a state-based action (CR 704.5f)
+# before its enters trigger resolves; the trigger is independent of its source (CR 113.7a) and still puts a flood counter
+# on the Forest, which is then an Island. The effect lasts as long as the counter, so Eluge being gone does not matter.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Eluge, the Shoreless Sea
+Island x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Eluge, the Shoreless Sea; Black Lotus
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Subtypes = Forest; Island
+Bot1.Battlefield.Forest.Counters.Flood = 1
+Bot1.Graveyard = Eluge, the Shoreless Sea; Black Lotus

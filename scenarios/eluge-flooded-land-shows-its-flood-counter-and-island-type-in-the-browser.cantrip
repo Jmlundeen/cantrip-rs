@@ -1,0 +1,45 @@
+# Browser
+# What the client shows of Eluge's flood counter (CR 122.1): the flooded Forest carries a "flood" counter pill and its
+# type line names the Island it now also is (CR 305.7, 611.2b); Eluge's power and toughness are the two Islands Bot1
+# controls. The Forest's menu then offers its new {U} ability, which pays for Opt with the reduction.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Eluge, the Shoreless Sea
+Opt
+Island
+Island
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Forest)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Client.Bot1.Battlefield.Forest.Counters = 1 × flood
+? Client.Bot1.Battlefield.Forest.TypeLine = Basic Land - Forest Island
+Bot1.Battlefield.Forest.Activate(Ability: {U})
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 2
+Bot1.Battlefield.Forest.Subtypes = Forest; Island
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Graveyard = Opt; Black Lotus
+Bot1.Mana = {U}
