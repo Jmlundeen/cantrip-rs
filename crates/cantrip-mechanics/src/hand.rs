@@ -94,6 +94,17 @@ pub fn look_and_may_choose(
     })
 }
 
+/// "Exile [that card]. For as long as that card remains exiled, its owner may play it. A spell cast this way costs {2} more to
+/// cast." (CR 400.7, 601.2f): the permission is for the card's owner and lasts while it stays in exile; nothing if it did not reach
+/// exile (a replacement sent it elsewhere) or is a token. Elite Spellbinder and Invasion of Gobakhan print it.
+pub fn exile_owner_may_play_for_two_more(g: &mut dyn Game, card: ObjectId) {
+    let owner = g.obj(card).owner;
+    let exiled = g.exile(card);
+    if g.obj(exiled).zone.is(ZoneKind::Exile) && !g.obj(exiled).token {
+        g.allow_play(exiled, owner, PlayGrant { lands: true, more: 2, ..PlayGrant::CAST });
+    }
+}
+
 /// "You may put a [kind of] card from your hand onto the battlefield" (CR 608.2d, 101.4): one card of the hand that passes
 /// `eligible`, chosen as an "up to one" with the whole hand shown, then put onto the battlefield under the player's control
 /// (an Aura chooses what it enchants as it enters, CR 303.4f). Nothing is asked when no card is eligible. The new object, or

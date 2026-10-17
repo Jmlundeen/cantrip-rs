@@ -1,5 +1,6 @@
-# Elite Spellbinder: "You may exile a nonland card from it." Bot2's whole hand is Islands, so nothing is offered and
-# nothing is exiled (a default answer would take the first card offered). The positive control is
+# Elite Spellbinder: "Look at target opponent's hand. You may exile a nonland card from it." Looking is part of the ability, so Bot1 is
+# shown Bot2's hand and asked even though every card in it is an Island and none can be chosen (the Choose() line waits for that question,
+# so the scenario fails if Bot1 is never asked). It chooses nothing and nothing is exiled. The positive control is
 # elite-spellbinder-exiles-a-card-its-owner-may-cast-for-two-more.
 
 [Bot1 Deck]
@@ -22,6 +23,7 @@ Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Elite Spellbinder.Cast
 Bot1.Pass
 Bot2.Pass
+Bot1.Choose()
 [Bot1.Main2]
 
 [Expect]

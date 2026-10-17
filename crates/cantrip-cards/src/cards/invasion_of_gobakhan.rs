@@ -7,13 +7,8 @@ use cantrip_oracle as oracle;
 /// with nothing eligible, so the choice is asked of any hand that is not empty.
 fn take_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
-    let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, "", |q, c| !q.chars(c).is(CardType::Land))? else { return Ok(()) };
-    let exiled = g.exile(card);
-    if g.obj(exiled).zone.is(ZoneKind::Exile) {
-        // Its owner may play it for as long as it stays there (CR 400.7), the spell costing {2} more (CR 601.2f).
-        let owner = g.obj(exiled).owner;
-        g.allow_play(exiled, owner, PlayGrant { lands: true, more: 2, ..PlayGrant::CAST });
-    }
+    let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, "nonland", |q, c| !q.chars(c).is(CardType::Land))? else { return Ok(()) };
+    hand::exile_owner_may_play_for_two_more(g, card);
     Ok(())
 }
 
