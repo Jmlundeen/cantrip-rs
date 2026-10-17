@@ -1,0 +1,63 @@
+# Arcane Adaptation (Merfolk) and Lord of Atlantis are effects of different layers: the type is added in layer 4 (CR
+# 613.1d), and by layer 6 and 7c, where the Lord's "Other Merfolk get +1/+1 and have islandwalk" applies, Bot1's Llanowar
+# Elves is a Merfolk - a 2/2 with islandwalk on turn 3 - while the Lord, a Merfolk already, is not "other" to itself and stays
+# 2/2. On turn 5 Humility takes the creatures' abilities, the Lord's with them, but not Arcane Adaptation's, an
+# enchantment's: the Elves is still an Elf Druid Merfolk, now a 1/1 with no islandwalk.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Lord of Atlantis
+Llanowar Elves
+Arcane Adaptation
+Humility
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Merfolk)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Merfolk
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Toughness = 2
+? Bot1.Battlefield.Llanowar Elves.Keywords = Islandwalk
+? Bot1.Battlefield.Lord of Atlantis.Power = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Merfolk
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Lord of Atlantis.Power = 1

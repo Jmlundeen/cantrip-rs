@@ -1,0 +1,55 @@
+# Arcane Adaptation's "The same is true for creature spells you control" works on the stack (CR 611.3a): with Merfolk chosen
+# for both it and Door of Destinies ("Whenever you cast a spell of the chosen type, put a charge counter on this artifact"),
+# Bot1's Llanowar Elves is a Merfolk spell as it is cast on turn 3 (CR 601.2i), so the Door triggers and gets a charge
+# counter (CR 603.2). On the battlefield the Elves is a Merfolk too, and the Door's "Creatures you control of the chosen type
+# get +1/+1 for each charge counter" makes it a 2/2. Without Arcane Adaptation an Elf spell would not trigger the Door.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Emerald
+Sol Ring
+Arcane Adaptation
+Door of Destinies
+Llanowar Elves
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+Bot1.Modes(Merfolk)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Door of Destinies.Cast
+Bot1.Pass
+Bot1.Modes(Merfolk)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Door of Destinies.Counters.Charge = (absent)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Door of Destinies.Counters.Charge = 1
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Merfolk
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2

@@ -1,0 +1,71 @@
+# "As this enchantment enters, choose a creature type" is a replacement effect of Arcane Adaptation's own (CR 614.1c,
+# 614.12a), and which apply is judged on the permanent "as it would exist on the battlefield, taking into account ...
+# continuous effects that already exist and would apply to the permanent" (CR 614.12). With Opalescence and Humility out,
+# Arcane Adaptation would be a creature there (Opalescence, layer 4) with no abilities (Humility, layer 6), so nothing is
+# chosen as it enters on turn 5 (the refusal "! Bot1.Modes" holds across its resolution) and it has no chosen type. It is a
+# 1/1 enchantment creature: Opalescence's 3/3 first, then the later Humility's 1/1 (layer 7b, CR 613.7). On turn 7 Bot1
+# disenchants Humility: Arcane Adaptation has its ability again, and is a creature Bot1 controls, but with no type chosen
+# it adds none - to itself or anything else - and is Opalescence's 3/3.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Sol Ring
+Opalescence
+Humility
+Arcane Adaptation
+Disenchant
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Arcane Adaptation.Cast
+Bot1.Pass
+! Bot1.Modes
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Arcane Adaptation.Types = Enchantment; Creature
+? Bot1.Battlefield.Arcane Adaptation.ChosenSubtype = (absent)
+? Bot1.Battlefield.Arcane Adaptation.Power = 1
+? Bot1.Battlefield.Arcane Adaptation.Toughness = 1
+[T7 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Humility)
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Graveyard = Disenchant; Humility; Black Lotus
+Bot1.Battlefield.Arcane Adaptation.Types = Enchantment; Creature
+Bot1.Battlefield.Arcane Adaptation.ChosenSubtype = (absent)
+Bot1.Battlefield.Arcane Adaptation.Subtypes = (absent)
+Bot1.Battlefield.Arcane Adaptation.Power = 3
+Bot1.Battlefield.Arcane Adaptation.Toughness = 3
