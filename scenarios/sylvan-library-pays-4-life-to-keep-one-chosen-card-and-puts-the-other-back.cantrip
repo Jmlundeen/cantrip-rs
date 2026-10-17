@@ -1,0 +1,35 @@
+# Sylvan Library: "For each of those cards, pay 4 life or put the card on top of your library" (CR 119.4). Bot1 draws the
+# Island for its turn 3 draw and the Mountain and the Plains for Sylvan Library, chooses the Island and the Mountain, pays 4
+# life to keep the Island, and puts the Mountain back on top. The Plains, drawn this turn but not chosen, stays too.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sylvan Library
+Swamp x4
+Island
+Mountain
+Plains
+Swamp x2
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Library.Cast
+[T3 Bot1.Draw]
+Bot1.Accept
+Bot1.Choose(Island; Mountain)
+Bot1.Accept
+Bot1.Decline
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Island; Plains
+Bot1.Library = Mountain; Swamp; Swamp
+Bot1.Life = 16

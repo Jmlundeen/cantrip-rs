@@ -1,0 +1,39 @@
+# Sylvan Library: "At the beginning of your draw step, you may draw two additional cards. If you do, choose two cards in your
+# hand drawn this turn. For each of those cards, pay 4 life or put the card on top of your library." "You always perform
+# your normal draw before this ability" (its ruling; CR 504.1, 504.2): in Bot1's turn 3 draw step it draws the Island, then
+# the ability resolves and it draws the Mountain and the Plains. Three cards in its hand were drawn this turn; it chooses
+# the Mountain and the Plains, pays no life, and puts the Mountain back and then the Plains on top of it. The Island,
+# drawn this turn but not chosen, stays.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sylvan Library
+Swamp x4
+Island
+Mountain
+Plains
+Swamp x2
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Library.Cast
+[T3 Bot1.Draw]
+? Stack = Sylvan Library
+Bot1.Accept
+Bot1.Choose(Mountain; Plains)
+Bot1.Decline
+Bot1.Decline
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Island
+Bot1.Library = Plains; Mountain; Swamp; Swamp
+Bot1.Life = 20

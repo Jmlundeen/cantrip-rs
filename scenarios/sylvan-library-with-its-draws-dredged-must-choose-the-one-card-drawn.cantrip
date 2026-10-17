@@ -1,0 +1,49 @@
+# Sylvan Library: "If you choose to draw two cards, then replace one or more of those draws with some other effect, the rest of
+# Sylvan Library's ability still happens. If you've actually drawn only one card that turn, you must choose that card and
+# either pay 4 life or put it on top of your library" (its ruling; CR 614.6). Golgari Grave-Troll's dredge replaces Bot1's turn
+# 3 draw for the turn and mills Stinkweed Imp; Bot1 takes Sylvan Library's two draws, the Imp's dredge replaces the first,
+# and the second draws the Island - the one card drawn this turn, so it is the one chosen: Bot1
+# declines to pay and puts it back.
+
+[Bot1 Deck]
+Swamp
+Mox Emerald
+Mox Jet
+Thoughtseize
+Sylvan Library
+Golgari Grave-Troll
+Plains
+Forest
+Stinkweed Imp
+Forest x9
+Island
+Forest x4
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sylvan Library.Cast
+[T3 Bot1.Upkeep]
+Bot1.Accept
+[T3 Bot1.Draw]
+? Bot1.Hand = Plains; Golgari Grave-Troll
+Bot1.Accept
+Bot1.Accept
+Bot1.Decline
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Plains; Golgari Grave-Troll; Stinkweed Imp
+Bot1.Library = Island; Forest; Forest; Forest; Forest
+Bot1.Graveyard.Count = 11

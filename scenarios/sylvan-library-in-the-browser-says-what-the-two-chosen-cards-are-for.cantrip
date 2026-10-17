@@ -1,0 +1,38 @@
+# Browser
+# Sylvan Library played by Bot1's page: as the ability resolves the page asks whether to draw two additional cards; then,
+# with three cards in hand drawn this turn, it asks for two of them and says what the choice is for - for each, 4 life or
+# the top of the library - not that they go back (CR 119.4). Bot1 chooses the Mountain and the Plains, then pays 4 life to
+# keep the Mountain and puts the Plains back on top.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sylvan Library
+Swamp x4
+Island
+Mountain
+Plains
+Swamp x2
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Library.Cast
+[T3 Bot1.Draw]
+Bot1.Accept
+? Client.Bot1.Prompt.Title = Sylvan Library: choose 2 cards in your hand drawn this turn - for each, pay 4 life or put it on top of your library
+Bot1.Choose(Mountain; Plains)
+Bot1.Accept
+Bot1.Decline
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Island; Mountain
+Bot1.Library = Plains; Swamp; Swamp
+Bot1.Life = 16

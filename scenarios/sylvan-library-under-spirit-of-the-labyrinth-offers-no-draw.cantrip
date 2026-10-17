@@ -1,0 +1,45 @@
+# Sylvan Library under Spirit of the Labyrinth (Bot2's): "if an effect offers the player a choice to draw multiple cards, the
+# affected player can't choose to do so" (CR 121.2b, 121.3). Bot1 has drawn its card for turn 3 when Sylvan Library's ability
+# resolves, and is not asked whether to draw two; nothing else happens - no card is chosen, and no life is paid.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sylvan Library
+Swamp x4
+Island
+Mountain
+Plains
+Swamp x2
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Spirit of the Labyrinth
+Swamp x4
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Library.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Spirit of the Labyrinth.Cast
+[T3 Bot1.Draw]
+? Stack = Sylvan Library
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Island
+Bot1.Library = Mountain; Plains; Swamp; Swamp
+Bot1.Life = 20
