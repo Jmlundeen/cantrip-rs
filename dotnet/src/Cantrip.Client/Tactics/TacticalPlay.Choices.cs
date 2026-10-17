@@ -935,6 +935,21 @@ public sealed partial class TacticalPlay
 
     // --- Yes or no, who, and what color --------------------------------------------------------------------------------
 
+    /// <summary>What the Food this seat controls that is worth least is worth, or nothing when it controls no Food.</summary>
+    private double? CheapestFood(GameClient client)
+    {
+        List<double> foods = [.. client.BattlefieldOf(client.Seat).Where(card => card.Subtypes.Contains("Food")).Select(card => Worth(client, card))];
+        return foods.Count == 0 ? null : foods.Min();
+    }
+
+    /// <summary>What the opponents' permanents a spell or ability on the stack targets are worth to them, together.</summary>
+    private double AimedAt(GameClient client, ViewHandle spell) =>
+        client.Object(spell)?.Targets
+            .Select(target => client.Object(target.Object))
+            .OfType<ObjectView>()
+            .Where(permanent => permanent.Zone == ZoneKindView.Battlefield && permanent.Controller != client.Seat)
+            .Sum(permanent => Worth(client, permanent)) ?? 0;
+
     private AnswerPayload May(GameClient client, PlayerView view, MayPromptMessage prompt)
     {
         int life = LifeOf(view, client.Seat);
@@ -947,6 +962,10 @@ public sealed partial class TacticalPlay
             // Ward—Sacrifice N permanents (Emrakul, the Exigent Doom; Ulamog, the Defiler): a price paid only out of a wide
             // board, which still holds four permanents afterwards.
             "SacrificeUnlessCountered" => client.BattlefieldOf(client.Seat).Count() - prompt.Amount >= 4,
+
+            // Ward—Sacrifice a Food (Ygra, Eater of All): paid when the cheapest Food this seat controls, the one the
+            // sacrifice choice would give up, is worth less than the opposing permanents its spell or ability aims at.
+            "SacrificeFoodUnlessCountered" => CheapestFood(client) is double food && food < AimedAt(client, prompt.Source),
 
             // Ad Nauseam: the next card's price is unknown, so keep going only while one more costly card cannot
             // kill — life loss is not a payment and nothing stops a player revealing past zero.
