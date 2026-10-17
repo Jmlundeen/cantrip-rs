@@ -1,0 +1,43 @@
+# Locthwain Scorn: "Target creature gets -3/-3 until end of turn. You gain 2 life." Against Bot2's Serra Paragon (3/4) it makes
+# a 0/1 that survives (toughness 1 is above 0), Bot1 gains 2 (22), and on Bot2's next turn the Paragon is a 3/4 again
+# (CR 514.2); the Adventure card is exiled as the spell resolves, since it resolved.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Virtue of Persistence
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Serra Paragon
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Serra Paragon.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Virtue of Persistence.Cast(Bot2.Battlefield.Serra Paragon; Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Serra Paragon.Power = 0
+? Bot2.Battlefield.Serra Paragon.Toughness = 1
+? Bot1.Life = 22
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Serra Paragon.Power = 3
+Bot2.Battlefield.Serra Paragon.Toughness = 4
+Bot1.Life = 22
+Exile = Virtue of Persistence

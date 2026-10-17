@@ -1,0 +1,55 @@
+# Virtue of Persistence as an Adventure card (CR 715): on turn 3 Bot1 casts Locthwain Scorn ({1}{B}) at Bot2's Ornithopter
+# (0/2): -3/-3 kills it, Bot1 gains 2 life (22), and the card is exiled as the spell resolves. On turn 5 Bot1 casts the
+# Virtue itself from exile for {5}{B}{B} (Black Lotus and four Moxen), and on turn 7, at the beginning of its upkeep, the
+# Virtue puts the Ornithopter from Bot2's graveyard onto the battlefield under Bot1's control (CR 603.2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Black Lotus
+Virtue of Persistence
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Virtue of Persistence.Cast(Bot2.Battlefield.Ornithopter; Ability: Adventure)
+? Stack = Locthwain Scorn
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+? Exile = Virtue of Persistence
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Virtue of Persistence.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Virtue of Persistence.Types = Enchantment
+[T7 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Island; Island
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Emerald; Virtue of Persistence; Ornithopter
+Exile.Count = 0

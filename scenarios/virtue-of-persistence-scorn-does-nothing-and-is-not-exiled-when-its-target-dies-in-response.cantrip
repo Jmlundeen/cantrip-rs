@@ -1,0 +1,38 @@
+# CR 608.2b, 715.4: Locthwain Scorn's only target, Bot2's Ornithopter, is killed by Bot2's own Lightning Bolt in response, so the
+# spell does not resolve: Bot1 gains no life (stays at 20), and as an Adventure that leaves the stack without resolving the
+# card goes to Bot1's graveyard, not exile, so the Virtue cannot be cast from exile later.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Virtue of Persistence
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Virtue of Persistence.Cast(Bot2.Battlefield.Ornithopter; Ability: Adventure)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Exile.Count = 0
+Bot1.Graveyard = Virtue of Persistence
+Bot2.Graveyard = Ornithopter; Lightning Bolt
