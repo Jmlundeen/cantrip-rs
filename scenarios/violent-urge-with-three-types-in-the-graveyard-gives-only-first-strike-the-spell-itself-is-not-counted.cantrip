@@ -1,0 +1,51 @@
+# Violent Urge's delirium is counted as it resolves (CR 608.2c): Wheel of Fortune puts Black Lotus (artifact), itself (sorcery) and an
+# Island (land) into Bot1's graveyard - three card types. Violent Urge is an instant, so it would make a fourth the moment it is
+# put into the graveyard, but while it resolves it is still on the stack (CR 608.2n puts it there after), so the Ornithopter gets
+# +1/+0 and first strike only and, attacking unblocked, deals 1 damage (the other scenario, with four types, deals 2). The
+# graveyard has no creature card: the Ornithopter drawn for the Wheel stays in the library.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Ornithopter
+Island
+Island
+Island
+Violent Urge
+Mountain
+Mountain
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Wheel of Fortune; Island; Island; Island; Black Lotus
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Violent Urge.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying
+? Bot2.Life = 19
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying

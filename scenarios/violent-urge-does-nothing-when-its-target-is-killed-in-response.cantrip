@@ -1,0 +1,46 @@
+# Violent Urge has one target; when Bot2 kills the Ornithopter with Lightning Bolt in response, the target is illegal on resolution
+# and the spell does not resolve (CR 608.2b): it goes to the graveyard (counted as "fizzled" by the rules, not countered) and
+# nothing else happens - no creature is pumped, and Bot1's other creature (a second Ornithopter) gets nothing either.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Ornithopter
+Ornithopter
+Violent Urge
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Mountain
+Lightning Bolt
+Island x4
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Violent Urge.Cast(Bot1.Battlefield.Ornithopter#1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Ornithopter
+Bot1.Graveyard = Violent Urge; Ornithopter
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying

@@ -1,0 +1,53 @@
+# Violent Urge with delirium (CR 702.138 / 207.2c): on turn 1 Black Lotus pays for a Wheel of Fortune that puts Black Lotus (artifact),
+# Wheel of Fortune (sorcery), an Ornithopter (artifact creature) and an Island (land) into Bot1's graveyard - four card types. On
+# turn 3 the first Ornithopter (0/2 flier) attacks unblocked and Violent Urge, cast after attackers are declared, makes it
+# 1/2 with first strike and double strike, so it deals 1 first-strike damage and 1 regular damage: 2 in all (the other scenario,
+# one type short, deals 1). The pump and the keywords last only until end of turn (CR 611.2a), checked on turn 4.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Ornithopter
+Ornithopter
+Island
+Island
+Violent Urge
+Mountain
+Mountain
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Violent Urge.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Keywords = DoubleStrike; FirstStrike; Flying
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying
