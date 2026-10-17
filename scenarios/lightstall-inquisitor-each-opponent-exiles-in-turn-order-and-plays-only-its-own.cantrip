@@ -1,0 +1,38 @@
+# Lightstall Inquisitor in a game of three: "each opponent exiles a card from their hand" asks Bot2 and then Bot3, in turn
+# order from the active player (CR 101.4), and never Bot1, who controls it. Bot3's first card is an Island, so if Bot3 were
+# asked first its answer would be the default Island and its Mountain would stay in hand. Each may play only the card it
+# exiled itself ("may play that card"): on its turn Bot3 can't play Bot2's Swamp, and plays its own Mountain, tapped.
+
+[Bot1 Deck]
+Plains
+Lightstall Inquisitor
+Plains x15
+
+[Bot2 Deck]
+Swamp
+Island x16
+
+[Bot3 Deck]
+Island
+Mountain
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightstall Inquisitor.Cast
+Bot2.Choose(Swamp)
+Bot3.Choose(Mountain)
+? Exile.Count = 2
+[T3 Bot3.Main1]
+! Bot3.Exile.Swamp.Play
+Bot3.Exile.Mountain.Play
+[T3 Bot3.Main2]
+
+[Expect]
+Turn = 3
+Exile = Swamp
+Bot1.Hand.Count = 6
+Bot3.Battlefield = Mountain
+Bot3.Battlefield.Mountain.Tapped = true
+Bot3.Hand.Mountain = (absent)

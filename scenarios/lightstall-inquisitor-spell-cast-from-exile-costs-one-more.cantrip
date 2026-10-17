@@ -1,0 +1,39 @@
+# Lightstall Inquisitor: Bot2 exiles Lightning Bolt from its hand. On its own turn Bot2 plays a Mountain from its hand - an
+# ordinary land play, which enters untapped (no permission is used) - and casts the Bolt from exile at the Inquisitor. "Each
+# spell cast this way costs {1} more to cast" (CR 601.2f): with {R}{R} in its pool, Bot2 has nothing left once the Bolt is
+# cast, where its printed {R} would have left one {R}.
+
+[Bot1 Deck]
+Plains
+Lightstall Inquisitor
+Plains x15
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain
+Mox Ruby
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightstall Inquisitor.Cast
+Bot2.Choose(Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Bot2.Battlefield.Mountain.Tapped = false
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+? Bot2.Mana = {R}{R}
+Bot2.Exile.Lightning Bolt.Cast(Lightstall Inquisitor)
+? Bot2.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Exile.Count = 0
+Bot1.Battlefield = Plains
+Bot1.Graveyard = Lightstall Inquisitor
+Bot2.Graveyard = Lightning Bolt
+Bot2.Mana =

@@ -1,0 +1,41 @@
+# Lightstall Inquisitor with Archon of Emeria: Bot2 plays the Tundra it exiled. Two replacement effects would make it enter
+# tapped - the permission's "each land played this way enters tapped" and Archon's "nonbasic lands your opponents control
+# enter tapped" (CR 614.1c) - so Bot2, whose land it is, chooses which applies first (CR 616.1). It picks the permission's;
+# Archon's then has nothing left to change (CR 616.1f), and the Tundra is tapped.
+
+[Bot1 Deck]
+Plains
+Lightstall Inquisitor
+Plains
+Archon of Emeria
+Plains
+Plains x15
+
+[Bot2 Deck]
+Tundra
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightstall Inquisitor.Cast
+Bot2.Choose(Tundra)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Archon of Emeria.Cast
+[T6 Bot2.Main1]
+Bot2.Exile.Tundra.Play
+Bot2.Replace(played this way)
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Exile.Count = 0
+Bot1.Battlefield.Count = 5
+Bot2.Battlefield = Tundra
+Bot2.Battlefield.Tundra.Tapped = true

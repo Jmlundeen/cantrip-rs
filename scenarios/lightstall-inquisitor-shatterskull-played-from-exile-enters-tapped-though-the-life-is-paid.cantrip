@@ -1,0 +1,30 @@
+# Lightstall Inquisitor and a modal double-faced card: Bot2 exiles Shatterskull Smashing and plays its back face, Shatterskull,
+# the Hammer Pass, from exile as its land (CR 712.4, 305.1). Its own "you may pay 3 life. If you don't, it enters tapped"
+# (CR 614.12) is paid, but the permission's "each land played this way enters tapped" (CR 614.1c) is a replacement of its
+# own: the land still enters tapped, and Bot2 has paid the 3 life.
+
+[Bot1 Deck]
+Plains
+Lightstall Inquisitor
+Plains x15
+
+[Bot2 Deck]
+Shatterskull Smashing
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightstall Inquisitor.Cast
+Bot2.Choose(Shatterskull Smashing)
+[T2 Bot2.Main1]
+Bot2.Exile.Shatterskull Smashing.Play
+Bot2.Accept
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Exile.Count = 0
+Bot2.Life = 17
+Bot2.Battlefield = Shatterskull, the Hammer Pass
+Bot2.Battlefield.Shatterskull, the Hammer Pass.Tapped = true
