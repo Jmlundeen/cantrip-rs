@@ -1,0 +1,61 @@
+# Phasing out is no leaving the battlefield (CR 702.26d): Teferi's Protection's ruling, "Any one-shot effects that are waiting
+# 'until [this] leaves the battlefield,' such as that of Banishing Light, won't happen when a permanent phases out." Bot1's
+# Oblivion Ring exiles Bot2's Ornithopter, and Teferi's Protection phases the Ring out with the rest of Bot1's permanents: the
+# Ornithopter stays in exile. As Bot1's turn 5 begins the Ring phases in without entering, so its "When this enchantment
+# enters" asks for no target, and the Ornithopter is still in exile.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Oblivion Ring
+Teferi's Protection
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oblivion Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut.Oblivion Ring.Tapped = false
+[T4 Bot2.Main1]
+? Exile = Ornithopter; Teferi's Protection
+[T5 Bot1.Upkeep]
+! Bot1.Target
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Plains; Plains; Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Oblivion Ring
+Exile = Ornithopter; Teferi's Protection
+Bot2.Battlefield.Count = 0

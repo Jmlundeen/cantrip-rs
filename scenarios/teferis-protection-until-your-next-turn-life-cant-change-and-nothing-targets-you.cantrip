@@ -1,0 +1,86 @@
+# Teferi's Protection: "Until your next turn, your life total can't change and you gain protection from everything."
+# Bot1 (at 10 life) casts it in its turn 3 first main phase, then plays Flooded Strand and casts Lightning Helix at Bot2: Bot2 takes 3,
+# but Bot1 gains no life (CR 119.7, 119.8), and Bot1 can't pay the Strand's 1 life (the ruling: "You can't pay a cost that
+# includes the payment of any amount of life other than 0 life"). On turn 4 Bot2's Sunspine Lynx deals Bot1 1 damage for the
+# Strand, which can't be prevented, so protection does not stop it - but Bot1's life total still doesn't change (the ruling on
+# damage that can't be prevented). Bot2 can't target Bot1 with Lightning Bolt (CR 702.16b, 702.16j). As Bot1's turn 5 begins
+# both effects end (CR 611.2b): Bot1 pays the Strand's life, and on turn 6 Bot2's Bolt reaches Bot1 - the positive controls.
+
+[Life]
+Bot1: 10
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Teferi's Protection
+Flooded Strand
+Mox Ruby
+Lotus Petal
+Lightning Helix
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Sunspine Lynx
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut = Mox Pearl; Mox Jet; Mox Sapphire
+Bot1.Hand.Flooded Strand.Play
+! Bot1.Battlefield.Flooded Strand.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Lotus Petal.Activate(Color: White)
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot1.Life = 10
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Sunspine Lynx.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 10
+? Prevented = (absent)
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+? Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Sapphire; Flooded Strand; Mox Ruby
+Bot1.Battlefield.Flooded Strand.Activate
+Bot1.Search(Plains)
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 6
+Bot1.Life = 6
+Bot2.Life = 17
+Exile = Teferi's Protection
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Sapphire; Mox Ruby; Plains

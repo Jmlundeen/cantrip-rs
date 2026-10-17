@@ -1,0 +1,81 @@
+# Teferi's Protection: "All permanents you control phase out." A phased-out permanent is treated as though it does not exist
+# (CR 702.26b; its example: "Destroy all creatures" does not destroy it). Bot1 answers Bot2's Wrath of God with it: Bot1's lands,
+# Moxen, Thraben Inspector, Walking Ballista and Clue token phase out, and so does Bot1's Rancor, which enchants Bot2's
+# Ornithopter - an Aura phases out directly with its controller's permanents, not with what it enchants (CR 702.26g is about
+# the permanent it is attached to phasing out). The Wrath destroys only the Ornithopter.
+# As Bot1's next untap step begins they phase in (CR 502.1) and untap: the same objects (CR 702.26d) - the token still exists,
+# the Ballista keeps its +1/+1 counter, the Inspector makes no second Clue (no "enters" trigger) and nothing of Bot1's left the
+# battlefield. Rancor phases in unattached, since what it enchanted is gone (CR 702.26i), and the state-based actions put it into
+# the graveyard (CR 704.5m), from which its own ability returns it to Bot1's hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Emerald
+Thraben Inspector
+Walking Ballista
+Rancor
+Teferi's Protection
+Plains
+Plains x10
+
+[Bot2 Deck]
+Plains
+Ornithopter
+Black Lotus
+Wrath of God
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teferi's Protection.Cast
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Count = 0
+? Bot1.PhasedOut = Plains; Mox Pearl; Mox Jet; Mox Emerald; Thraben Inspector; Walking Ballista; Clue Token; Rancor
+? Bot2.Battlefield = Plains; Plains
+? Bot1.Hand.Count = 0
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Emerald; Thraben Inspector; Walking Ballista; Clue Token
+Bot1.Battlefield.Clue Token.Token = true
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Plains.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.PhasedOut.Count = 0
+Bot1.Hand = Rancor; Plains
+Bot1.Graveyard.Count = 0
+Exile = Teferi's Protection
+LeftBattlefield = Black Lotus (tapped); Ornithopter; Rancor

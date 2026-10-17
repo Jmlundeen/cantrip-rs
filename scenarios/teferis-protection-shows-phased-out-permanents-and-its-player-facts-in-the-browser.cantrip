@@ -1,0 +1,47 @@
+# Browser
+# What Teferi's Protection puts into the game is shown on Bot1's page. Its phased-out permanents stay in sight - the players know
+# of them (CR 702.26b: treated as though they don't exist, not hidden) - with PHASED OUT at their foot, Ornithopter faded with its
+# Mox. Beside Bot1's life total its two effects about the player say what they do and how long they last (CR 702.16j, 119.7);
+# Bot2 has none. As Bot1's turn 3 begins they all phase in and the facts are gone (CR 502.1, 611.2b).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Ornithopter
+Teferi's Protection
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Battlefield.Ornithopter.Status =
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut = Plains; Mox Pearl; Mox Jet; Ornithopter
+? Client.Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Ornithopter
+? Client.Bot1.Battlefield.Ornithopter.Status = PHASED OUT
+? Client.Bot1.Facts = You have protection from everything until your next turn; Your life total can't change until your next turn
+? Client.Bot1.OpponentFacts =
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Ornithopter
+Bot1.PhasedOut.Count = 0
+Client.Bot1.Battlefield.Ornithopter.Status =
+Client.Bot1.Facts =
+Exile = Teferi's Protection

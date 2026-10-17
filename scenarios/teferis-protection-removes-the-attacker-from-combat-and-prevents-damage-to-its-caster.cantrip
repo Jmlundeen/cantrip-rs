@@ -1,0 +1,66 @@
+# A permanent that phases out is removed from combat (CR 702.26b, 506.4). Bot1's Llanowar Elves attacks on turn 3 and Bot2's
+# Elvish Mystic blocks it; in the declare blockers step Bot1 casts Teferi's Protection. The Elves phase out, so they deal and
+# are dealt no combat damage: the Mystic survives undamaged, and so do the Elves, which phase in as Bot1's turn 5 begins.
+# Protection from everything prevents all damage that would be dealt to its player (CR 702.16e, 702.16j): the Mystic attacking
+# Bot1 on turn 4 deals none. On turn 6 the protection is over (CR 611.2b) and the same attack deals 1 - the positive control.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Mox Pearl
+Mox Jet
+Plains
+Teferi's Protection
+Forest
+Forest x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest
+Forest
+Forest
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Llanowar Elves)
+Bot2.Block(Elvish Mystic > Llanowar Elves)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers.Count = 0
+? Combat.Blocks.Count = 0
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Elvish Mystic.Damage = 0
+? Bot1.PhasedOut.Llanowar Elves.Damage = 0
+[T4 Bot2.Main1]
+Bot2.Attack(Elvish Mystic)
+[T4 Bot2.Main2]
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+[T6 Bot2.Main1]
+Bot2.Attack(Elvish Mystic)
+[T6 Bot2.Main2]
+
+[Expect]
+Turn = 6
+Bot1.Life = 19
+Bot1.Battlefield = Forest; Llanowar Elves; Mox Pearl; Mox Jet; Plains
+Bot2.Battlefield = Forest; Elvish Mystic
+Prevented = 1 Elvish Mystic > Bot1 by Teferi's Protection
