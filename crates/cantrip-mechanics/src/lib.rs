@@ -205,13 +205,40 @@ pub fn each_opponent_sacrifices(
     count: u8,
     kind: fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<(), Suspend> {
-    let mut doomed = Vec::new();
-    for who in g.state().apnap().filter(|&p| p != controller).collect::<Vec<_>>() {
+    let players: Vec<PlayerId> = g.state().apnap().filter(|&p| p != controller).collect();
+    sacrifice_together(g, &players, source, count, kind).map(|_| ())
+}
+
+/// "Each player sacrifices `count` [kind] of their choice" (CR 701.21a, 101.4): as `each_opponent_sacrifices` but for every
+/// player, the controller included, in turn order from the active player. Returns who chose what (the old objects), so that
+/// "if you sacrificed a creature this way" can look at it. Garruk, Veiled Butcher's -2 and Innocent Blood print it.
+pub fn each_player_sacrifices(
+    g: &mut dyn Game,
+    source: ObjectId,
+    count: u8,
+    kind: fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<(PlayerId, ObjectId)>, Suspend> {
+    let players: Vec<PlayerId> = g.state().apnap().collect();
+    sacrifice_together(g, &players, source, count, kind)
+}
+
+/// Each of `players` in the order given chooses what they sacrifice, all on the board as it is before anything is
+/// sacrificed, and then the choices are sacrificed at once (CR 101.4, 701.21a). Returns the choices with who made them.
+fn sacrifice_together(
+    g: &mut dyn Game,
+    players: &[PlayerId],
+    source: ObjectId,
+    count: u8,
+    kind: fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<(PlayerId, ObjectId)>, Suspend> {
+    let mut chosen = Vec::new();
+    for &who in players {
         let eligible: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| kind(&*g, id)).collect();
-        doomed.extend(chosen_to_sacrifice(g, who, source, count, eligible)?);
+        chosen.extend(chosen_to_sacrifice(g, who, source, count, eligible)?.into_iter().map(|id| (who, id)));
     }
+    let doomed: Vec<ObjectId> = chosen.iter().map(|&(_, id)| id).collect();
     g.sacrifice(&doomed);
-    Ok(())
+    Ok(chosen)
 }
 
 /// "[Player] sacrifices `count` of `eligible`" (CR 701.21): the permanents the effect allows are decided by the caller (a

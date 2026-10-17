@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::replacements::OPPONENTS_CREATURES_EXILED_INSTEAD_OF_DYING;
-use cantrip_mechanics::{choose, choose_from_hand, targets, tokens};
+use cantrip_mechanics::{choose_from_hand, each_player_sacrifices, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// +2: Up to one target creature gets -4/-1 until your next turn (CR 611.2b).
@@ -18,23 +18,8 @@ fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// (CR 701.21a); a player with a single creature has no choice.
 fn minus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let mut doomed: Vec<ObjectId> = Vec::new();
-    let mut yours: Option<ObjectId> = None;
-    for who in g.state().apnap().collect::<Vec<_>>() {
-        let creatures: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-        let chosen = match creatures.len() {
-            0 => None,
-            1 => Some(creatures[0]),
-            _ => choose::card(g, who, item.object, Purpose::Sacrifice, creatures)?,
-        };
-        if let Some(creature) = chosen {
-            doomed.push(creature);
-            if who == you {
-                yours = Some(creature);
-            }
-        }
-    }
-    g.sacrifice(&doomed);
+    let chosen = each_player_sacrifices(g, item.object, 1, |q, id| q.chars(id).is(CardType::Creature))?;
+    let yours = chosen.into_iter().find(|&(who, _)| who == you).map(|(_, id)| id);
     if let Some(creature) = yours
         && g.obj(creature).became.is_some()
     {
