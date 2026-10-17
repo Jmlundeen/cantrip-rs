@@ -1,0 +1,41 @@
+# Counterpart of the warp scenario: Astelli Reclaimer cast for its mana cost {3}{W}{W} (five Mox Pearls) is not a warped spell,
+# and nothing left the battlefield, so Plasma Bolt deals 2 (20 -> 18). The Reclaimer stays on the battlefield.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Astelli Reclaimer
+Plasma Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Battlefield.Mox Pearl#5.Activate
+Bot1.Hand.Astelli Reclaimer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Plasma Bolt.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Astelli Reclaimer.Power = 5
+Bot1.Graveyard = Plasma Bolt

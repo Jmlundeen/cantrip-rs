@@ -1,0 +1,32 @@
+# Plasma Bolt's void: a nonland permanent left the battlefield this turn - Bot2's Ornithopter, killed by Bot1's Shock first -
+# so the Bolt deals 3 instead of 2 and Bot2 goes from 20 to 17. (Bot2's Ornithopter was hit by a Shock, not the Bolt.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Shock
+Plasma Bolt
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Hand.Plasma Bolt.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 17
+Bot1.Graveyard = Plasma Bolt; Shock

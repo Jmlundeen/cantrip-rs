@@ -1,0 +1,39 @@
+# Plasma Bolt's void counts any nonland permanent that left the battlefield, a token included (CR 111.7: it leaves, then ceases
+# to exist). Bot1 casts Thraben Inspector (W, investigate), sacrifices the Clue token for {2} to draw a card (hand: the Island and the drawn Island), and then the Bolt
+# deals 3 (20 -> 17). Three Mox Pearls and a Mox Ruby pay for everything: Inspector W, Clue {2}, Bolt R.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Thraben Inspector
+Plasma Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Plasma Bolt.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield.Count = 5
+Bot1.Graveyard = Plasma Bolt
+Bot1.Hand.Count = 2

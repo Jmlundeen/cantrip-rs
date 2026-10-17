@@ -1,0 +1,34 @@
+# Plasma Bolt's void, second half: "a spell was warped this turn" (CR 702.185c). Bot1 casts Astelli Reclaimer for its warp cost
+# {2}{W} (paid with three Mox Pearls); no permanent has left the battlefield, but the Bolt, paid with a Mox Ruby, deals 3 (20 -> 17).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Astelli Reclaimer
+Plasma Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Astelli Reclaimer.Cast(Ability: Warp)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Plasma Bolt.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield.Count = 5
+Bot1.Graveyard = Plasma Bolt

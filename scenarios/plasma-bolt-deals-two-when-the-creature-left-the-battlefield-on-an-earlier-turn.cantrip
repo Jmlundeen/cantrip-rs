@@ -1,0 +1,33 @@
+# Plasma Bolt's void is "this turn": Bot1's Shock kills Bot2's Ornithopter on turn 3, but on turn 5 nothing has left the
+# battlefield yet and no spell was warped, so the Bolt deals only 2 (20 -> 18). (The positive control, a permanent leaving the same
+# turn, is the scenario where a Shock first kills an Ornithopter.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Shock
+Plasma Bolt
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Shock.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Plasma Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 18
+Bot2.Battlefield.Count = 0
