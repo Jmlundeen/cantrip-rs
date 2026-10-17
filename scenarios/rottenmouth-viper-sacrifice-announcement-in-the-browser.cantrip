@@ -1,0 +1,43 @@
+# Browser
+# What the client shows as Rottenmouth Viper is announced (CR 601.2b, 601.2f): how many nonland permanents its additional
+# cost sacrifices, each taking {1} off the {5}{B}, raised to three for the three Ornithopters; the payment then asks {2}{B},
+# which the three Swamps' mana pays, and the three Ornithopters are chosen after it.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Ornithopter
+Ornithopter
+Rottenmouth Viper
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Hand.Rottenmouth Viper.Cast(X: 3)
+? Client.Bot1.Prompt.Title = Sacrifice how many for Rottenmouth Viper?
+? Client.Bot1.Prompt.Detail = 0 of up to 3  ·  each takes {1} off  ·  {5}{B} in all  ·  which ones come after the mana
+Bot1.Choose(Ornithopter#1; Ornithopter#2; Ornithopter#3)
+Bot1.Pass
+Bot2.Pass
+Bot2.Modes(Lose 4 life)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Swamp; Swamp; Swamp; Rottenmouth Viper
+Bot1.Graveyard = Ornithopter; Ornithopter; Ornithopter
+Bot2.Life = 16

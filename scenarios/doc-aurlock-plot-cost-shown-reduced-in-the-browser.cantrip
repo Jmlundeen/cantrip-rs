@@ -1,0 +1,38 @@
+# Browser
+# What the client shows of a special action whose cost a static ability changes (CR 116.2k, 118.7): with Doc Aurlock,
+# Grizzled Genius on the battlefield, Pillage the Bog's card menu offers its cast and its plot, and the plot row says it costs
+# {B}{G} now, not the {1}{B}{G} its text prints. Plotting it takes the {B} and {G} of the pool and leaves the {U}.
+
+[Bot1 Deck]
+Forest
+Island
+Doc Aurlock, Grizzled Genius
+Pillage the Bog
+Swamp
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Doc Aurlock, Grizzled Genius.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Pillage the Bog.Activate(Ability: Plot)
+? Client.Bot1.Menu = Plot {1}{B}{G} (You may pay {1}{B}{G} and exile this card from your hand. Cast it as a sorcery on a later turn without paying its mana cost. Plot only as a sorcery.) (costs {B}{G}); Cast Pillage the Bog
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Exile = Pillage the Bog
+Bot1.Mana = {U}
