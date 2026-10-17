@@ -1,0 +1,52 @@
+# CR 603.6a: abilities that trigger when a permanent enters see the permanents that enter together with it. Bringer of the Last Gift
+# returns every creature card in Bot1's graveyard that was not put there by its own sacrifice at once: Hinterland Sanctifier and
+# Llanowar Elves, which Entomb put there on turn 1. The Sanctifier, entering with the Elves, triggers for the Elves ("another
+# creature you control") and not for itself: Bot1 gains 1 life. Life: 20, less 2 from Ancient Tomb, plus 1 = 19.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Entomb
+Entomb
+Bringer of the Last Gift
+Black Lotus
+Ancient Tomb
+Hinterland Sanctifier
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Hinterland Sanctifier)
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Search(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Bringer of the Last Gift.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 19
+Bot1.Battlefield.Hinterland Sanctifier.Power = 1
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Bringer of the Last Gift.Power = 6

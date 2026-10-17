@@ -1,0 +1,45 @@
+# Combat damage from two lifelink creatures is dealt at the same moment but each source gains life separately (CR 120.3f, 510.2), so
+# "whenever you gain life" triggers twice and Bot2 loses 2 more life. Two Deep-Cavern Bats (1/1 flying lifelink) attack unblocked on turn 3
+# with Starscape Cleric, which stays home: Bot2 20 - 1 - 1 - 2 = 16; Bot1 20 + 1 + 1 = 22.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Pearl
+Mox Ruby
+Deep-Cavern Bat
+Deep-Cavern Bat
+Starscape Cleric
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Deep-Cavern Bat.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Deep-Cavern Bat.Cast
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Starscape Cleric.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Deep-Cavern Bat#1; Deep-Cavern Bat#2 > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Life = 16

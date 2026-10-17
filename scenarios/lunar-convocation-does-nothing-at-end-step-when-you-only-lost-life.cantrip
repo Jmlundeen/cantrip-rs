@@ -1,5 +1,5 @@
 # Lunar Convocation: Bot1 only loses life (paying 2 for the draw ability) and gains none, so neither end-step ability happens:
-# Bot2 stays on 20, there is no Bat, and Bot1 is on 18. 7 permanents. Positive controls: the two sibling scenarios.
+# Bot2 stays on 20, there is no Bat, and Bot1 is on 18. 5 permanents (four Moxen, the Convocation). Positive controls: the two sibling scenarios.
 
 [Bot1 Deck]
 Mox Pearl

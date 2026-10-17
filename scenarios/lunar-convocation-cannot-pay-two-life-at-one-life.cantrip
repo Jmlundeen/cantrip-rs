@@ -1,0 +1,46 @@
+# CR 119.4: a player can pay life only if their life total is at least the amount. Bot1 starts on 3 life and pays 2 for "{1}{B}, Pay 2 life:
+# Draw a card" (positive control: it draws), leaving it on 1 - and with two more Moxen untapped to pay {1}{B} the ability is no longer
+# offered (`! Bot1.Battlefield.Lunar Convocation.Activate`): 2 life cannot be paid from 1. Bot1 ends on 1 and has drawn once.
+
+[Life]
+Bot1: 3
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Lunar Convocation
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Lunar Convocation.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Battlefield.Lunar Convocation.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+! Bot1.Battlefield.Lunar Convocation.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 1
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Mox Jet#4.Tapped = false
+Bot1.Battlefield.Mox Jet#5.Tapped = false

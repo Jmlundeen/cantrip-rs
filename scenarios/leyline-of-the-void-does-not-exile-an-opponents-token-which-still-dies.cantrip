@@ -1,0 +1,44 @@
+# "If a card would be put into an opponent's graveyard": a token is not a card (CR 111.1), so the Leyline of the Void leaves it alone
+# (the ruling: tokens can still die). Bot2's Pest Infestation (X = 1) makes two Pest tokens; Bot1's Lightning Bolt kills one, it dies, and
+# its "When this token dies, you gain 1 life" trigger gains Bot2 1 life: 21. The Pest Infestation itself, a card going to Bot2's graveyard,
+# is exiled.
+
+[Bot1 Deck]
+Leyline of the Void
+Mox Ruby
+Lightning Bolt
+Island x4
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Pest Infestation
+Island x3
+Island x14
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Pest Infestation.Cast(X: 1)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Battlefield.Mox Emerald#3.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Pest)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 21
+Bot2.Graveyard.Count = 0
+Exile = Pest Infestation

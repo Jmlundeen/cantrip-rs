@@ -1,0 +1,44 @@
+# A card going to an opponent's graveyard is exiled instead, so it never "dies" (CR 700.4): Bot2's Sanguine Evangelist makes a Bat as it
+# enters, and Bot1's Lightning Bolt kills it - but with the Leyline of the Void the Evangelist is exiled in place of dying and its "When this
+# creature enters or dies" ability does not trigger a second time. Bot2 has one Bat, not two, and an empty graveyard.
+
+[Bot1 Deck]
+Leyline of the Void
+Mox Ruby
+Lightning Bolt
+Island x4
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Sanguine Evangelist
+Island x3
+Island x14
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Sanguine Evangelist.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Sanguine Evangelist)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Exile = Sanguine Evangelist
+Bot2.Battlefield = Mox Pearl; Mox Jet; Mox Emerald; Bat

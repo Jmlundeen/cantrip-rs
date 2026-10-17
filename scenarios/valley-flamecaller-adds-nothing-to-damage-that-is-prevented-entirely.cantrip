@@ -1,0 +1,49 @@
+# CR 615.6: prevented damage is no damage at all, so there is nothing for Valley Flamecaller's "that much damage plus 1" to add to. Bot2's
+# The One Ring gives it protection from everything until its next turn (CR 702.16j), which prevents all damage to it: the Flamecaller
+# attacks on turn 3 and Bot2 stays on 20, not 19. (The positive control, 3+1, is the combat scenarios beside this one.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Jet
+Valley Flamecaller
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+The One Ring
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Valley Flamecaller.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.The One Ring.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Valley Flamecaller > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20

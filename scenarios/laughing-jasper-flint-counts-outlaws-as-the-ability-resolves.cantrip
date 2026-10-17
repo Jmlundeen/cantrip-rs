@@ -1,0 +1,52 @@
+# "Where X is the number of outlaws you control" is counted as the ability resolves, not as it triggers (CR 608.2h). With Flint and Flamecache
+# Gecko (a Lizard Warlock) there are two outlaws when the turn-3 upkeep trigger goes on the stack, but Bot2 answers with Lightning Bolt on
+# the Gecko, so only Flint is left when it resolves and 1 card is exiled, not 2: Exile holds exactly one card. Bot1's graveyard holds the Gecko.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Laughing Jasper Flint
+Flamecache Gecko
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x5
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Laughing Jasper Flint.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Flamecache Gecko.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Flamecache Gecko)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 1
+Bot1.Graveyard = Flamecache Gecko
+Bot1.Battlefield.Laughing Jasper Flint.Power = 4

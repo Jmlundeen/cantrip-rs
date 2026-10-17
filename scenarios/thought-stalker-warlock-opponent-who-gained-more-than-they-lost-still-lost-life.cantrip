@@ -1,0 +1,56 @@
+# CR 119.3, "lost life this turn": Bot1's Lightning Bolt takes 3 from Bot2, who answers with Lightning Helix on Bot1 and gains 3, ending
+# the turn on 20 - the same life total as it started. It still lost life this turn, so Thought-Stalker Warlock's enters ability takes its
+# first branch: Bot2 reveals its hand and Bot1 chooses a nonland card - the Llanowar Elves, not a Forest (`! Bot1.Choose(Forest)`) - which
+# is discarded. Bot1 is on 17 (the Helix).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Thought-Stalker Warlock
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Lightning Helix
+Llanowar Elves
+Forest x3
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Thought-Stalker Warlock.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+! Bot1.Choose(Forest)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 20
+Bot1.Life = 17
+Bot2.Graveyard = Llanowar Elves; Lightning Helix
+Bot1.Graveyard = Lightning Bolt

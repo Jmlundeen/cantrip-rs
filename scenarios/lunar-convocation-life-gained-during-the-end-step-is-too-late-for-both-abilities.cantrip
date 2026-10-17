@@ -1,0 +1,38 @@
+# The intervening "if you gained life this turn" (CR 603.4) is checked as the end step begins: Bot1 had gained none then, so neither ability
+# triggered. Casting Lightning Helix in the end step afterwards (gaining 3) does not make them trigger - "at the beginning of" events do not
+# come again - so Bot2 loses only the Helix's 3 (17), Bot1 is on 23 and no Bat is made: 5 permanents, the four Moxen and the Convocation.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Pearl
+Mox Ruby
+Lunar Convocation
+Lightning Helix
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lunar Convocation.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T1 Bot1.End]
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield.Count = 5

@@ -1,0 +1,38 @@
+# The first branch with nothing to take: Bot2 lost life (Lightning Bolt), so its hand is revealed, but it holds only Forests and no nonland
+# card is eligible, so Bot1 is not asked to choose (`! Bot1.Choose`, CR 608.2d) and nothing is discarded - and Bot2 does not get the
+# "otherwise" discard either. Bot2's hand stays at seven cards and its graveyard holds only the Bolt Bot1 aimed at it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Thought-Stalker Warlock
+Island
+Island x12
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Hand.Thought-Stalker Warlock.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+! Bot1.Choose
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0

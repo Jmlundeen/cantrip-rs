@@ -1,0 +1,37 @@
+# Emberheart Challenger is a Mouse Warrior: with haste it attacks on turn 1 and its 2 combat damage becomes 3 beside Valley Flamecaller
+# (CR 614.1, 120.3). Bot2 is on 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Jet
+Mox Jet
+Valley Flamecaller
+Emberheart Challenger
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Valley Flamecaller.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Pass
+Bot1.Hand.Emberheart Challenger.Cast
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Emberheart Challenger > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

@@ -1,0 +1,39 @@
+# "Spend this mana only to cast an Angel spell" (CR 106.6): on turn 3 Giada is Bot1's only source of mana (the Black Lotus paid for her on turn
+# 1) and her {W} is the only mana in its pool, so `! Bot1.Hand.Hinterland Sanctifier.Cast` - a one-mana white creature spell, which that white
+# mana would pay for if it could - is not offered. The positive control is the same mana in the same pool paying for an Inspiring Overseer
+# (an Angel) once the Moxen are cast for the rest of its cost. The Overseer enters with Giada's counter, a 3/2.
+
+[Bot1 Deck]
+Black Lotus
+Giada, Font of Hope
+Hinterland Sanctifier
+Mox Pearl
+Mox Jet
+Mox Ruby
+Inspiring Overseer
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giada, Font of Hope.Activate
+? Bot1.Mana = {W} (AngelSpells)
+! Bot1.Hand.Hinterland Sanctifier.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Inspiring Overseer.Power = 3
+Bot1.Hand = Hinterland Sanctifier; Mox Ruby; Island; Island

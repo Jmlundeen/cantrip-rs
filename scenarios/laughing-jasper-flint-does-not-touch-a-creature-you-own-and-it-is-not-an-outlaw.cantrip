@@ -1,0 +1,36 @@
+# "Creatures you control but don't own": Bot1 owns and controls Llanowar Elves, so it is not made a Mercenary (it stays a Druid Elf) and is
+# no outlaw, so at the turn-3 upkeep Flint counts only itself and exiles 1 card, not 2 (CR 700.12a). The Elves are on the battlefield beside it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Laughing Jasper Flint
+Llanowar Elves
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Laughing Jasper Flint.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 1
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf

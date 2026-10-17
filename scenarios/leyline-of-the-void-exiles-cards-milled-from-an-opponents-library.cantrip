@@ -1,0 +1,30 @@
+# "From anywhere" includes a library: Bot1's Thought Scour makes Bot2 mill two cards (CR 701.17a), which would be put into its graveyard
+# and are exiled instead (CR 614.1a). Bot2's graveyard stays empty and its two top cards, the Lightning Bolt and Mox Ruby, are in exile; Thought
+# Scour itself goes to Bot1's own graveyard.
+
+[Bot1 Deck]
+Leyline of the Void
+Mox Sapphire
+Thought Scour
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Mox Ruby
+Island x10
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Thought Scour.Cast(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt; Mox Ruby
+Bot1.Graveyard = Thought Scour

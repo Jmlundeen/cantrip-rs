@@ -1,0 +1,54 @@
+# Bringer of the Last Gift makes each player sacrifice all their other creatures at once (CR 701.21a, 101.4), so Bot2's two Ornithopters
+# (artifact creatures) and Bot1's own Vengeful Tracker leave together. Leaves-the-battlefield abilities look back (CR 603.10a), so the
+# Tracker sees both sacrifices and triggers twice, dealing 2 damage to Bot2 each time as it last existed (CR 608.2h): Bot2 is on 16.
+# Bot1's own Tracker being sacrificed with them is no artifact sacrificed by an opponent. Black Lotus pays three of the eight mana.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Vengeful Tracker
+Bringer of the Last Gift
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Vengeful Tracker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Bringer of the Last Gift.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 16
+Bot2.Graveyard = Ornithopter; Ornithopter
+Bot1.Graveyard = Vengeful Tracker; Black Lotus
+Bot2.Battlefield.Count = 0
