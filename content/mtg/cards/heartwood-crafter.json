@@ -1,0 +1,14 @@
+{
+  "name": "Heartwood Crafter",
+  "manaCost": "{G}",
+  "type": "Creature — Elf Artificer",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "This creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)\n{T}: Add {C}. This mana can't be spent to cast spells from your hand.",
+  "prepare": {
+    "name": "Soul Tether",
+    "manaCost": "{2}{R/G}",
+    "type": "Sorcery",
+    "oracleText": "Create a Heartwood token. (It's a red and green artifact with \"{T}: Add {R} or {G}.\")"
+  }
+}

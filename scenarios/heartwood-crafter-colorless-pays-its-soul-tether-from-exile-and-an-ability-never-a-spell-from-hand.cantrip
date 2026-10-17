@@ -1,0 +1,59 @@
+# Heartwood Crafter: "{T}: Add {C}. This mana can't be spent to cast spells from your hand" (CR 106.6, 601.2a). Turn 1 it
+# enters prepared (CR 722.3a), Soul Tether's copy in exile. Turn 3 its {C} beside the untapped Forest can't make a Mind
+# Stone from the hand ({2}: the {C} can't pay for it, the Forest's {G} alone is one short) - the refusal; then, with a
+# Mountain played, the {C}, the Forest's {G} and the Mountain's {R} pay for Soul Tether's copy cast from exile (CR 722.3c),
+# which is not the hand: the pool is empty after, the Crafter unprepared and a Heartwood token made, which taps for {R}
+# or {G}. Turn 5 the Forest and Mountain cast the Mind Stone from the hand, and the Crafter's {C} pays the {1} of the
+# Mind Stone's ability - an ability, not a spell from the hand - which draws a card.
+
+[Bot1 Deck]
+Forest
+Heartwood Crafter
+Mind Stone
+Mountain
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heartwood Crafter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Heartwood Crafter.Prepared = true
+? Exile = Soul Tether
+[T3 Bot1.Main1]
+Bot1.Battlefield.Heartwood Crafter.Activate
+? Bot1.Mana = {C} (NotSpellsFromHand)
+! Bot1.Hand.Mind Stone.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Soul Tether.Cast(Spend: C NotSpellsFromHand, R, G)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+? Bot1.Battlefield.Heartwood Crafter.Prepared = (absent)
+Bot1.Battlefield.Heartwood Token.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Heartwood Crafter.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Battlefield = Forest; Heartwood Crafter; Heartwood Token; Mountain
+Bot1.Battlefield.Heartwood Token.Colors = Green; Red
+Bot1.Graveyard = Mind Stone
+Bot1.Hand.Count = 6
