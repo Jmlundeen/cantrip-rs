@@ -725,6 +725,11 @@ impl<'a> Projector<'a> {
             (false, true) => summary.pending_effects.push(format!("{} can't lose life.", if you { "You" } else { "They" })),
             (false, false) => {}
         }
+        // "Damage can't be prevented this turn" (CR 615.12: Skullcrack, Stomp): a rule of the game for the turn, true of the
+        // damage dealt to either player and their permanents, so shown beside each.
+        if s.turn.no_prevention_turn == s.turn.number {
+            summary.pending_effects.push("Damage can't be prevented this turn.".to_string());
+        }
         // What keeps the player in the game, or out of winning it (CR 104.2b, 104.3), and how damage and counters reach them
         // (CR 702.90b, 122.1), from the static abilities that apply now: Platinum Angel, Phyrexian Unlife, Melira.
         let (they, them) = if p == self.viewer { ("You", "you") } else { ("They", "them") };
