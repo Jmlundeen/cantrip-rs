@@ -28,22 +28,14 @@ fn reveal_until_shared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    let mut revealed: Vec<ObjectId> = Vec::new();
-    let mut found = None;
-    for card in g.state().zone(Zone::library(you)).to_vec() {
-        revealed.push(card);
-        let c = g.chars(card);
-        if c.is(CardType::Creature) && Subtype::ALL.iter().any(|&s| s.is_creature_type() && types.has(s) && c.subtypes.has(s)) {
-            found = Some(card);
-            break;
-        }
-    }
-    if revealed.is_empty() {
+    let (found, revealed) = cantrip_mechanics::library::reveal_until(g, you, &|q, card| {
+        let c = q.chars(card);
+        c.is(CardType::Creature) && Subtype::ALL.iter().any(|&s| s.is_creature_type() && types.has(s) && c.subtypes.has(s))
+    });
+    if found.is_none() && revealed.is_empty() {
         return Ok(());
     }
-    g.reveal(you, &revealed);
     if let Some(card) = found {
-        revealed.pop();
         g.return_to_hand(&[card]);
     }
     g.bottom_in_random_order(you, &revealed);

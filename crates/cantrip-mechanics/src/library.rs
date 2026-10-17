@@ -387,6 +387,31 @@ pub fn object_has_name(q: &dyn Query, id: ObjectId, wanted: CardId) -> bool {
     object_names(q, id).contains(&name)
 }
 
+/// "Reveal cards from the top of your library until you reveal a card that `qualifies`" (CR 701.20, 400.3): the cards are
+/// revealed together from the top down to the first that qualifies, or the whole library when none does (nothing from an
+/// empty one). The card that qualified, if any, and the rest of the revealed cards in the order revealed, for the caller to
+/// put "on the bottom of your library in a random order" (`Game::bottom_in_random_order`). Raph & Mikey (a creature card),
+/// Heirloom Blade (a creature card sharing a type with the creature) and Identity Echo (a creature or planeswalker card)
+/// print it.
+pub fn reveal_until(g: &mut dyn Game, player: PlayerId, qualifies: &dyn Fn(&dyn Query, ObjectId) -> bool) -> (Option<ObjectId>, Vec<ObjectId>) {
+    let mut revealed: Vec<ObjectId> = Vec::new();
+    let mut found = None;
+    for card in g.state().zone(Zone::library(player)).to_vec() {
+        revealed.push(card);
+        if qualifies(&*g, card) {
+            found = Some(card);
+            break;
+        }
+    }
+    if !revealed.is_empty() {
+        g.reveal(player, &revealed);
+    }
+    if found.is_some() {
+        revealed.pop();
+    }
+    (found, revealed)
+}
+
 /// "Exile cards from the top of your library until you exile a nonland card [that `qualifies`]" (CR 701.57a, 702.85a): each
 /// card is exiled one at a time, face up, from the top until one is a nonland card `qualifies` accepts, or the library
 /// is empty. Every card that really reached exile, in order (the qualifying one last), and the qualifying card if there
