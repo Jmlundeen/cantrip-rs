@@ -1,7 +1,7 @@
 # CR 510.4: the regular combat damage step after a first-strike step is for "the remaining attackers and blockers that had
 # neither first strike nor double strike as the first combat damage step began, as well as [those] that currently have
 # double strike". Bot1's Thalia, Guardian of Thraben (2/1, first strike) attacks unblocked and deals 2 in the first-strike
-# step. Bot2 then Turns it into a Frog (Black Lotus paying Thalia's tax) (Black Lotus paying Thalia's tax) (CR 613.1f: it loses all abilities and is 1/1), so it has neither keyword in the
+# step. Bot2 then Turns it into a Frog (Black Lotus paying Thalia's tax) (CR 613.1f: it loses all abilities and is 1/1), so it has neither keyword in the
 # regular step - but it had first strike as the first step began, so it deals nothing more: Bot2 ends at 18, not 17.
 
 [Bot1 Deck]

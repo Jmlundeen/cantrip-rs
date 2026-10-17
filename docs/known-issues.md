@@ -866,3 +866,32 @@ by the bestow cost too (no implemented bestow card's mana value reaches Gaddock 
 face and the bestow cost apart.
 
 **Scenarios.** none yet.
+
+### KI-68: A block requirement is counted on the declared block only, not through the blocked creature's band
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-17, review of Lure and banding |
+
+**Notes.** Lure's requirement (CR 509.1c) is obeyed by blocking the Lured creature. If it is in an attacking band, a creature
+blocking another member of the band blocks it too (CR 702.22h), which obeys the requirement; `BlockRequirements::obeyed`,
+`turn::most_requirements` and `validate` count only the declared (blocker, attacker) pairs, so they refuse that legal
+declaration (the blocker must be declared on the Lured creature itself, which is also legal and has the same result). A fix
+expands each declared block through its band before counting, in the search and in the check. Relatedly, the band members a
+blocker blocks only by 702.22h get no `Event::Blocks` (CR 509.3a's "whenever this creature blocks" correctly triggers once);
+no card in content triggers on "blocks a creature" or "becomes blocked by a creature" per pair (CR 509.3b, 509.3d).
+
+**Scenarios.** none yet: no card in content puts Lure on a creature with banding or bands with a Lured creature.
+
+### KI-69: The tactical bot's combat planning ignores bands
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-17, review of banding |
+
+**Notes.** The engine is right (CR 702.22h-k). The tactical bot's blocks and attacks (`TacticalPlay.Combat.cs`, `Combat`) are
+judged pair by pair: it does not know that blocking one member of a band blocks all of it, nor that the opponent divides its
+blocker's damage among the band (702.22k) or its attacker's damage among banding blockers (702.22j). Its band choice and the
+divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's sparing suggestion).
+
+**Scenarios.** none: a bot's judgement is not a rules outcome.

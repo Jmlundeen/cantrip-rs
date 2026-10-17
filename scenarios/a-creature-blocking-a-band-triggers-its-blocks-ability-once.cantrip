@@ -1,0 +1,56 @@
+# "Whenever this creature blocks" triggers once each combat, however many creatures it blocks (CR 509.3a), and a creature
+# blocking a member of a band blocks the whole band (CR 702.22h). Bot2's Benalish Hero and Guerrilla Gorilla attack as a
+# band; Bot1 crews Smuggler's Copter and blocks the Hero with it, so it blocks both. Its loot triggers once: Bot1 draws and
+# discards an Island, and is asked no second time.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Sol Ring
+Llanowar Elves
+Smuggler's Copter
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Benalish Hero.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Benalish Hero > Bot1; Guerrilla Gorilla > Bot1)
+Bot2.Choose(Guerrilla Gorilla)
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot1.Block(Smuggler's Copter > Benalish Hero)
+Bot1.Accept
+Bot1.Choose(Island)
+! Bot1.Accept
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Smuggler's Copter; Island

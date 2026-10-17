@@ -746,6 +746,9 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         let requirements = if pairs.is_empty() { BlockRequirements::default() } else { most_requirements(cx, &allowed, pairs) };
         let answer = cx.ask_core(defender, RequestKind::DeclareBlockers { eligible, attackers, allowed, requirements }, false)?;
         if let Answer::Block(blocks) = answer {
+            // CR 509.1g: the blockers are declared together, each declared block a "blocks" event for abilities that watch it -
+            // one per blocker as declared, so "whenever this creature blocks" triggers once (CR 509.3a) though it blocks a band.
+            let events: Vec<Event> = blocks.iter().map(|&(blocker, attacker)| Event::Blocks { blocker, attacker }).collect();
             let mut list = Vec::new();
             let mut attackers = cx.s().attackers.clone();
             for (blocker, attacker) in blocks {
@@ -761,11 +764,9 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
                 }
             }
             cx.st().set_attackers(attackers);
-            // CR 509.1g: the blockers are declared together, each one a "blocks" event for abilities that watch it.
-            let blocks: Vec<Event> = list.iter().map(|b| Event::Blocks { blocker: b.blocker, attacker: b.attacker }).collect();
             cx.st().set_blocks(list);
-            if !blocks.is_empty() {
-                cx.emit_batch(&blocks, None);
+            if !events.is_empty() {
+                cx.emit_batch(&events, None);
             }
         }
     }
