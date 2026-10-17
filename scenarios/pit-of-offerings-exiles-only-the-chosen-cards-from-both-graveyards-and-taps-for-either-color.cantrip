@@ -1,0 +1,53 @@
+# "Exile up to three target cards from graveyards": on turn 3 the Pit's trigger takes two of the three cards in graveyards, one Dark Ritual
+# (black) of Bot1's and Bot2's Lightning Bolt (red), one from each graveyard; Bot1's second Dark Ritual stays where it is (not
+# chosen). Its last ability then adds black on turn 5 and red on turn 7, one mana of any of the exiled cards' colors, each time with
+# green refused (the refusal beside the color that is taken).
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Dark Ritual
+Pit of Offerings
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Pit of Offerings.Play
+Bot1.Target(Bot1.Graveyard.Dark Ritual; Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Exile = Dark Ritual; Lightning Bolt
+? Bot1.Graveyard = Dark Ritual
+? Bot2.Graveyard.Count = 0
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Pit of Offerings.Activate(Ability: exiled; Color: Green)
+Bot1.Battlefield.Pit of Offerings.Activate(Ability: exiled; Color: Black)
+? Bot1.Mana = {B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Pit of Offerings.Activate(Ability: exiled; Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 7
+Exile.Count = 2
+Bot1.Graveyard = Dark Ritual

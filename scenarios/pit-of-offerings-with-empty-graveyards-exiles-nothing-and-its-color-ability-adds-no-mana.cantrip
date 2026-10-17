@@ -1,0 +1,27 @@
+# With every graveyard empty the Pit's enters trigger has no card to target and "up to three" lets it do nothing (CR 115.1d, 603.3d):
+# no target is asked (`! Bot1.Target`) and nothing is exiled. "If no cards are exiled with Pit of Offerings, its last ability can't
+# add mana" (ruling 2023-11-10): on turn 3 it is offered and adds nothing (CR 106.5), while {T}: Add {C} adds {C} on turn 5.
+
+[Bot1 Deck]
+Pit of Offerings
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Pit of Offerings.Play
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Pit of Offerings.Activate(Ability: exiled)
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Pit of Offerings.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 5
+Exile.Count = 0

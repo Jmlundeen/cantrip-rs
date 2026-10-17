@@ -1,0 +1,31 @@
+# Pit of Offerings's last ability "can't produce {C}" (ruling 2023-11-10). Turn 1 Bot1's
+# Mishra's Bauble (colorless) is in its graveyard and is the only card the Pit exiles: on turn 3 the color ability is still offered (an
+# any-color ability with no color to choose adds nothing, CR 106.5) but adds no mana. (The empty-graveyard scenario has the control: the
+# same land adds {C} with its other ability.)
+
+[Bot1 Deck]
+Mishra's Bauble
+Pit of Offerings
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot1)
+Bot1.Hand.Pit of Offerings.Play
+Bot1.Target(Bot1.Graveyard.Mishra's Bauble)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Pit of Offerings.Activate(Ability: exiled)
+? Bot1.Mana =
+
+[Expect]
+Turn = 3
+Exile = Mishra's Bauble
+Bot1.Battlefield.Pit of Offerings.Tapped = true
