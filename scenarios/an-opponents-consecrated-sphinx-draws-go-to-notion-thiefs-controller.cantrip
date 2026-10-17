@@ -1,0 +1,55 @@
+# Consecrated Sphinx (Bot2's) against Notion Thief (Bot1's): "if each player controls a Consecrated Sphinx, their abilities
+# will cause each other to trigger until one player chooses not to draw cards" (its ruling) - and Notion Thief turns Bot2's
+# draws into Bot1's. Bot1's turn 3 draw for the turn triggers the Sphinx; Bot2 draws two, each a draw outside its draw step
+# that Notion Thief replaces (CR 614.1a), so Bot1 draws both instead. Each of those triggers the Sphinx again, and Bot2
+# declines both, which ends it. Bot2's hand is as it was; Bot1 has drawn three cards.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Notion Thief
+Swamp x4
+Island x20
+
+[Bot2 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Emerald
+Consecrated Sphinx
+Swamp x2
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Notion Thief.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Consecrated Sphinx.Cast
+[T3 Bot1.Upkeep]
+? Bot2.Hand.Count = 3
+Bot2.Accept
+Bot2.Decline
+Bot2.Decline
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 17
+Bot2.Hand.Count = 3
+Bot2.Library.Count = 19
+Stack.Count = 0

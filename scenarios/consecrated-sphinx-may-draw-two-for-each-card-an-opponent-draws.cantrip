@@ -1,0 +1,57 @@
+# Consecrated Sphinx: "Whenever an opponent draws a card, you may draw two cards." "The ability triggers once for each card an
+# opponent draws. You choose whether to draw two cards as each of those abilities resolves", and it is two or nothing (its
+# rulings; CR 603.2). Bot2's turn 2 draw triggers it once (Bot1 declines); its Ancestral Recall triggers it three times - Bot1
+# draws two, declines, then draws two more. Bot1's own turn 3 draw is no opponent's and triggers nothing.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Emerald
+Consecrated Sphinx
+Plains
+Plains
+Island x20
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Consecrated Sphinx.Cast
+[T2 Bot2.Draw]
+? Stack = Consecrated Sphinx
+Bot1.Decline
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack = Consecrated Sphinx; Consecrated Sphinx; Consecrated Sphinx
+Bot1.Accept
+Bot1.Decline
+Bot1.Accept
+[T3 Bot1.Draw]
+? Stack.Count = 0
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 15
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 16

@@ -1,0 +1,69 @@
+# Underrealm Lich: its controller puts a card into their hand instead of drawing it, and a card moved into a hand without the
+# word "draw" is not drawn (CR 121.5, 614.6), so Consecrated Sphinx's "whenever an opponent draws a card" does not trigger.
+# Bot2 has the Sphinx out by turn 3. Bot1's turn 3 draw for the turn, before the Lich is cast, is a draw and triggers it (Bot2
+# declines). Then Bot1 casts the Lich and Ancestral Recall: three looks at the top three cards, three cards into Bot1's
+# hand, and nothing on the stack for the Sphinx.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Underrealm Lich
+Ancestral Recall
+Plains
+Island x20
+
+[Bot2 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Emerald
+Consecrated Sphinx
+Swamp x2
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Consecrated Sphinx.Cast
+[T3 Bot1.Draw]
+? Stack = Consecrated Sphinx
+Bot2.Decline
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 3
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Underrealm Lich.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Arrange(Island | Island; Island)
+Bot1.Arrange(Island | Island; Island)
+Bot1.Arrange(Island | Island; Island)
+Bot1.Pass
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Island; Island; Island; Island
+Bot1.Library.Count = 10
+Bot2.Hand.Count = 3

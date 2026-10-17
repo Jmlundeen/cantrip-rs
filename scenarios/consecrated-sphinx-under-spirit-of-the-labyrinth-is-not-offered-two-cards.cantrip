@@ -1,0 +1,54 @@
+# Consecrated Sphinx under Spirit of the Labyrinth: "if an effect offers the player a choice to draw multiple cards, the
+# affected player can't choose to do so" (CR 121.2b) - whether or not they have drawn yet this turn. Before the Spirit
+# arrives, Bot2's turn 2 draw triggers Bot1's Sphinx and Bot1 is asked, and draws two. Bot1 casts the Spirit on turn 3; Bot2's
+# turn 4 draw triggers the Sphinx again, and Bot1, who has drawn nothing in Bot2's turn, is not asked whether to draw two:
+# nothing is drawn.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Emerald
+Mox Pearl
+Consecrated Sphinx
+Spirit of the Labyrinth
+Island x20
+
+[Bot2 Deck]
+Plains
+Swamp x6
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Consecrated Sphinx.Cast
+[T2 Bot2.Draw]
+? Stack = Consecrated Sphinx
+Bot1.Accept
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+[T4 Bot2.Draw]
+? Stack = Consecrated Sphinx
+Bot1.Pass
+! Bot1.Accept
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 17
+Bot1.Battlefield.Count = 6

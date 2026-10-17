@@ -1,0 +1,11 @@
+{
+  "name": "Consecrated Sphinx",
+  "manaCost": "{4}{U}{U}",
+  "type": "Creature — Sphinx",
+  "power": 4,
+  "toughness": 6,
+  "oracleText": "Flying\nWhenever an opponent draws a card, you may draw two cards.",
+  "keywords": [
+    "Flying"
+  ]
+}

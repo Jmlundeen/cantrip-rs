@@ -1,0 +1,66 @@
+# Consecrated Sphinx and Notion Thief, both Bot1's. "Whenever an opponent draws a card" triggers on a card drawn (CR 603.2),
+# and a draw Notion Thief replaces never happens (CR 614.6): Bot2 skips it. Bot2's turn 2 and turn 4 draws for the turn are
+# exempt from Notion Thief (the first card of the draw step) and do trigger the Sphinx, whose two cards Bot1 takes each time
+# - its own draws are no opponent's and Notion Thief leaves them alone. Bot2's Ancestral Recall on turn 4 is three draws that
+# Notion Thief replaces: Bot1 draws those three, and the Sphinx does not trigger - nothing is on the stack once the spell has
+# resolved.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Emerald
+Mox Jet
+Consecrated Sphinx
+Notion Thief
+Island x20
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Consecrated Sphinx.Cast
+[T2 Bot2.Upkeep]
+Bot1.Accept
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 3
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Notion Thief.Cast
+[T4 Bot2.Upkeep]
+Bot1.Accept
+[T4 Bot2.Main1]
+? Bot1.Hand.Count = 4
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 12
+Bot2.Hand.Count = 7
+Bot2.Library.Count = 18
