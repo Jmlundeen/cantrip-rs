@@ -48,6 +48,7 @@ keeps it).
 | [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
 | [KI-32](#ki-32-a-copy-of-a-spell-keeps-the-zone-the-original-was-cast-from) | A copy of a spell keeps the zone the original was cast from | Medium | Open |
 | [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
+| [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 
 ## Issues
 
@@ -198,7 +199,6 @@ caption, or the cost on each candidate as it is pointed at.
 **Scenarios.**
 - [`scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip`](../scenarios/dragonfire-blade-equip-shows-its-reduced-cost-and-the-granted-hexproof-in-the-browser.cantrip) - the menu row of a two-action card (Shadowspear) and the payment of a one-action card (the Blade).
 
-
 ### KI-23: A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it
 
 | Severity | Status | Area | Found |
@@ -319,3 +319,19 @@ spell and may choose a new target for that copy." Paying is one choice and copyi
 affected. A fix asks a "may copy" (`effects::ask_may`) after a paid `may_pay`, and a scenario pays and declines the copy.
 
 **Scenarios.** None yet.
+### KI-34: A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-16, review of Ral Zarek, Guest Lecturer |
+
+**Notes.** When an effect that makes a player skip a turn (`EffectKind::SkipNextTurn`) and a "you may skip that turn" (Time
+Vault) both apply, the player chooses which applies (CR 616.1, `turn.rs::skip_turn`), and the prompt names each effect by its
+source. The skip effect's source is usually gone by then (Ral Zarek's −7 from 7 loyalty puts Ral into the graveyard,
+CR 704.5i), and `prompt.rs::source_handle` names a gone object only through a handle the seat's view already has. A seat
+that never saw the source (a reconnect with a fresh handle space) gets no handle, and its button reads "An effect: you
+skip this turn". The choice is still right; only the name is missing. A fix carries the source's name with the prompt.
+
+**Scenarios.**
+- [`scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip`](../scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip) -
+  the named case, the page having seen Ral; the unnamed one needs a reconnect, which no scenario does.

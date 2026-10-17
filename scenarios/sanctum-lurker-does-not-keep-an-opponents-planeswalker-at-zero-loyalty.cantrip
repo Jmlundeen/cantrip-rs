@@ -2,7 +2,8 @@
 # Veil, cast on turn 2 and down to 1 loyalty after a −2 at Bot2 itself (it has no creature to sacrifice), takes 3 damage
 # from Bot1's Lightning Bolt on turn 3: damage to a planeswalker removes that many loyalty counters (CR 120.3c), and at 0
 # loyalty it is put into Bot2's graveyard (CR 704.5i) though Bot1 controls a Lurker. Bot1's own Jace token, also at 0, is
-# the control that stays.
+# the control that stays. Nor does the Lurker give Bot2's Liliana its "[+2]" ("Planeswalkers you control have"): it is
+# refused there, while Jace, Bot1's, is offered it (sanctum-lurker-keeps-a-jace-at-zero-loyalty-that-then-uses-its-plus-two).
 
 [Bot1 Deck]
 Mox Jet
@@ -45,6 +46,7 @@ Bot2.Battlefield.Mox Jet#2.Activate
 Bot2.Hand.Liliana of the Veil.Cast
 Bot2.Pass
 Bot1.Pass
+! Bot2.Battlefield.Liliana of the Veil.Activate(Ability: +2)
 Bot2.Battlefield.Liliana of the Veil.Activate(Bot2; Ability: sacrifices)
 Bot2.Pass
 Bot1.Pass
