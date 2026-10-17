@@ -1,0 +1,59 @@
+# Repurposing Bay: "{2}, {T}, Sacrifice another artifact: Search your library for an artifact card with mana value equal to 1 plus the
+# sacrificed artifact's mana value, put that card onto the battlefield, then shuffle. Activate only as a sorcery." Bot1 sacrifices Mox Jet
+# (mana value 0), so only a mana value 1 artifact may be found: Sol Ring (the refusals: Mind Stone, mana value 2, and Ornithopter, 0,
+# beside the positive control Sol Ring). The ability is refused in Bot2's turn 2 though the cost could be paid (sorcery speed, CR 602.5d).
+# The Bay itself is not a choice for the sacrifice ("another artifact": ! Bot1.Choose(Repurposing Bay) beside Mox Jet).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Repurposing Bay
+Island
+Sol Ring
+Mind Stone
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Repurposing Bay.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Repurposing Bay.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Repurposing Bay.Activate
+! Bot1.Choose(Repurposing Bay)
+Bot1.Choose(Mox Jet)
+! Bot1.Search(Mind Stone)
+! Bot1.Search(Ornithopter)
+Bot1.Search(Sol Ring)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mox Jet
+Bot1.Battlefield.Sol Ring.Tapped = false
+Bot1.Battlefield.Repurposing Bay.Tapped = true
+Bot1.Battlefield = Island; Mox Sapphire; Mox Ruby; Mox Pearl; Mox Emerald; Repurposing Bay; Sol Ring

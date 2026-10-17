@@ -1,0 +1,51 @@
+# Repurposing Bay (CR 202.3): Bot1 taps Sol Ring for {C}{C} first, then activates the Bay paying that mana and sacrificing the tapped Sol
+# Ring (mana value 1), so the search is for an artifact of mana value 2: Mind Stone or Cranial Plating (either is found; Bot1 takes
+# Cranial Plating, and the Ornithopter, mana value 0, and a second Sol Ring, mana value 1, are not choices - refusals). The cost
+# paid with mana already made is allowed because mana abilities may be activated before the cost (CR 601.2g, 602.2b).
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Jet
+Sol Ring
+Repurposing Bay
+Mox Pearl
+Island
+Cranial Plating
+Mind Stone
+Ornithopter
+Sol Ring
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Repurposing Bay.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Repurposing Bay.Activate
+Bot1.Choose(Sol Ring)
+! Bot1.Search(Ornithopter)
+! Bot1.Search(Sol Ring)
+Bot1.Search(Cranial Plating)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Sol Ring
+Bot1.Battlefield = Island; Mox Ruby; Mox Jet; Mox Pearl; Repurposing Bay; Cranial Plating
+Bot1.Battlefield.Repurposing Bay.Tapped = true
