@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{destroy_target, targets};
 use cantrip_oracle as oracle;
 
-/// "Target nonland permanent with mana value 3 or less."
-fn nonland_permanent_mv3(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::NONLAND_PERMANENT.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= 3)
-}
-
 /// Destroy target nonland permanent with mana value 3 or less. (It can't be countered: the card's keyword.)
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     destroy_target(g, item, 0);
@@ -14,6 +9,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(nonland_permanent_mv3)], effect),
+    spell: spell(&[target(targets::nonland_permanent_with_mana_value_at_most::<3>)], effect),
     ..oracle::ABRUPT_DECAY
 };

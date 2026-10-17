@@ -1,0 +1,50 @@
+# CR 704.5q and 704.5f are performed in one state-based-action check (CR 704.3): Bot1's Walking Ballista (X=2: two +1/+1
+# counters) gets three -1/-1 counters from its own Emptiness (BB spent, evoked), which is a 0/0 -1/-1 creature with toughness
+# below 1 and has +1/+1 and -1/-1 counters at once. It leaves the battlefield having the two +1/+1 counters it had, so The Ooze
+# makes two Mutagen tokens (CR 603.10a), not zero for counters already annihilated.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+The Ooze
+Walking Ballista
+Emptiness
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emptiness.Cast(Ability: Evoke)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Walking Ballista)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard.Count = 3
+Bot1.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Swamp; The Ooze; Mutagen Token; Mutagen Token

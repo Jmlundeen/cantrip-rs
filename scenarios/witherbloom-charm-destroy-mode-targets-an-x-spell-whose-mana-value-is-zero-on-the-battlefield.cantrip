@@ -1,0 +1,46 @@
+# X in a mana cost is 0 on the battlefield (CR 202.3b), so Bot2's Walking Ballista cast with X=3 (a 3/3 with three counters,
+# cast for six mana) has mana value 0 and is a legal target for "nonland permanent with mana value 2 or less". Bot1 destroys it
+# at instant speed on turn 2.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Witherbloom Charm
+Swamp x17
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Walking Ballista
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 3)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 3
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(Destroy target)
+Bot1.Target(Bot2.Battlefield.Walking Ballista)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Walking Ballista; Black Lotus
+Bot1.Graveyard = Witherbloom Charm

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, destroy_target};
+use cantrip_mechanics::{choose, destroy_target, targets};
 use cantrip_oracle as oracle;
 
 /// "You may sacrifice a permanent. If you do, draw two cards." The permanent is chosen as the spell resolves (CR 608.2d)
@@ -21,12 +21,6 @@ fn gain_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Target nonland permanent with mana value 2 or less" (CR 115.1, 202.3: X on the battlefield is 0), whoever controls it.
-fn nonland_permanent_with_mana_value_two_or_less(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if is_live(q, id) && q.is_on_battlefield(id)
-        && !q.chars(id).is(CardType::Land) && q.mana_value(id) <= 2)
-}
-
 /// "Destroy target nonland permanent with mana value 2 or less." (CR 701.8)
 fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     destroy_target(g, item, 0);
@@ -37,7 +31,7 @@ static MODAL: ModalDef = modes(&[
     mode(sacrifice_to_draw, "You may sacrifice a permanent. If you do, draw two cards."),
     mode(gain_life, "You gain 5 life."),
     mode(destroy, "Destroy target nonland permanent with mana value 2 or less.")
-        .targets(&[target(nonland_permanent_with_mana_value_two_or_less)]),
+        .targets(&[target(targets::nonland_permanent_with_mana_value_at_most::<2>)]),
 ]);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::WITHERBLOOM_CHARM };

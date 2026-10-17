@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, destroy_target, tokens};
+use cantrip_mechanics::{choose, destroy_target, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// +2: You may sacrifice another permanent. If you do, you gain 1 life and draw a card. The permanent is chosen as the
@@ -13,11 +13,6 @@ fn sacrifice_to_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
         g.draw(item.controller, 1);
     }
     Ok(())
-}
-
-fn nonland_permanent_with_mana_value_three_or_less(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if is_live(q, id) && q.is_on_battlefield(id)
-        && !q.chars(id).is(CardType::Land) && q.mana_value(id) <= 3)
 }
 
 /// -3: Destroy target nonland permanent with mana value 3 or less.
@@ -52,7 +47,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         ability(loyalty(2), sacrifice_to_draw, "+2: You may sacrifice another permanent. If you do, you gain 1 life and draw a card."),
         ability(loyalty(-3), destroy, "\u{2212}3: Destroy target nonland permanent with mana value 3 or less.")
-            .targets(&[target(nonland_permanent_with_mana_value_three_or_less)]),
+            .targets(&[target(targets::nonland_permanent_with_mana_value_at_most::<3>)]),
         ability(loyalty(-9), emblem, "\u{2212}9: You get an emblem with \"Whenever a creature you control deals combat damage to a player, that player loses the game.\""),
     ],
     ..oracle::VRASKA_GOLGARI_QUEEN

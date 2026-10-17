@@ -1,0 +1,52 @@
+# Maelstrom Pulse: "Destroy target nonland permanent and all other permanents with the same name". Bot2 answers by discarding a
+# card to give the targeted Iron-Shield Elf indestructible, so the target survives (tapped by its own ability). The destruction of
+# the other Iron-Shield Elf is separate: it is still destroyed (CR 701.8a, 702.12b). Bot2's Island is the discard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Maelstrom Pulse
+Swamp x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Pearl
+Iron-Shield Elf
+Iron-Shield Elf
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Iron-Shield Elf.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Maelstrom Pulse.Cast(Bot2.Battlefield.Iron-Shield Elf#1)
+Bot2.Battlefield.Iron-Shield Elf#1.Activate
+Bot2.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Iron-Shield Elf
+Bot2.Battlefield.Iron-Shield Elf.Tapped = true
+Bot2.Graveyard.Count = 3

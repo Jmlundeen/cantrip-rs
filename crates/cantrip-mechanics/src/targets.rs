@@ -309,6 +309,12 @@ pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_f
 pub const PERMANENT: TargetSpec = target(permanent_filter);
 /// "Target nonland permanent". Banishing Knack and Boomerang Basics print it.
 pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);
+
+/// "Target nonland permanent with mana value `N` or less" (CR 115.1, 202.3: X in a mana cost is 0 on the battlefield), whoever
+/// controls it. Abrupt Decay (3), Vraska, Golgari Queen (3) and Witherbloom Charm (2) print it.
+pub fn nonland_permanent_with_mana_value_at_most<const N: u32>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    nonland_permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.mana_value(id) <= N)
+}
 /// "Target artifact or enchantment an opponent controls". Cathartic Parting, Witch Enchanter, Wistfulness and Scrapshooter print it.
 pub const ARTIFACT_OR_ENCHANTMENT_AN_OPPONENT_CONTROLS: TargetSpec = target(artifact_or_enchantment_an_opponent_controls_filter);
 fn permanent_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
