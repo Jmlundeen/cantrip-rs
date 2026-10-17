@@ -1,0 +1,6 @@
+{
+  "name": "Harmless Offering",
+  "manaCost": "{2}{R}",
+  "type": "Sorcery",
+  "oracleText": "Target opponent gains control of target permanent you control."
+}

@@ -1,0 +1,44 @@
+# Both targets must still be legal for the whole effect: Bot1 targets Bot2 and its Lotus Petal, then sacrifices the Petal for mana in
+# response (a mana ability, with the Offering on the stack), so the permanent target is illegal when the spell resolves (CR 608.2b)
+# and there is nothing to give: the spell resolves without taking anything from Bot1 or giving Bot2 anything, and the rest of the
+# Moxes stay with Bot1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Harmless Offering
+Lotus Petal
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+10 Island
+
+[Actions]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Lotus Petal)
+? Stack.Count = 1
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl
+Bot1.Graveyard = Harmless Offering; Lotus Petal

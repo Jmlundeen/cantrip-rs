@@ -1,0 +1,48 @@
+# "Target opponent gains control of target permanent you control": the first slot is an opponent (not Bot1 itself, `! Bot1.Target(Bot1)`),
+# the second a permanent Bot1 controls (not Bot2's Ornithopter, `! Bot1.Target(Bot2.Battlefield.Ornithopter)`). Bot1 gives its Swamp,
+# a land, to Bot2, which taps it for {B} on turn 4: the new controller is the one who may activate its mana ability.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Harmless Offering
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+10 Island
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Harmless Offering.Cast
+! Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Swamp)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Swamp.Activate
+
+[Expect]
+Bot2.Battlefield.Swamp.Tapped = true
+Bot2.Mana = {B}
+Bot1.Battlefield.Count = 3
+Bot2.Battlefield.Count = 2

@@ -1,0 +1,52 @@
+# Target opponent gains control of target permanent you control, for good (no duration, CR 108.4): Bot1's Ornithopter goes to
+# Bot2 on turn 1. Bot1 still owns it (CR 108.3), so when Bot2 kills it with Dismember on turn 2 (-5/-5) it goes to Bot1's graveyard,
+# not Bot2's (CR 400.3).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Harmless Offering
+Ornithopter
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Ornithopter)
+[T1 Bot1.Main2]
+? Bot2.Battlefield = Ornithopter
+? Bot1.Battlefield.Ornithopter = (absent)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Ornithopter)
+Bot2.Modes()
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Harmless Offering
+Bot2.Graveyard = Dismember
+Bot2.Battlefield.Count = 3
