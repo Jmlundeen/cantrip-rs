@@ -1,0 +1,62 @@
+# Doubling Season: "If an effect would create one or more tokens under your control, it creates twice that many of those tokens
+# instead" (CR 111.1, 614.1a): Bot1's Lingering Souls makes four 1/1 flying Spirits, each as the spell says. Bot2's Lingering
+# Souls creates its two under Bot2's control, which the Season does not see, and Bot2's Walking Ballista cast for X = 1 is no
+# permanent Bot1 controls: it enters with its one counter.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Doubling Season
+Lingering Souls
+Plains
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Sol Ring
+Lingering Souls
+Walking Ballista
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Lingering Souls.Cast
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Doubling Season; Forest; Plains; Sol Ring; Spirit; Spirit; Spirit; Spirit
+Bot1.Battlefield.Spirit#4.Token = true
+Bot1.Battlefield.Spirit#4.Keywords = Flying
+Bot2.Battlefield = Plains; Plains; Sol Ring; Spirit; Spirit; Walking Ballista
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1

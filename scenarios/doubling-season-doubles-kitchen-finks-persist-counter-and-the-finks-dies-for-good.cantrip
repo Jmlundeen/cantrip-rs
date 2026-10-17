@@ -1,0 +1,48 @@
+# Persist returns Kitchen Finks "with a -1/-1 counter on it" (CR 702.79a): a counter an effect puts on it as it enters (CR
+# 122.6, 614.1c), so Doubling Season, which doubles counters of any kind an effect puts on a permanent Bot1 controls, makes it
+# two. The 3/2 returns a 1/0 and dies to the state-based action (CR 704.5f), now with -1/-1 counters, so persist does not
+# return it again: it is in the graveyard for good. Its enters trigger still resolves for the return, so Bot1 gains 2 + 2.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Doubling Season
+Kitchen Finks
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Kitchen Finks.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Kitchen Finks; Black Lotus
+Bot1.Life = 24
+LeftBattlefield.Count = 3

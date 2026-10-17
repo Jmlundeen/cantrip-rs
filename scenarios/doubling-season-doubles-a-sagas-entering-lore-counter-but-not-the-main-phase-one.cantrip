@@ -1,0 +1,48 @@
+# A Saga's "enters with a lore counter" is an intrinsic ability's replacement effect (CR 714.3a, 614.1c), so Doubling Season
+# doubles it: Song of Freyalise enters with two, and its chapters I and II both trigger (CR 714.2b). The lore counter its
+# controller puts on it as their precombat main phase begins is a turn-based action (CR 714.3c, 703.4f), no effect, so it is one:
+# three, not four. Chapter III's "put a +1/+1 counter on each creature you control" is an effect's, doubled: Ornithopter gets two.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Doubling Season
+Ornithopter
+Mox Emerald
+Song of Freyalise
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Song of Freyalise.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Song of Freyalise.Counters.Lore = 2
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Song of Freyalise.Counters.Lore = 3
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Graveyard = Song of Freyalise; Black Lotus

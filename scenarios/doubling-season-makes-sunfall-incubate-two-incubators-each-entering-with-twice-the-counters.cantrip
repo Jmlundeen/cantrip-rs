@@ -1,0 +1,54 @@
+# A token created with counters on it meets both halves of Doubling Season. Sunfall exiles both Ornithopters, so it incubates 2:
+# "create an Incubator token with two +1/+1 counters on it" (CR 701.53a). The Season's first ability makes it two Incubator
+# tokens (CR 111.1, 614.1a), each as the effect says, and its second doubles the counters each enters with (CR 122.6, 614.1c):
+# two Incubators with four +1/+1 counters each. An Incubator is an artifact, not a creature: the Season's counters are any
+# permanent's.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Doubling Season
+Ornithopter
+Mox Pearl
+Sunfall
+Plains
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sunfall.Cast
+Bot1.Pass
+
+[Expect]
+Exile = Ornithopter; Ornithopter
+Bot1.Battlefield = Doubling Season; Forest; Incubator Token; Incubator Token; Mox Pearl; Plains; Sol Ring
+Bot1.Battlefield.Incubator Token#1.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Incubator Token#2.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Incubator Token#2.Token = true

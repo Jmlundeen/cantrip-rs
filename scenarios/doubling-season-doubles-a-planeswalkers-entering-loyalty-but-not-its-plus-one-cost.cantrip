@@ -1,0 +1,49 @@
+# Doubling Season's "if an effect would put one or more counters on a permanent you control": a planeswalker's printed loyalty is
+# an intrinsic ability that it enters with (CR 306.5b, 614.1c), an effect, so Jace, Wielder of Mysteries enters with 4 x 2 = 8
+# loyalty counters (the ruling). Its +1 puts one loyalty counter on it as the ability's cost (CR 606.4, 118.3), which is no
+# effect, so it is not doubled (the ruling): Jace has 9. (Doubling the cost too would make 10; not doubling the entry, 5.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Sol Ring
+Doubling Season
+Jace, Wielder of Mysteries
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jace, Wielder of Mysteries.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Jace, Wielder of Mysteries.Counters.Loyalty = 8
+Bot1.Battlefield.Jace, Wielder of Mysteries.Activate(Bot2; Ability: +1)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Jace, Wielder of Mysteries.Counters.Loyalty = 9

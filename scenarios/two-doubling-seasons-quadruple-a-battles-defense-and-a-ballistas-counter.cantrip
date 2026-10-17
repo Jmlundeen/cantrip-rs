@@ -1,0 +1,56 @@
+# Two Doubling Seasons are two replacement effects, each applied once (CR 614.5): counters an effect puts are four times as many (the
+# ruling). A battle's printed defense is an intrinsic ability's replacement effect as it enters (CR 310.4b, 614.1c), doubled by
+# Doubling Season (the ruling: "Battles will enter with double the normal number of defense counters"): Invasion of Gobakhan
+# enters with 3 x 4 = 12 defense counters, and Walking Ballista cast for X = 1 with 4 +1/+1 counters.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Doubling Season
+Doubling Season
+Invasion of Gobakhan
+Walking Ballista
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doubling Season.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Invasion of Gobakhan.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 12
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Invasion of Gobakhan.Counters.Defense = 12
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 4
