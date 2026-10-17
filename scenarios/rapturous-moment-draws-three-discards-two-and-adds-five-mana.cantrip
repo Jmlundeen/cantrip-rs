@@ -1,0 +1,51 @@
+# Rapturous Moment: "Draw three cards, then discard two cards. Add {U}{U}{R}{R}{R}." Bot1 plays Plains and taps five Moxen
+# for {4}{U}{R}, so its hand is empty when it resolves. It draws Lightning Bolt, Island, Island, discards the two Islands (its
+# choice), and the pool then holds {U}{U}{R}{R}{R}; the Bolt it kept is cast with one of those {R}, so Bot2 goes to 17 and
+# four mana are left in the pool (they empty as the phase ends).
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Rapturous Moment
+Lightning Bolt
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rapturous Moment.Cast
+Bot2.Pass
+Bot1.Choose(Island; Island)
+? Bot1.Mana = {U}{U}{R}{R}{R}
+? Bot1.Hand = Lightning Bolt
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+? Bot2.Life = 17
+? Bot1.Mana = {U}{U}{R}{R}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Rapturous Moment; Island; Island
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 10
+Bot1.Mana =
+Bot2.Life = 17

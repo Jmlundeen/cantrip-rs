@@ -1,0 +1,6 @@
+{
+  "name": "Rapturous Moment",
+  "manaCost": "{4}{U}{R}",
+  "type": "Sorcery",
+  "oracleText": "Draw three cards, then discard two cards. Add {U}{U}{R}{R}{R}."
+}
