@@ -254,6 +254,12 @@ pub fn plus_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, char
     chars.toughness = chars.toughness.map(|v| v + T);
 }
 
+/// "Creatures you control get +1/+1." (CR 613.4c, layer 7c): every creature its controller controls, itself among them once
+/// it is one (an Opalescence-animated Glorious Anthem pumps itself), judged on what the earlier layers made each object.
+/// Glorious Anthem, Warleader's Call and Cosmium Kiln (Clay-Fired Bricks' back face) print it.
+pub const CREATURES_YOU_CONTROL_GET_PLUS_ONE: StaticDef =
+    static_ability(Layer::PtModify, your_creatures, plus_pt::<1, 1>, "Creatures you control get +1/+1.");
+
 /// "Has base power and toughness P/T" (CR 613.4b, layer 7b) as a static ability's `apply`: it sets the power and toughness
 /// the counters and effects that modify them (layer 7c) then apply to. Humility and Eaten by Piranhas (1/1), Hexdrinker (4/4
 /// and 6/6), Kaito's Ninja (3/4), Puppet Crafting (5/5), Wrecking Ball Arm (7/7) and a station card's striation (Wurmwall

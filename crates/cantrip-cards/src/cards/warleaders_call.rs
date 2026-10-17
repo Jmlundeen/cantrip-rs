@@ -1,11 +1,6 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
 
-/// "Creatures you control get +1/+1."
-fn affects(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    so_far.is(CardType::Creature) && q.state().obj(affected).controller == q.state().obj(source).controller
-}
-
 /// This enchantment deals 1 damage to each opponent.
 fn strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::effects::damage_each_opponent(g, item, 1);
@@ -13,7 +8,7 @@ fn strike(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    statics: &[static_ability(Layer::PtModify, affects, cantrip_mechanics::statics::plus_pt::<1, 1>, "Creatures you control get +1/+1.")],
+    statics: &[cantrip_mechanics::statics::CREATURES_YOU_CONTROL_GET_PLUS_ONE],
     abilities: &[triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_ENTERS, strike, "Whenever a creature you control enters, this enchantment deals 1 damage to each opponent.")],
     ..oracle::WARLEADERS_CALL
 };
