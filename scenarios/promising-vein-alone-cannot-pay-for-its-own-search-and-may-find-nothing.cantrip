@@ -1,0 +1,27 @@
+# The search ability costs {1} besides tapping and sacrificing the Vein, and the Vein's own mana cannot pay it (its tap is part of the cost): alone on turn 1 it is not
+# offered (the refusal; the next scenario, with an Island beside it, is the positive control). On turn 3, with an Island, Bot1 searches a library that holds no basic land
+# card - only Karakas - and finds nothing: the Vein is still sacrificed, the Island stays, and no land arrives.
+
+[Bot1 Deck]
+Promising Vein
+Island
+Island x5
+Island
+Karakas x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Promising Vein.Play
+! Bot1.Battlefield.Promising Vein.Activate(Ability: Search)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Promising Vein.Activate(Ability: Search)
+Bot1.Battlefield.Island.Activate
+Bot1.Search()
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Island
+Bot1.Graveyard = Promising Vein

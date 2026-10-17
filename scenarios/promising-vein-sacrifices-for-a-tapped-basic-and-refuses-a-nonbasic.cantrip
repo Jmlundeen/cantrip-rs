@@ -1,0 +1,31 @@
+# "{1}, {T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle." Turn 3: Bot1 has an Island and the
+# Vein. The Vein cannot pay its own {1} (its tap is part of the cost), so the Island's mana does; the Vein is sacrificed as a cost, and the search offers the
+# basic Forest but not Karakas (a nonbasic land - the refusal; the Forest is the positive control). The Forest arrives tapped.
+
+[Bot1 Deck]
+Island
+Promising Vein
+Island x5
+Island x2
+Karakas
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Promising Vein.Play
+Bot1.Battlefield.Promising Vein.Activate(Ability: Search)
+Bot1.Battlefield.Island.Activate
+! Bot1.Search(Karakas)
+Bot1.Search(Forest)
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Island; Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Graveyard = Promising Vein
+Bot1.Library.Count = 12

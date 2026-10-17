@@ -1,0 +1,26 @@
+# "{T}: Add {C}." Bot1 plays Promising Vein and taps it for the {C} that pays for a Sol Ring ({1}); the Vein is tapped and the Ring is on the battlefield.
+# The Vein is a Cave land (Land - Cave), still on the battlefield: tapping for mana does not sacrifice it.
+
+[Bot1 Deck]
+Promising Vein
+Sol Ring
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Promising Vein.Play
+Bot1.Battlefield.Promising Vein.Activate(Ability: {T}: Add)
+? Bot1.Mana = {C}
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Promising Vein; Sol Ring
+Bot1.Battlefield.Promising Vein.Tapped = true
+Bot1.Battlefield.Promising Vein.Types = Land
+Bot1.Battlefield.Promising Vein.Subtypes = Cave
