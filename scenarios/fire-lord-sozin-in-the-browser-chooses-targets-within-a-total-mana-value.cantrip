@@ -1,0 +1,71 @@
+# Browser
+# Fire Lord Sozin at a table, Bot1 a browser page: "you may pay {X}" is answered with the dock's X stepper (raised to 1) and its pay
+# button, and the reflexive ability's targets - "any number of target creature cards with total mana value X or less" (CR 601.2c) -
+# are clicked in Bot2's graveyard, the dock keeping the running total against X. Guerrilla Gorilla (2) is worth more than X by
+# itself and is no candidate, so three are offered: Ornithopter (0) and the two Llanowar Elves (1 each). Ornithopter and one Elves
+# make 1 and enter under Bot1's control; the other Elves would have taken the total over and stays.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ornithopter
+Llanowar Elves
+Llanowar Elves
+Guerrilla Gorilla
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+Bot1.PayCost(X: 1)
+? Client.Bot1.Prompt.Title = Any number of targets for Fire Lord Sozin
+? Client.Bot1.Prompt.Detail = Creature cards from that player's graveyard to put onto the battlefield under your control  ·  total mana value 0, at most 1  ·  0 of 3 chosen
+Bot1.Target(Bot2.Graveyard.Ornithopter; Llanowar Elves#1)
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Ornithopter; Llanowar Elves; Swamp; Swamp
+Bot2.Graveyard = Guerrilla Gorilla; Llanowar Elves; Black Lotus

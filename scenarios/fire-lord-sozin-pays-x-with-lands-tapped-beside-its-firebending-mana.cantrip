@@ -1,0 +1,71 @@
+# Fire Lord Sozin: X is chosen as it is paid (CR 107.3f), and mana abilities may be activated while the payment is asked (CR
+# 605.3a, 118.12). Bot1 raises X to 4, more than firebending's {R}{R}{R}, and taps a Swamp for the fourth while asked; then every
+# creature card in Bot2's graveyard fits within 4 together - Guerrilla Gorilla (2), both Llanowar Elves (1 each) and Ornithopter
+# (0) - and all four enter under Bot1's control at once.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ornithopter
+Llanowar Elves
+Llanowar Elves
+Guerrilla Gorilla
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.PayCost(X: 4)
+Bot1.Target(Guerrilla Gorilla; Llanowar Elves#1; Llanowar Elves#2; Bot2.Graveyard.Ornithopter)
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Guerrilla Gorilla; Llanowar Elves; Llanowar Elves; Ornithopter; Swamp; Swamp
+Bot1.Battlefield.Swamp#1.Tapped = true
+Bot1.Battlefield.Swamp#2.Tapped = false
+Bot1.Mana =
+Bot2.Graveyard = Black Lotus

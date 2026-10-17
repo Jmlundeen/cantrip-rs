@@ -1,0 +1,68 @@
+# Fire Lord Sozin's reflexive ability targets both Llanowar Elves in Bot2's graveyard (total 2, X = 2). In response Bot2's Ghost
+# Vacuum exiles one of them. As the ability resolves each target is checked on its own (CR 608.2b): the exiled Elves is no longer
+# where it was targeted and is illegal; the other is still legal and enters under Bot1's control: one illegal target spoils nothing
+# for the rest.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ghost Vacuum
+Llanowar Elves
+Llanowar Elves
+Plains
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+Bot1.PayCost(X: 2)
+Bot1.Target(Llanowar Elves#1; Llanowar Elves#2)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot2.Graveyard.Llanowar Elves#1)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Llanowar Elves; Swamp; Swamp
+Exile = Llanowar Elves
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield.Ghost Vacuum.Tapped = true

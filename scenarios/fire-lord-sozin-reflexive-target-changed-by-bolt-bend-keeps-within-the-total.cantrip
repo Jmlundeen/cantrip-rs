@@ -1,0 +1,71 @@
+# Fire Lord Sozin's reflexive ability with X = 1 targets one Llanowar Elves in Bot2's graveyard - a single target - and Bot1
+# answers it with Bolt Bend ({R}: Fire Lord Sozin's power is 5) out of the firebending mana left: "change the target of target
+# spell or ability with a single target" (CR 115.7a). The new target must be a legal one: a creature card in that player's
+# graveyard (the player the combat damage was dealt to, CR 603.3d) that keeps the total within X (CR 601.2c). Guerrilla Gorilla
+# (2) would not and is not offered; Ornithopter (0) is, and it is what enters, the Elves staying in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Swamp
+Bolt Bend
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ornithopter
+Llanowar Elves
+Llanowar Elves
+Guerrilla Gorilla
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+Bot1.PayCost(X: 1)
+Bot1.Target(Llanowar Elves#1)
+Bot1.Hand.Bolt Bend.Cast(Stack.Fire Lord Sozin)
+! Bot1.Target(Guerrilla Gorilla)
+Bot1.Target(Bot2.Graveyard.Ornithopter)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Ornithopter; Swamp; Swamp
+Bot1.Graveyard = Bolt Bend; Black Lotus; Dark Ritual
+Bot2.Graveyard = Guerrilla Gorilla; Llanowar Elves; Llanowar Elves; Black Lotus

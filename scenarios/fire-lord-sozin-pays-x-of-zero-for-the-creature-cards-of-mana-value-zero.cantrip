@@ -1,0 +1,69 @@
+# Fire Lord Sozin with X = 0 (CR 107.3f: any X may be chosen; paying {0} is still paying, CR 118.5): the reflexive ability triggers
+# with a total of 0, and the ruling holds - "you can also choose any number of creature cards with mana value 0 as targets". Bot2's
+# Ornithopter (0) is a candidate; Llanowar Elves (1) is worth more than 0 by itself and is not. Nothing of the {R}{R}{R} firebending
+# added is spent paying {0}.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ornithopter
+Llanowar Elves
+Llanowar Elves
+Guerrilla Gorilla
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+Bot1.PayCost(X: 0)
+? Bot1.Mana = {R}{R}{R} lasting {R}{R}{R}
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Bot2.Graveyard.Ornithopter)
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Ornithopter; Swamp; Swamp
+Bot2.Graveyard = Guerrilla Gorilla; Llanowar Elves; Llanowar Elves; Black Lotus

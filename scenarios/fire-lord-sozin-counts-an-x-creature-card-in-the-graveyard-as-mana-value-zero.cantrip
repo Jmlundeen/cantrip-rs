@@ -1,0 +1,60 @@
+# Fire Lord Sozin with X = 0: a card's {X} is 0 anywhere but the stack (CR 202.3e), so Cryptic Trilobite ({X}{X}) has mana
+# value 0 in Bot2's graveyard and is a target even for a total of 0 ("any number of creature cards with mana value 0"); Jacked
+# Rabbit ({X}{1}{W}) is 2 there, more than X by itself, and is not. Bot2 discards both to hand size at the ends of its first two
+# turns (and Plains at the next two). The Trilobite enters under Bot1's control with X = 0 counters - it was not cast - so it is
+# a 0/0 and dies at once (CR 704.5f), back to its owner's graveyard: it was on the battlefield, as LeftBattlefield shows.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Cryptic Trilobite
+Jacked Rabbit
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Cleanup]
+Bot2.Discard(Cryptic Trilobite)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Cleanup]
+Bot2.Discard(Jacked Rabbit)
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+Bot1.PayCost(X: 0)
+! Bot1.Target(Jacked Rabbit)
+Bot1.Target(Cryptic Trilobite)
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Swamp; Swamp
+LeftBattlefield = Black Lotus (tapped); The Rise of Sozin; Cryptic Trilobite
+Bot2.Graveyard = Cryptic Trilobite; Plains; Plains; Jacked Rabbit

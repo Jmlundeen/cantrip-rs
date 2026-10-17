@@ -1,0 +1,95 @@
+# The Rise of Sozin, all three chapters (CR 714): "I - Destroy all creatures. II - Choose a card name. Search target opponent's
+# graveyard, hand, and library for up to four cards with that name and exile them. Then that player shuffles. III - Exile this
+# Saga, then return it to the battlefield transformed under your control."
+#
+# Bot2 casts two Llanowar Elves and an Ornithopter on T2 and keeps a third Elves in hand. Cast on T3, the Saga's chapter I
+# destroys every creature, Bot1's own Ornithopter as well as Bot2's three (Black Lotus, an artifact that is no creature, was
+# sacrificed). On T5 chapter II targets Bot2 and Bot1 names Llanowar Elves as it resolves: the two in the graveyard, the one in
+# hand and one of the two in the library are four, the limit, and the other stays in the library, which is shuffled. On T7
+# chapter III exiles the Saga and returns it transformed: Fire Lord Sozin, a legendary 5/5 black Human Noble with menace, a new
+# object that has just come under Bot1's control (summoning sick).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Ornithopter
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Llanowar Elves
+Ornithopter
+Llanowar Elves
+Plains
+Plains
+Plains
+Llanowar Elves
+Plains
+Llanowar Elves
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.End]
+? Bot1.Battlefield = Swamp; Swamp; The Rise of Sozin
+? Bot2.Battlefield = Forest
+? Bot2.Graveyard = Llanowar Elves; Llanowar Elves; Ornithopter; Black Lotus
+? Bot1.Graveyard = Ornithopter; Black Lotus; Dark Ritual
+[T5 Bot1.Main1]
+Bot1.Name(Llanowar Elves)
+Bot1.Choose(Llanowar Elves; Llanowar Elves)
+Bot1.Choose(Llanowar Elves)
+Bot1.Search(Llanowar Elves)
+[T5 Bot1.Main2]
+? Exile = Llanowar Elves; Llanowar Elves; Llanowar Elves; Llanowar Elves
+? Bot2.Graveyard = Ornithopter; Black Lotus
+? Bot2.Hand = Plains; Plains; Plains
+? Bot2.Library.Count = 12
+? Bot1.Battlefield.The Rise of Sozin.Counters.Lore = 2
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Swamp; Swamp
+Bot1.Battlefield.Fire Lord Sozin.Power = 5
+Bot1.Battlefield.Fire Lord Sozin.Toughness = 5
+Bot1.Battlefield.Fire Lord Sozin.Types = Creature
+Bot1.Battlefield.Fire Lord Sozin.Subtypes = Human; Noble
+Bot1.Battlefield.Fire Lord Sozin.Supertypes = Legendary
+Bot1.Battlefield.Fire Lord Sozin.Colors = Black
+Bot1.Battlefield.Fire Lord Sozin.Keywords = Menace
+Bot1.Battlefield.Fire Lord Sozin.SummoningSick = true
+Bot1.Battlefield.Fire Lord Sozin.Counters.Lore = (absent)
+Exile = Llanowar Elves; Llanowar Elves; Llanowar Elves; Llanowar Elves
+Bot2.Library.Count = 11

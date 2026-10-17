@@ -1,0 +1,85 @@
+# Fire Lord Sozin: "Whenever Fire Lord Sozin deals combat damage to a player, you may pay {X}. When you do, put any number of
+# target creature cards with total mana value X or less from that player's graveyard onto the battlefield under your control."
+#
+# Bot2 casts Ornithopter, two Llanowar Elves and Guerrilla Gorilla on T2; Bot1's The Rise of Sozin (cast on T3 off two Swamps, Dark
+# Ritual and Black Lotus) destroys them all with chapter I, Bot1's own Ornithopter too. Chapter III on T7 returns it as Fire Lord
+# Sozin, which attacks on T9: firebending 3 adds {R}{R}{R}, and in the combat damage step Bot1 pays X = 1 out of it (CR 107.3f:
+# X chosen as it is paid). The reflexive ability (CR 603.12) is put on the stack with X = 1 and its targets are chosen then
+# (CR 603.3d, 601.2c): Guerrilla Gorilla (mana value 2) is worth more than X by itself and is no candidate; the two Elves together
+# (total 2) are refused; Bot1's own Ornithopter is in the wrong graveyard. Ornithopter (0) and one Elves (1) make 1, and enter under
+# Bot1's control; the {R}{R} left over is lost as combat ends.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Ornithopter
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ornithopter
+Llanowar Elves
+Llanowar Elves
+Guerrilla Gorilla
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.End]
+? Bot2.Graveyard.Count = 5
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+? Bot1.Mana = {R}{R}{R} lasting {R}{R}{R}
+Bot1.PayCost(X: 1)
+! Bot1.Target(Bot2.Graveyard.Guerrilla Gorilla)
+! Bot1.Target(Bot1.Graveyard.Ornithopter)
+! Bot1.Target(Llanowar Elves#1; Llanowar Elves#2)
+Bot1.Target(Bot2.Graveyard.Ornithopter; Llanowar Elves#1)
+Bot1.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Mana =
+Bot1.Battlefield = Fire Lord Sozin; Ornithopter; Llanowar Elves; Swamp; Swamp
+Bot1.Battlefield.Llanowar Elves.SummoningSick = true
+Bot2.Graveyard = Guerrilla Gorilla; Llanowar Elves; Black Lotus
+Bot1.Graveyard = Ornithopter; Black Lotus; Dark Ritual

@@ -1,0 +1,54 @@
+# Fire Lord Sozin's reflexive ability takes "any number" of targets, none included: paid with X = 0 while the only creature card in
+# Bot2's graveyard is a Llanowar Elves (1), it has no candidate at all, so no target is asked for (the bare refusal) and it goes on
+# the stack with none and does nothing - not removed for want of a target (CR 603.3d; none is required). The Elves stays.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Black Lotus
+The Rise of Sozin
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Llanowar Elves
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Cleanup]
+Bot2.Discard(Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Rise of Sozin.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Name(Island)
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Attack(Fire Lord Sozin > Bot2)
+[T9 Bot1.Damage]
+Bot1.PayCost(X: 0)
+! Bot1.Target
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Fire Lord Sozin; Swamp; Swamp
+Bot2.Graveyard = Plains; Plains; Plains; Llanowar Elves
+Bot2.Life = 15
