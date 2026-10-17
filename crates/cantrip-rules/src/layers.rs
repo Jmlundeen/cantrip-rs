@@ -56,7 +56,7 @@ impl LayerQuery for View<'_> {
     }
 
     fn history(&self) -> History<'_> {
-        History { records: self.log, turn: self.state.turn.number }
+        History::new(self.log, self.state.turn.number)
     }
 
     fn chars(&self, id: ObjectId) -> Chars {

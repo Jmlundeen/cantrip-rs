@@ -177,7 +177,7 @@ pub trait Query {
 
     /// The game's event history, for any question about what has happened (`crate::history`).
     fn history(&self) -> History<'_> {
-        History { records: self.events(), turn: self.state().turn.number }
+        History::new(self.events(), self.state().turn.number)
     }
 
     /// The objects of the batch a "one or more" ability (`TriggeredDef::once_per_batch`) was triggered by

@@ -1025,7 +1025,8 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
         // counted against "this ability triggers only N times each turn" (no numbered rule; CR 603.2h is "do this only once each turn").
         for n in 0..=again.len() {
             if def.triggers_each_turn > 0 {
-                if cx.history().triggerings(trigger.source, trigger.ability) >= def.triggers_each_turn as usize {
+                let limit = def.triggers_each_turn as usize;
+                if crate::loops::settled_read(cx, |h| h.triggerings(trigger.source, trigger.ability) >= limit, |&reached| reached) {
                     break;
                 }
                 cx.record(Event::Triggered { source: trigger.source, ability: trigger.ability });

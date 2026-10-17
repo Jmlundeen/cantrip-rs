@@ -169,7 +169,25 @@ impl EventQuery {
     }
 }
 
-/// The history as card code reads it: every record, and this turn's.
+thread_local! {
+    /// How many times the history has been read since `take_reads` was last asked (`History::new`, `note_read`).
+    static READS: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+}
+
+/// The history is being read: a question about the past is being asked, whose answer may differ as the history grows.
+/// Counted for the rules that find a loop of mandatory actions (CR 104.4b, `cantrip_rules::loops`): two positions alike in
+/// everything but their history are the same position only if nothing asked the history in between. Every `History` is
+/// made by `History::new`, which notes it; a rule that reads the records some other way notes it itself.
+pub fn note_read() {
+    READS.with(|r| r.set(r.get().wrapping_add(1)));
+}
+
+/// How many times the history has been read on this thread since this was last asked, and starts the count again.
+pub fn take_reads() -> u32 {
+    READS.with(|r| r.replace(0))
+}
+
+/// The history as card code reads it: every record, and this turn's. Made by `History::new`, which notes the read.
 #[derive(Clone, Copy)]
 pub struct History<'a> {
     pub records: &'a [Record],
@@ -178,6 +196,12 @@ pub struct History<'a> {
 }
 
 impl<'a> History<'a> {
+    /// The history of a game, `records` its every record and `turn` the turn being played: a read of it (`note_read`).
+    pub fn new(records: &'a [Record], turn: u32) -> History<'a> {
+        note_read();
+        History { records, turn }
+    }
+
     /// Every record since the game began, oldest first.
     pub fn all(&self) -> &'a [Record] {
         self.records

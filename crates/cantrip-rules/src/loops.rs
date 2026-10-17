@@ -16,9 +16,13 @@
 //! The fingerprint is the position up to the identity of objects (CR 400.7: an exiled card that returns is a new object, so
 //! object ids and timestamps grow round a loop although nothing else changes): each object is numbered by where it is,
 //! a reference to an object that has left is followed to what it became (with what its row and last-known information
-//! still say), and timestamps are replaced by their order. The event history and the request counter are not part of it
-//! (`docs/known-issues.md`, KI-54). Anything else that differs round the loop keeps it from matching, which errs towards
-//! no draw.
+//! still say), and timestamps are replaced by their order. The request counter is no part of it, and neither is the event
+//! history, as no two rounds have the same one: instead the history counts every time it is read
+//! (`cantrip_api::history::note_read`), and a read clears the positions seen so far, so that a position comes round again
+//! only if nothing asked the past in between - "the third time this turn", "only once each turn" and "if you've cast two
+//! spells this turn" can never be what tells two rounds apart. A question about the past whose answer no later event of the
+//! turn can change ("it has triggered once this turn already") is asked through `settled_read`, which counts it only while
+//! it could still change. Anything else that differs round the loop keeps it from matching, which errs towards no draw.
 //!
 //! A normal game pays one comparison per priority: the fingerprinting starts only after a long run of priorities in which
 //! nobody could do anything, which a game outside a loop almost never has.
@@ -26,8 +30,9 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use cantrip_api::history::{note_read, take_reads};
 use cantrip_api::*;
-use cantrip_state::{LastKnown, LoopWatch};
+use cantrip_state::{GameState, LastKnown, LoopWatch};
 
 use crate::Cx;
 
@@ -69,6 +74,28 @@ fn priority_forced(cx: &Cx, options: &[ActionOption]) -> bool {
     })
 }
 
+/// A question about the past whose answer, once `settled` says so, no later event of this turn can change (a count that
+/// has reached its limit, "the first card drawn this turn" once one has been): asked of the history, and counted as a read
+/// of it (`note_read`) only while it could still change. A loop within the turn can't be told apart by a settled answer.
+pub fn settled_read<T>(cx: &Cx, ask: impl FnOnce(&History) -> T, settled: impl FnOnce(&T) -> bool) -> T {
+    let history = History { records: &cx.g.log, turn: cx.s().turn.number };
+    let answer = ask(&history);
+    if !settled(&answer) {
+        note_read();
+    }
+    answer
+}
+
+/// A frame of the rules has run: if it asked the history anything, the positions seen before can't be compared with any
+/// after (see the module).
+pub fn after_frame(s: &mut GameState) {
+    if take_reads() > 0 && !s.loop_watch.seen.is_empty() {
+        let mut watch = s.loop_watch.clone();
+        watch.seen.clear();
+        s.set_loop_watch(watch);
+    }
+}
+
 /// A question other than priority is asked: one with more than one legal answer clears the watch.
 pub fn asked(cx: &mut Cx, kind: &RequestKind) {
     if !matches!(kind, RequestKind::Priority { .. }) && !forced(kind) {
@@ -104,10 +131,16 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, options: &[ActionOption]) -> b
         clear(cx);
         return false;
     }
+    // The history asked since the last position was seen - deciding what may be done here among it - and the positions seen
+    // before can't be compared with this one.
+    let read = take_reads() > 0;
     let print = fingerprint(cx);
     // The same priority asked again (a run redone with its answers) is the same question, not a loop.
     if watch.seen.last() == Some(&print) {
         return false;
+    }
+    if read {
+        watch.seen.clear();
     }
     if watch.seen.contains(&print) {
         cx.st().set_loop_watch(LoopWatch::default());
@@ -394,5 +427,51 @@ mod tests {
             assert!(!at_priority(&mut cx(&mut game), PlayerId(0), &[]));
         }
         assert_eq!(game.state.loop_watch, LoopWatch::default());
+    }
+
+    /// Both players pass once round the loop; whether the game was drawn on the way.
+    fn round(game: &mut Game, between: impl Fn(&mut Game)) -> bool {
+        flicker(game);
+        let mut drawn = false;
+        for p in [PlayerId(0), PlayerId(1)] {
+            between(game);
+            crate::loops::after_frame(&mut game.state);
+            game.state.update_turn(|t| t.priority = p);
+            drawn |= at_priority(&mut cx(game), p, &[]);
+        }
+        drawn
+    }
+
+    /// CR 104.4b, 603.2h: a forced loop whose rounds differ only in their history is the same position round after round,
+    /// but a question the history is asked between them ("is this the sixth time this turn?") may answer otherwise on a later
+    /// round, so the rounds can't be found the same. A read of the history clears the positions seen; without one, the same
+    /// rounds are a draw.
+    #[test]
+    fn a_loop_whose_history_is_read_between_rounds_is_not_found_by_its_positions() {
+        cantrip_api::history::take_reads();
+        let mut game = game();
+        for _ in 0..WATCH_AFTER * 4 {
+            let read = |_: &mut Game| {
+                let records: [Record; 0] = [];
+                let _ = History::new(&records, 1).this_turn().len();
+            };
+            assert!(!round(&mut game, read), "the history was asked: the rounds could differ");
+        }
+        assert_eq!(game.state.outcome, Outcome::InProgress);
+        let drawn = (0..4).any(|_| round(&mut game, |_| {}));
+        assert!(drawn && game.state.outcome == Outcome::Draw, "the same rounds with nothing asking the past are a draw");
+    }
+
+    /// A question about the past settled for the rest of the turn is no read that tells rounds apart; one that is not yet
+    /// settled is.
+    #[test]
+    fn a_settled_question_about_the_past_is_not_counted_as_a_read() {
+        let mut game = game();
+        cantrip_api::history::take_reads();
+        let c = cx(&mut game);
+        assert!(settled_read(&c, |_| true, |&done| done));
+        assert_eq!(cantrip_api::history::take_reads(), 0);
+        assert!(!settled_read(&c, |_| false, |&done| done));
+        assert_eq!(cantrip_api::history::take_reads(), 1);
     }
 }

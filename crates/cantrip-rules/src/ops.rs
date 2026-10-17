@@ -910,7 +910,7 @@ pub fn transform(cx: &mut Cx, id: ObjectId, by: Option<&StackItem>) {
 fn transformed_since(cx: &Cx, item: &StackItem, id: ObjectId) -> bool {
     item.kind != StackKind::Spell
         && item.object == id
-        && cx.g.log[(item.since as usize).min(cx.g.log.len())..]
+        && History::new(&cx.g.log, cx.s().turn.number).all()[(item.since as usize).min(cx.g.log.len())..]
             .iter()
             .any(|r| matches!(r.event, Event::Transformed { object } if object == id))
 }
@@ -1696,7 +1696,7 @@ pub fn draw(cx: &mut Cx, player: PlayerId) {
     if cx.s().turn.number > 0 && cx.s().obj(card).zone == Zone::hand(player) {
         let miracles = cantrip_api::miracles(&*cx, card);
         if let Some(&first) = miracles.first()
-            && cx.history().drawn(player) == 0
+            && crate::loops::settled_read(cx, |h| h.drawn(player) == 0, |&first| !first)
             && matches!(cx.ask_core(player, RequestKind::May { source: card, purpose: Purpose::RevealForMiracle(only_miracle(cx, card, &miracles)) }, false), Ok(Answer::Yes))
             && let Some(miracle) = which_miracle(cx, player, card, &miracles, first)
             && cx.s().obj(card).zone == Zone::hand(player)

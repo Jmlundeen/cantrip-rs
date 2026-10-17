@@ -214,6 +214,8 @@ impl Game {
 
     /// Runs until the game asks something or ends.
     pub fn run(&mut self) {
+        // What read the history before this run (a view of the game built between answers) is none of the rules' business.
+        cantrip_api::history::take_reads();
         loop {
             if self.state.is_over() {
                 return;
@@ -249,6 +251,7 @@ impl Game {
                 }
             };
 
+            loops::after_frame(&mut self.state);
             // A question was asked and the run went on regardless: its work is thrown away and redone when it is answered.
             let flow = match flow {
                 Ok(_) if self.state.agenda.get(at).is_some_and(|f| f.pending.is_some()) => {

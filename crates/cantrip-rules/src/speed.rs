@@ -68,7 +68,7 @@ pub fn life_lost(cx: &mut Cx, player: PlayerId) {
     }
     let intrinsic = cx.cards().intrinsic;
     let ability = AbilityRef { card: intrinsic, index: SPEED_UP };
-    if cx.history().this_turn().iter().any(|r| matches!(r.event, Event::Triggered { ability: a, .. } if a == ability)) {
+    if crate::loops::settled_read(cx, |h| h.this_turn().iter().any(|r| matches!(r.event, Event::Triggered { ability: a, .. } if a == ability)), |&once| once) {
         return;
     }
     let source = crate::designations::queue(cx, intrinsic, SPEED_UP, active, Target::None);

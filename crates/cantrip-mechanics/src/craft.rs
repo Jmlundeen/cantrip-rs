@@ -33,7 +33,7 @@ fn return_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 /// then its materials together as the last of the cost (`Cost::materials`), so the exiles just before the activation,
 /// back to the source's own, are the materials. A token material ceased to exist (CR 111.7) and is none of them.
 fn exiled_materials(q: &dyn Query, source: ObjectId, ability: AbilityRef) -> Vec<ObjectId> {
-    let records = q.events();
+    let records = q.history().all();
     let activated = records
         .iter()
         .rposition(|r| matches!(r.event, Event::AbilityActivated { source: s, ability: a, .. } if s == source && a == ability));
