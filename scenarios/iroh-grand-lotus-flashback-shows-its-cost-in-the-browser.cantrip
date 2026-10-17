@@ -1,7 +1,7 @@
 # Browser
-# Iroh, Grand Lotus gives Lightning Bolt in Bot1's graveyard flashback "equal to that card's mana cost": the page's menu
-# for the Bolt says the way and what it costs, {R}, since the way's text does not (CR 702.34a, 118.9). Clicked, the Bolt
-# is cast again at Bot2 and exiled.
+# Iroh, Grand Lotus gives Faithless Looting in Bot1's graveyard a second flashback, "equal to that card's mana cost": the
+# page's menu for the card offers both - its own Flashback {2}{R} and Iroh's, which says what it costs, {R}, since the
+# way's text does not (CR 702.34a, 118.9). Bot1 picks Iroh's, pays {R}, and the card is exiled.
 
 [Bot1 Deck]
 Black Lotus
@@ -9,7 +9,7 @@ Mox Emerald
 Mox Sapphire
 Mox Ruby
 Iroh, Grand Lotus
-Lightning Bolt
+Faithless Looting
 Mountain
 Island x15
 
@@ -28,13 +28,16 @@ Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Iroh, Grand Lotus.Cast
 Bot1.Battlefield.Mountain.Activate
-Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Island)
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mox Ruby.Activate
-Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Flashback)
-? Client.Bot1.Menu = Cast Lightning Bolt — Flashback equal to its mana cost {R}
-[T3 Bot1.Main2]
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback equal)
+? Client.Bot1.Menu = Cast Faithless Looting — Flashback {2}{R}; Cast Faithless Looting — Flashback equal to its mana cost {R}
+Bot1.Choose(Island; Island)
 
 [Expect]
-Bot2.Life = 14
-Exile = Lightning Bolt
+Turn = 3
+Exile = Faithless Looting
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mountain.Tapped = false

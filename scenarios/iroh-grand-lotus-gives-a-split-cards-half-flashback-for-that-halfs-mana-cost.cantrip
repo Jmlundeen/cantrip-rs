@@ -1,0 +1,46 @@
+# Iroh, Grand Lotus with Leave // Chance in Bot1's graveyard: a split card is an instant and sorcery card there (CR
+# 709.4), so it has Iroh's flashback, and a half cast that way costs that half's own mana cost (CR 709.3a): Leave, an
+# instant, for {1}{W}. Bot1 casts it in turn 3, returning Mox Emerald to its hand, and the card is exiled (CR 702.34a).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Iroh, Grand Lotus
+Faithless Looting
+Leave // Chance
+Island
+Plains
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iroh, Grand Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Leave // Chance; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Leave // Chance.Cast(Ability: Leave: Flashback equal)
+Bot1.Target(Mox Emerald)
+
+[Expect]
+Turn = 3
+Exile = Leave // Chance
+Bot1.Hand = Mox Emerald
+Bot1.Battlefield.Mountain.Tapped = false

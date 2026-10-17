@@ -1,0 +1,56 @@
+# Iroh, Grand Lotus gives flashback to "instant and sorcery card[s] in your graveyard": the card is judged as it is in the
+# graveyard, with only its normal characteristics (CR 715.4). Faithless Looting discards Lindblum, Industrial Regency (a
+# land card whose Adventure is the instant Mage Siege) and Bonecrusher Giant (a creature card whose Adventure is the
+# instant Stomp): in turn 3, with mana for either Adventure untapped, neither is offered flashback, while Faithless Looting
+# is flashed back for {R} - the positive control. Then Octopus Form, an instant Lesson, is cast from the hand. "During
+# your turn": in Bot2's turn 4, with {1} untapped, the Octopus Form has no flashback, and in Bot1's turn 5 it is cast for
+# {1} and exiled.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Iroh, Grand Lotus
+Faithless Looting
+Lindblum, Industrial Regency
+Bonecrusher Giant
+Octopus Form
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iroh, Grand Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lindblum, Industrial Regency; Bonecrusher Giant)
+[T3 Bot1.Main1]
+! Bot1.Graveyard.Bonecrusher Giant.Cast
+! Bot1.Graveyard.Lindblum, Industrial Regency.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback equal)
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Octopus Form.Cast(Iroh, Grand Lotus)
+[T4 Bot2.Main1]
+! Bot1.Graveyard.Octopus Form.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Octopus Form.Cast(Iroh, Grand Lotus; Ability: Flashback {1})
+
+[Expect]
+Turn = 5
+Exile = Octopus Form; Faithless Looting
+Bot1.Graveyard = Island; Island; Bonecrusher Giant; Lindblum, Industrial Regency; Black Lotus

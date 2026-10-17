@@ -4,9 +4,9 @@
 # attacks and firebending 2 adds {R}{R}. In the declare-attackers step Lightning Bolt is offered flashback for {R} (its mana
 # cost) and not for {1} (it is no Lesson), and is cast with the firebending mana at Bot2 (14), then exiled (CR 702.34a);
 # the Demonstration, a sorcery, may not be flashed back in combat (the ruling: "you must still follow any timing
-# restrictions"). Iroh's 5 damage leaves Bot2 at 9. In Bot2's turn 4 the Demonstration has no flashback ("during your
-# turn"), with {1} at hand; in Bot1's turn 5 it is cast for {1} - not for its mana cost {1}{R}: a Lesson has only the
-# second flashback - and is exiled.
+# restrictions"). Iroh's 5 damage leaves Bot2 at 9. In Bot2's turn 4 the Demonstration, a sorcery, is not cast (an instant
+# Lesson shows "during your turn" in another scenario); in Bot1's turn 5 it is cast for {1} - not for its mana cost
+# {1}{R}: a Lesson has only the second flashback - and is exiled.
 
 [Bot1 Deck]
 Black Lotus

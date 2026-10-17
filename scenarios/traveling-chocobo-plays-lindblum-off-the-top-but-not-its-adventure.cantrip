@@ -1,0 +1,34 @@
+# Traveling Chocobo's ruling: with a land that has an Adventure on top of the library, "you can play [the land], but you
+# can't cast [its Adventure]" - the Adventure is judged by its own characteristics (CR 715.3a), and Mage Siege is no Bird
+# spell. With {2}{R} untapped Bot1 may not cast Mage Siege off the top, and plays Lindblum, Industrial Regency from there as
+# its land play; it enters tapped.
+
+[Bot1 Deck]
+Black Lotus
+Traveling Chocobo
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Island
+Island
+Lindblum, Industrial Regency
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Traveling Chocobo.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+! Bot1.Library.Lindblum, Industrial Regency.Cast
+Bot1.Library.Lindblum, Industrial Regency.Play
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Lindblum, Industrial Regency.Tapped = true
+Bot1.Library.Count = 15
+Bot1.Battlefield = Lindblum, Industrial Regency; Mox Jet; Mox Ruby; Mox Sapphire; Traveling Chocobo
