@@ -174,7 +174,9 @@ A match is best of three, and each of its games is played at **a table of its ow
 there from the pod's table (`TableMoveMessage`), see the result for a moment when the game ends, and are sent on - to the
 next game's table, where they sideboard first (three minutes, the same deck view, `DeckBuildingMessage.Title` saying
 where the match stands), or back to the pod's table when the match is decided. Every page is a fresh one, so nothing of
-one game is carried into the next. The pod's table shows the pairings and how each match stands (`PairingsMessage`)
+one game is carried into the next. Each game is dealt with the player's sideboard as the cards they own outside the game
+(CR 100.4b, 400.11a) - the rest of their pool, and any number of each basic land (`RulesGameOptions.BasicLandsOutside`) -
+for a card that brings one in (North Wind Avatar). The pod's table shows the pairings and how each match stands (`PairingsMessage`)
 whenever a player is there, and the final standings at the end.
 
 Every match has a **match clock**, a chess clock for each player across all its games: 25 minutes each by default

@@ -90,6 +90,9 @@ sweeping seeds (CLAUDE.md).
   - A cast for an alternative cost names it the same way (`Cast(Duress; Ability: Return)` for Daze).
   - Mana of any one color needs `Color:` (`Color: C` for colorless).
 - **Fixed dice.** A `[Dice]` section fixes the faces rolled, in order (README).
+- **Cards outside the game.** A `[Bot1 Sideboard]` section, written as a deck is, is what Bot1 owns outside the game (CR
+  400.11a), for a card that brings one in (North Wind Avatar); `[Basic Lands Outside]` makes it a Limited game whose
+  sideboards hold any number of the basic lands it lists. `Bot1.Sideboard` is the dump's key (README).
 - **Where scripts end.** A script stops when every line has fired and the stack is empty. It does not play on to
   combat damage or the next turn unless a trailing wait (`[Bot1.Main2]`) says so.
 - **Check timing.** `? Key = Value` in the action list is checked at the next question after the previous line.

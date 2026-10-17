@@ -46,7 +46,8 @@ pub fn player_at(seat: i32) -> Option<PlayerId> {
 /// Whether `viewer` may look into a zone.
 pub fn looks_into(viewer: PlayerId, zone: Zone) -> bool {
     match zone.kind() {
-        ZoneKind::Hand => zone.player == viewer,
+        // A player may look at their own sideboard at any time (CR 400.11a; North Wind Avatar's ruling); nobody else may.
+        ZoneKind::Hand | ZoneKind::Sideboard => zone.player == viewer,
         ZoneKind::Library | ZoneKind::Gone => false,
         _ => true,
     }
@@ -61,6 +62,7 @@ pub fn zone_kind_view(kind: ZoneKind) -> ZoneKindView {
         ZoneKind::Battlefield => ZoneKindView::Battlefield,
         ZoneKind::Stack => ZoneKindView::Stack,
         ZoneKind::Command => ZoneKindView::Command,
+        ZoneKind::Sideboard => ZoneKindView::Sideboard,
         // Where a token that left, or an object that never was, would be: the closest thing the wire has.
         ZoneKind::Gone => ZoneKindView::Exile,
     }
@@ -69,7 +71,7 @@ pub fn zone_kind_view(kind: ZoneKind) -> ZoneKindView {
 /// Seat owning a zone, or zero for a shared one.
 pub fn zone_owner(zone: Zone) -> i32 {
     match zone.kind() {
-        ZoneKind::Library | ZoneKind::Hand | ZoneKind::Graveyard => seat(zone.player),
+        ZoneKind::Library | ZoneKind::Hand | ZoneKind::Graveyard | ZoneKind::Sideboard => seat(zone.player),
         _ => 0,
     }
 }
@@ -404,6 +406,7 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
     for p in s.seats() {
         if p == viewer {
             visible.extend(s.zone(Zone::hand(p)).iter().copied());
+            visible.extend(s.zone(Zone::sideboard(p)).iter().copied());
         }
         visible.extend(s.zone(Zone::graveyard(p)).iter().copied());
         visible.extend(s.zone(Zone::exile(p)).iter().copied());
@@ -521,6 +524,7 @@ impl<'a> Projector<'a> {
             view.zones.push(self.zone_view(ZoneKind::Library, p, handles, &visible));
             view.zones.push(self.zone_view(ZoneKind::Hand, p, handles, &visible));
             view.zones.push(self.zone_view(ZoneKind::Graveyard, p, handles, &visible));
+            view.zones.push(self.zone_view(ZoneKind::Sideboard, p, handles, &visible));
         }
         for kind in [ZoneKind::Battlefield, ZoneKind::Stack, ZoneKind::Exile, ZoneKind::Command] {
             view.zones.push(self.zone_view(kind, PlayerId(0), handles, &visible));
@@ -718,6 +722,7 @@ impl<'a> Projector<'a> {
             ZoneKind::Stack => stack_entries(s).iter().map(StackEntry::key).collect(),
             ZoneKind::Exile => s.seats().flat_map(|p| s.zone(Zone::exile(p)).to_vec()).collect(),
             ZoneKind::Command => s.zone(Zone::COMMAND).to_vec(),
+            ZoneKind::Sideboard => s.zone(Zone::sideboard(owner)).to_vec(),
             ZoneKind::Gone => Vec::new(),
         };
         let count = contents.len() as i32;

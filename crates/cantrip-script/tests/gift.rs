@@ -77,7 +77,7 @@ fn deal(first: &[&str], second: &[&str]) -> Game {
         deck.extend(std::iter::repeat(filler).take(30 - deck.len()));
         deck
     };
-    let mut game = Game::new(table(), &Setup { decks: vec![list(first), list(second)], seed: 1, shuffle: false, opening_chooser: None });
+    let mut game = Game::new(table(), &Setup { decks: vec![list(first), list(second)], seed: 1, shuffle: false, opening_chooser: None, ..Default::default() });
     game.verify = true;
     game.run();
     game

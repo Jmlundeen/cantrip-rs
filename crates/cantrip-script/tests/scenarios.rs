@@ -15,7 +15,7 @@ fn scenario(name: &str) {
     let path = scripts().join(format!("{name}.cantrip"));
     let text = std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{name}: {e}"));
     let script = GameScript::load(&path).unwrap_or_else(|e| panic!("{name}: {e}"));
-    let mut missing: Vec<String> = (0..script.decks.len()).flat_map(|i| script.decklist(i)).filter(|c| cantrip_engine::card(c).is_none()).collect();
+    let mut missing: Vec<String> = script.cards().into_iter().filter(|c| cantrip_engine::card(c).is_none()).collect();
     missing.sort();
     missing.dedup();
     if !missing.is_empty() {
@@ -75,7 +75,7 @@ fn every_scenario_ends_the_same_with_its_seats_driven() {
     entries.sort();
     for path in entries {
         let Ok(script) = GameScript::load(&path) else { continue };
-        if (0..script.decks.len()).flat_map(|i| script.decklist(i)).any(|c| cantrip_engine::card(&c).is_none()) {
+        if script.cards().into_iter().any(|c| cantrip_engine::card(&c).is_none()) {
             continue;
         }
         let alone = run(&script).map(|r| r.dump.render()).map_err(|f| f.message);

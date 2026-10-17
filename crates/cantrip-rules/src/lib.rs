@@ -55,9 +55,16 @@ impl Clone for Game {
 }
 
 /// What dealing a game needs.
+#[derive(Clone, Debug, Default)]
 pub struct Setup {
     /// Each seat's deck, top of the library first.
     pub decks: Vec<Vec<CardId>>,
+    /// Each seat's sideboard: the cards it owns outside the game (CR 100.4, 400.11a, 108.3b), which effects that bring a
+    /// card into the game from outside it choose among. A seat with no entry has none.
+    pub sideboards: Vec<Vec<CardId>>,
+    /// In a Limited game, the basic land cards the event supplies: a Limited sideboard holds any number of each (Magic
+    /// Tournament Rules; North Wind Avatar's ruling), so each seat always has one of each outside the game. Empty otherwise.
+    pub basic_lands_outside: Vec<CardId>,
     pub seed: u64,
     /// Shuffle the libraries and play the real start of a game (CR 103): who goes first, mulligans. Without it the
     /// libraries stay in the order given, the first seat goes first and both opening hands are dealt and kept, as a
@@ -99,14 +106,17 @@ impl Game {
     pub fn new(cards: &'static CardTable, setup: &Setup) -> Game {
         let players = setup.decks.len();
         let mut state = GameState::new(players, setup.seed);
+        state.outside_supply = setup.basic_lands_outside.clone();
         for (seat, deck) in setup.decks.iter().enumerate() {
             let p = PlayerId(seat as u8);
-            for &card in deck {
+            let library = deck.iter().map(|&card| (card, Zone::library(p)));
+            let sideboard = setup.sideboards.get(seat).into_iter().flatten().chain(&setup.basic_lands_outside).map(|&card| (card, Zone::sideboard(p)));
+            for (card, zone) in library.chain(sideboard).collect::<Vec<_>>() {
                 let id = state.push_obj(Obj {
                     card,
                     owner: p,
                     controller: p,
-                    zone: Zone::library(p),
+                    zone,
                     token: false,
                     tapped: false,
                     controlled_since: 0,
@@ -143,7 +153,7 @@ impl Game {
                     face_down: false,
                     seen_by: 0,
                 });
-                state.zone_push(Zone::library(p), id);
+                state.zone_push(zone, id);
             }
         }
 
@@ -700,6 +710,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn return_to_hand(&mut self, objects: &[ObjectId]) -> Vec<ObjectId> {
         ops::return_to_hand(self, objects)
+    }
+
+    fn bring_into_hand(&mut self, cards: &[ObjectId]) -> Vec<ObjectId> {
+        ops::bring_into_hand(self, cards)
     }
 
     fn put_into_library(&mut self, objects: &[ObjectId], place: LibraryPlace) -> Vec<ObjectId> {

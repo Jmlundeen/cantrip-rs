@@ -25,6 +25,9 @@ enum Request {
         first_player: Option<i32>,
         #[serde(rename = "Chooser", default)]
         chooser: Option<i32>,
+        /// A Limited game's basic lands, which each sideboard holds any number of (`Setup::basic_lands_outside`).
+        #[serde(rename = "BasicLandsOutside", default)]
+        basic_lands_outside: Vec<String>,
         /// A `.cantrip` scenario to play instead of a dealt game: its decks, order and dice are the scenario's, and the
         /// seats named in `Driven` are answered by the table, every other by the script (docs/scenarios-in-the-browser.md).
         #[serde(rename = "Scenario", default)]
@@ -86,6 +89,9 @@ struct SeatSpec {
     name: String,
     #[serde(rename = "Deck")]
     deck: Vec<String>,
+    /// The cards the seat owns outside the game (CR 100.4, 400.11a).
+    #[serde(rename = "Sideboard", default)]
+    sideboard: Vec<String>,
 }
 
 struct Host {
@@ -104,11 +110,18 @@ fn ok(value: Value) -> Value {
 impl Host {
     fn handle(&mut self, request: Request) -> Value {
         match request {
-            Request::NewGame { seats, seed, shuffle, first_player, chooser, scenario } => {
+            Request::NewGame { seats, seed, shuffle, first_player, chooser, basic_lands_outside, scenario } => {
                 let made = match scenario {
                     Some(spec) => Session::scenario(&spec.text, &spec.name, seats.into_iter().map(|s| s.name).collect(), &spec.driven),
                     None => {
-                        let deal = Deal { seats: seats.into_iter().map(|s| (s.name, s.deck)).collect(), seed, shuffle, first_player, chooser };
+                        let deal = Deal {
+                            seats: seats.into_iter().map(|s| (s.name, s.deck, s.sideboard)).collect(),
+                            basic_lands_outside,
+                            seed,
+                            shuffle,
+                            first_player,
+                            chooser,
+                        };
                         Session::new(deal)
                     }
                 };

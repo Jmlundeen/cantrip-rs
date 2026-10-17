@@ -2,7 +2,10 @@ namespace Cantrip.Server.Rules;
 
 /// <summary>One seat of a game to be dealt: who sits there and the cards they bring, by name.</summary>
 /// <param name="Deck">The deck, one entry per copy, top first when dealt unshuffled.</param>
-/// <param name="Sideboard">Cards outside the game (CR 702.139b), which for now means a companion and nothing else.</param>
+/// <param name="Sideboard">
+/// The cards the seat owns outside the game (CR 100.4, 400.11a): what "a card you own from outside the game" chooses among
+/// (North Wind Avatar). The host refuses a card it does not know here as in the deck.
+/// </param>
 public sealed record RulesSeat(string Name, IReadOnlyList<string> Deck, IReadOnlyList<string> Sideboard)
 {
     public RulesSeat(string name, IReadOnlyList<string> deck) : this(name, deck, [])
@@ -23,6 +26,12 @@ public sealed class RulesGameOptions
 
     /// <summary>Whether the decks are shuffled. False deals them in order, which is what a scenario wants.</summary>
     public bool Shuffle { get; init; } = true;
+
+    /// <summary>
+    /// In a Limited game, the basic lands the event supplies, of which every sideboard holds any number (Magic Tournament
+    /// Rules; North Wind Avatar's ruling): one brought into the game from outside it leaves another there. Empty otherwise.
+    /// </summary>
+    public IReadOnlyList<string> BasicLandsOutside { get; init; } = [];
 
     /// <summary>A <c>.cantrip</c> scenario to play instead of dealing the seats' decks; null for a dealt game.</summary>
     public ScenarioSpec? Scenario { get; init; }

@@ -227,6 +227,13 @@ pub trait Query {
         obj.copy.unwrap_or_else(|| Copiable::of(self.chars(id).card))
     }
 
+    /// The cards `player` owns outside the game (CR 400.11, 108.3b) - in a match, their sideboard (CR 100.4, 400.11a) - in
+    /// the order the sideboard lists them: what "a card you own from outside the game" chooses among. Nothing else in the
+    /// game sees them (CR 400.11c).
+    fn outside_the_game(&self, player: PlayerId) -> Vec<ObjectId> {
+        self.state().zone(Zone::sideboard(player)).to_vec()
+    }
+
     /// The permanents a player controls, in battlefield order.
     fn permanents_of(&self, player: PlayerId) -> Vec<ObjectId> {
         self.state().battlefield().iter().copied().filter(|&id| self.obj(id).controller == player).collect()
@@ -381,6 +388,10 @@ pub trait Game: Query {
     /// anywhere else, whoever controls them. A token that leaves the battlefield ceases to exist (CR 111.7, 704.5d). Something
     /// that is no longer the object it was is not returned (CR 400.7). The new objects, in order.
     fn return_to_hand(&mut self, objects: &[ObjectId]) -> Vec<ObjectId>;
+    /// Puts cards their owners have outside the game (`Query::outside_the_game`) into their owners' hands, bringing them
+    /// into the game (CR 400.11b): each is a new object from then on. One no longer outside the game is not moved. The new
+    /// objects, in order.
+    fn bring_into_hand(&mut self, cards: &[ObjectId]) -> Vec<ObjectId>;
     /// Puts objects into their owners' libraries (CR 401.4, 400.3) at once, in `place`. The new objects, in order, of those
     /// that arrived in a library: a replacement may have sent one elsewhere, and it is not arranged.
     fn put_into_library(&mut self, objects: &[ObjectId], place: LibraryPlace) -> Vec<ObjectId>;

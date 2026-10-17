@@ -954,11 +954,15 @@ pub enum ZoneKind {
     Gone = 6,
     /// The command zone (CR 114, 408): where emblems are, and nothing leaves it.
     Command = 7,
+    /// Not a zone: the cards a player owns outside the game (CR 400.11), which in a match are their sideboard (CR 100.4,
+    /// 400.11a, 108.3b). Nothing affects them but what brings them into the game (CR 400.11c), and only their owner may
+    /// look at them.
+    Sideboard = 8,
 }
 
 impl ZoneKind {
     pub fn is_hidden(self) -> bool {
-        matches!(self, ZoneKind::Library | ZoneKind::Hand)
+        matches!(self, ZoneKind::Library | ZoneKind::Hand | ZoneKind::Sideboard)
     }
 
     pub fn name(self) -> &'static str {
@@ -971,26 +975,27 @@ impl ZoneKind {
             ZoneKind::Stack => "Stack",
             ZoneKind::Gone => "Gone",
             ZoneKind::Command => "Command",
+            ZoneKind::Sideboard => "Sideboard",
         }
     }
 }
 
 /// A set of zone kinds (CR 400.1): the zones a rule names, as "can't cast spells from graveyards or libraries" (CR 101.2).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
-pub struct ZoneKinds(pub u8);
+pub struct ZoneKinds(pub u16);
 
 impl ZoneKinds {
     pub const NONE: ZoneKinds = ZoneKinds(0);
     /// Every zone: "can't cast spells" wherever they are.
-    pub const ALL: ZoneKinds = ZoneKinds(u8::MAX);
+    pub const ALL: ZoneKinds = ZoneKinds(u16::MAX);
     /// The zones a spell can be cast from (CR 601.2a): every zone but the battlefield and the stack.
     pub const CAST_FROM: [ZoneKind; 5] = [ZoneKind::Hand, ZoneKind::Graveyard, ZoneKind::Exile, ZoneKind::Library, ZoneKind::Command];
 
     pub const fn of(kinds: &[ZoneKind]) -> ZoneKinds {
-        let mut bits = 0u8;
+        let mut bits = 0u16;
         let mut i = 0;
         while i < kinds.len() {
-            bits |= 1 << kinds[i] as u8;
+            bits |= 1 << kinds[i] as u16;
             i += 1;
         }
         ZoneKinds(bits)
@@ -1002,7 +1007,7 @@ impl ZoneKinds {
     }
 
     pub const fn contains(self, kind: ZoneKind) -> bool {
-        self.0 & (1 << kind as u8) != 0
+        self.0 & (1 << kind as u16) != 0
     }
 
     pub const fn union(self, other: ZoneKinds) -> ZoneKinds {
@@ -1010,7 +1015,7 @@ impl ZoneKinds {
     }
 
     pub const fn with(self, kind: ZoneKind) -> ZoneKinds {
-        ZoneKinds(self.0 | (1 << kind as u8))
+        ZoneKinds(self.0 | (1 << kind as u16))
     }
 }
 
@@ -1045,6 +1050,10 @@ impl Zone {
     pub fn exile(p: PlayerId) -> Zone {
         Zone::new(ZoneKind::Exile, p)
     }
+    /// The cards `p` owns outside the game (CR 400.11a): not a zone of the game, though the state keeps them as one.
+    pub fn sideboard(p: PlayerId) -> Zone {
+        Zone::new(ZoneKind::Sideboard, p)
+    }
 
     pub fn kind(self) -> ZoneKind {
         match self.kind_raw {
@@ -1055,6 +1064,7 @@ impl Zone {
             4 => ZoneKind::Battlefield,
             5 => ZoneKind::Stack,
             7 => ZoneKind::Command,
+            8 => ZoneKind::Sideboard,
             _ => ZoneKind::Gone,
         }
     }
@@ -1070,12 +1080,13 @@ impl Zone {
             ZoneKind::Stack => 4 * players + 1,
             ZoneKind::Gone => 4 * players + 2,
             ZoneKind::Command => 4 * players + 3,
+            ZoneKind::Sideboard => 4 * players + 4 + self.player.index(),
             k => (k as usize) * players + self.player.index(),
         }
     }
 
     pub fn slots(players: usize) -> usize {
-        4 * players + 4
+        5 * players + 4
     }
 }
 

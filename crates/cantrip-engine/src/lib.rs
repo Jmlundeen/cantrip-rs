@@ -43,17 +43,38 @@ pub fn card(name: &str) -> Option<CardId> {
 
 /// A game from decklists of names, top of the library first.
 pub fn deal(decks: &[Vec<String>], seed: u64, shuffle: bool, opening_chooser: Option<PlayerId>) -> Result<Game, String> {
-    let mut ids = Vec::new();
-    for deck in decks {
-        let mut list = Vec::new();
-        for name in deck {
-            // Either face of a double-faced card names it (CR 711.1); a deck holds the front.
-            let id = card(name).ok_or_else(|| format!("no card is named \"{name}\""))?;
-            list.push(cards().fronts[id.0 as usize].unwrap_or(id));
-        }
-        ids.push(list);
-    }
-    let mut game = Game::new(cards(), &Setup { decks: ids, seed, shuffle, opening_chooser });
+    deal_with(decks, &[], &[], seed, shuffle, opening_chooser)
+}
+
+/// A game from decklists of names, top of the library first, with each seat's sideboard - the cards it owns outside the
+/// game (CR 100.4, 400.11a) - and, for a Limited game, the basic lands a sideboard holds any number of (`Setup`).
+pub fn deal_with(
+    decks: &[Vec<String>],
+    sideboards: &[Vec<String>],
+    basic_lands_outside: &[String],
+    seed: u64,
+    shuffle: bool,
+    opening_chooser: Option<PlayerId>,
+) -> Result<Game, String> {
+    let ids = |names: &[String]| -> Result<Vec<CardId>, String> {
+        names
+            .iter()
+            .map(|name| {
+                // Either face of a double-faced card names it (CR 711.1); a deck holds the front.
+                let id = card(name).ok_or_else(|| format!("no card is named \"{name}\""))?;
+                Ok(cards().fronts[id.0 as usize].unwrap_or(id))
+            })
+            .collect()
+    };
+    let setup = Setup {
+        decks: decks.iter().map(|d| ids(d)).collect::<Result<_, _>>()?,
+        sideboards: sideboards.iter().map(|d| ids(d)).collect::<Result<_, _>>()?,
+        basic_lands_outside: ids(basic_lands_outside)?,
+        seed,
+        shuffle,
+        opening_chooser,
+    };
+    let mut game = Game::new(cards(), &setup);
     game.run();
     Ok(game)
 }

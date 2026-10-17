@@ -19,6 +19,12 @@ pub struct GameScript {
     pub name: String,
     /// Each player's deck by card name, top of the library first. Index 0 is Bot1.
     pub decks: Vec<Vec<DeckEntry>>,
+    /// Each player's sideboard by card name (a `[Bot1 Sideboard]` section): the cards they own outside the game (CR 100.4,
+    /// 400.11a). Index 0 is Bot1; a player with no section has none.
+    pub sideboards: Vec<Vec<DeckEntry>>,
+    /// A Limited game's basic lands (a `[Basic Lands Outside]` section, one name a line): every sideboard holds any number
+    /// of each (`Setup::basic_lands_outside`).
+    pub basic_lands_outside: Vec<String>,
     pub steps: Vec<ScriptStep>,
     pub expectations: Vec<Expectation>,
     /// Whether the game starts as a real one does (CR 103).
@@ -584,6 +590,8 @@ fn parse_deck_entry(line: &str, number: usize) -> Result<DeckEntry, ParseError> 
 enum Section {
     None,
     Deck(usize),
+    Sideboard(usize),
+    BasicLandsOutside,
     Actions,
     Expect,
     Opening,
@@ -620,6 +628,13 @@ impl GameScript {
                         }
                         script.decks[seat].push(parse_deck_entry(line, number)?)
                     }
+                    Section::Sideboard(seat) => {
+                        if script.sideboards.len() <= seat {
+                            script.sideboards.resize_with(seat + 1, Vec::new);
+                        }
+                        script.sideboards[seat].push(parse_deck_entry(line, number)?)
+                    }
+                    Section::BasicLandsOutside => script.basic_lands_outside.push(line.to_string()),
                     Section::Actions => script.steps.push(ScriptStep::parse(line, number)?),
                     Section::Expect => script.expectations.push(parse_expectation(line.trim_start_matches('?').trim(), number)?),
                     Section::Opening => script.chooser = opening_line(line)?,
@@ -654,6 +669,20 @@ impl GameScript {
     pub fn decklist(&self, index: usize) -> Vec<String> {
         self.decks.get(index).into_iter().flatten().flat_map(|e| std::iter::repeat_n(e.card.clone(), e.copies)).collect()
     }
+
+    /// Every card the script names for a player, deck and sideboard, one entry per copy.
+    pub fn cards(&self) -> Vec<String> {
+        (0..self.decks.len())
+            .flat_map(|i| self.decklist(i))
+            .chain((0..self.sideboards.len()).flat_map(|i| self.sideboard(i)))
+            .chain(self.basic_lands_outside.iter().cloned())
+            .collect()
+    }
+
+    /// Each sideboard's card names in order, one entry per copy.
+    pub fn sideboard(&self, index: usize) -> Vec<String> {
+        self.sideboards.get(index).into_iter().flatten().flat_map(|e| std::iter::repeat_n(e.card.clone(), e.copies)).collect()
+    }
 }
 
 fn section_header(line: &str) -> Option<Section> {
@@ -663,8 +692,14 @@ fn section_header(line: &str) -> Option<Section> {
         "[OPENING]" => Some(Section::Opening),
         "[DICE]" => Some(Section::Dice),
         "[LIFE]" => Some(Section::Life),
+        "[BASIC LANDS OUTSIDE]" => Some(Section::BasicLandsOutside),
         other => {
-            let seat = other.strip_prefix("[BOT")?.strip_suffix(" DECK]")?.parse::<usize>().ok()?;
+            let rest = other.strip_prefix("[BOT")?;
+            if let Some(seat) = rest.strip_suffix(" SIDEBOARD]") {
+                let seat = seat.parse::<usize>().ok()?;
+                return (1..=4).contains(&seat).then_some(Section::Sideboard(seat - 1));
+            }
+            let seat = rest.strip_suffix(" DECK]")?.parse::<usize>().ok()?;
             (1..=4).contains(&seat).then_some(Section::Deck(seat - 1))
         }
     }

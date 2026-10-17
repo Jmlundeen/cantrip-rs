@@ -2029,6 +2029,28 @@ pub fn return_to_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     move_together(cx, &moves, ZoneReason::Other)
 }
 
+/// Brings cards their owners have outside the game into the game, into their owners' hands (CR 400.11b, 108.3b): each
+/// arrives as a new object and stays in the game until it ends. Only a card still outside the game moves (CR 400.11c). A
+/// basic land of a Limited event's supply (`GameState::outside_supply`) is replaced outside the game by another, since a
+/// Limited sideboard holds any number of them.
+pub fn bring_into_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
+    let outside: Vec<Obj> =
+        live_ones(cx, ids).into_iter().map(|id| *cx.s().obj(id)).filter(|o| o.zone.is(ZoneKind::Sideboard)).collect();
+    let moves: Vec<Moving> = live_ones(cx, ids)
+        .into_iter()
+        .filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Sideboard))
+        .map(|id| Moving::to(id, Zone::hand(cx.s().obj(id).owner)))
+        .collect();
+    let brought = move_together(cx, &moves, ZoneReason::Other);
+    for row in outside {
+        if cx.s().outside_supply.contains(&row.card) {
+            let fresh = cx.st().push_obj(row);
+            cx.st().zone_push(row.zone, fresh);
+        }
+    }
+    brought
+}
+
 /// Puts counters on an object, or takes them off with a negative amount. Putting them is an event replacement effects
 /// can change (CR 122.6, 614.1a): "that many plus one" instead.
 pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {

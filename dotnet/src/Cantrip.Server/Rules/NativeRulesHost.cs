@@ -79,7 +79,7 @@ public sealed class NativeRulesHost : IRulesHost
         }
 
         var host = new NativeRulesHost(transport, seats, history ?? []);
-        var named = seats.Select(seat => new { seat.Name, seat.Deck }).ToList();
+        var named = seats.Select(seat => new { seat.Name, seat.Deck, seat.Sideboard }).ToList();
         NewGameReply dealt = host.Send<NewGameReply>(options.Scenario is { } scenario
             ? new
             {
@@ -96,6 +96,7 @@ public sealed class NativeRulesHost : IRulesHost
                 options.Shuffle,
                 options.FirstPlayer,
                 options.Chooser,
+                options.BasicLandsOutside,
             });
 
         host.GameId = dealt.GameId;

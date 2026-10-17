@@ -193,8 +193,9 @@ impl Scripted {
 impl<'s> Run<'s> {
     fn deal(script: &'s GameScript) -> Result<Run<'s>, ScriptFailure> {
         let decks: Vec<Vec<String>> = (0..script.decks.len()).map(|i| script.decklist(i)).collect();
+        let sideboards: Vec<Vec<String>> = (0..script.sideboards.len()).map(|i| script.sideboard(i)).collect();
         let chooser = if script.opening { Some(PlayerId((script.chooser.max(1) - 1) as u8)) } else { None };
-        let mut game = deal(&decks, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
+        let mut game = deal_with(&decks, &sideboards, &script.basic_lands_outside, 1, false, chooser).map_err(|m| ScriptFailure { message: m.clone(), report: m })?;
         // CANTRIP_VERIFY=1: every rollback is checked to restore the state exactly.
         game.verify = std::env::var_os("CANTRIP_VERIFY").is_some();
         game.state.force_rolls(&script.dice);
@@ -265,6 +266,7 @@ fn engine_zone(zone: parse::ZoneKind) -> Option<ZoneKind> {
         parse::ZoneKind::Graveyard => ZoneKind::Graveyard,
         parse::ZoneKind::Stack => ZoneKind::Stack,
         parse::ZoneKind::Exile => ZoneKind::Exile,
+        parse::ZoneKind::Sideboard => ZoneKind::Sideboard,
         _ => return None,
     })
 }
@@ -1182,6 +1184,7 @@ impl<'s> Run<'s> {
             ZoneKind::Library => s.seats().flat_map(|p| s.zone(Zone::library(p)).to_vec()).collect(),
             ZoneKind::Hand => s.seats().flat_map(|p| s.zone(Zone::hand(p)).to_vec()).collect(),
             ZoneKind::Command => s.zone(Zone::COMMAND).to_vec(),
+            ZoneKind::Sideboard => s.seats().flat_map(|p| s.zone(Zone::sideboard(p)).to_vec()).collect(),
             ZoneKind::Gone => Vec::new(),
         };
         ids.retain(|&id| live(s, id));

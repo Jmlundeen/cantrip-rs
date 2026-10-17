@@ -44,6 +44,10 @@ pub struct GameState {
     pub blocks: Vec<Block>,
     /// Extra turns waiting to be taken (CR 500.7): the most recently created last, and taken first.
     pub extra_turns: Vec<PlayerId>,
+    /// The basic land cards a Limited event supplies (Magic Tournament Rules: a Limited sideboard holds any number of basic
+    /// lands), of which each player always has one more outside the game (`Zone::sideboard`): one brought into the game is
+    /// replaced there. Empty for a constructed game. Fixed at the deal, so no part of the journal.
+    pub outside_supply: Vec<CardId>,
     /// Whether an object whose card has static abilities has ever been made in this game, or a hone counter put on a
     /// permanent (CR 122.1j): until one has, the layers skip looking for static sources, and hone counters, at all. Only
     /// ever set, so it can be stale only towards looking.
@@ -268,6 +272,7 @@ impl GameState {
             attackers: Vec::new(),
             blocks: Vec::new(),
             extra_turns: Vec::new(),
+            outside_supply: Vec::new(),
             statics_seen: false,
             agenda: Vec::new(),
             rng: Rng::new(seed),

@@ -894,7 +894,8 @@ public sealed class BoosterPod : ITableEvent
                 [.. PoolDecks.Sideboard(participant.Pool, deck).Select(card => NameOf(card))]);
         })];
 
-        return (rules ?? RulesHostFactory.Native).Create(seats, seed, new RulesGameOptions());
+        // A Limited sideboard is the rest of the pool and any number of basic lands (CR 100.4b; Magic Tournament Rules).
+        return (rules ?? RulesHostFactory.Native).Create(seats, seed, new RulesGameOptions { BasicLandsOutside = [.. PoolDecks.BasicLands.Select(name => NameOf(_basics[name]))] });
     }
 
     /// <summary>

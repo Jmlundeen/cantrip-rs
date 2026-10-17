@@ -53,11 +53,11 @@ fn main() {
             }
         };
         if let Some(only) = &only
-            && !(0..script.decks.len()).flat_map(|i| script.decklist(i)).any(|c| c.eq_ignore_ascii_case(only))
+            && !script.cards().into_iter().any(|c| c.eq_ignore_ascii_case(only))
         {
             continue;
         }
-        let mut missing: Vec<String> = (0..script.decks.len()).flat_map(|i| script.decklist(i)).filter(|c| card(c).is_none()).collect();
+        let mut missing: Vec<String> = script.cards().into_iter().filter(|c| card(c).is_none()).collect();
         missing.sort();
         missing.dedup();
         if !missing.is_empty() {

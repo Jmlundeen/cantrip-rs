@@ -91,7 +91,10 @@ struct Told {
 
 /// Dealing a game: the seats' names and decks, and the conditions beyond the seed.
 pub struct Deal {
-    pub seats: Vec<(String, Vec<String>)>,
+    /// Each seat's name, deck (top first) and sideboard: the cards it owns outside the game (CR 100.4, 400.11a).
+    pub seats: Vec<(String, Vec<String>, Vec<String>)>,
+    /// A Limited game's basic lands, which each sideboard holds any number of (`Setup::basic_lands_outside`).
+    pub basic_lands_outside: Vec<String>,
     pub seed: u64,
     pub shuffle: bool,
     pub first_player: Option<i32>,
@@ -104,13 +107,18 @@ impl Session {
             return Err(Rejection::new("InvalidSetup", "a game needs at least two seats"));
         }
         let cards = cards();
+        let known = |name: &str, card_name: &str| {
+            card(card_name).ok_or_else(|| Rejection::new("InvalidSetup", format!("{name}'s deck names {card_name}, which is not a card the engine has")))
+        };
         let mut decks = Vec::new();
+        let mut sideboards = Vec::new();
         let mut decklists = Vec::new();
-        for (name, deck) in &deal.seats {
+        for (name, deck, sideboard) in &deal.seats {
+            sideboards.push(sideboard.iter().map(|c| known(name, c).map(|id| cards.fronts[id.0 as usize].unwrap_or(id))).collect::<Result<Vec<_>, _>>()?);
             let mut list = Vec::new();
             let mut shown = Vec::new();
             for card_name in deck {
-                let id = card(card_name).ok_or_else(|| Rejection::new("InvalidSetup", format!("{name}'s deck names {card_name}, which is not a card the engine has")))?;
+                let id = known(name, card_name)?;
                 let front = cards.fronts[id.0 as usize].unwrap_or(id);
                 shown.push(printed(cards.get(front)));
                 list.push(front);
@@ -121,13 +129,18 @@ impl Session {
         let chooser = deal.chooser.and_then(player_at);
         let first = deal.first_player.and_then(player_at);
         let opening_chooser = chooser.or(first.filter(|_| !deal.shuffle));
-        let setup = Setup { decks, seed: deal.seed, shuffle: deal.shuffle, opening_chooser };
+        let basic_lands_outside = deal
+            .basic_lands_outside
+            .iter()
+            .map(|c| card(c).ok_or_else(|| Rejection::new("InvalidSetup", format!("the basic land {c} is not a card the engine has"))))
+            .collect::<Result<Vec<_>, _>>()?;
+        let setup = Setup { decks, sideboards, basic_lands_outside, seed: deal.seed, shuffle: deal.shuffle, opening_chooser };
         let mut game = Game::new(cards, &setup);
         game.run();
         let seats = deal.seats.len();
         let mut session = Session {
             tracker: Tracker::new(&game),
-            names: deal.seats.iter().map(|(n, _)| n.clone()).collect(),
+            names: deal.seats.iter().map(|(n, _, _)| n.clone()).collect(),
             decklists,
             handles: (0..seats).map(|_| HandleSpace::new()).collect(),
             published: 0,
@@ -612,7 +625,7 @@ mod tests {
 
     fn deal(first: &[&str], filler: &str, count: usize) -> Deal {
         let deck = |top: &[&str]| top.iter().map(|c| c.to_string()).chain(std::iter::repeat_n(filler.to_string(), count)).collect::<Vec<_>>();
-        Deal { seats: vec![("North".into(), deck(first)), ("South".into(), deck(&[]))], seed: 1, shuffle: false, first_player: Some(1), chooser: None }
+        Deal { seats: vec![("North".into(), deck(first), Vec::new()), ("South".into(), deck(&[]), Vec::new())], basic_lands_outside: Vec::new(), seed: 1, shuffle: false, first_player: Some(1), chooser: None }
     }
 
     fn of_type<'a>(events: &'a [Value], kind: &str) -> Vec<&'a Value> {
@@ -764,6 +777,39 @@ mod tests {
         }
         assert_eq!(green_in_pool(&step), 1, "the Star's mana");
         assert!(!options_of(&step).iter().any(|o| o.kind == ActionKindView::UndoManaAbility), "no Undo");
+    }
+
+    /// A seat's sideboard is the cards it owns outside the game (CR 400.11a): its owner sees what is in it, the other seat
+    /// only how many, and neither sees the other's cards among the objects of the view.
+    #[test]
+    fn a_sideboard_is_shown_to_its_owner_alone() {
+        let mut dealt = deal(&[], "Island", 20);
+        dealt.seats[0].2 = vec!["Lightning Bolt".into(), "Counterspell".into()];
+        let mut session = Session::new(dealt).ok().unwrap();
+        let sideboard = |view: &PlayerView, owner: i32| {
+            view.zones.iter().find(|z| z.kind == Some(ZoneKindView::Sideboard) && z.owner == owner).cloned().unwrap()
+        };
+        let names = |view: &PlayerView, zone: &ZoneView| -> Vec<String> {
+            zone.contents.iter().map(|h| view.objects.iter().find(|o| o.handle == *h).unwrap().name.clone()).collect()
+        };
+        let mine = session.view(1).ok().unwrap();
+        let shown = sideboard(&mine, 1);
+        assert!(shown.contents_visible);
+        assert_eq!(names(&mine, &shown), ["Lightning Bolt", "Counterspell"]);
+        let theirs = session.view(2).ok().unwrap();
+        let hidden = sideboard(&theirs, 1);
+        assert_eq!(hidden.count, 2);
+        assert!(!hidden.contents_visible && hidden.contents.is_empty());
+        assert!(!theirs.objects.iter().any(|o| o.name == "Lightning Bolt" || o.name == "Counterspell"));
+        assert_eq!(sideboard(&theirs, 2).count, 0);
+    }
+
+    /// A sideboard naming a card the engine does not have is refused at the deal, as a deck naming one is.
+    #[test]
+    fn a_sideboard_card_the_engine_does_not_have_is_refused() {
+        let mut dealt = deal(&[], "Island", 20);
+        dealt.seats[1].2 = vec!["No Such Card".into()];
+        assert!(Session::new(dealt).is_err());
     }
 
     fn options_of(step: &Value) -> Vec<ActionOptionMessage> {

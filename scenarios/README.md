@@ -65,6 +65,7 @@ A key starting `Client.` is about what the page shows, not the game's state, and
 | `Client.Bot1.Mana` | the mana pool's chips as drawn, `2 Blue (land abilities); 1 Red`: how many of each kind, and the caption of mana a restriction limits (CR 106.6) |
 | `Client.Bot1.Facts`, `.OpponentFacts` | the facts beside a player's life total, as a set: `The next spell you cast this turn can't be countered` |
 | `Client.Bot1.Exile.Lit`, `.Caption`, `.Tooltip` (and `OpponentExile.`) | the Exile button over a player's piles: `true` when a card in it may be played, what it says, its tooltip |
+| `Client.Bot1.Sideboard.Caption`, `.Tooltip` (and `OpponentSideboard.Caption`) | the Sideboard button over a player's piles, into the cards they own outside the game: what it says (`Sideboard  2`) and its tooltip; nothing where there is no button, as on the opponent's rail, whose sideboard is hidden |
 | `Client.Bot1.Graveyard.Lit`, `.Note` | the graveyard pile: lit when a card in it can be cast, and the note its tooltip adds |
 | `Client.Bot1.Dock` | the dock's buttons in order |
 | `Client.Bot1.Menu` | the rows of the card menu the page last opened (a row is judged when the menu opens, not after the click) |
@@ -87,6 +88,23 @@ engine is wrong, and never kept outside `scenarios/`.
 
 Every known bug also has an entry in `docs/known-issues.md` - its severity, notes and the scenarios that show it -
 added with the marked scenario and deleted with the fix.
+
+## Outside the game: `[Bot1 Sideboard]` and `[Basic Lands Outside]`
+
+```
+[Bot1 Sideboard]       the cards Bot1 owns outside the game (CR 100.4, 400.11a), as a deck is written
+Lightning Bolt
+2 Counterspell
+
+[Basic Lands Outside]  a Limited game: every sideboard holds any number of these basic lands
+Island
+Mountain
+```
+
+A player's sideboard is what an effect that brings a card into the game from outside it chooses among (CR 400.11b: North
+Wind Avatar). Only its owner may look at it (`BotN.Sideboard` is the dump's, which sees everything). A card brought in is
+in the game until it ends; a basic land of `[Basic Lands Outside]` brought in leaves another of it outside, since a Limited
+sideboard holds any number (Magic Tournament Rules). A player with no section has nothing outside the game.
 
 ## A real start: `[Opening]`
 
@@ -369,6 +387,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Looked`, the cards the player has looked at, in the order they looked (a look at one card of a hand, Urza's Bauble),
   once they have looked at any and absent until then
 - `BotN.Hand`, `.Library`, `.Graveyard`, `.Battlefield`, `.Emblems` (CR 114, from the command zone), each with `.Count`
+- `BotN.Sideboard` (with `.Count`): the cards the player owns outside the game (CR 400.11a), in the order the sideboard lists
+  them - what `[BotN Sideboard]` and `[Basic Lands Outside]` gave them, less what has been brought into the game
 - `BotN.Hand.<Name>.Power` and `.Toughness`, and the same for `BotN.Graveyard.<Name>`, for a creature card there (CR 604.3: a characteristic-defining ability such as Sandman's works in every zone); a name held twice there is `Name#1`, `Name#2` in zone order
 - `BotN.Battlefield.<Name>.Doors` and `.ManaValue` for a Room (CR 709.5): the names of its unlocked doors, left first
   (empty when both are locked), and the mana value they leave it. The Room is named by its unlocked doors (`Unholy Annex`,

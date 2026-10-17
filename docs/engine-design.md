@@ -798,6 +798,28 @@ longer suspected"): no card in content says so.
 
 "You may look at the top card of your library any time" (CR 401.2) is `PlayRule::LookAtLibraryTop` (Bolas's Citadel, Mystic
 Forge, a solved Case of the Locked Hothouse): the host shows that card to its player (`Game::may_look_at_library_top`).
+### Cards outside the game
+
+Outside the game is not a zone (CR 400.11), but the cards a player owns outside it - in a match, their sideboard (CR 100.4,
+400.11a), whose owner is the player who started the game with it there (CR 108.3b) - are what "a card you own from outside
+the game" chooses among, so the state keeps them as objects in a per-player `ZoneKind::Sideboard` (`Zone::sideboard(p)`),
+dealt from `Setup::sideboards`. Nothing walks it but what brings a card in (CR 400.11c): `Query::outside_the_game(p)` lists
+it, and `Game::bring_into_hand` moves cards from it to their owners' hands (CR 400.11b), each a new object with a
+`ZoneChange` from the sideboard, in the game until it ends. Only its owner may look at it: it is a hidden zone, and the host
+shows its contents to that seat alone (a `ZoneKindView::Sideboard` zone per seat, the other seat told only the count). A
+Limited sideboard also holds any number of basic lands (Magic Tournament Rules, and North Wind Avatar's ruling):
+`Setup::basic_lands_outside` names the event's basics, each sideboard gets one of each, and one brought in is replaced
+there by another (`GameState::outside_supply`, fixed at the deal). The server sends each seat's sideboard with its deck, and
+the Limited events (`BoosterPod`, `DraftPod`) the five basics; a sideboard card the engine does not have is refused at the deal
+as a deck card is. `cantrip_mechanics::outside::may_put_card_into_hand` is North Wind Avatar's and Death Wish's "you may
+put a card you own from outside the game into your hand", asked as `Purpose::PutIntoHand` over the sideboard's cards, which
+the client captions as coming from outside the game. Not built, because no card in content needs them: a revealed fetch of
+a quality (Burning Wish, Living Wish, Karn, the Great Creator), learn (CR 701.48: a Lesson card from outside the game,
+revealed, `Subtype::Lesson`, which would bring it in with this same verb), casting from outside the game (Spawnsire of
+Ulamog), and a companion (CR 702.139), which would start in the sideboard and be put into the hand by a special action. The
+benchmark is unchanged within the noise (2026-10-16, alternating: 57.4 (an outlier), 12.06, 14.10 us before and 13.87,
+12.45, 11.12 us after).
+
 ### Keyword counters
 
 A keyword counter gives its permanent the keyword it is named for (CR 122.1b): flying, first strike, double strike,

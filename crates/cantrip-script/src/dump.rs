@@ -329,6 +329,8 @@ impl StateDump {
                 d.list(&format!("{b}.Crimes"), crimes, true);
             }
             d.list(&format!("{b}.Library"), names(s.zone(Zone::library(p))), true);
+            // The cards the player owns outside the game (CR 400.11a), in the order the sideboard lists them.
+            d.list(&format!("{b}.Sideboard"), names(s.zone(Zone::sideboard(p))), true);
             let mut graveyard = names(s.zone(Zone::graveyard(p)));
             graveyard.reverse();
             d.list(&format!("{b}.Graveyard"), graveyard, true);

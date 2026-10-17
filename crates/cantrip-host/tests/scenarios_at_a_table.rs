@@ -241,7 +241,7 @@ fn every_scenario_passes_at_a_table_with_bot1_driven() {
         let text = std::fs::read_to_string(&path).unwrap();
         let name = path.file_stem().unwrap().to_string_lossy().to_string();
         let Ok(script) = GameScript::parse(&text, &name) else { continue };
-        if known_bug(&text).is_some() || (0..script.decks.len()).flat_map(|i| script.decklist(i)).any(|c| cantrip_engine::card(&c).is_none()) {
+        if known_bug(&text).is_some() || script.cards().into_iter().any(|c| cantrip_engine::card(&c).is_none()) {
             continue;
         }
         if run(&script).is_err() {
