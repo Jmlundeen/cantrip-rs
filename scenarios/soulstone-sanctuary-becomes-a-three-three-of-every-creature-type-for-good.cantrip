@@ -45,4 +45,5 @@ Bot1.Battlefield.Soulstone Sanctuary.Subtypes = (every creature type)
 Bot1.Battlefield.Soulstone Sanctuary.Keywords = Vigilance
 Bot1.Battlefield.Soulstone Sanctuary.Power = 3
 Bot1.Battlefield.Soulstone Sanctuary.Toughness = 3
+Bot1.Battlefield.Soulstone Sanctuary.Colors = (absent)
 Bot1.Battlefield.Soulstone Sanctuary.Tapped = False

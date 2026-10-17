@@ -23,6 +23,7 @@ Bot2.Pass
 ? Bot1.Battlefield.Mutavault.Subtypes = (every creature type)
 ? Bot1.Battlefield.Mutavault.Power = 2
 ? Bot1.Battlefield.Mutavault.Toughness = 2
+? Bot1.Battlefield.Mutavault.Keywords = (absent)
 Bot1.Attack(Mutavault > Bot2)
 [T3 Bot1.Main2]
 ? Bot2.Life = 18
@@ -33,3 +34,4 @@ Bot1.Attack(Mutavault > Bot2)
 Turn = 4
 Bot2.Life = 18
 Bot1.Battlefield.Mutavault.Types = Land
+Bot1.Battlefield.Mutavault.Subtypes = (absent)
