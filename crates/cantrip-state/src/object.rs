@@ -493,6 +493,10 @@ pub enum EffectKind {
     /// types (CR 205.3d), so it gives them to an object that is one by its timestamp. It is not Changeling: the object
     /// gains no ability (the Mutavault ruling).
     AddAllCreatureTypes,
+    /// It loses all creature types (CR 205.3m, 613.1d), layer 4, at its timestamp: its other subtypes and its card types stay,
+    /// and a creature type an effect gives it later is had (the Nameless Inversion rulings). Changeling's types are taken
+    /// too, the ability having applied first (CR 613.3); the ability itself stays.
+    LoseAllCreatureTypes,
     /// Its power and toughness are switched (CR 613.4d), layer 7d: applied after every setting and modifying effect and
     /// the counters.
     SwitchPt,

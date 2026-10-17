@@ -633,6 +633,9 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
             // CR 205.1b: added types are added; a land that becomes a creature is still a land.
             (Layer::Type, EffectKind::AddTypes(types)) => chars.types = TypeSet(chars.types.0 | types.0),
             (Layer::Type, EffectKind::AddSubtype(s)) => chars.subtypes = chars.subtypes.with(s),
+            (Layer::Type, EffectKind::LoseAllCreatureTypes) => {
+                chars.subtypes = chars.subtypes.iter().filter(|t| !t.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with);
+            }
             // CR 205.3d: creature types belong to creatures and Kindreds.
             (Layer::Type, EffectKind::AddAllCreatureTypes) => {
                 if chars.is(CardType::Creature) || chars.is(CardType::Kindred) {
