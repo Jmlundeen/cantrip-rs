@@ -1,0 +1,49 @@
+# Browser
+# What the client shows of Braided Net (CR 122.1, 602.5, 611.2b): the Net's net counters as a pill, three as it enters and
+# two once its ability has been activated, and on the netted Vampire Hexmage's face the line saying its activated
+# abilities can't be activated for as long as it remains tapped.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Braided Net
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Vampire Hexmage
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Braided Net.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Client.Bot1.Battlefield.Braided Net.Counters = 3 × net
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Vampire Hexmage.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Braided Net.Activate(Ability: Tap another; Bot2.Battlefield.Vampire Hexmage)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Client.Bot1.Battlefield.Braided Net.Counters = 2 × net
+? Client.Bot1.OpponentBattlefield.Vampire Hexmage.Rules = First strike / Sacrifice this creature: Remove all counters from target permanent. / Its activated abilities can't be activated for as long as it remains tapped.
+
+[Expect]
+Turn = 3
+Bot2.Battlefield.Vampire Hexmage.Tapped = true
+Bot1.Battlefield.Braided Net.Counters.Net = 2

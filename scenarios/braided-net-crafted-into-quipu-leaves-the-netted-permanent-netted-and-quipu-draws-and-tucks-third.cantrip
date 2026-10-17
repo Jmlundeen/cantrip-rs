@@ -1,0 +1,79 @@
+# The Net's effect is a resolved one (CR 611.2): once Braided Net has netted Bot2's Vampire Hexmage, Bot1 crafts the Net
+# with Mox Jet (CR 702.167a) into Braided Quipu, and the Hexmage still can't activate its ability while it stays tapped.
+# Bot2's untap step ends that, and Bot2 sacrifices it then (the positive control). On turn 5 Braided Quipu's ability
+# draws a card for each artifact Bot1 controls - the Quipu and Mox Sapphire, two: Opt and Ponder - and then puts the
+# Quipu into its owner's library third from the top, where it is Braided Net again (CR 401.1, 712.8a).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Braided Net
+Island
+Island
+Island
+Swamp
+Swamp
+Opt
+Ponder
+Brainstorm
+Consider
+Island x7
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Vampire Hexmage
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Braided Net.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Vampire Hexmage.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Braided Net.Activate(Ability: Tap another; Bot2.Battlefield.Vampire Hexmage)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Braided Net.Activate(Ability: Craft)
+Bot1.Choose(Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Braided Quipu.Tapped = false
+? Bot2.Battlefield.Vampire Hexmage.Tapped = true
+Bot1.Pass
+! Bot2.Battlefield.Vampire Hexmage.Activate
+[T4 Bot2.Main1]
+Bot2.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Braided Quipu)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Braided Quipu.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Island; Mox Sapphire
+Exile = Mox Jet
+Bot1.Hand = Island; Swamp; Swamp; Opt; Ponder
+Bot1.Library = Brainstorm; Consider; Braided Net; Island; Island; Island; Island; Island; Island; Island
+Bot2.Graveyard = Vampire Hexmage

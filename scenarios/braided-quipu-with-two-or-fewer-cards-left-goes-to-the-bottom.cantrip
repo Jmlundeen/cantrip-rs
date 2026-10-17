@@ -1,0 +1,52 @@
+# Braided Net is crafted on turn 1 with the Black Lotus that paid for it, an artifact card from the graveyard (CR 702.167a).
+# On turn 3 Braided Quipu draws three cards, for itself and the two Moxen, which leaves one card in Bot1's library: "third
+# from the top" of a library of fewer than two cards is its bottom (the ruling), under the last card, Opt.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Braided Net
+Island
+Island
+Island
+Ponder
+Brainstorm
+Consider
+Opt
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Braided Net.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Braided Net.Activate(Ability: Craft)
+Bot1.Choose(Graveyard.Black Lotus)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Braided Quipu.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Library = Opt; Braided Net
+Bot1.Hand = Island; Island; Ponder; Brainstorm; Consider
+Exile = Black Lotus
