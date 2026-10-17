@@ -300,9 +300,10 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             m.has_x = cost.x > 0;
             // Paid in life rather than its mana cost (CR 118.9, 119.4: Inside Information, Bolas's Citadel): the life is the
             // cost the row shows and the seats weigh, and no mana cost, which is not paid; an X in it is 0 (CR 107.3).
-            if let Some(life) = life_for_cast(game, game.cards, game.state.obj(src).controller, src, o.index) {
+            let asked = game.pending().map_or(game.state.turn.priority, |r| r.player);
+            if let Some(life) = life_for_cast(game, game.cards, asked, src, o.index) {
                 m.life_cost = i32::from(life);
-                m.cost_text = format!("Pay {life} life");
+                m.cost_text = format!("for {life} life");
                 m.has_x = false;
             }
             // A cost that depends on the target it is cast with (CR 601.2c, 601.2f): the row says what the cast costs with

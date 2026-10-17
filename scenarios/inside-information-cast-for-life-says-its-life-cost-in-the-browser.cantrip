@@ -1,0 +1,34 @@
+# Browser
+# As a person sees it: a spell Inside Information lets Bot1 cast is paid for in life, so the card's menu rows say the life
+# each way costs and no mana cost (CR 118.9, 119.4): Bonecrusher Giant itself for 3 life, its Adventure Stomp for 2. Bot1
+# casts Stomp at Bot2 for 2 life with no mana left; Bot2 takes 2, and the card goes into exile on its Adventure (CR 715.4).
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Inside Information
+Plains x14
+
+[Bot2 Deck]
+Island x7
+Bonecrusher Giant
+Island x9
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Inside Information.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot1.Exile.Bonecrusher Giant.Cast(Bot2; Ability: Stomp)
+? Client.Bot1.Menu = Cast Stomp for 2 life...; Cast Bonecrusher Giant — Cast by paying 3 life instead
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Exile = Bonecrusher Giant
