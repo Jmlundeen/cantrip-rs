@@ -1,0 +1,42 @@
+# Stir Up Trouble, "sacrifice an artifact or creature or pay {4}", first way: Bot1 has just a Swamp, so the spell costs {B}
+# and the Llanowar Elves is sacrificed (the Island in hand is untouched). "Destroy target creature": Bot2 has a Mox Emerald (an
+# artifact, not a creature) beside its Guerrilla Gorilla, and the cast aimed at the Mox is refused (the positive control is
+# the cast at the Gorilla on the next line). Only the Gorilla is destroyed.
+
+[Bot1 Deck]
+Forest
+Swamp
+Llanowar Elves
+Stir Up Trouble
+Island x12
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Stir Up Trouble.Cast(Bot2.Battlefield.Mox Emerald)
+Bot1.Hand.Stir Up Trouble.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Modes(Sacrifice an artifact or creature)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Swamp
+Bot1.Graveyard = Stir Up Trouble; Llanowar Elves
+Bot2.Battlefield = Mox Emerald; Forest
+Bot2.Graveyard = Guerrilla Gorilla
