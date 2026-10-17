@@ -912,6 +912,13 @@ impl<'a> Projector<'a> {
         if grant.exile_after {
             text.push_str(", then exiled");
         }
+        // What the permission adds to playing it: a spell's extra cost (CR 601.2f), a land's entering tapped (CR 614.1c).
+        if grant.more > 0 {
+            text.push_str(&format!(", a spell costs {{{}}} more", grant.more));
+        }
+        if grant.lands && grant.enters_tapped {
+            text.push_str(", a land enters tapped");
+        }
         text
     }
 

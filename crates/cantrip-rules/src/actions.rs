@@ -1993,14 +1993,34 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     }
     // A land a card lets this player play from where it is (CR 305.1): "you may play that card".
     for p in &cx.s().permissions {
-        if p.player == player
-            && p.grant.lands
-            && !cx.s().obj(p.card).zone.is(ZoneKind::Hand)
-            && !(from_graveyard && cx.s().obj(p.card).zone == Zone::graveyard(player))
-        {
+        if p.player == player && p.grant.lands && played_by_permission_from(cx, p.card, player, from_graveyard, from_top) {
             offer(p.card, options);
         }
     }
+}
+
+/// Whether a land play of `card` by `player` from where it is now would be by a permission (CR 305.1): not from the hand,
+/// and not from a graveyard or the top of a library that a rule lets the player play lands from (`LandRules`), which is the
+/// way it is played from there.
+fn played_by_permission_from(cx: &Cx, card: ObjectId, player: PlayerId, from_graveyard: bool, from_top: bool) -> bool {
+    let zone = cx.s().obj(card).zone;
+    !zone.is(ZoneKind::Hand)
+        && !(from_graveyard && zone == Zone::graveyard(player))
+        && !(from_top && cx.s().zone(Zone::library(player)).first() == Some(&card))
+}
+
+/// The permission a land play of `card` by `player` is made by (CR 305.1), if it is one (`played_by_permission_from`): what
+/// the permission says of a land played this way applies to it (`PlayGrant::enters_tapped`). Of several that would let it be
+/// played, it is played by one that lets it enter untapped if there is one, as one permission is taken when several would
+/// let a card be cast (`permission_for`): the land play offered is one, and entering tapped is all a permission can add to it.
+pub fn land_play_permission(cx: &Cx, card: ObjectId, player: PlayerId) -> Option<PlayPermission> {
+    let LandRules { graveyard, top_lands, .. } = land_rules(cx, player);
+    if !played_by_permission_from(cx, card, player, graveyard, top_lands) {
+        return None;
+    }
+    let mut by = cx.s().permissions.iter().filter(|p| p.card == card && p.player == player && p.grant.lands);
+    let first = by.clone().next().copied();
+    by.find(|p| !p.grant.enters_tapped).copied().or(first)
 }
 
 /// The spells `player` could begin to cast: from hand by its mana cost or an alternative cost, from a graveyard by a

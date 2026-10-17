@@ -731,6 +731,10 @@ pub struct PlayGrant {
     pub when: Option<PlayCondition>,
     /// It is cast only at sorcery speed, whatever it is (CR 702.170d): plot's "cast it as a sorcery".
     pub sorcery_speed: bool,
+    /// "Each land played this way enters tapped" (CR 305.1, 614.1c): a replacement effect on the land's entering, made by
+    /// the effect that gave the permission and ordered with the others that would change the same entry (CR 616.1).
+    /// Lightstall Inquisitor.
+    pub enters_tapped: bool,
 }
 
 /// A condition on a standing permission to play a card, worked out whenever the permission is asked.
@@ -742,7 +746,7 @@ pub enum PlayCondition {
 
 impl PlayGrant {
     /// "You may cast it": for as long as it stays where it is, for its mana cost.
-    pub const CAST: PlayGrant = PlayGrant { instead: None, lands: false, expiry: Expiry::Never, any_type: false, more: 0, later_turns: false, exile_after: false, when: None, sorcery_speed: false };
+    pub const CAST: PlayGrant = PlayGrant { instead: None, lands: false, expiry: Expiry::Never, any_type: false, more: 0, later_turns: false, exile_after: false, when: None, sorcery_speed: false, enters_tapped: false };
 }
 
 /// A standing permission to play or cast one card from a zone it could not be played from (CR 601.3, 305.1): "until

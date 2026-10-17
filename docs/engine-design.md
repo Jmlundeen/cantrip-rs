@@ -453,6 +453,13 @@ damage`), which the host words into the prompt's `Event` ("3 damage from Lightni
 the redirection (`cantrip_mechanics::replacements::DAMAGE_TO_YOU_AND_YOUR_OTHER_PERMANENTS_IS_DEALT_TO_THIS`, which Palisade
 Giant prints too).
 
+A permission to play a card may say what becomes of a land played by it (CR 305.1, 614.1c: Lightstall Inquisitor's "each land
+played this way enters tapped", `PlayGrant::enters_tapped`). That is a replacement effect of the permission, the core's own
+(`replace::Origin::PlayedTapped`), ordered with the others that would change the same entry by the land's controller (CR
+616.1): Archon of Emeria's "nonbasic lands your opponents control enter tapped" is a second, and once either has applied the
+other has nothing left to change (CR 616.1f). Which permission a land play is made by is `actions::land_play_permission`: none
+from the hand, or from a graveyard or a library's top a rule lets lands be played from, the same test the offer makes.
+
 The cleanup step removes all marked damage (CR 514.2) except from a permanent a static ability keeps it on:
 `CardDef::damage_stays` (`DamageStaysRule`, asked of each damaged permanent by the permanents on the battlefield with their
 abilities, only in a cleanup step with damage marked). Ancient Adamantoise's "damage isn't removed from this creature during

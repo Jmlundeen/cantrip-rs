@@ -33,6 +33,9 @@ enum Origin {
     /// A prevention effect a spell or ability made (CR 611.2, 615, `EffectKind::Prevention`), named by that effect's
     /// timestamp: one of its source card's `granted_preventions`.
     GrantedPrevention(u32),
+    /// "Each land played this way enters tapped" (CR 305.1, 614.1c, `PlayGrant::enters_tapped`): the replacement the effect
+    /// that gave a permission to play the land made, of the land played by it.
+    PlayedTapped,
 }
 
 /// One effect that applies to the event: its source, and which of the source's replacements it is.
@@ -51,6 +54,20 @@ const MADNESS_HINT: &str = "madness discards it into exile, then it may be cast 
 
 /// What protection's prevention says it does, for the player who orders it with others (CR 616.1).
 const PROTECTION_HINT: &str = "protection prevents the damage";
+
+/// What a permission's "enters tapped" says it does, for the player who orders it with others (CR 616.1).
+const PLAYED_TAPPED_HINT: &str = "a land played this way enters tapped";
+
+/// "Each land played this way enters tapped" (CR 305.1, 614.1c): a land played by a permission that says so
+/// (`actions::land_play_permission`), entering untapped as the proposal stands. Judged before the land moves, while it is
+/// still where it was played from and the permission is there to read.
+fn played_tapped_applies(cx: &Cx, z: &ZoneChange) -> bool {
+    z.reason == ZoneReason::PlayLand
+        && z.to.is(ZoneKind::Battlefield)
+        && !z.tapped
+        && cx.s().permissions.iter().any(|p| p.card == z.object && p.grant.enters_tapped)
+        && crate::actions::land_play_permission(cx, z.object, z.controller).is_some_and(|p| p.grant.enters_tapped)
+}
 
 /// Madness (CR 702.35a): "If a player would discard this card, that player discards it, but exiles it instead of putting
 /// it into their graveyard." A static ability of the card itself, functioning while it is in a hand; once another
@@ -233,6 +250,14 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     {
         found.insert(0, Candidate { source: z.object, index: 0, origin: Origin::Madness });
     }
+    // A permission's "each land played this way enters tapped" (CR 614.1c), ordered with the rest (CR 616.1): it is of the
+    // land itself, which is what the player ordering them is shown.
+    if let Proposal::ZoneChange(z) = proposal
+        && !applied.contains(&(z.object, 0, Origin::PlayedTapped))
+        && played_tapped_applies(cx, z)
+    {
+        found.push(Candidate { source: z.object, index: 0, origin: Origin::PlayedTapped });
+    }
     // Protection of whoever the damage would now be dealt to (CR 702.16e), ordered with the effects that would change it
     // (CR 616.1): prevented first, nothing is redirected; redirected first, it is judged again at its new recipient. It is
     // offered first, as the order the protected player almost always wants. Only asked about where some other effect
@@ -260,6 +285,7 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
             Some(EffectKind::Prevention { card, index, .. }) => cx.cards().get(card).granted_preventions[index as usize].hint,
             _ => "",
         },
+        Origin::PlayedTapped => PLAYED_TAPPED_HINT,
     }
 }
 
@@ -336,6 +362,12 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 if let Proposal::ZoneChange(z) = proposal {
                     z.to = Zone::exile(z.to.player);
                     z.madness = true;
+                }
+            }
+            // CR 614.1c: it enters tapped.
+            Origin::PlayedTapped => {
+                if let Proposal::ZoneChange(z) = proposal {
+                    z.tapped = true;
                 }
             }
             // CR 702.16e, 615.1: the damage is prevented, all of it.
@@ -422,7 +454,7 @@ fn prevent(cx: &mut Cx, d: &mut DamageEvent, amount: u16, by: ObjectId) {
 
 /// An object about to change zones (CR 614.1a, 614.1c): what remains of the move once every effect has applied.
 pub fn zone_change(cx: &mut Cx, change: ZoneChange) -> ZoneChange {
-    if !possible(cx, Some(change.object)) && !madness_applies(cx, &change) {
+    if !possible(cx, Some(change.object)) && !madness_applies(cx, &change) && !played_tapped_applies(cx, &change) {
         return change;
     }
     let mut proposal = Proposal::ZoneChange(change);
