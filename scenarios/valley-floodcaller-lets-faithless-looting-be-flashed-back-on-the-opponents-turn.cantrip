@@ -1,0 +1,41 @@
+# Valley Floodcaller's ruling: the permission "applies to noncreature cards in any zone, provided something is allowing you
+# to cast them. For example, you could cast a sorcery with flashback as though it had flash." Bot1 casts Faithless Looting
+# from its hand in its own turn 1, then in Bot2's turn 2 casts it again from the graveyard for its flashback cost {2}{R}
+# (CR 702.34a), and it is exiled as it resolves.
+
+[Bot1 Deck]
+Black Lotus
+Valley Floodcaller
+Mox Ruby
+Faithless Looting
+Mox Jet
+Mox Emerald
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Island)
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Choose(Island; Island)
+
+[Expect]
+Turn = 2
+Exile = Faithless Looting
+Bot1.Graveyard = Island; Island; Island; Island; Black Lotus
+Bot1.Hand.Count = 0

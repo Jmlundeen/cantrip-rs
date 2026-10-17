@@ -1,0 +1,43 @@
+# Valley Floodcaller: "You may cast noncreature spells as though they had flash" (CR 307.5, 702.8). Twinmaw Stormbrood is
+# a creature card, but cast as its Omen it is only Charring Bite, a sorcery (CR 720.3a: only the Omen's characteristics
+# are judged), so in Bot2's second main phase Bot1 casts it on Bot2's Llanowar Elves, and the card is shuffled into Bot1's
+# library as it resolves (CR 720.3d).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Valley Floodcaller
+Mox Ruby
+Mox Emerald
+Twinmaw Stormbrood
+Island x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Twinmaw Stormbrood.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Omen)
+
+[Expect]
+Turn = 2
+Bot2.Graveyard = Llanowar Elves
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 16

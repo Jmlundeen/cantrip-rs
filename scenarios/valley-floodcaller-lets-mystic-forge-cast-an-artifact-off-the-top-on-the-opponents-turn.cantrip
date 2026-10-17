@@ -1,0 +1,46 @@
+# Valley Floodcaller with Mystic Forge ("You may cast artifact spells and colorless spells from the top of your library"):
+# a card cast from the top of the library is a noncreature spell cast as though it had flash too (CR 307.5, 601.3). In
+# Bot1's turn 1 the top Ornithopter, an artifact creature, is cast at sorcery timing - the positive control - and in
+# Bot2's turn 2 the next one is refused: a creature. Bot1 draws it in turn 3, and in Bot2's turn 4 casts Mox Pearl, a
+# noncreature artifact, off the top.
+
+[Bot1 Deck]
+Black Lotus
+Valley Floodcaller
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mystic Forge
+Ornithopter
+Ornithopter
+Mox Pearl
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Library.Ornithopter.Cast
+[T2 Bot2.Main1]
+! Bot1.Library.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot1.Library.Mox Pearl.Cast
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Mystic Forge; Ornithopter; Valley Floodcaller
+Bot1.Hand = Ornithopter
+Bot1.Battlefield.Mox Pearl.Tapped = false

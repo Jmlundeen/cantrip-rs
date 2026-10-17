@@ -1,0 +1,57 @@
+# Valley Floodcaller: "You may cast noncreature spells as though they had flash" (CR 307.5, 702.8). In Bot2's turn 2 Bot1
+# casts Unholy Annex // Ritual Chamber as its left door, Unholy Annex: the spell is that door alone (CR 709.3a), an
+# enchantment. The ruling: the permission "has no effect on abilities that you can activate 'any time you could cast a
+# sorcery'", nor on the unlock of a door, a special action at sorcery timing (CR 709.5e): in Bot2's turn 4, with the
+# {3}{B}{B} for Ritual Chamber untapped, the unlock is refused, and in Bot1's own turn 5 it is taken - the positive
+# control - and makes the 6/6 Demon. Unholy Annex's end-step trigger in turn 3, with no Demon yet, costs Bot1 2 life.
+
+[Bot1 Deck]
+Black Lotus
+Valley Floodcaller
+Swamp
+Mox Jet
+Mox Ruby
+Mox Emerald
+Unholy Annex // Ritual Chamber
+Swamp
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+? Stack = Valley Floodcaller; Unholy Annex
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Unholy Annex.Doors = Unholy Annex
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+! Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex; Ritual Chamber
+Bot1.Battlefield.Demon.Power = 6
+Bot1.Life = 18

@@ -1,0 +1,49 @@
+# Valley Floodcaller: "You may cast noncreature spells as though they had flash" (CR 307.5, 702.8). Embereth
+# Shieldbreaker is a creature card, but cast as its Adventure it is only Battle Display, a sorcery (CR 715.3a: only the
+# Adventure's characteristics are judged), so in Bot2's second main phase Bot1 casts Battle Display on Bot2's
+# Ornithopter. Just before, the card cast as the creature is refused (`Ability: #1`, the cast for its mana cost) with
+# the mana for it at hand; after Battle Display resolves, the creature on its adventure is refused from exile too, and is
+# cast from there in Bot1's own main phase (CR 715.4), the positive control at sorcery timing.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Valley Floodcaller
+Mox Ruby
+Mox Emerald
+Embereth Shieldbreaker
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+[T2 Bot2.Main2]
+! Bot1.Hand.Embereth Shieldbreaker.Cast(Ability: #1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast(Bot2.Battlefield.Ornithopter; Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Exile.Embereth Shieldbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Embereth Shieldbreaker.Cast
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Embereth Shieldbreaker.Power = 2
+Exile.Count = 0

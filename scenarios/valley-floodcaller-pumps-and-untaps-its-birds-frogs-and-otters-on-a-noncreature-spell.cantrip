@@ -1,0 +1,69 @@
+# Valley Floodcaller: "Whenever you cast a noncreature spell, Birds, Frogs, Otters, and Rats you control get +1/+1 until
+# end of turn. Untap them." On turn 5 Bot1 attacks with Floodcaller (an Otter), Psychic Frog and Ornithopter (a Thopter),
+# then in the second main phase taps Birds of Paradise for the blue that casts Ancestral Recall. The trigger resolves
+# first (CR 603.3): the Otter, the Frog and the Bird get +1/+1 and untap - the Bird that paid for the spell among them -
+# while Ornithopter, of none of those types, stays tapped and 0/2, and Bot2's own Birds of Paradise is not pumped ("you
+# control"). On turn 3 the creature spell Ornithopter triggers nothing: only its own spell is on the stack.
+
+[Bot1 Deck]
+Black Lotus
+Valley Floodcaller
+Mox Emerald
+Birds of Paradise
+Mox Sapphire
+Mox Jet
+Psychic Frog
+Ornithopter
+Ancestral Recall
+Island x15
+
+[Bot2 Deck]
+Forest
+Birds of Paradise
+Forest x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Psychic Frog.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+[T5 Bot1.Main1]
+Bot1.Attack(Valley Floodcaller; Psychic Frog; Ornithopter)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Valley Floodcaller.Tapped = true
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Blue)
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+? Stack = Valley Floodcaller; Ancestral Recall
+Bot1.Pass
+Bot2.Pass
+? Stack = Ancestral Recall
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Valley Floodcaller.Power = 3
+Bot1.Battlefield.Valley Floodcaller.Toughness = 3
+Bot1.Battlefield.Valley Floodcaller.Tapped = false
+Bot1.Battlefield.Psychic Frog.Power = 2
+Bot1.Battlefield.Psychic Frog.Tapped = false
+Bot1.Battlefield.Birds of Paradise.Power = 1
+Bot1.Battlefield.Birds of Paradise.Toughness = 2
+Bot1.Battlefield.Birds of Paradise.Tapped = false
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Birds of Paradise.Power = 0
+Bot2.Life = 17

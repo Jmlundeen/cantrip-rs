@@ -1,0 +1,50 @@
+# Valley Floodcaller: "You may cast noncreature spells as though they had flash" (CR 307.5, 702.8). In Bot2's turn 2 Bot1
+# casts Life, the sorcery half of Life // Death (CR 709.3: the half alone is the spell), and its Island becomes a 1/1
+# creature until end of turn. The permission is its controller's alone: in Bot1's turn 3 Bot2, holding a Life // Death of
+# its own and an untapped Forest, may not cast Life, and in its own main phase in turn 4 it does - the positive control at
+# sorcery timing.
+
+[Bot1 Deck]
+Black Lotus
+Valley Floodcaller
+Island
+Mox Emerald
+Life // Death
+Island x15
+
+[Bot2 Deck]
+Forest
+Life // Death
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Valley Floodcaller.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+[T2 Bot2.Main2]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Life // Death.Cast(Ability: Life)
+? Stack = Valley Floodcaller; Life
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Island.Types = Land; Creature
+? Bot1.Battlefield.Island.Power = 1
+[T3 Bot1.Main1]
+! Bot2.Hand.Life // Death.Cast(Ability: Life)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Life // Death.Cast(Ability: Life)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Forest.Types = Land; Creature
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Life // Death; Black Lotus
+Bot2.Graveyard = Life // Death
+Bot1.Battlefield.Island.Types = Land
