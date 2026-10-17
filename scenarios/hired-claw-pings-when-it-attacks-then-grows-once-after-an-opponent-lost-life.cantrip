@@ -1,0 +1,44 @@
+# Hired Claw is a Lizard: attacking with it triggers "1 damage to target opponent" (20 -> 19). Its {1}{R} ability needs "an
+# opponent lost life this turn" and works once each turn: on turn 3 before the attack no opponent has lost life, so it is
+# refused (positive control: after the trigger resolves it is allowed); a second activation the same turn is refused. The
+# +1/+1 counter makes it a 2/3, so combat damage is 2: 19 - 2 = 17.
+
+[Bot1 Deck]
+Mountain
+Hired Claw
+Mox Ruby
+Mox Jet
+Mountain
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Hired Claw.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Battlefield.Hired Claw.Activate(Ability: {1}{R})
+Bot1.Attack(Hired Claw > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hired Claw.Activate(Ability: {1}{R})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hired Claw.Power = 2
+! Bot1.Battlefield.Hired Claw.Activate(Ability: {1}{R})
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Hired Claw.Power = 2
+Bot1.Battlefield.Hired Claw.Toughness = 3

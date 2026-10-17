@@ -1,0 +1,31 @@
+# "Attack with one or more Lizards": Elvish Mystic, an Elf Druid, attacks alone and Hired Claw stays home, so nothing
+# triggers: Bot2 takes only the Mystic's 1 combat damage (19). (The positive control, where a Lizard attacks, is the
+# neighbouring scenario.)
+
+[Bot1 Deck]
+Mountain
+Hired Claw
+Mox Emerald
+Elvish Mystic
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Hired Claw.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Elvish Mystic > Bot2)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 19

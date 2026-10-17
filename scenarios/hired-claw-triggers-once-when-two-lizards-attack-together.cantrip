@@ -1,0 +1,33 @@
+# Hired Claw and Magebane Lizard (1/4, a Lizard) attack together: the Lizards declared in one attack are one batch (CR
+# 603.2c), so Hired Claw triggers once - 1 damage - and Bot2 takes 1 + 1 + 1 combat damage: 20 - 3 = 17 (Magebane Lizard's
+# own trigger is about noncreature spells and does nothing here).
+
+[Bot1 Deck]
+Mountain
+Hired Claw
+Mox Ruby
+Mox Jet
+Magebane Lizard
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Hired Claw.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Magebane Lizard.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Hired Claw > Bot2; Magebane Lizard > Bot2)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 17

@@ -1,0 +1,8 @@
+{
+  "name": "Hired Claw",
+  "manaCost": "{R}",
+  "type": "Creature — Lizard Mercenary",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "Whenever you attack with one or more Lizards, this creature deals 1 damage to target opponent.\n{1}{R}: Put a +1/+1 counter on this creature. Activate only if an opponent lost life this turn and only once each turn."
+}

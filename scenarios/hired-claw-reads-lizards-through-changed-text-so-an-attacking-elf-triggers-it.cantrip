@@ -1,0 +1,39 @@
+# Artificial Evolution replaces the creature type Lizard with Elf in Hired Claw's text for good (CR 612.1): "Whenever you
+# attack with one or more Elves" - the word is read through the Claw's own words. Elvish Mystic, an Elf, attacks alone
+# on turn 3 and triggers it (20 - 1 - 1 = 18); without the change it would not (the neighbouring scenario).
+
+[Bot1 Deck]
+Mountain
+Hired Claw
+Mox Emerald
+Mox Sapphire
+Elvish Mystic
+Artificial Evolution
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Hired Claw.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Hired Claw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Lizard)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Attack(Elvish Mystic > Bot2)
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Hired Claw.Subtypes = Elf; Mercenary
