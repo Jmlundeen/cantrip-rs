@@ -1,0 +1,49 @@
+# Faebloom Trick creates two 1/1 blue Faerie tokens with flying, and when it does taps target creature an opponent controls:
+# Bot1 casts it on turn 3 with Bot2's Llanowar Elves (cast on turn 2, so untapped) on the battlefield, and targets the Elves.
+# With one legal target the engine chooses it without asking. The two Faeries are blue 1/1 tokens with flying and are not tapped; the Elves are tapped; the Trick is in the graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Faebloom Trick
+Island x3
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Faebloom Trick.Cast
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Pearl; Faerie; Faerie
+Bot1.Battlefield.Faerie#1.Token = true
+Bot1.Battlefield.Faerie#1.Colors = Blue
+Bot1.Battlefield.Faerie#1.Subtypes = Faerie
+Bot1.Battlefield.Faerie#1.Keywords = Flying
+Bot1.Battlefield.Faerie#1.Power = 1
+Bot1.Battlefield.Faerie#1.Toughness = 1
+Bot1.Battlefield.Faerie#1.Tapped = false
+Bot1.Battlefield.Faerie#2.Tapped = false
+Bot1.Battlefield.Faerie#2.Token = true
+Bot1.Battlefield.Faerie#2.Colors = Blue
+Bot1.Battlefield.Faerie#2.Keywords = Flying
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Graveyard = Faebloom Trick
+Stack.Count = 0

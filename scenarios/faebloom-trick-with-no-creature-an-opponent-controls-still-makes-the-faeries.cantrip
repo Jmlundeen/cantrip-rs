@@ -1,0 +1,40 @@
+# Faebloom Trick when an opponent controls no creature: the two Faeries are still created, and the reflexive ability has no
+# legal target (Bot1's own Faeries are not creatures "an opponent controls"), so it is never put on the stack (a bare
+# ! Bot1.Target would fail if a target were asked) and nothing is tapped: Bot1's Faeries stay untapped. Bot2 controls a
+# Mox (an artifact, not a creature), which stays untapped.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Faebloom Trick
+Island x3
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Swamp x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Faebloom Trick.Cast
+! Bot1.Target
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Pearl; Faerie; Faerie
+Bot1.Battlefield.Faerie#1.Tapped = false
+Bot1.Battlefield.Faerie#2.Tapped = false
+Bot2.Battlefield = Mox Jet
+Bot2.Battlefield.Mox Jet.Tapped = false
+Bot1.Graveyard = Faebloom Trick
+Stack.Count = 0

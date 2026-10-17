@@ -1,0 +1,6 @@
+{
+  "name": "Faebloom Trick",
+  "manaCost": "{2}{U}",
+  "type": "Instant",
+  "oracleText": "Create two 1/1 blue Faerie creature tokens with flying. When you do, tap target creature an opponent controls."
+}
