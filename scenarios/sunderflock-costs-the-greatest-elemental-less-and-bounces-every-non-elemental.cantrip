@@ -1,0 +1,72 @@
+# "This spell costs {X} less to cast, where X is the greatest mana value among Elementals you control": on turn 5 Bot1 controls Sandman (a Sand Elemental, mana value 3) and Bramble
+# Familiar (an Elemental Raccoon, mana value 2): the greatest is 3, not their sum 5, so Sunderflock ({7}{U}{U}) costs {4}{U}{U} - six mana, and Bot1 has exactly six
+# (three lands and three Moxen), leaving nothing in the pool. "When this creature enters, if you cast it, return all non-Elemental creatures to their owners' hands":
+# Bot2's Guerrilla Gorilla (not an Elemental) goes back to Bot2's hand, while Bot2's own Bramble Familiar, Bot1's Sandman and Familiar, and Sunderflock itself (all Elementals)
+# stay. Bot1's own Elementals are what make it cheap, so the ability never touches them.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Sandman, Shifting Scoundrel
+Bramble Familiar
+Island
+Island
+Sunderflock
+Island x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Bramble Familiar
+Guerrilla Gorilla
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sandman, Shifting Scoundrel.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Bramble Familiar.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Bramble Familiar.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sunderflock.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Island; Island; Mox Emerald; Mox Sapphire; Mox Jet; Sandman, Shifting Scoundrel; Bramble Familiar; Sunderflock
+Bot2.Battlefield = Forest; Mox Emerald; Mox Jet; Mox Ruby; Bramble Familiar
+Bot2.Hand = Guerrilla Gorilla; Forest; Forest; Forest
+Bot2.Hand.Count = 4

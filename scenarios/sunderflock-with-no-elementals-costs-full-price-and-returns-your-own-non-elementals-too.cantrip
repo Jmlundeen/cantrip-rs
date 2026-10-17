@@ -1,0 +1,61 @@
+# With no Elemental under Bot1's control, X is 0 and Sunderflock costs its full {7}{U}{U}: nine mana, which two Black Lotuses (six blue) and three Moxen are exactly - nothing is
+# left in the pool. Bot2's Bramble Familiar (an Elemental, mana value 2) is not one Bot1 controls and reduces nothing: a cost of {5}{U}{U} would leave two mana in the pool.
+# "Return all non-Elemental creatures to their owners' hands" has no controller in it: Bot1's own Ornithopter and Bot2's Guerrilla Gorilla both return (while Bot2's Familiar
+# and Sunderflock, Elementals, stay).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Sunderflock
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Bramble Familiar
+Guerrilla Gorilla
+Forest
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Bramble Familiar.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sunderflock.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Sunderflock
+Bot1.Hand = Ornithopter; Island
+Bot2.Battlefield = Forest; Mox Emerald; Mox Jet; Mox Ruby; Bramble Familiar
+Bot2.Hand = Guerrilla Gorilla; Forest; Forest
+Bot2.Hand.Count = 3

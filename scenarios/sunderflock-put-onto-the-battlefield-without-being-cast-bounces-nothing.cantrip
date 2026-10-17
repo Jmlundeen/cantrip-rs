@@ -1,0 +1,39 @@
+# "When this creature enters, if you cast it, ...": the condition is on the entering (CR 603.4). Bot1 puts Sunderflock onto the battlefield with Show and Tell instead of casting
+# it, so nothing is returned: Bot1's Ornithopter and Bot2's Guerrilla Gorilla both stay. (The other scenarios, where it is cast, are the positive control.) Bot2 puts nothing in.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Ornithopter
+Show and Tell
+Sunderflock
+Island x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Sunderflock)
+Bot2.Choose()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Ornithopter; Sunderflock
+Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla
