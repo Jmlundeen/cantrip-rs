@@ -1,0 +1,66 @@
+# Copy effects apply in layer 1 and control-changing effects in layer 2 (CR 613.1a-b): Bot2's Clone enters as a copy of
+# Bot1's Lord of Atlantis, and each Lord gives the other +1/+1 and islandwalk ("other Merfolk", whoever controls them), so
+# both are 3/3. Bot1 then takes the Clone with Mind Control: it is still a Lord of Atlantis, now Bot1's, and its ability,
+# which never asked who controls what, still pumps the other Lord - both stay 3/3 with islandwalk.
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Lord of Atlantis
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Mind Control
+Island x12
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Island
+Clone
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Clone.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Accept
+? Bot2.Battlefield.Lord of Atlantis.Power = 3
+? Bot1.Battlefield.Lord of Atlantis.Power = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Control.Cast(Bot2.Battlefield.Lord of Atlantis)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Island; Island; Lord of Atlantis; Lord of Atlantis; Mind Control
+Bot1.Battlefield.Lord of Atlantis#1.Power = 3
+Bot1.Battlefield.Lord of Atlantis#1.Keywords = Islandwalk
+Bot1.Battlefield.Lord of Atlantis#2.Power = 3
+Bot1.Battlefield.Lord of Atlantis#2.Keywords = Islandwalk
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Island

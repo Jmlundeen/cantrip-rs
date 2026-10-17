@@ -1,0 +1,56 @@
+# "Other Merfolk get +1/+1 and have islandwalk": every Merfolk but the Lord itself, whoever controls it (CR 613.4c, 613.1f).
+# Bot1's Lord of Atlantis makes Bot2's Hullbreacher, a Merfolk, 4/3 with islandwalk, and is itself 2/2 without it. Bot2
+# attacks with the Hullbreacher and Llanowar Elves: Bot1 controls an Island, so the Lord can't block the Hullbreacher (CR
+# 702.14c), and blocks the Elves instead.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Lord of Atlantis
+Island x17
+
+[Bot2 Deck]
+Forest
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Hullbreacher
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hullbreacher.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Hullbreacher.Power = 4
+? Bot2.Battlefield.Hullbreacher.Toughness = 3
+? Bot2.Battlefield.Hullbreacher.Keywords = Flash; Islandwalk
+? Bot1.Battlefield.Lord of Atlantis.Power = 2
+? Bot1.Battlefield.Lord of Atlantis.Keywords = (absent)
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Hullbreacher; Llanowar Elves > Bot1)
+! Bot1.Block(Lord of Atlantis > Hullbreacher)
+Bot1.Block(Lord of Atlantis > Llanowar Elves)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Lord of Atlantis.Damage = 1

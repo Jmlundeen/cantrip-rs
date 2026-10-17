@@ -1,0 +1,59 @@
+# "Merfolk" is a creature type word in Lord of Atlantis's type line and in "Other Merfolk get +1/+1 and have islandwalk"
+# (CR 612.2), so Artificial Evolution - not Mind Bend, which offers no creature types - may replace it with Elf (CR 612.1,
+# layer 3). The Lord is then an Elf, and its ability says "Other Elves": Bot1's Llanowar Elves is 2/2 with islandwalk, and
+# Bot1's Hullbreacher, a Merfolk, is a plain 3/2 again.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Emerald
+Lord of Atlantis
+Llanowar Elves
+Hullbreacher
+Artificial Evolution
+Island x11
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lord of Atlantis.Power = 2
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hullbreacher.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hullbreacher.Power = 4
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Artificial Evolution.Cast(Bot1.Battlefield.Lord of Atlantis)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Merfolk)
+Bot1.Modes(Elf)
+
+[Expect]
+Bot1.Battlefield.Lord of Atlantis.Subtypes = Elf
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = Islandwalk
+Bot1.Battlefield.Hullbreacher.Power = 3
+Bot1.Battlefield.Hullbreacher.Keywords = Flash
