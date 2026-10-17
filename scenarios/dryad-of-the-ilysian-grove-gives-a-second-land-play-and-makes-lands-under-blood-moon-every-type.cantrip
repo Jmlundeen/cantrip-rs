@@ -1,0 +1,55 @@
+# Dryad of the Ilysian Grove after Blood Moon. "You may play an additional land on each of your turns" (CR 305.2): with
+# the Dryad out, Bot1 plays a second land (Taiga) in the turn it played a Forest, and a third is refused (CR 305.2b). Its
+# "lands you control are every basic land type in addition to their other types" has the later timestamp than Blood Moon's
+# "nonbasic lands are Mountains", and neither depends on the other (CR 613.8a): Blood Moon applies first, the Dryad's after
+# (CR 613.7). The Dryad is a creature, no land, so the Moon takes none of its abilities. So Taiga and Mutavault are Mountains
+# that lost their rules text and are then every basic land type: Taiga taps for {U}, Mutavault has no "{T}: Add {C}". The
+# basic Forest is every basic land type too.
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Emerald
+Blood Moon
+Dryad of the Ilysian Grove
+Taiga
+Forest
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Dryad of the Ilysian Grove.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Taiga.Play
+? Bot1.LandsPlayed = 2
+! Bot1.Hand.Plains.Play
+? Bot1.Battlefield.Taiga.Subtypes = Forest; Island; Mountain; Plains; Swamp
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Battlefield.Taiga.Activate(Ability: Add {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Taiga.Subtypes = Forest; Island; Mountain; Plains; Swamp
+Bot1.Battlefield.Mutavault.Subtypes = Forest; Island; Mountain; Plains; Swamp
+Bot1.Battlefield.Forest.Subtypes = Forest; Island; Mountain; Plains; Swamp
+Bot1.Battlefield.Dryad of the Ilysian Grove.Types = Enchantment; Creature
+Bot1.LandsPlayed = 2

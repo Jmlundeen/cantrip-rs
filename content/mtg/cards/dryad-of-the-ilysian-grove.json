@@ -1,0 +1,8 @@
+{
+  "name": "Dryad of the Ilysian Grove",
+  "manaCost": "{2}{G}",
+  "type": "Enchantment Creature — Nymph Dryad",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "You may play an additional land on each of your turns.\nLands you control are every basic land type in addition to their other types."
+}
