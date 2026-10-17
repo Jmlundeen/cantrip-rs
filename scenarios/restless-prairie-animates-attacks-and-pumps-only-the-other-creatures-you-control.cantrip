@@ -1,0 +1,64 @@
+# Restless Prairie enters tapped on turn 1 and is a plain land. On turn 3 Bot1 pays {2}{G}{W} with four Moxen and animates it: until end
+# of turn it is a 3/3 green and white Llama land creature (CR 613.1d, 613.4b). It attacks beside an Elvish Mystic and its trigger gives
+# the other creatures Bot1 controls +1/+1 until end of turn - the Mystic (2/2) and the Ornithopter that stays home (1/3), not the Prairie
+# itself (still 3/3) and not Bot2's Llanowar Elves (1/1). Nothing blocks: 3 + 2 damage (20 - 5 = 15). On turn 4 the pumps and the
+# animation are gone (CR 514.2).
+
+[Bot1 Deck]
+Restless Prairie
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Elvish Mystic
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Restless Prairie.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Battlefield.Restless Prairie.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Restless Prairie.Activate(Ability: This land becomes)
+Bot1.Attack(Restless Prairie > Bot2; Elvish Mystic > Bot2)
+? Bot1.Battlefield.Restless Prairie.Types = Land; Creature
+? Bot1.Battlefield.Restless Prairie.Subtypes = Llama
+? Bot1.Battlefield.Restless Prairie.Colors = Green; White
+? Bot1.Battlefield.Restless Prairie.Power = 3
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Restless Prairie.Power = 3
+? Bot1.Battlefield.Restless Prairie.Toughness = 3
+? Bot1.Battlefield.Elvish Mystic.Power = 2
+? Bot1.Battlefield.Elvish Mystic.Toughness = 2
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+? Bot2.Life = 15
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 15
+Bot1.Battlefield.Restless Prairie.Types = Land
+Bot1.Battlefield.Restless Prairie.Colors = (absent)
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Ornithopter.Power = 0

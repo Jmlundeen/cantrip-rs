@@ -1,0 +1,45 @@
+# Artificial Evolution replaces the creature type Llama with Elf in Restless Prairie's text for good (CR 612.1, 612.2). Animated on turn 3 it
+# becomes a green and white Elf creature, 3/3, not a Llama (CR 612.4): the word is read through the words of its own text.
+
+[Bot1 Deck]
+Restless Prairie
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Artificial Evolution
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Restless Prairie.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Restless Prairie)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Llama)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Restless Prairie.Activate(Ability: This land becomes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Prairie.Types = Land; Creature
+
+[Expect]
+Bot1.Battlefield.Restless Prairie.Subtypes = Elf
+Bot1.Battlefield.Restless Prairie.Colors = Green; White
+Bot1.Battlefield.Restless Prairie.Power = 3
+Bot1.Battlefield.Restless Prairie.Toughness = 3

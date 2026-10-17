@@ -1,0 +1,45 @@
+# {2}{G}{W}: on turn 3, with {G} from the Prairie itself and {B}{R} from two Moxen there is no white and the ability is refused; casting Mox Pearl
+# and tapping it for {W} makes the same ability payable and it animates (the positive control). On turn 5 the same with the colors swapped:
+# {W}{B}{R} has no green and is refused until Mox Emerald is cast and tapped.
+
+[Bot1 Deck]
+Restless Prairie
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Plains
+Plains x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Restless Prairie.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Restless Prairie.Activate(Ability: Add; Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Restless Prairie.Activate(Ability: This land becomes)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Restless Prairie.Activate(Ability: This land becomes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Prairie.Types = Land; Creature
+[T5 Bot1.Main1]
+Bot1.Battlefield.Restless Prairie.Activate(Ability: Add; Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Restless Prairie.Activate(Ability: This land becomes)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Restless Prairie.Activate(Ability: This land becomes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Prairie.Power = 3
+
+[Expect]
+Bot1.Battlefield.Restless Prairie.Types = Land; Creature

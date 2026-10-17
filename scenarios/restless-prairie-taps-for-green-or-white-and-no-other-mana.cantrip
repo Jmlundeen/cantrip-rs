@@ -1,0 +1,29 @@
+# "{T}: Add {G} or {W}": on turn 3 green and white are offered (green taken) while red, black, blue and colorless are refused beside them as
+# the positive control; it entered tapped on turn 1 (CR 614.12), so there was no mana before then. It is not a creature here, so
+# its attack trigger cannot happen.
+
+[Bot1 Deck]
+Restless Prairie
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Restless Prairie.Play
+? Bot1.Battlefield.Restless Prairie.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Restless Prairie.Activate(Ability: Add; Color: Red)
+! Bot1.Battlefield.Restless Prairie.Activate(Ability: Add; Color: Black)
+! Bot1.Battlefield.Restless Prairie.Activate(Ability: Add; Color: Blue)
+! Bot1.Battlefield.Restless Prairie.Activate(Ability: Add; Color: Colorless)
+Bot1.Battlefield.Restless Prairie.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Restless Prairie.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 5
+Bot1.Mana = {W}
+Bot1.Battlefield = Restless Prairie

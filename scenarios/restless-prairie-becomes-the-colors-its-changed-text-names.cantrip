@@ -1,0 +1,47 @@
+# Trait Doctoring replaces the color word white with red in Restless Prairie's text until end of turn (CR 612.1), and the Prairie, animated
+# that turn, becomes a green and red Llama creature, not green and white (CR 612.4). The mana symbols in its abilities are not words and
+# cost what they did.
+
+[Bot1 Deck]
+Restless Prairie
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Trait Doctoring
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Restless Prairie.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Restless Prairie)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a color word)
+Bot1.Colors(White)
+Bot1.Colors(Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Restless Prairie.Activate(Ability: This land becomes)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Prairie.Types = Land; Creature
+? Bot1.Battlefield.Restless Prairie.Subtypes = Llama
+
+[Expect]
+Bot1.Battlefield.Restless Prairie.Colors = Green; Red
+Bot1.Battlefield.Restless Prairie.Power = 3
