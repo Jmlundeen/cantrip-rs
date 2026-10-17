@@ -1,0 +1,50 @@
+# Lyra: "Whenever you gain life": only her controller's life gain counts. On turn 2 Bot2's Lightning Helix gains Bot2 3 life and
+# Lyra (Bot1's) gets no counter (3/3); on turn 3 Bot1's own Lightning Helix (the positive control) does, and she is 4/4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Lyra, Archangel of Dawn
+Lightning Helix
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Lightning Helix
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Lyra, Archangel of Dawn.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+[T2 Bot2.Main2]
+? Bot2.Life = 23
+? Bot1.Battlefield.Lyra, Archangel of Dawn.Power = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Lyra, Archangel of Dawn.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Lyra, Archangel of Dawn.Power = 4

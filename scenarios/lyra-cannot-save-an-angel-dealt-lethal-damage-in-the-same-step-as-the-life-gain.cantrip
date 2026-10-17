@@ -1,0 +1,67 @@
+# Lyra's ruling: an Angel dealt lethal damage at the same time as you gain life is not saved by her counter. Bot1's Youthful Valkyrie
+# (2/4 after Lyra enters) and Healer's Hawk attack; Bot2's Astelli Reclaimer (5/4 flying) blocks the Valkyrie, dealing it lethal damage
+# while the Hawk's lifelink damage gains Bot1 1 life. State-based actions kill the Valkyrie (CR 704.5g) before Lyra's trigger
+# is on the stack, so it resolves with Lyra, who is not damaged, the only Angel left: she gets the counter (4/4).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Healer's Hawk
+Youthful Valkyrie
+Lyra, Archangel of Dawn
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Astelli Reclaimer
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Youthful Valkyrie.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Pearl#3.Activate
+Bot2.Battlefield.Mox Pearl#4.Activate
+Bot2.Battlefield.Mox Pearl#5.Activate
+Bot2.Hand.Astelli Reclaimer.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Lyra, Archangel of Dawn.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Attack(Youthful Valkyrie; Healer's Hawk > Bot2)
+Bot2.Block(Astelli Reclaimer > Youthful Valkyrie)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Youthful Valkyrie
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield.Lyra, Archangel of Dawn.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Lyra, Archangel of Dawn.Power = 4
+Bot2.Battlefield.Astelli Reclaimer.Damage = 2

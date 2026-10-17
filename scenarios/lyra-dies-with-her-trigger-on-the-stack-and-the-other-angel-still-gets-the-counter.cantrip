@@ -1,0 +1,56 @@
+# Lyra's trigger counts Angels as it resolves (CR 608.2c). Bot1 has Youthful Valkyrie and then casts Lyra: Lyra entering gives the
+# Valkyrie a counter (another Angel entered, 2/4). Bot1's Lightning Helix gains life, Lyra's ability goes on the stack, and
+# Bot2 Bolts Lyra in response, killing her (3/3). The ability still resolves: the Valkyrie, the only Angel left, gets a second
+# counter (3/5); Lyra, gone, gets none. (Bot2 passes on the Helix first so that Lyra is alive for the life gain.)
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Youthful Valkyrie
+Lyra, Archangel of Dawn
+Lightning Helix
+Plains
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Youthful Valkyrie.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Lyra, Archangel of Dawn.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Lyra, Archangel of Dawn)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Graveyard = Lyra, Archangel of Dawn; Lightning Helix
+Bot1.Battlefield.Youthful Valkyrie.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Youthful Valkyrie.Power = 3
+Bot1.Battlefield.Youthful Valkyrie.Toughness = 5
+Bot2.Graveyard = Lightning Bolt

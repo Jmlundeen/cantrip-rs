@@ -1,0 +1,44 @@
+# Lyra's ruling: if more than one creature you control with lifelink deals combat damage at the same time, her ability triggers
+# once for each of them (each damage is its own life gain). Two Healer's Hawks hit Bot2 together on turn 3: Bot1 gains 2, Lyra
+# triggers twice and gets two counters (5/5); the Hawks (Birds) get none.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Healer's Hawk
+Healer's Hawk
+Lyra, Archangel of Dawn
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Lyra, Archangel of Dawn.Cast
+Bot1.Pass
+Bot1.Attack(Healer's Hawk#1; Healer's Hawk#2 > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Lyra, Archangel of Dawn.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Lyra, Archangel of Dawn.Power = 5
+Bot1.Battlefield.Healer's Hawk#1.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,55 @@
+# Lyra: "Whenever you gain life, put a +1/+1 counter on each Angel you control." Bot1 has Lyra (an Angel) and an Ornithopter
+# (not an Angel); Bot2 has a Youthful Valkyrie (an Angel Bot1 does not control). Bot1's Lightning Helix gains 3 life in one event,
+# so the ability triggers once: Lyra gets exactly one counter (4/4). The Ornithopter and Bot2's Angel get none.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Lyra, Archangel of Dawn
+Lightning Helix
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Youthful Valkyrie
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Lyra, Archangel of Dawn.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Youthful Valkyrie.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield.Lyra, Archangel of Dawn.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Lyra, Archangel of Dawn.Power = 4
+Bot1.Battlefield.Lyra, Archangel of Dawn.Toughness = 4
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Youthful Valkyrie.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Youthful Valkyrie.Power = 1

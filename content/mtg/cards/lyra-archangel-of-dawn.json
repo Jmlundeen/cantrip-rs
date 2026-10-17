@@ -1,0 +1,11 @@
+{
+  "name": "Lyra, Archangel of Dawn",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Angel Knight",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nWhenever you gain life, put a +1/+1 counter on each Angel you control.",
+  "keywords": [
+    "Flying"
+  ]
+}
