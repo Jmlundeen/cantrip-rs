@@ -475,6 +475,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Reveal => V::Reveal,
         Purpose::PutCounters(..) => V::PutCounters,
         Purpose::PreventDamageFrom(_) => V::PreventDamageFrom,
+        Purpose::PayLifeOrPutOnTop(_) => V::PayLifeOrPutOnTop,
         Purpose::SeparatePiles
         | Purpose::ChoosePile
         | Purpose::CopyAsEnters
@@ -801,6 +802,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                         &eligible.iter().copied().filter(|&c| !game.chars(c).has(Keyword::Banding)).collect::<Vec<_>>(),
                     ),
                     _ => Vec::new(),
+                },
+                life: match purpose {
+                    Purpose::PayLifeOrPutOnTop(n) => i32::from(*n),
+                    _ => 0,
                 },
                 ..Default::default()
             })
@@ -1173,7 +1178,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 owner: seat(owner),
             })
         }
-        RequestKind::ChooseReplacement { subject, life, sources, hints, damage, turn, counters } => {
+        RequestKind::ChooseReplacement { subject, life, sources, hints, damage, turn, counters, draw } => {
             PromptPayload::ChooseReplacementPromptMessage(ChooseReplacementPrompt {
                 player,
                 subject: subject.map_or(ViewHandle::NONE, |s| source_handle(game, handles, s)),
@@ -1187,6 +1192,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     (None, None) if *turn => "Your turn would begin".to_string(),
                     // Counters about to be put on a permanent (CR 122.6), as the effects so far have left them.
                     (None, None) if !counters.is_empty() => counter_words(game, *subject, counters),
+                    // A card about to be drawn (CR 121.6), asked of the player who would draw it (CR 616.1).
+                    (None, None) if *draw => "You would draw a card".to_string(),
                     (None, None) => String::new(),
                 },
                 sources: sources.iter().map(|&s| source_handle(game, handles, s)).collect(),

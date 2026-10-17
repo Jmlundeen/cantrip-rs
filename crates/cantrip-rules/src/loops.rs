@@ -906,7 +906,7 @@ mod tests {
     }
 
     fn cx(game: &mut Game) -> Cx<'_> {
-        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None }
+        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None }
     }
 
     /// The permanent leaves and comes back: a new object (CR 400.7), at a later timestamp, and its ability triggers again,

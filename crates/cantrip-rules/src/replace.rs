@@ -16,8 +16,8 @@ use crate::layers::live;
 use crate::Cx;
 
 /// Where a replacement effect is defined.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-enum Origin {
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) enum Origin {
     /// One of its source card's `replacements`.
     Printed,
     /// One a spell or ability made (CR 611.2, `EffectKind::Replacement`), named by that effect's timestamp: one of its
@@ -47,7 +47,7 @@ struct Candidate {
 }
 
 /// An effect already applied to the event (CR 614.5): its source, its index and where it is defined.
-type Applied = (ObjectId, u8, Origin);
+pub(crate) type Applied = (ObjectId, u8, Origin);
 
 /// What madness's replacement says it does, for the player who orders it with others (CR 616.1).
 const MADNESS_HINT: &str = "madness discards it into exile, then it may be cast for its madness cost";
@@ -102,6 +102,16 @@ pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
         || cx.s().battlefield().iter().any(|&id| cards.replaces[card_of(cx, id).0 as usize])
 }
 
+/// Whether a card in `player`'s graveyard has an ability that replaces their draws there (CR 702.52a: dredge).
+fn graveyard_replaces_draws(cx: &Cx, player: PlayerId) -> bool {
+    let cards = cx.cards();
+    cards.any_replaces
+        && cx.s().zone(Zone::graveyard(player)).iter().any(|&id| {
+            let card = card_of(cx, id);
+            cards.replaces[card.0 as usize] && cards.get(card).replacements.iter().any(|r| r.in_graveyard)
+        })
+}
+
 fn subject_of(proposal: &Proposal) -> Option<ObjectId> {
     match proposal {
         Proposal::ZoneChange(z) => Some(z.object),
@@ -149,9 +159,15 @@ fn affected(cx: &Cx, proposal: &Proposal) -> PlayerId {
 /// Every effect that applies to the event and has not been applied to it yet (CR 614.5), in a deterministic order:
 /// by source, then by the order the card lists them.
 fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidate> {
-    // Damage that has been prevented in full is no event any more: nothing is left to replace (CR 615.1).
+    // Damage that has been prevented in full is no event any more: nothing is left to replace (CR 615.1); nor is a draw that
+    // an effect has replaced, which never happens (CR 614.6).
     if let Proposal::Damage(d) = proposal
         && d.amount == 0
+    {
+        return Vec::new();
+    }
+    if let Proposal::Draw(d) = proposal
+        && d.replaced
     {
         return Vec::new();
     }
@@ -164,16 +180,31 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
         _ => false,
     };
     let mut found = Vec::new();
-    let mut consider = |id: ObjectId, own_only: bool| {
+    // Where the object is: on the battlefield (`Field`), its own card elsewhere (`Own`), or a card in a graveyard whose
+    // abilities function there (`Graveyard`, CR 702.52a).
+    #[derive(PartialEq)]
+    enum At {
+        Field,
+        Own,
+        Graveyard,
+    }
+    let mut consider = |id: ObjectId, at: At| {
         let card = card_of(cx, id);
         // A permanent that has lost all its abilities has no replacement effects (CR 613.1f).
         if !cards.replaces[card.0 as usize] || cx.lost_all_abilities(id) {
             return;
         }
-        let asker = Asker { source: id, controller: controller_of(cx, id, proposal) };
+        // "You" for an ability of a card in a graveyard is its owner (CR 108.4a: it has no controller).
+        let controller = if at == At::Graveyard { cx.s().obj(id).owner } else { controller_of(cx, id, proposal) };
+        let asker = Asker { source: id, controller };
         for (index, def) in cards.get(card).replacements.iter().enumerate() {
             let index = index as u8;
-            if def.kind != kind || (own_only && !def.own_everywhere) || applied.contains(&(id, index, Origin::Printed)) {
+            let functions = match at {
+                At::Field => !def.in_graveyard,
+                At::Own => def.own_everywhere,
+                At::Graveyard => def.in_graveyard,
+            };
+            if def.kind != kind || !functions || applied.contains(&(id, index, Origin::Printed)) {
                 continue;
             }
             if (def.applies)(cx, &asker, proposal) {
@@ -183,7 +214,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
         // Its static abilities' prevention effects function only while it is on the battlefield (CR 604.1).
         if let Proposal::Damage(d) = proposal
             && preventable
-            && !own_only
+            && at == At::Field
         {
             for (index, def) in cards.get(card).preventions.iter().enumerate() {
                 let index = index as u8;
@@ -195,14 +226,22 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     };
     for &id in cx.s().battlefield() {
         if live(cx.s(), id) {
-            consider(id, false);
+            consider(id, At::Field);
         }
     }
     // The subject's own effects that function in every zone (CR 113.6b), when it is not on the battlefield already.
     if let Some(id) = subject
         && !cx.s().obj(id).zone.is(ZoneKind::Battlefield)
     {
-        consider(id, true);
+        consider(id, At::Own);
+    }
+    // The drawing player's graveyard, whose cards' dredge replaces their draws (CR 702.52a).
+    if let Proposal::Draw(d) = proposal
+        && graveyard_replaces_draws(cx, d.player)
+    {
+        for &id in cx.s().zone(Zone::graveyard(d.player)) {
+            consider(id, At::Graveyard);
+        }
     }
     // The replacement effects spells and abilities made, still lasting (CR 611.2): one about an object ends with it.
     for e in &cx.s().effects {
@@ -325,6 +364,7 @@ fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
             Proposal::Counters(c) => CounterKind::ALL.into_iter().zip(c.counts).filter(|&(_, n)| n > 0).collect(),
             _ => Vec::new(),
         },
+        draw: matches!(proposal, Proposal::Draw(_)),
     };
     match cx.ask_core(affected(cx, proposal), ask, false) {
         Ok(Answer::Index(i)) if (i as usize) < found.len() => i as usize,
@@ -332,10 +372,25 @@ fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
     }
 }
 
+/// Whether the affected player takes an optional effect ("you may ... instead", CR 614.1a) as it would apply. When the
+/// question has no answer yet the run goes on as if they did and is replayed with the answer (see `Cx::ask_core`).
+fn takes(cx: &mut Cx, proposal: &Proposal, source: ObjectId, question: &'static Question) -> bool {
+    !matches!(cx.ask_core(affected(cx, proposal), RequestKind::May { source, purpose: Purpose::Ask(question) }, false), Ok(Answer::No))
+}
+
+/// Runs what an effect does to the game as it applies (`ReplacementThen`): the modified event, every part of which meets only
+/// the effects that have not yet had their opportunity at the event (CR 614.5), `applied`.
+fn run_then(cx: &mut Cx, applied: &[Applied], then: impl FnOnce(&mut Cx)) {
+    let outer = std::mem::replace(&mut cx.lineage, applied.to_vec());
+    then(cx);
+    cx.lineage = outer;
+}
+
 /// Applies the effects to the proposal, one at a time: each is judged again after the one before it has changed the
-/// event (CR 616.1f), and none applies twice (CR 614.5).
+/// event (CR 616.1f), and none applies twice (CR 614.5), nor to an event that is part of what one of them made of an event
+/// it applied to already (`Cx::lineage`).
 fn apply(cx: &mut Cx, proposal: &mut Proposal) {
-    let mut applied: Vec<Applied> = Vec::new();
+    let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
         let found = candidates(cx, proposal, &applied);
         if found.is_empty() {
@@ -347,19 +402,37 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
         match origin {
             Origin::Printed => {
                 let def = &cx.cards().get(card_of(cx, source)).replacements[index as usize];
-                let (apply, then) = (def.apply, def.then);
-                let asker = Asker { source, controller: controller_of(cx, source, proposal) };
+                let (apply, then, optional, in_graveyard) = (def.apply, def.then, def.optional, def.in_graveyard);
+                // Declined, it has had its opportunity, and the event goes on as it was (CR 614.5, 616.1).
+                if let Some(question) = optional
+                    && !takes(cx, proposal, source, question)
+                {
+                    continue;
+                }
+                let controller = if in_graveyard { cx.s().obj(source).owner } else { controller_of(cx, source, proposal) };
+                let asker = Asker { source, controller };
                 let before = *proposal;
                 apply(&*cx, &asker, proposal);
                 if let Some(then) = then {
-                    then(cx, &asker, &before, proposal);
+                    let after = *proposal;
+                    run_then(cx, &applied, |cx| then(cx, &asker, &before, &after));
                 }
             }
             Origin::Granted(timestamp) => {
                 let e = *cx.s().effects.iter().find(|e| e.timestamp == timestamp).expect("the effect that applies");
                 let def = &cx.cards().get(card_of(cx, source)).granted_replacements[index as usize];
+                let (apply, then, once) = (def.apply, def.then, def.once);
                 let asker = Asker { source, controller: e.controller };
-                (def.apply)(&*cx, &asker, e.affected, proposal);
+                // "The next time": used up by this event (CR 614.1a).
+                if once {
+                    cx.st().effects_retain(|f| f.timestamp != timestamp);
+                }
+                let before = *proposal;
+                apply(&*cx, &asker, e.affected, proposal);
+                if let Some(then) = then {
+                    let after = *proposal;
+                    run_then(cx, &applied, |cx| then(cx, &asker, e.affected, &before, &after));
+                }
             }
             // "That player discards it, but exiles it instead of putting it into their graveyard" (CR 702.35a): the
             // graveyard is its owner's (CR 400.3), and so is the exile it goes to.
@@ -550,9 +623,10 @@ pub fn draw_count(cx: &mut Cx, player: PlayerId, count: u32) -> u32 {
     }
 }
 
-/// One card about to be drawn (CR 121.1, 121.6): whether an effect has replaced the draw, so that nothing is drawn.
+/// One card about to be drawn (CR 121.1, 121.6): whether an effect has replaced the draw, so that nothing is drawn. What
+/// the effect does instead is done as it applies, before the draws of an instruction to draw several go on (CR 121.6b).
 pub fn draw_replaced(cx: &mut Cx, player: PlayerId) -> bool {
-    if !possible(cx, None) {
+    if !possible(cx, None) && !graveyard_replaces_draws(cx, player) {
         return false;
     }
     let mut proposal = Proposal::Draw(CardDraw { player, replaced: false });
@@ -614,5 +688,139 @@ pub fn life_change(cx: &mut Cx, player: PlayerId, amount: i32) -> i32 {
     match proposal {
         Proposal::LifeChange(l) => l.amount,
         _ => unreachable!("an effect cannot change the kind of the event"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Game;
+    use cantrip_state::{Frame, FrameKind};
+
+    const ME: PlayerId = PlayerId(0);
+
+    fn you_would_draw(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+        matches!(proposal, Proposal::Draw(d) if d.player == asker.controller)
+    }
+
+    fn instead(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+        if let Proposal::Draw(d) = proposal {
+            d.replaced = true;
+        }
+    }
+
+    fn draw_two(g: &mut dyn cantrip_api::Game, asker: &Asker, _: &Proposal, _: &Proposal) {
+        g.draw(asker.controller, 2);
+    }
+
+    fn gain_one(g: &mut dyn cantrip_api::Game, asker: &Asker, _: &Proposal, _: &Proposal) {
+        g.gain_life(asker.controller, 1);
+    }
+
+    /// "Each player can't draw more than one card each turn."
+    fn one_each_turn(q: &dyn Query, _: &Asker, player: PlayerId, n: u32) -> bool {
+        q.history().drawn(player) as u32 + n > 1
+    }
+
+    static FILLER: CardDef = CardDef { name: "Filler", types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
+    /// "If you would draw a card, draw two cards instead."
+    static DOUBLER: CardDef = CardDef {
+        name: "Doubler",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        replacements: &[replacement(ReplacementKind::Draw, you_would_draw, instead, "draws two cards instead").then(draw_two)],
+        ..CardDef::BLANK
+    };
+    /// "If you would draw a card, you gain 1 life instead."
+    static GAINER: CardDef = CardDef {
+        name: "Gainer",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        replacements: &[replacement(ReplacementKind::Draw, you_would_draw, instead, "gains 1 life instead").then(gain_one)],
+        ..CardDef::BLANK
+    };
+    static ASK: Question = Question::new("Gain", "gain 1 life instead?", "", "Gain", "Draw");
+    /// "If you would draw a card, you may gain 1 life instead", functioning in its owner's graveyard alone, as dredge does.
+    static GRAVE_GAINER: CardDef = CardDef {
+        name: "Grave Gainer",
+        types: TypeSet::of(&[CardType::Creature]),
+        replacements: &[replacement(ReplacementKind::Draw, you_would_draw, instead, "may gain 1 life instead")
+            .then(gain_one)
+            .optional(&ASK)
+            .in_graveyard()],
+        ..CardDef::BLANK
+    };
+    static LIMITER: CardDef =
+        CardDef { name: "Limiter", types: TypeSet::of(&[CardType::Enchantment]), cant_draw: &[one_each_turn], ..CardDef::BLANK };
+
+    /// A game whose first player has each of `cards` in the zone beside it, a hand of seven Fillers and ten more in the
+    /// library, and a frame whose run is given `answers`.
+    fn game(cards: &[(&'static CardDef, Zone)], answers: Vec<Answer>) -> Game {
+        let table: &'static CardTable =
+            Box::leak(Box::new(CardTable::new([&FILLER, &DOUBLER, &GAINER, &GRAVE_GAINER, &LIMITER])));
+        let deck: Vec<CardId> = std::iter::repeat_n(table.id_of(&FILLER), 17).collect();
+        let mut game = Game::new(table, &crate::Setup { decks: vec![deck, Vec::new()], ..Default::default() });
+        for &(def, to) in cards {
+            let id = game.state.push_obj(Obj::new(table.id_of(def), ME, to));
+            game.state.zone_push(to, id);
+        }
+        game.state.frame_push(Frame::new(FrameKind::Settle));
+        let at = game.state.agenda.len() - 1;
+        game.state.update_frame(at, |f| f.answers = answers);
+        game
+    }
+
+    /// Has the first player draw `count` cards: their hand, library and life afterwards.
+    fn draw(game: &mut Game, count: u32) -> (usize, usize, i32) {
+        let frame = game.state.agenda.len() - 1;
+        let mut cx = Cx { g: game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+        crate::ops::draw_cards(&mut cx, ME, count);
+        assert!(cx.s().agenda[frame].pending.is_none(), "every question was answered");
+        let s = cx.s();
+        (s.zone(Zone::hand(ME)).len(), s.zone(Zone::library(ME)).len(), s.player(ME).life)
+    }
+
+    /// CR 614.5: each of two "draw two cards instead" effects has one opportunity at a draw and at the draws it is replaced
+    /// by. The first replaces the draw with two; the second replaces each of those with two more, and neither applies again,
+    /// so one draw is four cards (Thought Reflection's ruling). The player is asked once, at the first draw.
+    #[test]
+    fn two_effects_that_draw_two_instead_make_one_draw_four_cards() {
+        let mut game = game(&[(&DOUBLER, Zone::BATTLEFIELD), (&DOUBLER, Zone::BATTLEFIELD)], vec![Answer::Index(0)]);
+        assert_eq!(draw(&mut game, 1), (7 + 4, 10 - 4, 20));
+    }
+
+    /// CR 614.6: a replaced draw never happens, so no other effect replaces it as well: of two "gain 1 life instead"
+    /// effects only the one chosen applies.
+    #[test]
+    fn a_draw_replaced_is_not_replaced_again() {
+        let mut game = game(&[(&GAINER, Zone::BATTLEFIELD), (&GAINER, Zone::BATTLEFIELD)], vec![Answer::Index(1)]);
+        assert_eq!(draw(&mut game, 1), (7, 10, 21));
+    }
+
+    /// CR 121.2b, 614.17c: a card the player can't draw is not drawn and its draw is not replaced. The first draw of the
+    /// turn is replaced by two, of which only the first is drawn; with the life gain instead, the first draw is replaced
+    /// and so not drawn (CR 614.6), the next is too, and once a card has been drawn the draw after it can't happen, so
+    /// nothing replaces it.
+    #[test]
+    fn a_draw_that_cant_happen_is_not_replaced() {
+        let mut game = game(&[(&LIMITER, Zone::BATTLEFIELD), (&DOUBLER, Zone::BATTLEFIELD)], Vec::new());
+        assert_eq!(draw(&mut game, 1), (8, 9, 20));
+        assert_eq!(draw(&mut game, 1), (8, 9, 20));
+        let mut game = game_with(&[(&LIMITER, Zone::BATTLEFIELD), (&GAINER, Zone::BATTLEFIELD)]);
+        assert_eq!(draw(&mut game, 2), (7, 10, 22));
+    }
+
+    fn game_with(cards: &[(&'static CardDef, Zone)]) -> Game {
+        game(cards, Vec::new())
+    }
+
+    /// CR 702.52a, 614.1a: an ability that functions in its card's graveyard replaces its owner's draws from there, and only
+    /// from there; "you may" asks, and declined, the draw goes on as it was (CR 616.1).
+    #[test]
+    fn a_graveyard_replacement_functions_only_in_the_graveyard_and_may_be_declined() {
+        let mut game = game(&[(&GRAVE_GAINER, Zone::graveyard(ME))], vec![Answer::Yes]);
+        assert_eq!(draw(&mut game, 1), (7, 10, 21));
+        let mut game = game_with(&[(&GRAVE_GAINER, Zone::BATTLEFIELD)]);
+        assert_eq!(draw(&mut game, 1), (8, 9, 20));
+        let mut game = self::game(&[(&GRAVE_GAINER, Zone::graveyard(ME))], vec![Answer::No]);
+        assert_eq!(draw(&mut game, 1), (8, 9, 20));
     }
 }

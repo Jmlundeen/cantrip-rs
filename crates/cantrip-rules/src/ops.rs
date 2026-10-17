@@ -1681,6 +1681,11 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
 
 /// Draws a card (CR 121): from an empty library, nothing is drawn and the player will lose (CR 704.5b).
 pub fn draw(cx: &mut Cx, player: PlayerId) {
+    // CR 121.2b, 614.17c: a card the player can't draw is not drawn, and no replacement effect replaces the draw that can't
+    // happen (Spirit of the Labyrinth's ruling), so neither does a player who can't draw from an empty library lose for it.
+    if cantrip_api::cant_draw(&*cx, player, 1) {
+        return;
+    }
     // CR 121.6: a replacement applies even with no cards in the library to draw.
     if replace::draw_replaced(cx, player) {
         return;
@@ -3087,7 +3092,7 @@ mod tests {
     fn entering_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i16)> {
         let (mut game, held) = game_with(on_battlefield);
         let hand = Zone::hand(PlayerId(0));
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
         let mut out = Vec::new();
         for &id in &held {
             let mut entering = entering(id);
@@ -3127,7 +3132,7 @@ mod tests {
         let relic = held[1];
         let row = *game.state.obj(relic);
         let battlefield = game.state.battlefield().to_vec();
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
         let would = as_it_would_exist(&mut cx, &entering(relic));
         assert!(would.chars.is(CardType::Creature) && would.chars.is(CardType::Artifact) && would.lost);
         assert!(*cx.s().obj(relic) == row && cx.s().battlefield() == battlefield.as_slice());

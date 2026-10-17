@@ -17,7 +17,7 @@ use cantrip_state::*;
 use crate::card::*;
 use crate::event::EventMask;
 use crate::game::Game;
-use crate::replace::{GrantedApplies, GrantedApply, GrantedReplacementDef, ReplacementApplies, ReplacementApply, ReplacementDef, ReplacementKind, ReplacementThen};
+use crate::replace::{GrantedApplies, GrantedApply, GrantedReplacementDef, GrantedThen, ReplacementApplies, ReplacementApply, ReplacementDef, ReplacementKind, ReplacementThen};
 
 /// The tap symbol, {T} (CR 107.5).
 pub const TAP: Cost = Cost { tap: true, ..Cost::NONE };
@@ -852,11 +852,34 @@ impl ReplacementDef {
     pub const fn then(self, then: ReplacementThen) -> ReplacementDef {
         ReplacementDef { then: Some(then), ..self }
     }
+
+    /// "You may ... instead" (CR 614.1a): the affected player is asked `question` as the effect would apply.
+    pub const fn optional(self, question: &'static Question) -> ReplacementDef {
+        ReplacementDef { optional: Some(question), ..self }
+    }
+
+    /// It functions only while its card is in a graveyard, on its owner's draws (CR 702.52a: dredge).
+    pub const fn in_graveyard(self) -> ReplacementDef {
+        assert!(matches!(self.kind, ReplacementKind::Draw), "an ability of a card in a graveyard replaces only draws");
+        ReplacementDef { in_graveyard: true, ..self }
+    }
 }
 
 /// A replacement effect a resolving spell or ability makes for a while (CR 611.2), about the object it was made for.
 pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies, apply: GrantedApply, hint: &'static str) -> GrantedReplacementDef {
-    GrantedReplacementDef { hint, kind, applies, apply }
+    GrantedReplacementDef { hint, kind, applies, apply, then: None, once: false }
+}
+
+impl GrantedReplacementDef {
+    /// What the effect does to the game as it applies, besides reshaping the event.
+    pub const fn then(self, then: GrantedThen) -> GrantedReplacementDef {
+        GrantedReplacementDef { then: Some(then), ..self }
+    }
+
+    /// "The next time ... would ...": the effect ends as it applies, used up (CR 614.1a).
+    pub const fn once(self) -> GrantedReplacementDef {
+        GrantedReplacementDef { once: true, ..self }
+    }
 }
 
 // --- Other ways to cast, kickers -------------------------------------------------------------------------------------

@@ -182,7 +182,7 @@ impl Game {
         } else {
             // A scenario's deal: seven each, in turn order, kept.
             for p in game.state.apnap().collect::<Vec<_>>() {
-                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
+                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
                 for _ in 0..7 {
                     ops::draw(&mut cx, p);
                 }
@@ -240,16 +240,17 @@ impl Game {
             let before = if self.verify { Some(self.state.clone()) } else { None };
 
             let kind = self.state.agenda[at].kind;
-            let flow = {
-                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None };
-                match kind {
+            let (flow, asked_at) = {
+                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+                let flow = match kind {
                     FrameKind::Opening => turn::opening(&mut cx),
                     FrameKind::BeginStep => turn::begin_step(&mut cx),
                     FrameKind::Priority => turn::priority(&mut cx),
                     FrameKind::Settle => settle::settle(&mut cx),
                     FrameKind::Act { player } => actions::act(&mut cx, player),
                     FrameKind::Resolve => resolve::resolve(&mut cx),
-                }
+                };
+                (flow, cx.asked_at)
             };
 
             loops::after_frame(&mut self.state);
@@ -257,11 +258,14 @@ impl Game {
             let flow = match flow {
                 Ok(_) if self.state.agenda.get(at).is_some_and(|f| f.pending.is_some()) => {
                     // The run went on past a question it could not stop at (a replacement effect asking which
-                    // applies first): it is redone with the answer, so what it did is undone now, and the question
-                    // is asked of the position it began from.
+                    // applies first, or a question of what one does instead): it is redone with the answer, so what it
+                    // did after the question is undone now, and the question is asked of the position it was asked in,
+                    // as a run that stops at its question leaves it - the cards a replacement effect drew before it
+                    // asked which to discard are still there to be chosen.
                     let pending = self.state.agenda[at].pending.clone();
-                    self.state.revert(mark);
-                    self.log.truncate(log_mark as usize);
+                    let (back_to, log_to) = asked_at.unwrap_or((mark, log_mark as usize));
+                    self.state.revert(back_to);
+                    self.log.truncate(log_to);
                     self.state.update_frame(at, |f| f.pending = pending);
                     Err(Stop::Suspend)
                 }
@@ -493,6 +497,14 @@ pub(crate) struct Cx<'a> {
     /// `Query::lost_all_abilities` answer of it while the effects that modify how it enters are judged
     /// (`ops::judged_entering`).
     pub entering: Option<ops::WouldExist>,
+    /// The replacement effects that have had their one opportunity at the event whose modified event is being carried out
+    /// (CR 614.5, `replace::run_then`): a card Thought Reflection's "draw two cards instead" draws meets every draw replacement
+    /// but that Thought Reflection's. Empty outside one.
+    pub lineage: Vec<replace::Applied>,
+    /// Where the journal and the history stood when this run's question was asked: a run that goes on past a question it
+    /// could not stop at (`ask_core`) is wound back to here, so the question is put to the position it was asked in, with
+    /// the objects it names, and not to the one the run began from.
+    pub asked_at: Option<(Mark, usize)>,
 }
 
 impl<'a> Cx<'a> {
@@ -530,6 +542,7 @@ impl<'a> Cx<'a> {
         }
         let id = self.g.state.request_id();
         let at = self.frame;
+        self.asked_at = Some((self.g.state.mark(), self.g.log.len()));
         self.g.state.update_frame(at, |f| f.pending = Some(Request { id, player, kind, may_cancel }));
         loops::waiting(&mut self.g.state, id, key);
         Err(Stop::Suspend)

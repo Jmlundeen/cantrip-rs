@@ -1473,6 +1473,33 @@ pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
     all
 }
 
+/// Whether `player` can't draw `n` more cards right now (CR 121.2b, 121.3, 614.17): a static ability of a permanent on the
+/// battlefield with its abilities says so (`CardDef::cant_draw`). With `n` of 1 it is about the card about to be drawn,
+/// which then is not drawn and which no replacement effect may replace (CR 614.17c, Spirit of the Labyrinth's ruling); with
+/// more, about an effect that offers the player the choice to draw that many, which they can't take (CR 121.2b: "you may
+/// draw two cards" under "can't draw more than one card each turn"), the same as a choice to draw one they can't (CR 121.3).
+pub fn cant_draw(q: &dyn Query, player: PlayerId, n: u32) -> bool {
+    q.state().battlefield().iter().any(|&id| {
+        let o = q.obj(id);
+        // The definition its abilities come from: the card it copies, or the face that is up (CR 712.8d-f).
+        let def = match o.copy {
+            Some(c) => q.card(c.card),
+            None => {
+                let front = q.card(o.card);
+                match front.back {
+                    Some(back) if o.transformed => back,
+                    _ => front,
+                }
+            }
+        };
+        // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
+        !def.cant_draw.is_empty() && !q.lost_all_abilities(id) && {
+            let asker = Asker { source: id, controller: o.controller };
+            def.cant_draw.iter().any(|rule| rule(q, &asker, player, n))
+        }
+    })
+}
+
 /// A static ability that says whether a player may cast spells right now from a kind of zone (CR 101.2, 601.3): false
 /// forbids it, for every spell cast from that zone, a cast an effect offers during resolution too. "Your opponents can't
 /// cast spells during your turn" (Voice of Victory) ignores the zone; "your opponents can't cast spells from anywhere other
@@ -1645,6 +1672,12 @@ pub type UnpreventableRule = fn(&dyn Query, &Asker, ObjectId, bool) -> bool;
 /// A static ability that says a player can't gain life (CR 119.7): true for `player`. "Players can't gain life" (Sunspine
 /// Lynx), "Your opponents can't gain life" (Knight of Dusk's Shadow). `cantrip_mechanics::statics` has both.
 pub type LifeGainRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
+
+/// A static ability that limits the cards a player can draw (CR 121.2b, 121.3, 614.17): true when `player` can't draw `n` more
+/// cards right now, the card about to be drawn being the first of them. "Each player can't draw more than one card each
+/// turn" (Spirit of the Labyrinth), "each opponent can't draw more than one card each turn" (Narset, Parter of Veils;
+/// Leovold, Emissary of Trest): `cantrip_mechanics::statics` has both. Asked by `cant_draw`.
+pub type DrawRule = fn(&dyn Query, &Asker, PlayerId, u32) -> bool;
 
 /// A static ability that says a player can't lose life (CR 119.8): true for `player`. Platinum Emperion's "your life total
 /// can't change" is this and a `LifeGainRule` together.
@@ -2039,6 +2072,10 @@ pub struct CardDef {
     /// the loss - damage's, a payment's, an effect's, a new life total's that would lower the total - does not happen, and a
     /// cost that pays more than 0 life can't be paid.
     pub cant_lose_life: &'static [LifeLossRule],
+    /// Its static abilities that stop players from drawing cards (CR 121.2b, 614.17), while it is on the battlefield with its
+    /// abilities: a draw that can't happen does not, and no replacement effect replaces it (CR 614.17c); a choice to draw
+    /// that many can't be taken (CR 121.3). See `cant_draw`.
+    pub cant_draw: &'static [DrawRule],
     /// Its static abilities that keep a player from losing the game (CR 104.3, 704.5a-c), while it is on the battlefield with
     /// its abilities: "you can't lose the game" (Platinum Angel), "you don't lose the game for having 0 or less life"
     /// (Phyrexian Unlife). A concession still loses (CR 104.3a), and nothing stops a draw (CR 104.4).
@@ -2214,6 +2251,7 @@ impl CardDef {
         unpreventable_damage: &[],
         cant_gain_life: &[],
         cant_lose_life: &[],
+        cant_draw: &[],
         loss_rules: &[],
         win_rules: &[],
         infect_damage_to: &[],

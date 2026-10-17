@@ -389,7 +389,8 @@ pub enum RequestKind {
     /// player's life total (CR 119.3), how much: a gain above zero, a loss below; `damage`, for damage about to be dealt,
     /// what it is as the effects applied so far have left it (whom it would now be dealt to, CR 614.6); `turn`, whether the
     /// event is the beginning of the asked player's turn, which effects would skip (CR 614.10); `counters`, for counters
-    /// about to be put on `subject` (CR 122.6), how many of each kind as the effects so far have left them.
+    /// about to be put on `subject` (CR 122.6), how many of each kind as the effects so far have left them; `draw`, whether
+    /// the event is a card the asked player would draw (CR 121.6).
     ChooseReplacement {
         subject: Option<ObjectId>,
         life: Option<i32>,
@@ -398,6 +399,7 @@ pub enum RequestKind {
         damage: Option<DamageAbout>,
         turn: bool,
         counters: Vec<(CounterKind, i16)>,
+        draw: bool,
     },
 }
 
@@ -776,6 +778,9 @@ pub enum Purpose {
     /// permanent or player at the same time (CR 615.7): a source chosen from among them, by the player or the controller
     /// of the permanent, with this much left on the shield to prevent. The rest of the shield goes to the others.
     PreventDamageFrom(u16),
+    /// Cards in the chooser's hand drawn this turn, for each of which they will pay this much life or put it on top of their
+    /// library (Sylvan Library): which of them the choice is about, not which go back.
+    PayLifeOrPutOnTop(u8),
 }
 
 /// The text of one option, as an index, so no string is built at runtime.

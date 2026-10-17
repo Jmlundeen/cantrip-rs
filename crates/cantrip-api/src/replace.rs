@@ -163,7 +163,11 @@ pub type ReplacementApply = fn(&dyn Query, &Asker, &mut Proposal);
 
 /// What an effect does besides reshaping the event: the work of "instead you create a Treasure token" (CR 614.1a), done
 /// to the game once the effect has applied. It is handed the event as it was proposed and as the effect left it, so it
-/// can act on the difference (Hullbreacher: one Treasure for each draw the effect removed).
+/// can act on the difference (Hullbreacher: a Treasure for the draw the effect replaced). What it does is the modified
+/// event (CR 614.6): a card it has drawn meets the replacement effects that have not yet had their one opportunity at the
+/// event (CR 614.5), so a second Thought Reflection doubles each of the two cards the first one draws, and the first doubles
+/// neither. A question it asks that has no answer yet suspends the run, which is redone with the answer (`Game::ask`): it
+/// returns there, doing nothing more.
 pub type ReplacementThen = fn(&mut dyn Game, &Asker, &Proposal, &Proposal);
 
 /// A replacement effect of a static ability (CR 614.1, 604).
@@ -180,6 +184,13 @@ pub struct ReplacementDef {
     pub apply: ReplacementApply,
     /// Game operations the effect performs as it applies (see [`ReplacementThen`]).
     pub then: Option<ReplacementThen>,
+    /// "You may ... instead" (CR 614.1a): the affected player is asked this as the effect would apply, and declining it
+    /// leaves the event as it was, for the other effects (CR 616.1). Dredge's and Abundance's.
+    pub optional: Option<&'static Question>,
+    /// It functions only while its card is in a graveyard (CR 113.6, 702.52a: dredge), "you" being the card's owner, and
+    /// only on that player's draws: the one kind of event such an ability replaces. Never while the card is on the
+    /// battlefield.
+    pub in_graveyard: bool,
 }
 
 /// Whether a replacement effect a spell or ability made (`EffectKind::Replacement`) replaces this event, judged on the board
@@ -188,6 +199,10 @@ pub type GrantedApplies = fn(&dyn Query, &Asker, ObjectId, &Proposal) -> bool;
 
 /// What a replacement effect a spell or ability made does to the event.
 pub type GrantedApply = fn(&dyn Query, &Asker, ObjectId, &mut Proposal);
+
+/// What a replacement effect a spell or ability made does to the game as it applies, besides reshaping the event: as a
+/// [`ReplacementThen`], also told the object the effect is about.
+pub type GrantedThen = fn(&mut dyn Game, &Asker, ObjectId, &Proposal, &Proposal);
 
 /// A replacement effect (CR 614) that a resolving spell or ability makes for a duration (CR 611.2), as opposed to a static
 /// ability's (`ReplacementDef`): it is not a card's standing ability, but a continuous effect that lasts, and it is
@@ -199,6 +214,11 @@ pub struct GrantedReplacementDef {
     pub kind: ReplacementKind,
     pub applies: GrantedApplies,
     pub apply: GrantedApply,
+    /// Game operations the effect performs as it applies (see [`GrantedThen`]).
+    pub then: Option<GrantedThen>,
+    /// "The next time [an event] would happen this turn, ... instead" (CR 614.1a): the effect is used up by the one event it
+    /// replaces, and ends as it applies; a second such effect waits for the next event.
+    pub once: bool,
 }
 
 /// Whether a prevention effect applies to this damage (CR 615.1), judged on the board as it is and on the damage as the
@@ -254,5 +274,14 @@ fn nothing(_: &dyn Query, _: &Asker, _: &mut Proposal) {}
 
 impl ReplacementDef {
     pub const BLANK: ReplacementDef =
-        ReplacementDef { hint: "", kind: ReplacementKind::ZoneChange, own_everywhere: false, applies: never, apply: nothing, then: None };
+        ReplacementDef {
+        hint: "",
+        kind: ReplacementKind::ZoneChange,
+        own_everywhere: false,
+        applies: never,
+        apply: nothing,
+        then: None,
+        optional: None,
+        in_graveyard: false,
+    };
 }

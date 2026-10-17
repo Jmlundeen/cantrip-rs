@@ -455,6 +455,19 @@ would turn the event into a gain or a loss the player can't have leaves nothing.
 `actions::payable_life` is 0 for them): a cost with life in it is not offered, Phyrexian symbols are paid with mana, and X paid
 in life is announced at 0. The host shows "You can't lose life." or, with both, "Your life total can't change." beside the total.
 
+Draws (CR 121) are judged one card at a time (`ops::draw`): first whether the player can't draw it (`cantrip_api::cant_draw`,
+a permanent's `CardDef::cant_draw` rule: "can't draw more than one card each turn", CR 121.2b) - then nothing happens and no
+replacement effect replaces it (CR 614.17c) - then the `Proposal::Draw` replacements (CR 121.6), ordered by the drawing player
+(`ChooseReplacement`'s `draw`, worded "You would draw a card"). A replaced draw is gone and nothing else replaces it (CR 614.6).
+What an effect does instead is its `then`, done as it applies (CR 121.6b); the draws and the rest it makes are the modified
+event, and meet only the effects that have not yet had their one opportunity at the event (CR 614.5): `Cx::lineage` carries the
+effects applied so far into them, so two "draw two cards instead" make four, and a Notion Thief on each side returns the card
+to its drawer. A "you may ... instead" (`ReplacementDef::optional`, dredge, Abundance) asks its question as it would apply, and
+declined leaves the event to the others. Dredge functions in its owner's graveyard (`ReplacementDef::in_graveyard`), the one
+kind of replacement a card there has. A resolved "the next time you would draw a card" is a granted replacement that is used
+up as it applies (`GrantedReplacementDef::once`). A question a `then` asks (which card to discard) suspends a run that cannot
+stop there; the run is wound back to where the question was asked (`Cx::asked_at`), so the question names objects that exist.
+
 Replacement effects of a gain or loss of life (CR 614.1a: "you gain that much life plus 1 instead", "they lose twice that much
 life instead", "that player loses that much life instead") are `ReplacementKind::LifeChange` effects over a
 `Proposal::LifeChange { player, amount }`, `amount` signed (a gain above zero, a loss below), applied by `change_life` through

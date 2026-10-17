@@ -265,6 +265,9 @@ pub enum CardChoicePurposeView {
     /// The other attacking creatures that attack in a band with `Source`, a creature with banding (CR 702.22c, 508.1e): any
     /// number with banding and at most one of `WithoutBanding`. None chosen forms no band.
     Band,
+    /// Cards in the chooser's hand drawn this turn, for each of which they then pay `Life` life or put it on top of their
+    /// library (Sylvan Library): the cards the payments are about, not those that go back.
+    PayLifeOrPutOnTop,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -1023,6 +1026,8 @@ pub struct ChooseCardsPrompt {
     pub prevent_left: i32,
     /// For `Band`, the eligible creatures without banding, of which a band may have at most one (CR 702.22c).
     pub without_banding: Vec<ViewHandle>,
+    /// For `PayLifeOrPutOnTop`, the life each chosen card costs to keep.
+    pub life: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
