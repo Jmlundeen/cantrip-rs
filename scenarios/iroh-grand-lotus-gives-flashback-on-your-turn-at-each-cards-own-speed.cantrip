@@ -1,0 +1,67 @@
+# Iroh, Grand Lotus: "During your turn, each non-Lesson instant and sorcery card in your graveyard has flashback. The
+# flashback cost is equal to that card's mana cost. During your turn, each Lesson card in your graveyard has flashback {1}."
+# Turn 1: Iroh, then Lightning Bolt at Bot2 (17). Turn 3: Iroh's Demonstration, a sorcery Lesson, from the hand; Iroh
+# attacks and firebending 2 adds {R}{R}. In the declare-attackers step Lightning Bolt is offered flashback for {R} (its mana
+# cost) and not for {1} (it is no Lesson), and is cast with the firebending mana at Bot2 (14), then exiled (CR 702.34a);
+# the Demonstration, a sorcery, may not be flashed back in combat (the ruling: "you must still follow any timing
+# restrictions"). Iroh's 5 damage leaves Bot2 at 9. In Bot2's turn 4 the Demonstration has no flashback ("during your
+# turn"), with {1} at hand; in Bot1's turn 5 it is cast for {1} - not for its mana cost {1}{R}: a Lesson has only the
+# second flashback - and is exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Iroh, Grand Lotus
+Lightning Bolt
+Mountain
+Iroh's Demonstration
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iroh, Grand Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Iroh's Demonstration.Cast
+Bot1.Modes(1)
+Bot1.Attack(Iroh, Grand Lotus)
+? Stack = Iroh, Grand Lotus
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R} lasting {R}{R}
+! Bot1.Graveyard.Iroh's Demonstration.Cast
+! Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Flashback {1})
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Flashback equal to its mana cost)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 14
+? Exile = Lightning Bolt
+[T4 Bot2.Main1]
+! Bot1.Graveyard.Iroh's Demonstration.Cast
+[T5 Bot1.Main1]
+! Bot1.Graveyard.Iroh's Demonstration.Cast(Ability: its mana cost)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Graveyard.Iroh's Demonstration.Cast(Ability: Flashback {1})
+Bot1.Modes(1)
+
+[Expect]
+Turn = 5
+Bot2.Life = 9
+Exile = Iroh's Demonstration; Lightning Bolt
+Bot1.Graveyard = Black Lotus

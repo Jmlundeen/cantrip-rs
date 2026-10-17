@@ -1,0 +1,48 @@
+# Iroh, Grand Lotus gives Lightning Bolt in Bot1's graveyard flashback for its mana cost; the ruling: "A spell cast using
+# flashback will always be exiled afterward, whether it resolves, is countered, or leaves the stack in some other way"
+# (CR 702.34a). Bot1 casts the Bolt again in turn 3, and Bot2's Remand, which would return it to its owner's hand, exiles it
+# instead (CR 614.1). Bot2 took 3 from the first Bolt only.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Iroh, Grand Lotus
+Lightning Bolt
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Remand
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iroh, Grand Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Flashback)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Remand.Cast(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Exile = Lightning Bolt
+Bot1.Hand.Count = 1

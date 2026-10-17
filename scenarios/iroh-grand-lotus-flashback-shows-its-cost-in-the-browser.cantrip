@@ -1,0 +1,40 @@
+# Browser
+# Iroh, Grand Lotus gives Lightning Bolt in Bot1's graveyard flashback "equal to that card's mana cost": the page's menu
+# for the Bolt says the way and what it costs, {R}, since the way's text does not (CR 702.34a, 118.9). Clicked, the Bolt
+# is cast again at Bot2 and exiled.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Iroh, Grand Lotus
+Lightning Bolt
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Iroh, Grand Lotus.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2; Ability: Flashback)
+? Client.Bot1.Menu = Cast Lightning Bolt — Flashback equal to its mana cost {R}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Exile = Lightning Bolt
