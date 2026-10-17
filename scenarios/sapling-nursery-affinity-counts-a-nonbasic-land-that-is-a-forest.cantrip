@@ -1,0 +1,45 @@
+# Affinity for Forests counts lands by type, not by name or "basic" (CR 702.41a, 205.3i): Temple Garden is a Forest Plains
+# (here tapped, which does not matter), so with it as the only land {6}{G}{G} costs {5}{G}{G}, paid exactly by seven Mox
+# Emeralds, with nothing floating. Were it not counted the cost would be eight and the seven Moxen could not pay it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Temple Garden
+Mox Emerald
+Sapling Nursery
+Forest x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Temple Garden.Play
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Battlefield.Mox Emerald#6.Activate
+Bot1.Battlefield.Mox Emerald#7.Activate
+Bot1.Hand.Sapling Nursery.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Sapling Nursery.Types = Enchantment
+Bot1.Battlefield.Mox Emerald#7.Tapped = true

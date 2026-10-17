@@ -1,0 +1,6 @@
+{
+  "name": "Sapling Nursery",
+  "manaCost": "{6}{G}{G}",
+  "type": "Enchantment",
+  "oracleText": "Affinity for Forests (This spell costs {1} less to cast for each Forest you control.)\nLandfall — Whenever a land you control enters, create a 3/4 green Treefolk creature token with reach.\n{1}{G}, Exile this enchantment: Treefolk and Forests you control gain indestructible until end of turn."
+}

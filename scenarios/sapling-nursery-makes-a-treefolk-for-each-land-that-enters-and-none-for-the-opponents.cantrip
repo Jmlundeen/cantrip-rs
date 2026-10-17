@@ -1,0 +1,64 @@
+# Landfall - "Whenever a land you control enters" (CR 603.2): each land is its own trigger. On turn 5 Bot1 plays a Forest and casts
+# the Nursery for {5}{G}{G} (one Forest: seven mana from seven Mox Emeralds, nothing floating). Bot2's Island entering on turn 6
+# makes no token (the control for "you control": the Island is a land, and the Nursery is in play). On turn 7 Bot1 plays Wooded
+# Foothills (a Treefolk) and cracks it to fetch a Forest (a second Treefolk): two Treefolk, both 3/4 green with reach.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Forest
+Mox Emerald
+Sapling Nursery
+Wooded Foothills
+Forest x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Battlefield.Mox Emerald#6.Activate
+Bot1.Battlefield.Mox Emerald#7.Activate
+Bot1.Hand.Sapling Nursery.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 9
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+? Bot1.Battlefield.Count = 9
+[T7 Bot1.Main1]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Treefolk.Power = 3
+Bot1.Battlefield.Wooded Foothills.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Treefolk#1.Token = true
+Bot1.Battlefield.Treefolk#2.Token = true
+Bot1.Battlefield.Treefolk#2.Toughness = 4
+Bot1.Battlefield.Treefolk#2.Keywords = Reach
+Bot1.Battlefield.Count = 12

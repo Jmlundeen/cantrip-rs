@@ -1,0 +1,89 @@
+# Sapling Nursery, the whole card. Affinity for Forests (CR 702.41a): on turn 5 Bot1 controls two Forests (Bot2's two Forests
+# and Bot1's own Island do not count), so {6}{G}{G} costs {4}{G}{G}: six mana, paid by the two Forests, the Island and three Mox
+# Emeralds, and nothing floats afterwards (a cost of five would leave a mana in the pool). On turn 7 a Forest entering
+# triggers landfall: a 3/4 green Treefolk with reach. On Bot2's turn 8 Damnation is cast and, in response, Bot1 pays {1}{G} and
+# exiles the Nursery: Treefolk and Forests Bot1 controls gain indestructible until end of turn (the Treefolk survives, the Forests
+# are indestructible), but the Island does not and Bot2's Forests do not. Bot1's Ornithopter, neither, is destroyed.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Sapling Nursery
+Forest
+Forest
+Island
+Ornithopter
+Island
+Forest
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Damnation
+Forest
+Forest
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Sapling Nursery.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sapling Nursery.Types = Enchantment
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Treefolk.Power = 3
+? Bot1.Battlefield.Treefolk.Toughness = 4
+? Bot1.Battlefield.Treefolk.Keywords = Reach
+? Bot1.Battlefield.Treefolk.Colors = Green
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Battlefield.Mox Jet#4.Activate
+Bot2.Hand.Damnation.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Sapling Nursery.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Sapling Nursery
+Bot1.Battlefield.Treefolk.Keywords = Indestructible; Reach
+Bot1.Battlefield.Forest#1.Keywords = Indestructible
+Bot1.Battlefield.Island.Keywords = (absent)
+Bot2.Battlefield.Forest#1.Keywords = (absent)
+Bot1.Graveyard = Ornithopter
