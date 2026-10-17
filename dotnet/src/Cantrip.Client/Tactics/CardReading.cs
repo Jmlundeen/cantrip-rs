@@ -488,7 +488,7 @@ public static partial class CardReading
             return new EffectRead(EffectKind.Harm, Number(discard.Groups[1].Value));
         }
 
-        if (plain.Contains("tap target", StringComparison.Ordinal) || TapUpTo().IsMatch(plain)
+        if (plain.Contains("tap target", StringComparison.Ordinal) || plain.Contains("tap another target", StringComparison.Ordinal) || TapUpTo().IsMatch(plain)
             || plain.Contains("can't block", StringComparison.Ordinal)
             || plain.Contains("can't attack", StringComparison.Ordinal)
             || plain.Contains("reveals their hand", StringComparison.Ordinal)

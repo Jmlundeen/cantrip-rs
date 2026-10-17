@@ -119,6 +119,7 @@ public sealed class CardReadingTests
     [InlineData("When this creature enters, you may discard one or more land cards. When you do, return up to that many target nonland permanent cards from your graveyard to your hand.", EffectKind.Raise, 0)]
     [InlineData("Whenever you attack, you may sacrifice one or more Treasures. When you do, up to that many target creatures gain double strike until end of turn.", EffectKind.Help, 0)]
     [InlineData("Whenever Eluge enters or attacks, put a flood counter on target land. It's an Island in addition to its other types for as long as it has a flood counter on it.", EffectKind.Help, 0)]
+    [InlineData("{T}, Remove a net counter from this artifact: Tap another target nonland permanent. Its activated abilities can't be activated for as long as it remains tapped.", EffectKind.Harm, 0)]
     [InlineData("Untap up to three lands.", EffectKind.Unknown, 0)]
     [InlineData("+1: Draw a card. At the beginning of the next end step, untap up to two lands.", EffectKind.Unknown, 0)]
     [InlineData("Draw two cards.", EffectKind.Unknown, 0)]
