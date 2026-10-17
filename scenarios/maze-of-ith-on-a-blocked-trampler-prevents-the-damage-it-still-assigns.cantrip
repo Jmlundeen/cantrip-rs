@@ -1,0 +1,44 @@
+# Maze of Ith prevents a creature's combat damage as it is dealt, not its assignment (CR 510.1-2, 615.1): the creature stays
+# blocked (the rulings), so a trampler still assigns lethal damage to its blocker before any reaches the player (CR 702.19b).
+# Bot1's Ulvenwald Oddity (4/4 trample, haste) attacks; Bot2's Llanowar Elves blocks; Bot2 Mazes the Oddity after blocks.
+# Bot1 still divides its 4 - 1 to the Elves (lethal), 3 to Bot2 - and every point of it is prevented, as is the Elves' 1
+# to the Oddity. Bot2 stays at 20 and the Elves live.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x14
+
+[Bot2 Deck]
+Maze of Ith
+Mox Emerald
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Maze of Ith.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ulvenwald Oddity.Cast
+Bot1.Attack(Ulvenwald Oddity > Bot2)
+Bot2.Block(Llanowar Elves > Ulvenwald Oddity)
+[T3 Bot1.Blockers]
+Bot1.Pass
+Bot2.Battlefield.Maze of Ith.Activate(Ulvenwald Oddity)
+Bot1.AssignDamage(Ulvenwald Oddity > Llanowar Elves: 1; Ulvenwald Oddity > Bot2: 3)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Ulvenwald Oddity.Damage = 0
+Prevented = 1 Ulvenwald Oddity > Llanowar Elves by Maze of Ith; 3 Ulvenwald Oddity > Bot2 by Maze of Ith; 1 Llanowar Elves > Ulvenwald Oddity by Maze of Ith

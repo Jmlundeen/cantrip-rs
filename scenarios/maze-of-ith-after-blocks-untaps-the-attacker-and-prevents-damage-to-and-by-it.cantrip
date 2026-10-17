@@ -1,0 +1,59 @@
+# Maze of Ith: "{T}: Untap target attacking creature. Prevent all combat damage that would be dealt to and dealt by that
+# creature this turn." Bot1 attacks with Guerrilla Gorilla (2/2); Llanowar Elves stays home. Bot2 blocks with its own
+# Gorilla. In the declare blockers step Bot2 can't target the Elves, which is not attacking (the positive control is the
+# attacking Gorilla), and Mazes the attacking Gorilla: it untaps, stays in combat and blocked (the rulings), and neither the
+# 2 it would deal nor the 2 the blocker would deal it is dealt (CR 615.1) - each recorded as Maze of Ith's. Both Gorillas
+# survive undamaged and Bot2 takes nothing.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Guerrilla Gorilla
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Maze of Ith
+Mox Emerald
+Mox Jet
+Guerrilla Gorilla
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Maze of Ith.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla > Bot2)
+Bot2.Block(Guerrilla Gorilla > Guerrilla Gorilla)
+[T3 Bot1.Blockers]
+Bot1.Pass
+! Bot2.Battlefield.Maze of Ith.Activate(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Maze of Ith.Activate(Bot1.Battlefield.Guerrilla Gorilla)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Guerrilla Gorilla.Tapped = false
+? Combat.Blocks = Guerrilla Gorilla > Guerrilla Gorilla
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot1.Battlefield.Guerrilla Gorilla.Tapped = false
+Bot2.Battlefield.Maze of Ith.Tapped = true
+Prevented = 2 Guerrilla Gorilla > Guerrilla Gorilla by Maze of Ith; 2 Guerrilla Gorilla > Guerrilla Gorilla by Maze of Ith
