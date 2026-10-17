@@ -88,11 +88,17 @@ pub fn may_fetch_basic(g: &mut dyn Game, player: PlayerId, source: ObjectId, tap
 /// "Search your library for a basic land card, put it onto the battlefield [tapped], then shuffle" (CR 701.23): the search
 /// of a Ghost Quarter, a Prismatic Vista and a Lander token (Biotech Specialist), the player finding one or none.
 pub fn search_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<(), Suspend> {
+    fetch_basic_land_to_battlefield(g, player, source, tapped)?;
+    Ok(())
+}
+
+/// `search_basic_land_to_battlefield`, giving the land that arrived (none if the player found none) for an ability that goes
+/// on to do something to it: Elven Passage's "untap that land".
+pub fn fetch_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
     search_to_battlefield(g, player, source, Find::ONE, tapped, |q, c| {
         let chars = q.chars(c);
         chars.is(CardType::Land) && chars.supertypes.basic
-    })?;
-    Ok(())
+    })
 }
 
 /// What "you may search your library for a basic land card, reveal it, put it into your hand, then shuffle" asks.

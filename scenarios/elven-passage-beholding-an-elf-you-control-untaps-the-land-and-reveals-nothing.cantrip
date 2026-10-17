@@ -1,0 +1,32 @@
+# Elven Passage: beholding an Elf PERMANENT you control (Llanowar Elves, put out with the Mox Emerald) chooses it without
+# revealing anything (CR 701.4a), and the fetched Forest is untapped. The Elves are not tapped or otherwise changed.
+
+[Bot1 Deck]
+Mox Emerald
+Elven Passage
+Llanowar Elves
+Ornithopter
+Island x3
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Elven Passage.Play
+Bot1.Pass
+Bot1.Battlefield.Elven Passage.Activate
+Bot1.Search(Forest)
+Bot1.Choose(Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Mox Emerald; Llanowar Elves; Forest
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Revealed = (absent)

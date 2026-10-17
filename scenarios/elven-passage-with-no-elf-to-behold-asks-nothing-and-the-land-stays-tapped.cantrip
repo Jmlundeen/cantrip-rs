@@ -1,0 +1,26 @@
+# Elven Passage: with no Elf to behold - the hand holds only an Ornithopter (not an Elf: "an Elf card" needs the subtype)
+# and nothing on the battlefield is one - nobody is asked (! Bot1.Choose) and the Forest stays tapped. The positive
+# control, an Elf in hand, is elven-passage-beholding-an-elf-card-in-hand-reveals-it-and-untaps-the-land.
+
+[Bot1 Deck]
+Elven Passage
+Ornithopter
+Island x5
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Elven Passage.Play
+Bot1.Battlefield.Elven Passage.Activate
+Bot1.Search(Forest)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Revealed = (absent)

@@ -1,0 +1,30 @@
+# Elven Passage: {T}, pay 1 life, sacrifice it: the basic land comes in TAPPED; "you may behold an Elf. If you do, untap that
+# land." Bot1 reveals the Llanowar Elves in hand (CR 701.4a) - it stays in the hand - so the fetched Forest is untapped.
+# The Passage is in the graveyard (sacrificed as the cost) and Bot1 paid 1 life. Compare the scenarios where no Elf is
+# beheld: the Forest stays tapped.
+
+[Bot1 Deck]
+Elven Passage
+Llanowar Elves
+Ornithopter
+Island x4
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Elven Passage.Play
+Bot1.Battlefield.Elven Passage.Activate
+Bot1.Search(Forest)
+Bot1.Choose(Llanowar Elves)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Elven Passage
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Revealed = Llanowar Elves
+Bot1.Hand = Llanowar Elves; Ornithopter; Island; Island; Island; Island

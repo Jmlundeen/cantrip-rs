@@ -1,0 +1,26 @@
+# Elven Passage: "You may behold an Elf" - Bot1 has a Llanowar Elves in hand but beholds nothing (Choose() takes none), so
+# there is no "if you do": the fetched Forest stays tapped, and nothing is revealed.
+
+[Bot1 Deck]
+Elven Passage
+Llanowar Elves
+Island x5
+Forest
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Elven Passage.Play
+Bot1.Battlefield.Elven Passage.Activate
+Bot1.Search(Forest)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Revealed = (absent)
+Bot1.Hand = Llanowar Elves; Island; Island; Island; Island; Island
