@@ -38,6 +38,15 @@ pub fn creatures_you_control_gain_haste(g: &mut dyn Game, item: &StackItem) {
     }
 }
 
+/// "All creatures get +`power`/+`toughness` until end of turn" (CR 611.2, 611.2c): every creature on the battlefield as
+/// `source`'s spell or ability resolves, whoever controls it, and no creature that enters later. Toxic Deluge (-X/-X) and
+/// Withering Curse (-2/-2) print it.
+pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i16, toughness: i16) {
+    for id in creatures_on_the_battlefield(g) {
+        crate::pump(g, source, id, power, toughness);
+    }
+}
+
 /// "Creatures you control gain trample and get +P/+T until end of turn" (CR 611.2c): `pump_creatures_you_control` and trample for
 /// each of them, the creatures being those on the battlefield as it resolves. The creatures, for what the rest of the sentence does
 /// to them. Craterclaw Colossus (+X/+0, X the artifacts you control) and Craterhoof Behemoth (+X/+X, X the creatures) print it.
