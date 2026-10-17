@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{delayed, library};
+use cantrip_mechanics::{delayed, ferocious, library};
 use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
 use cantrip_oracle as oracle;
 
@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 /// exiled (CR 603.7c), and is set up even when there are none.
 fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let x = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature) && g.chars(id).power.is_some_and(|p| p >= 4)).count();
+    let x = ferocious::count(g, you);
     let grant = PlayGrant { lands: true, expiry: Expiry::UntilYourNextEndStep, ..PlayGrant::CAST };
     let exiled = library::exile_top_may_play(g, you, x, you, grant);
     delayed::at_your_next_end_step_about(g, item, 0, &exiled);

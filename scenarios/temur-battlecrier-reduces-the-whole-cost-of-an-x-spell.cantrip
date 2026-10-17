@@ -1,0 +1,42 @@
+# The reduction applies to the total cost, X included (CR 601.2f, 118.7a): with Temur Battlecrier on the battlefield Walking Ballista
+# ({X}{X}) with X = 2 costs {3} instead of {4}. Bot1 has exactly three mana left, Mox Jet, Mox Pearl and a Plains, and gets a
+# Ballista with two counters, which three mana could not pay for without the reduction.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Temur Battlecrier
+Walking Ballista
+Plains
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temur Battlecrier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Walking Ballista.Power = 2

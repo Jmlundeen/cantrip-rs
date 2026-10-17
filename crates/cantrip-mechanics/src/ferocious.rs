@@ -1,6 +1,6 @@
 //! Ferocious (CR 207.2c, an ability word with no rules meaning of its own): "if you control a creature with power 4 or
-//! greater". Stubborn Denial, Fanatic of Rhonas and Bolt Bend print it, the last without the word; Temur Battlecrier
-//! counts such creatures.
+//! greater". Stubborn Denial, Fanatic of Rhonas and Bolt Bend print it, the last without the word; Temur Battlecrier and
+//! Dragonhawk, Fate's Tempest count such creatures.
 
 use cantrip_api::*;
 

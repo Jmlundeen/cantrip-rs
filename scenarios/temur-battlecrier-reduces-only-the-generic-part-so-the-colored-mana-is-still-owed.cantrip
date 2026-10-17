@@ -1,0 +1,42 @@
+# Two creatures with power 4 or greater (Giant Cindermaw cast on turn 1, Temur Battlecrier on turn 3) would reduce Frantic Search
+# ({2}{U}) by two, but a reduction takes only generic mana (CR 118.7a): {U} is still owed. After Ruby, Emerald and the Island pay
+# for Battlecrier, Bot1 has only Mox Jet ({B}) untapped, so Frantic Search is refused. (The two-creature scenario is the positive
+# control: the same cast with an Island untapped is made for {U}.)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Island
+Giant Cindermaw
+Temur Battlecrier
+Frantic Search
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Giant Cindermaw.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Temur Battlecrier.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Frantic Search.Cast
+
+[Expect]
+Bot1.Battlefield.Giant Cindermaw.Power = 4
+Bot1.Battlefield.Temur Battlecrier.Power = 4
+Bot1.Hand.Count = 2
