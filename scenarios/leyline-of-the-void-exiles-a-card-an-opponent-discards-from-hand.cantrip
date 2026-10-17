@@ -1,0 +1,32 @@
+# "From anywhere": a discard moves a card from hand to a graveyard. Bot1's Duress makes Bot2 discard its Lightning Bolt, a card put
+# into an opponent's graveyard from a hand, so it is exiled instead (CR 614.1a, 701.9); Bot1's Duress goes to Bot1's graveyard.
+# Bot2 still lost the Bolt from its hand: six Islands remain.
+
+[Bot1 Deck]
+Leyline of the Void
+Mox Jet
+Duress
+Island x4
+Island x12
+
+[Bot2 Deck]
+Lightning Bolt
+Island
+Island
+Island x16
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Duress

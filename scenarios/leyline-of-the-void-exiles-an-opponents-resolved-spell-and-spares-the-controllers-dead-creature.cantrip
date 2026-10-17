@@ -1,0 +1,33 @@
+# The other direction, and a spell rather than a permanent: Bot2's Lightning Bolt kills Bot1's Llanowar Elves. The Elves go to
+# Bot1's own graveyard (the Leyline's controller is not its own opponent), while the Bolt, resolving into Bot2's graveyard,
+# is exiled instead (CR 614.1a, 608.2n). Bot1's graveyard = Llanowar Elves, Bot2's is empty, the Bolt is in exile.
+
+[Bot1 Deck]
+Leyline of the Void
+Mox Emerald
+Llanowar Elves
+Island x4
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Llanowar Elves
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt
