@@ -240,6 +240,15 @@ pub fn opponents_cant_gain_life(_: &dyn Query, asker: &Asker, player: PlayerId) 
     player != asker.controller
 }
 
+/// "You have shroud" (CR 702.18a) as a `CardDef::player_keywords` entry: the permanent's controller, while it is on the
+/// battlefield with its abilities. True Believer and Ivory Mask print it.
+pub const YOU_HAVE_SHROUD: PlayerKeywordRule = PlayerKeywordRule { keyword: Keyword::Shroud, applies: you };
+
+/// "You": the source's controller, as a [`PlayerKeywordRule`] reads it.
+fn you(q: &dyn LayerQuery, source: ObjectId, player: PlayerId) -> bool {
+    q.state().obj(source).controller == player
+}
+
 /// "Damage can't be prevented" (CR 615.12) as a `CardDef::unpreventable_damage` entry: all damage, from any source, combat
 /// or not, while the permanent is on the battlefield. Sunspine Lynx, Leyline of Punishment and Everlasting Torment print it.
 pub fn damage_cant_be_prevented(_: &dyn Query, _: &Asker, _: ObjectId, _: bool) -> bool {
