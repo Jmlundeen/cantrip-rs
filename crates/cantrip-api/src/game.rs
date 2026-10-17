@@ -612,8 +612,8 @@ pub trait Game: Query {
     fn create_tokens_worded(&mut self, tokens: &[(CardId, PlayerId)], tapped: bool, attacking: Option<Target>, words: Words) -> Result<Vec<ObjectId>, Suspend>;
     /// Creates a token "attached to" `host` (CR 111.1, 303.4): an Aura token enters attached to it, chosen by the effect
     /// and not targeted, so hexproof and shroud do not matter (the Role rulings, 2023-09-01). If the Aura could not legally
-    /// enchant `host` - gone from the battlefield, or protected from it - it is not created (CR 303.4i); a token that is
-    /// not an Aura, Equipment or Fortification enters unattached (CR 303.4h). Every token a replacement makes of it
+    /// enchant `host` - gone from the battlefield, or protected from it - it is not created (CR 303.4i); an Equipment token
+    /// that could not equip it is created unattached (CR 301.5e), and any other token enters unattached (CR 303.4h). Every token a replacement makes of it
     /// (CR 614.1a) enters so. The tokens created.
     fn create_token_attached(&mut self, def: CardId, controller: PlayerId, host: ObjectId) -> Result<Vec<ObjectId>, Suspend>;
     /// Exiles cards together and remembers them as exiled with `by` (CR 607.2a, 610.3). With `until_leaves` they return

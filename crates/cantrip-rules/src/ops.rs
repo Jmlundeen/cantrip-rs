@@ -943,8 +943,9 @@ pub fn create_token_attached(cx: &mut Cx, card: CardId, controller: PlayerId, ho
 }
 
 /// `create_tokens_worded`, each token an effect says is created attached to `host` entering so (CR 303.4): an Aura only
-/// if it could legally enchant `host` as it enters, and not created otherwise (CR 303.4i); anything else unattached
-/// (CR 303.4h). The choice is the effect's, not a target (hexproof does not matter).
+/// if it could legally enchant `host` as it enters, and not created otherwise (CR 303.4i); an Equipment if it could
+/// equip it, and unattached otherwise (CR 301.5e); anything else unattached (CR 303.4h). No Fortification token exists
+/// to be made so (CR 301.6). The choice is the effect's, not a target (hexproof does not matter).
 #[allow(clippy::too_many_arguments)]
 fn create_tokens_onto(
     cx: &mut Cx,
@@ -1018,14 +1019,19 @@ fn create_tokens_onto(
         // The token is judged as it would exist on the battlefield (CR 614.12): a token copy as what it copies.
         let copy = entering.copy;
         cx.st().update_obj(id, |o| o.copy = copy);
-        // "Create a token attached to [a permanent]" (CR 303.4h-i).
-        if let Some(host) = host
-            && cx.chars(id).has_subtype(Subtype::Aura)
-        {
-            if !(cx.s().obj(host).zone.is(ZoneKind::Battlefield) && crate::attach::host_allows(&*cx, id, host, true)) {
-                continue;
+        // "Create a token attached to [a permanent]" (CR 303.4h-i, 301.5e): an Aura that could not enchant it is not
+        // created; an Equipment that could not equip it is created unattached; anything else enters unattached.
+        if let Some(host) = host {
+            let chars = cx.chars(id);
+            let allowed = cx.s().obj(host).zone.is(ZoneKind::Battlefield) && crate::attach::host_allows(&*cx, id, host, true);
+            if chars.has_subtype(Subtype::Aura) {
+                if !allowed {
+                    continue;
+                }
+                entering.attach = Some(host);
+            } else if chars.has_subtype(Subtype::Equipment) && allowed {
+                entering.attach = Some(host);
             }
-            entering.attach = Some(host);
         }
         // A token enters the battlefield as it is created (CR 111.1): the replacements of a permanent's entry apply to it
         // as to any other's (CR 614.1c), "enters tapped" and the counters one gives as it arrives.
