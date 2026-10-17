@@ -719,3 +719,33 @@ one. A fix reads islandwalk into `Keywords` and makes a landwalker unblockable i
 seat controls a land of its type. The web client shows the keyword on the card, and the language-model client reads it.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
+
+### KI-58: A printed landwalk does not follow a text change of its land type
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, review of Lord of Atlantis |
+
+**Notes.** "Islandwalk" names a basic land type, a word of the text it is printed in (CR 612.2), so Trait Doctoring replacing
+Island with Swamp on a creature that prints islandwalk should leave it with swampwalk. A granted landwalk follows its source's
+words (`Keyword::landwalk`, Lord of Atlantis), but a printed one is a `Keyword` of the card's characteristics, which the
+layer-3 text change (`EffectKind::ChangeText`, `layers::apply_effect`) does not touch. No card in content prints a landwalk.
+A fix replaces a landwalk keyword in layer 3 where the changed word is its land type (only on the object's own text, not a
+granted copy, CR 612.3).
+
+**Scenarios.** none: no card in content prints landwalk.
+
+### KI-59: A daybound permanent entering at night under Humility or Dress Down enters transformed
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, review of Dress Down |
+
+**Notes.** Daybound's "if it is night, this permanent enters transformed" is a static ability of the permanent (CR
+702.145b), and which of a permanent's own entering replacements apply is judged on it as it would exist on the battlefield
+(CR 614.12): under Humility or Dress Down a daybound creature has no abilities there, so it should enter front face up even at
+night. `ops::prepare_entry` asks `day_night::enters_transformed` from the printed keyword before the CR 614.12 question
+(`enters_without_abilities`) that its other entering replacements go through. A fix puts that branch under the same
+question, with a scenario of a daybound creature cast at night under Humility.
+
+**Scenarios.** none yet.

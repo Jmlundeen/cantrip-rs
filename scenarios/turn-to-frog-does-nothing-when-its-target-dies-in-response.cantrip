@@ -1,0 +1,54 @@
+# Turn to Frog's only target gone: on turn 3 Bot1 casts it at Bot2's Llanowar Elves, and Bot2 answers with Lightning Bolt at
+# its own Elves, which resolves first and kills it. As Turn to Frog resolves its target is illegal, so it does nothing (CR
+# 608.2b): Bot2's other Llanowar Elves is still a green 1/1 Elf Druid with its mana ability, and the spell goes to Bot1's
+# graveyard. (The Elves is on top of the Bolt in Bot2's graveyard: the Bolt went there as its last step, CR 608.2n, before
+# the state-based actions put the Elves there.)
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Turn to Frog
+Island x17
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Llanowar Elves
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Turn to Frog.Cast(Llanowar Elves#1)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Llanowar Elves#1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Turn to Frog
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
+Bot2.Battlefield.Llanowar Elves.Colors = Green
+Bot2.Battlefield.Llanowar Elves.Power = 1

@@ -955,7 +955,7 @@ Landwalk (CR 702.14) is an evasion ability, a keyword per basic land type: `Keyw
 block it (CR 702.14c), whatever landwalk the blocker has (702.14d). An ability that grants one names its land type through
 its source's words (CR 612.2: Lord of Atlantis with Island changed to Swamp grants swampwalk, `Keyword::landwalk`). A
 printed landwalk's land type a text change replaces is not followed (no card in content prints landwalk; known issue
-KI-52). Another kind of landwalk (nonbasic, snow) is another keyword.
+KI-58). Another kind of landwalk (nonbasic, snow) is another keyword.
 
 ### Can't attack unless
 

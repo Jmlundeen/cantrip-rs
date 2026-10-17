@@ -5,7 +5,7 @@
 # chosen as it enters on turn 5 (the refusal "! Bot1.Modes" holds across its resolution) and it has no chosen type. It is a
 # 1/1 enchantment creature: Opalescence's 3/3 first, then the later Humility's 1/1 (layer 7b, CR 613.7). On turn 7 Bot1
 # disenchants Humility: Arcane Adaptation has its ability again, and is a creature Bot1 controls, but with no type chosen
-# it adds none - to itself or anything else - and is Opalescence's 3/3.
+# it adds none - to itself, or to the Ornithopter in Bot1's library, still a Thopter alone - and is Opalescence's 3/3.
 
 [Bot1 Deck]
 Plains
@@ -18,7 +18,8 @@ Opalescence
 Humility
 Arcane Adaptation
 Disenchant
-Island x10
+Ornithopter
+Island x9
 
 [Bot2 Deck]
 Island x20
@@ -69,3 +70,4 @@ Bot1.Battlefield.Arcane Adaptation.ChosenSubtype = (absent)
 Bot1.Battlefield.Arcane Adaptation.Subtypes = (absent)
 Bot1.Battlefield.Arcane Adaptation.Power = 3
 Bot1.Battlefield.Arcane Adaptation.Toughness = 3
+Bot1.Library.Ornithopter.Subtypes = Thopter

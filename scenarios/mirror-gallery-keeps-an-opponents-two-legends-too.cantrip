@@ -1,0 +1,44 @@
+# Mirror Gallery's "The 'legend rule' doesn't apply" is about the rule itself, not its controller's permanents (CR 704.5j):
+# with Bot1's Gallery out, Bot2 casts two Ragavan, Nimble Pilferer on turn 2 and keeps both - Bot2 is never asked which to
+# keep (the refusal "! Bot2.Choose" holds after the second resolves). Hall of Echoes' "doesn't apply to permanents you
+# control" is the narrower kind; this one reaches every player.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mirror Gallery
+Island x16
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Ragavan, Nimble Pilferer
+Ragavan, Nimble Pilferer
+Mountain x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mirror Gallery.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Pass
+! Bot2.Choose
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield = Mountain; Mox Ruby; Ragavan, Nimble Pilferer; Ragavan, Nimble Pilferer
+Bot2.Graveyard.Count = 0
