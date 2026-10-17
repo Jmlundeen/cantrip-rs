@@ -1,0 +1,43 @@
+# "Island" in Spreading Seas's "Enchanted land is an Island" is a basic land type word (CR 612.2). Magical Hack replaces it
+# with Swamp in the Aura's text (CR 612.1, layer 3): the Aura now sets the enchanted land's subtype to Swamp (CR 305.7, layer
+# 4), so Bot2's Mutavault is a Swamp that taps for {B} - not an Island, and not a Mutavault with its own abilities.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Spreading Seas
+Magical Hack
+Island x16
+
+[Bot2 Deck]
+Mutavault
+Plains x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mutavault.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spreading Seas.Cast(Bot2.Battlefield.Mutavault)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Mutavault.Subtypes = Island
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Magical Hack.Cast(Bot1.Battlefield.Spreading Seas)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mutavault.Activate
+? Bot2.Mana = {B}
+
+[Expect]
+Bot2.Battlefield.Mutavault.Subtypes = Swamp
+Bot1.Graveyard = Magical Hack

@@ -1,0 +1,49 @@
+# "If you change the text of a spell which is to become a permanent, the permanent will retain the text change" (Magical
+# Hack's ruling; CR 400.7a: the effect goes on to the permanent the spell becomes). Bot1 casts Lord of Atlantis and, with it
+# on the stack, Magical Hack on it, replacing Island with Swamp. The Lord enters saying "have swampwalk": Bot1's Hullbreacher,
+# a Merfolk, has swampwalk, not islandwalk, and +1/+1.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Hullbreacher
+Lord of Atlantis
+Magical Hack
+Island x13
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hullbreacher.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Magical Hack.Cast(Stack.Lord of Atlantis)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+? Stack = Lord of Atlantis
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Hullbreacher.Keywords = Flash; Swampwalk
+Bot1.Battlefield.Hullbreacher.Power = 4
+Bot1.Battlefield.Lord of Atlantis.Subtypes = Merfolk
+Bot1.Graveyard = Magical Hack

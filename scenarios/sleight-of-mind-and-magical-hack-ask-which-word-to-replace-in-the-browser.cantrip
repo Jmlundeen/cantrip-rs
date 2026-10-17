@@ -1,0 +1,55 @@
+# Browser
+# A text-changing spell asks two words as it resolves (CR 612.1, 608.2d): the one to replace, then the one replacing it, and
+# Bot1's page says which it is asking. Sleight of Mind on Bot2's White Knight asks "choose the color word to replace" and
+# then "choose the color word that replaces it" (black, then red: the Knight has protection from red, CR 612.2); Magical
+# Hack on Bot2's Plains asks "choose the basic land type to replace" and "choose the basic land type that replaces it"
+# (Plains, then Island: the Plains is an Island, CR 305.6).
+
+[Bot1 Deck]
+Mox Sapphire
+Island
+Sleight of Mind
+Magical Hack
+Island x16
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+White Knight
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.White Knight.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot2.Battlefield.White Knight)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Sleight of Mind: choose the color word to replace
+? Client.Bot1.Prompt.Detail = Every instance of it in the target's text is replaced
+Bot1.Colors(Black)
+? Client.Bot1.Prompt.Title = Sleight of Mind: choose the color word that replaces it
+Bot1.Colors(Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Magical Hack.Cast(Bot2.Battlefield.Plains)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Magical Hack: choose the basic land type to replace
+? Client.Bot1.Prompt.Detail = Every instance of it in the target's text is replaced
+Bot1.Modes(Plains)
+? Client.Bot1.Prompt.Title = Magical Hack: choose the basic land type that replaces it
+Bot1.Modes(Island)
+
+[Expect]
+Bot2.Battlefield.White Knight.ProtectionFrom = Red
+Bot2.Battlefield.Plains.Subtypes = Island
+Bot1.Graveyard = Magical Hack; Sleight of Mind

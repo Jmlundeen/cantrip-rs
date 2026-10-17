@@ -1,0 +1,31 @@
+# "It can be used to change a land's type from one basic land type to another. For example, Forest can be changed to Island
+# so it produces blue mana. It doesn't change the name of any permanent" (Magical Hack's ruling). Its type line is text (CR
+# 612.1): Bot2's Forest becomes an Island, still named Forest, and its intrinsic mana ability is {U}'s now (CR 305.6) - on
+# Bot2's next turn it taps for {U}, and its text change has not ended (it lasts indefinitely).
+
+[Bot1 Deck]
+Island
+Magical Hack
+Island x18
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Magical Hack.Cast(Bot2.Battlefield.Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Forest)
+Bot1.Modes(Island)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+? Bot2.Mana = {U}
+
+[Expect]
+Bot2.Battlefield.Forest.Subtypes = Island
+Bot1.Graveyard = Magical Hack
