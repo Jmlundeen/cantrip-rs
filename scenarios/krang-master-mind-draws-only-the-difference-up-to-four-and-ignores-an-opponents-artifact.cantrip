@@ -1,0 +1,50 @@
+# Krang's enters trigger has an intervening "if you have fewer than four cards in hand" (CR 603.4), and draws "equal to the difference"
+# as it resolves. Bot1 plays four Moxen and an Island on turn 1 and holds Krang, an Island and, with each draw step, one more card.
+# Krang costs {2}{U}{U} with the four artifacts (affinity), so it is cast on turn 5 with the Island, Mox Sapphire and two more
+# Moxen: with Krang gone, the hand is Island, Plains, Plains = 3 cards, and Krang draws 4 - 3 = 1 (the Island on top of the library).
+# Bot2's Mox Ruby is an artifact too, but not one Bot1 controls: it neither reduces Krang's cost nor adds to its power, a 5/4.
+# Cast a turn later (the next scenario) four cards remain in hand and it draws nothing.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Krang, Master Mind
+Island
+Plains
+Plains
+Island
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Krang, Master Mind.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Plains; Plains; Island
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Krang, Master Mind.Power = 5
+Bot1.Battlefield.Mox Pearl.Tapped = false
