@@ -1,0 +1,61 @@
+# Patchwork Beastie's ruling: "Once Patchwork Beastie is attacking or blocking, reducing the number of card types among cards in
+# your graveyard won't remove Patchwork Beastie from combat" (CR 506.4, 508.1c). Bot1 gets delirium in turn 3 (an Island milled,
+# Lightning Bolt, Haywire Mite) and attacks with the Beastie; Bot2's Ghost Vacuum then exiles the Bolt from Bot1's graveyard,
+# leaving three card types, and the Beastie still deals its 3.
+
+[Bot1 Deck]
+Forest
+Patchwork Beastie
+Mox Ruby
+Haywire Mite
+Lightning Bolt
+Forest
+Plains
+Island
+Plains x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Ghost Vacuum
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Patchwork Beastie.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Upkeep]
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Mox Sapphire)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Patchwork Beastie > Bot2)
+Bot2.Battlefield.Ghost Vacuum.Activate(Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Haywire Mite; Island
+? Combat.Attackers = Patchwork Beastie > Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Exile = Mox Sapphire; Lightning Bolt

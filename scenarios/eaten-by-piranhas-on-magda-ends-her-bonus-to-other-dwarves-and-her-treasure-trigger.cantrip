@@ -1,0 +1,48 @@
+# A static ability of the enchanted creature that applies to other permanents (layer 7c) stops (CR 613.1f, 613.8a): Bot2's
+# Magda, Brazen Outlaw gives its Dwarven Mauler +1/+0 (3/1) until Bot1 enchants Magda with Eaten by Piranhas, after which the
+# Mauler is 2/1. Magda's "Whenever a Dwarf you control becomes tapped, create a Treasure token" is gone too: the Mauler attacks
+# in turn 4 and no Treasure is made. Magda is a 1/1 Skeleton, no longer a Dwarf.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Eaten by Piranhas
+Island x17
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Magda, Brazen Outlaw
+Dwarven Mauler
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Magda, Brazen Outlaw.Cast
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Dwarven Mauler.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Dwarven Mauler.Power = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Magda, Brazen Outlaw)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Dwarven Mauler.Power = 2
+[T4 Bot2.Main1]
+Bot2.Attack(Dwarven Mauler > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield = Mountain; Mox Ruby; Mox Ruby; Magda, Brazen Outlaw; Dwarven Mauler
+Bot2.Battlefield.Dwarven Mauler.Power = 2
+Bot2.Battlefield.Magda, Brazen Outlaw.Subtypes = Skeleton

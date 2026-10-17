@@ -1,0 +1,41 @@
+# The block restriction is an ability too (CR 509.1b, 613.1f): Bot1's Patchwork Beastie, enchanted by Eaten by Piranhas in turn 3,
+# is a 1/1 Skeleton with no abilities, so in Bot2's turn 4 it blocks Curious Farm Animals though Bot1's graveyard is empty. The
+# two 1/1s trade, and Bot2 gains 3 from the Farm Animals.
+
+[Bot1 Deck]
+Island
+Patchwork Beastie
+Mox Sapphire
+Mox Emerald
+Eaten by Piranhas
+Island x15
+
+[Bot2 Deck]
+Plains
+Curious Farm Animals
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Patchwork Beastie.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Patchwork Beastie)
+[T4 Bot2.Main1]
+Bot2.Attack(Curious Farm Animals > Bot1)
+Bot1.Block(Patchwork Beastie > Curious Farm Animals)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Eaten by Piranhas; Patchwork Beastie
+Bot2.Graveyard = Curious Farm Animals
+Bot2.Life = 23
+Bot1.Life = 20
