@@ -304,6 +304,13 @@ shapes have an example:
   with the state-based actions and as each event happens, before what it triggers is looked for (CR 702.131d,
   702.195c), so a token that is the tenth permanent gives the blessing in time for the rest of the ability that made it.
   The scenario keys are `BotN.CitysBlessing` and `BotN.EnduringStory`.
+- **Speed** (CR 702.179) is `Player.speed`, none until set. A card with start your engines! says
+  `start_your_engines: true`, and the rules give its controller speed 1 as a state-based action (CR 704.5aa,
+  `speed::engines_start`); the player's inherent "whenever one or more opponents lose life during your turn" ability is
+  the rules' own (`intrinsic::SPEED_UP`, queued from `change_life`, once a turn by the history's `Triggered` records), and
+  `g.increase_speed(p, n)` raises it, never past 4. Each change is `Event::SpeedChanged`. A card reads it with
+  `start_your_engines::speed` (0 for none, CR 702.179f) or `has_max_speed`; "Max speed — [ability]" is
+  `statics: &[max_speed::max_speed(text)]` with the ability as the card's `delayed[0]` (CR 702.178a). `BotN.Speed`.
 - **Venturing** (CR 701.49, 309) walks `Player.room` through a dungeon card (`CardDef.dungeon`: the arrows of each room;
   the ability of the room is the ability of the same index, its label "Name — text"). The Undercity is
   `cards/undercity.rs`; `g.venture(p)` enters or moves on, and the rules complete it (CR 704.5t, `dungeons_completed`).
