@@ -1,0 +1,35 @@
+# Mutavault: "{1}: This land becomes a 2/2 creature with all creature types until end of turn. It's still a land." Played
+# on turn 1, on turn 3 it is animated for a Swamp's {B}: a Land Creature (CR 205.1b) of every creature type (CR 205.3m),
+# a 2/2 with no keyword - all creature types is not Changeling (the card's ruling). It attacks and taps doing so. The
+# effect ends in the cleanup step (CR 514.2), so on Bot2's turn 4 it is a plain Land again.
+
+[Bot1 Deck]
+Mutavault
+Swamp
+Swamp x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+? Bot1.Battlefield.Mutavault.Subtypes = (every creature type)
+? Bot1.Battlefield.Mutavault.Power = 2
+? Bot1.Battlefield.Mutavault.Toughness = 2
+Bot1.Attack(Mutavault > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Battlefield.Mutavault.Tapped = True
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 18
+Bot1.Battlefield.Mutavault.Types = Land

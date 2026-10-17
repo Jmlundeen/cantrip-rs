@@ -1,0 +1,33 @@
+# An animated Mutavault is a 2/2 creature, so 3 damage from Bot2's Lightning Bolt is lethal damage (CR 704.5g) and the
+# land card goes to its owner's graveyard. While the animation is on the stack it is only a land, which "any target"
+# (CR 115.4) does not include, so the Bolt is refused then and cast once the animation has resolved. Bot1 animates it
+# on turn 3 with a Swamp; Bot2 answers with a Mountain.
+
+[Bot1 Deck]
+Mutavault
+Swamp
+Swamp x18
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mutavault)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Mutavault)
+Bot2.Battlefield.Mountain.Activate
+
+[Expect]
+Bot1.Graveyard = Mutavault
+Bot2.Graveyard = Lightning Bolt
