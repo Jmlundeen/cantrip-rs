@@ -1,0 +1,70 @@
+# The Swarmweaver: "When The Swarmweaver enters, create two 1/1 black and green Insect creature tokens with flying. Delirium - As
+# long as there are four or more card types among cards in your graveyard, Insects and Spiders you control get +1/+1 and have
+# deathtouch." Bot2's Grist (turn 2) makes a plain Insect of its own. On turn 1 Bot1 puts an Ornithopter into its graveyard with
+# Entomb: artifact, creature and instant, three types. On turn 3 the Swarmweaver makes two Insects that are 1/1 flyers without
+# deathtouch (three types is not delirium). On turn 5 a second Entomb puts a Swamp there: the fourth type, a land, and the two
+# Insects are 2/2 with deathtouch while the Swarmweaver (a Scarecrow) and Bot2's Insect stay as they were.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Entomb
+Entomb
+Forest
+Mox Emerald
+The Swarmweaver
+Ornithopter
+Swamp
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Grist, the Hunger Tide
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Grist, the Hunger Tide.Cast
+Bot2.Battlefield.Grist, the Hunger Tide.Activate(Ability: +1)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Swarmweaver.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Insect#1.Power = 1
+? Bot1.Battlefield.Insect#1.Keywords = Flying
+? Bot1.Battlefield.Insect#1.Colors = Black; Green
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Insect#1.Power = 2
+Bot1.Battlefield.Insect#1.Toughness = 2
+Bot1.Battlefield.Insect#1.Keywords = Deathtouch; Flying
+Bot1.Battlefield.Insect#2.Power = 2
+Bot1.Battlefield.Insect#2.Keywords = Deathtouch; Flying
+Bot1.Battlefield.The Swarmweaver.Power = 2
+Bot1.Battlefield.The Swarmweaver.Toughness = 3
+Bot1.Battlefield.The Swarmweaver.Keywords = (absent)
+Bot2.Battlefield.Insect.Power = 1
+Bot2.Battlefield.Insect.Keywords = (absent)

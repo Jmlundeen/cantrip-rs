@@ -1,0 +1,51 @@
+# The Swarmweaver: "Insects AND SPIDERS you control". Town Greeter mills four cards on turn 1 (an Ornithopter, a Swamp, a Dark
+# Ritual and a Plains: artifact, creature, land and instant types, delirium); Bot1 takes no land from among them. On turn 3 the
+# Swarmweaver's Insects arrive already 2/2 with deathtouch, and on turn 5 Spider-Man, Web-Slinger (a 3/3 Spider) is 4/4 with
+# deathtouch the moment it enters.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Mox Pearl
+Town Greeter
+The Swarmweaver
+Mox Ruby
+Ornithopter
+Swamp
+Dark Ritual
+Plains
+Spider-Man, Web-Slinger
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Town Greeter.Cast
+Bot1.Choose()
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Swarmweaver.Cast
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Insect#1.Power = 2
+? Bot1.Battlefield.Insect#2.Keywords = Deathtouch; Flying
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spider-Man, Web-Slinger.Cast
+
+[Expect]
+Bot1.Battlefield.Spider-Man, Web-Slinger.Power = 4
+Bot1.Battlefield.Spider-Man, Web-Slinger.Toughness = 4
+Bot1.Battlefield.Spider-Man, Web-Slinger.Keywords = Deathtouch
