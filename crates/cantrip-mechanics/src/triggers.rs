@@ -196,6 +196,19 @@ pub fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fi
     }
 }
 
+/// "Whenever this creature is dealt damage" (CR 120.2, 603.2c): the damage it is dealt at once, even if it is lethal, as
+/// the trigger's `data[0]` ("that much"); damage of zero is not dealt. The ability is `.sums_per_subject()`, which adds up
+/// the events of one combat that hurt it from several sources. Screaming Nemesis and Hexhaven Invigorator print it. The
+/// `listens` mask is `EventMask::DAMAGE`.
+pub fn this_dealt_damage(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { target: Target::Object(hurt), amount, .. } if *hurt == source && *amount > 0 => {
+            Some(Fired { subject: Target::None, data: [*amount as u32, 0] })
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever you sacrifice [a permanent]" (CR 701.21a): the permanent `player` sacrificed, as it last was on the
 /// battlefield, for the card to judge the quality it names. The ability is `.on_sacrifice().look_back()`. Tireless Tracker
 /// (a Clue) and Biotech Specialist (an artifact) print it.
@@ -961,6 +974,7 @@ pub const YOU_GAIN_LIFE: Trigger = when_asked(EventMask::LIFE_CHANGE, you_gain_l
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks);
+pub const THIS_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, this_dealt_damage);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
 pub const THIS_ENTERS_OR_ATTACKS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), this_enters_or_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);

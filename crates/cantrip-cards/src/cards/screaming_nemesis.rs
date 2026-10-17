@@ -1,17 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
-
-/// "Whenever this creature is dealt damage" (CR 120.2, 603.2c): one trigger for the damage it is dealt at once, even if
-/// it is lethal, carrying that much (`sums_per_subject` adds up the events of one combat that hurt it from several sources).
-fn dealt_damage(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Damage { target: Target::Object(hurt), amount, .. } if *hurt == source && *amount > 0 => {
-            Some(Fired { subject: Target::None, data: [*amount as u32, 0] })
-        }
-        _ => None,
-    }
-}
 
 /// "Any other target" (CR 115.1): any target but this creature itself.
 fn any_other_target(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -31,7 +20,7 @@ fn retaliate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::DAMAGE, dealt_damage), retaliate, "Whenever this creature is dealt damage, it deals that much damage to any other target. If a player is dealt damage this way, they can't gain life for the rest of the game.")
+    abilities: &[triggered(triggers::THIS_DEALT_DAMAGE, retaliate, "Whenever this creature is dealt damage, it deals that much damage to any other target. If a player is dealt damage this way, they can't gain life for the rest of the game.")
         .targets(&[target(any_other_target)])
         .sums_per_subject()],
     ..oracle::SCREAMING_NEMESIS
