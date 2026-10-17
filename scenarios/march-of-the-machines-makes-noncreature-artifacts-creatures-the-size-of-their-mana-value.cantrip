@@ -1,0 +1,73 @@
+# March of the Machines: "Each noncreature artifact is an artifact creature with power and toughness each equal to its mana
+# value." Layer 4 adds Creature, layer 7b sets the size (CR 613.6, 613.4b), to the artifacts the layer-4 part applied to.
+# - Sol Ring (mana value 1) is a 1/1 artifact creature, Chromatic Lantern ({3}) a 3/3; Bot2's are too ("each").
+# - The four Moxes and Darksteel Citadel, an artifact land, have mana value 0: 0/0, put into the graveyard (CR 704.5f, the
+#   ruling) - indestructible does not save a creature with 0 toughness. The Citadel is still a land as it dies.
+# - Ornithopter is already an artifact creature, so March does not apply to it: it stays 0/2.
+# - Sol Ring, a creature that came under Bot1's control this turn, has summoning sickness: its {T} ability can't be
+#   activated (the ruling, CR 302.6); Chromatic Lantern, there since an earlier turn, taps for mana (the positive control).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Chromatic Lantern
+March of the Machines
+Darksteel Citadel
+Sol Ring
+Plains x15
+
+[Bot2 Deck]
+Sol Ring
+Ornithopter
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Darksteel Citadel.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Chromatic Lantern.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.March of the Machines.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Darksteel Citadel.Activate(Ability: Add {C})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring.SummoningSick = true
+! Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Chromatic Lantern.Activate(Ability: any color; Color: Blue)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Chromatic Lantern; March of the Machines; Sol Ring
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Sol Ring.Types = Artifact; Creature
+Bot1.Battlefield.Sol Ring.Power = 1
+Bot1.Battlefield.Sol Ring.Toughness = 1
+Bot1.Battlefield.Chromatic Lantern.Power = 3
+Bot1.Battlefield.Chromatic Lantern.Toughness = 3
+Bot1.Battlefield.March of the Machines.Types = Enchantment
+Bot2.Battlefield.Sol Ring.Power = 1
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
