@@ -1,0 +1,59 @@
+# Lady Octopus, Inspired Inventor gets an ingenuity counter for each of the first two cards Bot1 draws each turn
+# (CR 120.3): none for Bot2's draw on turn 2, one for Bot1's draw step on turn 3, one for the first Opt's draw, none
+# for the second Opt's (the third card). With two counters her {T} ability casts an artifact spell of mana value 2 or
+# less from Bot1's hand for free (CR 608.2g, 118.9): Coalition Relic (3) is not offered, nor is Consider (1), no artifact; Mind Stone (2) is, and is cast
+# with no mana spent. On turn 5 the count starts again, and the draw step's card makes three counters.
+
+[Bot1 Deck]
+Island
+Lady Octopus, Inspired Inventor
+Mind Stone
+Coalition Relic
+Opt
+Opt
+Consider
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Lady Octopus, Inspired Inventor.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters.Ingenuity = (absent)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters.Ingenuity = 1
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters.Ingenuity = 2
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters.Ingenuity = 2
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Coalition Relic)
+! Bot1.Choose(Consider)
+Bot1.Choose(Mind Stone)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mind Stone.Tapped = false
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters.Ingenuity = 3
+Bot1.Battlefield = Island; Island; Lady Octopus, Inspired Inventor; Mind Stone
+Bot1.Hand = Coalition Relic; Consider; Island; Island; Island
+Bot1.Graveyard = Opt; Opt

@@ -1,0 +1,31 @@
+# "You may cast": with one ingenuity counter Lady Octopus's ability offers Mind Stone? No - Mind Stone is 2, so it
+# offers Chromatic Star (1), and Bot1 chooses nothing. Nothing is cast, the Star stays in the hand, and the cast cannot
+# be made later (the rulings: it is cast as the ability resolves or not at all) - Lady Octopus is tapped.
+
+[Bot1 Deck]
+Island
+Lady Octopus, Inspired Inventor
+Chromatic Star
+Island x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Lady Octopus, Inspired Inventor.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Lady Octopus, Inspired Inventor
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Tapped = true
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters.Ingenuity = 1
+Bot1.Hand = Chromatic Star; Island; Island; Island; Island; Island

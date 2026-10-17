@@ -1,0 +1,51 @@
+# Bot2 answers Lady Octopus's ability with Lightning Bolt, and she dies with two ingenuity counters on her. The ability
+# still resolves (CR 113.7a) and counts the counters she had as she last existed on the battlefield (CR 608.2h), so
+# Mind Stone (2) may still be cast for free.
+
+[Bot1 Deck]
+Island
+Lady Octopus, Inspired Inventor
+Mind Stone
+Opt
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Lady Octopus, Inspired Inventor.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Activate
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Lady Octopus, Inspired Inventor)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Lady Octopus, Inspired Inventor; Opt
+Bot2.Pass
+Bot1.Choose(Mind Stone)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Island; Mind Stone
+Bot1.Graveyard = Lady Octopus, Inspired Inventor; Opt
+Bot2.Graveyard = Lightning Bolt
