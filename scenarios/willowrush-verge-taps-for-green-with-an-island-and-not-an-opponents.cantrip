@@ -1,0 +1,30 @@
+# "You control a Forest or an Island": a Plains of its own does not enable {G}, nor do the opponent's Forest (turn 2) and Island
+# (turn 4); an Island of its own does (turn 5, the "or" in the other direction from the Forest scenario).
+
+[Bot1 Deck]
+Willowrush Verge
+Plains
+Island
+Plains x14
+
+[Bot2 Deck]
+Forest
+Island
+Plains x14
+
+[Actions]
+Bot1.Hand.Willowrush Verge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Willowrush Verge.Activate(Ability: {G})
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Willowrush Verge.Activate(Ability: {G})
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Willowrush Verge.Activate(Ability: {G})
+
+[Expect]
+Bot1.Mana = {G}

@@ -1,0 +1,21 @@
+# Willowrush Verge: its {G} ability is offered only while you control a Forest or an Island (CR 602.5b). Alone it makes {U}, the
+# {G} refused beside that positive control; once a Forest is in play (turn 3) it makes {G}.
+
+[Bot1 Deck]
+Willowrush Verge
+Forest
+Plains x18
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Willowrush Verge.Play
+! Bot1.Battlefield.Willowrush Verge.Activate(Ability: {G})
+Bot1.Battlefield.Willowrush Verge.Activate(Ability: {U})
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Willowrush Verge.Activate(Ability: {G})
+
+[Expect]
+Bot1.Mana = {G}
