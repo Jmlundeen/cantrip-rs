@@ -1,0 +1,46 @@
+# "For each Angel you already control": with Giada and a first Inspiring Overseer (which entered with 1 counter) on the battlefield, a
+# second Inspiring Overseer enters on turn 5 with 2 additional counters (two Angels already controlled) and is a 4/3, while the
+# first stays a 3/2. Giada's mana pays for each Overseer's white. Bot1 gained 1 life twice: 22.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Giada, Font of Hope
+Inspiring Overseer
+Inspiring Overseer
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giada, Font of Hope.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Giada, Font of Hope.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot1.Battlefield.Inspiring Overseer#1.Power = 3
+Bot1.Battlefield.Inspiring Overseer#1.Toughness = 2
+Bot1.Battlefield.Inspiring Overseer#2.Power = 4
+Bot1.Battlefield.Inspiring Overseer#2.Toughness = 3

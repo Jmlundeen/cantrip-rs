@@ -1,0 +1,52 @@
+# "Each other Angel you control": Bot1's Llanowar Elves (an Elf Druid) enters as a plain 1/1 beside Giada, and Bot2's own Inspiring
+# Overseer, entering under Bot2's control on turn 2, is a plain 2/1 (Giada is Bot1's). The positive control is the sibling scenario,
+# where Bot1's own Angel gets a counter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Giada, Font of Hope
+Llanowar Elves
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Jet
+Inspiring Overseer
+Island
+Island
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Inspiring Overseer.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot2.Battlefield.Inspiring Overseer.Power = 2
+Bot2.Battlefield.Inspiring Overseer.Toughness = 1

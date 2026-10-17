@@ -1,0 +1,12 @@
+{
+  "name": "Giada, Font of Hope",
+  "manaCost": "{1}{W}",
+  "type": "Legendary Creature — Angel",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying, vigilance\nEach other Angel you control enters with an additional +1/+1 counter on it for each Angel you already control.\n{T}: Add {W}. Spend this mana only to cast an Angel spell.",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}

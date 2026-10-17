@@ -1,0 +1,42 @@
+# Giada, Font of Hope: "{T}: Add {W}. Spend this mana only to cast an Angel spell." On turn 3 Giada's white mana (shown as
+# restricted to Angel spells) and two Moxen cast Inspiring Overseer, an Angel. "Each other Angel you control enters with an
+# additional +1/+1 counter on it for each Angel you already control" (CR 614.1c, 122.6): Giada is the one Angel already controlled, so
+# the 2/1 Overseer enters with one counter and is a 3/2, while Giada herself (cast with no other Angel) is a plain 2/2.
+# The Overseer's enters trigger still gains 1 life and draws: Bot1 is on 21.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Giada, Font of Hope
+Inspiring Overseer
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giada, Font of Hope.Activate
+? Bot1.Mana = {W} (AngelSpells)
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Battlefield.Giada, Font of Hope.Power = 2
+Bot1.Battlefield.Giada, Font of Hope.Toughness = 2
+Bot1.Battlefield.Inspiring Overseer.Power = 3
+Bot1.Battlefield.Inspiring Overseer.Toughness = 2

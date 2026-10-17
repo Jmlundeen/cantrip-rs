@@ -1,0 +1,37 @@
+# "Each OTHER Angel": Inspiring Overseer is already on the battlefield (turn 1), and Giada enters on turn 3. Giada's own ability
+# does not apply to her entering (CR 614.12: and she is not "other"), so she is a plain 2/2 though an Angel is already controlled.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Jet
+Giada, Font of Hope
+Inspiring Overseer
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Giada, Font of Hope.Power = 2
+Bot1.Battlefield.Giada, Font of Hope.Toughness = 2
+Bot1.Battlefield.Inspiring Overseer.Power = 2
