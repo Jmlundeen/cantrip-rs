@@ -515,4 +515,9 @@ pub mod filters {
         let c = q.chars(id);
         c.is(CardType::Artifact) || c.is(CardType::Creature)
     }
+    /// "Another creature or artifact": an artifact or a creature other than the source of the cost. Broadside Bombardiers and
+    /// Umbral Collar Zealot sacrifice one.
+    pub fn another_creature_or_artifact(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
+        id != asker.source && artifact_or_creature(q, asker, id)
+    }
 }
