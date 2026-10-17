@@ -1,0 +1,60 @@
+# Greed's Gambit entering: "you draw three cards, gain 6 life, and create three 2/1 black Bat creature tokens with flying" - hand
+# 2 + 3 = 5, life 26, three 2/1 flying Bats. At the beginning of Bot1's end step: "you discard a card, lose 2 life, and sacrifice a
+# creature", each of Bot1's choice: it discards a Swamp and sacrifices the Ornithopter instead of a Bat (the Bats are not forced),
+# so after turn 1 it has 24 life, a hand of 3 (the three drawn cards) and three Bats. Bot2's end step
+# on turn 2 is not Bot1's: nothing more is taken (turn 3: still 24 life, and 4 cards in hand after the draw).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Greed's Gambit
+Swamp
+Ornithopter
+Island
+Forest
+Mountain
+Plains
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Greed's Gambit.Cast
+[T1 Bot1.Main2]
+? Bot1.Life = 26
+? Bot1.Hand.Count = 4
+? Bot1.Battlefield.Bat#1.Power = 2
+? Bot1.Battlefield.Bat#1.Toughness = 1
+? Bot1.Battlefield.Bat#1.Keywords = Flying
+? Bot1.Battlefield.Bat#1.Colors = Black
+? Bot1.Battlefield.Bat#1.Subtypes = Bat
+? Bot1.Battlefield.Bat#3.Token = true
+[T1 Bot1.End]
+Bot1.Choose(Island)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Ornithopter; Island
+Bot1.Battlefield.Bat#3.Token = true
+Bot1.Battlefield.Greed's Gambit.Types = Enchantment

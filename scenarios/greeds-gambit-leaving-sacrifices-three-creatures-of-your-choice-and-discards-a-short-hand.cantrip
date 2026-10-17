@@ -1,0 +1,59 @@
+# The Gambit leaves (Bot2's Disenchant, turn 2): Bot1 has only two cards in hand, so "discard three cards" takes both (CR 701.9);
+# it loses 6 life (24 - 6 = 18), and with four creatures (two Bats, left after the end step's sacrifice, and two Ornithopters) it chooses
+# which three to sacrifice (CR 701.21): both Ornithopters and one Bat, keeping a Bat.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Greed's Gambit
+Swamp
+Ornithopter
+Ornithopter
+Island
+Forest
+Mountain
+10 Swamp
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Disenchant
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Greed's Gambit.Cast
+[T1 Bot1.End]
+Bot1.Choose(Island)
+Bot1.Choose(Bat)
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield.Count = 9
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Greed's Gambit)
+Bot1.Choose(Forest; Mountain)
+Bot1.Choose(Bat; Ornithopter#1; Ornithopter#2)
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Bat.Token = true
+Bot1.Graveyard.Count = 6
