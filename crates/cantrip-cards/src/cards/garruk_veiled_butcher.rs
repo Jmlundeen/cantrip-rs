@@ -1,17 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::replacements::exile_instead_apply;
+use cantrip_mechanics::replacements::OPPONENTS_CREATURES_EXILED_INSTEAD_OF_DYING;
 use cantrip_mechanics::{choose, choose_from_hand, targets, tokens};
 use cantrip_oracle as oracle;
-
-/// "If a creature an opponent controls would die" (CR 614.1a, 700.4): a creature controlled by an opponent of this
-/// permanent's controller, moving from the battlefield to a graveyard. A token is a creature too.
-fn opponents_creature_would_die(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
-    matches!(proposal, Proposal::ZoneChange(z)
-        if z.from.is(ZoneKind::Battlefield)
-            && z.to.is(ZoneKind::Graveyard)
-            && q.chars(z.object).is(CardType::Creature)
-            && q.state().opponents(asker.controller).any(|o| o == q.controller(z.object)))
-}
 
 /// +2: Up to one target creature gets -4/-1 until your next turn (CR 611.2b).
 fn plus_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -77,7 +67,7 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    replacements: &[replacement(ReplacementKind::ZoneChange, opponents_creature_would_die, exile_instead_apply, "exiles a creature an opponent controls instead of letting it die")],
+    replacements: &[OPPONENTS_CREATURES_EXILED_INSTEAD_OF_DYING],
     abilities: &[
         ability(loyalty(2), plus_two, "+2: Up to one target creature gets -4/-1 until your next turn.").targets(&[targets::CREATURE.optional()]),
         ability(loyalty(-2), minus_two, "\u{2212}2: Each player sacrifices a creature of their choice. If you sacrificed a creature this way, create a 4/4 green Beast creature token with trample."),

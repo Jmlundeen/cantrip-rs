@@ -96,6 +96,25 @@ pub fn exile_instead_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     }
 }
 
+/// "If a creature an opponent controls would die" (CR 614.1a, 700.4): a creature controlled by an opponent of this
+/// permanent's controller, moving from the battlefield to a graveyard. A token is a creature too.
+fn opponents_creature_would_die(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::ZoneChange(z)
+        if z.from.is(ZoneKind::Battlefield)
+            && z.to.is(ZoneKind::Graveyard)
+            && q.chars(z.object).is(CardType::Creature)
+            && q.state().opponents(asker.controller).any(|o| o == q.controller(z.object)))
+}
+
+/// "If a creature an opponent controls would die, exile it instead." as a permanent's static replacement effect.
+/// Garruk, Veiled Butcher and Vren, the Relentless print it.
+pub const OPPONENTS_CREATURES_EXILED_INSTEAD_OF_DYING: ReplacementDef = replacement(
+    ReplacementKind::ZoneChange,
+    opponents_creature_would_die,
+    exile_instead_apply,
+    "exiles a creature an opponent controls instead of letting it die",
+);
+
 fn exile_instead_of_dying_applies(_: &dyn Query, _: &Asker, affected: ObjectId, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
         if z.object == affected && z.from.is(ZoneKind::Battlefield) && z.to.is(ZoneKind::Graveyard))
