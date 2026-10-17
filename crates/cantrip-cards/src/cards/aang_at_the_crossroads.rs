@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers::{BEGINNING_OF_YOUR_COMBAT, THIS_ENTERS};
-use cantrip_mechanics::{choose, earthbend, effects, library, statics, top_of_library};
+use cantrip_mechanics::{earthbend, effects, library, statics};
 use cantrip_oracle as oracle;
 
 /// "Look at the top five cards of your library. You may put a creature card with mana value 4 or less from among them onto
@@ -8,19 +8,8 @@ use cantrip_oracle as oracle;
 /// library shows what it has, CR 609.3), up to one creature card of mana value 4 or less among them is chosen, and the
 /// others still in the library go to the bottom in a random order (CR 401.4).
 fn look_for_a_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    let looked = top_of_library(g, you, 5);
-    g.look_at(you, &looked);
-    let creatures: Vec<ObjectId> = looked
-        .iter()
-        .copied()
-        .filter(|&c| g.chars(c).is(CardType::Creature) && g.mana_value(c) <= 4)
-        .collect();
-    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::PutOntoBattlefield, "creature", looked.clone(), creatures, 1, true)?;
-    if let Some(&creature) = chosen.first() {
-        g.put_onto_battlefield(creature, you, false)?;
-    }
-    library::rest_to_bottom_in_random_order(g, you, &looked);
+    let creature = |q: &dyn Query, c: ObjectId| q.chars(c).is(CardType::Creature) && q.mana_value(c) <= 4;
+    library::look_at_top_onto_battlefield(g, item.controller, item.object, 5, 1, "creature", creature, None)?;
     Ok(())
 }
 

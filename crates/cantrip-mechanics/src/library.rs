@@ -217,6 +217,44 @@ pub fn look_at_top(
     Ok(taken)
 }
 
+/// "Look at the top `count` cards of your library. Put up to `most` [`kind`] cards [with total mana value N or less] from among
+/// them onto the battlefield. Put the rest on the bottom of your library in a random order." (CR 401.2, 110.2a, 401.4): the
+/// player sees every card looked at (a smaller library shows what it has, CR 609.3) and chooses among those `wanted` says
+/// qualify, read where they are (an {X} in the library is 0, CR 202.3e); with `total`, the cards chosen together have mana
+/// values adding up to at most it (`choose::cards_within_total`). The cards chosen enter together under the player's control
+/// (CR 110.2a), and the others still in the library go to the bottom at random. With nothing qualifying nobody is asked. The
+/// permanents that arrived are returned. Aang, at the Crossroads ("you may put a creature card with mana value 4 or less", one), United
+/// Battlefront (up to two) and Michelangelo's Technique (up to two, total mana value 6 or less) print it.
+pub fn look_at_top_onto_battlefield(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    count: usize,
+    most: u8,
+    kind: &'static str,
+    wanted: impl Fn(&dyn Query, ObjectId) -> bool,
+    total: Option<u32>,
+) -> Result<Vec<ObjectId>, Suspend> {
+    let looked = top_of_library(g, player, count);
+    if looked.is_empty() {
+        return Ok(Vec::new());
+    }
+    g.look_at(player, &looked);
+    let permitted: Vec<ObjectId> = looked.iter().copied().filter(|&c| wanted(g, c)).collect();
+    let chosen = match total {
+        Some(total) => crate::choose::cards_within_total(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, most, total)?,
+        None => crate::choose::cards_from_kind(g, player, source, Purpose::PutOntoBattlefield, kind, looked.clone(), permitted, most, true)?,
+    };
+    let arrived = if chosen.is_empty() {
+        Vec::new()
+    } else {
+        let entering: Vec<(ObjectId, PlayerId)> = chosen.into_iter().map(|c| (c, player)).collect();
+        g.put_all_onto_battlefield(&entering)?
+    };
+    rest_to_bottom_in_random_order(g, player, &looked);
+    Ok(arrived)
+}
+
 /// "Put the rest on the bottom of your library in a random order" (CR 401.4) after looking at `looked`, cards of `player`'s
 /// library: those still in it, a card taken having left. Narset, Parter of Veils, Once Upon a Time and United Battlefront print it.
 pub fn rest_to_bottom_in_random_order(g: &mut dyn Game, player: PlayerId, looked: &[ObjectId]) {
