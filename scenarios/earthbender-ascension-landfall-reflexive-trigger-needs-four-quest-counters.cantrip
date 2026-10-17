@@ -1,0 +1,68 @@
+# Earthbender Ascension's landfall: "put a quest counter on this enchantment. When you do, if it has four or more quest counters on it,
+# put a +1/+1 counter on target creature you control. It gains trample until end of turn." Turn 1: the fetched Island is counter 1.
+# Turn 3: Prismatic Vista entering is counter 2 and the basic it fetches is counter 3 - three is too few, so nothing is put on the stack
+# and no creature gets a counter. Turn 5: a Forest is counter 4: Bot1 chooses the Ornithopter, which gets a +1/+1 counter and trample
+# until end of turn (gone again on turn 6; the counter stays). Turn 7: a Forest is counter 5 - "four or more" - and the earthbent Forest gets
+# the +1/+1 counter. (The creature choice is asked because there are two: the earthbent Forest and the Ornithopter.)
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Earthbender Ascension
+Ornithopter
+Prismatic Vista
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Earthbender Ascension.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+Bot1.Search(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Earthbender Ascension.Counters.Quest = 2
+Bot1.Battlefield.Prismatic Vista.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Earthbender Ascension.Counters.Quest = 3
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Target(Island)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Earthbender Ascension.Counters.Quest = 4
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Forest)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Earthbender Ascension.Counters.Quest = 5
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Forest#1.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Forest#1.Power = 3
+Bot1.Battlefield.Forest#1.Keywords = Haste; Trample

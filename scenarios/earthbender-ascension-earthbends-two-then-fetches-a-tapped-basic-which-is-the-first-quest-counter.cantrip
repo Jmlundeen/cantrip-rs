@@ -1,0 +1,42 @@
+# Earthbender Ascension: "When this enchantment enters, earthbend 2. Then search your library for a basic land card, put it onto the
+# battlefield tapped, then shuffle." Bot1's only land, a Forest, is earthbent: a 2/2 haste land creature (0/0 and two +1/+1 counters).
+# The search may not find the Prismatic Vista (not basic) but finds the Island, which enters tapped - and being a land that entered
+# under Bot1's control with the Ascension already on the battlefield, it is landfall: the first quest counter. 
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Earthbender Ascension
+Forest
+Forest
+Forest
+Forest
+Prismatic Vista
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Earthbender Ascension.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+! Bot1.Search(Prismatic Vista)
+Bot1.Search(Island)
+[T1 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Forest; Island; Earthbender Ascension
+Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Forest.Power = 2
+Bot1.Battlefield.Forest.Toughness = 2
+Bot1.Battlefield.Forest.Keywords = Haste
+Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Island.Types = Land
+Bot1.Battlefield.Earthbender Ascension.Counters.Quest = 1

@@ -1,0 +1,40 @@
+# Earthbender Ascension: its enters ability has one target, the land to earthbend. With the ability on the stack Bot2 destroys that
+# land with Strip Mine; the target is illegal, so the ability does not resolve at all (CR 608.2b, the card's ruling "if the spell or
+# ability didn't have other targets, it won't resolve"): no search for a basic land either, and the Island stays in the library.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Earthbender Ascension
+Forest
+Forest
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Strip Mine
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Earthbender Ascension.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Forest; Ability: Destroy)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Earthbender Ascension
+Bot1.Graveyard = Forest; Black Lotus
+Bot1.Library.Count = 11
+Bot1.Hand.Count = 5

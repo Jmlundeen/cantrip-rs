@@ -1,0 +1,32 @@
+# Earthbender Ascension: "When this enchantment enters, earthbend 2. Then search ..." - earthbend targets a land you control (CR
+# 701.66a), and Bot1 controls none, so the ability has no legal target and is never put on the stack (CR 603.3d): the search that follows
+# the earthbend does not happen either, and the Island stays in the library with every other card.
+
+[Bot1 Deck]
+Black Lotus
+Earthbender Ascension
+Forest
+Forest
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Earthbender Ascension.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Earthbender Ascension
+Bot1.Library.Count = 11
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Black Lotus

@@ -1,0 +1,67 @@
+# Earthbender Ascension: "put a quest counter on this enchantment. When you do, ..." - the reflexive trigger (CR 603.12) happens only
+# if the counter was put on. The Ascension has four quest counters by turn 5 (Island, Vista, its fetched basic, a Forest). On turn 7 Bot1
+# plays a land, and with the landfall trigger on the stack Bot2 destroys the Ascension with Disenchant: no counter can be put on an
+# enchantment that has left the battlefield, so "when you do" never happens and no creature gets a +1/+1 counter, though the row it
+# left behind still showed four counters. (The turn-5 reflexive trigger, which does happen, is the positive control: the Ornithopter has its one counter from it, and no more.)
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Earthbender Ascension
+Ornithopter
+Prismatic Vista
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Earthbender Ascension.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+Bot1.Search(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Prismatic Vista.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Earthbender Ascension.Counters.Quest = 4
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Earthbender Ascension)
+Bot1.Pass
+Bot1.Pass
+[T7 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Earthbender Ascension; Prismatic Vista; Black Lotus
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Forest#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Forest#1.Keywords = Haste
