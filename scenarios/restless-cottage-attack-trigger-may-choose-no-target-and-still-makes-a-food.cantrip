@@ -1,0 +1,43 @@
+# "Exile up to one target card from a graveyard": Bot1 chooses no target (Target()) with Bot2's Lightning Bolt available
+# in its graveyard, so nothing is exiled, but the Food token is still created (CR 111.10b, 115.1d, 608.2b): the ability
+# resolves with no target chosen at all. The Bolt (positive control in the first scenario: it is exiled when chosen) stays.
+
+[Bot1 Deck]
+Restless Cottage
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Restless Cottage.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Restless Cottage.Activate(Ability: becomes a 4/4)
+Bot1.Attack(Restless Cottage > Bot2)
+Bot1.Target()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Food Token.Subtypes = Food
+Exile.Count = 0

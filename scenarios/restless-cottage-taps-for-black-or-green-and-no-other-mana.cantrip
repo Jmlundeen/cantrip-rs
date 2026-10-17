@@ -1,0 +1,28 @@
+# "{T}: Add {B} or {G}": on turn 3 black and green are each offered (the positive controls, on turns 3 and 5) while white,
+# blue, red and colorless are refused; it entered tapped on turn 1 (CR 614.12). It makes no Food here, as it did not attack.
+
+[Bot1 Deck]
+Restless Cottage
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Restless Cottage.Play
+? Bot1.Battlefield.Restless Cottage.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Restless Cottage.Activate(Ability: Add; Color: White)
+! Bot1.Battlefield.Restless Cottage.Activate(Ability: Add; Color: Blue)
+! Bot1.Battlefield.Restless Cottage.Activate(Ability: Add; Color: Red)
+! Bot1.Battlefield.Restless Cottage.Activate(Ability: Add; Color: Colorless)
+Bot1.Battlefield.Restless Cottage.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Restless Cottage.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 5
+Bot1.Mana = {G}
+Bot1.Battlefield = Restless Cottage

@@ -1,0 +1,52 @@
+# The trigger's only target, Lightning Bolt in Bot2's graveyard, is exiled in response by Bot2's Ghost Vacuum. With every one
+# of its targets illegal, the ability doesn't resolve (CR 608.2b), so no Food token is created at all - even though the
+# Food is not part of the targeted text. The Cottage still deals its 4 combat damage. (Positive control: the first Cottage
+# scenario makes the Food when the target stays legal.)
+
+[Bot1 Deck]
+Restless Cottage
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mox Ruby
+Ghost Vacuum
+Mountain x16
+
+[Actions]
+Bot1.Hand.Restless Cottage.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Restless Cottage.Activate(Ability: becomes a 4/4)
+Bot1.Attack(Restless Cottage > Bot2)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot2.Graveyard.Lightning Bolt)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Battlefield.Count = 5
+Stack.Count = 0

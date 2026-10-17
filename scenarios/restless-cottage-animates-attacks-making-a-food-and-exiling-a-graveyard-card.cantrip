@@ -1,0 +1,53 @@
+# Restless Cottage enters tapped on turn 1 (CR 614.1c). On turn 3 Bot1 pays {2}{B}{G} with four Moxen and animates it: until end
+# of turn it is a 4/4 black and green Horror land creature (CR 613.1d, 613.4b). It attacks, and its trigger creates a Food
+# token (CR 111.10b) and exiles the Lightning Bolt Bot2 put into its own graveyard on turn 2 (exile "from a graveyard" is any
+# graveyard). The unblocked 4/4 deals 4: 20 - 4 = 16. Bot1 took 3 from the Bolt: 17.
+
+[Bot1 Deck]
+Restless Cottage
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Restless Cottage.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+? Bot1.Battlefield.Restless Cottage.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Restless Cottage.Activate(Ability: becomes a 4/4)
+Bot1.Attack(Restless Cottage > Bot2)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+? Bot1.Battlefield.Restless Cottage.Types = Land; Creature
+? Bot1.Battlefield.Restless Cottage.Subtypes = Horror
+? Bot1.Battlefield.Restless Cottage.Colors = Black; Green
+? Bot1.Battlefield.Restless Cottage.Power = 4
+? Bot1.Battlefield.Restless Cottage.Toughness = 4
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 17
+Bot1.Battlefield.Food Token.Subtypes = Food
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt
