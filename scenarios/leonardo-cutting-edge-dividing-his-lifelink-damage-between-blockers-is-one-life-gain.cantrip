@@ -1,0 +1,49 @@
+# The ruling: a single creature with lifelink dealing combat damage to several creatures at the same time causes one
+# life-gaining event (CR 510.2, 702.15b, 119.9), so Leonardo's last ability triggers once. On turn 5 Leonardo (1/1) attacks
+# unblocked and his lifelink grows him to a 2/2. On turn 7 Bot2 blocks him with Llanowar Elves and Ornithopter, and Bot1
+# divides his 2 damage, 1 to each: Bot1 gains 2 in one event and Leonardo gets one counter (a 3/3 with two counters), not
+# two. The Elves die; the Ornithopter (0/2) and Leonardo each keep 1 damage.
+
+[Bot1 Deck]
+Plains
+Leonardo, Cutting Edge
+Plains x18
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Leonardo, Cutting Edge.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Leonardo, Cutting Edge > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Leonardo, Cutting Edge.Counters.PlusOnePlusOne = 1
+? Bot1.Life = 21
+[T7 Bot1.Main1]
+Bot1.Attack(Leonardo, Cutting Edge > Bot2)
+[T7 Bot1.DeclareBlockers]
+Bot2.Block(Llanowar Elves > Leonardo, Cutting Edge; Ornithopter > Leonardo, Cutting Edge)
+Bot1.AssignDamage(Leonardo, Cutting Edge > Llanowar Elves: 1; Leonardo, Cutting Edge > Ornithopter: 1)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 19
+Bot1.Battlefield.Leonardo, Cutting Edge.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Leonardo, Cutting Edge.Power = 3
+Bot1.Battlefield.Leonardo, Cutting Edge.Damage = 1
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Ornithopter.Damage = 1
