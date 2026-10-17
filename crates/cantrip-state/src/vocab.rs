@@ -832,6 +832,7 @@ counter_kinds! {
     Vigilance = 43, "vigilance", "Vigilance";
     Page = 44, "page", "Page";
     Flood = 45, "flood", "Flood";
+    Ingenuity = 46, "ingenuity", "Ingenuity";
 }
 
 impl CounterKind {
