@@ -1,0 +1,34 @@
+# Nutrient Block's draw is for "put into a graveyard from the battlefield" only: Bot2's Prismatic Ending (X = 1, paid with white
+# alone, so it exiles a permanent with mana value 1 or less) exiles the Block, which never reaches a graveyard, so Bot1 draws nothing
+# (hand stays 5 and the Block is in exile). The destroyed-and-drew case, the sacrifice, is the other scenario.
+
+[Bot1 Deck]
+Mox Jet
+Nutrient Block
+Plains x18
+
+[Bot2 Deck]
+Mox Pearl x3
+Prismatic Ending
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nutrient Block.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Pearl#3.Activate
+Bot2.Hand.Prismatic Ending.Cast(Bot1.Battlefield.Nutrient Block; X: 1)
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet
+Bot1.Graveyard.Count = 0
+Exile = Nutrient Block
+Bot1.Hand.Count = 5
