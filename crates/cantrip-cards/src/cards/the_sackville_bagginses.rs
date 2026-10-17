@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::targets::filters;
 use cantrip_mechanics::{choose, effects, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
@@ -13,12 +14,7 @@ fn sacrifice_for_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
         .battlefield()
         .iter()
         .copied()
-        .filter(|&id| {
-            g.controller(id) == you && id != item.object && {
-                let c = g.chars(id);
-                c.is(CardType::Artifact) || c.is(CardType::Creature)
-            }
-        })
+        .filter(|&id| g.controller(id) == you && filters::another_creature_or_artifact(g, &Asker { source: item.object, controller: you }, id))
         .collect();
     let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Sacrifice, "other creature or artifact", eligible.clone(), eligible, 1, true)?;
     let Some(&victim) = chosen.first() else { return Ok(()) };

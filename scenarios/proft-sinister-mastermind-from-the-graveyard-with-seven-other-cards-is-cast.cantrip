@@ -1,0 +1,40 @@
+# Proft, Sinister Mastermind cast from the graveyard needs seven cards there OTHER than itself (the ruling). Turn 1: Town Greeter
+# mills Proft and three Guerrilla Gorillas; Black Lotus and three Dark Rituals (a chain of black mana) go to the graveyard too:
+# eight cards, Proft and seven others. Yawgmoth's Will lets Bot1 cast from the graveyard and Proft is cast and resolves. The refusal,
+# one Dark Ritual fewer, is proft-sinister-mastermind-from-the-graveyard-needs-seven-other-cards.
+
+[Bot1 Deck]
+Forest
+Town Greeter
+Black Lotus
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Yawgmoth's Will
+Proft, Sinister Mastermind
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Town Greeter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+? Bot1.Graveyard.Count = 8
+Bot1.Graveyard.Proft, Sinister Mastermind.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Proft, Sinister Mastermind.Power = 5
+Bot1.Graveyard.Count = 7

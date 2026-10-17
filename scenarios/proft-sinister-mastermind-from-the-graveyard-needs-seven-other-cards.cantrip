@@ -1,0 +1,40 @@
+# Proft, Sinister Mastermind: "You can't cast this spell unless there are seven or more cards in your graveyard." Cast from the
+# graveyard (Yawgmoth's Will), Proft is itself one of the cards there while it is being cast, and the ruling asks for seven OTHER
+# cards. Turn 1: Town Greeter mills Proft and three Guerrilla Gorillas; Black Lotus and two Dark Rituals (a chain of black mana)
+# go to the graveyard too: seven cards, Proft and six others. Yawgmoth's Will lets Bot1 cast from the graveyard, and Proft is
+# refused. The positive control is proft-sinister-mastermind-from-the-graveyard-with-seven-other-cards-is-cast, which has one
+# more card there.
+
+[Bot1 Deck]
+Forest
+Town Greeter
+Black Lotus
+Dark Ritual
+Dark Ritual
+Mox Jet
+Yawgmoth's Will
+Proft, Sinister Mastermind
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Town Greeter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Yawgmoth's Will.Cast
+Bot1.Pass
+? Bot1.Graveyard.Count = 7
+! Bot1.Graveyard.Proft, Sinister Mastermind.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 7

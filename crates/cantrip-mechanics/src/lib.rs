@@ -244,8 +244,7 @@ pub static PAY_FOUR_OR_SACRIFICE_AN_ARTIFACT_OR_CREATURE: [ExtraCost; 2] = [
 ];
 
 /// Threshold (ability word, CR 207.2c): seven or more cards in `player`'s graveyard, counted as the question is asked.
-/// Cabal Ritual's "threshold" (the resolving spell is on the stack, so not counted) and Proft, Sinister Mastermind's
-/// "can't cast this spell unless there are seven or more cards in your graveyard" read it.
+/// Cabal Ritual's "threshold" (the resolving spell is on the stack, so not counted), Eye of Jace and Tersa Lightshatter read it.
 pub fn threshold(q: &dyn Query, player: PlayerId) -> bool {
     q.state().zone(Zone::graveyard(player)).len() >= 7
 }

@@ -7,10 +7,12 @@ fn enters_or_your_upkeep(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fir
     triggers::this_enters(q, me.source, event).or_else(|| triggers::your_upkeep(q, me, event))
 }
 
-/// "You lose 1 life and create a Clue token." (CR 119.3, 701.16a.)
-fn lose_life_and_investigate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+/// "You lose 1 life and create a Clue token." (CR 119.3, 111.10f.) Creating a Clue is not investigating (the ruling), so
+/// nothing that triggers on investigating sees it.
+fn lose_life_and_create_a_clue(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.lose_life(item.controller, 1);
-    tokens::investigate(g, item.controller)
+    tokens::create(g, item.controller, &tokens::CLUE, 1)?;
+    Ok(())
 }
 
 /// The number of permanents `player` has sacrificed this turn (CR 701.21a): every permanent that went from the battlefield to
@@ -18,7 +20,7 @@ fn lose_life_and_investigate(g: &mut dyn Game, item: &StackItem) -> Result<(), S
 fn permanents_sacrificed_this_turn(q: &dyn Query, player: PlayerId) -> usize {
     q.history()
         .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).this_turn())
-        .filter(|r| matches!(r.event, Event::ZoneChange { old, reason: ZoneReason::Sacrifice, .. } if q.controller(old) == player))
+        .filter(|r| triggers::sacrificed_by(q, player, &r.event).is_some())
         .count()
 }
 
@@ -39,7 +41,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
             when_asked(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::STEP_BEGAN.0), enters_or_your_upkeep),
-            lose_life_and_investigate,
+            lose_life_and_create_a_clue,
             "When this enchantment enters and at the beginning of your upkeep, you lose 1 life and create a Clue token.",
         ),
         triggered(

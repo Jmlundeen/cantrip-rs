@@ -19,7 +19,7 @@ fn discard_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "If there are seven or more cards in your graveyard" (CR 603.4): asked as it triggers and again as it resolves.
 fn seven_in_graveyard(q: &dyn Query, asker: &Asker) -> bool {
-    q.state().zone(Zone::graveyard(asker.controller)).len() >= 7
+    cantrip_mechanics::threshold(q, asker.controller)
 }
 
 /// Exile a card at random from your graveyard. You may play that card this turn.
