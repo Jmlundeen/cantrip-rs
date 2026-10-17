@@ -1,0 +1,43 @@
+# Noncombat damage too: Magebane Lizard (a Lizard) deals 1 damage to Bot1 for casting its first noncreature spell, Lightning Bolt,
+# and Valley Flamecaller makes it 2 (CR 614.1). The Bolt itself is not a Lizard, Mouse, Otter or Raccoon, so it still deals 3.
+# Bot1 ends on 18 and Bot2 on 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Jet
+Mox Jet
+Valley Flamecaller
+Magebane Lizard
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Valley Flamecaller.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Pass
+Bot1.Hand.Magebane Lizard.Cast
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 18
+Bot2.Life = 17

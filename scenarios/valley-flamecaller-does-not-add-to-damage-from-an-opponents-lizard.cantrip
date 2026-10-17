@@ -1,0 +1,44 @@
+# "A Lizard ... you control": Bot2 controls the Magebane Lizard, so its 1 damage to Bot1 for Bot1's Lightning Bolt is not
+# increased by Bot1's Valley Flamecaller (CR 614.1). Bot1 is on 19, not 18 as in the sibling scenario where the Lizard is Bot1's.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Jet
+Valley Flamecaller
+Island x3
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Magebane Lizard
+Island x4
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Valley Flamecaller.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Magebane Lizard.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 19
+Bot2.Life = 17

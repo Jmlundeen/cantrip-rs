@@ -1,0 +1,36 @@
+# Valley Flamecaller is a Lizard and Elusive Otter an Otter, so each deals 1 more combat damage (CR 614.1, 120.3): attacking
+# unblocked on turn 3, 3+1 and 1+1 make 6, leaving Bot2 on 14 (20 - 6).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Jet
+Mox Sapphire
+Valley Flamecaller
+Elusive Otter
+Island
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Valley Flamecaller.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Pass
+Bot1.Hand.Elusive Otter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Valley Flamecaller; Elusive Otter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 20
