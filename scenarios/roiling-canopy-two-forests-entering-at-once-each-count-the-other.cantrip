@@ -1,0 +1,55 @@
+# Roiling Canopy: two Forests entering at the same time (Hexhaven Invigorator, dealt 3 by Lightning Bolt, fetches two Forests tapped) with four Forests already under Bot1's
+# control: each entering Forest sees five other Forests - the four and the other newcomer - so it triggers twice (CR 603.2, 603.4), and Bot1 targets the Llanowar
+# Elves with both: +6/+6, a 7/7.
+
+[Bot1 Deck]
+Roiling Canopy
+Llanowar Elves
+Forest
+Forest
+Forest
+Forest
+Hexhaven Invigorator
+Island x4
+Forest
+Forest
+Island x9
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Hexhaven Invigorator.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T10 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hexhaven Invigorator)
+Bot1.Accept
+Bot1.Search(Forest; Forest)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Llanowar Elves)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 7
+Bot1.Battlefield.Llanowar Elves.Toughness = 7
+Bot1.Battlefield.Count = 9
+Stack.Count = 0

@@ -107,10 +107,9 @@ pub fn search_to_battlefield(
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
     let found = find(g, player, source, if tapped { SearchDestination::BattlefieldTapped } else { SearchDestination::Battlefield }, how, eligible)?;
-    let mut arrived = Vec::new();
-    for card in found {
-        arrived.push(g.put_onto_battlefield(card, player, tapped)?);
-    }
+    // All the cards found enter at the same time (CR 110.2a, 701.23): each sees the others already there, as a landfall-like
+    // "if you control N other Forests" does (Roiling Canopy).
+    let arrived = g.put_all_onto_battlefield_as(&found.into_iter().map(|c| (c, player, tapped)).collect::<Vec<_>>())?;
     g.shuffle(player);
     Ok(arrived)
 }
