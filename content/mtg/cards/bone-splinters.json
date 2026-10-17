@@ -1,0 +1,6 @@
+{
+  "name": "Bone Splinters",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "As an additional cost to cast this spell, sacrifice a creature.\nDestroy target creature."
+}

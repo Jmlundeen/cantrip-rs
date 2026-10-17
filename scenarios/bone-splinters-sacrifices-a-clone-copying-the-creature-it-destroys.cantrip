@@ -1,0 +1,52 @@
+# A Clone that entered as a copy of Bot2's Hired Blade (CR 707.2) is a creature Bone Splinters' cost can sacrifice (CR 601.2h):
+# Bot1 sacrifices it to destroy the original. The Clone goes to its owner's graveyard as the Clone card (CR 707.4: the copy
+# effect ends as it leaves), the Blade to Bot2's.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Sapphire
+Clone
+Bone Splinters
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Hired Blade
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Hired Blade.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hired Blade.Power = 3
+Bot1.Hand.Bone Splinters.Cast(Bot2.Battlefield.Hired Blade)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bone Splinters; Clone; Black Lotus
+Bot2.Graveyard = Hired Blade
+Bot1.Battlefield = Swamp; Mox Sapphire
+Bot2.Battlefield = Swamp; Mox Jet; Mox Pearl

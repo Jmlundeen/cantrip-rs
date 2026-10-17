@@ -1,0 +1,33 @@
+# Targets are chosen before costs are paid (CR 601.2c, 601.2h), so Bone Splinters may target the very creature its additional
+# cost then sacrifices. Bot1's only creature is Ornithopter and Bot2 has none: Bot1 can still cast Bone Splinters, targeting
+# Ornithopter and sacrificing it; on resolution its only target is gone (CR 400.7, 608.2b) and it does nothing.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Bone Splinters
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Bone Splinters.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Bone Splinters; Ornithopter
+Bot1.Battlefield = Swamp
+LeftBattlefield = Ornithopter
