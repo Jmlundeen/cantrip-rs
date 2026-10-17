@@ -69,6 +69,31 @@ pub fn discard_chosen_nonland_from_revealed_hand(g: &mut dyn Game, item: &StackI
     discard_chosen_from_revealed_hand_of_kind(g, item, player, Purpose::TakeFromHand, "nonland", |q, c| !q.chars(c).is(CardType::Land))
 }
 
+/// "Look at target player's hand. You may choose a card from it [that passes `eligible`]": the ability's controller sees the hand
+/// (it is shown to them alone, not revealed) and may choose one eligible card. Looking is part of the ability, so the choice is
+/// asked of any hand that is not empty, even when nothing in it is eligible; an empty hand is nothing to look at. The card chosen
+/// is left for the caller to exile or discard; `purpose` and `kind` word the question. Deep Cavern Bat, Invasion of Gobakhan and
+/// Oildeep Gearhulk print it.
+pub fn look_and_may_choose(
+    g: &mut dyn Game,
+    item: &StackItem,
+    player: PlayerId,
+    purpose: Purpose,
+    kind: &'static str,
+    eligible: fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Option<ObjectId>, Suspend> {
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    if hand.is_empty() {
+        return Ok(None);
+    }
+    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&*g, c)).collect();
+    let ask = RequestKind::ChooseCards { source: item.object, purpose, cards: hand, count: eligible.len().min(1) as u8, eligible, up_to: true, kind, total: None };
+    Ok(match g.ask(item.controller, ask)? {
+        Answer::Cards(chosen) => chosen.first().copied(),
+        _ => None,
+    })
+}
+
 /// "You may put a [kind of] card from your hand onto the battlefield" (CR 608.2d, 101.4): one card of the hand that passes
 /// `eligible`, chosen as an "up to one" with the whole hand shown, then put onto the battlefield under the player's control
 /// (an Aura chooses what it enchants as it enters, CR 303.4f). Nothing is asked when no card is eligible. The new object, or

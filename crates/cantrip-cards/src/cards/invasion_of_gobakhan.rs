@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{hand, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Look at target opponent's hand. You may exile a nonland card from it. For as long as that card remains exiled, its
@@ -7,14 +7,7 @@ use cantrip_oracle as oracle;
 /// with nothing eligible, so the choice is asked of any hand that is not empty.
 fn take_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
-    let hand = g.state().zone(Zone::hand(opponent)).to_vec();
-    if hand.is_empty() {
-        return Ok(());
-    }
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !g.chars(c).is(CardType::Land)).collect();
-    let ask = RequestKind::ChooseCards { source: item.object, purpose: Purpose::Exile, cards: hand, eligible, count: 1, up_to: true, kind: "", total: None };
-    let Answer::Cards(chosen) = g.ask(item.controller, ask)? else { return Ok(()) };
-    let Some(&card) = chosen.first() else { return Ok(()) };
+    let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, "", |q, c| !q.chars(c).is(CardType::Land))? else { return Ok(()) };
     let exiled = g.exile(card);
     if g.obj(exiled).zone.is(ZoneKind::Exile) {
         // Its owner may play it for as long as it stays there (CR 400.7), the spell costing {2} more (CR 601.2f).

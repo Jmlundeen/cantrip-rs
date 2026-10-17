@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{hand, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "Look at target opponent's hand. You may exile a nonland card from it until this creature leaves the battlefield"
@@ -7,20 +7,8 @@ use cantrip_oracle as oracle;
 /// comes back to the hand it was taken from as soon as the Bat is gone, and is not exiled at all if the Bat already is.
 fn look_and_exile(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.targets[0].player() else { return Ok(()) };
-    let hand = g.state().zone(Zone::hand(opponent)).to_vec();
-    if hand.is_empty() {
-        return Ok(());
-    }
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !g.chars(c).is(CardType::Land)).collect();
-    let ask = RequestKind::ChooseCards {
-        source: item.object,
-        purpose: Purpose::Exile,
-        cards: hand,
-        count: eligible.len().min(1) as u8,
-        eligible,
-        up_to: true, kind: "", total: None };
-    if let Answer::Cards(cards) = g.ask(item.controller, ask)? {
-        g.exile_with(&cards, item.object, true);
+    if let Some(card) = hand::look_and_may_choose(g, item, opponent, Purpose::Exile, "", |q, c| !q.chars(c).is(CardType::Land))? {
+        g.exile_with(&[card], item.object, true);
     }
     Ok(())
 }
