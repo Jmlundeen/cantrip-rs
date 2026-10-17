@@ -353,6 +353,19 @@ public sealed class CardActions
             _ => option.Kind.ToString(),
         };
 
+        // A cast without paying its mana cost (CR 118.9, Omniscience) says so, beside the ordinary cast it would otherwise read
+        // the same as, and what it still costs where something raises it (Thalia's {1}). The server's description, after the
+        // face it names, says it and any cost that depends on the target ("{0} and 3 life targeting Terror of the Peaks").
+        if (option.Kind == ActionKindView.CastSpell && option.WithoutPayingManaCost)
+        {
+            string spell = option.SpellName.Length > 0 ? option.SpellName : name;
+            string way = option.Description.StartsWith($"{spell}: ", StringComparison.Ordinal)
+                ? option.Description[(spell.Length + 2)..]
+                : option.Description.Length > 0 ? option.Description : "Without paying its mana cost";
+            string still = option.CostText.Length > 0 && option.CostText != "{0}" ? $" · still costs {option.CostText}" : string.Empty;
+            return $"{verb} {spell} — {way}{still}{ellipsis}";
+        }
+
         // A cast that puts a differently named spell on the stack reads as that spell: an adventurer card cast as its
         // Adventure (CR 715.3) casts Battle Display, not Embereth Shieldbreaker some other way, so the Adventure's name
         // is the whole of what there is to say. The server names it; the client never reads it out of the description.

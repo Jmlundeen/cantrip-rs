@@ -290,9 +290,20 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                     m.description = if m.description.is_empty() { text } else { format!("{} {text}", m.description) };
                 }
             }
-            let cost = if let Some(face) = granted_face.or(inset) {
+            let player = game.state.obj(src).controller;
+            // A way that casts without paying the mana cost (CR 118.9, Omniscience), whose X is 0 (CR 107.3b), is marked so,
+            // and its row says what it comes to with the cost changes in play before any target ({0}, or {1} under Thalia).
+            let granted = granted_slot(o.index).and_then(|_| granted_cast_total(game, player, src, o.index));
+            let cost = if let Some((way, total)) = granted {
+                let face = granted_face.unwrap_or(def);
+                m.without_paying_mana_cost = way.mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
+                if m.without_paying_mana_cost {
+                    m.cost_text = total.to_string();
+                }
+                way.mana
+            } else if let Some(face) = granted_face.or(inset) {
                 face.cost
-            } else if o.index == 0 || granted_slot(o.index).is_some() {
+            } else if o.index == 0 {
                 def.cost
             } else {
                 def.ways.get(o.index as usize - 1).map_or(def.cost, |w| w.cost.mana)
@@ -307,11 +318,10 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                 m.has_x = false;
             }
             // A cost that depends on the target it is cast with (CR 601.2c, 601.2f): the row says what the cast costs with
-            // each candidate, where that is not its mana cost.
-            if o.index == 0 && o.targets_required == 1 && !o.target_candidates.is_empty() {
-                let player = game.state.obj(src).controller;
-                let costs = cast_costs(game, player, src, &o.target_candidates);
-                if costs.iter().any(|&c| c != cost) {
+            // each candidate, where that is not what it costs otherwise - mana, and life a change adds (CR 118.8).
+            if (o.index == 0 || granted.is_some()) && o.targets_required == 1 && !o.target_candidates.is_empty() {
+                let costs = cast_costs(game, player, src, o.index, &o.target_candidates);
+                if costs.iter().any(|&(c, life)| c != cost || life > 0) {
                     let each = costs_by_target(game, &o.target_candidates, &costs);
                     m.description = if m.description.is_empty() { format!("costs {each}") } else { format!("{} (costs {each})", m.description) };
                 }
@@ -322,6 +332,13 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             let ability = game.chars(src).abilities().nth(o.index as usize).map(|a| game.cards.ability(a));
             if let Some(AbilityDef::Activated(d)) = ability {
                 m.life_cost = i32::from(d.cost.life);
+                // A special action whose cost a static ability changes (CR 116.2k, 118.7: "plotting cards from your hand costs
+                // {2} less"): the row says what it costs now, which its printed text does not.
+                if d.special_action
+                    && let Some(cost) = special_action_costs(game, game.state.obj(src).controller, src, o.index)
+                {
+                    m.description = format!("{} (costs {cost})", m.description);
+                }
                 if d.is_mana_ability() {
                     for mana in Mana::ALL {
                         for _ in 0..d.adds.get(mana) {
@@ -343,7 +360,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                     // the activation costs with each candidate, where that is not the printed cost.
                     let player = game.state.obj(src).controller;
                     let costs = activation_costs(game, player, src, o.index, &o.target_candidates);
-                    if costs.iter().any(|&c| c != d.cost.mana) {
+                    if costs.iter().any(|&(c, life)| c != d.cost.mana || life > 0) {
                         m.description = format!("{} (costs {})", m.description, costs_by_target(game, &o.target_candidates, &costs));
                     }
                 }
@@ -362,13 +379,16 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
 
 /// What an action costs with each candidate target, for its menu row: "{1} targeting Dwarven Mauler, {4} targeting
 /// Ornithopter".
-fn costs_by_target(game: &Game, candidates: &[Target], costs: &[ManaCost]) -> String {
+fn costs_by_target(game: &Game, candidates: &[Target], costs: &[(ManaCost, u32)]) -> String {
     let each: Vec<String> = candidates
         .iter()
         .zip(costs)
-        .map(|(t, cost)| match t.object() {
-            Some(id) => format!("{cost} targeting {}", game.name(id)),
-            None => format!("{cost} targeting a player"),
+        .map(|(t, &(cost, life))| {
+            let cost = if life > 0 { format!("{cost} and {life} life") } else { cost.to_string() };
+            match t.object() {
+                Some(id) => format!("{cost} targeting {}", game.name(id)),
+                None => format!("{cost} targeting a player"),
+            }
         })
         .collect();
     each.join(", ")
@@ -641,7 +661,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::Priority { options } => {
             PromptPayload::PriorityPromptMessage(PriorityPrompt { player, options: options_messages(game, handles, options) })
         }
-        RequestKind::PayCosts { source, total, remaining, options, announcing, x, loyalty, attackers } => {
+        RequestKind::PayCosts { source, total, remaining, options, announcing, x, loyalty, attackers, life } => {
             let def = game.cards.get(game.state.obj(*source).card);
             let kicker = def.kicker;
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);
@@ -666,6 +686,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 x_removes_loyalty: *loyalty,
                 spends_no_mana,
                 attackers: handles_of(handles, attackers),
+                life: (*life).min(i32::MAX as u32) as i32,
                 ..Default::default()
             })
         }

@@ -532,7 +532,7 @@ public sealed partial class TacticalPlay
         // What it costs was an estimate, and the server said each of these could be paid for on its own: when no set
         // fits the estimate, the single best one is tried and the payment finds out.
         List<Candidate> plan = bestSet == 0
-            ? [.. candidates.Where(candidate => candidate.Option.Kind != ActionKindView.CastSpell || candidate.Option.AbilityIndex == 0).Take(1)]
+            ? [.. candidates.Where(candidate => candidate.Option.Kind != ActionKindView.CastSpell || candidate.Option.AbilityIndex == 0 || candidate.Option.WithoutPayingManaCost).Take(1)]
             : [.. candidates.Where((_, index) => (bestSet & (1 << index)) != 0)];
 
         if (plan.Count == 0)
@@ -585,9 +585,28 @@ public sealed partial class TacticalPlay
 
             if (option.Kind == ActionKindView.CastSpell)
             {
+                // A cast without paying its mana cost (Omniscience) is the same spell for less: taken over the ordinary cast,
+                // unless the spell has {X}, where the ordinary cast's X is worth more than the free one's 0 (CR 107.3b) and
+                // the free one is kept for when the mana cannot pay for the other.
+                if (option.WithoutPayingManaCost)
+                {
+                    if (prompt.Options.Exists(other =>
+                            other.Kind == ActionKindView.CastSpell && other.Source == option.Source && other.AbilityIndex == 0 && other.Affordable && other.HasX))
+                    {
+                        continue;
+                    }
+                }
+                else if (option.AbilityIndex == 0
+                    && prompt.Options.Exists(other =>
+                        other.Kind == ActionKindView.CastSpell && other.Source == option.Source && other.WithoutPayingManaCost && other.Affordable)
+                    && !option.HasX)
+                {
+                    continue;
+                }
+
                 // The printed cost when it can be paid, rather than a dash this seat cannot weigh; and never a cost
                 // paid in something other than mana — an evoke, a pitch — which is a trade it cannot price.
-                if (option.AbilityIndex > 0
+                else if (option.AbilityIndex > 0
                     && (CardReading.ManaValue(option.Description) == 0
                         || prompt.Options.Exists(other =>
                             other.Kind == ActionKindView.CastSpell && other.Source == option.Source && other.AbilityIndex == 0 && other.Affordable)))
@@ -696,7 +715,10 @@ public sealed partial class TacticalPlay
         string text = other ? string.Empty : CardReading.Text(card);
         bool permanent = !other && IsPermanentCard(card);
 
-        int cost = option.AbilityIndex == 0 ? card.ManaValue : CardReading.ManaValue(option.Description) is > 0 and int alternative ? alternative : card.ManaValue;
+        // Cast without paying its mana cost, it costs what the server says is left of nothing: {0}, or a cost increase.
+        int cost = option.WithoutPayingManaCost
+            ? CardReading.ManaValue(option.CostText)
+            : option.AbilityIndex == 0 ? card.ManaValue : CardReading.ManaValue(option.Description) is > 0 and int alternative ? alternative : card.ManaValue;
 
         // A Phyrexian symbol can be paid for in life, so a spell with one that the mana does not reach is counted as
         // costing that much less, for as many symbols as there is life to spare for.
@@ -1754,7 +1776,7 @@ public sealed partial class TacticalPlay
 
             // A counterspell paid for with another card (Force of Will) is two cards for one, and is kept for a spell
             // worth that.
-            bool pitched = option.Kind == ActionKindView.CastSpell && option.AbilityIndex > 0 && CardReading.ManaValue(option.Description) == 0;
+            bool pitched = option.Kind == ActionKindView.CastSpell && option.AbilityIndex > 0 && !option.WithoutPayingManaCost && CardReading.ManaValue(option.Description) == 0;
 
             if (effect.Kind == EffectKind.Counter)
             {

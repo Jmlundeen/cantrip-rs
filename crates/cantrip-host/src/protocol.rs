@@ -667,6 +667,9 @@ pub struct ActionOptionMessage {
     /// For a mana ability offered while a cost is paid: its mana is restricted so that none of it may pay this cost
     /// (CR 106.6).
     pub pays_nothing: bool,
+    /// For a cast: a way a permanent gives that casts the spell without paying its mana cost (CR 118.9, Omniscience).
+    /// `cost_text` is what it comes to with the cost changes in play, before any target ({0}, or {1} under Thalia).
+    pub without_paying_mana_cost: bool,
 }
 
 impl ActionOptionMessage {
@@ -700,6 +703,7 @@ impl ActionOptionMessage {
             alternative: 0,
             life_gained: 0,
             granted_by: String::new(),
+            without_paying_mana_cost: false,
             pays_nothing: false,
         }
     }
@@ -939,6 +943,9 @@ pub struct PayCostsPrompt {
     /// Announcing the X of a "−X" loyalty cost (CR 606.4, 107.3): X loyalty counters come off `spell`, the permanent, and
     /// no mana is paid; `most_affordable` is its loyalty.
     pub x_removes_loyalty: bool,
+    /// The life the total cost asks besides its mana (CR 119.4, 601.2h: "an additional 3 life", "pay X life"), paid with it
+    /// once the mana is. Zero while X is announced.
+    pub life: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

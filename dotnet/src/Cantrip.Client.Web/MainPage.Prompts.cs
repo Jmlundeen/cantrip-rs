@@ -380,11 +380,14 @@ public sealed partial class MainPage
             }
             else
             {
+                // Life the total cost asks besides its mana (CR 119.4, 601.2h: Terror of the Peaks' additional 3 life), paid
+                // with it once the mana is.
+                string life = prompt.Life > 0 ? $"  ·  and {prompt.Life} life, paid with it" : string.Empty;
                 Prompt(
                     _actions.Assignable.Count > 0 ? $"Choose mana for {name}" : $"Pay for {name}",
                     covered
-                        ? $"your pool covers {prompt.Total}  ·  {how}"
-                        : $"{prompt.Remaining} of {prompt.Total} still to pay  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
+                        ? $"your pool covers {prompt.Total}{life}  ·  {how}"
+                        : $"{prompt.Remaining} of {prompt.Total} still to pay{life}  ·  {how}{colorless}{(prompt.SpendsNoMana ? string.Empty : AutoManaNote())}");
             }
 
             if (covered && _actions.Confirm is { } pay)

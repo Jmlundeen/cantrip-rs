@@ -299,8 +299,10 @@ public sealed class Decisions
             ActionKindView.CastSpell =>
                 $"Cast {name}"
                 + CastFrom(client, card)
-                + (card?.ManaCost is { Length: > 0 } cost ? $" for {cost}" : string.Empty)
-                + CastWay(option, card)
+                + (option.WithoutPayingManaCost
+                    ? " without paying its mana cost" + (option.CostText is { Length: > 0 } still && still != "{0}" ? $" (a cost increase still asks {still})" : string.Empty)
+                        + (option.Description.IndexOf("(costs ", StringComparison.Ordinal) is >= 0 and int at ? $" {option.Description[at..]}" : string.Empty)
+                    : (card?.ManaCost is { Length: > 0 } cost ? $" for {cost}" : string.Empty) + CastWay(option, card))
                 + (option.HasX ? $" (you can pay for X up to {option.MaxX})" : string.Empty)
                 + (card?.OracleText is { Length: > 0 } spell ? $". It reads: \"{spell.ReplaceLineEndings(" / ")}\"" : ".")
                 + Costs(option),

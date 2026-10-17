@@ -2057,6 +2057,15 @@ public sealed class ActionOptionMessage
     /// <summary>The mana value <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendManaValue"/>.</summary>
     [Key(29)]
     public int SpendManaValue { get; set; }
+
+    /// <summary>
+    /// For a cast: a way a permanent gives that casts the spell without paying its mana cost (CR 118.9: Omniscience's "you
+    /// may cast spells from your hand without paying their mana costs"), offered beside the ordinary cast. X is 0 (CR
+    /// 107.3b); additional costs and cost increases are still paid, and <see cref="CostText"/> is what it comes to with the
+    /// cost changes in play before any target: <c>{0}</c>, or <c>{1}</c> under Thalia.
+    /// </summary>
+    [Key(30)]
+    public bool WithoutPayingManaCost { get; set; }
 }
 
 /// <summary>
@@ -2211,6 +2220,14 @@ public sealed class PayCostsPromptMessage : PromptPayload
     /// </summary>
     [Key(22)]
     public bool XRemovesLoyalty { get; set; }
+
+    /// <summary>
+    /// The life the total cost asks besides its mana (CR 119.4, 601.2h): an additional cost's "pay X life", or one a static
+    /// ability adds ("spells your opponents cast that target this creature cost an additional 3 life to cast"). Paid with
+    /// it once the mana is. Zero while X is announced.
+    /// </summary>
+    [Key(23)]
+    public int Life { get; set; }
 
     /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
