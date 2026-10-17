@@ -390,7 +390,7 @@ pub fn gain_hexproof_until_end_of_turn(g: &mut dyn Game, source: ObjectId, targe
 }
 
 /// "`target` gains lifelink until end of turn" (CR 702.15, 611.2a): a layer 6 keyword for the rest of the turn, from the
-/// effect's source. Gix's Command and Archenemy's Charm print it.
+/// effect's source. Gix's Command, Archenemy's Charm, Hardened Academic and Obsessive Pursuit print it.
 pub fn gain_lifelink_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {
     g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Lifelink])), Duration::EndOfTurn);
 }

@@ -1,12 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{effects, targets};
 use cantrip_mechanics::targets::filters;
 use cantrip_oracle as oracle;
 
 /// "This creature gains lifelink until end of turn." Nothing if it has left the battlefield by the time the ability
 /// resolves (CR 400.7): the effect is added to the object it was when the ability was put on the stack.
 fn lifelink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::Lifelink])), Duration::EndOfTurn);
+    effects::gain_lifelink_until_end_of_turn(g, item.object, item.object);
     Ok(())
 }
 
