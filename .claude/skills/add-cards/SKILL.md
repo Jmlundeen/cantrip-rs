@@ -144,8 +144,8 @@ calling, means it was not the same thing. Leave that in its own card.
    A card that only uses what the client already shows and asks needs no client change - the review confirms it.
    **Browser tests are only for a new user interaction**: a prompt, action, cost display or piece of state the client
    did not have before. A card that reuses existing prompts and actions gets no browser scenario and runs no browser
-   tests, and a bot-only change (the tactical bot, the language-model client) is proven by unit tests, not the
-   browser. A card that does add an interaction makes the change in the same work, and proves it with a browser
+   tests: its headless scenarios prove it. A bot-only change (the tactical bot, the language-model client) is proven
+   the same way - headless scenarios that play the bot's seat, plus unit tests where useful - not in the browser. A card that does add an interaction makes the change in the same work, and proves it with a browser
    scenario: `# Browser` at the
    top and `? Client.` checks of what the page shows (`docs/scenarios-in-the-browser.md`), run with
    `tools\test.cmd /filter "ScenarioInBrowser"` (or `tools\scenario-in-browser.cmd name` to watch). If the browser
