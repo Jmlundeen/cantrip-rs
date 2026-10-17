@@ -264,6 +264,18 @@ pub const FETCH_BASIC: Question = Question::new(
     "Don't search",
 );
 
+/// "Activate only if this land entered this turn or if you control a basic land" (CR 602.5b): checked as the ability is
+/// activated. Entering is asked of the event history (CR 400.7: a land that left and came back is a new object that entered
+/// this turn); a basic land is a land with the basic supertype (CR 205.4a), read through the layers. The land itself is not
+/// basic, so it never counts itself. Gleaming Bastion and Hidden Lair print it.
+pub fn entered_this_turn_or_you_control_a_basic_land(q: &dyn Query, asker: &Asker) -> bool {
+    crate::history::entered_this_turn(q.history(), asker.source)
+        || q.permanents_of(asker.controller).into_iter().any(|id| {
+            let chars = q.chars(id);
+            chars.is(CardType::Land) && chars.supertypes.basic
+        })
+}
+
 /// The same search, the land put onto the battlefield tapped (Path to Exile, Erode).
 pub const FETCH_BASIC_TAPPED: Question = Question::new(
     "SearchLibrary",
