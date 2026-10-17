@@ -33,6 +33,16 @@ pub fn permanent_left_battlefield_this_turn(q: &dyn Query, player: PlayerId) -> 
         .any(|r| matches!(r.event, Event::ZoneChange { old, .. } if q.obj(old).controller == player))
 }
 
+/// The void condition: "a nonland permanent left the battlefield this turn or a spell was warped this turn" (CR 702.185c).
+/// Any player's permanent counts, a token too, judged as it was as it left the battlefield (CR 608.2h). Elegy Acolyte and
+/// every other card with a void ability print it.
+pub fn void(q: &dyn Query) -> bool {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).this_turn())
+        .any(|r| matches!(r.event, Event::ZoneChange { old, .. } if q.state().last_known(old).is_some_and(|l| !l.types.has(CardType::Land))))
+        || crate::warp::spell_was_warped_this_turn(q)
+}
+
 /// Cards (not tokens) that left `player`'s graveyard this turn (Gau, Feral Youth).
 pub fn cards_left_graveyard_this_turn(q: &dyn Query, player: PlayerId) -> usize {
     q.history()

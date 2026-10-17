@@ -24,6 +24,12 @@ pub fn was_cast_for_warp(q: &dyn Query, id: ObjectId) -> bool {
     object.cast_way > 0 && q.card(object.card).ways.get(object.cast_way as usize - 1).is_some_and(|w| w.kind == WayKind::Warp)
 }
 
+/// "A spell was warped this turn" (CR 702.185c): a spell, any player's, was cast for its warp cost this turn. Elegy Acolyte's
+/// void condition asks it.
+pub fn spell_was_warped_this_turn(q: &dyn Query) -> bool {
+    q.history().casts().any(|c| c.way > 0 && q.card(q.obj(c.spell).card).ways.get(c.way as usize - 1).is_some_and(|w| w.kind == WayKind::Warp))
+}
+
 /// Exile the permanent the warped spell became, if it is still on the battlefield, and let its owner cast it from
 /// exile on a later turn, for its mana cost: warp's cost is a way from the hand only, so it is not offered again.
 fn exile_for_later(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{tokens, triggers};
+use cantrip_mechanics::{effects, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// A 2/2 colorless Robot Villain artifact creature token (CR 111.4).
@@ -28,8 +28,7 @@ fn creature_cards_to_your_graveyard(q: &dyn Query, me: &Asker, event: &Event) ->
 /// "You draw a card, lose 1 life, and put a plan counter on this enchantment." The counter goes only on the enchantment that
 /// triggered, if it is still there (CR 400.7).
 fn draw_lose_and_plan(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.draw(item.controller, 1);
-    g.lose_life(item.controller, 1);
+    effects::draw_a_card_and_lose_1_life(g, item)?;
     g.add_counters(item.object, CounterKind::Plan, 1);
     Ok(())
 }

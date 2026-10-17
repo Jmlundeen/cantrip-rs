@@ -78,6 +78,14 @@ pub fn draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// "You draw a card and lose 1 life" (CR 121.1, 119.3): the controller draws, then loses the life. Plumb the Forbidden,
+/// Robot Domination (before its counter) and Elegy Acolyte print it.
+pub fn draw_a_card_and_lose_1_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.draw(item.controller, 1);
+    g.lose_life(item.controller, 1);
+    Ok(())
+}
+
 /// "Target player draws N cards" (CR 121.1): the player the item targeted in `slot`, if the target is still legal (CR 608.2b).
 /// Ancestral Recall (three), Flame of Anor and Ashling's Command (two) print it.
 pub fn target_player_draws(g: &mut dyn Game, item: &StackItem, slot: usize, n: u32) {
