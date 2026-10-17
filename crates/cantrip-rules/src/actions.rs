@@ -2443,20 +2443,40 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             }
             // What a face cast by the permission costs (CR 118.9, 601.2f): what it names instead, or life equal to the face's
             // mana value, and what it adds; the face's own mana cost from the hand.
-            let face_covered = |face: &CardDef, by_permission: bool| {
+            let face_covered = |face: &CardDef, by_permission: Option<Option<Cost>>| {
                 let a = available.get_or_init(|| self::available(cx, player));
-                if !by_permission {
+                let Some(additional) = by_permission else {
                     return a.covers_for(&least_cost(cx, a, player, id, face, face.cost, &[]), &spell_kind(cx, a, id, face));
-                }
+                };
                 if life_grant && !can_pay_other(cx, id, player, &life_for_mana_value(face)) {
                     return false;
                 }
                 let mut least = least_cost(cx, a, player, id, face, instead.unwrap_or(face.cost), &[]);
                 least.generic = least.generic.saturating_add(more);
+                if let Some(additional) = additional {
+                    least = add_cost(least, additional.mana);
+                }
                 if any_type {
                     least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
                 }
                 a.covers_for(&least, &spell_kind(cx, a, id, face))
+            };
+            // Whether a permission casts this face from here, and what it adds (CR 118.8): a permission of the card's own for
+            // the card, or a permanent's to cast cards from exile, judged on the face (CR 709.3a, 712.8a), whose additional
+            // cost has to be payable.
+            let face_permission = |face: &'static CardDef| -> Option<Option<Cost>> {
+                if zone.is(ZoneKind::Hand) {
+                    None
+                } else if by_exile_cast {
+                    match exile_cast_for(cx, casts, id, Some(cx.card_id(face)), player) {
+                        Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(Some(c.additional)),
+                        _ => None,
+                    }
+                } else if permitted_whole {
+                    Some(None)
+                } else {
+                    None
+                }
             };
             let face_speed = |face: &'static CardDef| speed.face(face) && !grant.is_some_and(|g| g.sorcery_speed);
             // A split card's halves (CR 709.3): each cast for its own cost at its own speed, from the hand, or for an
@@ -2465,8 +2485,8 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             if let Some((left, right)) = def.split {
                 for (way, half) in [(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)] {
                     let from = if half.aftermath { ZoneKind::Graveyard } else { ZoneKind::Hand };
-                    let by_permission = permitted_whole && !half.aftermath && !zone.is(ZoneKind::Hand);
-                    if (!(zone.is(from) && own) && !by_permission) || face_speed(half) != instants {
+                    let by_permission = if half.aftermath { None } else { face_permission(half) };
+                    if (!(zone.is(from) && own) && by_permission.is_none()) || face_speed(half) != instants {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
@@ -2478,11 +2498,11 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             // A modal double-faced card's back face, from the hand or wherever a permission lets the card be cast (CR 712.11b,
             // 601.3), at the speed of the back face's own type (CR 712.2, 712.8a): the back face of a transforming card has no
             // mana cost and is not cast.
-            let back_by_permission = permitted_whole && !zone.is(ZoneKind::Hand);
-            if (zone.is(ZoneKind::Hand) || back_by_permission)
-                && let Some(back) = def.back
+            if let Some(back) = def.back
                 && back.has_cost
                 && face_speed(back) == instants
+                && let back_by_permission = face_permission(back)
+                && (zone.is(ZoneKind::Hand) || back_by_permission.is_some())
             {
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
                 if face_covered(back, back_by_permission) && offer_spell(cx, &asker, back, &mut option) {
@@ -3029,7 +3049,7 @@ fn cast(
     let face = cx.card_id(def);
     // Cast from exile by a permanent's permission (CR 601.3), it owes what the permission adds (CR 118.8, 601.2f): found now, as
     // the cast begins, so the permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling).
-    let exile_permit = if resolving || copy { None } else { exile_cast_permission(cx, card, inset.map(|_| face), player) };
+    let exile_permit = if resolving || copy { None } else { exile_cast_permission(cx, card, inset.or(half).or(back).map(|_| face), player) };
     // Flashback (CR 702.34a) a permission or a permanent gave, or aftermath (CR 702.127a): exiled instead of put anywhere
     // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
     let flashback = flashback || def.aftermath || granted.is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.flashback);
