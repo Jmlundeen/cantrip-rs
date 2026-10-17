@@ -1,0 +1,6 @@
+{
+  "name": "Turn to Frog",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Until end of turn, target creature loses all abilities and becomes a blue Frog with base power and toughness 1/1."
+}

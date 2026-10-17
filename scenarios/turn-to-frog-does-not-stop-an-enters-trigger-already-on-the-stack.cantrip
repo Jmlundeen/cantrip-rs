@@ -1,0 +1,55 @@
+# Turn to Frog's ruling: it "doesn't counter abilities that have already triggered or been activated": a triggered ability
+# on the stack exists apart from its source (CR 113.7a). Bot1's Inspiring Overseer enters on turn 3 and its "When this
+# creature enters, you gain 1 life and draw a card" goes on the stack; Bot2 answers with Turn to Frog at the Overseer, which
+# resolves first. The trigger still resolves: Bot1 goes to 21 and draws. The Overseer is a 1/1 blue Frog without flying.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Inspiring Overseer
+Island x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Turn to Frog
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Inspiring Overseer)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Inspiring Overseer.Subtypes = Frog
+? Bot1.Hand.Count = 4
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Inspiring Overseer.Power = 1
+Bot1.Battlefield.Inspiring Overseer.Toughness = 1
+Bot1.Battlefield.Inspiring Overseer.Colors = Blue
+Bot1.Battlefield.Inspiring Overseer.Keywords = (absent)

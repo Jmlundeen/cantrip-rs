@@ -1,0 +1,78 @@
+# Opalescence makes Humility a creature, so Turn to Frog can target it. On turn 4 Bot2 casts it at Humility: in layer 6
+# Turn to Frog's "loses all abilities" would take Humility's ability away, so Humility's effect depends on it and waits
+# (CR 613.8a); applied first, it leaves Humility with no ability to apply at all - and as that ability's effect begins in
+# layer 6, no part of it has begun to apply earlier to go on applying (CR 613.6). Until end of turn Humility does nothing:
+# Bot1's Inspiring Overseer is its printed 2/1 with flying again. Humility is a blue Frog enchantment creature, 1/1 (layer
+# 7b: Opalescence's 4/4 first, the later Turn to Frog's 1/1 after). On turn 5, the frog gone in the cleanup (CR 514.2),
+# Humility applies again: the Overseer is 1/1 without flying and Humility a 1/1 enchantment creature with no Frog type.
+# (Under Humility from turn 3 the Overseer was 1/1 without flying; its enters trigger on turn 1 drew Humility.)
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Sol Ring
+Opalescence
+Inspiring Overseer
+Humility
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Turn to Frog
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Inspiring Overseer.Power = 1
+? Bot1.Battlefield.Inspiring Overseer.Keywords = (absent)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Humility)
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Inspiring Overseer.Power = 2
+? Bot1.Battlefield.Inspiring Overseer.Toughness = 1
+? Bot1.Battlefield.Inspiring Overseer.Keywords = Flying
+? Bot1.Battlefield.Humility.Types = Enchantment; Creature
+? Bot1.Battlefield.Humility.Subtypes = Frog
+? Bot1.Battlefield.Humility.Colors = Blue
+? Bot1.Battlefield.Humility.Power = 1
+? Bot1.Battlefield.Humility.Toughness = 1
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Inspiring Overseer.Power = 1
+Bot1.Battlefield.Inspiring Overseer.Toughness = 1
+Bot1.Battlefield.Inspiring Overseer.Keywords = (absent)
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Subtypes = (absent)
+Bot1.Battlefield.Humility.Power = 1
+Bot1.Battlefield.Humility.Toughness = 1

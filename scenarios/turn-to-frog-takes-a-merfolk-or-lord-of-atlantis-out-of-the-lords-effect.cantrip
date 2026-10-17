@@ -1,0 +1,67 @@
+# Turn to Frog against Lord of Atlantis ("Other Merfolk get +1/+1 and have islandwalk"). On turn 2 Bot2 turns Bot1's Cenote
+# Scout into a Frog: its creature types are replaced in layer 4 (CR 205.1a, the ruling), so by layer 6 it is no Merfolk and
+# the Lord's effect does not reach it - a 1/1 with no islandwalk, not a 2/2. On turn 4, the Scout a Merfolk again (a 2/2
+# with islandwalk), Bot2 turns the Lord itself into a Frog: the Lord loses its ability in layer 6, the ability's effect
+# never begins (CR 613.8a), and the Scout is a 1/1 Merfolk with no islandwalk. The Lord is a 1/1 blue Frog.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Lord of Atlantis
+Cenote Scout
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Turn to Frog
+Turn to Frog
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cenote Scout.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Cenote Scout.Power = 2
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Cenote Scout)
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Cenote Scout.Subtypes = Frog
+? Bot1.Battlefield.Cenote Scout.Power = 1
+? Bot1.Battlefield.Cenote Scout.Toughness = 1
+? Bot1.Battlefield.Cenote Scout.Keywords = (absent)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Cenote Scout.Power = 2
+? Bot1.Battlefield.Cenote Scout.Keywords = Islandwalk
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Lord of Atlantis)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Cenote Scout.Subtypes = Merfolk; Scout
+Bot1.Battlefield.Cenote Scout.Power = 1
+Bot1.Battlefield.Cenote Scout.Toughness = 1
+Bot1.Battlefield.Cenote Scout.Keywords = (absent)
+Bot1.Battlefield.Lord of Atlantis.Subtypes = Frog
+Bot1.Battlefield.Lord of Atlantis.Colors = Blue
+Bot1.Battlefield.Lord of Atlantis.Power = 1
+Bot1.Battlefield.Lord of Atlantis.Toughness = 1

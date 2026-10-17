@@ -1,0 +1,76 @@
+# Turn to Frog sets base power and toughness 1/1 in layer 7b; Giant Growth's +3/+3 modifies them in layer 7c, which
+# always applies after 7b whatever the timestamps (CR 613.4b-c; Turn to Frog's ruling: "Effects that modify a creature's
+# power and/or toughness ... will apply to the creature no matter when they started to take effect"). On turn 3 Bot1
+# casts Giant Growth and then Turn to Frog at its Llanowar Elves; on turn 4 Bot2 does the same in the other order. Each
+# Elves is a 4/4 blue Frog (layers 4 and 5: Frog in place of Elf Druid, blue in place of green), not a 1/1, and has lost
+# its "{T}: Add {G}" (layer 6): Bot1 is not offered it (the refusal), and on turn 5, the frog gone with the cleanup of turn
+# 3 (CR 514.2), it is a 1/1 green Elf Druid again and taps for {G} (the positive control).
+
+[Bot1 Deck]
+Forest
+Island
+Mox Sapphire
+Llanowar Elves
+Giant Growth
+Turn to Frog
+Island x14
+
+[Bot2 Deck]
+Forest
+Island
+Mox Sapphire
+Llanowar Elves
+Giant Growth
+Turn to Frog
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Turn to Frog.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Power = 4
+? Bot1.Battlefield.Llanowar Elves.Toughness = 4
+? Bot1.Battlefield.Llanowar Elves.Subtypes = Frog
+? Bot1.Battlefield.Llanowar Elves.Colors = Blue
+! Bot1.Battlefield.Llanowar Elves.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot2.Battlefield.Llanowar Elves.Power = 4
+? Bot2.Battlefield.Llanowar Elves.Toughness = 4
+? Bot2.Battlefield.Llanowar Elves.Subtypes = Frog
+? Bot2.Battlefield.Llanowar Elves.Colors = Blue
+[T5 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
+Bot1.Battlefield.Llanowar Elves.Colors = Green
+Bot1.Graveyard = Turn to Frog; Giant Growth

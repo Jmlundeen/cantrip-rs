@@ -1,0 +1,53 @@
+# Clone copying Ornithopter has the Ornithopter's copiable values in layer 1 (CR 707.2, 613.1a); Turn to Frog applies
+# after, in layers 4 to 7b (CR 613.1d-f, 613.4b). On turn 2 Bot2 casts Turn to Frog at the Clone: it is still named
+# Ornithopter and still an artifact (the ruling: it "will retain any other card types"), but a blue Frog with no flying and
+# base power and toughness 1/1. The effect ends in the cleanup step (CR 514.2): on turn 3 it is a colorless 0/2 Thopter
+# with flying again, the copy it always was.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Sapphire
+Clone
+Island x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Turn to Frog
+Island x17
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Ornithopter#2)
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield = Mox Sapphire; Ornithopter; Ornithopter
+? Bot1.Battlefield.Ornithopter#2.Types = Artifact; Creature
+? Bot1.Battlefield.Ornithopter#2.Subtypes = Frog
+? Bot1.Battlefield.Ornithopter#2.Colors = Blue
+? Bot1.Battlefield.Ornithopter#2.Keywords = (absent)
+? Bot1.Battlefield.Ornithopter#2.Power = 1
+? Bot1.Battlefield.Ornithopter#2.Toughness = 1
+? Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Ornithopter#2.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter#2.Subtypes = Thopter
+Bot1.Battlefield.Ornithopter#2.Colors = (absent)
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot1.Battlefield.Ornithopter#2.Toughness = 2

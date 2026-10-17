@@ -1,0 +1,67 @@
+# Turn to Frog's "loses all abilities" is a layer-6 effect at its timestamp (CR 613.1f, 613.7): it takes what the creature
+# has when it applies, an ability gained earlier included, and not one gained later (the ruling: "If the affected creature
+# gains an ability after Turn to Frog resolves, it will keep that ability"). On turn 3 Bot1's Llanowar Elves gets Blossoming
+# Defense's +2/+2 and hexproof and then Turn to Frog: no hexproof, a 3/3 (base 1/1, +2/+2 in 7c). On turn 4 Bot2's Elves
+# gets Turn to Frog first and Blossoming Defense after it: hexproof kept, a 3/3 too.
+
+[Bot1 Deck]
+Forest
+Island
+Mox Sapphire
+Llanowar Elves
+Blossoming Defense
+Turn to Frog
+Island x14
+
+[Bot2 Deck]
+Forest
+Island
+Mox Sapphire
+Llanowar Elves
+Blossoming Defense
+Turn to Frog
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Blossoming Defense.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = Hexproof
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Turn to Frog.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Bot1.Battlefield.Llanowar Elves.Toughness = 3
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Blossoming Defense.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Battlefield.Llanowar Elves.Keywords = Hexproof
+Bot2.Battlefield.Llanowar Elves.Power = 3
+Bot2.Battlefield.Llanowar Elves.Toughness = 3
+Bot2.Battlefield.Llanowar Elves.Subtypes = Frog
