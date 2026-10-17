@@ -1,0 +1,63 @@
+# Mazemind Tome: "{T}, Put a page counter on this artifact: Scry 1", "{2}, {T}, Put a page counter on this artifact: Draw a
+# card" and "When there are four or more page counters on this artifact, exile it. If you do, you gain 4 life." Bot1 scries
+# on turn 1, draws on turn 3 and scries on turn 5: three page counters, and the state trigger has not triggered (CR 603.8).
+# On turn 7 the scry's cost puts the fourth counter: the state is true at once, so the trigger goes on the stack above the
+# scry that caused it and resolves first - the Tome is exiled and Bot1 gains 4 life - and the scry then still happens
+# (CR 608.2b: it has no target, and its source's absence changes nothing).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mazemind Tome
+Island x4
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mazemind Tome.Cast
+Bot1.Pass
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+? Bot1.Battlefield.Mazemind Tome.Counters.Page = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mazemind Tome.Counters.Page = 2
+? Bot1.Hand.Count = 5
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+? Bot1.Battlefield.Mazemind Tome.Counters.Page = 3
+? Stack.Count = 0
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+? Stack.Count = 2
+? Bot1.Battlefield.Mazemind Tome.Counters.Page = 4
+Bot1.Pass
+Bot2.Pass
+? Exile = Mazemind Tome
+? Bot1.Life = 24
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Island)
+
+[Expect]
+Stack.Count = 0
+Exile = Mazemind Tome
+Bot1.Life = 24
+Bot1.Battlefield = Island; Island; Sol Ring

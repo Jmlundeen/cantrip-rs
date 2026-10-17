@@ -1,0 +1,70 @@
+# Mazemind Tome's "When there are four or more page counters on this artifact, exile it. If you do, you gain 4 life", with
+# the Tome gone before it resolves. Its ruling: "If Mazemind Tome leaves the battlefield while its triggered ability is on
+# the stack, you can't exile it from the zone it's put into." Bot1 puts the fourth page counter on turn 7 and Bot2, in
+# response to the trigger, returns the Tome to Bot1's hand with Prismari Charm: the card in hand is a new object (CR
+# 400.7), so the trigger exiles nothing and, as nothing was exiled, Bot1 gains no life (CR 608.2c). The scry under it
+# still happens.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mazemind Tome
+Island x4
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Prismari Charm
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mazemind Tome.Cast
+Bot1.Pass
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Prismari Charm.Cast
+Bot2.Modes(Return target nonland permanent)
+Bot2.Target(Bot1.Battlefield.Mazemind Tome)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield = Island; Sol Ring
+Bot1.Hand = Mazemind Tome; Island; Island; Island; Island; Island; Island; Island

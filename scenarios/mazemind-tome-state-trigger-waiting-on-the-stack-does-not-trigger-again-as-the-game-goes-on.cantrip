@@ -1,0 +1,66 @@
+# Mazemind Tome's state trigger ("When there are four or more page counters on this artifact, exile it. If you do, you
+# gain 4 life") "doesn't trigger again until the ability has resolved, has been countered, or has otherwise left the
+# stack" (CR 603.8). Bot1 puts the fourth page counter on turn 7 and, with the trigger on the stack, casts Lightning Bolt
+# at Bot2 off a Mox Ruby: the state is still true through the cast, the Bolt's damage and every priority after, but the
+# waiting trigger is the only one - once the Bolt has resolved the stack holds it and the scry, no second trigger - and
+# Bot1 gains 4 life once.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mazemind Tome
+Mox Ruby
+Lightning Bolt
+Island x2
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mazemind Tome.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+? Stack.Count = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Exile = Mazemind Tome
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+
+[Expect]
+Stack.Count = 0
+Exile = Mazemind Tome
+Bot1.Life = 24
+Bot2.Life = 17
