@@ -1,0 +1,54 @@
+# Insatiable Avarice with both modes, the draw mode aimed at Bot2, who answers with Dawn's Truce (hexproof for its player). The spell's only
+# target is then illegal as it tries to resolve, so it does not resolve (CR 608.2b) and none of its effects happen - the ruling for spree:
+# "If all targets for the chosen modes become illegal before a spell with spree resolves, the spell won't resolve and none of its
+# effects will happen". So the other mode's search never happens either: no question is asked and the library keeps its order, the
+# Lightning Bolt second. Bot2 draws nothing and loses no life. (Compare the neighbouring scenario where both modes happen in order.)
+
+[Bot1 Deck]
+Black Lotus
+Insatiable Avarice
+Mox Jet
+Mox Jet
+Swamp x3
+Swamp
+Swamp
+Lightning Bolt
+Swamp x6
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Dawn's Truce
+Plains x4
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Insatiable Avarice.Cast
+Bot1.Modes(1; 2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot2.Hand.Count = 5
+Bot1.Graveyard = Insatiable Avarice; Black Lotus
+Bot1.Library = Swamp; Lightning Bolt; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp

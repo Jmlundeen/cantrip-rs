@@ -1,0 +1,42 @@
+# Insatiable Avarice, spree (CR 702.172a): the "+ {2}" mode alone costs {B} + {2}. It is a sorcery (CR 307.1): on Bot2's turn 2, with three
+# Mox Jets untapped, it is refused; on Bot1's turn 3 the same cast is offered (the positive control). Bot1 searches for the Lightning
+# Bolt, which is shuffled in and put on top ("then shuffle and put that card on top"), and no life is lost (the draw mode was not
+# chosen). The Bolt, not a Swamp, is then the top card, and the library keeps its other nine cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Insatiable Avarice
+Swamp x3
+Swamp x4
+Lightning Bolt
+Swamp x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+! Bot1.Hand.Insatiable Avarice.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Insatiable Avarice.Cast
+Bot1.Modes(1)
+Bot1.Search(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Library = Lightning Bolt; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot1.Life = 20
+Bot1.Graveyard = Insatiable Avarice
+Bot1.Hand.Count = 4
