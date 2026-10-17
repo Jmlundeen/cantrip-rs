@@ -154,6 +154,36 @@ public sealed partial class TacticalPlay
         return CardReading.ManaValue(aside < 0 ? text : text[..aside]);
     }
 
+    /// <summary>
+    /// The offered type of mana ("{W}" ... "{C}") whose color the most nonland cards in this seat's hand have, the earlier
+    /// offered on a tie; colorless counts as wanted by none, so it is taken only when no offered color is.
+    /// </summary>
+    private static int ManaTypeWanted(GameClient client, ChooseModesPromptMessage prompt)
+    {
+        List<ColorView> wanted = [.. client.MyHand().Where(card => !IsLand(card)).SelectMany(card => card.Colors)];
+        int best = prompt.Eligible[0];
+        int most = -1;
+        foreach (int mode in prompt.Eligible)
+        {
+            ColorView? color = prompt.Modes[mode] switch
+            {
+                "{W}" => ColorView.White,
+                "{U}" => ColorView.Blue,
+                "{B}" => ColorView.Black,
+                "{R}" => ColorView.Red,
+                "{G}" => ColorView.Green,
+                _ => null,
+            };
+            int count = color is { } c ? wanted.Count(w => w == c) : -1;
+            if (count > most)
+            {
+                (best, most) = (mode, count);
+            }
+        }
+
+        return best;
+    }
+
     private static int MostCommonCreatureType(GameClient client, ChooseModesPromptMessage prompt)
     {
         List<ObjectView> mine = [.. Creatures(client, client.Seat), .. client.MyHand().Where(IsCreature)];
@@ -245,6 +275,13 @@ public sealed partial class TacticalPlay
                 .ThenBy(mode => MiracleCost(prompt.Modes[mode]))
                 .First();
             return new ModesChosenAnswer { Modes = [cheapest] };
+        }
+
+        // "One mana of any type that land produced" (Mana Flare, Lavaleaper): the type its spells in hand ask for most, as
+        // mana of a color chosen is; colorless only when no color offered is asked for.
+        if (prompt.Heading == "Choose which type of mana to add" && prompt.Eligible.Count > 0)
+        {
+            return new ModesChosenAnswer { Modes = [ManaTypeWanted(client, prompt)] };
         }
 
         if (prompt.Eligible.Count == 0 || prompt.AdditionalCost || prompt.Heading.Length > 0)

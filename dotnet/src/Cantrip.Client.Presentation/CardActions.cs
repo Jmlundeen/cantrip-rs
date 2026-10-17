@@ -242,9 +242,12 @@ public sealed class CardActions
                 List<string> notes = [];
                 if (option.Filter != ManaSpendFilterView.None)
                 {
-                    notes.Add(option.Filter == ManaSpendFilterView.NotNonartifactSpells
-                        ? "can't be spent on nonartifact spells"
-                        : $"only for {Restricted(option.Filter, option.SpendSubtypes, option.SpendManaValue)}");
+                    notes.Add(option.Filter switch
+                    {
+                        ManaSpendFilterView.NotNonartifactSpells => "can't be spent on nonartifact spells",
+                        ManaSpendFilterView.NotSpellsFromHand => "can't be spent on spells cast from your hand",
+                        _ => $"only for {Restricted(option.Filter, option.SpendSubtypes, option.SpendManaValue)}",
+                    });
                 }
 
                 if (option.Effect == ManaSpendEffectView.GainsHaste)
@@ -587,9 +590,12 @@ public sealed class CardActions
         ManaSpendFilterView.ArtifactSpells => "artifact spells",
         ManaSpendFilterView.LegendarySpells => "legendary spells",
         ManaSpendFilterView.NotNonartifactSpells => "anything but nonartifact spells",
+        ManaSpendFilterView.SpellsFromExile => "spells cast from exile",
+        ManaSpendFilterView.NotSpellsFromHand => "anything but spells cast from your hand",
         ManaSpendFilterView.PlaneswalkerSpells => "planeswalker spells",
         ManaSpendFilterView.LandAbilities => "abilities of land sources",
         ManaSpendFilterView.ArtifactAbilities => "abilities of artifact sources",
+        ManaSpendFilterView.CreatureAbilities => "abilities of creature sources",
         _ => "anything",
     };
 

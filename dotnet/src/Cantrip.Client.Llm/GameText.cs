@@ -555,7 +555,7 @@ public static class GameText
 
         if (card.SummoningSick)
         {
-            parts.Add("summoning sick, so it cannot attack or use {T} abilities");
+            parts.Add("summoning sick, so it cannot attack, and its {T} abilities only where an effect lets them be activated as though it had haste (the actions offered say)");
         }
 
         foreach (CounterView counter in card.Counters)
