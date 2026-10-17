@@ -1,0 +1,58 @@
+# Secluded Courtyard: "As this land enters, choose a creature type" (CR 614.12a) and "{T}: Add one mana of any color.
+# Spend this mana only to cast a creature spell of the chosen type or activate an ability of a creature source of the
+# chosen type" (CR 106.6, 205.3m, 602.2b). Elemental chosen: turn 1 its {G}, the only mana, can't cast Llanowar Elves (an
+# Elf). Turn 3 it and the Forest cast Bramble Familiar, an Elemental creature spell. Turn 5, with the Familiar's own plain
+# {G} beside it, it can't pay Basking Rootwalla's "{1}{G}: +2/+2" (a Lizard source) - two mana, one of which may not go
+# there. Turn 7 it and the Forest pay the Familiar's "{1}{G}, {T}, Discard a card: Return this creature to its owner's
+# hand", an ability of an Elemental creature source.
+
+[Bot1 Deck]
+Secluded Courtyard
+Forest
+Bramble Familiar
+Basking Rootwalla
+Llanowar Elves
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Secluded Courtyard.Play
+Bot1.Modes(Elemental)
+? Bot1.Battlefield.Secluded Courtyard.ChosenSubtype = Elemental
+Bot1.Battlefield.Secluded Courtyard.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} (ElementalCreatureSpellsOrAbilities)
+! Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Secluded Courtyard.Activate(Ability: any color; Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bramble Familiar.Cast(Spend: G ElementalCreatureSpellsOrAbilities, G)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Bramble Familiar.Activate(Ability: Add {G})
+Bot1.Battlefield.Secluded Courtyard.Activate(Ability: any color; Color: Green)
+? Bot1.Mana = {G} {G} (ElementalCreatureSpellsOrAbilities)
+! Bot1.Battlefield.Basking Rootwalla.Activate
+[T7 Bot1.Main1]
+Bot1.Battlefield.Secluded Courtyard.Activate(Ability: any color; Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return; Spend: G ElementalCreatureSpellsOrAbilities, G)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Basking Rootwalla; Forest; Secluded Courtyard
+Bot1.Battlefield.Basking Rootwalla.Power = 1
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Island
