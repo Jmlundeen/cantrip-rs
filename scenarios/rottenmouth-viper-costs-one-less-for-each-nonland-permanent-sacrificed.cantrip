@@ -1,0 +1,46 @@
+# Rottenmouth Viper: "As an additional cost to cast this spell, you may sacrifice any number of nonland permanents. This
+# spell costs {1} less to cast for each permanent sacrificed this way." How many is announced as it is cast (CR 601.2b) and
+# the total cost determined with it (CR 601.2f, 118.7a): sacrificing three Ornithopters, its {5}{B} costs {2}{B}, which the
+# three Swamps' {B}{B}{B} pays exactly. A land is not among what may be sacrificed. It enters, a blight counter is put on it,
+# and for its one counter Bot2 (with only cards in hand, no nonland permanent) chooses to lose 4 life.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Ornithopter
+Ornithopter
+Rottenmouth Viper
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+? Bot1.Mana = {B}{B}{B}
+Bot1.Hand.Rottenmouth Viper.Cast(X: 3)
+! Bot1.Choose(Swamp)
+Bot1.Choose(Ornithopter#1; Ornithopter#2; Ornithopter#3)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot2.Modes(Lose 4 life)
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Swamp; Swamp; Swamp; Rottenmouth Viper
+Bot1.Battlefield.Rottenmouth Viper.Counters.Blight = 1
+Bot1.Graveyard = Ornithopter; Ornithopter; Ornithopter
+Bot2.Life = 16

@@ -1,0 +1,55 @@
+# An opponent with no nonland permanent and no card in hand can neither sacrifice nor discard, so loses 4 life, and is asked
+# nothing (CR 608.2c). Bot2 mulligans to one card (CR 103.5). Bot1's Show and Tell puts Rottenmouth Viper onto the
+# battlefield on turn 1: one blight counter, and Bot2 discards its one card. On turn 2 Bot2 plays the Island it drew - a land,
+# not a nonland permanent - and has nothing left. On turn 3 the Viper attacks with two counters, and for each Bot2 loses 4
+# life unasked; then its 6 damage: 20 - 8 - 6 = 6.
+
+[Opening]
+Chooser: Bot1
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Rottenmouth Viper
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.PlayFirst
+Bot1.Keep
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Mulligan
+Bot2.Keep
+Bot2.Choose(Island; Island; Island; Island; Island; Island)
+? Bot2.Hand.Count = 1
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Rottenmouth Viper)
+Bot2.Choose()
+Bot2.Modes(Discard a card)
+Bot2.Choose(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Bot2.Hand.Count = 0
+[T3 Bot1.Main1]
+Bot1.Attack(Rottenmouth Viper > Bot2)
+Bot1.Pass
+Bot2.Pass
+! Bot2.Modes
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 6
+Bot2.Graveyard = Island
+Bot2.Battlefield = Island
+Bot1.Battlefield.Rottenmouth Viper.Counters.Blight = 2

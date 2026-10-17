@@ -1,0 +1,42 @@
+# "Whenever this creature enters or attacks, put a blight counter on it. Then for each blight counter on it, each opponent
+# loses 4 life unless that player sacrifices a nonland permanent of their choice or discards a card." Show and Tell puts
+# Rottenmouth Viper onto the battlefield for Bot1 and Ornithopter for Bot2: it enters with no counter, gets one, and Bot2
+# sacrifices the Ornithopter rather than lose 4 life. On turn 3 it attacks: a second counter, and Bot2 answers twice - it
+# loses 4 life for the first, and discards a Lightning Bolt for the second (CR 608.2c: "unless" is the player's choice).
+# The Viper's 6 combat damage follows: 20 - 4 - 6 = 10.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Rottenmouth Viper
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Rottenmouth Viper)
+Bot2.Choose(Ornithopter)
+Bot2.Modes(Sacrifice a nonland permanent)
+Bot2.Choose(Ornithopter)
+? Bot2.Graveyard = Ornithopter
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Attack(Rottenmouth Viper > Bot2)
+Bot2.Modes(Lose 4 life)
+Bot2.Modes(Discard a card)
+Bot2.Choose(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 10
+Bot1.Battlefield.Rottenmouth Viper.Counters.Blight = 2
+Bot2.Graveyard = Lightning Bolt; Ornithopter
+Bot2.Hand.Count = 6

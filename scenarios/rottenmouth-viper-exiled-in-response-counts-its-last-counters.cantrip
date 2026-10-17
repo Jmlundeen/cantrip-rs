@@ -1,0 +1,44 @@
+# Rottenmouth Viper's ability once triggered is independent of it (CR 113.7a). On turn 3 it attacks with one blight counter,
+# and Bot2 exiles it with Swords to Plowshares in response (Bot1 gains 6). The ability puts no counter on it, since it is
+# no longer on the battlefield, and counts the one counter it had as it last existed there (CR 608.2h): Bot2 answers once,
+# losing 4 life (16 after the first time, 12 now). The attack's damage is gone with it.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Rottenmouth Viper
+Island x10
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Rottenmouth Viper)
+Bot2.Choose()
+Bot2.Modes(Lose 4 life)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Rottenmouth Viper > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Rottenmouth Viper)
+Bot2.Pass
+Bot1.Pass
+? Exile = Rottenmouth Viper
+Bot1.Pass
+Bot2.Pass
+Bot2.Modes(Lose 4 life)
+! Bot2.Modes
+
+[Expect]
+Turn = 3
+Bot1.Life = 26
+Bot2.Life = 12
+Exile = Rottenmouth Viper
