@@ -220,7 +220,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
                 {
                     let def = &cards.get(card).granted_preventions[index as usize];
                     let asker = Asker { source: e.source, controller: e.controller };
-                    if (def.applies)(cx, &asker, d) {
+                    if (def.applies)(cx, &asker, e.affected, d) {
                         found.push(Candidate { source: e.source, index, origin: Origin::GrantedPrevention(e.timestamp) });
                     }
                 }
@@ -439,8 +439,7 @@ pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u16)> {
             continue;
         }
         let def = &cx.cards().get(card).granted_preventions[index as usize];
-
-        if (def.applies)(cx, &Asker { source: e.source, controller: e.controller }, d) {
+        if (def.applies)(cx, &Asker { source: e.source, controller: e.controller }, e.affected, d) {
             found = Some(found.map_or((e.source, left), |(s, n)| (s, n.saturating_add(left))));
         }
     }

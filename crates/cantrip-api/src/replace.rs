@@ -216,10 +216,15 @@ pub struct PreventionDef {
     pub applies: PreventionApplies,
 }
 
+/// Whether a prevention effect a spell or ability made applies to this damage (CR 615.1), judged as `PreventionApplies` is,
+/// with the object the effect was made about (`ContinuousEffect::affected`): the resolving spell itself for one about no
+/// object ("prevent all combat damage that would be dealt this turn"), else the object it names ("that creature").
+pub type GrantedPreventionApplies = fn(&dyn Query, &Asker, ObjectId, &DamageEvent) -> bool;
+
 /// A prevention effect a resolving spell or ability makes (CR 615, 611.2): "prevent the next 3 damage that would be dealt
 /// to any target this turn", "prevent all combat damage that would be dealt this turn". The effect itself
 /// (`EffectKind::Prevention`) holds whom the damage must be dealt to and how much is left to prevent (`Shield`); this says
-/// what else the damage must be, if anything (combat damage, from a source).
+/// what else the damage must be, if anything (combat damage, from a source, to or by the object it is about).
 #[derive(Clone, Copy)]
 pub struct GrantedPreventionDef {
     /// What it does, in a few words: shown beside its source when a player orders several (CR 616.1).
@@ -227,7 +232,11 @@ pub struct GrantedPreventionDef {
     /// The damage it prevents, as its text names it ("damage", "combat damage"): what is shielded is shown with "Prevent
     /// the next 3 damage that would be dealt to it this turn".
     pub damage: &'static str,
-    pub applies: PreventionApplies,
+    /// For an effect about an object that prevents damage named by more than whom it is dealt to, how its text names that
+    /// damage in relation to the object ("to and dealt by it": Maze of Ith's "that creature"): the effect is shown on the
+    /// object so. None for one about whom the damage is dealt to, or about no object.
+    pub of_it: Option<&'static str>,
+    pub applies: GrantedPreventionApplies,
 }
 
 fn never(_: &dyn Query, _: &Asker, _: &Proposal) -> bool {

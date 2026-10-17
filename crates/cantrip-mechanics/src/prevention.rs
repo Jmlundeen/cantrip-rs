@@ -6,21 +6,21 @@
 
 use cantrip_api::*;
 
-fn any(_: &dyn Query, _: &Asker, _: &DamageEvent) -> bool {
+fn any(_: &dyn Query, _: &Asker, _: ObjectId, _: &DamageEvent) -> bool {
     true
 }
 
-fn combat(_: &dyn Query, _: &Asker, d: &DamageEvent) -> bool {
+fn combat(_: &dyn Query, _: &Asker, _: ObjectId, d: &DamageEvent) -> bool {
     d.combat
 }
 
 /// Damage of any kind from any source, to whom the effect names: "prevent the next 3 damage that would be dealt to any
 /// target this turn" (Healing Salve; Bandage's next 1, Mending Hands' next 4).
-pub const ANY_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents the damage", damage: "damage", applies: any };
+pub const ANY_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents the damage", damage: "damage", of_it: None, applies: any };
 
 /// Combat damage only (CR 510.2): "prevent all combat damage that would be dealt this turn" (Fog, Holy Day, Moment's
 /// Peace).
-pub const COMBAT_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all combat damage", damage: "combat damage", applies: combat };
+pub const COMBAT_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents all combat damage", damage: "combat damage", of_it: None, applies: combat };
 
 /// Makes the prevention effect the resolving spell or ability's card lists `index`th in its `granted_preventions`, of damage
 /// to `to` (`Target::None` for damage to anyone), until end of turn: all of it, or the next N (CR 615.7).
