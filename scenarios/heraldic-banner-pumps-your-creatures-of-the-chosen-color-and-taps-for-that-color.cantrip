@@ -1,0 +1,53 @@
+# Heraldic Banner choosing green as it enters: "Creatures you control of the chosen color get +1/+0" - Bot1's green Llanowar
+# Elves is a 2/1, its black Misshapen Fiend stays 1/1, and Bot2's green Elvish Mystic (not "you control") stays 1/1. "{T}: Add
+# one mana of the chosen color": the Banner pays for the Elves with {G}, and cannot add any other color
+# (`! ... Activate(Color: Red)`; positive control: `Color: Green`).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Heraldic Banner
+Llanowar Elves
+Misshapen Fiend
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Heraldic Banner.Cast
+Bot1.Colors(Green)
+! Bot1.Battlefield.Heraldic Banner.Activate(Color: Red)
+Bot1.Battlefield.Heraldic Banner.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Misshapen Fiend.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Misshapen Fiend.Power = 1
+Bot2.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Heraldic Banner.ChosenColor = Green

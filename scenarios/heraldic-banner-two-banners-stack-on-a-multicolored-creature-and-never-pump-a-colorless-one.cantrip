@@ -1,0 +1,55 @@
+# Two Heraldic Banners, one choosing red and one blue: Lutri, the Spellchaser ({1}{U/R}{U/R}, a blue and red creature, 3/2)
+# is "of the chosen color" for both and gets +1/+0 from each (CR 613.4c), 5/2; the colorless Ornithopter is of neither
+# color (CR 105.2c) and Bot1's green Llanowar Elves is not either, so they stay as they are.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Heraldic Banner
+Heraldic Banner
+Lutri, the Spellchaser
+Ornithopter
+Swamp
+Llanowar Elves
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Heraldic Banner.Cast
+Bot1.Colors(Red)
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Heraldic Banner.Cast
+Bot1.Colors(Blue)
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Heraldic Banner#1.Activate(Color: Red)
+Bot1.Battlefield.Heraldic Banner#2.Activate(Color: Blue)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Lutri, the Spellchaser.Power = 5
+Bot1.Battlefield.Lutri, the Spellchaser.Toughness = 2
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Heraldic Banner#1.ChosenColor = Red
+Bot1.Battlefield.Heraldic Banner#2.ChosenColor = Blue
