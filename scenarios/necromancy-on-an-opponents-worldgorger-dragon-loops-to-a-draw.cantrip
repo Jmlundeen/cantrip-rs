@@ -1,0 +1,55 @@
+# A second loop of mandatory actions, through a target rather than an Aura's choice of host (CR 104.4b, 732.4), and across
+# owners. Bot2 Entombs its own Worldgorger Dragon on turn 2; on turn 5 Bot1 casts Necromancy at sorcery speed, and its
+# enters ability targets the Dragon, the only creature card in any graveyard. The Dragon enters under Bot1's control (CR 110.2), and its enters ability, Bot1's, exiles all other permanents Bot1
+# controls: Necromancy and three Swamps. Necromancy's leaves ability makes the Dragon's controller, Bot1, sacrifice it,
+# and it goes to its owner's graveyard, Bot2's. The Dragon's leaves ability returns the exiled cards under their owner's
+# control, Bot1's. Necromancy enters again and its enters ability must target a creature card in a graveyard: the
+# Dragon in Bot2's graveyard is the only one, so it is chosen without asking (CR 603.3d), and round it goes. Nobody can
+# do anything at any priority but pass or tap a land: the game is a draw.
+
+[Bot1 Deck]
+Swamp
+Necromancy
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Entomb
+Island
+Island
+Island
+Island
+Island
+Island
+Worldgorger Dragon
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Worldgorger Dragon)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Necromancy.Cast
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Turn = 5
+Step = Main1
+Stack.Count = 1
+Bot1.Status = (absent)
+Bot2.Status = (absent)

@@ -1,0 +1,72 @@
+# The Worldgorger Dragon loop with another creature card in a graveyard is no draw: it contains a choice (CR 104.4b). Bot2
+# has Entombed an Ornithopter on turn 2. On turn 3 Bot1 animates the Dragon; its enters ability exiles Animate Dead and
+# both Swamps (tapped for it), Animate Dead's leaves ability makes Bot1 sacrifice the Dragon, and the Dragon's leaves
+# ability returns them all, new objects (CR 400.7), the Swamps untapped. Animate Dead, put onto the battlefield without
+# being cast, chooses what it enchants (CR 303.4f, the Worldgorger Dragon ruling): a creature card in a graveyard, which is
+# now the Dragon or Bot2's Ornithopter, and not targeting. Bot1 chooses the Dragon ten times, going round the loop ten
+# times - far past where a loop of mandatory actions is found, and still no draw, for each of those was a choice - and
+# then the Ornithopter, so Animate Dead's enters ability
+# returns it under Bot1's control (CR 110.2) and the loop is over: the Dragon stays in the graveyard, and Bot1 has two
+# untapped Swamps again (mana made in the loop would have stayed in the pool all along, CR 106.4).
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Entomb
+Island
+Island
+Island
+Island
+Island
+Island
+Ornithopter
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Target(Bot2.Graveyard.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Swamp; Swamp; Animate Dead; Ornithopter
+Bot1.Battlefield.Animate Dead.AttachedTo = Ornithopter
+Bot1.Battlefield.Swamp#1.Tapped = false
+Bot1.Battlefield.Swamp#2.Tapped = false
+Bot1.Graveyard = Worldgorger Dragon; Entomb
+Bot2.Graveyard = Entomb

@@ -1,0 +1,47 @@
+# Worldgorger Dragon and Animate Dead, the loop of mandatory actions that is a draw (CR 104.4b, 732.4). Bot1 Entombs the
+# Dragon on turn 1 and animates it on turn 3. The Dragon enters; its enters ability exiles Animate Dead and both Swamps
+# (all other permanents Bot1 controls), so Animate Dead's leaves ability makes Bot1 sacrifice the Dragon, whose leaves
+# ability returns the exiled cards, new objects (CR 400.7), the Swamps untapped. Animate Dead, put onto the battlefield
+# without being cast, chooses what it enchants (CR 303.4f): a creature card in a graveyard, and the Dragon is the only
+# one, so it enchants the Dragon without anyone choosing; its enters ability returns the Dragon, and round it goes. Each
+# trigger has no target or one, the Dragon's two abilities never trigger together, and at every priority neither player
+# can do anything but pass or tap a Swamp for mana (their hands are only basic lands; no spell is castable with a trigger
+# on the stack), and tapping a land only fills a pool that buys nothing: no player can stop it, so the game is a draw.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Entomb; Worldgorger Dragon
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Turn = 3
+Step = Main1
+Stack.Count = 1
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Status = (absent)
+Bot2.Status = (absent)

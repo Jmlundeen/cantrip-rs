@@ -1,0 +1,12 @@
+{
+  "name": "Worldgorger Dragon",
+  "manaCost": "{3}{R}{R}{R}",
+  "type": "Creature — Nightmare Dragon",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Flying, trample\nWhen this creature enters, exile all other permanents you control.\nWhen this creature leaves the battlefield, return the exiled cards to the battlefield under their owners' control.",
+  "keywords": [
+    "Flying",
+    "Trample"
+  ]
+}

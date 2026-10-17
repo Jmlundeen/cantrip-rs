@@ -1,0 +1,53 @@
+# The Worldgorger Dragon ruling (CR 607.2a, 603.6c): Bot1 animates the Dragon; with its enters ability on the stack, Bot2
+# Swords to Plowshares it. Its leaves ability triggers, resolves first and returns nothing - nothing has been exiled with
+# it yet - and Animate Dead, enchanting nothing, goes to the graveyard (CR 704.5m). Then the enters ability resolves and
+# exiles all other permanents Bot1 controls, both Swamps, for good. Bot1 gains 6 life, the Dragon's power as it was
+# exiled (7, less Animate Dead's 1).
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack = Worldgorger Dragon
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Worldgorger Dragon)
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Exile = Worldgorger Dragon; Swamp; Swamp
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Animate Dead; Entomb
+Bot1.Life = 26

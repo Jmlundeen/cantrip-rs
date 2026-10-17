@@ -1,0 +1,99 @@
+# The Worldgorger Dragon loop is no draw when tapping lands can buy something (CR 104.4b's last sentence, CR 106.4): Bot1
+# holds Withering Torment ({2}{B}), which its two Swamps can't pay for at once - so it is never offered at priority - but
+# the Swamps come back untapped each time round the loop and mana stays in the pool until the step ends. Bot1 lets the
+# loop go round ten times without tapping them - far past where a loop of mandatory actions is found, and no draw: tapping
+# them is a choice that could pay for the Torment - then taps them two times round in a row, floating four black mana, and with the Dragon's third enters ability on the stack
+# casts Withering Torment on the Dragon: Bot1 loses 2 life, the Dragon's leaves ability returns nothing (nothing is exiled
+# with it yet), Animate Dead goes to the graveyard enchanting nothing (CR 704.5m), and the enters ability then exiles both
+# Swamps for good. One black mana is left floating.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Withering Torment
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}{B}
+? Stack = Worldgorger Dragon
+Bot1.Hand.Withering Torment.Cast(Worldgorger Dragon)
+[T3 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.Battlefield.Count = 0
+Exile = Swamp; Swamp
+Bot1.Graveyard.Count = 4
+Bot1.Life = 18
