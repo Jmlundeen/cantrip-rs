@@ -5,14 +5,13 @@ use cantrip_oracle as oracle;
 /// "Target creature or planeswalker that's blue or red" (CR 115.1, 105.2): the colors are read through the words of this
 /// spell's text (CR 612), and a permanent of both colors qualifies.
 fn blue_or_red_creature_or_planeswalker(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    let Target::Object(id) = t else { return false };
-    if !targets::permanent(q, id) {
+    if !(targets::CREATURE_OR_PLANESWALKER.filter)(q, asker, t) {
         return false;
     }
-    let chars = q.chars(id);
+    let Target::Object(id) = t else { return false };
     let words = q.words(asker.source);
-    (chars.is(CardType::Creature) || chars.is(CardType::Planeswalker))
-        && (chars.colors.has(words.color(Color::Blue)) || chars.colors.has(words.color(Color::Red)))
+    let colors = q.chars(id).colors;
+    colors.has(words.color(Color::Blue)) || colors.has(words.color(Color::Red))
 }
 
 /// "Destroy target creature or planeswalker that's blue or red. You gain 1 life." (CR 701.8, 608.2b): with its one target

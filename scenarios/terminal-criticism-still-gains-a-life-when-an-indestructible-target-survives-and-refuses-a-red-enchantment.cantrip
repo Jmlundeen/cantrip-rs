@@ -1,0 +1,59 @@
+# Terminal Criticism: "Destroy target creature or planeswalker that's blue or red. You gain 1 life." The Artist's Talent (a red
+# Class, an enchantment) is refused: only creatures and planeswalkers are targets, whatever their colour. The legal target,
+# Bot2's red Masked Meower, is made indestructible in response by Revitalizing Repast (+1/+1 counter and indestructible until
+# end of turn): the spell resolves, the destroy does nothing (CR 702.12b), and Bot1 still gains the life (CR 608.2c: the
+# instructions are independent; the one target was still legal). Meower is still there with its counter. (The Island in Bot2's
+# graveyard is the discard of its own Artist's Talent, triggered by casting the Repast.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Terminal Criticism
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Pearl
+Mox Jet
+Masked Meower
+Artist's Talent
+Revitalizing Repast
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Masked Meower.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Artist's Talent.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Artist's Talent)
+Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Masked Meower)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Revitalizing Repast.Cast(Bot2.Battlefield.Masked Meower)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Battlefield.Masked Meower.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Masked Meower.Keywords = Haste; Indestructible
+Bot2.Graveyard = Revitalizing Repast; Island
+Bot1.Graveyard = Terminal Criticism
