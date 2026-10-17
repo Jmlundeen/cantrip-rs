@@ -1,0 +1,48 @@
+# The Irencrag: "Whenever a legendary creature you control enters, you may have The Irencrag become a legendary Equipment
+# artifact named Everflame, Heroes' Legacy. If you do, it gains equip {3} and 'Equipped creature gets +3/+3' and loses all
+# other abilities." Aunt May, a legendary creature, enters on turn 1 and Bot1 accepts: the permanent is named Everflame,
+# Heroes' Legacy and nothing else (CR 612.8), a legendary Artifact - Equipment (layer 4), and its {T}: Add {C} is gone
+# (layer 6: "loses all other abilities"). It lasts (the ruling: no duration), so on turn 3 Bot1 pays the equip {3} it
+# gained (Plains, Mox Pearl, Mox Jet) and Aunt May, a 0/2, gets +3/+3 from the ability it gave the Equipment: a 3/5.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+The Irencrag
+Aunt May
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Irencrag.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield.Everflame, Heroes' Legacy.Types = Artifact
+? Bot1.Battlefield.Everflame, Heroes' Legacy.Subtypes = Equipment
+? Bot1.Battlefield.Everflame, Heroes' Legacy.Supertypes = Legendary
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Everflame, Heroes' Legacy.Activate(Ability: {T}: Add {C})
+Bot1.Battlefield.Everflame, Heroes' Legacy.Activate(Bot1.Battlefield.Aunt May; Ability: Equip)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Aunt May.Power = 3
+Bot1.Battlefield.Aunt May.Toughness = 5
+Bot1.Battlefield.Everflame, Heroes' Legacy.Types = Artifact
+Bot1.Battlefield.Everflame, Heroes' Legacy.Subtypes = Equipment
