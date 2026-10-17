@@ -2,7 +2,7 @@
 # What the page shows of mana only for creature spells and only for abilities of creature sources (CR 106.6), and that a
 # person can spend each where it may go. Rockface Village's menu words its {R} as only for creature spells, and the {R}
 # sits in the pool as a chip "creatures"; it pays for Shang-Chi, Master of Kung Fu with Black Lotus's {G}. Shang-Chi taps
-# the turn it arrives (its own "as though those creatures had haste", CR 302.6), its menu words the {G}{G} as only for
+# the turn it arrives (its own "as though those creatures had haste", CR 302.6), its menu offers each color's pair as only for
 # abilities of creature sources, the pool shows them as a chip "creature abilities" beside the plain {G} Black Lotus left,
 # and they pay Basking Rootwalla's {1}{G} pump: a 3/3, the plain {G} still in the pool.
 
@@ -33,7 +33,7 @@ Bot1.Hand.Shang-Chi, Master of Kung Fu.Cast(Spend: R CreatureSpells, G)
 Bot1.Pass
 Bot2.Pass
 Bot1.Battlefield.Shang-Chi, Master of Kung Fu.Activate(Color: Green)
-? Client.Bot1.Menu = {T}: Add two mana of any one color (only for abilities of creature sources)
+? Client.Bot1.Menu = {T}: Add {W}{W} (only for abilities of creature sources); {T}: Add {U}{U} (only for abilities of creature sources); {T}: Add {B}{B} (only for abilities of creature sources); {T}: Add {R}{R} (only for abilities of creature sources); {T}: Add {G}{G} (only for abilities of creature sources)
 ? Client.Bot1.Mana = 1 Green; 2 Green (creature abilities)
 Bot1.Battlefield.Basking Rootwalla.Activate(Spend: G CreatureAbilities, G CreatureAbilities)
 Bot1.Pass

@@ -463,7 +463,12 @@ public sealed class ScenarioPlayer
             {
                 PlayerState me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat)
                     ?? throw new NotDrivenException("AssignMana, with no pool shown", state);
-                ManaChipState chip = me.Mana.FirstOrDefault(c => c.Type == action.Mana?.ToString() && c.Clickable)
+                // Restricted mana is a chip of its own, captioned with what it is for; plain mana's caption says at most how
+                // much is spoken for ("1 to spell"). The answer's restriction says which of the two to click.
+                bool restricted = action.Filter != ManaSpendFilterView.None || action.Effect != ManaSpendEffectView.None;
+                static bool Captioned(ManaChipState c) => c.Caption.Length > 0 && !Regex.IsMatch(c.Caption, @"^\d+ to spell$");
+                List<ManaChipState> ofType = [.. me.Mana.Where(c => c.Type == action.Mana?.ToString() && c.Clickable)];
+                ManaChipState chip = (ofType.FirstOrDefault(c => Captioned(c) == restricted) ?? ofType.FirstOrDefault())
                     ?? throw new Xunit.Sdk.XunitException($"No {action.Mana} in the pool to click: {string.Join(", ", me.Mana.Select(c => $"{c.Count} {c.Type}"))}");
                 await _page.Page.Mouse.ClickAsync(chip.X, chip.Y);
                 return;
