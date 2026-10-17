@@ -338,3 +338,31 @@ pub fn artifacts_and_creatures_entering_dont_trigger(q: &dyn Query, _: &Asker, e
         chars.is(CardType::Artifact) || chars.is(CardType::Creature)
     })
 }
+
+/// "Nonbasic lands ...": every land without the basic supertype, judged as layers 1 to 3 left it (CR 205.4a, 613.1d).
+fn nonbasic_land(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
+    so_far.is(CardType::Land) && !so_far.supertypes.basic
+}
+
+/// "... are Mountains" (CR 305.7, layer 4): the land's subtype is set to Mountain, the word of the source's text (CR 612).
+/// It loses its other land types and the abilities of its rules text, and has "{T}: Add {R}" (CR 305.6); its name and
+/// supertypes stay (the cards' rulings).
+fn mountains(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    chars.set_land_subtypes(SubtypeSet::NONE.with(view.words(source).subtype(Subtype::Mountain)));
+}
+
+/// "Nonbasic lands are Mountains." (CR 305.7, 613.1d): Blood Moon and Magus of the Moon print it. Applied in layer 4 to
+/// every nonbasic land, whoever controls it, it goes on applying when its source loses its abilities in layer 6 (CR 613.6,
+/// Magus of the Moon's ruling), and a land with an ability of its own that changes land types (Urborg) loses that ability
+/// to it first (CR 613.8a, `sets_land_subtypes`).
+pub const NONBASIC_LANDS_ARE_MOUNTAINS: StaticDef = sets_land_subtypes(nonbasic_land, mountains, "Nonbasic lands are Mountains.");
+
+/// "... are every basic land type in addition to their other types" (CR 305.7, 205.1b, layer 4): the land keeps its land
+/// types and rules text and gains Plains, Island, Swamp, Mountain and Forest, and with them each one's mana ability (CR
+/// 305.6). "Every basic land type" names no basic land type, so no text-changing effect changes it (CR 612.2). Prismatic
+/// Omen, Dryad of the Ilysian Grove and Leyline of the Guildpact print it, for `your_lands`.
+pub fn every_basic_land_type(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    if chars.is(CardType::Land) {
+        chars.subtypes = chars.subtypes.union(SubtypeSet::of(&[Subtype::Plains, Subtype::Island, Subtype::Swamp, Subtype::Mountain, Subtype::Forest]));
+    }
+}
