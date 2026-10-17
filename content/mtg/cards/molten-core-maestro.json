@@ -1,0 +1,11 @@
+{
+  "name": "Molten-Core Maestro",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Goblin Bard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Menace\nOpus — Whenever you cast an instant or sorcery spell, put a +1/+1 counter on this creature. If five or more mana was spent to cast that spell, add an amount of {R} equal to this creature's power.",
+  "keywords": [
+    "Menace"
+  ]
+}

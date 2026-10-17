@@ -1,0 +1,41 @@
+# Molten-Core Maestro: "Menace. Opus - Whenever you cast an instant or sorcery spell, put a +1/+1 counter on this creature." Bot1
+# casts the Maestro (Mox Ruby and Mox Jet), then Ornithopter, a creature spell: no trigger, still a 2/2. Then Lightning Bolt (one
+# mana): the Maestro gets its counter and is a 3/3, and with fewer than five mana spent no mana is added (the pool is empty).
+# It has menace.
+
+[Bot1 Deck]
+Mox Ruby x2
+Mox Jet
+Molten-Core Maestro
+Ornithopter
+Lightning Bolt
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Molten-Core Maestro.Cast
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+? Bot1.Battlefield.Molten-Core Maestro.Power = 2
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Molten-Core Maestro.Power = 3
+Bot1.Battlefield.Molten-Core Maestro.Toughness = 3
+Bot1.Battlefield.Molten-Core Maestro.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Molten-Core Maestro.Keywords = Menace
+Bot2.Life = 17

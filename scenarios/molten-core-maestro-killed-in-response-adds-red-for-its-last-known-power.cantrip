@@ -1,0 +1,55 @@
+# Molten-Core Maestro's opus when the Maestro is gone (CR 400.7, 608.2h): Bot1 casts Mind Twist with X = 4 (five mana) and the opus
+# trigger goes on the stack; Bot2 answers with Lightning Bolt on the 2/2 Maestro, which dies. The trigger resolves anyway: there is
+# no creature to put a counter on, and the amount of {R} is the power the Maestro last had on the battlefield, 2 - not 3, as the
+# counter was never put on. So {R}{R} is in the pool.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Molten-Core Maestro
+Mind Twist
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Molten-Core Maestro.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 4)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Molten-Core Maestro)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Molten-Core Maestro
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}{R}
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Mind Twist; Molten-Core Maestro
+Bot2.Graveyard = Plains; Plains; Plains; Plains; Lightning Bolt
