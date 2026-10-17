@@ -1,0 +1,46 @@
+# Witherbloom Charm, third mode: "Destroy target nonland permanent with mana value 2 or less". Bot2 has an Island (a land),
+# a Basalt Monolith (mana value 3) and a Mox Ruby (0): the Island and the Monolith are refused as targets, the Mox is the
+# positive control and is destroyed (CR 115.1, 202.3, 701.8). Cast at instant speed in Bot2's turn.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Witherbloom Charm
+Swamp x17
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Basalt Monolith
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Basalt Monolith.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(Destroy target)
+! Bot1.Target(Bot2.Battlefield.Island)
+! Bot1.Target(Bot2.Battlefield.Basalt Monolith)
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Battlefield = Island; Mox Pearl; Mox Sapphire; Basalt Monolith
+Bot2.Graveyard = Mox Ruby
+Bot1.Graveyard = Witherbloom Charm

@@ -1,0 +1,30 @@
+# Witherbloom Charm, second mode: "You gain 5 life": 20 + 5 = 25 for the caster, 20 for the opponent. Nothing is
+# sacrificed or drawn (hand 4 after casting three cards of seven).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Witherbloom Charm
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(You gain 5 life)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 25
+Bot2.Life = 20
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Mox Jet; Mox Emerald

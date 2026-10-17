@@ -1,0 +1,36 @@
+# "Target nonland permanent with mana value 2 or less" names no controller and includes exactly 2: Bot1 destroys its own
+# Mind Stone (mana value 2; the boundary of "2 or less") with the Charm's third mode (CR 115.1, 202.3, 701.8).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mind Stone
+Witherbloom Charm
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(Destroy target)
+Bot1.Target(Mind Stone)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Pearl; Mox Sapphire
+Bot1.Graveyard = Witherbloom Charm; Mind Stone

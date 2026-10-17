@@ -1,0 +1,42 @@
+# Bot1 casts the Charm's destroy mode on Bot2's Ornithopter; Bot2 responds with Snakeskin Veil on it. Hexproof (Bot1 is an
+# opponent) makes the only target illegal on resolution, so the spell does not resolve (CR 608.2b) and the Ornithopter stays.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Witherbloom Charm
+Swamp x17
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Snakeskin Veil
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(Destroy target)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Ornithopter
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+Bot1.Graveyard = Witherbloom Charm
+Bot2.Graveyard = Snakeskin Veil

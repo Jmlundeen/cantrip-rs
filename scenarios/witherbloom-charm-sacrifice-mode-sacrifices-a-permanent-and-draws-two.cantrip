@@ -1,0 +1,32 @@
+# Witherbloom Charm, first mode: Bot1 sacrifices Mox Jet (a permanent it controls, already tapped for the Charm) and draws two
+# cards (CR 701.21a, 121.1). Bot1 starts with seven cards, casts Jet, Emerald and the Charm (4 left) and draws 2: 6.
+# The library is 20 - 7 - 2 = 11 cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Witherbloom Charm
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(You may sacrifice)
+Bot1.Choose(Mox Jet)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 11
+Bot1.Battlefield = Mox Emerald
+Bot1.Graveyard = Witherbloom Charm; Mox Jet

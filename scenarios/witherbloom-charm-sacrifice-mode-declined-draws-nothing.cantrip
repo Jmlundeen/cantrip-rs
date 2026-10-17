@@ -1,0 +1,31 @@
+# "You may sacrifice a permanent. If you do, draw two cards": Bot1 declines (chooses nothing), so it sacrifices nothing and
+# draws nothing (CR 608.2d). Hand 7 - 3 cards cast = 4, library unchanged at 13.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Witherbloom Charm
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(You may sacrifice)
+Bot1.Choose()
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 13
+Bot1.Battlefield = Mox Jet; Mox Emerald
+Bot1.Graveyard = Witherbloom Charm
