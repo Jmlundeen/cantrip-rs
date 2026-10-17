@@ -68,3 +68,22 @@ pub fn discard_chosen_from_revealed_hand_of_kind(
 pub fn discard_chosen_nonland_from_revealed_hand(g: &mut dyn Game, item: &StackItem, player: PlayerId) -> Result<Vec<ObjectId>, Suspend> {
     discard_chosen_from_revealed_hand_of_kind(g, item, player, Purpose::TakeFromHand, "nonland", |q, c| !q.chars(c).is(CardType::Land))
 }
+
+/// "You may put a [kind of] card from your hand onto the battlefield" (CR 608.2d, 101.4): one card of the hand that passes
+/// `eligible`, chosen as an "up to one" with the whole hand shown, then put onto the battlefield under the player's control
+/// (an Aura chooses what it enchants as it enters, CR 303.4f). Nothing is asked when no card is eligible. The new object, or
+/// none if nothing was put; it may have left the battlefield again by the time the caller looks. Kona, Rescue Beastie, Uro,
+/// Sneak Attack, Flash and Through the Breach print it.
+pub fn may_put_onto_battlefield(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    eligible: impl Fn(&Chars) -> bool,
+) -> Result<Option<ObjectId>, Suspend> {
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&g.chars(c))).collect();
+    let Some(&card) = choose::cards_from(g, player, source, Purpose::PutOntoBattlefield, hand, eligible, 1, true)?.first() else {
+        return Ok(None);
+    };
+    Ok(Some(g.put_onto_battlefield(card, player, false)?))
+}

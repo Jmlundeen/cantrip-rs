@@ -396,23 +396,23 @@ fn creature_card_with_mana_value_3_or_less_in_your_graveyard_filter(q: &dyn Quer
 /// Call a Surprise Witness and Leonardo's Technique print it.
 pub const CREATURE_CARD_WITH_MANA_VALUE_3_OR_LESS_IN_YOUR_GRAVEYARD: TargetSpec = target(creature_card_with_mana_value_3_or_less_in_your_graveyard_filter);
 
-/// The card types of a permanent card (CR 110.4b): those that can exist on the battlefield.
+/// The card types of a permanent card (CR 110.4a): those that can exist on the battlefield.
 pub const PERMANENT_CARD_TYPES: [CardType; 6] =
     [CardType::Artifact, CardType::Battle, CardType::Creature, CardType::Enchantment, CardType::Land, CardType::Planeswalker];
 
-/// Whether these are the characteristics of a permanent card (CR 110.4b). Malevolent Rumble, Moonshadow, Lion Sash,
+/// Whether these are the characteristics of a permanent card (CR 110.4a). Malevolent Rumble, Moonshadow, Lion Sash,
 /// Faith's Reward and The Aesir Escape Valhalla ask it.
 pub fn is_permanent_card(c: &Chars) -> bool {
     PERMANENT_CARD_TYPES.iter().any(|&t| c.is(t))
 }
 
-/// Whether these are the characteristics of a nonland permanent card (CR 110.4b): an artifact land is a land. Six,
+/// Whether these are the characteristics of a nonland permanent card (CR 110.4a): an artifact land is a land. Six,
 /// Guardian Scalelord and Loamcrafter Faun ask it.
 pub fn is_nonland_permanent_card(c: &Chars) -> bool {
     !c.is(CardType::Land) && is_permanent_card(c)
 }
 
-/// "Target permanent card in your graveyard" (CR 115.1, 110.4b). Shifting Woodland prints it; Night Nurse asks it of a
+/// "Target permanent card in your graveyard" (CR 115.1, 110.4a). Shifting Woodland prints it; Night Nurse asks it of a
 /// card put there this turn.
 pub fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     card_in_your_graveyard(q, asker, t, &PERMANENT_CARD_TYPES)
@@ -421,7 +421,7 @@ pub fn permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target)
 /// "Target permanent card in your graveyard". Shifting Woodland prints it.
 pub const PERMANENT_CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(permanent_card_in_your_graveyard);
 
-/// "Target nonland permanent card from your graveyard" (CR 115.1, 110.4b). Loamcrafter Faun prints it; Guardian
+/// "Target nonland permanent card from your graveyard" (CR 115.1, 110.4a). Loamcrafter Faun prints it; Guardian
 /// Scalelord asks it of a card with mana value up to its power.
 pub fn nonland_permanent_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if card_in_your_graveyard(q, asker, t, &[]) && is_nonland_permanent_card(&q.chars(id)))

@@ -419,6 +419,15 @@ pub fn damage_target(g: &mut dyn Game, item: &StackItem, slot: usize, amount: u1
     }
 }
 
+/// "[Source] deals `amount` damage to each of [up to N / one or two] targets" (CR 120.3, 608.2b): every target of the resolving
+/// item that is still legal is dealt `amount` by the item's source, all together as one event. A target that has become
+/// illegal is left out. Prismari Charm and Batroc the Leaper print it.
+pub fn damage_each_target(g: &mut dyn Game, item: &StackItem, amount: u16) {
+    let hits: Vec<(ObjectId, Target, u16)> =
+        (0..item.target_count as usize).filter(|&slot| g.target_legal(item, slot)).map(|slot| (item.object, item.targets[slot], amount)).collect();
+    g.damage_together(&hits);
+}
+
 /// Deals each target of the resolving item its own share of the damage it was divided into (CR 601.2d, 120.3): "N damage
 /// divided as you choose among [targets]". The shares were fixed as the spell or ability was put on the stack, a target
 /// that has since become illegal is left out with its share (CR 608.2b), and the rest is dealt together as one event.

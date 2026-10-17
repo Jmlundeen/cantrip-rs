@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::hand;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -8,12 +8,8 @@ use cantrip_oracle as oracle;
 /// no mana cost) is sacrificed outright.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| g.chars(c).is(CardType::Creature)).collect();
-    let chosen = choose::cards_from(g, player, item.object, Purpose::PutOntoBattlefield, hand, eligible, 1, true)?;
-    let Some(&card) = chosen.first() else { return Ok(()) };
-    let def = g.card(g.obj(card).card);
-    let entered = g.put_onto_battlefield(card, player, false)?;
+    let Some(entered) = hand::may_put_onto_battlefield(g, player, item.object, |c| c.is(CardType::Creature))? else { return Ok(()) };
+    let def = g.card(g.obj(entered).card);
     if !targets::permanent(g, entered) {
         return Ok(());
     }

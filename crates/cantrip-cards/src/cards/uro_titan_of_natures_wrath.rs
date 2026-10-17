@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, escape};
+use cantrip_mechanics::{escape, hand};
 use cantrip_oracle as oracle;
 
 /// You gain 3 life and draw a card, then you may put a land card from your hand onto the battlefield: one "up to one"
@@ -8,11 +8,7 @@ fn gain_draw_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.gain_life(you, 3);
     g.draw(you, 1);
-    let hand = g.state().zone(Zone::hand(you)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| g.chars(c).is(CardType::Land)).collect();
-    for land in choose::cards_from(g, you, item.object, Purpose::PutOntoBattlefield, hand, eligible, 1, true)? {
-        g.put_onto_battlefield(land, you, false)?;
-    }
+    hand::may_put_onto_battlefield(g, you, item.object, |c| c.is(CardType::Land))?;
     Ok(())
 }
 
