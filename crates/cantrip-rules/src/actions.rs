@@ -2526,7 +2526,10 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             // A permission to cast it only as its Adventure (CR 715.3) casts neither the card itself nor another face of it.
             let permitted_whole = permitted && !grant.is_some_and(|g| g.adventure_only);
             // A cost paid "rather than" the mana cost is itself an alternative cost: no other may be used with it (CR 118.9a).
-            let alternatives = permitted_whole && !life_grant;
+            // Flashback a permission gives (Snapcaster Mage's) is one too, though its cost is the card's mana cost: the card
+            // may be cast from the graveyard only "by paying [cost] rather than paying its mana cost" (CR 702.34a), so not for
+            // an alternative cost of its own (Force of Will's; Snapcaster Mage's ruling).
+            let alternatives = permitted_whole && !life_grant && !grant.is_some_and(|g| g.exile_after);
             let speed = Speed { cx, flash, granters: &flash_granters, player, card: id };
             let instant = speed.whole(def) && !grant.is_some_and(|g| g.sorcery_speed);
             // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard";

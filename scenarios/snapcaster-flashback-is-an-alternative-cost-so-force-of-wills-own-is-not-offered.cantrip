@@ -1,0 +1,60 @@
+# Flashback is an alternative cost (CR 702.34a: "by paying [cost] rather than paying its mana cost"), and a spell can't be
+# cast for two alternative costs (CR 601.2b, 118.9a; Snapcaster Mage's ruling). Bot2's first Duress takes Force of Will from
+# Bot1's hand. On turn 4 Bot2 casts a second Duress; in response Bot1 flashes in Snapcaster Mage, whose trigger gives the Force
+# flashback for its mana cost. From the graveyard it may not be cast for its own alternative cost - 1 life and a blue card
+# exiled, though Bot1 holds Brainstorm - but is cast for {3}{U}{U}, counters the Duress and is exiled.
+
+[Bot1 Deck]
+Force of Will
+Brainstorm
+Snapcaster Mage
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Duress
+Duress
+Swamp
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Force of Will)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Pass
+Bot1.Pass
+? Stack = Duress
+! Bot1.Graveyard.Force of Will.Cast(Stack.Duress; Ability: exile a blue card)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Force of Will.Cast(Stack.Duress; Ability: Flashback)
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Hand = Brainstorm
+Exile = Force of Will
+Bot2.Graveyard = Duress; Duress
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Island; Snapcaster Mage
