@@ -1,0 +1,75 @@
+# A token is a creature too: on turn 4 Bot2 bolts one of the three Rabbit tokens Hop to It made for Bot1, and Aang, at the
+# Crossroads triggers for it ("another creature you control leaves the battlefield"). The token ceases to exist (CR 111.7)
+# and is in no graveyard; at the next upkeep, Bot1's on turn 5, Aang becomes Aang, Destined Savior. "Land creatures you
+# control have vigilance" is Bot1's alone: on turn 6 Bot2's Badgermole Cub earthbends Bot2's Mountain, which attacks with
+# haste and taps - no vigilance from Bot1's Aang.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Aang, at the Crossroads
+Mox Ruby
+Mox Jet
+Island x5
+Hop to It
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Forest
+Mox Emerald
+Badgermole Cub
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hop to It.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Rabbit)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.End]
+? Bot1.Battlefield.Aang, at the Crossroads.Power = 3
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Aang, Destined Savior.Power = 4
+[T6 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Badgermole Cub.Cast
+Bot2.Target(Mountain)
+Bot2.Attack(Mountain > Bot1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Pearl; Mox Sapphire; Mox Ruby; Mox Jet; Aang, Destined Savior; Rabbit; Rabbit
+Bot1.Graveyard = Hop to It; Black Lotus
+Bot1.Life = 19
+Bot2.Battlefield.Mountain.Types = Land; Creature
+Bot2.Battlefield.Mountain.Keywords = Haste
+Bot2.Battlefield.Mountain.Tapped = true

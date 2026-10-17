@@ -1,0 +1,54 @@
+# Aang, Destined Savior's earthbend 2: "When it dies or is exiled, return it to the battlefield tapped." Aang transforms at
+# Bot2's upkeep on turn 4 (Bot1's Ornithopter was exiled on turn 3) and earthbends the Forest at the beginning of combat on
+# turn 5: a 2/2 land creature. Bot2 bolts it in Bot1's second main phase; it dies and comes back as the Forest it was - a
+# land, not a creature, tapped, with no counters.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Aang, at the Crossroads
+Ornithopter
+Swords to Plowshares
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Ornithopter)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Forest.Power = 2
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Forest)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Aang, Destined Savior; Forest
+Bot1.Battlefield.Forest.Types = Land
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Forest.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Swords to Plowshares; Black Lotus

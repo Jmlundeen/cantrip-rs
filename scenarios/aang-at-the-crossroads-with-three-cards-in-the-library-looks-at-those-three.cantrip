@@ -1,0 +1,38 @@
+# "Look at the top five cards of your library" with only three there: Bot1 looks at the three it has (CR 609.3), puts
+# Llanowar Elves onto the battlefield, and the two Islands go to the bottom. On turn 3 Bot1 draws one of them, leaving one.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Aang, at the Crossroads
+Plains
+Island
+Llanowar Elves
+Island
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aang, at the Crossroads.Cast
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Looked = Island; Llanowar Elves; Island
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Sapphire; Mox Ruby; Aang, at the Crossroads; Llanowar Elves
+Bot1.Hand = Plains; Island
+Bot1.Library = Island
