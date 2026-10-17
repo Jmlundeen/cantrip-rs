@@ -1056,6 +1056,10 @@ impl cantrip_api::Game for Cx<'_> {
         Ok(created)
     }
 
+    fn create_token_attached(&mut self, def: CardId, controller: PlayerId, host: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
+        ops::create_token_attached(self, def, controller, host).map_err(|_| Suspend)
+    }
+
     fn gain_life(&mut self, player: PlayerId, amount: i32) {
         ops::change_life(self, player, amount);
     }

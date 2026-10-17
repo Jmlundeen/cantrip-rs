@@ -3,6 +3,33 @@
 use cantrip_api::*;
 use crate::statics::itself;
 
+/// A Royal Role token (CR 111.10m, 303.7): "a colorless Aura Role enchantment token named Royal with enchant creature and
+/// 'Enchanted creature gets +1/+1 and has ward {1}.'" Royal Treatment, Charmed Clothier, Gylwain, Casting Director,
+/// Besotted Knight and Redtooth Genealogist make it, attached to a creature (`create_role`).
+pub static ROYAL_ROLE: CardDef = CardDef {
+    name: "Royal",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura, Subtype::Role]),
+    enchant: Some(crate::targets::CREATURE),
+    delayed: &[crate::triggers::ward::<1>("Ward {1}")],
+    statics: &[
+        static_ability(Layer::PtModify, crate::attach::attached_object, crate::statics::plus_pt::<1, 1>, "Enchanted creature gets +1/+1."),
+        static_ability(Layer::Ability, crate::attach::attached_object, crate::statics::grant_delayed_ability, "Enchanted creature has ward {1}."),
+    ],
+    text: "Enchant creature\nEnchanted creature gets +1/+1 and has ward {1}.",
+    ..CardDef::BLANK
+};
+
+/// "Create a [Role] token attached to [a creature]" (CR 111.10j-r, 303.7, 303.4): a Role token `role` under `controller`,
+/// entering attached to `creature`, which the effect names and does not target; not created if the Role could not
+/// enchant it (CR 303.4i). If `controller` already controls a Role on it, the state-based action puts the older one into
+/// its owner's graveyard (CR 704.5z). The card file lists `role` in its `EXTRA`. The tokens created.
+pub fn create_role(g: &mut dyn Game, role: &'static CardDef, controller: PlayerId, creature: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
+    let role = g.card_id(role);
+    g.create_token_attached(role, controller, creature)
+}
+
 fn draw_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.draw(item.controller, 1);
     Ok(())

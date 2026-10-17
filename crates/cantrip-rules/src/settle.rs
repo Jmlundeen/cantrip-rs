@@ -147,6 +147,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     let mut bound: Vec<crate::day_night::Bound> = Vec::new();
     let mut battles: Vec<(ObjectId, bool)> = Vec::new();
     let mut annihilate: Vec<(ObjectId, i16)> = Vec::new();
+    let mut roles: Vec<(ObjectId, ObjectId, PlayerId, u32)> = Vec::new();
     for &id in cx.s().battlefield() {
         // CR 704.5q: a permanent with both +1/+1 and -1/-1 counters loses N of each, N the smaller number. Power and
         // toughness are the same either way, so the other actions of this check are judged alike; removed below.
@@ -181,6 +182,11 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         // CR 704.5m: an Aura attached to an illegal object, or to nothing, goes to its owner's graveyard. CR 704.5n:
         // an Equipment attached to an illegal permanent becomes unattached; so does anything else attached to
         // anything (CR 704.5p).
+        if let Some(host) = obj.attached_to
+            && chars.has_subtype(Subtype::Role)
+        {
+            roles.push((id, host, obj.controller, obj.timestamp));
+        }
         if chars.has_subtype(Subtype::Aura) {
             if !(obj.attached_to.is_some_and(|host| crate::attach::host_allows(&*cx, id, host, false))
                 || obj.attached_player.is_some_and(|p| crate::attach::player_allows(&*cx, id, p)))
@@ -332,8 +338,19 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
             }
         }
     }
+    // CR 704.5z, 303.7a: of the Roles one player controls attached to one permanent, all but the one with the most
+    // recent timestamp go to their owners' graveyards, judged on the same board as the rest (CR 704.3), so a Role leaving
+    // for another reason in this check still counts. Roles that became attached at the same moment have their relative
+    // timestamps in an order their controller would choose (CR 613.7m); the engine gives them consecutive ones, and only
+    // copies of one token (a token doubler's) can arrive together on one permanent, so which is kept is the same game.
+    let mut roles_surplus = Vec::new();
+    for &(id, host, controller, timestamp) in &roles {
+        if roles.iter().any(|&(other, h, c, t)| other != id && h == host && c == controller && t > timestamp) {
+            roles_surplus.push(id);
+        }
+    }
     // A permanent that satisfies several of these changes zones once, and what is not destruction wins over it.
-    for id in sacrificed.into_iter().chain(surplus) {
+    for id in sacrificed.into_iter().chain(surplus).chain(roles_surplus) {
         if !to_graveyard.contains(&id) {
             to_graveyard.push(id);
         }

@@ -929,6 +929,33 @@ pub fn create_tokens_worded(
     words: Words,
     spell: Option<&StackItem>,
 ) -> R<Vec<ObjectId>> {
+    create_tokens_onto(cx, tokens, tapped, copy, with, words, spell, None)
+}
+
+/// Creates a token "attached to" a permanent (CR 111.1, 303.4): `Game::create_token_attached`, with the words of the text
+/// making it (CR 612.4).
+pub fn create_token_attached(cx: &mut Cx, card: CardId, controller: PlayerId, host: ObjectId) -> R<Vec<ObjectId>> {
+    let words = match cx.cause() {
+        Cause::Spell(source) | Cause::Ability { source, .. } => cantrip_api::words(cx.s(), source),
+        _ => Words::NONE,
+    };
+    create_tokens_onto(cx, &[(card, controller)], false, None, &[], words, None, Some(host))
+}
+
+/// `create_tokens_worded`, each token an effect says is created attached to `host` entering so (CR 303.4): an Aura only
+/// if it could legally enchant `host` as it enters, and not created otherwise (CR 303.4i); anything else unattached
+/// (CR 303.4h). The choice is the effect's, not a target (hexproof does not matter).
+#[allow(clippy::too_many_arguments)]
+fn create_tokens_onto(
+    cx: &mut Cx,
+    tokens: &[(CardId, PlayerId)],
+    tapped: bool,
+    copy: Option<Copiable>,
+    with: &[(CounterKind, i16)],
+    words: Words,
+    spell: Option<&StackItem>,
+    host: Option<ObjectId>,
+) -> R<Vec<ObjectId>> {
     // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made. The
     // token a copy of a permanent spell becomes as it resolves is not created (CR 111.13, 707.10f), so nothing replaces it.
     let replaced = if spell.is_some() { None } else { replace::token_batch(cx, tokens) };
@@ -991,6 +1018,15 @@ pub fn create_tokens_worded(
         // The token is judged as it would exist on the battlefield (CR 614.12): a token copy as what it copies.
         let copy = entering.copy;
         cx.st().update_obj(id, |o| o.copy = copy);
+        // "Create a token attached to [a permanent]" (CR 303.4h-i).
+        if let Some(host) = host
+            && cx.chars(id).has_subtype(Subtype::Aura)
+        {
+            if !(cx.s().obj(host).zone.is(ZoneKind::Battlefield) && crate::attach::host_allows(&*cx, id, host, true)) {
+                continue;
+            }
+            entering.attach = Some(host);
+        }
         // A token enters the battlefield as it is created (CR 111.1): the replacements of a permanent's entry apply to it
         // as to any other's (CR 614.1c), "enters tapped" and the counters one gives as it arrives.
         let change = replace::zone_change(
