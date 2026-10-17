@@ -719,6 +719,12 @@ pub trait Game: Query {
     /// the cost and the subject's name go), its verb what the bots read it by. Whether it was paid: "if they do" (CR
     /// 118.12) asks exactly that, not what the paid-for effect did.
     fn may_pay(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<bool, Suspend>;
+    /// "You may pay {X}" (CR 118.12, 608.2d) where the text leaves X to the payer (CR 107.3f): X chosen as it is paid, in one
+    /// question that raises and lowers it and makes mana, any X from 0 up. `cost` is the cost with its {X}
+    /// (`cost("{X}")`), and `question` what paying does, as for `may_pay`. The X paid, or `None` when the payer declined:
+    /// "when you do" asks whether it was paid (CR 603.12), and a reflexive ability that reads X is given it
+    /// (`reflexive_trigger_counted`).
+    fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<Option<u16>, Suspend>;
     /// Whether `card` could be cast now by the ability's controller as an effect resolves (CR 608.2g), from where it
     /// is: it is not a land and has a legal target for every target it needs. The mana is not asked: a player who
     /// finds they cannot pay gives the cast up (CR 733.1).

@@ -198,6 +198,7 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
 | colors | `ChooseColors { choices, count }` | `Colors(...)` |
 | may | `May { purpose }` | `Accept` / `Decline` |
 | a payment ("you may pay", "unless pays") | `g.may_pay(...)` asks it (`UnlessPays`) | `PayCost` (`Accept` for one of life alone) / `Decline` |
+| "you may pay {X}", X the payer's (CR 107.3f) | `g.may_pay_x(...)` asks it (`UnlessPays` with `x`), the X paid or `None` | `PayCost(X: 3)` / `Decline` |
 | distribute cards | `DistributeCards { cards, destinations, may_shuffle }` | `Arrange(... \| ...)` |
 | search a library | `SearchLibrary` (use `mechanics::search_library`, which names where the cards found go: the question says it) | `Search(...)` |
 

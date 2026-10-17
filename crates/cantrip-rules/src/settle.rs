@@ -451,6 +451,7 @@ fn choose_trigger_targets(
             // was kicked, or its X (CR 702.33d, 107.3m).
             let source = cx.s().obj(trigger.source);
             let counted = trigger.count.unwrap_or(if source.x > 0 { source.x } else { source.kicked as u16 });
+            let (candidates, total) = crate::actions::within_total(cx, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
             if candidates.len() < least as usize {
                 // Fewer legal targets than the slot's minimum: it is removed from the stack (CR 603.3d, 601.2c).
@@ -468,7 +469,7 @@ fn choose_trigger_targets(
                 targets.push(candidates[0]);
                 break 'slot;
             }
-            if all_of_few && spec.min > 0 && candidates.len() <= spec.max as usize {
+            if all_of_few && spec.min > 0 && candidates.len() <= spec.max as usize && total.is_none() {
                 targets.extend(candidates);
                 break 'slot;
             }
@@ -487,6 +488,7 @@ fn choose_trigger_targets(
                 count,
                 // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
                 any_number: spec.is_any_number(),
+                total,
             };
             // The ability's controller chooses its targets (CR 603.3d), unless it says that player does: the one it is about.
             let chooser = match trigger.subject {

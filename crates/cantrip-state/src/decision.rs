@@ -272,7 +272,10 @@ pub enum RequestKind {
     /// total covers the life (CR 118.3, 119.4), or decline. `question` is the card's words for what paying does, with
     /// `{cost}` and `{subject}` where the cost and the subject's name go; its verb is what the bots read it by.
     /// `remaining` is the mana the pool does not cover yet, and `life_payable` whether the life total still covers the
-    /// life (false once a mana ability has cost the life the payment needed).
+    /// life (false once a mana ability has cost the life the payment needed). `x` is the X chosen so far when the cost is
+    /// "{X}" and the payer chooses X as they pay it ("you may pay {X}", CR 107.3f): `total` is then the cost at that X (its
+    /// {X} as that much generic mana), `IncreaseX` and
+    /// `DecreaseX` among the options change it, and paying pays that X. `None` for a cost with no X.
     UnlessPays {
         source: ObjectId,
         subject: ObjectId,
@@ -282,6 +285,7 @@ pub enum RequestKind {
         life_payable: bool,
         question: &'static Question,
         options: Vec<ActionOption>,
+        x: Option<u16>,
     },
     /// Choose `count` (or up to `count`) of `eligible`, from among `cards` (all of which the player sees).
     /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
@@ -292,8 +296,11 @@ pub enum RequestKind {
     /// `least` to `count` targets are chosen (a range, "one or two target creatures", CR 601.2c); `optional` is `least == 0`.
     /// Targets for an ability as it goes on the stack, or any other "choose a [thing]" the C# engine asks as targets.
     /// `label` is what the slot is for as its card words it (`TargetSpec::label`, empty when it has nothing to add), and
-    /// `slot_player` the opponent whose slot it is when the ability has one for each opponent.
-    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u8, count: u8, any_number: bool, label: &'static str, slot_player: Option<PlayerId> },
+    /// `slot_player` the opponent whose slot it is when the ability has one for each opponent. `total`, when the targets
+    /// chosen together are limited to a total mana value ("any number of target creature cards with total mana value X or
+    /// less", `TargetSpec::total_mana_value`), is that limit, its values index for index with `candidates`: the core refuses
+    /// a choice whose mana values add up to more.
+    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u8, count: u8, any_number: bool, label: &'static str, slot_player: Option<PlayerId>, total: Option<TotalAtMost> },
     /// One or more of these labelled options (a pile, a mode), by index.
     /// `count` to `at_most` of them when `at_most` is more than `count` (zero `count` is "up to"). `affordable` is
     /// the eligible modes whose own cost the chooser could pay as well, advice for a default; `additional_cost`
@@ -489,7 +496,8 @@ impl DamageDivision {
 /// "[Cards] with total mana value N or less" (CR 202.3): the mana values of the cards chosen together add up to at most
 /// `most`. `values` is each eligible card's mana value, index for index with the question's `eligible`, read as it is asked
 /// (where the card is: an {X} in a library or graveyard counts as 0, CR 202.3e), so whoever answers needs to know no card.
-/// Michelangelo's Technique, Lively Dirge and Ao, the Dawn Sky print it.
+/// Michelangelo's Technique, Lively Dirge and Ao, the Dawn Sky print it of cards chosen; Fire Lord Sozin of targets
+/// (`RequestKind::ChooseTarget::total`, its values index for index with the candidates).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct TotalAtMost {
     pub values: Vec<u16>,
@@ -498,7 +506,7 @@ pub struct TotalAtMost {
 
 impl TotalAtMost {
     /// The total mana value of `chosen`, each read at its index in `eligible` (a card not eligible adds nothing).
-    pub fn of(&self, eligible: &[ObjectId], chosen: &[ObjectId]) -> u32 {
+    pub fn of<T: PartialEq>(&self, eligible: &[T], chosen: &[T]) -> u32 {
         chosen
             .iter()
             .filter_map(|c| eligible.iter().position(|e| e == c))
@@ -507,20 +515,20 @@ impl TotalAtMost {
     }
 
     /// Whether `chosen` is within the limit.
-    pub fn allows(&self, eligible: &[ObjectId], chosen: &[ObjectId]) -> bool {
+    pub fn allows<T: PartialEq>(&self, eligible: &[T], chosen: &[T]) -> bool {
         self.of(eligible, chosen) <= u32::from(self.most)
     }
 
     /// The first of `eligible`, in order, that fit together within the limit, at most `count` of them: an answer always
     /// accepted, for a player who answers without reading the cards.
-    pub fn first_fitting(&self, eligible: &[ObjectId], count: usize) -> Vec<ObjectId> {
+    pub fn first_fitting<T: Clone>(&self, eligible: &[T], count: usize) -> Vec<T> {
         let mut left = u32::from(self.most);
         let mut taken = Vec::new();
-        for (i, &card) in eligible.iter().enumerate() {
+        for (i, card) in eligible.iter().enumerate() {
             let value = u32::from(self.values.get(i).copied().unwrap_or(0));
             if taken.len() < count && value <= left {
                 left -= value;
-                taken.push(card);
+                taken.push(card.clone());
             }
         }
         taken

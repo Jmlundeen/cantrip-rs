@@ -661,7 +661,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
+        RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
             player,
             source: source_handle(game, handles, *source),
             subject: source_handle(game, handles, *subject),
@@ -679,6 +679,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             detail: question.detail.into(),
             yes: question.yes.into(),
             no: question.no.into(),
+            // "You may pay {X}" (CR 107.3f): X is chosen as it is paid, raised and lowered by the options.
+            choosing_x: x.is_some(),
+            x: x.map_or(0, i32::from),
         }),
         RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, kind, total } => {
             let owner = if *purpose == Purpose::TakeFromHand {
@@ -776,14 +779,27 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::ChooseTarget { source, purpose, candidates, optional, least, count, any_number, label, slot_player } => {
+        RequestKind::ChooseTarget { source, purpose, candidates, optional, least, count, any_number, label, slot_player, total } => {
             let source_handle = source_handle(game, handles, *source);
+            // Each candidate the wire can carry, with its mana value when the targets are limited to a total of them.
+            let sent: Vec<(TargetMessage, i32)> = candidates
+                .iter()
+                .enumerate()
+                .filter_map(|(i, t)| {
+                    let value = total.as_ref().map_or(0, |t| i32::from(t.values.get(i).copied().unwrap_or(0)));
+                    target_message(handles, *t).map(|m| (m, value))
+                })
+                .collect();
             PromptPayload::ChooseTargetPromptMessage(ChooseTargetPrompt {
                 player,
                 ability: source_handle,
                 source: source_handle,
                 text: (*label).to_string(),
-                candidates: candidates.iter().filter_map(|t| target_message(handles, *t)).collect(),
+                // "With total mana value X or less" (CR 601.2c, 202.3): each candidate's mana value, index for index, and the
+                // most the targets chosen may add up to.
+                mana_values: if total.is_some() { sent.iter().map(|&(_, v)| v).collect() } else { Vec::new() },
+                maximum_total_mana_value: total.as_ref().map(|t| i32::from(t.most)),
+                candidates: sent.into_iter().map(|(m, _)| m).collect(),
                 optional: *optional,
                 count: i32::from(*count),
                 targeted: *purpose == Purpose::Targets,
@@ -1165,6 +1181,46 @@ mod tests {
         };
         assert_eq!(ask(Some(TotalAtMost { values: vec![1, 0], most: 6 })), (Some(6), vec![1, 0]));
         assert_eq!(ask(None), (None, Vec::new()));
+    }
+
+    /// "Any number of target creature cards with total mana value X or less" reaches the client as the limit and each
+    /// candidate's mana value, index for index; the default answer takes the first candidates that fit together.
+    #[test]
+    fn targets_within_a_total_mana_value_send_the_limit_and_each_candidates_value() {
+        let (game, hand) = game_with(&["Llanowar Elves", "Ornithopter", "Guerrilla Gorilla"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let ask = |total: Option<TotalAtMost>| {
+            let request = Request {
+                id: 1,
+                player: seat,
+                kind: RequestKind::ChooseTarget {
+                    source: hand[0],
+                    purpose: Purpose::Targets,
+                    candidates: hand[..3].iter().map(|&c| Target::Object(c)).collect(),
+                    optional: false,
+                    least: 0,
+                    count: 3,
+                    any_number: true,
+                    label: "",
+                    slot_player: None,
+                    total,
+                },
+                may_cancel: false,
+            };
+            match prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
+                PromptPayload::ChooseTargetPromptMessage(p) => p,
+                other => panic!("{other:?}"),
+            }
+        };
+        let limited = ask(Some(TotalAtMost { values: vec![1, 0, 2], most: 1 }));
+        assert_eq!((limited.maximum_total_mana_value, limited.mana_values.clone()), (Some(1), vec![1, 0, 2]));
+        let AnswerPayload::TargetsChosenAnswer(default) = PromptPayload::ChooseTargetPromptMessage(limited.clone()).default_answer() else {
+            panic!("a targets answer")
+        };
+        // Llanowar Elves (1) and Ornithopter (0) fit within 1; Guerrilla Gorilla (2) would not.
+        assert_eq!(default.targets.len(), 2);
+        let free = ask(None);
+        assert_eq!((free.maximum_total_mana_value, free.mana_values), (None, Vec::new()));
     }
 
     #[test]

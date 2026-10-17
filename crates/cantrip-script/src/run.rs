@@ -559,6 +559,27 @@ impl<'s> Run<'s> {
                 continue;
             }
 
+            // `Bot1.PayCost(X: 3)`: "you may pay {X}" with X chosen as it is paid (CR 107.3f) raises or lowers X to what the line
+            // says, one step at a time, and then pays it as `PayCost` does.
+            if let Some(ScriptStep::Action(step)) = self.current()
+                && step.verb == ScriptVerb::PayCost
+                && request.player == player_of(step.bot)
+                && let RequestKind::UnlessPays { options, x: Some(x), .. } = &request.kind
+                && let Some(wanted) = x_of(step)?
+                && wanted != *x
+            {
+                let (line, text) = (step.line, step.text.clone());
+                let kind = if wanted > *x { ActionKind::IncreaseX } else { ActionKind::DecreaseX };
+                match options.iter().find(|o| o.kind == kind) {
+                    Some(o) => {
+                        let answer = Answer::Act(Action::of(o));
+                        self.deliver(&request, answer, None)?;
+                    }
+                    None => return fail(format!("line {line}: {text}: X cannot be chosen as {wanted} (it stops at {x})")),
+                }
+                continue;
+            }
+
             // `! Bot1.PayCost`: at the player's next "unless pays" question, paying is not among the options.
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
                 && matches!(action.verb, ScriptVerb::PayCost)
@@ -1028,6 +1049,8 @@ impl<'s> Run<'s> {
                 }
                 Answer::Modes(modes.into_iter().take(*count as usize).collect())
             }
+            // The fewest it takes; "with total mana value X or less", the first of them that fit together.
+            RequestKind::ChooseTarget { candidates, least, total: Some(t), .. } => Answer::Targets(t.first_fitting(candidates, *least as usize)),
             RequestKind::ChooseTarget { candidates, least, .. } => {
                 Answer::Targets(candidates.iter().take(*least as usize).copied().collect())
             }

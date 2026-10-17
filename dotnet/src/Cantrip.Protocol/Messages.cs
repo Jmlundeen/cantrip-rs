@@ -1318,9 +1318,45 @@ public sealed class ChooseTargetPromptMessage : PromptPayload
     [Key(10)]
     public int ForPlayer { get; set; }
 
-    /// <summary>No target where that is allowed, and otherwise the first candidates the server offered.</summary>
+    /// <summary>
+    /// "Any number of target creature cards with total mana value X or less" (CR 601.2c, 202.3): the most the chosen targets'
+    /// <see cref="ManaValues"/> may add up to, as Fire Lord Sozin's reflexive ability asks. Null when the slot asks nothing of
+    /// them. <c>Cantrip.Core.Decisions.TotalManaValue.Within</c> is the rule; the engine refuses a choice over it.
+    /// </summary>
+    [Key(11)]
+    public int? MaximumTotalManaValue { get; set; }
+
+    /// <summary>The mana value of each of <see cref="Candidates"/>, index for index, when <see cref="MaximumTotalManaValue"/> is set.</summary>
+    [Key(12)]
+    public List<int> ManaValues { get; set; } = [];
+
+    /// <summary>The total mana value of <paramref name="chosen"/>, each read at its place among <see cref="Candidates"/>.</summary>
+    public int TotalManaValueOf(IEnumerable<TargetMessage> chosen) =>
+        TotalManaValue.Of(Keys(), ManaValues, chosen.Select(Key));
+
+    /// <summary>
+    /// Whether <paramref name="candidate"/> can join <paramref name="chosen"/> and keep within <see cref="MaximumTotalManaValue"/>:
+    /// always, without one, and for a target already chosen (choosing it again puts it back).
+    /// </summary>
+    public bool Fits(IReadOnlyCollection<TargetMessage> chosen, TargetMessage candidate) =>
+        TotalManaValue.Fits(Keys(), ManaValues, [.. chosen.Select(Key)], Key(candidate), MaximumTotalManaValue);
+
+    private List<(int, int)> Keys() => [.. Candidates.Select(Key)];
+
+    private static (int, int) Key(TargetMessage target) => (target.Player, target.Object.Value);
+
+    /// <summary>
+    /// No target where that is allowed, and otherwise the first candidates the server offered; with a total mana value, the
+    /// first that fit together within it.
+    /// </summary>
     public override AnswerPayload Default() =>
-        new TargetsChosenAnswer { Targets = Optional ? [] : [.. Candidates.Take(Count)] };
+        new TargetsChosenAnswer
+        {
+            Targets = Optional ? []
+                : MaximumTotalManaValue is { } most
+                    ? TotalManaValue.FirstFitting(Candidates, ManaValues, Count, most)
+                    : [.. Candidates.Take(Count)],
+        };
 }
 
 /// <summary>
@@ -1804,6 +1840,18 @@ public sealed class UnlessPaysPromptMessage : PromptPayload
     /// <summary>The button that declines, named for what it does.</summary>
     [Key(15)]
     public string No { get; set; } = string.Empty;
+
+    /// <summary>
+    /// "You may pay {X}" with X left to the payer (CR 107.3f), as Fire Lord Sozin's: X is chosen as it is paid. <see cref="X"/>
+    /// is the X so far and <see cref="Total"/> the cost at it; IncreaseX and DecreaseX among the <see cref="Options"/> change
+    /// it, and paying pays that X.
+    /// </summary>
+    [Key(17)]
+    public bool ChoosingX { get; set; }
+
+    /// <summary>The X chosen so far, when <see cref="ChoosingX"/>.</summary>
+    [Key(18)]
+    public int X { get; set; }
 
     /// <summary>The whole cost in words: "{W}{B} and 2 life", "{3}", "2 life".</summary>
     public string CostText()

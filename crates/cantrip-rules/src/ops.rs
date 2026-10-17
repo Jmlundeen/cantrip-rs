@@ -1273,7 +1273,9 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             }
             // A slot sees what the slots before it now target (CR 601.2c: "another target creature").
             let earlier = if item.target_count > 1 { &item.targets[..run.start] } else { &[][..] };
-            let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, Target::None, slot_player);
+            let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, item.subject, slot_player);
+            // "With total mana value X or less" holds of the new targets together (CR 115.7d, 601.2c), X as it was.
+            let (candidates, total) = crate::actions::within_total(cx, &spec, item.x, candidates);
             if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
                 continue;
             }
@@ -1285,12 +1287,14 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
                 least: current.len() as u8,
                 count: current.len() as u8,
                 any_number: false,
+                total: total.clone(),
             };
             // Each target of a slot is a different object or player (CR 115.3), and a legal one (CR 115.7d).
             if let Answer::Targets(chosen) = cx.ask_core(chooser, ask, false)?
                 && chosen.len() == current.len()
                 && chosen.iter().all(|t| candidates.contains(t))
                 && chosen.iter().enumerate().all(|(i, t)| !chosen[..i].contains(t))
+                && total.as_ref().is_none_or(|t| t.allows(&candidates, &chosen))
             {
                 item.targets[run].copy_from_slice(&chosen);
             }
@@ -1298,6 +1302,19 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
     }
     cx.st().stack_set(top, item);
     Ok(item)
+}
+
+/// Whether target `slot` of `item` changed to `to` keeps the targets of its slot within the slot's total mana value
+/// (`TargetSpec::total_mana_value`, CR 115.7a, 601.2c), the X the item was put on the stack with; true for a slot with none.
+fn fits_total(cx: &Cx, item: &StackItem, slot: usize, spec: &TargetSpec, to: Target) -> bool {
+    let Some(most) = spec.total_limit(item.x) else { return true };
+    let value = |t: Target| match t {
+        Target::Object(id) => cx.mana_value(id),
+        _ => 0,
+    };
+    let run = item.spec_targets(item.spec_of[slot] as usize);
+    let total: u32 = run.map(|i| if i == slot { value(to) } else { value(item.targets[i]) }).sum();
+    total <= u32::from(most)
 }
 
 /// `chooser` may choose new targets for a spell on the stack (CR 115.7d): Sudden Substitution's "then the spell's controller
@@ -1336,9 +1353,9 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         }
         let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) else { return Ok(()) };
         let others: Vec<Target> =
-            crate::actions::target_candidates_given(cx, &asker, &spec, &item.targets[..slot], Target::None, slot_player)
+            crate::actions::target_candidates_given(cx, &asker, &spec, &item.targets[..slot], item.subject, slot_player)
                 .into_iter()
-                .filter(|&t| t != item.targets[slot])
+                .filter(|&t| t != item.targets[slot] && fits_total(cx, &item, slot, &spec, t))
                 .collect();
         if others.is_empty() {
             return Ok(());
@@ -1347,13 +1364,18 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
     }
     let mut changed = item;
     for (slot, others) in options.into_iter().enumerate() {
+        // A slot with a total mana value judges each new target with the ones already changed (CR 115.7a, 601.2c).
+        let others: Vec<Target> = match crate::resolve::slot_spec(cx.cards(), cx.s(), &item, slot) {
+            Some((spec, _)) if spec.total_mana_value.is_some() => others.into_iter().filter(|&t| fits_total(cx, &changed, slot, &spec, t)).collect(),
+            _ => others,
+        };
         if others.is_empty() {
             continue;
         }
         changed.targets[slot] = if others.len() == 1 {
             others[0]
         } else {
-            let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
+            let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
                 source: item.object,
                 purpose: Purpose::Targets,
                 candidates: others.clone(),
@@ -2178,7 +2200,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     if candidates.is_empty() {
         return Ok(());
     }
-    let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
+    let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
         source,
         purpose: Purpose::Targets,
         count: candidates.len().min(255) as u8,

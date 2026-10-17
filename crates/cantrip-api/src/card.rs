@@ -306,9 +306,22 @@ pub struct TargetSpec {
     /// targets when the spell or the ability's source was kicked, in place of `min` and `max`. The kicker is announced
     /// before the targets are chosen, so the slot is asked once it is known (`TargetSpec::when_kicked`).
     pub if_kicked: Option<(u8, u8)>,
+    /// "Any number of target creature cards with total mana value X or less" (CR 601.2c, 603.3d, 202.3): the targets
+    /// chosen for the slot together have mana values adding up to at most this, judged as they are chosen (and as they
+    /// are chosen anew, CR 115.7). `COUNTED` is the slot's count: the X announced, or what a reflexive ability was given
+    /// (`Game::reflexive_trigger_counted`), so a printed limit of 255 cannot be said. A candidate worth more than the limit
+    /// by itself is no legal target. Once
+    /// chosen, each target is checked on its own as the spell or ability resolves (CR 608.2b): one gone leaves the
+    /// others. `None` limits nothing.
+    pub total_mana_value: Option<u8>,
 }
 
 impl TargetSpec {
+    /// The most the slot's targets' mana values may add up to (`total_mana_value`), with `counted` read for `COUNTED`.
+    pub fn total_limit(&self, counted: u16) -> Option<u16> {
+        self.total_mana_value.map(|v| if v == TargetSpec::COUNTED { counted } else { u16::from(v) })
+    }
+
     /// The same slot with `label` as what it is for.
     pub const fn labelled(self, label: &'static str) -> TargetSpec {
         TargetSpec { label, ..self }

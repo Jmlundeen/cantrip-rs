@@ -1170,6 +1170,10 @@ impl cantrip_api::Game for Cx<'_> {
         actions::may_pay(self, payer, source, subject, &cost, question).map_err(|_| Suspend)
     }
 
+    fn may_pay_x(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: Cost, question: &'static Question) -> Result<Option<u16>, Suspend> {
+        actions::may_pay_x(self, payer, source, subject, &cost, question).map_err(|_| Suspend)
+    }
+
     fn could_cast_during_resolution(&self, card: ObjectId) -> bool {
         actions::could_cast_during_resolution(self, card)
     }

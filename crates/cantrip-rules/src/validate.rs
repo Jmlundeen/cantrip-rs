@@ -118,12 +118,14 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
-        (RequestKind::ChooseTarget { candidates, least, count, .. }, Answer::Targets(targets)) => {
+        (RequestKind::ChooseTarget { candidates, least, count, total, .. }, Answer::Targets(targets)) => {
             let n = targets.len() as u8;
             if !distinct(targets) || !targets.iter().all(|t| candidates.contains(t)) {
                 no("not among the candidates")
             } else if n > *count || n < *least {
                 no(format!("{n} chosen, {least} to {count} wanted (CR 601.2c)"))
+            } else if let Some(t) = total.as_ref().filter(|t| !t.allows(candidates, targets)) {
+                no(format!("total mana value {}, {} or less wanted (CR 601.2c, 202.3)", t.of(candidates, targets), t.most))
             } else {
                 Ok(())
             }

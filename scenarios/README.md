@@ -203,6 +203,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Channel.Activate` | a mana ability the player has of their own (CR 611.2a), named by the card that gave it and no zone: it has no source, so it is offered wherever that card has gone |
 | `Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Strip Mine; Color: C)` | a cost that sacrifices one of several permanents names which; `Color: C` (or `Colorless`) answers colorless where the ability's type can be it (CR 106.7) |
 | `Bot1.Pass` · `Bot1.PayCost` · `Bot1.Decline` · `Bot1.Undo` · `Bot1.Cancel` | priority, unless-costs, mana undo, cancel a spell or ability at any question before it is on the stack |
+| `Bot1.PayCost(X: 3)` | "you may pay {X}" with X chosen as it is paid (CR 107.3f): X is raised (or lowered) to the number one step at a time, then paid from the pool like any `PayCost` |
 | `Bot1.Accept` · `Bot1.Decline` | a "you may" choice, such as Path to Exile's search (default: decline); `Accept` also pays a payment of life alone (a shockland's 2 life, ward's), which has no mana to make first |
 | `Bot1.Choose(Lightning Bolt; Island)` | Duress, Brainstorm (last chosen ends on top) |
 | `Bot1.Choose(Graveyard.Black Lotus)` | craft's materials (CR 702.167a), permanents and graveyard cards in one question: qualify the zone where a name is in both (default: the fewest it takes, the first offered); a refusal `! Bot1.Choose(Ornithopter)` holds when no such material may be chosen, and one naming only choosable materials holds when that is no answer the question accepts (one of "two creatures") |
@@ -296,11 +297,12 @@ is still answered by the next line, `Bot1.Search()` or another card.
 
 A target, `! Bot1.Target(Lightning Bolt)`, is checked at that player's next target question and fails if the named object is among its
 candidates; it fails as proving nothing when no such card exists anywhere in the game. It shows a spell or ability cannot target something
-(a creature card, not an instant, in "target creature card in your graveyard"); pair it with the legal target named on the next line.
+(a creature card, not an instant, in "target creature card in your graveyard", or one worth more than a slot's "total mana value X or less" by
+itself); pair it with the legal target named on the next line.
 Several names that are all among the candidates are instead one answer, which the question must refuse:
 `! Bot1.Target(Ornithopter#1; Ornithopter#2; Ornithopter#3)` for "up to two target creatures" (more than the slot takes), or one
 object named twice, `! Bot1.Target(Ornithopter#1; Ornithopter#1)`, as many as the slot takes, so that the repetition is what is
-refused (CR 115.3). The engine's own check of the answer decides (`check_answer`).
+refused (CR 115.3), or targets whose mana values add up to more than the slot's total allows (CR 601.2c). The engine's own check of the answer decides (`check_answer`).
 `! Bot1.Target(Count: N)` fails instead if the question takes N targets, and proves nothing when it has fewer candidates than
 that; `Count: 0` is choosing none, which no answer naming targets can say. It shows a slot takes at least one target (The Eagles Are Coming! unkicked, where kicked it takes any number).
 

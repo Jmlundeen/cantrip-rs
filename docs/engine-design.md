@@ -189,6 +189,16 @@ refuses a card that would go over by the same numbers. Michelangelo's Technique 
 `library::look_at_top_onto_battlefield` (which Aang, at the Crossroads and United Battlefront use without a total), and Lively
 Dirge asks it from the graveyard ("up to two creature cards with total mana value 4 or less"); Ao, the Dawn Sky prints it too.
 
+Targets can carry the same limit (CR 601.2c, 603.3d): "any number of target creature cards with total mana value X or less" is
+a `TargetSpec` with `total_mana_value` (`TargetSpec::total_mana_value_at_most`, `COUNTED` for X), and wherever targets are
+chosen - a cast or activation (`actions::choose_slots`), a triggered ability going on the stack (`settle::choose_trigger_targets`),
+new targets for a copy (CR 115.7d) and a changed target (CR 115.7a) - `actions::within_total` takes out every candidate worth
+more than the limit by itself and hands the question its `ChooseTarget::total`, which the validator checks as it does a
+card choice's. The total is judged as the targets are chosen; as the spell or ability resolves each target is checked on its
+own (CR 608.2b), so one gone leaves the rest. Fire Lord Sozin's reflexive ability is the slot that has it, X the count it was
+given (`Game::reflexive_trigger_counted`); the client keeps the running total in the caption and leaves a candidate that
+would go over unclickable.
+
 ### Characteristics
 
 - **Computed on query** (`chars()`), through the layers (613), from the object's card, its counters and the
@@ -357,7 +367,9 @@ do", "counter it unless its controller pays {3}", a shockland's "you may pay 2 l
 payer is not asked without the life (`actions::can_pay_life`), may activate mana abilities while there is mana to pay (CR
 605.3a), and may pay once the pool covers the mana and the life total still covers the life, so a mana ability that costs
 life (Mana Confluence) can leave only declining. The mana and the life are paid together, and "if they do" asks whether
-they paid (CR 118.12). Not built, because no card in content has one: exchanges of life totals, costs
+they paid (CR 118.12). "You may pay {X}" where the text leaves X to the payer (CR 107.3f) is `Game::may_pay_x`
+(`actions::may_pay_x`): the same question with its `x`, raised and lowered (`IncreaseX`, `DecreaseX`) while mana is made, any
+X from 0 up, and the X paid is what it returns, for "when you do" to carry (Fire Lord Sozin). Not built, because no card in content has one: exchanges of life totals, costs
 that gain life, and "can't lose life" (CR 119.8).
 
 "Damage can't be prevented" (CR 615.12) is asked by `ops::damage_can_be_prevented` before any prevention: a turn an effect said

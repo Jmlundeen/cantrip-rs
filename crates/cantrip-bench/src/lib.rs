@@ -184,9 +184,17 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
                 None => Answer::Cards(chosen),
             }
         }
-        RequestKind::ChooseTarget { candidates, least, count, .. } => {
+        RequestKind::ChooseTarget { candidates, least, count, total, .. } => {
             let n = *least as usize + random.below((*count - *least) as usize + 1);
-            Answer::Targets(random.some(candidates, n))
+            let chosen = random.some(candidates, n);
+            // "With total mana value X or less": a random choice over it is cut back to the targets that fit, in the order drawn.
+            match total {
+                Some(t) => {
+                    let values: Vec<u16> = chosen.iter().map(|c| t.values[candidates.iter().position(|e| e == c).unwrap_or(0)]).collect();
+                    Answer::Targets(TotalAtMost { values, most: t.most }.first_fitting(&chosen, chosen.len()))
+                }
+                None => Answer::Targets(chosen),
+            }
         }
         RequestKind::ChooseModes { eligible, count, .. } => Answer::Modes(random.some(eligible, *count as usize)),
         RequestKind::ChooseColors { choices, count, .. } => {

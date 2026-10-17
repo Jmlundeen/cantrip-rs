@@ -3520,6 +3520,20 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
     }
 }
 
+/// A slot "with total mana value N or less" (`TargetSpec::total_mana_value`; CR 601.2c, 603.3d, 202.3), `counted` its
+/// count: the candidates less any worth more than the limit by itself, which no legal choice could include, and the limit
+/// with each remaining candidate's mana value, index for index, for the question (the core refuses an answer over it).
+/// A slot without one keeps its candidates and asks nothing of them.
+pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u16, candidates: Vec<Target>) -> (Vec<Target>, Option<TotalAtMost>) {
+    let Some(most) = spec.total_limit(counted) else { return (candidates, None) };
+    let value = |t: Target| match t {
+        Target::Object(id) => cx.mana_value(id).min(u32::from(u16::MAX)) as u16,
+        _ => 0,
+    };
+    let (kept, values): (Vec<Target>, Vec<u16>) = candidates.into_iter().map(|t| (t, value(t))).filter(|&(_, v)| v <= most).unzip();
+    (kept, Some(TotalAtMost { values, most }))
+}
+
 /// Each target slot's targets, asked in slot order (CR 601.2c), each a target of the slot's own (a player may be
 /// chosen for two slots). A slot that chose nothing ("up to") keeps its place with `Target::None` among the slots, so
 /// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose. Each target comes
@@ -3536,6 +3550,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
         'slot: {
             let candidates =
                 target_candidates_given(cx, &asker, spec, if slots.len() > 1 { &targets } else { &[] }, Target::None, *slot_player);
+            let (candidates, total) = within_total(cx, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
             // Fewer legal targets than the slot's minimum is not a legal announcement (CR 601.2c, 602.2b): given up whole.
             if candidates.len() < least as usize {
@@ -3562,6 +3577,7 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
                 count,
                 // "Any number of targets" (CR 115.1d) is said so, not as "up to" the candidates there are.
                 any_number: spec.is_any_number(),
+                total,
             };
             match cx.ask_core(player, ask, true)? {
                 Answer::Targets(chosen) => targets.extend(chosen),
@@ -4899,34 +4915,82 @@ pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u8) -> bool {
 /// paid.
 pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<bool> {
     assert!(only_mana_and_life(cost), "a cost paid during resolution is mana and life; its other parts are not built");
-    let total = cost.mana;
+    Ok(pay_during_resolution(cx, payer, source, subject, cost, question, None)?.is_some())
+}
+
+/// The most X a payer may raise "you may pay {X}" to while choosing it: past what any game could produce, a bound for a
+/// player who raises without paying.
+const MOST_X_PAID: u16 = 1000;
+
+/// "You may pay {X}" as a spell or ability resolves (CR 118.12, 608.2d), X chosen by the payer as they pay it, since the
+/// text does not define it (CR 107.3f): one question (`RequestKind::UnlessPays` with its `x`) raises and lowers X, makes mana
+/// (CR 605.3a), and pays {X} once the pool covers it, or declines. Any X may be chosen, 0 included (paying {0} is still
+/// paying, CR 118.5). The X paid, or `None` when the payer declined: "when you do" (CR 603.12) asks whether it was paid, and
+/// "X" afterwards is the X paid. `cost` is the cost with its {X} (and any other mana or life beside it).
+pub fn may_pay_x(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u16>> {
+    assert!(cost.mana.x > 0, "may_pay_x pays a cost with an {{X}} in it");
+    let without_x = Cost { mana: ManaCost { x: 0, ..cost.mana }, ..*cost };
+    assert!(only_mana_and_life(&without_x), "a cost paid during resolution is mana and life; its other parts are not built");
+    pay_during_resolution(cx, payer, source, subject, cost, question, Some(0))
+}
+
+/// The payment `may_pay` and `may_pay_x` ask: with `x` the X chosen so far for a cost with an {X}, else none. What was
+/// paid: the X (0 for a cost without one), or `None` declined.
+fn pay_during_resolution(
+    cx: &mut Cx,
+    payer: PlayerId,
+    source: ObjectId,
+    subject: ObjectId,
+    cost: &Cost,
+    question: &'static Question,
+    mut x: Option<u16>,
+) -> R<Option<u16>> {
     let life = cost.life;
     if !can_pay_life(cx, payer, life) {
-        return Ok(false);
+        return Ok(None);
     }
     loop {
+        // The cost as X now stands: each {X} is X generic mana (CR 107.3f).
+        let total = match x {
+            Some(n) => {
+                let generic = u32::from(cost.mana.generic) + u32::from(n) * u32::from(cost.mana.x);
+                ManaCost { generic: generic.min(255) as u8, x: 0, ..cost.mana }
+            }
+            None => cost.mana,
+        };
         // Once a mana ability has cost the payer the life the payment needs, there is nothing left to do but decline.
         let mut options = Vec::new();
         let pool = spendable(cx, payer, source, Paying::Other);
         let remaining = uncovered(&pool, &total);
         let life_payable = can_pay_life(cx, payer, life);
         if life_payable {
-            if total != ManaCost::ZERO {
+            if total != ManaCost::ZERO || x.is_some() {
                 options = mana_options_while_paying(cx, payer, source, Paying::Other);
             }
             if total == ManaCost::ZERO || !matches!(ways(&pool, &total), Ways::None) {
                 options.push(ActionOption::simple(ActionKind::PayCost));
             }
+            if let Some(n) = x {
+                // The generic mana a cost holds is a byte: X goes no higher than that leaves room for.
+                if n < MOST_X_PAID && u32::from(total.generic) + u32::from(cost.mana.x) <= 255 {
+                    options.push(ActionOption::simple(ActionKind::IncreaseX));
+                }
+                if n > 0 {
+                    options.push(ActionOption::simple(ActionKind::DecreaseX));
+                }
+            }
         }
         options.push(ActionOption::simple(ActionKind::DeclineCost));
-        let ask = RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options };
+        let ask = RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x };
         let answer = cx.ask_core(payer, ask, false)?;
-        let Answer::Act(action) = answer else { return Ok(false) };
+        let Answer::Act(action) = answer else { return Ok(None) };
         match action.kind {
             ActionKind::ActivateAbility => {
                 let from = action.source.expect("source");
                 activate_mana(cx, payer, from, action.index, action.color, action.mana == Some(Mana::C), &action.targets)?;
             }
+            ActionKind::IncreaseX => x = x.map(|n| n + 1),
+            ActionKind::DecreaseX => x = x.map(|n| n.saturating_sub(1)),
             ActionKind::PayCost => {
                 if total != ManaCost::ZERO {
                     pay_mana(cx, payer, source, total)?;
@@ -4934,9 +4998,9 @@ pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId
                 if life > 0 {
                     ops::change_life(cx, payer, -i32::from(life));
                 }
-                return Ok(true);
+                return Ok(Some(x.unwrap_or(0)));
             }
-            _ => return Ok(false),
+            _ => return Ok(None),
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 176;
+    public const int ProtocolVersion = 177;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;

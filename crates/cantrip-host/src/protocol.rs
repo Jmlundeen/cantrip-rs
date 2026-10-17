@@ -998,6 +998,10 @@ pub struct UnlessPaysPrompt {
     pub detail: String,
     pub yes: String,
     pub no: String,
+    /// "You may pay {X}" with X left to the payer (CR 107.3f): X is chosen as it is paid, `X` so far, `Total` the cost at
+    /// that X, and `IncreaseX` and `DecreaseX` among the options change it.
+    pub choosing_x: bool,
+    pub x: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1025,6 +1029,11 @@ pub struct ChooseTargetPrompt {
     pub minimum: i32,
     pub any_number: bool,
     pub for_player: i32,
+    /// "Any number of target creature cards with total mana value X or less" (CR 601.2c, 202.3): the most the chosen
+    /// targets' `mana_values` may add up to; none when the slot asks nothing of them.
+    pub maximum_total_mana_value: Option<i32>,
+    /// Each candidate's mana value, index for index, when `maximum_total_mana_value` is set; empty otherwise.
+    pub mana_values: Vec<i32>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1363,6 +1372,21 @@ pub struct CountersRemovedAnswer {
     pub removals: Vec<CounterPoolMessage>,
 }
 
+/// The first of `eligible`, in order, whose `mana_values` (index for index) fit together within `most`, at most `count` of
+/// them: a default answer to a choice "with total mana value N or less" (CR 202.3) always accepted.
+fn first_fitting<T: Clone>(eligible: &[T], mana_values: &[i32], count: i32, most: i32) -> Vec<T> {
+    let mut left = most;
+    let mut taken = Vec::new();
+    for (i, item) in eligible.iter().enumerate() {
+        let value = mana_values.get(i).copied().unwrap_or(0);
+        if taken.len() < count.max(0) as usize && value <= left {
+            left -= value;
+            taken.push(item.clone());
+        }
+    }
+    taken
+}
+
 impl PromptPayload {
     /// The seat being asked.
     pub fn player(&self) -> i32 {
@@ -1472,18 +1496,7 @@ impl PromptPayload {
             PromptPayload::ChooseCardsPromptMessage(p) => AnswerPayload::CardsChosenAnswer(CardsChosenAnswer {
                 cards: match p.maximum_total_mana_value {
                     // "With total mana value N or less": the first cards that fit together, in order.
-                    Some(most) => {
-                        let mut left = most;
-                        let mut taken = Vec::new();
-                        for (i, &card) in p.eligible.iter().enumerate() {
-                            let value = p.mana_values.get(i).copied().unwrap_or(0);
-                            if taken.len() < p.count.max(0) as usize && value <= left {
-                                left -= value;
-                                taken.push(card);
-                            }
-                        }
-                        taken
-                    }
+                    Some(most) => first_fitting(&p.eligible, &p.mana_values, p.count, most),
                     None => p.eligible.iter().take(p.count.max(0) as usize).copied().collect(),
                 },
             }),
@@ -1495,7 +1508,14 @@ impl PromptPayload {
                 shuffle: false,
             }),
             PromptPayload::ChooseTargetPromptMessage(p) => AnswerPayload::TargetsChosenAnswer(TargetsChosenAnswer {
-                targets: if p.optional { Vec::new() } else { p.candidates.iter().take(p.count.max(0) as usize).cloned().collect() },
+                targets: if p.optional {
+                    Vec::new()
+                } else if let Some(most) = p.maximum_total_mana_value {
+                    // "With total mana value X or less": the first candidates that fit together, in order.
+                    first_fitting(&p.candidates, &p.mana_values, p.count, most)
+                } else {
+                    p.candidates.iter().take(p.count.max(0) as usize).cloned().collect()
+                },
             }),
             PromptPayload::MayPromptMessage(_) => AnswerPayload::MayChosenAnswer(MayChosenAnswer { accept: false }),
             PromptPayload::ChooseModesPromptMessage(p) => {

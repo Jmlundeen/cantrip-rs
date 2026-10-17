@@ -590,17 +590,17 @@ pub const fn spell(targets: &'static [TargetSpec], effect: Effect) -> Option<Spe
 
 /// One target that passes the filter (CR 115.1).
 pub const fn target(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 1, max: 1, filter, label: "", if_kicked: None }
+    TargetSpec { min: 1, max: 1, filter, label: "", if_kicked: None, total_mana_value: None }
 }
 
 /// "Up to one target" (CR 115.1d).
 pub const fn up_to_one(filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: 1, filter, label: "", if_kicked: None }
+    TargetSpec { min: 0, max: 1, filter, label: "", if_kicked: None, total_mana_value: None }
 }
 
 /// "Up to N targets" (CR 115.1d).
 pub const fn up_to(n: u8, filter: TargetFilter) -> TargetSpec {
-    TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None }
+    TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None, total_mana_value: None }
 }
 
 impl TargetSpec {
@@ -623,6 +623,12 @@ impl TargetSpec {
     /// Eagles Are Coming!'s and Divine Resilience's "instead choose any number of target creatures" is `if_kicked(0, n)`.
     pub const fn if_kicked(self, min: u8, max: u8) -> TargetSpec {
         TargetSpec { if_kicked: Some((min, max)), ..self }
+    }
+
+    /// "With total mana value `most` or less" (CR 601.2c, 202.3): the targets chosen for the slot together; `COUNTED` reads
+    /// the slot's count, "total mana value X or less" (`TargetSpec::total_mana_value`).
+    pub const fn total_mana_value_at_most(self, most: u8) -> TargetSpec {
+        TargetSpec { total_mana_value: Some(most), ..self }
     }
 }
 
