@@ -1,0 +1,36 @@
+# "Each opponent loses 1 life and you gain 1 life": in a three-player game BOTH opponents lose 1 (19 each) and Bot1 gains only
+# 1 (21, not 22). (The first player of a three-player game draws, CR 103.8a, so an Island sits above the Bolt.) The scry keeps the top card, Lightning Bolt, on top (the positive control of the bottoming scenario).
+
+[Bot1 Deck]
+Mox Jet
+Dream Beavers
+Island x5
+Island
+Lightning Bolt
+Black Lotus
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Bot3 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dream Beavers.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Arrange(Lightning Bolt)
+
+[Expect]
+Bot2.Life = 19
+Bot3.Life = 19
+Bot1.Life = 21
+Bot1.Library = Lightning Bolt; Black Lotus; Island; Island; Island; Island; Island; Island; Island; Island
+Stack.Count = 0
