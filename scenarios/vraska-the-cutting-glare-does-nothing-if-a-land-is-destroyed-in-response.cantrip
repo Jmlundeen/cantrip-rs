@@ -1,0 +1,56 @@
+# The intervening "if" is checked again as the ability resolves (CR 603.4): with six lands Vraska's ability triggers and
+# targets Bot2's Mox Ruby, but Bot2 sacrifices Strip Mine in response to destroy one of Bot1's Forests. At five lands the
+# ability does nothing: Mox Ruby stays and no Treasure is created.
+
+[Bot1 Deck]
+Forest
+Fastbond
+Swamp
+Swamp
+Forest
+Forest
+Vraska, the Cutting Glare
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mox Ruby
+Strip Mine
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Vraska, the Cutting Glare.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Forest#2; Ability: Destroy target land)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Mox Ruby
+Bot2.Graveyard = Strip Mine
+Bot1.Battlefield.Count = 7
+Bot1.Graveyard = Forest
+Stack.Count = 0

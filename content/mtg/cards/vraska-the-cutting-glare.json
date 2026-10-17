@@ -1,0 +1,11 @@
+{
+  "name": "Vraska, the Cutting Glare",
+  "manaCost": "{B}{B}{G}",
+  "type": "Legendary Creature — Gorgon Assassin",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Deathtouch\nWhen Vraska enters, if you control six or more lands, destroy target permanent an opponent controls. They create a Treasure token. (It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

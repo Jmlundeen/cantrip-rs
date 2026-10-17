@@ -1,0 +1,56 @@
+# With every one of its targets illegal the ability doesn't resolve (CR 608.2b): Bot2 answers with Snakeskin Veil on the
+# targeted Ornithopter, which gains hexproof, so it is not destroyed and Bot2 creates no Treasure token.
+
+[Bot1 Deck]
+Forest
+Fastbond
+Swamp
+Swamp
+Forest
+Forest
+Vraska, the Cutting Glare
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Snakeskin Veil
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Vraska, the Cutting Glare.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Ornithopter
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+Stack.Count = 0

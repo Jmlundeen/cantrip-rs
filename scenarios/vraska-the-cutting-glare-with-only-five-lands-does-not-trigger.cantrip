@@ -1,0 +1,49 @@
+# The intervening "if you control six or more lands" (CR 603.4): with only five lands (Fastbond's five on turn 1, no sixth
+# played on turn 3) Vraska's enters ability does not trigger at all - nothing goes on the stack, no target is asked and
+# Bot2 keeps its Mox Ruby and Island and gets no Treasure. The six-land scenario is the positive control.
+
+[Bot1 Deck]
+Forest
+Fastbond
+Swamp
+Swamp
+Forest
+Forest
+Vraska, the Cutting Glare
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mox Ruby
+Island
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Vraska, the Cutting Glare.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+! Bot1.Target
+
+[Expect]
+Bot2.Battlefield = Island; Mox Ruby
+Bot1.Battlefield.Count = 7
+Stack.Count = 0

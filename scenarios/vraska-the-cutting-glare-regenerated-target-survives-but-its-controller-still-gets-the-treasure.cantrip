@@ -1,0 +1,57 @@
+# "Destroy target permanent an opponent controls. They create a Treasure token." The Treasure is not conditional on the
+# destruction (CR 701.8, 111.10a): Bot2 sacrifices Welding Jar in response to regenerate the targeted Ornithopter (CR
+# 701.19a), which is only tapped, and Bot2 still creates the Treasure.
+
+[Bot1 Deck]
+Forest
+Fastbond
+Swamp
+Swamp
+Forest
+Forest
+Vraska, the Cutting Glare
+Forest
+Forest x12
+
+[Bot2 Deck]
+Welding Jar
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Welding Jar.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Vraska, the Cutting Glare.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Ornithopter; Treasure Token
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Graveyard = Welding Jar
+Stack.Count = 0

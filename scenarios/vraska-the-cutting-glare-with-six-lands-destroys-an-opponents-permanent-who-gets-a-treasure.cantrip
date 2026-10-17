@@ -1,0 +1,55 @@
+# Fastbond puts five lands (four damage) onto Bot1's battlefield on turn 1; the sixth comes on turn 3. Vraska, the Cutting Glare
+# is cast then ({B}{B}{G}): "When Vraska enters, if you control six or more lands, destroy target permanent an opponent controls.
+# They create a Treasure token." Bot1's own Swamp is refused as the target (an opponent's permanent only) beside Bot2's Mox
+# Ruby, the positive control, which is destroyed; Bot2, its controller, creates the Treasure (CR 701.8, 111.10a).
+
+[Bot1 Deck]
+Forest
+Fastbond
+Swamp
+Swamp
+Forest
+Forest
+Vraska, the Cutting Glare
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mox Ruby
+Island
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fastbond.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Vraska, the Cutting Glare.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Battlefield.Swamp#1)
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Island; Treasure Token
+Bot2.Graveyard = Mox Ruby
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Vraska, the Cutting Glare.Keywords = Deathtouch
+Bot1.Life = 16
