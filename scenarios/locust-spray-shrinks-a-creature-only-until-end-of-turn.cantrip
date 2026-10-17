@@ -1,0 +1,42 @@
+# -1/-1 is not destruction: Ornithopter (0/2) becomes -1/1 and survives, and "until end of turn" (CR 514.2) ends at
+# cleanup, so on Bot2's turn 4 it is a 0/2 again.
+
+[Bot1 Deck]
+Swamp
+Locust Spray
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Locust Spray.Cast(Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Ornithopter.Power = -1
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Locust Spray

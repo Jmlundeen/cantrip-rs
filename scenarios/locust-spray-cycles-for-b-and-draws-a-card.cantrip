@@ -1,0 +1,40 @@
+# Cycling {B} from hand: Bot1 taps a Swamp, discards Locust Spray and draws a card (the Mox Jet below it). The
+# discarded card offers no cycling from the graveyard (CR 702.29a: cycling works only while the card is in hand) and
+# the spell is not cast, so Bot2's Ornithopter is untouched.
+
+[Bot1 Deck]
+Swamp
+Locust Spray
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Mox Jet
+10 Swamp
+
+[Bot2 Deck]
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Locust Spray.Activate
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Graveyard.Locust Spray.Activate
+
+[Expect]
+Bot1.Graveyard = Locust Spray
+Bot1.Battlefield.Swamp.Tapped = true
+Bot1.Hand.Count = 7
+Bot2.Battlefield.Ornithopter.Toughness = 2

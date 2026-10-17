@@ -1,0 +1,44 @@
+# Target creature gets -1/-1: Misshapen Fiend (1/1) dies as a state-based action (toughness 0, CR 704.5f), and
+# Locust Spray goes to its owner's graveyard. Before the Fiend exists the Spray has no legal target (it is a
+# creature-only spell, CR 601.2c) and is not offered; once the Fiend is there the same cast is offered (positive control).
+
+[Bot1 Deck]
+Swamp
+Locust Spray
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Misshapen Fiend
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Locust Spray.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Misshapen Fiend.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Locust Spray.Cast(Misshapen Fiend)
+Bot1.Battlefield.Swamp.Activate
+
+[Expect]
+Bot2.Battlefield.Misshapen Fiend = (absent)
+Bot2.Graveyard = Misshapen Fiend
+Bot1.Graveyard = Locust Spray

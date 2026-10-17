@@ -1,0 +1,43 @@
+# Two Locust Sprays on Ornithopter (0/2): the first leaves it -1/1 and it lives (checked as the second is cast;
+# CR 704.5f needs toughness 0 or less); the second makes it -2/0 and it dies as a state-based action. The effects
+# stack (CR 613.4c), and each is a separate spell, so both reach the graveyard.
+
+[Bot1 Deck]
+Swamp
+Locust Spray
+Locust Spray
+Mox Jet
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Locust Spray.Cast(Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot1.Hand.Locust Spray.Cast(Ornithopter)
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+Bot1.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot2.Battlefield.Ornithopter = (absent)
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Locust Spray; Locust Spray
