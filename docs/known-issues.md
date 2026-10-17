@@ -60,6 +60,8 @@ keeps it).
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-42](#ki-42-a-permissions-enters-tapped-is-judged-from-where-the-land-is-not-from-the-way-it-was-played) | A permission's "enters tapped" is judged from where the land is, not from the way it was played | Low | Unexercised |
 | [KI-43](#ki-43-a-modal-double-faced-cards-back-face-cast-by-a-permission-is-not-exercised) | A modal double-faced card's back face cast by a permission is not exercised | Low | Unexercised |
+| [KI-44](#ki-44-a-hand-way-is-not-offered-to-a-cast-made-while-an-effect-resolves-and-no-emblem-gives-a-way) | A hand way is not offered to a cast made while an effect resolves, and no emblem gives a way | Low | Open |
+| [KI-45](#ki-45-the-number-a-cost-sacrifices-is-kept-as-the-spells-x) | The number a cost sacrifices is kept as the spell's X | Low | Suspected |
 
 ## Issues
 
@@ -482,3 +484,32 @@ scenario. (Two transforming cards, Jennifer Walters and Norman Osborn, give thei
 spell-backed modal double-faced card is added.
 
 **Scenarios.** None yet.
+
+### KI-44: A hand way is not offered to a cast made while an effect resolves, and no emblem gives a way
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-16, review of Omniscience |
+
+**Notes.** Omniscience's "you may cast spells from your hand without paying their mana costs" is a `GrantedWay` from the hand
+(CR 118.9), offered with priority (`actions::castable`). A cast an effect makes as it resolves from its controller's hand
+(CR 608.2g) is offered only for the card's mana cost and faces (`cast_ways_during_resolution`), so Omniscience's free cast is
+not among its ways there, though the rules allow any alternative cost. Ways are found on the battlefield's permanents only
+(`granted_ways_of`), so an emblem that gives one - Tamiyo, Field Researcher's "You may cast spells from your hand without paying
+their mana costs" (CR 114.4) - could not be built. No card in content casts from a hand as it resolves under such a way.
+
+**Scenarios.** none yet.
+
+### KI-45: The number a cost sacrifices is kept as the spell's X
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | engine | 2026-10-16, review of Rottenmouth Viper |
+
+**Notes.** `VariableCost::SacrificeAnyNumber` (Rottenmouth Viper) and `SacrificeX` (Immoral Bargain) keep the number announced
+as the spell's `x` (`StackItem::x`, `Obj::x`), though Viper's mana cost has no {X}. Its mana value is right (`Query::mana_value`
+and the `Cast` record count X once per {X} in the mana cost, CR 202.3e), but anything that reads `x` as "the value of X" -
+"X is the value of X paid" on a permanent, a copy's X (CR 707.10), the client's X shown on a spell - would see the number
+sacrificed for a spell that has no X. No card in content reads X of a Viper. A fix keeps the number apart from X.
+
+**Scenarios.** none: no card reaches it.

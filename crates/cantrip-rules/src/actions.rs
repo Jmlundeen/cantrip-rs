@@ -1285,9 +1285,12 @@ fn change_total(
         Costed::SpecialAction(id, _) => (id, None),
         Costed::Ability(id, ability) => (id, Some(ability)),
     };
-    let own: &[CostChange] = match face {
-        Some(face) => cx.card(face).own_cost_changes,
-        None => own_cost_changes(cx, id),
+    // A card's own changes are its spell's ("this spell costs {3} less ..."), never a special action's (CR 116.1): plotting
+    // or foretelling the card is not made cheaper by what makes the spell cheaper.
+    let own: &[CostChange] = match (face, costed) {
+        (_, Costed::SpecialAction(..)) => &[],
+        (Some(face), _) => cx.card(face).own_cost_changes,
+        (None, _) => own_cost_changes(cx, id),
     };
     // The ability's own change ("this ability costs ... less", power-up), asked for this ability alone.
     let ability_own = ability.and_then(|a| activated(cx, a)).and_then(|d| d.cost_change);
@@ -4432,7 +4435,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
         return None;
     }
     let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.state.lost_all_abilities(id)
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
     });
     if !changers {
         return None;
