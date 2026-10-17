@@ -1,0 +1,36 @@
+# Ruthless Negotiation from the hand: the targeted opponent chooses a card from their hand and exiles it (exiles - it is not
+# discarded, so it goes to exile and not the graveyard), and because the spell was not cast from a graveyard Bot1 draws
+# nothing: 7 cards, minus the Swamp and the Negotiation = 5.
+
+[Bot1 Deck]
+Swamp
+Ruthless Negotiation
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Island
+Mountain
+Plains
+Forest
+Ornithopter
+Mox Sapphire
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ruthless Negotiation.Cast(Bot2)
+Bot1.Battlefield.Swamp.Activate
+Bot2.Choose(Forest)
+
+[Expect]
+Exile = Forest
+Bot2.Graveyard.Count = 0
+Bot2.Hand = Swamp; Island; Mountain; Plains; Ornithopter; Mox Sapphire
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Ruthless Negotiation

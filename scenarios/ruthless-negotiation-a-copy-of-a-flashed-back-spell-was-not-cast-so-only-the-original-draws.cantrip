@@ -1,0 +1,55 @@
+# Known bug: a copy of a spell made by Lutri is given the original spell's cast_from (copy_spell in cantrip-rules ops.rs spreads ..original), so the copy of a flashed-back Ruthless Negotiation draws too; a copy is never cast (CR 707.10).
+# "If this spell was cast from a graveyard, draw a card": a copy of a spell is not cast (CR 707.10), so the copy of a
+# flashed-back Negotiation, made by Lutri flashed in with it on the stack, exiles a card but does not draw; only the original
+# draws. Hand-cast on turn 1 (Bot2 exiles Forest), flashed back on turn 3 (the copy, resolving first, makes Bot2 exile
+# Island; the original Mountain), so Bot1 draws exactly once (hand: Lutri + the turn-3 draw, minus the Swamp played and Lutri cast, plus 1 = 1; Bot2: 7 - Forest + the turn-2 draw - Island - Mountain = 5).
+
+[Bot1 Deck]
+Swamp
+Ruthless Negotiation
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Lutri, the Spellchaser
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Island
+Mountain
+Plains
+Forest
+Ornithopter
+Mox Sapphire
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ruthless Negotiation.Cast(Bot2)
+Bot1.Battlefield.Swamp.Activate
+Bot2.Choose(Forest)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Ruthless Negotiation.Cast(Bot2; Ability: Flashback)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Choose(Island)
+Bot2.Choose(Mountain)
+
+[Expect]
+Exile = Forest; Island; Mountain; Ruthless Negotiation
+Bot2.Hand.Count = 5
+Bot1.Hand.Count = 1

@@ -1,0 +1,50 @@
+# Flashback {4}{B}: the spell is cast from a graveyard, so after Bot2 exiles a card from hand Bot1 draws a card, and the
+# Negotiation itself is exiled as it leaves the stack (CR 702.34a) instead of returning to the graveyard. It was first cast
+# from the hand on turn 1 (no draw; Bot2 exiles Forest), then flashed back on turn 3 with the Swamps and three Moxes
+# (Bot2 exiles Island). Bot1 hand: 7 - Swamp, Negotiation, 3 Moxes = 2, plus the turn-3 draw, minus the second Swamp
+# played, plus the flashback draw = 3 (without the flashback draw it would be 2).
+
+[Bot1 Deck]
+Swamp
+Ruthless Negotiation
+Mox Jet
+Mox Ruby
+Mox Pearl
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Island
+Mountain
+Plains
+Forest
+Ornithopter
+Mox Sapphire
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ruthless Negotiation.Cast(Bot2)
+Bot1.Battlefield.Swamp.Activate
+Bot2.Choose(Forest)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Ruthless Negotiation.Cast(Bot2; Ability: Flashback)
+Bot2.Choose(Island)
+
+[Expect]
+Exile = Forest; Island; Ruthless Negotiation
+Bot1.Graveyard.Count = 0
+Bot2.Hand.Count = 6
+Bot1.Hand.Count = 3

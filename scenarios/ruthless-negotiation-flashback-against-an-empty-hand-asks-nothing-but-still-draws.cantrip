@@ -1,0 +1,57 @@
+# "Target opponent exiles a card from their hand. If this spell was cast from a graveyard, draw a card": the draw does not
+# depend on the exile. Bot2 plays out its whole hand on turn 2 (everything but the Swamp costs {0}) after exiling Mox
+# Emerald from the hand-cast Negotiation on turn 1, so the flashback on turn 3 finds an empty hand: Bot2 is asked
+# nothing (`! Bot2.Choose`) and Bot1 still draws (hand: 2 + the turn-3 draw - the Swamp played + the flashback draw = 3).
+
+[Bot1 Deck]
+Swamp
+Ruthless Negotiation
+Mox Jet
+Mox Ruby
+Mox Pearl
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Ornithopter
+Lotus Petal
+Mox Sapphire
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ruthless Negotiation.Cast(Bot2)
+Bot1.Battlefield.Swamp.Activate
+Bot2.Choose(Mox Emerald)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Graveyard.Ruthless Negotiation.Cast(Bot2; Ability: Flashback)
+! Bot2.Choose
+
+[Expect]
+Exile = Mox Emerald; Ruthless Negotiation
+Bot2.Hand.Count = 0
+Bot1.Hand.Count = 3
