@@ -66,6 +66,7 @@ pub mod melee;
 pub mod mobilize;
 pub mod ninjutsu;
 pub mod offspring;
+pub mod outlaw;
 pub mod persist;
 pub mod overload;
 pub mod paradigm;

@@ -168,6 +168,13 @@ pub fn each_opponent_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem)
     Ok(())
 }
 
+/// "Each opponent loses 1 life" (CR 119.3): every opponent still in the game loses it together. Lunar Convocation, Starscape
+/// Cleric and The Meathook Massacre print it.
+pub fn each_opponent_loses_1_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.each_opponent_loses_life(item.controller, 1);
+    Ok(())
+}
+
 /// "Target opponent loses 1 life and you gain 1 life" (CR 119.3): the first target, a player; with it gone the ability does not
 /// resolve (CR 608.2b), so nothing is gained. Blood Hustler and Down, Down to Goblin-town print it.
 pub fn target_opponent_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

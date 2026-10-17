@@ -34,16 +34,10 @@ fn opponents_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fire
     }
 }
 
-/// "Each opponent loses 1 life."
-fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.each_opponent_loses_life(item.controller, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, shrink_all, "When The Meathook Massacre enters, each creature gets -X/-X until end of turn."),
-        triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, drain, "Whenever a creature you control dies, each opponent loses 1 life.")
+        triggered(cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_DIES, cantrip_mechanics::effects::each_opponent_loses_1_life, "Whenever a creature you control dies, each opponent loses 1 life.")
             .look_back(),
         triggered(when(EventMask::ZONE_CHANGE, opponents_dies), |g, item| effects::gain_life(g, item, 1), "Whenever a creature an opponent controls dies, you gain 1 life.")
             .look_back(),

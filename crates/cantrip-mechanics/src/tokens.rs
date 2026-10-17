@@ -314,6 +314,27 @@ pub static PEST: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "Whenever this token attacks, you gain 1 life."
+fn gain_a_life_on_attack(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.gain_life(item.controller, 1);
+    Ok(())
+}
+
+/// The 1/1 black and green Pest creature token with "Whenever this token attacks, you gain 1 life." Moseo, Vein's New Dean makes
+/// it; the Pest with "When this token dies, you gain 1 life" is `PEST`.
+pub static PEST_THAT_GAINS_LIFE_ON_ATTACK: CardDef = CardDef {
+    name: "Pest",
+    has_cost: false,
+    colors: Some(ColorSet(0b10100)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Pest]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[triggered(crate::triggers::THIS_ATTACKS, gain_a_life_on_attack, "Whenever this token attacks, you gain 1 life.")],
+    text: "Whenever this token attacks, you gain 1 life.",
+    ..CardDef::BLANK
+};
+
 /// A colorless Gold artifact token with "Sacrifice this artifact: Add one mana of any color." (CR 111.10c).
 pub static GOLD: CardDef = CardDef {
     name: "Gold Token",

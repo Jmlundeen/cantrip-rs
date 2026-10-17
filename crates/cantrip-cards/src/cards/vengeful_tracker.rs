@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers;
+use cantrip_mechanics::{effects, triggers};
 use cantrip_oracle as oracle;
 
 /// "Whenever an opponent sacrifices an artifact" (CR 701.21a): an artifact that a sacrifice moved from the battlefield under an
@@ -15,8 +15,7 @@ fn an_opponent_sacrifices_an_artifact(q: &dyn Query, me: &Asker, event: &Event) 
 /// "This creature deals 2 damage to them": to the opponent who sacrificed, dealt by the creature (off its last-known
 /// information if it has left the battlefield, CR 608.2h).
 fn two_damage_to_them(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.damage(item.object, item.subject, 2);
-    Ok(())
+    effects::damage_that_player(g, item, 2)
 }
 
 pub static CARD: CardDef = CardDef {

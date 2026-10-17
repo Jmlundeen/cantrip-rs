@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::history::gained_life_this_turn;
+use cantrip_mechanics::history::you_gained_life_this_turn;
 use cantrip_mechanics::surveil_into_graveyard;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
@@ -18,6 +18,6 @@ fn surveil_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::YOUR_END_STEP, surveil_and_take, "At the beginning of your end step, if you gained life this turn, surveil 1. If you put a card with mana value less than or equal to the amount of life you gained this turn into your graveyard this way, put that card into your hand.")
-        .condition(|q, asker| gained_life_this_turn(q, asker.controller))],
+        .condition(you_gained_life_this_turn)],
     ..oracle::ENLIGHTENED_CONFIDANT
 };

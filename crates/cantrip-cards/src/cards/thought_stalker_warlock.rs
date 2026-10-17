@@ -1,5 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::hand::discard_chosen_nonland_from_revealed_hand;
+use cantrip_mechanics::history;
 use cantrip_mechanics::{discard_chosen, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
@@ -8,7 +9,7 @@ use cantrip_oracle as oracle;
 /// (CR 119.3); the opponent chooses their own discard in the second case (CR 701.9b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(opponent) = item.targets[0].player() else { return Ok(()) };
-    if g.history().life_lost(opponent) > 0 {
+    if history::lost_life_this_turn(g, opponent) {
         discard_chosen_nonland_from_revealed_hand(g, item, opponent)?;
     } else {
         discard_chosen(g, opponent, item.object, 1)?;
