@@ -1,0 +1,36 @@
+# Opt is an instant: Bot1 casts it in response to Bot2's Lightning Bolt aimed at Bot1, scrying 1 (the Island stays on
+# top) and drawing it first; the Bolt then resolves, Bot1 at 17. It is cast on Bot2's turn 2 with the Island Bot1 played
+# on turn 1.
+
+[Bot1 Deck]
+Island
+Opt
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island | )
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Opt
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 1

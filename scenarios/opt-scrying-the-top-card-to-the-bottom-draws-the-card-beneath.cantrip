@@ -1,0 +1,28 @@
+# Opt: Black Lotus, the only card scried (scry 1, not 2), goes to the bottom, so the draw is the card beneath it,
+# Lightning Bolt; the library is left Island, Black Lotus.
+
+[Bot1 Deck]
+Island
+Opt
+Island
+Island
+Island
+Island
+Island
+Black Lotus
+Lightning Bolt
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange( | Black Lotus)
+
+[Expect]
+Bot1.Graveyard = Opt
+Bot1.Hand = Island; Island; Island; Island; Island; Lightning Bolt
+Bot1.Library = Island; Black Lotus

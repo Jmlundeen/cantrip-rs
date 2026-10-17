@@ -1,0 +1,30 @@
+# Opt: scry 1, then draw a card. Black Lotus is the top card and stays there, so the draw is Black Lotus; the library is
+# left Lightning Bolt, Island.
+
+[Bot1 Deck]
+Island
+Opt
+Island
+Island
+Island
+Island
+Island
+Black Lotus
+Lightning Bolt
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Black Lotus | )
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Opt
+Bot1.Hand = Island; Island; Island; Island; Island; Black Lotus
+Bot1.Library = Lightning Bolt; Island

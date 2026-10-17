@@ -1,0 +1,24 @@
+# Opt with an empty library: there is nothing to scry (CR 701.22d), and the draw from an empty library makes Bot1 lose at
+# the next state-based check (CR 704.5b).
+
+[Bot1 Deck]
+Island
+Opt
+Island
+Island
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+
+[Expect]
+Result = Bot2 won
+Bot1.Library.Count = 0
+Bot1.Graveyard = Opt
