@@ -1,0 +1,69 @@
+# Troyan, Gutsy Explorer: "{T}: Add {G}{U}. Spend this mana only to cast spells with mana value 5 or greater or spells
+# with {X} in their mana costs" (CR 106.6, 202.3, 107.3). Turn 3: with its {G}{U} and three other untapped sources, Mine
+# Collapse (mana value 4, no {X}, {3}{R}) can't be cast: those three alone are one short, and the {G}{U} may not pay for it.
+# Thoughtcast, a spell of mana value 5 whatever affinity for artifacts takes off what it costs (CR 702.41a, 601.2f), is
+# cast for {2}{U}, the {G}{U} paying two of it. Turn 5: Mind Twist with X of 2 - mana value 3, but {X} in its mana cost -
+# is paid with the new {G}{U} and Mox Jet's {B} (its rulings: any part of the cost of such a spell). Turn 7: "{U}, {T}: Draw
+# a card, then discard a card", the Island paying the {U}.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Ruby
+Troyan, Gutsy Explorer
+Mine Collapse
+Thoughtcast
+Mind Twist
+Mox Jet
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Troyan, Gutsy Explorer.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Troyan, Gutsy Explorer.Activate(Ability: Add)
+? Bot1.Mana = {U} (ManaValue5OrGreaterOrXSpells) {G} (ManaValue5OrGreaterOrXSpells)
+! Bot1.Hand.Mine Collapse.Cast(Bot1.Battlefield.Troyan, Gutsy Explorer)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thoughtcast.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Troyan, Gutsy Explorer.Activate(Ability: Add)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Troyan, Gutsy Explorer.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mine Collapse)
+
+[Expect]
+Turn = 7
+Stack.Count = 0
+Bot1.Battlefield.Troyan, Gutsy Explorer.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Graveyard = Mine Collapse; Mind Twist; Thoughtcast
+Bot2.Hand.Count = 6

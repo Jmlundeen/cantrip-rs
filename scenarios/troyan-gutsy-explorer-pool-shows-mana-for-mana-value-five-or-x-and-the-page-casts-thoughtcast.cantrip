@@ -1,0 +1,46 @@
+# Browser
+# What the page shows of Troyan, Gutsy Explorer's restricted mana (CR 106.6): its card menu says what the {G}{U} is only
+# for, the mana sits in the pool as chips captioned "mana value 5+ or X" beside Mox Ruby's plain {R}, Mine Collapse (mana
+# value 4) can't be cast with it, and Thoughtcast (mana value 5, {2}{U} after affinity) is cast with the {G}{U} and the Island.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Ruby
+Troyan, Gutsy Explorer
+Mine Collapse
+Thoughtcast
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Troyan, Gutsy Explorer.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Troyan, Gutsy Explorer.Activate(Ability: Add)
+? Client.Bot1.Menu = {T}: Add {U}{G} (only for spells with mana value 5 or greater or with {X} in their mana costs); {U}, {T}: Draw a card, then discard a card.
+? Client.Bot1.Mana = 1 Blue (mana value 5+ or X); 1 Green (mana value 5+ or X)
+! Bot1.Hand.Mine Collapse.Cast(Bot1.Battlefield.Troyan, Gutsy Explorer)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thoughtcast.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana =
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Graveyard = Thoughtcast

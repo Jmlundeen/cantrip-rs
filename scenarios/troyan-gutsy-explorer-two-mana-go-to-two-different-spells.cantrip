@@ -1,0 +1,51 @@
+# Troyan, Gutsy Explorer's {G}{U} need not be spent on one spell (its ruling): {U} pays the {1} of Mind Twist
+# with X of 1, {G} the {1} of Prismatic Ending with X of 1 - each a spell with {X} in its mana cost. Mox Jet and Mox
+# Pearl pay their colored symbols. The Ending, with white and green spent on it, exiles Bot2's Ornithopter.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Ruby
+Troyan, Gutsy Explorer
+Mox Jet
+Mox Pearl
+Mind Twist
+Prismatic Ending
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Troyan, Gutsy Explorer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Troyan, Gutsy Explorer.Activate(Ability: Add)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {G} (ManaValue5OrGreaterOrXSpells)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Prismatic Ending.Cast(Bot2.Battlefield.Ornithopter; X: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Graveyard = Prismatic Ending; Mind Twist
+Bot2.Battlefield =
+Exile = Ornithopter
