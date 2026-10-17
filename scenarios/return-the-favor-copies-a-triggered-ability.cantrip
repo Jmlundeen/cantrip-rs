@@ -1,0 +1,34 @@
+# Return the Favor, first mode, on a triggered ability (CR 707.10): Thraben Inspector's "When this creature enters,
+# investigate" is on the stack and Bot1 copies it with Return the Favor (Black Lotus's {R}{R}{R}). The copy, with nothing to
+# target, resolves first; then the original: two Clues.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thraben Inspector
+Return the Favor
+Plains x16
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Thraben Inspector
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 2
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Clue Token; Clue Token; Plains; Thraben Inspector
+Stack.Count = 0

@@ -1,0 +1,47 @@
+# Return the Favor with both modes (spree, CR 702.172): on its turn Bot2 casts an Ornithopter and, holding priority, a
+# Lightning Bolt at Bot1. Bot1 answers with Return the Favor for {R}{R}{1}{1} (Black Lotus and Mox Ruby). Neither mode may
+# target the Ornithopter: it is a creature spell (not "instant spell, sorcery spell"), and it has no target (not "with a
+# single target"). Both target the Bolt. In the order written: the first copies it, the copy given Bot2 as its new target
+# (CR 707.10c); the second changes the Bolt's own target to Bot2, the only other legal one, so nothing is asked (CR
+# 115.7a). Bot2 takes both, 6; Bot1 none.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Return the Favor
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Ornithopter
+Swamp x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target; Change the target)
+! Bot1.Target(Stack.Ornithopter)
+Bot1.Target(Stack.Lightning Bolt)
+! Bot1.Target(Stack.Ornithopter)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 14
+Bot2.Battlefield = Mox Ruby; Ornithopter
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0
