@@ -1,0 +1,58 @@
+# Omnivorous Flytrap with one of two targets gone (CR 608.2b): the counters were divided one to the Flytrap and one to Bot2's
+# Llanowar Elves when the trigger went on the stack (CR 601.2d). Bot2 answers with Lightning Bolt on the Elves, which dies. The
+# trigger resolves for the target still legal only: the Flytrap gets its one counter, and the Elves' counter is lost, not given to the
+# Flytrap in its place.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Faithless Looting
+Ornithopter
+Lightning Bolt
+Plains
+Omnivorous Flytrap
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Choose(Ornithopter; Lightning Bolt)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Omnivorous Flytrap.Cast
+Bot2.Pass
+Bot1.Divide(Omnivorous Flytrap: 1; Bot2.Battlefield.Llanowar Elves: 1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Omnivorous Flytrap.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Stack.Count = 0

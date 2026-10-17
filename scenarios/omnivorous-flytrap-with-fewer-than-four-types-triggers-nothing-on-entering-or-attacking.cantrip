@@ -1,0 +1,41 @@
+# Omnivorous Flytrap's trigger has an intervening "if there are four or more card types among cards in your graveyard" (CR 603.4,
+# 702.138a). Bot1's graveyard is empty: the Flytrap enters without a trigger (the bare refusal: no target is asked for) and, on
+# turn 3 it attacks with one type in the graveyard (Lightning Bolt, an instant, cast at Bot2) and again triggers nothing: it deals its 2
+# combat damage plus the Bolt's 3 (20 -> 15) and has no counters. The graveyard of four types is the other scenario.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Omnivorous Flytrap
+Lightning Bolt
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Omnivorous Flytrap.Cast
+Bot2.Pass
+! Bot1.Target
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+? Bot1.Graveyard = Lightning Bolt
+Bot1.Attack(Omnivorous Flytrap > Bot2)
+! Bot1.Target
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Omnivorous Flytrap.Counters.PlusOnePlusOne = (absent)
+Bot2.Life = 15

@@ -1,0 +1,56 @@
+# Omnivorous Flytrap, "distribute two +1/+1 counters among one or two target creatures": chosen together with the targets (CR 601.2d),
+# one each to the Flytrap and to Bot2's Llanowar Elves (a creature an opponent controls is a legal target). The graveyard holds five card
+# types - instant (Lightning Bolt, cast), sorcery (Faithless Looting), artifact and creature (the discarded Ornithopter) and land (the
+# discarded Plains) - which is four or more but not six, so nothing doubles: the Elves is a 2/2 and the Flytrap a 3/5, one counter each.
+
+[Bot1 Deck]
+Mox Ruby x2
+Mox Emerald
+Mox Jet
+Mox Pearl
+Faithless Looting
+Lightning Bolt
+Plains
+Ornithopter
+Omnivorous Flytrap
+Plains x12
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Choose(Ornithopter; Plains)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Omnivorous Flytrap.Cast
+Bot2.Pass
+Bot1.Divide(Omnivorous Flytrap: 1; Bot2.Battlefield.Llanowar Elves: 1)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Omnivorous Flytrap.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Omnivorous Flytrap.Power = 3
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Llanowar Elves.Power = 2
+Bot2.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Graveyard.Count = 4
