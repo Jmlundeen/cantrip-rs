@@ -1,0 +1,40 @@
+# Nameless Inversion: "Target creature gets +3/-3 and loses all creature types until end of turn." Bot1's Concealing
+# Curtains, a 0/4 Wall, becomes a 3/1 with no creature type at all (CR 613.1d, 613.4c); it is still a creature. Both
+# effects end in the cleanup step (CR 514.2), so on Bot2's turn it is a 0/4 Wall again.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Concealing Curtains
+Nameless Inversion
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Concealing Curtains.Subtypes = Wall
+Bot1.Hand.Nameless Inversion.Cast(Bot1.Battlefield.Concealing Curtains)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Concealing Curtains.Power = 3
+? Bot1.Battlefield.Concealing Curtains.Toughness = 1
+? Bot1.Battlefield.Concealing Curtains.Subtypes = (absent)
+? Bot1.Battlefield.Concealing Curtains.Types = Creature
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Concealing Curtains.Power = 0
+Bot1.Battlefield.Concealing Curtains.Toughness = 4
+Bot1.Battlefield.Concealing Curtains.Subtypes = Wall
+Bot1.Graveyard = Nameless Inversion

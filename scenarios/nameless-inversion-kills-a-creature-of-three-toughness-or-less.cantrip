@@ -1,0 +1,31 @@
+# Nameless Inversion's -3 toughness leaves Bot2's Ornithopter, a 0/2, at 3/-1: a creature with toughness 0 or less is put
+# into its owner's graveyard (CR 704.5f), and it is not destroyed, so nothing could regenerate it. Bot1 casts the
+# Inversion at instant speed on Bot2's turn 2, after the Ornithopter is cast.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Nameless Inversion
+Swamp x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Nameless Inversion.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Nameless Inversion

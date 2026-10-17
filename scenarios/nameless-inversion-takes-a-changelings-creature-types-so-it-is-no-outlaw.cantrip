@@ -1,0 +1,62 @@
+# "Loses all creature types" takes Changeling's too (the Nameless Inversion rulings: the characteristic-defining ability
+# applies first, CR 613.3, and the later layer-4 effect removes what it gave). Bot1's animated Firdoch Core, a 4/4
+# artifact creature of every creature type, is an outlaw (CR 700.12): while Nameless Inversion is on the stack Bot2's
+# Shoot the Sheriff ("Destroy target non-outlaw creature") can't target it. Once the Inversion resolves the Core is a 7/1
+# of no creature type, still Kindred, Artifact and Creature with its Changeling keyword, and Shoot the Sheriff destroys
+# it.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Sol Ring
+Firdoch Core
+Nameless Inversion
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Shoot the Sheriff
+Swamp x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Firdoch Core.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Firdoch Core.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Nameless Inversion.Cast(Bot1.Battlefield.Firdoch Core)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+! Bot2.Hand.Shoot the Sheriff.Cast(Bot1.Battlefield.Firdoch Core)
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Power = 7
+? Bot1.Battlefield.Firdoch Core.Toughness = 1
+? Bot1.Battlefield.Firdoch Core.Subtypes = (absent)
+? Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact; Creature
+? Bot1.Battlefield.Firdoch Core.Keywords = Changeling
+Bot1.Pass
+Bot2.Hand.Shoot the Sheriff.Cast(Bot1.Battlefield.Firdoch Core)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot1.Graveyard = Firdoch Core; Nameless Inversion
+Bot2.Graveyard = Shoot the Sheriff
