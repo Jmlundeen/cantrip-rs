@@ -12,10 +12,6 @@ fn attacking_creature_you_control(view: &dyn LayerQuery, source: ObjectId, affec
         && state.attackers.iter().any(|a| a.id == affected)
 }
 
-fn deathtouch(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Deathtouch);
-}
-
 /// One of "up to four target cards from your graveyard" (CR 115.1): a mode's target slots are one target each, so the
 /// four are four optional slots, and a card an earlier one chose is not a target again (CR 115.3).
 fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -64,6 +60,6 @@ static MODAL: ModalDef = modes(&[
 
 pub static CARD: CardDef = CardDef {
     abilities: &[modal_ability(cost("{1}{G}, {T}"), &MODAL, "{1}{G}, {T}: Choose one \u{2014} put a +1/+1 counter on target creature; Bow of Nylea deals 2 damage to target creature with flying; you gain 3 life; or put up to four target cards from your graveyard on the bottom of your library in any order.")],
-    statics: &[static_ability(Layer::Ability, attacking_creature_you_control, deathtouch, "Attacking creatures you control have deathtouch.")],
+    statics: &[static_ability(Layer::Ability, attacking_creature_you_control, cantrip_mechanics::statics::have_deathtouch, "Attacking creatures you control have deathtouch.")],
     ..oracle::BOW_OF_NYLEA
 };

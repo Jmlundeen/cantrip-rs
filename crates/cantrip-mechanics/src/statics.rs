@@ -61,17 +61,7 @@ pub fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Char
 /// again whenever characteristics are computed). Dragon's Rage Channeler and Wildfire Wickerfolk use it; a spell or an
 /// ability asked at a `Query` uses `cantrip_mechanics::delirium`.
 pub fn itself_with_delirium(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    if source != affected {
-        return false;
-    }
-    let state = q.state();
-    let mut seen = TypeSet::NONE;
-    for &card in state.zone(Zone::graveyard(state.obj(source).controller)) {
-        for t in q.chars(card).types.iter() {
-            seen = seen.with(t);
-        }
-    }
-    seen.iter().count() >= 4
+    source == affected && delirium(q, source)
 }
 
 /// "... has haste" (CR 702.10, layer 6) as a static ability's `StaticDef::apply`. Anger, Samut, Lavaspur Boots, Skateboard
@@ -91,6 +81,28 @@ pub fn cant_be_countered(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// Man Armor's equipped creature print it.
 pub fn have_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying);
+}
+
+/// "... has deathtouch" (CR 702.2, layer 6) as a static ability's `StaticDef::apply`. Bow of Nylea's attacking creatures and
+/// The Swarmweaver's delirium Insects and Spiders print it.
+pub fn have_deathtouch(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Deathtouch);
+}
+
+/// Delirium (an ability word, CR 207.2c) for a static ability's condition: four or more card types among the cards in the
+/// graveyard of `source`'s controller, judged on the cards' characteristics as the layers made them. `mechanics::delirium` is
+/// the same question outside the layers. `itself_with_delirium` (Dragon's Rage Channeler, Wildfire Wickerfolk) and The
+/// Swarmweaver's Insects and Spiders use it.
+pub fn delirium(view: &dyn LayerQuery, source: ObjectId) -> bool {
+    let state = view.state();
+    let you = state.obj(source).controller;
+    let mut seen = TypeSet::NONE;
+    for &card in state.zone(Zone::graveyard(you)) {
+        for t in view.chars(card).types.iter() {
+            seen = seen.with(t);
+        }
+    }
+    seen.iter().count() >= 4
 }
 
 /// "... has vigilance" (CR 702.20, layer 6) as a static ability's `StaticDef::apply`. Ori, Keeper of Songs, Gideon's Memorial's
