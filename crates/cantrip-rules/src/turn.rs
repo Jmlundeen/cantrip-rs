@@ -545,8 +545,11 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     Ok(())
 }
 
+/// Each landwalk keyword (CR 702.14a) and the land type it names.
+const LANDWALK: [(Keyword, Subtype); 1] = [(Keyword::Islandwalk, Subtype::Island)];
+
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
-/// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), protection (CR 702.16f). Menace (CR 702.110b) is about the
+/// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.110b) is about the
 /// whole declaration, not a pair.
 fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[ObjectId]) -> bool {
     let a = cx.chars(attacker);
@@ -563,6 +566,22 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
     // "Can't be blocked by creatures with power 2 or less" (CR 509.1b): a creature with no power can't block it either.
     if a.has(Keyword::CantBeBlockedByPowerTwoOrLess) && b.power.is_none_or(|p| p <= 2) {
         return false;
+    }
+    // Landwalk (CR 702.14c): not while the defending player - the blocker's controller - controls a land of its type, as the
+    // layers have that land now. A creature with landwalk of its own is no exception (CR 702.14d).
+    for (walk, land_type) in LANDWALK {
+        if a.has(walk) {
+            let defending = cx.s().obj(blocker).controller;
+            let has_land = cx.s().battlefield().iter().any(|&id| {
+                cx.s().obj(id).controller == defending && {
+                    let land = cx.chars(id);
+                    land.is(CardType::Land) && land.has_subtype(land_type)
+                }
+            });
+            if has_land {
+                return false;
+            }
+        }
     }
     // CR 509.1b: a static ability that limits who may block whom, of the blocker, of the attacker, or of another permanent
     // ("creatures you control with power 2 or less can't be blocked by ...", Delney, Streetwise Lookout).

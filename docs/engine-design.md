@@ -947,6 +947,13 @@ the restrictions are cumulative) is offered no block at all (`turn::declare_bloc
 at the attacker clicked and says why the rest are still held; the tactical, random, automatic and language-model seats never
 declare more. A multi-pair refusal in a scenario is judged by the engine's check of that declaration.
 
+### Landwalk
+
+Landwalk (CR 702.14) is an evasion ability, a keyword per land type: `Keyword::Islandwalk` (Lord of Atlantis gives it in
+layer 6), which `turn::can_block` reads with the land type it names (`LANDWALK`): no creature of a defending player who
+controls a land of that type, as the layers have it now, may block it (CR 702.14c), whatever landwalk the blocker has
+(702.14d). Another landwalk printed is one more keyword and one more entry there.
+
 ### Can't attack unless
 
 A static ability that keeps a creature from attacking (CR 508.1c), "this creature can't attack unless ...", is a

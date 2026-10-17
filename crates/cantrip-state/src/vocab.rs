@@ -770,6 +770,11 @@ pub enum Keyword {
     /// declaration of blockers. Printed (Stalking Tiger, Charging Rhino, Ironhoof Ox) or given (Meltstrider's Resolve,
     /// Familiar Ground, Challenger Troll, Vorrac Battlehorns).
     CantBeBlockedByMoreThanOne = 34,
+    /// Islandwalk (CR 702.14): landwalk naming the land type Island, an evasion ability - "this creature can't be blocked as
+    /// long as defending player controls an Island" (CR 702.14c). Printed or given (Lord of Atlantis's "other Merfolk ...
+    /// have islandwalk"). Each landwalk is a keyword of its own that the blocking rule reads with its land type (`LANDWALK`
+    /// in `cantrip-rules`' turn structure), so another one printed is a keyword and an entry there.
+    Islandwalk = 35,
 }
 
 /// Day and night (CR 731.1): the designation the game itself has, belonging to no player. A game starts with neither
