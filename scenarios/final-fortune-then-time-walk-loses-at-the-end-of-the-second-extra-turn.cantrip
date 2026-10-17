@@ -1,0 +1,44 @@
+# "That turn" is the extra turn Final Fortune created, whatever turns come before it (CR 500.7: the most recently created
+# extra turn is taken first). Bot1 casts Final Fortune and then Time Walk in turn 1: Time Walk's extra turn is turn 2, Final
+# Fortune's is turn 3. Bot1 is still in the game after turn 2's end step and loses at the beginning of turn 3's.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Final Fortune
+Time Walk
+Mountain x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Final Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Time Walk.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot1.End]
+? Stack.Count = 0
+Bot1.Pass
+[T3 Bot1.Upkeep]
+? Result = InProgress
+? ActivePlayer = Bot1
+[T3 Bot1.End]
+? Stack = Final Fortune
+
+[Expect]
+Turn = 3
+Result = Bot2 won
+Bot1.LostTo = Effect

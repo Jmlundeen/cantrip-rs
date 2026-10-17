@@ -1,0 +1,46 @@
+# The classic: Final Fortune's "at the beginning of that turn's end step, you lose the game" triggers and goes on the stack,
+# and Bot1 answers it with Sundial of the Infinite. Ending the turn exiles every spell and ability on the stack (CR 724.1b), so
+# the ability never resolves; a delayed ability triggers only once (CR 603.7c), and the extra turn is over, so Bot1 never
+# loses to it.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Sol Ring
+Sundial of the Infinite
+Final Fortune
+Mountain x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Final Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot1.End]
+? Stack = Final Fortune
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+[T3 Bot2.Upkeep]
+[T4 Bot1.End]
+Bot1.Pass
+[T5 Bot2.Upkeep]
+
+[Expect]
+Turn = 5
+Result = InProgress
+Bot1.Graveyard = Final Fortune
+Delayed.Count = 0

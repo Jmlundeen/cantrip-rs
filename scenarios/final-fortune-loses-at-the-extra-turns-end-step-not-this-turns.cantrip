@@ -1,0 +1,35 @@
+# Final Fortune: "Take an extra turn after this one. At the beginning of that turn's end step, you lose the game." (CR 500.7,
+# 603.7). Bot1 casts it in turn 1's first main phase. Turn 1's end step comes first and is not "that turn's": Bot1 is still in
+# the game at turn 2's upkeep, which is Bot1's extra turn. At the beginning of turn 2's end step the delayed ability triggers,
+# and Bot1 loses as it resolves.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Final Fortune
+Mountain x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Final Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+? Delayed = Final Fortune
+[T2 Bot1.Upkeep]
+? ActivePlayer = Bot1
+? Result = InProgress
+[T2 Bot1.End]
+? Stack = Final Fortune
+? Result = InProgress
+
+[Expect]
+Turn = 2
+Result = Bot2 won
+Bot1.LostTo = Effect
+Delayed.Count = 0
