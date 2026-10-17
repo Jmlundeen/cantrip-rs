@@ -3020,6 +3020,8 @@ fn cast(
     let as_cast = cx.chars(spell);
     let x = cx.s().stack.iter().rev().find(|i| i.object == spell).map_or(0, |i| i.x);
     let value = (cx.card(as_cast.card).cost.mana_value() + x as u32).min(255) as u8;
+    // "As you cast this spell": the board once the costs are paid (CR 601.2i), asked of the face being cast.
+    let fact = def.cast_fact.map_or(0, |f| f(cx, &Asker { source: spell, controller: player }));
     cx.record(Event::Cast(Cast {
         spell,
         player,
@@ -3028,6 +3030,7 @@ fn cast(
         value,
         from: cast_from,
         way,
+        fact,
     }));
     // "Until this card is cast from exile" (CR 611.2a, 400.7) ends now, as the card that was in exile becomes cast: the
     // effects about it were there while its costs were paid.

@@ -1082,6 +1082,16 @@ pub struct SpellDef {
 /// If you control a Wizard as you cast this spell, you may choose two instead". Asked once, as the modes are announced.
 pub type ModeCount = fn(&dyn Query, &Asker) -> u8;
 
+/// What the board was as a spell was cast, for its effect to read later: "if you controlled a Faerie as you cast this
+/// spell" (Faerie Fencing), "if you controlled a Mount" (Steer Clear), "a modified creature" (Flame Discharge), "for each
+/// modified creature you controlled" (Lethal Exploit), "the greatest power among creatures you controlled" (Lifestream's
+/// Blessing). Asked once, of the spell (`Asker::source`) and its caster, as it becomes cast (CR 601.2i) - once its costs are
+/// paid, so a permanent sacrificed or one a mana ability sacrificed while paying is gone - and kept in its `Cast` record of
+/// the history (`history::Cast::fact`). What happens to the board afterwards changes nothing (the rulings). A copy of the
+/// spell was not cast (CR 707.10), so it has no such record and no such fact: Draconic Roar's ruling, "the copy wasn't
+/// cast, so whether you controlled a Dragon won't matter".
+pub type CastFact = fn(&dyn Query, &Asker) -> u32;
+
 /// The cost a card in a graveyard may be cast for by a static ability's say-so (CR 113.6, 118.9), or none when it may not
 /// be: asked of the granting permanent (`Asker`), the card in the graveyard and the player casting it. Underworld Breach's
 /// escape is the card's mana cost and exiling three other cards; mayhem is its mana cost for a card discarded this turn.
@@ -1489,6 +1499,8 @@ pub struct CardDef {
     pub modal: Option<&'static ModalDef>,
     /// The most modes the board lets it choose as it is cast, where that is more than `modal.max` (CR 700.2): Flame of Anor.
     pub modes_up_to: Option<ModeCount>,
+    /// What the board was as it was cast, which its effect reads from the history (CR 601.2i): `CastFact`.
+    pub cast_fact: Option<CastFact>,
     /// Its targets are chosen after the kicker and X are announced, because what may be targeted depends on them
     /// (CR 601.2b-c): Bloodchief's Thirst's kicked target.
     pub late_targets: bool,
@@ -1697,6 +1709,7 @@ impl CardDef {
         divide: None,
         modal: None,
         modes_up_to: None,
+        cast_fact: None,
         end_step_riders: &[],
         late_targets: false,
         additional_cost: None,

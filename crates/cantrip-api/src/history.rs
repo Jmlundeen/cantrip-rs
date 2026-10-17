@@ -34,6 +34,10 @@ pub struct Cast {
     pub from: ZoneKind,
     /// Which way it was cast (0 its mana cost).
     pub way: u8,
+    /// What its card's `CardDef::cast_fact` said of the board as it became cast ("if you controlled a Faerie as you cast this
+    /// spell"); 0 for a card with none. A copy of a spell is not cast (CR 707.10) and has no `Cast`, so `fact_as_cast` is 0
+    /// for it.
+    pub fact: u32,
 }
 
 impl Cast {
@@ -227,6 +231,20 @@ impl<'a> History<'a> {
     /// How the spell on the stack as `spell` was cast, if it was cast this turn.
     pub fn cast_of(&self, spell: ObjectId) -> Option<&'a Cast> {
         self.casts().find(|c| c.spell == spell)
+    }
+
+    /// What the board was as the spell on the stack as `spell` was cast, by its card's `CardDef::cast_fact` (CR 601.2i): 0 for
+    /// a copy, which was not cast (CR 707.10). A spell is cast and resolves in the same turn (the stack is empty before a turn
+    /// can end, and an effect that ends it exiles the stack, CR 724.1b), so this turn's casts are where it is.
+    pub fn fact_as_cast(&self, spell: ObjectId) -> u32 {
+        self.this_turn()
+            .iter()
+            .rev()
+            .find_map(|r| match &r.event {
+                Event::Cast(c) if c.spell == spell => Some(c.fact),
+                _ => None,
+            })
+            .unwrap_or(0)
     }
 
     /// How many times this ability of this object has resolved this turn (CR 608.2m).

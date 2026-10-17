@@ -448,6 +448,24 @@ the object has left, as it last existed (CR 608.2h). Nothing is pushed for an ab
 benchmark is unchanged. A spell's additional cost is still read from the history (Kazuul's Fury, Broadside Bombardiers'
 boast ability): the cast path does not keep its chosen permanents yet.
 
+### What the board was as a spell was cast
+
+"If you controlled a Faerie as you cast this spell" (Faerie Fencing) asks the board as the spell became cast (CR 601.2i), once
+its costs are paid: a Faerie sacrificed to a mana ability while paying does not count, and one lost or gained afterwards
+changes nothing (the rulings). A card says what it asks with `CardDef::cast_fact` (`CastFact`, a function of the game asked
+of the spell and its caster), which `actions::cast` asks just before it records the spell's `Event::Cast`, and the answer is
+kept in that record, `history::Cast::fact`: the past is asked of the history, so nothing is added to the stack item. The
+effect reads it with `History::fact_as_cast(spell)`. A copy of the spell was not cast (CR 707.10), so it has no `Cast` and
+its fact is 0, which is the rulings' "the copy wasn't cast, so whether you controlled a Dragon won't matter". The `Cast`
+record grew from 12 to 16 bytes and the `Event` stayed 20; a card with no fact costs one `Option` test per cast. Steer
+Clear ("if you controlled a Mount"), Flame Discharge ("a modified creature"), Lethal Exploit ("for each modified creature you
+controlled") and Lifestream's Blessing ("the greatest power among creatures you controlled") print the same thing; a
+number goes in the fact as it is. The modes a modal spell may choose by the board as it is cast (Flame of Anor) are
+`CardDef::modes_up_to`, asked as the modes are announced (CR 700.2), which is earlier. Not built: the Dragon cycle's
+"if you revealed a Dragon card or controlled a Dragon", whose reveal is an optional additional cost a copy does copy
+(Draconic Roar, Silumgar's Scorn; none in content). The benchmark measured 6.55, 7.01, 6.75 us against 6.60, 6.68, 7.00 us
+before, alternating the two builds (2026-10-16).
+
 ### Station
 
 Station (CR 702.184a) is `cantrip_mechanics::station::ability(text)`: "tap another untapped creature you control" as a cost
