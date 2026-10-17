@@ -1,0 +1,8 @@
+{
+  "name": "Harbinger of the Seas",
+  "manaCost": "{1}{U}{U}",
+  "type": "Creature — Merfolk Wizard",
+  "oracleText": "Nonbasic lands are Islands.",
+  "power": "2",
+  "toughness": "2"
+}
