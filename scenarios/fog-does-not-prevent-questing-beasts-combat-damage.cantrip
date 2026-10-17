@@ -1,0 +1,54 @@
+# Questing Beast: "Combat damage that would be dealt by creatures you control can't be prevented." Bot1 attacks with
+# Questing Beast and Llanowar Elves; Bot2 blocks the Elves with its own Llanowar Elves and casts Fog. Damage that can't be
+# prevented is dealt anyway (CR 615.12): the Beast's 4 reaches Bot2, and Bot1's Elves deal their 1 to Bot2's Elves, which
+# die. The combat damage of Bot2's Elves is Bot2's creature's, which the Beast says nothing about, so Fog prevents it and
+# Bot1's Elves live: the one prevention recorded.
+
+[Bot1 Deck]
+Black Lotus
+Forest
+Mox Emerald
+Questing Beast
+Llanowar Elves
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Fog
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Questing Beast.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Questing Beast > Bot2; Llanowar Elves > Bot2)
+Bot2.Block(Llanowar Elves > Llanowar Elves)
+[T3 Bot1.DeclareBlockers]
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fog.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Graveyard = Llanowar Elves; Fog
+Prevented = 1 Llanowar Elves > Llanowar Elves by Fog
