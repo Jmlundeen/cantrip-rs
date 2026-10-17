@@ -1,0 +1,40 @@
+# "creature or planeswalker with mana value 3 or less": Bot2 has Liliana of the Veil (planeswalker, mana value 3) and Karn, Scion of Urza (planeswalker,
+# mana value 4). Long Goodbye cannot target Karn (the refusal) and destroys Liliana (the positive control).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Long Goodbye
+Swamp x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Black Lotus
+Liliana of the Veil
+Karn, Scion of Urza
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Karn, Scion of Urza.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Long Goodbye.Cast(Karn, Scion of Urza)
+Bot1.Hand.Long Goodbye.Cast(Liliana of the Veil)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Long Goodbye
+Bot2.Graveyard = Liliana of the Veil; Black Lotus; Black Lotus
+Bot2.Battlefield = Island; Karn, Scion of Urza

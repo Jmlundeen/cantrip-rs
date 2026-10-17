@@ -1,0 +1,45 @@
+# "This spell can't be countered." Bot1 casts Long Goodbye at Bot2's Brazen Borrower. Bot2 answers with Counterspell (tapping the Mox and an Island), which
+# resolves and does nothing; Long Goodbye then resolves and destroys the Borrower. Counterspell ends in Bot2's graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Long Goodbye
+Swamp x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Brazen Borrower
+Counterspell
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Long Goodbye.Cast(Brazen Borrower)
+? Stack = Long Goodbye
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Long Goodbye)
+? Stack = Counterspell; Long Goodbye
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Long Goodbye
+Bot2.Graveyard = Brazen Borrower; Counterspell; Black Lotus
+Bot2.Battlefield = Island; Mox Sapphire

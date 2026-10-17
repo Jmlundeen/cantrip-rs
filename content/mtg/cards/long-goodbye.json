@@ -1,0 +1,9 @@
+{
+  "name": "Long Goodbye",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "This spell can't be countered. (This includes by the ward ability.)\nDestroy target creature or planeswalker with mana value 3 or less.",
+  "keywords": [
+    "CantBeCountered"
+  ]
+}

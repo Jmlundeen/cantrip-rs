@@ -1,0 +1,40 @@
+# "This spell can't be countered. (This includes by the ward ability.)" Bot2's Colorstorm Stallion (mana value 3) has ward {1}. Bot1 casts Long Goodbye at it
+# with exactly its two mana, so it cannot pay the ward cost; the ward trigger resolves and does not counter the spell, which resolves and destroys the Stallion.
+# (Colorstorm Stallion's own scenario shows the same ward countering a Lightning Bolt.)
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Long Goodbye
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Colorstorm Stallion
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Colorstorm Stallion.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Long Goodbye.Cast(Colorstorm Stallion)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Long Goodbye
+Bot2.Graveyard = Colorstorm Stallion; Black Lotus

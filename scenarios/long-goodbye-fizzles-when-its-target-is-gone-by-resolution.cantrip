@@ -1,0 +1,35 @@
+# CR 608.2b: with its only target illegal, Long Goodbye does nothing. Bot2's Walking Ballista (X = 1) removes its last counter in response to pinging Bot1 and
+# dies as a 0/0; when Long Goodbye would resolve there is nothing to destroy. The ping still resolved: Bot1 is at 19.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Long Goodbye
+Swamp x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Walking Ballista
+Island x11
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Long Goodbye.Cast(Walking Ballista)
+Bot2.Battlefield.Walking Ballista.Activate(Bot1; Ability: Remove)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 19
+Bot1.Graveyard = Long Goodbye
+Bot2.Graveyard = Walking Ballista

@@ -1,0 +1,45 @@
+# "Destroy target creature or planeswalker with mana value 3 or less." Bot2 has Brazen Borrower (creature, mana value 3), Displacer Kitten (creature,
+# mana value 4), a Mox Sapphire (a noncreature permanent) and an Island. Long Goodbye cannot target the Kitten (too expensive), the Island or the
+# Mox (neither a creature nor a planeswalker) - the refusals - and destroys the Borrower (the positive control: the same action at mana value 3).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Long Goodbye
+Swamp x12
+
+[Bot2 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Sapphire
+Brazen Borrower
+Displacer Kitten
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Displacer Kitten.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Long Goodbye.Cast(Bot2.Battlefield.Island)
+! Bot1.Hand.Long Goodbye.Cast(Displacer Kitten)
+! Bot1.Hand.Long Goodbye.Cast(Bot2.Battlefield.Mox Sapphire)
+Bot1.Hand.Long Goodbye.Cast(Brazen Borrower)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Long Goodbye
+Bot2.Graveyard = Brazen Borrower; Black Lotus; Black Lotus
+Bot2.Battlefield = Island; Mox Sapphire; Displacer Kitten
