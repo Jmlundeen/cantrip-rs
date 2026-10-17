@@ -1,0 +1,32 @@
+# Overprotect: "Target creature you control gets +3/+3 and gains trample, hexproof, and indestructible until end of turn."
+# Bot1's Ornithopter (0/2 flying) becomes a 3/5 with all of Flying, Hexproof, Indestructible and Trample (the sorted list)
+# while the turn lasts; on Bot1's next turn (turn 3) the pump and the keywords are gone (CR 514.2, 611.2a). Two Moxen pay {1}{G}.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Overprotect
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overprotect.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 5
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof; Indestructible; Trample
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Overprotect
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying

@@ -1,0 +1,40 @@
+# Overprotect's trample and +3/+3 (CR 702.19b): Bot1's Ornithopter attacks on turn 3 and Bot2's Ornithopter (0/2) blocks it.
+# After the block, Overprotect makes it a 3/5 trampler: 2 damage is lethal to the blocker and the other 1 reaches Bot2 (20 -> 19).
+# Without trample none would. Its own 0 power would have dealt nothing, so the pump is what kills the blocker.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Overprotect
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Plains
+Ornithopter
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Block(Ornithopter > Ornithopter)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overprotect.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.AssignDamage(Ornithopter > Ornithopter: 2; Ornithopter > Bot2: 1)
+[T3 Bot1.Damage]
+? Bot2.Life = 19
+
+[Expect]
+Bot2.Life = 19
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Ornithopter.Damage = 0

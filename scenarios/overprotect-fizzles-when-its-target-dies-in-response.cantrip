@@ -1,0 +1,39 @@
+# Overprotect with its target gone (CR 608.2b): Bot1 casts it on its Ornithopter (0/2) and Bot2 answers with Lightning Bolt, which
+# resolves first and kills the Ornithopter. Overprotect then has no legal target and does nothing; it is put into the graveyard
+# and, being countered on resolution, never gives Bot1 anything. Both spells end in their owners' graveyards.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Overprotect
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overprotect.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Overprotect; Ornithopter
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Count = 2
+Stack.Count = 0

@@ -1,0 +1,43 @@
+# Overprotect's indestructible (CR 702.12b): in response to Bot2's Wrath of God, Bot1's Ornithopter becomes indestructible
+# and survives "destroy all creatures", while Bot2's own Ornithopter (the control: Wrath does destroy) dies. Bot2 pays for the
+# Wrath with Moxen on its own turn 2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Overprotect
+Ornithopter
+Plains x17
+
+[Bot2 Deck]
+Mox Pearl x4
+Wrath of God
+Ornithopter
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Pearl#3.Activate
+Bot2.Battlefield.Mox Pearl#4.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Overprotect.Cast(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Graveyard = Overprotect
+Bot2.Graveyard = Wrath of God; Ornithopter
+Bot2.Battlefield.Count = 4
