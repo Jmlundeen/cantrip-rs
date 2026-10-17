@@ -1,10 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects::plus_one_counter_on_this;
 use cantrip_oracle as oracle;
-
-fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 1);
-    Ok(())
-}
 
 /// "If a card left your graveyard this turn."
 fn card_left(q: &dyn Query, asker: &Asker) -> bool {
@@ -20,7 +16,7 @@ fn damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, counter, "Rage \u{2014} Whenever Gau attacks, put a +1/+1 counter on it."),
+        triggered(cantrip_mechanics::triggers::THIS_ATTACKS, plus_one_counter_on_this, "Rage \u{2014} Whenever Gau attacks, put a +1/+1 counter on it."),
         triggered(cantrip_mechanics::triggers::EACH_END_STEP, damage, "At the beginning of each end step, if a card left your graveyard this turn, Gau deals damage equal to its power to each opponent.")
             .condition(card_left),
     ],

@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects::plus_one_counter_on_this;
 use cantrip_mechanics::library::exile_top_play_until_your_next_end_step;
 use cantrip_oracle as oracle;
 
@@ -29,16 +30,10 @@ fn you_cast_a_white_blue_black_or_red_spell(q: &dyn Query, source: ObjectId, eve
     }
 }
 
-/// "Put a +1/+1 counter on this creature."
-fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         when(EventMask::SPELL_CAST, you_cast_a_white_blue_black_or_red_spell),
-        counter,
+        plus_one_counter_on_this,
         "Whenever you cast a spell that's white, blue, black, or red, put a +1/+1 counter on this creature.",
     )],
     adventure: Some(&SEEK_THE_BEAST),

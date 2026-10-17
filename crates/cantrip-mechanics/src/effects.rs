@@ -71,8 +71,10 @@ pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kin
 }
 
 /// "Put a +1/+1 counter on [this permanent]" (CR 122.1), the ability's source: none once it has left the battlefield, as a
-/// new object it is another (CR 400.7). Essence Channeler, Ajani Resolute's Ajani's Pridemate token and Leonardo, Cutting
-/// Edge print it after "whenever you gain life".
+/// new object it is another (CR 400.7). The whole effect of a trigger or ability of Essence Channeler, Ajani Resolute's
+/// Ajani's Pridemate token, Leonardo, Cutting Edge, Blood Hustler, Cryptic Trilobite, Gau, Feral Youth, Hired Claw, Ivora,
+/// Insatiable Heir, Laelia, the Blade Reforged, Questing Druid, Shang-Chi and the Ten Rings, Tireless Tracker and Youthful
+/// Valkyrie.
 pub fn plus_one_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 1);
     Ok(())
