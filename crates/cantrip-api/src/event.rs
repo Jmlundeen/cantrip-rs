@@ -29,6 +29,12 @@ pub enum Event {
     /// you controlled dealt this turn" counts a source that has since changed controller or color, or left (Temple of
     /// Power's ruling), and a spell's or an ability's source by what it was on the stack or the battlefield then.
     Damage { source: ObjectId, target: Target, amount: u16, combat: bool, controller: PlayerId, colors: ColorSet },
+    /// Damage that would have been dealt was prevented (CR 615.6, 615.13): `amount` of what `source` would have dealt to
+    /// `target`, by the prevention effect of `by` - the permanent whose static ability it is, the source of a resolved
+    /// prevention effect, the protected permanent or the source of a player's protection (CR 702.16e). One event each time
+    /// a prevention effect is applied to a damage event and prevents some or all of it, before what is left is dealt;
+    /// "if damage is prevented this way" (CR 615.5) asks it. `combat` says whether it would have been combat damage.
+    DamagePrevented { source: ObjectId, target: Target, amount: u16, combat: bool, by: ObjectId },
     LifeChange { player: PlayerId, delta: i32 },
     Drew { player: PlayerId, card: ObjectId },
     Discarded { player: PlayerId, card: ObjectId },
@@ -173,7 +179,7 @@ impl Event {
             | Event::CrimeCommitted { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::BecameTarget { controller, .. } | Event::EnteredFaceDown { controller, .. } => Some(controller),
-            Event::Damage { target: Target::Player(p), .. } => Some(p),
+            Event::Damage { target: Target::Player(p), .. } | Event::DamagePrevented { target: Target::Player(p), .. } => Some(p),
             _ => None,
         }
     }
@@ -188,6 +194,7 @@ impl Event {
             Event::BecameTarget { target, by, .. } => by == object || target == Target::Object(object),
             Event::ZoneChange { old, new, .. } => old == object || new == object,
             Event::Damage { source, target, .. } => source == object || target == Target::Object(object),
+            Event::DamagePrevented { source, target, by, .. } => source == object || by == object || target == Target::Object(object),
             Event::Drew { card, .. } | Event::Discarded { card, .. } | Event::Revealed { card, .. } | Event::Looked { card, .. } | Event::Cycled { card, .. } => {
                 card == object
             }
@@ -266,6 +273,8 @@ impl EventMask {
     pub const SUSPECTED: EventMask = EventMask(1 << 41);
     pub const ENTERED_FACE_DOWN: EventMask = EventMask(1 << 42);
     pub const TURNED_FACE_UP: EventMask = EventMask(1 << 43);
+    /// Damage was prevented (CR 615.13).
+    pub const DAMAGE_PREVENTED: EventMask = EventMask(1 << 44);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -333,6 +342,7 @@ impl EventMask {
             Event::CrimeCommitted { .. } => EventMask::CRIME,
             Event::Scried { .. } => EventMask::SCRIED,
             Event::Surveilled { .. } => EventMask::SURVEILLED,
+            Event::DamagePrevented { .. } => EventMask::DAMAGE_PREVENTED,
             _ => EventMask(0),
         }
     }

@@ -212,6 +212,7 @@ pub enum Undo {
     EffectPushed,
     EffectRemoved(u16, Box<ContinuousEffect>),
     EffectInserted(u16),
+    EffectSet(u16, Box<ContinuousEffect>),
     PermissionPushed,
     PermissionRemoved(u16, PlayPermission),
     PermissionInserted(u16),
@@ -524,6 +525,13 @@ impl GameState {
         self.set_unsettled();
     }
 
+    /// Replaces the effect at `at` with `effect`, in its place: a prevention shield reduced (CR 615.7).
+    pub fn effect_set(&mut self, at: usize, effect: ContinuousEffect) {
+        let old = std::mem::replace(&mut self.effects[at], effect);
+        self.log(Undo::EffectSet(at as u16, Box::new(old)));
+        self.set_unsettled();
+    }
+
     /// Removes every effect `remove` says to, keeping the order of the rest.
     /// Keeps the effects at the indices `keep` marks true (one flag per effect, in order); the rest go.
     pub fn effects_keep(&mut self, keep: &[bool]) {
@@ -829,6 +837,7 @@ impl GameState {
             Undo::EffectInserted(at) => {
                 self.effects.remove(at as usize);
             }
+            Undo::EffectSet(at, old) => self.effects[at as usize] = *old,
             Undo::PermissionPushed => {
                 self.permissions.pop();
             }
@@ -917,6 +926,7 @@ impl GameState {
             Undo::EffectPushed => Undo::EffectRemoved(self.effects.len() as u16 - 1, Box::new(*self.effects.last().expect("an effect"))),
             Undo::EffectRemoved(at, _) => Undo::EffectInserted(*at),
             Undo::EffectInserted(at) => Undo::EffectRemoved(*at, Box::new(self.effects[*at as usize])),
+            Undo::EffectSet(at, _) => Undo::EffectSet(*at, Box::new(self.effects[*at as usize])),
             Undo::PermissionPushed => {
                 Undo::PermissionRemoved(self.permissions.len() as u16 - 1, *self.permissions.last().expect("a permission"))
             }

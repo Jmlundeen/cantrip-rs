@@ -4,6 +4,11 @@
 //! The effects belong to cards (`CardDef::replacements`): the core knows no card. An event that nothing on the board
 //! could replace costs one scan of the battlefield for a flag per card, and nothing is built. One keyword's replacement
 //! is the core's own and is ordered with the cards' like any other: madness (CR 702.35a), of a card being discarded.
+//!
+//! Prevention effects (CR 615) are ordered with them (CR 616.1): a static ability's (`CardDef::preventions`), one a
+//! resolved spell or ability made (`EffectKind::Prevention`) and protection's (CR 702.16e). Each that prevents damage
+//! records it (`Event::DamagePrevented`, CR 615.6), and none applies to damage that can't be prevented (CR 615.12): such
+//! a prevention effect would prevent nothing, and a shield is not reduced by it.
 
 use cantrip_api::*;
 
@@ -23,6 +28,11 @@ enum Origin {
     /// Protection's prevention of damage (CR 702.16e, 702.16j), a prevention effect ordered with the replacement effects that
     /// would change the same damage (CR 616.1): of the protected permanent, or the source of a player's protection.
     Protection,
+    /// One of its source card's `preventions`, a static ability's prevention effect (CR 615, 604).
+    Prevention,
+    /// A prevention effect a spell or ability made (CR 611.2, 615, `EffectKind::Prevention`), named by that effect's
+    /// timestamp: one of its source card's `granted_preventions`.
+    GrantedPrevention(u32),
 }
 
 /// One effect that applies to the event: its source, and which of the source's replacements it is.
@@ -53,17 +63,18 @@ fn madness_applies(cx: &Cx, z: &ZoneChange) -> bool {
         && !cx.lost_all_abilities(z.object)
 }
 
-/// The card whose definition a permanent's abilities come from: the card it copies, if it copies one.
+/// The card whose definition a permanent's abilities come from: the card it copies, if it copies one, or the face that is up
+/// (CR 712.8d-f: a double-faced permanent with its back face up has only that face's abilities).
 fn card_of(cx: &Cx, id: ObjectId) -> CardId {
     let obj = cx.s().obj(id);
-    obj.copy.map_or(obj.card, |c| c.card)
+    obj.copy.map_or_else(|| cx.cards().face(obj.card, obj.transformed), |c| c.card)
 }
 
 /// Whether any effect could apply to an event about `subject`: a permanent with replacements, or the subject's own
 /// card, which has some that function from every zone. The guard that keeps the hot path free of replacement work.
 fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
     // An effect a spell or ability made, which lasts (CR 611.2).
-    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement(_) | EffectKind::ReplacementRule(_))) {
+    if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement(_) | EffectKind::ReplacementRule(_) | EffectKind::Prevention { .. })) {
         return true;
     }
     let cards = cx.cards();
@@ -130,6 +141,11 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     let cards = cx.cards();
     let kind = proposal.kind();
     let subject = subject_of(proposal);
+    // Damage a prevention effect may prevent (CR 615.12): where it can't be, none of them applies.
+    let preventable = match proposal {
+        Proposal::Damage(d) => crate::ops::damage_can_be_prevented(cx, d.source, d.combat),
+        _ => false,
+    };
     let mut found = Vec::new();
     let mut consider = |id: ObjectId, own_only: bool| {
         let card = card_of(cx, id);
@@ -145,6 +161,18 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
             }
             if (def.applies)(cx, &asker, proposal) {
                 found.push(Candidate { source: id, index, origin: Origin::Printed });
+            }
+        }
+        // Its static abilities' prevention effects function only while it is on the battlefield (CR 604.1).
+        if let Proposal::Damage(d) = proposal
+            && preventable
+            && !own_only
+        {
+            for (index, def) in cards.get(card).preventions.iter().enumerate() {
+                let index = index as u8;
+                if !applied.contains(&(id, index, Origin::Prevention)) && (def.applies)(cx, &asker, d) {
+                    found.push(Candidate { source: id, index, origin: Origin::Prevention });
+                }
             }
         }
     };
@@ -164,6 +192,23 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
         let (index, about_player) = match e.kind {
             EffectKind::Replacement(i) => (i, false),
             EffectKind::ReplacementRule(i) => (i, true),
+            // A prevention effect a spell or ability made (CR 615.3): of damage to whom it names, if it names anyone, and of
+            // the damage its definition describes. One about an object ends with it (CR 400.7).
+            EffectKind::Prevention { index, to, .. } => {
+                if let Proposal::Damage(d) = proposal
+                    && preventable
+                    && (to == Target::None || to == d.target)
+                    && (to.object().is_none() || live(cx.s(), e.affected))
+                    && !applied.contains(&(e.source, index, Origin::GrantedPrevention(e.timestamp)))
+                {
+                    let def = &cards.get(card_of(cx, e.source)).granted_preventions[index as usize];
+                    let asker = Asker { source: e.source, controller: e.controller };
+                    if (def.applies)(cx, &asker, d) {
+                        found.push(Candidate { source: e.source, index, origin: Origin::GrantedPrevention(e.timestamp) });
+                    }
+                }
+                continue;
+            }
             _ => continue,
         };
         if !about_player && !live(cx.s(), e.affected) {
@@ -210,6 +255,23 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
         Origin::Granted(_) => card.granted_replacements[c.index as usize].hint,
         Origin::Madness => MADNESS_HINT,
         Origin::Protection => PROTECTION_HINT,
+        Origin::Prevention => card.preventions[c.index as usize].hint,
+        Origin::GrantedPrevention(_) => card.granted_preventions[c.index as usize].hint,
+    }
+}
+
+/// Whether the effect prevents all the damage it applies to and uses nothing up: a static ability's prevention,
+/// protection's, or a resolved effect that prevents all of it. Which of several such effects applies first changes nothing
+/// but which one is recorded as having prevented it, so the affected player is not asked to order only these (CR 616.1).
+fn prevents_all(cx: &Cx, c: &Candidate) -> bool {
+    match c.origin {
+        Origin::Protection | Origin::Prevention => true,
+        Origin::GrantedPrevention(timestamp) => cx
+            .s()
+            .effects
+            .iter()
+            .any(|e| e.timestamp == timestamp && matches!(e.kind, EffectKind::Prevention { shield: Shield::All, .. })),
+        _ => false,
     }
 }
 
@@ -245,7 +307,7 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
         if found.is_empty() {
             return;
         }
-        let pick = if found.len() > 1 { choose(cx, proposal, &found) } else { 0 };
+        let pick = if found.len() > 1 && !found.iter().all(|c| prevents_all(cx, c)) { choose(cx, proposal, &found) } else { 0 };
         let Candidate { source, index, origin } = found[pick];
         applied.push((source, index, origin));
         match origin {
@@ -274,13 +336,84 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 }
             }
             // CR 702.16e, 615.1: the damage is prevented, all of it.
-            Origin::Protection => {
+            Origin::Protection | Origin::Prevention => {
                 if let Proposal::Damage(d) = proposal {
-                    d.amount = 0;
+                    prevent(cx, d, d.amount, source);
+                }
+            }
+            Origin::GrantedPrevention(timestamp) => {
+                if let Proposal::Damage(d) = proposal {
+                    let at = cx.s().effects.iter().position(|e| e.timestamp == timestamp).expect("the effect that applies");
+                    let mut e = cx.s().effects[at];
+                    let EffectKind::Prevention { index, to, shield } = e.kind else { unreachable!("a prevention effect") };
+                    match shield {
+                        Shield::All => prevent(cx, d, d.amount, source),
+                        // CR 615.7: each 1 damage prevented reduces the shield by 1; once it is 0 the rest is dealt, and
+                        // the effect is used up.
+                        Shield::Next(left) => {
+                            let prevented = left.min(d.amount);
+                            prevent(cx, d, prevented, source);
+                            if prevented == left {
+                                cx.st().effects_retain(|f| f.timestamp != timestamp);
+                            } else {
+                                e.kind = EffectKind::Prevention { index, to, shield: Shield::Next(left - prevented) };
+                                cx.st().effect_set(at, e);
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+/// Whether a replacement effect might change damage about to be dealt ("it deals that much damage plus 1 instead"): one a
+/// spell or ability made, or a permanent's on the battlefield with a damage replacement. Asked before the damage is
+/// proposed, so it only says the amounts may not stay as they are.
+pub(crate) fn damage_may_change(cx: &Cx) -> bool {
+    let cards = cx.cards();
+    cx.s().effects.iter().any(|e| match e.kind {
+        EffectKind::Replacement(i) | EffectKind::ReplacementRule(i) => {
+            cards.get(card_of(cx, e.source)).granted_replacements[i as usize].kind == ReplacementKind::Damage
+        }
+        _ => false,
+    }) || cx.s().battlefield().iter().any(|&id| {
+        live(cx.s(), id)
+            && !cx.s().lost_all_abilities(id)
+            && cards.get(card_of(cx, id)).replacements.iter().any(|r| r.kind == ReplacementKind::Damage)
+    })
+}
+
+/// The prevention shields that would apply to this damage (CR 615.7), taken together: the source of the first, and how much
+/// they have left to prevent between them. None where no shield applies, or the damage can't be prevented (CR 615.12).
+pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u16)> {
+    if !cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Prevention { shield: Shield::Next(_), .. })) {
+        return None;
+    }
+    if !crate::ops::damage_can_be_prevented(cx, d.source, d.combat) {
+        return None;
+    }
+    let mut found: Option<(ObjectId, u16)> = None;
+    for e in &cx.s().effects {
+        let EffectKind::Prevention { index, to, shield: Shield::Next(left) } = e.kind else { continue };
+        if !(to == Target::None || to == d.target) || (to.object().is_some() && !live(cx.s(), e.affected)) {
+            continue;
+        }
+        let def = &cx.cards().get(card_of(cx, e.source)).granted_preventions[index as usize];
+        if (def.applies)(cx, &Asker { source: e.source, controller: e.controller }, d) {
+            found = Some(found.map_or((e.source, left), |(s, n)| (s, n.saturating_add(left))));
+        }
+    }
+    found
+}
+
+/// Prevents `amount` of the damage (CR 615.1) by the effect of `by`, and records it (CR 615.6, 615.13).
+fn prevent(cx: &mut Cx, d: &mut DamageEvent, amount: u16, by: ObjectId) {
+    if amount == 0 {
+        return;
+    }
+    d.amount -= amount;
+    cx.emit(Event::DamagePrevented { source: d.source, target: d.target, amount, combat: d.combat, by });
 }
 
 /// An object about to change zones (CR 614.1a, 614.1c): what remains of the move once every effect has applied.

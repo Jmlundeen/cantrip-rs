@@ -699,6 +699,10 @@ pub enum Purpose {
     /// "You may cast any number of copies without paying their mana costs" within a budget (Uldaros Theorix): a copy chosen to be
     /// cast, with this much mana value left to spend in all.
     CastCopyFreeWithin(u8),
+    /// Whose damage a prevention shield prevents first, where two or more sources would deal damage to the shielded
+    /// permanent or player at the same time (CR 615.7): a source chosen from among them, by the player or the controller
+    /// of the permanent, with this much left on the shield to prevent. The rest of the shield goes to the others.
+    PreventDamageFrom(u16),
 }
 
 /// The text of one option, as an index, so no string is built at runtime.

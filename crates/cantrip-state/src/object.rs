@@ -563,6 +563,12 @@ pub enum EffectKind {
     /// A regeneration shield (CR 701.19a, 614.8): the next time the permanent would be destroyed this turn, it is
     /// tapped, its damage removed and it is removed from combat instead. One effect for each shield.
     RegenerationShield,
+    /// A prevention effect (CR 615) a resolving spell or ability made, for as long as its duration lasts: the nth of the
+    /// source card's `granted_preventions`, which says what damage it watches for. `to` is whom that damage is dealt to:
+    /// an object (its `affected` object too, so the effect ends with it, CR 400.7), a player, or `Target::None` for damage
+    /// to anyone ("prevent all combat damage that would be dealt this turn"), when it is about no object and outlives its
+    /// `affected` object, which is only the source. `shield` is how much it has left to prevent (CR 615.7).
+    Prevention { index: u8, to: Target, shield: Shield },
     /// A replacement effect (CR 611.2, 614) a resolving spell or ability made about its `affected` object, for as long
     /// as its duration lasts: the nth of the source card's `granted_replacements`. It ends with the object, which is a
     /// new one when it changes zones (CR 400.7): "if that creature would die this turn, exile it instead".
@@ -622,8 +628,18 @@ impl EffectKind {
                 | EffectKind::PlayerManaAbility(_)
                 | EffectKind::NextSpellCantBeCountered
                 | EffectKind::SkipNextTurn(_)
-        )
+        ) || matches!(self, EffectKind::Prevention { to, .. } if to.object().is_none())
     }
+}
+
+/// How much damage a prevention effect a spell or ability made prevents (CR 615.1, 615.7).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum Shield {
+    /// All of the damage it applies to, for as long as it lasts: "prevent all damage that would be dealt to target
+    /// creature this turn".
+    All,
+    /// The next N damage (CR 615.7): each 1 damage it prevents reduces it by 1, and once it is 0 the rest is dealt.
+    Next(u16),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

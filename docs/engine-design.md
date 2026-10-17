@@ -362,10 +362,38 @@ that gain life, and "can't lose life" (CR 119.8).
 
 "Damage can't be prevented" (CR 615.12) is asked by `ops::damage_can_be_prevented` before any prevention: a turn an effect said
 so (Bonecrusher Giant's Stomp) or a `CardDef::unpreventable_damage` static (Questing Beast's combat damage,
-`statics::damage_cant_be_prevented` for Sunspine Lynx and Leyline of Punishment). Protection (CR 702.16e, of a permanent or a
-player's protection from everything) is the only prevention effect the engine has today; a prevention shield or other
-prevention effect added later must ask the same function, and be ordered with the replacement effects that change the same
-damage, as protection is (below).
+`statics::damage_cant_be_prevented` for Sunspine Lynx and Leyline of Punishment). Every prevention effect asks it.
+
+### Preventing damage
+
+Prevention effects (CR 615) are applied by `replace::damage` with the replacement effects of the same damage, and the affected
+player orders them together (CR 616.1, `RequestKind::ChooseReplacement`), each judged again on the damage as the one before
+left it (CR 616.1f). There are three kinds besides protection's (CR 702.16e, `replace::Origin::Protection`):
+
+- a static ability's, `CardDef::preventions` (`PreventionDef`: a hint and an `applies` over the `DamageEvent`), functioning
+  while its permanent is on the battlefield and gone with its abilities (CR 613.1f): Black Panther, Hope Enduring's "Prevent
+  all damage that would be dealt to Black Panther". It prevents all of what it applies to;
+- one a resolving spell or ability made (CR 615.3, 611.2), `EffectKind::Prevention { index, to, shield }`: of damage to an
+  object (which it ends with, CR 400.7), to a player, or to anyone (`Target::None`), and of the damage the source card's
+  `granted_preventions[index]` describes (any damage, combat damage: `cantrip_mechanics::prevention::ANY_DAMAGE`,
+  `COMBAT_DAMAGE`). `Shield::All` prevents all of it while it lasts (Fog's "all combat damage that would be dealt this
+  turn"); `Shield::Next(n)` is a shield (CR 615.7), reduced by what it prevents (`GameState::effect_set`) and gone at 0
+  (Healing Salve's "the next 3 damage that would be dealt to any target this turn");
+- where two or more sources would deal damage to a shielded permanent or player at the same time (combat damage,
+  `damage_together`), its player or controller chooses whose damage the shield prevents first (CR 615.7,
+  `ops::order_for_shields`, a `ChooseCards` of the sources with `Purpose::PreventDamageFrom(left)`), asked whenever the
+  shield would not cover all of it as assigned or a damage replacement on the board might make it more (Valley Flamecaller);
+  the assignments then meet the shield in that order.
+
+None applies to damage that can't be prevented (CR 615.12): it would prevent nothing, and a shield is not reduced by it. A
+player is not asked to order prevention effects that each prevent all the damage and use nothing up, since the order
+changes nothing. Each prevention that prevents something records `Event::DamagePrevented { source, target, amount, combat,
+by }` (CR 615.6, 615.13), protection's too, before what is left is dealt: what "if damage is prevented this way" (CR 615.5)
+and "whenever damage is prevented" ask, and the scenario dump's `Prevented`. Not built, because no card in content has one:
+"the next time a source would deal damage" (CR 615.8), a source of a player's choice (CR 615.9, 609.7), "prevent N of that
+damage" from a static ability (CR 615.10) and prevention with an additional effect (CR 615.5). The host shows a resolved
+prevention effect on the object it shields ("Prevent the next 3 damage that would be dealt to it this turn (Healing Salve)."),
+or beside the life total of the player it shields, or of its controller for damage to anyone.
 
 ### Damage redirected, and damage that stays
 

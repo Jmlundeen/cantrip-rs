@@ -305,6 +305,9 @@ public enum CardChoicePurposeView
 
     /// <summary>A card chosen to be revealed from among cards just looked at (CR 701.20a); what becomes of it is the effect's to say, so the prompt's wording is only "reveal" (Break Out).</summary>
     Reveal = 29,
+
+    /// <summary>Whose damage a prevention shield prevents first, of two or more sources that would deal damage at the same time to the shielded permanent or player (CR 615.7): one of the sources. The prompt's <c>Source</c> made the shield and <c>PreventLeft</c> is how much it has left to prevent; the rest of it goes to the others' damage.</summary>
+    PreventDamageFrom = 30,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

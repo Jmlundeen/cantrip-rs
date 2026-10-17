@@ -23,7 +23,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         bool permanents = prompt.Purpose is CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand
             or CardChoicePurposeView.Untap or CardChoicePurposeView.Keep or CardChoicePurposeView.TapToPay
             or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
-            or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce or CardChoicePurposeView.PutCounters;
+            or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce or CardChoicePurposeView.PutCounters
+            or CardChoicePurposeView.PreventDamageFrom;
         // A mulligan's bottoming is asked by the rules and has no source; an effect's (Valakut Awakening) names its own.
         string source = legend ? "The legend rule"
             : client.Object(context?.Source ?? prompt.Source)?.Name
@@ -100,11 +101,16 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             // Not a target (empower Jace's token, amass's Army): the one chosen gets the counters, and nothing is kept or lost.
             : prompt.Purpose == CardChoicePurposeView.PutCounters && prompt.Count == 1 && !prompt.UpTo
                 ? $"{source}: choose {article} {kind} to put {Counters(prompt)} on"
+            // A prevention shield two or more sources would deal damage to at once (CR 615.7): whose damage it prevents first.
+            : prompt.Purpose == CardChoicePurposeView.PreventDamageFrom
+                ? $"{source}: choose the source whose damage the shield prevents first"
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}{budget}"
             : anyNumber ? $"{source}: choose any number of {many} to {verb}{budget}"
             : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}{budget}";
         string detail = craft
             ? $"{picked.Count} chosen  ·  exiled with {source} to pay the craft cost; {source} returns transformed"
+            : prompt.Purpose == CardChoicePurposeView.PreventDamageFrom
+            ? $"It has {prompt.PreventLeft} damage left to prevent; what it can't prevent of the others' damage is dealt{where}"
             : prompt.Purpose == CardChoicePurposeView.TapToReduce
             ? picked.Count == 0
                 ? $"None tapped: the full cost is paid{where}"
@@ -152,6 +158,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.PutCounters => $"Put {Counters(prompt)} on it",
             CardChoicePurposeView.Craft => picked.Count == 1 ? "Exile it" : $"Exile {picked.Count}",
             CardChoicePurposeView.Reveal => picked.Count == 0 ? "Reveal nothing" : "Reveal it",
+            CardChoicePurposeView.PreventDamageFrom => "Prevent its damage first",
+
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",

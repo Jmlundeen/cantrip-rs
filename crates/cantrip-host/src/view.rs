@@ -630,6 +630,20 @@ impl<'a> Projector<'a> {
                 summary.pending_effects.push(self.cant_cast_text(p, zones, e.duration));
             }
         }
+        // A prevention effect a spell or ability made about the player (CR 615.7: "prevent the next 3 damage that would be dealt
+        // to target player"), shown beside the player it shields; one of damage to anyone (Fog) beside its controller's.
+        for e in s.effects.iter() {
+            let whom = match e.kind {
+                EffectKind::Prevention { to: Target::Player(q), .. } if q == p => {
+                    if p == self.viewer { "you" } else { "them" }
+                }
+                EffectKind::Prevention { to: Target::None, .. } if e.controller == p => "",
+                _ => continue,
+            };
+            if let Some(text) = self.prevention_text(e, whom) {
+                summary.pending_effects.push(text);
+            }
+        }
         // "Players can't gain life" (CR 119.7): from a permanent's static ability while it is on the battlefield, or a resolved
         // effect about the player (Screaming Nemesis's "for the rest of the game"), as it applies now.
         if game.cant_gain_life(p) {
@@ -668,6 +682,22 @@ impl<'a> Projector<'a> {
 
     /// How long an effect lasts, as `viewer` reads it: " this turn", " until your next turn", " until Bot1's next turn", or
     /// nothing for one that lasts as long as its object.
+    /// A prevention effect a spell or ability made (CR 615, 611.2), as the object or player it is about shows it: "Prevent the
+    /// next 3 damage that would be dealt to it this turn (Healing Salve)." `whom` is "it", "you", "them" or empty for damage
+    /// to anyone.
+    fn prevention_text(&self, e: &ContinuousEffect, whom: &str) -> Option<String> {
+        let EffectKind::Prevention { index, shield, .. } = e.kind else { return None };
+        let game = self.game;
+        let card = game.cards.get(game.state.obj(e.source).copy.map_or(game.state.obj(e.source).card, |c| c.card));
+        let damage = card.granted_preventions.get(index as usize)?.damage;
+        let how = match shield {
+            Shield::All => format!("Prevent all {damage}"),
+            Shield::Next(n) => format!("Prevent the next {n} {damage}"),
+        };
+        let to = if whom.is_empty() { String::new() } else { format!(" to {whom}") };
+        Some(format!("{how} that would be dealt{to}{} ({}).", self.until_text(e.duration), card.name))
+    }
+
     fn until_text(&self, duration: Duration) -> String {
         match duration {
             Duration::EndOfTurn => " this turn".to_string(),
@@ -1011,6 +1041,13 @@ impl<'a> Projector<'a> {
                 let what = match e.kind {
                     EffectKind::CantAttack => "Can't attack",
                     EffectKind::CantBlock => "Can't block",
+                    // A prevention shield on it (CR 615.7), or all damage to it prevented: no ability of its own says so.
+                    EffectKind::Prevention { to, .. } if to == Target::Object(id) => {
+                        if let Some(text) = self.prevention_text(e, "it") {
+                            view.granted_abilities.push(AbilityTextView { text, spent: false });
+                        }
+                        continue;
+                    }
                     _ => continue,
                 };
                 view.granted_abilities.push(AbilityTextView { text: format!("{what}{}.", self.until_text(e.duration)), spent: false });

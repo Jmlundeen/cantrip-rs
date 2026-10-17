@@ -15,6 +15,7 @@ internal static class PromptPresentation
         {
             Action = Action(choose.Purpose),
             Cause = choose.Purpose is CardChoicePurposeView.KeepLegend or CardChoicePurposeView.OrderSimultaneous
+                    or CardChoicePurposeView.PreventDamageFrom
                 || choose.Purpose == CardChoicePurposeView.PutOnBottom && choose.Source.IsNone ? PromptCauseView.Rule
                 : IsCost(choose.Purpose) || mayCancel && choose.Purpose != CardChoicePurposeView.Splice
                     ? PromptCauseView.Cost : PromptCauseView.Effect,

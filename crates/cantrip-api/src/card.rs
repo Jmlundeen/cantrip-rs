@@ -7,7 +7,7 @@ use crate::chars::Chars;
 use crate::event::{Event, EventMask};
 use crate::history::History;
 use crate::game::{CastTerms, CastWay, Game, Query, Suspend};
-use crate::replace::{GrantedReplacementDef, ReplacementDef};
+use crate::replace::{GrantedPreventionDef, GrantedReplacementDef, PreventionDef, ReplacementDef};
 
 /// A spell or ability's effect as it resolves (CR 608.2).
 pub type Effect = fn(&mut dyn Game, &StackItem) -> Result<(), Suspend>;
@@ -1617,6 +1617,12 @@ pub struct CardDef {
     /// The replacement effects its resolving spells and abilities make for a duration (CR 611.2, 614): `EffectKind::Replacement(n)`
     /// and `ReplacementRule(n)` name the nth. Not standing abilities: they function only while such an effect lasts.
     pub granted_replacements: &'static [GrantedReplacementDef],
+    /// Its prevention effects (CR 615) of static abilities: "prevent all damage that would be dealt to [this]". Functioning
+    /// while it is on the battlefield.
+    pub preventions: &'static [PreventionDef],
+    /// The prevention effects its resolving spells and abilities make for a duration (CR 611.2, 615): `EffectKind::Prevention`
+    /// names the nth.
+    pub granted_preventions: &'static [GrantedPreventionDef],
     /// "Each player can't cast more than this many spells each turn" (CR 101.2), while it is on the battlefield; 0 for
     /// no such limit. Archon of Emeria, High Noon, Rule of Law.
     pub cast_limit: u8,
@@ -1796,6 +1802,8 @@ impl CardDef {
         statics: &[],
         replacements: &[],
         granted_replacements: &[],
+        preventions: &[],
+        granted_preventions: &[],
         cast_limit: 0,
         cost_changes: &[],
         own_cost_changes: &[],
@@ -1908,7 +1916,8 @@ pub struct CardTable {
     /// Which cards have play rules, and whether any does: land plays look for them only when one might.
     pub play_rules: Vec<bool>,
     pub any_play_rules: bool,
-    /// Which cards have replacement effects, and whether any does: events look for sources only when one might be.
+    /// Which cards have replacement or prevention effects of static abilities (CR 614, 615), and whether any does: events
+    /// look for sources only when one might be.
     pub replaces: Vec<bool>,
     pub any_replaces: bool,
     /// Whether any card limits the spells cast each turn.
@@ -1986,7 +1995,7 @@ impl CardTable {
         let exile_statics = cards.iter().any(|c| c.statics.iter().any(|s| s.from == ZoneKind::Exile));
         let play_rules: Vec<bool> = cards.iter().map(|c| !c.play_rules.is_empty()).collect();
         let any_play_rules = play_rules.iter().any(|&s| s);
-        let replaces: Vec<bool> = cards.iter().map(|c| !c.replacements.is_empty()).collect();
+        let replaces: Vec<bool> = cards.iter().map(|c| !c.replacements.is_empty() || !c.preventions.is_empty()).collect();
         let any_replaces = replaces.iter().any(|&r| r);
         let any_cast_limit = cards.iter().any(|c| c.cast_limit > 0);
         let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty() || !c.ability_discounts.is_empty()).collect();

@@ -427,6 +427,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::TapToReduce => V::TapToReduce,
         Purpose::Reveal => V::Reveal,
         Purpose::PutCounters(..) => V::PutCounters,
+        Purpose::PreventDamageFrom(_) => V::PreventDamageFrom,
         Purpose::SeparatePiles
         | Purpose::ChoosePile
         | Purpose::CopyAsEnters
@@ -713,6 +714,10 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 // "With total mana value N or less": each eligible card's mana value, and the most they may add up to.
                 mana_values: total.as_ref().map_or_else(Vec::new, |t| t.values.iter().map(|&v| i32::from(v)).collect()),
                 maximum_total_mana_value: total.as_ref().map(|t| i32::from(t.most)),
+                prevent_left: match purpose {
+                    Purpose::PreventDamageFrom(n) => i32::from(*n),
+                    _ => 0,
+                },
                 ..Default::default()
             })
         }

@@ -245,6 +245,10 @@ pub enum CardChoicePurposeView {
     Craft,
     /// A card chosen to be revealed from among cards looked at; what becomes of it is the effect's to say (Break Out).
     Reveal,
+    /// Whose damage a prevention shield prevents first, of two or more sources that would deal damage at the same time to
+    /// the shielded permanent or player (CR 615.7): one of the sources. `Source` is what made the shield and
+    /// `PreventLeft` how much it has left to prevent.
+    PreventDamageFrom,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -961,6 +965,8 @@ pub struct ChooseCardsPrompt {
     /// "With total mana value N or less" (CR 202.3): the most the chosen cards' `mana_values` may add up to; none when the
     /// choice asks nothing of them.
     pub maximum_total_mana_value: Option<i32>,
+    /// For `PreventDamageFrom`, how much damage the shield has left to prevent (CR 615.7).
+    pub prevent_left: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

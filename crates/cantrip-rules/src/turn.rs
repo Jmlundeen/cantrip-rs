@@ -765,11 +765,15 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
             assignments.push((block.blocker, Target::Object(block.attacker), power));
         }
     }
-    // CR 510.2: all of it is dealt at once, and announced at once (CR 603.2c).
+    // CR 510.2: all of it is dealt at once, and announced at once (CR 603.2c). A prevention shield two or more sources would
+    // deal damage to prevents whose damage its player or controller chooses (CR 615.7).
     let mut batch = ops::DamageBatch::default();
-    let events: Vec<Event> = assignments
+    let events: Vec<Event> = ops::order_for_shields(cx, &assignments, true)
         .into_iter()
-        .filter_map(|(source, target, amount)| ops::deal_damage_with(cx, source, target, amount, true, &mut batch))
+        .filter_map(|i| {
+            let (source, target, amount) = assignments[i];
+            ops::deal_damage_with(cx, source, target, amount, true, &mut batch)
+        })
         .collect();
     batch.gain_lifelink(cx);
     cx.emit_batch(&events, None);

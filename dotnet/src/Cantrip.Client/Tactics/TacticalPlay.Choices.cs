@@ -578,6 +578,19 @@ public sealed partial class TacticalPlay
             return TapToReduce(client, prompt);
         }
 
+        // A prevention shield too small for all the damage two or more sources would deal at once (CR 615.7): the damage that
+        // would hurt most is prevented first - deathtouch's, lifelink's or the one that tramples, when the shield has enough
+        // left to prevent all of it (any of it dealt is the whole harm), then the most damage.
+        if (prompt.Purpose == CardChoicePurposeView.PreventDamageFrom)
+        {
+            ViewHandle first = prompt.Eligible
+                .OrderByDescending(card => client.Object(card) is { } source && (source.Power ?? 0) <= prompt.PreventLeft
+                    && (CardReading.KeywordsOf(source) & (Keywords.Deathtouch | Keywords.Lifelink)) != 0 ? 1 : 0)
+                .ThenByDescending(card => client.Object(card)?.Power ?? 0)
+                .First();
+            return new CardsChosenAnswer { Cards = [first] };
+        }
+
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
 
         // Station's creature (CR 702.184a): its power is the counters the permanent gets, so the one Station chose, or else

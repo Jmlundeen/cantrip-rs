@@ -1546,23 +1546,109 @@ pub fn damage(cx: &mut Cx, source: ObjectId, target: Target, amount: u16, combat
 pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16> {
     let mut batch = DamageBatch::default();
     let mut events = Vec::with_capacity(hits.len());
-    let mut dealt = Vec::with_capacity(hits.len());
-    for &(source, target, amount) in hits {
+    let mut dealt = vec![0; hits.len()];
+    for i in order_for_shields(cx, hits, false) {
+        let (source, target, amount) = hits[i];
         match deal_damage_with(cx, source, target, amount, false, &mut batch) {
             Some(event) => {
-                dealt.push(match event {
+                dealt[i] = match event {
                     Event::Damage { amount, .. } => amount,
                     _ => 0,
-                });
+                };
                 events.push(event);
             }
-            None => dealt.push(0),
+            None => {}
         }
     }
     batch.gain_lifelink(cx);
     cx.emit_batch(&events, None);
     dealt
 }
+
+/// The order in which the assignments of one simultaneous damage event (CR 120.2, 510.2) meet the prevention shields of
+/// their recipients, as indices into `hits`: "If damage would be dealt to the shielded permanent or player by two or more
+/// applicable sources at the same time, the player or the controller of the permanent chooses which damage the shield
+/// prevents" (CR 615.7). For each recipient a shield would not cover in full, its player or controller chooses a source
+/// whose damage the shield prevents first, then the next while some is left; the damage of the others is dealt normally
+/// once it is used up. Everything else keeps its order.
+pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: bool) -> Vec<usize> {
+    let mut order: Vec<usize> = (0..hits.len()).collect();
+    if hits.len() < 2 || !cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Prevention { shield: Shield::Next(_), .. })) {
+        return order;
+    }
+    let mut recipients: Vec<Target> = Vec::new();
+    for &(_, to, _) in hits {
+        if !recipients.contains(&to) {
+            recipients.push(to);
+        }
+    }
+    for to in recipients {
+        let chooser = match to {
+            Target::Player(p) => p,
+            Target::Object(id) if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) => cx.s().obj(id).controller,
+            _ => continue,
+        };
+        // The assignments to it that a shield applies to, and what the shields have left between them.
+        let mut shielded: Vec<usize> = Vec::new();
+        let (mut by, mut left) = (ObjectId(0), 0u16);
+        for (i, &(source, target, amount)) in hits.iter().enumerate() {
+            if target != to || amount == 0 {
+                continue;
+            }
+            if let Some((s, n)) = replace::shields(cx, &DamageEvent { source, target, amount, combat, heal_marked: false }) {
+                shielded.push(i);
+                (by, left) = (s, n);
+            }
+        }
+        // The amounts are as assigned; where a replacement effect may yet change them ("that much damage plus 1"), the
+        // shield might not cover them after all, so the choice is asked whatever they are.
+        let may_change = replace::damage_may_change(cx);
+        let total = |rest: &[usize]| rest.iter().map(|&i| hits[i].2 as u32).sum::<u32>();
+        let mut rest = shielded.clone();
+        let mut chosen = Vec::new();
+        while left > 0 && (total(&rest) > left as u32 || may_change) {
+            let mut sources: Vec<ObjectId> = Vec::new();
+            for &i in &rest {
+                if !sources.contains(&hits[i].0) {
+                    sources.push(hits[i].0);
+                }
+            }
+            if sources.len() < 2 {
+                break;
+            }
+            let ask = RequestKind::ChooseCards {
+                source: by,
+                purpose: Purpose::PreventDamageFrom(left),
+                cards: sources.clone(),
+                eligible: sources,
+                count: 1,
+                up_to: false,
+                kind: "",
+                total: None,
+            };
+            // Unanswered yet, the run goes on with the first and is replayed with the answer (`Cx::ask_core`).
+            let pick = match cx.ask_core(chooser, ask, false) {
+                Ok(Answer::Cards(c)) if c.len() == 1 => rest.iter().position(|&i| hits[i].0 == c[0]).unwrap_or(0),
+                _ => 0,
+            };
+            let i = rest.remove(pick);
+            left = left.saturating_sub(hits[i].2);
+            chosen.push(i);
+        }
+        if chosen.is_empty() {
+            continue;
+        }
+        chosen.extend(rest);
+        // The shielded assignments take their places in the order chosen.
+        let mut slots: Vec<usize> = shielded.iter().map(|i| order.iter().position(|o| o == i).expect("in the order")).collect();
+        slots.sort_unstable();
+        for (slot, i) in slots.into_iter().zip(chosen) {
+            order[slot] = i;
+        }
+    }
+    order
+}
+
 
 /// Deals damage as `damage` does, but hands back the event for the caller to announce, so that damage dealt
 /// simultaneously (combat damage, CR 510.2) can be announced as one batch (CR 603.2c): "whenever equipped creature
@@ -1616,17 +1702,24 @@ pub fn deal_damage_with(
     if amount == 0 {
         return None;
     }
-    // Protection prevents the damage (CR 702.16e, 702.16j) unless it can't be prevented (CR 615.12). Where replacement
-    // effects applied, protection was ordered with them (CR 616.1) and has prevented it already if it applies.
+    // Protection prevents the damage (CR 702.16e, 702.16j) unless it can't be prevented (CR 615.12), and the prevention is
+    // recorded (CR 615.6). Where replacement or other prevention effects applied, protection was ordered with them
+    // (CR 616.1) and has prevented it already if it applies.
     let source_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
+    let prevented = |cx: &mut Cx, by: ObjectId| -> Option<Event> {
+        cx.emit(Event::DamagePrevented { source, target, amount, combat, by });
+        None
+    };
     match target {
         Target::None | Target::Ability(_) => None,
         Target::Player(p) => {
-            if cx.s().effects.iter().any(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == p)
+            if let Some(by) =
+                cx.s().effects.iter().find(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == p).map(|e| e.source)
                 && damage_can_be_prevented(cx, source, combat)
             {
-                return None;
+                return prevented(cx, by);
             }
+
             if source_chars.has(Keyword::Infect) {
                 // Damage from a source with infect is dealt to a player as that many poison counters (CR 702.90b,
                 // 120.3b).
@@ -1647,7 +1740,7 @@ pub fn deal_damage_with(
             let target_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
             let source_controller = cx.s().obj(source).controller;
             if target_chars.protected_from_by(&source_chars, source_controller) && damage_can_be_prevented(cx, source, combat) {
-                return None;
+                return prevented(cx, id);
             }
             let deathtouch = source_chars.has(Keyword::Deathtouch);
             if target_chars.is(CardType::Creature) {
@@ -1715,9 +1808,10 @@ pub(crate) fn protection_prevents(cx: &Cx, source: ObjectId, target: Target, com
 
 /// Whether a prevention effect may prevent the damage `source` is about to deal (CR 615.12): not in a turn an effect said
 /// damage can't be prevented this turn (Bonecrusher Giant's Stomp), nor while a static ability says this damage can't be
-/// (Sunspine Lynx's "Damage can't be prevented", Questing Beast's combat damage). Protection (CR 702.16e) is the only
-/// prevention effect the engine has; any other must ask this too.
-fn damage_can_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {
+/// (Sunspine Lynx's "Damage can't be prevented", Questing Beast's combat damage). Every prevention effect asks it:
+/// protection's (CR 702.16e) and those of `replace` (CR 615).
+pub(crate) fn damage_can_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {
+
     let turn = cx.s().turn;
     turn.no_prevention_turn != turn.number && !crate::static_rules::damage_cant_be_prevented(cx, source, combat)
 }

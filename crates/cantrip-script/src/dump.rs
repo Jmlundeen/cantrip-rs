@@ -169,6 +169,27 @@ impl StateDump {
             .collect();
         d.list("LeftBattlefield", left, true);
 
+        // Every prevention of damage (CR 615.6), in order, from the history (`Event::DamagePrevented`): how much, from which
+        // source, to whom, and whose prevention effect it was - "3 Lightning Bolt > Black Panther, Hope Enduring by Black
+        // Panther, Hope Enduring". Absent until damage has been prevented.
+        let prevented: Vec<String> = records
+            .iter()
+            .filter_map(|r| match r.event {
+                Event::DamagePrevented { source, target, amount, by, .. } => {
+                    let to = match target {
+                        Target::Player(p) => bot(p),
+                        Target::Object(id) => game.name(id).to_string(),
+                        _ => String::new(),
+                    };
+                    Some(format!("{amount} {} > {to} by {}", game.name(source), game.name(by)))
+                }
+                _ => None,
+            })
+            .collect();
+        if !prevented.is_empty() {
+            d.list("Prevented", prevented, true);
+        }
+
         let attackers = s
             .attackers
             .iter()

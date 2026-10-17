@@ -1237,6 +1237,10 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(17)]
     public int? MaximumTotalManaValue { get; set; }
 
+    /// <summary>For <see cref="CardChoicePurposeView.PreventDamageFrom"/>, how much damage the shield has left to prevent (CR 615.7).</summary>
+    [Key(18)]
+    public int PreventLeft { get; set; }
+
     /// <summary>
     /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
     /// offered "up to" every candidate, so taking them all meets it whenever anything can; one with a <see cref="Minimum"/>

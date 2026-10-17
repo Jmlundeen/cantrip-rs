@@ -353,6 +353,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   last was there (CR 608.2h): `Expedition Map (tapped)` when it was tapped as it left. A tap the history records only after
   the permanent had left does not count (CR 701.26a), which is how a cost that taps and moves its source shows it paid the tap
   first (CR 602.2b, 601.2h)
+- `Prevented` (with `.Count`): every prevention of damage (CR 615.6), in the order the history recorded it: how much, its source,
+  whom it would have been dealt to and whose prevention effect it was, `3 Lightning Bolt > Bot1 by Healing Salve` (protection's is
+  the protected permanent's, or the source of a player's protection). Absent until damage has been prevented
 - `Exile` lists a card exiled face down as `(face down)` (CR 406.3), and `Exile.FaceDown` says what those cards are (the dump sees
   everything; a player's view does not)
 - `BotN.Life`, `.Poison`, `.Energy`, `.Status` (`Lost`, once the player has lost the game and absent until then), `.Mana` (`{U}{U}`), `.LandsPlayed`
