@@ -1,0 +1,44 @@
+# Mode two: "Return target Cave card from your graveyard to the battlefield tapped." Bot1's graveyard holds Fabled Passage (a land, not a Cave - turn 1, sacrificed
+# for a Forest) and Promising Vein (a Cave - turn 3, sacrificed with a Mox Jet's {1} for another Forest). Glimpse the Core cannot target the Passage (the refusal)
+# and returns the Vein (the positive control), tapped. The Passage stays in the graveyard.
+
+[Bot1 Deck]
+Fabled Passage
+Mox Emerald
+Mox Jet
+Mox Ruby
+Glimpse the Core
+Promising Vein
+Island
+Forest
+Forest
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Hand.Promising Vein.Play
+Bot1.Battlefield.Promising Vein.Activate(Ability: Search)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Forest)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glimpse the Core.Cast
+Bot1.Modes(2)
+! Bot1.Target(Fabled Passage)
+Bot1.Target(Promising Vein)
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Glimpse the Core; Fabled Passage
+Bot1.Battlefield = Forest; Forest; Promising Vein; Mox Emerald; Mox Jet; Mox Ruby
+Bot1.Battlefield.Promising Vein.Tapped = true

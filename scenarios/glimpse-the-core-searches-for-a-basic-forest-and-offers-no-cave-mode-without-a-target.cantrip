@@ -1,0 +1,40 @@
+# Mode one: "Search your library for a basic Forest card, put that card onto the battlefield tapped, then shuffle." Bot1's library holds a Mountain (basic, not a
+# Forest), a Taiga (a Forest, but not basic) and a Forest: only the Forest may be found (refusals for the first two). It arrives tapped. Bot1's graveyard holds no
+# Cave card, so the second mode has no target and cannot be chosen (`! Modes(2)`); the first is the positive control.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Glimpse the Core
+Island
+Island
+Island
+Mountain
+Taiga
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glimpse the Core.Cast
+! Bot1.Modes(2)
+Bot1.Modes(1)
+! Bot1.Search(Mountain)
+! Bot1.Search(Taiga)
+Bot1.Search(Forest)
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Glimpse the Core
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet
+Bot1.Battlefield.Forest#1.Tapped = false
+Bot1.Battlefield.Forest#2.Tapped = true
+Bot1.Library.Count = 12
