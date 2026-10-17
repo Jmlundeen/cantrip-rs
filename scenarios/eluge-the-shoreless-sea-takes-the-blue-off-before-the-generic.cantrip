@@ -1,0 +1,42 @@
+# Eluge, the Shoreless Sea's reduction is {U} for each flooded land: the {U} of the cost comes off first, and only what is left
+# over reduces generic mana (CR 118.7b-c; ruling 2024-07-26, Season of Weaving). Turn 3: Eluge (Black Lotus and an Island) floods
+# Bot1's Plains. Turn 5: Time Walk ({1}{U}) is the first sorcery of the turn and costs {1}, which the Mountain played that turn
+# pays with {R} - had the {1} come off instead, it would cost {U}, which {R} cannot pay. The Island and the Plains are not
+# tapped.
+
+[Bot1 Deck]
+Island
+Plains
+Black Lotus
+Eluge, the Shoreless Sea
+Time Walk
+Mountain
+Island
+Island x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Plains)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Time Walk.Cast
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana =
+
+[Expect]
+Bot1.Graveyard = Time Walk; Black Lotus
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Island.Tapped = false
+Bot1.Battlefield.Plains.Tapped = false
+Bot1.Battlefield.Plains.Subtypes = Island; Plains

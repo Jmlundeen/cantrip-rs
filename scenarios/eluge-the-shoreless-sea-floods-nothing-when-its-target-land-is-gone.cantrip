@@ -1,0 +1,46 @@
+# Eluge, the Shoreless Sea's trigger does nothing when its only target is gone as it resolves (CR 608.2b): no flood counter is put
+# anywhere and nothing becomes an Island. Turn 3: Eluge (Black Lotus and an Island) enters and targets Bot2's Strip Mine; Bot2
+# answers by sacrificing the Strip Mine to destroy Bot1's Mountain. The trigger finds its target gone: Bot1's Island has no flood
+# counter and Eluge is 1/1, counting the one Island.
+
+[Bot1 Deck]
+Island
+Mountain
+Black Lotus
+Eluge, the Shoreless Sea
+Island x16
+
+[Bot2 Deck]
+Strip Mine
+Mountain x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Strip Mine)
+Bot1.Pass
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Mountain; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Strip Mine
+Bot1.Graveyard = Mountain; Black Lotus
+Bot1.Battlefield = Eluge, the Shoreless Sea; Island
+Bot1.Battlefield.Island.Subtypes = Island
+Bot1.Battlefield.Island.Counters.Flood = (absent)
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 1
+Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 1

@@ -1,0 +1,80 @@
+# Eluge, the Shoreless Sea: "It's an Island in addition to its other types for as long as it has a flood counter on it" ends when
+# the counter is removed (CR 611.2b), and a new flood counter from Eluge's next trigger makes it an Island again by a new effect.
+# Turn 3: Eluge (Black Lotus and an Island) floods Bot1's Mountain and is 2/2. Turn 4: Bot2's Vampire Hexmage (its own Black
+# Lotus) is sacrificed to remove all counters from the Mountain: it is only a Mountain again and Eluge is 1/1.
+# Turn 5: the first instant of the turn, Brainstorm, gets no reduction - no land Bot1 controls has a flood counter - so an Island
+# pays its {U}, and no mana is left over. Eluge attacks and floods the Mountain again: an Island again, Eluge 3/3 (two Islands and
+# the Mountain). The second Brainstorm is not the first instant or sorcery spell of the turn, so it costs its full {U}, which the
+# Mountain pays as an Island, again with nothing left over. Bot2 takes 3.
+
+[Bot1 Deck]
+Island
+Mountain
+Black Lotus
+Eluge, the Shoreless Sea
+Brainstorm
+Brainstorm
+Island
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Vampire Hexmage
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Mountain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mountain.Subtypes = Island; Mountain
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 2
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Vampire Hexmage.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Mountain)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mountain.Subtypes = Mountain
+? Bot1.Battlefield.Mountain.Counters.Flood = (absent)
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 1
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 1
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot1.Attack(Eluge, the Shoreless Sea > Bot2)
+Bot1.Target(Mountain)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mountain.Subtypes = Island; Mountain
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Mountain.Activate(Ability: {U})
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mountain.Subtypes = Island; Mountain
+Bot1.Battlefield.Mountain.Counters.Flood = 1
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 3
+Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 3
+Bot1.Graveyard = Brainstorm; Brainstorm; Black Lotus
+Bot2.Life = 17
