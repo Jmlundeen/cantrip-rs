@@ -1,0 +1,53 @@
+# Chromatic Lantern, then Blood Moon. "Lands you control have '{T}: Add one mana of any color.'" is a layer-6 effect (CR
+# 613.1f); Blood Moon's is layer 4 (CR 613.1d), and the layers apply in order whatever the timestamps (CR 613.1), so the
+# Lantern's grant comes after the Moon has taken the abilities of Mutavault's rules text - and CR 305.7 "doesn't remove any
+# abilities that were granted to the land by other effects". Under the Moon Mutavault has "{T}: Add {R}" and the Lantern's
+# ability, which makes {U}, and no "{T}: Add {C}". The Lantern's own "{T}: Add one mana of any color." makes {G}. Bot2's
+# Island is not a land Bot1 controls: it has no such ability (the refusal of a color it cannot make).
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Jet
+Mox Pearl
+Chromatic Lantern
+Blood Moon
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Chromatic Lantern.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+! Bot2.Battlefield.Island.Activate(Color: Green)
+[T3 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Battlefield.Mutavault.Activate(Ability: any color; Color: Blue)
+Bot1.Battlefield.Chromatic Lantern.Activate(Color: Green)
+? Bot1.Mana = {U}{G}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mutavault.Subtypes = Mountain
+Bot1.Battlefield.Mutavault.Tapped = true
+Bot1.Battlefield.Chromatic Lantern.Tapped = true

@@ -1,0 +1,6 @@
+{
+  "name": "Chromatic Lantern",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "Lands you control have \"{T}: Add one mana of any color.\"\n{T}: Add one mana of any color."
+}
