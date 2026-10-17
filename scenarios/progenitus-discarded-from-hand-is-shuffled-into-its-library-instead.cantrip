@@ -1,0 +1,28 @@
+# Progenitus's replacement works "from anywhere" (CR 113.6b, 614.1a): discarded from Bot1's hand to its maximum hand size at
+# turn 3's cleanup (CR 514.1), it is revealed and shuffled into Bot1's library instead of reaching the graveyard.
+
+[Bot1 Deck]
+Progenitus
+Island
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Discard(Progenitus)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 7
+Bot1.Revealed = Progenitus
+Bot1.Library.Count = 10

@@ -1,0 +1,52 @@
+# Protection from everything stops targeting, damage, blocking and attaching (CR 702.16b-e, the ruling), not an effect that
+# does none of those: Wrath of God destroys Progenitus (CR 701.8). "If Progenitus would be put into a graveyard from anywhere,
+# reveal Progenitus and shuffle it into its owner's library instead" (CR 614.1a, 701.20a, 701.24a) then sends it to Bot1's
+# library, revealed. Bot1 puts it onto the battlefield on turn 1 with Natural Order; Bot2 casts Wrath on turn 2.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Natural Order
+Island
+Island
+Progenitus
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Wrath of God
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Natural Order.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Progenitus)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Progenitus.Power = 10
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Wrath of God.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald
+Bot1.Graveyard = Natural Order; Llanowar Elves; Black Lotus
+Bot1.Revealed = Progenitus
+Bot1.Library.Count = 11

@@ -1,0 +1,80 @@
+# Progenitus's protection from everything (CR 702.16e, "DEBT", the ruling), each part beside its positive control:
+# - it can't be targeted (702.16b): Bot2 can't bolt it, but bolts Bot1;
+# - it can't be blocked (702.16f): Dragon Sniper (reach) can't block it, but blocks Ornithopter, killing it with deathtouch,
+#   while Progenitus deals Bot2 10;
+# - it can't be enchanted (702.16c): Bot1 can't cast Rancor on it, but casts it on Bot2's Dragon Sniper ("enchant creature");
+# - damage to it is prevented (702.16d): Pyroclasm's 2 is prevented and recorded as prevented by Progenitus, while the Sniper
+#   dies, and Rancor returns to its owner's hand (its own trigger).
+# Natural Order puts Progenitus onto the battlefield on turn 1.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Natural Order
+Ornithopter
+Rancor
+Progenitus
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Emerald
+Mox Ruby
+Dragon Sniper
+Lightning Bolt
+Pyroclasm
+Island
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Natural Order.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Progenitus)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Dragon Sniper.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Progenitus)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Progenitus > Bot2; Ornithopter > Bot2)
+! Bot2.Block(Dragon Sniper > Progenitus)
+Bot2.Block(Dragon Sniper > Ornithopter)
+[T3 Bot1.Main2]
+! Bot1.Hand.Rancor.Cast(Bot1.Battlefield.Progenitus)
+Bot1.Hand.Rancor.Cast(Bot2.Battlefield.Dragon Sniper)
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Dragon Sniper.Power = 3
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 10
+Bot1.Battlefield.Progenitus.Damage = 0
+Prevented = 2 Pyroclasm > Progenitus by Progenitus
+Bot1.Hand = Rancor; Island
+Bot2.Graveyard = Dragon Sniper; Pyroclasm; Lightning Bolt
