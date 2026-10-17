@@ -1,0 +1,64 @@
+# Eddymurk Crab: Flash, "This creature enters tapped if it's not your turn", "When this creature enters, tap up to two target creatures."
+# On turn 1 Bot1 casts one Lightning Bolt (so the Crab costs {1} less: {4}{U}{U} = six, exactly the six blue mana of two Mox Sapphires, an Island
+# and a Black Lotus). On Bot2's turn 2, after Bot2 has cast two Llanowar Elves and an Ornithopter, Bot1 flashes the Crab in: it is not Bot1's turn, so it
+# enters tapped (CR 614.1c), and its trigger taps two of the three creatures - three cannot be chosen (up to two) - leaving the third untapped.
+# (The control, where it is Bot1's own turn and the Crab enters untapped, is the neighbouring scenario.)
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Lightning Bolt
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Eddymurk Crab
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Ornithopter
+Island
+Island
+Forest x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eddymurk Crab.Cast
+Bot1.Pass
+! Bot1.Target(Llanowar Elves#1; Llanowar Elves#2; Ornithopter)
+Bot1.Target(Llanowar Elves#1; Llanowar Elves#2)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Eddymurk Crab.Tapped = true
+Bot2.Battlefield.Llanowar Elves#1.Tapped = true
+Bot2.Battlefield.Llanowar Elves#2.Tapped = true
+Bot2.Battlefield.Ornithopter.Tapped = false
+Bot1.Mana =

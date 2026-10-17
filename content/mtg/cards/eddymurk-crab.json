@@ -1,0 +1,11 @@
+{
+  "name": "Eddymurk Crab",
+  "manaCost": "{5}{U}{U}",
+  "type": "Creature — Elemental Crab",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flash\nThis spell costs {1} less to cast for each instant and sorcery card in your graveyard.\nThis creature enters tapped if it's not your turn.\nWhen this creature enters, tap up to two target creatures.",
+  "keywords": [
+    "Flash"
+  ]
+}
