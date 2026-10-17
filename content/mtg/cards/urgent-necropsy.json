@@ -1,0 +1,6 @@
+{
+  "name": "Urgent Necropsy",
+  "manaCost": "{2}{B}{G}",
+  "type": "Instant",
+  "oracleText": "As an additional cost to cast this spell, collect evidence X, where X is the total mana value of the permanents this spell targets. (To collect evidence X, exile cards with total mana value X or more from your graveyard.)\nDestroy up to one target artifact, up to one target creature, up to one target enchantment, and up to one target planeswalker."
+}

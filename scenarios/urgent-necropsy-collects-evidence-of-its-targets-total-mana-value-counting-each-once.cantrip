@@ -1,0 +1,61 @@
+# Urgent Necropsy: "As an additional cost to cast this spell, collect evidence X, where X is the total mana value of the
+# permanents this spell targets." X is worked out once the targets are chosen (CR 601.2c, 601.2f), and a permanent counts once
+# however many slots chose it: Bot2's Haywire Mite (an artifact creature, mana value 1) is its target artifact and its target
+# creature, Goblin Bombardment (2) its target enchantment, no planeswalker - X is 3, not 4. Bot1's graveyard holds three
+# Lightning Bolts (3 in all) and the Black Lotus that paid (0): the Bolts are exiled as evidence, which would not be enough
+# for 4. Both targets are destroyed together, the Mite once though it was targeted twice (its death gives Bot2 2 life, once).
+
+[Bot1 Deck]
+Mountain
+Lightning Bolt
+Forest
+Lightning Bolt
+Mountain
+Lightning Bolt
+Black Lotus
+Urgent Necropsy
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Goblin Bombardment
+Haywire Mite
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Goblin Bombardment.Cast
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Urgent Necropsy.Cast
+Bot1.Target(Haywire Mite)
+Bot1.Target(Haywire Mite)
+Bot1.Target(Goblin Bombardment)
+Bot1.Choose(Lightning Bolt; Lightning Bolt; Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Goblin Bombardment; Haywire Mite; Black Lotus
+Exile = Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Graveyard = Urgent Necropsy; Black Lotus
+Bot2.Life = 13
