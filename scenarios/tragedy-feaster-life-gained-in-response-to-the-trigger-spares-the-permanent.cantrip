@@ -1,0 +1,39 @@
+# The ruling: "Tragedy Feaster's infusion ability will trigger regardless of whether you've gained life this turn. As the ability resolves, it will check." Bot1 gains no life before its end
+# step, so the ability triggers and goes on the stack; in response Bot1 casts Lightning Helix (gaining 3), and the ability resolves sacrificing nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Tragedy Feaster
+Lightning Helix
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tragedy Feaster.Cast
+[T1 Bot1.End]
+? Stack = Tragedy Feaster
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+
+[Expect]
+Turn = 2
+Bot1.Life = 23
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Tragedy Feaster

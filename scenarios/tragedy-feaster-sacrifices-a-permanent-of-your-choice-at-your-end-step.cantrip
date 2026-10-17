@@ -1,0 +1,34 @@
+# "At the beginning of your end step, sacrifice a permanent unless you gained life this turn": Bot1 gained no life, so at its end step it sacrifices a permanent of its choice - not
+# necessarily Tragedy Feaster: it chooses Mox Pearl and the 7/6 stays. The Feaster has trample (a keyword of the card).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Black Lotus
+Tragedy Feaster
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tragedy Feaster.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Pearl)
+[T2 Bot2.Upkeep]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield = Mox Jet; Tragedy Feaster
+Bot1.Graveyard = Mox Pearl; Black Lotus
+Bot1.Battlefield.Tragedy Feaster.Keywords = Trample
+Bot1.Battlefield.Tragedy Feaster.Power = 7

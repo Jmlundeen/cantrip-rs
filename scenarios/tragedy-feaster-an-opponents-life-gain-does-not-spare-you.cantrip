@@ -1,0 +1,47 @@
+# "Unless you gained life this turn": Bot2's life gain is not Bot1's. On turn 3, with Bot1's end-step ability on the stack, Bot2 casts Lightning Helix at Bot1 and gains 3 life; Bot1 still has
+# to sacrifice a permanent (Mox Jet). On turn 1 Bot1's own ability had taken Mox Pearl.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Black Lotus
+Tragedy Feaster
+Swamp x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Lightning Helix
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tragedy Feaster.Cast
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.End]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Jet)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Life = 17
+Bot2.Life = 23
+Bot1.Battlefield = Tragedy Feaster
+Bot1.Graveyard = Mox Jet; Mox Pearl; Black Lotus

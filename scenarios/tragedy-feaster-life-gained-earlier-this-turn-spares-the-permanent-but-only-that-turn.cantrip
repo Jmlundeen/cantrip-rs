@@ -1,0 +1,42 @@
+# "Sacrifice a permanent unless you gained life this turn": on turn 1 Bot1 gains 3 life with Lightning Helix (aimed at Bot2) before its end step, so the end-step ability sacrifices nothing - and
+# asks nothing (`! Bot1.Choose`). On turn 3 it gains no life, and the ability makes it sacrifice a permanent: life gained on an earlier turn does not count.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Tragedy Feaster
+Lightning Helix
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tragedy Feaster.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Ruby)
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield = Mox Jet; Mox Pearl; Tragedy Feaster
+Bot1.Graveyard = Mox Ruby; Lightning Helix; Black Lotus

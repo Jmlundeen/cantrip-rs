@@ -1,0 +1,39 @@
+# Ward - Discard a card (CR 702.21a). Bot1's Tragedy Feaster (turn 1; the end-step sacrifice takes Mox Pearl). On turn 2 Bot2 Lightning Bolts it: the first time Bot2 declines to discard and the
+# Bolt is countered (the Feaster has no damage); the control is the next scenario, in which Bot2 discards and the Bolt resolves.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Black Lotus
+Tragedy Feaster
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tragedy Feaster.Cast
+[T1 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mox Pearl)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Tragedy Feaster)
+Bot2.Decline
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Mox Jet; Tragedy Feaster
+Bot1.Battlefield.Tragedy Feaster.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
