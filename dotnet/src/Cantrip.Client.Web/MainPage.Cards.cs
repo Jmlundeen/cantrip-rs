@@ -583,6 +583,7 @@ public sealed partial class MainPage
         Filter = option.Filter,
         Effect = option.Effect,
         SpendSubtypes = option.SpendSubtypes,
+        SpendManaValue = option.SpendManaValue,
     };
 
     private void Send(GameClient client, AnswerPayload answer)

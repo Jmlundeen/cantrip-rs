@@ -139,13 +139,15 @@ public sealed class CardActions
 
     /// <summary>
     /// The offer to put one mana of this kind towards the spell, or null when none is free. Mana restricted to spells of
-    /// some subtypes is told apart by them too: Dragon mana and Elf mana are different mana (CR 106.6).
+    /// some subtypes is told apart by them too: Dragon mana and Elf mana are different mana (CR 106.6); and mana for spells
+    /// of a mana value or greater by that mana value.
     /// </summary>
-    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null) =>
+    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null, int manaValue = 0) =>
         Assignable.FirstOrDefault(option =>
             option.Produces.Count == 1 && option.Produces[0] == type
             && option.Filter == filter && option.Effect == effect
-            && option.SpendSubtypes.SequenceEqual(subtypes ?? []));
+            && option.SpendSubtypes.SequenceEqual(subtypes ?? [])
+            && option.SpendManaValue == manaValue);
 
     public IReadOnlyList<ActionOptionMessage> For(ViewHandle handle) =>
         _bySource.TryGetValue(handle.Value, out List<ActionOptionMessage>? options) ? options : None;
@@ -242,7 +244,7 @@ public sealed class CardActions
                 {
                     notes.Add(option.Filter == ManaSpendFilterView.NotNonartifactSpells
                         ? "can't be spent on nonartifact spells"
-                        : $"only for {Restricted(option.Filter, option.SpendSubtypes)}");
+                        : $"only for {Restricted(option.Filter, option.SpendSubtypes, option.SpendManaValue)}");
                 }
 
                 if (option.Effect == ManaSpendEffectView.GainsHaste)
@@ -567,10 +569,14 @@ public sealed class CardActions
 
     /// <summary>
     /// What restricted mana may be spent on, as a phrase. <paramref name="subtypes"/> are those a subtype filter names:
-    /// "Dragon or Omen spells", "Elf creature spells".
+    /// "Dragon or Omen spells", "Elf creature spells". <paramref name="manaValue"/> is the least mana value a mana value
+    /// filter names: "spells with mana value 4 or greater".
     /// </summary>
-    public static string Restricted(ManaSpendFilterView filter, IReadOnlyList<string>? subtypes = null) => filter switch
+    public static string Restricted(ManaSpendFilterView filter, IReadOnlyList<string>? subtypes = null, int manaValue = 0) => filter switch
     {
+        ManaSpendFilterView.NoncreatureSpells => "noncreature spells",
+        ManaSpendFilterView.ManaValueSpells => $"spells with mana value {manaValue} or greater",
+        ManaSpendFilterView.ManaValueOrXSpells => $"spells with mana value {manaValue} or greater or with {{X}} in their mana costs",
         ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells when subtypes is not { Count: > 0 } =>
             "spells of a chosen type, and no type was chosen",
         ManaSpendFilterView.SubtypeSpells => $"{Subtypes(subtypes)} spells",

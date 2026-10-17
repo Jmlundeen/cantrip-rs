@@ -393,8 +393,11 @@ public sealed class Decisions
 
         return One(new Question
         {
-            Heading = $"You are casting {spell}. How large is X?",
-            Note = prompt.XPaidInLife
+            Heading = prompt.XRemovesLoyalty ? $"You are activating −X of {spell}. How large is X?" : $"You are casting {spell}. How large is X?",
+            Note = prompt.XRemovesLoyalty
+                ? "X loyalty counters come off it. It has " + reach.ToString(CultureInfo.InvariantCulture)
+                    + "; at 0 loyalty it is put into the graveyard."
+                : prompt.XPaidInLife
                 ? "X is paid in life. You can pay up to X = " + reach.ToString(CultureInfo.InvariantCulture)
                     + " and still be alive; every point of X is a point of life gone."
                 : "Your mana will stretch to X = " + reach.ToString(CultureInfo.InvariantCulture)

@@ -529,7 +529,7 @@ public sealed partial class MainPage
         {
             if (player.Mana[type] > 0)
             {
-                chips.Add(Chip((ManaTypeView)type, ManaSpendFilterView.None, ManaSpendEffectView.None, [], player.Mana[type], null, null));
+                chips.Add(Chip((ManaTypeView)type, ManaSpendFilterView.None, ManaSpendEffectView.None, [], 0, player.Mana[type], null, null));
             }
         }
 
@@ -540,9 +540,10 @@ public sealed partial class MainPage
                 restricted.Filter,
                 restricted.Effect,
                 restricted.SpendSubtypes,
+                restricted.SpendManaValue,
                 restricted.Amount,
-                RestrictionCaption(restricted.Filter, restricted.Effect, restricted.SpendSubtypes),
-                RestrictionTooltip(restricted.Filter, restricted.Effect, restricted.SpendSubtypes)));
+                RestrictionCaption(restricted.Filter, restricted.Effect, restricted.SpendSubtypes, restricted.SpendManaValue),
+                RestrictionTooltip(restricted.Filter, restricted.Effect, restricted.SpendSubtypes, restricted.SpendManaValue)));
         }
 
         // The player's own mana abilities (CR 611.2a), which no card on the table offers: beside the pool they add to,
@@ -570,7 +571,7 @@ public sealed partial class MainPage
 
         return chips;
 
-        PlayerRail.ManaChipSpec Chip(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int count, string? caption, string? tooltip)
+        PlayerRail.ManaChipSpec Chip(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue, int count, string? caption, string? tooltip)
         {
             if (paying is null)
             {
@@ -578,13 +579,13 @@ public sealed partial class MainPage
             }
 
             int committed = paying.Committed
-                .Where(c => c.Type == type && c.Filter == filter && c.Effect == effect && c.SpendSubtypes.SequenceEqual(subtypes))
+                .Where(c => c.Type == type && c.Filter == filter && c.Effect == effect && c.SpendSubtypes.SequenceEqual(subtypes) && c.SpendManaValue == manaValue)
                 .Sum(c => c.Amount);
 
             string spokenFor = committed == 0 ? string.Empty : $"{committed} to spell";
             string full = caption is null ? spokenFor : spokenFor.Length == 0 ? caption : $"{caption} · {spokenFor}";
 
-            if (_actions.AssignFor(type, filter, effect, subtypes) is not { } assign)
+            if (_actions.AssignFor(type, filter, effect, subtypes, manaValue) is not { } assign)
             {
                 return new PlayerRail.ManaChipSpec(type, count, full.Length == 0 ? null : full, tooltip, null);
             }
@@ -597,8 +598,11 @@ public sealed partial class MainPage
         }
     }
 
-    private static string RestrictionCaption(ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes) => (filter, effect) switch
+    private static string RestrictionCaption(ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue) => (filter, effect) switch
     {
+        (ManaSpendFilterView.NoncreatureSpells, _) => "noncreature spells",
+        (ManaSpendFilterView.ManaValueSpells, _) => $"mana value {manaValue}+",
+        (ManaSpendFilterView.ManaValueOrXSpells, _) => $"mana value {manaValue}+ or X",
         (ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells, _) when subtypes.Count == 0 => "no type chosen",
         (ManaSpendFilterView.SubtypeSpells, ManaSpendEffectView.CantBeCountered) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells · uncounterable",
         (ManaSpendFilterView.SubtypeSpells, _) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells",
@@ -618,10 +622,14 @@ public sealed partial class MainPage
         _ => "restricted",
     };
 
-    private static string RestrictionTooltip(ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes)
+    private static string RestrictionTooltip(ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue)
     {
         string text = filter switch
         {
+            ManaSpendFilterView.NoncreatureSpells => "Spend this mana only to cast a noncreature spell.",
+            ManaSpendFilterView.ManaValueSpells => $"Spend this mana only to cast spells with mana value {manaValue} or greater.",
+            ManaSpendFilterView.ManaValueOrXSpells =>
+                $"Spend this mana only to cast spells with mana value {manaValue} or greater or spells with {{X}} in their mana costs.",
             ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells when subtypes.Count == 0 =>
                 "Spend this mana only to cast a spell of the chosen type. No type was chosen, so it can't be spent on any spell.",
             ManaSpendFilterView.SubtypeSpells => $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} spells.",

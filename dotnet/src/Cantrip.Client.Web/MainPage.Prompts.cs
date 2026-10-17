@@ -444,6 +444,30 @@ public sealed partial class MainPage
     /// <summary>The announcement (CR 601.2b): X, or how many times to kick, chosen before the targets and before anything is paid.</summary>
     private void FillAnnouncement(GameClient client, PayCostsPromptMessage prompt, string name)
     {
+        // A "−X" loyalty cost (CR 606.4, 107.3): X loyalty counters come off the permanent, up to its loyalty; no mana.
+        if (prompt.XRemovesLoyalty)
+        {
+            Prompt(
+                $"Choose X for {name}",
+                $"−X removes X loyalty counters  ·  {name} has {prompt.MostAffordable}  ·  targets come next");
+
+            if (_actions.Confirm is { } activate)
+            {
+                _pass = () => Send(client, AnswerFor(activate));
+                AddButton("Okay", () => Send(client, AnswerFor(activate)), primary: true).Tooltip =
+                    $"Activate with X = {prompt.X}, removing {prompt.X} loyalty" + Suffix(PassKey);
+            }
+
+            AddXStepper(client, prompt);
+
+            if (_actions.Cancel is { } back)
+            {
+                AddCancelButton(() => Send(client, AnswerFor(back)));
+            }
+
+            return;
+        }
+
         bool kicker = prompt.Kicker.Length > 0;
         string reach = prompt.MostAffordable < 0
             ? "not enough mana for it"

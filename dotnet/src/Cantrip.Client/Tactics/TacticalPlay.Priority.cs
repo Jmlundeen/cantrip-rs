@@ -2040,7 +2040,7 @@ public sealed partial class TacticalPlay
 
         // X is announced before anything is paid (CR 601.2b), at what the mana reaches: not counting the mana that
         // would cost the last of its life, which the payment will not take.
-        if (prompt.AnnouncesXOrKicks && prompt.Kicker.Length == 0 && !prompt.XPaidInLife && client.View is { } announcing
+        if (prompt.AnnouncesXOrKicks && prompt.Kicker.Length == 0 && !prompt.XPaidInLife && !prompt.XRemovesLoyalty && client.View is { } announcing
             && LethalMana(client, announcing) is > 0 and int lethal)
         {
             // Nothing left to announce for a spell that was worth casting for its X: it is given up, the card kept.

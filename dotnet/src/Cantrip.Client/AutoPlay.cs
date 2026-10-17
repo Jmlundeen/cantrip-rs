@@ -464,6 +464,13 @@ public static class AutoPlay
         ArgumentNullException.ThrowIfNull(prompt);
 
         int most = Math.Max(0, prompt.MostAffordable);
+
+        // A "−X" loyalty cost: as much as leaves the planeswalker one loyalty, so it stays on the battlefield.
+        if (prompt.XRemovesLoyalty)
+        {
+            return Math.Max(0, most - 1);
+        }
+
         return prompt.XPaidInLife ? most / 2 : most;
     }
 
@@ -646,6 +653,7 @@ public static class AutoPlay
         Filter = option.Filter,
         Effect = option.Effect,
         SpendSubtypes = option.SpendSubtypes,
+        SpendManaValue = option.SpendManaValue,
     };
 
     /// <summary>
