@@ -1,0 +1,48 @@
+# Warp {2}{G} (CR 702.185a): on turn 1 Bot1 casts the Harmonizer from its hand for three mana, plays a Forest (landfall doubles it
+# to 8 power while it is there), and at the beginning of the next end step it is exiled. On turn 3 it is cast from exile for its
+# mana cost (four Mox Emeralds, "on a later turn"), and a second Forest doubles it again to 8. Exile is empty at the end.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mightform Harmonizer
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Mightform Harmonizer.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mightform Harmonizer.Power = 8
+[T3 Bot1.Main1]
+? Exile = Mightform Harmonizer
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Exile.Mightform Harmonizer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mightform Harmonizer.Power = 8
+Exile =

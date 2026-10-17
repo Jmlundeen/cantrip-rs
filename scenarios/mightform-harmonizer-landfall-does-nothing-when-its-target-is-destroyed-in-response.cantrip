@@ -1,0 +1,55 @@
+# The landfall target is checked as the ability resolves (CR 608.2b): Bot1's Forest on turn 3 targets the Harmonizer, Bot2 destroys
+# it in response with Get Lost, and the ability does nothing - Hercules, Prince of Power, which was not the target, stays a 3/3
+# (the Harmonizer did not double anything, and the doubling is not redirected). Bot1 gets two Map tokens from Get Lost.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mightform Harmonizer
+Hercules, Prince of Power
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Get Lost
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Mightform Harmonizer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+Bot1.Target(Mightform Harmonizer)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Get Lost.Cast(Mightform Harmonizer)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Mightform Harmonizer
+Bot1.Battlefield.Hercules, Prince of Power.Power = 3
+Bot1.Battlefield.Map Token#1.Token = true

@@ -1,0 +1,55 @@
+# The target is "creature you control", any of them: on turn 3 Bot1's Forest doubles Hercules, Prince of Power (3 -> 6), not the
+# Harmonizer (still 4). Bot2's Elvish Mystic is refused as a target (beside the legal Hercules, the positive control). Bot2's own
+# Island entering on turn 2 triggers nothing ("a land you control"): the stack is empty after it and Bot1's creatures are
+# unchanged.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mightform Harmonizer
+Hercules, Prince of Power
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Mightform Harmonizer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+? Bot1.Battlefield.Mightform Harmonizer.Power = 4
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Forest.Play
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Hercules, Prince of Power.Power = 6
+Bot1.Battlefield.Hercules, Prince of Power.Toughness = 3
+Bot1.Battlefield.Mightform Harmonizer.Power = 4
+Bot2.Battlefield.Elvish Mystic.Power = 1

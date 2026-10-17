@@ -1,0 +1,49 @@
+# Landfall - Whenever a land you control enters, double the power of target creature you control until end of turn (CR 701.10b-c).
+# Bot1 casts Mightform Harmonizer (4/4) with four Mox Emeralds, then plays Wooded Foothills: that land entering doubles the
+# Harmonizer to 8; cracking the Foothills puts a Forest onto the battlefield, a second land entering, which doubles it again to
+# 16, the power it has as the second ability resolves. Toughness is untouched. It lasts through the turn (checked in the
+# second main phase) and ends at cleanup: on turn 3 it is a 4/4 again.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mightform Harmonizer
+Wooded Foothills
+Island
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Mightform Harmonizer.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mightform Harmonizer.Power = 4
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mightform Harmonizer.Power = 8
+Bot1.Battlefield.Wooded Foothills.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Mightform Harmonizer.Power = 16
+? Bot1.Battlefield.Mightform Harmonizer.Toughness = 4
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Mightform Harmonizer.Power = 4
+Bot1.Battlefield.Mightform Harmonizer.Toughness = 4
+Bot1.Battlefield.Forest.Tapped = false
