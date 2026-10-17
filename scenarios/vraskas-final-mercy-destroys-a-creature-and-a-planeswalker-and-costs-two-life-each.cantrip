@@ -1,0 +1,49 @@
+# Vraska's Final Mercy, first mode: "You lose 2 life. Destroy target creature or planeswalker." Cast twice in turn 3 (Black Lotus's
+# three black and a Mox Jet pay {B}{B} twice): first at Bot2's Ornithopter, then at Bot2's Liliana of the Veil. Both die
+# (CR 701.8, 704.5i) and Bot1 loses 2 life each time, ending at 16. A refusal of both modes at once (Modes(1; 2)) sits
+# beside the single mode chosen, since the card says "choose one".
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Vraska's Final Mercy
+Vraska's Final Mercy
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vraska's Final Mercy.Cast
+! Bot1.Modes(1; 2)
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 18
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vraska's Final Mercy.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 16
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Liliana of the Veil; Ornithopter; Black Lotus
+Bot1.Graveyard = Vraska's Final Mercy; Vraska's Final Mercy; Black Lotus

@@ -1,0 +1,37 @@
+# CR 608.2b: Vraska's Final Mercy chose the destroy mode and targets Bot2's Ornithopter, which Bot2 kills in response with its
+# own Lightning Bolt. The spell's only target is illegal as it tries to resolve, so it does not resolve at all: the "You lose
+# 2 life" half does not happen either, and Bot1 stays at 20. The Mercy is in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Vraska's Final Mercy
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vraska's Final Mercy.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Vraska's Final Mercy; Black Lotus
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Stack.Count = 0

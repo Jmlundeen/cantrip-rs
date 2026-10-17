@@ -1,0 +1,6 @@
+{
+  "name": "Vraska's Final Mercy",
+  "manaCost": "{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Choose one —\n• You lose 2 life. Destroy target creature or planeswalker.\n• You lose 2 life. Empower Jace 6. (Put six loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with \"[−1]: Surveil 1\" and \"[−3]: Draw a card.\")"
+}
