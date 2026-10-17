@@ -35,6 +35,7 @@ Bot2.Pass
 ? Exile.Count = 1
 ? Client.Bot1.OpponentExile.(hidden).Annotation = Playable while it stays here
 ? Client.Bot1.OpponentExile.(hidden).TypeLine =
+? Client.Bot1.OpponentExile.(hidden).FaceDownName = Lightning Helix
 Bot1.Battlefield.Mox Jet#4.Activate
 Bot1.Battlefield.Mox Jet#5.Activate
 Bot1.Exile.Lightning Helix.Cast(Bot2)

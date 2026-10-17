@@ -340,7 +340,8 @@ public sealed record CardState(
     string Status = "",
     string Annotation = "",
     string Counters = "",
-    string Damage = "");
+    string Damage = "",
+    string FaceDownName = "");
 
 /// <summary>A card named in a line of text - the game log, a draft's picks - where its name is, and whether it is in view.</summary>
 public sealed record MentionState(string Name, bool Visible, float X, float Y, float W, float H);

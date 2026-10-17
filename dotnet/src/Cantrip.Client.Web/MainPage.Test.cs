@@ -237,6 +237,8 @@ public sealed partial class MainPage
                     {
                         json.WriteStartObject();
                         json.WriteString("name", card.Known || card.FaceDown ? card.Name : string.Empty);
+                        // What a face-down card really is, to a seat that may look at it (CR 406.3): empty for one that may not.
+                        json.WriteString("faceDownName", card.FaceDownName);
                         json.WriteBoolean("visible", visible);
                         json.WriteString("row", row);
                         json.WriteString("place", place);

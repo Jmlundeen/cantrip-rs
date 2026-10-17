@@ -292,3 +292,43 @@ fn a_spell_being_announced_is_not_shown_to_the_opponent_until_it_is_cast() {
     assert!(announcing > 0, "Bot1 was never asked anything while the Bolt was being announced");
     assert!(cast > 0, "Bot2 never saw the Bolt on the stack once it was cast");
 }
+
+/// Outrageous Robbery (CR 406.3): "You may look at" the cards it exiles face down. Bot1, who looked, is told what the card is
+/// (`face_down_name`, `known`); Bot2, whose library it came out of and who never looked at it, is told nothing of it - no
+/// name, not known - though it is a card of Bot2's in Bot2's own exile.
+#[test]
+fn a_card_robbery_exiles_face_down_is_named_to_the_caster_and_not_to_its_owner() {
+    let name = "outrageous-robbery-in-the-browser-offers-the-caster-the-face-down-card-in-the-opponents-exile";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    let (mut caster_saw, mut owner_saw) = (0, 0);
+    for _ in 0..20_000 {
+        let caster = session.view(1).map_err(|r| r.detail).unwrap();
+        let owner = session.view(2).map_err(|r| r.detail).unwrap();
+        for object in caster.objects.iter().filter(|o| o.face_down) {
+            assert_eq!(object.face_down_name, "Lightning Helix", "the caster is not told what it looked at");
+            assert!(object.known && object.name.is_empty());
+            caster_saw += 1;
+        }
+        for object in owner.objects.iter().filter(|o| o.face_down) {
+            assert!(object.face_down_name.is_empty() && !object.known && object.name.is_empty(), "the owner is told what the card is: {:?}", object.face_down_name);
+            owner_saw += 1;
+        }
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true));
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    assert!(caster_saw > 0 && owner_saw > 0, "the scenario never showed both seats the face-down card");
+}

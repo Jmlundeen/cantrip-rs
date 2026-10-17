@@ -814,7 +814,7 @@ public sealed class ScenarioPlayer
     }
 
     private static readonly Regex CardKey = new(
-        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Counters|Damage)$",
+        @"^(?<row>Stack|Hand|Battlefield|OpponentBattlefield|Exile|OpponentExile|Graveyard)\.(?<card>.+)\.(?<attr>TypeLine|Rules|Status|Annotation|Counters|Damage|FaceDownName)$",
         RegexOptions.CultureInvariant);
 
     /// <summary>One thing a card's face says, with its lines on one line.</summary>
@@ -825,6 +825,7 @@ public sealed class ScenarioPlayer
         "Status" => card.Status,
         "Counters" => card.Counters,
         "Damage" => card.Damage,
+        "FaceDownName" => card.FaceDownName,
         _ => card.Annotation.ReplaceLineEndings(" / "),
     };
 
@@ -876,7 +877,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
 
     private string? Read(string what, TableState state)
     {
