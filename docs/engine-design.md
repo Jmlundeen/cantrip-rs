@@ -427,6 +427,8 @@ an ability activated or put on the stack, a copy put on the stack (CR 707.10) an
 once per distinct object or player, since one chosen for several instances of "target" (CR 115.3) becomes the target of that
 spell or ability once (CR 601.2c) - ward, Bonecrusher Giant and Pawpatch Recruit trigger once for it.
 
+A card put onto the battlefield transformed (CR 712.14a) enters with its back face up as one entry, `ops::put_onto_battlefield_as`: the counters the instruction gives it ("with a finality counter on it", CR 122.6, 614.1c) are on its `Entering` record with those the face it enters with gives it (a Saga back face's lore counter, CR 714.3a; a planeswalker's loyalty), so the replacements of counters put on a permanent apply to all of them at once and they are announced as it enters - chapter I triggers, and two lore counters from Innkeeper's Talent trigger I and II. `Game::put_onto_battlefield_transformed_with_counters` is Esper Origins's (and would be Ojer Pakpatiq, Deepest Epoch's, tapped with three time counters). A finality counter is the rules' replacement (CR 122.1h) in `ops::move_together`. The benchmark measured 6.75 and 6.88 us per decision before and 6.91 and 7.64 us after on a busy machine (2026-10-16): the path is only reached by the cards that put a card onto the battlefield transformed.
+
 A crime (CR 700.13) is `Event::CrimeCommitted { player, by }`, emitted by `ops::commit_crime` from the three procedures that
 choose targets for a new object - casting a spell (CR 601.2i), activating an ability (CR 602.2) and putting a triggered
 ability on the stack (CR 603.3d), the trigger's controller the criminal - after their `BecameTarget` events, once for the
