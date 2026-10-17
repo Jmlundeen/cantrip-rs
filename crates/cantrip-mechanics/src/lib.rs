@@ -642,11 +642,14 @@ pub fn surveil_into_graveyard(
 
 /// What "becomes a P/T [colors] [subtype] creature with [keywords]" makes of a permanent (CR 205.1b, 613.1). `colors`
 /// and `subtype` are `None` when the text names none ("becomes a 4/4 artifact creature"): the permanent keeps its own.
+/// "With all creature types" gives it every one besides (layer 4).
 pub struct Animation {
     pub power: i16,
     pub toughness: i16,
     pub colors: Option<ColorSet>,
     pub subtype: Option<Subtype>,
+    /// "with all creature types" (CR 205.3m): Mutavault, Soulstone Sanctuary.
+    pub all_creature_types: bool,
     pub keywords: Keywords,
     /// A triggered or activated ability the permanent is given for the duration (CR 613.1f), if the text gives one.
     pub ability: Option<AbilityRef>,
@@ -654,7 +657,7 @@ pub struct Animation {
 
 /// "[Until end of turn,] this land becomes a P/T [colors] [subtype] creature with [keywords]. It's still a land", for the
 /// `duration` the text gives (Great Hall of the Biblioplex has none: `Duration::Indefinite`): the creature type is added
-/// (layer 4) with its subtype, the colors replace its own (5), the keywords and the ability are granted (6) and the base
+/// (layer 4) with its subtype or all creature types, the colors replace its own (5), the keywords and the ability are granted (6) and the base
 /// power and toughness set (7b), so counters and pumps count on top. Celestial Colonnade and Creeping Tar Pit print it
 /// until end of turn, Firdoch Core names no colors or creature type and leaves those two out, and Great Hall of the
 /// Biblioplex gives a triggered ability.
@@ -665,6 +668,9 @@ pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Anim
     g.add_effect(source, permanent, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), duration);
     if let Some(subtype) = a.subtype {
         g.add_effect(source, permanent, EffectKind::AddSubtype(subtype), duration);
+    }
+    if a.all_creature_types {
+        g.add_effect(source, permanent, EffectKind::AddAllCreatureTypes, duration);
     }
     if let Some(colors) = a.colors {
         g.add_effect(source, permanent, EffectKind::SetColors(colors), duration);

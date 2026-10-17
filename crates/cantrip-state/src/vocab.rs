@@ -500,6 +500,9 @@ pub struct SubtypeSet(pub [u64; SUBTYPE_WORDS]);
 
 impl SubtypeSet {
     pub const NONE: SubtypeSet = SubtypeSet([0; SUBTYPE_WORDS]);
+    /// Every creature type (CR 205.3m): what Changeling makes an object (CR 702.73a), and what "all creature types"
+    /// gives one (Mutavault).
+    pub const CREATURE_TYPES: SubtypeSet = SubtypeSet::of(&Subtype::CREATURE_TYPES);
 
     pub const fn of(subtypes: &[Subtype]) -> SubtypeSet {
         let mut bits = [0u64; SUBTYPE_WORDS];

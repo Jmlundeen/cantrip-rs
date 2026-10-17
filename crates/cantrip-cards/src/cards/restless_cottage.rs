@@ -12,6 +12,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         toughness: 4,
         colors: Some(words.colors(ColorSet(ColorSet::of(Color::Black).0 | ColorSet::of(Color::Green).0))),
         subtype: Some(words.subtype(Subtype::Horror)),
+        all_creature_types: false,
         keywords: Keywords::NONE,
         ability: None,
     };

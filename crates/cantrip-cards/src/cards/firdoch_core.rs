@@ -13,7 +13,7 @@ use cantrip_oracle as oracle;
 /// Outlaws or a search for a type all see it. Mirror Entity, Universal Automaton and the other changelings need only
 /// their content file and their own text.
 fn animate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let animation = Animation { power: 4, toughness: 4, colors: None, subtype: None, keywords: Keywords::NONE, ability: None };
+    let animation = Animation { power: 4, toughness: 4, colors: None, subtype: None, all_creature_types: false, keywords: Keywords::NONE, ability: None };
     cantrip_mechanics::animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
     Ok(())
 }

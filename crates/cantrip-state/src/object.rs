@@ -488,6 +488,11 @@ pub enum EffectKind {
     /// Its creature type becomes this one (CR 205.1a, 613.1d), layer 4: every creature type it had is replaced, its card types
     /// and its other subtypes (artifact types, land types) stay: "becomes a green Wurm" (Scale Up).
     SetCreatureType(Subtype),
+    /// It gains all creature types (CR 205.3m, 613.1d), layer 4, in addition to its other subtypes: "becomes a 2/2
+    /// creature with all creature types" (Mutavault, Soulstone Sanctuary). Only a creature or a Kindred can have creature
+    /// types (CR 205.3d), so it gives them to an object that is one by its timestamp. It is not Changeling: the object
+    /// gains no ability (the Mutavault ruling).
+    AddAllCreatureTypes,
     /// Its power and toughness are switched (CR 613.4d), layer 7d: applied after every setting and modifying effect and
     /// the counters.
     SwitchPt,

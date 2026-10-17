@@ -248,6 +248,7 @@ pub fn becomes_creature_until_end_of_turn(
         toughness,
         colors: Some(words.colors(colors)),
         subtype: Some(words.subtype(subtype)),
+        all_creature_types: false,
         keywords,
         ability: None,
     };

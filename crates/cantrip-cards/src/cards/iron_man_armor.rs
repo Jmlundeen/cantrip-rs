@@ -27,6 +27,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         toughness: 0,
         colors: None,
         subtype: Some(words.subtype(Subtype::Construct)),
+        all_creature_types: false,
         keywords: Keywords::of(&[Keyword::Flying]),
         ability: Some(AbilityRef::delayed(card, 0)),
     };
