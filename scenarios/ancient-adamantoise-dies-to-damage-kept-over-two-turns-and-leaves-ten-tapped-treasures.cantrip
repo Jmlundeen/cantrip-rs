@@ -1,0 +1,65 @@
+# Ancient Adamantoise's damage adds up across turns (CR 514.2: "Damage isn't removed from this creature during cleanup
+# steps") until it is lethal (CR 704.5g), and "When this creature dies, exile it and create ten tapped Treasure tokens".
+# Bot1 deals its own 20-toughness Adamantoise 17 with Fire Covenant (paying 17 life; its own spell, so ward does not
+# trigger) on turn 3. The damage survives Bot1's cleanup. On turn 4 Bot2's Lightning Bolt at Bot1, who has 3 life, is
+# dealt to the Adamantoise instead (a redirect of noncombat damage to a player): 20 damage, and it dies with Bot1 still at
+# 3. Its trigger exiles the card from the graveyard and makes ten Treasures, all tapped, under Bot1's control.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Forest
+Mox Jet
+Mox Ruby
+Fire Covenant
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Fire Covenant.Cast(X: 17)
+Bot1.Divide(Ancient Adamantoise: 17)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+? Bot1.Life = 3
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 17
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 17
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 3
+Exile = Ancient Adamantoise
+Bot1.Graveyard = Fire Covenant; Show and Tell; Black Lotus
+Bot1.Battlefield.Count = 14
+Bot1.Battlefield.Treasure Token#1.Tapped = true
+Bot1.Battlefield.Treasure Token#10.Tapped = true
+Bot1.Battlefield.Treasure Token#10.Token = true
+Bot2.Graveyard = Lightning Bolt

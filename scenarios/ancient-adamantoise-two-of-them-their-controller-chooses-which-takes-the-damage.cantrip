@@ -1,0 +1,76 @@
+# Two Ancient Adamantoises (the ruling: "you choose which redirection effect to apply ... which of those Ancient
+# Adamantoises will take that damage"; you can't divide it or take it yourself). Each applies to an event once (CR 614.5),
+# and once one has applied the event is judged again (CR 616.1f): Bolt aimed at Bot1, the first one's effect makes it
+# damage to the first, which is another permanent Bot1 controls, so the second's effect then makes it damage to the
+# second, and the first's has had its turn. So the effect Bot1 chooses first decides which one ends with the damage.
+# Bot2's first Bolt: Bot1 applies #1's effect first, and #2 takes 3. Second Bolt: #2's first, and #1 takes 3. Third
+# Bolt, aimed at #1 (Bot2 pays its ward {3}): only #2's effect applies (#1's is about "other" permanents), then #1's, and
+# the 3 come back to #1 with no choice to make. Bot1 loses no life.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Show and Tell
+Ancient Adamantoise
+Ancient Adamantoise
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Sol Ring
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Show and Tell.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Replace(Ancient Adamantoise#1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain#2.Activate
+? Bot1.Battlefield.Ancient Adamantoise#1.Damage = 0
+? Bot1.Battlefield.Ancient Adamantoise#2.Damage = 3
+Bot1.Replace(Ancient Adamantoise#2)
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ancient Adamantoise#1)
+? Bot1.Battlefield.Ancient Adamantoise#1.Damage = 3
+? Bot1.Battlefield.Ancient Adamantoise#2.Damage = 3
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Ancient Adamantoise#1.Damage = 6
+Bot1.Battlefield.Ancient Adamantoise#2.Damage = 3
+Bot2.Graveyard = Lightning Bolt; Black Lotus; Lightning Bolt; Lightning Bolt

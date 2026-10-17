@@ -1,0 +1,61 @@
+# Protection's prevention and Ancient Adamantoise's redirection both want to change the 2 damage Pyroclasm would deal to
+# Bot1's Llanowar Elves, which Mother of Runes has given protection from red: the Elves' controller chooses which applies
+# first (CR 616.1). Bot1 has it redirected, so it would be dealt to the Adamantoise, whose own protection is judged now
+# (CR 614.6) - it has none, and the Elves' no longer applies to it (CR 616.1f). The Adamantoise takes 2 for the Elves, 2 for
+# Mother of Runes and its own 2: 6, and every creature lives. The other order is
+# ancient-adamantoise-pyroclasm-on-a-protected-elf-its-controller-prevents-it-first.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Forest
+Mox Pearl
+Mother of Runes
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Pyroclasm
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mother of Runes.Activate(Llanowar Elves)
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Replace(Ancient Adamantoise)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Ancient Adamantoise.Damage = 6
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Mother of Runes.Damage = 0
+Bot2.Graveyard = Pyroclasm

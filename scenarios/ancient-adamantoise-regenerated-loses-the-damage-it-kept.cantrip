@@ -1,0 +1,61 @@
+# "Effects that remove all damage from a permanent (such as regeneration) will still remove damage from Ancient
+# Adamantoise" (the ruling; CR 701.19a). Bot2's Lightning Bolt at Bot1 on turn 2 is dealt to the Adamantoise, and the 3
+# damage stays through cleanup (CR 514.2). On turn 4 Baleful Strix (deathtouch) attacks Bot1; Bot1 gives the Adamantoise a
+# regeneration shield with Yavimaya Hollow, and the Strix's damage, dealt to the Adamantoise instead, would destroy it:
+# it regenerates - tapped, and all its damage removed, the 3 it kept included.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Forest
+Yavimaya Hollow
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Baleful Strix.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Upkeep]
+? Bot1.Life = 20
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Yavimaya Hollow.Play
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 3
+Bot2.Attack(Baleful Strix)
+Bot1.Battlefield.Yavimaya Hollow.Activate(Ancient Adamantoise; Ability: Regenerate)
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Ancient Adamantoise; Forest; Mox Sapphire; Yavimaya Hollow
+Bot1.Battlefield.Ancient Adamantoise.Damage = 0
+Bot1.Battlefield.Ancient Adamantoise.Tapped = true
+Exile.Count = 0

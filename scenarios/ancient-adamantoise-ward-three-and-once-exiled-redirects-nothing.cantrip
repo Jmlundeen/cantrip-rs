@@ -1,0 +1,62 @@
+# Ancient Adamantoise's ward {3} (CR 702.21a): Bot2's first Swords to Plowshares at it is countered when Bot2 declines to
+# pay {3}; the second, paid for, exiles it, and Bot1 gains 8 life. Exiled is not dying, so no Treasures (CR 700.4). With the
+# Adamantoise gone its redirection no longer applies (CR 611.3a, 614.1a): Bot2's Lightning Bolt at Bot1 is dealt to Bot1.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Forest
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Black Lotus
+Swords to Plowshares
+Lightning Bolt
+Swords to Plowshares
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Ancient Adamantoise)
+Bot2.Pass
+Bot2.Decline
+? Bot2.Graveyard = Swords to Plowshares
+? Bot1.Battlefield.Ancient Adamantoise.Tapped = false
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Swords to Plowshares.Cast(Ancient Adamantoise)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.PayCost
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Exile = Ancient Adamantoise
+? Bot1.Life = 28
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 25
+Exile = Ancient Adamantoise
+Bot1.Battlefield = Forest; Mox Sapphire
+Bot2.Graveyard = Lightning Bolt; Swords to Plowshares; Black Lotus; Swords to Plowshares

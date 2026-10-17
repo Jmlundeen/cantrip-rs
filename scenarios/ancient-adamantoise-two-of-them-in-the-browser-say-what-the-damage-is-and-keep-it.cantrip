@@ -1,0 +1,71 @@
+# Browser
+# Two Ancient Adamantoises, played by Bot1's page. Bot2's Lightning Bolt at Bot1 meets both redirections, and the page asks
+# which applies first (CR 616.1), saying what the damage is and whom it would be dealt to, and that the others that still
+# apply then do, each once (CR 614.5, 616.1f): the one chosen first passes the damage to the other. Its two buttons read the
+# same while the two are alike, and Bot1 takes #1's effect: #2 is dealt the 3. At the second Bolt the buttons tell them
+# apart by the damage #2 has marked; Bot1 takes #2's effect and #1 is dealt 3. Bot1 loses no life. The damage stays on
+# both through the cleanup step (CR 514.2), and the page still draws it on Bot1's next turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Show and Tell
+Ancient Adamantoise
+Ancient Adamantoise
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Show and Tell.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Pass
+? Client.Bot1.Prompt.Title = 3 damage from Lightning Bolt to you: which applies first?
+? Client.Bot1.Prompt.Detail = 2 effects want to change this  ·  then each other one that still applies does, once
+? Client.Bot1.Dock = Ancient Adamantoise: the damage is dealt to this creature instead; Ancient Adamantoise: the damage is dealt to this creature instead
+Bot1.Replace(Ancient Adamantoise#1)
+? Bot1.Battlefield.Ancient Adamantoise#1.Damage = 0
+? Bot1.Battlefield.Ancient Adamantoise#2.Damage = 3
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain#2.Activate
+Bot1.Pass
+? Client.Bot1.Dock = Ancient Adamantoise: the damage is dealt to this creature instead; Ancient Adamantoise (3 damage marked): the damage is dealt to this creature instead
+Bot1.Replace(Ancient Adamantoise#2)
+[T5 Bot1.Upkeep]
+? Client.Bot1.Battlefield.Ancient Adamantoise.Damage = -3
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Ancient Adamantoise#1.Damage = 3
+Bot1.Battlefield.Ancient Adamantoise#2.Damage = 3
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

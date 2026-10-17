@@ -1,0 +1,60 @@
+# Protection is judged against the creature the damage is redirected to (CR 614.6, 702.16e): Bot2's Lightning Bolt at
+# Bot1 would be dealt to Ancient Adamantoise instead, and Bot1 has given the Adamantoise protection from red with Mother
+# of Runes in response, so the damage is prevented - Bot1 loses no life and the Adamantoise is dealt none. The positive
+# control: Bofur, white, attacks Bot1 the same turn, and its 1 combat damage is redirected and dealt to the Adamantoise
+# (protection from red does not stop it), with Bofur's lifelink.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Forest
+Mox Pearl
+Mother of Runes
+Forest x10
+
+[Bot2 Deck]
+Mox Pearl
+Mountain
+Bofur, Reliable Guardian
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Bofur, Reliable Guardian.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mother of Runes.Activate(Ancient Adamantoise)
+Bot2.Pass
+Bot1.Colors(Red)
+Bot2.Attack(Bofur, Reliable Guardian)
+? Bot1.Life = 20
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 0
+? Bot2.Graveyard = Lightning Bolt
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 21
+Bot1.Battlefield.Ancient Adamantoise.Damage = 1
+Bot2.Graveyard = Lightning Bolt

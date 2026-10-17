@@ -1,0 +1,72 @@
+# Ancient Adamantoise: "All damage that would be dealt to you and other permanents you control is dealt to this creature
+# instead" (CR 614.1a), and "Damage isn't removed from this creature during cleanup steps" (CR 514.2). Bot2 attacks with
+# Bofur (1/1 lifelink) unblocked and Woodland Changeling (2/2), which Bot1's Llanowar Elves blocks. Bofur's combat damage to
+# Bot1 and the Changeling's to the Elves are both dealt to the Adamantoise instead, still combat damage from the same
+# sources (the rulings): Bot1 loses no life and the Elves live, and Bofur's lifelink still gains Bot2 1 life (CR
+# 702.15b). The Elves' 1 damage to the Changeling is no redirect's business. In Bot2's cleanup the Changeling's damage
+# wears off and the Adamantoise's does not; it is still there in Bot1's next turn, and after Bot1's own cleanup too. The
+# Adamantoise attacks in between and stays untapped (vigilance).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Ancient Adamantoise
+Llanowar Elves
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Forest
+Bofur, Reliable Guardian
+Woodland Changeling
+Forest
+Forest
+Forest x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Bofur, Reliable Guardian.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Woodland Changeling.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+[T4 Bot2.Main1]
+Bot2.Attack(Bofur, Reliable Guardian; Woodland Changeling)
+Bot1.Block(Llanowar Elves > Woodland Changeling)
+[T4 Bot2.Main2]
+? Bot1.Life = 20
+? Bot2.Life = 21
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 3
+? Bot1.Battlefield.Llanowar Elves.Damage = 0
+? Bot2.Battlefield.Woodland Changeling.Damage = 1
+[T5 Bot1.Upkeep]
+? Bot1.Battlefield.Ancient Adamantoise.Damage = 3
+? Bot2.Battlefield.Woodland Changeling.Damage = 0
+[T5 Bot1.Main1]
+Bot1.Attack(Ancient Adamantoise)
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 13
+Bot1.Battlefield.Ancient Adamantoise.Damage = 3
+Bot1.Battlefield.Ancient Adamantoise.Tapped = false
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot2.Battlefield.Woodland Changeling.Damage = 0
+Bot1.Graveyard = Show and Tell; Black Lotus
