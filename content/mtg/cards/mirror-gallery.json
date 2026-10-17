@@ -1,0 +1,6 @@
+{
+  "name": "Mirror Gallery",
+  "manaCost": "{5}",
+  "type": "Artifact",
+  "oracleText": "The \"legend rule\" doesn't apply."
+}

@@ -1,0 +1,50 @@
+# Mirror Gallery: "The 'legend rule' doesn't apply." Clone copying Ragavan, Nimble Pilferer is a legendary Ragavan too (CR
+# 707.2, 205.4), and with both under Bot1 the legend rule (CR 704.5j) would have Bot1 keep one - but Mirror Gallery turns
+# that state-based action off: Bot1 is asked nothing (the refusal "! Bot1.Choose" holds after the Clone resolves) and both
+# Ragavans stay. clone-copying-your-own-legend-meets-the-legend-rule is the control, where the same Clone without the
+# Gallery puts a Ragavan into the graveyard.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Mox Jet
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Mirror Gallery
+Clone
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mirror Gallery.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Sol Ring; Mox Jet; Mox Sapphire; Mirror Gallery; Ragavan, Nimble Pilferer; Ragavan, Nimble Pilferer
+Bot1.Battlefield.Ragavan, Nimble Pilferer#2.Supertypes = Legendary
+Bot1.Graveyard = Black Lotus

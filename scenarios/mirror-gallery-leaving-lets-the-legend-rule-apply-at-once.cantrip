@@ -1,0 +1,58 @@
+# Mirror Gallery's ruling: "If all Mirror Galleries leave the battlefield, the 'legend rule' will apply the next time
+# state-based actions are performed." With the Gallery out, Bot1's Ragavan, Nimble Pilferer and the Clone copying it both
+# stay (turn 3). On turn 5 Bot1 casts Disenchant at the Gallery; once it is destroyed the state-based actions find two
+# legendary Ragavans under Bot1 (CR 704.5j), and Bot1 chooses which to keep - the second, the Clone - so the Ragavan card
+# goes to its owner's graveyard (not destroyed), on top of Disenchant, which went there as the last step of its resolution
+# after the Gallery (CR 608.2n), before the state-based actions were checked.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Sol Ring
+Mox Pearl
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Mirror Gallery
+Clone
+Disenchant
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mirror Gallery.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[T3 Bot1.Main2]
+? Bot1.Battlefield = Mountain; Sol Ring; Mox Pearl; Mox Sapphire; Mirror Gallery; Ragavan, Nimble Pilferer; Ragavan, Nimble Pilferer
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Disenchant.Cast(Mirror Gallery)
+Bot1.Pass
+Bot1.Choose(Ragavan, Nimble Pilferer#2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Sol Ring; Mox Pearl; Mox Sapphire; Ragavan, Nimble Pilferer
+Bot1.Graveyard = Ragavan, Nimble Pilferer; Disenchant; Mirror Gallery; Black Lotus
