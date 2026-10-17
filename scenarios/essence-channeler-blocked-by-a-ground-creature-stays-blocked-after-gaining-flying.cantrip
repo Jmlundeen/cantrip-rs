@@ -1,0 +1,42 @@
+# Essence Channeler: "Once Essence Channeler has been blocked by a creature without flying or reach, losing life to give it
+# flying and vigilance won't cause it to become unblocked" (ruling 2024-07-26; CR 509.1h, 506.4). Bot1 attacks with the
+# Channeler, which has no flying (Bot1 has lost no life), and Bot2's Ornithopter blocks it. In the declare blockers step Bot1
+# pays 1 life for Marsh Flats: the Channeler now has flying and vigilance, but it stays blocked and stays tapped (vigilance only
+# matters as attackers are declared, CR 702.20b). It deals its 2 damage to the Ornithopter, none to Bot2.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Marsh Flats
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Essence Channeler.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Marsh Flats.Play
+Bot1.Attack(Essence Channeler)
+Bot2.Block(Ornithopter > Essence Channeler)
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Essence Channeler.Keywords = (absent)
+Bot1.Battlefield.Marsh Flats.Activate
+Bot1.Search(Plains)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Essence Channeler.Keywords = Flying; Vigilance
+Bot1.Battlefield.Essence Channeler.Tapped = true

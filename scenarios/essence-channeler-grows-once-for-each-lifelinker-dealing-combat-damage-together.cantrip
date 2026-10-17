@@ -1,0 +1,39 @@
+# Essence Channeler: "Each creature with lifelink dealing combat damage causes a separate life-gaining event" (ruling
+# 2024-07-26; CR 702.15b, 120.3f), and "Whenever you gain life, put a +1/+1 counter on this creature" triggers once for each.
+# Bot1's two Healer's Hawks deal combat damage to Bot2 at once: Bot1 gains 1 life twice, and the Channeler gets two counters
+# (4/3). Gaining life is not losing it, so it has no flying.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Black Lotus
+Healer's Hawk
+Healer's Hawk
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x7
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Essence Channeler.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Hand.Healer's Hawk.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Healer's Hawk#1; Healer's Hawk#2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Essence Channeler.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Essence Channeler.Power = 4
+Bot1.Battlefield.Essence Channeler.Keywords = (absent)
