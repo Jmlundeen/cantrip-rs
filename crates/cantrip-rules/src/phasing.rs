@@ -206,7 +206,7 @@ mod tests {
     }
 
     fn cx(game: &mut Game) -> Cx<'_> {
-        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None }
+        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None }
     }
 
     #[test]
