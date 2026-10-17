@@ -1,0 +1,43 @@
+# While a player's life total can't change, they can't pay any life but 0 (CR 119.8; Teferi's Protection's ruling: "You can't
+# pay a cost that includes the payment of any amount of life other than 0 life"), so a Phyrexian symbol can't be paid with life
+# (CR 107.4f). After Teferi's Protection Bot1 has a Mox Ruby and no blue mana: Gitaxian Probe ({U/P}) can't be cast. On turn 5 the
+# effect is over and Bot1 casts it for 2 life - the positive control.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Teferi's Protection
+Mox Ruby
+Gitaxian Probe
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Gitaxian Probe.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 18
+Bot1.Graveyard = Gitaxian Probe

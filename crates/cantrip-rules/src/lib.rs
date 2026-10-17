@@ -806,6 +806,10 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn move_to(&mut self, object: ObjectId, to: Zone) -> ObjectId {
+        // A phased-out permanent can't be affected by anything (CR 702.26b).
+        if self.g.state.obj(object).zone.is(ZoneKind::PhasedOut) {
+            return object;
+        }
         ops::move_to(self, object, to)
     }
 

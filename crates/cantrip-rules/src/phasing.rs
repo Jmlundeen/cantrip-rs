@@ -63,6 +63,13 @@ pub fn phase_out(cx: &mut Cx, permanents: &[ObjectId], until_leaves: Option<Obje
         let blocks = cx.s().blocks.iter().copied().filter(|b| !leaving(b.blocker) && !leaving(b.attacker)).collect();
         cx.st().set_blocks(blocks);
     }
+    // CR 702.26f: a "for as long as" duration that tracks one of them ends, as it can no longer see it (Teferi's Protection's
+    // ruling on Mathas, Fiend Seeker): one about its counters or its being tapped. (One about an effect's source on the
+    // battlefield ends with the state-based check, `WhileSourceOnBattlefield`.)
+    let tracks = |e: &ContinuousEffect| leaving(e.affected) && matches!(e.duration, Duration::WhileCounter(_) | Duration::WhileTapped);
+    if cx.s().effects.iter().any(tracks) {
+        cx.st().effects_retain(|e| !tracks(e));
+    }
     for &(id, indirect) in &all {
         let controller = cx.s().obj(id).controller;
         let phased = if indirect {
@@ -245,6 +252,18 @@ mod tests {
         let s = cx.s();
         assert_eq!(s.battlefield(), &[bear, aura]);
         assert!(s.obj(bear).tapped && !s.obj(aura).tapped);
+    }
+
+    #[test]
+    fn a_phased_out_permanent_is_moved_by_nothing() {
+        let (mut game, bear, aura, _) = game();
+        let mut cx = cx(&mut game);
+        phase_out(&mut cx, &[bear], None, false);
+        // CR 702.26b: "Return it to your hand" from an ability that remembered it does nothing.
+        assert!(crate::ops::return_to_hand(&mut cx, &[bear]).is_empty());
+        assert!(crate::ops::exile_all(&mut cx, &[aura]).is_empty());
+        assert_eq!(cx.s().zone(Zone::PHASED_OUT), &[bear, aura]);
+        assert!(live(cx.s(), bear) && live(cx.s(), aura));
     }
 
     #[test]

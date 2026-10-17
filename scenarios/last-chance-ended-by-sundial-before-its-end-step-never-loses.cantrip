@@ -1,7 +1,7 @@
 # Last Chance's delayed ability waits for "that turn's end step" (CR 603.7) alone. Bot1 casts Last Chance on turn 1 and, in the
 # extra turn 2's first main phase, ends the turn with Sundial of the Infinite: the end step is skipped (CR 724.1e), so the
 # ability never triggers, and once turn 2 is over it never can - it is gone, and Bot1 is still in the game at its own end
-# step of turn 4 (Final Fortune's ruling: "If you end up skipping the extra turn's end step you do not lose").
+# step of turn 4 (CR 603.7, 724.1e).
 
 [Bot1 Deck]
 Mountain

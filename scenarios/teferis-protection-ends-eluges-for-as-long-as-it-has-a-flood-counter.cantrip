@@ -1,0 +1,48 @@
+# A "for as long as" duration that tracks a permanent ends when it phases out, because it can no longer see it (CR 702.26f;
+# Teferi's Protection's ruling on Mathas, Fiend Seeker). Eluge's enters trigger puts a flood counter on Bot1's Plains, which is
+# an Island too "for as long as it has a flood counter on it". Teferi's Protection phases the Plains out: as it phases in on
+# turn 5 it keeps the flood counter (CR 702.26d) but is no Island any more.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Black Lotus
+Eluge, the Shoreless Sea
+Mox Pearl
+Mox Jet
+Teferi's Protection
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Plains.Subtypes = Island; Plains
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate(Ability: {W})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut.Plains.Counters.Flood = 1
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Plains.Counters.Flood = 1
+Bot1.Battlefield.Plains.Subtypes = Plains

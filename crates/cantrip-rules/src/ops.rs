@@ -2254,7 +2254,8 @@ pub fn sacrifice(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
 
 /// The objects among `ids` that are still the objects they were, for a verb that moves them (CR 400.7).
 fn live_ones(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
-    ids.iter().copied().filter(|&id| live(cx.s(), id)).collect()
+    // A phased-out permanent can't be affected by anything (CR 702.26b): an ability that remembered it moves nothing.
+    ids.iter().copied().filter(|&id| live(cx.s(), id) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut)).collect()
 }
 
 /// Puts objects together into their owners' graveyards (CR 400.3), in the order given.
