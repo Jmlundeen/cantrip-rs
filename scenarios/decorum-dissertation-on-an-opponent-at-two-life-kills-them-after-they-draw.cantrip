@@ -1,0 +1,35 @@
+# Decorum Dissertation aimed at the opponent: Bot2 draws two cards (library 13 to 11) and loses 2 life, which from 2 is 0, so Bot2
+# loses the game as state-based actions are checked (CR 704.5a). The other scenario aims at oneself with life to spare (the control:
+# 18, still playing).
+
+[Life]
+Bot2: 2
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Black Lotus
+Decorum Dissertation
+Island x3
+Island x13
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Decorum Dissertation.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot2.Life = 0
+Bot2.Library.Count = 11
+Bot1.Life = 20
+Exile = Decorum Dissertation

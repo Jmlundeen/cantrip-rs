@@ -1,0 +1,53 @@
+# "Target player draws two cards and loses 2 life" (CR 121.1, 119.3) and paradigm (CR 702.192a). Turn 1: Bot1 pays {3}{B}{B} with
+# Black Lotus and two Mox Jets and targets ITSELF: it draws two cards (library 13 to 11) and goes to 18; the card is exiled as it
+# resolves. Turn 3: at the beginning of its first main phase Bot1 accepts the free copy and this time targets Bot2 - a copy chooses
+# its own target - which draws two (library 12 to 10 after its turn-2 draw) and goes to 18. Turn 5: the copy is declined, so nothing
+# more happens and the card is still in exile.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Black Lotus
+Decorum Dissertation
+Island x3
+Island x13
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Decorum Dissertation.Cast(Bot1)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Life = 18
+? Bot1.Library.Count = 11
+? Bot2.Life = 20
+? Exile = Decorum Dissertation
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+? Bot2.Library.Count = 10
+? Bot1.Life = 18
+[T5 Bot1.Main1]
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Decorum Dissertation
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Library.Count = 9
+Bot2.Library.Count = 9
+Bot1.Graveyard = Black Lotus
