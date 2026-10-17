@@ -1,0 +1,49 @@
+# "Spells you cast" and "creature you control": Bot1's Temur Battlecrier does nothing for Bot2, even on Bot2's own turn and
+# with a power-4 creature of Bot2's own. Bot2 casts a Giant Cindermaw (full {2}{R}) and keeps Mox Sapphire and an Island
+# untapped, two mana: Frantic Search ({2}{U}) is refused, as it would be castable if the opponent's Battlecrier reduced it by
+# Bot2's one big creature (CR 601.2f, 118.7a).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Temur Battlecrier
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Island
+Giant Cindermaw
+Frantic Search
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temur Battlecrier.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Giant Cindermaw.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot2.Hand.Frantic Search.Cast
+
+[Expect]
+Bot2.Battlefield.Giant Cindermaw.Power = 4
+Bot2.Hand.Count = 2

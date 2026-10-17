@@ -1,0 +1,8 @@
+{
+  "name": "Temur Battlecrier",
+  "manaCost": "{G}{U}{R}",
+  "type": "Creature — Orc Ranger",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "During your turn, spells you cast cost {1} less to cast for each creature you control with power 4 or greater."
+}

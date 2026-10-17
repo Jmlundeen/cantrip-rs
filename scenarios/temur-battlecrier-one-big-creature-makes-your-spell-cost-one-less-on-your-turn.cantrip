@@ -1,0 +1,45 @@
+# Temur Battlecrier on Bot1's turn 3 is a creature with power exactly 4, so Frantic Search ({2}{U}) costs {1}{U} (CR 601.2f,
+# 118.7a): Bot1 has only Mox Jet and an Island untapped, two mana, enough only because of the reduction. Bot1's own
+# Ornithopter (power 0) is not counted: the reduction is one, not zero or two (see the two-creature scenario and the
+# Island-only refusal for the exact amount).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Temur Battlecrier
+Frantic Search
+Island
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temur Battlecrier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Frantic Search.Cast
+Bot1.Pass
+Bot2.Pass
+
+# Frantic Search resolved: draw two, discard two (hand 0 either way), so the graveyard is the Search and the two discards.
+
+[Expect]
+Bot1.Graveyard.Count = 3
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Temur Battlecrier.Power = 4

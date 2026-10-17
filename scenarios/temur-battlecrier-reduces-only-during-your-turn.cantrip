@@ -1,0 +1,38 @@
+# "During your turn": on Bot2's turn 4 Temur Battlecrier gives Bot1 no reduction. Bot1 keeps Mox Jet and an Island untapped
+# (the exact position of the one-big-creature scenario, where Frantic Search can be cast for {1}{U}) and now cannot cast it
+# at instant speed for the full {2}{U}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Temur Battlecrier
+Frantic Search
+Island
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temur Battlecrier.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Pass
+! Bot1.Hand.Frantic Search.Cast
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Temur Battlecrier.Power = 4

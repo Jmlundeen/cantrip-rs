@@ -1,0 +1,49 @@
+# The Island-only twin of the one-big-creature scenario: Bot1 controls Temur Battlecrier (power 4) and Bot2 controls Giant
+# Cindermaw (power 4). Frantic Search costs {1}{U} for Bot1, so with one Island untapped it cannot be cast: the Cindermaw is not
+# "a creature you control" (CR 601.2f, 118.7a). The positive control is the one-big-creature scenario, where the second mana
+# source makes the same cast possible.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Temur Battlecrier
+Frantic Search
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Giant Cindermaw
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Giant Cindermaw.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temur Battlecrier.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Frantic Search.Cast
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot2.Battlefield.Giant Cindermaw.Power = 4

@@ -1,0 +1,42 @@
+# Temur Battlecrier reduces "spells you cast", not abilities (CR 601.2f, 602.2b). On turn 3 Bot1 casts Battlecrier with three Moxen,
+# then Mind Stone ({2}, reduced to {1}) with its Island - the reduction applies to the spell. Everything else is tapped, and Mind
+# Stone's "{1}, {T}, Sacrifice this artifact: Draw a card" is refused: its {1} is not reduced to nothing. On turn 5 with mana
+# available the same ability is activated (the positive control) and draws a card.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Temur Battlecrier
+Mind Stone
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Temur Battlecrier.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+
+[Expect]
+Bot1.Graveyard = Mind Stone
+Bot1.Hand.Count = 4
