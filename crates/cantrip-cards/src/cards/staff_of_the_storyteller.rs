@@ -3,10 +3,8 @@ use cantrip_mechanics::{effects, tokens};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
-use crate::lingering_souls::SPIRIT;
-
 fn spirit(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &SPIRIT, 1)?;
+    tokens::create(g, item.controller, &tokens::WHITE_FLYING_SPIRIT, 1)?;
     Ok(())
 }
 
@@ -38,3 +36,5 @@ pub static CARD: CardDef = CardDef {
     ],
     ..oracle::STAFF_OF_THE_STORYTELLER
 };
+
+pub static EXTRA: &[&CardDef] = &[&tokens::WHITE_FLYING_SPIRIT];

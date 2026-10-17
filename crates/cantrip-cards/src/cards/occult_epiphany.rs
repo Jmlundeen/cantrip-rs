@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use crate::lingering_souls::SPIRIT;
+use cantrip_mechanics::tokens::WHITE_FLYING_SPIRIT;
 use cantrip_mechanics::choose_from_hand;
 use cantrip_oracle as oracle;
 
@@ -24,7 +24,7 @@ fn epiphany(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if types == 0 {
         return Ok(());
     }
-    let spirit = g.card_id(&SPIRIT);
+    let spirit = g.card_id(&WHITE_FLYING_SPIRIT);
     let tokens: Vec<(CardId, PlayerId)> = (0..types).map(|_| (spirit, you)).collect();
     g.create_tokens_together(&tokens)?;
     Ok(())
@@ -35,4 +35,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::OCCULT_EPIPHANY
 };
 
-pub static EXTRA: &[&CardDef] = &[&SPIRIT];
+pub static EXTRA: &[&CardDef] = &[&WHITE_FLYING_SPIRIT];

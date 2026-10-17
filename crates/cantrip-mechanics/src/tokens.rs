@@ -612,6 +612,22 @@ pub static SPIRIT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 white Spirit creature token with flying. Lingering Souls, Occult Epiphany, Staff of the Storyteller and Doomed
+/// Traveler make it. It shares its name with the colorless [`SPIRIT`].
+pub static WHITE_FLYING_SPIRIT: CardDef = CardDef {
+    name: "Spirit",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Spirit]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    shares_name: true,
+    text: "Flying",
+    ..CardDef::BLANK
+};
+
 /// "Create a Treasure token" as an effect (CR 111.10a): one Treasure under the controller of the resolving spell or ability. Bejeweled
 /// Warg, Fable of the Mirror-Breaker's Reflection, Fountainport, Magda, Brazen Outlaw, Monument to Endurance, Sanar, Unfinished
 /// Genius and Smaug the Magnificent print it.
