@@ -4,15 +4,6 @@ use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
-const ASK: Question = Question::new("Mill", "mill a card?", "", "Mill", "Don't mill");
-
-/// "You may mill a card": asked first, then the mill (CR 701.17a).
-fn may_mill(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
-        g.mill(item.controller, 1);
-    }
-    Ok(())
-}
 
 /// The 1/1 green Minion creature token named Moloid with "Whenever this token attacks, you may mill a card."
 pub static MOLOID: CardDef = CardDef {
@@ -23,7 +14,7 @@ pub static MOLOID: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Minion]),
     power: Some(1),
     toughness: Some(1),
-    abilities: &[triggered(triggers::THIS_ATTACKS, may_mill, "Whenever this token attacks, you may mill a card.")],
+    abilities: &[triggered(triggers::THIS_ATTACKS, effects::may_mill_a_card, "Whenever this token attacks, you may mill a card.")],
     ..CardDef::BLANK
 };
 

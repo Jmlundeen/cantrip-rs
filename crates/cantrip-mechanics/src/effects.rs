@@ -329,6 +329,17 @@ pub fn ask_may(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Pu
     Ok(g.ask(player, RequestKind::May { source, purpose })? == Answer::Yes)
 }
 
+const MAY_MILL: Question = Question::new("Mill", "mill a card?", "The top card of your library goes into your graveyard", "Mill", "Don't mill");
+
+/// "You may mill a card" (CR 701.17a): asked of the ability's controller, then the mill. Mole Man's Moloid tokens and
+/// Patchwork Beastie print it.
+pub fn may_mill_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if ask_may(g, item.controller, item.object, Purpose::Ask(&MAY_MILL))? {
+        g.mill(item.controller, 1);
+    }
+    Ok(())
+}
+
 /// "You may return this card from your graveyard to ..." (CR 113.6k): `ask_may` for a card that triggered from a zone it
 /// functions in, asked only while the card is still the object that triggered (CR 400.7). Once it has left, nothing is asked
 /// and the answer is no. Squee, Goblin Nabob and Vengevine ask it.
