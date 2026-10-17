@@ -48,7 +48,7 @@ keeps it).
 | [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
 | [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
-| [KI-29](#ki-29-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
+| [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 
 ## Issues
 
@@ -322,7 +322,8 @@ skip this turn". The choice is still right; only the name is missing. A fix carr
 **Scenarios.**
 - [`scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip`](../scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip) -
   the named case, the page having seen Ral; the unnamed one needs a reconnect, which no scenario does.
-### KI-29: The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi
+
+### KI-35: The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
