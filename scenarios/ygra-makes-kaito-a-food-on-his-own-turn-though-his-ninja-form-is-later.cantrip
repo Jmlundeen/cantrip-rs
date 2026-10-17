@@ -1,0 +1,51 @@
+# CR 613.8a between two static abilities: Kaito, Bane of Nightmares enters after Ygra, so his "during your turn ... he's a
+# Ninja creature" has the later timestamp, but Ygra's "Other creatures are Food artifacts" depends on it (it changes what
+# Ygra's effect applies to) and applies after it. On Bot1's turn Kaito is a Ninja creature that is also a Food artifact.
+# On Bot2's turn he is a planeswalker, no creature, so Ygra's effect does not apply to him at all.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Sapphire
+Kaito, Bane of Nightmares
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Cast
+Bot2.Pass
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Artifact; Creature
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Subtypes = Food; Ninja
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Planeswalker
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Subtypes = Kaito
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Kaito, Bane of Nightmares.Types = Artifact; Creature
+Bot1.Battlefield.Kaito, Bane of Nightmares.Subtypes = Food; Ninja
+Bot1.Battlefield.Ygra, Eater of All.Types = Creature

@@ -1,0 +1,77 @@
+# Ygra against Oko, Thief of Crowns' +1 ("loses all abilities and becomes a green Elk creature with base power and toughness
+# 3/3"), which has the later timestamp both times.
+# Mox Jet, no creature: Oko's type-setting effect makes it one, which changes what Ygra's "Other creatures are Food
+# artifacts" applies to, so Ygra's effect depends on it and applies after it (CR 613.8a): a Food artifact Elk creature.
+# In layer 6 neither depends on the other (applying "loses all abilities" doesn't change that it is a creature), so they
+# go in timestamp order (CR 613.7) and Oko's, the later, takes Ygra's "{2}, {T}, Sacrifice this permanent: You gain 3 life"
+# with the rest: the refusal, with the mana for it floating.
+# Elvish Mystic, a creature already: Oko's effect changes nothing about what Ygra's applies to, so neither depends on the
+# other and timestamp order has Oko's "becomes a creature" replace the artifact type and Food that Ygra's effect added
+# (CR 613.1d, 205.1a): only an Elk creature. Before Oko it is a Food artifact Elf Druid.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Sapphire
+Oko, Thief of Crowns
+Forest x10
+
+[Bot2 Deck]
+Forest
+Forest
+Elvish Mystic
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot2.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Mox Jet; Ability: Elk)
+Bot2.Pass
+? Bot1.Battlefield.Mox Jet.Types = Artifact; Creature
+? Bot1.Battlefield.Mox Jet.Subtypes = Elk; Food
+? Bot1.Battlefield.Mox Jet.Power = 3
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Mox Jet.Activate(Ability: You gain 3 life)
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot1.Pass
+? Bot2.Battlefield.Elvish Mystic.Types = Creature; Artifact
+? Bot2.Battlefield.Elvish Mystic.Subtypes = Druid; Elf; Food
+[T5 Bot1.Main1]
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Bot2.Battlefield.Elvish Mystic; Ability: Elk)
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Mox Jet.Types = Artifact; Creature
+Bot1.Battlefield.Mox Jet.Subtypes = Elk; Food
+Bot2.Battlefield.Elvish Mystic.Types = Creature
+Bot2.Battlefield.Elvish Mystic.Subtypes = Elk
+Bot2.Battlefield.Elvish Mystic.Power = 3
+Bot1.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 6

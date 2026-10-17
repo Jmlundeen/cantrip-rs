@@ -1,0 +1,45 @@
+# CR 613.8a the other way round: impending's "As long as this permanent has a time counter on it, it isn't a creature"
+# changes what Ygra's "Other creatures are Food artifacts" applies to, so Ygra's effect waits for it although Overlord of the
+# Balemurk entered later. Once it isn't a creature, Ygra's effect does not apply to it: it is an enchantment alone, no
+# artifact and no Food. In timestamp order Ygra's effect would have found an enchantment creature and made it a Food artifact.
+# (ygra-makes-a-vehicle-crewed-after-it-a-food-artifact-by-dependency is the positive case of the same dependency.)
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Sapphire
+Overlord of the Balemurk
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Overlord of the Balemurk.Cast(Ability: Impending)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Overlord of the Balemurk.Counters.Time = 5
+Bot1.Battlefield.Overlord of the Balemurk.Types = Enchantment
+Bot1.Battlefield.Overlord of the Balemurk.Subtypes = (absent)

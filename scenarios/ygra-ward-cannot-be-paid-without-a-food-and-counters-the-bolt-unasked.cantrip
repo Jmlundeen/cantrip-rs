@@ -1,0 +1,47 @@
+# Ward—Sacrifice a Food with nothing to pay it (CR 118.3): Bot2 controls a Mountain and a Mox Jet, an artifact but no Food,
+# when it Lightning Bolts Ygra. It is not asked whether to pay (the refused Accept), the Bolt is countered, and nothing of
+# Bot2's is sacrificed.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ygra, Eater of All)
+Bot2.Pass
+! Bot2.Accept
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Ygra, Eater of All.Damage = 0
+Bot2.Battlefield = Mountain; Mox Jet
+Bot2.Graveyard = Lightning Bolt

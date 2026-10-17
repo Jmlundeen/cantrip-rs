@@ -1,0 +1,62 @@
+# CR 613.8a: Ygra's "Other creatures are Food artifacts" depends on the crew effect that makes Smuggler's Copter an artifact
+# creature (applying the crew effect changes what Ygra's effect applies to), so it applies after it although the crew effect
+# has the later timestamp. Ygra enters first; the Copter is cast two turns later and crewed by Llanowar Elves on the turn after, when it is no longer summoning sick. Crewed, the
+# Copter is a Food, and has Ygra's "{2}, {T}, Sacrifice this permanent: You gain 3 life", which Bot1 activates; the Copter
+# is a Food going to the graveyard, so Ygra gets two counters. Before it is crewed it is no creature, so neither a Food nor
+# able to activate the ability (the refusal). Llanowar Elves, a creature from the start, is a Food all along.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Smuggler's Copter
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Smuggler's Copter.Cast
+Bot2.Pass
+? Bot1.Battlefield.Smuggler's Copter.Types = Artifact
+? Bot1.Battlefield.Smuggler's Copter.Subtypes = Vehicle
+? Bot1.Battlefield.Llanowar Elves.Types = Creature; Artifact
+? Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Food
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Smuggler's Copter.Activate(Ability: You gain 3 life)
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: Crew)
+Bot2.Pass
+? Bot1.Battlefield.Smuggler's Copter.Types = Artifact; Creature
+? Bot1.Battlefield.Smuggler's Copter.Subtypes = Food; Vehicle
+Bot1.Battlefield.Smuggler's Copter.Activate(Ability: You gain 3 life)
+Bot2.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Smuggler's Copter
+Bot1.Battlefield.Ygra, Eater of All.Counters.PlusOnePlusOne = 2

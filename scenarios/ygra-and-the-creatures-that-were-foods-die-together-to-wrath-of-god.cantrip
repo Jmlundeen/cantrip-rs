@@ -1,0 +1,67 @@
+# Wrath of God destroys Ygra and Bot2's Llanowar Elves and Elvish Mystic at once. A leaves-the-battlefield ability looks back
+# in time (CR 603.10a): the Elves and the Mystic were Foods as they left, Ygra's ability was there to see it, so it triggers
+# twice, once per Food (CR 603.2c) - two triggers on the stack. Ygra itself is no Food ("other creatures"), so it does not
+# trigger for itself. The triggers resolve and put no counters anywhere: Ygra has left (CR 400.7).
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Pearl
+Wrath of God
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Elvish Mystic
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot2.Pass
+Bot1.Triggers(Ygra, Eater of All; Ygra, Eater of All)
+? Stack.Count = 2
+? Bot1.Battlefield.Count = 6
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Wrath of God; Ygra, Eater of All
+Bot2.Graveyard = Elvish Mystic; Llanowar Elves
+Bot2.Battlefield.Count = 2

@@ -1,0 +1,49 @@
+# CR 613.8a with reconfigure (CR 702.151b): Lion Sash enters after Ygra, so its "While attached, this isn't a creature" has
+# the later timestamp. As a creature it is one of Ygra's "other creatures", a Food (the first check). Attached to Ygra, it
+# isn't a creature: that changes what Ygra's effect applies to, so Ygra's effect waits for it and then does not apply - an
+# Equipment that is no Food. In timestamp order Ygra's effect would have made it a Food before it stopped being a creature.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Pearl
+Lion Sash
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lion Sash.Cast
+Bot2.Pass
+? Bot1.Battlefield.Lion Sash.Subtypes = Cat; Equipment; Food
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Lion Sash.Activate(Bot1.Battlefield.Ygra, Eater of All; Ability: Attach)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Lion Sash.AttachedTo = Ygra, Eater of All
+Bot1.Battlefield.Lion Sash.Types = Artifact
+Bot1.Battlefield.Lion Sash.Subtypes = Equipment

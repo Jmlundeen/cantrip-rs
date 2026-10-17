@@ -1,0 +1,57 @@
+# "Whenever a Food is put into a graveyard from the battlefield" counts any Food, not only the creatures Ygra makes Foods:
+# Oko, Thief of Crowns' +2 makes a Food token, a noncreature artifact Ygra's static ability leaves alone: it has no
+# "Sacrifice this permanent" of Ygra's (the refusal), only its own "Sacrifice this token". Sacrificed for its own ability,
+# it goes to the graveyard (CR 111.7, 704.5d) and Ygra gets two +1/+1 counters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Sapphire
+Oko, Thief of Crowns
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot2.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Ability: Food)
+Bot2.Pass
+? Bot1.Battlefield.Food Token.Types = Artifact
+? Bot1.Battlefield.Food Token.Subtypes = Food
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Food Token.Activate(Ability: Sacrifice this permanent)
+Bot1.Battlefield.Food Token.Activate(Ability: Sacrifice this token)
+Bot2.Pass
+? Stack.Count = 1
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 23
+Bot1.Battlefield.Ygra, Eater of All.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ygra, Eater of All.Power = 8

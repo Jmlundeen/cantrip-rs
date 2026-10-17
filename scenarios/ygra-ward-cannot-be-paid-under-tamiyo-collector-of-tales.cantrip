@@ -1,0 +1,70 @@
+# Tamiyo, Collector of Tales: "Spells and abilities your opponents control can't cause you to discard cards or sacrifice
+# permanents." Her ruling: when an opponent's ability says something happens unless you sacrifice, you can't choose to
+# (CR 101.2). Bot2 controls Tamiyo and a Food - its Llanowar Elves, a Food because of Ygra - when it Lightning Bolts Ygra:
+# Ygra's ward, Bot1's ability, can't be paid, so Bot2 is not asked (the refused Accept), the Bolt is countered and the
+# Elves stay. (ygra-ward-paid-by-sacrificing-the-chosen-of-two-foods-lets-the-bolt-resolve is the same payment allowed.)
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Mountain
+Mox Sapphire
+Mox Jet
+Tamiyo, Collector of Tales
+Lightning Bolt
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Llanowar Elves.Activate(Ability: Add)
+Bot2.Hand.Tamiyo, Collector of Tales.Cast
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Ygra, Eater of All)
+Bot2.Pass
+! Bot2.Accept
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Ygra, Eater of All.Damage = 0
+Bot1.Battlefield.Ygra, Eater of All.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield = Forest; Llanowar Elves; Mountain; Mox Emerald; Mox Jet; Mox Sapphire; Tamiyo, Collector of Tales
+Bot2.Graveyard = Lightning Bolt
