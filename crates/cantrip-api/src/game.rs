@@ -528,9 +528,11 @@ pub trait Game: Query {
 
     /// `player` wins the game (CR 104.2b): their opponents lose and the game ends at once. Nothing if they have lost, or
     /// are losing to a state-based action (CR 104.3f).
-    /// `permanent` becomes a copy of these copiable values until end of turn (CR 707.2, 611.2b): the same object, as another card.
-    /// `source` is the spell or ability doing it.
-    fn become_copy(&mut self, source: ObjectId, permanent: ObjectId, values: Copiable);
+    /// `permanent` becomes a copy of these copiable values for `duration` (CR 707.2, 611.2b): the same object, as another
+    /// card. `Duration::EndOfTurn` for "until end of turn" (Shifting Woodland, Saheeli); `Duration::Indefinite` for an
+    /// effect that states no duration, which lasts as long as the permanent stays (CR 611.2a-b: Likeness Looter). `source`
+    /// is the spell or ability doing it.
+    fn become_copy(&mut self, source: ObjectId, permanent: ObjectId, values: Copiable, duration: Duration);
     fn win_game(&mut self, player: PlayerId);
     /// An effect states that `player` loses the game (CR 104.3e): they are out at once, and the last one left has won.
     fn lose_game(&mut self, player: PlayerId);

@@ -963,6 +963,12 @@ pub fn targets_with_action(specs: &[TargetSpec]) -> bool {
     specs.len() == 1 && specs[0].max == 1
 }
 
+/// Whether an activated ability's targets are announced with the action: one slot of one target, unless they wait for X
+/// (`ActivatedDef::late_targets`, CR 601.2b-c by way of 602.2b).
+fn targets_with_activation(def: &ActivatedDef) -> bool {
+    !def.late_targets && targets_with_action(def.targets)
+}
+
 /// Whether every required slot has at least its minimum number of legal targets (CR 601.2c): fewer is no legal announcement, so the
 /// spell or ability is not offered.
 pub(crate) fn slots_satisfiable(cx: &Cx, asker: &Asker, specs: &[TargetSpec]) -> bool {
@@ -1756,7 +1762,7 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             // change the cost - a cost changer on the battlefield, or the ability's or card's own - since nearly nothing does;
             // otherwise the cost is judged once, before any target is looked for.
             let each_target = a.is_some_and(|a| {
-                targets_with_action(def.targets)
+                targets_with_activation(def)
                     && !def.special_action
                     && def.modal.is_none()
                     && (!a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty())
@@ -1771,6 +1777,7 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
             let possible = match def.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
+                None if def.late_targets => slots_satisfiable(cx, &asker, def.targets),
                 None => with_targets(cx, &asker, def.targets, &mut option),
             };
             if !possible {
@@ -3989,7 +3996,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         let of;
         (targets, of) = choose_slots(cx, player, source, &mode_specs(modal, mask), item.x, 0)?;
         set_item_targets(cx, &targets, &of);
-    } else if !targets_with_action(def.targets) && !def.targets.is_empty() {
+    } else if !targets_with_activation(def) && !def.targets.is_empty() {
         // CR 601.2c by way of 602.2b: slots that are not announced with the action are chosen now, after X (a slot
         // counted by X, as Candelabra of Tawnos's "untap X target lands", reads the X just announced).
         let of;

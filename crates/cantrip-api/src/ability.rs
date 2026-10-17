@@ -456,6 +456,12 @@ impl AbilityDef {
         AbilityDef::Activated(ActivatedDef { exhaust: true, once: true, ..activated(self, "only an activated ability has exhaust") })
     }
 
+    /// Its targets are chosen once X is announced (CR 601.2b-c by way of 602.2b), as a target that depends on X needs:
+    /// Likeness Looter's "target creature card in your graveyard with mana value X".
+    pub const fn targets_after_x(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { late_targets: true, ..activated(self, "only an activated ability is announced") })
+    }
+
     /// "Activate only once." (CR 602.5b)
     pub const fn once(self) -> AbilityDef {
         AbilityDef::Activated(ActivatedDef { once: true, ..activated(self, "only an activated ability is activated only once") })

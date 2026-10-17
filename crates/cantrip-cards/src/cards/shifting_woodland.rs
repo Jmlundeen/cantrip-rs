@@ -13,7 +13,7 @@ fn has_delirium(q: &dyn Query, asker: &Asker) -> bool {
 fn become_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(card) = targets::object(g, item, 0) {
         let values = g.copiable_values(card);
-        g.become_copy(item.object, item.object, values);
+        g.become_copy(item.object, item.object, values, Duration::EndOfTurn);
     }
     Ok(())
 }

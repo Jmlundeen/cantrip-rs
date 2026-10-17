@@ -971,8 +971,8 @@ impl cantrip_api::Game for Cx<'_> {
         ops::give_poison(self, player, amount);
     }
 
-    fn become_copy(&mut self, source: ObjectId, permanent: ObjectId, values: Copiable) {
-        ops::become_copy(self, source, permanent, values);
+    fn become_copy(&mut self, source: ObjectId, permanent: ObjectId, values: Copiable, duration: Duration) {
+        ops::become_copy(self, source, permanent, values, duration);
     }
 
     fn win_game(&mut self, player: PlayerId) {

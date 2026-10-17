@@ -800,6 +800,10 @@ pub struct ActivatedDef {
     pub special_action: bool,
     /// An equip ability (CR 702.6a): "equip abilities" are named as a class by cards that change how they work.
     pub equip: bool,
+    /// Its targets are chosen after X is announced (CR 601.2b-c by way of 602.2b), because what may be targeted depends on
+    /// X ("target creature card in your graveyard with mana value X": Likeness Looter): never with the action, even for
+    /// one slot of one target.
+    pub late_targets: bool,
 }
 
 fn no_effect(_: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
@@ -854,6 +858,7 @@ impl ActivatedDef {
         waterbend: false,
         tap_creatures_for_mana: false,
         equip: false,
+        late_targets: false,
         special_action: false,
         modal: None,
     };
