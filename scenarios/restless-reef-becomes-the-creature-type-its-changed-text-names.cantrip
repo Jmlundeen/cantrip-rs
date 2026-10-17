@@ -1,0 +1,44 @@
+# Artificial Evolution replaces the creature type Shark with Elf in Restless Reef's text for good (CR 612.1, 612.2). Animated
+# on turn 3 it becomes a blue and black Elf creature with deathtouch and 4/4, not a Shark (CR 612.4): the word is read through
+# the words of its own text. Its mana symbols and numbers are not words and cost and give what they did.
+
+[Bot1 Deck]
+Restless Reef
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Artificial Evolution
+Island
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Restless Reef.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Artificial Evolution.Cast(Restless Reef)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Shark)
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Reef.Types = Land; Creature
+
+[Expect]
+Bot1.Battlefield.Restless Reef.Subtypes = Elf
+Bot1.Battlefield.Restless Reef.Colors = Black; Blue
+Bot1.Battlefield.Restless Reef.Keywords = Deathtouch
+Bot1.Battlefield.Restless Reef.Power = 4
