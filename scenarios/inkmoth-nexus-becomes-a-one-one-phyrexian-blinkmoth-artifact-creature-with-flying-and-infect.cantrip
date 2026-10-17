@@ -1,0 +1,50 @@
+# Inkmoth Nexus: "{T}: Add {C}." It is a land that entered this turn but not a creature, so it taps for mana at once
+# (CR 302.6 is about creatures; the card's ruling): on turn 1 its {C} pays for Sol Ring. "{1}: This land becomes a 1/1
+# Phyrexian Blinkmoth artifact creature with flying and infect until end of turn. It's still a land." On turn 3 the
+# Island pays for it: a Land Artifact Creature - Phyrexian Blinkmoth (CR 205.1b), colorless (the text names no color),
+# 1/1 with flying and infect. It attacks, and its combat damage to Bot2 is a poison counter, not lost life
+# (CR 702.90b, 120.3b). The effect ends in the cleanup step (CR 514.2): on Bot2's turn 4 it is a plain Land again,
+# still tapped from attacking.
+
+[Bot1 Deck]
+Inkmoth Nexus
+Sol Ring
+Island
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {T})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sol Ring.Types = Artifact
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Inkmoth Nexus.Types = Land; Artifact; Creature
+? Bot1.Battlefield.Inkmoth Nexus.Subtypes = Blinkmoth; Phyrexian
+? Bot1.Battlefield.Inkmoth Nexus.Keywords = Flying; Infect
+? Bot1.Battlefield.Inkmoth Nexus.Power = 1
+? Bot1.Battlefield.Inkmoth Nexus.Toughness = 1
+? Bot1.Battlefield.Inkmoth Nexus.Colors = (absent)
+Bot1.Attack(Inkmoth Nexus > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Poison = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 20
+Bot2.Poison = 1
+Bot1.Battlefield = Inkmoth Nexus; Island; Sol Ring
+Bot1.Battlefield.Inkmoth Nexus.Types = Land
+Bot1.Battlefield.Inkmoth Nexus.Subtypes = (absent)
+Bot1.Battlefield.Inkmoth Nexus.Keywords = (absent)
+Bot1.Battlefield.Inkmoth Nexus.Tapped = true

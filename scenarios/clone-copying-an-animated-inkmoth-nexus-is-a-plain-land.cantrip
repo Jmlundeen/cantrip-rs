@@ -1,0 +1,39 @@
+# An animated Inkmoth Nexus is a creature, so Clone may choose it, but the animation is an effect and not a copiable
+# value (CR 707.2): the Clone is an Inkmoth Nexus that is a Land and nothing else - not an artifact, not a creature, no
+# Phyrexian or Blinkmoth, no flying or infect - so it does not die as a 0/0. On turn 1 Bot1 taps its Inkmoth Nexus for
+# {C} and spends it animating the Nexus, then casts Clone with Black Lotus and Mox Sapphire. The original is still a
+# 1/1 artifact creature land, and the Clone was not played as a land.
+
+[Bot1 Deck]
+Inkmoth Nexus
+Black Lotus
+Mox Sapphire
+Clone
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {T})
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Inkmoth Nexus; Inkmoth Nexus; Mox Sapphire
+Bot1.Battlefield.Inkmoth Nexus#1.Types = Land; Artifact; Creature
+Bot1.Battlefield.Inkmoth Nexus#1.Keywords = Flying; Infect
+Bot1.Battlefield.Inkmoth Nexus#2.Types = Land
+Bot1.Battlefield.Inkmoth Nexus#2.Subtypes = (absent)
+Bot1.Battlefield.Inkmoth Nexus#2.Keywords = (absent)

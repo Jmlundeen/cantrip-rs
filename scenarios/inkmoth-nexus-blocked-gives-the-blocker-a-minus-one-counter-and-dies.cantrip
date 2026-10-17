@@ -1,0 +1,44 @@
+# Infect damage to a creature is dealt as that many -1/-1 counters, not marked damage (CR 702.90c, 120.3d). On turn 3
+# Bot1's animated Inkmoth Nexus (1/1 flying, infect) attacks and Bot2's Guerrilla Gorilla (2/2 reach) blocks it: the
+# Gorilla gets one -1/-1 counter and is a 1/1 with no damage marked, and its own 2 ordinary damage kills the Nexus,
+# which goes to the graveyard as the land card it is. Nothing reached Bot2: no poison, no life lost.
+
+[Bot1 Deck]
+Inkmoth Nexus
+Island
+Island x18
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x17
+
+[Actions]
+Bot1.Hand.Inkmoth Nexus.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Inkmoth Nexus > Bot2)
+Bot2.Block(Guerrilla Gorilla > Inkmoth Nexus)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island
+Bot1.Graveyard = Inkmoth Nexus
+Bot2.Battlefield.Guerrilla Gorilla.Counters.MinusOneMinusOne = 1
+Bot2.Battlefield.Guerrilla Gorilla.Power = 1
+Bot2.Battlefield.Guerrilla Gorilla.Toughness = 1
+Bot2.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Poison = 0
+Bot2.Life = 20

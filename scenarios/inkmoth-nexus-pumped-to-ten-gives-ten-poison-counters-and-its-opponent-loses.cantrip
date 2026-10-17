@@ -1,0 +1,50 @@
+# The animation sets Inkmoth Nexus's base power and toughness (layer 7b), so effects that modify them apply on top
+# (layer 7c, CR 613.4b-c). On turn 3 the Mountain animates it and Black Lotus's {R}{R}{R} pays for three Turn Inside Outs
+# (+3/+0 each): a 10/1. Its 10 infect damage to Bot2 is ten poison counters (CR 702.90b), and a player with ten or more
+# poison counters loses the game (CR 704.5c); Bot2's life total is untouched.
+
+[Bot1 Deck]
+Inkmoth Nexus
+Black Lotus
+Turn Inside Out
+Turn Inside Out
+Turn Inside Out
+Mountain
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Inkmoth Nexus)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Turn Inside Out.Cast(Inkmoth Nexus)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Turn Inside Out.Cast(Inkmoth Nexus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Inkmoth Nexus.Power = 10
+? Bot1.Battlefield.Inkmoth Nexus.Toughness = 1
+Bot1.Attack(Inkmoth Nexus > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot2.Poison = 10
+Bot2.Life = 20

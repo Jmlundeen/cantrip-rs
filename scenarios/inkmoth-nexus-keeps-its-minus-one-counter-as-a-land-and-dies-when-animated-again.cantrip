@@ -1,0 +1,70 @@
+# Counters stay on a permanent when it stops being a creature, and count again when it next becomes one: the animation
+# sets base power and toughness (layer 7b) and counters apply after (layer 7c, CR 613.4b-c). On turn 3 Bot1 animates its
+# Inkmoth Nexus and Battlefield Improvisation makes it a 3/3; it attacks, and Bot2 animates its own Inkmoth Nexus and
+# blocks. Bot1's deals 3 infect damage, three -1/-1 counters that kill Bot2's 1/1 (CR 702.90c, 704.5f); Bot2's deals 1,
+# a -1/-1 counter on Bot1's, which survives as a 2/2. After the cleanup step (CR 514.2) it is a Land with that counter.
+# On turn 5 it is animated again: a 1/1 with a -1/-1 counter is 0/0 and goes to the graveyard.
+
+[Bot1 Deck]
+Inkmoth Nexus
+Mox Pearl
+Mox Jet
+Battlefield Improvisation
+Plains
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Inkmoth Nexus
+Mox Emerald
+Island x18
+
+[Actions]
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Inkmoth Nexus.Play
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Bot1.Battlefield.Inkmoth Nexus)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Inkmoth Nexus.Power = 3
+? Bot1.Battlefield.Inkmoth Nexus.Toughness = 3
+Bot1.Attack(Inkmoth Nexus > Bot2)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot2.Pass
+Bot1.Pass
+Bot2.Block(Bot2.Battlefield.Inkmoth Nexus > Bot1.Battlefield.Inkmoth Nexus)
+[T3 Bot1.Main2]
+? Bot2.Graveyard = Inkmoth Nexus
+? Bot1.Battlefield.Inkmoth Nexus.Counters.MinusOneMinusOne = 1
+? Bot1.Battlefield.Inkmoth Nexus.Power = 2
+? Bot1.Battlefield.Inkmoth Nexus.Toughness = 2
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Inkmoth Nexus.Types = Land
+? Bot1.Battlefield.Inkmoth Nexus.Counters.MinusOneMinusOne = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet
+Bot1.Graveyard = Inkmoth Nexus; Battlefield Improvisation
+Bot2.Graveyard = Inkmoth Nexus
+Bot2.Poison = 0
+Bot2.Life = 20

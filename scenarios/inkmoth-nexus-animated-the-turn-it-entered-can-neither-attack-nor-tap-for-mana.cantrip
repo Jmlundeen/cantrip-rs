@@ -1,0 +1,58 @@
+# A creature can attack or use a {T} ability only if its controller has controlled it continuously since their most
+# recent turn began (CR 302.6), and an animated land is a creature (the card's ruling). Bot1 plays one Inkmoth Nexus on
+# turn 1 and a second on turn 3, and animates both on turn 3 with the two Moxes. The first, controlled since the turn
+# began, taps for {C} while a creature; the second, which entered this turn, may not (refused), nor attack (refused,
+# beside Ornithopter, which attacks). On turn 5 the second has been controlled since the turn began: animated again it
+# attacks, and Bot2 gets a poison counter.
+
+[Bot1 Deck]
+Inkmoth Nexus
+Mox Sapphire
+Mox Jet
+Ornithopter
+Inkmoth Nexus
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Inkmoth Nexus#1.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Inkmoth Nexus#2.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Inkmoth Nexus#1.Types = Land; Artifact; Creature
+? Bot1.Battlefield.Inkmoth Nexus#2.Types = Land; Artifact; Creature
+Bot1.Battlefield.Inkmoth Nexus#1.Activate(Ability: {T})
+? Bot1.Mana = {C}
+! Bot1.Battlefield.Inkmoth Nexus#2.Activate(Ability: {T})
+! Bot1.Attack(Inkmoth Nexus#2 > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Poison = 0
+? Bot1.Battlefield.Inkmoth Nexus#2.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Inkmoth Nexus#2.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Inkmoth Nexus#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Poison = 1
+Bot2.Life = 20
+Bot1.Battlefield.Inkmoth Nexus#2.Tapped = true
