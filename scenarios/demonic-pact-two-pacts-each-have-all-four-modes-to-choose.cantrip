@@ -1,0 +1,53 @@
+# Ruling 2015-06-22: "that hasn't been chosen" refers only to that specific Demonic Pact. Bot1 casts a Pact on turn 1 and a second on
+# turn 3 (the same four Moxen pay both). On turn 3 only the first triggers and chooses the damage mode (Bot2 16, Bot1 24). On turn 5 both
+# trigger: the first Pact is refused the damage mode (`! Bot1.Modes(1)`) and draws two; the second, which has never chosen anything, takes the
+# damage mode (the positive control): Bot2 12, Bot1 28. Each Pact shows only the modes it chose itself: the first 1 and 3, the second 1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Demonic Pact
+Demonic Pact
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Demonic Pact.Cast
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Modes(deals 4 damage)
+Bot1.Target(Bot2)
+[T3 Bot1.Main1]
+? Bot2.Life = 16
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Demonic Pact.Cast
+Bot1.Pass
+[T5 Bot1.Upkeep]
+! Bot1.Modes(1)
+Bot1.Modes(Draw two)
+Bot1.Modes(deals 4 damage)
+Bot1.Target(Bot2)
+[T5 Bot1.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 12
+Bot1.Life = 28
+Bot1.Battlefield.Demonic Pact#1.ChosenModes = 1, 3
+Bot1.Battlefield.Demonic Pact#2.ChosenModes = 1

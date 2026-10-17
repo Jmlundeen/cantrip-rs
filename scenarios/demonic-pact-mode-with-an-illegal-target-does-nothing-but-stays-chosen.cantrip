@@ -1,0 +1,58 @@
+# Ruling 2015-06-22: if the ability doesn't resolve (its target becomes illegal), the mode chosen for that instance still counts as chosen.
+# Turn 3 upkeep: Bot1 chooses the damage mode and targets Bot2's Llanowar Elves; in response Bot2 Lightning Bolts its own Elves. The
+# ability's only target is illegal, so it does not resolve (CR 608.2b): Bot1 does NOT gain 4 life (still 20). Turn 5: the damage mode is refused
+# (`! Bot1.Modes(1)`) though it never happened - the positive control is the draw mode taken on the next line - and ChosenModes shows 1 and 3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Demonic Pact
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Demonic Pact.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Upkeep]
+Bot1.Modes(deals 4 damage)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+? Bot1.Battlefield.Demonic Pact.ChosenModes = 1
+? Stack.Count = 0
+[T5 Bot1.Upkeep]
+! Bot1.Modes(1)
+Bot1.Modes(Draw two)
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Demonic Pact.ChosenModes = 1, 3
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot2.Life = 20

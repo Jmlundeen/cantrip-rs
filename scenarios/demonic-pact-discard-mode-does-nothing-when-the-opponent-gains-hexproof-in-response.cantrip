@@ -1,0 +1,48 @@
+# "Target opponent discards two cards": in response Bot2 casts Dawn's Truce (Mox Pearl and Mox Ruby), so Bot2 has hexproof and is no longer a
+# legal target; the ability's only target is illegal and it does not resolve (CR 608.2b): Bot2 discards nothing. The mode still counts as
+# chosen (ruling 2015-06-22). The positive control is demonic-pact-discard-mode-makes-the-opponent-choose-two-cards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Demonic Pact
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Dawn's Truce
+Island x4
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Demonic Pact.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Upkeep]
+Bot1.Modes(discards two)
+Bot1.Pass
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Graveyard = Dawn's Truce
+Bot2.Hand.Count = 5
+Bot1.Battlefield.Demonic Pact.ChosenModes = 2

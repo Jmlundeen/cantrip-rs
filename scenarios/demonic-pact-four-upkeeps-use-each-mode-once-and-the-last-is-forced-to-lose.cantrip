@@ -1,0 +1,63 @@
+# Demonic Pact, "at the beginning of your upkeep, choose one that hasn't been chosen" (CR 700.2, 603.3c). Cast on turn 1 with two
+# Mox Jets, Mox Ruby and Mox Pearl ({2}{B}{B}). Turn 3: 4 damage to Bot2 and Bot1 gains 4 (Bot2 16, Bot1 24). Turn 5: all four modes
+# were offered but the damage is spent: it is refused (`! Bot1.Modes(1)`) and Bot1 picks "Target opponent discards two cards"; Bot2 discards
+# two of its cards. Turn 7: draw two cards (the library goes down by that and the draw step's one). Turn 9: only "you lose the game" remains,
+# so it is chosen without asking (`! Bot1.Modes`) and Bot1 loses (CR 104.3a): Bot2 won. Ruling 2015-06-22: "You read the whole contract".
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Demonic Pact
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island
+Lightning Bolt
+Island x4
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Demonic Pact.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Upkeep]
+Bot1.Modes(deals 4 damage)
+Bot1.Target(Bot2)
+[T3 Bot1.Main1]
+? Bot2.Life = 16
+? Bot1.Life = 24
+? Bot1.Battlefield.Demonic Pact.ChosenModes = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Upkeep]
+! Bot1.Modes(1)
+Bot1.Modes(discards two)
+[T5 Bot1.Main1]
+? Bot2.Hand.Count = 5
+? Bot1.Battlefield.Demonic Pact.ChosenModes = 1, 2
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Upkeep]
+Bot1.Modes(Draw two)
+[T7 Bot1.Main1]
+? Bot1.Hand.Count = 7
+? Bot1.Battlefield.Demonic Pact.ChosenModes = 1, 2, 3
+[T9 Bot1.Upkeep]
+! Bot1.Modes
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost

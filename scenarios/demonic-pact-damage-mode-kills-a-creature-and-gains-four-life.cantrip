@@ -1,0 +1,45 @@
+# First mode: "This enchantment deals 4 damage to any target and you gain 4 life." Aimed at Bot2's Llanowar Elves (not a player): the
+# Elves, a 1/1, dies, Bot2 keeps its 20 life, and Bot1 gains 4 (24) - the life gain does not depend on the target being a player.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Demonic Pact
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x5
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Demonic Pact.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Upkeep]
+Bot1.Modes(deals 4 damage)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot2.Life = 20
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Demonic Pact.ChosenModes = 1
