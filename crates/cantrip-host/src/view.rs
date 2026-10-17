@@ -306,6 +306,21 @@ const KEYWORD_WORDS: [(Keyword, &str); 34] = [
     (Keyword::Decayed, "Decayed"),
 ];
 
+/// A rules line without its parenthesized reminder text, trimmed.
+fn without_reminder(line: &str) -> String {
+    let mut out = String::new();
+    let mut depth = 0;
+    for ch in line.chars() {
+        match ch {
+            '(' => depth += 1,
+            ')' if depth > 0 => depth -= 1,
+            _ if depth == 0 => out.push(ch),
+            _ => {}
+        }
+    }
+    out.trim().to_string()
+}
+
 /// A mana cost in oracle notation; empty for no mana cost at all (CR 202.1b).
 pub fn cost_text(def: &CardDef) -> String {
     if def.has_cost { def.cost.to_string() } else { String::new() }
@@ -758,7 +773,7 @@ impl<'a> Projector<'a> {
     /// card's own, or a copy's. A keyword or ability it has that it did not start with is granted, and one it started with
     /// and has not is lost. The abilities a land has from its basic land types are the rules' and are neither. Nothing is
     /// allocated for an object the layers left alone, which is nearly every one.
-    fn ability_changes(&self, view: &mut ObjectView, c: &Chars, copy: Option<Copiable>) {
+    fn ability_changes(&self, view: &mut ObjectView, id: ObjectId, c: &Chars, copy: Option<Copiable>) {
         let cards = self.game.cards;
         let def = cards.get(c.card);
         let base = Keywords(def.keywords.0 | copy.map_or(0, |copy| copy.extra_keywords.0));
@@ -799,6 +814,21 @@ impl<'a> Projector<'a> {
             if !c.abilities.contains(&Some(ability)) {
                 view.lost_abilities.push(def.abilities[index].text().to_string());
             }
+        }
+        // Lost all its abilities (CR 613.1f): its static abilities, cost changes, replacement effects and other rules lines
+        // are gone too, which no keyword or ability above names. A line of keywords alone, or one of the abilities above, is
+        // judged above, so a keyword or ability had again after the loss is not called lost.
+        if Query::lost_all_abilities(self.game, id) {
+            let judged = |line: &str| {
+                let words = without_reminder(line);
+                let keyword = |part: &str| {
+                    KEYWORD_WORDS.iter().any(|(_, w)| w.trim_end_matches('.').eq_ignore_ascii_case(part.trim().trim_end_matches('.')))
+                };
+                (!words.is_empty() && words.split(',').all(keyword)) || def.abilities.iter().any(|a| without_reminder(a.text()) == words)
+            };
+            let rest: Vec<String> =
+                view.oracle_text.split('\n').filter(|line| !line.trim().is_empty() && !judged(line)).map(str::to_string).collect();
+            view.lost_abilities.extend(rest);
         }
     }
 
@@ -968,7 +998,7 @@ impl<'a> Projector<'a> {
             });
         }
         if (on_battlefield || zone.is(ZoneKind::Stack)) && !obj.face_down {
-            self.ability_changes(&mut view, &c, obj.copy);
+            self.ability_changes(&mut view, id, &c, obj.copy);
         }
         // "Can't attack" and "can't block" from a resolved effect (CR 508.1c, 509.1b), with how long they last: no ability
         // of the creature says so, so its face does.
