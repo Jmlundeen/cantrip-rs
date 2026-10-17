@@ -1,0 +1,43 @@
+# Rockface Village's "{R}, {T}: Target Lizard, Mouse, Otter, or Raccoon you control gets +1/+0 and gains haste until end of
+# turn": its only target gone before it resolves, it does nothing (CR 608.2b). Turn 3 Bot1 aims it at Blazing Rootwalla and
+# Bot2 answers with Lightning Bolt; the Rootwalla dies, the Village stays tapped and the cost stays paid.
+
+[Bot1 Deck]
+Rockface Village
+Blazing Rootwalla
+Mountain
+Island x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Rockface Village.Play
+Bot1.Battlefield.Rockface Village.Activate(Ability: creature spell)
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Rockface Village.Activate(Ability: Target; Bot1.Battlefield.Blazing Rootwalla)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Blazing Rootwalla)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Blazing Rootwalla
+Bot1.Battlefield = Mountain; Rockface Village
+Bot1.Battlefield.Rockface Village.Tapped = true
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,72 @@
+# Rockface Village. "{T}: Add {R}. Spend this mana only to cast a creature spell" (CR 106.6): on turn 1 that {R}, the only
+# mana there is, can't cast Lightning Bolt (the refusal) but casts Blazing Rootwalla, a Lizard creature spell. Turn 3: Black
+# Lotus's {R}{R}{R} casts a second Rootwalla, and "{R}, {T}: Target Lizard, Mouse, Otter, or Raccoon you control gets +1/+0
+# and gains haste until end of turn" gives it haste the turn it arrived: it attacks as a 2/1 (Bot2 to 18). It can't target
+# Ornithopter (a creature of Bot1's that is none of the four types) nor Bot2's own Rootwalla (a Lizard Bot1 doesn't control).
+# "Activate only as a sorcery" (CR 602.5d): in Bot1's turn-5 upkeep, the Mountain and the Village untapped, it is not
+# offered; in the main phase it is, on the first Rootwalla. Turn 7 "{T}: Add {C}" adds plain {C}, and the +1/+0 of turn 5
+# is gone (until end of turn, CR 514.2).
+
+[Bot1 Deck]
+Rockface Village
+Blazing Rootwalla
+Lightning Bolt
+Ornithopter
+Black Lotus
+Blazing Rootwalla
+Mountain
+Island x13
+
+[Bot2 Deck]
+Mountain
+Blazing Rootwalla
+Mountain x18
+
+[Actions]
+Bot1.Hand.Rockface Village.Play
+Bot1.Battlefield.Rockface Village.Activate(Ability: creature spell)
+? Bot1.Mana = {R} (CreatureSpells)
+! Bot1.Hand.Lightning Bolt.Cast
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Blazing Rootwalla.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Rockface Village.Activate(Ability: Target; Bot1.Battlefield.Ornithopter)
+! Bot1.Battlefield.Rockface Village.Activate(Ability: Target; Bot2.Battlefield.Blazing Rootwalla)
+Bot1.Battlefield.Rockface Village.Activate(Ability: Target; Bot1.Battlefield.Blazing Rootwalla#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blazing Rootwalla#2.Power = 2
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Blazing Rootwalla#2)
+[T5 Bot1.Upkeep]
+! Bot1.Battlefield.Rockface Village.Activate(Ability: Target; Bot1.Battlefield.Blazing Rootwalla#1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Rockface Village.Activate(Ability: Target; Bot1.Battlefield.Blazing Rootwalla#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Blazing Rootwalla#1.Power = 2
+[T7 Bot1.Main1]
+Bot1.Battlefield.Rockface Village.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 7
+Bot2.Life = 18
+Bot1.Battlefield.Blazing Rootwalla#1.Power = 1
+Bot1.Battlefield.Blazing Rootwalla#2.Power = 1
+Bot1.Battlefield = Blazing Rootwalla; Blazing Rootwalla; Mountain; Ornithopter; Rockface Village
