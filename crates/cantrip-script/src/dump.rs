@@ -444,12 +444,14 @@ impl StateDump {
                     if obj.token {
                         d.set(format!("{key}.Token"), true);
                     }
-                    // A Room (CR 709.5): its unlocked doors by name, and the mana value they leave it, whatever the doors are.
+                    // Its mana value (CR 202.3): a Room's unlocked doors' (CR 709.5), a transformed permanent's front face's
+                    // (CR 202.3b), 0 for a copy of a back face or a face-down permanent.
+                    d.set(format!("{key}.ManaValue"), game.mana_value(id));
+                    // A Room (CR 709.5): its unlocked doors by name, whatever the doors are.
                     let room = game.cards.get(c.card);
                     if room.is_room() {
                         let doors: Vec<String> = room.unlocked_doors(obj.marks.doors).map(|half| half.name.to_string()).collect();
                         d.list(&format!("{key}.Doors"), doors, true);
-                        d.set(format!("{key}.ManaValue"), game.mana_value(id));
                     }
                     if obj.prepared {
                         d.set(format!("{key}.Prepared"), true);
