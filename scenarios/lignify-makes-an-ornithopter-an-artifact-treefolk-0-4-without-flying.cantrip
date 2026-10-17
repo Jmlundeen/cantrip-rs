@@ -1,0 +1,56 @@
+# Lignify: "Enchanted creature is a Treefolk with base power and toughness 0/4 and loses all abilities." Bot1 enchants Bot2's
+# Ornithopter (a colorless 0/2 Thopter artifact creature with flying). "Is a Treefolk" replaces its creature types only (CR
+# 205.1a): it stays an artifact creature, and colorless (unlike Kenrith's Transformation or Eaten by Piranhas). It is 0/4
+# and has lost flying (CR 613.1f), so when it attacks, Bot1's Llanowar Elves, which have neither flying nor reach, block it
+# (CR 702.9b). Lignify itself is a Kindred Enchantment - Treefolk Aura.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Lignify
+Forest
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lignify.Cast(Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+Bot1.Block(Llanowar Elves > Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Lignify.AttachedTo = Ornithopter
+Bot1.Battlefield.Lignify.Types = Kindred; Enchantment
+Bot1.Battlefield.Lignify.Subtypes = Aura; Treefolk
+Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot2.Battlefield.Ornithopter.Subtypes = Treefolk
+Bot2.Battlefield.Ornithopter.Colors = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 4
+Bot2.Battlefield.Ornithopter.Damage = 1
+Bot2.Battlefield.Ornithopter.Keywords = (absent)
