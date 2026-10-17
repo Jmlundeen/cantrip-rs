@@ -196,4 +196,24 @@ public sealed class TacticalGraveyardTests
         legend.Supertypes = [SupertypeView.Legendary];
         Assert.Contains("weighed (mana 2,", Told(Seated([Land(1), amber, legend, giant]), prompt), StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void Sacrifices_three_permanents_for_Scavengers_Talent_only_for_a_creature_card_worth_more_than_they_are()
+    {
+        // Scavenger's Talent, level 3 ("SacrificeThreeToReturn"): three other nonland permanents given up for a creature card
+        // back from the graveyard. It is accepted when that card is worth more on the battlefield than the three cheapest
+        // permanents put together, and never for a graveyard with no creature card in it (the generic "Sacrifice" is refused).
+        ObjectView talent = Creature(1, "Scavenger's Talent", 0, 0);
+        talent.CardTypes = [CardTypeView.Enchantment];
+        MayPromptMessage prompt = new() { Player = Me, Source = Handle(1), Verb = "SacrificeThreeToReturn" };
+
+        ObjectView[] fodder = [Creature(2, "Bear", 1, 1), Creature(3, "Bear", 1, 1), Creature(4, "Bear", 1, 1)];
+        ObjectView bigDead = Dead(10, "Hill Giant", 3, 7, 7, Me);
+        ObjectView smallDead = Dead(11, "Bear", 2, 1, 1, Me);
+
+        Assert.True(Assert.IsType<MayChosenAnswer>(Bot().Decide(Seated([talent, .. fodder, bigDead]), prompt)).Accept);
+        Assert.False(Assert.IsType<MayChosenAnswer>(Bot().Decide(Seated([talent, .. fodder, smallDead]), prompt)).Accept);
+        Assert.False(Assert.IsType<MayChosenAnswer>(Bot().Decide(Seated([talent, .. fodder]), prompt)).Accept);
+        Assert.False(Assert.IsType<MayChosenAnswer>(Bot().Decide(Seated([talent, .. fodder, bigDead]), new MayPromptMessage { Player = Me, Source = Handle(1), Verb = "Sacrifice" })).Accept);
+    }
 }

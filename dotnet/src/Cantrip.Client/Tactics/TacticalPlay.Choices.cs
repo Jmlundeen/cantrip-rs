@@ -738,6 +738,14 @@ public sealed partial class TacticalPlay
             // Pia's Revolution: three damage to keep an artifact out of its owner's hand, while it cannot get close.
             "TakeDamageInsteadOfReturn" => life - prompt.Amount >= 10,
 
+            // Scavenger's Talent, level 3: three other nonland permanents given up for a creature card back from the graveyard.
+            // Worth it when the best creature card there is worth more on the battlefield than the three cheapest permanents
+            // that could be given up put together.
+            "SacrificeThreeToReturn" => BestDead(client, client.Seat)
+                > client.BattlefieldOf(client.Seat)
+                    .Where(permanent => permanent.Handle != prompt.Source && !IsLand(permanent))
+                    .Select(_model.Worth).Order().Take(3).Sum(),
+
             // Gift (CR 702.174a): what the opponent is given is a price for what the spell does more. A Food or a tapped 1/1
             // Fish is small; a card, a Treasure, an 8/8 Octopus or an extra turn is worth more to them than any spell's
             // better mode is to this seat, so those are never promised.
