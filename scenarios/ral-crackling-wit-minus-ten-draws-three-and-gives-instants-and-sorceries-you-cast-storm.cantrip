@@ -1,0 +1,109 @@
+# Ral, Crackling Wit, -10: "Draw three cards. You get an emblem with 'Instant and sorcery spells you cast have storm.'"
+# Ral reaches 10 loyalty: 4 on entering, +1 on turns 1, 3 and 5 (7), then three noncreature spells (Mox Emerald, Mox Amber,
+# Mox Ruby) cast on turn 7 put a counter each (10). Ral's -10 draws three (hand 5 -> 5 after the three Moxen were cast and the
+# turn's draw: the check below) and Ral, at 0 loyalty, dies. Bot1 then casts Lightning Bolt: the emblem gives it storm, the
+# three spells cast before it this turn make three copies, so Bot2 takes four Bolts (12), not 3. The Ornithopter cast after
+# it is a creature spell, which the emblem does not touch: one Ornithopter, no copies. On turn 8 Bot2 casts two Lightning
+# Bolts at Bot1 and the emblem is not Bot2's: the second has no storm, Bot1 takes 6, not 9.
+
+[Bot1 Deck]
+Mox Sapphire
+Mountain
+Mox Jet
+Mox Pearl
+Ral, Crackling Wit
+Mox Ruby
+Mox Emerald
+Mox Amber
+Lightning Bolt
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ral, Crackling Wit.Cast
+Bot2.Pass
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Create a 1/1)
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Create a 1/1)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Create a 1/1)
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 7
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Hand.Mox Amber.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 10
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: You get an emblem)
+Bot2.Pass
+? Bot1.Emblems.Count = 1
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+[T8 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot2.Life = 8
+Bot1.Life = 14
+Bot1.Emblems.Count = 1
+Bot1.Graveyard = Lightning Bolt; Ral, Crackling Wit
+Bot1.Battlefield.Count = 11

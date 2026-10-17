@@ -1,0 +1,45 @@
+# Ral, Crackling Wit, -3: "Draw three cards, then discard two cards." Ral enters with 4 and goes to 1. The three cards are drawn
+# first (Mountain, Plains, Swamp) and only then does Bot1 choose two to discard from the whole hand: the Mountain just drawn
+# and the Island held since the start, which a discard before the draw could not do. Another loyalty ability the same turn
+# is refused, the -10 included (CR 606.3).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ral, Crackling Wit
+Island
+Forest
+Mountain
+Plains
+Swamp
+Island x20
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ral, Crackling Wit.Cast
+Bot2.Pass
+? Bot1.Hand = Island; Forest
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Draw three cards, then discard)
+Bot1.Choose(Mountain; Island)
+Bot2.Pass
+? Bot1.Hand = Forest; Plains; Swamp
+! Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Create a 1/1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 1
+Bot1.Hand = Forest; Plains; Swamp
+Bot1.Graveyard = Island; Mountain
+Bot1.Library.Count = 20

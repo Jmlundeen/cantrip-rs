@@ -1,0 +1,64 @@
+# Ral, Crackling Wit: "Whenever you cast a noncreature spell, put a loyalty counter on Ral." Ral enters with 4 (casting him
+# is not a spell cast with him on the battlefield). Bot2 casts two noncreature spells in its own turn (Mox Jet, Mox Sapphire):
+# not "you", so no counter. Bot1 casts Ornithopter (a creature spell, an artifact creature): no counter. Bot1 casts Lightning
+# Bolt: Ral gets a counter and the Otter token's prowess (a noncreature spell) makes it 2/2 until end of turn. Bot2 counters the
+# Bolt, and Ral keeps the counter: the trigger resolves before the spell and is independent of it (the ruling).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ral, Crackling Wit
+Ornithopter
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Counterspell
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ral, Crackling Wit.Cast
+Bot2.Pass
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 4
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Create a 1/1)
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot1.Pass
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 5
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Triggers(Ral, Crackling Wit; Otter)
+? Stack.Count = 3
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 6
+Bot1.Battlefield.Otter.Power = 2
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Counterspell

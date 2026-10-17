@@ -1,0 +1,50 @@
+# Ral, Crackling Wit, +1: "Create a 1/1 blue and red Otter creature token with prowess." Bot1 casts Ral (loyalty 4, no counter
+# from casting him: he is not on the battlefield yet, CR 603.2) with four Moxen and +1s him: loyalty 5 and a 1/1 blue and red
+# Otter. A second loyalty ability the same turn is refused (CR 606.3). On turn 3 the -10 is refused with only
+# five loyalty counters (CR 606.6: a loyalty cost can't be paid with too few counters), beside the +1, which is offered and
+# makes a second Otter (loyalty 6).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ral, Crackling Wit
+Island x3
+Island x20
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ral, Crackling Wit.Cast
+Bot2.Pass
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 4
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Create a 1/1)
+Bot2.Pass
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 5
+? Bot1.Battlefield.Otter.Power = 1
+? Bot1.Battlefield.Otter.Toughness = 1
+? Bot1.Battlefield.Otter.Colors = Blue; Red
+? Bot1.Battlefield.Otter.Subtypes = Otter
+? Bot1.Battlefield.Otter.Token = true
+! Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Draw three cards, then discard)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: You get an emblem)
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Create a 1/1)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 6
+Bot1.Battlefield.Otter#1.Power = 1
+Bot1.Battlefield.Otter#2.Power = 1
+Bot1.Emblems.Count = 0
