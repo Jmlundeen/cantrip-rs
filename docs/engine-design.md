@@ -505,7 +505,12 @@ changes nothing (the rulings). A card says what it asks with `CardDef::cast_fact
 of the spell and its caster), which `actions::cast` asks just before it records the spell's `Event::Cast`, and the answer is
 kept in that record, `history::Cast::fact`: the past is asked of the history, so nothing is added to the stack item. The
 effect reads it with `History::fact_as_cast(spell)`. A copy of the spell was not cast (CR 707.10), so it has no `Cast` and
-its fact is 0, which is the rulings' "the copy wasn't cast, so whether you controlled a Dragon won't matter". The `Cast`
+its fact is 0, which is the rulings' "the copy wasn't cast, so whether you controlled a Dragon won't matter". Nor has it
+what its object carries of a cast: `ops::copy_spell` gives it no `cast_from` (Sevinne's Reclamation's copy was not cast from a
+graveyard and does not copy itself; `statics::spell_you_cast` is `cast_from` alone, so a cast copy of a card, a prepare
+spell's, is a spell you cast), no `cast_untimely` and no granted way's `gains`. What was chosen and paid as the original
+was cast it does copy: X, kicks, other additional costs, gift and the alternative cost (`cast_way`, the item's `way`: a copy
+of a sneak-cast spell had its sneak cost paid). The `Cast`
 record grew from 12 to 16 bytes and the `Event` stayed 20; a card with no fact costs one `Option` test per cast. Steer
 Clear ("if you controlled a Mount"), Flame Discharge ("a modified creature"), Lethal Exploit ("for each modified creature you
 controlled") and Lifestream's Blessing ("the greatest power among creatures you controlled") print the same thing; a

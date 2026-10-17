@@ -1,7 +1,8 @@
 # Sevinne's Reclamation: a spent Black Lotus and a cracked Scalding Tarn are in the graveyard (both mana value 0). The
 # first Reclamation, cast from the hand, returns the Lotus, which pays for the flashback ({4}{W}) with its second life.
 # Cast from the graveyard it may be copied: Bot1 accepts, the original returns the Lotus again and the copy, with a new
-# target, returns the Tarn. The card itself ends exiled by flashback.
+# target, returns the Tarn. The copy was not cast (CR 707.10), so not from a graveyard: it offers no copy of itself. The
+# card itself ends exiled by flashback.
 
 [Bot1 Deck]
 Scalding Tarn
@@ -34,6 +35,8 @@ Bot1.Battlefield.Black Lotus.Activate(Color: White)
 Bot1.Graveyard.Sevinne's Reclamation.Cast(Bot1.Graveyard.Black Lotus; Ability: Flashback)
 Bot1.Accept
 Bot1.Target(Bot1.Graveyard.Scalding Tarn)
+Bot1.Pass
+! Bot1.Accept
 
 [Expect]
 Exile = Sevinne's Reclamation

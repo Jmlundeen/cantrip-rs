@@ -247,13 +247,14 @@ pub fn plus_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, char
     chars.toughness = chars.toughness.map(|v| v + T);
 }
 
-/// "Spells you cast" (CR 601.2i, 707.10a): `affected` is a spell on the stack that was cast, not a copy of one, and its controller
-/// is `source`'s controller. Thrumming Stone and Ral, Crackling Wit's emblem grant their abilities to such spells.
+/// "Spells you cast" (CR 601.2i, 707.10a): `affected` is a spell on the stack that was cast, from the zone it was cast from
+/// (a copy of a spell was cast from none, CR 707.10; a copy of a card that was cast, a prepare spell's, CR 707.12, 722.3c,
+/// is a spell cast), and its controller is `source`'s controller. Thrumming Stone and Ral, Crackling Wit's emblem grant
+/// their abilities to such spells.
 pub fn spell_you_cast(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId) -> bool {
     let s = view.state();
     let obj = s.obj(affected);
     obj.zone.is(ZoneKind::Stack)
-        && !obj.card_copy
         && obj.cast_from.is_some()
         && s.stack.iter().any(|i| i.kind == StackKind::Spell && i.object == affected && i.controller == s.obj(source).controller)
 }

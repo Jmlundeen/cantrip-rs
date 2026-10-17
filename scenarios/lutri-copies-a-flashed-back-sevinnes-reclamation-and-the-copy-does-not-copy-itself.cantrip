@@ -1,0 +1,51 @@
+# Sevinne's Reclamation: "If this spell was cast from a graveyard, you may copy this spell and may choose a new target for
+# the copy." A copy is not cast (CR 707.10), so it was cast from no zone: a copy of a flashed-back Reclamation does not offer
+# a copy of itself (the card's ruling). On turn 3 Bot1 casts Reclamation from the hand for a spent Black Lotus, then flashes
+# it back for the Lotus again and, with it on the stack, flashes in Lutri, the Spellchaser, whose trigger copies it with a
+# new target, the Scalding Tarn cracked on turn 1. The copy returns the Tarn and asks nothing; the original, cast from the
+# graveyard, returns the Lotus and offers its copy, which Bot1 takes (it has nothing left to return).
+
+[Bot1 Deck]
+Scalding Tarn
+Black Lotus
+Mox Pearl
+Mox Ruby
+Mox Jet
+Sevinne's Reclamation
+Lutri, the Spellchaser
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Scalding Tarn.Play
+Bot1.Battlefield.Scalding Tarn.Activate
+Bot1.Search(Mountain)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Sevinne's Reclamation.Cast(Bot1.Graveyard.Black Lotus)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Sevinne's Reclamation.Cast(Bot1.Graveyard.Black Lotus; Ability: Flashback)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Scalding Tarn)
+Bot1.Pass
+! Bot1.Accept
+Bot1.Pass
+Bot1.Accept
+
+[Expect]
+Exile = Sevinne's Reclamation
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Mountain; Mountain; Mox Pearl; Mox Ruby; Mox Jet; Lutri, the Spellchaser; Scalding Tarn; Black Lotus
