@@ -232,3 +232,15 @@ pub fn attacking_you_or_your_planeswalkers_costs<const N: u8>(q: &dyn Query, ask
     };
     yours.then_some(ManaCost { generic: N, ..ManaCost::ZERO })
 }
+
+/// "Artifacts and creatures entering don't cause abilities to trigger" (CR 603.2, 603.6a) as a `CardDef::trigger_rules` entry:
+/// an event that puts an artifact or a creature onto the battlefield, judged as it is there (the continuous effects applied),
+/// triggers no ability, the permanent's own enters abilities included. A land that is an artifact or a creature too stops a
+/// landfall ability; one that is neither does not (the rulings' Tireless Tracker). Doorkeeper Thrull and Karn, Argent
+/// Defender print it.
+pub fn artifacts_and_creatures_entering_dont_trigger(q: &dyn Query, _: &Asker, event: &Event, _: &Triggering) -> bool {
+    entering(event).is_some_and(|permanent| {
+        let chars = q.chars(permanent);
+        chars.is(CardType::Artifact) || chars.is(CardType::Creature)
+    })
+}
