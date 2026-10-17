@@ -1,20 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{Animation, animate, mana};
+use cantrip_mechanics::{lands, mana};
 use cantrip_oracle as oracle;
 
 /// "Until end of turn, this land becomes a 3/2 blue and black Elemental creature. It's still a land. It can't be
 /// blocked this turn."
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let words = g.words(item.object);
-    let animation = Animation {
-        power: 3,
-        toughness: 2,
-        colors: Some(words.colors(ColorSet(0b00110))),
-        subtype: Some(words.subtype(Subtype::Elemental)),
-        keywords: Keywords::NONE,
-        ability: None,
-    };
-    animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
+    let colors = ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Black).0);
+    lands::becomes_creature_until_end_of_turn(g, item, (3, 2), colors, Subtype::Elemental, Keywords::NONE);
     g.add_effect(item.object, item.object, EffectKind::AddKeywords(Keywords::of(&[Keyword::CantBeBlocked])), Duration::EndOfTurn);
     Ok(())
 }

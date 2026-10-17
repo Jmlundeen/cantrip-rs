@@ -1,22 +1,14 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens::create_map;
 use cantrip_mechanics::triggers;
-use cantrip_mechanics::{Animation, animate, mana};
+use cantrip_mechanics::{lands, mana};
 use cantrip_oracle as oracle;
 
 /// "Until end of turn, this land becomes a 2/3 white and blue Bird creature with flying. It's still a land."
 /// (CR 613.1d, 613.4b, 613.1e)
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let words = g.words(item.object);
-    let animation = Animation {
-        power: 2,
-        toughness: 3,
-        colors: Some(words.colors(ColorSet(ColorSet::of(Color::White).0 | ColorSet::of(Color::Blue).0))),
-        subtype: Some(words.subtype(Subtype::Bird)),
-        keywords: Keywords::of(&[Keyword::Flying]),
-        ability: None,
-    };
-    animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
+    let colors = ColorSet(ColorSet::of(Color::White).0 | ColorSet::of(Color::Blue).0);
+    lands::becomes_creature_until_end_of_turn(g, item, (2, 3), colors, Subtype::Bird, Keywords::of(&[Keyword::Flying]));
     Ok(())
 }
 

@@ -230,6 +230,30 @@ pub const fn verge<const A: u16, const B2: u16>(
     ]
 }
 
+/// A manland's animation (CR 613.1d, 613.4b): "Until end of turn, this land becomes a P/T [colors] [subtype] creature
+/// [with keywords]. It's still a land." The colors and the creature type are the ones the land's own text has now (CR 612),
+/// read through its words; the base power and toughness, the keywords and the type are laid over the land (see
+/// `animate`). Restless Anchorage, Restless Reef, Restless Vinestalk, Creeping Tar Pit and Celestial Colonnade print it.
+pub fn becomes_creature_until_end_of_turn(
+    g: &mut dyn Game,
+    item: &StackItem,
+    (power, toughness): (i16, i16),
+    colors: ColorSet,
+    subtype: Subtype,
+    keywords: Keywords,
+) {
+    let words = g.words(item.object);
+    let animation = crate::Animation {
+        power,
+        toughness,
+        colors: Some(words.colors(colors)),
+        subtype: Some(words.subtype(subtype)),
+        keywords,
+        ability: None,
+    };
+    crate::animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
+}
+
 /// What "[player] may search their library for a basic land card, put it onto the battlefield, then shuffle" asks.
 pub const FETCH_BASIC: Question = Question::new(
     "SearchLibrary",

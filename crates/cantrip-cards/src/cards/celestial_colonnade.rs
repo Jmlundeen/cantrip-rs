@@ -1,18 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{Animation, animate, mana};
+use cantrip_mechanics::{lands, mana};
 use cantrip_oracle as oracle;
 
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let words = g.words(item.object);
-    let animation = Animation {
-        power: 4,
-        toughness: 4,
-        colors: Some(words.colors(ColorSet(0b00011))),
-        subtype: Some(words.subtype(Subtype::Elemental)),
-        keywords: Keywords::of(&[Keyword::Flying, Keyword::Vigilance]),
-        ability: None,
-    };
-    animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
+    let colors = ColorSet(ColorSet::of(Color::White).0 | ColorSet::of(Color::Blue).0);
+    lands::becomes_creature_until_end_of_turn(g, item, (4, 4), colors, Subtype::Elemental, Keywords::of(&[Keyword::Flying, Keyword::Vigilance]));
     Ok(())
 }
 
