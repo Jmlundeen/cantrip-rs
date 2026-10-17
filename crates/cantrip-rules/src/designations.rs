@@ -201,7 +201,7 @@ pub fn keyword_designations(cx: &mut Cx) -> bool {
         let def = cx.card(card);
         let p = obj.controller;
         let player = cx.s().player(p);
-        if player.lost || cx.s().lost_all_abilities(id) {
+        if player.lost || cx.lost_all_abilities(id) {
             continue;
         }
         if def.ascend && !player.citys_blessing {

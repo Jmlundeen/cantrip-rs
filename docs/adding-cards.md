@@ -118,6 +118,8 @@ target(filter), up_to_one(filter), up_to(3, filter),               // target slo
 static MODAL: ModalDef = modes(&[mode(deal_3, "...").targets(&[targets::CREATURE]), mode(gain_3, "...")]).choose(1, 2);
 statics: &[static_ability(Layer::PtModify, attached_object, plus_one, "Equipped creature gets +1/+1.")],
 statics: &[characteristic_defining(Layer::PtDefine, power_is_creatures, "...")],
+statics: &[loses_all_abilities(attached_object, "Enchanted creature loses all abilities.")],  // never a hand-made layer-6 clear:
+                                                                  // the core must know (cost changes, replacements, triggers)
 replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "shuffles it into its owner's library").own_everywhere()],
 ways: &[way(cost("{1}{B}"), ZoneKind::Hand, "Pay {1}{B}; an opponent draws a card")],  // keywords: flashback::way(cost(..), text)
 kicker: kicker(mana("{2}{B}")),                                   // `multikicker(..)`

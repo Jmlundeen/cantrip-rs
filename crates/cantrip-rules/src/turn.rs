@@ -352,7 +352,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
         let card = obj.copy.map_or(obj.card, |c| c.card);
         let asker = Asker { source: id, controller: player };
         // A scan once a turn of what is on the battlefield, for a card that has such a rule.
-        if !cx.card(card).turn_begin.is_empty() && cx.s().lost_all_abilities(id) {
+        if !cx.card(card).turn_begin.is_empty() && cx.lost_all_abilities(id) {
             continue;
         }
         for rule in cx.card(card).turn_begin {
@@ -615,7 +615,7 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().block_rules[obj.copy.map_or(obj.card, |c| c.card).0 as usize] && !cx.s().lost_all_abilities(id)
+            cx.cards().block_rules[obj.copy.map_or(obj.card, |c| c.card).0 as usize] && !cx.lost_all_abilities(id)
         })
         .collect();
     let mut allowed = Vec::new();

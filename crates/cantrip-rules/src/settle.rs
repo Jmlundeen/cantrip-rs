@@ -737,7 +737,7 @@ impl<'a> TriggerStatics<'a> {
 fn trigger_rule_sources(cx: &Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     ids.iter()
         .copied()
-        .filter(|&id| cx.cards().trigger_rules[cx.cards().current(cx.s().obj(id)).0 as usize] && !cx.s().lost_all_abilities(id))
+        .filter(|&id| cx.cards().trigger_rules[cx.cards().current(cx.s().obj(id)).0 as usize] && !cx.lost_all_abilities(id))
         .collect()
 }
 

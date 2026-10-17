@@ -50,7 +50,7 @@ fn madness_applies(cx: &Cx, z: &ZoneChange) -> bool {
         && z.from.is(ZoneKind::Hand)
         && z.to.is(ZoneKind::Graveyard)
         && cx.cards().get(card_of(cx, z.object)).madness.is_some()
-        && !cx.s().lost_all_abilities(z.object)
+        && !cx.lost_all_abilities(z.object)
 }
 
 /// The card whose definition a permanent's abilities come from: the card it copies, if it copies one.
@@ -134,7 +134,7 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
     let mut consider = |id: ObjectId, own_only: bool| {
         let card = card_of(cx, id);
         // A permanent that has lost all its abilities has no replacement effects (CR 613.1f).
-        if !cards.replaces[card.0 as usize] || cx.s().lost_all_abilities(id) {
+        if !cards.replaces[card.0 as usize] || cx.lost_all_abilities(id) {
             return;
         }
         let asker = Asker { source: id, controller: controller_of(cx, id, proposal) };

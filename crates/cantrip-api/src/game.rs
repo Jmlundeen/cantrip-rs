@@ -89,7 +89,7 @@ pub fn may_cause_discard_or_sacrifice(q: &dyn Query, causer: PlayerId, player: P
         let o = q.obj(id);
         let def = q.card(o.copy.map_or(o.card, |c| c.card));
         // A permanent that has lost all its abilities has no such rule (CR 613.1f).
-        if def.cause_rules.is_empty() || q.state().lost_all_abilities(id) {
+        if def.cause_rules.is_empty() || q.lost_all_abilities(id) {
             continue;
         }
         let asker = Asker { source: id, controller: o.controller };
@@ -130,6 +130,12 @@ pub trait Query {
 
     /// An object's characteristics after every continuous effect (CR 613).
     fn chars(&self, id: ObjectId) -> Chars;
+
+    /// Whether `id` has lost all its abilities (CR 613.1f), to a resolved effect or a static ability, so that the
+    /// abilities its card prints are gone: the one answer every rule read off a card is judged by - static abilities
+    /// from layer 6 on, play rules, cost changes, replacement effects, trigger and block rules - so that they agree with
+    /// layer 6. Abilities granted after the loss are the object's own and do not come back through the card.
+    fn lost_all_abilities(&self, id: ObjectId) -> bool;
 
     /// The words an object's text has now (CR 612): every color word, basic land type and creature type its rules text
     /// names is read through these, `words(source).subtype(Subtype::Goblin)` for "Goblin", so a text-changing effect

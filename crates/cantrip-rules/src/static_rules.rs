@@ -12,7 +12,7 @@ fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + 'a) -> impl Iterator
         let obj = cx.s().obj(id);
         let def = cx.card(cx.cards().current(obj));
         // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
-        (has(def) && !cx.s().lost_all_abilities(id)).then_some((id, obj.controller, def))
+        (has(def) && !cx.lost_all_abilities(id)).then_some((id, obj.controller, def))
     })
 }
 
@@ -95,7 +95,7 @@ pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId
     s.battlefield().iter().any(|&id| {
         let obj = s.obj(id);
         let def = cards.get(cards.current(obj));
-        !def.cant_gain_life.is_empty() && !s.lost_all_abilities(id) && {
+        !def.cant_gain_life.is_empty() && !q.lost_all_abilities(id) && {
             let asker = Asker { source: id, controller: obj.controller };
             def.cant_gain_life.iter().any(|rule| rule(q, &asker, player))
         }
@@ -117,7 +117,7 @@ pub fn may_attack_despite_defender(q: &dyn Query, cards: &'static CardTable, cre
     s.battlefield().iter().any(|&id| {
         let obj = s.obj(id);
         let def = cards.get(cards.current(obj));
-        !def.attacks_despite_defender.is_empty() && !s.lost_all_abilities(id) && {
+        !def.attacks_despite_defender.is_empty() && !q.lost_all_abilities(id) && {
             let asker = Asker { source: id, controller: obj.controller };
             def.attacks_despite_defender.iter().any(|rule| rule(q, &asker, creature))
         }
@@ -259,7 +259,7 @@ pub fn activation_forbidders(cx: &Cx) -> Vec<ObjectId> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().activation_rules[cx.cards().current(obj).0 as usize] && !cx.s().lost_all_abilities(id)
+            cx.cards().activation_rules[cx.cards().current(obj).0 as usize] && !cx.lost_all_abilities(id)
         })
         .collect()
 }

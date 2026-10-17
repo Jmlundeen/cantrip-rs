@@ -1,0 +1,49 @@
+# Losing all abilities to a resolved effect is a layer-6 effect too (CR 611.2, 613.1f), and layers 1 to 5 come first (CR
+# 613.1, 613.6): Painter's Servant's "All cards that aren't on the battlefield, spells, and permanents are the chosen color in
+# addition to their other colors" (layer 5) has applied by the time Oko, Thief of Crowns' +1 takes its abilities away, so Bot1's
+# Island and Bot2's Mox stay blue. The Servant is a green Elk 3/3: Oko's "becomes green" is a later layer-5 effect and sets its
+# color.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Painter's Servant
+Island
+Island x16
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Island
+Oko, Thief of Crowns
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Blue)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Island.Colors = Blue
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+Bot2.Battlefield.Oko, Thief of Crowns.Activate(Bot1.Battlefield.Painter's Servant; Ability: Elk)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Painter's Servant.Colors = Green
+Bot1.Battlefield.Painter's Servant.Subtypes = Elk
+Bot1.Battlefield.Painter's Servant.Power = 3
+Bot1.Battlefield.Island.Colors = Blue
+Bot2.Battlefield.Mox Ruby.Colors = Blue
+Bot2.Battlefield.Oko, Thief of Crowns.Colors = Blue; Green

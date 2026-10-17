@@ -18,7 +18,7 @@ fn blunderbusses_on(q: &dyn Query, creature: ObjectId) -> Vec<ObjectId> {
         .battlefield()
         .iter()
         .copied()
-        .filter(|&id| q.obj(id).attached_to == Some(creature) && q.chars(id).card == back && !q.state().lost_all_abilities(id))
+        .filter(|&id| q.obj(id).attached_to == Some(creature) && q.chars(id).card == back && !q.lost_all_abilities(id))
         .collect();
     on.sort_by_key(|&id| q.obj(id).timestamp);
     on

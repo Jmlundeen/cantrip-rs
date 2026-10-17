@@ -89,6 +89,21 @@ impl Chars {
         self.protected_from(source) || self.protection_players & (1 << controller.0) != 0
     }
 
+    /// "Loses all abilities" (CR 613.1f): every ability it has now goes, keywords, protections and "hexproof from"
+    /// included. What is granted after it, in timestamp order, it keeps (CR 613.7).
+    pub fn lose_all_abilities(&mut self) {
+        self.keywords = Keywords::NONE;
+        self.protection = ColorSet::NONE;
+        self.protection_colorless = false;
+        self.protection_players = 0;
+        self.protection_types = TypeSet::NONE;
+        self.protection_colored_spells = false;
+        self.protection_everything = false;
+        self.hexproof_from = HexproofFrom::NONE;
+        self.must_attack = false;
+        self.abilities = [None; MAX_ABILITIES];
+    }
+
     /// The fewest creatures that may block it (CR 509.1b): menace's two, "except by three or more creatures"'s three,
     /// otherwise one. A creature blocked by fewer, but at least one, is not blocked legally.
     pub fn minimum_blockers(&self) -> u8 {

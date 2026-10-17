@@ -567,6 +567,10 @@ impl Query for Game {
         layers::chars(self.cards, &self.state, &self.log, id)
     }
 
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        layers::lost_all_abilities(self.cards, &self.state, &self.log, id)
+    }
+
     fn can_target(&self, asker: &Asker, target: Target) -> bool {
         layers::can_target(self.cards, &self.state, &self.log, asker, target)
     }
@@ -591,6 +595,10 @@ impl Query for Cx<'_> {
 
     fn chars(&self, id: ObjectId) -> Chars {
         layers::chars(self.g.cards, &self.g.state, &self.g.log, id)
+    }
+
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        layers::lost_all_abilities(self.g.cards, &self.g.state, &self.g.log, id)
     }
 
     fn can_target(&self, asker: &Asker, target: Target) -> bool {

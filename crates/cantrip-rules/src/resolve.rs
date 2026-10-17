@@ -203,6 +203,10 @@ impl Query for Given<'_> {
         self.q.chars(id)
     }
 
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        self.q.lost_all_abilities(id)
+    }
+
     fn can_target(&self, asker: &Asker, target: Target) -> bool {
         self.q.can_target(asker, target)
     }
@@ -250,6 +254,10 @@ impl Query for Reader<'_> {
 
     fn chars(&self, id: ObjectId) -> Chars {
         layers::chars(self.cards, self.state, self.events, id)
+    }
+
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        layers::lost_all_abilities(self.cards, self.state, self.events, id)
     }
 
     fn can_target(&self, asker: &Asker, target: Target) -> bool {

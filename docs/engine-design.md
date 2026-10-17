@@ -211,6 +211,19 @@ Dirge asks it from the graveyard ("up to two creature cards with total mana valu
   timestamp order with the effects and other statics of that layer. One that affects other objects
   (`granted_static_ability`, The Irencrag's "Equipped creature gets +3/+3") makes the permanent a static source
   (`StaticSources::granted`) while it still has the ability, applied among the other sources' abilities at its timestamp.
+- **"Loses all abilities" (613.1f)** comes from a resolved effect (`EffectKind::LoseAllAbilities`: Oko's Elk, The Wondrous
+  Wasp) or a static ability (`loses_all_abilities(affects, text)`, a `StaticDef` with `loses_all`: Eaten by Piranhas; Darksteel
+  Mutation, Kenrith's Transformation, Frogify and Humility print the same). Either is a layer-6 effect at its timestamp, so an
+  ability gained after it stays (613.7). Every rule read off a card - its static abilities from layer 6 on, cost changes,
+  replacement effects, play rules, trigger, block and activation rules, granted ways, miracles - asks the one answer,
+  `Query::lost_all_abilities` (`layers::lost_all_abilities`): the effects, then `layers::lost_to_statics`, the permanents such
+  static abilities took everything from, worked out once per position and history length (an `affects` may read the past) and
+  free while no such ability is on the battlefield. A source's static abilities of layers 1 to 5 have applied by the time
+  layer 6 takes them (613.6: Painter's Servant enchanted by Eaten by Piranhas, or turned into an Elk, still paints everything),
+  so the static-source list keeps such a source and leaves it out from layer 6 on. One "loses all abilities" ability that
+  would take another's source's applies first (613.8a dependency), each taking the other's in timestamp order (613.8b); no
+  card in content can make two of them meet (an Aura is no creature), so that order has no scenario. The host lists every
+  rules line of an object that lost all abilities as lost, not only its keywords and activated and triggered abilities.
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.

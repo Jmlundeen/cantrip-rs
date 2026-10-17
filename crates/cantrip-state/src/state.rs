@@ -64,6 +64,19 @@ pub struct GameState {
     pub epoch: u64,
     /// The permanents whose static abilities could apply to anything, found by the layers (a function of the position).
     pub static_sources: std::cell::RefCell<StaticSources>,
+    /// The permanents that have lost all their abilities to a static ability (CR 613.1f), found by the layers for one
+    /// position and history (a function of both: such an ability may read the past).
+    pub lost_to_statics: std::cell::RefCell<LostToStatics>,
+}
+
+/// The layers' list of the permanents a "loses all abilities" static ability took everything from, made for one epoch
+/// of the state and one length of the history.
+#[derive(Clone, Debug)]
+pub struct LostToStatics {
+    pub key: (u64, usize),
+    pub objects: Vec<ObjectId>,
+    /// Being worked out: a question asked from inside the working out is answered without it.
+    pub finding: bool,
 }
 
 /// When the keyword counters of one kind on a permanent were put on it (CR 613.7c), for layer 6's timestamp order.
@@ -78,7 +91,13 @@ pub struct CounterStamp {
 #[derive(Clone, Debug)]
 pub struct StaticSources {
     pub epoch: u64,
-    pub list: Vec<(ObjectId, ZoneKind)>,
+    /// Each source, the zone it functions from, and whether a resolved effect took all its abilities away (CR 613.1f):
+    /// such a source's static abilities of layers 1 to 5 still apply, as they did before layer 6 took them (CR 613.6),
+    /// and those of layer 6 on do not.
+    pub list: Vec<(ObjectId, ZoneKind, bool)>,
+    /// Those of `list` with a static ability that makes objects lose all abilities (`StaticDef::loses_all`), which no
+    /// resolved effect has taken away, in timestamp order.
+    pub strippers: Vec<(ObjectId, ZoneKind)>,
     /// The permanents with hone counters on them (CR 122.1j), in battlefield order: what each gives the creature it is
     /// attached to is no ability of it, so it is found apart from `list`, whatever abilities the permanent has lost.
     pub honed: Vec<ObjectId>,
@@ -254,7 +273,8 @@ impl GameState {
             unsettled: true,
             journal: Journal::default(),
             epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), honed: Vec::new(), granted: Vec::new() }),
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), honed: Vec::new(), granted: Vec::new() }),
+            lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), finding: false }),
         }
     }
 
@@ -276,11 +296,10 @@ impl GameState {
         self.zone(Zone::BATTLEFIELD)
     }
 
-    /// Whether `id` has lost all its abilities (CR 613.1f): the abilities its card prints, which are what static rules read
-    /// off a card, are gone. The one answer every such rule is judged by - the static abilities `layers.rs` collects, play
-    /// rules, cost changes, replacement effects, restrictions - so that they agree with the layer-6 loss; abilities granted
-    /// after it are the object's own and do not come back through the card. Free while no effect is lasting.
-    pub fn lost_all_abilities(&self, id: ObjectId) -> bool {
+    /// Whether a resolved spell or ability's effect has taken all of `id`'s abilities (CR 611.2, 613.1f). Only half of
+    /// the answer: a static ability may take them too, which only the layers know, so every rule asks
+    /// `Query::lost_all_abilities` (`layers::lost_all_abilities`), never this. Free while no effect is lasting.
+    pub fn lost_all_abilities_to_an_effect(&self, id: ObjectId) -> bool {
         !self.effects.is_empty() && self.effects.iter().any(|e| e.affected == id && e.kind == EffectKind::LoseAllAbilities)
     }
 

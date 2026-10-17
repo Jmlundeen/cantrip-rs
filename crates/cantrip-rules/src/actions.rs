@@ -1006,7 +1006,7 @@ fn cost_change_sources(cx: &Cx) -> Vec<ObjectId> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().cost_changes[cx.cards().current(obj).0 as usize] && !cx.s().lost_all_abilities(id)
+            cx.cards().cost_changes[cx.cards().current(obj).0 as usize] && !cx.lost_all_abilities(id)
         })
         .collect()
 }
@@ -1036,6 +1036,10 @@ impl Query for AsFace<'_> {
         self.cx.card_id(def)
     }
 
+    fn lost_all_abilities(&self, id: ObjectId) -> bool {
+        self.cx.lost_all_abilities(id)
+    }
+
     fn events(&self) -> &[Record] {
         self.cx.events()
     }
@@ -1054,7 +1058,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
     let Some(ability) = game.chars(source).abilities().nth(index as usize) else { return Vec::new() };
     let AbilityDef::Activated(def) = game.cards.ability(ability) else { return Vec::new() };
     let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.state.lost_all_abilities(id)
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
     });
     let obj = game.state.obj(source);
     let own = !game.cards.get(obj.copy.map_or(obj.card, |c| c.card)).own_cost_changes.is_empty();
@@ -1074,7 +1078,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
 pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, candidates: &[Target]) -> Vec<ManaCost> {
     let def = game.cards.get(game.state.obj(card).card);
     let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.state.lost_all_abilities(id)
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
     });
     if !(changers || !def.own_cost_changes.is_empty()) {
         return Vec::new();
@@ -1812,7 +1816,7 @@ pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, comman
     for &id in s.battlefield().iter().chain(emblems) {
         let obj = s.obj(id);
         let card = cards.current(obj);
-        if obj.controller != player || !cards.play_rules[card.0 as usize] || s.lost_all_abilities(id) {
+        if obj.controller != player || !cards.play_rules[card.0 as usize] || q.lost_all_abilities(id) {
             continue;
         }
         let def = cards.get(card);
@@ -1918,7 +1922,7 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
         if !cx.chars(id).is(CardType::Land) {
             continue;
         }
-        let ways = granted.get_or_insert_with(|| granted_ways_of(cx.cards(), cx.s()));
+        let ways = granted.get_or_insert_with(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log));
         for (k, &(granter, controller, way)) in ways.iter().enumerate().take(WAY_GRANTED_SLOTS as usize) {
             if way.lands && (way.cost)(cx, &Asker { source: granter, controller }, id, player).is_some() {
                 options.push(ActionOption::on(ActionKind::PlayLand, id, granted_way(k, GRANTED_FACE_WHOLE)));
@@ -1952,7 +1956,7 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
             let obj = cx.s().obj(id);
             // A permanent that has lost all its abilities limits nothing (CR 613.1f).
             let limit = cx.card(obj.copy.map_or(obj.card, |c| c.card)).cast_limit;
-            if limit > 0 && cx.s().lost_all_abilities(id) { 0 } else { limit }
+            if limit > 0 && cx.lost_all_abilities(id) { 0 } else { limit }
         })
         .filter(|&n| n > 0)
         .min()
@@ -1997,12 +2001,12 @@ fn cast_only_if_met(cx: &Cx, face: &'static CardDef, asker: &Asker) -> bool {
 
 /// The ways the permanents on the battlefield give cards in graveyards to be cast (CR 604, 118.9): each with the permanent
 /// and its controller, in the order a way number counts them. Nothing is allocated while no permanent has one.
-fn granted_ways_of(cards: &CardTable, s: &GameState) -> Vec<(ObjectId, PlayerId, &'static GrantedWay)> {
+fn granted_ways_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<(ObjectId, PlayerId, &'static GrantedWay)> {
     let mut ways = Vec::new();
     for &id in s.battlefield() {
         let obj = s.obj(id);
         let def = cards.get(cards.current(obj));
-        if !def.granted_ways.is_empty() && s.lost_all_abilities(id) {
+        if !def.granted_ways.is_empty() && crate::layers::lost_all_abilities(cards, s, log, id) {
             continue;
         }
         for way in def.granted_ways {
@@ -2231,7 +2235,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             // that would be cast, the only spell it would be on the stack (CR 709.3, 715.4, 712.8a), so a Room's door is
             // chosen here and a restriction on the spell ("mana value 3 or less") reads that door's characteristics.
             if zone.is(ZoneKind::Graveyard) && own {
-                let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s()));
+                let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log));
                 if !ways.is_empty() {
                     for (face_way, face_def) in faces_to_cast(def).into_iter().filter(|&(f, _)| !(land && f == GRANTED_FACE_WHOLE)) {
                         let face_instant = if face_way == GRANTED_FACE_WHOLE { instant } else { speed.face(face_def) };
@@ -2545,7 +2549,7 @@ fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &A
         ActionKind::CastSpell if option.index == WAY_BESTOW => "Bestow",
         ActionKind::CastSpell | ActionKind::PlayLand if granted_slot(option.index).is_some() => {
             let (k, _) = granted_slot(option.index).expect("a granted way");
-            granted_ways_of(cards, state).get(k).map_or("", |&(_, _, way)| way.text)
+            granted_ways_of(cards, state, log).get(k).map_or("", |&(_, _, way)| way.text)
         }
         ActionKind::CastSpell if option.index == WAY_SPLIT_LEFT => cards.get(state.obj(source).card).split.map_or("", |h| h.0.name),
         ActionKind::CastSpell if option.index == WAY_SPLIT_RIGHT => cards.get(state.obj(source).card).split.map_or("", |h| h.1.name),
@@ -2584,7 +2588,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             // A way a permanent gave is noted in the history against it (see the cast's note), and what it grants is the
             // land's from the moment it is on the battlefield.
             let granted = granted_slot(action.index).map(|(k, _)| {
-                let (granter, _, way) = granted_ways_of(cx.cards(), cx.s())[k];
+                let (granter, _, way) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k];
                 (granter, way)
             });
             if let Some((granter, _)) = granted {
@@ -2739,7 +2743,7 @@ fn cast(
         (_, Some(instead)) => Cost::mana(instead),
         _ if granted.is_some() => {
             let (k, _) = granted.expect("a granted way");
-            let (granter, controller, rule) = granted_ways_of(cx.cards(), cx.s())[k];
+            let (granter, controller, rule) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k];
             let asker = Asker { source: granter, controller };
             // Judged on the face being cast, as the offer was.
             let view = AsFace { cx: &*cx, spell: card, face };
@@ -2771,11 +2775,11 @@ fn cast(
     // A way a permanent gave is noted in the history against it, for a permission "once during each of your turns"
     // (CR 601.3): an activation of `GRANTED_WAY_USED`, past any ability a card prints.
     if let Some((k, _)) = granted {
-        let (granter, _, _) = granted_ways_of(cx.cards(), cx.s())[k];
+        let (granter, _, _) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k];
         let ability = AbilityRef { card: cx.s().obj(granter).card, index: GRANTED_WAY_USED };
         cx.record(Event::AbilityActivated { source: granter, ability, player });
         // "If you do, it gains ...": the spell carries it to the permanent it becomes.
-        if let Some(n) = granted_ways_of(cx.cards(), cx.s())[k].2.gains {
+        if let Some(n) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.gains {
             let ability = AbilityRef::delayed(cx.s().obj(granter).card, n);
             cx.st().update_obj(spell, |o| o.marks.gains = Some(ability));
         }

@@ -679,6 +679,20 @@ pub const fn static_ability(layer: Layer, affects: StaticAffects, apply: StaticA
     StaticDef { text, layer, affects, apply, ..StaticDef::BLANK }
 }
 
+/// A static ability by which every object `affects` accepts loses all abilities (CR 613.1f, layer 6): "enchanted
+/// creature loses all abilities" (Eaten by Piranhas, Darksteel Mutation, Kenrith's Transformation, Frogify), "all
+/// creatures lose all abilities" (Humility). Its effect takes away every ability the object has at its timestamp, its
+/// printed ones and those granted before it (CR 613.7), and the object's own static abilities of layer 6 and later no
+/// longer apply (CR 613.8a, dependency); those of earlier layers have applied by then (CR 613.6). Cost changes,
+/// replacement effects, play rules and the other rules a card prints are gone with them.
+pub const fn loses_all_abilities(affects: StaticAffects, text: &'static str) -> StaticDef {
+    StaticDef { text, layer: Layer::Ability, affects, apply: lose_all_abilities, loses_all: true, ..StaticDef::BLANK }
+}
+
+fn lose_all_abilities(_: &dyn LayerQuery, _: ObjectId, chars: &mut crate::Chars) {
+    chars.lose_all_abilities();
+}
+
 /// A static ability an effect gives an object (CR 613.1f), to be granted with `EffectKind::AddAbility` from the card's
 /// `delayed` list: the object itself is its source, so "you" and "your" are its controller's (CR 113.6, 109.5), and it
 /// applies in `layer` (which must be `Layer::PtDefine` or later) at the later of the object's timestamp and the

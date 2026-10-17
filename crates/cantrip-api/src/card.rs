@@ -180,6 +180,11 @@ pub struct StaticDef {
     /// For a characteristic-defining ability of power and toughness printed as stars: what the stars are worth once the
     /// ability is lost (CR 208.2a, 208.5, 613.1f), as `*/1+*` is 0/1. The card's printed power and toughness stay unset.
     pub lost_pt: Option<(i16, i16)>,
+    /// It makes what it affects lose all abilities (CR 613.1f, layer 6): `loses_all_abilities`. The layers read it to
+    /// know which objects have lost their printed abilities to a static ability, so that every rule judged by the
+    /// abilities a card prints (static abilities of layer 6 on, cost changes, replacement effects, play rules, trigger
+    /// rules) agrees with what layer 6 did (`Query::lost_all_abilities`).
+    pub loses_all: bool,
 }
 
 fn affects_nothing(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, _: &Chars) -> bool {
@@ -199,6 +204,7 @@ impl StaticDef {
             own: false,
             from: ZoneKind::Battlefield,
             lost_pt: None,
+            loses_all: false,
         };
 }
 
@@ -1239,7 +1245,7 @@ pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
         let granter = o.copy.map_or(o.card, |c| c.card);
         let def = q.card(granter);
         // A permanent that has lost all its abilities gives nothing (CR 613.1f).
-        if def.granted_miracles.is_empty() || q.state().lost_all_abilities(id) {
+        if def.granted_miracles.is_empty() || q.lost_all_abilities(id) {
             continue;
         }
         let asker = Asker { source: id, controller: o.controller };
@@ -1950,6 +1956,11 @@ impl CardTable {
                 if let AbilityDef::Static(s) = ability {
                     assert!(s.layer >= Layer::PtDefine, "{}: a granted static ability applies in layer 7 only (CR 613.1f)", card.name);
                 }
+            }
+            // The layers find what a "loses all abilities" static took from among the permanents
+            // (`layers::lost_to_statics`), and a characteristic-defining ability is no such ability (CR 604.3).
+            for s in card.statics.iter().filter(|s| s.loses_all) {
+                assert!(!s.everywhere && !s.own, "{}: a static ability that makes objects lose all abilities affects permanents", card.name);
             }
         }
         let anywhere = cards
