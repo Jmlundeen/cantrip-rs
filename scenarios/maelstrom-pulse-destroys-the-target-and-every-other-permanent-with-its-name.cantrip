@@ -1,0 +1,38 @@
+# Maelstrom Pulse targets Bot2's Ornithopter: it and every other Ornithopter with that name are destroyed together, whoever
+# controls them (Bot1's own goes too), while a differently named artifact (Bot2's Mox Ruby) is not
+# (CR 701.8a, 201.2). The Pulse is a sorcery cast on Bot1's turn 3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Ornithopter
+Maelstrom Pulse
+Swamp x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Mox Ruby
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Maelstrom Pulse.Cast(Bot2.Battlefield.Ornithopter#1)
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Pearl
+Bot1.Graveyard = Maelstrom Pulse; Ornithopter
+Bot2.Battlefield = Mox Ruby
+Bot2.Graveyard = Ornithopter; Ornithopter

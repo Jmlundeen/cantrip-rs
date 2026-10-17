@@ -1,0 +1,45 @@
+# "Target nonland permanent": Bot2's Forest is refused as a target while its Ornithopter (the positive control) is not.
+# Then Bot2 sacrifices a Welding Jar in response to give the second Ornithopter a regeneration shield (CR 701.19a): the
+# targeted Ornithopter is destroyed, the shielded namesake is only tapped (the destroy of each is its own, CR 701.8, 701.19)
+# and the Jar, a different name, is not touched.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Maelstrom Pulse
+Swamp x13
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Ornithopter
+Welding Jar
+Welding Jar
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Welding Jar.Cast
+Bot2.Hand.Welding Jar.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Maelstrom Pulse.Cast(Bot2.Battlefield.Forest)
+Bot1.Hand.Maelstrom Pulse.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot2.Battlefield.Welding Jar.Activate(Bot2.Battlefield.Ornithopter#2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Ornithopter; Welding Jar
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Graveyard = Ornithopter; Welding Jar
+Bot1.Graveyard = Maelstrom Pulse
+Stack.Count = 0

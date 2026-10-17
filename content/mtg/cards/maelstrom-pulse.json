@@ -1,0 +1,6 @@
+{
+  "name": "Maelstrom Pulse",
+  "manaCost": "{1}{B}{G}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target nonland permanent and all other permanents with the same name as that permanent."
+}

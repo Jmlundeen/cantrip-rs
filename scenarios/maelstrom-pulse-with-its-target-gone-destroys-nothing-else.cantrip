@@ -1,0 +1,44 @@
+# Bot2 answers Maelstrom Pulse with Snakeskin Veil on the targeted Ornithopter: hexproof makes the spell's only target
+# illegal, so the spell does not resolve (CR 608.2b) and the other Ornithopter, which the effect would have named, is not
+# destroyed either.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Maelstrom Pulse
+Swamp x13
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Ornithopter
+Snakeskin Veil
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Maelstrom Pulse.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Ornithopter; Ornithopter
+Bot2.Battlefield.Ornithopter#1.Keywords = Flying; Hexproof
+Bot1.Graveyard = Maelstrom Pulse
+Bot2.Graveyard = Snakeskin Veil
