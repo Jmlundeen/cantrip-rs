@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::library::{Find, instant_or_sorcery_card, search_to_hand};
-use cantrip_mechanics::tokens;
+use cantrip_mechanics::{prepare, tokens};
 use cantrip_oracle as oracle;
 
 /// Wild Idea: "Search your library for an instant or sorcery card, reveal it, put it into your hand, then shuffle." (CR 701.23): the
@@ -20,12 +20,6 @@ pub static WILD_IDEA: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// "Sanar enters prepared" (CR 614.1d, 722.3a).
-fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.prepared = true;
-    Ok(())
-}
-
 /// "Activate only if you've cast an instant or sorcery spell this turn" (CR 602.5b): asked as the ability is activated. A copy of
 /// a prepare spell that was cast counts like any spell cast (CR 722.3c, 601.2i); a copy of a spell put onto the stack is not cast.
 fn cast_an_instant_or_sorcery_this_turn(q: &dyn Query, asker: &Asker) -> bool {
@@ -35,7 +29,7 @@ fn cast_an_instant_or_sorcery_this_turn(q: &dyn Query, asker: &Asker) -> bool {
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP, tokens::create_a_treasure, "{T}: Create a Treasure token. Activate only if you've cast an instant or sorcery spell this turn.")
         .condition(cast_an_instant_or_sorcery_this_turn)],
-    enters: Some(enters_prepared),
+    enters: Some(prepare::enters_prepared),
     prepare: Some(&WILD_IDEA),
     ..oracle::SANAR_UNFINISHED_GENIUS
 };

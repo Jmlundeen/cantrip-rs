@@ -1,0 +1,45 @@
+# Sanar's "Activate only if you've cast an instant or sorcery spell this turn" is about spells its controller cast (CR 602.5b, 601.2i). On
+# turn 3 Bot2 casts Lightning Bolt at Sanar (0/4, it survives) while Bot1 holds priority in its main phase: Bot1 has cast nothing, so the
+# Treasure ability is refused. Bot1 then casts its own Lightning Bolt, and the same activation (the positive control) works.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Sanar, Unfinished Genius
+Lightning Bolt
+Plains x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Sanar, Unfinished Genius.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sanar, Unfinished Genius)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Sanar, Unfinished Genius.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+Bot1.Battlefield.Sanar, Unfinished Genius.Activate
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Treasure Token.Token = true
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt

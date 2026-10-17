@@ -1,0 +1,45 @@
+# Sanar's Wild Idea: "Search your library for an instant or sorcery card ..." may find nothing (CR 701.23b): the library holds a
+# Lightning Bolt, but Bot1 chooses to find nothing (`Search()`), so the Bolt stays in the library (shuffled) and the hand gets nothing.
+# The copy is cast from exile for {3}{U}{R} with five Moxen; Sanar is unprepared.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Sanar, Unfinished Genius
+Plains
+Plains
+Lightning Bolt
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sanar, Unfinished Genius.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Wild Idea.Cast
+Bot2.Pass
+Bot1.Search()
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Hand = Plains; Plains
+Bot1.Library.Count = 12
+Bot1.Battlefield.Sanar, Unfinished Genius.Prepared = (absent)

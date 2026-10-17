@@ -1,0 +1,51 @@
+# Omnivorous Flytrap's delirium is an intervening "if" (CR 603.4): it is checked when the ability would trigger and again as it
+# resolves. The Flytrap enters with four card types in Bot1's graveyard (sorcery, instant, artifact and creature, from Faithless
+# Looting) and the trigger goes on the stack with its divided counters; Bot2 answers by exiling the graveyard with Soul-Guide
+# Lantern, so on resolution the "if" is false and the ability does nothing: no counters, and the graveyard stays empty.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Faithless Looting
+Ornithopter
+Lightning Bolt
+Omnivorous Flytrap
+Plains x12
+
+[Bot2 Deck]
+Mox Pearl
+Soul-Guide Lantern
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Choose(Ornithopter; Lightning Bolt)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Omnivorous Flytrap.Cast
+Bot2.Pass
+Bot1.Divide(Omnivorous Flytrap: 2)
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Omnivorous Flytrap.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard.Count = 0
