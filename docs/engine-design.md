@@ -465,6 +465,8 @@ from the hand, or from a graveyard or a library's top a rule lets lands be playe
 A permission may stand under a condition (`PlayCondition`, CR 611.2): "during any turn you attacked with a Rogue" (Robber of the
 Rich), "if you control a Wizard" (`ControlsSubtype`, Flameshape), asked whenever the card would be played - a land play by the
 permission as much as a cast - and so are its other terms (`actions::permission_stands`: a warp card's later turn).
+A permission may also be for the card's Adventure alone (`PlayGrant::adventure_only`, CR 715.3: Mosswood Dreadknight's "cast it
+from your graveyard as an Adventure"): neither the card itself nor another face of it is cast by it.
 
 The cleanup step removes all marked damage (CR 514.2) except from a permanent a static ability keeps it on:
 `CardDef::damage_stays` (`DamageStaysRule`, asked of each damaged permanent by the permanents on the battlefield with their
