@@ -27,6 +27,21 @@ pub fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtyp
     q.state().battlefield().iter().any(|&id| q.controller(id) == controller && q.chars(id).has_subtype(land_type))
 }
 
+/// "This land enters tapped. As it enters, choose a color." (CR 614.1c, 614.12a): both as it enters, the color kept on the
+/// permanent (CR 607.2d). Sunken Citadel and Valgavoth's Lair print it.
+pub fn enters_tapped_choosing_a_color(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    entering.tapped = true;
+    entering.chosen_color = Some(crate::choose_color(g, entering.controller, entering.object)?);
+    Ok(())
+}
+
+/// "Mana of the chosen color" (CR 106.5): the one color chosen as it entered, none if none was (a land that became a copy of it
+/// without entering), and then the ability adds no mana. "The chosen color" is no color word, so a text-changing effect leaves it
+/// as it is (CR 612.2). The colors for a mana ability's `colors_from`: Sunken Citadel and Valgavoth's Lair.
+pub fn chosen_color(q: &dyn Query, asker: &Asker) -> ColorSet {
+    q.obj(asker.source).chosen_color.map_or(ColorSet::NONE, ColorSet::of)
+}
+
 /// "This land enters tapped unless you control a [land type]" (CR 614.1c): read on the battlefield as it is while the land
 /// enters, so the land itself is not counted, through the layers (a land of any kind may have the type). Arena of Glory
 /// (Mountain), Castle Locthwain (Swamp) and Shifting Woodland (Forest) print it.
