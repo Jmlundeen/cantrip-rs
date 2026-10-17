@@ -624,9 +624,13 @@ and takes the land's abilities there. The two disagree only for an object a laye
 Man, Fluid Felon becoming a land; a land animated into a non-land by an effect that sets its types): such an object under Magus of
 the Moon is a Mountain and loses the abilities among its abilities, but `Query::lost_all_abilities` does not say so, so the rules
 its card prints apart from its abilities (replacement effects, cost changes, static abilities of other objects) would still apply.
-Hydro-Man prints none. Likewise a land about to enter (`layers::loses_rules_text_entering`, CR 614.12) is judged by its own card or
-the copy it enters as, without the layer 1-3 effects of other objects: none in content changes a land's supertypes or types as it
-enters. A fix applies the object's own layer-4 effects that change its card types before asking.
+Hydro-Man prints none. Life and Limb (2026-10-17) is another such effect: it makes every Saproling a Forest land, so a Woodland
+Changeling under Life and Limb and Blood Moon is a Mountain (blood-moon-after-life-and-limb-...) without being counted here; it
+prints nothing but Changeling, so nothing differs. Likewise a permanent about to enter (`layers::loses_rules_text_entering`, CR
+614.12) is judged by its own card or the copy it enters as, without the layer 1-4 effects of other objects - for a subtype-setting
+effect and for a "loses all abilities" one alike (Blood Sun, Humility): none in content changes a land's supertypes or types as it
+enters, and no Saproling with an "enters" replacement of its own exists to enter under Life and Limb and Blood Sun. A fix applies
+the other objects' effects of layers 1 to 4 to the entering object before asking.
 
 **Scenarios.** none: no card in content reaches it.
 
