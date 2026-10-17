@@ -1182,7 +1182,7 @@ public sealed class Decisions
             CardChoicePurposeView.CastFree => $"{source}: choose {many}{kind} card(s) to cast{where} without paying their mana costs.",
             CardChoicePurposeView.CastCopyFree =>
                 $"{source}: choose {many}{kind} {(prompt.Count == 1 ? "copy" : "copies")} to cast{where} without paying their mana costs. The copies cease to exist if not cast.{budget}",
-            CardChoicePurposeView.Play => $"{source}: choose {many}{kind} card(s) you may play this turn without paying their cost.",
+            CardChoicePurposeView.Play => $"{source}: choose {many}{kind} card(s) you may play this turn. The card's text says whether you pay its costs.",
             CardChoicePurposeView.Vote => $"{source}: cast your vote.",
             CardChoicePurposeView.TapToPay => $"{source}: tap creatures to pay its cost.",
             CardChoicePurposeView.ExileToPay => $"{source}: exile {many}{kind} card(s) from your hand to pay for it.",

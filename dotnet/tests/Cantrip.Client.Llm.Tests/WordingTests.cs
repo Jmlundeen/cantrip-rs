@@ -85,6 +85,30 @@ public sealed class WordingTests
     }
 
     [Fact]
+    public void A_choice_of_a_card_to_play_does_not_say_it_is_free()
+    {
+        var chooser = new ScriptedChooser([0]);
+        ObjectView bolt = In(Card(3, "Lightning Bolt", "{R}"), ZoneKindView.Exile, Me);
+        ObjectView island = In(Card(4, "Island", "{0}"), ZoneKindView.Exile, Me);
+
+        new Decisions(chooser).Answer(
+            Seated(bolt, island),
+            new ChooseCardsPromptMessage
+            {
+                Player = Me,
+                Source = Handle(9),
+                Purpose = CardChoicePurposeView.Play,
+                Cards = [Handle(3), Handle(4)],
+                Eligible = [Handle(3), Handle(4)],
+                Count = 1,
+            });
+
+        string heading = chooser.Asked[0].Heading;
+        Assert.Contains("you may play this turn", heading, StringComparison.Ordinal);
+        Assert.DoesNotContain("without paying", heading, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void A_free_cast_of_copies_says_copies_free_and_what_is_left_of_the_budget()
     {
         var chooser = new ScriptedChooser([0]);
