@@ -1,0 +1,38 @@
+# Warg Tactics, first mode: "Destroy target creature with flying." Bot2 controls an Ornithopter (flying) and an Elvish Mystic
+# (not). The target question refuses the Mystic (beside the Ornithopter, the positive control, which is destroyed). The Mystic
+# is untouched. Warg Tactics is an instant: Bot1 casts it on Bot2's turn 2 after the Ornithopter is cast.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Warg Tactics
+Island x17
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Warg Tactics.Cast
+Bot1.Modes(Destroy target creature with flying)
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Elvish Mystic.Damage = 0
+Bot1.Graveyard = Warg Tactics

@@ -1,0 +1,69 @@
+# Warg Tactics, second mode: Hercules, Prince of Power (3/3) gets a +1/+1 counter (4/4) and gains trample and hexproof until end
+# of turn. On turn 3, with it on the battlefield, Bot2 cannot aim Get Lost at it (hexproof; refusal) but can at Bot1's Ornithopter
+# (the control, which dies). On Bot1's turn 5 the hexproof has ended (CR 514.2), the counter and 4/4 have not, and Bot2's
+# second Get Lost destroys Hercules. Bot2's creature is refused as the Warg's target (it targets "a creature you control").
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Ornithopter
+Warg Tactics
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Mox Jet
+Mox Jet
+Get Lost
+Get Lost
+Ornithopter
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Warg Tactics.Cast
+Bot1.Modes(Put a +1/+1 counter)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hercules, Prince of Power.Power = 4
+? Bot1.Battlefield.Hercules, Prince of Power.Keywords = Hexproof; Trample
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Jet#1.Activate
+! Bot2.Hand.Get Lost.Cast(Bot1.Battlefield.Hercules, Prince of Power)
+Bot2.Hand.Get Lost.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Hercules, Prince of Power.Power = 4
+? Bot1.Battlefield.Hercules, Prince of Power.Keywords = (absent)
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Hand.Get Lost.Cast(Hercules, Prince of Power)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Hercules, Prince of Power; Ornithopter; Warg Tactics
