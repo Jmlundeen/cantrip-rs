@@ -1,0 +1,65 @@
+# Wildfire Wickerfolk's delirium is checked continuously (CR 611.3a, 613): on turn 1 Wheel of Fortune puts Black Lotus (artifact), itself
+# (sorcery) and an Island (land) into Bot1's graveyard - only three card types, so on turn 5 the Wickerfolk is its printed 3/2 with haste
+# and no trample. Cast Violent Urge on itself (R, the spell resolves with the graveyard still at three types, so it gains first strike
+# and +1/+0 only), the Urge reaches the graveyard as the fourth type (instant) and the Wickerfolk becomes 4/3 + 1 = 5/3 with trample as well.
+# Attacking into Bot2's Ornithopter (0/2) it tramples 3 over, first strike or not: 20 - 3 = 17. Ownership counts: only Bot1's graveyard.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island
+Island
+Island
+Island
+Wildfire Wickerfolk
+Forest
+Mountain
+Violent Urge
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Wildfire Wickerfolk.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#2.Activate
+? Bot1.Battlefield.Wildfire Wickerfolk.Power = 3
+? Bot1.Battlefield.Wildfire Wickerfolk.Toughness = 2
+? Bot1.Battlefield.Wildfire Wickerfolk.Keywords = Haste
+Bot1.Hand.Violent Urge.Cast(Bot1.Battlefield.Wildfire Wickerfolk)
+Bot1.Pass
+Bot1.Attack(Wildfire Wickerfolk > Bot2)
+Bot2.Block(Ornithopter > Wildfire Wickerfolk)
+[T5 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Wildfire Wickerfolk.Power = 5
+? Bot1.Battlefield.Wildfire Wickerfolk.Toughness = 3
+? Bot1.Battlefield.Wildfire Wickerfolk.Keywords = FirstStrike; Haste; Trample
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard.Count = 7
+Bot1.Battlefield.Wildfire Wickerfolk.Power = 5
+Bot1.Battlefield.Wildfire Wickerfolk.Toughness = 3
+Bot1.Battlefield.Wildfire Wickerfolk.Keywords = FirstStrike; Haste; Trample

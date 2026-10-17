@@ -1,0 +1,55 @@
+# Wildfire Wickerfolk's delirium (CR 207.2c, 604.1): on turn 1 Black Lotus pays for a Wheel of Fortune that puts Black Lotus (artifact),
+# Wheel of Fortune (sorcery), an Ornithopter (artifact creature) and an Island (land) into Bot1's graveyard: four card types. On turn 3 the
+# Wickerfolk (printed 3/2, haste) is 4/3 with trample, so Bot2's Ornithopter (0/2) blocking it takes 2 lethal damage and the other 2
+# trample over to Bot2 (CR 702.19b): 20 - 2 = 18. Haste lets it attack the turn it is cast.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Ornithopter
+Island
+Island
+Island
+Wildfire Wickerfolk
+Forest
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x7
+Ornithopter
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Wildfire Wickerfolk.Cast
+Bot1.Pass
+Bot1.Attack(Wildfire Wickerfolk > Bot2)
+Bot2.Block(Ornithopter > Wildfire Wickerfolk)
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Wildfire Wickerfolk.Power = 4
+? Bot1.Battlefield.Wildfire Wickerfolk.Toughness = 3
+? Bot1.Battlefield.Wildfire Wickerfolk.Keywords = Haste; Trample
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard.Count = 8
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Wildfire Wickerfolk.Power = 4
+Bot1.Battlefield.Wildfire Wickerfolk.Toughness = 3
+Bot1.Battlefield.Wildfire Wickerfolk.Keywords = Haste; Trample
+Bot1.Battlefield.Wildfire Wickerfolk.Damage = 0
