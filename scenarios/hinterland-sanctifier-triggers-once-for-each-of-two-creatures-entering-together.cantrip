@@ -1,0 +1,36 @@
+# Lingering Souls makes two 1/1 Spirits at once; each is another creature entering under Bot1's control, so Hinterland
+# Sanctifier triggers twice (CR 603.2c, 603.2) and Bot1 gains 2 life, ending on 22 (20 + 2). A token is a creature that enters.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Hinterland Sanctifier
+Lingering Souls
+Island
+Island x14
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Hinterland Sanctifier.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 22
+Bot1.Battlefield.Count = 7

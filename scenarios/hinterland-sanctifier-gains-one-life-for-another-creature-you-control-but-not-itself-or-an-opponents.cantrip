@@ -1,0 +1,36 @@
+# Hinterland Sanctifier entering triggers nothing ("another"), Bot1's Llanowar Elves entering gains 1 life, and Bot2's own
+# Llanowar Elves entering (a creature Bot1 does not control) gains nothing: Bot1 ends on 21.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Hinterland Sanctifier
+Llanowar Elves
+Island x16
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Hinterland Sanctifier.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+? Bot1.Life = 20
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Battlefield.Llanowar Elves.Power = 1
