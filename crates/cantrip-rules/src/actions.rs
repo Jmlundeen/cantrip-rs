@@ -3432,6 +3432,17 @@ fn cast(
     // what is paid. A change may add life as an additional cost (CR 118.8: "cost an additional 3 life to cast"), part of the
     // total, which a player can pay only with at least that much life, the rest of the life the total asks included
     // (CR 119.4, 118.3, 601.2h: no partial payment): a cast that cannot is taken back.
+    // CR 601.2f: an additional cost the targets define ("collect evidence X, where X is the total mana value of the
+    // permanents this spell targets") joins the total now that they are announced; one its caster can't pay is no legal
+    // announcement (CR 601.2h), and the cast is taken back.
+    if let Some(of_targets) = def.cost_of_targets {
+        let added = of_targets(cx, &Asker { source: spell, controller: player }, &targets);
+        if !can_pay_other(cx, spell, player, &added) {
+            return Err(Stop::Cancel);
+        }
+        extra = extra.and(added);
+        cost.mana = add_cost(cost.mana, added.mana);
+    }
     let added_life;
     (cost.mana, added_life) = apply_cost_changes_total(cx, player, Costed::Spell(spell), cost.mana, &targets);
     if added_life > 0 {

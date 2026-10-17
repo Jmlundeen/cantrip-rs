@@ -89,6 +89,15 @@ struct Plan {
 /// the board as it was before any of them moved (CR 603.10a); everything else on the board after. A library is
 /// entered on top. Returns the new objects, in order.
 pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<ObjectId> {
+    // An object moves once however many times the batch names it: a permanent a spell targets twice ("destroy target
+    // artifact and target creature" at an artifact creature, CR 115.3) is destroyed once (CR 400.7). The first move kept.
+    let distinct;
+    let moves = if moves.iter().enumerate().any(|(i, m)| moves[..i].iter().any(|n| n.id == m.id)) {
+        distinct = moves.iter().enumerate().filter(|&(i, m)| !moves[..i].iter().any(|n| n.id == m.id)).map(|(_, m)| *m).collect::<Vec<_>>();
+        &distinct[..]
+    } else {
+        moves
+    };
     // Destruction a regeneration shield replaces never happens (CR 701.19a, 614.8).
     let unregenerated;
     let moves = if reason == ZoneReason::Destroy {

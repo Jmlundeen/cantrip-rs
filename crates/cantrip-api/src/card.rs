@@ -1179,6 +1179,9 @@ pub type ModeCount = fn(&dyn Query, &Asker) -> u8;
 /// cast, so whether you controlled a Dragon won't matter".
 pub type CastFact = fn(&dyn Query, &Asker) -> u32;
 
+/// An additional cost worked out from a spell's announced targets (`CardDef::cost_of_targets`, CR 601.2f).
+pub type TargetedCost = fn(&dyn Query, &Asker, &[Target]) -> Cost;
+
 /// The cost a card in a graveyard or a hand may be cast for by a static ability's say-so (CR 113.6, 118.9), or none when it
 /// may not be: asked of the granting permanent (`Asker`), the card (as the face being cast) and the player casting it.
 /// Underworld Breach's escape is the card's mana cost and exiling three other cards; mayhem is its mana cost for a card
@@ -1651,6 +1654,11 @@ pub struct CardDef {
     pub modes_up_to: Option<ModeCount>,
     /// What the board was as it was cast, which its effect reads from the history (CR 601.2i): `CastFact`.
     pub cast_fact: Option<CastFact>,
+    /// An additional cost that depends on the targets announced (CR 601.2b-c, 601.2f): "as an additional cost to cast this
+    /// spell, collect evidence X, where X is the total mana value of the permanents this spell targets" (Urgent Necropsy).
+    /// Asked of the spell (`Asker::source`) and its caster with the targets in slot order once they are chosen, and added to
+    /// the total cost determined then; a total its caster can't pay takes the cast back (CR 601.2h).
+    pub cost_of_targets: Option<TargetedCost>,
     /// Its targets are chosen after the kicker and X are announced, because what may be targeted depends on them
     /// (CR 601.2b-c): Bloodchief's Thirst's kicked target.
     pub late_targets: bool,
@@ -1889,6 +1897,7 @@ impl CardDef {
         modal: None,
         modes_up_to: None,
         cast_fact: None,
+        cost_of_targets: None,
         end_step_riders: &[],
         late_targets: false,
         additional_cost: None,

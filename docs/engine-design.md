@@ -563,6 +563,11 @@ the mana is paid (CR 601.2g-h). The advice counts every permanent that could be 
 what the number is (`PayCostsPromptMessage::SacrificeReduces`). A spell's mana value in its `Cast` record counts X once
 for each {X} in its mana cost (CR 202.3e), and not at all for an X a cost defines without one.
 
+An additional cost the targets define ("collect evidence X, where X is the total mana value of the permanents this spell
+targets", Urgent Necropsy) is `CardDef::cost_of_targets`, asked once the targets are chosen and added to the total then
+(CR 601.2c, 601.2f); one its caster can't pay takes the cast back (CR 601.2h). A batch of zone changes moves an object once
+however many times it is named (`move_together`): a permanent a spell targets in two slots is destroyed once.
+
 ### Ways a permanent gives: from a graveyard or from a hand
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
