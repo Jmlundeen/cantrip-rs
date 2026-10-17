@@ -20,11 +20,11 @@ Bot2.Hand.Forest.Play
 Bot2.Hand.Mox Emerald.Cast
 Bot2.Battlefield.Forest.Activate
 Bot2.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 ! Bot1.Hand.Get Out.Cast
 Bot1.Pass
 Bot2.Battlefield.Mox Emerald.Activate
 Bot2.Hand.Llanowar Elves.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Hand.Get Out.Cast
 Bot1.Modes(1)
 Bot1.Target(Stack.Llanowar Elves)
