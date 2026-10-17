@@ -185,6 +185,13 @@ public sealed class ScenarioPlayer
                 foreach (AttackMessage one in attack.Attacks)
                 {
                     await ClickHandleAsync(one.Attacker.Value);
+
+                    // With a choice of what to attack (a planeswalker, a battle, another seat) the click picks the creature
+                    // up, and a click on the seat's box or on the permanent sends it there, as a person does.
+                    if ((await _page.SettledAsync()).Selected > 0)
+                    {
+                        await ClickTargetAsync(new TargetMessage { Object = one.TargetPermanent, Player = one.TargetPlayer });
+                    }
                 }
 
                 await ClickButtonStartingAsync(attack.Attacks.Count == 0 ? "No attack" : "Attack with");
@@ -877,7 +884,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
 
     private string? Read(string what, TableState state)
     {
@@ -914,6 +921,7 @@ public sealed class ScenarioPlayer
             "Prompt.Modes" => state.Modes is { } modes ? string.Join("; ", modes) : string.Empty,
             "Menu" => _lastMenu,
             "Dock" => string.Join("; ", (state.Dock ?? []).Select(b => b.Label)),
+            "Combat" => string.Join("; ", state.Combat ?? []),
             _ when what.StartsWith("Button.", StringComparison.Ordinal) =>
                 state.Controls.Any(c => c.Kind == "button" && c.Label.Contains(what["Button.".Length..], StringComparison.Ordinal)) ? "shown" : "absent",
             _ => null,
@@ -922,7 +930,7 @@ public sealed class ScenarioPlayer
 
     private static string? RoomKey(string what, TableState state)
     {
-        foreach ((string prefix, string place) in new[] { ("Battlefield.", "battlefield"), ("OpponentBattlefield.", "opponent-battlefield") })
+        foreach ((string prefix, string place) in new[] { ("Battlefield.", "battlefield"), ("OpponentBattlefield.", "opponent-battlefield"), ("Hand.", "hand") })
         {
             foreach (string field in new[] { "Doors", "Actions" })
             {

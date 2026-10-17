@@ -167,6 +167,17 @@ public sealed partial class MainPage
 
             json.WriteEndArray();
 
+            // The combat groups as the attacking side's ground captions them, each with the attackers standing in it, mine first:
+            // "Attacking Liliana of the Veil: Leonardo, Cutting Edge" (a scenario's `Client.Bot1.Combat`).
+            json.WriteStartArray("combat");
+            foreach (BoardRows.CombatGroup group in _myCombat.Concat(_opponentCombat).Where(g => g.Caption is not null))
+            {
+                IEnumerable<string> names = group.Columns.SelectMany(column => column.Cards).Select(card => card.Name);
+                json.WriteStringValue($"{group.Caption}: {string.Join(", ", names)}");
+            }
+
+            json.WriteEndArray();
+
             // Each ability shown resolving, newest last: the way it cut on the whole, and each arrow's.
             json.WriteStartArray("effects");
             foreach (ResolutionEffectsElement.Effect effect in _resolutions.History)

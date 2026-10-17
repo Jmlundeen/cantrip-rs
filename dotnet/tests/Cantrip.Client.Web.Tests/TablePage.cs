@@ -240,6 +240,7 @@ public sealed class TablePage : IAsyncDisposable
 /// What the page publishes under <c>?test</c>. <see cref="Phase"/> is the table's: Setup, Drafting, DeckBuilding, Playing...
 /// <see cref="Art"/> is where it is asking for card art, as a URL template. <see cref="Answered"/> is, in the prompt
 /// gallery, the last answer the dock sent - its kind, and the indexes of any modes or options chosen.
+/// <see cref="Combat"/> is each combat group as its ground is captioned, with its attackers: "Attacking Bot2: Ornithopter".
 /// <see cref="Selected"/> is how many creatures are picked up to attack or block, not yet sent anywhere.
 /// </summary>
 public sealed record TableState(
@@ -271,7 +272,8 @@ public sealed record TableState(
     IReadOnlyList<string>? Modes = null,
     IReadOnlyList<string>? LogText = null,
     bool GraveyardsOpen = false,
-    IReadOnlyList<DockButtonState>? Dock = null);
+    IReadOnlyList<DockButtonState>? Dock = null,
+    IReadOnlyList<string>? Combat = null);
 
 /// <summary>A button of the dock, in the order the dock offers them, and whether it can be pressed.</summary>
 public sealed record DockButtonState(string Label, bool Enabled);
