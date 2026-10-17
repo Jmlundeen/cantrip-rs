@@ -1,0 +1,43 @@
+# CR 707.8, 712.8e, 202.3b: a copy of a transformed double-faced permanent copies the face that is up, so Bot2's Clone
+# entering as a copy of Bot1's transformed Delver of Secrets is an Insectile Aberration - a 3/2 blue Human Insect with
+# flying - with no Delver ability. The transformed Delver's mana value is its front face's, 1; the copy's is 0, as it
+# copies a back face, which has no mana cost.
+
+[Bot1 Deck]
+Island
+Delver of Secrets
+Island x5
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Clone
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Delver of Secrets.Cast
+[T3 Bot1.Upkeep]
+Bot1.Accept
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Clone.Cast
+Bot2.Accept
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Insectile Aberration
+Bot1.Battlefield.Insectile Aberration.ManaValue = 1
+Bot2.Battlefield = Mox Sapphire; Insectile Aberration
+Bot2.Battlefield.Insectile Aberration.Power = 3
+Bot2.Battlefield.Insectile Aberration.Toughness = 2
+Bot2.Battlefield.Insectile Aberration.Keywords = Flying
+Bot2.Battlefield.Insectile Aberration.Colors = Blue
+Bot2.Battlefield.Insectile Aberration.Subtypes = Human; Insect
+Bot2.Battlefield.Insectile Aberration.ManaValue = 0

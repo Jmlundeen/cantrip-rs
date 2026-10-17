@@ -1,0 +1,56 @@
+# CR 712.8a, 712.14, 400.7: a transformed Delver of Secrets returned to its owner's hand is a new object with only its front
+# face's characteristics, and cast again it enters front face up as a 1/1 Delver. Bot2 returns the Insectile Aberration
+# with Brazen Borrower's Adventure, Petty Theft, on turn 4; that card is exiled on an adventure (CR 715.4) and Bot2 casts
+# Brazen Borrower from exile on turn 6 (CR 715.5), after Bot1 has recast Delver on turn 5.
+
+[Bot1 Deck]
+Island
+Delver of Secrets
+Island x5
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Brazen Borrower
+Island x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Delver of Secrets.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Upkeep]
+Bot1.Accept
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Brazen Borrower.Cast(Bot1.Battlefield.Insectile Aberration; Ability: Adventure)
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot1.Hand.Delver of Secrets.Power = 1
+? Exile = Brazen Borrower
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Delver of Secrets.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Exile.Brazen Borrower.Cast
+Bot2.Pass
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Delver of Secrets
+Bot1.Battlefield.Delver of Secrets.Power = 1
+Bot1.Battlefield.Delver of Secrets.Keywords = (absent)
+Bot2.Battlefield = Island; Island; Mox Sapphire; Brazen Borrower
+Bot2.Battlefield.Brazen Borrower.Power = 3
+Exile.Count = 0
+Bot2.Graveyard.Count = 0
