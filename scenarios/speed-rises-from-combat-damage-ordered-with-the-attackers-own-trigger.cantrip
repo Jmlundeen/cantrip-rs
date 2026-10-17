@@ -1,0 +1,53 @@
+# Combat damage is life lost (CR 120.3a, 119.3): Bot1, at speed 1 from Perilous Snare (CR 704.5aa), attacks with Ragavan,
+# Nimble Pilferer on turn 3, and its 2 damage to Bot2 triggers both Ragavan's "whenever Ragavan deals combat damage to a
+# player" and Bot1's speed ability (CR 702.179d). Both are Bot1's, so Bot1 orders them (CR 603.3b): the speed ability,
+# which has no source, is offered among them by its text and put on the stack first, so Ragavan's resolves first. Bot1's
+# speed is 2 at the end; Ragavan made a Treasure and exiled Bot2's top card.
+
+[Bot1 Deck]
+Mountain
+Ragavan, Nimble Pilferer
+Black Lotus
+Perilous Snare
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Speed = 1
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot1.Triggers(your speed increases; Ragavan, Nimble Pilferer)
+? Bot2.Life = 18
+? Stack.Count = 2
+? Bot1.Speed = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Speed = 1
+? Exile.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Speed = 2
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Speed = 2
+Exile.Count = 1
+Bot1.Battlefield.Treasure Token.Token = true
+Stack.Count = 0

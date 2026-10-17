@@ -1,0 +1,77 @@
+# Browser
+# Speed (CR 702.179) is a value of the player, on no card. Before Perilous Snare Bot1's page shows nothing beside its life
+# total; once the Snare is out it says "Speed 1" (CR 704.5aa), and each Lightning Bolt at Bot2 on Bot1's own turn moves
+# it up (CR 702.179d): "Speed 2", "Speed 3", then "Max speed" at 4 (CR 702.179e). Bot2 has no speed, so nothing shows
+# beside its life. The Snare's max speed ability (CR 702.178a) is not on its menu at speed 3 and is at max speed, where it
+# is clicked to put a counter on Bot1's Ornithopter.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Perilous Snare
+Ornithopter
+Lightning Bolt
+Island
+Island
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+? Client.Bot1.Facts =
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Client.Bot1.Facts = Speed 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+? Bot1.Speed = 2
+? Client.Bot1.Facts = Speed 2
+? Client.Bot1.OpponentFacts =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Bot1.Speed = 3
+? Client.Bot1.Facts = Speed 3
+? Client.Bot1.Battlefield.Perilous Snare.Actions =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Speed = 4
+? Client.Bot1.Facts = Max speed
+? Client.Bot1.Battlefield.Perilous Snare.Actions = {T}: Put a +1/+1 counter on target creature or Vehicle you control. Activate only as a sorcery....
+Bot1.Battlefield.Perilous Snare.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Speed = 4
+Bot2.Speed = (absent)
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Perilous Snare.Tapped = true
+Client.Bot1.Facts = Max speed
+Client.Bot1.OpponentFacts =

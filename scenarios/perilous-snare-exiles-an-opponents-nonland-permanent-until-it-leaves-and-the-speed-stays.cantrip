@@ -1,0 +1,62 @@
+# Perilous Snare: "When this artifact enters, exile target nonland permanent an opponent controls until this artifact
+# leaves the battlefield." Bot1's own Mox Pearl and Bot2's Island (a land) are refused as targets; Bot2's Ornithopter is
+# exiled, the positive control (CR 610.3). Bot1's speed became 1 as the Snare entered (start your engines!, CR 704.5aa).
+# When Disenchant destroys the Snare, the Ornithopter returns (CR 610.3a), and Bot1 keeps its speed: nothing decreases
+# it, and the permanent that gave it leaving changes nothing (the rulings).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Plains
+Perilous Snare
+Disenchant
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Mox Sapphire
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+! Bot1.Target(Mox Pearl)
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Ornithopter)
+? Bot1.Speed = 1
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+? Bot2.Battlefield = Island; Mox Sapphire
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Disenchant.Cast(Perilous Snare)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Stack.Count = 0
+Bot2.Battlefield = Island; Mox Sapphire; Ornithopter
+Bot1.Graveyard = Disenchant; Perilous Snare
+Bot1.Speed = 1

@@ -1,0 +1,59 @@
+# Start your engines! is an ability of the permanent (CR 702.179a, 704.5aa): one that has lost all its abilities has none to
+# give. Bot1's Perilous Snare gives Bot1 speed 1 on turn 1. On turn 2 Bot2's Oko, Thief of Crowns makes the Snare an Elk
+# that has lost all abilities (CR 613.1f), and on turn 4 Oko exchanges Bot2's Mox Sapphire for it. Bot2, with no speed,
+# now controls the Snare and gets none; Bot1 keeps speed 1. The positive control is
+# speed-is-gained-with-control-of-a-snare-and-max-speed-is-its-controllers, where a Snare that has kept its abilities
+# gives the player who takes control of it speed.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Perilous Snare
+Plains x17
+
+[Bot2 Deck]
+Island
+Black Lotus
+Oko, Thief of Crowns
+Mox Sapphire
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Oko, Thief of Crowns.Activate(Perilous Snare; Ability: Elk)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Perilous Snare.Power = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Oko, Thief of Crowns.Activate(Ability: Exchange)
+Bot2.Target(Mox Sapphire)
+Bot2.Target(Perilous Snare)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Perilous Snare.Power = 3
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Sapphire
+Bot2.Battlefield = Island; Perilous Snare
+Bot1.Speed = 1
+Bot2.Speed = (absent)

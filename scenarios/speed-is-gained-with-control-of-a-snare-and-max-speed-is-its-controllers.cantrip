@@ -1,0 +1,101 @@
+# Speed belongs to each player apart (CR 702.179). Bot1 reaches max speed with Perilous Snare and Lightning Bolts on turns
+# 1, 3 and 5 (CR 704.5aa, 702.179d) and uses the Snare's max speed ability on its Ornithopter. On turn 6 Bot2 takes the
+# Snare with Dack Fayden: a player with no speed who controls a permanent with start your engines! gets speed 1, gaining
+# control included (CR 702.179a; the rulings), and Bot2's Bolt at Bot1 during its own turn raises it to 2. Bot1 keeps
+# speed 4: losing control of the permanent changes nothing (the rulings). The max speed ability is the Snare's
+# controller's to have (CR 702.178a: "your speed"), so on turn 8, untapped in Bot2's main phase with a creature of Bot2's
+# to target, it is not offered to Bot2 at speed 2, though the Snare's owner has max speed.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Perilous Snare
+Lightning Bolt
+Ornithopter
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island
+Mountain
+Ornithopter
+Black Lotus
+Dack Fayden
+Lightning Bolt
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Speed = 4
+Bot1.Battlefield.Perilous Snare.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Bot2.Speed = (absent)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Dack Fayden.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Dack Fayden.Activate(Perilous Snare; Ability: Gain control)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Perilous Snare.Tapped = true
+? Bot2.Speed = 1
+? Bot1.Speed = 4
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Speed = 2
+[T8 Bot2.Main1]
+! Bot2.Battlefield.Perilous Snare.Activate
+
+[Expect]
+Turn = 8
+Bot1.Speed = 4
+Bot2.Speed = 2
+Bot1.Life = 17
+Bot2.Life = 11
+Bot2.Battlefield.Perilous Snare.Tapped = false
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1

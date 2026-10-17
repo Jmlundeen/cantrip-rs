@@ -1,0 +1,57 @@
+# The speed ability is "whenever one or more opponents lose life during your turn" (CR 702.179d), and a player has it only
+# once they have speed. Bot1 Bolts Bot2 before Perilous Snare is out: no speed, nothing triggers (and nothing is used up
+# of "only once each turn"). The Snare gives speed 1 (CR 704.5aa); Bot1 paying 2 life for Gitaxian Probe triggers
+# nothing, since Bot1 is no opponent of Bot1. A second Bolt at Bot2 then raises the speed to 2: the earlier losses
+# neither counted nor spent the turn's one triggering.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Perilous Snare
+Lightning Bolt
+Lightning Bolt
+Gitaxian Probe
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Stack.Count = 0
+? Bot1.Speed = (absent)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Perilous Snare.Cast
+Bot1.Pass
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+? Bot1.Speed = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 18
+? Stack.Count = 0
+? Bot1.Speed = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Bot1.Life = 18
+Bot2.Life = 14
+Bot1.Speed = 2
+Stack.Count = 0
