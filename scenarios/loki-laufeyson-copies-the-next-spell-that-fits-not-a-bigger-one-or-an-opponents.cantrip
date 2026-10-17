@@ -1,0 +1,61 @@
+# Loki Laufeyson's delayed ability waits for the next instant or sorcery spell its controller casts "with mana value less
+# than or equal to Loki's power" (2). Bot1 first casts Fireblast by sacrificing two Mountains: an alternative cost does not
+# change its mana value, 6 (CR 118.9c, 202.3), so it is not copied. Bot2 answers with Lightning Bolt, mana value 1 - but it is
+# not "you" who cast it (CR 603.7d), so it is not copied either. Then Bot1's Lightning Strike, mana value 2, equal to Loki's
+# power, is the one copied. Bot2 takes 4 + 3 + 3; Bot1 takes 3.
+
+[Bot1 Deck]
+Mountain
+Loki Laufeyson
+Mountain
+Mox Ruby
+Mox Ruby
+Fireblast
+Lightning Strike
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loki Laufeyson.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Loki Laufeyson.Activate(Ability: When you next)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Delayed = Loki Laufeyson
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fireblast.Cast(Bot2; Ability: sacrifice)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Delayed = Loki Laufeyson
+Bot1.Hand.Lightning Strike.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 10
+Bot1.Life = 17
+Bot1.Graveyard = Lightning Strike; Fireblast; Mountain; Mountain
+Bot2.Graveyard = Lightning Bolt
+Delayed.Count = 0

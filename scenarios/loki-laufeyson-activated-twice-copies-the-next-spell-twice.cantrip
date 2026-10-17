@@ -1,0 +1,53 @@
+# Loki Laufeyson activated twice in one turn: each activation sets up its own delayed triggered ability (CR 603.7), and
+# both trigger on the next instant or sorcery spell that fits (Doublecast's ruling). Bot1 activates Loki, untaps it with
+# Sewer-veillance Cam's entering trigger, activates it again, and casts Lightning Bolt at Bot2: two copies, both aimed at
+# Bot2, and the copies are not cast, so they trigger nothing more (CR 707.10). Bot2 takes 3 x 3.
+
+[Bot1 Deck]
+Mountain
+Loki Laufeyson
+Mountain
+Mox Ruby
+Mox Sapphire
+Sewer-veillance Cam
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loki Laufeyson.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Loki Laufeyson.Activate(Ability: When you next)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sewer-veillance Cam.Cast
+Bot1.Pass
+Bot1.Modes(Untap)
+? Bot1.Battlefield.Loki Laufeyson.Tapped = false
+Bot1.Battlefield.Loki Laufeyson.Activate(Ability: When you next)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Delayed.Count = 2
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 11
+Bot1.Graveyard = Lightning Bolt
+Delayed.Count = 0

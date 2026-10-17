@@ -1,0 +1,41 @@
+# Loki Laufeyson: "when you next cast ... this turn" (CR 603.7b-c). Bot1 activates Loki on turn 3 and casts nothing; the
+# delayed ability waits through that turn and is gone once it ends. On turn 5 Bot1's Lightning Bolt, mana value 1, is not
+# copied: Bot2 takes 3, not 6.
+
+[Bot1 Deck]
+Mountain
+Loki Laufeyson
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loki Laufeyson.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Loki Laufeyson.Activate(Ability: When you next)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+[T3 Bot1.Main2]
+? Delayed = Loki Laufeyson
+[T4 Bot2.Main1]
+? Delayed.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Delayed.Count = 0
