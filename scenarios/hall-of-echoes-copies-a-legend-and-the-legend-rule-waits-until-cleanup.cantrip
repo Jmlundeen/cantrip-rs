@@ -1,0 +1,62 @@
+# Hall of Echoes: "{5}: This land becomes a copy of target creature you control until end of turn. The "legend rule"
+# doesn't apply to permanents you control this turn." Bot1 casts Bofur, Reliable Guardian on turn 1 and on turn 3 pays
+# {5} with the Hall aimed at it: Bot2's Llanowar Elves is refused as the target (not Bot1's), Bofur is chosen. The Hall becomes a
+# second Bofur and both stay (CR 704.5j doesn't apply); then a second Bofur card is cast and all three stay. In the
+# cleanup step both effects end together (the ruling): the Hall is a land again, and the legend rule applies at once to
+# the two Bofur cards (CR 514.3a) - Bot1 keeps one, the other goes to the graveyard.
+
+[Bot1 Deck]
+Hall of Echoes
+Sol Ring
+Mox Pearl
+Mox Pearl
+Black Lotus
+Bofur, Reliable Guardian
+Bofur, Reliable Guardian
+Plains x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Hall of Echoes.Play
+Bot1.Battlefield.Hall of Echoes.Activate(Ability: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bofur, Reliable Guardian.Types = Creature
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Hall of Echoes.Activate(Bot2.Battlefield.Llanowar Elves; Ability: becomes a copy)
+Bot1.Battlefield.Hall of Echoes.Activate(Bot1.Battlefield.Bofur, Reliable Guardian; Ability: becomes a copy)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+? Bot1.Battlefield = Bofur, Reliable Guardian; Bofur, Reliable Guardian; Sol Ring; Mox Pearl; Mox Pearl
+? Client.Bot1.Facts = The "legend rule" doesn't apply to permanents you control this turn.
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Hall of Echoes; Sol Ring; Mox Pearl; Mox Pearl; Bofur, Reliable Guardian
+Bot1.Battlefield.Hall of Echoes.Types = Land
+Bot1.Graveyard = Bofur, Reliable Guardian; Black Lotus

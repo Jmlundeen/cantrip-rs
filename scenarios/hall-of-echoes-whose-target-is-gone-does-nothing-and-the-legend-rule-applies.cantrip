@@ -1,0 +1,65 @@
+# Hall of Echoes' "{5}: This land becomes a copy of target creature you control until end of turn. The "legend rule"
+# doesn't apply to permanents you control this turn" with its one target gone: Bot1 casts the Ornithopter it drew and aims
+# the Hall at it on turn 3 and Bot2 bolts the Ornithopter in response. The ability does nothing at all (CR 608.2b) - the Hall stays a land, and
+# the legend rule still applies: when Bot1 then casts a second Bofur, Reliable Guardian it keeps one of the two at once
+# (CR 704.5j) and the other goes to the graveyard.
+
+[Bot1 Deck]
+Hall of Echoes
+Sol Ring
+Mox Pearl
+Mox Pearl
+Black Lotus
+Bofur, Reliable Guardian
+Bofur, Reliable Guardian
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Hall of Echoes.Play
+Bot1.Battlefield.Hall of Echoes.Activate(Ability: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Hall of Echoes.Activate(Bot1.Battlefield.Ornithopter; Ability: becomes a copy)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Ornithopter; Black Lotus
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hall of Echoes.Types = Land
+? Client.Bot1.Facts =
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Hall of Echoes; Sol Ring; Mox Pearl; Mox Pearl; Bofur, Reliable Guardian
+Bot1.Graveyard = Bofur, Reliable Guardian; Ornithopter; Black Lotus
