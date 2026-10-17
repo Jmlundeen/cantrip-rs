@@ -1,0 +1,6 @@
+{
+  "name": "Mana Flare",
+  "manaCost": "{2}{R}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a player taps a land for mana, that player adds one mana of any type that land produced."
+}

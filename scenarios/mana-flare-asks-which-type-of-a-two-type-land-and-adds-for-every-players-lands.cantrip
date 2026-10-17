@@ -1,0 +1,55 @@
+# Mana Flare: "Whenever a player taps a land for mana, that player adds one mana of any type that land produced" (CR
+# 106.12a, 605.1b). Turn 2: Bot2's Forest taps for {G}{G} into Bot2's own pool ("that player"; Bot1's stays empty), and Bot2
+# casts Llanowar Elves with it. Turn 4: the Elves, a creature and no land, tap for {G} alone. Turn 5: Bot1's Azorius
+# Chancery produces {W}{U}, two types, so Bot1 chooses one ("If you tap a land for more than one mana, you choose one type
+# that was produced", its ruling): {U}, for {W}{U}{U}; one type, not both (`! Bot1.Modes(1; 2)`). The Mountain tapped on
+# turn 1 before the Flare was out gave {R} alone.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mana Flare
+Azorius Chancery
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {R}
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mana Flare.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+? Bot2.Mana = {G}{G}
+? Bot1.Mana =
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Azorius Chancery.Play
+Bot1.Choose(Mountain)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+? Bot2.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Azorius Chancery.Activate
+! Bot1.Modes(1; 2)
+Bot1.Modes({U})
+? Bot1.Mana = {W}{U}{U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Azorius Chancery; Mana Flare
+Bot1.Hand.Count = 6
+Bot2.Battlefield = Forest; Llanowar Elves

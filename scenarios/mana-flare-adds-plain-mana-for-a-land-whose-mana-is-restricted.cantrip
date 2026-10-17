@@ -1,0 +1,34 @@
+# Mana Flare "doesn't care about any restrictions or riders your lands put on the mana they produce" (its ruling; CR
+# 106.6): Great Hall of the Biblioplex tapped (paying 1 life) for blue mana only for instant and sorcery spells produced
+# {U}, and Mana Flare adds a {U} with no restriction - spent on Flitterwing Nuisance, a creature spell the Hall's {U} could
+# not pay for, and the Hall's restricted {U} stays in the pool. The Flare is paid with Black Lotus on turn 1.
+
+[Bot1 Deck]
+Great Hall of the Biblioplex
+Black Lotus
+Mana Flare
+Flitterwing Nuisance
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Great Hall of the Biblioplex.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mana Flare.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Great Hall of the Biblioplex.Activate(Ability: Pay 1 life; Color: U)
+? Bot1.Mana = {U} {U} (InstantOrSorcerySpells)
+Bot1.Hand.Flitterwing Nuisance.Cast
+? Bot1.Mana = {U} (InstantOrSorcerySpells)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 19
+Bot1.Battlefield = Flitterwing Nuisance; Great Hall of the Biblioplex; Mana Flare

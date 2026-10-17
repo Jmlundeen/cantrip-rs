@@ -1,0 +1,38 @@
+# Browser
+# What the page asks for Mana Flare's "one mana of any type that land produced" (CR 106.12a) when the land produced two
+# types: Azorius Chancery's {W}{U}. The dock asks which type of mana to add, its buttons the two types the land produced
+# and no other; the person clicks {U}, and the pool shows one white and two blue.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mana Flare
+Azorius Chancery
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mana Flare.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Azorius Chancery.Play
+Bot1.Choose(Mountain)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Azorius Chancery.Activate
+? Client.Bot1.Prompt.Title = Choose which type of mana to add
+? Client.Bot1.Prompt.Modes = {W}; {U}
+Bot1.Modes({U})
+? Client.Bot1.Mana = 1 White; 2 Blue
+
+[Expect]
+Turn = 5
+Bot1.Mana = {W}{U}{U}
