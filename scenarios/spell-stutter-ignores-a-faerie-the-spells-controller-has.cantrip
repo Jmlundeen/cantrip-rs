@@ -30,6 +30,9 @@ Bot2.Hand.Mox Emerald.Cast
 Bot2.Battlefield.Mox Sapphire.Activate
 Bot2.Battlefield.Mox Jet.Activate
 Bot2.Hand.Picklock Prankster.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Picklock Prankster.Subtypes = Faerie; Rogue
 Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Hand.Lightning Bolt.Cast(Bot1)
 Bot1.Battlefield.Mox Sapphire.Activate

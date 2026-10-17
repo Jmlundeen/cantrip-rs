@@ -1,0 +1,61 @@
+# "For each Faerie you control" is a word of Spell Stutter's text (CR 612.2): Bot1 casts Artificial Evolution on its own Stutter
+# in response to nothing but its own cast, replacing Faerie with Human, so the Stutter now charges {1} for each Human Bot1
+# controls - the Dragon Sniper (a Human Archer) - and the price is {3}. Bot2 has only Mox Pearl and Mox Emerald left after
+# paying for the Bolt, which would pay the unchanged {2} (see the sibling scenarios), but cannot pay {3}: the Bolt is
+# countered and Bot1 stays at 20.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Dragon Sniper
+Mox Sapphire
+Mox Sapphire
+Spell Stutter
+Artificial Evolution
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dragon Sniper.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spell Stutter.Cast(Stack.Lightning Bolt)
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Artificial Evolution.Cast(Stack.Spell Stutter)
+Bot1.Modes(Faerie)
+Bot1.Modes(Human)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+? Bot1.Battlefield.Dragon Sniper.Subtypes = Archer; Human
+! Bot2.PayCost
+Bot2.Decline
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Spell Stutter; Artificial Evolution
