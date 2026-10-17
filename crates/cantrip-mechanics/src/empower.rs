@@ -1,8 +1,7 @@
-//! Empower Jace N (the 2026 keyword action): "if you don't control a Jace planeswalker token, create a blue Jace
+//! Empower Jace N (CR 701.71a): "if you don't control a Jace planeswalker token, create a blue Jace
 //! planeswalker token with 0 loyalty, '[-1]: Surveil 1,' and '[-3]: Draw a card.' Choose a Jace planeswalker token you
 //! control. Put N loyalty counters on it." Nonland Jace planeswalkers are never chosen. Theorist's Sanctum, Fatehold Charm,
 //! Countersculpt and Jace's Machinations print it.
-//! (It is not in the Comprehensive Rules this repository holds; the rulings on the card are the source.)
 
 use crate::{choose, effects, tokens};
 use cantrip_api::*;

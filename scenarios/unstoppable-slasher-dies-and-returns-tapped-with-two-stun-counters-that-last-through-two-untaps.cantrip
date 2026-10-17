@@ -1,6 +1,6 @@
 # "When this creature dies, if it had no counters on it, return it to the battlefield tapped under its owner's control with two
 # stun counters on it." Bot2 kills the Slasher with Dismember on turn 2 (-5/-5, paid with mana): it comes back tapped with two
-# stun counters (CR 122.1g: instead of untapping, a stun counter is removed). Bot1's untap step on turn 3 only removes one
+# stun counters (CR 122.1d: instead of untapping, a stun counter is removed). Bot1's untap step on turn 3 only removes one
 # (1 left, still tapped), turn 5's removes the other (none left, still tapped), and turn 7's finally untaps it.
 
 [Bot1 Deck]

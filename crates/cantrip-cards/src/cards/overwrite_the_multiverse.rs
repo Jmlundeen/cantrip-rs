@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::empower;
+use cantrip_mechanics::{effects, empower};
 use cantrip_oracle as oracle;
 
 /// "Exile all creatures. Empower Jace X, where X is the number of creatures exiled this way." The creatures are every creature on the
@@ -7,8 +7,7 @@ use cantrip_oracle as oracle;
 /// an effect kept from being exiled does not count. With X of 0 the empower still makes the Jace token if there is none, and it has no
 /// loyalty and goes to the graveyard (CR 704.5i, 701.71a), so nothing is left.
 fn overwrite(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    let exiled = g.exile_all(&creatures).len();
+    let exiled = effects::exile_all_creatures(g);
     empower::jace(g, item.controller, item.object, exiled.min(i16::MAX as usize) as i16)
 }
 

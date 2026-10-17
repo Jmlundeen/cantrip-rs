@@ -37,7 +37,7 @@ pub fn enters_tapped_choosing_a_color(g: &mut dyn Game, entering: &mut Entering)
 
 /// "Mana of the chosen color" (CR 106.5): the one color chosen as it entered, none if none was (a land that became a copy of it
 /// without entering), and then the ability adds no mana. "The chosen color" is no color word, so a text-changing effect leaves it
-/// as it is (CR 612.2). The colors for a mana ability's `colors_from`: Sunken Citadel and Valgavoth's Lair.
+/// as it is (CR 612.2). The colors for a mana ability's `colors_from`: Sunken Citadel, Valgavoth's Lair and Heraldic Banner.
 pub fn chosen_color(q: &dyn Query, asker: &Asker) -> ColorSet {
     q.obj(asker.source).chosen_color.map_or(ColorSet::NONE, ColorSet::of)
 }

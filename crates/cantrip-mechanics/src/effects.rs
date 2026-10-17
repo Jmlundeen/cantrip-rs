@@ -433,3 +433,11 @@ pub fn greatest_mana_value_creature_or_planeswalker(g: &dyn Game, player: Player
     let greatest = group.iter().map(|&id| g.mana_value(id)).max().unwrap_or(0);
     group.into_iter().filter(|&id| g.mana_value(id) == greatest).collect()
 }
+
+/// "Exile all creatures" (CR 406.2, 608.2f): every creature on the battlefield, whoever controls it, in one move, tokens too.
+/// How many were exiled (CR 608.2c: the moves made, those a replacement sent elsewhere included), for "X is the number of
+/// creatures exiled this way". Sunfall and Overwrite the Multiverse print it.
+pub fn exile_all_creatures(g: &mut dyn Game) -> usize {
+    let creatures: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    g.exile_all(&creatures).len()
+}

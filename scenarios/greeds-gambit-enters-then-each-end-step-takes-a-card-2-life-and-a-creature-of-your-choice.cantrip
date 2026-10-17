@@ -1,6 +1,6 @@
 # Greed's Gambit entering: "you draw three cards, gain 6 life, and create three 2/1 black Bat creature tokens with flying" - hand
-# 2 + 3 = 5, life 26, three 2/1 flying Bats. At the beginning of Bot1's end step: "you discard a card, lose 2 life, and sacrifice a
-# creature", each of Bot1's choice: it discards a Swamp and sacrifices the Ornithopter instead of a Bat (the Bats are not forced),
+# 1 + 3 = 4, life 26, three 2/1 flying Bats. At the beginning of Bot1's end step: "you discard a card, lose 2 life, and sacrifice a
+# creature", each of Bot1's choice: it discards the Island and sacrifices the Ornithopter instead of a Bat (the Bats are not forced),
 # so after turn 1 it has 24 life, a hand of 3 (the three drawn cards) and three Bats. Bot2's end step
 # on turn 2 is not Bot1's: nothing more is taken (turn 3: still 24 life, and 4 cards in hand after the draw).
 
