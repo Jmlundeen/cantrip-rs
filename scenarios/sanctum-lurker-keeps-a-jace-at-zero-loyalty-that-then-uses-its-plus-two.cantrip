@@ -1,0 +1,46 @@
+# Sanctum Lurker: "When this creature enters, empower Jace 1" makes Bot1 a Jace planeswalker token with 0 loyalty and puts
+# one loyalty counter on it (CR 701.71a). Jace's −1 (Surveil 1) leaves it at 0 loyalty, and "Planeswalkers you control
+# aren't put into their owners' graveyards for having 0 loyalty" keeps it on the battlefield (CR 704.5i). It may not
+# activate a second loyalty ability that turn (CR 606.3: the card's ruling, however many it has gained), but on turn 3 it
+# activates the granted "[+2]: This planeswalker deals 1 damage to each opponent and you gain 1 life" from 0 (the
+# ruling): Bot2 goes to 19, Bot1 to 21, and Jace to 2 loyalty.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Sanctum Lurker
+Swamp x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Sanctum Lurker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Battlefield.Jace.Activate(Ability: Surveil 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Types = Planeswalker
+! Bot1.Battlefield.Jace.Activate(Ability: +2)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Jace.Types = Planeswalker
+Bot1.Battlefield.Jace.Activate(Ability: +2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Life = 21
+Bot2.Life = 19

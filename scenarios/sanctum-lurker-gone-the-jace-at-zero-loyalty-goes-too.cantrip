@@ -1,0 +1,43 @@
+# Sanctum Lurker's "aren't put into their owners' graveyards for having 0 loyalty" lasts only while the Lurker is on the
+# battlefield (CR 611.3a). Its Jace token is at 0 loyalty after its −1 on turn 1; on turn 2 Bot2's Lightning Bolt kills
+# the Lurker (3 damage to a 3/2), and the next check of state-based actions puts the 0-loyalty Jace into the graveyard
+# (CR 704.5i), where the token ceases to exist (CR 704.5d).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Sanctum Lurker
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x22
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Sanctum Lurker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace.Activate(Ability: Surveil 1)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Jace.Types = Planeswalker
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sanctum Lurker)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Sanctum Lurker
+Bot1.Battlefield = Mox Jet; Mox Jet; Mox Jet
