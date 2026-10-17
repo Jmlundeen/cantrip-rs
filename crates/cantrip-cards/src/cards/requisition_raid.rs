@@ -4,10 +4,6 @@ use cantrip_mechanics::spree;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-fn enchantment(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if targets::permanent(q, id) && q.chars(id).is(CardType::Enchantment))
-}
-
 fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     destroy_target(g, item, 0);
     Ok(())
@@ -30,7 +26,7 @@ const MODES: &[ModeDef] = &[
         .targets(&[targets::ARTIFACT])
         .cost(mana("{1}")),
     mode(destroy_it, "+ {1} — Destroy target enchantment.")
-        .targets(&[target(enchantment)])
+        .targets(&[targets::ENCHANTMENT])
         .cost(mana("{1}")),
     mode(counters, "+ {1} — Put a +1/+1 counter on each creature target player controls.")
         .targets(&[targets::PLAYER])
