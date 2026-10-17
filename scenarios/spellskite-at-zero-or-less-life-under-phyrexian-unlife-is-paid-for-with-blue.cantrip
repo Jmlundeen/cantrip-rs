@@ -1,0 +1,59 @@
+# Spellskite's {U/P} and Phyrexian Unlife (CR 119.4, 107.4f; the Unlife ruling: at 0 or less life you can't pay any amount
+# of life but 0). Bot1, at 1 life, has Unlife. Bot2 Bolts Bot1 to -2 (life loss: Bot1 had 1 life as it was dealt). With a
+# second Bolt on the stack aimed at Bot1, Bot1 activates Spellskite: the {U/P} can't be paid with 2 life now (it is paid so
+# at 20 in its own scenario; were it offered, it would be the first choice offered and Bot1 would go to -4), so it is paid
+# with an Island's {U}, and the Bolt is dealt to Spellskite instead. Bot1 stays at -2 with no poison counters.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Island
+Sol Ring
+Spellskite
+Phyrexian Unlife
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = -2
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Spellskite.Activate(Stack.Lightning Bolt)
+Bot1.Battlefield.Island.Activate
+[T4 Bot2.End]
+
+[Expect]
+Bot1.Life = -2
+Bot1.Poison = 0
+Bot1.Battlefield.Spellskite.Damage = 3
+Bot1.Battlefield.Island.Tapped = true

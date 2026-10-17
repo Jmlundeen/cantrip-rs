@@ -1,0 +1,55 @@
+# Spellskite and a spell with two targets for one word "target" (CR 115.7b, the 2020-08-07 rulings): Bot2's Prismari Charm
+# deals 1 damage to each of one or two targets, Bot1 and Bot1's Ornithopter. Spellskite changes a target, so only one of
+# them can become Spellskite, and Bot1, who controls the ability, chooses which as it resolves (the choice is asked: both
+# could change). Bot1 moves its own: the Charm then deals 1 to Spellskite and 1 to the Ornithopter, and none to Bot1.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Ornithopter
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Mountain
+Prismari Charm
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Prismari Charm.Cast
+Bot2.Modes(deals 1 damage)
+Bot2.Target(Bot1; Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Spellskite.Activate(Stack.Prismari Charm)
+Bot1.Modes()
+Bot1.Battlefield.Island#1.Activate
+Bot1.Pass
+Bot1.Target(Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Spellskite.Damage = 1
+Bot1.Battlefield.Ornithopter.Damage = 1

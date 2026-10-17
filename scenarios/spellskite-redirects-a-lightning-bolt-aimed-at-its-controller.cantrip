@@ -1,0 +1,46 @@
+# Spellskite (CR 115.7b, 115.7a): Bot2 Bolts Bot1 on turn 4, and Bot1 answers with Spellskite's ability, paying {U} for its
+# {U/P} with an Island (CR 107.4f). Spellskite is a legal target for "any target", so the Bolt's target changes to it: Bot1
+# keeps its 20 life and Spellskite, a 0/4, is dealt 3 damage and survives.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Spellskite.Activate(Stack.Lightning Bolt)
+Bot1.Modes()
+Bot1.Battlefield.Island#1.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Spellskite.Damage = 3
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,54 @@
+# Spellskite leaving before its ability resolves (the 2020-08-07 ruling, CR 115.7a): Bot2 Bolts Bot1, Bot1 activates
+# Spellskite, and Bot2 answers with Disenchant on Spellskite. When the ability resolves, Spellskite is not on the
+# battlefield to be a target, so the Bolt's target stays Bot1, who is dealt 3.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Plains
+Plains
+Lightning Bolt
+Disenchant
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Spellskite.Activate(Stack.Lightning Bolt)
+Bot1.Modes()
+Bot1.Battlefield.Island#1.Activate
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Spellskite)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Spellskite
+Bot2.Graveyard = Lightning Bolt; Disenchant

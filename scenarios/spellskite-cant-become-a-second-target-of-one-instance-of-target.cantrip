@@ -1,0 +1,52 @@
+# Spellskite and CR 115.3: Bot2's Prismari Charm targets Spellskite and Bot1 with its one word "target". Changing Bot1 to
+# Spellskite would choose Spellskite twice for that one word, which the rules forbid, and the target that already is
+# Spellskite is not changed (CR 115.7a): Spellskite's ability changes nothing. Bot1 is dealt 1, and so is Spellskite.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Mountain
+Prismari Charm
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Prismari Charm.Cast
+Bot2.Modes(deals 1 damage)
+Bot2.Target(Bot1.Battlefield.Spellskite; Bot1)
+Bot1.Battlefield.Spellskite.Activate(Stack.Prismari Charm)
+Bot1.Modes()
+Bot1.Battlefield.Island#1.Activate
+Bot1.Pass
+! Bot1.Target
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Spellskite.Damage = 1
+Bot1.Battlefield.Island#1.Tapped = true

@@ -1,0 +1,61 @@
+# Spellskite and a divided spell (CR 115.7f): Bot2's Fire Covenant, X = 3, deals 2 to Bot1's first Ornithopter and 1 to
+# the second. Bot1 changes the first target to Spellskite (choosing it, since either could change); the division stays as it
+# was announced, so Spellskite is dealt that target's 2 and the second Ornithopter its 1. Both Ornithopters live.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Ornithopter
+Ornithopter
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Swamp
+Mountain
+Island
+Fire Covenant
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Fire Covenant.Cast(X: 3)
+Bot2.Divide(Bot1.Battlefield.Ornithopter#1: 2; Bot1.Battlefield.Ornithopter#2: 1)
+Bot1.Battlefield.Spellskite.Activate(Stack.Fire Covenant)
+Bot1.Modes()
+Bot1.Battlefield.Island#1.Activate
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Ornithopter#1)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Spellskite.Damage = 2
+Bot1.Battlefield.Ornithopter#1.Damage = 0
+Bot1.Battlefield.Ornithopter#2.Damage = 1

@@ -1,0 +1,41 @@
+# Spellskite's {U/P} paid with 2 life (CR 107.4f, 119.4): on turn 2 Bot1's Island and Sol Ring are still tapped from turn
+# 1, so Bot1 pays 2 life to change the target of Bot2's Bolt from Bot1 to Spellskite. Bot1 ends at 18, not 17.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Spellskite.Activate(Stack.Lightning Bolt)
+Bot1.Modes(1)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Spellskite.Damage = 3
+Bot1.Battlefield.Island.Tapped = true

@@ -1,0 +1,47 @@
+# Spellskite and "target creature you control" (CR 115.7a): Bot2 casts Snakeskin Veil on its own Ornithopter. Spellskite is
+# Bot1's, so it is no legal target for the Veil and the target is not changed; the ability still resolves, its {U} spent.
+# The Veil puts its +1/+1 counter on Bot2's Ornithopter.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Snakeskin Veil
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Spellskite.Activate(Stack.Snakeskin Veil)
+Bot1.Modes()
+Bot1.Battlefield.Island#1.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Spellskite.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Island#1.Tapped = true

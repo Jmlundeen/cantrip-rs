@@ -1,0 +1,46 @@
+# Spellskite and a spell already aimed at it (CR 115.7a: a target is changed only to another legal target): Bot2 Bolts
+# Spellskite, and Bot1 activates Spellskite's ability anyway (the 2020-08-07 ruling: it may be). There is no other target to
+# change, so nothing changes, and the Bolt deals Spellskite 3.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Spellskite
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Spellskite.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spellskite)
+Bot1.Battlefield.Spellskite.Activate(Stack.Lightning Bolt)
+Bot1.Modes()
+Bot1.Battlefield.Island#1.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Spellskite.Damage = 3
+Bot1.Battlefield.Island#1.Tapped = true
