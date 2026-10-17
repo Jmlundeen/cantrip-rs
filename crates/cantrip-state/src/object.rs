@@ -924,7 +924,8 @@ impl ManaValueSpells {
 /// Dragon spells: Desolation of Smaug, Sarkhan, Fireblood. A Dragon spell or an Omen spell: Maelstrom of the Spirit
 /// Dragon. A creature spell of the chosen type: Unclaimed Territory, Pillar of Origins, and Cavern of Souls, whose spell
 /// can't be countered. Elemental spells or abilities of Elemental sources: Flamebraider. A spell or an ability of a source of
-/// the chosen type: Eclipsed Realms.
+/// the chosen type: Eclipsed Realms; a creature spell or an ability of a creature source of the chosen type: Secluded
+/// Courtyard.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct SubtypeSpells {
     /// The subtypes, any one of which the spell must have. Read through the words of the text that names them (CR 612)
@@ -933,7 +934,8 @@ pub struct SubtypeSpells {
     /// "Of the chosen type" (CR 205.3m, 607.2a): as the mana is added, `subtypes` becomes the type chosen for the source
     /// as it entered, or nothing at all if none was, which then no spell has.
     pub chosen: bool,
-    /// Only a creature spell (CR 302): "a creature spell of the chosen type", "Dragon creature spells".
+    /// Only a creature spell (CR 302): "a creature spell of the chosen type", "Dragon creature spells"; with `abilities`, only
+    /// an ability of a creature source too ("a creature source of the chosen type").
     pub creature: bool,
     /// "... and that spell can't be countered" (CR 106.6, 701.6): the effect the mana has on the spell it pays for.
     pub uncounterable: bool,
@@ -952,6 +954,11 @@ impl SubtypeSpells {
     /// (Eclipsed Realms).
     pub const CHOSEN_TYPE_SPELLS_OR_ABILITIES: SubtypeSpells =
         SubtypeSpells { subtypes: [None, None], chosen: true, creature: false, uncounterable: false, abilities: true };
+
+    /// "Spend this mana only to cast a creature spell of the chosen type or activate an ability of a creature source of the
+    /// chosen type" (Secluded Courtyard): `creature` limits the ability's source as it does the spell.
+    pub const CHOSEN_TYPE_CREATURE_SPELLS_OR_ABILITIES: SubtypeSpells =
+        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false, abilities: true };
 
     /// "Spend this mana only to cast [subtype] spells."
     pub const fn of(subtype: Subtype) -> SubtypeSpells {
@@ -1106,8 +1113,8 @@ impl ManaRestriction {
             (ManaRestriction::Spells(allowed), ManaPayment::Spell { types, .. }) => allowed.0 & types.0 != 0,
             (ManaRestriction::Abilities(allowed), ManaPayment::Ability { source, .. }) => allowed.0 == 0 || allowed.0 & source.0 != 0,
             (ManaRestriction::Subtypes(s), ManaPayment::Spell { types, ref subtypes, .. }) => s.admits(types, subtypes),
-            (ManaRestriction::Subtypes(s), ManaPayment::Ability { ref subtypes, .. }) => {
-                s.abilities && s.subtypes.iter().flatten().any(|&t| subtypes.has(t))
+            (ManaRestriction::Subtypes(s), ManaPayment::Ability { source, ref subtypes }) => {
+                s.abilities && (!s.creature || source.has(CardType::Creature)) && s.subtypes.iter().flatten().any(|&t| subtypes.has(t))
             }
             _ => false,
         }
@@ -1375,6 +1382,7 @@ mod tests {
         all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: true, abilities: false }));
         all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: true, uncounterable: false, abilities: false }));
         all.push(ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Elemental).or_abilities()));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: false, abilities: true }));
         all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: false, uncounterable: false, abilities: true }));
         all.push(ManaRestriction::mana_value_at_least(4));
         all.push(ManaRestriction::mana_value_at_least_or_x(5));

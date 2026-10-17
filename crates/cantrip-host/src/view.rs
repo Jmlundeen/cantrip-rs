@@ -126,7 +126,8 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         ManaRestriction::Subtypes(s) => {
             subtypes = s.subtypes.iter().flatten().map(|t| t.name().to_string()).collect();
             match (s.creature, s.abilities) {
-                (_, true) => ManaSpendFilterView::SubtypeSpellsOrAbilities,
+                (true, true) => ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities,
+                (false, true) => ManaSpendFilterView::SubtypeSpellsOrAbilities,
                 (true, false) => ManaSpendFilterView::SubtypeCreatureSpells,
                 (false, false) => ManaSpendFilterView::SubtypeSpells,
             }
@@ -163,7 +164,7 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
         let at_least = u8::try_from(mana_value).ok()?;
         return Some(ManaRestriction::ManaValue(ManaValueSpells { at_least, or_x: filter == ManaSpendFilterView::ManaValueOrXSpells }));
     }
-    if matches!(filter, ManaSpendFilterView::SubtypeSpells | ManaSpendFilterView::SubtypeCreatureSpells | ManaSpendFilterView::SubtypeSpellsOrAbilities) {
+    if matches!(filter, ManaSpendFilterView::SubtypeSpells | ManaSpendFilterView::SubtypeCreatureSpells | ManaSpendFilterView::SubtypeSpellsOrAbilities | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities) {
         if subtypes.len() > 2 {
             return None;
         }
@@ -174,9 +175,9 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
         return Some(ManaRestriction::Subtypes(SubtypeSpells {
             subtypes: named,
             chosen: false,
-            creature: filter == ManaSpendFilterView::SubtypeCreatureSpells,
+            creature: matches!(filter, ManaSpendFilterView::SubtypeCreatureSpells | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities),
             uncounterable: effect == ManaSpendEffectView::CantBeCountered,
-            abilities: filter == ManaSpendFilterView::SubtypeSpellsOrAbilities,
+            abilities: matches!(filter, ManaSpendFilterView::SubtypeSpellsOrAbilities | ManaSpendFilterView::SubtypeCreatureSpellsOrAbilities),
         }));
     }
     ManaRestriction::NAMED.into_iter().map(|(r, _)| r).find(|&r| restriction_view(r) == (filter, effect, Vec::new(), 0))

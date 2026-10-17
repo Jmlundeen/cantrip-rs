@@ -373,6 +373,9 @@ public enum ManaSpendFilterView
     /// <summary>Only to cast a spell with one of the subtypes named beside it or activate an ability of a source with one:
     /// "Elemental spells or abilities of Elemental sources".</summary>
     SubtypeSpellsOrAbilities = 18,
+    /// <summary>Only to cast a creature spell with one of the subtypes named beside it or activate an ability of a creature
+    /// source with one: "a creature spell of the chosen type or an ability of a creature source of the chosen type".</summary>
+    SubtypeCreatureSpellsOrAbilities = 19,
 }
 
 /// <summary>What spending some mana does to whatever it pays for (CR 106.6): the effect half of a restriction.</summary>

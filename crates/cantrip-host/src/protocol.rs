@@ -309,6 +309,9 @@ pub enum ManaSpendFilterView {
     /// Spells with one of the subtypes named beside it, or abilities of sources with one: "Elemental spells or abilities of
     /// Elemental sources".
     SubtypeSpellsOrAbilities,
+    /// Creature spells with one of the subtypes named beside it, or abilities of creature sources with one: "a creature
+    /// spell of the chosen type or an ability of a creature source of the chosen type".
+    SubtypeCreatureSpellsOrAbilities,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

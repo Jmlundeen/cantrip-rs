@@ -339,7 +339,8 @@ shapes have an example:
   `ManaRestriction::Subtypes(..)` "spend this mana only to cast [subtype] [creature] spells" (`SubtypeSpells::of(Dragon)`,
   `::either(Dragon, Omen)`, `SubtypeSpells::CHOSEN_TYPE_CREATURE` for "a creature spell of the chosen type",
   `.uncounterable()` for Cavern of Souls, `.or_abilities()` for "or activate abilities of [subtype] sources",
-  `SubtypeSpells::CHOSEN_TYPE_SPELLS_OR_ABILITIES` for Eclipsed Realms), `ManaRestriction::NONCREATURE_SPELLS` "spend this mana only to cast a noncreature
+  `SubtypeSpells::CHOSEN_TYPE_SPELLS_OR_ABILITIES` for Eclipsed Realms, `CHOSEN_TYPE_CREATURE_SPELLS_OR_ABILITIES` for Secluded
+  Courtyard), `ManaRestriction::NONCREATURE_SPELLS` "spend this mana only to cast a noncreature
   spell", `ManaRestriction::mana_value_at_least(4)` "spells with mana value 4 or greater" (and `mana_value_at_least_or_x(5)`
   "... or spells with {X} in their mana costs"), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the
   rest. A mana ability's subtype is read through its source's words and its chosen type as it is activated; an effect
