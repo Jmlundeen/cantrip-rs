@@ -1,0 +1,52 @@
+# Bot1's Heritage Reclamation targets Bot2's Lightning Bolt in their graveyard. Bot2 answers with their own Heritage
+# Reclamation (third mode) on the same Bolt: it is exiled first, so Bot1's only target is illegal as the spell would
+# resolve and it does nothing at all (CR 608.2b) - no card for Bot1, though Bot2 draws for theirs. Bot2 has the
+# Forest and Mox Emerald untapped for it; their Bolt was cast with Mox Ruby.
+
+[Bot1 Deck]
+Forest
+Forest
+Heritage Reclamation
+Forest x30
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Lightning Bolt
+Heritage Reclamation
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heritage Reclamation.Cast
+Bot1.Modes(Exile up to one target card)
+Bot1.Target(Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Heritage Reclamation.Cast
+Bot2.Modes(Exile up to one target card)
+Bot2.Target(Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile = Lightning Bolt
+Bot2.Graveyard = Heritage Reclamation
+Bot1.Graveyard = Heritage Reclamation
+Bot1.Hand.Count = 5

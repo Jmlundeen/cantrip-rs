@@ -1,0 +1,40 @@
+# Heritage Reclamation's third mode: "Exile up to one target card from a graveyard. Draw a card." Bot2's Lightning Bolt
+# (cast at Bot1 on turn 2) is in their graveyard; Bot1 exiles it from there - a card in any graveyard is a legal target -
+# and draws a card: 7 cards, less a Forest on turn 1, plus the turn-3 draw, less a Forest and the Reclamation, plus the
+# card it draws is 6.
+
+[Bot1 Deck]
+Forest
+Forest
+Heritage Reclamation
+Forest x30
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heritage Reclamation.Cast
+Bot1.Modes(Exile up to one target card)
+Bot1.Target(Lightning Bolt)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile = Lightning Bolt
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Heritage Reclamation
+Bot1.Hand.Count = 6
+Bot1.Life = 17

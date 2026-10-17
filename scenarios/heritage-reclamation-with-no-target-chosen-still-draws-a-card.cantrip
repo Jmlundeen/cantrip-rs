@@ -1,0 +1,37 @@
+# "Exile up to one target card": with zero targets chosen the spell is still cast and does what it can - nothing is exiled
+# (Bot2's Lightning Bolt stays in their graveyard) - and "draw a card" happens all the same.
+
+[Bot1 Deck]
+Forest
+Forest
+Heritage Reclamation
+Forest x30
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heritage Reclamation.Cast
+Bot1.Modes(Exile up to one target card)
+Bot1.Target()
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Heritage Reclamation
+Bot1.Hand.Count = 6

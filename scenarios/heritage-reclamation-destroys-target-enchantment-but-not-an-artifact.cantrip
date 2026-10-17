@@ -1,0 +1,42 @@
+# Heritage Reclamation's second mode: "Destroy target enchantment." With Sol Ring and Oath of Druids on Bot2's side, the
+# artifact is not a legal target (the refusal) and the enchantment, the positive control, is destroyed. Sol Ring stays.
+
+[Bot1 Deck]
+Forest
+Forest
+Heritage Reclamation
+Forest x30
+
+[Bot2 Deck]
+Forest
+Mox Sapphire
+Sol Ring
+Oath of Druids
+Forest x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Oath of Druids.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heritage Reclamation.Cast
+Bot1.Modes(Destroy target enchantment)
+! Bot1.Target(Sol Ring)
+Bot1.Target(Oath of Druids)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot2.Graveyard = Oath of Druids
+Bot2.Battlefield = Forest; Mox Sapphire; Sol Ring
+Bot1.Graveyard = Heritage Reclamation
+Bot1.Hand.Count = 5
