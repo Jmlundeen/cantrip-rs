@@ -1,0 +1,72 @@
+# Gisela, Blade of Goldnight's ruling (CR 616.1): with several replacement and prevention effects on one damage event, the
+# player dealt the damage orders them. Bot1's Gisela; Bot2's Furnace of Rath ("deals double that damage ... instead"). Bot2
+# Bolts Bot1 twice. The first time Bot1 applies Gisela's prevention first: half of 3 rounded up is 2, the 1 left is doubled,
+# and Bot1 is dealt 2. The second time Bot1 lets the Furnace go first: 6, half of which (3) is prevented, and Bot1 is dealt 3
+# (CR 616.1f: each effect judged on the damage as the one before left it). Bot1 ends at 15. Bot1's own Bolt at Bot2 meets
+# two doublings, the Furnace's and Gisela's (CR 614.5: each applies once): 12, and Bot2 ends at 8.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Gisela, Blade of Goldnight
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Furnace of Rath
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gisela, Blade of Goldnight.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Furnace of Rath.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Replace(Furnace of Rath)
+? Bot2.Life = 8
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Replace(Gisela, Blade of Goldnight)
+? Bot1.Life = 18
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Replace(Furnace of Rath)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 15
+Bot2.Life = 8
+Prevented = 2 Lightning Bolt > Bot1 by Gisela, Blade of Goldnight; 3 Lightning Bolt > Bot1 by Gisela, Blade of Goldnight

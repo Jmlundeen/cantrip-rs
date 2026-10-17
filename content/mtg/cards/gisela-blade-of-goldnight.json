@@ -1,0 +1,12 @@
+{
+  "name": "Gisela, Blade of Goldnight",
+  "manaCost": "{4}{R}{W}{W}",
+  "type": "Legendary Creature — Angel",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying, first strike\nIf a source would deal damage to an opponent or a permanent an opponent controls, that source deals double that damage to that player or permanent instead.\nIf a source would deal damage to you or a permanent you control, prevent half that damage, rounded up.",
+  "keywords": [
+    "Flying",
+    "FirstStrike"
+  ]
+}

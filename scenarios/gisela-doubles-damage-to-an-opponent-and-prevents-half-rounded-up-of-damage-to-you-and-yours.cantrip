@@ -1,0 +1,64 @@
+# Gisela, Blade of Goldnight: "If a source would deal damage to an opponent or a permanent an opponent controls, that source
+# deals double that damage to that player or permanent instead. If a source would deal damage to you or a permanent you
+# control, prevent half that damage, rounded up." Bot1's Gisela. Bot1's Lightning Bolt deals 6 to Bot2 (14). Bot2's two
+# Bolts, at Bot1 and (in response) at Gisela, each have 2 of their 3 prevented (half of 3, rounded up): Bot1 is dealt 1 (19) and Gisela
+# is marked with 1. On turn 4 Bot2's Llanowar Elves attacks Bot1 and its 1 is all prevented (half of 1, rounded up).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Gisela, Blade of Goldnight
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Lightning Bolt
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gisela, Blade of Goldnight.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gisela, Blade of Goldnight)
+[T2 Bot2.End]
+? Bot1.Life = 19
+? Bot1.Battlefield.Gisela, Blade of Goldnight.Damage = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T4 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 19
+Bot2.Life = 14
+Prevented = 2 Lightning Bolt > Gisela, Blade of Goldnight by Gisela, Blade of Goldnight; 2 Lightning Bolt > Bot1 by Gisela, Blade of Goldnight; 1 Llanowar Elves > Bot1 by Gisela, Blade of Goldnight

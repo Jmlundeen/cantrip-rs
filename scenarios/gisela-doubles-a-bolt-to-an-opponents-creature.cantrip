@@ -1,0 +1,49 @@
+# Gisela, Blade of Goldnight doubles damage to "a permanent an opponent controls" (CR 614.1a): Bot1's Lightning Bolt at Bot2's
+# Ulvenwald Oddity (4/4) deals 6, so the Oddity dies (CR 704.5g) - it would have lived with 3. Bot1's Gisela itself, a
+# permanent Bot1 controls, is the other side: Bot2 has nothing to deal it damage here, so only the doubling is shown.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Gisela, Blade of Goldnight
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gisela, Blade of Goldnight.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ulvenwald Oddity)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Ulvenwald Oddity; Black Lotus
+Bot2.Life = 20
