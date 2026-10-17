@@ -1,0 +1,8 @@
+{
+  "name": "Melira, Sylvok Outcast",
+  "manaCost": "{1}{G}",
+  "type": "Legendary Creature — Human Scout",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "You can't get poison counters.\nCreatures you control can't have -1/-1 counters put on them.\nCreatures your opponents control lose infect."
+}

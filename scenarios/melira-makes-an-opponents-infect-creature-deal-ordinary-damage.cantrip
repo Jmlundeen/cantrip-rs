@@ -1,0 +1,43 @@
+# Melira, Sylvok Outcast: "Creatures your opponents control lose infect" (CR 613.1f, 702.90): Bot2's Glistener Elf has no
+# infect while Melira is out, so its combat damage to Bot1 is ordinary damage - 1 life lost, no poison counter (CR 120.3a).
+# The same Elf in Bot1's own scenario gives poison counters; here it has no keywords at all.
+
+[Bot1 Deck]
+Forest
+Melira, Sylvok Outcast
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Glistener Elf
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Glistener Elf.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Melira, Sylvok Outcast.Cast
+[T4 Bot2.Main1]
+Bot2.Attack(Glistener Elf > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Poison = 0
+Bot2.Battlefield.Glistener Elf.Keywords = (absent)

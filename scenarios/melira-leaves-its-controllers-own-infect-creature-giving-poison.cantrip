@@ -1,0 +1,32 @@
+# Melira, Sylvok Outcast takes infect only from creatures its controller's opponents control: Bot1's own Glistener Elf keeps
+# it, and its combat damage to Bot2 is a poison counter (CR 702.90b). Melira says nothing of Bot2's poison counters.
+
+[Bot1 Deck]
+Forest
+Glistener Elf
+Melira, Sylvok Outcast
+Forest
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Glistener Elf.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Melira, Sylvok Outcast.Cast
+Bot1.Attack(Glistener Elf > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Poison = 1
+Bot2.Life = 20
+Bot1.Battlefield.Glistener Elf.Keywords = Infect
