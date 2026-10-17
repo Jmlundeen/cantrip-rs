@@ -1,0 +1,52 @@
+# Mossborn Hydra (0/0, trample) enters with a +1/+1 counter, so it is a 1/1 and does not die (CR 614.1c, 704.5f). Landfall doubles
+# the +1/+1 counters on it (CR 701.10e) for each land that enters under Bot1's control: Wooded Foothills (1 -> 2), and the Forest
+# it fetches (2 -> 4), a 4/4 trampler. Bot2's Island on turn 2 changes nothing (4 stays 4); Bot1's land on turn 3 makes 8.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mossborn Hydra
+Wooded Foothills
+Forest
+Island
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Mossborn Hydra.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Mossborn Hydra.Power = 1
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Wooded Foothills.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+? Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Mossborn Hydra.Counters.PlusOnePlusOne = 8
+Bot1.Battlefield.Mossborn Hydra.Power = 8
+Bot1.Battlefield.Mossborn Hydra.Toughness = 8
+Bot1.Battlefield.Mossborn Hydra.Keywords = Trample

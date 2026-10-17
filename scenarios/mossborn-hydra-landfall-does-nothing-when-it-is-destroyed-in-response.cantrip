@@ -1,0 +1,44 @@
+# Landfall is a trigger that goes on the stack: with the Hydra's ability waiting, Bot2 destroys the Hydra in response (Get Lost).
+# The ability resolves and does nothing - it cannot put counters on a creature that is no longer on the battlefield - and the
+# Hydra is in Bot1's graveyard (as a new object it has no counters). Bot1 gets two Map tokens.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mossborn Hydra
+Forest
+Forest x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Get Lost
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Mossborn Hydra.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Get Lost.Cast(Mossborn Hydra)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Mossborn Hydra
+Bot1.Battlefield.Map Token#1.Token = true
+Stack.Count = 0
