@@ -1,15 +1,7 @@
 use cantrip_api::*;
+use cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_ATTACKS;
 use cantrip_mechanics::{effects, tokens};
 use cantrip_oracle as oracle;
-
-/// "Whenever a creature you control attacks" (CR 508.1m, 603.2): each creature this ability's controller attacks with, Ingris
-/// herself included, triggers it once; the ability is about that creature ("that creature deals ...").
-fn creature_you_control_attacks(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Attacks { attacker, .. } if q.controller(*attacker) == me.controller => Fired::about(Target::Object(*attacker)),
-        _ => None,
-    }
-}
 
 /// "That creature deals 1 damage to each opponent": the attacking creature is the source (CR 120.3), as it last was if it has
 /// left the battlefield by now (CR 113.7a, 608.2h); one damage event for each opponent still in the game, dealt together.
@@ -30,7 +22,7 @@ fn cadet_then_haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when_asked(EventMask::ATTACKS, creature_you_control_attacks), attacker_deals_1_to_each_opponent, "Whenever a creature you control attacks, that creature deals 1 damage to each opponent."),
+        triggered(CREATURE_YOU_CONTROL_ATTACKS, attacker_deals_1_to_each_opponent, "Whenever a creature you control attacks, that creature deals 1 damage to each opponent."),
         ability(cost("{4}"), cadet_then_haste, "{4}: Create a 2/2 colorless Wizard Soldier creature token named Cadet. Then creatures you control gain haste until end of turn."),
     ],
     ..oracle::INGRIS_STINGERQUILL

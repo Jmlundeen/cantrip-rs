@@ -1,16 +1,8 @@
 use cantrip_api::*;
 use cantrip_mechanics::pump;
+use cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_ATTACKS;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
-
-/// "Whenever a creature you control attacks" (CR 508.3a): once for each declared attacker, about that attacker. A
-/// creature put onto the battlefield attacking was never declared (CR 508.4) and triggers nothing.
-fn creature_you_control_attacks(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Attacks { attacker, .. } if q.controller(*attacker) == q.controller(source) => Fired::about(Target::Object(*attacker)),
-        _ => None,
-    }
-}
 
 /// It gets +1/+0 until end of turn for each other attacking creature that shares a creature type with it. Counted as
 /// the ability resolves (CR 608.2h), and the bonus is fixed for the turn (CR 611.2c).
@@ -33,6 +25,6 @@ fn bonus(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(when(EventMask::ATTACKS, creature_you_control_attacks), bonus, "Whenever a creature you control attacks, it gets +1/+0 until end of turn for each other attacking creature that shares a creature type with it.")],
+    abilities: &[triggered(CREATURE_YOU_CONTROL_ATTACKS, bonus, "Whenever a creature you control attacks, it gets +1/+0 until end of turn for each other attacking creature that shares a creature type with it.")],
     ..oracle::SHARED_ANIMOSITY
 };
