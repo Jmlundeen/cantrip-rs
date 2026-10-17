@@ -75,6 +75,9 @@ pub struct GameState {
 pub struct LostToStatics {
     pub key: (u64, usize),
     pub objects: Vec<ObjectId>,
+    /// The sources whose "loses all abilities" abilities apply: one among `objects` that took its own abilities keeps
+    /// applying its static abilities, which had begun to apply (CR 613.6).
+    pub applying: Vec<ObjectId>,
     /// Being worked out: a question asked from inside the working out is answered without it.
     pub finding: bool,
 }
@@ -274,7 +277,7 @@ impl GameState {
             journal: Journal::default(),
             epoch: 0,
             static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), honed: Vec::new(), granted: Vec::new() }),
-            lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), finding: false }),
+            lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
         }
     }
 

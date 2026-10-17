@@ -337,3 +337,20 @@ them out, so it plans with less mana than it has. The view has no word for the p
 a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
 
 **Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
+### KI-36: An ability that loses its source's abilities stops applying in its later layers
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-16, Eaten by Piranhas review |
+
+**Notes.** CR 613.6: an effect that has started to apply in one layer goes on applying in the later ones, "even if the ability
+generating the effect is removed during this process". A card's static abilities are one `StaticDef` per layer, and
+`layers::statics` drops every layer-6-and-later part of a source that lost all its abilities, so a single ability that spans a
+layer before 6 and one after loses its later part: Opalescence or March of the Machines made to lose its abilities (layer 4, then
+7b), Kenrith's Transformation on a creature that loses its abilities. No card in content reaches it: the only "loses all
+abilities" static is an Aura's, and no permanent with a multi-layer static can become a creature that loses its abilities. A
+fix groups a card's `StaticDef`s by ability, so the later parts of one that applied earlier keep applying to the set of objects
+fixed then. A "loses all abilities" ability that takes its own source's (Humility made a creature) already goes on applying
+(`Stripped::applying`).
+
+**Scenarios.** None can be written with the cards in content.

@@ -1915,9 +1915,8 @@ pub struct CardTable {
     pub any_cast_limit: bool,
     /// Which cards have block rules (CR 509.1b): looked at only for the blocker and the attacker of a possible block.
     pub block_rules: Vec<bool>,
-    /// Which cards have attack rules (CR 508.1c), and whether any does: the battlefield is searched for them only then.
+    /// Which cards have attack rules (CR 508.1c).
     pub attack_rules: Vec<bool>,
-    pub any_attack_rules: bool,
     /// Per card: it has a targeting rule. Read to find the few battlefield sources of one, never to ask the table.
     pub targeting_rules: Vec<bool>,
     /// Which cards have a triggered mana ability: looked for among the permanents only when a permanent is tapped for mana.
@@ -1996,7 +1995,6 @@ impl CardTable {
         let designators: Vec<bool> = cards.iter().map(|c| c.ascend || c.storied).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
-        let any_attack_rules = attack_rules.iter().any(|&a| a);
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let mana_triggers: Vec<bool> =
             cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))).collect();
@@ -2020,7 +2018,6 @@ impl CardTable {
             any_cast_limit,
             block_rules,
             attack_rules,
-            any_attack_rules,
             targeting_rules,
             mana_triggers,
             cost_changes,

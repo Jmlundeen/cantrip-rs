@@ -506,7 +506,7 @@ fn statics(
 ) {
     let view = View { cards, state, log, stop: layer };
     // From layer 6 on, the permanents a "loses all abilities" static ability has taken everything from (CR 613.1f).
-    let stripped = if layer >= Layer::Ability { lost_to_statics(cards, state, log) } else { Vec::new() };
+    let stripped = if layer >= Layer::Ability { lost_to_statics(cards, state, log) } else { Stripped::default() };
     // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
     // ability that would define them.
     let overridden = (layer == Layer::Color && overrides.0) || (layer == Layer::PtDefine && overrides.1);
@@ -516,7 +516,7 @@ fn statics(
         if overridden {
             continue;
         }
-        if layer >= Layer::Ability && (state.lost_all_abilities_to_an_effect(id) || stripped.contains(&id)) {
+        if layer >= Layer::Ability && (state.lost_all_abilities_to_an_effect(id) || stripped.lost.contains(&id)) {
             if let Some((power, toughness)) = st.lost_pt {
                 chars.power = Some(power);
                 chars.toughness = Some(toughness);
@@ -573,8 +573,9 @@ fn statics(
     };
     for &(source, from, lost) in sources {
         // CR 613.1f, 613.8a: a permanent that has lost all its abilities has no static abilities from layer 6 on. Before
-        // it, they have applied (CR 613.6).
-        if layer >= Layer::Ability && (lost || stripped.contains(&source)) {
+        // it, they have applied (CR 613.6), and so has the "loses all abilities" ability of one that took its own (Humility
+        // made a creature), which goes on applying (CR 613.6).
+        if layer >= Layer::Ability && (lost || stripped.lost.contains(&source)) && !stripped.applying.contains(&source) {
             continue;
         }
         let sobj = state.obj(source);
@@ -869,7 +870,15 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
 /// Whether `id` has lost all its abilities (CR 613.1f): to a resolved effect, or to a static ability
 /// (`StaticDef::loses_all`, which `lost_to_statics` works out). `Query::lost_all_abilities` is this.
 pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> bool {
-    state.lost_all_abilities_to_an_effect(id) || (state.statics_seen && lost_to_statics(cards, state, log).contains(&id))
+    state.lost_all_abilities_to_an_effect(id) || (state.statics_seen && lost_to_statics(cards, state, log).lost.contains(&id))
+}
+
+/// What `lost_to_statics` found: the permanents that lost all their abilities to a static ability, and the sources whose
+/// such abilities apply.
+#[derive(Default)]
+struct Stripped {
+    lost: Vec<ObjectId>,
+    applying: Vec<ObjectId>,
 }
 
 /// The permanents that have lost all their abilities to a "loses all abilities" static ability (CR 613.1f), found once
@@ -881,13 +890,13 @@ pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], 
 /// existence depends on it (CR 613.8a), and the abilities it takes no longer apply; where each would take the other's,
 /// the earlier timestamp goes first (CR 613.8b). The source of one a resolved effect took away is left out already: its
 /// ability depends on that effect, which comes first.
-fn lost_to_statics(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<ObjectId> {
+fn lost_to_statics(cards: &CardTable, state: &GameState, log: &[Record]) -> Stripped {
     if !state.statics_seen {
-        return Vec::new();
+        return Stripped::default();
     }
     let strippers = static_sources(cards, state).strippers.clone();
     if strippers.is_empty() {
-        return Vec::new();
+        return Stripped::default();
     }
     let key = (state.epoch, log.len());
     {
@@ -895,10 +904,10 @@ fn lost_to_statics(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<
         // An `affects` that asked for characteristics past layer 6 would come back here: it is answered as layer 6
         // began, before any ability was taken.
         if have.finding {
-            return Vec::new();
+            return Stripped::default();
         }
         if have.key == key {
-            return have.objects.clone();
+            return Stripped { lost: have.objects.clone(), applying: have.applying.clone() };
         }
     }
     state.lost_to_statics.borrow_mut().finding = true;
@@ -922,11 +931,13 @@ fn lost_to_statics(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<
     }
     let objects: Vec<ObjectId> =
         state.battlefield().iter().copied().filter(|&id| applied.iter().any(|&ability| strips(ability, id))).collect();
+    let applying: Vec<ObjectId> = applied.iter().map(|&(source, _)| source).collect();
     let mut have = state.lost_to_statics.borrow_mut();
     have.key = key;
     have.objects = objects.clone();
+    have.applying = applying.clone();
     have.finding = false;
-    objects
+    Stripped { lost: objects, applying }
 }
 
 /// Whether a targeting rule of `kind` (CR 609.4, 702.11, 702.21) applies to `subject`: some permanent on the battlefield has a static

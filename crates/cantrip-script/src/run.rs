@@ -1411,12 +1411,13 @@ impl<'s> Run<'s> {
                         continue;
                     }
                     // Fewer blockers than an attacker requires (menace): the declaration is refused (CR 509.1b). A line of
-                    // several pairs is one declaration, which the engine's own check of the answer judges as a whole (more
-                    // blockers than "can't be blocked by more than one creature" allows, CR 509.1b).
+                    // several pairs is one declaration: more blockers on an attacker than "can't be blocked by more than one
+                    // creature" allows (CR 509.1b), which the engine's own check of the answer must refuse.
                     let short = targets.iter().any(|&a| {
                         given.iter().find(|g| g.0 == a).is_some_and(|g| (g.1 as u8) < self.game.chars(a).minimum_blockers())
                     }) || (pairs.len() > 1
                         && pairs.iter().all(|p| allowed.contains(p))
+                        && pairs.iter().any(|&(_, a)| pairs.iter().filter(|p| p.1 == a).count() > usize::from(self.game.chars(a).maximum_blockers()))
                         && check_answer(&self.game, request, &Answer::Block(pairs.clone())).is_err());
                     if !short && blockers.iter().any(|&b| targets.iter().any(|&a| allowed.contains(&(b, a)))) {
                         return fail(format!("line {line} says {text} must not be allowed, but it is"));

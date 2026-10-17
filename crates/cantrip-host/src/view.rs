@@ -825,7 +825,10 @@ impl<'a> Projector<'a> {
                 let keyword = |part: &str| {
                     KEYWORD_WORDS.iter().any(|(_, w)| w.trim_end_matches('.').eq_ignore_ascii_case(part.trim().trim_end_matches('.')))
                 };
-                (!words.is_empty() && words.split(',').all(keyword)) || def.abilities.iter().any(|a| without_reminder(a.text()) == words)
+                // "Hexproof from [quality]" is judged with the qualities above.
+                (!words.is_empty() && words.split(',').all(keyword))
+                    || words.starts_with("Hexproof from")
+                    || def.abilities.iter().any(|a| without_reminder(a.text()) == words)
             };
             let rest: Vec<String> =
                 view.oracle_text.split('\n').filter(|line| !line.trim().is_empty() && !judged(line)).map(str::to_string).collect();

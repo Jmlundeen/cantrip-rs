@@ -1094,7 +1094,7 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, candidat
 /// way, or one the permanent no longer gives.
 pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, card: ObjectId, way: u8) -> Option<Cost> {
     let (k, face) = granted_slot(way)?;
-    let (granter, controller, rule) = *granted_ways_of(game.cards, &game.state).get(k)?;
+    let (granter, controller, rule) = *granted_ways_of(game.cards, &game.state, &game.log).get(k)?;
     let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
@@ -2738,7 +2738,7 @@ fn cast(
     let face = cx.card_id(def);
     // Flashback (CR 702.34a) a permission or a permanent gave, or aftermath (CR 702.127a): exiled instead of put anywhere
     // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
-    let flashback = flashback || def.aftermath || granted.is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s())[k].2.flashback);
+    let flashback = flashback || def.aftermath || granted.is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.flashback);
     let mut cost = match (way, instead) {
         (_, Some(instead)) => Cost::mana(instead),
         _ if granted.is_some() => {
