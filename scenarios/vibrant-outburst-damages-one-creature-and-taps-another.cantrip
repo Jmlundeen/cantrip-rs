@@ -1,0 +1,38 @@
+# The two targets are separate: three damage to Llanowar Elves kills it, while Elvish Mystic, the other target, is
+# tapped and survives. (Both Elves are untapped at the start; Bot2 took no damage.)
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Vibrant Outburst
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Elvish Mystic
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vibrant Outburst.Cast
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Elvish Mystic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Elvish Mystic.Tapped = true

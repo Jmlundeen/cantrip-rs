@@ -1,0 +1,6 @@
+{
+  "name": "Vibrant Outburst",
+  "manaCost": "{U}{R}",
+  "type": "Instant",
+  "oracleText": "Vibrant Outburst deals 3 damage to any target. Tap up to one target creature."
+}

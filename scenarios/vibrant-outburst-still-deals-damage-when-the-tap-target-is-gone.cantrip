@@ -1,0 +1,44 @@
+# One of two targets becoming illegal (CR 608.2b): Bot1 aims Vibrant Outburst at Bot2 and at Bot2's Llanowar Elves; in
+# response Bot2 Bolts their own Elves, so the tap target is gone and the spell, with one legal target left, still deals
+# its 3 damage to Bot2 (20 - 3 = 17).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Vibrant Outburst
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vibrant Outburst.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot1.Graveyard = Vibrant Outburst
