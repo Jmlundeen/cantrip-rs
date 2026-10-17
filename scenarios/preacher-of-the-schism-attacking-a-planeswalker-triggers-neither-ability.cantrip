@@ -1,0 +1,58 @@
+# The ruling: the token trigger works only if Preacher attacks a player (CR 508.1m, 506.2 - attacking a planeswalker is
+# not attacking its controller). Bot2 has the most life (20 to Bot1's 10), but Preacher attacks Bot2's Liliana of the Veil
+# instead, so no Vampire is made; and Bot1 does not have the most life, so there is no draw either. Liliana takes the
+# Preacher's 2 damage (3 loyalty -> 1). Compare the attack on the player at the same life totals in
+# preacher-of-the-schism-attacking-the-player-with-the-most-life-only-makes-a-vampire.
+
+[Life]
+Bot1: 10
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Preacher of the Schism
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Preacher of the Schism.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Preacher of the Schism > Bot2.Battlefield.Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 10
+Bot2.Life = 20
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Count = 4
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1

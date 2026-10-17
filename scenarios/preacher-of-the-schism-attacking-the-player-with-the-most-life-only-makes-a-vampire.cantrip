@@ -1,0 +1,46 @@
+# Bot1 is at 10 and Bot2 at 20: Preacher attacks the player with the most life, so the token is made, but its controller
+# does not have the most life, so the draw-and-lose-1 trigger does not happen (Bot1 stays at 10, with no extra card:
+# 3 left in hand after the opening 7 and the three cards cast, plus the turn-3 draw).
+
+[Life]
+Bot1: 10
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Preacher of the Schism
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Preacher of the Schism.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Preacher of the Schism > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 10
+Bot2.Life = 18
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Vampire.Token = true

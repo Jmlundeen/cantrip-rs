@@ -1,0 +1,55 @@
+# The rulings: once a trigger has triggered, life totals no longer matter. Tied at 20, Preacher attacks Bot2 and both
+# abilities trigger. With them on the stack Bot2 exiles its own Embereth Shieldbreaker with Swords to Plowshares and gains
+# 2 (22), so Bot2 no longer has the tied-for-most life and neither does Bot1 - yet the Vampire token is made and Bot1 draws
+# and loses 1 anyway. Combat damage then takes Bot2 from 22 to 20.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Preacher of the Schism
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Embereth Shieldbreaker
+Swords to Plowshares
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Preacher of the Schism.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Preacher of the Schism > Bot2)
+Bot2.Hand.Swords to Plowshares.Cast(Embereth Shieldbreaker)
+? Stack.Count = 3
+Bot2.Battlefield.Plains.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 19
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Vampire.Token = true
+Exile = Embereth Shieldbreaker

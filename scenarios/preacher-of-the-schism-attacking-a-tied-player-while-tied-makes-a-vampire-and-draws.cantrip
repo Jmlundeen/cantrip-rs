@@ -1,0 +1,51 @@
+# Both of Preacher of the Schism's attack triggers on one attack: the players are tied at 20, so the attacked player is
+# "tied for most life" (a token: a 1/1 white Vampire with lifelink) and its controller is too (draw a card, lose 1 life).
+# Combat damage is the Preacher's 2 into Bot2 (the token came in after attackers were declared, so it is not attacking).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Preacher of the Schism
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Preacher of the Schism.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Preacher of the Schism > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 18
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Vampire.Token = true
+Bot1.Battlefield.Vampire.Power = 1
+Bot1.Battlefield.Vampire.Toughness = 1
+Bot1.Battlefield.Vampire.Colors = White
+Bot1.Battlefield.Vampire.Subtypes = Vampire
+Bot1.Battlefield.Vampire.Keywords = Lifelink
+Bot1.Battlefield.Vampire.Tapped = false
+Bot1.Battlefield.Preacher of the Schism.Keywords = Deathtouch
+Bot1.Battlefield.Preacher of the Schism.Tapped = true

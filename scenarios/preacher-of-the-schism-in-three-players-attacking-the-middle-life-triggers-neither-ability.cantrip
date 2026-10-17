@@ -1,0 +1,59 @@
+# Three players at 10 (Bot1), 15 (Bot2) and 20 (Bot3): "the most life" is compared with every player, not only the one
+# attacked. Preacher attacks Bot2, who is neither the highest (Bot3 is) nor tied, and Bot1 is lowest, so neither trigger
+# happens: no token, no draw. The first player of a game of more than two draws on their first turn (CR 103.8a), so
+# Bot1 holds 8 - 4 cast = 4, plus the turn-4 draw = 5.
+
+[Life]
+Bot1: 10
+Bot2: 15
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Preacher of the Schism
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot3 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Preacher of the Schism.Cast
+[T4 Bot1.Main1]
+Bot1.Attack(Preacher of the Schism > Bot2)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 10
+Bot2.Life = 13
+Bot3.Life = 20
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Count = 4

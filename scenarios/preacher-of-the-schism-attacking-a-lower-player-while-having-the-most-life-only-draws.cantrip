@@ -1,0 +1,46 @@
+# Bot1 is at 20 and Bot2 at 10: Preacher's controller has the most life, so it draws a card and loses 1 life, but the
+# attacked player does not, so no token is made (the battlefield is just the three Moxes and the Preacher). Hand: 3 after the opening
+# seven and four casts, plus the turn-3 draw and the trigger's draw.
+
+[Life]
+Bot2: 10
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Preacher of the Schism
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Preacher of the Schism.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Preacher of the Schism > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 8
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Count = 4

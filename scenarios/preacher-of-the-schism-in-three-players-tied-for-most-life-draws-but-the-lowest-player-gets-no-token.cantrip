@@ -1,0 +1,59 @@
+# Three players at 15 (Bot1), 15 (Bot2) and 10 (Bot3): Bot1 is tied for the most life, so attacking anyone draws a card and
+# loses 1 life; Bot3, the attacked player, is the lowest, so there is no token. Hand: 8 - 4 cast + the turn-4 draw +
+# the trigger's draw = 6.
+
+[Life]
+Bot1: 15
+Bot2: 15
+Bot3: 10
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Preacher of the Schism
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot3 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Preacher of the Schism.Cast
+[T4 Bot1.Main1]
+Bot1.Attack(Preacher of the Schism > Bot3)
+[T4 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 14
+Bot2.Life = 15
+Bot3.Life = 8
+Bot1.Hand.Count = 6
+Bot1.Battlefield.Count = 4
