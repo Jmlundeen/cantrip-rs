@@ -211,7 +211,18 @@ would go over unclickable.
   effect that sets a name (612.8, "named Everflame, Heroes' Legacy") is `EffectKind::SetName`, in layer 3: the object
   has that name alone (`Chars::name_set`), for the legend rule and every "same name" or chosen-name question
   (`library::object_names`).
-- **Type-changing effects (613.1d, layer 4)** in timestamp order: `AddTypes`, `SetTypes`, `AddSubtype`,
+- **Dependency (613.8)**: within each layer and sublayer, the effects that may apply to the object are merged in timestamp
+  order (`layers::Merge`: a source's static abilities, those granted to others, resolved effects, the object's own granted
+  abilities). While a static ability whose "affects" can change is followed by others, the rest go through
+  `layers::by_dependency`: an effect depends on another if applying the other changes whether it applies to the object
+  (613.8a; Ygra's "other creatures are Food artifacts" on a Vehicle crewed later, Kaito's Ninja form, an impending
+  Overlord's "isn't a creature"), and waits for it; free effects go in timestamp order, as do the members of a loop among
+  themselves (613.8b), and the order is worked out again after each (613.8c). Judged on the object being worked out, an
+  effect that would change what another applies to once its own prerequisites have applied counts too (a chain:
+  "creatures are artifacts" after "lands are creatures" after the effect that makes it a land). A resolved effect names
+  what it applies to and is never the dependent one; text changes stay in timestamp order (613.7, the Artificial
+  Evolution scenarios). Characteristic-defining abilities apply first and apart (613.3, 613.8a(c)).
+- **Type-changing effects (613.1d, layer 4)**: `AddTypes`, `SetTypes`, `AddSubtype`,
   `SetCreatureType`, `AddAllCreatureTypes` ("with all creature types", only to a creature or Kindred, 205.3d) and
   `LoseAllCreatureTypes`. Changeling's every creature type is a characteristic-defining ability applied first (613.3).
 - **Static abilities granted by effects (613.1f, 613.7a)** are `granted_static` entries (`AbilityDef::Static`) of a card's
