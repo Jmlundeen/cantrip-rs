@@ -1,0 +1,66 @@
+# Abundance and a Words of Wind effect, both Bot1's, both replace its draws, and Bot1 orders them (CR 616.1). Bot1 declines
+# Abundance for its turn 3 draw for the turn and draws Ancestral Recall; then it activates Words of Wind once and casts the
+# spell. For the first draw it has Abundance apply first and takes it, choosing land: the Island on top goes to its hand -
+# not a draw, so the Words effect is not used. For the second it has the Words effect apply: each player returns a
+# permanent, Bot1 its Mox Jet and Bot2 its Swamp, and the effect is used up. The third meets Abundance alone, which Bot1
+# declines, and draws the Plains.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Abundance
+Words of Wind
+Mox Sapphire
+Mox Jet
+Ancestral Recall
+Island
+Plains
+Swamp x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Abundance.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+? Bot1.Hand = Words of Wind; Ancestral Recall
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Words of Wind.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Words of Wind.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Abundance)
+Bot1.Accept
+Bot1.Modes(Land)
+Bot1.Replace(Words of Wind)
+Bot1.Choose(Mox Jet)
+Bot2.Choose(Swamp)
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Mox Jet; Plains
+Bot1.Battlefield = Island; Sol Ring; Mox Sapphire; Abundance; Words of Wind
+Bot1.Library.Count = 20
+Bot2.Battlefield.Count = 0

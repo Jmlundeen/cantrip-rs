@@ -1,0 +1,56 @@
+# Words of Wind activated twice makes two effects, each used up by one draw: "if multiple Words have been used prior to
+# drawing a card, then you can choose which one to apply (and use up) each time you draw a card" (its ruling; CR 616.1).
+# Bot1 activates it twice on turn 3 and casts Ancestral Recall: its first draw is replaced by one effect (Bot1 is asked which
+# - they are alike), its second by the other, and its third is drawn. Each replacement has each player return a permanent:
+# Bot1 its Mox Jet and then its Sol Ring, Bot2 its Swamp and then nothing, having none left (nobody asks a player with no
+# permanent to choose one).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Words of Wind
+Mox Sapphire
+Mox Jet
+Plains
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Words of Wind.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Words of Wind.Activate
+Bot1.Pass
+Bot1.Battlefield.Words of Wind.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Words of Wind)
+Bot1.Choose(Mox Jet)
+Bot2.Choose(Swamp)
+Bot1.Choose(Sol Ring)
+! Bot2.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Mox Jet; Sol Ring; Island
+Bot1.Library.Count = 19
+Bot1.Battlefield = Island; Mox Sapphire; Words of Wind
+Bot2.Battlefield.Count = 0

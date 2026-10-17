@@ -1,0 +1,51 @@
+# Words of Wind: "{1}: The next time you would draw a card this turn, each player returns a permanent they control to its
+# owner's hand instead." (CR 614.1a, 611.2) Bot1 activates it once on turn 3 and casts Ancestral Recall. The first draw is
+# replaced: in turn order each player chooses one of their permanents - Bot1 its tapped Mox Jet, Bot2 its Swamp - and both
+# go to their owners' hands together (CR 101.4); the effect is then used up, so the second and third draws are drawn.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Words of Wind
+Mox Sapphire
+Mox Jet
+Plains
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Words of Wind.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+? Bot1.Hand = Plains; Ancestral Recall
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Words of Wind.Activate
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Choose(Mox Jet)
+Bot2.Choose(Swamp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Mox Jet; Island; Island
+Bot1.Library.Count = 18
+Bot1.Battlefield = Island; Sol Ring; Mox Sapphire; Words of Wind
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 8
