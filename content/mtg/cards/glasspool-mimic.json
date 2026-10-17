@@ -1,0 +1,14 @@
+{
+  "name": "Glasspool Mimic",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Shapeshifter Rogue",
+  "oracleText": "You may have this creature enter as a copy of a creature you control, except it's a Shapeshifter Rogue in addition to its other types.",
+  "power": "0",
+  "toughness": "0",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Glasspool Shore",
+    "type": "Land",
+    "oracleText": "This land enters tapped.\n{T}: Add {U}."
+  }
+}
