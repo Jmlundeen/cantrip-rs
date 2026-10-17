@@ -1,0 +1,64 @@
+# The Ooze's ability on a creature card (Hired Blade, killed by Stab) is on the stack when Bot2 kills the Ooze with a
+# Lightning Bolt in response. The ability still resolves (its target is fine): the card is exiled and Bot1 gains 1 life
+# (21), but there is no Ooze to put the counter on (CR 608.2c: each instruction is done as far as it can be). The Ooze is in
+# the graveyard with no counters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Scavenging Ooze
+Stab
+Forest
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Hired Blade
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scavenging Ooze.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stab.Cast(Bot2.Battlefield.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Scavenging Ooze.Activate(Bot2.Graveyard.Hired Blade)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Scavenging Ooze)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Exile = Hired Blade
+Bot1.Graveyard = Scavenging Ooze; Stab
+Bot2.Graveyard = Lightning Bolt

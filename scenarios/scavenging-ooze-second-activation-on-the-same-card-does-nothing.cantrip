@@ -1,0 +1,62 @@
+# The Ooze's ability twice on the same creature card (the ruling): the second to resolve finds its target gone from the
+# graveyard (CR 608.2b, 400.7) and does nothing, so there is only one counter (3/3) and one life (21). A card on the
+# battlefield (Bot2's Mox Jet) is not a legal target (`!`): the target must be a card in a graveyard.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Scavenging Ooze
+Stab
+Forest
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Hired Blade
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Scavenging Ooze.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stab.Cast(Bot2.Battlefield.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Scavenging Ooze.Activate(Bot2.Battlefield.Mox Jet)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Scavenging Ooze.Activate(Bot2.Graveyard.Hired Blade)
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Scavenging Ooze.Activate(Bot2.Graveyard.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Scavenging Ooze.Power = 3
+Bot1.Battlefield.Scavenging Ooze.Counters.PlusOnePlusOne = 1
+Bot1.Life = 21
+Exile = Hired Blade
+Bot1.Graveyard = Stab
