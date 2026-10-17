@@ -2276,6 +2276,8 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let instead = grant.and_then(|g| g.instead);
             let any_type = grant.is_some_and(|g| g.any_type);
             let more = grant.map_or(0, |g| g.more);
+            // A permission to cast it only as its Adventure (CR 715.3) casts neither the card itself nor another face of it.
+            let permitted_whole = permitted && !grant.is_some_and(|g| g.adventure_only);
             let speed = Speed { cx, flash, granters: &flash_granters, player, card: id };
             let instant = speed.whole(def) && !grant.is_some_and(|g| g.sorcery_speed);
             // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard";
@@ -2289,7 +2291,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 && (instant == instants || (instants && def.ways.iter().any(|w| w.instant_speed)))
                 && cx.chars(id).has(Keyword::Retrace)
                 && can_pay_other(cx, id, player, &RETRACE);
-            let elsewhere = permitted || from_graveyard || retrace || adventured;
+            let elsewhere = permitted_whole || from_graveyard || retrace || adventured;
             // Whether a way of casting it from the hand is open to it here (CR 118.9, 601.3): one that names no zone is an
             // alternative cost that may be paid whatever zone a rule or permission has the spell cast from, as Yawgmoth's
             // Will does for Force of Will's, Daze's or web-slinging's; one whose text names the hand is not (warp, CR
@@ -2297,7 +2299,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let from_elsewhere = |way: &WayDef, elsewhere: bool| way.from == ZoneKind::Hand && !way.only_from && !zone.is(ZoneKind::Hand) && elsewhere;
             if instant == instants && !land {
                 if def.split.is_none()
-                    && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted || from_graveyard || retrace)
+                    && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted_whole || from_graveyard || retrace)
                     && (def.has_cost || instead.is_some())
                     && additional_payable
                     && def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
@@ -2491,6 +2493,9 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
             if zone.is(ZoneKind::Hand) || permitted || from_graveyard || by_exile_cast {
                 for (way, _, inset) in def.inset_faces() {
+                    if permitted && !zone.is(ZoneKind::Hand) && !from_graveyard && grant.is_some_and(|g| g.adventure_only) && way != WAY_ADVENTURE {
+                        continue;
+                    }
                     let face_instant = speed.face(inset) && !grant.is_some_and(|g| g.sorcery_speed);
                     if face_instant != instants {
                         continue;
@@ -2819,8 +2824,9 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             // Cast from where a permission allows (CR 601.3), for the cost it names instead of the mana cost: the card, or its
             // Adventure or Omen, which is casting the card too (CR 715.3, 720.3).
             let permitted = match action.index {
-                0 => permission_for(cx, source, player),
-                WAY_ADVENTURE | WAY_OMEN if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player),
+                0 => permission_for(cx, source, player).filter(|p| !p.grant.adventure_only),
+                WAY_ADVENTURE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player),
+                WAY_OMEN if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player).filter(|p| !p.grant.adventure_only),
                 _ => None,
             };
             let instead = permitted.and_then(|p| p.grant.instead);

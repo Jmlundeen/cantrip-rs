@@ -907,6 +907,9 @@ impl<'a> Projector<'a> {
             Some(PlayCondition::ControlsSubtype(subtype)) => text.push_str(&format!(", if {who} control a {}", subtype.name())),
             None => {}
         }
+        if grant.adventure_only {
+            text.push_str(", as an Adventure");
+        }
         if grant.sorcery_speed {
             text.push_str(", as a sorcery");
         }
