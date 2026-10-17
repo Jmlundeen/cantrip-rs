@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, triggers::THIS_ENTERS};
+use cantrip_mechanics::{choose, mana, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Imprint (CR 607.2a): "you may exile a nonartifact, nonland card from your hand", exiled with this artifact. Nothing
@@ -18,19 +18,10 @@ fn imprint(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// The colors of the card exiled with this artifact: what its mana ability may add.
-fn imprinted_colors(q: &dyn Query, asker: &Asker) -> ColorSet {
-    let mut colors = ColorSet::NONE;
-    for card in q.exiled_with(asker.source) {
-        colors = ColorSet(colors.0 | q.chars(card).colors.0);
-    }
-    colors
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any of the exiled card's colors.")
-            .colors_from(imprinted_colors),
+            .colors_from(mana::colors_of_cards_exiled_with_this),
         triggered(THIS_ENTERS, imprint, "Imprint \u{2014} When this artifact enters, you may exile a nonartifact, nonland card from your hand."),
     ],
     ..oracle::CHROME_MOX

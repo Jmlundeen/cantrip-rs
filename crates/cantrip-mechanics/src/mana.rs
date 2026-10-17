@@ -23,6 +23,17 @@ pub fn add_green_for_each_creature(g: &mut dyn Game, asker: &Asker, _: Option<Co
     Ok(())
 }
 
+/// "Add one mana of any of the exiled cards' colors" (CR 106.5, 607.2a): the colors the cards exiled with the source have now, for a
+/// mana ability's `colors_from`. With no exiled card, or only colorless ones, there is no color to choose: the ability is still
+/// offered and adds no mana (CR 106.5). Chrome Mox ("the exiled card") and Pit of Offerings read it.
+pub fn colors_of_cards_exiled_with_this(q: &dyn Query, asker: &Asker) -> ColorSet {
+    let mut colors = ColorSet::NONE;
+    for card in q.exiled_with(asker.source) {
+        colors = ColorSet(colors.0 | q.chars(card).colors.0);
+    }
+    colors
+}
+
 /// "This land enters tapped" (CR 614.1c): the modal double-faced lands' (Bala Ged Sanctuary, Haven of the Harvest).
 pub fn enters_tapped(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.tapped = true;
