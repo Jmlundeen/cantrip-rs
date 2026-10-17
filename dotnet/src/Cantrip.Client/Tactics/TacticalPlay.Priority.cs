@@ -2115,6 +2115,16 @@ public sealed partial class TacticalPlay
             return AutoPlay.Announce(prompt, best.ManaValue);
         }
 
+        // Permanents sacrificed for {1} less each (CR 601.2b, 601.2f): only as many as the mana this seat has falls short of the
+        // cost by, the colored part apart - each is a card lost for one mana.
+        if (prompt.AnnouncesXOrKicks && prompt.SacrificeReduces > 0)
+        {
+            int full = CardReading.ManaValue(prompt.Total) + prompt.X * prompt.SacrificeReduces;
+            int shortBy = Math.Max(0, full - Mana(client));
+            int wanted = (shortBy + prompt.SacrificeReduces - 1) / prompt.SacrificeReduces;
+            return AutoPlay.Announce(prompt, Math.Clamp(wanted, 0, Math.Max(0, prompt.MostAffordable)));
+        }
+
         // X is announced before anything is paid (CR 601.2b), at what the mana reaches: not counting the mana that
         // would cost the last of its life, which the payment will not take.
         if (prompt.AnnouncesXOrKicks && prompt.Kicker.Length == 0 && !prompt.XPaidInLife && !prompt.XRemovesLoyalty && client.View is { } announcing

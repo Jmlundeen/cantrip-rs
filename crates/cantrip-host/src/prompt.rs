@@ -665,6 +665,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             let def = game.cards.get(game.state.obj(*source).card);
             let kicker = def.kicker;
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);
+            // "You may sacrifice any number of ... This spell costs {1} less for each" (CR 601.2b): what the number announced is.
+            let sacrifices = if *announcing { sacrifices_for_reduction(game, *source, request.player) } else { None };
             PromptPayload::PayCostsPromptMessage(PayCostsPrompt {
                 player,
                 spell: source_handle(game, handles, *source),
@@ -682,7 +684,14 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 kicker_paid: kicker.is_some() && *x > 0,
                 announces_x_or_kicks: *announcing,
                 // A "−X" loyalty cost reaches as far as the loyalty there is (CR 606.4, 118.3); mana is not asked.
-                most_affordable: if *loyalty { i32::from(game.state.obj(*source).counters(CounterKind::Loyalty).max(0)) } else { -1 },
+                most_affordable: if *loyalty {
+                    i32::from(game.state.obj(*source).counters(CounterKind::Loyalty).max(0))
+                } else if let Some((_, could)) = sacrifices {
+                    could.min(i32::MAX as usize) as i32
+                } else {
+                    -1
+                },
+                sacrifice_reduces: sacrifices.map_or(0, |(each, _)| i32::from(each)),
                 x_removes_loyalty: *loyalty,
                 spends_no_mana,
                 attackers: handles_of(handles, attackers),

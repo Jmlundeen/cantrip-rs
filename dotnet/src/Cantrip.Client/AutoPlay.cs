@@ -474,6 +474,12 @@ public static class AutoPlay
 
         int most = Math.Max(0, prompt.MostAffordable);
 
+        // Permanents sacrificed for a reduction each (CR 601.2b): none, a seat with no plan for its board keeping it.
+        if (prompt.SacrificeReduces > 0)
+        {
+            return 0;
+        }
+
         // A "−X" loyalty cost: as much as leaves the planeswalker one loyalty, so it stays on the battlefield.
         if (prompt.XRemovesLoyalty)
         {

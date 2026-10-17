@@ -400,6 +400,19 @@ public sealed class Decisions
         int most = Math.Min(reach, MostChoices - 1);
         string spell = GameText.Named(client, prompt.Spell);
 
+        // "You may sacrifice any number of nonland permanents. This spell costs {1} less to cast for each" (CR 601.2b): the
+        // number is of permanents to lose, not mana to spend.
+        if (prompt.SacrificeReduces > 0)
+        {
+            return One(new Question
+            {
+                Heading = $"You are casting {spell}. How many permanents will you sacrifice for it?",
+                Note = string.Create(CultureInfo.InvariantCulture,
+                    $"Each one sacrificed takes {{{prompt.SacrificeReduces}}} off its cost of {prompt.Total}, never its colored mana; you could sacrifice up to {reach}. Which ones you choose after paying the mana."),
+                Choices = [.. Enumerable.Range(0, most + 1).Select(n => n.ToString(CultureInfo.InvariantCulture))],
+            });
+        }
+
         return One(new Question
         {
             Heading = prompt.XRemovesLoyalty ? $"You are activating −X of {spell}. How large is X?" : $"You are casting {spell}. How large is X?",

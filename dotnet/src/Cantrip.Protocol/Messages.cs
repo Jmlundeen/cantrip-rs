@@ -2229,6 +2229,16 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(23)]
     public int Life { get; set; }
 
+    /// <summary>
+    /// Announcing how many permanents the spell's additional cost sacrifices (CR 601.2b): "you may sacrifice any number of
+    /// nonland permanents. This spell costs {1} less to cast for each permanent sacrificed this way" (Rottenmouth Viper).
+    /// Each takes this much generic mana off <see cref="Total"/>; <see cref="X"/> is the number so far, and
+    /// <see cref="MostAffordable"/> how many could be. Which ones is asked once the mana is paid. Zero for any other
+    /// announcement.
+    /// </summary>
+    [Key(24)]
+    public int SacrificeReduces { get; set; }
+
     /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
 }

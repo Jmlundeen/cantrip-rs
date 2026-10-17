@@ -475,6 +475,31 @@ public sealed partial class MainPage
             return;
         }
 
+        // "You may sacrifice any number of nonland permanents. This spell costs {1} less to cast for each permanent sacrificed
+        // this way" (CR 601.2b, 601.2f): how many is announced now, and which ones are chosen once the mana is paid.
+        if (prompt.SacrificeReduces > 0)
+        {
+            Prompt(
+                $"Sacrifice how many for {name}?",
+                $"{prompt.X} of up to {prompt.MostAffordable}  ·  each takes {{{prompt.SacrificeReduces}}} off  ·  {prompt.Total} in all  ·  which ones come after the mana");
+
+            if (_actions.Confirm is { } sacrifice)
+            {
+                _pass = () => Send(client, AnswerFor(sacrifice));
+                AddButton("Okay", () => Send(client, AnswerFor(sacrifice)), primary: true).Tooltip =
+                    $"Cast it sacrificing {prompt.X}" + Suffix(PassKey);
+            }
+
+            AddXStepper(client, prompt);
+
+            if (_actions.Cancel is { } back)
+            {
+                AddCancelButton(() => Send(client, AnswerFor(back)));
+            }
+
+            return;
+        }
+
         bool kicker = prompt.Kicker.Length > 0;
         string reach = prompt.MostAffordable < 0
             ? "not enough mana for it"

@@ -946,6 +946,11 @@ pub struct PayCostsPrompt {
     /// The life the total cost asks besides its mana (CR 119.4, 601.2h: "an additional 3 life", "pay X life"), paid with it
     /// once the mana is. Zero while X is announced.
     pub life: i32,
+    /// Announcing how many permanents the spell's additional cost sacrifices, each taking this much generic mana off its
+    /// total ("you may sacrifice any number of nonland permanents. This spell costs {1} less to cast for each permanent
+    /// sacrificed this way", CR 601.2b, 601.2f); `x` is the number so far and `most_affordable` how many could be. Zero
+    /// for any other announcement.
+    pub sacrifice_reduces: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
