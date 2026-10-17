@@ -1,0 +1,27 @@
+# Cruelclaw's Heist: "You choose a nonland card from it". Bot2 holds only Islands (and draws another one from the
+# promised gift, before the other effects, CR 702.174j): no card can be chosen, nothing is chosen and
+# nothing is exiled, so Bot1 has nothing to cast; the spell still resolves and Bot2 keeps all eight Islands.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Cruelclaw's Heist
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Hand.Count = 8
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Cruelclaw's Heist

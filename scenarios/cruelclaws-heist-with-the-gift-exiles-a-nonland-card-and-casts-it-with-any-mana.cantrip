@@ -1,0 +1,39 @@
+# Cruelclaw's Heist promising its gift: Bot2 draws a card first (an Island, CR 702.174j), then reveals its hand (six
+# Islands, a seventh drawn, and a Lightning Bolt). Bot1 may not choose a land (the refusal; the Bolt is the positive
+# control on the next line), exiles the Bolt, and may cast it for as long as it stays exiled with mana of any type: the
+# Mox Pearl's white mana pays the {R}. The Bolt hits Bot2 (17) and, cast from exile, goes to its owner's graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Cruelclaw's Heist
+Island x14
+
+[Bot2 Deck]
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Accept
+! Bot1.Choose(Island)
+Bot1.Choose(Lightning Bolt)
+[T1 Bot1.Main1]
+? Exile = Lightning Bolt
+? Bot2.Hand.Count = 7
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 7
+Exile.Count = 0
+Bot1.Graveyard = Cruelclaw's Heist

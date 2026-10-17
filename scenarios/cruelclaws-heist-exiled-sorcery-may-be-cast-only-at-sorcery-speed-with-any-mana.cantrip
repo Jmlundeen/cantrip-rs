@@ -1,0 +1,41 @@
+# Cruelclaw's Heist, ruling 2024-07-26: "You pay all costs and follow all timing rules for a spell cast this way. For example,
+# if the exiled card is a sorcery, you may cast it only during your main phase while the stack is empty." Bot1 takes
+# a Hymn to Tourach from Bot2's hand with the gift promised (Bot2 draws an Island first). In the beginning of combat step
+# Bot1 is refused casting it from exile although it has an untapped Mox Ruby and a Mox Pearl; in main phase 2 it casts it,
+# paying {B}{B} with the red and the white of the Moxen (mana of any type), and Bot2 discards its two cards at random
+# (it holds only Islands): Bot2 ends with seven cards less the Hymn already gone and two discarded.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Cruelclaw's Heist
+Island x14
+
+[Bot2 Deck]
+Hymn to Tourach
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Accept
+Bot1.Choose(Hymn to Tourach)
+[T1 Bot1.BeginCombat]
+! Bot1.Exile.Hymn to Tourach.Cast(Bot2)
+[T1 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Hymn to Tourach.Cast(Bot2)
+[T1 Bot1.End]
+
+[Expect]
+Bot2.Hand.Count = 5
+Bot2.Graveyard.Count = 3
+Exile.Count = 0

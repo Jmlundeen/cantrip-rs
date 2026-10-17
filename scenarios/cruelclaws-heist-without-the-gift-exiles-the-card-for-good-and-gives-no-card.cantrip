@@ -1,0 +1,34 @@
+# Cruelclaw's Heist cast without promising the gift: nothing is drawn by Bot2 (its hand is the Bolt and six Islands, so six
+# cards after the Bolt goes), the Bolt is exiled and Bot1 gets no permission to cast it: with a Mox Pearl untapped,
+# Bot1 is refused the Bolt from exile (its positive control is the scenario where the gift is promised).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Cruelclaw's Heist
+Island x14
+
+[Bot2 Deck]
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Decline
+Bot1.Choose(Lightning Bolt)
+[T1 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+[T1 Bot1.Main2]
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Exile = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot2.Life = 20
+Bot1.Graveyard = Cruelclaw's Heist

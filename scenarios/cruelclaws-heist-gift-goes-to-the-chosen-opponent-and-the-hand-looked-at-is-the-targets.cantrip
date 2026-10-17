@@ -1,0 +1,42 @@
+# At a table of three, Cruelclaw's Heist targets Bot3 while the gift is promised to Bot2 (CR 702.174a: the gifted opponent
+# is chosen as an additional cost, the target is another choice). Bot2 draws the card (eight cards in hand), Bot3 does not
+# (it loses the Lightning Bolt to the exile: six cards). Bot1 takes the Bolt from Bot3's revealed hand, casts it from exile
+# with a Mox Pearl's white mana, and Bot3 is at 17 while Bot2 is untouched.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Cruelclaw's Heist
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Accept
+Bot1.ChoosePlayer(Bot2)
+Bot1.Target(Bot3)
+Bot1.Choose(Lightning Bolt)
+[T1 Bot1.Main1]
+? Exile = Lightning Bolt
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot3)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Hand.Count = 8
+Bot3.Hand.Count = 6
+Bot3.Life = 17
+Bot2.Life = 20
+Bot3.Graveyard = Lightning Bolt
