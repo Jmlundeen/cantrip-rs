@@ -1,0 +1,36 @@
+# Negative controls for "an opponent sacrifices an artifact": Bot2 sacrificing a land (Prismatic Vista, no artifact) and Bot1
+# sacrificing its own Black Lotus (not an opponent) deal nothing. Bot2 is on 19 (the Vista's life) and Bot1 on 20. The positive
+# control, an opponent's sacrificed Black Lotus, is the sibling scenario.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Vengeful Tracker
+Black Lotus
+Island x17
+
+[Bot2 Deck]
+Prismatic Vista
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vengeful Tracker.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Prismatic Vista.Play
+Bot2.Battlefield.Prismatic Vista.Activate
+Bot2.Search()
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Life = 20
+Bot2.Graveyard = Prismatic Vista
+Bot1.Graveyard = Black Lotus

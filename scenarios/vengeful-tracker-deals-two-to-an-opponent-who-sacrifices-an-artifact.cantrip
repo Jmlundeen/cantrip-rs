@@ -1,0 +1,31 @@
+# "Whenever an opponent sacrifices an artifact, this creature deals 2 damage to them": Bot2 casts Black Lotus and sacrifices it for
+# mana (CR 701.21a); the artifact was sacrificed under Bot2's control, so Vengeful Tracker deals 2 damage to Bot2, who is on 18.
+# Bot1 takes nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Vengeful Tracker
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vengeful Tracker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Life = 20
+Bot2.Graveyard = Black Lotus
+Bot1.Battlefield.Vengeful Tracker.Damage = 0
