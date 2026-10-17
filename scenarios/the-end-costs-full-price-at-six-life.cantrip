@@ -1,0 +1,35 @@
+# The End's reduction needs 5 life or less: at 6 life it still costs {2}{B}{B}. Black Lotus's three black mana cannot cast it
+# (the cast is refused), and once a Mox Jet is cast and adds the fourth the same cast is allowed and spends all four,
+# leaving nothing floating; Bot2's Ornithopter is exiled.
+
+[Life]
+Bot1: 6
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+The End
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Hand.The End.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The End.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = The End; Black Lotus

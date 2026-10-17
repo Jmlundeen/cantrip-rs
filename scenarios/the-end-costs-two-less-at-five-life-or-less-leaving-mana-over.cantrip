@@ -1,0 +1,31 @@
+# The End: "This spell costs {2} less to cast if your life total is 5 or less" (CR 601.2f, 118.7). At exactly 5 life the
+# {2}{B}{B} costs {B}{B}: Black Lotus's three black mana pay it with one {B} left floating, and Bot2's Ornithopter is
+# exiled. It changes the cost only, not the mana value.
+
+[Life]
+Bot1: 5
+
+[Bot1 Deck]
+Black Lotus
+The End
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The End.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana = {B}
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Graveyard = The End; Black Lotus

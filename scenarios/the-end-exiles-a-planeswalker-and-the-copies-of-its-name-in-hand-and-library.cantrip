@@ -1,0 +1,42 @@
+# The End targets "creature or planeswalker": here Bot2's Liliana of the Veil, exiled with the Lilianas in Bot2's hand and
+# library (the graveyard has none, so no choice is asked there). Bot2 draws one card for the one from its hand. Bot1 pays the
+# full {2}{B}{B} with Black Lotus and Mox Jet (Bot1 is at 20 life).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+The End
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Liliana of the Veil
+Island x4
+Island
+Liliana of the Veil
+Island x8
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The End.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Liliana of the Veil)
+Bot1.Search(Liliana of the Veil)
+
+[Expect]
+Exile.Count = 3
+Bot2.Battlefield.Count = 0
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 7

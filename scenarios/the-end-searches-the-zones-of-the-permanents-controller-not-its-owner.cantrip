@@ -1,0 +1,52 @@
+# The End searches "its controller's" zones, not its owner's. Bot1 steals Bot2's Ornithopter with a kicked Thieving Skydiver
+# (X = 1 for the artifact of mana value 0) and exiles it with The End: the Ornithopters searched for are Bot1's own, one in
+# its hand and one in its library, and Bot1 draws a card for the one from its hand; Bot2's Ornithopter in hand is left
+# alone. Bot1 is at 5 life so The End costs {B}{B} (Mox Jet and a Swamp), after Black Lotus has paid for the Skydiver.
+
+[Life]
+Bot1: 5
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Thieving Skydiver
+The End
+Swamp
+Ornithopter
+Swamp
+Island
+Ornithopter
+Island x8
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thieving Skydiver.Cast(X: 1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.The End.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Search(Ornithopter)
+
+[Expect]
+Exile.Count = 3
+Bot2.Hand = Ornithopter; Island; Island; Island; Island; Island; Island
+Bot1.Hand.Count = 3
+Bot1.Battlefield = Swamp; Mox Jet; Thieving Skydiver
