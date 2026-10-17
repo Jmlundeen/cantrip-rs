@@ -1,0 +1,64 @@
+# Vren makes X Rats, X the number of creatures exiled under the opponents' control this turn, tokens too (they were exiled before
+# they ceased to exist). Bot2 casts Song of Totentanz with X = 2 on turn 2 (two Rat tokens that can't block) and Bot1, who cast Vren on turn 1,
+# bolts both on turn 3: each dies, so is exiled instead and counted. At the end step Bot1 gets two Rats. Each token "gets +1/+1 for each other Rat you
+# control": Vren and the other token, so 3/3 apiece. Bot2's tokens are gone and the opponent's Rats never counted for Bot1's.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Vren, the Relentless
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Song of Totentanz
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Song of Totentanz.Cast(X: 2)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Rat#1.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Rat#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Rat)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Count = 0
+? Bot1.Battlefield.Count = 5
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Exile.Count = 0
+Bot2.Graveyard = Song of Totentanz; Black Lotus
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Rat#1.Power = 3
+Bot1.Battlefield.Rat#1.Toughness = 3
+Bot1.Battlefield.Rat#2.Power = 3
+Bot1.Battlefield.Rat#2.Toughness = 3

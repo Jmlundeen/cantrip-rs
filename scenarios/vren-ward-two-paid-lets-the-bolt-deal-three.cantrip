@@ -1,0 +1,39 @@
+# Vren, the Relentless, "ward {2}": Bot2 taps a Black Lotus for three red mana, spends one on the Lightning Bolt and pays the other two
+# when the ward trigger asks, so the Bolt is not countered and deals 3 damage to the 3/4 (it survives). The negative control is the
+# neighbouring scenario, where the opponent cannot pay.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Vren, the Relentless
+Island x30
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Vren, the Relentless)
+Bot2.PayCost
+? Bot2.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Vren, the Relentless.Damage = 3
+Bot2.Graveyard = Lightning Bolt; Black Lotus

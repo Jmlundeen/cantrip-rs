@@ -1,0 +1,45 @@
+# Vren only replaces a creature on the battlefield dying: "Cards that would go to your opponent's graveyard for reasons other than
+# dying, such as being discarded or milled, will still go to the graveyard". Bot1 casts Vren on turn 1; on turn 3 Thoughtseize makes Bot2 discard
+# the Llanowar Elves card from its hand. It lands in Bot2's graveyard, not exile, and a card discarded from the hand was not exiled
+# from the battlefield, so there is no Rat at the end step.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Vren, the Relentless
+Thoughtseize
+Mox Jet
+Island
+Island x10
+
+[Bot2 Deck]
+Llanowar Elves
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot2)
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Exile.Count = 0
+Bot1.Life = 18
+Bot1.Battlefield.Count = 4

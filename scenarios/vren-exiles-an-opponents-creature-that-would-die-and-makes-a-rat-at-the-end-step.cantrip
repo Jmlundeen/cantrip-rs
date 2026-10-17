@@ -1,0 +1,62 @@
+# Vren, the Relentless: "If a creature an opponent controls would die, exile it instead" (CR 614.1a) and, at the beginning of each
+# end step, X Rat tokens where X is the number of creatures exiled under the opponents' control this turn. Bot1 casts Vren on
+# turn 1 (Sapphire, Jet and a Black Lotus), Bot2 plays Llanowar Elves, and on turn 3 Bot1 bolts it: it is exiled rather than put into the
+# graveyard (so nothing in Bot2's graveyard), and in the end step one Rat is created. Vren is itself a Rat, so the token is 1/1 +1/+1 for
+# the one other Rat = 2/2, while Vren stays 3/4. On Bot2's turn-4 end step nothing was exiled that turn, so no second token.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Vren, the Relentless
+Mox Ruby
+Lightning Bolt
+Island x2
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 0
+? Exile = Llanowar Elves
+? Bot1.Battlefield.Count = 4
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rat.Power = 2
+[T4 Bot2.End]
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Llanowar Elves
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Rat.Power = 2
+Bot1.Battlefield.Rat.Toughness = 2
+Bot1.Battlefield.Rat.Token = true
+Bot1.Battlefield.Vren, the Relentless.Power = 3
+Bot1.Battlefield.Vren, the Relentless.Toughness = 4

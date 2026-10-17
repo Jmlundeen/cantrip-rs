@@ -1,0 +1,51 @@
+# Vren's third ability counts every creature exiled under an opponent's control this turn, however it was exiled, not only those its
+# own replacement exiled. Bot1 casts Vren on turn 1 (four Moxen) and on turn 3 casts Swords to Plowshares on Bot2's Llanowar Elves, which is
+# exiled outright (Bot2 gains 1 life). At the end step Bot1 gets one Rat, 2/2 beside Vren.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Vren, the Relentless
+Swords to Plowshares
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Llanowar Elves
+Bot2.Life = 21
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Rat.Power = 2
+Bot1.Battlefield.Rat.Toughness = 2
