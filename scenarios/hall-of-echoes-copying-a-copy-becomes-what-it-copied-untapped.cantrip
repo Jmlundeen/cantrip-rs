@@ -1,0 +1,65 @@
+# Hall of Echoes copying a creature that is itself a copy: "If the copied creature is copying something else, then Hall
+# of Echoes becomes a copy of whatever that creature copied" (the ruling, CR 707.3), exceptions included (CR 707.9b), and
+# "it doesn't copy whether that creature is tapped or untapped" (the ruling). On turn 3 Bot1's Likeness Looter loots
+# (tapping) and becomes a copy of Embereth Shieldbreaker "except it has flying and this ability"; then Bot1 pays {5} for
+# the Hall at it. The Hall becomes an Embereth Shieldbreaker with flying too - a 2/1 red Human Knight - and stays
+# untapped beside the tapped Looter.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Likeness Looter
+Embereth Shieldbreaker
+Sol Ring
+Black Lotus
+Hall of Echoes
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Likeness Looter.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Hall of Echoes.Play
+Bot1.Battlefield.Likeness Looter.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Embereth Shieldbreaker)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Likeness Looter.Activate(Ability: becomes a copy; X: 2)
+Bot1.Target(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Hall of Echoes.Activate(Bot1.Battlefield.Embereth Shieldbreaker; Ability: becomes a copy)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Embereth Shieldbreaker; Embereth Shieldbreaker; Island; Mox Jet; Mox Sapphire; Sol Ring
+Bot1.Battlefield.Embereth Shieldbreaker#1.Tapped = true
+Bot1.Battlefield.Embereth Shieldbreaker#2.Tapped = false
+Bot1.Battlefield.Embereth Shieldbreaker#2.Keywords = Flying
+Bot1.Battlefield.Embereth Shieldbreaker#2.Power = 2
+Bot1.Battlefield.Embereth Shieldbreaker#2.Toughness = 1
+Bot1.Battlefield.Embereth Shieldbreaker#2.Subtypes = Human; Knight
+Bot1.Battlefield.Embereth Shieldbreaker#2.Colors = Red

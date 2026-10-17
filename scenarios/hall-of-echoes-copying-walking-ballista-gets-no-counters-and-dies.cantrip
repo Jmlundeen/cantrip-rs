@@ -1,0 +1,42 @@
+# Hall of Echoes copying a creature with counters: it "doesn't copy whether that creature ... has any counters on it" (the
+# ruling, CR 707.2), and it doesn't enter, so "enters with" doesn't apply (the ruling). Bot1's Walking Ballista entered
+# with one +1/+1 counter for X=1; on turn 3 the Hall becomes a copy of it - a 0/0 Walking Ballista with no counters - and
+# dies to state-based actions (CR 704.5f): the Hall of Echoes card goes to the graveyard and the real Ballista stays, 1/1.
+
+[Bot1 Deck]
+Hall of Echoes
+Sol Ring
+Black Lotus
+Walking Ballista
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Hall of Echoes.Play
+Bot1.Battlefield.Hall of Echoes.Activate(Ability: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Hall of Echoes.Activate(Bot1.Battlefield.Walking Ballista; Ability: becomes a copy)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Sol Ring; Walking Ballista
+Bot1.Battlefield.Walking Ballista.Power = 1
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Hall of Echoes; Black Lotus

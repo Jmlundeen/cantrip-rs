@@ -1,0 +1,64 @@
+# Hall of Echoes: 'The "legend rule" doesn't apply to permanents you control this turn' - its controller's, nobody
+# else's. Bot1 has Bofur, Reliable Guardian, and Bot2 has its own. In Bot2's turn 4, after Bot2 plays a land, Bot1 pays
+# {5} for the Hall at Bot1's Bofur: the Hall becomes a second Bofur and Bot1 keeps both. Bot2 then casts its second Bofur:
+# the legend rule applies to Bot2 (CR 704.5j), who keeps one and puts the other into its graveyard, while Bot1's two
+# stay until the end of the turn, when the Hall is a land again.
+
+[Bot1 Deck]
+Hall of Echoes
+Sol Ring
+Mox Pearl
+Black Lotus
+Bofur, Reliable Guardian
+Plains x2
+Plains x20
+
+[Bot2 Deck]
+Plains
+Bofur, Reliable Guardian
+Bofur, Reliable Guardian
+Plains x4
+Plains x20
+
+[Actions]
+Bot1.Hand.Hall of Echoes.Play
+Bot1.Battlefield.Hall of Echoes.Activate(Ability: Add)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Bofur, Reliable Guardian.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Hall of Echoes.Activate(Bot1.Battlefield.Bofur, Reliable Guardian; Ability: becomes a copy)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains#1.Activate
+? Bot1.Battlefield = Bofur, Reliable Guardian; Bofur, Reliable Guardian; Sol Ring; Mox Pearl
+Bot2.Hand.Bofur, Reliable Guardian.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Bofur, Reliable Guardian)
+? Bot2.Battlefield = Plains; Plains; Bofur, Reliable Guardian
+? Bot2.Graveyard = Bofur, Reliable Guardian
+? Bot1.Battlefield = Bofur, Reliable Guardian; Bofur, Reliable Guardian; Sol Ring; Mox Pearl
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Hall of Echoes; Bofur, Reliable Guardian; Sol Ring; Mox Pearl
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Bofur, Reliable Guardian
