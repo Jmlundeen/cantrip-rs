@@ -578,6 +578,12 @@ pub enum EffectKind {
     /// `to` (Trait Doctoring, Artificial Evolution). Card code reads its words through `Query::words`; the layers change
     /// the type line.
     ChangeText { from: Word, to: Word },
+    /// "[It] becomes ... named [name]" (CR 612.8): a text-changing effect (layer 3) that sets the object's name, so it
+    /// loses any names it had and has only this one, for every rule and effect that asks its name (the legend rule,
+    /// "with the same name", a chosen name). Its rules text is not changed: text that refers to the object by name still
+    /// means the object (CR 201.5). The Irencrag's "become a legendary Equipment artifact named Everflame, Heroes'
+    /// Legacy".
+    SetName(&'static str),
     /// "The next spell you cast this turn can't be countered" (CR 611.2c, 601.2, 701.5a; Mistrise Village): a rule about the
     /// effect's controller that reaches a spell that does not exist yet, so it outlives its `affected` object, which is only the
     /// source. It marks the next spell that player casts, as it is cast and before anyone has priority, and is used up by it.

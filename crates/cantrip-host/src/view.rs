@@ -910,7 +910,11 @@ impl<'a> Projector<'a> {
             ..Default::default()
         };
 
-        if def.is_room() && on_battlefield {
+        // A name an effect set (CR 612.8) or a copy effect states (CR 707.9b) is the name it has.
+        if c.name_set || obj.copy.is_some_and(|copy| copy.name.is_some()) {
+            view.name = c.name.to_string();
+        }
+        if def.is_room() && on_battlefield && !c.name_set {
             // A Room on the battlefield (CR 709.5) is its unlocked doors: their names, costs and text; a locked door is
             // one the client can show as locked.
             let doors = obj.marks.doors;

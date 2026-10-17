@@ -1078,6 +1078,12 @@ impl cantrip_api::Game for Cx<'_> {
         let controller = self.g.state.obj(source).controller;
         let timestamp = self.g.state.timestamp();
         self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected, kind, duration });
+        // A static ability given to a permanent that affects other objects makes it a source of static abilities.
+        if let EffectKind::AddAbility(ability) = kind
+            && matches!(self.cards().ability(ability), AbilityDef::Static(s) if !s.own)
+        {
+            self.g.state.see_statics();
+        }
         if matches!(kind, EffectKind::Control(_)) {
             ops::refresh_control(self, affected);
         }

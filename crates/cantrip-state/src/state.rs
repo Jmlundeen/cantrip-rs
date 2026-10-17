@@ -81,6 +81,10 @@ pub struct StaticSources {
     /// The permanents with hone counters on them (CR 122.1j), in battlefield order: what each gives the creature it is
     /// attached to is no ability of it, so it is found apart from `list`, whatever abilities the permanent has lost.
     pub honed: Vec<ObjectId>,
+    /// The permanents an effect has given a static ability that affects other objects (CR 613.1f: The Irencrag's
+    /// "Equipped creature gets +3/+3"), whatever abilities they have lost before it: the layers ask each whether it still
+    /// has the ability.
+    pub granted: Vec<ObjectId>,
 }
 
 impl GameState {
@@ -249,7 +253,7 @@ impl GameState {
             unsettled: true,
             journal: Journal::default(),
             epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), honed: Vec::new() }),
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), honed: Vec::new(), granted: Vec::new() }),
         }
     }
 

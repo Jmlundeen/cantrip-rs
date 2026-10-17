@@ -127,8 +127,10 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     let sources: &[(ObjectId, ZoneKind)] = found.as_ref().map_or(&[], |f| &f.list);
     // The permanents with hone counters attached to it, if any are.
     let honed: &[ObjectId] = found.as_ref().map_or(&[], |f| &f.honed);
+    // The permanents given a static ability that affects other objects.
+    let others: &[ObjectId] = found.as_ref().map_or(&[], |f| &f.granted);
     let has_hone = on_battlefield && honed.iter().any(|&e| state.obj(e).attached_to == Some(id));
-    if !has_effects && !has_counters && !has_own && sources.is_empty() && !has_hone {
+    if !has_effects && !has_counters && !has_own && sources.is_empty() && others.is_empty() && !has_hone {
         if obj.copy.is_none() && !spell && !room {
             // Nothing acts on it: the card's own values, made once.
             return *printed(cards, card, stop > Layer::Ability);
@@ -186,8 +188,9 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
             hone(cards, state, log, id, honed, &mut chars);
         }
         // CR 613.7: within a layer, static abilities and other continuous effects apply in timestamp order, interleaved.
-        if has_own || !sources.is_empty() || !granted.is_empty() {
-            statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), sources, on_battlefield, layer, &fx, &granted, &mut chars);
+        if has_own || !sources.is_empty() || !granted.is_empty() || !others.is_empty() {
+            let givers = (sources, others);
+            statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), givers, on_battlefield, layer, &fx, &granted, &mut chars);
         } else {
             for e in &fx {
                 apply_effect(e, layer, &mut chars);
@@ -245,7 +248,8 @@ fn granted_statics(cards: &CardTable, object_timestamp: u32, fx: &[ContinuousEff
     let mut granted: Vec<(u32, AbilityRef)> = Vec::new();
     for e in fx {
         match e.kind {
-            EffectKind::AddAbility(ability) if matches!(cards.ability(ability), AbilityDef::Static(_)) => {
+            // Its own: one that affects other objects applies from it as a source (`granted_to_others`).
+            EffectKind::AddAbility(ability) if matches!(cards.ability(ability), AbilityDef::Static(s) if s.own) => {
                 granted.push((e.timestamp.max(object_timestamp), ability));
             }
             EffectKind::LoseAllAbilities => granted.clear(),
@@ -311,6 +315,17 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         }
         // CR 613.7: static abilities apply in the timestamp order of the objects that have them.
         made.list.sort_by_key(|&(source, _)| state.obj(source).timestamp);
+        made.granted.clear();
+        for e in &state.effects {
+            if let EffectKind::AddAbility(ability) = e.kind
+                && matches!(cards.ability(ability), AbilityDef::Static(s) if !s.own)
+                && live(state, e.affected)
+                && state.obj(e.affected).zone.is(ZoneKind::Battlefield)
+                && !made.granted.contains(&e.affected)
+            {
+                made.granted.push(e.affected);
+            }
+        }
         made.epoch = state.epoch;
     }
     state.static_sources.borrow()
@@ -362,6 +377,7 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         must_attack: false,
         abilities,
         no_cost,
+        name_set: false,
     };
     changeling(&mut chars);
     chars
@@ -471,7 +487,7 @@ fn statics(
     id: ObjectId,
     def: &CardDef,
     overrides: (bool, bool),
-    sources: &[(ObjectId, ZoneKind)],
+    (sources, others): (&[(ObjectId, ZoneKind)], &[ObjectId]),
     on_battlefield: bool,
     layer: Layer,
     fx: &[ContinuousEffect],
@@ -528,8 +544,24 @@ fn statics(
             }
         }
     };
+    // The static abilities effects gave permanents that affect other objects, in their timestamp order (CR 613.7a), each
+    // applied among the sources' own at its timestamp.
+    let mut given: Vec<(u32, ObjectId, &'static StaticDef)> =
+        others.iter().flat_map(|&holder| granted_to_others(cards, state, log, holder, layer)).collect();
+    given.sort_by_key(|&(timestamp, _, _)| timestamp);
+    let mut given = given.into_iter().peekable();
+    let mut give = |upto: u32, chars: &mut Chars, until: &mut dyn FnMut(u32, &mut Chars)| {
+        while let Some(&(timestamp, holder, st)) = given.peek().filter(|(timestamp, _, _)| *timestamp < upto) {
+            given.next();
+            if on_battlefield && (st.affects)(&view, holder, id, chars) {
+                until(timestamp, chars);
+                (st.apply)(&view, holder, chars);
+            }
+        }
+    };
     for &(source, from) in sources {
         let sobj = state.obj(source);
+        give(sobj.timestamp, chars, &mut until);
         let scard = sobj.copy.map(|c| c.card).unwrap_or_else(|| cards.face(sobj.card, sobj.transformed));
         for st in cards.get(scard).statics.iter().filter(|s| !s.own && s.layer == layer && s.from == from) {
             if (on_battlefield || st.everywhere) && (st.affects)(&view, source, id, chars) {
@@ -538,7 +570,40 @@ fn statics(
             }
         }
     }
+    give(u32::MAX, chars, &mut until);
     until(u32::MAX, chars);
+}
+
+/// The static abilities of `layer` effects have given `holder` that affect other objects (CR 613.1f), each with its
+/// timestamp (CR 613.7a: the later of the holder's and the granting effect's), that it still has once its abilities are
+/// settled: a later "loses all abilities" takes them, as a static ability that removes abilities does.
+fn granted_to_others(cards: &CardTable, state: &GameState, log: &[Record], holder: ObjectId, layer: Layer) -> Vec<(u32, ObjectId, &'static StaticDef)> {
+    // Whether it has the ability is settled by layer 6, so only abilities of the layers after it can be told apart without
+    // asking the layers of the very object being worked out (`granted_static_ability`).
+    if layer < Layer::PtDefine {
+        return Vec::new();
+    }
+    let object_timestamp = state.obj(holder).timestamp;
+    let mut found: Vec<(u32, AbilityRef, &'static StaticDef)> = Vec::new();
+    for e in state.effects.iter().filter(|e| e.affected == holder) {
+        match e.kind {
+            EffectKind::AddAbility(ability) => {
+                if let AbilityDef::Static(s) = cards.ability(ability)
+                    && !s.own
+                {
+                    found.push((e.timestamp.max(object_timestamp), ability, s));
+                }
+            }
+            EffectKind::LoseAllAbilities => found.clear(),
+            _ => {}
+        }
+    }
+    found.retain(|(_, _, s)| s.layer == layer);
+    if found.is_empty() {
+        return Vec::new();
+    }
+    let has = chars_before(cards, state, log, holder, Layer::PtDefine);
+    found.into_iter().filter(|(_, ability, _)| has.abilities.contains(&Some(*ability))).map(|(t, _, s)| (t, holder, s)).collect()
 }
 
 /// A continuous effect a resolved spell or ability created (CR 611.2), applied if it is in `layer`.
@@ -551,6 +616,11 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                 if chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling)) {
                     chars.subtypes = chars.subtypes.without(from).with(to);
                 }
+            }
+            // CR 612.8: an effect that sets the name is a text-changing effect; the object loses every name it had.
+            (Layer::Text, EffectKind::SetName(name)) => {
+                chars.name = name;
+                chars.name_set = true;
             }
             // CR 612.2: a color word of a "hexproof from [color]" ability is a word of the text; only the printed abilities
             // are there yet (what layer 6 grants comes after).
@@ -866,6 +936,7 @@ mod tests {
             must_attack: false,
             abilities,
             no_cost: false,
+            name_set: false,
         };
         let grant = |t| effect(t, EffectKind::AddAbility(ability));
         let strip = |t| effect(t, EffectKind::LoseAllAbilities);

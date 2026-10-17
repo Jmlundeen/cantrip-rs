@@ -40,6 +40,9 @@ pub struct Chars {
     /// It has no mana cost (CR 118.6, 707.9b): a copy that says so, whatever the card it copies prints. Its mana
     /// value is 0.
     pub no_cost: bool,
+    /// A continuous effect set its name (CR 612.8): it has `name` alone, and none of the names it had (a split card's halves,
+    /// a Room's doors).
+    pub name_set: bool,
 }
 
 /// The words `id`'s text has now (CR 612): the ones its copiable values changed (a token made by changed text), then

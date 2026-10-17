@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{library, targets};
 use cantrip_oracle as oracle;
 
 const NAME: &str = "\"Name Sticker\" Goblin";
@@ -26,10 +26,8 @@ fn on_battlefield_and_nine_or_fewer(q: &dyn Query, asker: &Asker) -> bool {
     let named = q
         .permanents_of(asker.controller)
         .into_iter()
-        .filter(|&id| {
-            let c = q.chars(id);
-            c.is(CardType::Creature) && q.card(c.card).name == NAME
-        })
+        // A creature's names as it has them now (CR 201.2a): a copy's, or one an effect named (CR 612.8).
+        .filter(|&id| q.chars(id).is(CardType::Creature) && library::object_names(q, id).contains(&NAME))
         .count();
     named <= 9
 }

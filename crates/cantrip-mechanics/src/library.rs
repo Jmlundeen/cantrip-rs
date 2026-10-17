@@ -410,11 +410,12 @@ pub fn card_has_name(q: &dyn Query, card: CardId, wanted: CardId) -> bool {
 
 /// The names the object `id` has (CR 201.2a): a Room on the battlefield those of its unlocked doors alone, and none at all
 /// with neither unlocked (CR 709.5); any other split card both halves' (CR 709.4a); a copy that says "except its name is X"
-/// only that (CR 707.9b); and anything else its own name, one for each of the two faces' names of a card written "A // B".
+/// only that (CR 707.9b), and so has one whose name an effect set (CR 612.8); and anything else its own name, one for each
+/// of the two faces' names of a card written "A // B".
 pub fn object_names(q: &dyn Query, id: ObjectId) -> Vec<&'static str> {
     let c = q.chars(id);
     let obj = q.obj(id);
-    if obj.copy.is_some_and(|copy| copy.name.is_some()) {
+    if c.name_set || obj.copy.is_some_and(|copy| copy.name.is_some()) {
         return vec![c.name];
     }
     let def = q.card(c.card);

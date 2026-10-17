@@ -686,7 +686,16 @@ pub const fn static_ability(layer: Layer, affects: StaticAffects, apply: StaticA
 /// Ms. Marvel, Kamala Khan grants herself "base power is equal to the number of cards in your hand"; any card that
 /// gives a creature a quoted static ability about its characteristics can.
 pub const fn granted_static(layer: Layer, apply: StaticApply, text: &'static str) -> AbilityDef {
-    AbilityDef::Static(StaticDef { text, layer, apply, ..StaticDef::BLANK })
+    AbilityDef::Static(StaticDef { text, layer, apply, own: true, ..StaticDef::BLANK })
+}
+
+/// A static ability an effect gives an object (CR 613.1f) that affects the objects `affects` accepts, the object that
+/// has it as the source (CR 113.6): The Irencrag's "it gains 'Equipped creature gets +3/+3'". Granted with
+/// `EffectKind::AddAbility` from the card's `delayed` list, it applies in `layer` (layer 7 or later, after the abilities
+/// are settled) at the later of the object's timestamp and the granting effect's (CR 613.7a), while the object is on the
+/// battlefield and still has the ability.
+pub const fn granted_static_ability(layer: Layer, affects: StaticAffects, apply: StaticApply, text: &'static str) -> AbilityDef {
+    AbilityDef::Static(StaticDef { text, layer, affects, apply, ..StaticDef::BLANK })
 }
 
 /// A characteristic-defining ability (CR 604.3): it applies to its own object only, in every zone.
