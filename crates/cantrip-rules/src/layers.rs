@@ -391,14 +391,14 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
         power: pt.map(|(p, _)| p).or(def.power),
         toughness: pt.map(|(_, t)| t).or(def.toughness),
         keywords: Keywords(def.keywords.0 | extra_keywords.0),
-        protection: ColorSet::NONE,
+        // CR 612.4: a color word of a token's text is the text's that made it.
+        protection: words.colors(def.protection),
         protection_colorless: false,
         protection_players: 0,
         protection_types: TypeSet::NONE,
         spell: false,
         protection_colored_spells: false,
         protection_everything: false,
-        // CR 612.4: a color word of a token's text is the text's that made it.
         hexproof_from: worded_hexproof(def.hexproof_from, words),
         must_attack: false,
         abilities,
@@ -754,9 +754,10 @@ impl Entry {
             Entry::Granted(_) | Entry::Continued(..) => true,
             Entry::Effect(e) => match e.kind {
                 EffectKind::ChangeText { from: Word::Subtype(from), .. } => {
-                    chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling))
+                    (chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling)))
+                        || Keyword::landwalk(from).is_some_and(|walk| chars.keywords.has(walk))
                 }
-                EffectKind::ChangeText { from: Word::Color(from), .. } => chars.hexproof_from.colors().has(from),
+                EffectKind::ChangeText { from: Word::Color(from), .. } => chars.hexproof_from.colors().has(from) || chars.protection.has(from),
                 EffectKind::AddAllCreatureTypes | EffectKind::SetCreatureType(_) => chars.is(CardType::Creature) || chars.is(CardType::Kindred),
                 _ => true,
             },
@@ -1152,18 +1153,28 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                 if chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling)) {
                     chars.subtypes = chars.subtypes.without(from).with(to);
                 }
+                // CR 612.2: the land type of a landwalk ability is a word of the text, "forestwalk" to "islandwalk"; only the
+                // printed abilities are there yet (what layer 6 grants comes after).
+                if let (Some(walk), Some(new)) = (Keyword::landwalk(from), Keyword::landwalk(to))
+                    && chars.keywords.has(walk)
+                {
+                    chars.keywords = Keywords(chars.keywords.0 & !Keywords::of(&[walk]).0 | Keywords::of(&[new]).0);
+                }
             }
             // CR 612.8: an effect that sets the name is a text-changing effect; the object loses every name it had.
             (Layer::Text, EffectKind::SetName(name)) => {
                 chars.name = name;
                 chars.name_set = true;
             }
-            // CR 612.2: a color word of a "hexproof from [color]" ability is a word of the text; only the printed abilities
-            // are there yet (what layer 6 grants comes after).
+            // CR 612.2: a color word of a "hexproof from [color]" or "protection from [color]" ability is a word of the text;
+            // only the printed abilities are there yet (what layer 6 grants comes after).
             (Layer::Text, EffectKind::ChangeText { from: Word::Color(from), to: Word::Color(to) }) => {
                 let colors = chars.hexproof_from.colors();
                 if colors.has(from) {
                     chars.hexproof_from = chars.hexproof_from.with_colors(ColorSet(colors.0 & !ColorSet::of(from).0).with(to));
+                }
+                if chars.protection.has(from) {
+                    chars.protection = ColorSet(chars.protection.0 & !ColorSet::of(from).0).with(to);
                 }
             }
             // CR 205.1b: added types are added; a land that becomes a creature is still a land.
@@ -1973,5 +1984,25 @@ mod tests {
         state.effect_push(ContinuousEffect { affected: ids[1], ..effect(9, EffectKind::LoseAllAbilities) });
         state.see_statics();
         assert_eq!(static_control(&cards, &state, &[], ids[0]), [(2, PlayerId(1))]);
+    }
+
+    /// CR 612.2: the land type of a printed landwalk and the color of a printed protection are words of the text, which a
+    /// text-changing effect changes in layer 3: "swampwalk" becomes "islandwalk", "protection from black" "protection from red".
+    #[test]
+    fn a_text_change_changes_a_printed_landwalk_and_protection() {
+        let cards = CardTable::new([&HOLDER]);
+        let mut chars = *printed(&cards, cards.find("Holder").unwrap(), false);
+        chars.keywords = Keywords::of(&[Keyword::Swampwalk, Keyword::Flying]);
+        chars.protection = ColorSet::of(Color::Black);
+        let swamp = effect(5, EffectKind::ChangeText { from: Word::Subtype(Subtype::Swamp), to: Word::Subtype(Subtype::Island) });
+        apply_effect(&swamp, Layer::Text, &mut chars);
+        assert_eq!(chars.keywords, Keywords::of(&[Keyword::Islandwalk, Keyword::Flying]));
+        let black = effect(6, EffectKind::ChangeText { from: Word::Color(Color::Black), to: Word::Color(Color::Red) });
+        apply_effect(&black, Layer::Text, &mut chars);
+        assert_eq!(chars.protection, ColorSet::of(Color::Red));
+        // A creature type is no land type: no landwalk names it.
+        let elf = effect(7, EffectKind::ChangeText { from: Word::Subtype(Subtype::Elf), to: Word::Subtype(Subtype::Goblin) });
+        apply_effect(&elf, Layer::Text, &mut chars);
+        assert_eq!(chars.keywords, Keywords::of(&[Keyword::Islandwalk, Keyword::Flying]));
     }
 }

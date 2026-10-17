@@ -50,8 +50,21 @@ pub fn changed_text(text: &str, name: &str, words: Words) -> String {
     out
 }
 
-/// The word `word` becomes, if `words` change it.
+/// The word `word` becomes, if `words` change it: a color word or a subtype, alone, in "non[color]" (Mind Bend's
+/// "nonblack creature" to "nongreen creature") or in a landwalk ability ("forestwalk" to "islandwalk", CR 702.14a).
 fn replaced(word: &str, words: Words, changed: &[Subtype]) -> Option<String> {
+    for prefix in ["non", "Non"] {
+        if let Some(rest) = word.strip_prefix(prefix)
+            && Color::ALL.into_iter().any(|c| c.name().eq_ignore_ascii_case(rest))
+        {
+            return replaced(rest, words, changed).map(|new| format!("{prefix}{new}"));
+        }
+    }
+    if let Some(land) = word.strip_suffix("walk")
+        && let Some(&s) = changed.iter().find(|s| s.name().eq_ignore_ascii_case(land))
+    {
+        return Some(format!("{}walk", in_case_of(land, words.subtype(s).name())));
+    }
     if let Some(color) = Color::ALL.into_iter().find(|c| c.name().eq_ignore_ascii_case(word)) {
         let now = words.color(color);
         return (now != color).then(|| in_case_of(word, now.name()));
@@ -99,6 +112,14 @@ mod tests {
 
     fn change(from: Word, to: Word) -> Words {
         Words::NONE.changed(from, to)
+    }
+
+    #[test]
+    fn a_land_type_in_a_landwalk_and_a_color_after_non_are_replaced() {
+        let w = change(Word::Subtype(Subtype::Island), Word::Subtype(Subtype::Swamp));
+        assert_eq!(changed_text("Other Merfolk have islandwalk.\nIslandwalk", "Lord", w), "Other Merfolk have swampwalk.\nSwampwalk");
+        let w = change(Word::Color(Color::Black), Word::Color(Color::Green));
+        assert_eq!(changed_text("Destroy target nonblack creature.", "Doom Blade", w), "Destroy target nongreen creature.");
     }
 
     #[test]

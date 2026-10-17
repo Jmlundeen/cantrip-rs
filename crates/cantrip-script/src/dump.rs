@@ -551,6 +551,12 @@ impl StateDump {
                     qualities.sort();
                     d.list(&format!("{key}.HexproofFrom"), qualities, true);
                 }
+                // Its protection from colors (CR 702.16a), printed or granted, as the colors' words: `Black; Red`.
+                if !c.protection.is_empty() {
+                    let mut colors: Vec<String> = c.protection.iter().map(|c| c.name().to_string()).collect();
+                    colors.sort();
+                    d.list(&format!("{key}.ProtectionFrom"), colors, true);
+                }
                 if c.is(CardType::Creature) {
                     d.set(format!("{key}.Power"), c.power.unwrap_or(0));
                     d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));

@@ -428,6 +428,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.Keywords` (`Indestructible; Lifelink`, sorted), computed keywords, absent when it has none
 - `BotN.Battlefield.<Name>.HexproofFrom` (`Black; White`, `Monocolored`, sorted), the qualities of its "hexproof from"
   abilities (CR 702.11d), printed or granted, absent when it has none
+- `BotN.Battlefield.<Name>.ProtectionFrom` (`Black; Red`, sorted), the colors of its "protection from [color]" abilities
+  (CR 702.16a), printed or granted, absent when it has none
 - `BotN.Battlefield.<Name>.Monstrous`, `true` for a monstrous permanent (CR 701.37b) and absent otherwise
 - `BotN.Battlefield.<Name>.Solved`, `true` for a solved permanent (a Case, CR 719.3b) and absent otherwise
 - `BotN.Battlefield.<Name>.Suspected`, `true` for a suspected permanent (CR 701.60b) and absent otherwise

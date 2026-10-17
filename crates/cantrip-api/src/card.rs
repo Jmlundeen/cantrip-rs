@@ -1799,6 +1799,10 @@ pub struct CardDef {
     /// and is lost as keywords are (CR 702.11e). A color word in it is a word of its text (CR 612.2): a text-changing effect
     /// changes the color.
     pub hexproof_from: HexproofFrom,
+    /// Its printed "protection from [color]" abilities (CR 702.16a): White Knight's "protection from black". A keyword
+    /// ability, so part of its copiable values and lost as keywords are; its color word is a word of its text (CR 612.2),
+    /// which a text-changing effect changes.
+    pub protection: ColorSet,
     /// Convoke, delve, improvise: what besides mana may pay its total cost.
     pub pay_with: PayWith,
     pub spell: Option<SpellDef>,
@@ -2089,6 +2093,7 @@ impl CardDef {
         defense: None,
         keywords: Keywords::NONE,
         hexproof_from: HexproofFrom::NONE,
+        protection: ColorSet::NONE,
         pay_with: PayWith::NONE,
         spell: None,
         abilities: &[],

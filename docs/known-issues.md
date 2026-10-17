@@ -522,7 +522,6 @@ counters.
 - [`scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip`](../scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip)
   (marked `# Known bug`): one lore counter becomes two, so chapters II and III trigger together.
 
-
 ### KI-48: Emperor of Bones puts its finality counter on after the creature enters
 
 | Severity | Status | Area | Found |
@@ -593,7 +592,6 @@ entirely would start the land's characteristics from its own card when `layers::
 **Scenarios.** vesuva-copying-dark-depths-under-blood-moon-is-a-legendary-mountain-named-dark-depths-with-no-abilities,
 thespians-stage-copying-urborg-under-blood-moon-keeps-the-name-and-loses-the-ability-it-kept,
 clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: they assert this reading and pass.
-
 
 ### KI-53: A copy holds at most four abilities added by exceptions
 
@@ -707,21 +705,6 @@ one. A fix reads islandwalk into `Keywords` and makes a landwalker unblockable i
 seat controls a land of its type. The web client shows the keyword on the card, and the language-model client reads it.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
-
-### KI-58: A printed landwalk does not follow a text change of its land type
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, review of Lord of Atlantis |
-
-**Notes.** "Islandwalk" names a basic land type, a word of the text it is printed in (CR 612.2), so Trait Doctoring replacing
-Island with Swamp on a creature that prints islandwalk should leave it with swampwalk. A granted landwalk follows its source's
-words (`Keyword::landwalk`, Lord of Atlantis), but a printed one is a `Keyword` of the card's characteristics, which the
-layer-3 text change (`EffectKind::ChangeText`, `layers::apply_effect`) does not touch. No card in content prints a landwalk.
-A fix replaces a landwalk keyword in layer 3 where the changed word is its land type (only on the object's own text, not a
-granted copy, CR 612.3).
-
-**Scenarios.** none: no card in content prints landwalk.
 
 ### KI-60: Infect's -1/-1 counters are counters an effect puts
 
