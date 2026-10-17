@@ -1,0 +1,19 @@
+# The "or": a Plains alone (no Forest) enables the {W} ability.
+
+[Bot1 Deck]
+Hushwood Verge
+Plains
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Hushwood Verge.Play
+! Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+
+[Expect]
+Bot1.Mana = {W}

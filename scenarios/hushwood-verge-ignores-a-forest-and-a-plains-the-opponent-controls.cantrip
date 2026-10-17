@@ -1,0 +1,30 @@
+# "You control": Bot2's Forest (turn 2) and Plains (turn 4) do not enable Bot1's {W}; Bot1's own Forest does on turn 7.
+
+[Bot1 Deck]
+Hushwood Verge
+Island
+Island
+Forest
+Island x16
+
+[Bot2 Deck]
+Forest
+Plains
+Island x18
+
+[Actions]
+Bot1.Hand.Hushwood Verge.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+
+[Expect]
+Bot1.Mana = {W}

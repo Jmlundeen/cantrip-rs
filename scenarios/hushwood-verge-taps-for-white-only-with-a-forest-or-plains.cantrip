@@ -1,0 +1,26 @@
+# "Activate only if you control a Forest or a Plains": alone and with an Island the {W} ability is refused (the Verge is
+# neither type), a Forest enables it (turn 5, the positive control) and the {G} ability never needed anything.
+
+[Bot1 Deck]
+Hushwood Verge
+Island
+Forest
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Hushwood Verge.Play
+! Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+Bot1.Battlefield.Hushwood Verge.Activate(Ability: {G})
+? Bot1.Mana = {G}
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Hushwood Verge.Activate(Ability: {W})
+
+[Expect]
+Bot1.Mana = {W}

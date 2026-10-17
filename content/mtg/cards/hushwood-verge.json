@@ -1,0 +1,5 @@
+{
+  "name": "Hushwood Verge",
+  "type": "Land",
+  "oracleText": "{T}: Add {G}.\n{T}: Add {W}. Activate only if you control a Forest or a Plains."
+}
