@@ -1,0 +1,45 @@
+# Resonating Lute: "Activate only if you have seven or more cards in your hand" is a restriction on activating (CR 602.5b), checked
+# once (ruling 2026-03-20: once activated, it doesn't matter if the hand drops below seven; the ability resolves as normal). On
+# turn 11 Bot1 holds seven cards, activates the draw, and in response casts Lightning Bolt, leaving six; the draw still resolves
+# and the hand is seven again, with the Bolt having dealt 3 to Bot2.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Resonating Lute
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Resonating Lute.Cast
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main1]
+? Bot1.Hand.Count = 7
+Bot1.Battlefield.Resonating Lute.Activate(Ability: Draw)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Hand.Count = 6
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 11
+Bot1.Hand.Count = 7
+Bot2.Life = 17
