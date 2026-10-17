@@ -1,0 +1,55 @@
+# Hardened Academic: "leave YOUR graveyard". Bot1 has the Academic and a Ghost Vacuum ({T}: Exile target card from a
+# graveyard) on turn 1 and discards a Plains to the Academic (so its graveyard has a card). On turn 2 Bot2 casts Faithless
+# Looting (discarding two Islands) and in Bot2's second main phase the Vacuum exiles an Island from BOT2's graveyard: a card
+# left a graveyard, but not Bot1's, so the Academic stays 2/1. On turn 3 the untapped Vacuum exiles the Plains from Bot1's
+# own graveyard (the positive control): the Academic gets its counter and is 3/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Hardened Academic
+Ghost Vacuum
+Mountain
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Faithless Looting
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hardened Academic.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ghost Vacuum.Cast
+Bot1.Battlefield.Hardened Academic.Activate
+Bot1.Choose(Plains)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Choose(Island; Island)
+[T2 Bot2.Main2]
+? Bot2.Graveyard.Count = 3
+Bot1.Battlefield.Ghost Vacuum.Activate(Bot2.Graveyard.Island)
+Bot1.Pass
+? Bot1.Battlefield.Hardened Academic.Power = 2
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Plains)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 2
+Exile.Count = 2
+Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hardened Academic.Power = 3
+Bot1.Battlefield.Hardened Academic.Toughness = 2

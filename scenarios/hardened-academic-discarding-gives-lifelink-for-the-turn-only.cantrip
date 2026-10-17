@@ -1,0 +1,41 @@
+# Hardened Academic: "Discard a card: This creature gains lifelink until end of turn." On turn 1 Bot1 casts it with two
+# Moxen (it has haste), discards a Plains to its ability and attacks: it deals 2 and Bot1 gains 2 (CR 702.15, lifelink
+# for the turn). On turn 3 it attacks again without the ability: Bot2 loses 2 more and Bot1 gains nothing, so the lifelink
+# ended with the turn (CR 514.2) and was not kept.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Hardened Academic
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hardened Academic.Cast
+[Bot1.Main1]
+Bot1.Battlefield.Hardened Academic.Activate
+Bot1.Choose(Plains)
+Bot1.Attack(Hardened Academic > Bot2)
+[T2 Bot2.Main1]
+? Bot1.Life = 22
+? Bot2.Life = 18
+? Bot1.Battlefield.Hardened Academic.Keywords = Flying; Haste
+[T3 Bot1.Main1]
+Bot1.Attack(Hardened Academic > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 16
+Bot1.Graveyard = Plains
+Bot1.Battlefield.Hardened Academic.Keywords = Flying; Haste

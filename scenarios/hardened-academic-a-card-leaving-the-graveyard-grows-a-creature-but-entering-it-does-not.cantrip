@@ -1,0 +1,53 @@
+# Hardened Academic: "Whenever one or more cards leave your graveyard, put a +1/+1 counter on target creature you control."
+# On turn 1 Bot1 casts the Academic and Faithless Looting (R), discarding two Plains: three cards went INTO the graveyard and
+# none left it, so no counter (checked on turn 2: the Academic is still 2/1). On turn 3 it casts Healer's Hawk, then flashes
+# Looting back (the card moves to the stack, leaving the graveyard) and the trigger's target is the Hawk, not the
+# Academic: the Hawk becomes 2/2 and the Academic stays 2/1. Flashback then exiles Looting.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Hardened Academic
+Faithless Looting
+Mountain
+Plains
+Mountain
+Plains
+Plains
+Healer's Hawk
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hardened Academic.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Plains; Plains)
+[T2 Bot2.Main1]
+? Bot1.Graveyard.Count = 3
+? Bot1.Battlefield.Hardened Academic.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Target(Healer's Hawk)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 4
+Exile = Faithless Looting
+Bot1.Battlefield.Healer's Hawk.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Healer's Hawk.Power = 2
+Bot1.Battlefield.Hardened Academic.Power = 2
+Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = (absent)

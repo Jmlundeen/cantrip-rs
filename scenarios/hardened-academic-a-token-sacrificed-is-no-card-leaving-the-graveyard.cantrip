@@ -1,0 +1,37 @@
+# Hardened Academic: "cards leave your graveyard". A token that goes to the graveyard is gone before any player could
+# act (CR 111.7, 704.5d), so it is not a card that left. Bot1 sacrifices the Clue token Thraben Inspector made ({2},
+# Sacrifice: draw a card): the Academic stays 2/1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Hardened Academic
+Thraben Inspector
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hardened Academic.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Clue Token.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Hardened Academic.Power = 2
+Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Clue Token = (absent)
