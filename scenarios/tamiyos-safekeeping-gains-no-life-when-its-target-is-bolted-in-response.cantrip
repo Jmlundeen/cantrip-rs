@@ -1,0 +1,31 @@
+# Tamiyo's Safekeeping has one target: Bot2 Bolts Bot1's Ornithopter in response, the Ornithopter dies, and with its only target
+# gone the spell doesn't resolve at all (CR 608.2b): Bot1 gains no life, and the spell goes to the graveyard.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Tamiyo's Safekeeping
+Forest x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Tamiyo's Safekeeping.Cast(Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Tamiyo's Safekeeping; Ornithopter

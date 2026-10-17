@@ -1,0 +1,53 @@
+# Tamiyo's Safekeeping: "Target permanent you control gains hexproof and indestructible until end of turn. You gain 2 life."
+# Bot1 can't target Bot2's Ornithopter with it ("you control"), and casts it on its own in response to Bot2's Wrath of God: the
+# Wrath destroys Bot2's Ornithopter, and Bot1's, indestructible, survives it (CR 702.12b), and Bot1 gains 2. Hexproof keeps Bot2's
+# Lightning Bolt off it that turn (CR 702.11b), though the Bolt can still be cast at Bot1 (the positive control). Both keywords
+# end with the turn (CR 514.2): on Bot1's turn the Ornithopter flies and has nothing else.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Tamiyo's Safekeeping
+Forest x12
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Mox Ruby
+Ornithopter
+Wrath of God
+Lightning Bolt
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Wrath of God.Cast
+! Bot1.Hand.Tamiyo's Safekeeping.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Tamiyo's Safekeeping.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Life = 22
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof; Indestructible
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Life = 19
+Bot2.Graveyard = Lightning Bolt; Wrath of God; Ornithopter; Black Lotus
