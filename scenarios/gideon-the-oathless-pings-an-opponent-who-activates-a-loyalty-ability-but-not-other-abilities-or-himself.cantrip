@@ -1,0 +1,63 @@
+# Gideon the Oathless: "Whenever an opponent activates a loyalty ability, Gideon deals 1 damage to that player." Bot1 casts Gideon
+# and its own Liliana of the Veil with Black Lotus and a Mox Jet, Mox Ruby and Swamp, and activates +1 itself: Bot1 takes no
+# damage (it is not an opponent). In turn 2 Bot2 casts Liliana of the Veil too and activates +1: Bot2 takes 1 (19). Bot2 then
+# activates Strip Mine against Bot1's Swamp, an ability that uses the stack but is not a loyalty ability: no more damage.
+
+[Bot1 Deck]
+Black Lotus
+Gideon the Oathless
+Mox Jet
+Liliana of the Veil
+Swamp
+Mox Ruby
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Strip Mine
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Gideon the Oathless.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Swamp)
+Bot2.Choose(Island)
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Liliana of the Veil.Activate(Ability: Each player)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot2.Battlefield.Strip Mine.Activate(Ability: Destroy target land; Bot1.Battlefield.Swamp)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot1.Battlefield = Gideon the Oathless; Liliana of the Veil; Mox Jet; Mox Ruby

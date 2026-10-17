@@ -1,0 +1,43 @@
+# Gideon the Oathless has "Ward--Discard a card" (CR 702.21a). Bot2 bolts Gideon twice with a Mountain and a Mox Ruby: the
+# first time it declines to discard and the Bolt is countered (Gideon survives, undamaged); the second time it discards an
+# Island, the Bolt resolves and Gideon, a 3/3, dies.
+
+[Bot1 Deck]
+Black Lotus
+Gideon the Oathless
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Gideon the Oathless.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gideon the Oathless)
+Bot2.Decline
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gideon the Oathless.Damage = 0
+? Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gideon the Oathless)
+Bot2.Accept
+Bot2.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Gideon the Oathless; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Island; Lightning Bolt

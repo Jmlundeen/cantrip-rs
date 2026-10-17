@@ -1,0 +1,8 @@
+{
+  "name": "Gideon the Oathless",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Human Mercenary",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Ward—Discard a card.\nWhenever a creature an opponent controls enters, Gideon deals 1 damage to that player.\nWhenever an opponent activates a loyalty ability, Gideon deals 1 damage to that player."
+}

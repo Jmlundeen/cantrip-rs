@@ -1,0 +1,56 @@
+# Gideon the Oathless: "Whenever a creature an opponent controls enters, Gideon deals 1 damage to that player." Three players:
+# Bot1's Gideon (Black Lotus's three black). Bot1's own Ornithopter entering hurts nobody. In Bot2's turn 2 Bot2's Ornithopter
+# enters and Bot2 takes 1 (19); in Bot3's turn 3 Bot3's Ornithopter enters and only Bot3 takes 1 (19): the damage is to "that
+# player", the controller of the creature that entered, not to each opponent.
+
+[Bot1 Deck]
+Black Lotus
+Gideon the Oathless
+Ornithopter
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Forest x14
+
+[Bot3 Deck]
+Ornithopter
+Forest x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Gideon the Oathless.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot1.Life = 20
+? Bot2.Life = 20
+? Bot3.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Life = 19
+[T3 Bot3.Main1]
+Bot3.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 19
+Bot3.Life = 19
