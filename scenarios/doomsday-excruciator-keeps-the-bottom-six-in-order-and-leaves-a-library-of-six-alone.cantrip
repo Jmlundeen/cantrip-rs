@@ -1,0 +1,45 @@
+# The cards kept are the BOTTOM six, in order: Bot1's library of eight (Forest, Plains on top, then Mountain and five Swamps)
+# loses exactly its top two, Forest and Plains. Bot2's library of exactly six (Forest, Plains, Mountain, Island, Swamp,
+# Swamp) loses nothing (ruling 2024-09-20: a player with six or fewer cards left exiles none): only Bot1's two cards are in exile.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Black Lotus
+Doomsday Excruciator
+Swamp
+Swamp
+Swamp
+Forest
+Plains
+Mountain
+Swamp x5
+
+[Bot2 Deck]
+Island x7
+Forest
+Plains
+Mountain
+Island
+Swamp
+Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Doomsday Excruciator.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 2
+Bot1.Library = Mountain; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot2.Library = Forest; Plains; Mountain; Island; Swamp; Swamp
+Bot2.Library.Count = 6

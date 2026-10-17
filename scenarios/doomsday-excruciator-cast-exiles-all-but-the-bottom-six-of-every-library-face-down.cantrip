@@ -1,0 +1,47 @@
+# Doomsday Excruciator ({B}x6) is cast on turn 1 (Mox Jet's {B}, Dark Ritual turning it into {B}{B}{B}, Black Lotus's {B}{B}{B}).
+# "When this creature enters, if it was cast, each player exiles all but the bottom six cards of their library face down":
+# Bot1's library of ten loses four, Bot2's of nine loses three; both are left with exactly six, and seven cards sit in exile
+# face down. At Bot1's next upkeep it draws a card ("At the beginning of your upkeep, draw a card"), besides its draw step:
+# six cards left become four by main phase one of turn 3; Bot2 drew for turn 2, so its six became five.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Black Lotus
+Doomsday Excruciator
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Doomsday Excruciator.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Jet; Doomsday Excruciator
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 7
+? Bot1.Library.Count = 6
+? Bot2.Library.Count = 6
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 4
+? Bot2.Library.Count = 5
+? Exile.Count = 7
+
+[Expect]
+Exile.Count = 7
+Bot1.Library.Count = 4
+Bot2.Library.Count = 5
+Bot1.Battlefield = Mox Jet; Doomsday Excruciator

@@ -1,0 +1,44 @@
+# "If it was cast": Doomsday Excruciator put into the battlefield from the graveyard with Reanimate (Entomb put it there) was
+# not cast, so no library is touched (CR 603.4): Bot1's library keeps all its cards and Bot2's too; nothing is exiled. Bot1
+# pays 6 life for Reanimate (its mana value). Its upkeep draw still happens: at turn 3 the library (12 after Entomb) shrinks by one
+# for the upkeep trigger and one for the draw step: 10.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Entomb
+Reanimate
+Swamp
+Swamp
+Swamp
+Doomsday Excruciator
+Swamp x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Doomsday Excruciator)
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Doomsday Excruciator)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mox Jet; Doomsday Excruciator
+? Exile.Count = 0
+? Bot1.Life = 14
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 10
+? Bot2.Library.Count = 8
+
+[Expect]
+Exile.Count = 0
+Bot1.Library.Count = 10
+Bot2.Library.Count = 8
+Bot1.Life = 14
