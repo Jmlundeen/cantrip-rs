@@ -1,0 +1,44 @@
+# Blood Sun takes no mana ability (CR 605.1a): Taiga, a nonbasic Land - Mountain Forest, keeps the "{T}: Add {R}" and
+# "{T}: Add {G}" of its land types (CR 305.6), whose reminder text is all its text box holds, and changes no land type
+# (unlike Blood Moon). On turn 3, under the Sun, it taps for {G}; Bot2's Island taps for {U}.
+
+[Bot1 Deck]
+Taiga
+Mox Ruby
+Mox Jet
+Mox Pearl
+Blood Sun
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Blood Sun.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana = {U}
+[T3 Bot1.Main1]
+Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Taiga.Subtypes = Forest; Mountain
+Bot1.Battlefield.Taiga.Tapped = true
+Bot1.Battlefield = Taiga; Mox Ruby; Mox Jet; Mox Pearl; Blood Sun

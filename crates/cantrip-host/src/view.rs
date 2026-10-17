@@ -908,8 +908,15 @@ impl<'a> Projector<'a> {
         // are gone too, which no keyword or ability above names. A line of keywords alone, or one of the abilities above, is
         // judged above, so a keyword or ability had again after the loss is not called lost.
         if Query::lost_all_abilities(self.game, id) {
+            // A line that is reminder text alone ("({T}: Add {R} or {G}.)") reminds of the abilities of a basic land type
+            // (CR 305.6): lost only if the land no longer has one, as under Humility, not under Blood Sun's "except mana
+            // abilities", which keeps them.
+            let intrinsic = c.abilities().any(|a| a.card == cards.intrinsic);
             let judged = |line: &str| {
                 let words = without_reminder(line);
+                if words.trim().is_empty() && intrinsic {
+                    return true;
+                }
                 let keyword = |part: &str| {
                     KEYWORD_WORDS.iter().any(|(_, w)| w.trim_end_matches('.').eq_ignore_ascii_case(part.trim().trim_end_matches('.')))
                 };

@@ -267,6 +267,37 @@ fn a_nonbasic_land_magus_of_the_moon_makes_a_mountain_is_shown_with_its_printed_
     }
 }
 
+/// CR 605.1a, 305.6 at a table: under Blood Sun ("All lands lose all abilities except mana abilities") Taiga keeps the mana
+/// abilities of its land types, so the reminder text that is its whole text box is not shown as lost.
+#[test]
+fn a_land_under_blood_sun_is_not_shown_losing_its_land_types_mana_abilities() {
+    let name = "blood-sun-leaves-taiga-the-mana-abilities-of-its-land-types";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    for _ in 0..20_000 {
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true));
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    for seat in [1, 2] {
+        let view = session.view(seat).map_err(|r| r.detail).unwrap();
+        let taiga = view.objects.iter().find(|o| o.name == "Taiga").expect("Taiga is shown");
+        assert!(taiga.lost_abilities.is_empty(), "seat {seat}: {:?}", taiga.lost_abilities);
+    }
+}
+
 #[test]
 fn every_scenario_passes_at_a_table_with_bot1_driven() {
     let mut entries: Vec<PathBuf> =
