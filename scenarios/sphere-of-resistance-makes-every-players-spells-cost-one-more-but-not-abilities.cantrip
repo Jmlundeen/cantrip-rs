@@ -1,0 +1,51 @@
+# Sphere of Resistance: "Spells cost {1} more to cast" (CR 601.2f), every player's, its controller's own included (its
+# ruling), and no ability. On turn 2 Bot2's Mox Sapphire, {0}, costs {1}: its Island pays it, and nothing is left. On turn 3
+# Bot1 floats four mana; its Mind Stone, {2}, costs {3}, and Mind Stone's own "{1}, {T}, Sacrifice: Draw a card" still
+# costs {1}, which the fourth mana pays: the pool is empty, the Stone in the graveyard and a card drawn.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mountain
+Sphere of Resistance
+Mind Stone
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sphere of Resistance.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana = {U}
+Bot2.Hand.Mox Sapphire.Cast
+? Bot2.Mana =
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}{R}{R}{R}
+Bot1.Hand.Mind Stone.Cast
+Bot1.Battlefield.Mind Stone.Activate(Ability: Draw)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Graveyard = Mind Stone
+Bot1.Hand.Count = 3
+Bot2.Battlefield = Island; Mox Sapphire
+Bot2.Battlefield.Island.Tapped = true

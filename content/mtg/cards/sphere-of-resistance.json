@@ -1,0 +1,6 @@
+{
+  "name": "Sphere of Resistance",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "Spells cost {1} more to cast."
+}

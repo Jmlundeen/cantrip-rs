@@ -1,0 +1,56 @@
+# Paying for "counter target spell unless its controller pays {3}" is no spell being cast (CR 118.12, 608.2d), so what
+# changes the cost to cast spells does not change it. Under Bot1's Sphere of Resistance Bot1's Lightning Bolt costs {1}{R}
+# and Bot2's Mana Leak {2}{U}; Bot1 then pays Mana Leak's {3} - exactly three, from three red floated - and the Bolt resolves.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Black Lotus
+Sphere of Resistance
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mana Leak
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Sphere of Resistance.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana = {R}
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Mana Leak.Cast(Lightning Bolt)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+? Bot1.Mana = {R}{R}{R}
+Bot1.PayCost
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot2.Life = 17
+Bot2.Graveyard = Mana Leak
