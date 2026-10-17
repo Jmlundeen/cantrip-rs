@@ -1,5 +1,5 @@
 //! Warp (CR 702.185a): "You may cast this card from your hand for its warp cost. Exile this permanent at the beginning
-//! of the next end step, then you may cast it from exile on a later turn." Quantum Riddler and Pinnacle Emissary print it.
+//! of the next end step, then you may cast it from exile on a later turn." Quantum Riddler, Pinnacle Emissary and Timeline Culler print it.
 //!
 //! A card with warp lists `way(cost, text)` as its only alternative cost, `EXILE` among its `delayed` abilities as the
 //! first, and `RIDERS` as its `end_step_riders`: the way casts it, and the core creates the delayed ability without
@@ -10,11 +10,28 @@ use cantrip_api::*;
 /// The alternative cost of warp: cast from the hand for `cost` (CR 118.9), and only from the hand: "You may cast this card
 /// from your hand for its warp cost" (CR 702.185a), so a permission to cast it from exile or a graveyard does not open it.
 pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
-    cantrip_api::way(Cost::mana(cost), ZoneKind::Hand, text).kind(WayKind::Warp).only_from()
+    way_with_cost(Cost::mana(cost), text)
+}
+
+/// `way` for a warp cost that is more than mana ("Warp - {B}, Pay 2 life", CR 118.8): Timeline Culler.
+pub const fn way_with_cost(cost: Cost, text: &'static str) -> WayDef {
+    cantrip_api::way(cost, ZoneKind::Hand, text).kind(WayKind::Warp).only_from()
+}
+
+/// "You may cast this card from your graveyard using its warp ability": the same warp cost, paid for the card cast from its
+/// owner's graveyard, and only from there. It is warp's way as far as "cast for its warp cost" goes (CR 702.185a-c): the
+/// permanent is exiled at the next end step and the spell counts as warped. It is the card's second way, after the one from the
+/// hand, and `RIDERS_FROM_HAND_AND_GRAVEYARD` gives both the delayed ability. Timeline Culler.
+pub const fn way_from_graveyard(cost: Cost, text: &'static str) -> WayDef {
+    cantrip_api::way(cost, ZoneKind::Graveyard, text).kind(WayKind::Warp).only_from()
 }
 
 /// Warp's delayed ability (CR 702.185a): the way is the card's first and this its first delayed ability.
 pub const RIDERS: &[(u8, u8)] = &[(1, 0)];
+
+/// Warp's delayed ability for a card with two warp ways, the first from the hand and the second from the graveyard
+/// (`way_from_graveyard`): both create the card's first delayed ability.
+pub const RIDERS_FROM_HAND_AND_GRAVEYARD: &[(u8, u8)] = &[(1, 0), (2, 0)];
 
 /// "Was cast for its warp cost" (CR 702.185a): the permanent (or spell) was cast through the way a card with warp lists
 /// as warp (`WayKind::Warp`, set by `way`). Another keyword's way is not warp's, and a permanent that was not cast (a
