@@ -1,0 +1,41 @@
+# Stinkweed Imp: "destroy that creature" - the creature its combat damage was dealt to. Birds of Paradise blocks the Imp and
+# dies of that 1 damage as a state-based action before the trigger resolves (CR 704.5g, 603.3); the trigger then finds no such
+# permanent (CR 400.7) and does nothing. The Imp survives the Birds' 0 power.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Stinkweed Imp
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Forest
+Birds of Paradise
+Forest x5
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stinkweed Imp.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Stinkweed Imp)
+Bot2.Block(Birds of Paradise > Stinkweed Imp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Swamp; Stinkweed Imp
+Bot2.Graveyard = Birds of Paradise
+LeftBattlefield = Birds of Paradise

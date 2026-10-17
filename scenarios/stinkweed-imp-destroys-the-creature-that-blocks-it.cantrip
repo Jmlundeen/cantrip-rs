@@ -1,0 +1,44 @@
+# Stinkweed Imp: "Whenever this creature deals combat damage to a creature, destroy that creature." A triggered ability, not
+# deathtouch (its ruling; CR 603.2, 510.2): Bot1's flying Imp attacks and Bot2 blocks with Endurance, a 3/4 with reach. The
+# Imp's 1 combat damage is far from lethal, but it triggers the ability, which destroys Endurance; Endurance's 3 damage kills
+# the 1/2 Imp.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Stinkweed Imp
+Plains x3
+Plains x20
+
+[Bot2 Deck]
+Black Lotus
+Endurance
+Forest x5
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stinkweed Imp.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Endurance.Cast
+Bot2.Target()
+[T3 Bot1.Main1]
+Bot1.Attack(Stinkweed Imp)
+Bot2.Block(Endurance > Stinkweed Imp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Stinkweed Imp
+Bot2.Graveyard = Endurance; Black Lotus
+Bot2.Life = 20

@@ -1,0 +1,39 @@
+# Dredge with several draws: "if you're instructed to draw two cards and you replace the first draw with a dredge ability,
+# another card with a dredge ability (including one that was milled by the first dredge ability) may be used to replace the
+# second draw" (its ruling; CR 121.2, 702.52a). Ancestral Recall's first draw is replaced by Golgari Grave-Troll's dredge 6,
+# which mills Stinkweed Imp; the second by the Imp's dredge 5; the third finds no card with dredge in Bot1's graveyard and is
+# drawn. Bot1 ends with both dredgers and one Forest drawn, eleven cards milled.
+
+[Bot1 Deck]
+Swamp
+Mox Sapphire
+Thoughtseize
+Ancestral Recall
+Golgari Grave-Troll
+Plains
+Plains
+Forest
+Stinkweed Imp
+Forest x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot1)
+Bot1.Choose(Golgari Grave-Troll)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Accept
+? Bot1.Graveyard.Stinkweed Imp.Power = 1
+Bot1.Accept
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Golgari Grave-Troll; Stinkweed Imp; Forest
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 12
