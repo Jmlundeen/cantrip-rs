@@ -1,6 +1,5 @@
 # "Tap up to one target creature": with no creature chosen the spell is still cast, and the damage happens - Bot2 takes 3
-# - while Bot2's Llanowar Elves stays untapped. A spell that targets a player and one creature of one's own is refused
-# neither: only the second target is optional.
+# - while Bot2's Llanowar Elves stays untapped. Only the second target is optional: the damage target is always chosen.
 
 [Bot1 Deck]
 Mox Sapphire
