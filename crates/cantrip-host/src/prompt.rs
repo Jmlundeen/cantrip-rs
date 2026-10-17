@@ -651,6 +651,16 @@ fn damage_words(game: &Game, asked: PlayerId, d: DamageAbout) -> String {
     format!("{} damage from {} to {to}", d.amount, game.name(d.source))
 }
 
+/// Counters about to be put on a permanent, in words: "2 +1/+1 counters would be put on Walking Ballista".
+fn counter_words(game: &Game, subject: Option<ObjectId>, counters: &[(CounterKind, i16)]) -> String {
+    let kinds: Vec<String> = counters
+        .iter()
+        .map(|&(kind, n)| format!("{n} {} counter{}", kind.name(), if n == 1 { "" } else { "s" }))
+        .collect();
+    let on = subject.map_or("it", |s| game.name(s));
+    format!("{} would be put on {on}", kinds.join(" and "))
+}
+
 fn handles_of(handles: &mut HandleSpace, ids: &[ObjectId]) -> Vec<ViewHandle> {
     ids.iter().map(|&id| handles.handle(id)).collect()
 }
@@ -1126,7 +1136,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 owner: seat(owner),
             })
         }
-        RequestKind::ChooseReplacement { subject, life, sources, hints, damage, turn } => {
+        RequestKind::ChooseReplacement { subject, life, sources, hints, damage, turn, counters } => {
             PromptPayload::ChooseReplacementPromptMessage(ChooseReplacementPrompt {
                 player,
                 subject: subject.map_or(ViewHandle::NONE, |s| source_handle(game, handles, s)),
@@ -1138,6 +1148,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     (None, Some(d)) => damage_words(game, request.player, *d),
                     // The turn effects would skip (CR 614.10) is the asked player's.
                     (None, None) if *turn => "Your turn would begin".to_string(),
+                    // Counters about to be put on a permanent (CR 122.6), as the effects so far have left them.
+                    (None, None) if !counters.is_empty() => counter_words(game, *subject, counters),
                     (None, None) => String::new(),
                 },
                 sources: sources.iter().map(|&s| source_handle(game, handles, s)).collect(),

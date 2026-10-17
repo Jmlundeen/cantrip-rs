@@ -80,6 +80,15 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     {
         return false;
     }
+    // CR 101.2, 118.3: a cost that puts counters on a permanent that can't have them put on it can't be paid (Solemnity's
+    // ruling): a loyalty ability's plus, or "put a counter on this" as a cost.
+    let banned = |kind| obj.zone.is(ZoneKind::Battlefield) && static_rules::counters_banned(cx, cx.cards(), source, obj.controller, kind);
+    if cost.loyalty.is_some_and(|l| l > 0) && banned(CounterKind::Loyalty) {
+        return false;
+    }
+    if cost.put_counters.is_some_and(|(kind, n)| n > 0 && banned(kind)) {
+        return false;
+    }
     if !can_pay_life(cx, controller, cost.life) {
         return false;
     }
@@ -297,9 +306,15 @@ fn pay_behold(cx: &mut Cx, player: PlayerId, chosen: &[ObjectId]) {
     }
 }
 
-/// The creatures a cost that blights may put its counters on (CR 701.68a).
+/// The creatures a cost that blights may put its counters on (CR 701.68a): not one that can't have -1/-1 counters put on it
+/// (CR 101.2, 118.3: Melira, Sylvok Outcast; Solemnity's ruling).
 fn blight_candidates(cx: &Cx, controller: PlayerId) -> Vec<ObjectId> {
-    cx.permanents_of(controller).into_iter().filter(|&id| cx.chars(id).is(CardType::Creature)).collect()
+    cx.permanents_of(controller)
+        .into_iter()
+        .filter(|&id| {
+            cx.chars(id).is(CardType::Creature) && !static_rules::counters_banned(cx, cx.cards(), id, controller, CounterKind::MinusOne)
+        })
+        .collect()
 }
 
 /// Chooses the creature a cost blights (CR 701.68a, 601.2h), always asked, even when the choice is forced.
@@ -318,7 +333,7 @@ fn choose_blight(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
 /// Pays the blight part of a cost (CR 701.68a): the -1/-1 counters go on the creature chosen.
 fn pay_blight(cx: &mut Cx, cost: &Cost, chosen: Option<ObjectId>) {
     if let Some(creature) = chosen {
-        ops::add_counters(cx, creature, CounterKind::MinusOne, cost.blight as i16);
+        ops::put_counters(cx, creature, CounterKind::MinusOne, cost.blight as i16, false);
     }
 }
 
@@ -646,7 +661,7 @@ fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: 
     }
     // Counters a cost puts on its source are put by the player paying it (CR 118.3): what replaces counters being put applies.
     if let Some((kind, n)) = cost.put_counters {
-        ops::add_counters(cx, source, kind, n as i16);
+        ops::put_counters(cx, source, kind, n as i16, false);
     }
 }
 
@@ -4411,12 +4426,19 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     if let Some(loyalty) = def.cost.loyalty {
         let turn = cx.s().turn.number;
         let change = if loyalty == LOYALTY_MINUS_X { -(item.x as i16) } else { loyalty as i16 };
-        cx.st().update_obj(source, |o| {
-            o.loyalty_turn = turn;
-            let n = &mut o.counters[CounterKind::Loyalty as usize];
-            *n = (*n + change).max(0);
-        });
-        ops::end_lapsed_durations(cx, source);
+        cx.st().update_obj(source, |o| o.loyalty_turn = turn);
+        if change > 0 {
+            // CR 606.4, 118.3: loyalty counters put on as the cost, by the player activating it - what replaces counters being
+            // put applies ("if you would put", Innkeeper's Talent), but not what replaces those an effect puts (Doubling
+            // Season's ruling).
+            ops::put_counters(cx, source, CounterKind::Loyalty, change, false);
+        } else if change < 0 {
+            cx.st().update_obj(source, |o| {
+                let n = &mut o.counters[CounterKind::Loyalty as usize];
+                *n = (*n + change).max(0);
+            });
+            ops::end_lapsed_durations(cx, source);
+        }
     }
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, &[source]);

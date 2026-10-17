@@ -320,6 +320,10 @@ fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
             _ => None,
         },
         turn: false,
+        counters: match proposal {
+            Proposal::Counters(c) => CounterKind::ALL.into_iter().zip(c.counts).filter(|&(_, n)| n > 0).collect(),
+            _ => Vec::new(),
+        },
     };
     match cx.ask_core(affected(cx, proposal), ask, false) {
         Ok(Answer::Index(i)) if (i as usize) < found.len() => i as usize,
@@ -467,8 +471,16 @@ pub fn zone_change(cx: &mut Cx, change: ZoneChange) -> ZoneChange {
 
 /// Counters that would be put on a permanent, or that one enters with (CR 122.6, 614.1a): how many of each kind
 /// remain once every effect has applied. The permanent is judged as it is now, or as it would exist on the
-/// battlefield if it is entering (CR 614.12).
-pub fn counters(cx: &mut Cx, object: ObjectId, controller: PlayerId, entering: bool, counts: [i16; CounterKind::COUNT]) -> [i16; CounterKind::COUNT] {
+/// battlefield if it is entering (CR 614.12). `effect` says an effect puts them, not a cost or a turn-based action
+/// (`CounterPlacement::effect`).
+pub fn counters(
+    cx: &mut Cx,
+    object: ObjectId,
+    controller: PlayerId,
+    entering: bool,
+    effect: bool,
+    counts: [i16; CounterKind::COUNT],
+) -> [i16; CounterKind::COUNT] {
     if counts.iter().all(|&n| n <= 0) {
         return counts;
     }
@@ -481,7 +493,7 @@ pub fn counters(cx: &mut Cx, object: ObjectId, controller: PlayerId, entering: b
     }
     // CR 122.6a: counters an object enters with are put on it by its controller, unless the effect names another player.
     let putter = if entering { Some(controller) } else { cx.actor() };
-    let mut proposal = Proposal::Counters(CounterPlacement { object, controller, entering, counts, putter });
+    let mut proposal = Proposal::Counters(CounterPlacement { object, controller, entering, counts, putter, effect });
     apply(cx, &mut proposal);
     match proposal {
         Proposal::Counters(placement) => without_banned(cx, object, controller, placement.counts),

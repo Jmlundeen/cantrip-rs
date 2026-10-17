@@ -53,6 +53,10 @@ pub struct CounterPlacement {
     /// The player who puts them (CR 122.6a): who controls the spell or ability, or does the action, doing it. None for
     /// the rules' own doing. "If you would put one or more counters on a permanent or player" is keyed to this.
     pub putter: Option<PlayerId>,
+    /// An effect puts them (CR 609.1): a resolving spell's or ability's, or the replacement effect a permanent enters with
+    /// them by (CR 614.1c, 122.6). Not a cost's (CR 118.3: a loyalty ability's, CR 606.4) nor a turn-based action's (a Saga's
+    /// lore counter, CR 714.3c). "If an effect would put one or more counters" (Doubling Season) is keyed to this.
+    pub effect: bool,
 }
 
 /// Counters that would be put on a player (CR 122.1, 122.6): poison counters and energy counters, which a player has

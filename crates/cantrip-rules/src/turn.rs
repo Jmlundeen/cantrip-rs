@@ -371,7 +371,7 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
             sources.push(id);
             hints.push(rule.hint);
         }
-        let ask = RequestKind::ChooseReplacement { subject: None, life: None, sources, hints, damage: None, turn: true };
+        let ask = RequestKind::ChooseReplacement { subject: None, life: None, sources, hints, damage: None, turn: true, counters: Vec::new() };
         if let Answer::Index(i) = cx.ask_core(player, ask, false)?
             && i > 0
             && let Some(&(id, rule)) = optional.get(i as usize - 1)

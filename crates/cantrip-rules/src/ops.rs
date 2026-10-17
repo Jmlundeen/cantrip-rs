@@ -276,7 +276,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             enters_with_intrinsic_counters(cx.cards(), &mut new);
             // Counters it enters with are counters put on it (CR 122.6, 614.1a): replacements that change how many
             // apply to them, the permanent judged as it would exist on the battlefield (CR 614.12).
-            new.counters = replace::counters(cx, m.id, new.controller, true, new.counters);
+            new.counters = replace::counters(cx, m.id, new.controller, true, true, new.counters);
         }
         plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, last_known });
     }
@@ -1113,7 +1113,7 @@ fn create_tokens_onto(
         for (n, with) in entering.counters.iter_mut().zip(change.counters) {
             *n += with;
         }
-        entering.counters = replace::counters(cx, id, controller, true, entering.counters);
+        entering.counters = replace::counters(cx, id, controller, true, true, entering.counters);
         arriving.push((id, controller, entering));
     }
     for (id, controller, entering) in arriving {
@@ -2279,9 +2279,16 @@ pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
     }
 }
 
-/// Puts counters on an object, or takes them off with a negative amount. Putting them is an event replacement effects
-/// can change (CR 122.6, 614.1a): "that many plus one" instead.
+/// Puts counters on an object, or takes them off with a negative amount, as an effect does (CR 609.1). Putting them is an
+/// event replacement effects can change (CR 122.6, 614.1a): "that many plus one" instead.
 pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
+    put_counters(cx, id, kind, amount, true);
+}
+
+/// Puts counters on an object, or takes them off with a negative amount: by an effect (`effect`), or as a cost (CR 118.3) or
+/// a turn-based action (CR 714.3c), which the replacement effects of counters put by "an effect" do not see
+/// (`CounterPlacement::effect`). Every other replacement of counters being put applies to all of them.
+pub fn put_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16, effect: bool) {
     if !live(cx.s(), id) {
         return;
     }
@@ -2289,7 +2296,7 @@ pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
     counts[kind as usize] = amount;
     if amount > 0 && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         let controller = cx.s().obj(id).controller;
-        counts = replace::counters(cx, id, controller, false, counts);
+        counts = replace::counters(cx, id, controller, false, effect, counts);
     }
     let defense = cx.s().obj(id).counters(CounterKind::Defense);
     cx.st().update_obj(id, |o| {
@@ -2353,7 +2360,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
     });
 }
 
-/// CR 714.3b: as the active player's precombat main phase begins, they put a lore counter on each Saga they control
+/// CR 714.3c: as the active player's precombat main phase begins, they put a lore counter on each Saga they control
 /// that has chapter abilities. A turn-based action, so it does not use the stack.
 pub fn add_lore_counters(cx: &mut Cx) {
     let active = cx.s().turn.active;
@@ -2365,7 +2372,8 @@ pub fn add_lore_counters(cx: &mut Cx) {
         if chars.has_subtype(Subtype::Saga)
             && chars.abilities().any(|a| matches!(cx.cards().ability(a), AbilityDef::Triggered(t) if t.chapter > 0))
         {
-            add_counters(cx, id, CounterKind::Lore, 1);
+            // A turn-based action's counter, not an effect's (CR 714.3c, 703.4f).
+            put_counters(cx, id, CounterKind::Lore, 1, false);
         }
     }
 }
