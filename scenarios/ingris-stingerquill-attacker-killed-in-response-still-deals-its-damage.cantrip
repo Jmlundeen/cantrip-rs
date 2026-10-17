@@ -1,0 +1,53 @@
+# Ingris Stingerquill's trigger is "that creature deals 1 damage to each opponent". Bot1's Healer's Hawk (1/1 flying lifelink)
+# and Ingris attack on turn 3 and Bot2 answers the Hawk's trigger by killing the Hawk with Lightning Bolt: the ability still
+# resolves with the Hawk as it last existed the source of the damage (CR 113.7a, 608.2h), so Bot2 still takes 1 and, the
+# lifelink being the Hawk's, Bot1 gains 1 (21). Bot2: 1 per trigger (2) plus Ingris's 1 combat damage: 17.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Ingris Stingerquill
+Healer's Hawk
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ingris Stingerquill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ingris Stingerquill; Healer's Hawk > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Healer's Hawk)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 21
+Bot1.Graveyard = Healer's Hawk; Black Lotus

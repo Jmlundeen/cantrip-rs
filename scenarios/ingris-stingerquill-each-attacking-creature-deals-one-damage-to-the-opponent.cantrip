@@ -1,0 +1,43 @@
+# Ingris Stingerquill: "Whenever a creature you control attacks, that creature deals 1 damage to each opponent." Cast in turn 1
+# with an Ornithopter (Mox Jet, Mox Ruby and one red from Black Lotus), on turn 3 both attack Bot2, who has no creature: two
+# triggers, one for Ingris and one for the Ornithopter (a 0/2 deals 1 damage from the ability regardless of its power), and
+# Ingris's own 1 combat damage: Bot2 goes from 20 to 17.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Ingris Stingerquill
+Ornithopter
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ingris Stingerquill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ingris Stingerquill; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 20

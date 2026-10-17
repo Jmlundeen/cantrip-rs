@@ -1,0 +1,41 @@
+# Ingris Stingerquill's trigger deals 1 damage "to each opponent" (CR 120.3): in a three-player game, on turn 4 (Bot1's second
+# turn, after Bot2 and Bot3) Ingris attacks Bot2. Both opponents take 1 from the trigger and Bot2 takes Ingris's 1 combat damage
+# too: Bot2 is at 18 and Bot3 at 19.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Ingris Stingerquill
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Bot3 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ingris Stingerquill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Ingris Stingerquill > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot3.Life = 19

@@ -1,0 +1,11 @@
+{
+  "name": "Ingris Stingerquill",
+  "manaCost": "{B}{R}{R}",
+  "type": "Legendary Creature — Elder Sphinx",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Flying\nWhenever a creature you control attacks, that creature deals 1 damage to each opponent.\n{4}: Create a 2/2 colorless Wizard Soldier creature token named Cadet. Then creatures you control gain haste until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

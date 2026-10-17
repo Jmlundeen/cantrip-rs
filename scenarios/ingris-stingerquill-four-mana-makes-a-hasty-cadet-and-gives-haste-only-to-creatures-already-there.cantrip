@@ -1,0 +1,56 @@
+# Ingris Stingerquill: "{4}: Create a 2/2 colorless Wizard Soldier creature token named Cadet. Then creatures you control gain
+# haste until end of turn." On turn 3 Bot1 pays {4} (a Mountain, Mox Jet, Mox Ruby and Mox Pearl): the Cadet is made and then
+# it and every other creature there as the ability resolves have haste; an Ornithopter cast afterwards does not, and
+# is refused as an attacker beside the Cadet, which attacks the turn it was made. Ingris and the Cadet attack: two triggers
+# (2 damage), then combat damage 1 + 2: Bot2 ends at 15.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Ingris Stingerquill
+Mox Pearl
+Mountain
+Ornithopter
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Ingris Stingerquill.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Ingris Stingerquill.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cadet.Keywords = Haste
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack(Ornithopter > Bot2)
+Bot1.Attack(Ingris Stingerquill; Cadet > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ingris Stingerquill.Keywords = Flying; Haste
