@@ -1,0 +1,42 @@
+# Doc Aurlock, Grizzled Genius: "Plotting cards from your hand costs {2} less" is its controller's alone. With Doc on
+# Bot1's battlefield, Bot2 plots Pillage the Bog on turn 6 for its full {1}{B}{G}: the {U}{B}{G} in Bot2's pool is all spent,
+# where a reduced cost would have left the {U}.
+
+[Bot1 Deck]
+Forest
+Island
+Doc Aurlock, Grizzled Genius
+Island x20
+
+[Bot2 Deck]
+Swamp
+Forest
+Island
+Pillage the Bog
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Doc Aurlock, Grizzled Genius.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana = {U}{B}{G}
+Bot2.Hand.Pillage the Bog.Activate(Ability: Plot)
+! Bot2.Hand.Island.Play
+? Bot2.Mana =
+
+[Expect]
+Turn = 6
+Exile = Pillage the Bog
+Bot1.Battlefield = Forest; Island; Doc Aurlock, Grizzled Genius

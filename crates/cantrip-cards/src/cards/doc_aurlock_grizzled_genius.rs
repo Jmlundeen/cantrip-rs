@@ -15,11 +15,17 @@ fn graveyard_and_exile_spells_cost_two_less(q: &dyn Query, source: ObjectId, pla
 }
 
 /// "Plotting cards from your hand costs {2} less" (CR 116.2k, 702.170a, 118.7a): plot's special action, taken by this
-/// permanent's controller; generic mana of the plot cost only (its rulings). Becoming plotted any other way pays nothing to
-/// reduce.
+/// permanent's controller, of a card in their hand (a card plotted from elsewhere, as Fblthp, Lost on the Range plots from the
+/// top of a library, is not); generic mana of the plot cost only (its rulings). Becoming plotted any other way pays nothing
+/// to reduce.
 fn plotting_costs_two_less(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    let Costed::SpecialAction(_, ability) = costed else { return CostDelta::NONE };
-    if player == q.controller(source) && q.activated_ability(ability).is_some_and(|d| d.plot) { CostDelta::less(2) } else { CostDelta::NONE }
+    let Costed::SpecialAction(card, ability) = costed else { return CostDelta::NONE };
+    let from_your_hand = q.obj(card).zone == Zone::hand(player);
+    if player == q.controller(source) && from_your_hand && q.activated_ability(ability).is_some_and(|d| d.plot) {
+        CostDelta::less(2)
+    } else {
+        CostDelta::NONE
+    }
 }
 
 pub static CARD: CardDef = CardDef {
