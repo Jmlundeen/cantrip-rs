@@ -1,0 +1,53 @@
+# Browser
+# What the page shows of mana restricted by the zone a spell is cast from (CR 106.6, 601.2a), and that a person can spend
+# it where it may go. Heartwood Crafter's card menu words its {C} as mana that can't be spent on spells cast from the hand,
+# and the {C} sits in the pool as its own chip, "not from hand"; Interdimensional Web Watch's two mana, chosen as it
+# resolves, sit as chips "spells from exile". All three pay for the Crafter's Soul Tether copy, cast from exile (CR
+# 722.3c), and the pool is empty after.
+
+[Bot1 Deck]
+Forest
+Heartwood Crafter
+Black Lotus
+Interdimensional Web Watch
+Mountain
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heartwood Crafter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Interdimensional Web Watch.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Interdimensional Web Watch.Activate
+Bot1.Colors(Red; Green)
+? Client.Bot1.Mana = 1 Red (spells from exile); 1 Green (spells from exile)
+Bot1.Battlefield.Heartwood Crafter.Activate
+? Client.Bot1.Menu = {T}: Add {C} (can't be spent on spells cast from your hand)
+? Client.Bot1.Mana = 1 Red (spells from exile); 1 Green (spells from exile); 1 Colorless (not from hand)
+Bot1.Exile.Soul Tether.Cast
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana =
+
+[Expect]
+Turn = 3
+Bot1.Mana =
+Exile = Island; Island
+Bot1.Battlefield = Forest; Heartwood Crafter; Heartwood Token; Interdimensional Web Watch; Mountain

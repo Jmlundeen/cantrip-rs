@@ -1,0 +1,50 @@
+# "Mana from Interdimensional Web Watch's last ability may be spent on any spells cast from exile, not just spells cast from
+# exile via its first ability" (its ruling; CR 106.6, 601.2a). Heartwood Crafter entered prepared on turn 1, its Soul
+# Tether copy in exile (CR 722.3c). Turn 3 the Watch arrives (the Mountain and Black Lotus) and exiles two Islands; its
+# {R}{G} and the Crafter's {C} - which can't be spent on spells from the hand - pay together for the Soul Tether copy, which
+# is cast from exile: the pool is empty after, and the Heartwood token is made.
+
+[Bot1 Deck]
+Forest
+Heartwood Crafter
+Black Lotus
+Interdimensional Web Watch
+Mountain
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Heartwood Crafter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Interdimensional Web Watch.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Island; Island; Soul Tether
+Bot1.Battlefield.Interdimensional Web Watch.Activate
+Bot1.Colors(Red; Green)
+Bot1.Battlefield.Heartwood Crafter.Activate
+? Bot1.Mana = {R} (SpellsFromExile) {G} (SpellsFromExile) {C} (NotSpellsFromHand)
+Bot1.Exile.Soul Tether.Cast
+Bot1.Pass
+? Bot1.Mana =
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Exile = Island; Island
+Bot1.Battlefield = Forest; Heartwood Crafter; Heartwood Token; Interdimensional Web Watch; Mountain
