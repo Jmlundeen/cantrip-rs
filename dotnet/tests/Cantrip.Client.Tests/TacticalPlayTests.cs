@@ -486,6 +486,17 @@ public sealed class TacticalPlayTests
     }
 
     [Fact]
+    public void Attacks_past_a_phased_out_creature_which_cannot_block()
+    {
+        // An Oubliette'd Wall is shown with the battlefield, but phased out it can't block (CR 702.26b).
+        ObjectView wall = Creature(3, "Wall", 3, 4, Them);
+        wall.PhasedOut = true;
+        GameClient client = Seated([Creature(1, "Bear", 2, 2), wall], step: TurnStepView.DeclareAttackers);
+
+        Assert.Equal([1], Attacking(Bot().Decide(client, Attackers(1))));
+    }
+
+    [Fact]
     public void Attacks_past_a_blocker_with_a_creature_it_cannot_block()
     {
         GameClient client = Seated(

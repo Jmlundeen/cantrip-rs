@@ -471,8 +471,12 @@ public sealed class GameClient
 
     public IReadOnlyList<ObjectView> Battlefield() => Zone(ZoneKindView.Battlefield, 0);
 
+    /// <summary>
+    /// The permanents a player controls that the game treats as existing: a phased-out one is shown with the battlefield
+    /// (<see cref="Battlefield"/>) but can't attack, block, be sacrificed or do anything until it phases in (CR 702.26b).
+    /// </summary>
     public IEnumerable<ObjectView> BattlefieldOf(int seat) =>
-        Battlefield().Where(o => o.Controller == seat);
+        Battlefield().Where(o => o.Controller == seat && !o.PhasedOut);
 
     /// <summary>
     /// The game log as the server has written it for this seat, oldest first. The server keeps it and sends all of it
