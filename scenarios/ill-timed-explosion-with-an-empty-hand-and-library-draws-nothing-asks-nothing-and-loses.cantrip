@@ -1,0 +1,35 @@
+# Ill-Timed Explosion with every other card already played and an empty library: both draws fail (CR 121.4: a player who tried to draw
+# from an empty library loses the next time state-based actions are checked), the hand is still empty, so there is nothing to discard
+# and "you may discard two cards" is not offered (`! Bot1.Accept`, CR 608.2d). Bot1 loses once the spell has finished resolving.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ill-Timed Explosion
+Ornithopter
+Ornithopter
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ill-Timed Explosion.Cast
+! Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost

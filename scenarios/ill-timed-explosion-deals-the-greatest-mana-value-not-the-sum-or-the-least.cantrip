@@ -1,0 +1,54 @@
+# Ill-Timed Explosion (turn 3) draws Lightning Bolt (mana value 1) and Counterspell (2) and Bot1 discards both: X is the greatest
+# mana value among them, 2 (CR 603.12), not their sum 3 and not the least 1. The reflexive ability deals 2 to each creature: the two
+# Ornithopters (0/2) die and Bot2's Concealing Curtains (0/4) survives with exactly 2 damage marked (3 or 1 would show here).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ill-Timed Explosion
+Ornithopter
+Plains
+Mountain
+Lightning Bolt
+Counterspell
+Plains x10
+
+[Bot2 Deck]
+Mox Jet
+Concealing Curtains
+Ornithopter
+Plains x14
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ill-Timed Explosion.Cast
+Bot1.Accept
+Bot1.Choose(Lightning Bolt; Counterspell)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Mox Jet; Mox Pearl
+Bot2.Battlefield = Mox Jet; Concealing Curtains
+Bot2.Battlefield.Concealing Curtains.Damage = 2
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard = Ornithopter
+Bot1.Hand = Plains; Mountain

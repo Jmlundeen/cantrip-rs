@@ -1,0 +1,6 @@
+{
+  "name": "Ill-Timed Explosion",
+  "manaCost": "{2}{U}{R}",
+  "type": "Sorcery",
+  "oracleText": "Draw two cards. Then you may discard two cards. When you do, Ill-Timed Explosion deals X damage to each creature, where X is the greatest mana value among cards discarded this way."
+}

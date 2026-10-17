@@ -1,0 +1,53 @@
+# A card discarded this way with {X} in its mana cost counts X as 0 (ruling 2024-02-02, CR 202.3e): Walking Ballista ({X}{X}) and Island
+# give X = 0, the reflexive ability still triggers (cards were discarded) and deals no damage, so every creature is undamaged.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ill-Timed Explosion
+Ornithopter
+Plains
+Mountain
+Walking Ballista
+Island
+Plains x10
+
+[Bot2 Deck]
+Mox Jet
+Concealing Curtains
+Ornithopter
+Plains x14
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ill-Timed Explosion.Cast
+Bot1.Accept
+Bot1.Choose(Walking Ballista; Island)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard.Count = 3
+Bot2.Battlefield = Mox Jet; Concealing Curtains; Ornithopter
+Bot2.Battlefield.Concealing Curtains.Damage = 0
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Hand = Plains; Mountain
