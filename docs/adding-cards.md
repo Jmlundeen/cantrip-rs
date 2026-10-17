@@ -393,6 +393,17 @@ shapes have an example:
 
 ## Rules bricks added with the second wave of cards
 
+- **Control** (CR 613.1b): `Game::gain_control(source, permanent, player, duration)` and `exchange_control` for a resolved
+  effect (`effects::gain_control_untap_haste` is Act of Treason's whole text); `control_changing(affects, text)` in `statics`
+  for "You control enchanted creature" (Mind Control, with `attach::attached_object`). A duration the card words itself
+  ("for as long as this creature remains tapped and ...") is `Duration::AsLongAs(g.card_id(&CARD), i)` with the condition
+  the card's `lasting[i]`, its `text` the client's words (`{source}` for the source's name). "You may choose not to untap
+  this ... during your untap step" is `may_not_untap: true`.
+- **Landwalk** (CR 702.14) is `Keyword::Islandwalk` and the other basic landwalks, a JSON `keywords` entry when printed (Bog
+  Wraith) and a layer-6 grant otherwise, its land type read through the words of the text that grants it (Lord of
+  Atlantis: `Keyword::landwalk(view.words(source).subtype(Subtype::Island))`). Printed "protection from [color]" is
+  `CardDef::protection` (White Knight). Text changes reach both (CR 612.2).
+
 - **Entering with counters** (CR 122.6, 614.1c): `Game::put_onto_battlefield_with_counters` and
   `create_tokens_with_counters`; `mechanics::tokens::incubate` (CR 701.53). **`Game::win_game`** (CR 104.2b).
 - **Combat**: planeswalkers are attackable (`DeclareAttackers.planeswalkers`); `Keyword::CantBeAttacked` (CR 508.1c), `EffectKind::CantAttack` and `CantBlock` for a resolved "can't attack or block" (CR 508.1c, 509.1b; the host writes each on the creature with its duration),

@@ -73,6 +73,8 @@ keeps it).
 | [KI-60](#ki-60-infects--1-1-counters-are-counters-an-effect-puts) | Infect's -1/-1 counters are counters an effect puts | Low | Suspected |
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-62](#ki-62-a-pool-holds-at-most-255-mana-of-one-kind) | A pool holds at most 255 mana of one kind | Low | Open |
+| [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
+| [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
 
 ## Issues
 
@@ -760,3 +762,27 @@ each time round a Worldgorger Dragon loop is made to stop only after some hundre
 `ROUNDS_TO_CHOOSE` rounds), by which three lands of one color have made 255. A fix widens the counts.
 
 **Scenarios.** none yet.
+### KI-63: Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, review of the control-changing static abilities (Mind Control, Old Man of the Sea) |
+
+**Notes.** A resolved control effect changes the controller as it is created (`Game::add_effect`), and the untap step settles
+control after untapping (an Old Man of the Sea untapped there gives its creature back before the upkeep's triggers). But a
+static control-changing ability that starts or stops applying (`control_changing`: an Aura attached, moved or gone) and a
+`Duration::AsLongAs` condition that turns false partway through a resolution are worked out by `ops::settle_control` and
+`ops::end_lapsed_conditions` only when the state-based actions are next checked (CR 613.1b and 611.2b say at once). Anything
+read in between - later in the same resolution, or a trigger looking at the controller at the event - sees the old
+controller. No card in content reads a controller in that window that a scenario reaches.
+
+### KI-64: No card in content lets one control-changing effect decide another
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, review of the control-changing static abilities |
+
+**Notes.** `ops::settle_control` works the controllers out again while any changes, since an Aura's controller is whom it
+gives control to (gain control of a Mind Control, and the creature it enchants follows). No card in content can take control
+of an Aura that gives control: Opalescence leaves Auras alone, and the stealing cards target creatures. The repeat has no
+scenario.

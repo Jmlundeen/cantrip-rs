@@ -203,11 +203,32 @@ would go over unclickable.
 
 - **Computed on query** (`chars()`), through the layers (613), from the object's card, its counters and the
   continuous effects that apply.
+- **Control-changing effects (613.1b, layer 2)** set the permanent's stored controller (`Obj::controller`, with
+  `marks.control_base` the one it had before any applied). They are resolved `EffectKind::Control(player)` effects
+  (`Game::gain_control`, `exchange_control`) and static abilities of `Layer::Control` made with `control_changing(affects,
+  text)` ("You control enchanted creature": Mind Control, Treachery), whose source's controller gains what they affect,
+  judged on what layer 1 made it, at the source's timestamp (an Aura's is when it became attached, 613.7e). The latest
+  applying effect decides (`ops::refresh_control`, 613.7); new control is new for summoning sickness and takes the
+  permanent out of combat. `ops::settle_control` works every permanent out again as the state-based actions are checked
+  (and after effects end with their sources), repeating while one controller decides another; it costs a scan of the
+  effects and the battlefield, free while nothing has ever changed control. A layer-2 ability applies though its source
+  loses its abilities in layer 6 (CR 613.1). Durations end it as they end any effect: end of turn (`turn.rs`), a source
+  leaving, a permanent untapping (`ops::end_lapsed_durations`), or a card's own "for as long as" condition
+  (`Duration::AsLongAs(card, index)` naming one of `CardDef::lasting`, asked by `ops::end_lapsed_conditions` at each check
+  of the state-based actions, and before the effect begins: one false then does nothing, CR 611.2b - Old Man of the Sea's
+  "for as long as this creature remains tapped and that creature's power remains less than or equal to this creature's
+  power"). "You may choose not to untap this ... during your untap step" is `CardDef::may_not_untap`: the untap step asks
+  the active player of each such tapped permanent before anything untaps (CR 502.3).
 - **Text-changing effects (612, layer 3)** are `EffectKind::ChangeText { from, to }`, a `Word` (a color word or a
   subtype) replaced by another. The layers change the type line; card code reads every word of its rules text through
   `Query::words` (`Words`, the changes in timestamp order unless one depends on another), so the card does what its changed text says. A token's
   colors and creature types are those of the text that made it (`Copiable::words`, 612.4), a permanent spell's effects
-  go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`). An
+  go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`). Layer 3
+  also changes the words of printed keyword abilities that name a color or a land type: "hexproof from [color]",
+  "protection from [color]" (`CardDef::protection`, White Knight) and a basic landwalk (`Keyword::Islandwalk` ...,
+  702.14: Bog Wraith's swampwalk to Magical Hack's plainswalk); an ability another permanent grants reads the word through
+  its source's text instead (Lord of Atlantis's islandwalk). A text change is no copiable value (707.2), so a copy of a
+  changed permanent has the printed text, and a permanent that leaves and returns is a new object with it too. An
   effect that sets a name (612.8, "named Everflame, Heroes' Legacy") is `EffectKind::SetName`, in layer 3: the object
   has that name alone (`Chars::name_set`), for the legend rule and every "same name" or chosen-name question
   (`library::object_names`).
