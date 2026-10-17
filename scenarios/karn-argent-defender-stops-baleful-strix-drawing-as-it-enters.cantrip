@@ -1,0 +1,40 @@
+# Karn, Argent Defender stops a creature's own enters ability (CR 603.2, 603.6a). The first Baleful Strix, cast on turn 1 before Karn, draws its card (the control).
+# On turn 3 Karn comes down, and the second Strix, a creature entering, causes no trigger: no card drawn and nothing on the stack.
+# Hand: 7 - Island, Mox Sapphire, Mox Jet, Strix = 3, + 1 drawn by the Strix = 4; turn 3 draws (5), plays an Island (4), casts Karn (3) and the Strix (2).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Baleful Strix
+Karn, Argent Defender
+Island
+Island x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T1 Bot1.Main2]
+? Bot1.Hand.Count = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Karn, Argent Defender.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 2
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Jet; Karn, Argent Defender; Baleful Strix; Baleful Strix

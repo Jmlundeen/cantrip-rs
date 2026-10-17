@@ -1,0 +1,48 @@
+# Karn, Argent Defender: "Artifacts and creatures entering the battlefield don't cause abilities to trigger" (CR 603.2, 603.6a). Bot1's Tezzeret, Cruel Captain gets a
+# loyalty counter whenever an artifact enters under its controller's control: Mox Sapphire, cast before Karn, puts one on it (4 -> 5, the control). Then Karn
+# himself, an artifact creature entering, causes nothing (his own entering is stopped too), nor does Ornithopter, nor does the Clue. A Forest is neither an artifact
+# nor a creature, so Tireless Tracker's landfall still triggers and makes the Clue (the rulings: "If a nonartifact, noncreature land enters ... the ability will
+# trigger"); Tezzeret stays at 5 although the Clue is an artifact entering.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Tezzeret, Cruel Captain
+Mox Sapphire
+Karn, Argent Defender
+Ornithopter
+Tireless Tracker
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tezzeret, Cruel Captain.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 5
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Karn, Argent Defender.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Tireless Tracker.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Sol Ring; Tezzeret, Cruel Captain; Mox Sapphire; Karn, Argent Defender; Ornithopter; Tireless Tracker; Clue Token
+Bot1.Battlefield.Tezzeret, Cruel Captain.Counters.Loyalty = 5
