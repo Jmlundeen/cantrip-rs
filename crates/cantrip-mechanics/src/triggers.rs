@@ -90,10 +90,15 @@ pub fn landfall(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
 
 /// "When you unlock this door" on the Room's right half (CR 709.5h): the Room permanent was given that half's unlocked
 /// designation by its controller, whether as it entered because the half was cast (CR 709.5d) or after (CR 709.5e-f).
-/// Ritual Chamber, Awakening Hall and Cadaver Lab print it. (The left half's is the same with `DOOR_LEFT`, added with the
-/// first card that has one.)
+/// Ritual Chamber, Awakening Hall and Cadaver Lab print it.
 pub fn you_unlock_this_right_door(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     you_unlock_this_door(q, source, event, DOOR_RIGHT)
+}
+
+/// "When you unlock this door" on the Room's left half (CR 709.5h): the same, for the left door. Roaring Furnace, Bottomless
+/// Pool and Surgical Suite print it.
+pub fn you_unlock_this_left_door(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    you_unlock_this_door(q, source, event, DOOR_LEFT)
 }
 
 fn you_unlock_this_door(q: &dyn Query, source: ObjectId, event: &Event, door: u8) -> Option<Fired> {
@@ -966,6 +971,7 @@ pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
 pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);
 pub const LANDFALL: Trigger = when_asked(EventMask::ZONE_CHANGE, landfall);
 pub const YOU_UNLOCK_THIS_RIGHT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_right_door);
+pub const YOU_UNLOCK_THIS_LEFT_DOOR: Trigger = when(EventMask::DOOR_UNLOCKED, you_unlock_this_left_door);
 pub const YOU_SCRY: Trigger = when_asked(EventMask::SCRIED, you_scry);
 pub const YOU_SURVEIL: Trigger = when_asked(EventMask::SURVEILLED, you_surveil);
 pub const YOU_SCRY_OR_SURVEIL: Trigger = when_asked(EventMask(EventMask::SCRIED.0 | EventMask::SURVEILLED.0), you_scry_or_surveil);
