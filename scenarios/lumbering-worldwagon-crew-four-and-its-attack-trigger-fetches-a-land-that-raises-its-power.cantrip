@@ -1,0 +1,62 @@
+# Crew 4 and "whenever this Vehicle ... attacks": turn 1 Bot1 casts Lumbering Worldwagon (a Black Lotus) and then one Guerrilla Gorilla (power 2): the Gorilla alone
+# cannot crew it (total power 2 is under 4 - the refusal). Turn 3 a second Guerrilla Gorilla makes four, and the two crew it (the positive control). It attacks
+# as a creature whose power is the number of lands: three lands (the Forest, the one its enters trigger found, and turn 3's Forest) when crewed, then four
+# when the attack trigger finds another, so it deals 4 to Bot2, who is at 16. (The Mox is an artifact, not a land, and Bot2's Island is not Bot1's: power 4, not 5.)
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Lumbering Worldwagon
+Guerrilla Gorilla
+Guerrilla Gorilla
+Forest
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lumbering Worldwagon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Search(Forest)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Lumbering Worldwagon.Activate(Ability: Crew)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Lumbering Worldwagon.Activate(Ability: Crew)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Lumbering Worldwagon > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Search(Forest)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Lumbering Worldwagon.Power = 4
+Bot1.Battlefield.Lumbering Worldwagon.Toughness = 4
+Bot1.Battlefield.Lumbering Worldwagon.Tapped = true
+Bot1.Battlefield.Guerrilla Gorilla#1.Tapped = true
+Bot1.Battlefield.Guerrilla Gorilla#2.Tapped = true

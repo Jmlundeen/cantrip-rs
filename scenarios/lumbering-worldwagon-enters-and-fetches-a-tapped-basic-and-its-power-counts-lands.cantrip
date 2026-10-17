@@ -1,0 +1,42 @@
+# "Whenever this Vehicle enters or attacks, you may search your library for a basic land card, put it onto the battlefield tapped, then shuffle." Bot1 casts
+# Lumbering Worldwagon with a Black Lotus, accepts, and finds a Forest (the nonbasic Karakas is in the library but not offered: only a basic land card may be
+# found - the Search refusal; a basic Mountain is the positive control, offered though not a Forest). The Forest arrives tapped (the one played
+# earlier is untapped, so it is the found one that is tapped). Its power is read in the attack scenario, where it is a creature.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Lumbering Worldwagon
+Forest
+Forest
+Forest
+Forest
+Mountain
+Karakas
+Forest x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lumbering Worldwagon.Cast
+? Stack = Lumbering Worldwagon
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+! Bot1.Search(Karakas)
+Bot1.Search(Forest)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Lumbering Worldwagon
+Bot1.Battlefield.Forest#1.Tapped = false
+Bot1.Battlefield.Forest#2.Tapped = true
+Bot1.Library.Count = 9
