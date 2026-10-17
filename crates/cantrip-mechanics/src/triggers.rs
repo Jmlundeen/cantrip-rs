@@ -47,6 +47,13 @@ pub fn valiant(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
 /// Valiant as a trigger condition: `triggered(VALIANT, ..)`.
 pub const VALIANT: Trigger = when_asked(EventMask::BECAME_TARGET, valiant);
 
+/// An intervening "if this [permanent] is tapped" (CR 603.4), checked as the ability triggers and again as it resolves; a
+/// permanent that has left the battlefield is judged by the status it last had there (CR 608.2h). Mana Vault and Kona, Rescue
+/// Beastie print it.
+pub fn this_is_tapped(q: &dyn Query, asker: &Asker) -> bool {
+    q.obj(asker.source).tapped
+}
+
 /// An intervening "if it's on the battlefield" (CR 603.4), checked as the ability triggers and again as it resolves: the
 /// permanent is still the object that triggered (CR 400.7) and has not left. Animate Dead and Necromancy print it.
 pub fn this_is_on_the_battlefield(q: &dyn Query, asker: &Asker) -> bool {
@@ -664,6 +671,13 @@ pub fn your_first_main_phase(q: &dyn Query, me: &Asker, event: &Event) -> Option
     your_step(q, me, event, Step::PrecombatMain)
 }
 
+/// "At the beginning of your second main phase" (CR 505.1a, 603.2): the postcombat main phase of a turn of the controller's,
+/// the only second main phase a turn has (an additional combat phase is followed by that one main phase, CR 500.8). Fireglass
+/// Mentor and Kona, Rescue Beastie print it.
+pub fn your_second_main_phase(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    your_step(q, me, event, Step::PostcombatMain)
+}
+
 /// "At the beginning of combat on your turn" (CR 507.1). Luminarch Aspirant and Ouroboroid print it.
 pub fn beginning_of_your_combat(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     your_step(q, me, event, Step::BeginCombat)
@@ -960,6 +974,7 @@ pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
 pub const YOUR_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_upkeep);
 pub const YOUR_DRAW_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_draw_step);
 pub const YOUR_FIRST_MAIN_PHASE: Trigger = when_asked(EventMask::STEP_BEGAN, your_first_main_phase);
+pub const YOUR_SECOND_MAIN_PHASE: Trigger = when_asked(EventMask::STEP_BEGAN, your_second_main_phase);
 pub const EACH_OPPONENTS_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, each_opponents_upkeep);
 pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, beginning_of_your_combat);
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
