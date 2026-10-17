@@ -1,0 +1,52 @@
+# Dusk Rose Reliquary, "Ward {2}", the positive control of the neighbouring scenario: the same turn-4 Disenchant, but Bot2 has cast two
+# Mox Pearls and pays the ward {2} with them, so the Disenchant resolves, the Reliquary is destroyed and the Llanowar Elves it exiled
+# (CR 610.3) return to the battlefield.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Dusk Rose Reliquary
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Plains
+Disenchant
+Mox Pearl
+Mox Pearl
+Forest x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Dusk Rose Reliquary.Cast
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Dusk Rose Reliquary)
+Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot1.Battlefield = Plains; Plains
+Bot1.Graveyard = Dusk Rose Reliquary; Mox Pearl
+Bot2.Graveyard = Disenchant
+Bot2.Battlefield = Forest; Plains; Mox Pearl; Mox Pearl; Llanowar Elves

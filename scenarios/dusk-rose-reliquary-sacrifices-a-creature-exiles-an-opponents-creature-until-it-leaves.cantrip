@@ -1,0 +1,56 @@
+# Dusk Rose Reliquary: "As an additional cost to cast this spell, sacrifice an artifact or creature" (a creature here: Healer's
+# Hawk; the choice is also offered the Mox Pearl, never a land) and "When this artifact enters, exile target artifact or creature
+# an opponent controls until this artifact leaves the battlefield" (CR 610.3). The target may not be Bot1's own Mox Pearl or
+# Bot2's Forest; it is Bot2's Llanowar Elves, though Bot2's Mox Jet was a legal choice too (so the question is asked). When Bot1 Disenchants its own Reliquary (ward only watches opponents), the Elves return.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Healer's Hawk
+Dusk Rose Reliquary
+Disenchant
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Jet
+Forest x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healer's Hawk.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Dusk Rose Reliquary.Cast
+! Bot1.Choose(Plains)
+Bot1.Choose(Healer's Hawk)
+Bot1.Pass
+! Bot1.Target(Mox Pearl)
+! Bot1.Target(Forest)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+? Exile = Llanowar Elves
+? Bot2.Battlefield.Count = 2
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Dusk Rose Reliquary)
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves; Mox Jet
+Bot1.Battlefield = Plains; Plains; Mox Pearl
+Bot1.Graveyard = Disenchant; Dusk Rose Reliquary; Healer's Hawk

@@ -1,0 +1,35 @@
+# Dusk Rose Reliquary: "As an additional cost to cast this spell, sacrifice an artifact or creature" - with only lands to sacrifice
+# (a land is neither) it cannot be cast at all (CR 601.2b, 601.2h), though Bot1 has the {W}. The positive control is the
+# same turn after Bot1 casts a Mox Pearl (an artifact) and can cast it.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Dusk Rose Reliquary
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Hand.Dusk Rose Reliquary.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Dusk Rose Reliquary.Cast
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield = Plains; Plains; Dusk Rose Reliquary
+Bot1.Graveyard = Mox Pearl

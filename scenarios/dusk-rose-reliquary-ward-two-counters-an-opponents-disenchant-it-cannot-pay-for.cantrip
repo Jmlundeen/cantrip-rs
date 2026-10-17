@@ -1,0 +1,46 @@
+# Dusk Rose Reliquary, "Ward {2}": whenever it becomes the target of a spell or ability an opponent controls, counter it unless that
+# player pays {2}. Bot1's Reliquary exiles Bot2's Llanowar Elves on turn 3. On turn 4 Bot2's only mana is its two lands, both spent
+# on Disenchant ({1}{W}), so it cannot pay the ward: Disenchant is countered, the Reliquary stays and the Elves stay exiled. The positive
+# control is the neighbouring scenario, where Bot2 has two Mox Pearls to pay with and the Reliquary is destroyed.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Dusk Rose Reliquary
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Plains
+Disenchant
+Forest x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Dusk Rose Reliquary.Cast
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Dusk Rose Reliquary)
+! Bot2.PayCost
+[T4 Bot2.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Stack.Count = 0
+Bot1.Battlefield = Plains; Plains; Dusk Rose Reliquary
+Bot2.Graveyard = Disenchant
+Bot2.Battlefield = Forest; Plains
