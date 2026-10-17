@@ -1,0 +1,36 @@
+# Prismari Charm, third mode: "Return target nonland permanent to its owner's hand." With its only target gone before resolution the spell
+# does nothing (CR 608.2b). In response Bot2 kills its own Ornithopter (0/2) with Lightning Bolt; the Charm resolves without effect and goes
+# to the graveyard, so nothing is returned: Bot2's hand does not hold the Ornithopter.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Prismari Charm
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Prismari Charm.Cast
+Bot1.Modes(Return target nonland permanent)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot2.Hand.Count = 5
+Bot1.Graveyard = Prismari Charm

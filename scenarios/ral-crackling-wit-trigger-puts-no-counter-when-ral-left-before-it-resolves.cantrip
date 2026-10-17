@@ -1,0 +1,51 @@
+# Ral, Crackling Wit: "put a loyalty counter on Ral" is for the permanent that triggered (CR 400.7, 608.2h). Ral uses -3 on turn 1 and has
+# one loyalty counter left. On turn 3 Bot1 casts Lightning Bolt: Ral triggers; with the trigger on the stack Bot2 kills Ral with its own
+# Lightning Bolt (3 damage), so Ral is gone when the ability resolves and no counter goes anywhere: Ral stays in the graveyard and no
+# permanent has a loyalty counter.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ral, Crackling Wit
+Lightning Bolt
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ral, Crackling Wit.Cast
+Bot2.Pass
+Bot1.Battlefield.Ral, Crackling Wit.Activate(Ability: Draw three cards, then discard)
+Bot1.Choose(Plains; Plains)
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Battlefield.Ral, Crackling Wit.Counters.Loyalty = 1
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ral, Crackling Wit)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Ral, Crackling Wit; Plains; Plains
+Bot1.Battlefield.Count = 4
+Bot2.Life = 17

@@ -42,6 +42,7 @@ keeps it).
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 | [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
+| [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-or-fireglass-mentor) | An exile that a replacement sends elsewhere is not exercised by Hex Magic or Fireglass Mentor | Low | Unexercised |
 
 ## Issues
 
@@ -219,3 +220,18 @@ life or mana from `land_rules(..).top_for_life` alone, so only the life cast is 
 and has the cast pay what that way says.
 
 **Scenarios.** None yet: Bolas's Citadel with Mystic Forge, or with a solved Case of the Locked Hothouse, and a creature on top.
+
+### KI-26: An exile that a replacement sends elsewhere is not exercised by Hex Magic or Fireglass Mentor
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | card | 2026-10-16, review of Hex Magic |
+
+**Notes.** Hex Magic exiles the whole hand, then draws "that many" cards and lets the player play "cards exiled this way"; Fireglass
+Mentor exiles two cards and lets the player choose one "of them". Both keep only the cards that really reached exile
+(`g.obj(card).zone.is(ZoneKind::Exile)`), as a replacement effect could send one elsewhere (CR 614.6, 406.2), and draw or grant
+play for those alone. No card in the engine replaces an exile from a hand or a library today, so the false arm of that guard
+(hex_magic.rs, fireglass_mentor.rs) runs in no scenario. The day such a card exists each card needs a scenario, and this entry is
+deleted.
+
+**Scenarios.** None yet.
