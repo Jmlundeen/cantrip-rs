@@ -548,6 +548,13 @@ whole of the life the total cost asks - an additional "pay X life", Phyrexian sy
 (CR 119.4, 118.3): a cast or activation that cannot is taken back (CR 733). The advice counts it too: a single-target cast
 announced with its action is not offered at a target whose tax its caster could not pay (`added_life_payable`).
 
+A special action with a cost (CR 116.2: plotting, suspending, foretelling, turning a face-down permanent up, unlocking a
+door) is costed as `Costed::SpecialAction`: it is no activated ability (CR 116.1), so what changes the cost of activating
+abilities (Forensic Gadgeteer, Anointed Peacekeeper) leaves it alone, and only a change that names it applies - Doc Aurlock,
+Grizzled Genius's "plotting cards from your hand costs {2} less" (CR 116.2k, 118.7), which knows plot's action by
+`ActivatedDef::plot`. `special_action_cost` applies the changes to the printed cost, for the advice and the payment alike;
+the host's menu row says what it costs when that differs ("(costs {B}{G})").
+
 ### Ways a permanent gives: from a graveyard or from a hand
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra

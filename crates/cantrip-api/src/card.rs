@@ -215,6 +215,11 @@ pub enum Costed {
     Spell(ObjectId),
     /// The permanent (or card) whose ability is being activated, and which of its abilities.
     Ability(ObjectId, AbilityRef),
+    /// The object a special action with a cost is taken for (CR 116.2), and the ability-shaped entry that is the action:
+    /// plotting a card (CR 116.2k, 702.170a: "plotting cards from your hand costs {2} less"), suspending, foretelling,
+    /// turning a face-down permanent face up, unlocking a door. A special action is not an activated ability (CR 116.1), so
+    /// what changes the cost of activating abilities does not apply to it; only a change that names it does.
+    SpecialAction(ObjectId, AbilityRef),
 }
 
 /// What a cost change does to a cost (CR 601.2f, 118.7, 118.8): generic mana it adds, an amount of mana it takes off,
@@ -816,6 +821,9 @@ pub struct ActivatedDef {
     /// X ("target creature card in your graveyard with mana value X": Likeness Looter): never with the action, even for
     /// one slot of one target.
     pub late_targets: bool,
+    /// Plot's special action (CR 702.170a, 116.2k): "plotting cards" is named as a class by a card that changes its cost
+    /// (Doc Aurlock, Grizzled Genius).
+    pub plot: bool,
 }
 
 fn no_effect(_: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
@@ -871,6 +879,7 @@ impl ActivatedDef {
         tap_creatures_for_mana: false,
         equip: false,
         late_targets: false,
+        plot: false,
         special_action: false,
         modal: None,
     };

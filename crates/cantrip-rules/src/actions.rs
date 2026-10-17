@@ -1157,7 +1157,7 @@ impl Query for AsFace<'_> {
 /// 602.2b): for the menu row of an action whose cost depends on the target it would be announced with. Empty when
 /// nothing could change that cost (no cost changer on the battlefield, none of the ability's or card's own), which is
 /// nearly always, or when it is no activated ability with a mana cost.
-pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8, candidates: &[Target]) -> Vec<ManaCost> {
+pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8, candidates: &[Target]) -> Vec<(ManaCost, u32)> {
     let Some(ability) = game.chars(source).abilities().nth(index as usize) else { return Vec::new() };
     let AbilityDef::Activated(def) = game.cards.ability(ability) else { return Vec::new() };
     let changers = game.state.battlefield().iter().any(|&id| {
@@ -1171,14 +1171,15 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
-    candidates.iter().map(|&t| apply_cost_changes(&cx, player, Costed::Ability(source, ability), def.cost.mana, &[t])).collect()
+    candidates.iter().map(|&t| apply_cost_changes_total(&cx, player, Costed::Ability(source, ability), def.cost.mana, &[t])).collect()
 }
 
-/// What casting `card` for its mana cost would cost `player` with each of `candidates` as its one target, the cost
-/// changes applied as they are once the target is announced (CR 601.2c, 601.2f): for the menu row of a cast whose cost
-/// depends on its target. Empty when nothing could change it (no cost changer on the battlefield, none of the card's
-/// own), which is nearly always.
-pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, candidates: &[Target]) -> Vec<ManaCost> {
+/// What casting `card` by the cast option `index` (its mana cost, 0, or a way a permanent gives) would cost `player` with
+/// each of `candidates` as its one target, the cost changes applied as they are once the target is announced (CR 601.2c,
+/// 601.2f): its mana, and the life the changes add (CR 118.8). For the menu row of a cast whose cost depends on its target.
+/// Empty when nothing could change it (no cost changer on the battlefield, none of the card's own), which is nearly always,
+/// or for any other way of casting it.
+pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8, candidates: &[Target]) -> Vec<(ManaCost, u32)> {
     let def = game.cards.get(game.state.obj(card).card);
     let changers = game.state.battlefield().iter().any(|&id| {
         game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
@@ -1186,9 +1187,32 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, candidat
     if !(changers || !def.own_cost_changes.is_empty()) {
         return Vec::new();
     }
+    let base = match (index, granted_slot(index)) {
+        (0, _) => def.cost,
+        (_, Some(_)) => match granted_cast_cost(game, player, card, index) {
+            Some(cost) => cost.mana,
+            None => return Vec::new(),
+        },
+        _ => return Vec::new(),
+    };
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
-    candidates.iter().map(|&t| apply_cost_changes(&cx, player, Costed::Spell(card), def.cost, &[t])).collect()
+    let face = granted_slot(index).and_then(|(_, face)| faces_to_cast(def).into_iter().find(|&(f, _)| f == face)).filter(|&(f, _)| f != GRANTED_FACE_WHOLE).map(|(_, d)| cx.card_id(d));
+    candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
+}
+
+/// What a cast a permanent grants (`index`, a granted way's number) costs `player` for `card` (`granted_cast_cost`), and its
+/// mana as the cost changes in play leave it before any target is announced (CR 601.2f): for the menu row of a cast without
+/// paying the mana cost, which says what it still costs ({1} more under Thalia).
+pub fn granted_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8) -> Option<(Cost, ManaCost)> {
+    let cost = granted_cast_cost(game, player, card, index)?;
+    let (_, face) = granted_slot(index)?;
+    let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let face_id = (face != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def));
+    let mana = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face_id, &[]);
+    Some((cost, mana))
 }
 
 /// What a cast a permanent grants (CR 604, 118.9) costs `player` for `card`, by the option's way number: the way's own
@@ -1245,6 +1269,8 @@ fn change_total(
     // The thing costed is its own source for the changes it carries itself (affinity, channel's reduction).
     let (id, ability) = match costed {
         Costed::Spell(id) => (id, None),
+        // A special action is no activated ability (CR 116.1): no discount on abilities, and no ability's own change.
+        Costed::SpecialAction(id, _) => (id, None),
         Costed::Ability(id, ability) => (id, Some(ability)),
     };
     let own: &[CostChange] = match face {
@@ -1793,7 +1819,7 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             }
             // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
             // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
-            let owed = if def.special_action { special_action_cost(cx, id, ability, def) } else { def.cost.mana };
+            let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
             let judged = owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
             // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
             let own = (judged && def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
@@ -1802,7 +1828,8 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };
             let covered = |a: &Available, targets: &[Target]| {
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
-                // touch it, and `special_action` pays the cost as it stands.
+                // touch it; what changes its own cost is already in `owed` (`special_action_cost`), which `special_action`
+                // pays.
                 let mut cost =
                     if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
@@ -3425,7 +3452,8 @@ fn cast(
     if let Some(creature) = reducer {
         ops::tap(cx, creature);
     }
-    let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles, attackers: &[] };
+    let life_owed = cost.life as u32 + extra.life as u32 + life as u32 + x_life as u32;
+    let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles, attackers: &[], life: life_owed };
     let (spent, restrictions) = pay_mana_used(cx, player, spell, cost.mana, &helpers)?;
     // CR 106.6: a creature spell paid for with mana that gives it haste has haste once it resolves; a spell paid for with
     // mana that makes it uncounterable can't be countered.
@@ -4127,7 +4155,7 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, loyalty, attackers: Vec::new() };
+        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, loyalty, attackers: Vec::new(), life: 0 };
         match cx.ask_core(player, ask, true)? {
             Answer::Act(a) => match a.kind {
                 ActionKind::IncreaseX => n += 1,
@@ -4322,7 +4350,16 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
 /// The mana a special action costs (CR 116.2): the ability's own, except for the two the rules word as "pay the mana cost of
 /// the object": turning a face-down creature card face up costs its mana cost, with X as 0 (CR 701.40b, 107.3b), and
 /// unlocking a Room's door the mana cost of that door (CR 709.5e).
-fn special_action_cost(cx: &Cx, source: ObjectId, ability: AbilityRef, def: &ActivatedDef) -> ManaCost {
+/// What a special action costs `player` to take (CR 116.2): its mana cost - a face-down permanent's card's mana cost to turn
+/// it face up, a Room door's to unlock it, the printed cost otherwise - with the static abilities that change the cost of
+/// that special action applied (`Costed::SpecialAction`: "plotting cards from your hand costs {2} less", CR 116.2k, 118.7),
+/// increases first, then reductions, none below {0}.
+fn special_action_cost(cx: &Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, def: &ActivatedDef) -> ManaCost {
+    let printed = special_action_printed_cost(cx, source, ability, def);
+    change_with(cx, &cost_change_sources(cx), player, Costed::SpecialAction(source, ability), printed, None, &[])
+}
+
+fn special_action_printed_cost(cx: &Cx, source: ObjectId, ability: AbilityRef, def: &ActivatedDef) -> ManaCost {
     let card = cx.s().obj(source).card;
     if ability.card == cx.cards().face_down {
         return ManaCost { x: 0, ..cx.card(card).cost };
@@ -4342,11 +4379,33 @@ fn special_action_cost(cx: &Cx, source: ObjectId, ability: AbilityRef, def: &Act
     def.cost.mana
 }
 
+/// What the special action `index` of `source` (numbered as its options are) costs `player` now, where a cost change makes
+/// it differ from its printed cost (CR 116.2, 118.7): for the menu row, which says so ("costs {B}"). None otherwise, or for
+/// anything that is not a special action.
+pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8) -> Option<ManaCost> {
+    let ability = game.chars(source).abilities().nth(index as usize)?;
+    let AbilityDef::Activated(def) = game.cards.ability(ability) else { return None };
+    if !def.special_action {
+        return None;
+    }
+    let changers = game.state.battlefield().iter().any(|&id| {
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.state.lost_all_abilities(id)
+    });
+    if !changers {
+        return None;
+    }
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let printed = special_action_printed_cost(&cx, source, ability, def);
+    let cost = special_action_cost(&cx, player, source, ability, def);
+    (cost != printed).then_some(cost)
+}
+
 /// A special action (CR 116.2) from an ability: its mana cost is paid, and its effect done at once with no stack. The
 /// effect asks no questions and has no targets.
 fn special_action(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef) -> R<()> {
     let def = activated(cx, ability).expect("activated");
-    let mana = special_action_cost(cx, source, ability, def);
+    let mana = special_action_cost(cx, player, source, ability, def);
     if mana != ManaCost::ZERO {
         pay_mana(cx, player, source, mana)?;
     }
@@ -4821,10 +4880,13 @@ pub(crate) struct Helpers<'a> {
     pub reserved: &'a [ObjectId],
     /// The attacking creatures whose cost to attack this pays (CR 508.1h-j), for the question to name.
     pub attackers: &'a [ObjectId],
+    /// The life the total cost asks besides its mana (CR 119.4, 601.2h), paid with it once the mana is: for the question to
+    /// say.
+    pub life: u32,
 }
 
 impl Helpers<'static> {
-    pub const NONE: Helpers<'static> = Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[], attackers: &[] };
+    pub const NONE: Helpers<'static> = Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[], attackers: &[], life: 0 };
 }
 
 /// What a mana payment is for, as far as restricted mana is concerned (CR 106.6): see `payment_for`.
@@ -5055,7 +5117,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, loyalty: false, attackers: helpers.attackers.to_vec() };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {

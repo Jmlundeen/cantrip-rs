@@ -31,5 +31,5 @@ pub const fn plot(cost: ManaCost, text: &'static str) -> AbilityDef {
     ability(Cost::mana(cost), plot_it, text)
         .sorcery_speed()
         .from(ZoneKind::Hand)
-        .special_action()
+        .plot()
 }

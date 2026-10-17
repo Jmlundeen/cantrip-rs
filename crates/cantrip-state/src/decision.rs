@@ -265,6 +265,9 @@ pub enum RequestKind {
         /// The creatures whose cost to attack this pays (CR 508.1h-j), when it is one: `source` is then the permanent
         /// whose static ability makes attacking cost something (the first, when several do). Empty for anything else.
         attackers: Vec<ObjectId>,
+        /// The life the total cost asks besides its mana (CR 119.4, 601.2h: "an additional 3 life", "pay X life"), paid with it
+        /// once the mana is. Zero while X is announced, and for anything but a spell.
+        life: u32,
     },
     /// A cost paid as a spell or ability resolves (CR 118.12, 608.2d): "[a player] may pay [cost]. If they do, ...", and
     /// "... unless [a player] pays [cost]" (CR 118.12a). One payment of the whole cost, `total` mana and `life` life:

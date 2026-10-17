@@ -529,6 +529,11 @@ impl AbilityDef {
         AbilityDef::Activated(ActivatedDef { special_action: true, ..activated(self, "a special action is taken as an activated ability is") })
     }
 
+    /// Plot's special action (CR 702.170a, 116.2k).
+    pub const fn plot(self) -> AbilityDef {
+        AbilityDef::Activated(ActivatedDef { plot: true, special_action: true, ..activated(self, "plotting is taken as an activated ability is") })
+    }
+
     /// An equip ability (CR 702.6a).
     pub const fn equip(self) -> AbilityDef {
         AbilityDef::Activated(ActivatedDef { equip: true, ..activated(self, "only an activated ability equips") })

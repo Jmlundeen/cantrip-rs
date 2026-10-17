@@ -14,6 +14,8 @@ fn tax(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[T
     let (object, spell) = match costed {
         Costed::Spell(id) => (id, true),
         Costed::Ability(id, _) => (id, false),
+        // Plotting and the other special actions are no activated abilities (CR 116.1).
+        Costed::SpecialAction(..) => return CostDelta::NONE,
     };
     if !cantrip_mechanics::library::object_has_name(q, object, chosen) || (spell && player == q.controller(source)) {
         return CostDelta::NONE;
