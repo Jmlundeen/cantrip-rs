@@ -1,0 +1,11 @@
+{
+  "name": "Notion Thief",
+  "manaCost": "{2}{U}{B}",
+  "type": "Creature — Human Rogue",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Flash\nIf an opponent would draw a card except the first one they draw in each of their draw steps, instead that player skips that draw and you draw a card.",
+  "keywords": [
+    "Flash"
+  ]
+}

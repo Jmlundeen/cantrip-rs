@@ -1,0 +1,64 @@
+# Thought Reflection (Bot1's) and Notion Thief (Bot2's) both replace Bot1's draws outside its draw step: Bot1, the drawing
+# player, chooses which applies first (CR 616.1; both cards' rulings). In its turn 3 draw step the first draw is exempt from
+# Notion Thief, so only Thought Reflection replaces it; of the two cards it draws instead, the first is still the first
+# Bot1 draws in the draw step and is drawn, and Notion Thief replaces the second - Bot2 draws it. Then Bot1 casts Ancestral
+# Recall and has Notion Thief apply first to each draw: Bot1 skips it and Bot2 draws one card, and Thought Reflection has
+# no draw of Bot1's left to replace (CR 614.6), nor is Bot2's draw one of Bot1's. Bot1 ends with no cards in hand and Bot2
+# draws three for the three draws (six with Thought Reflection first, as the scenario beside this one shows).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Jet
+Thought Reflection
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Island
+Black Lotus
+Notion Thief
+Swamp x4
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thought Reflection.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Notion Thief.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+? Bot2.Hand.Count = 6
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Notion Thief)
+Bot1.Replace(Notion Thief)
+Bot1.Replace(Notion Thief)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 19
+Bot2.Hand.Count = 9
+Bot2.Library.Count = 15

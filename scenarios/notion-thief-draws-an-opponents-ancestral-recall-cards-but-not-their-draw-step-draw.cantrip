@@ -1,0 +1,39 @@
+# Notion Thief: "If an opponent would draw a card except the first one they draw in each of their draw steps, instead that
+# player skips that draw and you draw a card" (CR 614.1a-b, 121.6). Bot1 flashes it in on turn 1. Bot2's draw for its turn 2
+# is the first card it draws in its draw step and is drawn as usual (the check before its main phase). Its Ancestral Recall
+# is three draws, each replaced on its own (CR 121.2): Bot2 draws none of them and Bot1 draws three. Bot1's own draws are no
+# opponent's and are left alone.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Notion Thief
+Swamp x4
+Island x20
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Notion Thief.Cast
+[T2 Bot2.Main1]
+? Bot2.Hand.Count = 8
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 17
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 19
+Bot2.Graveyard = Ancestral Recall

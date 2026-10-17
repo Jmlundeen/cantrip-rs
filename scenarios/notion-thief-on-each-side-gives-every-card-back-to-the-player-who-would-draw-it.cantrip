@@ -1,0 +1,50 @@
+# A Notion Thief on each side: "if each player in a two-player game controls a Notion Thief and one would draw a card, it
+# really will be that player who draws a card" (its ruling; CR 614.5, 616.1). Bot2 casts Ancestral Recall: each draw is
+# replaced by Bot1's Notion Thief (Bot2's own does not replace its controller's draws), so Bot1 would draw instead; that draw
+# is an opponent's of Bot2, outside its draw step, so Bot2's Notion Thief replaces it, and Bot2 would draw; Bot1's Notion
+# Thief has had its one opportunity at that draw already, so Bot2 draws the card. Bot2 draws all three, Bot1 none - and
+# nothing goes round for ever.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Notion Thief
+Swamp x4
+Island x20
+
+[Bot2 Deck]
+Island
+Black Lotus
+Notion Thief
+Mox Sapphire
+Ancestral Recall
+Swamp x2
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Notion Thief.Cast
+[T2 Bot2.Main1]
+? Bot2.Hand.Count = 8
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Notion Thief.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 20
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 16
