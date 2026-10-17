@@ -1,0 +1,16 @@
+{
+  "name": "Ojer Axonil, Deepest Might",
+  "manaCost": "{2}{R}{R}",
+  "type": "Legendary Creature — God",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Trample\nIf a red source you control would deal an amount of noncombat damage less than Ojer Axonil's power to an opponent, that source deals damage equal to Ojer Axonil's power instead.\nWhen Ojer Axonil dies, return it to the battlefield tapped and transformed under its owner's control.",
+  "keywords": [
+    "Trample"
+  ],
+  "backFace": {
+    "name": "Temple of Power",
+    "type": "Land",
+    "oracleText": "(Transforms from Ojer Axonil, Deepest Might.)\n{T}: Add {R}.\n{2}{R}, {T}: Transform this land. Activate only if red sources you controlled dealt 4 or more noncombat damage this turn and only as a sorcery."
+  }
+}

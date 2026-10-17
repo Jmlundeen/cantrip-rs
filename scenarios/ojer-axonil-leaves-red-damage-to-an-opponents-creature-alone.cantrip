@@ -1,0 +1,55 @@
+# Ojer Axonil: "to an opponent" - a player, not a permanent an opponent controls. Bot1 casts Ojer Axonil on turn 1 off Mox Ruby, a Mountain, Mox Pearl and Mox Jet. Bot2 casts Questing Beast,
+# a 4/4, on turn 2. On turn 3 Bot1 Lightning Bolts it: 3 damage, which it survives (4 would have killed it).
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mox Pearl
+Mox Jet
+Ojer Axonil, Deepest Might
+Lightning Bolt
+Plains
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Questing Beast
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ojer Axonil, Deepest Might.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Questing Beast.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Questing Beast)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Questing Beast.Damage = 3

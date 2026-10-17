@@ -1,0 +1,61 @@
+# Ojer Axonil raises the damage of a red source only, its color as it would deal the damage (CR 105.2, 613.1e). Bot1 casts Ojer Axonil on turn 1 off Mox Ruby, a Mountain, Mox Pearl and Mox Jet.
+# On turn 3 Bot1 sacrifices a Pyrite Spellbomb, a colorless artifact, to deal 2 to Bot2 - 2 - and casts a second one. On
+# turn 5 Bot1 casts Painter's Servant choosing red, which makes the second Spellbomb red, and its 2 to Bot2 becomes 4.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mox Pearl
+Mox Jet
+Ojer Axonil, Deepest Might
+Pyrite Spellbomb
+Plains
+Pyrite Spellbomb
+Painter's Servant
+Mountain x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ojer Axonil, Deepest Might.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Pass
+Bot1.Battlefield.Pyrite Spellbomb.Activate(Bot2; Ability: It deals 2 damage)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Pass
+Bot1.Colors(Red)
+? Bot1.Battlefield.Pyrite Spellbomb.Colors = Red
+Bot1.Battlefield.Pyrite Spellbomb.Activate(Bot2; Ability: It deals 2 damage)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 14

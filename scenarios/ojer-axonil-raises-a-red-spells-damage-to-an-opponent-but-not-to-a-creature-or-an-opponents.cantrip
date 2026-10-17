@@ -1,0 +1,60 @@
+# Ojer Axonil: "If a red source you control would deal an amount of noncombat damage less than Ojer Axonil's power to an
+# opponent, that source deals damage equal to Ojer Axonil's power instead." (CR 614.1a) Bot1 casts Ojer Axonil on turn 1 off Mox Ruby, a Mountain, Mox Pearl and Mox Jet.
+# On turn 2 Bot2 Lightning Bolts Bot1: a red source, but Bot2's, so 3. On turn 3 Bot1 Lightning Bolts Bot2: 3 is less
+# than Ojer's power, so 4. Then Bot1 Lightning Bolts its own Ojer Axonil: not an opponent, so 3, which the 4/4 survives.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mox Pearl
+Mox Jet
+Ojer Axonil, Deepest Might
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ojer Axonil, Deepest Might.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 17
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ojer Axonil, Deepest Might)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 17
+Bot2.Life = 16
+Bot1.Battlefield.Ojer Axonil, Deepest Might.Damage = 3

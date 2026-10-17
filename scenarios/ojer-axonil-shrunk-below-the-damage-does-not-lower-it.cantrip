@@ -1,0 +1,51 @@
+# "An amount of noncombat damage less than Ojer Axonil's power": damage that is not less is left alone, never lowered.
+# Bot1 casts Ojer Axonil on turn 1 off Mox Ruby, a Mountain, Mox Pearl and Mox Jet. On turn 3 Collective Brutality gives it -2/-2, a 2/2, and Lightning Bolt still deals 3 to Bot2.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mox Pearl
+Mox Jet
+Ojer Axonil, Deepest Might
+Collective Brutality
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ojer Axonil, Deepest Might.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(2)
+Bot1.Target(Ojer Axonil, Deepest Might)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ojer Axonil, Deepest Might.Power = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield.Ojer Axonil, Deepest Might.Power = 2

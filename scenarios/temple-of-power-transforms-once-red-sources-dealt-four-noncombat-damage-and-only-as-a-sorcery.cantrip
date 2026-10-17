@@ -1,0 +1,85 @@
+# Temple of Power: "{2}{R}, {T}: Transform this land. Activate only if red sources you controlled dealt 4 or more
+# noncombat damage this turn and only as a sorcery." Bot1 cast Ojer Axonil on turn 1 (Mox Ruby, Mountain, Mox Pearl, Mox Jet); Bot2 cast Ornithopter and killed it on
+# turn 2 with two Lightning Bolts, and it came back tapped and transformed as Temple of Power (CR 712.14a).
+# Turn 3: Black Lotus for {R}{R}{R}. Lightning Bolt deals 3 to Bot2 - three is not four, so the Temple is refused with
+# mana to pay for it. Firebolt deals 2 to Bot2's Ornithopter: damage to a creature counts, and two red sources add up (the
+# ruling), 5 in all. In the beginning of combat step it is still refused (CR 602.5d: only as a sorcery); in the second main
+# phase it transforms, paid with the three Moxen, back into Ojer Axonil, still tapped (CR 701.27c: the same permanent).
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mox Pearl
+Mox Jet
+Ojer Axonil, Deepest Might
+Black Lotus
+Lightning Bolt
+Firebolt
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Ornithopter
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ojer Axonil, Deepest Might.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Ojer Axonil, Deepest Might)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Ojer Axonil, Deepest Might)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+! Bot1.Battlefield.Temple of Power.Activate(Ability: Transform)
+Bot1.Hand.Firebolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.BeginCombat]
+! Bot1.Battlefield.Temple of Power.Activate(Ability: Transform)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Temple of Power.Activate(Ability: Transform)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot2.Graveyard.Count = 3
+Bot1.Battlefield.Ojer Axonil, Deepest Might.Types = Creature
+Bot1.Battlefield.Ojer Axonil, Deepest Might.Tapped = true
+Bot1.Battlefield.Ojer Axonil, Deepest Might.Power = 4
+Bot1.Battlefield.Ojer Axonil, Deepest Might.Keywords = Trample

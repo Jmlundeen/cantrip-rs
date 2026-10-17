@@ -1,0 +1,66 @@
+# Temple of Power's "{T}: Add {R}." Bot1 cast Ojer Axonil on turn 1 (Mox Ruby, Mountain, Mox Pearl, Mox Jet); Bot2 cast Ornithopter and killed it on
+# turn 2 with two Lightning Bolts, and it came back tapped and transformed as Temple of Power (CR 712.14a). On turn 3 Bot1 taps the Temple for {R}
+# and casts Lightning Bolt at Bot2 with it, the Temple's red mana the only mana it uses.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mox Pearl
+Mox Jet
+Ojer Axonil, Deepest Might
+Lightning Bolt
+Plains
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mox Ruby
+Ornithopter
+Plains
+Plains
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ojer Axonil, Deepest Might.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Ojer Axonil, Deepest Might)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Ojer Axonil, Deepest Might)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Temple of Power.Activate(Ability: Add)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield.Temple of Power.Tapped = true
+Bot1.Battlefield.Mox Ruby.Tapped = false
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.Graveyard = Lightning Bolt

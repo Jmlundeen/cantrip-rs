@@ -1,0 +1,65 @@
+# Ojer Axonil's ruling: with another replacement effect that would modify the damage, the player being dealt it chooses the
+# order (CR 616.1). Bot1 casts Ojer Axonil on turn 1 off Mox Ruby, a Mountain, Mox Pearl and Mox Jet. Bot1 casts Artist's Talent and levels it to 2 on turn 3 and to 3 on turn 5 ("If a source
+# you control would deal noncombat damage to an opponent ..., it deals that much damage plus 2 instead"). Then Lightning
+# Bolt at Bot2 (the Talent's loot asks nothing of an empty hand), and Bot2 applies Talent's first: 3 plus 2 is 5, no longer less than Ojer's power, so Ojer's no longer applies (CR 616.1e) and it stays 5.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Mox Pearl
+Mox Jet
+Ojer Axonil, Deepest Might
+Artist's Talent
+Lightning Bolt
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ojer Axonil, Deepest Might.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Artist's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Artist's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Replace(Artist's Talent)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 15
