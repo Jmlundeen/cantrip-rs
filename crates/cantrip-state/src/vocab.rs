@@ -274,6 +274,26 @@ impl ManaCost {
         self.mana_value() == 0
     }
 
+    /// The cost as a player who "may spend mana as though it were mana of any color" pays it (CR 609.4b): each colored
+    /// symbol and each hybrid symbol of two colors may be paid with any mana, colorless included (Mycosynth Lattice's
+    /// ruling), so it is paid as generic; a {C} symbol still takes colorless mana, which no color stands for, and a
+    /// Phyrexian symbol keeps its 2-life choice (announced before the mana is paid, which turns it into its color's
+    /// symbol, and that then any mana pays). The cost itself, and its mana value, are not changed (CR 609.4b): this is the
+    /// payment's view of it only.
+    pub fn paid_with_any_color(&self) -> ManaCost {
+        let mut paid = *self;
+        let mut generic = self.generic as u32;
+        for i in 0..5 {
+            generic += self.symbols[i] as u32;
+            paid.symbols[i] = 0;
+        }
+        // A hybrid symbol has a colored half, which any mana may now pay.
+        generic += paid.hybrid.iter().flatten().count() as u32;
+        paid.hybrid = [None; 6];
+        paid.generic = generic.min(255) as u8;
+        paid
+    }
+
     /// The two costs added symbol by symbol (CR 709.4b: a split card's mana cost is its halves' combined; a Room's
     /// is that of its unlocked doors, CR 709.5).
     pub fn plus(&self, other: &ManaCost) -> ManaCost {
@@ -1230,5 +1250,21 @@ mod tests {
         assert_eq!(Words::NONE.changed(goblin, dragon).changed(elf, goblin).word(elf), dragon);
         assert_eq!(Words::NONE.changed(elf, goblin).changed(elf, dragon).word(elf), goblin);
         assert_eq!(Words::NONE.changed(elf, goblin).changed(goblin, elf).word(elf), elf);
+    }
+
+    /// CR 609.4b: paid as though mana were of any color, {1}{R}{R/G}{C}{X} is paid as {3}{C}{X} - the colored and hybrid
+    /// symbols by any mana, the {C} by colorless only - and its mana value is unchanged.
+    #[test]
+    fn a_cost_paid_with_any_color_keeps_its_colorless_symbol() {
+        let mut cost = ManaCost { generic: 1, x: 1, ..ManaCost::ZERO };
+        cost.symbols[Mana::R as usize] = 1;
+        cost.symbols[Mana::C as usize] = 1;
+        cost.hybrid[0] = Some((Mana::R, Mana::G));
+        let paid = cost.paid_with_any_color();
+        assert_eq!(paid.generic, 3);
+        assert_eq!(paid.symbols, [0, 0, 0, 0, 0, 1]);
+        assert!(paid.hybrid.iter().all(Option::is_none));
+        assert_eq!(paid.x, 1);
+        assert_eq!(paid.mana_value(), cost.mana_value());
     }
 }

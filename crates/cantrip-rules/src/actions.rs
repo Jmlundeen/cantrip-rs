@@ -820,8 +820,8 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
             if def.cost.mana.x == 0 && def.cost.mana.mana_value() > 0 {
                 let a = available_without(cx, player, def.cost.tap.then_some(id));
                 let mut cost = def.cost.mana;
-                if static_rules::spend_any_color_for(cx, player, id) {
-                    cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                if static_rules::spend_any_color_for(cx, player, id, true) {
+                    cost = cost.paid_with_any_color();
                 }
                 if !a.covers_for(&cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }) {
                     continue;
@@ -1458,6 +1458,8 @@ pub struct Available {
     /// and its mana of any one color a mana ability adds (Great Hall of the Biblioplex, Delighted Halfling). Each pays
     /// only what `Available::covers_for` says it may. Mana that pays anything (`GainsHaste`) is in `fixed`.
     restricted: Vec<(ManaRestriction, [u8; 6], u32)>,
+    /// The player may spend mana as though it were mana of any color for every payment (CR 609.4b: Mycosynth Lattice).
+    any_color: bool,
 }
 
 /// Adds restricted mana to the entry of its restriction in `Available::restricted`.
@@ -1562,7 +1564,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 }
             }
             if def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 {
-                return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), restricted };
+                return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), restricted, any_color: false };
             }
         }
         if count > 0 {
@@ -1601,7 +1603,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
         }
     }
-    Available { fixed, flex, consume, unknown: false, changers: cost_change_sources(cx), restricted }
+    Available { fixed, flex, consume, unknown: false, changers: cost_change_sources(cx), restricted, any_color: static_rules::spend_any_color_always(cx, player) }
 }
 
 /// The spell a card or face is when cast, as far as the mana limited to some spells is concerned (CR 106.6): advice,
@@ -1640,6 +1642,14 @@ impl Available {
     }
 
     pub fn covers_for(&self, cost: &ManaCost, payment: &ManaPayment) -> bool {
+        // CR 609.4b: a player who may spend mana as though it were mana of any color pays a colored symbol with any mana.
+        let as_paid;
+        let cost = if self.any_color {
+            as_paid = cost.paid_with_any_color();
+            &as_paid
+        } else {
+            cost
+        };
         if self.covers_as(cost, payment) {
             return true;
         }
@@ -1671,6 +1681,7 @@ impl Available {
             unknown: self.unknown,
             changers: Vec::new(),
             restricted: Vec::new(),
+            any_color: false,
         };
         for (r, fixed, flex) in &self.restricted {
             if r.may_pay(payment) {
@@ -1888,8 +1899,8 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 let mut cost =
                     if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
-                if static_rules::spend_any_color_for(cx, player, id) {
-                    cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                if static_rules::spend_any_color_for(cx, player, id, !def.special_action) {
+                    cost = cost.paid_with_any_color();
                 }
                 a.covers_for(&cost, &payment)
             };
@@ -4345,10 +4356,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         cx.st().stack_set(at, with);
     }
     let counter = choose_counter_kind(cx, player, source, &def.cost)?;
-    // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
-    if mana.mana_value() > 0 && static_rules::spend_any_color_for(cx, player, source) {
-        mana = ManaCost { generic: mana.mana_value().min(255) as u8, ..ManaCost::ZERO };
-    }
     pay_mana_with(
         cx,
         player,
@@ -4553,12 +4560,6 @@ pub fn activate_mana(
     }
     // A mana ability's own mana cost (Chromatic Star's {1}) is paid like any other (CR 605.3a, 601.2g).
     if mana != ManaCost::ZERO {
-        // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
-        let mana = if static_rules::spend_any_color_for(cx, player, source) {
-            ManaCost { generic: mana.mana_value().min(255) as u8, ..ManaCost::ZERO }
-        } else {
-            mana
-        };
         pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating, ..Helpers::NONE })?;
     }
     pay_exert_and_tappers(cx, source, &def.cost, &[]);
@@ -5195,7 +5196,10 @@ pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 
 /// `pay_mana_with`, and what the mana spent does to what it paid for (`ManaRestriction::effects`, CR 106.6).
 pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
-    let mut owed = total;
+    // CR 609.4b: a player who may spend mana as though it were mana of any color for this cost pays each colored symbol with
+    // any mana; the cost is not changed, nor is what was spent.
+    let mut owed =
+        if static_rules::spend_any_color_for(cx, player, source, helpers.purpose == Paying::Activating) { total.paid_with_any_color() } else { total };
     let mut paid = ManaPool::default();
     let mut used = 0u8;
     // What has paid instead of mana: creatures tapped for convoke (by their colors), and cards exiled or artifacts

@@ -829,6 +829,16 @@ nothing of this cost is still offered (CR 601.2g) and is marked `pays_nothing`, 
 mana goes where the player sends it: two mana of one restriction may pay one ability or two. The pool empties at the end
 of each step and phase as any mana does (CR 106.4).
 
+### Mana spent as though it were of any color
+
+"Spend mana as though it were mana of any color" (CR 609.4b) is a `CardDef::spend_any_color` rule, asked of a payment
+(`Spending`: the player, what it is for, whether it is an activation): Agatha's Soul Cauldron's for its controller's
+creatures' abilities, Mycosynth Lattice's for every player and payment. Where one says yes, the cost is paid as
+`ManaCost::paid_with_any_color` has it - each colored and hybrid symbol by any mana, colorless included, a {C} symbol by
+colorless only - by the payment itself (`pay_mana_used`) and by the advice (`Available::covers_for`, which asks once per
+player whether the rule holds for every payment, and the activation offers, which ask for their source); the cost, its
+mana value and the mana spent are unchanged, and no restriction on the mana is lifted.
+
 ### Tapped for mana
 
 `Event::TappedForMana { permanent, player, produced }` is recorded when a mana ability with {T} in its cost resolves

@@ -1649,9 +1649,23 @@ pub type ZeroLoyaltyRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// keeps defender for every other purpose (CR 609.4).
 pub type AttackDespiteDefenderRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
-/// Whether a static ability lets its controller spend mana as though it were mana of any color to activate the abilities
-/// of this permanent (CR 609.4b): given the rule's own asker and the permanent whose ability is activated.
-pub type SpendAnyColorRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+/// A payment a "spend mana as though it were mana of any color" rule is asked about (CR 609.4b): the player paying, what the
+/// cost is for - the permanent whose ability is activated, the spell, the source of an "unless pays" - and whether it is
+/// an activation cost. `source` is `None` when the question is whether the player may do so for every payment whatever it
+/// is for (Mycosynth Lattice's "players may spend mana as though it were mana of any color"), which the payments' advice
+/// asks once.
+#[derive(Clone, Copy, Debug)]
+pub struct Spending {
+    pub player: PlayerId,
+    pub source: Option<ObjectId>,
+    pub activating: bool,
+}
+
+/// Whether a static ability lets a player spend mana as though it were mana of any color for a payment (CR 609.4b), given
+/// the rule's own asker and the payment: Agatha's Soul Cauldron's "you may ... to activate abilities of creatures you
+/// control", Mycosynth Lattice's "players may ...". It changes how the cost may be paid, not the cost
+/// (`ManaCost::paid_with_any_color`).
+pub type SpendAnyColorRule = fn(&dyn Query, &Asker, &Spending) -> bool;
 
 /// Whether a static ability lets its controller activate the abilities of this creature as though it had haste (CR 302.6):
 /// given the rule's own asker and the creature whose ability is activated.
@@ -1977,7 +1991,7 @@ pub struct CardDef {
     /// battlefield with its abilities.
     pub zero_loyalty_stays: &'static [ZeroLoyaltyRule],
     /// "You may spend mana as though it were mana of any color to activate abilities of creatures you control" (CR 609.4b):
-    /// Agatha's Soul Cauldron, Mycosynth Lattice's kind.
+    /// Agatha's Soul Cauldron; "Players may spend mana as though it were mana of any color": Mycosynth Lattice.
     pub spend_any_color: &'static [SpendAnyColorRule],
     /// "You may activate each of those abilities only once each turn" (CR 602.5b): how many of a permanent's instances of
     /// an activated ability are ones its static ability gave it with that limit (Locus of Enlightenment's of the exiled

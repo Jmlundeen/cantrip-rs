@@ -192,11 +192,21 @@ pub fn attack_costs(cx: &Cx, eligible: &[ObjectId], targets: &[Target]) -> Vec<A
     out
 }
 
-/// Whether `player` may spend mana as though it were of any color to activate an ability of `source` (CR 609.4b).
-pub fn spend_any_color_for(cx: &Cx, player: PlayerId, source: ObjectId) -> bool {
-    sources(cx, |d| !d.spend_any_color.is_empty()).any(|(id, controller, def)| {
-        controller == player && def.spend_any_color.iter().any(|rule| rule(cx, &Asker { source: id, controller }, source))
-    })
+/// Whether `player` may spend mana as though it were of any color to pay a cost for `source` (CR 609.4b): to activate an
+/// ability of it (`activating`), to cast it, or anything else.
+pub fn spend_any_color_for(cx: &Cx, player: PlayerId, source: ObjectId, activating: bool) -> bool {
+    spend_any_color(cx, &Spending { player, source: Some(source), activating })
+}
+
+/// Whether `player` may spend mana as though it were of any color for every payment, whatever it is for (CR 609.4b:
+/// Mycosynth Lattice): what the advice of what can be paid reads once (`Available`).
+pub fn spend_any_color_always(cx: &Cx, player: PlayerId) -> bool {
+    spend_any_color(cx, &Spending { player, source: None, activating: false })
+}
+
+fn spend_any_color(cx: &Cx, spending: &Spending) -> bool {
+    sources(cx, |d| !d.spend_any_color.is_empty())
+        .any(|(id, controller, def)| def.spend_any_color.iter().any(|rule| rule(cx, &Asker { source: id, controller }, spending)))
 }
 
 /// Whether `player` may activate the abilities of `creature` as though it had haste (CR 302.6): a static ability of a
