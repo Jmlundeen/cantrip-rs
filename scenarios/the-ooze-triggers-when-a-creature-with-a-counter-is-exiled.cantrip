@@ -1,0 +1,45 @@
+# "Leaves the battlefield" is any zone change, not only dying (CR 603.6c): Bot1 casts Swords to Plowshares on its own Walking Ballista (X=1,
+# one +1/+1 counter) and The Ooze makes one Mutagen token. Bot1 gains the Ballista's power as life: 1 (the 1/1 it was).
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Mox Ruby
+The Ooze
+Walking Ballista
+Swords to Plowshares
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Walking Ballista)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Walking Ballista
+Bot1.Life = 21
+Bot1.Battlefield = Plains; Mox Sapphire; Mox Pearl; Mox Jet; Mox Ruby; The Ooze; Mutagen Token

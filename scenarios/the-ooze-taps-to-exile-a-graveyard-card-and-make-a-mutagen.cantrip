@@ -1,0 +1,38 @@
+# The Ooze: "{T}: Exile target card from a graveyard. Create a Mutagen token." Bot1's Lightning Bolt (in its own graveyard after
+# hitting Bot2 for 3) is exiled and one Mutagen token is created; The Ooze is tapped. (An artifact, it can tap the turn it
+# arrives.) Mana: Mountain for the Bolt, Mox Ruby and Mox Pearl for The Ooze.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+The Ooze
+Lightning Bolt
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Ooze.Activate(Bot1.Graveyard.Lightning Bolt; Ability: Exile target card)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; The Ooze; Mutagen Token
+Bot1.Battlefield.The Ooze.Tapped = true
+Bot2.Life = 17

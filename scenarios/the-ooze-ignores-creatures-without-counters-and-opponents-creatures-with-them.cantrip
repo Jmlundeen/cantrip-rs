@@ -1,0 +1,54 @@
+# "A creature YOU control WITH a +1/+1 counter": Bot1's own Ornithopter (no counters) dies to Bot1's Lightning Bolt on turn 1 and
+# Bot2's Walking Ballista (X=1, one +1/+1 counter, an opponent's creature) dies to Bot1's second Bolt on turn 3. Neither makes
+# a Mutagen token. (The Ooze makes tokens for the counters of Bot1's own Ballista in the neighbouring scenarios.)
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+The Ooze
+Ornithopter
+Lightning Bolt
+Lightning Bolt
+Mountain x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Walking Ballista
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Walking Ballista)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Pearl; The Ooze
+Bot1.Graveyard = Lightning Bolt; Ornithopter; Lightning Bolt
+Bot2.Graveyard = Walking Ballista

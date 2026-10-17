@@ -1,0 +1,62 @@
+# "A creature you control with a +1/+1 counter": a Mutagen token puts a counter on Bot1's Restless Cottage while it is an
+# animated 4/4 creature on turn 3; the animation ends with the turn, so on turn 4 it is a land with a +1/+1 counter. Bot2's
+# Strip Mine destroys it and The Ooze makes nothing: it is not a creature as it leaves the battlefield (CR 603.10a). The
+# first Mutagen token, from The Ooze's tap ability on turn 1 (exiling Bot1's Bolt), was sacrificed for the counter.
+
+[Bot1 Deck]
+Restless Cottage
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+The Ooze
+Lightning Bolt
+Swamp x13
+
+[Bot2 Deck]
+Strip Mine
+Island x19
+
+[Actions]
+Bot1.Hand.Restless Cottage.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.The Ooze.Activate(Bot1.Graveyard.Lightning Bolt; Ability: Exile target card)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Restless Cottage.Activate(Ability: becomes a 4/4)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Restless Cottage.Activate(Ability: Add; Color: Black)
+Bot1.Battlefield.Mutagen Token.Activate(Bot1.Battlefield.Restless Cottage)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Cottage.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Restless Cottage.Power = 5
+[T4 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Restless Cottage; Ability: Destroy target land)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Restless Cottage
+Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Pearl; Mox Ruby; The Ooze

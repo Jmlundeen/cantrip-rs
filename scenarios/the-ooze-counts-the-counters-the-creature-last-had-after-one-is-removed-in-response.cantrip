@@ -1,0 +1,51 @@
+# The count is the +1/+1 counters the creature had as it left the battlefield (CR 603.10a, 608.2h), not when it came in. Bot1's
+# Walking Ballista (X=2) answers Bot2's Lightning Bolt by removing a counter to ping Bot2 (the ability resolves first and Bot2 goes
+# to 19). The 1/1 Ballista then dies to the Bolt with one counter, so The Ooze makes one Mutagen token, not two.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+The Ooze
+Walking Ballista
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Walking Ballista)
+Bot2.Pass
+Bot1.Battlefield.Walking Ballista.Activate(Bot2; Ability: Remove)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Walking Ballista; Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Sapphire; Mutagen Token; The Ooze
+Bot2.Life = 19

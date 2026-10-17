@@ -1,0 +1,48 @@
+# The Ooze: "Whenever a creature you control with a +1/+1 counter on it leaves the battlefield, create a Mutagen token for each
+# +1/+1 counter on it." Bot1's Walking Ballista (X=2) enters with two +1/+1 counters; Bot2's Lightning Bolt kills the 2/2 on turn 2
+# and Bot1 gets two Mutagen tokens (CR 603.10a: the counters it last had). Mana: Black Lotus for The Ooze ({2}) and the three Moxen
+# for the Ballista ({X}{X} = {4}: the Lotus's third mana and three Moxen).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+The Ooze
+Walking Ballista
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Walking Ballista)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Walking Ballista; Black Lotus
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Sapphire; Mutagen Token; Mutagen Token; The Ooze
+Bot1.Battlefield.Mutagen Token#2.Subtypes = Mutagen

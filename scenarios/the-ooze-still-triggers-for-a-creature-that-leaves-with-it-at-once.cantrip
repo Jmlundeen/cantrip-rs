@@ -1,0 +1,49 @@
+# Leaves-the-battlefield abilities look back (CR 603.10a): Vicious Rivalry (X=2, Bot1 pays 2 life) destroys every artifact and
+# creature with mana value 2 or less, The Ooze (mana value 2) and Bot1's Walking Ballista (X=1: one counter; mana value 0 on the
+# battlefield) at the same moment. The Ooze still sees the Ballista leave and Bot1 gets one Mutagen token, which is all that is
+# left on Bot1's battlefield (the Moxen also go).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Mox Ruby
+The Ooze
+Walking Ballista
+Island
+Vicious Rivalry
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Ooze.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vicious Rivalry.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield = Mutagen Token
+Bot1.Graveyard.Count = 7
