@@ -1,0 +1,48 @@
+# Moat ("Creatures without flying can't attack", CR 508.1c) against banding: a band is formed only of creatures declared as
+# attackers (CR 702.22c), so Benalish Hero, which can't attack at all, can't join Mesa Pegasus's band - banding gives no
+# creature the right to attack. Bot2's Moat; Bot1's Hero is refused as an attacker, the Pegasus (flying) attacks alone, and
+# with no other attacker beside it no band is asked for. It deals its 1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Benalish Hero
+Mesa Pegasus
+Island x14
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Pearl
+Moat
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mesa Pegasus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Moat.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Benalish Hero > Bot2)
+Bot1.Attack(Mesa Pegasus > Bot2)
+! Bot1.Choose
+[T3 Bot1.Blockers]
+? Combat.Attackers = Mesa Pegasus > Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Benalish Hero.Tapped = false

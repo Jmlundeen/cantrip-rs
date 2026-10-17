@@ -1,0 +1,52 @@
+# Banding with evasion (CR 702.22h and its example): a creature declared as a blocker of one member of a band blocks every
+# member, even one it could not have been declared blocking. Bot1's Mesa Pegasus (1/1 flying, banding) attacks in a band with
+# Guerrilla Gorilla. Bot2's Llanowar Elves can't block the Pegasus (flying, CR 702.9b) - refused - but blocks the Gorilla,
+# and so the Pegasus is blocked too: nothing reaches Bot2. Bot1 divides the Elves' 1 (CR 702.22k) and puts it on the Gorilla,
+# which lives; the band's 1 + 2 kill the Elves.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Mesa Pegasus
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mesa Pegasus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Mesa Pegasus > Bot2; Guerrilla Gorilla > Bot2)
+Bot1.Choose(Guerrilla Gorilla)
+! Bot2.Block(Llanowar Elves > Mesa Pegasus)
+Bot2.Block(Llanowar Elves > Guerrilla Gorilla)
+[T5 Bot1.Blockers]
+? Combat.Blocks = Llanowar Elves > Guerrilla Gorilla; Llanowar Elves > Mesa Pegasus
+Bot1.AssignDamage(Llanowar Elves > Guerrilla Gorilla: 1)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 20
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 1
+Bot1.Battlefield.Mesa Pegasus.Damage = 0
