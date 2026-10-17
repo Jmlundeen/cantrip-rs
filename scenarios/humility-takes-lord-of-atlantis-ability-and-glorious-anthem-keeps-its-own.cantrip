@@ -1,0 +1,72 @@
+# Humility ("All creatures lose all abilities and have base power and toughness 1/1") reaches only creatures. Lord of
+# Atlantis is one: its "Other Merfolk get +1/+1 and have islandwalk" is gone (CR 613.1f), and since that ability's very
+# existence depends on Humility's effect, Humility applies first in layer 6 and the Lord's ability never applies at all
+# (CR 613.8a) - though the Lord came first. Glorious Anthem is an enchantment, not a creature, so it keeps "Creatures you
+# control get +1/+1", which applies in layer 7c over Humility's base 1/1 (CR 613.4b-c). So on turn 5: the Lord is 1/1 +1
+# = 2/2, Cenote Scout 1/1 +1 (the Anthem, no longer the Lord) = 2/2 with no islandwalk, and Bot2's Llanowar Elves, which
+# the Anthem does not reach, 1/1. Before Humility (turn 3) the Scout was 3/3 with islandwalk and the Lord 3/3.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Mox Pearl
+Black Lotus
+Lord of Atlantis
+Cenote Scout
+Plains
+Glorious Anthem
+Humility
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cenote Scout.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Glorious Anthem.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Cenote Scout.Power = 3
+? Bot1.Battlefield.Cenote Scout.Keywords = Islandwalk
+? Bot1.Battlefield.Lord of Atlantis.Power = 3
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Lord of Atlantis.Power = 2
+Bot1.Battlefield.Lord of Atlantis.Toughness = 2
+Bot1.Battlefield.Cenote Scout.Power = 2
+Bot1.Battlefield.Cenote Scout.Toughness = 2
+Bot1.Battlefield.Cenote Scout.Keywords = (absent)
+Bot1.Battlefield.Glorious Anthem.Types = Enchantment
+Bot1.Battlefield.Humility.Types = Enchantment
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Llanowar Elves.Toughness = 1

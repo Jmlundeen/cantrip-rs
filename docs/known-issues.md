@@ -703,3 +703,19 @@ noncreature card entering as a creature, is judged by its own characteristics. M
 creature cards entering as themselves, are judged rightly.
 
 **Scenarios.** none yet.
+
+### KI-57: The tactical bot does not know islandwalk
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-17, adding Lord of Atlantis |
+
+**Notes.** The engine is right: a creature with islandwalk can't be blocked while the defending player controls an Island
+(CR 702.14c, `turn::can_block`), and the blockers question offers only the pairs the rules allow, which the bots follow. The
+tactical bot's own combat arithmetic (`dotnet/src/Cantrip.Client/Tactics`, `Unit.CouldBlock` and `Exposure`) reads no
+landwalk: `CardReading.cs` passes "Islandwalk" over, and a unit knows nothing of the defending player's lands, so the bot
+plans its attacks as if an islandwalker could be blocked by an opponent with an Island, and counts its own blockers against
+one. A fix reads islandwalk into `Keywords` and makes a landwalker unblockable in the bot's planning when the defending
+seat controls a land of its type. The web client shows the keyword on the card, and the language-model client reads it.
+
+**Scenarios.** none: a bot's judgement is not a rules outcome.

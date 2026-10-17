@@ -1,0 +1,8 @@
+{
+  "name": "Lord of Atlantis",
+  "manaCost": "{U}{U}",
+  "type": "Creature — Merfolk",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Other Merfolk get +1/+1 and have islandwalk. (They can't be blocked as long as defending player controls an Island.)"
+}

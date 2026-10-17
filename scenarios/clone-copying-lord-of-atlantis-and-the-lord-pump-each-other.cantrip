@@ -1,0 +1,42 @@
+# Clone copies Lord of Atlantis's copiable values, its static ability among them (CR 707.2), so there are two Lords of
+# Atlantis, each one of the other's "other Merfolk": each gets +1/+1 and islandwalk from the other (CR 613.4c, 613.1f)
+# and is a 3/3. Neither pumps itself, so neither is 4/4; Clone's own 0/0 Shapeshifter is gone.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Mox Jet
+Lord of Atlantis
+Clone
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Lord of Atlantis; Lord of Atlantis
+Bot1.Battlefield.Lord of Atlantis#1.Power = 3
+Bot1.Battlefield.Lord of Atlantis#1.Toughness = 3
+Bot1.Battlefield.Lord of Atlantis#1.Keywords = Islandwalk
+Bot1.Battlefield.Lord of Atlantis#2.Power = 3
+Bot1.Battlefield.Lord of Atlantis#2.Toughness = 3
+Bot1.Battlefield.Lord of Atlantis#2.Keywords = Islandwalk
+Bot1.Battlefield.Lord of Atlantis#2.Subtypes = Merfolk
