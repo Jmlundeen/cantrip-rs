@@ -1,0 +1,8 @@
+{
+  "name": "Gene Pollinator",
+  "manaCost": "{G}",
+  "type": "Artifact Creature — Robot Insect",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "{T}, Tap an untapped permanent you control: Add one mana of any color."
+}

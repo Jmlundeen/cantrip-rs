@@ -1,0 +1,37 @@
+# Gene Pollinator: "{T}, Tap an untapped permanent you control: Add one mana of any color." A mana ability whose extra
+# permanent is chosen with the activation. On turn 3 Bot1 casts an Ornithopter, which is summoning sick, and Gene Pollinator
+# (on the battlefield since turn 1) taps it as its cost - tapping it is not the Ornithopter's own {T} (CR 302.6) - for red
+# mana that casts a Lightning Bolt. Both end tapped; the Mox Emerald, not chosen, is untapped.
+
+[Bot1 Deck]
+Mox Emerald
+Gene Pollinator
+Ornithopter
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gene Pollinator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Gene Pollinator.Activate(Tap: Ornithopter; Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Gene Pollinator.Tapped = true
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Ornithopter.SummoningSick = true
+Bot1.Battlefield.Mox Emerald.Tapped = false

@@ -1,0 +1,32 @@
+# Gene Pollinator's second cost needs an untapped permanent besides the one its {T} taps: on turn 3, with the Mox Emerald
+# (its only other permanent) tapped for mana, the ability is not offered, though Gene Pollinator itself is untapped and
+# no longer summoning sick (it could not pay both costs with itself). The control, where an untapped permanent is there, is
+# gene-pollinator-taps-an-untapped-permanent-for-mana-of-any-color.
+
+[Bot1 Deck]
+Mox Emerald
+Gene Pollinator
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gene Pollinator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Gene Pollinator.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Gene Pollinator.Tapped = false
+Bot1.Battlefield.Mox Emerald.Tapped = true

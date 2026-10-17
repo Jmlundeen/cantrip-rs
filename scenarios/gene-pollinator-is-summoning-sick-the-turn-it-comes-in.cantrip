@@ -1,0 +1,32 @@
+# Gene Pollinator's ability has {T} in its cost, so a Gene Pollinator that has not been under Bot1's control since the start of
+# its turn can't use it (CR 302.6), even with an untapped Mox Ruby to tap for the other part of the cost. The control,
+# once it has, is gene-pollinator-taps-an-untapped-permanent-for-mana-of-any-color (turn 3).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Gene Pollinator
+Forest
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gene Pollinator.Cast
+Bot1.Pass
+! Bot1.Battlefield.Gene Pollinator.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Gene Pollinator.SummoningSick = true
+Bot1.Battlefield.Gene Pollinator.Tapped = false
+Bot1.Battlefield.Mox Ruby.Tapped = false
