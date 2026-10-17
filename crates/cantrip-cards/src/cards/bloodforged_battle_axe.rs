@@ -18,8 +18,7 @@ fn equipped_deals_combat_damage_to_a_player(q: &dyn Query, source: ObjectId, eve
 /// Create a token that's a copy of this Equipment (CR 707.2, 111.4): the Equipment's copiable values, or its last known
 /// ones if it has left the battlefield by now (CR 608.2h). The token is created unattached.
 fn copy_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.create_token_copies(item.object, item.controller, 1)?;
-    Ok(())
+    cantrip_mechanics::copy::create_token_copy_of_it(g, item, |_, values| values)
 }
 
 pub static CARD: CardDef = CardDef {

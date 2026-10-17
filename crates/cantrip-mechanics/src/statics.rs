@@ -66,14 +66,21 @@ pub fn have_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Vigilance);
 }
 
+/// "Each artifact you control" counted for a static ability (CR 613.4c): the permanents under the controller of `source` that
+/// the earlier layers made artifacts, `source` itself among them if it is one. "+1/+1 for each artifact you control"
+/// (below, Adaptive Omnitool and others) and Improvised Arsenal's "+1/+0 for each artifact you control" both count them.
+pub fn artifacts_you_control(view: &dyn LayerQuery, source: ObjectId) -> i16 {
+    let state = view.state();
+    let you = state.obj(source).controller;
+    state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Artifact)).count() as i16
+}
+
 /// "Gets +1/+1 for each artifact you control" (CR 613.4c, layer 7c): "you" is the controller of the source, the object that has
 /// the ability (CR 109.5, 113.6), counted as the earlier layers left every permanent, the source itself among them if it is an
 /// artifact. The Construct token (Urza's Saga, Karn, Scion of Urza), Adaptive Omnitool's equipped creature and Iron Man
 /// Armor's animated Equipment print it.
 pub fn plus_one_plus_one_per_artifact_you_control(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let state = view.state();
-    let you = state.obj(source).controller;
-    let n = state.battlefield().iter().filter(|&&id| state.obj(id).controller == you && view.chars(id).is(CardType::Artifact)).count() as i16;
+    let n = artifacts_you_control(view, source);
     chars.power = chars.power.map(|v| v + n);
     chars.toughness = chars.toughness.map(|v| v + n);
 }
