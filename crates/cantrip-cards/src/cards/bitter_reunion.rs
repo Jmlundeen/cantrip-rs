@@ -1,14 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, haste_until_end_of_turn, triggers::THIS_ENTERS};
+use cantrip_mechanics::{effects, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Creatures you control gain haste until end of turn.
 fn haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let creatures: Vec<ObjectId> =
-        g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-    for id in creatures {
-        haste_until_end_of_turn(g, item.object, id);
-    }
+    effects::creatures_you_control_gain_haste(g, item);
     Ok(())
 }
 

@@ -29,6 +29,15 @@ pub fn pump_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16
     creatures
 }
 
+/// "Creatures you control gain haste until end of turn" (CR 611.2, 611.2c, 702.10): the creatures `item`'s controller controls as
+/// it resolves, and no creature that enters later. Bitter Reunion and Ingris Stingerquill print it.
+pub fn creatures_you_control_gain_haste(g: &mut dyn Game, item: &StackItem) {
+    let creatures: Vec<ObjectId> = g.permanents_of(item.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
+    for id in creatures {
+        crate::haste_until_end_of_turn(g, item.object, id);
+    }
+}
+
 /// "Creatures you control gain trample and get +P/+T until end of turn" (CR 611.2c): `pump_creatures_you_control` and trample for
 /// each of them, the creatures being those on the battlefield as it resolves. The creatures, for what the rest of the sentence does
 /// to them. Craterclaw Colossus (+X/+0, X the artifacts you control) and Craterhoof Behemoth (+X/+X, X the creatures) print it.
