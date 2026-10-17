@@ -266,6 +266,12 @@ fn permanent_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id))
 }
 
+/// "Target permanent you control" (CR 115.1, 110.2): a permanent on the battlefield that the ability's or spell's controller
+/// controls, judged again as it resolves (CR 608.2b), so one whose control changed in response is no longer a legal target.
+pub fn permanent_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    permanent_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) == asker.controller)
+}
+
 fn nonland_permanent_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && !q.chars(id).is(CardType::Land))
 }
@@ -361,6 +367,8 @@ pub fn artifact_or_creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool 
 pub const ARTIFACT_OR_ENCHANTMENT: TargetSpec = target(artifact_or_enchantment_filter);
 /// "Target permanent". Alpha Deathclaw and Argentum Armor print it.
 pub const PERMANENT: TargetSpec = target(permanent_filter);
+/// "Target permanent you control". Harmless Offering and Deceiver Exarch print it.
+pub const PERMANENT_YOU_CONTROL: TargetSpec = target(permanent_you_control_filter);
 /// "Target nonland permanent". Banishing Knack and Boomerang Basics print it.
 pub const NONLAND_PERMANENT: TargetSpec = target(nonland_permanent_filter);
 
