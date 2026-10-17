@@ -1,0 +1,8 @@
+{
+  "name": "Magus of the Moon",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Human Wizard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Nonbasic lands are Mountains."
+}

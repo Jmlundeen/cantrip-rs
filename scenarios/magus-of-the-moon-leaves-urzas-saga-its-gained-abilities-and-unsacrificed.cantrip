@@ -1,0 +1,55 @@
+# CR 305.7: setting a land's subtype "doesn't remove any abilities that were granted to the land by other effects". Urza's
+# Saga's chapters I and II resolve (turns 1 and 3), giving it "{T}: Add {C}" and "{2}, {T}: Create a ... Construct" - abilities
+# the chapters' effects granted, not its rules text. Then Magus of the Moon resolves: the Saga is a Mountain (Urza's is
+# gone; Saga is an enchantment type and stays) and loses its rules text, the chapter abilities among it. It keeps both granted
+# abilities (the Construct on turn 5, {C} on turn 7) and has "{T}: Add {R}" (turn 9). With no chapter abilities it gets no
+# lore counter as Bot1's precombat main phases begin (CR 714.3c), so it stays at 2, and it is not sacrificed (CR 714.4): its
+# chapter III never comes.
+
+[Bot1 Deck]
+Urza's Saga
+Mox Ruby
+Mox Emerald
+Magus of the Moon
+Forest x3
+Forest x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Urza's Saga.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Urza's Saga.Counters.Lore = 2
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Urza's Saga.Activate(Ability: Add {C})
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Urza's Saga.Subtypes = Mountain; Saga
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Urza's Saga.Counters.Lore = 2
+Bot1.Battlefield.Urza's Saga.Activate(Ability: Construct)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Construct.Power = 3
+[T7 Bot1.Main1]
+Bot1.Battlefield.Urza's Saga.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+[T9 Bot1.Main1]
+Bot1.Battlefield.Urza's Saga.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 9
+Bot1.Battlefield.Urza's Saga.Counters.Lore = 2
+Bot1.Battlefield.Urza's Saga.Subtypes = Mountain; Saga
+Bot1.Battlefield.Urza's Saga.Types = Enchantment; Land
+Bot1.Battlefield.Construct.Power = 3

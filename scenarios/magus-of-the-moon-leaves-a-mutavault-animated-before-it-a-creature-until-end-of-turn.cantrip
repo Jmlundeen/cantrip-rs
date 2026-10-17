@@ -1,0 +1,58 @@
+# CR 305.7: setting a land's subtype "doesn't remove any abilities that were granted to the land by other effects" and
+# adds or removes no card type. Bot1 animates Mutavault ({1}: a 2/2 creature with all creature types until end of turn)
+# and then casts Magus of the Moon. The animation is the effect of a resolved ability, not an ability of the land: Mutavault
+# stays a 2/2 Land Creature with every creature type, now also a Mountain in place of no land type (Magus sets land types
+# only), and attacks for 2. Its own "{1}" and "{T}: Add {C}" are gone. The animation ends in the cleanup step (CR 514.2):
+# on turn 4 it is a Land, a Mountain, and on turn 5 it taps for {R}.
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Magus of the Moon
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+? Bot1.Battlefield.Mutavault.Subtypes = (every creature type); Mountain
+? Bot1.Battlefield.Mutavault.Power = 2
+? Bot1.Battlefield.Mutavault.Toughness = 2
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+! Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Attack(Mutavault > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 18
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Mutavault.Types = Land
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
+Bot1.Battlefield.Mutavault.Types = Land
+Bot1.Battlefield.Mutavault.Subtypes = Mountain
+Bot1.Battlefield.Mutavault.Tapped = true

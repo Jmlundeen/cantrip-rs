@@ -1,0 +1,40 @@
+# Magus of the Moon's ruling: abilities that apply "as" a nonbasic land enters are lost before they can apply (CR 305.7,
+# 614.12). Multiversal Passage enters under Magus: "As this land enters, choose a basic land type. Then you may pay 2
+# life. If you don't, it enters tapped" never applies, so Bot1 is asked neither question, the Passage enters untapped
+# (declining would have tapped it) and Bot1 keeps 20 life. It is a Mountain, not the type it would have chosen (its "this
+# land is the chosen type" is gone too, CR 613.8a), and taps for {R}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Magus of the Moon
+Multiversal Passage
+Plains x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Multiversal Passage.Play
+! Bot1.Modes
+! Bot1.Accept
+? Bot1.Battlefield.Multiversal Passage.Tapped = false
+? Bot1.Battlefield.Multiversal Passage.Subtypes = Mountain
+Bot1.Battlefield.Multiversal Passage.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 1
+Bot1.Life = 20
+Bot1.Battlefield.Multiversal Passage.Subtypes = Mountain
+Bot1.Battlefield.Multiversal Passage.Tapped = true

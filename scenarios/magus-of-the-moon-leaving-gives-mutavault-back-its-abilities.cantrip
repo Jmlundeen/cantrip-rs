@@ -1,0 +1,53 @@
+# Magus of the Moon's effect lasts only as long as it is on the battlefield (CR 611.3a). Bot2 bolts it on turn 2, after a
+# check that Mutavault is a Mountain; on turn 3 Mutavault has no land type again, its "{1}: This land becomes a 2/2
+# creature" is back (it animates, a creature of every creature type) and so is its "{T}: Add {C}".
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Jet
+Mox Pearl
+Magus of the Moon
+Mox Emerald
+Mountain x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Magus of the Moon)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Magus of the Moon
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Magus of the Moon
+Bot1.Battlefield.Mutavault.Types = Land; Creature
+Bot1.Battlefield.Mutavault.Subtypes = (every creature type)
+Bot1.Battlefield.Mutavault.Tapped = true

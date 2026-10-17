@@ -1,0 +1,58 @@
+# Magus of the Moon: "Nonbasic lands are Mountains." (CR 305.7) A nonbasic land whose subtype an effect sets loses the
+# abilities of its rules text and gains "{T}: Add {R}" (CR 305.6). On turn 1 Bot1's Mutavault animates with its {1}
+# ability (the positive control: the ability is there). On turn 3 Magus resolves: Mutavault is a Mountain, its "{1}: This
+# land becomes a 2/2 creature" and its "{T}: Add {C}" are not offered, and it taps for {R}. Bot2's basic Island is not
+# nonbasic and stays an Island that taps for {U}; Bot1's basic Mountain paid for Magus as itself.
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Jet
+Mountain
+Magus of the Moon
+Mountain x15
+
+[Bot2 Deck]
+Island
+Island x19
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+! Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Island.Activate(Ability: Add {R})
+Bot2.Battlefield.Island.Activate(Ability: Add {U})
+? Bot2.Mana = {U}
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Mutavault.Types = Land
+Bot1.Battlefield.Mutavault.Subtypes = Mountain
+Bot1.Battlefield.Mutavault.Tapped = true
+Bot1.Battlefield.Mountain.Subtypes = Mountain
+Bot1.Battlefield.Mountain.Supertypes = Basic
+Bot2.Battlefield.Island.Subtypes = Island
+Bot2.Battlefield.Island.Supertypes = Basic

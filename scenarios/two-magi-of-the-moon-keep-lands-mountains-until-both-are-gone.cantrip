@@ -1,0 +1,69 @@
+# Two Magus of the Moon each make nonbasic lands Mountains (CR 305.7): two effects setting the same subtype. With one
+# bolted, the other's effect still applies on its own: Mutavault is a Mountain, taps for {R} and not {C}. With the second
+# bolted too, Mutavault has no land type and taps for {C} again.
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Jet
+Mox Pearl
+Magus of the Moon
+Magus of the Moon
+Mox Emerald
+Mox Sapphire
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Magus of the Moon#1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Magus of the Moon
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T6 Bot2.Main1]
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Magus of the Moon)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = (absent)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Magus of the Moon; Magus of the Moon
+Bot1.Battlefield.Mutavault.Subtypes = (absent)
+Bot1.Battlefield.Mutavault.Tapped = true

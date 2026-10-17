@@ -1,0 +1,54 @@
+# Magus of the Moon's rulings: a nonbasic land's "enters tapped" and its "when this land enters" trigger are lost before
+# they can apply (CR 305.7; CR 614.12: an entering permanent's replacements are judged as it would exist on the
+# battlefield). Bot2's Azorius Chancery is the positive control on turn 2, with no Magus: it enters tapped, and its trigger
+# returns the only land Bot2 controls, the Chancery itself, to hand. Bot1's Magus resolves on turn 3; on turn 4 the same
+# Chancery is played again and enters untapped with nothing on the stack, stays on the battlefield, and is a Mountain that
+# taps for {R} and not for {W}{U}. Magus affects an opponent's land as much as its controller's.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mountain
+Magus of the Moon
+Mountain x16
+
+[Bot2 Deck]
+Azorius Chancery
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Azorius Chancery.Play
+? Bot2.Battlefield.Azorius Chancery.Tapped = true
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Azorius Chancery)
+? Bot2.Battlefield.Count = 0
+[T2 Bot2.Cleanup]
+Bot2.Discard(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Azorius Chancery.Play
+? Bot2.Battlefield.Azorius Chancery.Tapped = false
+? Stack.Count = 0
+? Bot2.Battlefield.Azorius Chancery.Subtypes = Mountain
+! Bot2.Battlefield.Azorius Chancery.Activate(Ability: {W}{U})
+Bot2.Battlefield.Azorius Chancery.Activate(Ability: Add {R})
+? Bot2.Mana = {R}
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Count = 1
+Bot2.Battlefield.Azorius Chancery.Subtypes = Mountain
+Bot2.Battlefield.Azorius Chancery.Tapped = true
+Stack.Count = 0

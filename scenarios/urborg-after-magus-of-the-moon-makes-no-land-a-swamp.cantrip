@@ -1,0 +1,47 @@
+# Urborg, Tomb of Yawgmoth enters after Magus of the Moon: Urborg's "each land is a Swamp" has the later timestamp, which
+# alone would make every land, the Mountain Urborg itself included, a Swamp too. But Urborg's effect depends on Magus's
+# (applying Magus's takes Urborg's ability away, CR 305.7, 613.8a), so Magus's applies first and Urborg's does not exist:
+# Bot2's basic Plains is only a Plains, tapping for {W} and not {B}, and Urborg is only a Mountain, tapping for {R} and not
+# {B}. It is still legendary.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Magus of the Moon
+Urborg, Tomb of Yawgmoth
+Plains x15
+
+[Bot2 Deck]
+Plains
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Magus of the Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+? Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+? Bot2.Battlefield.Plains.Subtypes = Plains
+! Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Add {B})
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Plains.Activate(Ability: Add {B})
+Bot2.Battlefield.Plains.Activate(Ability: Add {W})
+? Bot2.Mana = {W}
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Supertypes = Legendary
+Bot2.Battlefield.Plains.Subtypes = Plains

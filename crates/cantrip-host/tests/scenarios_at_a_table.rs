@@ -230,6 +230,43 @@ fn an_until_your_next_turn_delayed_ability_is_shown_until_that_turn_begins() {
     );
 }
 
+/// CR 305.7 at a table: under Magus of the Moon, Bot2's Azorius Chancery is a Mountain. Each seat's view of it, at the end of
+/// the scenario, gives its subtypes as Mountain alone and calls the three lines its rules text printed lost: "This land enters
+/// tapped." (a rule of its card, not an ability among its abilities), its enters trigger, and its "{T}: Add {W}{U}." Its
+/// name stays.
+#[test]
+fn a_nonbasic_land_magus_of_the_moon_makes_a_mountain_is_shown_with_its_printed_lines_lost() {
+    let name = "magus-of-the-moon-lets-azorius-chancery-enter-untapped-without-its-trigger";
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    for _ in 0..20_000 {
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true));
+            break;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    for seat in [1, 2] {
+        let view = session.view(seat).map_err(|r| r.detail).unwrap();
+        let chancery = view.objects.iter().find(|o| o.name == "Azorius Chancery").expect("the Chancery is shown");
+        assert_eq!(chancery.subtypes, vec!["Mountain".to_string()], "seat {seat}");
+        for line in ["This land enters tapped.", "When this land enters, return a land you control to its owner's hand.", "{T}: Add {W}{U}."] {
+            assert!(chancery.lost_abilities.iter().any(|l| l == line), "seat {seat} is not told {line:?} is lost: {:?}", chancery.lost_abilities);
+        }
+        assert!(chancery.granted_abilities.is_empty(), "seat {seat}: {:?}", chancery.granted_abilities.iter().map(|a| &a.text).collect::<Vec<_>>());
+    }
+}
+
 #[test]
 fn every_scenario_passes_at_a_table_with_bot1_driven() {
     let mut entries: Vec<PathBuf> =
