@@ -1,0 +1,43 @@
+# Withering Torment on a creature that has become indestructible in response (Boros Charm's first mode): it is not destroyed (CR 702.12b) and Bot1 loses 2 life all the same.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Withering Torment
+Island x16
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Forest
+Llanowar Elves
+Boros Charm
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Withering Torment.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Boros Charm.Cast
+Bot2.Modes(indestructible)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield.Llanowar Elves.Power = 1

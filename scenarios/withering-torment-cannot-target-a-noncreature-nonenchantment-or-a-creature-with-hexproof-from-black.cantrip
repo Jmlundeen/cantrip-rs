@@ -1,0 +1,44 @@
+# "Target creature or enchantment": a Mox is neither, and Knight of Grace has hexproof from black (Torment is a black spell, an opponent's), so both are refused as
+# targets beside the positive control of the Llanowar Elves, which are legal and destroyed.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Withering Torment
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Knight of Grace
+Llanowar Elves
+Forest
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Forest.Play
+Bot2.Hand.Knight of Grace.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+! Bot1.Hand.Withering Torment.Cast(Bot2.Battlefield.Knight of Grace)
+! Bot1.Hand.Withering Torment.Cast(Bot2.Battlefield.Mox Pearl)
+Bot1.Hand.Withering Torment.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield.Count = 4

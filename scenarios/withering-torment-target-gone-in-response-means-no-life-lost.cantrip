@@ -1,0 +1,41 @@
+# Withering Torment with its only target illegal as it would resolve does nothing at all (CR 608.2b): Bot2 bolts its own Llanowar Elves in response, so Bot1 loses no life
+# (the contrast to the other scenarios, where the life is lost).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Withering Torment
+Island x16
+
+[Bot2 Deck]
+Forest
+Mountain
+Llanowar Elves
+Lightning Bolt
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Withering Torment.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield.Count = 2

@@ -1,0 +1,33 @@
+# Withering Torment: "Destroy target creature or enchantment. You lose 2 life." Bot1 casts it on turn 3 on Bot2's Llanowar Elves: the Elves are destroyed and Bot1 loses 2 (20 - 2 = 18).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Withering Torment
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Withering Torment.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot2.Battlefield = Forest
