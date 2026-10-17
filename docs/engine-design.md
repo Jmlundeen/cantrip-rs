@@ -541,6 +541,25 @@ Helitrooper and Fervent Champion ("equip abilities you activate that target this
 Blade ("{1} less for each color of the creature it targets") and Ghostfire Blade ("{2} less if it targets a colorless
 creature") read them.
 
+A cost change may add life as well as mana (`CostDelta::life`, CR 118.8: Terror of the Peaks' "spells your opponents cast
+that target this creature cost an additional 3 life to cast"). It is part of the total cost locked in once the targets are
+announced (`apply_cost_changes_total`), paid with the rest of it (CR 601.2h), and a player can pay it only with at least the
+whole of the life the total cost asks - an additional "pay X life", Phyrexian symbols and X paid in life counted with it
+(CR 119.4, 118.3): a cast or activation that cannot is taken back (CR 733). The advice counts it too: a single-target cast
+announced with its action is not offered at a target whose tax its caster could not pay (`added_life_payable`).
+
+### Ways a permanent gives: from a graveyard or from a hand
+
+A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
+Paragon, Underworld Breach's escape, mayhem) or the hand ("you may cast spells from your hand without paying their mana
+costs", Omniscience). Each is judged on the face being cast, offered beside the card's other casts with its own way number,
+and is the one alternative cost of that cast (CR 118.9a); additional costs and cost increases still apply to it (CR 118.9d).
+Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost that is or includes the mana cost has its
+{X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana cost may be cast that way (CR 118.6a).
+The host marks such a cast `WithoutPayingManaCost`, with the cost it comes to as its `CostText`, and the tactical bot takes it
+over the card's ordinary cast. Not built: a way given to cards in a hand used by a cast an effect makes as it resolves
+(`cast_ways_during_resolution` offers the mana cost only), and emblems that give one (Tamiyo, Field Researcher's).
+
 ### Hexproof from a quality
 
 "Hexproof from [quality]" (CR 702.11d) is `Chars::hexproof_from`, a `HexproofFrom` bitset of qualities: the five colors,

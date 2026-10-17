@@ -217,11 +217,17 @@ pub enum Costed {
     Ability(ObjectId, AbilityRef),
 }
 
-/// What a cost change does to a cost (CR 601.2f, 118.7): generic mana it adds, and an amount of mana it takes off.
+/// What a cost change does to a cost (CR 601.2f, 118.7, 118.8): generic mana it adds, an amount of mana it takes off,
+/// and life it adds.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CostDelta {
     /// Generic mana added: "costs {1} more" (CR 601.2f).
     pub more: u8,
+    /// Life added as an additional cost (CR 118.8, 601.2f): "spells your opponents cast that target this creature cost an
+    /// additional 3 life to cast" (Terror of the Peaks). Part of the total cost once the targets are announced, paid with
+    /// the rest of it (CR 601.2h), and payable only by a player whose life total is at least the whole of the life the total
+    /// cost asks (CR 119.4, 118.3): a cast that cannot pay it is taken back.
+    pub life: u8,
     /// The amount of mana the cost is reduced by (CR 118.7). Its generic part reduces only the generic part of the cost
     /// (118.7a); each colored or colorless symbol reduces mana of its own type, and whatever of it the cost does not have
     /// reduces generic mana instead (118.7b-d); a Phyrexian symbol reduces mana of its color (118.7f). `x` is not read
@@ -232,21 +238,26 @@ pub struct CostDelta {
 
 impl CostDelta {
     /// No change.
-    pub const NONE: CostDelta = CostDelta { more: 0, less: ManaCost::ZERO };
+    pub const NONE: CostDelta = CostDelta { more: 0, less: ManaCost::ZERO, life: 0 };
 
     /// "Costs {n} more."
     pub const fn more(n: u8) -> CostDelta {
-        CostDelta { more: n, less: ManaCost::ZERO }
+        CostDelta { more: n, ..CostDelta::NONE }
+    }
+
+    /// "Costs an additional n life" (CR 118.8, 601.2f).
+    pub const fn life(n: u8) -> CostDelta {
+        CostDelta { life: n, ..CostDelta::NONE }
     }
 
     /// "Costs {n} less": `n` generic mana off (CR 118.7a).
     pub const fn less(n: u8) -> CostDelta {
-        CostDelta { more: 0, less: ManaCost { generic: n, ..ManaCost::ZERO } }
+        CostDelta { less: ManaCost { generic: n, ..ManaCost::ZERO }, ..CostDelta::NONE }
     }
 
     /// "Costs {W}{W} less", or "reduced by its mana cost": an amount of mana that may be colored (CR 118.7b-d, f).
     pub const fn less_mana(mana: ManaCost) -> CostDelta {
-        CostDelta { more: 0, less: mana }
+        CostDelta { less: mana, ..CostDelta::NONE }
     }
 }
 
@@ -1152,21 +1163,29 @@ pub type ModeCount = fn(&dyn Query, &Asker) -> u8;
 /// cast, so whether you controlled a Dragon won't matter".
 pub type CastFact = fn(&dyn Query, &Asker) -> u32;
 
-/// The cost a card in a graveyard may be cast for by a static ability's say-so (CR 113.6, 118.9), or none when it may not
-/// be: asked of the granting permanent (`Asker`), the card in the graveyard and the player casting it. Underworld Breach's
-/// escape is the card's mana cost and exiling three other cards; mayhem is its mana cost for a card discarded this turn.
+/// The cost a card in a graveyard or a hand may be cast for by a static ability's say-so (CR 113.6, 118.9), or none when it
+/// may not be: asked of the granting permanent (`Asker`), the card (as the face being cast) and the player casting it.
+/// Underworld Breach's escape is the card's mana cost and exiling three other cards; mayhem is its mana cost for a card
+/// discarded this turn; Omniscience's is nothing (`Cost::NONE`, "without paying its mana cost").
+///
+/// Whether X is announced follows from the cost (CR 107.3a-b): a cost that includes the card's mana cost has its {X}, and
+/// one that is neither the mana cost nor includes X ("without paying its mana cost") leaves 0 the only legal choice for X.
 pub type GrantedCost = fn(&dyn Query, &Asker, ObjectId, PlayerId) -> Option<Cost>;
 
 /// The ability index of the marker the history keeps of a granted way having been used: an activation, by the permanent that
 /// gave the way, of this index (past any ability a card prints). "Once during each of your turns" reads it (CR 601.3).
 pub const GRANTED_WAY_USED: u8 = AbilityRef::GRANTED_WAY_USED;
 
-/// A way of casting cards from graveyards that a permanent gives (CR 604, 118.9).
+/// A way of casting cards from graveyards, or from a hand, that a permanent gives (CR 604, 118.9).
 #[derive(Clone, Copy)]
 pub struct GrantedWay {
-    /// What the way is called, which a scenario's `Ability:` names it by.
+    /// What the way is called, which a scenario's `Ability:` names it by and a menu row shows beside the cast.
     pub text: &'static str,
     pub cost: GrantedCost,
+    /// The zone of the caster's own the way casts cards from (CR 601.3): their graveyard (Lurrus, escape, mayhem) or their
+    /// hand ("you may cast spells from your hand without paying their mana costs", Omniscience). Another zone's rule or
+    /// permission does not open it.
+    pub from: ZoneKind,
     /// The way also lets a land card in the graveyard be played (CR 305.1) rather than cast: `cost` is asked of the land
     /// card too, and any `Some` allows the play (the land has no cost). It uses the land drop, and the history marks the
     /// use as it marks a cast's, so "once during each of your turns" is shared between the play and the casts. Serra Paragon.
@@ -1183,7 +1202,7 @@ pub struct GrantedWay {
 
 impl GrantedWay {
     /// A way that casts only and grants nothing, for a card's file to start from.
-    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, lands: false, gains: None, flashback: false };
+    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, lands: false, gains: None, flashback: false };
 }
 
 /// A static ability of a permanent that lets a player cast cards in exile (CR 601.3, 604.1): "you may cast spells from among
