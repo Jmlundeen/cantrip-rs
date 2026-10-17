@@ -1,0 +1,6 @@
+{
+  "name": "Stab",
+  "manaCost": "{B}",
+  "type": "Instant",
+  "oracleText": "Target creature gets -2/-2 until end of turn."
+}

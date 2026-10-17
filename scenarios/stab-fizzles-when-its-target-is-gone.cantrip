@@ -1,0 +1,41 @@
+# Stab's only target is Hired Blade; Bot2 kills it in response with Lightning Bolt on its own creature. Stab then has
+# no legal target and does nothing (CR 608.2b) - it is put into its owner's graveyard, and no effect is left on anything
+# else (Bot2's life is untouched).
+
+[Bot1 Deck]
+Mox Jet
+Stab
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Hired Blade
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stab.Cast(Bot2.Battlefield.Hired Blade)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Hired Blade; Lightning Bolt
+Bot1.Graveyard = Stab
+Bot2.Life = 20
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Emerald; Mox Pearl

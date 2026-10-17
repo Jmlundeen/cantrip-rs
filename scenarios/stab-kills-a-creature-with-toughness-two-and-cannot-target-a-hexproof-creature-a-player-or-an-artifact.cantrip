@@ -1,0 +1,49 @@
+# Stab: "Target creature gets -2/-2 until end of turn." Bot2 has Hired Blade (3/2) and Sylvan Caryatid (0/3, hexproof) out.
+# Stab only names creatures: the refusals are Bot2 (a player), Mox Ruby (a noncreature permanent) and the hexproof
+# Caryatid (CR 702.11b); the positive control is the Stab on Hired Blade, whose toughness 2 -2 = 0 puts it into the
+# graveyard as a state-based action (CR 704.5f). The Caryatid stays where it is, and Stab goes to its owner's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Stab
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Sylvan Caryatid
+Hired Blade
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Stab.Cast(Bot2)
+! Bot1.Hand.Stab.Cast(Bot2.Battlefield.Mox Ruby)
+! Bot1.Hand.Stab.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Hand.Stab.Cast(Bot2.Battlefield.Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Hired Blade
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Emerald; Mox Pearl; Mox Sapphire; Sylvan Caryatid
+Bot2.Battlefield.Sylvan Caryatid.Power = 0
+Bot2.Battlefield.Sylvan Caryatid.Toughness = 3
+Bot1.Graveyard = Stab

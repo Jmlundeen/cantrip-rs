@@ -1,0 +1,42 @@
+# Two Stabs are two separate -2/-2 effects that add up (CR 613.4c): Six (2/4) survives one and dies to the second
+# (toughness 4 - 2 - 2 = 0, CR 704.5f). The first Stab alone is checked to have left it at 0/2.
+
+[Bot1 Deck]
+Mox Jet
+Swamp
+Swamp
+Stab
+Stab
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Six
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stab.Cast(Bot2.Battlefield.Six)
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Six.Toughness = 2
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Stab.Cast(Bot2.Battlefield.Six)
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Graveyard = Six
+Bot1.Graveyard = Stab; Stab
