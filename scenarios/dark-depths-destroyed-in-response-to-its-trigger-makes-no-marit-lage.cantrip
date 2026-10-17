@@ -1,0 +1,43 @@
+# Dark Depths has its ice counters removed by Vampire Hexmage and its state trigger goes on the stack; Bot2 destroys it with
+# Strip Mine in response. When the trigger resolves Dark Depths is a new object in the graveyard (CR 400.7), so it can't be
+# sacrificed, and "If you do" makes no Marit Lage (CR 608.2c; the ruling: "If Dark Depths leaves the battlefield before its
+# triggered ability resolves, you won't be able to sacrifice it, so you won't create Marit Lage").
+
+[Bot1 Deck]
+Dark Depths
+Mox Jet
+Black Lotus
+Vampire Hexmage
+Forest x11
+
+[Bot2 Deck]
+Strip Mine
+Island x14
+
+[Actions]
+Bot1.Hand.Dark Depths.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vampire Hexmage.Activate(Dark Depths)
+Bot1.Pass
+Bot2.Pass
+? Stack = Dark Depths
+Bot1.Pass
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Dark Depths; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet
+Bot1.Graveyard = Dark Depths; Vampire Hexmage; Black Lotus
+Stack.Count = 0

@@ -1,0 +1,28 @@
+# Vesuva enters as a copy of Dark Depths, so the copied "Dark Depths enters with ten ice counters on it" applies as it enters
+# (CR 614.12, 707.9a; the ruling: "'[This land] enters the battlefield with' abilities of the copied land will also work") -
+# where Thespian's Stage, becoming a copy on the battlefield, gets none. The legend rule then has Bot1 keep one (CR 704.5j):
+# Bot1 keeps the Vesuva, a tapped legendary snow Dark Depths with ten ice counters, and nothing triggers.
+
+[Bot1 Deck]
+Dark Depths
+Vesuva
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Dark Depths.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Choose(Dark Depths#2)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Dark Depths
+Bot1.Battlefield.Dark Depths.Counters.Ice = 10
+Bot1.Battlefield.Dark Depths.Tapped = true
+Bot1.Battlefield.Dark Depths.Supertypes = Legendary; Snow
+Bot1.Graveyard = Dark Depths
+Stack.Count = 0

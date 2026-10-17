@@ -1,0 +1,42 @@
+# Vampire Hexmage removes all ten ice counters from Dark Depths. "When Dark Depths has no ice counters on it" is a state
+# trigger (CR 603.8): it triggers at once, and only once while it waits on the stack (the check shows the one ability there).
+# It resolves: Dark Depths is sacrificed, and because it was, Bot1 creates Marit Lage, a legendary 20/20 black Avatar creature
+# token with flying and indestructible (CR 111.4).
+
+[Bot1 Deck]
+Dark Depths
+Mox Jet
+Black Lotus
+Vampire Hexmage
+Forest x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Dark Depths.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Vampire Hexmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vampire Hexmage.Activate(Dark Depths)
+Bot1.Pass
+Bot2.Pass
+? Stack = Dark Depths
+? Bot1.Battlefield.Dark Depths.Counters.Ice = (absent)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Marit Lage
+Bot1.Battlefield.Marit Lage.Token = true
+Bot1.Battlefield.Marit Lage.Power = 20
+Bot1.Battlefield.Marit Lage.Toughness = 20
+Bot1.Battlefield.Marit Lage.Colors = Black
+Bot1.Battlefield.Marit Lage.Subtypes = Avatar
+Bot1.Battlefield.Marit Lage.Supertypes = Legendary
+Bot1.Battlefield.Marit Lage.Keywords = Flying; Indestructible
+Bot1.Graveyard = Dark Depths; Vampire Hexmage; Black Lotus
+Stack.Count = 0

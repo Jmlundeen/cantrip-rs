@@ -1,0 +1,40 @@
+# Dark Depths enters with ten ice counters (CR 614.1c, 122.6), and "{3}: Remove an ice counter" takes one off as it resolves:
+# activated twice, it has eight. With counters left its state trigger never triggers (CR 603.8), so it stays. It has no mana
+# ability (the ruling): the refusal shows it, beside Sol Ring tapping for the second activation.
+
+[Bot1 Deck]
+Dark Depths
+Sol Ring
+Mox Pearl
+Mox Jet
+Forest x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Dark Depths.Play
+? Bot1.Battlefield.Dark Depths.Counters.Ice = 10
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+! Bot1.Battlefield.Dark Depths.Activate(Color: C)
+Bot1.Battlefield.Dark Depths.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dark Depths.Counters.Ice = 9
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dark Depths.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Dark Depths; Mox Pearl; Sol Ring; Mox Jet
+Bot1.Battlefield.Dark Depths.Counters.Ice = 8
+Bot1.Battlefield.Dark Depths.Supertypes = Legendary; Snow
+Stack.Count = 0

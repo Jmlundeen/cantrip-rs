@@ -1,0 +1,39 @@
+# Thespian's Stage becomes a copy of Dark Depths with no ice counters, and Bot1 keeps the original Dark Depths under the legend
+# rule (CR 704.5j): the Stage goes to the graveyard. Its state trigger had triggered the moment the Stage was a Dark Depths with
+# no ice counters, before state-based actions were checked (CR 603.8, 704.3), so it is put on the stack all the same (CR
+# 113.7a: an ability exists apart from its source). It resolves and can't sacrifice the Stage, now a new object (CR 400.7), so
+# "If you do" makes no Marit Lage. The real Dark Depths keeps its ten ice counters.
+
+[Bot1 Deck]
+Dark Depths
+Mox Pearl
+Sol Ring
+Thespian's Stage
+Forest x11
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Dark Depths.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Dark Depths; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Dark Depths#1)
+? Bot1.Graveyard = Thespian's Stage
+? Stack = Dark Depths
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Dark Depths; Mox Pearl; Sol Ring
+Bot1.Battlefield.Dark Depths.Counters.Ice = 10
+Bot1.Graveyard = Thespian's Stage
+Stack.Count = 0
