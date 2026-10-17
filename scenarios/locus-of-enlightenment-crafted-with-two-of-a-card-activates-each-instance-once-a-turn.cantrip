@@ -1,0 +1,95 @@
+# Locus of Enlightenment crafted with two Goblin Bombardments (and Walking Ballista and Mox Ruby) has the Bombardment's
+# ability twice (CR 702.167c, 113.2c), each instance "only once each turn" (CR 602.5b): on turn 13 Bot1 activates it twice,
+# sacrificing an Ornithopter each time, and the third time is refused with a third Ornithopter to sacrifice. Locus's
+# trigger copies each activation; the copies were not activated (CR 707.10) and use up nothing: Bot2 takes 4. The
+# Ballista's "{4}: Put a +1/+1 counter on this creature" puts its counter on Locus, whose ability it now is (the ruling: an
+# ability that names its card means Locus; CR 113.7), and its copy another: two counters.
+
+[Bot1 Deck]
+Island
+The Enigma Jewel
+Walking Ballista
+Goblin Bombardment
+Goblin Bombardment
+Mox Ruby
+Mox Jet
+Mountain
+Mountain
+Black Lotus
+Ornithopter
+Ornithopter
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Swamp x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Enigma Jewel.Cast
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Craft)
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Add)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Choose(Graveyard.Walking Ballista; Goblin Bombardment; Goblin Bombardment; Mox Ruby)
+[T9 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T11 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T13 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Stack.Count = 0
+! Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Locus of Enlightenment.Activate(Ability: {4})
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T13 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Locus of Enlightenment.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Graveyard = Ornithopter; Ornithopter; Black Lotus
+Stack.Count = 0
