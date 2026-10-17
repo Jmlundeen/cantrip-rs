@@ -1,0 +1,5 @@
+{
+  "name": "Restless Reef",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {U} or {B}.\n{2}{U}{B}: Until end of turn, this land becomes a 4/4 blue and black Shark creature with deathtouch. It's still a land.\nWhenever this land attacks, target player mills four cards."
+}

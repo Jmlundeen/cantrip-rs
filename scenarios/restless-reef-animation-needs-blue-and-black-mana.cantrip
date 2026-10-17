@@ -1,0 +1,49 @@
+# {2}{U}{B}: with {U}{R}{W}{G} in the pool (the Reef itself tapped for the blue) there is no black and the ability is
+# refused; casting Mox Jet and tapping it for {B} makes the same ability payable and it animates (the positive control).
+# On turn 5 the same with the colors swapped: {B}{R}{W}{G} has no blue and is refused until Mox Sapphire is cast.
+
+[Bot1 Deck]
+Restless Reef
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Island
+Island x12
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Restless Reef.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Reef.Types = Land; Creature
+[T5 Bot1.Main1]
+Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Restless Reef.Power = 4
+
+[Expect]
+Bot1.Battlefield.Restless Reef.Types = Land; Creature

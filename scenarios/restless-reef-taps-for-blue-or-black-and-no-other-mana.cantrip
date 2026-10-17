@@ -1,0 +1,30 @@
+# "{T}: Add {U} or {B}": on turn 3 blue and black are offered (blue taken) while red, white, green and colorless are
+# refused beside them as the positive control; it entered tapped on turn 1 (CR 614.12), so there was no mana before then.
+# It mills nobody here: it is not a creature, so it does not attack.
+
+[Bot1 Deck]
+Restless Reef
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Restless Reef.Play
+? Bot1.Battlefield.Restless Reef.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: Red)
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: White)
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: Green)
+! Bot1.Battlefield.Restless Reef.Activate(Ability: Add; Color: Colorless)
+Bot1.Battlefield.Restless Reef.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Restless Reef.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 5
+Bot1.Mana = {B}
+Bot1.Battlefield = Restless Reef
+Bot2.Library.Count = 11

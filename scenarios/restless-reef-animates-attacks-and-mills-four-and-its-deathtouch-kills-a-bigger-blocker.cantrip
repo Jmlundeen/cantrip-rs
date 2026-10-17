@@ -1,0 +1,71 @@
+# Restless Reef enters tapped on turn 1. On turn 3 Bot1 pays {2}{U}{B} with four Moxen and animates it: until end of turn it
+# is a 4/4 blue and black Shark land creature with deathtouch (CR 613.1d, 613.4b). Attacking, it targets Bot2: "target
+# player mills four cards" - four Lightning Bolts go to Bot2's graveyard (their library 20 - 7 - 1 - 4 = 8). Bot2 blocks
+# with Sheoldred, the Apocalypse (4/5): Reef's 4 damage is less than her toughness, so only deathtouch kills her; her own
+# deathtouch kills Reef. Bot1 lost 2 life drawing with Sheoldred in play (18).
+
+[Bot1 Deck]
+Restless Reef
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sheoldred, the Apocalypse
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Swamp x8
+
+[Actions]
+Bot1.Hand.Restless Reef.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+? Bot1.Battlefield.Restless Reef.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sheoldred, the Apocalypse.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Attack(Restless Reef > Bot2)
+Bot1.Target(Bot2)
+? Bot1.Battlefield.Restless Reef.Types = Land; Creature
+? Bot1.Battlefield.Restless Reef.Subtypes = Shark
+? Bot1.Battlefield.Restless Reef.Colors = Black; Blue
+? Bot1.Battlefield.Restless Reef.Keywords = Deathtouch
+? Bot1.Battlefield.Restless Reef.Power = 4
+? Bot1.Battlefield.Restless Reef.Toughness = 4
+Bot2.Block(Sheoldred, the Apocalypse > Restless Reef)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Restless Reef
+Bot2.Graveyard = Sheoldred, the Apocalypse; Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot2.Library.Count = 8
+Bot2.Life = 20

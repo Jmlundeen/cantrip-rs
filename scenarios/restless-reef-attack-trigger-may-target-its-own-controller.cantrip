@@ -1,0 +1,43 @@
+# "Whenever this land attacks, target player mills four cards": any player is a legal target, so Bot1 mills their own four
+# cards - four Lightning Bolts after the turn-3 draw - while the unblocked Shark deals 4 to Bot2 (20 - 4 = 16). Bot2's
+# library is untouched (Reef was not made to mill them).
+
+[Bot1 Deck]
+Restless Reef
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Island
+Island
+Island
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Restless Reef.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Restless Reef.Activate(Ability: Until end of turn)
+Bot1.Attack(Restless Reef > Bot2)
+Bot1.Target(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Library.Count = 10
+Bot2.Library.Count = 12
