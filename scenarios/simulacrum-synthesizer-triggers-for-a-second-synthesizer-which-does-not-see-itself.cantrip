@@ -1,0 +1,50 @@
+# Two Simulacrum Synthesizers (mana value 3 each): the second one entering is "another artifact you control with mana value 3 or greater"
+# for the first, which makes one Construct; the second does not trigger on itself, so there is exactly one Construct (it would be
+# Construct#1 and Construct#2 otherwise). Both scry 2 as they enter (the library is left in place). Artifacts: five Moxen, two
+# Synthesizers and the Construct itself: an 8/8.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Simulacrum Synthesizer
+Simulacrum Synthesizer
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Simulacrum Synthesizer.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 7
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Simulacrum Synthesizer.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Construct.Power = 8
+Bot1.Battlefield.Construct.Toughness = 8
+Bot1.Battlefield.Count = 9

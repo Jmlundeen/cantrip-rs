@@ -1,0 +1,73 @@
+# Simulacrum Synthesizer: "When this artifact enters, scry 2" (turn 1: both cards kept on top, Blasting Station first), "Whenever another
+# artifact you control with mana value 3 or greater enters, create a Construct". In turn 1 nothing but the scry happens although four
+# Moxen (mana value 0) enter beside it and the Synthesizer itself is an artifact of mana value 3 ("another"). In turn 2 Bot2 casts Blasting Station
+# (mana value 3) with Black Lotus: an opponent's artifact does not trigger it. In turn 3 Bot1's Blasting Station does: one Construct, a
+# 0/0 that gets +1/+1 for each artifact Bot1 controls (the five Moxen, the Synthesizer, the Station and itself: 8/8). In turn 5 Cranial Plating
+# (mana value 2) enters and makes no second Construct, only a 9/9 Construct (one more artifact).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Simulacrum Synthesizer
+Blasting Station
+Cranial Plating
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Blasting Station
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Simulacrum Synthesizer.Cast
+Bot1.Pass
+Bot1.Arrange(Blasting Station; Cranial Plating |)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Count = 7
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Blasting Station.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield = Blasting Station
+? Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blasting Station.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Construct.Power = 8
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Cranial Plating.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Construct.Power = 9
+Bot1.Battlefield.Construct.Toughness = 9
+Bot1.Battlefield.Construct.Token = true
+Bot1.Battlefield.Construct.Types = Artifact; Creature
+Bot2.Battlefield = Blasting Station
