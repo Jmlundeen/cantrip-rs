@@ -49,13 +49,6 @@ pub fn is_a_creature(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.types = chars.types.with(CardType::Creature);
 }
 
-/// "[P/T]" in a striation (CR 721.2b), layer 7b: its base power and toughness. A station card has no power or toughness
-/// otherwise (CR 721.2c), so its content file prints none.
-pub fn base_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = Some(P);
-    chars.toughness = Some(T);
-}
-
 /// The abilities of a striation (CR 721.2a), layer 6: the ability at `INDEX` of the station card's `delayed` list. A
 /// permanent that copies the station card has it too, read from its own charge counters (ruling 2025-07-25).
 pub fn has<const INDEX: u8>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

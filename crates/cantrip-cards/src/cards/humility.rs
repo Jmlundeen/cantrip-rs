@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::all_creatures;
+use cantrip_mechanics::statics::{all_creatures, base_pt};
 use cantrip_oracle as oracle;
 
 /// "All creatures lose all abilities and have base power and toughness 1/1." One ability, one effect in two layers
@@ -10,13 +10,7 @@ use cantrip_oracle as oracle;
 /// Humility itself once Humility is a creature: taking its own ability, it goes on applying (CR 613.6).
 const TEXT: &str = "All creatures lose all abilities and have base power and toughness 1/1.";
 
-/// "... have base power and toughness 1/1" (CR 613.4b, layer 7b).
-fn base_one_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = Some(1);
-    chars.toughness = Some(1);
-}
-
 pub static CARD: CardDef = CardDef {
-    statics: &[loses_all_abilities(all_creatures, TEXT), static_ability(Layer::PtSet, all_creatures, base_one_one, TEXT).continues()],
+    statics: &[loses_all_abilities(all_creatures, TEXT), static_ability(Layer::PtSet, all_creatures, base_pt::<1, 1>, TEXT).continues()],
     ..oracle::HUMILITY
 };

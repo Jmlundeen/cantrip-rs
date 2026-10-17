@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::base_pt;
 use cantrip_mechanics::{attach::attached_object, targets};
 use cantrip_oracle as oracle;
 
@@ -15,20 +16,13 @@ fn black(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     chars.colors = view.words(source).colors(ColorSet::of(Color::Black));
 }
 
-/// "... with base power and toughness 1/1" (CR 613.4b, layer 7b): counters and effects that modify power and toughness
-/// still apply after it.
-fn base_one_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = Some(1);
-    chars.toughness = Some(1);
-}
-
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
     statics: &[
         static_ability(Layer::Type, attached_object, skeleton_creature, "Enchanted creature is a Skeleton creature."),
         static_ability(Layer::Color, attached_object, black, "Enchanted creature is black.").continues(),
         loses_all_abilities(attached_object, "Enchanted creature loses all abilities.").continues(),
-        static_ability(Layer::PtSet, attached_object, base_one_one, "Enchanted creature has base power and toughness 1/1.").continues(),
+        static_ability(Layer::PtSet, attached_object, base_pt::<1, 1>, "Enchanted creature has base power and toughness 1/1.").continues(),
     ],
     ..oracle::EATEN_BY_PIRANHAS
 };

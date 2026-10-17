@@ -1,11 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::{effects, station, triggers};
+use cantrip_mechanics::{effects, station, statics, triggers};
 use cantrip_oracle as oracle;
-
-/// "4+ | Flying" (CR 721.2a).
-fn flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Flying);
-}
 
 /// The 4+ striation, "Flying" with the 2/2 power/toughness box (CR 721.2b): while it has four or more charge counters it
 /// has flying and is a creature with base power and toughness 2/2 in addition to its other types - an artifact creature,
@@ -19,8 +14,8 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::Type, station::charged::<4>, station::is_a_creature, FOUR_PLUS),
-        static_ability(Layer::Ability, station::charged::<4>, flying, FOUR_PLUS).continues(),
-        static_ability(Layer::PtSet, station::charged::<4>, station::base_pt::<2, 2>, FOUR_PLUS).continues(),
+        static_ability(Layer::Ability, station::charged::<4>, statics::have_flying, FOUR_PLUS).continues(),
+        static_ability(Layer::PtSet, station::charged::<4>, statics::base_pt::<2, 2>, FOUR_PLUS).continues(),
     ],
     ..oracle::WURMWALL_SWEEPER
 };

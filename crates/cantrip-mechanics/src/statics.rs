@@ -254,6 +254,15 @@ pub fn plus_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, char
     chars.toughness = chars.toughness.map(|v| v + T);
 }
 
+/// "Has base power and toughness P/T" (CR 613.4b, layer 7b) as a static ability's `apply`: it sets the power and toughness
+/// the counters and effects that modify them (layer 7c) then apply to. Humility and Eaten by Piranhas (1/1), Hexdrinker (4/4
+/// and 6/6), Kaito's Ninja (3/4), Puppet Crafting (5/5), Wrecking Ball Arm (7/7) and a station card's striation (Wurmwall
+/// Sweeper's 2/2, CR 721.2b) print it.
+pub fn base_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = Some(P);
+    chars.toughness = Some(T);
+}
+
 /// "Spells you cast" (CR 601.2i, 707.10a): `affected` is a spell on the stack that was cast, from the zone it was cast from
 /// (a copy of a spell was cast from none, CR 707.10; a copy of a card that was cast, a prepare spell's, CR 707.12, 722.3c,
 /// is a spell cast), and its controller is `source`'s controller. Thrumming Stone and Ral, Crackling Wit's emblem grant

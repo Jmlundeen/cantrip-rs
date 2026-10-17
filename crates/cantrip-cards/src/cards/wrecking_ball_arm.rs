@@ -1,16 +1,11 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::base_pt;
 use cantrip_mechanics::attach::{attached_object, equip, equip_quality};
 use cantrip_oracle as oracle;
 
 /// The equipped creature: what the Equipment is attached to while it is still that creature (CR 301.5a).
 fn equipped_creature(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     attached_object(view, source, affected, so_far) && view.chars(affected).is(CardType::Creature)
-}
-
-/// Base power and toughness 7/7 (CR 613.4b), below every modifier and counter.
-fn size(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = Some(7);
-    chars.toughness = Some(7);
 }
 
 /// An ability the creature gains in layer 6 (CR 613.1f), so losing all abilities takes it away.
@@ -31,7 +26,7 @@ pub static CARD: CardDef = CardDef {
         equip(mana("{7}"), "Equip {7}"),
     ],
     statics: &[
-        static_ability(Layer::PtSet, equipped_creature, size, "Equipped creature has base power and toughness 7/7."),
+        static_ability(Layer::PtSet, equipped_creature, base_pt::<7, 7>, "Equipped creature has base power and toughness 7/7."),
         static_ability(Layer::Ability, equipped_creature, evasion, "Equipped creature can't be blocked by creatures with power 2 or less."),
     ],
     ..oracle::WRECKING_BALL_ARM

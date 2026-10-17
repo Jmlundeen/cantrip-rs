@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics::plus_pt;
+use cantrip_mechanics::statics::{base_pt, plus_pt};
 use cantrip_mechanics::{ninjutsu::ninjutsu, surveil, targets};
 use cantrip_oracle as oracle;
 
@@ -26,12 +26,6 @@ fn become_a_ninja_creature(q: &dyn LayerQuery, source: ObjectId, chars: &mut Cha
 /// Layer 6: hexproof.
 fn hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Hexproof);
-}
-
-/// Layer 7b: a base power and toughness on a card that has none printed.
-fn three_four(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = Some(3);
-    chars.toughness = Some(4);
 }
 
 // --- The abilities ------------------------------------------------------------------------------------------------
@@ -93,7 +87,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[
         static_ability(Layer::Type, affects, become_a_ninja_creature, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a Ninja creature."),
         static_ability(Layer::Ability, affects, hexproof, "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof.").continues(),
-        static_ability(Layer::PtSet, affects, three_four, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4.").continues(),
+        static_ability(Layer::PtSet, affects, base_pt::<3, 4>, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4.").continues(),
     ],
     ..oracle::KAITO_BANE_OF_NIGHTMARES
 };

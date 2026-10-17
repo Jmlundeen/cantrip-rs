@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::base_pt;
 use cantrip_mechanics::attach::attached_object;
 use cantrip_mechanics::{effects, targets};
 use cantrip_oracle as oracle;
@@ -20,12 +21,6 @@ fn construct_creature_too(q: &dyn LayerQuery, source: ObjectId, chars: &mut Char
     chars.subtypes = chars.subtypes.with(q.words(source).subtype(Subtype::Construct));
 }
 
-/// Layer 7b (CR 613.4b): "base power and toughness 5/5", under counters and every modifier.
-fn base_five_five(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.power = Some(5);
-    chars.toughness = Some(5);
-}
-
 pub static CARD: CardDef = CardDef {
     enchant: Some(target(artifact_or_non_aura_enchantment)),
     abilities: &[ability(cost("{4}{G}"), effects::return_this_to_hand, "{4}{G}: Return this card from your graveyard to your hand.").from(ZoneKind::Graveyard)],
@@ -39,7 +34,7 @@ pub static CARD: CardDef = CardDef {
         static_ability(
             Layer::PtSet,
             attached_object,
-            base_five_five,
+            base_pt::<5, 5>,
             "Enchanted permanent is a Construct creature with base power and toughness 5/5 in addition to its other types.",
         )
         .continues(),
