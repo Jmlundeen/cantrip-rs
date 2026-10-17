@@ -1,0 +1,53 @@
+# Hardened Academic: "Whenever ONE OR MORE cards leave your graveyard" (CR 603.2c) triggers once for a batch. Bot1 puts a
+# Guerrilla Gorilla into its graveyard with Entomb and casts the Academic on turn 1; on turn 3 a Lively Dirge (modes 1 and 2,
+# five mana) searches for the second Gorilla and returns both to the battlefield at once. Two cards left the graveyard
+# together: one trigger, one +1/+1 counter on the target (the Academic), not two. The search itself only put a card INTO the
+# graveyard, which triggers nothing.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Entomb
+Hardened Academic
+Lively Dirge
+Guerrilla Gorilla
+Guerrilla Gorilla
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Guerrilla Gorilla)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hardened Academic.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Lively Dirge.Cast
+Bot1.Modes(1; 2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Search(Guerrilla Gorilla)
+Bot1.Choose(Guerrilla Gorilla)
+Bot1.Choose(Guerrilla Gorilla)
+Bot1.Target(Hardened Academic)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hardened Academic.Power = 3
+Bot1.Graveyard = Lively Dirge; Entomb

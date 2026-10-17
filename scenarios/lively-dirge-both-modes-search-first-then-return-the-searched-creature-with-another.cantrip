@@ -1,0 +1,45 @@
+# Lively Dirge, modes 1 and 2 (spree, CR 702.172; modes are followed in printed order, CR 700.2): Bot1 puts a Guerrilla
+# Gorilla into its graveyard with Entomb on turn 1. On turn 3 it casts Lively Dirge for {1}{B} + {1} + {2} = 5 mana
+# (Mox Jet, Mox Pearl, Mox Ruby and two Swamps). Mode 1 searches for the second Gorilla and puts it into the graveyard; mode 2
+# then returns both Gorillas (mana values 2 + 2 = 4, the most allowed) to the battlefield together. The Dirge goes to the graveyard.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Mox Ruby
+Entomb
+Lively Dirge
+Guerrilla Gorilla
+Guerrilla Gorilla
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Guerrilla Gorilla)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lively Dirge.Cast
+Bot1.Modes(1; 2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Search(Guerrilla Gorilla)
+Bot1.Choose(Guerrilla Gorilla)
+Bot1.Choose(Guerrilla Gorilla)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lively Dirge; Entomb
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Mox Pearl; Mox Ruby; Guerrilla Gorilla; Guerrilla Gorilla

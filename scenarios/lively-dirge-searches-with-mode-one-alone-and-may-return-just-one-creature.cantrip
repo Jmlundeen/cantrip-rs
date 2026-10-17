@@ -1,0 +1,52 @@
+# Lively Dirge, "up to two": the creatures are chosen one at a time and Bot1 stops after the first (the second choice is
+# declined), so one of the two eligible Gorillas returns and the other stays in the graveyard. Before that, a Dirge cast
+# for mode 1 alone ({1}{B}+{1} = 3 mana) on turn 3 searches for a Gorilla and puts it into the graveyard; no creature is
+# returned by it (mode 2 was not chosen), which the checks at the start of turn 5 show.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Lively Dirge
+Lively Dirge
+Entomb
+Guerrilla Gorilla
+Guerrilla Gorilla
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Guerrilla Gorilla)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Lively Dirge.Cast
+Bot1.Modes(1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Search(Guerrilla Gorilla)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Count = 4
+? Bot1.Graveyard.Count = 4
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Lively Dirge.Cast
+Bot1.Modes(2)
+Bot1.Choose(Guerrilla Gorilla)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Mox Jet; Mox Pearl; Guerrilla Gorilla
+Bot1.Graveyard = Lively Dirge; Lively Dirge; Guerrilla Gorilla; Entomb
