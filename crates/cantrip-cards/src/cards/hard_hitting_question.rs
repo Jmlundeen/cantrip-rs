@@ -24,6 +24,12 @@ fn bite(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[targets::CREATURE_YOU_CONTROL, target(creature_or_planeswalker_you_dont_control)], bite),
+    spell: spell(
+        &[
+            targets::CREATURE_YOU_CONTROL.labelled("Creature you control to deal damage equal to its power"),
+            target(creature_or_planeswalker_you_dont_control).labelled("Creature or planeswalker you don't control to be dealt that damage"),
+        ],
+        bite,
+    ),
     ..oracle::HARD_HITTING_QUESTION
 };

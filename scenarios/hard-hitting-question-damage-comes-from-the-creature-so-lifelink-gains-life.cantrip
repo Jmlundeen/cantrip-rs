@@ -1,0 +1,40 @@
+# The creature is the source of the damage (CR 120.3, 609.7, 702.15b): Bot1's Brave Brawler (2/1, lifelink) deals 2 damage to Bot2's
+# Elvish Mystic (1/1), which dies, and Bot1 gains 2 life for the damage dealt, though the Mystic had only 1 toughness. Hard-Hitting
+# Question has no lifelink of its own, so the life proves whose damage it was.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Mox Emerald
+Brave Brawler
+Hard-Hitting Question
+Island x15
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brave Brawler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Hard-Hitting Question.Cast
+Bot1.Target(Brave Brawler)
+Bot1.Target(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Elvish Mystic
+Bot1.Battlefield.Brave Brawler.Damage = 0
