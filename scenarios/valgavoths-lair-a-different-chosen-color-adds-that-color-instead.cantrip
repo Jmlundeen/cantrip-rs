@@ -1,0 +1,20 @@
+# Valgavoth's Lair: the color is whichever was chosen as it entered - green here - and red or black are not on offer (the control to the first scenario's black).
+
+[Bot1 Deck]
+Valgavoth's Lair
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Valgavoth's Lair.Play
+Bot1.Colors(Green)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Valgavoth's Lair.Activate(Color: Black)
+! Bot1.Battlefield.Valgavoth's Lair.Activate(Color: Red)
+Bot1.Battlefield.Valgavoth's Lair.Activate(Color: Green)
+
+[Expect]
+Bot1.Mana = {G}
+Bot1.Battlefield.Valgavoth's Lair.ChosenColor = Green

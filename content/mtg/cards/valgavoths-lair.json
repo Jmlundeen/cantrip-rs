@@ -1,0 +1,8 @@
+{
+  "name": "Valgavoth's Lair",
+  "type": "Enchantment Land",
+  "oracleText": "Hexproof\nThis land enters tapped. As it enters, choose a color.\n{T}: Add one mana of the chosen color.",
+  "keywords": [
+    "Hexproof"
+  ]
+}

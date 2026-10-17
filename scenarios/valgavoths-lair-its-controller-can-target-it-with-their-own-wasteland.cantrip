@@ -1,0 +1,22 @@
+# Hexproof is only against opponents (CR 702.11a): Bot1's own Wasteland can destroy Bot1's own Valgavoth's Lair - the control that the refusal in the opponent's Wasteland
+# scenario is about the hexproof and not about the Lair being an illegal target.
+
+[Bot1 Deck]
+Valgavoth's Lair
+Wasteland
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Valgavoth's Lair.Play
+Bot1.Colors(Black)
+[T3 Bot1.Main1]
+Bot1.Hand.Wasteland.Play
+Bot1.Battlefield.Wasteland.Activate(Ability: Destroy; Valgavoth's Lair)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Valgavoth's Lair; Wasteland

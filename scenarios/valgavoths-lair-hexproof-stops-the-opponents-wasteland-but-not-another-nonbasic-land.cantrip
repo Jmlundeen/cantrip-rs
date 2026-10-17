@@ -1,0 +1,29 @@
+# Valgavoth's Lair has hexproof (CR 702.11): it can't be the target of spells or abilities Bot2 controls. Bot2's Wasteland ({T}, Sacrifice: Destroy target nonbasic land) is refused with the Lair
+# as its target on turn 4 and destroys Bot1's Overgrown Tomb, equally a nonbasic land, as the positive control.
+
+[Bot1 Deck]
+Valgavoth's Lair
+Overgrown Tomb
+Island x18
+
+[Bot2 Deck]
+Wasteland
+Island x19
+
+[Actions]
+Bot1.Hand.Valgavoth's Lair.Play
+Bot1.Colors(Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Overgrown Tomb.Play
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Valgavoth's Lair)
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Overgrown Tomb)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Valgavoth's Lair
+Bot1.Graveyard = Overgrown Tomb
+Bot2.Graveyard = Wasteland

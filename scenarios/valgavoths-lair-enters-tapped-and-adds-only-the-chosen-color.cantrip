@@ -1,0 +1,33 @@
+# Valgavoth's Lair: "This land enters tapped. As it enters, choose a color. {T}: Add one mana of the chosen color." Bot1 plays it on turn 1 and chooses black:
+# it enters tapped, and black is kept on it (CR 614.12a, 607.2d). On turn 3 its ability offers black and no other color (CR 106.5), and
+# the {B} it adds pays for Duress.
+
+[Bot1 Deck]
+Valgavoth's Lair
+Duress
+Island x5
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Valgavoth's Lair.Play
+Bot1.Colors(Black)
+? Bot1.Battlefield.Valgavoth's Lair.Tapped = true
+? Bot1.Battlefield.Valgavoth's Lair.ChosenColor = Black
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Valgavoth's Lair.Activate(Color: Blue)
+! Bot1.Battlefield.Valgavoth's Lair.Activate(Color: Red)
+! Bot1.Battlefield.Valgavoth's Lair.Activate(Color: Colorless)
+Bot1.Battlefield.Valgavoth's Lair.Activate(Color: Black)
+? Bot1.Mana = {B}
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Valgavoth's Lair.Tapped = true
+Bot1.Battlefield.Valgavoth's Lair.ChosenColor = Black
+Bot1.Graveyard = Duress
