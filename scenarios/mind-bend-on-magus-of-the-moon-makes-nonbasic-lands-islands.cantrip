@@ -1,0 +1,47 @@
+# "Mountains" in Magus of the Moon's "Nonbasic lands are Mountains" is a basic land type word used as one (CR 612.2), so Mind
+# Bend may replace it with Island (CR 612.1, layer 3): the Magus then sets nonbasic lands' subtype to Island (CR 305.7, layer
+# 4). Bot1's Mutavault, a Mountain that tapped for {R}, is an Island that taps for {U} (CR 305.6), and has no other land type.
+
+[Bot1 Deck]
+Mutavault
+Mox Sapphire
+Island
+Mind Bend
+Island x16
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Magus of the Moon
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Magus of the Moon.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mind Bend.Cast(Bot2.Battlefield.Magus of the Moon)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Mountain)
+Bot1.Modes(Island)
+Bot1.Battlefield.Mutavault.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield.Mutavault.Subtypes = Island
+Bot1.Graveyard = Mind Bend
+Bot2.Battlefield.Magus of the Moon.Subtypes = Human; Wizard

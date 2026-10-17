@@ -1,0 +1,66 @@
+# "Island" in Lord of Atlantis's "have islandwalk" is a basic land type word (CR 612.2; Mind Bend's own example changes
+# "forestwalk" to "islandwalk"). Lord of Atlantis gives Bot1's Hullbreacher, a Merfolk, +1/+1 and islandwalk: Bot2 controls an
+# Island, so Bot2's Ornithopter can't block it (CR 702.14c), though it could block the Lord, which attacks beside it (the
+# Lord's "other" leaves itself out). Then Mind Bend replaces Island with Swamp in the Lord's text: the Hullbreacher has
+# swampwalk instead (layer 3, then layer 6), Bot2 controls no Swamp, and the Ornithopter blocks it and dies. Merfolk is a
+# creature type, not a word Mind Bend can change (it offers color words and basic land types only).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Lord of Atlantis
+Hullbreacher
+Mind Bend
+Island x12
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hullbreacher.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hullbreacher.Keywords = Flash; Islandwalk
+? Bot1.Battlefield.Hullbreacher.Power = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Lord of Atlantis; Hullbreacher > Bot2)
+! Bot2.Block(Ornithopter > Hullbreacher)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mind Bend.Cast(Bot1.Battlefield.Lord of Atlantis)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+? Bot1.Battlefield.Hullbreacher.Keywords = Flash; Swampwalk
+Bot1.Attack(Hullbreacher > Bot2)
+Bot2.Block(Ornithopter > Hullbreacher)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Hullbreacher.Keywords = Flash; Swampwalk
+Bot1.Battlefield.Hullbreacher.Power = 4
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 14

@@ -1,0 +1,57 @@
+# A text-changing effect applies to the object it was created for; an object that leaves the battlefield and comes back is a
+# new object (CR 400.7) with none of the old one's effects (CR 611.2c). Bot1's Mind Bend replaces Island with Swamp in Lord of
+# Atlantis's text, so Bot1's Hullbreacher, a Merfolk, has swampwalk. Then Ephemerate exiles the Lord and returns it: the new
+# Lord's text is the printed one, and the Hullbreacher has islandwalk again (and still +1/+1).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Lord of Atlantis
+Hullbreacher
+Mind Bend
+Ephemerate
+Island x11
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hullbreacher.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mind Bend.Cast(Bot1.Battlefield.Lord of Atlantis)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+? Bot1.Battlefield.Hullbreacher.Keywords = Flash; Swampwalk
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Lord of Atlantis)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Hullbreacher.Keywords = Flash; Islandwalk
+Bot1.Battlefield.Hullbreacher.Power = 4
+Bot1.Battlefield.Lord of Atlantis.Power = 2
+LeftBattlefield = Lord of Atlantis

@@ -1,0 +1,36 @@
+# Mind Bend replaces the basic land type Swamp with Island in Urborg, Tomb of Yawgmoth's text (CR 612.1, layer 3), and "this
+# effect lasts indefinitely": "Each land is a Swamp in addition to its other land types" now says Island (CR 305.7, layer 4),
+# so Bot2's Forest is a Forest Island and Urborg an Island, and still so on the turns after (unlike Trait Doctoring's,
+# which ends with the turn). Urborg taps for {U} from its basic land type (CR 305.6). Its name is not changed (CR 612.2).
+
+[Bot1 Deck]
+Island
+Urborg, Tomb of Yawgmoth
+Mind Bend
+Island x17
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+? Bot2.Battlefield.Forest.Subtypes = Forest; Swamp
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Hand.Mind Bend.Cast(Urborg, Tomb of Yawgmoth)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Swamp)
+Bot1.Modes(Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Island
+Bot2.Battlefield.Forest.Subtypes = Forest; Island
+Bot1.Graveyard = Mind Bend

@@ -1,0 +1,42 @@
+# A text-changing effect is no copiable value (CR 707.2: the copiable values are what is printed, modified only by other
+# copy effects, face-down status and "as ... enters" abilities; text-changing effects are not copied). Bot1's Mind Bend
+# makes its Urborg, Tomb of Yawgmoth say "Each land is an Island". Bot2's Vesuva then enters as a copy of that Urborg: the
+# copy says "Each land is a Swamp", as Urborg was printed. Both apply (each player controls one Urborg, so the legend rule
+# leaves both, CR 704.5j): every land is an Island and a Swamp in addition to its other types - Bot1's Urborg and Bot2's
+# copy among them - where a copied text change would have made them Islands alone.
+
+[Bot1 Deck]
+Island
+Urborg, Tomb of Yawgmoth
+Mind Bend
+Island x17
+
+[Bot2 Deck]
+Forest
+Vesuva
+Forest x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Hand.Mind Bend.Cast(Urborg, Tomb of Yawgmoth)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Swamp)
+Bot1.Modes(Island)
+? Bot2.Battlefield.Forest.Subtypes = Forest; Island
+[T4 Bot2.Main1]
+Bot2.Hand.Vesuva.Play
+Bot2.Accept
+Bot2.Target(Bot1.Battlefield.Urborg, Tomb of Yawgmoth)
+
+[Expect]
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Island; Swamp
+Bot1.Battlefield.Island.Subtypes = Island; Swamp
+Bot2.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Island; Swamp
+Bot2.Battlefield.Forest.Subtypes = Forest; Island; Swamp
