@@ -385,12 +385,15 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 // A copy of a permanent spell becomes a token as it resolves (CR 707.10f).
                 ops::resolve_copy_as_token(cx, &item, at)?;
             } else {
+                // A permanent spell whose sneak cost was paid enters tapped and attacking what the creature returned to
+                // pay it was attacking (CR 702.190b), which the cast kept in `subject`.
+                let attacking = item.way >= 1 && def.ways.get(item.way as usize - 1).is_some_and(|w| w.enters_attacking);
                 // A permanent spell becomes a permanent (CR 608.3), its entering replacements applied first, while it
                 // is still on the stack (CR 614.12).
                 let mut entering = Entering {
                     object: item.object,
                     controller: item.controller,
-                    tapped: false,
+                    tapped: attacking,
                     counters: [0; CounterKind::COUNT],
                     // A bestowed spell is the Aura it was cast as, until it ceases to be bestowed (CR 702.103b).
                     copy: if item.way == WAY_BESTOW { cx.s().obj(item.object).copy } else { None },
@@ -420,6 +423,9 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     && cx.s().obj(new).zone.is(ZoneKind::Battlefield)
                 {
                     ops::carry_effects(cx, item.object, new);
+                    if attacking {
+                        ops::enter_attacking(cx, &[new], item.subject);
+                    }
                 }
                 // A creature spell paid for with mana that gives it haste has it until end of turn (CR 106.6).
                 if cx.s().obj(item.object).marks.gains_haste

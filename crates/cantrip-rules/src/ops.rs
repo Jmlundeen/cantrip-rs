@@ -2157,27 +2157,61 @@ pub fn create_tokens_attacking(cx: &mut Cx, tokens: &[(CardId, PlayerId)], defen
 
 /// Makes created tokens attack `defender` (CR 508.4), when there is a combat to attack in.
 pub fn attack_with_tokens(cx: &mut Cx, created: &[ObjectId], defender: Target) {
-    if cx.s().turn.attacked {
-        let mut attackers = cx.s().attackers.clone();
-        for &id in created {
-            if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-                attackers.push(Attacker { id, target: defender, blocked: false });
-            }
-        }
-        cx.st().set_attackers(attackers);
-    }
+    enter_attacking(cx, created, defender);
 }
 
 /// Puts a card onto the battlefield tapped and attacking `defender` (CR 508.4): ninjutsu's "put this card onto the
 /// battlefield from your hand tapped and attacking". Outside combat it is only tapped.
 pub fn put_onto_battlefield_attacking(cx: &mut Cx, object: ObjectId, controller: PlayerId, defender: Target) -> R<ObjectId> {
     let new = put_onto_battlefield(cx, &[(object, controller, true)], ZoneReason::Other)?.first().copied().unwrap_or(object);
-    if cx.s().turn.attacked && live(cx.s(), new) && cx.s().obj(new).zone.is(ZoneKind::Battlefield) {
-        let mut attackers = cx.s().attackers.clone();
-        attackers.push(Attacker { id: new, target: defender, blocked: false });
+    enter_attacking(cx, &[new], defender);
+    Ok(new)
+}
+
+/// Permanents just put onto the battlefield attacking `defender` become attacking creatures (CR 506.3, 508.4), not declared
+/// as attackers, so no "whenever ... attacks" sees them; one that entered during the declare blockers step or later is
+/// unblocked (CR 508.4d). Each one that the rules keep out of combat only enters: outside a combat with attackers declared
+/// (`TurnState::attacked`), one that is not a creature or is also a battle (CR 506.3a, 506.3f), or is controlled by a
+/// player other than the attacking player (CR 506.3b), and all of them when `defender` can no longer be attacked
+/// (CR 506.3c, 508.4a: a player not in the game, a planeswalker or battle no longer on the battlefield, no longer one, or
+/// no longer controlled or protected by a defending player).
+pub fn enter_attacking(cx: &mut Cx, entered: &[ObjectId], defender: Target) {
+    if !cx.s().turn.attacked {
+        return;
+    }
+    let attacking = cx.s().turn.active;
+    if !attackable(cx, attacking, defender) {
+        return;
+    }
+    let mut attackers = cx.s().attackers.clone();
+    for &id in entered {
+        if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).controller != attacking {
+            continue;
+        }
+        let chars = cx.chars(id);
+        if chars.is(CardType::Creature) && !chars.is(CardType::Battle) {
+            attackers.push(Attacker { id, target: defender, blocked: false });
+        }
+    }
+    if attackers.len() != cx.s().attackers.len() {
         cx.st().set_attackers(attackers);
     }
-    Ok(new)
+}
+
+/// Whether `attacking`'s creatures can be put onto the battlefield attacking `defender` (CR 508.4a, 506.3c): a defending
+/// player still in the game, a planeswalker a defending player controls, or a battle a defending player protects. The
+/// defending players are the attacking player's opponents (CR 506.2, 802.1).
+fn attackable(cx: &Cx, attacking: PlayerId, defender: Target) -> bool {
+    let defending = |p: PlayerId| p != attacking && !cx.s().player(p).lost && cx.s().opponents(attacking).any(|o| o == p);
+    match defender {
+        Target::Player(p) => defending(p),
+        Target::Object(id) if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) => {
+            let chars = cx.chars(id);
+            (chars.is(CardType::Planeswalker) && defending(cx.s().obj(id).controller))
+                || (chars.is(CardType::Battle) && cx.s().obj(id).marks.protector.is_some_and(defending))
+        }
+        _ => false,
+    }
 }
 
 /// Settles who controls a permanent from the control-changing effects that apply to it (CR 613.1b, layer 2): the one

@@ -1,0 +1,68 @@
+# Ninjutsu puts the Ninja onto the battlefield attacking what the returned creature attacked (CR 702.49a, 508.4); if that
+# planeswalker is no longer on the battlefield as the ability resolves, the Ninja still enters, tapped, but is never an
+# attacking creature (CR 508.4a, 506.3c). Bot1's Guerrilla Gorilla attacks Bot2's Liliana of the Veil on turn 3, unblocked;
+# Bot1 activates Kaito, Bane of Nightmares' ninjutsu returning the Gorilla, and in response Lightning Bolts Liliana, who dies
+# (CR 704.5i). Kaito enters tapped and not attacking, and deals no combat damage: Bot2 stays at 20.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Mox Sapphire
+Mox Jet
+Kaito, Bane of Nightmares
+Lightning Bolt
+Mox Ruby
+Forest x12
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Attack(Guerrilla Gorilla > Liliana of the Veil)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaito, Bane of Nightmares.Activate(Ability: Ninjutsu)
+Bot1.Choose(Guerrilla Gorilla)
+Bot1.Hand.Lightning Bolt.Cast(Liliana of the Veil)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kaito, Bane of Nightmares.Tapped = true
+? Combat.Attackers.Count = 0
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot1.Hand = Guerrilla Gorilla
+Bot1.Battlefield = Forest; Mox Emerald; Mox Sapphire; Mox Jet; Mox Ruby; Kaito, Bane of Nightmares
+Bot1.Battlefield.Kaito, Bane of Nightmares.Tapped = true

@@ -3043,6 +3043,21 @@ fn cast(
     let extra_discards = choose_discards(cx, player, spell, &extra)?;
     let extra_tappers = choose_tappers(cx, player, spell, &extra)?;
     let extra_evidence = choose_exiles(cx, player, spell, &extra)?;
+    // Sneak (CR 702.190b): the permanent the spell becomes attacks what the creature its cost returns to hand is attacking
+    // as the cost is paid, kept on the spell for its resolution. An instant or sorcery becomes no permanent, and keeps none.
+    if granted.is_none()
+        && instead.is_none()
+        && way >= 1
+        && whole.ways.get(way as usize - 1).is_some_and(|w| w.enters_attacking)
+        && !cx.chars(spell).is(CardType::Instant)
+        && !cx.chars(spell).is(CardType::Sorcery)
+        && let Some(attack) = chosen.first().and_then(|&c| cx.s().attackers.iter().find(|a| a.id == c)).copied()
+    {
+        let at = cx.s().stack.len() - 1;
+        let mut with = cx.s().stack[at];
+        with.subject = attack.target;
+        cx.st().stack_set(at, with);
+    }
     cx.st().update_obj(spell, |o| {
         o.spent = spent;
         o.cast_way = way;

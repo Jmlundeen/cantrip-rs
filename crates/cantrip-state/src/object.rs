@@ -391,7 +391,8 @@ pub struct StackItem {
     pub modes: u8,
     /// Card code's own values chosen as it was put on the stack: a mode, a pile, a number.
     pub choice: u32,
-    /// What the event that triggered it was about (CR 603.2): not a target.
+    /// What the event that triggered it was about (CR 603.2): not a target. For an ability or a permanent spell whose cost
+    /// returned an attacking creature to hand (ninjutsu, sneak: CR 702.49a, 702.190b), what that creature was attacking.
     pub subject: Target,
     /// What the event that triggered it carried (CR 603.2): the spell cast, the object that targeted.
     pub data: [u32; 2],

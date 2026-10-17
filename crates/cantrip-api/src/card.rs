@@ -969,6 +969,10 @@ pub struct WayDef {
     /// It may be cast this way whenever its caster could cast an instant, whatever the card's own type (sneak, CR 702.190a:
     /// "any time you could cast an instant during your declare blockers step"). `condition` says when that is.
     pub instant_speed: bool,
+    /// A permanent spell cast this way enters tapped and attacking the same player, planeswalker or battle as the creature
+    /// its cost returned to its owner's hand was attacking (sneak, CR 702.190b, 506.3, 508.4). What that creature attacked
+    /// is kept on the spell as the cost is paid, in its `StackItem::subject`.
+    pub enters_attacking: bool,
     /// Which keyword's way this is.
     pub kind: WayKind,
 }

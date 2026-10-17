@@ -752,7 +752,7 @@ pub const fn granted_replacement(kind: ReplacementKind, applies: GrantedApplies,
 
 /// An alternative way to cast the card (CR 118.9): for `cost`, from the zone `from`.
 pub const fn way(cost: Cost, from: ZoneKind, text: &'static str) -> WayDef {
-    WayDef { text, cost, from, only_from: false, exile_after: false, condition: None, instant_speed: false, kind: WayKind::Other }
+    WayDef { text, cost, from, only_from: false, exile_after: false, condition: None, instant_speed: false, enters_attacking: false, kind: WayKind::Other }
 }
 
 impl WayDef {
@@ -780,6 +780,12 @@ impl WayDef {
     /// It may be cast this way whenever an instant could be (sneak, CR 702.190a).
     pub const fn instant_speed(self) -> WayDef {
         WayDef { instant_speed: true, ..self }
+    }
+
+    /// A permanent spell cast this way enters tapped and attacking what the creature its cost returned to its owner's hand
+    /// was attacking (sneak, CR 702.190b).
+    pub const fn enters_attacking(self) -> WayDef {
+        WayDef { enters_attacking: true, ..self }
     }
 }
 
