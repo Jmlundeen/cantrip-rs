@@ -3,7 +3,7 @@ use cantrip_mechanics::triggers;
 use cantrip_mechanics::{Animation, animate, mana, pump};
 use cantrip_oracle as oracle;
 
-/// "Until end of turn, this land becomes a 3/3 green and white Llama creature. It's still a land." (CR 613.1d, 613.4b, 613.1e)
+/// "This land becomes a 3/3 green and white Llama creature until end of turn. It's still a land." (CR 613.1d, 613.4b, 613.1e)
 fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let words = g.words(item.object);
     let animation = Animation {

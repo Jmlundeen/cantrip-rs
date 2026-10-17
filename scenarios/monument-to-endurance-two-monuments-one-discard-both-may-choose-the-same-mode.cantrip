@@ -1,0 +1,45 @@
+# Monument to Endurance: each tracks its own chosen modes. Two of them (one paid with Black Lotus, one with three Moxen) trigger on one discard - Masked Meower's - and both choose
+# "Draw a card" the same turn: two cards from the Monuments plus the Meower's own, so the hand ends at three.
+
+[Bot1 Deck]
+Black Lotus
+Monument to Endurance
+Monument to Endurance
+Mox Ruby
+Mox Jet
+Mox Pearl
+Masked Meower
+Island
+Island x4
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Monument to Endurance.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Monument to Endurance.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Masked Meower.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+Bot1.Modes(Draw a card)
+Bot1.Modes(Draw a card)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
