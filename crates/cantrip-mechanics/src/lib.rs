@@ -227,13 +227,20 @@ fn untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> 
 /// Delirium (an ability word, CR 207.2c): four or more card types among the cards in `player`'s graveyard. Fear of Missing Out and
 /// Unholy Heat read it; a static ability asks the same of a `LayerQuery` with `statics::itself_with_delirium`.
 pub fn delirium(q: &dyn Query, player: PlayerId) -> bool {
+    card_types_in_graveyard(q, player) >= 4
+}
+
+/// How many card types are among the cards in `player`'s graveyard (CR 205.2a, 702.138a): each type counted once however many
+/// cards have it, a card with several types giving each of them. Delirium reads it against four; Omnivorous Flytrap's "six or
+/// more card types among cards in your graveyard" reads it again against six as its ability resolves.
+pub fn card_types_in_graveyard(q: &dyn Query, player: PlayerId) -> usize {
     let mut types = TypeSet::NONE;
     for &id in q.state().zone(Zone::graveyard(player)) {
         for t in q.chars(id).types.iter() {
             types = types.with(t);
         }
     }
-    types.iter().count() >= 4
+    types.iter().count()
 }
 
 /// "As an additional cost to cast this spell, pay {4} or sacrifice an artifact or creature" (CR 601.2b, 118.8): the two ways
