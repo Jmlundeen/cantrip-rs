@@ -3,12 +3,6 @@ use cantrip_mechanics::library::{Find, search_to_hand};
 use cantrip_mechanics::{targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
-/// "Put a loyalty counter on Tezzeret", if he is still the permanent that triggered.
-fn add_loyalty(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::Loyalty, 1);
-    Ok(())
-}
-
 /// "Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it."
 fn untap_and_grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(target) = targets::object(g, item, 0) else { return Ok(()) };
@@ -64,7 +58,7 @@ pub static EMBLEM: CardDef = CardDef {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::ARTIFACT_YOU_CONTROL_ENTERS, add_loyalty, "Whenever an artifact you control enters, put a loyalty counter on Tezzeret."),
+        triggered(triggers::ARTIFACT_YOU_CONTROL_ENTERS, cantrip_mechanics::effects::put_loyalty_counter_on_this, "Whenever an artifact you control enters, put a loyalty counter on Tezzeret."),
         ability(loyalty(0), untap_and_grow, "0: Untap target artifact or creature. If it's an artifact creature, put a +1/+1 counter on it.")
             .targets(&[targets::ARTIFACT_OR_CREATURE]),
         ability(loyalty(-3), tutor, "\u{2212}3: Search your library for an artifact card with mana value 1 or less, reveal it, put it into your hand, then shuffle."),

@@ -3,12 +3,6 @@ use cantrip_mechanics::tokens;
 use cantrip_mechanics::triggers::YOU_GAIN_LIFE;
 use cantrip_oracle as oracle;
 
-/// "Put a loyalty counter on Ajani" (CR 122.1, 306.5b).
-fn loyalty_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::Loyalty, 1);
-    Ok(())
-}
-
 /// 0: "You gain 1 life."
 fn gain_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     cantrip_mechanics::effects::gain_life(g, item, 1)
@@ -75,7 +69,7 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(YOU_GAIN_LIFE, loyalty_counter, "Whenever you gain life, put a loyalty counter on Ajani."),
+        triggered(YOU_GAIN_LIFE, cantrip_mechanics::effects::put_loyalty_counter_on_this, "Whenever you gain life, put a loyalty counter on Ajani."),
         ability(loyalty(0), gain_one, "0: You gain 1 life."),
         ability(
             loyalty(-4),

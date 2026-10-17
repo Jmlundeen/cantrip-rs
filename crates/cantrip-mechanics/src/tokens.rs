@@ -180,6 +180,20 @@ pub static MONK: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 blue and red Otter creature token with prowess. Ral, Crackling Wit's +1 and Stormchaser's Talent make it.
+pub static OTTER: CardDef = CardDef {
+    name: "Otter",
+    has_cost: false,
+    colors: Some(ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Red).0)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Otter]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[crate::triggers::PROWESS],
+    text: "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)",
+    ..CardDef::BLANK
+};
+
 /// The 0/0 black Phyrexian Germ creature token living weapon makes (CR 702.92a): Nettlecyst, Kaldra Compleat.
 pub static GERM: CardDef = CardDef {
     name: "Phyrexian Germ",

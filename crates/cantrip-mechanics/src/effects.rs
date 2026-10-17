@@ -203,6 +203,13 @@ pub fn take_the_initiative(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
     Ok(())
 }
 
+/// "Put a loyalty counter on [this planeswalker]" (CR 122.1, 306.5b): the ability's source, if it is still the permanent that
+/// triggered. Ajani Resolute, Tezzeret, Cruel Captain and Ral, Crackling Wit print it.
+pub fn put_loyalty_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::Loyalty, 1);
+    Ok(())
+}
+
 /// "Sacrifice this [permanent]" (CR 701.21): the ability's source. City of Traitors and Carnage, Crimson Chaos print it.
 pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.sacrifice(&[item.object]);

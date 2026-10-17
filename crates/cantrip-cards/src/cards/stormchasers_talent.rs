@@ -1,24 +1,10 @@
 use cantrip_api::*;
 use cantrip_mechanics::{class, targets, tokens};
-use cantrip_mechanics::triggers::{PROWESS, THIS_ENTERS};
+use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
-/// The 1/1 blue and red Otter creature token with prowess.
-pub static OTTER: CardDef = CardDef {
-    name: "Otter",
-    has_cost: false,
-    colors: Some(ColorSet(ColorSet::of(Color::Blue).0 | ColorSet::of(Color::Red).0)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Otter]),
-    power: Some(1),
-    toughness: Some(1),
-    abilities: &[PROWESS],
-    text: "Prowess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)",
-    ..CardDef::BLANK
-};
-
 fn otter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &OTTER, 1)?;
+    tokens::create(g, item.controller, &tokens::OTTER, 1)?;
     Ok(())
 }
 
@@ -42,4 +28,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::STORMCHASERS_TALENT
 };
 
-pub static EXTRA: &[&CardDef] = &[&OTTER];
+pub static EXTRA: &[&CardDef] = &[&tokens::OTTER];
