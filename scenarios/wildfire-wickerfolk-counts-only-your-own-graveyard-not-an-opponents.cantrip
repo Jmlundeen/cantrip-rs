@@ -1,0 +1,53 @@
+# Wildfire Wickerfolk's delirium counts "cards in YOUR graveyard" (CR 207.2c). Turn 1: Mox Ruby and Mox Jet (which stay on the
+# battlefield) and a Mountain pay for Wheel of Fortune: Bot1's graveyard gets the Wheel (sorcery) and three Islands (land) - two card types.
+# The same Wheel makes Bot2 discard Ornithopter (artifact creature), Lightning Bolt (instant) and Islands: Bot2's graveyard holds
+# artifact, creature, instant and land - four types, which must not count. In turn 3 the Wickerfolk is its printed 3/2 with haste and no trample.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Wheel of Fortune
+Island
+Island
+Island
+Wildfire Wickerfolk
+Forest
+Island x5
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Lightning Bolt
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Wheel of Fortune; Island; Island; Island
+? Bot2.Graveyard.Count = 8
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Wildfire Wickerfolk.Cast
+Bot1.Pass
+Bot1.Attack(Wildfire Wickerfolk > Bot2)
+[T3 Bot1.DeclareBlockers]
+? Bot1.Battlefield.Wildfire Wickerfolk.Power = 3
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Wildfire Wickerfolk.Power = 3
+Bot1.Battlefield.Wildfire Wickerfolk.Toughness = 2
+Bot1.Battlefield.Wildfire Wickerfolk.Keywords = Haste
+Bot2.Life = 17
