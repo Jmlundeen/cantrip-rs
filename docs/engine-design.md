@@ -581,7 +581,9 @@ an ability whose source has one of them, or any source (Sunken Citadel, Steelswa
 (CR 601.2a: `ManaPayment::Spell::from` is the zone the card was in, `Obj::cast_from` once on the stack; Interdimensional Web
 Watch's "spells from exile", Heartwood Crafter's "can't be spent to cast spells from your hand"),
 `Subtypes(SubtypeSpells)` only for casting a spell with one of up to two subtypes, a creature spell where it says so,
-uncounterable where it says so (Desolation of Smaug and Sarkhan, Fireblood's Dragon spells, Maelstrom of the Spirit
+uncounterable where it says so, and where it says so also for activating an ability of a source with one of them
+(`SubtypeSpells::abilities`: Flamebraider's Elementals, Eclipsed Realms' chosen type; `ManaPayment::Ability` carries the
+source's subtypes) (Desolation of Smaug and Sarkhan, Fireblood's Dragon spells, Maelstrom of the Spirit
 Dragon's Dragon or Omen spells, Unclaimed Territory, Pillar of Origins and Cavern of Souls' creature spell of the chosen
 type), `NonSpells(types)` only for casting a spell with none of the card types (Chandra, Chill of Compliance and Narset
 of the Ancient Way's "a noncreature spell": an artifact creature spell is a creature spell), `ManaValue(ManaValueSpells)`

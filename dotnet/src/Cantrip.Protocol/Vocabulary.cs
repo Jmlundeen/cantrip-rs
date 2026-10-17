@@ -370,6 +370,9 @@ public enum ManaSpendFilterView
     NotSpellsFromHand = 16,
     /// <summary>Only to activate abilities of creature sources.</summary>
     CreatureAbilities = 17,
+    /// <summary>Only to cast a spell with one of the subtypes named beside it or activate an ability of a source with one:
+    /// "Elemental spells or abilities of Elemental sources".</summary>
+    SubtypeSpellsOrAbilities = 18,
 }
 
 /// <summary>What spending some mana does to whatever it pays for (CR 106.6): the effect half of a restriction.</summary>

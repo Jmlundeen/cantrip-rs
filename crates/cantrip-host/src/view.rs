@@ -125,7 +125,11 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         r if r == ManaRestriction::NONCREATURE_SPELLS => ManaSpendFilterView::NoncreatureSpells,
         ManaRestriction::Subtypes(s) => {
             subtypes = s.subtypes.iter().flatten().map(|t| t.name().to_string()).collect();
-            if s.creature { ManaSpendFilterView::SubtypeCreatureSpells } else { ManaSpendFilterView::SubtypeSpells }
+            match (s.creature, s.abilities) {
+                (_, true) => ManaSpendFilterView::SubtypeSpellsOrAbilities,
+                (true, false) => ManaSpendFilterView::SubtypeCreatureSpells,
+                (false, false) => ManaSpendFilterView::SubtypeSpells,
+            }
         }
         ManaRestriction::NotNonartifactSpells => ManaSpendFilterView::NotNonartifactSpells,
         ManaRestriction::GainsHaste => ManaSpendFilterView::None,
@@ -159,7 +163,7 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
         let at_least = u8::try_from(mana_value).ok()?;
         return Some(ManaRestriction::ManaValue(ManaValueSpells { at_least, or_x: filter == ManaSpendFilterView::ManaValueOrXSpells }));
     }
-    if matches!(filter, ManaSpendFilterView::SubtypeSpells | ManaSpendFilterView::SubtypeCreatureSpells) {
+    if matches!(filter, ManaSpendFilterView::SubtypeSpells | ManaSpendFilterView::SubtypeCreatureSpells | ManaSpendFilterView::SubtypeSpellsOrAbilities) {
         if subtypes.len() > 2 {
             return None;
         }
@@ -172,6 +176,7 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
             chosen: false,
             creature: filter == ManaSpendFilterView::SubtypeCreatureSpells,
             uncounterable: effect == ManaSpendEffectView::CantBeCountered,
+            abilities: filter == ManaSpendFilterView::SubtypeSpellsOrAbilities,
         }));
     }
     ManaRestriction::NAMED.into_iter().map(|(r, _)| r).find(|&r| restriction_view(r) == (filter, effect, Vec::new(), 0))

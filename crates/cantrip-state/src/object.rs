@@ -876,7 +876,8 @@ pub enum ManaRestriction {
     /// "Spend this mana only to cast [a] [subtype] [or [subtype]] [creature] spell[s][, and that spell can't be
     /// countered]" (CR 106.6, 205.3): only on casting a spell that has one of these subtypes as it is on the stack (its
     /// characteristics there, CR 601.2g: a changeling creature spell is every creature type, CR 702.73a; a type an effect
-    /// gave it or took away counts). See `SubtypeSpells`.
+    /// gave it or took away counts); where it says so, also on activating an ability of a source with one of them. See
+    /// `SubtypeSpells`.
     Subtypes(SubtypeSpells),
     /// "Spend this mana only to cast [a] non[type] spell[s]" (CR 106.6, 205.2a): only on casting a spell (CR 601.2g) that
     /// has none of these card types as it is on the stack - an artifact creature spell is a creature spell, so no
@@ -922,7 +923,8 @@ impl ManaValueSpells {
 /// "Spend this mana only to cast [a] [subtype] [or [subtype]] [creature] spell[s]" (CR 106.6, 205.3).
 /// Dragon spells: Desolation of Smaug, Sarkhan, Fireblood. A Dragon spell or an Omen spell: Maelstrom of the Spirit
 /// Dragon. A creature spell of the chosen type: Unclaimed Territory, Pillar of Origins, and Cavern of Souls, whose spell
-/// can't be countered.
+/// can't be countered. Elemental spells or abilities of Elemental sources: Flamebraider. A spell or an ability of a source of
+/// the chosen type: Eclipsed Realms.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct SubtypeSpells {
     /// The subtypes, any one of which the spell must have. Read through the words of the text that names them (CR 612)
@@ -935,26 +937,40 @@ pub struct SubtypeSpells {
     pub creature: bool,
     /// "... and that spell can't be countered" (CR 106.6, 701.6): the effect the mana has on the spell it pays for.
     pub uncounterable: bool,
+    /// "... or activate abilities of [subtype] sources" (CR 106.6, 602.2b): it pays too for activating an ability whose
+    /// source has one of the subtypes as the ability is activated - a permanent, or a card in a hand or graveyard (the
+    /// rulings of Flamebraider and Eclipsed Realms) - never a special action or a triggered ability's cost.
+    pub abilities: bool,
 }
 
 impl SubtypeSpells {
     /// "Spend this mana only to cast a creature spell of the chosen type."
     pub const CHOSEN_TYPE_CREATURE: SubtypeSpells =
-        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false };
+        SubtypeSpells { subtypes: [None, None], chosen: true, creature: true, uncounterable: false, abilities: false };
+
+    /// "Spend this mana only to cast a spell of the chosen type or activate an ability of a source of the chosen type"
+    /// (Eclipsed Realms).
+    pub const CHOSEN_TYPE_SPELLS_OR_ABILITIES: SubtypeSpells =
+        SubtypeSpells { subtypes: [None, None], chosen: true, creature: false, uncounterable: false, abilities: true };
 
     /// "Spend this mana only to cast [subtype] spells."
     pub const fn of(subtype: Subtype) -> SubtypeSpells {
-        SubtypeSpells { subtypes: [Some(subtype), None], chosen: false, creature: false, uncounterable: false }
+        SubtypeSpells { subtypes: [Some(subtype), None], chosen: false, creature: false, uncounterable: false, abilities: false }
     }
 
     /// "Spend this mana only to cast a [subtype] spell or a [subtype] spell."
     pub const fn either(a: Subtype, b: Subtype) -> SubtypeSpells {
-        SubtypeSpells { subtypes: [Some(a), Some(b)], chosen: false, creature: false, uncounterable: false }
+        SubtypeSpells { subtypes: [Some(a), Some(b)], chosen: false, creature: false, uncounterable: false, abilities: false }
     }
 
     /// "... and that spell can't be countered."
     pub const fn uncounterable(self) -> SubtypeSpells {
         SubtypeSpells { uncounterable: true, ..self }
+    }
+
+    /// "... or activate abilities of [subtype] sources": Flamebraider's Elementals.
+    pub const fn or_abilities(self) -> SubtypeSpells {
+        SubtypeSpells { abilities: true, ..self }
     }
 
     /// Whether a spell with these characteristics may be paid for with the mana.
@@ -973,8 +989,9 @@ pub enum ManaPayment {
     /// `from` is the kind of zone it is cast from (CR 601.2a): where the card is, for the advice; where it was, once on
     /// the stack (`Obj::cast_from`).
     Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool, from: ZoneKind },
-    /// Activating an ability whose source has these card types (CR 602.2b, 605.3a).
-    Ability { source: TypeSet },
+    /// Activating an ability whose source has these card types (CR 602.2b, 605.3a), and these subtypes - worked out only
+    /// where some mana at hand is restricted by subtype, as for a spell.
+    Ability { source: TypeSet, subtypes: SubtypeSet },
     /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
     Other,
 }
@@ -1087,8 +1104,11 @@ impl ManaRestriction {
             (ManaRestriction::GainsHaste, _) => true,
             (ManaRestriction::LegendaryUncounterable, ManaPayment::Spell { legendary, .. }) => legendary,
             (ManaRestriction::Spells(allowed), ManaPayment::Spell { types, .. }) => allowed.0 & types.0 != 0,
-            (ManaRestriction::Abilities(allowed), ManaPayment::Ability { source }) => allowed.0 == 0 || allowed.0 & source.0 != 0,
+            (ManaRestriction::Abilities(allowed), ManaPayment::Ability { source, .. }) => allowed.0 == 0 || allowed.0 & source.0 != 0,
             (ManaRestriction::Subtypes(s), ManaPayment::Spell { types, ref subtypes, .. }) => s.admits(types, subtypes),
+            (ManaRestriction::Subtypes(s), ManaPayment::Ability { ref subtypes, .. }) => {
+                s.abilities && s.subtypes.iter().flatten().any(|&t| subtypes.has(t))
+            }
             _ => false,
         }
     }
@@ -1104,7 +1124,8 @@ impl ManaRestriction {
     }
 
     /// The name a scenario's `Spend:` and the state dump write it by: the limit and the effect, as the C# engine does.
-    /// One of `Subtypes` is its subtypes (spaces left out) and "Spells" ("DragonSpells", "DragonOrOmenSpells", "ElfCreatureSpells"),
+    /// One of `Subtypes` is its subtypes (spaces left out) and "Spells" ("DragonSpells", "DragonOrOmenSpells", "ElfCreatureSpells",
+    /// "ElementalSpellsOrAbilities"),
     /// "NoTypeCreatureSpells" for a chosen type never chosen, with ", CantBeCountered" after it for its effect.
     pub fn name(self) -> String {
         if let ManaRestriction::ManaValue(m) = self {
@@ -1117,6 +1138,9 @@ impl ManaRestriction {
                 name = "ChosenType".to_string();
             }
             name.push_str(if s.creature { "CreatureSpells" } else { "Spells" });
+            if s.abilities {
+                name.push_str("OrAbilities");
+            }
             if s.uncounterable {
                 name.push_str(", CantBeCountered");
             }
@@ -1151,6 +1175,10 @@ impl ManaRestriction {
             return None;
         }
         let limit = text.iter().find(|w| *w != "cantbecountered")?;
+        let (limit, abilities) = match limit.strip_suffix("orabilities") {
+            Some(rest) => (rest, true),
+            None => (limit.as_str(), false),
+        };
         let (body, creature) = match limit.strip_suffix("creaturespells") {
             Some(body) => (body, true),
             None => (limit.strip_suffix("spells")?, false),
@@ -1168,7 +1196,7 @@ impl ManaRestriction {
                 Some([Some(first), Some(named(rest)?)])
             })?
         };
-        Some(ManaRestriction::Subtypes(SubtypeSpells { subtypes, chosen: false, creature, uncounterable }))
+        Some(ManaRestriction::Subtypes(SubtypeSpells { subtypes, chosen: false, creature, uncounterable, abilities }))
     }
 }
 
@@ -1344,8 +1372,10 @@ mod tests {
         all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Orc, Subtype::Warrior)));
         all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Horror, Subtype::Orc)));
         all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Dragon, Subtype::Omen)));
-        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: true }));
-        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: true, uncounterable: false }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: true, abilities: false }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: true, uncounterable: false, abilities: false }));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells::of(Subtype::Elemental).or_abilities()));
+        all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: false, uncounterable: false, abilities: true }));
         all.push(ManaRestriction::mana_value_at_least(4));
         all.push(ManaRestriction::mana_value_at_least_or_x(5));
         all.push(ManaRestriction::mana_value_at_least(12));

@@ -768,7 +768,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 if static_rules::spend_any_color_for(cx, player, id) {
                     cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
                 }
-                if !a.covers_for(&cost, &ManaPayment::Ability { source: chars.types }) {
+                if !a.covers_for(&cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }) {
                     continue;
                 }
             }
@@ -1271,7 +1271,7 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
     if cx.s().obj(source).zone.is(ZoneKind::Stack) {
         a.covers_for(cost, &spell_payment(cx, source, a.names_subtypes()))
     } else {
-        a.covers_for(cost, &ManaPayment::Ability { source: chars.types })
+        a.covers_for(cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes })
     }
 }
 
@@ -1680,7 +1680,7 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             let own = (judged && def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
             let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
-            let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types } };
+            let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };
             let covered = |a: &Available, targets: &[Target]| {
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
                 // touch it, and `special_action` pays the cost as it stands.
@@ -4285,7 +4285,10 @@ fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> 
             // The subtypes, only where some of the player's mana is limited by them.
             spell_payment(cx, source, cx.s().restricted_of(player).any(|(r, _)| r.names_subtypes()))
         }
-        Paying::Activating => ManaPayment::Ability { source: cx.chars(source).types },
+        Paying::Activating => {
+            let chars = cx.chars(source);
+            ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }
+        }
         _ => ManaPayment::Other,
     }
 }
