@@ -1,0 +1,46 @@
+# Browser
+# What the client shows of a cast without paying its mana cost (CR 118.9, Omniscience) and of life a static ability adds to
+# a cost (CR 118.8, 601.2f, Terror of the Peaks). Bot2's Show and Tell puts Terror of the Peaks onto the battlefield and Bot1
+# puts Omniscience. On turn 3 Lightning Bolt's card menu has two casts: for its mana cost, and without paying it, each saying
+# what it costs with each target where that differs - 3 life more at Terror. Bot1 casts it for {R} at Terror: the payment
+# says the 3 life is paid with the mana, and Bot1 is at 17. The second Bolt is cast at Bot2 without paying its mana cost.
+
+[Bot1 Deck]
+Mountain
+Omniscience
+Lightning Bolt
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Show and Tell.Cast
+Bot2.Choose(Terror of the Peaks)
+Bot1.Choose(Omniscience)
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Terror of the Peaks)
+? Client.Bot1.Menu = Cast Lightning Bolt — costs {R} targeting a player, {R} targeting a player, {R} and 3 life targeting Terror of the Peaks...; Cast Lightning Bolt — Without paying its mana cost (costs {0} targeting a player, {0} targeting a player, {0} and 3 life targeting Terror of the Peaks)...
+? Client.Bot1.Prompt.Title = Pay for Lightning Bolt
+? Client.Bot1.Prompt.Detail = {R} of {R} still to pay  ·  and 3 life, paid with it  ·  tap a land
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 17
+Bot2.Life = 17
+Bot2.Battlefield.Terror of the Peaks.Damage = 3
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt
