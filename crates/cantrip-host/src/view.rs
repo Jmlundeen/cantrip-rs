@@ -715,6 +715,8 @@ impl<'a> Projector<'a> {
             Duration::EndOfTurn => " this turn".to_string(),
             Duration::UntilNextTurnOf(q) if q == self.viewer => " until your next turn".to_string(),
             Duration::UntilNextTurnOf(q) => format!(" until {}'s next turn", self.names.get(q.index()).cloned().unwrap_or_default()),
+            Duration::WhileTapped => " for as long as it remains tapped".to_string(),
+            Duration::WhileCounter(kind) => format!(" for as long as it has a {} counter on it", kind.name()),
             _ => String::new(),
         }
     }
@@ -1062,6 +1064,7 @@ impl<'a> Projector<'a> {
                 let what = match e.kind {
                     EffectKind::CantAttack => "Can't attack",
                     EffectKind::CantBlock => "Can't block",
+                    EffectKind::CantActivateAbilities => "Its activated abilities can't be activated",
                     // A prevention shield on it (CR 615.7), or all damage to it prevented: no ability of its own says so.
                     EffectKind::Prevention { to, .. } if to == Target::Object(id) => {
                         if let Some(text) = self.prevention_text(e, "it") {

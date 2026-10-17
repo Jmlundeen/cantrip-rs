@@ -2334,6 +2334,7 @@ pub fn untap(cx: &mut Cx, id: ObjectId) {
         return;
     }
     cx.st().update_obj(id, |o| o.tapped = false);
+    end_lapsed_durations(cx, id);
 }
 
 /// Exerts a permanent (CR 701.43a): it won't untap during its controller's next untap step.

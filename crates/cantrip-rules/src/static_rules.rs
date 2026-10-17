@@ -266,6 +266,10 @@ pub fn activation_forbidders(cx: &Cx) -> Vec<ObjectId> {
 
 /// Whether one of the `forbidders` (from `activation_forbidders`) stops `source`'s ability `def` being activated (CR 602.5).
 pub fn activation_barred(cx: &Cx, forbidders: &[ObjectId], source: ObjectId, def: &ActivatedDef) -> bool {
+    // "Its activated abilities can't be activated", from a resolved effect on the object itself (CR 602.5, 611.2).
+    if cx.s().effects.iter().any(|e| e.affected == source && e.kind == EffectKind::CantActivateAbilities) {
+        return true;
+    }
     forbidders.iter().any(|&id| {
         let obj = cx.s().obj(id);
         let asker = Asker { source: id, controller: obj.controller };

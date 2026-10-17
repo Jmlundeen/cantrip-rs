@@ -518,6 +518,10 @@ pub enum EffectKind {
     Goaded,
     /// "Can't block" (CR 509.1b) for as long as the effect lasts.
     CantBlock,
+    /// "Its activated abilities can't be activated" (CR 602.5) for as long as the effect lasts: every activated ability of
+    /// the object, mana abilities (CR 605.1a) and abilities whose cost untaps it included, whoever would activate them. A
+    /// resolved effect, so it outlasts its source (Braided Net).
+    CantActivateAbilities,
     /// "Can't attack" (CR 508.1c) for as long as the effect lasts: a restriction on declaring the creature as an attacker.
     CantAttack,
     /// The permanent is harnessed (CR 701.64): a designation it keeps as long as it stays where it is
@@ -674,6 +678,10 @@ pub enum Duration {
     /// Shoreless Sea, Aquitect's Will, Quicksilver Fountain and Xolatoyac, the Smiling Flood ("it's an Island ... for as
     /// long as it has a flood counter on it"), Aven Mimeomancer, Mathas, Fiend Seeker.
     WhileCounter(CounterKind),
+    /// "For as long as it remains tapped" (CR 611.2b): it ends the moment the affected permanent untaps, and does not
+    /// begin if it is untapped then. Braided Net; Rust Tick, Amber Prison and the other "doesn't untap ... for as long as"
+    /// cards word theirs about their own source instead.
+    WhileTapped,
 }
 
 impl Duration {
@@ -682,6 +690,7 @@ impl Duration {
     pub fn holds_for(self, affected: &Obj) -> bool {
         match self {
             Duration::WhileCounter(kind) => affected.counters(kind) > 0,
+            Duration::WhileTapped => affected.tapped,
             _ => true,
         }
     }
