@@ -586,6 +586,9 @@ pub enum Purpose {
     PutOnLibrary,
     /// A card put onto the battlefield (Show and Tell).
     PutOntoBattlefield,
+    /// The player, planeswalker or battle a creature put onto the battlefield attacking attacks, chosen by its controller
+    /// as it enters when the effect names none (CR 508.4): not a target.
+    EnterAttacking,
     /// A plain "you may" with nothing more to say about it. A prompt that asks only this shows the source's text and Yes
     /// and No; a card says what it asks with [`Purpose::Ask`] instead.
     Optional,

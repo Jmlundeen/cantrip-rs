@@ -1358,7 +1358,14 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
     let values = if door != 0 { Copiable::of(spell.card) } else { spell.copy.unwrap_or_else(|| Copiable::of(spell.card)) };
     let words = if values.has_exceptions() { Words::NONE } else { cantrip_api::words(cx.s(), item.object) };
     let copy = if values.has_exceptions() { Some(values) } else { None };
-    let tokens = create_tokens_worded(cx, &[(values.card, item.controller)], false, copy, &[], words, Some(item))?;
+    // A copy keeps the alternative cost paid for the original (CR 707.10): a copy of a spell cast for sneak becomes a token
+    // that enters tapped and attacking what the original's returned creature attacked (CR 702.190b), unless the rules keep
+    // it out of combat (`enter_attacking`, CR 506.3b: its controller is not the attacking player).
+    let attacking = item.way >= 1 && cx.cards().get(spell.card).ways.get(item.way as usize - 1).is_some_and(|w| w.enters_attacking);
+    let tokens = create_tokens_worded(cx, &[(values.card, item.controller)], attacking, copy, &[], words, Some(item))?;
+    if attacking {
+        enter_attacking(cx, &tokens, item.subject);
+    }
     for token in tokens.into_iter().filter(|_| door != 0) {
         unlock_door(cx, token, door, item.controller);
     }
