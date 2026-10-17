@@ -1,0 +1,25 @@
+# Training Compound on a later turn: it did not enter this turn, and the only other land Bot1 controls, Rockfall Vale, is not basic
+# (CR 205.4a), so its second ability is refused for red and for green; the first ability, {T}: Add {C}, is the positive control and
+# works. (The Vale enters tapped, fewer than two other lands.) Bot2 plays an Island: a basic land, but not one Bot1 controls.
+
+[Bot1 Deck]
+Training Compound
+Rockfall Vale
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Training Compound.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Rockfall Vale.Play
+! Bot1.Battlefield.Training Compound.Activate(Ability: {R} or {G}; Color: Red)
+! Bot1.Battlefield.Training Compound.Activate(Ability: {R} or {G}; Color: Green)
+Bot1.Battlefield.Training Compound.Activate(Ability: Add {C}.)
+
+[Expect]
+Bot1.Mana = {C}
+Bot1.Battlefield.Training Compound.Tapped = true

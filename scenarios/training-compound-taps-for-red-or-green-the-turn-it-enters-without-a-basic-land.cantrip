@@ -1,0 +1,18 @@
+# Training Compound: "{T}: Add {R} or {G}. Activate only if this land entered this turn or if you control a basic land." As Bot1's
+# only land it enters untapped and, having entered this turn, taps for {R} (the first half of the condition) although Bot1 controls no
+# basic land.
+
+[Bot1 Deck]
+Training Compound
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Training Compound.Play
+Bot1.Battlefield.Training Compound.Activate(Ability: {R} or {G}; Color: Red)
+
+[Expect]
+Bot1.Battlefield.Training Compound.Tapped = true
+Bot1.Mana = {R}

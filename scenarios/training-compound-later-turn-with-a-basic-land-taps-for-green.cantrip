@@ -1,0 +1,21 @@
+# Training Compound on a later turn with a basic land: it entered on turn 1, but on turn 3 Bot1 has played an Island, a basic land
+# (CR 205.4a), so "if you control a basic land" holds and the Compound taps for {G} (the second half of the condition; the
+# refusal of the same ability without the Island is the other scenario). Red is on offer too.
+
+[Bot1 Deck]
+Training Compound
+Island
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Training Compound.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Training Compound.Activate(Ability: {R} or {G}; Color: Green)
+
+[Expect]
+Bot1.Mana = {G}
+Bot1.Battlefield.Training Compound.Tapped = true

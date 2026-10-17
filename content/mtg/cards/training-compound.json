@@ -1,0 +1,5 @@
+{
+  "name": "Training Compound",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}: Add {R} or {G}. Activate only if this land entered this turn or if you control a basic land."
+}
