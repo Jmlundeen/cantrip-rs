@@ -1,0 +1,47 @@
+# "Whenever another ARTIFACT you control with mana value 3 or greater enters": Giant Cindermaw (a red creature, mana value 3, not an artifact)
+# entering in turn 3 makes no Construct. Turn 1 puts the Synthesizer onto the battlefield with five Moxen and an Island (seven permanents);
+# turn 3 adds only the Cindermaw: eight, with no token among them.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Simulacrum Synthesizer
+Giant Cindermaw
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Simulacrum Synthesizer.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Cindermaw.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Giant Cindermaw.Power = 4
