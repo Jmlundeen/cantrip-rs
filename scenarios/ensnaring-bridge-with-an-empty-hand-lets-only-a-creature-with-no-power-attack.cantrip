@@ -1,0 +1,42 @@
+# Ensnaring Bridge with no cards in its controller's hand: a creature with power 0 is not greater than 0, so it may attack
+# (CR 508.1c); anything with power 1 or more may not. Bot1 controls the Bridge and empties its hand. On turn 3 Bot1's
+# Llanowar Elves (power 1) is refused, and Ornithopter (power 0) attacks - and deals no damage (CR 510.1a).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Ensnaring Bridge
+Ornithopter
+Mox Emerald
+Llanowar Elves
+Mox Ruby
+Mox Jet
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ensnaring Bridge.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+? Bot1.Hand.Count = 0
+! Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Blockers]
+? Combat.Attackers = Ornithopter > Bot2
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Llanowar Elves.Tapped = false

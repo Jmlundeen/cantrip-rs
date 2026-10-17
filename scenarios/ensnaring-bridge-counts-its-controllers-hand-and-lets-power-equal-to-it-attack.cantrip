@@ -1,0 +1,54 @@
+# Ensnaring Bridge: "Creatures with power greater than the number of cards in your hand can't attack." (CR 508.1c) - "your"
+# is the Bridge's controller. Bot2 plays its hand down to one card (Mox Emerald) under its Bridge. On turn 3 Bot1 holds three
+# cards, but it is Bot2's one that counts: Bot1's Guerrilla Gorilla (power 2) is refused as an attacker, while Llanowar Elves
+# (power 1, not greater than one) attacks - the boundary and the positive control - and deals 1.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Island
+Black Lotus
+Ensnaring Bridge
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Ensnaring Bridge.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+? Bot2.Hand = Mox Emerald
+? Bot1.Hand.Count = 3
+! Bot1.Attack(Guerrilla Gorilla > Bot2)
+Bot1.Attack(Llanowar Elves > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Guerrilla Gorilla.Tapped = false
