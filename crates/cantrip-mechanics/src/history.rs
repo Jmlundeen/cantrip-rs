@@ -122,3 +122,13 @@ pub fn activated_an_equip_ability_this_turn(q: &dyn Query, player: PlayerId) -> 
             if p == player && q.activated_ability(ability).is_some_and(|d| d.equip))
     })
 }
+
+/// "Choose one that hasn't been chosen" (CR 700.2): whether mode `mode` of a modal ability has not been chosen before by the
+/// object that has it (`asker.source`), as its ability went on the stack. A mode chosen for an ability that was then countered
+/// or fizzled stays chosen, whoever controlled the object when it was chosen, and an object that left and came back is a new one
+/// (CR 400.7) with every mode to choose again. Gollum, Riddle Master and Demonic Pact print it (`ModalDef::allowed`).
+pub fn mode_not_chosen_before(q: &dyn Query, asker: &Asker, mode: u8) -> bool {
+    !q.history().all().iter().any(|r| {
+        matches!(r.event, Event::ModesChosen { source, modes, .. } if source == asker.source && modes & (1 << mode) != 0)
+    })
+}

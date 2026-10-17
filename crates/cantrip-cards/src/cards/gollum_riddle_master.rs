@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::{choose, history};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -19,16 +19,6 @@ fn opponent_casts_a_matching_spell(q: &dyn Query, source: ObjectId, event: &Even
         return None;
     }
     Fired::PLAIN
-}
-
-/// "Choose one that hasn't been chosen": a mode this Gollum chose before, as its ability went on the stack, is spent - even
-/// if that ability was then countered - read from the event history. A Gollum that left and came back is a new object
-/// (CR 400.7) with every mode to choose again. With all three spent the ability still triggers and is removed as it would
-/// be put on the stack (CR 603.3c, 700.2).
-fn not_chosen_before(q: &dyn Query, asker: &Asker, mode: u8) -> bool {
-    !q.history().all().iter().any(|r| {
-        matches!(r.event, Event::ModesChosen { source, modes, .. } if source == asker.source && modes & (1 << mode) != 0)
-    })
 }
 
 /// "Put a +1/+1 counter on Gollum": nothing to put it on once Gollum has left.
@@ -57,7 +47,7 @@ static RIDDLE: ModalDef = modes(&[
     mode(drain, "Each opponent loses 2 life and you gain 2 life."),
     mode(draw, "Draw a card."),
 ])
-    .allowed(not_chosen_before);
+    .allowed(history::mode_not_chosen_before);
 
 pub static CARD: CardDef = CardDef {
     enters: Some(enters),

@@ -290,6 +290,17 @@ pub fn return_first_target_to_hand(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
+/// "[This source] deals `n` damage to any target and you gain `n` life" (CR 120.3, 119.1): the first target, if it is still
+/// legal (CR 608.2b), is dealt the damage by the resolving object (as it last was if it has left, CR 113.7a), and the
+/// controller gains the life. Lightning Helix, Phlage, Titan of Fire's Fury and Demonic Pact print it.
+pub fn damage_target_and_gain_life(g: &mut dyn Game, item: &StackItem, n: u16) -> Result<(), Suspend> {
+    if g.target_legal(item, 0) {
+        g.damage(item.object, item.targets[0], n);
+        g.gain_life(item.controller, i32::from(n));
+    }
+    Ok(())
+}
+
 /// "Change the target of target spell or ability with a single target" (CR 115.7a): the first target of the resolving spell or
 /// ability is a spell or ability on the stack whose target its controller changes to another legal one as this resolves, and
 /// the target is not changed if there is no other legal choice. An item whose only target is no longer legal is never
