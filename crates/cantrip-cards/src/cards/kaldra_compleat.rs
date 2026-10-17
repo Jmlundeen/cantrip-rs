@@ -15,7 +15,7 @@ fn keywords(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 /// is dealt.
 fn deals_combat_damage_to_creature(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Object(id), amount, combat: true }
+        Event::Damage { source: from, target: Target::Object(id), amount, combat: true, .. }
             if *from == source && *amount > 0 && q.chars(*id).is(CardType::Creature) =>
         {
             Fired::about(Target::Object(*id))

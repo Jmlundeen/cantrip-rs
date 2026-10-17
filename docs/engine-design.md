@@ -142,7 +142,8 @@ records events; no per-turn counter answers a history question, the layers' incl
 the history through `LayerQuery::history` (below). A state that changes in place is recorded as it changes, so the
 history can answer for it afterwards: a permanent entering face down is `EnteredFaceDown` (with its controller then) and
 turning one face up is `TurnedFaceUp` (with the player who did it, CR 708.8), as the face-down status itself is gone
-once it is turned up.
+once it is turned up; a `Damage` record carries its source's controller and colors as it dealt the damage, which
+neither a later change of control or color nor the source leaving can alter.
 
 - **Causes are recorded.** Each event names what produced it, which serves explanations, debugging and the AI's
   features.

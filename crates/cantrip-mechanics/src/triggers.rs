@@ -842,7 +842,7 @@ pub fn artifact_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Opti
 /// subject and the amount of damage its `data[0]`. Etali, Primal Conqueror and Fallen Shinobi print it.
 pub fn deals_combat_damage_to_player_subject(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(p), amount, combat: true } if *from == source && *amount > 0 => {
+        Event::Damage { source: from, target: Target::Player(p), amount, combat: true, .. } if *from == source && *amount > 0 => {
             Some(Fired { subject: Target::Player(*p), data: [*amount as u32, 0] })
         }
         _ => None,
@@ -853,7 +853,7 @@ pub fn deals_combat_damage_to_player_subject(_: &dyn Query, source: ObjectId, ev
 /// Bejeweled Warg prints it; Carnage, Crimson Chaos's granted ability has the same condition.
 pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(_), amount, combat: true } if *from == source && *amount > 0 => {
+        Event::Damage { source: from, target: Target::Player(_), amount, combat: true, .. } if *from == source && *amount > 0 => {
             Fired::PLAIN
         }
         _ => None,
@@ -864,7 +864,7 @@ pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Ev
 /// player, with "that player" fixed as the trigger's subject. Vraska, Golgari Queen's emblem and Enduring Curiosity print it.
 pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: from, target: Target::Player(p), amount, combat: true }
+        Event::Damage { source: from, target: Target::Player(p), amount, combat: true, .. }
             if *amount > 0 && q.controller(*from) == me.controller && q.chars(*from).is(CardType::Creature) =>
         {
             Fired::about(Target::Player(*p))

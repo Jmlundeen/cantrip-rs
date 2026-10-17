@@ -14,8 +14,10 @@ pub enum Event {
     BecameTarget { target: Target, by: ObjectId, controller: PlayerId },
     /// An object moved between zones. A token's creation comes from no zone (`Zone::GONE`).
     ZoneChange { old: ObjectId, new: ObjectId, from: Zone, to: Zone, reason: ZoneReason },
-    /// Damage was dealt.
-    Damage { source: ObjectId, target: Target, amount: u16, combat: bool },
+    /// Damage was dealt. `controller` and `colors` are the source's as it dealt it (CR 120.3, 609.7): "damage red sources
+    /// you controlled dealt this turn" counts a source that has since changed controller or color, or left (Temple of
+    /// Power's ruling), and a spell's or an ability's source by what it was on the stack or the battlefield then.
+    Damage { source: ObjectId, target: Target, amount: u16, combat: bool, controller: PlayerId, colors: ColorSet },
     LifeChange { player: PlayerId, delta: i32 },
     Drew { player: PlayerId, card: ObjectId },
     Discarded { player: PlayerId, card: ObjectId },

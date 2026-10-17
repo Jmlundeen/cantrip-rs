@@ -1555,7 +1555,7 @@ pub fn deal_damage_with(
             if combat {
                 crate::designations::combat_damage(cx, source, p, amount);
             }
-            Some(Event::Damage { source, target, amount, combat })
+            Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })
         }
         Target::Object(id) => {
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
@@ -1600,7 +1600,7 @@ pub fn deal_damage_with(
                 });
             }
             lifelink(cx, source, &source_chars, amount, batch);
-            Some(Event::Damage { source, target, amount, combat })
+            Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })
         }
     }
 }

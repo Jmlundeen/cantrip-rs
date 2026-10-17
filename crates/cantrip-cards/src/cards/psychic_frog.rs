@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// planeswalker it dealt damage to (CR 603.2c), judged as the damage is dealt (CR 510.2).
 fn combat_damage_to_player_or_planeswalker(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: dealer, target, amount, combat: true } if *dealer == source && *amount > 0 => match target {
+        Event::Damage { source: dealer, target, amount, combat: true, .. } if *dealer == source && *amount > 0 => match target {
             Target::Player(_) => Fired::PLAIN,
             Target::Object(id) if q.chars(*id).is(CardType::Planeswalker) => Fired::PLAIN,
             _ => None,

@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// damage to a player (CR 510.2); each such event is one player and one trigger (CR 603.2c).
 fn equipped_deals_combat_damage_to_a_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::Damage { source: dealer, target: Target::Player(_), amount, combat: true }
+        Event::Damage { source: dealer, target: Target::Player(_), amount, combat: true, .. }
             if *amount > 0 && q.attached_to(source) == Some(*dealer) =>
         {
             Fired::PLAIN
