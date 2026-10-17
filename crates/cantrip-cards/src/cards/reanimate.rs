@@ -2,10 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-fn creature_card(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    targets::card_in_graveyard(q, t, &[CardType::Creature])
-}
-
 /// Put target creature card from a graveyard onto the battlefield under your control; you lose life equal to its
 /// mana value.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -17,6 +13,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    spell: spell(&[target(creature_card)], effect),
+    spell: spell(&[targets::CREATURE_CARD_IN_A_GRAVEYARD], effect),
     ..oracle::REANIMATE
 };

@@ -3,10 +3,6 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::{each_opponent_sacrifices, triggers};
 use cantrip_oracle as oracle;
 
-fn creature_card(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    targets::card_in_graveyard(q, t, &[CardType::Creature])
-}
-
 /// Each opponent sacrifices three creatures of their choice (CR 701.21a), in turn order; a player with three or fewer
 /// sacrifices them all without being asked.
 fn opponents_sacrifice_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -28,7 +24,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ENTERS, opponents_sacrifice_three, "When this artifact enters, each opponent sacrifices three creatures of their choice."),
         triggered(triggers::YOUR_UPKEEP, reanimate, "At the beginning of your upkeep, put target creature card from a graveyard onto the battlefield under your control. It's a Phyrexian in addition to its other types.")
-            .targets(&[target(creature_card)]),
+            .targets(&[targets::CREATURE_CARD_IN_A_GRAVEYARD]),
     ],
     ..oracle::PORTAL_TO_PHYREXIA
 };

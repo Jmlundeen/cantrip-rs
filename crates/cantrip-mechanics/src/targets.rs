@@ -357,6 +357,14 @@ pub fn any_card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bo
 /// "Target card from your graveyard": see `any_card_in_your_graveyard`.
 pub const CARD_IN_YOUR_GRAVEYARD: TargetSpec = target(any_card_in_your_graveyard);
 
+fn creature_card_in_a_graveyard_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    card_in_graveyard(q, t, &[CardType::Creature])
+}
+
+/// "Target creature card from a graveyard" (CR 115.1): a creature card in any player's graveyard. Reanimate, Necromancy, From
+/// the Catacombs, Portal to Phyrexia and Virtue of Persistence print it.
+pub const CREATURE_CARD_IN_A_GRAVEYARD: TargetSpec = target(creature_card_in_a_graveyard_filter);
+
 /// "Target card from a graveyard". Emperor of Bones, Ghost Vacuum, Keen-Eyed Curator and Lion Sash print it.
 pub const CARD_IN_A_GRAVEYARD: TargetSpec = target(card_in_a_graveyard_filter);
 /// "Target noncreature spell". Spell Pierce and Stubborn Denial print it.

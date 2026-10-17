@@ -8,10 +8,6 @@ fn enchant_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).entered_with == Some(asker.source))
 }
 
-fn creature_card_in_a_graveyard(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    targets::card_in_graveyard(q, t, &[CardType::Creature])
-}
-
 /// It becomes an Aura with "enchant creature put onto the battlefield with Necromancy": the Aura subtype (CR 613.1d), kept as
 /// long as it is this object, and the enchant ability the card gains with it. Put target creature card from a graveyard onto the
 /// battlefield under your control and attach Necromancy to it, as part of the same move.
@@ -43,7 +39,7 @@ pub static CARD: CardDef = CardDef {
     becomes_aura_enchant: Some(target(enchant_filter)),
     abilities: &[
         triggered(triggers::THIS_ENTERS, reanimate, "When this enchantment enters, if it's on the battlefield, it becomes an Aura with \"enchant creature put onto the battlefield with Necromancy.\" Put target creature card from a graveyard onto the battlefield under your control and attach this enchantment to it.")
-            .targets(&[target(creature_card_in_a_graveyard)])
+            .targets(&[targets::CREATURE_CARD_IN_A_GRAVEYARD])
             .condition(triggers::this_is_on_the_battlefield),
         triggered(triggers::THIS_LEAVES, sacrifice_creature, "When this enchantment leaves the battlefield, that creature's controller sacrifices it.")
             .look_back(),
