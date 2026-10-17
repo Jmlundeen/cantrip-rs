@@ -53,6 +53,7 @@ Bot1.Pass
 Bot2.Pass
 [T5 Bot1.End]
 Bot1.Accept
+! Bot1.Choose(Scavenger's Talent)
 Bot1.Choose(Healer's Hawk; Mox Pearl; Mox Ruby)
 Bot1.Choose(Healer's Hawk)
 Bot1.Target(Bot2)

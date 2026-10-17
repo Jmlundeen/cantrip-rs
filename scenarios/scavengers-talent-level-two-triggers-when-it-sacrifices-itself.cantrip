@@ -1,0 +1,54 @@
+# Scavenger's Talent level 2: "Whenever you sacrifice a permanent, target player mills two cards." The Talent triggers when
+# it is sacrificed itself (the ruling): Bot1 levels it up in turn 3, then casts Witherbloom Charm for "You may sacrifice a
+# permanent. If you do, draw two cards" and sacrifices the Talent. The ability, read as the Talent last was (level 2,
+# CR 603.10a), still triggers and Bot2 mills two cards. Bot1 draws the two cards (hand 3).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Scavenger's Talent
+Mox Jet
+Mox Emerald
+Mox Pearl
+Witherbloom Charm
+Island x10
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(sacrifice a permanent)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Scavenger's Talent)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Mox Jet; Mox Emerald; Mox Pearl
+Bot1.Graveyard = Witherbloom Charm; Scavenger's Talent
+Bot1.Hand.Count = 3
+Bot2.Graveyard.Count = 2

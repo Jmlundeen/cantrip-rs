@@ -30,7 +30,7 @@ fn your_end_step_at_level_three(q: &dyn Query, me: &Asker, event: &Event) -> Opt
 }
 
 const ASK: Question = Question::new(
-    "Sacrifice",
+    "SacrificeThreeToReturn",
     "sacrifice three other nonland permanents?",
     "If you do, return a creature card from your graveyard to the battlefield with a finality counter on it",
     "Sacrifice three",

@@ -1,7 +1,8 @@
 # Level 3 with exactly three other nonland permanents (three Moxen): they are all sacrificed without a choice, and with no
 # creature card in the graveyard there is nothing to return ("return a creature card": none to return, CR 608.2c). The
 # three sacrifices trigger level 2 three times, each milling two cards from Bot2 (6). The Swamps (lands) are not among the
-# permanents that can be sacrificed. Bot2 plays a land each turn so nothing is discarded.
+# permanents that can be sacrificed, nor is the Talent itself ("other"): it stays while the three Moxen go. Bot2 plays a land each
+# turn so nothing is discarded.
 
 [Bot1 Deck]
 Swamp
@@ -47,7 +48,6 @@ Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 3)
 Bot1.Pass
 Bot2.Pass
 [T5 Bot1.End]
-! Bot1.Choose
 Bot1.Accept
 Bot1.Target(Bot2)
 Bot1.Target(Bot2)

@@ -1,0 +1,49 @@
+# "Whenever YOU sacrifice a permanent": with the Talent at level 2, Bot2 sacrifices its own Masked Meower to the Meower's
+# ability in turn 4 and Bot1's Talent does not trigger (`! Bot1.Target`: no target question for the mill is asked). Bot2's
+# graveyard holds only the Meower and the Island it discarded as the cost (2 cards), nothing is milled.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Scavenger's Talent
+Island x4
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Masked Meower
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Masked Meower.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Masked Meower.Activate
+Bot2.Choose(Island)
+! Bot1.Target
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 2
+Bot1.Battlefield = Swamp; Swamp; Scavenger's Talent
+Bot1.Graveyard.Count = 0
