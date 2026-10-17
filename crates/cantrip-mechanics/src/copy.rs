@@ -99,3 +99,29 @@ pub fn create_token_copy_of_target(g: &mut dyn Game, item: &StackItem) -> Result
     }
     Ok(())
 }
+
+/// "Create a token that's a copy of [the target], except it has haste. Sacrifice it at the beginning of the next end step"
+/// (CR 707.2, 707.9a, 111.1, 603.7): the first target's copiable values as the ability resolves, with haste as the
+/// exception (so a copy of the token has haste too, and is not sacrificed: the rulings), for the ability's controller. The
+/// delayed ability is the `delayed` list's ability number `ability` of `card` (the face that prints the ability: Reflection
+/// of Kiki-Jiki is a back face), about every token the resolution made (CR 603.7c: a replacement that makes more makes each
+/// of them sacrificed). Nothing if the target is no longer legal (CR 608.2b). Kiki-Jiki, Mirror Breaker and Reflection of
+/// Kiki-Jiki print it.
+pub fn create_hasty_token_copy_sacrificed_at_end_step(g: &mut dyn Game, item: &StackItem, card: CardId, ability: u8) -> Result<(), Suspend> {
+    let Some(creature) = crate::targets::object(g, item, 0) else { return Ok(()) };
+    let values = g.copiable_values(creature).with_keyword(Keyword::Haste);
+    let tokens = g.create_token_copies_of(values, item.controller, 1)?;
+    g.delayed_trigger_about(
+        DelayedWhen::Step { step: Step::End, on_turn_of: None },
+        item.object,
+        item.controller,
+        AbilityRef::delayed(card, ability),
+        &tokens,
+    );
+    Ok(())
+}
+
+/// The delayed ability of `create_hasty_token_copy_sacrificed_at_end_step`, for the card's `delayed` list: "Sacrifice it",
+/// each token it carries that is still on the battlefield under its controller (`delayed::sacrifice_created`).
+pub const SACRIFICE_IT_AT_END_STEP: AbilityDef =
+    delayed_trigger(crate::delayed::sacrifice_created, "Sacrifice it at the beginning of the next end step.");

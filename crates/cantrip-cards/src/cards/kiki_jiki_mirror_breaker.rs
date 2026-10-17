@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::delayed::{self, SACRIFICE_CREATED};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -13,22 +12,16 @@ fn nonlegendary_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) ->
 }
 
 /// "Create a token that's a copy of target nonlegendary creature you control, except it has haste. Sacrifice it at the
-/// beginning of the next end step." The target's copiable values as the ability resolves (CR 707.2: what is printed on it, or
-/// what it is copying, never counters, Auras or an animation; the rulings), with haste as an exception, so a copy of the
-/// token has haste too (CR 707.9b) but is not sacrificed (the ruling). Its own "enters" abilities trigger and its "enters"
-/// replacements apply (the ruling). The delayed ability is about every token this resolution made (CR 603.7c: a replacement
-/// that makes more makes each of them sacrificed). Nothing if the target is no longer legal (CR 608.2b).
+/// beginning of the next end step" (`copy::create_hasty_token_copy_sacrificed_at_end_step`, CR 707.2, 707.9a, 603.7). Its
+/// "enters" abilities trigger and its "enters" replacements apply (the ruling).
 fn copy_with_haste(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let values = g.copiable_values(creature).with_keyword(Keyword::Haste);
-    let tokens = g.create_token_copies_of(values, item.controller, 1)?;
-    delayed::at_next_end_step_about(g, item, 0, &tokens);
-    Ok(())
+    let me = g.card_id(&CARD);
+    cantrip_mechanics::copy::create_hasty_token_copy_sacrificed_at_end_step(g, item, me, 0)
 }
 
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP, copy_with_haste, "{T}: Create a token that's a copy of target nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step.")
         .targets(&[target(nonlegendary_creature_you_control)])],
-    delayed: &[SACRIFICE_CREATED],
+    delayed: &[cantrip_mechanics::copy::SACRIFICE_IT_AT_END_STEP],
     ..oracle::KIKI_JIKI_MIRROR_BREAKER
 };

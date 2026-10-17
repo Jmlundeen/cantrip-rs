@@ -54,25 +54,14 @@ fn another_nonlegendary_creature_you_control(q: &dyn Query, asker: &Asker, t: Ta
 /// "Create a token that's a copy of another target nonlegendary creature you control, except it has haste. Sacrifice
 /// it at the beginning of the next end step."
 fn copy_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let values = g.copiable_values(creature).with_keyword(Keyword::Haste);
     let me = g.card_id(&BACK);
-    for token in g.create_token_copies_of(values, item.controller, 1)? {
-        g.delayed_trigger(
-            DelayedWhen::Step { step: Step::End, on_turn_of: None },
-            item.object,
-            item.controller,
-            AbilityRef::delayed(me, 0),
-            Target::Object(token),
-        );
-    }
-    Ok(())
+    cantrip_mechanics::copy::create_hasty_token_copy_sacrificed_at_end_step(g, item, me, 0)
 }
 
 pub static BACK: CardDef = CardDef {
     abilities: &[ability(cost("{1}, {T}"), copy_creature, "{1}, {T}: Create a token that's a copy of another target nonlegendary creature you control, except it has haste. Sacrifice it at the beginning of the next end step.")
         .targets(&[target(another_nonlegendary_creature_you_control)])],
-    delayed: &[delayed_trigger(cantrip_mechanics::delayed::sacrifice_subject, "Sacrifice it at the beginning of the next end step.")],
+    delayed: &[cantrip_mechanics::copy::SACRIFICE_IT_AT_END_STEP],
     ..oracle::REFLECTION_OF_KIKI_JIKI
 };
 
