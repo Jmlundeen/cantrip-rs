@@ -1,0 +1,54 @@
+# Get Out, second mode: "Return one or two target creatures and/or enchantments you own to your hand." Bot1 owns two Ornithopters (creatures) and a Fastbond (an enchantment); Bot2 has a
+# Llanowar Elves (a creature it owns, not Bot1's) and a Sol Ring (neither a creature nor an enchantment). The Elves and the Sol Ring cannot be targeted, nor can no target, nor three
+# (the refusals); an Ornithopter and the Fastbond are chosen together (the positive control) and both return to Bot1's hand, while the other Ornithopter and Bot2's permanents stay.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Ornithopter
+Ornithopter
+Fastbond
+Get Out
+Mox Sapphire
+Island x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Sol Ring
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fastbond.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Get Out.Cast
+Bot1.Modes(2)
+! Bot1.Target(Count: 0)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+! Bot1.Target(Bot2.Battlefield.Sol Ring)
+! Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2; Bot1.Battlefield.Fastbond)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Fastbond)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Ornithopter; Fastbond; Island
+Bot1.Battlefield = Mox Emerald; Mox Sapphire; Ornithopter
+Bot1.Graveyard = Get Out; Black Lotus
+Bot2.Battlefield = Forest; Mox Emerald; Sol Ring; Llanowar Elves

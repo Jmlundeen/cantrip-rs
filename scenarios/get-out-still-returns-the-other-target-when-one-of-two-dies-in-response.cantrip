@@ -1,0 +1,38 @@
+# CR 608.2b: Get Out's second mode with two targets, one illegal as it resolves, still does what it can with the other. Bot1 targets both of its Ornithopters; in response Bot2's
+# Lightning Bolt kills one (0/2), so only the other returns to Bot1's hand. The dead one is in the graveyard, not returned.
+
+[Bot1 Deck]
+Black Lotus
+Get Out
+Ornithopter
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Get Out.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Ornithopter; Island; Island; Island; Island
+Bot1.Graveyard = Get Out; Ornithopter; Black Lotus
+Bot1.Battlefield.Count = 0
+Bot2.Graveyard = Lightning Bolt
