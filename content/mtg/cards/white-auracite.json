@@ -1,0 +1,6 @@
+{
+  "name": "White Auracite",
+  "manaCost": "{2}{W}{W}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, exile target nonland permanent an opponent controls until this artifact leaves the battlefield.\n{T}: Add {W}."
+}
