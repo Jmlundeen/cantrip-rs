@@ -2,7 +2,7 @@
 # Lightning Bolt (an instant) and Duress (a sorcery), so two cards count; the Black Lotus sacrificed on turn 3 is an artifact in the graveyard
 # and counts for nothing. On turn 3 Bot1 taps seven mana (Mountain {R}, Mox Jet {B}, Mox Sapphire {U}, Black Lotus {U}{U}{U}, Island {U}) and the
 # Crab costs {3}{U}{U} = five, so two blue mana are left in the pool (the reduction of 2, not 1 and not 3). It is Bot1's own turn, so
-# "enters tapped if it's not your turn" does not apply: the Crab is untapped. No creatures are in play to tap with its trigger.
+# "enters tapped if it's not your turn" does not apply: the Crab is untapped. Bot2 controls no creatures, so its trigger has nothing to tap.
 
 [Bot1 Deck]
 Mountain

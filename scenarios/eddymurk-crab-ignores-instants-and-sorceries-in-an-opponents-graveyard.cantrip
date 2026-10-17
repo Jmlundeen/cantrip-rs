@@ -1,0 +1,47 @@
+# Eddymurk Crab: "for each instant and sorcery card in YOUR graveyard". Bot2 casts a Lightning Bolt on turn 2, so an instant is in Bot2's graveyard and
+# none in Bot1's. On turn 3 Bot1 taps exactly seven blue mana (two Islands, two Mox Sapphires and a Black Lotus) and the Crab costs its full {5}{U}{U}:
+# nothing is left in the pool. Were Bot2's graveyard counted it would cost six and one blue mana would be left over.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Eddymurk Crab
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eddymurk Crab.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Eddymurk Crab.Tapped = false
+Bot1.Mana =
+Bot1.Life = 17

@@ -1,0 +1,61 @@
+# Earthbender Ascension: once the reflexive trigger is on the stack it is independent of the enchantment (CR 603.12, 113.7a). The fourth quest counter on
+# turn 5 puts it on the stack targeting the Ornithopter; in response Bot2 destroys the Ascension with Disenchant. The trigger's "if it has four or more
+# quest counters on it" is judged on the Ascension as it last existed (CR 603.4, 608.2h): it had four, so the trigger resolves, the Ornithopter gets
+# the +1/+1 counter and trample until end of turn, though the enchantment is in the graveyard.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Earthbender Ascension
+Ornithopter
+Prismatic Vista
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Plains x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Earthbender Ascension.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+Bot1.Search(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Prismatic Vista.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot1.Target(Ornithopter)
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Earthbender Ascension)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Earthbender Ascension; Prismatic Vista; Black Lotus
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot1.Battlefield.Forest#1.Counters.PlusOnePlusOne = 2

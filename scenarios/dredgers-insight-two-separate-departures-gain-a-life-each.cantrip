@@ -1,0 +1,49 @@
+# Dredger's Insight: "Whenever one or more artifact and/or creature cards leave your graveyard, you gain 1 life" triggers once for each
+# separate departure (CR 603.2c is about simultaneous events only). Its enters trigger mills Llanowar Elves, Ornithopter, Lightning Bolt and
+# Island and Bot1 takes the Ornithopter into hand: 1 life. Then Animate Dead returns the Elves from the graveyard to the battlefield, a second,
+# separate departure: another life. Bot1 ends at 22.
+
+[Bot1 Deck]
+Forest
+Forest
+Dredger's Insight
+Mox Jet
+Mox Emerald
+Animate Dead
+Forest
+Forest
+Llanowar Elves
+Ornithopter
+Lightning Bolt
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Life = 21
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Forest; Forest; Ornithopter
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot1.Graveyard = Island; Lightning Bolt

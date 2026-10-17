@@ -1,0 +1,60 @@
+# Dredger's Insight: a batch that holds a card that does not qualify (a land) beside one that does (a creature) triggers once. On Bot2's turn 4
+# Strip Mine destroys one of Bot1's Forests and a Lightning Bolt kills its Llanowar Elves; in Bot2's second main phase Bot1 casts Second Sunrise,
+# which returns the Forest and the Elves together (and Bot2's own Strip Mine). Bot1 gains 1 life for the batch: the land is no artifact or creature,
+# the Elves are, and they are one batch (CR 603.2c).
+
+[Bot1 Deck]
+Forest
+Forest
+Llanowar Elves
+Dredger's Insight
+Second Sunrise
+Mox Pearl
+Mox Pearl
+Mox Emerald
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Strip Mine
+Mountain
+Lightning Bolt
+Mountain x4
+Mountain x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Forest; Ability: Destroy)
+[T4 Bot2.Main2]
+? Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Second Sunrise.Cast
+[Bot2.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield = Forest; Forest; Llanowar Elves; Mox Pearl; Mox Pearl; Mox Emerald; Dredger's Insight
+Bot2.Battlefield = Strip Mine; Mountain
+Bot2.Graveyard = Lightning Bolt

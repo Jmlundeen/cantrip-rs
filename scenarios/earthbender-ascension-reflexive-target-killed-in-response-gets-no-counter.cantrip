@@ -1,0 +1,60 @@
+# Earthbender Ascension's reflexive trigger puts a +1/+1 counter on "target creature you control" (CR 603.12, 608.2b). With the fourth quest counter
+# on turn 5 the trigger goes on the stack targeting the Ornithopter, and in response Bot2 kills the Ornithopter with Lightning Bolt: the only target is
+# illegal, so the ability does not resolve and nobody gets a counter. The earthbent Forest keeps its two counters only. (The neighbouring
+# scenario with four quest counters is the positive control.)
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Earthbender Ascension
+Ornithopter
+Prismatic Vista
+Forest
+Forest
+Forest
+Island
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Earthbender Ascension.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Pass
+Bot1.Pass
+Bot1.Search(Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Prismatic Vista.Play
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Prismatic Vista.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot1.Target(Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield.Earthbender Ascension.Counters.Quest = 4
+Bot1.Graveyard = Ornithopter; Prismatic Vista; Black Lotus
+Bot1.Battlefield.Forest#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Forest#1.Keywords = Haste

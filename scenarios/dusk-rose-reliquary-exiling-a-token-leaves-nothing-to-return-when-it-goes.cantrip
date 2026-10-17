@@ -1,0 +1,60 @@
+# Dusk Rose Reliquary exiles a Treasure token Bot2 made (CR 610.3, 111.7): a token that leaves the battlefield ceases to exist, so when Bot1 later
+# Disenchants the Reliquary nothing comes back (the card's ruling). Bot2 on turn 2 casts Deadly Dispute, sacrificing an Ornithopter for a Treasure
+# token and two cards; on turn 3 Bot1 sacrifices its Healer's Hawk to cast the Reliquary, which can exile the Treasure or the Mox Jet - Bot1 chooses
+# the Treasure. The Mox Jet is still on the battlefield afterwards, the Treasure nowhere.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Healer's Hawk
+Dusk Rose Reliquary
+Disenchant
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Ornithopter
+Deadly Dispute
+Forest x3
+Forest x11
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healer's Hawk.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Deadly Dispute.Cast
+Bot2.Choose(Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Dusk Rose Reliquary.Cast
+Bot1.Choose(Healer's Hawk)
+Bot1.Pass
+Bot1.Target(Treasure Token)
+Bot1.Pass
+Bot1.Pass
+? Exile.Count = 0
+? Bot2.Battlefield = Forest; Mox Jet
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Dusk Rose Reliquary)
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Stack.Count = 0
+Bot2.Battlefield = Forest; Mox Jet
+Bot1.Battlefield = Plains; Plains; Mox Pearl

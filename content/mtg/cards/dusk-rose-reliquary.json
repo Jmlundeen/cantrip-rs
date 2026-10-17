@@ -2,5 +2,5 @@
   "name": "Dusk Rose Reliquary",
   "manaCost": "{W}",
   "type": "Artifact",
-  "oracleText": "As an additional cost to cast this spell, sacrifice an artifact or creature.\nWard {2} (Whenever this artifact becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)\nWhen this artifact enters, exile target artifact or creature an opponent controls until this artifact leaves the battlefield."
+  "oracleText": "As an additional cost to cast this spell, sacrifice an artifact or creature.\nWard {2}\nWhen this artifact enters, exile target artifact or creature an opponent controls until this artifact leaves the battlefield."
 }
