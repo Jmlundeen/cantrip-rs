@@ -1,0 +1,43 @@
+# Sigarda's Aid: "You may cast Aura and Equipment spells as though they had flash" (CR 307.5, 702.8), and a bestowed spell
+# is an Aura enchantment spell, not a creature spell (CR 702.103b). In Bot2's main phase Bot1 may cast Springheart Nantuko
+# bestowed on Llanowar Elves: the permission reads the Aura it would be on the stack. Cast as itself, an enchantment
+# creature, it is no Aura and keeps sorcery speed, so before the bestowed cast the plain cast is refused (`Ability: #1` picks
+# the cast for its mana cost) beside the bestowed one that is then taken.
+
+[Bot1 Deck]
+Mox Pearl
+Sigarda's Aid
+Mox Emerald
+Llanowar Elves
+Springheart Nantuko
+Mox Sapphire
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sigarda's Aid.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+! Bot1.Hand.Springheart Nantuko.Cast(Ability: #1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Springheart Nantuko.Cast(Bot1.Battlefield.Llanowar Elves; Ability: Bestow)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Springheart Nantuko.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Springheart Nantuko.Types = Enchantment
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Hand.Count = 0

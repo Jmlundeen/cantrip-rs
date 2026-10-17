@@ -559,7 +559,8 @@ either with the way it is cast by (`WAY_ADVENTURE`, `WAY_OMEN`) and the face a g
 that face wherever the card itself may be cast - from the hand, or from elsewhere by a permission, by its own say-so or by an
 effect's (Yawgmoth's Will), for what the permission says to pay (CR 601.3, 715.3, 720.3) - but not as an Adventure by the
 permission an Adventure gives the card it exiled (CR 715.3d). Only the face is judged to see whether it can be cast, at its own
-speed (CR 715.3a, 720.3a), and on the stack it is that face alone (`Obj::copy`, CR 715.3b, 720.3b), which a copy of it and a
+speed (CR 715.3a, 720.3a) - which a permission to cast spells as though they had flash reads too, through a view of
+the face (`actions::Speed`, as for a split half, a Room's door, a back face and a bestowed Aura) - and on the stack it is that face alone (`Obj::copy`, CR 715.3b, 720.3b), which a copy of it and a
 choice of new targets for it read too (CR 715.3c, 720.3c). As it resolves, an Adventure is exiled on its adventure (CR 715.3d)
 and an Omen is shuffled into its owner's library by its controller (CR 720.3d); a copy of an Omen still shuffles its owner's
 library and ceases to exist. Countered, or with every target gone, either goes to the graveyard. The host sends the face as
@@ -750,8 +751,9 @@ Known gaps:
   the battlefield one after another by an effect (Ghost Vacuum) enter one at a time rather than together.
 - Rooms (CR 709.5) are built: `Marks::doors` holds the unlocked designations, `layers::doors` gives a Room on the
   battlefield the name, mana cost and abilities of its unlocked doors, the unlock special action is an intrinsic ability
-  per locked door (`intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, cost read off the door), and `Event::DoorUnlocked` is what
-  "when you unlock this door" listens for. Not yet: a door with static abilities, replacement effects or an enters
+  per locked door (`intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, cost read off the door), `Event::DoorUnlocked` is what
+  "when you unlock this door" listens for, and a door's play rules (`CardDef::play_rules`, Steaming Sauna's "You have no
+  maximum hand size") apply while it is unlocked (`actions::each_play_rule`). Not yet: a door with static abilities, replacement effects or an enters
   rule (the card table refuses one), instructions to unlock or lock a door (`Game::unlock_door` exists for the first,
   nothing locks), "fully unlocks", and a copy of a Room spell (`resolve_copy_as_token` gives the token its door, but
   no card in content can copy a Room spell to prove it).

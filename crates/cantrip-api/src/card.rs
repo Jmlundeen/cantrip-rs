@@ -1975,9 +1975,9 @@ impl CardTable {
                 table.backs[front] = Some(back);
                 table.fronts[back.0 as usize] = Some(CardId(front as u16));
             }
-            // A Room's doors (CR 709.5): the abilities of an unlocked one are the permanent's. What a door's text does
-            // beyond abilities (static abilities, replacement effects, entering rules) is read off the card, not off the
-            // door, so a door that has any is refused until those follow the designations: never quietly absent.
+            // A Room's doors (CR 709.5): the abilities and play rules of an unlocked one are the permanent's. What a door's
+            // text does beyond those (static abilities, replacement effects, entering rules) is read off the card, not off
+            // the door, so a door that has any is refused until those follow the designations: never quietly absent.
             let card = table.cards[front];
             if card.is_room() {
                 let (left, right) = card.split.expect("a Room is a split card");
@@ -1988,6 +1988,8 @@ impl CardTable {
                         half.name
                     );
                 }
+                // The Room is looked at for play rules, which `actions::each_play_rule` takes from its unlocked doors.
+                table.play_rules[front] |= !left.play_rules.is_empty() || !right.play_rules.is_empty();
                 let ids = (table.find(left.name), table.find(right.name));
                 table.halves[front] = Some((ids.0.expect("a door is in the card table"), ids.1.expect("a door is in the card table")));
             }

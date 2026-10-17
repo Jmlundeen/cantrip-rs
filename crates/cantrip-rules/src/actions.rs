@@ -1744,7 +1744,8 @@ fn graveyard_play(cx: &Cx, player: PlayerId) -> bool {
 /// The play rules that apply to `player` now (`CardDef::play_rules`), each with the permanent whose rule it is: those of the
 /// permanents they control, and with `command` of the emblems they have (CR 114.4), that have not lost their abilities (CR
 /// 613.1f). A rule under "as long as" (`PlayRule::While`) applies only while its condition holds for its permanent: a
-/// Case's "Solved - [static ability]" (CR 702.169b).
+/// Case's "Solved - [static ability]" (CR 702.169b). A Room's are those of its unlocked doors: a locked door has no rules
+/// text (CR 709.5).
 pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, command: bool, mut f: impl FnMut(ObjectId, &'static PlayRule)) {
     fn walk(q: &dyn Query, asker: &Asker, rules: &'static [PlayRule], f: &mut impl FnMut(ObjectId, &'static PlayRule)) {
         for rule in rules {
@@ -1769,7 +1770,15 @@ pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, comman
         if obj.controller != player || !cards.play_rules[card.0 as usize] || s.lost_all_abilities(id) {
             continue;
         }
-        walk(q, &Asker { source: id, controller: player }, cards.get(card).play_rules, &mut f);
+        let def = cards.get(card);
+        let asker = Asker { source: id, controller: player };
+        if def.is_room() {
+            for door in def.unlocked_doors(obj.marks.doors) {
+                walk(q, &asker, door.play_rules, &mut f);
+            }
+        } else {
+            walk(q, &asker, def.play_rules, &mut f);
+        }
     }
 }
 
@@ -1957,6 +1966,44 @@ fn extra_payable(cx: &Cx, id: ObjectId, player: PlayerId, def: &CardDef) -> bool
         && (def.additional_choice.is_empty() || def.additional_choice.iter().any(|c| can_pay_other(cx, id, player, &c.cost)))
 }
 
+/// Whether a card, or the face of it that would be cast, may be cast whenever its caster could cast an instant (CR 307.5,
+/// 702.8): an instant, a spell with flash, one of a type an effect lets them cast as though it had flash, or one a static
+/// ability lets them (Sigarda's Aid, Valley Floodcaller). A face is judged as the spell it would be on the stack, its own
+/// characteristics alone (CR 709.3a, 712.8a, 715.3a, 720.3a, 702.103b), so "noncreature spells" finds a creature's sorcery
+/// Adventure and a bestowed Aura is an Aura spell.
+struct Speed<'a> {
+    cx: &'a Cx<'a>,
+    /// The card types an effect lets the player cast as though they had flash (`static_rules::flash_types`).
+    flash: TypeSet,
+    /// The permanents whose static abilities may let them (`static_rules::flash_granters`).
+    granters: &'a [(ObjectId, PlayerId, &'static CardDef)],
+    player: PlayerId,
+    card: ObjectId,
+}
+
+impl Speed<'_> {
+    /// The card cast as itself, with the card's own "you may cast this spell as though it had flash".
+    fn whole(&self, def: &'static CardDef) -> bool {
+        def.cast_as_though_flash
+            || own_speed(def, self.flash)
+            || (!self.granters.is_empty() && static_rules::grants_flash(self.cx, self.granters, self.player, self.card))
+    }
+
+    /// The card cast as `face`: a split card's half or a Room's door, an Adventure or an Omen, a back face, a bestowed Aura.
+    fn face(&self, face: &'static CardDef) -> bool {
+        own_speed(face, self.flash)
+            || (!self.granters.is_empty() && {
+                let view = AsFace { cx: self.cx, spell: self.card, face: self.cx.card_id(face) };
+                static_rules::grants_flash(&view, self.granters, self.player, self.card)
+            })
+    }
+}
+
+/// An instant, a spell with flash, or one of the `flash` types (CR 307.5, 702.8).
+fn own_speed(def: &CardDef, flash: TypeSet) -> bool {
+    def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.types.0 & flash.0 != 0
+}
+
 fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
     let barred = cast_barred(cx, player);
     if ZoneKinds::CAST_FROM.iter().all(|&from| barred.contains(from)) {
@@ -2005,9 +2052,8 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let instead = grant.and_then(|g| g.instead);
             let any_type = grant.is_some_and(|g| g.any_type);
             let more = grant.map_or(0, |g| g.more);
-            let instant = (def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.cast_as_though_flash || def.types.0 & flash.0 != 0
-                || (!flash_granters.is_empty() && static_rules::grants_flash(cx, &flash_granters, player, id)))
-                && !grant.is_some_and(|g| g.sorcery_speed);
+            let speed = Speed { cx, flash, granters: &flash_granters, player, card: id };
+            let instant = speed.whole(def) && !grant.is_some_and(|g| g.sorcery_speed);
             // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard";
             // or by a rule that lets its owner cast spells from their graveyard (Yawgmoth's Will).
             let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
@@ -2133,11 +2179,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s()));
                 if !ways.is_empty() {
                     for (face_way, face_def) in faces_to_cast(def) {
-                        let face_instant = if face_way == GRANTED_FACE_WHOLE {
-                            instant
-                        } else {
-                            face_def.is(CardType::Instant) || face_def.keywords.has(Keyword::Flash) || face_def.types.0 & flash.0 != 0
-                        };
+                        let face_instant = if face_way == GRANTED_FACE_WHOLE { instant } else { speed.face(face_def) };
                         if face_instant != instants {
                             continue;
                         }
@@ -2169,7 +2211,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     let from = if half.aftermath { ZoneKind::Graveyard } else { ZoneKind::Hand };
                     if !zone.is(from)
                         || !own
-                        || (half.is(CardType::Instant) || half.keywords.has(Keyword::Flash) || half.types.0 & flash.0 != 0) != instants
+                        || speed.face(half) != instants
                     {
                         continue;
                     }
@@ -2188,7 +2230,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             if zone.is(ZoneKind::Hand)
                 && let Some(back) = def.back
                 && back.has_cost
-                && (back.is(CardType::Instant) || back.keywords.has(Keyword::Flash)) == instants
+                && speed.face(back) == instants
             {
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
                 if {
@@ -2202,7 +2244,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             // Bestow (CR 702.103a): from the hand, as the Aura it becomes, which needs a creature to enchant (CR 601.2c).
             if (zone.is(ZoneKind::Hand) || (zone.is(ZoneKind::Graveyard) && own && def.bestow_from_graveyard))
                 && let Some(bestow) = def.bestow
-                && (bestow.keywords.has(Keyword::Flash) || bestow.types.0 & flash.0 != 0) == instants
+                && speed.face(bestow) == instants
                 && bestow.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
             {
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BESTOW);
@@ -2221,8 +2263,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
             if zone.is(ZoneKind::Hand) || permitted || from_graveyard {
                 for (way, _, inset) in def.inset_faces() {
-                    let face_instant = (inset.is(CardType::Instant) || inset.keywords.has(Keyword::Flash) || inset.types.0 & flash.0 != 0)
-                        && !grant.is_some_and(|g| g.sorcery_speed);
+                    let face_instant = speed.face(inset) && !grant.is_some_and(|g| g.sorcery_speed);
                     if face_instant != instants {
                         continue;
                     }
@@ -2252,7 +2293,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
         let def = cx.card(cx.s().obj(id).card);
         let mut allowed = false;
         each_play_rule(cx, cx.cards(), player, false, |_, rule| allowed |= matches!(rule, PlayRule::LibraryTopSpells(f) if f(cx, id)));
-        let instant = def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.types.0 & flash.0 != 0;
+        let instant = Speed { cx, flash, granters: &flash_granters, player, card: id }.whole(def);
         // Where a permanent lets them pay life instead, that cast below is the one offered.
         if allowed && !land_rules(cx, player).top_for_life && !def.is(CardType::Land) && def.has_cost && instant == instants {
             let a = available.get_or_init(|| self::available(cx, player));
@@ -2270,7 +2311,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
         && let Some(&id) = cx.s().zone(Zone::library(player)).first()
     {
         let def = cx.card(cx.s().obj(id).card);
-        let instant = def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.types.0 & flash.0 != 0;
+        let instant = Speed { cx, flash, granters: &flash_granters, player, card: id }.whole(def);
         let life = Cost { life: def.cost.mana_value().min(255) as u8, ..Cost::NONE };
         if !def.is(CardType::Land) && def.has_cost && instant == instants && can_pay_other(cx, id, player, &life) {
             let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);

@@ -184,11 +184,12 @@ pub fn flash_granters(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
 }
 
 /// Whether one of the `granters` (from `flash_granters`) lets `player` cast `spell`, a card in the zone it is cast from, as
-/// though it had flash (CR 307.5, 702.8).
-pub fn grants_flash(cx: &Cx, granters: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> bool {
+/// though it had flash (CR 307.5, 702.8). `q` is what the rule reads the spell through: a view of the face being cast,
+/// where that is not the card itself.
+pub fn grants_flash(q: &dyn Query, granters: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> bool {
     granters.iter().any(|&(id, controller, def)| {
         let asker = Asker { source: id, controller };
-        def.flash_rules.iter().any(|rule| rule(cx, &asker, spell, player))
+        def.flash_rules.iter().any(|rule| rule(q, &asker, spell, player))
     })
 }
 
