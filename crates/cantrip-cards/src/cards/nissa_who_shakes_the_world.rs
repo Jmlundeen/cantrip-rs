@@ -60,10 +60,6 @@ fn emblem_and_forests(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 // --- The emblem ---------------------------------------------------------------------------------------------------
 
-fn land_its_controller_controls(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    so_far.is(CardType::Land) && q.state().obj(affected).controller == q.state().obj(source).controller
-}
-
 fn indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = Keywords(chars.keywords.0 | Keywords::of(&[Keyword::Indestructible]).0);
 }
@@ -71,7 +67,7 @@ fn indestructible(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
 pub static EMBLEM: CardDef = CardDef {
     name: "Nissa, Who Shakes the World emblem",
     has_cost: false,
-    statics: &[static_ability(Layer::Ability, land_its_controller_controls, indestructible, "Lands you control have indestructible.")],
+    statics: &[static_ability(Layer::Ability, cantrip_mechanics::statics::your_lands, indestructible, "Lands you control have indestructible.")],
     text: "Lands you control have indestructible.",
     ..CardDef::BLANK
 };

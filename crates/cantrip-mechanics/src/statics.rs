@@ -19,6 +19,14 @@ pub fn your_planeswalkers(q: &dyn LayerQuery, source: ObjectId, affected: Object
     so_far.is(CardType::Planeswalker) && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// "Lands you control" (CR 613.1f, layer 6): every land under the source's controller's control, judged on what the earlier
+/// layers made it, and by control, not ownership. The emblem of Nissa, Who Shakes the World and Resonating Lute use it as
+/// `StaticDef::affects`.
+pub fn your_lands(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    let s = q.state();
+    so_far.is(CardType::Land) && s.obj(affected).controller == s.obj(source).controller
+}
+
 /// "Creature tokens you control" (CR 111.1, 613.1f): a creature under the source's controller's control, as the earlier
 /// layers made it, that is a token. Teysa Karlov, Caretaker's Talent (at level 3) and Gideon's Memorial use it as
 /// `StaticDef::affects`.
