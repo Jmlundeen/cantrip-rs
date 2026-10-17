@@ -1,0 +1,41 @@
+# Pawpatch Formation, "Destroy target creature with flying." Bot2 has a Healer's Hawk (flying) and a Thraben Inspector (no
+# flying). On turn 3 Bot1 chooses the first mode: the target question refuses the Inspector (and the Clue and a land), and
+# takes the Hawk, which is destroyed. The Inspector and its Clue stay.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Pawpatch Formation
+Forest x17
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Healer's Hawk
+Thraben Inspector
+Plains x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Pawpatch Formation.Cast
+Bot1.Modes(1)
+! Bot1.Target(Bot2.Battlefield.Thraben Inspector)
+! Bot1.Target(Bot2.Battlefield.Plains)
+Bot1.Target(Healer's Hawk)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Healer's Hawk
+Bot2.Battlefield = Plains; Mox Pearl; Thraben Inspector; Clue Token
+Bot1.Graveyard = Pawpatch Formation

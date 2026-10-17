@@ -1,0 +1,40 @@
+# Pawpatch Formation, "Destroy target enchantment." Bot2 casts Obsessive Pursuit (an enchantment) with a Swamp and Mox Jet, which
+# also makes a Clue token. On turn 3 Bot1 chooses the second mode: the target question refuses the Clue (an artifact), the
+# Swamp and Bot2 itself, and takes the Pursuit, which is destroyed.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Pawpatch Formation
+Forest x17
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Obsessive Pursuit
+Swamp x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Obsessive Pursuit.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Pawpatch Formation.Cast
+Bot1.Modes(2)
+! Bot1.Target(Bot2.Battlefield.Clue Token)
+! Bot1.Target(Bot2.Battlefield.Swamp)
+! Bot1.Target(Bot2)
+Bot1.Target(Obsessive Pursuit)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Obsessive Pursuit
+Bot2.Battlefield = Swamp; Mox Jet; Clue Token
+Bot2.Life = 19

@@ -1,0 +1,36 @@
+# Pawpatch Formation, "Draw a card. Create a Food token." The third mode has no target, so it can be chosen with nothing for
+# the other modes to aim at (Bot2 has no creatures or enchantments). Bot1 draws the top card of its library (an Island) and
+# gets an untapped Food token, a colorless artifact, under its control.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Pawpatch Formation
+Island
+Island
+Island
+Island
+Island
+Island x2
+Forest x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Pawpatch Formation.Cast
+Bot1.Modes(3)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Food Token
+Bot1.Battlefield.Food Token.Token = true
+Bot1.Battlefield.Food Token.Tapped = false
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 11
+Bot1.Graveyard = Pawpatch Formation
