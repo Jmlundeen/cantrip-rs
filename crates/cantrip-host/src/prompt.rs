@@ -467,6 +467,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         | Purpose::CopyAsEnters
         | Purpose::CopyWhich
         | Purpose::Targets
+        | Purpose::ChangeTargetTo
         | Purpose::EnterAttacking
         | Purpose::Color
         | Purpose::Optional

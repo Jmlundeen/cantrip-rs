@@ -368,6 +368,12 @@ public static partial class CardReading
     public const string VictimLabel = "to be dealt that damage";
 
     /// <summary>
+    /// What the choice of "change a target of target spell or ability to this creature" says it is for (Spellskite, CR 115.7b):
+    /// which of the spell's targets lets go, the creature asking taking its place.
+    /// </summary>
+    public const string ChangeTargetLabel = "The target to change to this creature";
+
+    /// <summary>
     /// What a piece of rules text does to its target: a spell's text, one mode of it, or an ability as it reads.
     /// </summary>
     public static EffectRead Effect(string text)

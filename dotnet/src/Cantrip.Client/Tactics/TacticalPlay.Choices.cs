@@ -24,6 +24,17 @@ public sealed partial class TacticalPlay
             return new TargetsChosenAnswer { Targets = WithinTotal(client, prompt, most) };
         }
 
+        // Spellskite's "change a target ... to this creature" (CR 115.7b): which target the spell or ability lets go of. A seat
+        // pays to change a target to its own creature to draw something away from what it would rather keep - itself, then its
+        // own permanents - so that is the one let go; otherwise the first.
+        if (string.Equals(prompt.Text, CardReading.ChangeTargetLabel, StringComparison.Ordinal))
+        {
+            TargetMessage spared = prompt.Candidates.FirstOrDefault(c => c.IsPlayer && c.Player == client.Seat)
+                ?? prompt.Candidates.FirstOrDefault(c => !c.IsPlayer && client.Object(c.Object)?.Controller == client.Seat)
+                ?? prompt.Candidates[0];
+            return new TargetsChosenAnswer { Targets = [spared] };
+        }
+
         EffectRead effect = Reading(client, prompt.Text, prompt.Source, prompt.Ability);
 
         // A bite deals damage equal to the power of the creature chosen for its first slot, to what its second slot chooses:

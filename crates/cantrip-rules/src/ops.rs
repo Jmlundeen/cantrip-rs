@@ -1457,6 +1457,79 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
     Ok(())
 }
 
+/// "Change a target of target spell or ability to [object]" (CR 115.7b, 115.7a): one of the targets of the spell or ability on
+/// the stack (a `Target::Object` spell or a `Target::Ability`) becomes `to`, if `to` is a legal target for it: legal for that
+/// target's own instance of "target" as the item's controller and source would judge it, not already chosen for that instance
+/// (CR 115.3), within its slot's total (CR 601.2c), and leaving every other target that was legal still legal (the
+/// Spellskite rulings; CR 115.7e judges the final set). A target that already is `to` is not changed, and no other is changed
+/// in its place. With more than one target that may be changed, `chooser` chooses which as this resolves; with none, nothing
+/// happens - nor does it if `to` has left the battlefield. The division of a divided total stays as it was (CR 115.7f), and
+/// `to` becomes a target (CR 115.10).
+pub fn change_a_target_to(cx: &mut Cx, of: Target, to: ObjectId, chooser: PlayerId) -> R<()> {
+    let at = match of {
+        Target::Object(o) => cx.s().stack.iter().position(|i| i.kind == StackKind::Spell && i.object == o),
+        Target::Ability(serial) => cx.s().stack.iter().position(|i| i.kind != StackKind::Spell && i.serial == serial),
+        _ => None,
+    };
+    let Some(at) = at else { return Ok(()) };
+    if !live(cx.s(), to) || !cx.s().obj(to).zone.is(ZoneKind::Battlefield) {
+        return Ok(());
+    }
+    let item = cx.s().stack[at];
+    let count = item.target_count as usize;
+    let asker = Asker { source: item.object, controller: item.controller };
+    let new = Target::Object(to);
+    // Whether target `slot` of `of` is legal for its instance of "target", given the targets before it.
+    let legal = |cx: &Cx, of: &StackItem, slot: usize| -> bool {
+        let Some((spec, slot_player)) = crate::resolve::slot_spec(cx.cards(), cx.s(), of, slot) else { return false };
+        crate::actions::target_candidates_given(cx, &asker, &spec, &of.targets[..slot], of.subject, slot_player).contains(&of.targets[slot])
+            && fits_total(cx, of, slot, &spec, of.targets[slot])
+    };
+    let changeable: Vec<usize> = (0..count)
+        .filter(|&slot| {
+            let current = item.targets[slot];
+            if current == Target::None || current == new {
+                return false;
+            }
+            // CR 115.3: not for an instance of "target" that already has it.
+            if (0..count).any(|j| j != slot && item.spec_of[j] == item.spec_of[slot] && item.targets[j] == new) {
+                return false;
+            }
+            let mut changed = item;
+            changed.targets[slot] = new;
+            legal(cx, &changed, slot) && (slot + 1..count).all(|k| item.targets[k] == Target::None || !legal(cx, &item, k) || legal(cx, &changed, k))
+        })
+        .collect();
+    let slot = match changeable.as_slice() {
+        [] => return Ok(()),
+        [only] => *only,
+        _ => {
+            let candidates: Vec<Target> = changeable.iter().map(|&s| item.targets[s]).collect();
+            let ask = RequestKind::ChooseTarget {
+                label: "The target to change to this creature",
+                slot_player: None,
+                total: None,
+                source: to,
+                purpose: Purpose::ChangeTargetTo,
+                candidates: candidates.clone(),
+                optional: false,
+                least: 1,
+                count: 1,
+                any_number: false,
+            };
+            match cx.ask_core(chooser, ask, false)? {
+                Answer::Targets(chosen) if chosen.len() == 1 => changeable[candidates.iter().position(|&t| t == chosen[0]).unwrap_or(0)],
+                _ => changeable[0],
+            }
+        }
+    };
+    let mut changed = item;
+    changed.targets[slot] = new;
+    cx.st().stack_set(at, changed);
+    became_targets(cx, [new], item.object, item.controller);
+    Ok(())
+}
+
 /// A spell changes controllers on the stack (CR 112.2): only who controls it moves, so it resolves for its new controller
 /// and "you" in it means them. Nothing it was cast with changes.
 pub fn change_spell_controller(cx: &mut Cx, spell: ObjectId, player: PlayerId) {

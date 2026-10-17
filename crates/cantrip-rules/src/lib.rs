@@ -1203,6 +1203,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::change_target(self, of, chooser).map_err(|_| Suspend)
     }
 
+    fn change_a_target_to(&mut self, of: Target, to: ObjectId, chooser: PlayerId) -> Result<(), Suspend> {
+        ops::change_a_target_to(self, of, to, chooser).map_err(|_| Suspend)
+    }
+
     fn choose_new_targets(&mut self, spell: ObjectId, chooser: PlayerId) -> Result<(), Suspend> {
         ops::choose_new_targets(self, spell, chooser).map_err(|_| Suspend)
     }

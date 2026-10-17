@@ -728,6 +728,11 @@ pub trait Game: Query {
     /// `Target::Ability`) on the stack has each of its targets changed to another legal one, `chooser` choosing; if any has no
     /// other legal target, none changes. A target with one other choice is not asked.
     fn change_target(&mut self, of: Target, chooser: PlayerId) -> Result<(), Suspend>;
+    /// "Change a target of target spell or ability to [this]" (CR 115.7b): one target of the spell or ability (a
+    /// `Target::Object` spell or a `Target::Ability`) on the stack becomes `to`, if `to` is a legal target for it and the
+    /// change leaves its other targets legal; `chooser` chooses which when more than one may change. A target that already
+    /// is `to` stays, and nothing changes if no target can, or if `to` has left the battlefield. Spellskite.
+    fn change_a_target_to(&mut self, of: Target, to: ObjectId, chooser: PlayerId) -> Result<(), Suspend>;
     /// A spell leaves the stack without being countered (CR 400.3) for its owner's hand, library or exile: Sink into
     /// Stupor, Subtlety. A spell that can't be countered goes too.
     fn remove_spell(&mut self, spell: ObjectId, to: CounterTo);

@@ -644,6 +644,9 @@ pub enum Purpose {
     CopyWhich,
     /// The targets of a triggered or activated ability.
     Targets,
+    /// Which target of a spell or ability is changed to the request's source (CR 115.7b: "change a target of target spell or
+    /// ability to this creature", Spellskite): a choice among its targets, not a target.
+    ChangeTargetTo,
     Color,
     /// A cost's sacrifice (Fireblast's Mountains).
     SacrificeCost,
