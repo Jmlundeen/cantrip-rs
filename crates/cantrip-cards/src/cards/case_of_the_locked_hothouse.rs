@@ -9,7 +9,7 @@ fn seven_or_more_lands(q: &dyn Query, asker: &Asker) -> bool {
 }
 
 /// "Creature and enchantment spells" (CR 601.3): the top card is a creature or an enchantment card.
-fn creature_or_enchantment(q: &dyn Query, card: ObjectId) -> bool {
+fn creature_or_enchantment(q: &dyn Query, _: &Asker, card: ObjectId) -> bool {
     let c = q.chars(card);
     c.is(CardType::Creature) || c.is(CardType::Enchantment)
 }

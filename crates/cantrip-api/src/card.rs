@@ -1420,8 +1420,10 @@ pub enum PlayRule {
     /// to its mana value rather than pay its mana cost" (CR 305.1, 601.3, 118.9): Bolas's Citadel.
     LibraryTop,
     /// "You may cast [spells that pass the filter] from the top of your library" (CR 601.3), for their mana cost: Mystic Forge's
-    /// artifact and colorless spells. Lands are not played from there.
-    LibraryTopSpells(fn(&dyn Query, ObjectId) -> bool),
+    /// artifact and colorless spells, Traveling Chocobo's Bird spells. Lands are not played from there. The filter is asked
+    /// with the permanent whose rule it is and its controller (`Asker`), so that a creature type it names is read through
+    /// that permanent's words (CR 612), and the card on top.
+    LibraryTopSpells(fn(&dyn Query, &Asker, ObjectId) -> bool),
     /// "You may play lands from the top of your library" (CR 305.1): Case of the Locked Hothouse, solved. Bolas's Citadel's
     /// `LibraryTop` includes it.
     LibraryTopLands,

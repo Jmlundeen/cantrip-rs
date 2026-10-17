@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_oracle as oracle;
 
 /// "Artifact spells and colorless spells" (CR 601.3, 105.2c): an artifact, or a card with no color.
-fn artifact_or_colorless(q: &dyn Query, card: ObjectId) -> bool {
+fn artifact_or_colorless(q: &dyn Query, _: &Asker, card: ObjectId) -> bool {
     let c = q.chars(card);
     c.is(CardType::Artifact) || c.colors.is_empty()
 }

@@ -2307,7 +2307,9 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
     {
         let def = cx.card(cx.s().obj(id).card);
         let mut allowed = false;
-        each_play_rule(cx, cx.cards(), player, false, |_, rule| allowed |= matches!(rule, PlayRule::LibraryTopSpells(f) if f(cx, id)));
+        each_play_rule(cx, cx.cards(), player, false, |source, rule| {
+            allowed |= matches!(rule, PlayRule::LibraryTopSpells(f) if f(cx, &Asker { source, controller: player }, id))
+        });
         let instant = Speed { cx, flash, granters: &flash_granters, player, card: id }.whole(def);
         // Where a permanent lets them pay life instead, that cast below is the one offered.
         if allowed && !land_rules(cx, player).top_for_life && !def.is(CardType::Land) && def.has_cost && instant == instants {
