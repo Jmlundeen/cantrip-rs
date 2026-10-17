@@ -1,0 +1,51 @@
+# Layer 4 in timestamp order (CR 613.1d, 613.7): Oko's +1 ("loses all abilities and becomes a green Elk creature with base
+# power and toughness 3/3") comes after the Sanctuary's own effect, so the Elk creature it is replaces the Land Creature of
+# every creature type: it is a Creature and an Elk and nothing else, green, and with no vigilance (layer 6). The Sanctuary
+# is animated on turn 3 (Sol Ring, Mox Jet, a Swamp), then taps for {C} as a creature it has had since the turn began, to
+# help cast Oko with Mox Emerald and Mox Sapphire.
+
+[Bot1 Deck]
+Soulstone Sanctuary
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Sol Ring
+Oko, Thief of Crowns
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Soulstone Sanctuary.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Soulstone Sanctuary.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soulstone Sanctuary.Subtypes = (every creature type)
+? Bot1.Battlefield.Soulstone Sanctuary.Keywords = Vigilance
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Soulstone Sanctuary.Activate(Ability: {T}: Add {C})
+Bot1.Hand.Oko, Thief of Crowns.Cast
+Bot1.Pass
+Bot1.Battlefield.Oko, Thief of Crowns.Activate(Soulstone Sanctuary; Ability: Elk)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Soulstone Sanctuary.Types = Creature
+Bot1.Battlefield.Soulstone Sanctuary.Subtypes = Elk
+Bot1.Battlefield.Soulstone Sanctuary.Colors = Green
+Bot1.Battlefield.Soulstone Sanctuary.Power = 3
+Bot1.Battlefield.Soulstone Sanctuary.Toughness = 3

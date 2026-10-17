@@ -1,0 +1,51 @@
+# The card's ruling (CR 302.6): a land that becomes a creature can attack, and its {T} ability can be activated, only if
+# its controller has controlled it continuously since their most recent turn began. Soulstone Sanctuary is played on
+# turn 1 and animated at once by four Mox Rubies, so it may not attack, and its {T}: Add {C} may not be activated. A
+# fifth Mox Ruby casts Fervent Champion, a hasty attacker, so that Bot1 is asked to declare attackers on turn 1 and
+# the refusal is judged there. (The control: animated on turn 3 after being played on turn 1, the Sanctuary attacks, in
+# soulstone-sanctuary-becomes-a-three-three-of-every-creature-type-for-good.)
+
+[Bot1 Deck]
+Soulstone Sanctuary
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Fervent Champion
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Soulstone Sanctuary.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Fervent Champion.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Soulstone Sanctuary.Activate(Ability: {4})
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soulstone Sanctuary.Types = Land; Creature
+! Bot1.Battlefield.Soulstone Sanctuary.Activate(Ability: {T}: Add {C})
+! Bot1.Attack(Soulstone Sanctuary > Bot2)
+Bot1.Attack(Fervent Champion > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot2.Life = 19
+Bot1.Battlefield.Soulstone Sanctuary.Tapped = False
+Bot1.Battlefield.Soulstone Sanctuary.Types = Land; Creature

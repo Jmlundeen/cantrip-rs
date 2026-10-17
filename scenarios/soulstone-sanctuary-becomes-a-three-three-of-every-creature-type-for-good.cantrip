@@ -1,0 +1,48 @@
+# Soulstone Sanctuary: "{4}: This land becomes a 3/3 creature with vigilance and all creature types. It's still a land."
+# Played on turn 1, it is a plain Land on turn 3 until Bot1 pays {4} (Sol Ring, Mox Jet and a Swamp). Then it is a Land
+# Creature (CR 205.1b) with every creature type (CR 205.3m, layer 4), a 3/3 (layer 7b) with vigilance (layer 6) and no
+# Changeling (the Mutavault ruling: all creature types is not the keyword), still colorless, as the text names no color.
+# It attacks, untapped by vigilance. The ability has no duration (CR 611.2a, the card's ruling), so on Bot2's turn 4,
+# after a cleanup step that ends "until end of turn" effects, it is still all of that.
+
+[Bot1 Deck]
+Soulstone Sanctuary
+Mox Jet
+Sol Ring
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Soulstone Sanctuary.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+? Bot1.Battlefield.Soulstone Sanctuary.Types = Land
+Bot1.Battlefield.Soulstone Sanctuary.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soulstone Sanctuary.Types = Land; Creature
+? Bot1.Battlefield.Soulstone Sanctuary.Subtypes = (every creature type)
+Bot1.Attack(Soulstone Sanctuary > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Battlefield.Soulstone Sanctuary.Tapped = False
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 17
+Bot1.Battlefield.Soulstone Sanctuary.Types = Land; Creature
+Bot1.Battlefield.Soulstone Sanctuary.Subtypes = (every creature type)
+Bot1.Battlefield.Soulstone Sanctuary.Keywords = Vigilance
+Bot1.Battlefield.Soulstone Sanctuary.Power = 3
+Bot1.Battlefield.Soulstone Sanctuary.Toughness = 3
+Bot1.Battlefield.Soulstone Sanctuary.Tapped = False

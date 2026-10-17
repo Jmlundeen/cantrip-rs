@@ -1,0 +1,45 @@
+# All creature types (CR 205.3m) are every one of them: the animated Soulstone Sanctuary is an Assassin, a Mercenary, a
+# Pirate, a Rogue and a Warlock, so an outlaw (CR 700.12), and Bot2's Shoot the Sheriff ("Destroy target non-outlaw
+# creature") can't target it. Bot2's Ornithopter, a creature of no outlaw type, is the control the spell is cast at.
+
+[Bot1 Deck]
+Soulstone Sanctuary
+Mox Jet
+Sol Ring
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Shoot the Sheriff
+Swamp x16
+
+[Actions]
+Bot1.Hand.Soulstone Sanctuary.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Soulstone Sanctuary.Activate(Ability: {4})
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Soulstone Sanctuary.Types = Land; Creature
+Bot1.Pass
+! Bot2.Hand.Shoot the Sheriff.Cast(Bot1.Battlefield.Soulstone Sanctuary)
+Bot2.Hand.Shoot the Sheriff.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot1.Battlefield.Soulstone Sanctuary.Types = Land; Creature
+Bot2.Graveyard = Shoot the Sheriff; Ornithopter
