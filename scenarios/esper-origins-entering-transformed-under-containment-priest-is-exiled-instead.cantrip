@@ -1,0 +1,62 @@
+# Known bug: Containment Priest judges whether a creature would enter by the card where it is (here the sorcery face in
+# exile), not by the permanent as it would exist on the battlefield (CR 614.12), so a double-faced card put onto the
+# battlefield transformed into a creature is not exiled (KI-47). Containment Priest's ruling: a noncreature card that
+# wasn't cast and is entering the battlefield as a creature is exiled.
+#
+# "Exile it, then put it onto the battlefield transformed": Summon: Esper Maduin would enter as a nontoken creature that
+# was not cast (the spell was Esper Origins; the permanent is put onto the battlefield by its effect, CR 712.14a), so
+# Bot2's Containment Priest ("if a nontoken creature would enter and it wasn't cast, exile it instead") applies as it
+# would enter (CR 614.12: the replacement looks at the back face it would have) and the card stays in exile. Nothing has
+# entered, so nothing gets a finality counter and no chapter triggers. The surveil and the life still happened (24).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Esper Origins
+Forest x3
+Forest
+Lightning Bolt
+Island
+Forest
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Containment Priest
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Containment Priest.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Arrange(| Island; Forest)
+
+[Expect]
+Exile = Esper Origins
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet
+Bot1.Life = 24
+Bot1.Graveyard = Forest; Island; Lightning Bolt
+Stack.Count = 0
+Bot2.Battlefield = Plains; Mox Pearl; Containment Priest

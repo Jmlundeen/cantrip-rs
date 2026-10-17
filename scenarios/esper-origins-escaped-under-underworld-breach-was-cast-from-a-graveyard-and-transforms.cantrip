@@ -1,0 +1,58 @@
+# "If this spell was cast from a graveyard" asks where the spell was cast from (CR 601.2a), not whether flashback was used:
+# cast from the graveyard by the escape Underworld Breach gives it ({1}{G} and three other cards exiled from the graveyard,
+# CR 702.138a), Esper Origins still exiles itself and enters transformed as Summon: Esper Maduin with a finality counter.
+# Turn 1: cast from hand (surveil bins Lightning Bolt and Island; 22 life); Black Lotus pays for the Breach and is
+# sacrificed, so the graveyard holds Esper Origins, Lightning Bolt, Island and Black Lotus. The escape exiles the other
+# three and the spell surveils (Forest and Llanowar Elves kept on top) and gains 2 (24). Chapter I then reveals the Forest
+# and puts it into Bot1's hand. Exile holds the three escape cards and not Esper Origins, which is on the battlefield.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Black Lotus
+Esper Origins
+Underworld Breach
+Lightning Bolt
+Island
+Forest
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(| Lightning Bolt; Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Underworld Breach.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Escape)
+Bot1.Choose(Lightning Bolt; Island; Black Lotus)
+Bot1.Pass
+Bot1.Arrange(Forest; Llanowar Elves |)
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 24
+Exile = Lightning Bolt; Island; Black Lotus
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+Bot1.Revealed = Forest
+Bot1.Hand = Forest
+Bot1.Library.Count = 11
+Bot1.Graveyard.Count = 0

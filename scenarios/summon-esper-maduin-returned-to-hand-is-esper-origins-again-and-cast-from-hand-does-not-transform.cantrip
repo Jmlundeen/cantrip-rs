@@ -1,0 +1,69 @@
+# A finality counter only replaces going to a graveyard from the battlefield (CR 122.1h, the ruling): Summon: Esper Maduin
+# returned to its owner's hand by Bot2's Boomerang Basics goes there normally, as the card Esper Origins, front face up
+# (CR 712.8a: in a hand only the front face's characteristics count), a new object without counters (CR 400.7). Bot2 did
+# not control it, so Boomerang Basics draws nothing. On turn 5 Bot1 casts it from hand: it surveils and gains 2, but was
+# not cast from a graveyard, so it goes to the graveyard as a sorcery and does not transform.
+# Life: 20 + 2 (turn 1) + 2 (flashback, turn 3) + 2 (from hand, turn 5) = 26.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Esper Origins
+Forest x3
+Forest
+Lightning Bolt
+Forest
+Island
+Forest
+Swamp
+Forest x10
+
+[Bot2 Deck]
+Island
+Boomerang Basics
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Arrange(Forest | Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Forest; Forest; Forest; Forest
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Boomerang Basics.Cast(Bot1.Battlefield.Summon: Esper Maduin)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand = Forest; Forest; Forest; Forest; Esper Origins
+? Bot2.Hand.Count = 7
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(| Swamp; Forest)
+
+[Expect]
+Bot1.Life = 26
+Bot1.Graveyard = Esper Origins; Forest; Swamp; Island; Lightning Bolt
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet
+Exile.Count = 0
+Bot2.Graveyard = Boomerang Basics

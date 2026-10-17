@@ -1,0 +1,55 @@
+# A flashed-back Esper Origins that is countered never resolves, so none of its text happens: no surveil, no life, and
+# it is not put onto the battlefield. Flashback exiles it as it leaves the stack (CR 702.34a, the ruling: "whether it
+# resolves, is countered, or leaves the stack in some other way"), so it ends in exile, front face up, and not in the
+# graveyard to be flashed back again. Bot1's life stays at 22 from the turn-1 cast from hand.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Esper Origins
+Forest x3
+Forest
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Forest; Lightning Bolt |)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Esper Origins)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Esper Origins
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet
+Bot1.Life = 22
+Bot1.Library = Lightning Bolt; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest
+Bot2.Graveyard = Counterspell

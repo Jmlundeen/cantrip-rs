@@ -1,0 +1,65 @@
+# Esper Origins flashed back from its owner's graveyard (CR 702.34a: {3}{G}, paid with two Forests, Mox Emerald and Mox
+# Jet). Cast from hand on turn 1 (surveil: Forest kept, Lightning Bolt binned; 22 life). On turn 3, from the graveyard, it
+# surveils 2 again (Llanowar Elves and Island, both kept on top in that order) and gains 2 more (24). It was cast from a
+# graveyard, so it exiles itself and then enters with its back face up (CR 712.14a), as Summon: Esper Maduin, a green 4/4
+# Enchantment Creature - Saga Elemental, with a finality counter (CR 122.1h) and, as a Saga entering, a lore counter
+# (CR 714.3a), whose chapter I triggers. The card left the stack by its own instruction, so flashback's "exile it instead"
+# has nothing to replace and it stays on the battlefield, not in exile. Chapter I reveals the top card, Llanowar Elves, a
+# permanent card, and puts it into Bot1's hand; the Island stays on top.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Esper Origins
+Forest x3
+Forest
+Lightning Bolt
+Llanowar Elves
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Lightning Bolt)
+? Bot1.Life = 22
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Arrange(Llanowar Elves; Island |)
+? Stack.Count = 1
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+? Bot1.Life = 24
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+Bot1.Battlefield.Summon: Esper Maduin.Power = 4
+Bot1.Battlefield.Summon: Esper Maduin.Toughness = 4
+Bot1.Battlefield.Summon: Esper Maduin.Colors = Green
+Bot1.Battlefield.Summon: Esper Maduin.Types = Enchantment; Creature
+Bot1.Battlefield.Summon: Esper Maduin.Subtypes = Elemental; Saga
+Bot1.Revealed = Llanowar Elves
+Bot1.Hand = Forest; Forest; Forest; Llanowar Elves
+Bot1.Library = Island; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 11
+Exile.Count = 0
+Stack.Count = 0

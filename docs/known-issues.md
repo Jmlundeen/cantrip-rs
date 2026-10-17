@@ -43,7 +43,7 @@ keeps it).
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
 | [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
-| [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-or-fireglass-mentor) | An exile that a replacement sends elsewhere is not exercised by Hex Magic or Fireglass Mentor | Low | Unexercised |
+| [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
 | [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
 | [KI-30](#ki-30-a-permanents-name-is-not-part-of-its-last-known-information) | A permanent's name is not part of its last-known information | Low | Open |
 | [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
@@ -62,6 +62,9 @@ keeps it).
 | [KI-43](#ki-43-a-modal-double-faced-cards-back-face-cast-by-a-permission-is-not-exercised) | A modal double-faced card's back face cast by a permission is not exercised | Low | Unexercised |
 | [KI-44](#ki-44-a-hand-way-is-not-offered-to-a-cast-made-while-an-effect-resolves-and-no-emblem-gives-a-way) | A hand way is not offered to a cast made while an effect resolves, and no emblem gives a way | Low | Open |
 | [KI-45](#ki-45-the-number-a-cost-sacrifices-is-kept-as-the-spells-x) | The number a cost sacrifices is kept as the spell's X | Low | Suspected |
+| [KI-46](#ki-46-the-lore-counter-a-player-puts-on-a-saga-as-their-main-phase-begins-has-no-player-putting-it) | The lore counter a player puts on a Saga as their main phase begins has no player putting it | Medium | Open |
+| [KI-47](#ki-47-containment-priest-judges-a-card-entering-transformed-by-its-front-face) | Containment Priest judges a card entering transformed by its front face | Medium | Open |
+| [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
 
 ## Issues
 
@@ -241,7 +244,7 @@ and has the cast pay what that way says.
 
 **Scenarios.** None yet: Bolas's Citadel with Mystic Forge, or with a solved Case of the Locked Hothouse, and a creature on top.
 
-### KI-26: An exile that a replacement sends elsewhere is not exercised by Hex Magic or Fireglass Mentor
+### KI-26: An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
@@ -251,8 +254,10 @@ and has the cast pay what that way says.
 Mentor exiles two cards and lets the player choose one "of them". Both keep only the cards that really reached exile
 (`g.obj(card).zone.is(ZoneKind::Exile)`), as a replacement effect could send one elsewhere (CR 614.6, 406.2), and draw or grant
 play for those alone. No card in the engine replaces an exile from a hand or a library today, so the false arm of that guard
-(hex_magic.rs, fireglass_mentor.rs) runs in no scenario. The day such a card exists each card needs a scenario, and this entry is
-deleted.
+(hex_magic.rs, fireglass_mentor.rs) runs in no scenario. Esper Origins likewise exiles itself as it resolves and puts onto the
+battlefield transformed only a card that reached exile ("exile it, then put it onto the battlefield transformed", CR 608.2c,
+712.14a); the false arm of that guard (esper_origins.rs, `effect`) is the one line of the card no scenario runs, and no card
+replaces an exile from the stack. The day such a card exists each card needs a scenario, and this entry is deleted.
 
 **Scenarios.** None yet.
 
@@ -510,5 +515,57 @@ as the spell's `x` (`StackItem::x`, `Obj::x`), though Viper's mana cost has no {
 and the `Cast` record count X once per {X} in the mana cost, CR 202.3e), but anything that reads `x` as "the value of X" -
 "X is the value of X paid" on a permanent, a copy's X (CR 707.10), the client's X shown on a spell - would see the number
 sacrificed for a spell that has no X. No card in content reads X of a Viper. A fix keeps the number apart from X.
+
+**Scenarios.** none: no card reaches it.
+
+### KI-46: The lore counter a player puts on a Saga as their main phase begins has no player putting it
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-17, scenarios of Esper Origins |
+
+**Notes.** CR 714.3c: "As a player's precombat main phase begins, that player puts a lore counter on each Saga they control."
+`ops::add_lore_counters` runs as a turn-based action whose cause is the rules, so `replace::counters` finds no putter
+(`Cx::actor` is `None` for `Cause::Rules`), and "If you would put one or more counters on a permanent or player" (Innkeeper's
+Talent at level 3, `replacements::double_counters_applies`, keyed to the putter) does not double it. The lore counter a Saga
+enters with is doubled, as its controller puts it (CR 122.6a). A fix names the active player as the putter of the turn's lore
+counters.
+
+**Scenarios.**
+- [`scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip`](../scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip)
+  (marked `# Known bug`): one lore counter becomes two, so chapters II and III trigger together.
+
+### KI-47: Containment Priest judges a card entering transformed by its front face
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine / card | 2026-10-17, scenarios of Esper Origins |
+
+**Notes.** "If a nontoken creature would enter and it wasn't cast, exile it instead" looks at the permanent as it would exist on
+the battlefield (CR 614.12; Containment Priest's ruling: "If a noncreature card wasn't cast and is entering the battlefield as a
+creature ..., it will be exiled"). `containment_priest.rs` reads `q.chars(z.object)`, the card where it is, and a card put onto
+the battlefield transformed (`put_onto_battlefield_transformed`, CR 712.14a) has only its front face's characteristics there
+(CR 712.8a): Esper Origins (a sorcery) entering as Summon: Esper Maduin (a creature), or The Legend of Roku (an enchantment)
+returning as Avatar Roku, is not exiled. `Proposal::ZoneChange` does not say the object will enter transformed (the core's
+`Entering::transformed` does), so the card cannot ask; a fix gives replacements the entering permanent's characteristics (the
+same is owed to a face-down permanent, CR 708).
+
+**Scenarios.**
+- [`scenarios/esper-origins-entering-transformed-under-containment-priest-is-exiled-instead.cantrip`](../scenarios/esper-origins-entering-transformed-under-containment-priest-is-exiled-instead.cantrip)
+  (marked `# Known bug`): Summon: Esper Maduin enters under Containment Priest.
+
+### KI-48: Emperor of Bones puts its finality counter on after the creature enters
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | card | 2026-10-17, review of Esper Origins |
+
+**Notes.** "Put a creature card exiled with this creature onto the battlefield under your control with a finality counter on it"
+is one entry with the counter on it (CR 122.6, 614.1c). `emperor_of_bones.rs` calls `put_onto_battlefield` and then
+`add_counters`, though `put_onto_battlefield_with_counters` does both, as Scavenger's Talent and Zoraline use (and
+`put_onto_battlefield_transformed_with_counters` for a card entering transformed, as Esper Origins uses). Nothing can happen
+between the two inside the resolution; the difference is to an ability that triggers on a permanent entering with a counter on
+it (no card in content has one) and to who puts the counter (CR 122.6a: the permanent's controller, which for the Emperor is
+also the ability's controller). A fix calls `put_onto_battlefield_with_counters`.
 
 **Scenarios.** none: no card reaches it.

@@ -1,0 +1,68 @@
+# "If this spell was cast from a graveyard": a copy of a spell is not cast (CR 707.10), so the copy of a flashed-back
+# Esper Origins, made by Lutri flashed in with it on the stack, surveils 2 and gains 2 life but is neither exiled nor put
+# onto the battlefield - a copy has no card to put there (CR 707.10a, 111.7 do not apply: it simply does nothing more)
+# and ceases to exist as it leaves the stack (CR 704.5e). The original, cast from the graveyard, then surveils 2, gains 2
+# and becomes the one Summon: Esper Maduin, whose chapter I reveals Llanowar Elves into Bot1's hand.
+# Life: 20 + 2 (turn 1, from hand) + 2 (copy) + 2 (original) = 26. Each surveil bins both cards it looks at, so the
+# second surveil sees fresh cards: the copy bins Forest and Island, the original Swamp and Plains (with the
+# sacrificed Black Lotus, five cards in the graveyard).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Black Lotus
+Esper Origins
+Lutri, the Spellchaser
+Forest
+Forest
+Island
+Swamp
+Plains
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Forest; Forest |)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Arrange(| Forest; Island)
+? Bot1.Life = 24
+? Stack = Esper Origins
+? Bot1.Battlefield.Summon: Esper Maduin = (absent)
+Bot1.Pass
+Bot1.Arrange(| Swamp; Plains)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Mox Ruby; Lutri, the Spellchaser; Summon: Esper Maduin
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot1.Revealed = Llanowar Elves
+Bot1.Hand = Llanowar Elves
+Bot1.Graveyard.Count = 5
+Exile.Count = 0
+Stack.Count = 0

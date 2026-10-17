@@ -1,0 +1,102 @@
+# "Other creatures you control get +2/+2 and gain trample": the Saga itself is not among them. To see the Saga after its
+# chapter III has resolved, II and III trigger together (CR 714.2c), so that II is still on the stack and the Saga is not
+# yet sacrificed (CR 714.4). On turn 9 Esper Origins is flashed back and Summon: Esper Maduin enters with one lore counter
+# (Innkeeper's Talent is at level 2, so it does not double it); chapter I resolves; the Talent is raised to level 3; and
+# Tezzeret's Gambit proliferates the Saga's lore counter, which the Talent doubles (CR 122.6, 701.34a): from one to three,
+# II and III trigger at once.
+# III resolves first: Llanowar Elves (three +1/+1 counters from the Talent's combat triggers on turns 3, 5 and 7, a 4/4)
+# get +2/+2 and trample, a 6/6; the Saga stays a 4/4 without trample. Then II adds {G}{G}, and the Saga, done, is
+# sacrificed and exiled for its finality counter (CR 122.1h).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Sol Ring
+Esper Origins
+Black Lotus
+Llanowar Elves
+Innkeeper's Talent
+Forest
+Forest
+Tezzeret's Gambit
+Lightning Bolt
+Island
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Innkeeper's Talent; Forest |)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 3
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Arrange(| Lightning Bolt; Island)
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Tezzeret's Gambit.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Summon: Esper Maduin)
+Bot1.Triggers(Add {G}{G}; Other creatures you control)
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 3
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Battlefield.Llanowar Elves.Power = 6
+? Bot1.Battlefield.Llanowar Elves.Toughness = 6
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+? Bot1.Battlefield.Summon: Esper Maduin.Power = 4
+? Bot1.Battlefield.Summon: Esper Maduin.Toughness = 4
+? Bot1.Battlefield.Summon: Esper Maduin.Keywords = (absent)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Mana = {G}{G}
+Bot1.Battlefield.Summon: Esper Maduin = (absent)
+Exile = Esper Origins
+Bot1.Battlefield.Llanowar Elves.Power = 6
+Bot1.Life = 22

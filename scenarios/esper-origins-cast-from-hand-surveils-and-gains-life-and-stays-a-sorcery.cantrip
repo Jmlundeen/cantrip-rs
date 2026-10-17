@@ -1,0 +1,34 @@
+# Esper Origins cast from its owner's hand: "Surveil 2. You gain 2 life." Surveil (CR 701.25) looks at the top two
+# cards, Llanowar Elves and Lightning Bolt: the Elves stay on top and the Bolt goes to the graveyard. Bot1 gains 2 (22).
+# "If this spell was cast from a graveyard" is false for a spell cast from a hand (CR 601.2a), so the card is not exiled
+# and nothing enters: it goes to its owner's graveyard as a resolved sorcery (CR 608.2n), on top of the Bolt the surveil
+# put there first, and Summon: Esper Maduin is nowhere.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Esper Origins
+Forest x4
+Llanowar Elves
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Llanowar Elves | Lightning Bolt)
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Esper Origins; Lightning Bolt
+Bot1.Library.Count = 11
+Bot1.Battlefield = Forest; Mox Emerald
+Exile.Count = 0
+Stack.Count = 0

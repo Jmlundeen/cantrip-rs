@@ -1,0 +1,51 @@
+# Chapter I, "Reveal the top card of your library. If it's a permanent card, put it into your hand", with no library: there
+# is no top card, so nothing is revealed or moved, and drawing from an empty library is not part of it - Bot1 has not
+# lost (CR 704.5b needs a draw). Bot1's whole library is three cards: the turn-1 surveil bins two, the turn-3 draw takes the
+# last, so the flashed-back Esper Origins surveils nothing, gains 2 (24) and enters as Summon: Esper Maduin, whose chapter I
+# then finds the library empty.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Esper Origins
+Forest
+Forest
+Forest
+Lightning Bolt
+Island
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(| Lightning Bolt; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 24
+Bot1.Library.Count = 0
+Bot1.Hand = Forest; Forest; Forest
+Bot1.Revealed = (absent)
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Result = InProgress
+Stack.Count = 0

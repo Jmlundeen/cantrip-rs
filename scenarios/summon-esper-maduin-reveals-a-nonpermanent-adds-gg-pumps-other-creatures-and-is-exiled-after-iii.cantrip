@@ -1,0 +1,86 @@
+# Summon: Esper Maduin through all three chapters. Esper Origins is cast from hand on turn 1 (Island surveilled into the
+# graveyard) and flashed back on turn 3, entering transformed with a finality counter and its first lore counter.
+# I: the top card, Lightning Bolt (kept there by the second surveil), is revealed; it is not a permanent card, so it stays
+# on top of the library, where Bot1 draws it on turn 5.
+# II (turn 5, after the draw step, CR 714.3b): "Add {G}{G}" - a triggered ability, not a mana ability, on the stack
+# (the ruling); the two green are in Bot1's pool once it resolves.
+# III (turn 7): "Other creatures you control get +2/+2 and gain trample until end of turn": Bot1's Llanowar Elves become a
+# 3/3 with trample; Bot2's Ornithopter is not Bot1's and stays a 0/2 flier. With three lore counters and no chapter
+# ability on the stack, the Saga is sacrificed (CR 714.4); the finality counter sends it to exile instead of the graveyard
+# (CR 122.1h). On turn 8 the Elves are a 1/1 without trample again (CR 514.2).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Esper Origins
+Llanowar Elves
+Forest
+Forest
+Forest
+Island
+Lightning Bolt
+Forest
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Forest | Island)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt; Forest |)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Revealed = Lightning Bolt
+? Bot1.Library.Count = 12
+? Bot1.Hand = Forest; Forest
+[T5 Bot1.Main1]
+? Bot1.Hand = Forest; Forest; Lightning Bolt
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 2
+? Stack = Summon: Esper Maduin
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {G}{G}
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Bot1.Battlefield.Llanowar Elves.Toughness = 3
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+? Bot2.Battlefield.Ornithopter.Keywords = Flying
+? Exile = Esper Origins
+[T8 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Summon: Esper Maduin = (absent)
+Exile = Esper Origins
+Bot1.Graveyard = Island
+Bot1.Life = 24
