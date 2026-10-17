@@ -256,22 +256,6 @@ reads the controller of the stack item that is dealing the damage (the `DamageEv
 
 **Scenarios.** none yet.
 
-### KI-29: A permanent entering with others is affected by their "enters with" replacements
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, review of Gev, Scaled Scorch |
-
-**Notes.** Permanents that enter at the same time do not affect one another's entering (CR 614.12; Gev, Scaled Scorch's ruling: when
-Gev and other creatures enter together, those creatures get no counter). `move_together` in `crates/cantrip-rules/src/ops.rs`
-works out each object's `replace::zone_change` inside the loop that puts the objects on the battlefield, so an object moved
-later in the same batch sees the earlier ones already on the battlefield and their replacement effects apply to it. A fix
-works out every object's replacements before any of them is put on the battlefield (or judges them against the battlefield as
-it was before the move).
-
-**Scenarios.**
-- [`scenarios/gev-and-another-creature-entering-together-get-no-counters.cantrip`](../scenarios/gev-and-another-creature-entering-together-get-no-counters.cantrip) - Second Sunrise returns Gev and an Ornithopter after an opponent lost life; the Ornithopter must get no counter (marked `# Known bug`).
-
 ### KI-30: A permanent's name is not part of its last-known information
 
 | Severity | Status | Area | Found |

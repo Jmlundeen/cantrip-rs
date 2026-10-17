@@ -244,6 +244,13 @@ are never asked about, and neither is the end of an "until" exile (CR 610.3, a o
 `TriggeredDef::on_sacrifice` (Hushbringer's ruling). The sources are found from the board, once per batch and only once
 something has matched.
 
+Objects that move together (`ops::move_together`, and the tokens of one `create_tokens_worded`) are planned before any of
+them moves (CR 614.12, 101.4): each one's "as enters" choices (`prepare_entry`, done by the callers first), its zone-change
+and entering-counter replacements and the last-known information of a permanent leaving are all worked out against the
+game as it was before the event, then every object moves. So permanents entering together never see one another (a
+creature returned with Gev or Containment Priest is untouched by them; Giada counts only the Angels already there), and
+permanents leaving together all still see one another (Dauthi Voidwalker dying with an opponent's creature exiles it).
+
 A static ability that makes triggered abilities trigger an additional time (CR 603.2d: Elesh Norn, Mother of Machines,
 Panharmonicon, Teysa Karlov, Harmonic Prodigy) is a `CardDef::additional_triggers` entry, the same shape asked of the same
 permanents (CR 603.10) after the suppressing rules: a triggering they stop is never doubled. Each entry that says yes adds

@@ -1,4 +1,3 @@
-# Known bug: a creature entering at the same time as Gev gets a counter from him (CR 614.12; the Gev ruling), KI-29.
 # Gev, Scaled Scorch only affects creatures that enter while he is already on the battlefield (the ruling): a creature that enters
 # at the same time as Gev gets no counter though an opponent has lost life this turn. In Bot2's turn 4 Bot1 bolts Bot2 in the
 # upkeep (an opponent has lost life), Bot2 casts Wrath of God and Gev and Bot1's Ornithopter die, and Bot1 answers with Second

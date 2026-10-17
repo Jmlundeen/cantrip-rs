@@ -1,0 +1,46 @@
+# Tokens created together enter together (CR 111.1, 101.4), and each is judged against the battlefield as it was before
+# (CR 614.12): Devastating Onslaught for X=2 copies Giada, so two Angel tokens that are Giadas enter at once. Only the original
+# Giada is an "Angel you already control" for either, and only her replacement applies (the other token is not on the
+# battlefield yet): each token enters with exactly one +1/+1 counter. The legend rule (CR 704.5j) then keeps one Giada: Bot1
+# keeps the second token, a 3/3 with one counter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Giada, Font of Hope
+Devastating Onslaught
+Island x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Giada, Font of Hope; X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Giada, Font of Hope#3)
+
+[Expect]
+Bot1.Battlefield.Giada, Font of Hope.Token = true
+Bot1.Battlefield.Giada, Font of Hope.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Giada, Font of Hope.Power = 3
+Bot1.Graveyard = Giada, Font of Hope; Devastating Onslaught

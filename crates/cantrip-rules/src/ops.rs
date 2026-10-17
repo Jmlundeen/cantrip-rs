@@ -70,6 +70,21 @@ impl Moving {
     }
 }
 
+/// One move of a `move_together`, worked out before any of them is made (CR 614.12, 101.4): where it goes once every
+/// replacement has applied, the new object it arrives as, and the permanent's last-known information if it is leaving.
+struct Plan {
+    m: Moving,
+    reason: ZoneReason,
+    old: Obj,
+    from: Zone,
+    to: Zone,
+    change: ZoneChange,
+    madness: bool,
+    entering: bool,
+    new: Obj,
+    last_known: Option<LastKnown>,
+}
+
 /// Moves objects at once (CR 400.7: each arrives as a new object). Leaves-the-battlefield abilities are judged on
 /// the board as it was before any of them moved (CR 603.10a); everything else on the board after. A library is
 /// entered on top. Returns the new objects, in order.
@@ -98,6 +113,11 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             events.push(Event::Unattached { attachment: a, from: host });
         }
     }
+    // CR 614.12, 101.4: what replaces each object's move, and what it arrives with, is worked out against the game as it
+    // is before any of them moves - so objects entering together do not see one another on the battlefield (a creature
+    // entering with Gev gets none of his counters) and those leaving together still see one another - and only then do
+    // they all move. The last-known information of each permanent leaving is taken before any of them leaves (CR 603.10a).
+    let mut plans: Vec<Plan> = Vec::with_capacity(moves.len());
     for m in moves {
         let reason = m.reason.unwrap_or(reason);
         let old = *cx.s().obj(m.id);
@@ -148,10 +168,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         // still discarded, and the linked ability is queued below, once the exiled card exists - if no later effect sent
         // it on elsewhere, so that it was "exiled this way".
         let madness = change.madness && to.is(ZoneKind::Exile);
-        if from.is(ZoneKind::Battlefield) {
+        let last_known = if from.is(ZoneKind::Battlefield) {
             let c = layers::chars(cx.cards(), cx.s(), &cx.g.log, m.id);
             let words = cantrip_api::words(cx.s(), m.id);
-            cx.st().last_known_push(LastKnown {
+            Some(LastKnown {
                 id: m.id,
                 types: c.types,
                 subtypes: c.subtypes,
@@ -161,22 +181,11 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
                 keywords: c.keywords,
                 abilities: c.abilities,
                 words,
-            });
-        }
-        cx.st().zone_remove(from, m.id);
-        // A spell that leaves the stack by any move other than resolving or being countered (exiled, bounced) does not
-        // resolve: it is gone from the stack.
-        if from.is(ZoneKind::Stack)
-            && let Some(at) = cx.s().stack.iter().position(|i| i.kind == StackKind::Spell && i.object == m.id)
-        {
-            cx.st().stack_remove(at);
-        }
-        // Revolt (CR 207.2c) asks whether a permanent left the battlefield under its controller this turn.
-        if from.is(ZoneKind::Battlefield) {
-        }
-
+            })
+        } else {
+            None
+        };
         let turn = cx.s().turn.number;
-        let timestamp = cx.st().timestamp();
         let entering = to.is(ZoneKind::Battlefield);
         let mut new = Obj {
             card: old.card,
@@ -189,7 +198,8 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             damage: 0,
             deathtouched: false,
             counters: [0; CounterKind::COUNT],
-            timestamp,
+            // Given as it arrives, below.
+            timestamp: 0,
             copy: None,
             loyalty_turn: 0,
             became: None,
@@ -259,6 +269,22 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             // apply to them, the permanent judged as it would exist on the battlefield (CR 614.12).
             new.counters = replace::counters(cx, m.id, new.controller, true, new.counters);
         }
+        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, last_known });
+    }
+    for Plan { m, reason, old, from, to, change, madness, entering, mut new, last_known } in plans {
+        let m = &m;
+        if let Some(last_known) = last_known {
+            cx.st().last_known_push(last_known);
+        }
+        cx.st().zone_remove(from, m.id);
+        // A spell that leaves the stack by any move other than resolving or being countered (exiled, bounced) does not
+        // resolve: it is gone from the stack.
+        if from.is(ZoneKind::Stack)
+            && let Some(at) = cx.s().stack.iter().position(|i| i.kind == StackKind::Spell && i.object == m.id)
+        {
+            cx.st().stack_remove(at);
+        }
+        new.timestamp = cx.st().timestamp();
         let entered_with = new.counters;
         let new_id = cx.st().push_obj(new);
         note_statics(cx, new_id);
@@ -910,6 +936,9 @@ pub fn create_tokens_worded(
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
     let mut events = Vec::new();
     let mut created = Vec::new();
+    // CR 614.12, 101.4: tokens created together enter together. Each one's entering choices and replacements are worked
+    // out before any of them is on the battlefield, so none sees another (Giada counts the Angels already there).
+    let mut arriving: Vec<(ObjectId, PlayerId, Entering)> = Vec::with_capacity(tokens.len());
     for &(card, controller) in tokens {
         let turn = cx.s().turn.number;
         let timestamp = cx.st().timestamp();
@@ -990,6 +1019,9 @@ pub fn create_tokens_worded(
             *n += with;
         }
         entering.counters = replace::counters(cx, id, controller, true, entering.counters);
+        arriving.push((id, controller, entering));
+    }
+    for (id, controller, entering) in arriving {
         cx.st().update_obj(id, |o| {
             o.zone = Zone::BATTLEFIELD;
             o.tapped = entering.tapped;

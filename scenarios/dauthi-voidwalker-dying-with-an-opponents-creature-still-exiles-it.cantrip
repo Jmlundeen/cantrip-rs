@@ -1,0 +1,44 @@
+# Permanents that leave the battlefield together are all judged against the battlefield as it was before (CR 614.12, 101.4):
+# Dauthi Voidwalker, destroyed by Bot2's Wrath of God together with Bot2's Ornithopter (which came after it), is still there for
+# the Ornithopter's move, so the Ornithopter is exiled (with a void counter) instead of put into Bot2's graveyard. Bot2's Black
+# Lotus, sacrificed for the Wrath while the Voidwalker was there, is exiled too. The Voidwalker itself goes to its owner's
+# graveyard (it only touches an opponent's), and Wrath of God, finishing its resolution after the Voidwalker has left, goes to
+# Bot2's graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Dauthi Voidwalker
+Swamp x20
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Ornithopter
+Wrath of God
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauthi Voidwalker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Wrath of God.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Black Lotus; Ornithopter
+Bot1.Graveyard = Dauthi Voidwalker
+Bot2.Graveyard = Wrath of God

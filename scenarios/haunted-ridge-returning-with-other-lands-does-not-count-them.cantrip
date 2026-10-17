@@ -1,0 +1,45 @@
+# Lands entering at the same time as Haunted Ridge are not "other lands you control" for it (CR 614.12, 101.4; the ruling): it
+# looks at the battlefield as it was before the event. In turn 5 Bot1 cracks Flooded Strand for an Island and Strip Mines its own
+# Haunted Ridge, and Second Sunrise (Black Lotus's white) returns the Ridge, Strip Mine, Flooded Strand and the Lotus together:
+# Bot1 controlled only the Island before, so the Ridge enters tapped though three other lands are on the battlefield after.
+
+[Bot1 Deck]
+Haunted Ridge
+Strip Mine
+Flooded Strand
+Black Lotus
+Second Sunrise
+Mountain
+Mountain
+Mountain x3
+Island
+Mountain x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Haunted Ridge.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Strip Mine.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Flooded Strand.Play
+Bot1.Battlefield.Flooded Strand.Activate
+Bot1.Search(Island)
+Bot1.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Haunted Ridge; Ability: Destroy)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Island
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Second Sunrise.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Haunted Ridge; Strip Mine; Flooded Strand; Black Lotus
+Bot1.Battlefield.Haunted Ridge.Tapped = true
+Bot1.Battlefield.Strip Mine.Tapped = false
+Bot1.Battlefield.Flooded Strand.Tapped = false

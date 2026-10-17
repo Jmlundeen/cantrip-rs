@@ -1,0 +1,68 @@
+# Two Angels entering at the same time do not count each other as "Angels you already control" (CR 614.12, 101.4): each is judged
+# against the battlefield as it was before the event. Giada stays on the battlefield while Bot1 bolts its own two Inspiring
+# Overseers (a 3/2 and a 4/3 by then) on turn 7, and Second Sunrise returns both at once (and Black Lotus, sacrificed for its
+# mana): Giada is the only Angel already there, so each Overseer enters with exactly one counter, a 3/2. Bot1 gained 1 life on
+# each of the four entries: 24.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mountain
+Giada, Font of Hope
+Inspiring Overseer
+Inspiring Overseer
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Second Sunrise
+Island x15
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Giada, Font of Hope.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Giada, Font of Hope.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Giada, Font of Hope.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Inspiring Overseer#2.Power = 4
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Inspiring Overseer#1)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Inspiring Overseer)
+Bot1.Pass
+? Bot1.Graveyard.Count = 2
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Second Sunrise.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot1.Battlefield.Inspiring Overseer#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Inspiring Overseer#1.Power = 3
+Bot1.Battlefield.Inspiring Overseer#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Inspiring Overseer#2.Power = 3
