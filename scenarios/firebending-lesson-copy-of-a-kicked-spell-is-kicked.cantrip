@@ -1,0 +1,59 @@
+# Firebending Lesson: "If you copy a kicked spell on the stack, the copy is also kicked" (ruling, CR 707.10). Bot1 casts the
+# Lesson kicked at Picklock Prankster, then flashes in Lutri, the Spellchaser to copy it, aiming the copy at Ulvenwald
+# Oddity (toughness 4). The copy deals 5 and kills it - an unkicked copy's 2 would not. Bot1 spends all eight mana of
+# Black Lotus and five Moxen.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Firebending Lesson
+Lutri, the Spellchaser
+Black Lotus
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Picklock Prankster
+Ulvenwald Oddity
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Picklock Prankster.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Picklock Prankster; Kicked: 1)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Ulvenwald Oddity)
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Picklock Prankster; Ulvenwald Oddity; Black Lotus
+Bot2.Life = 20

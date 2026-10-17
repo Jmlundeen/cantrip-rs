@@ -1,0 +1,38 @@
+# Firebending Lesson kicked ({R} + {4}): "it deals 5 damage to that creature instead" - 5, not 2 + 5. Bot1 pays with Black
+# Lotus (red) and two Moxen, and Bot2's Picklock Prankster (toughness 3) dies; unkicked (the other scenario) the same
+# creature survives 2 damage, which is the control that the kicker made the difference.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Firebending Lesson
+Island x16
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Picklock Prankster
+Island x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Picklock Prankster.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Firebending Lesson.Cast(Bot2.Battlefield.Picklock Prankster; Kicked: 1)
+
+[Expect]
+Bot2.Graveyard = Picklock Prankster
+Bot2.Battlefield = Mox Sapphire; Mox Jet
+Bot2.Life = 20
+Bot1.Graveyard = Firebending Lesson; Black Lotus
