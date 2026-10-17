@@ -1,0 +1,67 @@
+# Five instants make five page counters, so "{5}, {T}: Draw a card" costs {5} less: nothing but the {T}. Bot1 casts five Dark
+# Rituals on turn 3 (Mox Jet's {B} starts the chain; each Ritual pays {B} and adds {B}{B}{B}, so eleven {B} float afterwards).
+# Activating the Diary then must leave all eleven {B} in the pool: had it cost any mana it would have taken some. It draws
+# a card (the library's Island) and is tapped.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Diary of Dreams
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Diary of Dreams.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Diary of Dreams.Counters.Page = 5
+? Bot1.Mana = {B}{B}{B}{B}{B}{B}{B}{B}{B}{B}{B}
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Diary of Dreams.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}{B}{B}{B}{B}{B}{B}{B}{B}
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Diary of Dreams.Counters.Page = 5
+Bot1.Battlefield.Diary of Dreams.Tapped = true
+Bot1.Graveyard.Count = 5
