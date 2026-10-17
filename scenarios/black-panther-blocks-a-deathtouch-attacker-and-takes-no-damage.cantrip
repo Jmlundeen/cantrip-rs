@@ -1,0 +1,46 @@
+# Black Panther, Hope Enduring blocks Preacher of the Schism (2/4 deathtouch). In the first-strike combat damage step
+# Black Panther deals 3 (double strike, CR 702.4b); in the regular step it deals 3 more, and the Preacher deals its 2 at
+# the same time - which "Prevent all damage that would be dealt to Black Panther" prevents (CR 615.1). Deathtouch needs
+# damage dealt (CR 702.2b), so Black Panther lives with no damage marked, and the Preacher, with 6 damage, dies. The
+# prevention of combat damage is recorded once, by Black Panther.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+King T'Challa
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Preacher of the Schism
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.King T'Challa.Cast(Ability: back face)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Preacher of the Schism.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Preacher of the Schism > Bot1)
+Bot1.Block(Black Panther, Hope Enduring > Preacher of the Schism)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Black Panther, Hope Enduring.Damage = 0
+Bot1.Life = 20
+Bot2.Graveyard = Preacher of the Schism; Black Lotus
+Prevented = 2 Preacher of the Schism > Black Panther, Hope Enduring by Black Panther, Hope Enduring

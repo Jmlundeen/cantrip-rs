@@ -1,0 +1,49 @@
+# King T'Challa: "Whenever a player draws their second card each turn, you draw a card." On turn 2 Bot2 draws for the
+# turn (its first card: nothing) and casts Opt, its second card: Bot1 draws one (Bot1's own first card that turn, which
+# does not trigger it again). On turn 3 Bot1 draws for the turn (first) and casts Opt: its own second card triggers too
+# ("a player" is any player, CR 603.2), and the card that trigger draws is Bot1's third, which does not (CR 120.3). So
+# Bot1 draws four cards in all: one on turn 2, three on turn 3; a trigger on the first or third draw would draw more.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+King T'Challa
+Opt
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Opt
+Island
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.King T'Challa.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 3
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Opt.Cast
+[T2 Bot2.Main2]
+? Bot1.Hand.Count = 4
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opt.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 16
+Bot2.Library.Count = 18
+Bot1.Battlefield.King T'Challa.Power = 3
+Bot1.Battlefield.King T'Challa.Toughness = 2

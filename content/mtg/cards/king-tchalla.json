@@ -1,0 +1,23 @@
+{
+  "name": "King T'Challa",
+  "manaCost": "{1}{W}{U}",
+  "type": "Legendary Creature — Human Noble Hero",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Flash\nWhenever a player draws their second card each turn, you draw a card.\n{4}{W}{U}: Transform King T'Challa. Activate only as a sorcery.",
+  "keywords": [
+    "Flash"
+  ],
+  "backFace": {
+    "name": "Black Panther, Hope Enduring",
+    "manaCost": "{4}{W}{U}",
+    "type": "Legendary Creature — Human Warrior Hero",
+    "power": 3,
+    "toughness": 3,
+    "oracleText": "Flash\nDouble strike\nPrevent all damage that would be dealt to Black Panther.\nWhenever Black Panther deals combat damage to a player, draw a card.",
+    "keywords": [
+      "Flash",
+      "DoubleStrike"
+    ]
+  }
+}

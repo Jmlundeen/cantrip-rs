@@ -1,0 +1,48 @@
+# King T'Challa // Black Panther, Hope Enduring is a modal double-faced card (CR 712.3): its back face has a mana cost of
+# its own, {4}{W}{U}, and flash, so Bot1 casts it as that face (CR 712.11b) in Bot2's turn, and it is put onto the
+# battlefield back face up (CR 712.8f). Bot2 bolts it: "Prevent all damage that would be dealt to Black Panther" is a
+# static ability's prevention effect (CR 615.1, 604.1), so the 3 damage is never dealt (CR 615.6) and the 3/3 lives with
+# no damage marked; the history records the prevention, by Black Panther's own effect. Without the prevention the Bolt
+# would kill it (black-panther-dies-to-damage-that-cant-be-prevented).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+King T'Challa
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.King T'Challa.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Black Panther, Hope Enduring)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet; Black Panther, Hope Enduring
+Bot1.Battlefield.Black Panther, Hope Enduring.Damage = 0
+Bot1.Battlefield.Black Panther, Hope Enduring.Power = 3
+Bot1.Battlefield.Black Panther, Hope Enduring.Toughness = 3
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Lightning Bolt
+Prevented = 3 Lightning Bolt > Black Panther, Hope Enduring by Black Panther, Hope Enduring

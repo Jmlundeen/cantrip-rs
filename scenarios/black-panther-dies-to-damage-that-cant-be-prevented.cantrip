@@ -1,0 +1,42 @@
+# Impractical Joke: "Damage can't be prevented this turn. Impractical Joke deals 3 damage to up to one target creature or
+# planeswalker." Black Panther's "Prevent all damage that would be dealt to Black Panther" does not apply to damage that
+# can't be prevented (CR 615.12), so the 3 damage is dealt and the 3/3 dies (CR 704.5g); no prevention is recorded. The
+# control is black-panther-cast-as-its-back-face-with-flash-prevents-a-lightning-bolt, where the same 3 damage is prevented.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+King T'Challa
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Impractical Joke
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.King T'Challa.Cast(Ability: back face)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Impractical Joke.Cast(Black Panther, Hope Enduring)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet
+Bot1.Graveyard = King T'Challa; Black Lotus
+Bot2.Graveyard = Impractical Joke
+Prevented = (absent)

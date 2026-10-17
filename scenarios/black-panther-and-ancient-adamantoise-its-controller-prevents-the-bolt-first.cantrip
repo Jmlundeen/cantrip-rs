@@ -1,0 +1,55 @@
+# Black Panther's prevention ("Prevent all damage that would be dealt to Black Panther") and Ancient Adamantoise's
+# redirection ("All damage that would be dealt to you and other permanents you control is dealt to this creature
+# instead") both apply to the 3 damage Bot2's Lightning Bolt would deal to Black Panther: its controller chooses which
+# applies first (CR 616.1). Bot1 has the prevention apply first: the damage is prevented, and there is nothing left to
+# redirect (CR 615.6). Neither creature is dealt damage, and the prevention is recorded. The other order is
+# black-panther-and-ancient-adamantoise-its-controller-redirects-the-bolt-first.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+King T'Challa
+Show and Tell
+Ancient Adamantoise
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x25
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.King T'Challa.Cast(Ability: back face)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Black Panther, Hope Enduring)
+Bot2.Pass
+Bot1.Replace(prevents)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Black Panther, Hope Enduring.Damage = 0
+Bot1.Battlefield.Ancient Adamantoise.Damage = 0
+Bot2.Graveyard = Lightning Bolt
+Prevented = 3 Lightning Bolt > Black Panther, Hope Enduring by Black Panther, Hope Enduring
