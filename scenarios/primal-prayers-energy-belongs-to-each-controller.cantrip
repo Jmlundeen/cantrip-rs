@@ -1,0 +1,47 @@
+# CR 109.5, 604.1: each Prayers benefits its own controller. After Bot2 loses theirs, their remaining energy cannot use Bot1s Prayers, while Bot1 still can.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Force of Vigor
+Giant Growth
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Primal Prayers
+Ornithopter
+Ornithopter
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot2.Choose(Primal Prayers)
+[T2 Bot2.Main1]
+? Bot1.Energy = 2
+? Bot2.Energy = 2
+Bot2.Hand.Ornithopter.Cast(Ability: Pay {E})
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Force of Vigor.Cast(Ability: Exile)
+Bot1.Target(Bot2.Battlefield.Primal Prayers)
+Bot1.Choose(Giant Growth)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Energy = 1
+! Bot2.Hand.Ornithopter.Cast(Ability: Pay {E})
+Bot2.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast(Ability: Pay {E})
+
+[Expect]
+Bot1.Energy = 1
+Bot2.Energy = 1
+Bot1.Battlefield = Island; Primal Prayers; Ornithopter
+Bot2.Battlefield = Ornithopter; Ornithopter
+Bot2.Graveyard = Primal Prayers

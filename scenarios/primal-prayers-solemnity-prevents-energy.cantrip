@@ -1,0 +1,31 @@
+# CR 101.2, 122.1: Solemnity stops the triggered energy gain. With no energy the alternative is refused; a normal zero-mana creature cast remains legal.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Solemnity
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot2.Choose(Solemnity)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Energy = 0
+! Bot1.Hand.Ornithopter.Cast(Ability: Pay {E})
+Bot1.Hand.Ornithopter.Cast
+
+[Expect]
+Bot1.Energy = 0
+Bot1.Battlefield = Island; Primal Prayers; Ornithopter
+Bot2.Battlefield = Solemnity

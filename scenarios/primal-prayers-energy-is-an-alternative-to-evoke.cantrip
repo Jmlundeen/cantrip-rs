@@ -1,0 +1,43 @@
+# CR 118.9a: casting Endurance with energy does not pay its evoke alternative and does not cause an evoke sacrifice.
+# A second Endurance cast with evoke consumes a green card and is sacrificed, leaving energy unchanged.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Endurance
+Endurance
+Llanowar Elves
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Endurance.Cast(Ability: Pay {E})
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Count: 0)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Endurance.Toughness = 4
+? Bot1.Energy = 1
+Bot1.Hand.Endurance.Cast(Ability: Evoke)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot1.Target(Count: 0)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Energy = 1
+Bot1.Battlefield = Island; Primal Prayers; Endurance
+Bot1.Graveyard = Endurance; Show and Tell; Black Lotus
+Exile = Llanowar Elves

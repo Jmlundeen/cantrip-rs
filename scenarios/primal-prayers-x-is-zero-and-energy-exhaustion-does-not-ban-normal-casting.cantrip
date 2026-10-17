@@ -1,0 +1,38 @@
+# CR 107.3b, 118.9: X must be zero for an energy cast. At zero energy that alternative disappears, but normal casting remains legal.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Walking Ballista
+Walking Ballista
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Walking Ballista.Cast(X: 2; Ability: Pay {E})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Energy = 1
+Bot1.Hand.Walking Ballista.Cast(X: 1; Ability: Pay {E})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Energy = 0
+! Bot1.Hand.Ornithopter.Cast(Ability: Pay {E})
+Bot1.Hand.Ornithopter.Cast
+
+[Expect]
+Bot1.Energy = 0
+Bot1.Graveyard = Walking Ballista; Walking Ballista; Show and Tell; Black Lotus
+Bot1.Battlefield = Island; Primal Prayers; Ornithopter

@@ -1,0 +1,39 @@
+# CR 608.2g, 118.9: Chandra permits casting during resolution for the normal cost; Prayers offers its energy alternative there.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Mother of Runes
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Accept
+Bot1.Modes(Pay {E})
+
+[Expect]
+Bot1.Energy = 1
+Bot1.Battlefield = Island; Mox Ruby; Primal Prayers; Chandra, Torch of Defiance; Mother of Runes
+Bot1.Battlefield.Chandra, Torch of Defiance.Counters.Loyalty = 5
+Bot2.Life = 20
+Exile =
