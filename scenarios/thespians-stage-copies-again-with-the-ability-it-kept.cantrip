@@ -1,0 +1,39 @@
+# The ability Thespian's Stage keeps as its copy's exception (CR 707.9b) works on the next turn: on turn 3 the Stage becomes a
+# copy of Bot1's Island, on turn 5 that Island-Stage uses the kept ability to become a copy of Bot1's Mountain. The newer copy
+# effect overwrites the older one (CR 613.2a, 707.2; the ruling): it is a Mountain and no longer an Island at all.
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Island
+Mountain
+Forest x11
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Island; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Island#1.Subtypes = Island
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island#1.Activate(Bot1.Battlefield.Mountain; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Sol Ring; Island; Mountain; Mountain
+Bot1.Battlefield.Mountain#1.Subtypes = Mountain
+Bot1.Battlefield.Mountain#1.Tapped = true
+Bot1.Battlefield.Mountain#2.Tapped = false
+Bot1.Battlefield.Island.Tapped = false

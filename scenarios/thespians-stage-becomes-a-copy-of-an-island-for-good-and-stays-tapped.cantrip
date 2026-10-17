@@ -1,0 +1,40 @@
+# Thespian's Stage becomes a copy of Bot1's Island (CR 707.2): a basic Land - Island named Island, with the Island's
+# intrinsic "{T}: Add {U}" (CR 305.6) and its own copy ability as the exception (CR 707.9b), and without "{T}: Add {C}" (the
+# ruling: "The permanent will no longer have the first ability of Thespian's Stage"). Becoming a copy doesn't untap it (the
+# ruling): it is still tapped from its cost. The effect has no duration (CR 611.2a), so on turn 5 it is an Island still and
+# taps for {U} and not {C}; on turn 1 the Stage tapping for {C} is the refusal's positive control.
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Island
+Forest x12
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Ability: {C})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Island; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Island#1.Tapped = true
+? Bot1.Battlefield.Island#1.Subtypes = Island
+? Bot1.Battlefield.Island#2.Tapped = false
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Island#1.Activate(Color: C)
+Bot1.Battlefield.Island#1.Activate(Ability: {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield = Sol Ring; Island; Island
+Bot1.Battlefield.Island#1.Types = Land
+Bot1.Battlefield.Island#1.Supertypes = Basic
+Bot1.Battlefield.Island#1.Subtypes = Island
+Bot1.Battlefield.Island#1.Tapped = true

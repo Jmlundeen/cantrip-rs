@@ -1,0 +1,37 @@
+# Thespian's Stage becomes a copy of a Mutavault that is a 2/2 creature until end of turn. Only the Mutavault's printed values
+# are copiable; its "becomes a creature" effect is not a copy effect (CR 707.2; the ruling: "if you copy a land that is also a
+# creature because of a temporary effect ..., Thespian's Stage will become just the 'unanimated' land"). The Stage is a Land
+# named Mutavault and no creature; the real Mutavault stays a 2/2 Land Creature.
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Mutavault
+Forest x12
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mutavault.Play
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot1.Battlefield.Mutavault.Activate(Ability: {C})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Mutavault; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Sol Ring; Mutavault; Mutavault
+Bot1.Battlefield.Mutavault#1.Types = Land
+Bot1.Battlefield.Mutavault#1.Power = (absent)
+Bot1.Battlefield.Mutavault#2.Types = Land; Creature
+Bot1.Battlefield.Mutavault#2.Power = 2

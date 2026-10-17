@@ -1,0 +1,42 @@
+# Thespian's Stage targets Bot1's Island, and Bot2 destroys the Island with Strip Mine in response: the ability's only target is
+# illegal as it would resolve, so it doesn't resolve (CR 608.2b) and the Stage stays Thespian's Stage, with both its abilities.
+# On turn 5 it taps for {C} again (it was tapped for the cost on turn 3).
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Island
+Forest x12
+
+[Bot2 Deck]
+Strip Mine
+Plains x14
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Island; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Island; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Thespian's Stage.Activate(Ability: {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Battlefield = Thespian's Stage; Sol Ring
+Bot1.Battlefield.Thespian's Stage.Types = Land
+Bot1.Battlefield.Thespian's Stage.Subtypes = (absent)
+Bot1.Graveyard = Island
+Bot2.Battlefield.Count = 0

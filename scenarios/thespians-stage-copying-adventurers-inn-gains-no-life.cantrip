@@ -1,0 +1,35 @@
+# Thespian's Stage becomes a copy of Adventurer's Inn: it was already on the battlefield, so it doesn't enter and the Inn's
+# "When this land enters, you gain 2 life" doesn't trigger (CR 603.6a; the ruling: "No enters-the-battlefield abilities of the
+# land Thespian's Stage is copying will trigger"). Bot1's life is the 22 the Inn itself gave. The Stage is a Town named
+# Adventurer's Inn (CR 707.2).
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Adventurer's Inn
+Forest x12
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Adventurer's Inn.Play
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Adventurer's Inn; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Sol Ring; Adventurer's Inn; Adventurer's Inn
+Bot1.Battlefield.Adventurer's Inn#1.Subtypes = Town
+Stack.Count = 0

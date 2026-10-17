@@ -1,0 +1,44 @@
+# A copy effect's exception is a copiable value (CR 707.9b): Thespian's Stage is a copy of an Island "except it has this
+# ability", so Vesuva entering as a copy of that Stage-Island (CR 707.2) is an Island with the Stage's copy ability too. On turn
+# 7 the Vesuva-Island uses it to become a copy of Bot2's Plains. The real Island has no such ability: the refusal, beside the
+# Vesuva's activation, shows it.
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Island
+Vesuva
+Forest x11
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Island; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Island#1)
+? Bot1.Battlefield.Island#3.Tapped = true
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Island#2.Activate(Ability: becomes)
+Bot1.Battlefield.Island#3.Activate(Bot2.Battlefield.Plains; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Sol Ring; Island; Island; Plains
+Bot1.Battlefield.Plains.Subtypes = Plains
+Bot1.Battlefield.Plains.Tapped = true

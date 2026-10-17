@@ -1,0 +1,5 @@
+{
+  "name": "Thespian's Stage",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{2}, {T}: This land becomes a copy of target land, except it has this ability."
+}
