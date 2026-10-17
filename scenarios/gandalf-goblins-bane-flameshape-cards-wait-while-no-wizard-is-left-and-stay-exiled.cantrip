@@ -1,0 +1,79 @@
+# Gandalf, Goblins' Bane // Flameshape: the permission to play the exiled cards holds only while their player controls a Wizard
+# (CR 611.2), and the cards stay exiled meanwhile ("for as long as they remain exiled"). Turn 1: Flameshape exiles Lightning Bolt
+# and a Plains face down, and Gandalf is cast from exile on his Adventure. Turn 3, Bot1's upkeep: Bot2 Bolts Gandalf - an
+# opponent's spell, which does not trigger him (Bot2 stays at 20 until Bot1's Bolt). With no Wizard left the two cards are still
+# in exile, and neither can be played: not the Bolt with Mox Ruby untapped, nor the Plains with the land play unused. Jace,
+# Vryn's Prodigy, a Human Wizard, comes down, and both can be played again: the Plains as the land play, then the Bolt at Bot2.
+# Bot2 answers by Bolting Jace with its Black Lotus's mana: the Bolt from exile was cast while Bot1 controlled a Wizard and
+# resolves without one (the rulings: losing the last Wizard does not stop a spell already cast).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Gandalf, Goblins' Bane
+Mox Ruby
+Jace, Vryn's Prodigy
+Lightning Bolt
+Plains
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Black Lotus
+Mountain x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gandalf, Goblins' Bane.Cast(Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Gandalf, Goblins' Bane.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gandalf, Goblins' Bane.Subtypes = Avatar; Wizard
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Gandalf, Goblins' Bane)
+Bot2.Battlefield.Mountain.Activate
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Gandalf, Goblins' Bane; Black Lotus
+? Exile.FaceDown = Lightning Bolt; Plains
+! Bot1.Exile.Lightning Bolt.Cast
+! Bot1.Exile.Plains.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jace, Vryn's Prodigy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Plains.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Jace, Vryn's Prodigy)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Jace, Vryn's Prodigy; Gandalf, Goblins' Bane; Black Lotus
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Jace, Vryn's Prodigy; Gandalf, Goblins' Bane; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Black Lotus; Lightning Bolt
+Bot1.Battlefield.Plains.Types = Land

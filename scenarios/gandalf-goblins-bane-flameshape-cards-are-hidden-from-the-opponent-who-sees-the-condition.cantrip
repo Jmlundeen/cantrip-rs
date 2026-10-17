@@ -1,0 +1,47 @@
+# Browser
+# Gandalf, Goblins' Bane // Flameshape cast by Bot2: the two cards it exiles face down are hidden from Bot1 (CR 406.3) - no
+# name, no type line - while Bot1's page still says that Bot2 may play them, and only while Bot2 controls a Wizard: "Bot2:
+# Playable while it stays here, if they control a Wizard". The Wizard must be Bot2's own: Bot1's Jace, Vryn's Prodigy (a Human
+# Wizard, cast on turn 1) does not let Bot2 play them - not the Bolt with {R} floating, nor the Mountain with Bot2's land play
+# unused. The cards are Lightning Bolt and a Mountain, which the dump sees and Bot1 does not.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Jace, Vryn's Prodigy
+Island x17
+
+[Bot2 Deck]
+Black Lotus
+Gandalf, Goblins' Bane
+Mountain x5
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace, Vryn's Prodigy.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Gandalf, Goblins' Bane.Cast(Ability: Adventure)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Mana = {R}
+! Bot2.Exile.Lightning Bolt.Cast
+! Bot2.Exile.Mountain.Play
+[T3 Bot1.Main1]
+? Client.Bot1.OpponentExile.(hidden).TypeLine =
+? Client.Bot1.OpponentExile.(hidden).Annotation = Bot2: Playable while it stays here, if they control a Wizard
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Jace, Vryn's Prodigy.Subtypes = Human; Wizard
+Bot2.Battlefield.Count = 0
+Exile = Gandalf, Goblins' Bane; (face down); (face down)
+Exile.FaceDown = Lightning Bolt; Mountain
+Bot2.Graveyard = Black Lotus
