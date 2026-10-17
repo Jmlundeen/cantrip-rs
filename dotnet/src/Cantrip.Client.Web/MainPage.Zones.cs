@@ -603,7 +603,9 @@ public sealed partial class MainPage
         (ManaSpendFilterView.NoncreatureSpells, _) => "noncreature spells",
         (ManaSpendFilterView.ManaValueSpells, _) => $"mana value {manaValue}+",
         (ManaSpendFilterView.ManaValueOrXSpells, _) => $"mana value {manaValue}+ or X",
-        (ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells, _) when subtypes.Count == 0 => "no type chosen",
+        (ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells or ManaSpendFilterView.SubtypeSpellsOrAbilities, _)
+            when subtypes.Count == 0 => "no type chosen",
+        (ManaSpendFilterView.SubtypeSpellsOrAbilities, _) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells & abilities",
         (ManaSpendFilterView.SubtypeSpells, ManaSpendEffectView.CantBeCountered) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells · uncounterable",
         (ManaSpendFilterView.SubtypeSpells, _) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} spells",
         (ManaSpendFilterView.SubtypeCreatureSpells, ManaSpendEffectView.CantBeCountered) => $"{CardActions.Subtypes(subtypes).ToLowerInvariant()} creatures · uncounterable",
@@ -633,10 +635,13 @@ public sealed partial class MainPage
             ManaSpendFilterView.ManaValueSpells => $"Spend this mana only to cast spells with mana value {manaValue} or greater.",
             ManaSpendFilterView.ManaValueOrXSpells =>
                 $"Spend this mana only to cast spells with mana value {manaValue} or greater or spells with {{X}} in their mana costs.",
-            ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells when subtypes.Count == 0 =>
+            ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells or ManaSpendFilterView.SubtypeSpellsOrAbilities
+                when subtypes.Count == 0 =>
                 "Spend this mana only to cast a spell of the chosen type. No type was chosen, so it can't be spent on any spell.",
             ManaSpendFilterView.SubtypeSpells => $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} spells.",
             ManaSpendFilterView.SubtypeCreatureSpells => $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} creature spells.",
+            ManaSpendFilterView.SubtypeSpellsOrAbilities =>
+                $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} spells or activate abilities of {CardActions.Subtypes(subtypes)} sources.",
             ManaSpendFilterView.CreatureSpells => "Spend this mana only to cast creature spells.",
             ManaSpendFilterView.InstantOrSorcerySpells => "Spend this mana only to cast instant or sorcery spells.",
             ManaSpendFilterView.ActivatedAbilities => "Spend this mana only to activate abilities.",
