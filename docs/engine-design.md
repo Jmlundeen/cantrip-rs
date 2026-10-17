@@ -520,6 +520,26 @@ number goes in the fact as it is. The modes a modal spell may choose by the boar
 (Draconic Roar, Silumgar's Scorn; none in content). The benchmark measured 6.55, 7.01, 6.75 us against 6.60, 6.68, 7.00 us
 before, alternating the two builds (2026-10-16).
 
+### Copies of abilities
+
+`Game::copy_ability(Target::Ability(serial), copier, new_targets)` (`ops::copy_ability`) puts another instance of an activated
+or triggered ability onto the stack (CR 707.10): the original's item with the copier as its controller and a new serial, so
+the same source (the Lithoform Engine ruling), targets, modes, X, subject and the objects its costs were paid with, and new
+targets chosen as for a spell (`retarget`, CR 707.10c). It was not activated: no `AbilityActivated`, so a Locus of
+Enlightenment does not copy its own copy. "Whenever you activate an ability ... copy it" names the ability by
+`triggers::activated_ability_on_stack`, the topmost activated item of that source and ability as the activation is
+emitted (triggers are collected then, CR 603.2), carried as the trigger's subject. An activated ability's item joins
+`left_stack` as it leaves the stack (`GameState::left_ability`), so one countered before the trigger resolves is still
+copied as it last was (the Rings of Brighthearth ruling); a triggered ability is copied only by what targets it. Rings of
+Brighthearth, Kurkesh, Illusionist's and Battlemage's Bracers and Locus copy activations; Lithoform Engine, Strionic
+Resonator and Return the Favor target. An item that finishes resolving now leaves the stack by its serial (CR 608.2n),
+not its old position, since its effect may have taken an item under it (Ertai Resurrected countering an ability).
+
+"You may activate each of those abilities only once each turn" (Locus, Mairsil, the Pretender) is
+`CardDef::granted_once_each_turn`: the card says how many of its permanent's instances of an ability its static gave with
+the limit, and `actions::granted_limit_reached` counts that ability's activations by the object this turn in the history
+(CR 602.5b); an unlimited instance of the same ability is used first.
+
 ### Station
 
 Station (CR 702.184a) is `cantrip_mechanics::station::ability(text)`: "tap another untapped creature you control" as a cost

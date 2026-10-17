@@ -1682,6 +1682,12 @@ pub struct CardDef {
     /// "You may spend mana as though it were mana of any color to activate abilities of creatures you control" (CR 609.4b):
     /// Agatha's Soul Cauldron, Mycosynth Lattice's kind.
     pub spend_any_color: &'static [SpendAnyColorRule],
+    /// "You may activate each of those abilities only once each turn" (CR 602.5b): how many of a permanent's instances of
+    /// an activated ability are ones its static ability gave it with that limit (Locus of Enlightenment's of the exiled
+    /// cards used to craft it, Mairsil, the Pretender's of the caged cards), asked of the permanent of this card as the
+    /// ability would be activated. Each such instance may be activated once each turn; an instance of the same ability it
+    /// has another way is not limited.
+    pub granted_once_each_turn: Option<fn(&dyn Query, ObjectId, AbilityRef) -> usize>,
     /// Its static abilities that forbid spells and abilities to cause discards or sacrifices (CR 101.2).
     pub cause_rules: &'static [CauseRule],
     /// Its replacements of its controller's turn beginning (CR 614.10).
@@ -1796,6 +1802,7 @@ impl CardDef {
         damage_stays: &[],
         zero_loyalty_stays: &[],
         spend_any_color: &[],
+        granted_once_each_turn: None,
         cause_rules: &[],
         turn_begin: &[],
         instant_activation: &[],

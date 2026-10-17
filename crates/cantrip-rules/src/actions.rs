@@ -361,11 +361,11 @@ fn pay_exert_and_tappers(cx: &mut Cx, source: ObjectId, cost: &Cost, tappers: &[
 /// "Activate only once each turn" (CR 602.5b-c): whether the `index`th ability of this object has been activated this
 /// turn, by anyone. Counted for the object (a new object is a new count) and for each instance of an identically
 /// worded ability on its own.
-fn limit_reached(cx: &Cx, id: ObjectId, index: usize, def: &ActivatedDef) -> bool {
+fn limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize, def: &ActivatedDef) -> bool {
     // "Activate only once" (CR 602.5b; exhaust, 702.177a; power-up, 702.193a): this permanent has activated this
     // ability before, in any turn. A permanent that left and came back is another object, with the ability unused.
     if def.once
-        && let Some(ability) = cx.chars(id).abilities().nth(index)
+        && let Some(ability) = chars.abilities().nth(index)
         && cx
             .history()
             .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id))
@@ -373,11 +373,34 @@ fn limit_reached(cx: &Cx, id: ObjectId, index: usize, def: &ActivatedDef) -> boo
     {
         return true;
     }
+    if granted_limit_reached(cx, id, chars, index) {
+        return true;
+    }
     if !def.once_each_turn {
         return false;
     }
     let obj = cx.s().obj(id);
     obj.activated_turn == cx.s().turn.number && obj.activated_mask & (1 << index) != 0
+}
+
+/// "You may activate each of those abilities only once each turn" (CR 602.5b, `CardDef::granted_once_each_turn`): the
+/// `index`th ability of `id` is an instance of an ability its permanent's static ability gave it with that limit, and as
+/// many of them have been activated this turn as it has limited instances, asked of the history. An instance it has with
+/// no limit (printed, or given by something else) is the one activated first: identical abilities are interchangeable,
+/// so the limit binds only once every instance it has is a limited one.
+fn granted_limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize) -> bool {
+    let Some(limited) = cx.card(chars.card).granted_once_each_turn else { return false };
+    let Some(ability) = chars.abilities().nth(index) else { return false };
+    let limited = limited(cx, id, ability);
+    if limited == 0 || chars.abilities().filter(|&a| a == ability).count() > limited {
+        return false;
+    }
+    let used = cx
+        .history()
+        .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id).this_turn())
+        .filter(|r| matches!(r.event, Event::AbilityActivated { ability: a, .. } if a == ability))
+        .count();
+    used >= limited
 }
 
 /// Notes that the `index`th ability of an object was activated this turn.
@@ -720,7 +743,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
             let Some(def) = activated(cx, ability) else { continue };
             if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
-                || limit_reached(cx, id, index, def)
+                || limit_reached(cx, id, &chars, index, def)
                 || !can_pay_other(cx, id, player, &def.cost)
                 || static_rules::activation_barred(cx, &forbidders, id, def)
             {
@@ -1336,7 +1359,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             let Some(def) = activated(cx, ability) else { continue };
             if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
-                || limit_reached(cx, id, index, def)
+                || limit_reached(cx, id, &chars, index, def)
                 || !can_pay_other(cx, id, player, &def.cost)
                 || static_rules::activation_barred(cx, &forbidders, id, def)
             {
@@ -1601,7 +1624,7 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             let Some(def) = activated(cx, ability) else { continue };
             if def.is_mana_ability()
                 || def.from != zone
-                || limit_reached(cx, id, index, def)
+                || limit_reached(cx, id, &chars, index, def)
                 || static_rules::activation_barred(cx, &forbidders, id, def)
             {
                 continue;
@@ -2427,10 +2450,11 @@ const RETRACE: Cost = Cost { discard: Some((1, is_land)), ..Cost::NONE };
 /// or artifact tapped to pay for convoke or improvise cannot also be used for.
 fn has_mana_source(cx: &Cx, id: ObjectId, player: PlayerId) -> bool {
     let forbidders = static_rules::activation_forbidders(cx);
-    cx.chars(id).abilities().enumerate().any(|(index, ability)| {
+    let chars = cx.chars(id);
+    chars.abilities().enumerate().any(|(index, ability)| {
         activated(cx, ability).is_some_and(|def| {
             def.is_mana_ability()
-                && !limit_reached(cx, id, index, def)
+                && !limit_reached(cx, id, &chars, index, def)
                 && can_pay_other(cx, id, player, &def.cost)
                 && !static_rules::activation_barred(cx, &forbidders, id, def)
         })
