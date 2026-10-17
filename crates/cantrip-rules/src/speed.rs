@@ -39,7 +39,7 @@ pub fn engines_start(cx: &mut Cx) -> bool {
         }
         let p = obj.controller;
         let player = cx.s().player(p);
-        if player.lost || player.speed.is_some() || cx.s().lost_all_abilities(id) {
+        if player.lost || player.speed.is_some() || cx.lost_all_abilities(id) {
             continue;
         }
         starting |= 1 << p.index();
