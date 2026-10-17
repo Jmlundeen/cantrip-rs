@@ -1,0 +1,54 @@
+# Identity Echo's reveal stops at "a creature or planeswalker card": here the first such card is Liliana of the Veil, which
+# enters with her three loyalty counters (CR 306.5b) while the revealed Forest goes to the bottom. The target is "you
+# control": on turn 3 Bot2's Ornithopter is refused as a target (a refusal naming it) beside the positive control of
+# Bot1's own Ornithopter, which is then exiled.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Identity Echo
+Ornithopter
+Mountain
+Sol Ring
+Forest
+Forest
+Liliana of the Veil
+Plains
+Plains
+
+[Bot2 Deck]
+Ornithopter
+Forest x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Identity Echo.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Battlefield.Identity Echo.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Identity Echo.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Sol Ring; Identity Echo; Liliana of the Veil
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+Bot1.Library = Plains; Plains; Forest

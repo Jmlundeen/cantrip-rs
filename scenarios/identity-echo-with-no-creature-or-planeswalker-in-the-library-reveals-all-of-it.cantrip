@@ -1,0 +1,43 @@
+# With no creature or planeswalker card in the library, Identity Echo's reveal runs to the end of it: every card is
+# revealed (CR 701.20), nothing is put onto the battlefield, and all of them go to the bottom of the library in a random
+# order (CR 401.4), here the same library, since the cards are identical. The exiled Ornithopter is still exiled.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Black Lotus
+Identity Echo
+Ornithopter
+Forest x3
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Identity Echo.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Identity Echo.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Identity Echo
+Bot1.Library = Forest; Forest
+Bot1.Revealed = Forest; Forest

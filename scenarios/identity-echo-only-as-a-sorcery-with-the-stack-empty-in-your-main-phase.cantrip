@@ -1,0 +1,49 @@
+# Identity Echo's ability is "Activate only as a sorcery" (CR 307.1): Bot1 leaves a Mountain and three Moxen untapped
+# after turn 1, enough for {3}{R}, and during Bot2's turn 2 the ability is refused (Bot1 has priority, but it is not Bot1's
+# main phase). On turn 3, in Bot1's own main phase with an empty stack, the same activation is offered and resolves:
+# the Ornithopter is exiled and the first creature revealed (Llanowar Elves, behind a Forest) enters.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Black Lotus
+Identity Echo
+Ornithopter
+Forest
+Forest
+Llanowar Elves
+Plains
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Identity Echo.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Identity Echo.Activate(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Identity Echo.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Identity Echo; Llanowar Elves
+Bot1.Library = Plains; Forest
