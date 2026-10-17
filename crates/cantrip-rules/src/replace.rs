@@ -194,14 +194,14 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
             EffectKind::ReplacementRule(i) => (i, true),
             // A prevention effect a spell or ability made (CR 615.3): of damage to whom it names, if it names anyone, and of
             // the damage its definition describes. One about an object ends with it (CR 400.7).
-            EffectKind::Prevention { index, to, .. } => {
+            EffectKind::Prevention { card, index, to, .. } => {
                 if let Proposal::Damage(d) = proposal
                     && preventable
                     && (to == Target::None || to == d.target)
                     && (to.object().is_none() || live(cx.s(), e.affected))
                     && !applied.contains(&(e.source, index, Origin::GrantedPrevention(e.timestamp)))
                 {
-                    let def = &cards.get(card_of(cx, e.source)).granted_preventions[index as usize];
+                    let def = &cards.get(card).granted_preventions[index as usize];
                     let asker = Asker { source: e.source, controller: e.controller };
                     if (def.applies)(cx, &asker, d) {
                         found.push(Candidate { source: e.source, index, origin: Origin::GrantedPrevention(e.timestamp) });
@@ -256,7 +256,10 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
         Origin::Madness => MADNESS_HINT,
         Origin::Protection => PROTECTION_HINT,
         Origin::Prevention => card.preventions[c.index as usize].hint,
-        Origin::GrantedPrevention(_) => card.granted_preventions[c.index as usize].hint,
+        Origin::GrantedPrevention(timestamp) => match cx.s().effects.iter().find(|e| e.timestamp == timestamp).map(|e| e.kind) {
+            Some(EffectKind::Prevention { card, index, .. }) => cx.cards().get(card).granted_preventions[index as usize].hint,
+            _ => "",
+        },
     }
 }
 
@@ -345,7 +348,7 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 if let Proposal::Damage(d) = proposal {
                     let at = cx.s().effects.iter().position(|e| e.timestamp == timestamp).expect("the effect that applies");
                     let mut e = cx.s().effects[at];
-                    let EffectKind::Prevention { index, to, shield } = e.kind else { unreachable!("a prevention effect") };
+                    let EffectKind::Prevention { card, index, to, shield } = e.kind else { unreachable!("a prevention effect") };
                     match shield {
                         Shield::All => prevent(cx, d, d.amount, source),
                         // CR 615.7: each 1 damage prevented reduces the shield by 1; once it is 0 the rest is dealt, and
@@ -356,7 +359,7 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                             if prevented == left {
                                 cx.st().effects_retain(|f| f.timestamp != timestamp);
                             } else {
-                                e.kind = EffectKind::Prevention { index, to, shield: Shield::Next(left - prevented) };
+                                e.kind = EffectKind::Prevention { card, index, to, shield: Shield::Next(left - prevented) };
                                 cx.st().effect_set(at, e);
                             }
                         }
@@ -395,11 +398,12 @@ pub(crate) fn shields(cx: &Cx, d: &DamageEvent) -> Option<(ObjectId, u16)> {
     }
     let mut found: Option<(ObjectId, u16)> = None;
     for e in &cx.s().effects {
-        let EffectKind::Prevention { index, to, shield: Shield::Next(left) } = e.kind else { continue };
+        let EffectKind::Prevention { card, index, to, shield: Shield::Next(left) } = e.kind else { continue };
         if !(to == Target::None || to == d.target) || (to.object().is_some() && !live(cx.s(), e.affected)) {
             continue;
         }
-        let def = &cx.cards().get(card_of(cx, e.source)).granted_preventions[index as usize];
+        let def = &cx.cards().get(card).granted_preventions[index as usize];
+
         if (def.applies)(cx, &Asker { source: e.source, controller: e.controller }, d) {
             found = Some(found.map_or((e.source, left), |(s, n)| (s, n.saturating_add(left))));
         }

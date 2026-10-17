@@ -373,8 +373,8 @@ left it (CR 616.1f). There are three kinds besides protection's (CR 702.16e, `re
 - a static ability's, `CardDef::preventions` (`PreventionDef`: a hint and an `applies` over the `DamageEvent`), functioning
   while its permanent is on the battlefield and gone with its abilities (CR 613.1f): Black Panther, Hope Enduring's "Prevent
   all damage that would be dealt to Black Panther". It prevents all of what it applies to;
-- one a resolving spell or ability made (CR 615.3, 611.2), `EffectKind::Prevention { index, to, shield }`: of damage to an
-  object (which it ends with, CR 400.7), to a player, or to anyone (`Target::None`), and of the damage the source card's
+- one a resolving spell or ability made (CR 615.3, 611.2), `EffectKind::Prevention { card, index, to, shield }`: of damage to an
+  object (which it ends with, CR 400.7), to a player, or to anyone (`Target::None`), and of the damage the making card's
   `granted_preventions[index]` describes (any damage, combat damage: `cantrip_mechanics::prevention::ANY_DAMAGE`,
   `COMBAT_DAMAGE`). `Shield::All` prevents all of it while it lasts (Fog's "all combat damage that would be dealt this
   turn"); `Shield::Next(n)` is a shield (CR 615.7), reduced by what it prevents (`GameState::effect_set`) and gone at 0
@@ -388,8 +388,12 @@ left it (CR 616.1f). There are three kinds besides protection's (CR 702.16e, `re
 None applies to damage that can't be prevented (CR 615.12): it would prevent nothing, and a shield is not reduced by it. A
 player is not asked to order prevention effects that each prevent all the damage and use nothing up, since the order
 changes nothing. Each prevention that prevents something records `Event::DamagePrevented { source, target, amount, combat,
-by }` (CR 615.6, 615.13), protection's too, before what is left is dealt: what "if damage is prevented this way" (CR 615.5)
-and "whenever damage is prevented" ask, and the scenario dump's `Prevented`. Not built, because no card in content has one:
+by }` (CR 615.6, 615.13), protection's too, before what is left is dealt: what "if damage is prevented this way" (CR 615.5) would ask,
+and the scenario dump's `Prevented`. It is one record for each damage event an effect prevents some of, emitted as it is
+applied rather than with the damage batch, so a "whenever damage is prevented" trigger (CR 615.13: once each time an effect
+is applied to one or more simultaneous damage events) would need them batched first, and an additional effect "if damage is
+prevented this way" would make the order of prevention effects that each prevent it all matter, so the player would have to
+be asked again. Not built, because no card in content has one:
 "the next time a source would deal damage" (CR 615.8), a source of a player's choice (CR 615.9, 609.7), "prevent N of that
 damage" from a static ability (CR 615.10) and prevention with an additional effect (CR 615.5). The host shows a resolved
 prevention effect on the object it shields ("Prevent the next 3 damage that would be dealt to it this turn (Healing Salve)."),

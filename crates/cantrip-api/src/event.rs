@@ -33,7 +33,7 @@ pub enum Event {
     /// `target`, by the prevention effect of `by` - the permanent whose static ability it is, the source of a resolved
     /// prevention effect, the protected permanent or the source of a player's protection (CR 702.16e). One event each time
     /// a prevention effect is applied to a damage event and prevents some or all of it, before what is left is dealt;
-    /// "if damage is prevented this way" (CR 615.5) asks it. `combat` says whether it would have been combat damage.
+    /// what "if damage is prevented this way" (CR 615.5) would ask. `combat` says whether it would have been combat damage.
     DamagePrevented { source: ObjectId, target: Target, amount: u16, combat: bool, by: ObjectId },
     LifeChange { player: PlayerId, delta: i32 },
     Drew { player: PlayerId, card: ObjectId },

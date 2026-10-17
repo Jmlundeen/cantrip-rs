@@ -1570,24 +1570,26 @@ pub fn damage_together(cx: &mut Cx, hits: &[(ObjectId, Target, u16)]) -> Vec<u16
 /// applicable sources at the same time, the player or the controller of the permanent chooses which damage the shield
 /// prevents" (CR 615.7). For each recipient a shield would not cover in full, its player or controller chooses a source
 /// whose damage the shield prevents first, then the next while some is left; the damage of the others is dealt normally
-/// once it is used up. Everything else keeps its order.
+/// once it is used up. Everything else keeps its order. Players with such choices make them in APNAP order (CR 616.1).
 pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: bool) -> Vec<usize> {
     let mut order: Vec<usize> = (0..hits.len()).collect();
     if hits.len() < 2 || !cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Prevention { shield: Shield::Next(_), .. })) {
         return order;
     }
-    let mut recipients: Vec<Target> = Vec::new();
+    let mut recipients: Vec<(PlayerId, Target)> = Vec::new();
     for &(_, to, _) in hits {
-        if !recipients.contains(&to) {
-            recipients.push(to);
-        }
-    }
-    for to in recipients {
         let chooser = match to {
             Target::Player(p) => p,
             Target::Object(id) if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) => cx.s().obj(id).controller,
             _ => continue,
         };
+        if !recipients.iter().any(|&(_, t)| t == to) {
+            recipients.push((chooser, to));
+        }
+    }
+    let apnap: Vec<PlayerId> = cx.s().apnap().collect();
+    recipients.sort_by_key(|&(p, _)| apnap.iter().position(|&q| q == p).unwrap_or(usize::MAX));
+    for (chooser, to) in recipients {
         // The assignments to it that a shield applies to, and what the shields have left between them.
         let mut shielded: Vec<usize> = Vec::new();
         let (mut by, mut left) = (ObjectId(0), 0u16);
@@ -1596,17 +1598,22 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
                 continue;
             }
             if let Some((s, n)) = replace::shields(cx, &DamageEvent { source, target, amount, combat, heal_marked: false }) {
+                if shielded.is_empty() {
+                    by = s;
+                }
                 shielded.push(i);
-                (by, left) = (s, n);
+                left = n;
             }
         }
-        // The amounts are as assigned; where a replacement effect may yet change them ("that much damage plus 1"), the
-        // shield might not cover them after all, so the choice is asked whatever they are.
+        // The amounts are as assigned; where a replacement effect may yet change them ("that much damage plus 1", or less),
+        // the shield might not cover them after all, or have more left than they say, so the choice is asked whatever they
+        // are, for as long as two or more sources are left.
         let may_change = replace::damage_may_change(cx);
         let total = |rest: &[usize]| rest.iter().map(|&i| hits[i].2 as u32).sum::<u32>();
         let mut rest = shielded.clone();
         let mut chosen = Vec::new();
-        while left > 0 && (total(&rest) > left as u32 || may_change) {
+        while may_change || (left > 0 && total(&rest) > left as u32) {
+
             let mut sources: Vec<ObjectId> = Vec::new();
             for &i in &rest {
                 if !sources.contains(&hits[i].0) {
@@ -1648,7 +1655,6 @@ pub fn order_for_shields(cx: &mut Cx, hits: &[(ObjectId, Target, u16)], combat: 
     }
     order
 }
-
 
 /// Deals damage as `damage` does, but hands back the event for the caller to announce, so that damage dealt
 /// simultaneously (combat damage, CR 510.2) can be announced as one batch (CR 603.2c): "whenever equipped creature
@@ -1811,7 +1817,6 @@ pub(crate) fn protection_prevents(cx: &Cx, source: ObjectId, target: Target, com
 /// (Sunspine Lynx's "Damage can't be prevented", Questing Beast's combat damage). Every prevention effect asks it:
 /// protection's (CR 702.16e) and those of `replace` (CR 615).
 pub(crate) fn damage_can_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {
-
     let turn = cx.s().turn;
     turn.no_prevention_turn != turn.number && !crate::static_rules::damage_cant_be_prevented(cx, source, combat)
 }

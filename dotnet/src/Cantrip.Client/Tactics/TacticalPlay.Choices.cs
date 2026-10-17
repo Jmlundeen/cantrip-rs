@@ -579,7 +579,7 @@ public sealed partial class TacticalPlay
         }
 
         // A prevention shield too small for all the damage two or more sources would deal at once (CR 615.7): the damage that
-        // would hurt most is prevented first - deathtouch's, lifelink's or the one that tramples, when the shield has enough
+        // would hurt most is prevented first - deathtouch's or lifelink's, when the shield has enough
         // left to prevent all of it (any of it dealt is the whole harm), then the most damage.
         if (prompt.Purpose == CardChoicePurposeView.PreventDamageFrom)
         {

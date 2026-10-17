@@ -680,15 +680,12 @@ impl<'a> Projector<'a> {
         format!("{who} can't cast spells{from}{until}.")
     }
 
-    /// How long an effect lasts, as `viewer` reads it: " this turn", " until your next turn", " until Bot1's next turn", or
-    /// nothing for one that lasts as long as its object.
     /// A prevention effect a spell or ability made (CR 615, 611.2), as the object or player it is about shows it: "Prevent the
     /// next 3 damage that would be dealt to it this turn (Healing Salve)." `whom` is "it", "you", "them" or empty for damage
     /// to anyone.
     fn prevention_text(&self, e: &ContinuousEffect, whom: &str) -> Option<String> {
-        let EffectKind::Prevention { index, shield, .. } = e.kind else { return None };
-        let game = self.game;
-        let card = game.cards.get(game.state.obj(e.source).copy.map_or(game.state.obj(e.source).card, |c| c.card));
+        let EffectKind::Prevention { card, index, shield, .. } = e.kind else { return None };
+        let card = self.game.cards.get(card);
         let damage = card.granted_preventions.get(index as usize)?.damage;
         let how = match shield {
             Shield::All => format!("Prevent all {damage}"),
@@ -697,6 +694,9 @@ impl<'a> Projector<'a> {
         let to = if whom.is_empty() { String::new() } else { format!(" to {whom}") };
         Some(format!("{how} that would be dealt{to}{} ({}).", self.until_text(e.duration), card.name))
     }
+
+    /// How long an effect lasts, as `viewer` reads it: " this turn", " until your next turn", " until Bot1's next turn", or
+    /// nothing for one that lasts as long as its object.
 
     fn until_text(&self, duration: Duration) -> String {
         match duration {

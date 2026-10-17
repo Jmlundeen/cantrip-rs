@@ -20,6 +20,16 @@ pub fn drawn_this_turn(q: &dyn Query, player: PlayerId) -> usize {
     q.history().drawn(player)
 }
 
+/// "Draws their second card each turn" (CR 120.3, 603.2): the player making this draw, if it is their second card this
+/// turn, whichever step it falls in (the history holds the draws before the one being matched). Faerie Mastermind ("an
+/// opponent") and King T'Challa ("a player") print it.
+pub fn second_card_drawn_this_turn(q: &dyn Query, event: &Event) -> Option<PlayerId> {
+    match event {
+        Event::Drew { player, .. } if drawn_this_turn(q, *player) == 1 => Some(*player),
+        _ => None,
+    }
+}
+
 /// Spells cast this turn by every player (storm, CR 702.40a, counts those cast before the storm spell: subtract it).
 pub fn spells_cast_this_turn(q: &dyn Query) -> usize {
     q.history().casts().count()

@@ -4,7 +4,9 @@
 # flash and double strike (CR 712.18: the same object, so it can attack - it has been under Bot1's control since turn 1).
 # It attacks: "Whenever Black Panther deals combat damage to a player, draw a card" triggers in the first-strike and the
 # regular combat damage step each (CR 702.4b, 510.4): Bot2 loses 6 and Bot1 draws two cards. King T'Challa's draw trigger
-# is gone with the front face (CR 712.8e), so Bot1's second card of the turn draws nothing more.
+# is gone with the front face (CR 712.8e), so Bot1's second card of the turn draws nothing more. Its prevention comes
+# with the back face: on turn 4 Bot2's Lightning Bolt at it is prevented, where it killed the front face
+# (king-tchalla-front-face-is-dealt-damage-and-dies-to-a-lightning-bolt).
 
 [Bot1 Deck]
 Mox Pearl
@@ -17,7 +19,9 @@ Island
 Island x20
 
 [Bot2 Deck]
-Island x27
+Mountain
+Lightning Bolt
+Island x25
 
 [Actions]
 Bot1.Hand.Island.Play
@@ -41,6 +45,11 @@ Bot1.Battlefield.King T'Challa.Activate(Ability: Transform)
 Bot1.Pass
 Bot1.Attack(Black Panther, Hope Enduring > Bot2)
 [T3 Bot1.Main2]
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Black Panther, Hope Enduring)
+[T4 Bot2.Main2]
 
 [Expect]
 Bot2.Life = 14
@@ -50,3 +59,6 @@ Bot1.Battlefield.Black Panther, Hope Enduring.Power = 3
 Bot1.Battlefield.Black Panther, Hope Enduring.Toughness = 3
 Bot1.Battlefield.Black Panther, Hope Enduring.Keywords = DoubleStrike; Flash
 Bot1.Battlefield.Black Panther, Hope Enduring.Subtypes = Hero; Human; Warrior
+Bot1.Battlefield.Black Panther, Hope Enduring.Damage = 0
+Prevented = 3 Lightning Bolt > Black Panther, Hope Enduring by Black Panther, Hope Enduring
+

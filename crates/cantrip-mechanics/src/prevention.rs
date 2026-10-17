@@ -15,7 +15,7 @@ fn combat(_: &dyn Query, _: &Asker, d: &DamageEvent) -> bool {
 }
 
 /// Damage of any kind from any source, to whom the effect names: "prevent the next 3 damage that would be dealt to any
-/// target this turn" (Healing Salve, Healing Grace, Shelter's "prevent all damage").
+/// target this turn" (Healing Salve; Bandage's next 1, Mending Hands' next 4).
 pub const ANY_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "prevents the damage", damage: "damage", applies: any };
 
 /// Combat damage only (CR 510.2): "prevent all combat damage that would be dealt this turn" (Fog, Holy Day, Moment's
@@ -26,7 +26,9 @@ pub const COMBAT_DAMAGE: GrantedPreventionDef = GrantedPreventionDef { hint: "pr
 /// to `to` (`Target::None` for damage to anyone), until end of turn: all of it, or the next N (CR 615.7).
 pub fn this_turn(g: &mut dyn Game, item: &StackItem, to: Target, index: u8, shield: Shield) {
     let affected = to.object().unwrap_or(item.object);
-    g.add_effect(item.object, affected, EffectKind::Prevention { index, to, shield }, Duration::EndOfTurn);
+    // The definition is the card's whose spell or ability this is: the face that is up, if it is a permanent's.
+    let card = item.ability.card;
+    g.add_effect(item.object, affected, EffectKind::Prevention { card, index, to, shield }, Duration::EndOfTurn);
 }
 
 /// "Prevent all combat damage that would be dealt this turn" (CR 615.1): Fog, Holy Day, Moment's Peace. The card lists
@@ -36,7 +38,7 @@ pub fn all_combat_damage_this_turn(g: &mut dyn Game, item: &StackItem, index: u8
 }
 
 /// "Prevent the next N damage that would be dealt to [the target in `slot`] this turn" (CR 615.7): a shield on it, if it is
-/// still a legal target (CR 608.2b). Healing Salve, Healing Grace. The card lists `ANY_DAMAGE` `index`th in its
+/// still a legal target (CR 608.2b). Healing Salve, Bandage, Mending Hands. The card lists `ANY_DAMAGE` `index`th in its
 /// `granted_preventions`.
 pub fn next_damage_to_target(g: &mut dyn Game, item: &StackItem, slot: usize, index: u8, n: u16) {
     if !g.target_legal(item, slot) {

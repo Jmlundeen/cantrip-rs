@@ -1,0 +1,39 @@
+# King T'Challa, the front face, has no prevention effect: "Prevent all damage that would be dealt to Black Panther" is
+# the back face's, and a double-faced permanent has only the characteristics of the face that is up (CR 712.8d). Bot2's
+# Lightning Bolt deals its 3 to the 3/2, which dies (CR 704.5g), and nothing is prevented. Turned to Black Panther, the
+# same Bolt is prevented (king-tchalla-transforms-only-as-a-sorcery-and-black-panther-draws-for-each-double-strike-hit).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+King T'Challa
+Island
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x25
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.King T'Challa.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(King T'Challa)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet
+Bot1.Graveyard = King T'Challa
+Prevented = (absent)

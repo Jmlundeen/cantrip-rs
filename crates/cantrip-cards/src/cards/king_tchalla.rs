@@ -3,15 +3,11 @@ use cantrip_mechanics::effects;
 use cantrip_mechanics::triggers::DEALS_COMBAT_DAMAGE_TO_PLAYER;
 use cantrip_oracle as oracle;
 
-/// "Whenever a player draws their second card each turn" (CR 120.3, 603.2): the draw itself, by any player, you included,
-/// whichever step it falls in, by a drawer who had drawn exactly one card this turn before it (the history holds the draws
-/// before the one being matched).
+/// "Whenever a player draws their second card each turn" (CR 120.3, 603.2): any player's, you included.
 fn a_players_second_draw(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Drew { player, .. } if cantrip_mechanics::history::drawn_this_turn(q, *player) == 1 => Fired::PLAIN,
-        _ => None,
-    }
+    cantrip_mechanics::history::second_card_drawn_this_turn(q, event).and(Fired::PLAIN)
 }
+
 
 /// "Prevent all damage that would be dealt to Black Panther" (CR 615.1, 604.1): a static ability's prevention effect,
 /// of all damage to this permanent from any source, combat or not, while it is on the battlefield.

@@ -159,7 +159,6 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Craft => picked.Count == 1 ? "Exile it" : $"Exile {picked.Count}",
             CardChoicePurposeView.Reveal => picked.Count == 0 ? "Reveal nothing" : "Reveal it",
             CardChoicePurposeView.PreventDamageFrom => "Prevent its damage first",
-
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",

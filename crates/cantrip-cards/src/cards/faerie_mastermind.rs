@@ -2,14 +2,14 @@ use cantrip_api::*;
 use cantrip_oracle as oracle;
 
 /// "Whenever an opponent draws their second card each turn" (CR 120.3, 603.2): the draw itself, whichever step it
-/// falls in, by a drawer who had drawn exactly one card this turn before it (the history holds the draws before the
-/// one being matched).
+/// falls in, by an opponent of this creature's controller.
 fn opponent_second_draw(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Drew { player, .. } if *player != q.controller(source) && cantrip_mechanics::history::drawn_this_turn(q, *player) == 1 => Fired::PLAIN,
+    match cantrip_mechanics::history::second_card_drawn_this_turn(q, event) {
+        Some(player) if player != q.controller(source) => Fired::PLAIN,
         _ => None,
     }
 }
+
 
 /// {3}{U}: Each player draws a card, in turn order from the active player (CR 101.4).
 fn everyone_draws(g: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {

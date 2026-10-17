@@ -1,0 +1,56 @@
+# Black Panther, Hope Enduring blocks Bot2's Guerrilla Gorilla, and Bot1 casts Fog ("Prevent all combat damage that would
+# be dealt this turn"). The Gorilla's 2 to Black Panther meets two prevention effects, Black Panther's own and Fog's: each
+# would prevent all of it and use nothing up, so whichever applies first leaves the same game (CR 616.1), and Bot1 is not
+# asked to order them; the damage is prevented once (CR 615.6). Black Panther's 3 in each combat damage step (double
+# strike) is prevented by Fog. Three preventions, no damage marked on either creature, and Bot1's life untouched.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Mox Emerald
+King T'Challa
+Fog
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.King T'Challa.Cast(Ability: back face)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Guerrilla Gorilla > Bot1)
+Bot1.Block(Black Panther, Hope Enduring > Guerrilla Gorilla)
+[T4 Bot2.DeclareBlockers]
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fog.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Black Panther, Hope Enduring.Damage = 0
+Bot2.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot1.Graveyard = Fog; Black Lotus
+Prevented.Count = 3

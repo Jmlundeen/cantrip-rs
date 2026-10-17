@@ -564,11 +564,12 @@ pub enum EffectKind {
     /// tapped, its damage removed and it is removed from combat instead. One effect for each shield.
     RegenerationShield,
     /// A prevention effect (CR 615) a resolving spell or ability made, for as long as its duration lasts: the nth of the
-    /// source card's `granted_preventions`, which says what damage it watches for. `to` is whom that damage is dealt to:
+    /// `granted_preventions` of `card`, the card whose spell or ability made it (the face that was up, for a double-faced
+    /// permanent that transforms later), which says what damage it watches for. `to` is whom that damage is dealt to:
     /// an object (its `affected` object too, so the effect ends with it, CR 400.7), a player, or `Target::None` for damage
     /// to anyone ("prevent all combat damage that would be dealt this turn"), when it is about no object and outlives its
     /// `affected` object, which is only the source. `shield` is how much it has left to prevent (CR 615.7).
-    Prevention { index: u8, to: Target, shield: Shield },
+    Prevention { card: CardId, index: u8, to: Target, shield: Shield },
     /// A replacement effect (CR 611.2, 614) a resolving spell or ability made about its `affected` object, for as long
     /// as its duration lasts: the nth of the source card's `granted_replacements`. It ends with the object, which is a
     /// new one when it changes zones (CR 400.7): "if that creature would die this turn, exile it instead".
