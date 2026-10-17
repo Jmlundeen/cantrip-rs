@@ -814,6 +814,24 @@ public sealed class TacticalPlayTests
     }
 
     [Fact]
+    public void Discards_two_cards_for_an_Ill_Timed_Explosion_only_while_the_other_side_has_more_creatures()
+    {
+        // Ill-Timed Explosion: damage to every creature, this seat's own among them, so the price of two cards is paid
+        // only when more creatures stand across the table than on this seat's side.
+        ObjectView explosion = InHand(20, "Ill-Timed Explosion", CardTypeView.Sorcery, 4, "Draw two cards. Then you may discard two cards.");
+        explosion.Zone = ZoneKindView.Stack;
+        explosion.ZoneOwner = 0;
+        explosion.Controller = Me;
+        MayPromptMessage prompt = new() { Player = Me, Source = Handle(20), Verb = "DiscardForSweep" };
+
+        GameClient outnumbered = Seated([explosion, Creature(1, "Mine", 2, 2), Creature(2, "Theirs", 2, 2, Them), Creature(3, "Theirs too", 2, 2, Them)]);
+        GameClient even = Seated([explosion, Creature(1, "Mine", 2, 2), Creature(2, "Theirs", 2, 2, Them)]);
+
+        Assert.True(Assert.IsType<MayChosenAnswer>(Bot().Decide(outnumbered, prompt)).Accept);
+        Assert.False(Assert.IsType<MayChosenAnswer>(Bot().Decide(even, prompt)).Accept);
+    }
+
+    [Fact]
     public void Does_not_cast_a_spell_it_cannot_read_at_anything()
     {
         // Whose things an unread effect is good for is not something to guess at with a card.

@@ -676,6 +676,12 @@ public sealed partial class TacticalPlay
             // kill — life loss is not a payment and nothing stops a player revealing past zero.
             "RevealAgain" => life >= 10,
 
+            // Ill-Timed Explosion: damage to every creature, this seat's own included, for the price of two cards. Worth it
+            // while the creatures across the table outnumber this seat's; how much damage it is comes from the cards the
+            // next question has it discard.
+            "DiscardForSweep" => view.Players.Where(player => player.Seat != client.Seat).Sum(player => Creatures(client, player.Seat).Count())
+                > Creatures(client, client.Seat).Count(),
+
             // Pia's Revolution: three damage to keep an artifact out of its owner's hand, while it cannot get close.
             "TakeDamageInsteadOfReturn" => life - prompt.Amount >= 10,
 
