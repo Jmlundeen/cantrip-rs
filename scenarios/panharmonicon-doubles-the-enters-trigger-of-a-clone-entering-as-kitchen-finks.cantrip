@@ -1,0 +1,53 @@
+# Panharmonicon doubles the "when this creature enters, you gain 2 life" of Kitchen Finks as it enters: 4 life. Clone enters as a
+# copy of Finks (CR 707.2, 614.1c), with Finks's enters ability, and a creature entering caused it to trigger, so it triggers
+# twice too (the ruling: a permanent's own enters abilities): 4 more. Bot1 ends at 28.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Mox Emerald
+Panharmonicon
+Kitchen Finks
+Clone
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Panharmonicon.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Kitchen Finks.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Life = 24
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 28
+Bot1.Battlefield = Forest; Island; Island; Kitchen Finks; Kitchen Finks; Mox Emerald; Panharmonicon; Sol Ring

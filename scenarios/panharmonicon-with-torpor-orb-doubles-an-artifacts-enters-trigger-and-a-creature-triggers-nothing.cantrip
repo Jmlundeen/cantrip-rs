@@ -1,0 +1,59 @@
+# Panharmonicon ("If an artifact or creature entering causes a triggered ability ... to trigger, that ability triggers an
+# additional time", CR 603.2d) beside Torpor Orb ("Creatures entering don't cause abilities to trigger", CR 603.2): Cryogen Relic,
+# an artifact and no creature, enters and its "when this artifact enters" triggers twice, two cards. Kitchen Finks, a creature,
+# causes nothing to trigger, so there is nothing for Panharmonicon to add to: no life is gained.
+# Hand: 7 - 6 played on turn 1 = 1 (the Relic); turn 3 draws a Forest (2), plays it and the Relic (0) and draws Kitchen Finks and
+# an Island (2); turn 5 draws a Forest (3), plays it and Finks: the Island is left.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Sol Ring
+Panharmonicon
+Torpor Orb
+Cryogen Relic
+Forest
+Kitchen Finks
+Island
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Panharmonicon.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Torpor Orb.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Cryogen Relic.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Kitchen Finks.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island
+Bot1.Life = 20
+Bot1.Battlefield.Kitchen Finks.Power = 3
