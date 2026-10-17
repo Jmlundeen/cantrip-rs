@@ -1,0 +1,6 @@
+{
+  "name": "Sleight of Mind",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Change the text of target spell or permanent by replacing all instances of one color word with another. (For example, you may change \"target black spell\" to \"target blue spell.\" This effect lasts indefinitely.)"
+}

@@ -1,0 +1,46 @@
+# Sleight of Mind can change the text of a spell (CR 612.1: "target spell or permanent"). Bot2 bolts Bot1. Bot1 answers with
+# Pyroblast, "Counter target spell if it's blue", aimed at the red Bolt - which as printed would do nothing - and then with
+# Sleight of Mind on the Pyroblast, replacing "blue" with "red". Pyroblast's target was chosen as it was cast and is still
+# legal (the ruling: a text change does not change targets); as it resolves it reads "if it's red" (CR 608.2), and counters
+# the Bolt. Bot1 takes no damage.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Island
+Pyroblast
+Sleight of Mind
+Island x15
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pyroblast.Cast
+Bot1.Modes(1)
+Bot1.Target(Lightning Bolt)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Stack.Pyroblast)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Blue)
+Bot1.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Graveyard = Pyroblast; Sleight of Mind
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

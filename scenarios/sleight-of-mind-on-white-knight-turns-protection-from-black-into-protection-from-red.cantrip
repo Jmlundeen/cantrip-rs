@@ -1,0 +1,54 @@
+# A color word in a keyword ability is a word of the text (CR 612.2): Sleight of Mind replaces "black" with "red" in Bot2's
+# White Knight's "Protection from black" (CR 612.1, layer 3, before layer 6). Before it, Bot1's Cut Down (black) can't
+# target the Knight (CR 702.16b), while Lightning Bolt could; after it, the Knight has protection from red - the Bolt is
+# refused - and Cut Down destroys it.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Cut Down
+Lightning Bolt
+Sleight of Mind
+Mox Ruby
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+White Knight
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.White Knight.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.White Knight.ProtectionFrom = Black
+[T3 Bot1.Main1]
+! Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.White Knight)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sleight of Mind.Cast(Bot2.Battlefield.White Knight)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Colors(Red)
+? Bot2.Battlefield.White Knight.ProtectionFrom = Red
+! Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.White Knight)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.White Knight)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Cut Down; Sleight of Mind
+Bot1.Hand = Lightning Bolt; Island
+Bot2.Graveyard = White Knight
