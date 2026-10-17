@@ -1,0 +1,78 @@
+# The layers in order for a Clone of an enchantment creature under Humility and a later Opalescence. Layer 1: on turn 1
+# Clone copies Fear of Missing Out, a {1}{R} 2/3 enchantment creature (CR 707.2) - its mana cost and so its mana value of 2
+# with the rest (CR 613.2c). Humility arrives on turn 3, Opalescence on turn 5. Layer 4: Opalescence makes Humility a
+# creature (Fear of Missing Out and its copy are enchantments, and creatures already). Layer 6: Humility takes all three
+# creatures' abilities. Layer 7b in timestamp order (CR 613.7): Humility's 1/1 first, then Opalescence's mana value - so
+# Fear of Missing Out is 2/2, the Clone 2/2 too (its copied mana value; Clone's own {3}{U} would make it 4/4), and Humility
+# 4/4. On turn 3, before Opalescence, all were Humility's 1/1. The enters triggers of turn 1 ("discard a card, then draw a
+# card") each had Bot1 discard an Island.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Fear of Missing Out
+Clone
+Island
+Island
+Plains
+Humility
+Opalescence
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fear of Missing Out.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Choose(Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Pass
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Fear of Missing Out#2.Power = 1
+? Bot1.Battlefield.Fear of Missing Out#2.Toughness = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Graveyard = Island; Black Lotus; Island
+Bot1.Battlefield.Fear of Missing Out#1.Types = Enchantment; Creature
+Bot1.Battlefield.Fear of Missing Out#1.Power = 2
+Bot1.Battlefield.Fear of Missing Out#1.Toughness = 2
+Bot1.Battlefield.Fear of Missing Out#2.Types = Enchantment; Creature
+Bot1.Battlefield.Fear of Missing Out#2.Subtypes = Nightmare
+Bot1.Battlefield.Fear of Missing Out#2.Power = 2
+Bot1.Battlefield.Fear of Missing Out#2.Toughness = 2
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Power = 4
+Bot1.Battlefield.Humility.Toughness = 4
+Bot1.Battlefield.Opalescence.Types = Enchantment

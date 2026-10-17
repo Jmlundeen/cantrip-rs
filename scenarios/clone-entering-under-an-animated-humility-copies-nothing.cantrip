@@ -1,0 +1,61 @@
+# A Clone can't become a copy of Humility while Humility applies to it: Clone's "You may have this creature enter as a copy
+# of any creature" is its own replacement effect, judged on Clone as it would exist on the battlefield, continuous effects
+# that already exist included (CR 614.12) - and there it is a creature that Humility strips. Opalescence (turn 1) makes
+# Humility (turn 3) a creature, so Humility takes its own ability too; its effect goes on applying, to itself and to every
+# other creature, entering ones included (CR 613.6). So on turn 5 Clone is offered nothing to copy - not the animated
+# Humility, not anything (the refusal "! Bot1.Accept" holds) - and enters as itself, a Shapeshifter that Humility makes 1/1.
+# Humility, its own 7b part after Opalescence's 4/4, is 1/1 too.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Sol Ring
+Opalescence
+Humility
+Clone
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Clone.Subtypes = Shapeshifter
+Bot1.Battlefield.Clone.Power = 1
+Bot1.Battlefield.Clone.Toughness = 1
+Bot1.Battlefield.Humility.Power = 1
+Bot1.Battlefield.Humility.Toughness = 1
+Bot1.Battlefield.Opalescence.Types = Enchantment

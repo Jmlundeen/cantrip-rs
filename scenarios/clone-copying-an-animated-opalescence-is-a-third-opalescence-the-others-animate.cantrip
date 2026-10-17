@@ -1,0 +1,65 @@
+# Opalescence "does not animate itself, but can be animated by another Opalescence" (the ruling): with two out, each is a
+# 4/4 enchantment creature, so Clone may copy one on turn 5. It copies the copiable values only (CR 707.2): Opalescence's,
+# a noncreature enchantment with its static ability and its mana cost - not the animation, which is no copiable value. As
+# an enchantment the two others make it a creature with base power and toughness its mana value, the copied {2}{W}{W}'s 4
+# (CR 202.3, layer 7b), and its own ability animates the two others in turn: three 4/4 enchantment creatures, each named
+# Opalescence. Clone's printed 0/0 and its own mana value of 4 play no part.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Opalescence
+Opalescence
+Clone
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Opalescence#1.Types = Enchantment; Creature
+? Bot1.Battlefield.Opalescence#2.Power = 4
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Target(Opalescence#1)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Sol Ring; Opalescence; Opalescence; Opalescence
+Bot1.Battlefield.Opalescence#1.Types = Enchantment; Creature
+Bot1.Battlefield.Opalescence#1.Power = 4
+Bot1.Battlefield.Opalescence#1.Toughness = 4
+Bot1.Battlefield.Opalescence#2.Types = Enchantment; Creature
+Bot1.Battlefield.Opalescence#2.Power = 4
+Bot1.Battlefield.Opalescence#2.Toughness = 4
+Bot1.Battlefield.Opalescence#3.Types = Enchantment; Creature
+Bot1.Battlefield.Opalescence#3.Subtypes = (absent)
+Bot1.Battlefield.Opalescence#3.Colors = White
+Bot1.Battlefield.Opalescence#3.Power = 4
+Bot1.Battlefield.Opalescence#3.Toughness = 4

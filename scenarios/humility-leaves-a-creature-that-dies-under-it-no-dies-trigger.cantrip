@@ -1,0 +1,59 @@
+# A dies trigger looks back in time (CR 603.10a): it triggers on the creature as it last existed on the battlefield. Bot1's
+# first Doomed Traveler dies to Bot2's Lightning Bolt on turn 2, before Humility, with its "When this creature dies, create
+# a 1/1 white Spirit creature token with flying": the Spirit is made (the control). The second one, cast under Humility on
+# turn 3 and bolted on turn 4, had no abilities as it died, so nothing triggers: one Spirit only, itself a 1/1 without
+# flying under Humility.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Doomed Traveler
+Doomed Traveler
+Humility
+Plains
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Doomed Traveler)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Spirit.Token = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Doomed Traveler)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Graveyard = Doomed Traveler; Black Lotus; Doomed Traveler
+Bot1.Battlefield = Plains; Mox Pearl; Humility; Spirit
+Bot1.Battlefield.Spirit.Power = 1
+Bot1.Battlefield.Spirit.Keywords = (absent)

@@ -1,0 +1,77 @@
+# Opalescence's ruling: "A noncreature permanent that turns into a creature can attack, and its {T} abilities can be
+# activated, only if its controller has continuously controlled that permanent since the beginning of their most recent
+# turn. It doesn't matter how long the permanent has been a creature" (CR 302.6). Bot1's Bow of Nylea came on turn 1; on
+# turn 3 Opalescence makes it a 3/3 creature that very turn, and Bot1 may still activate "{1}{G}, {T}: ... You gain 3 life"
+# - Bot1 goes to 23. Bot2's Bow of Nylea, cast on turn 4 while Opalescence is out, is a creature that has not been under
+# Bot2's control since its turn began, so with {1}{G} open its {T} ability is not offered (the refusal).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Jet
+Bow of Nylea
+Opalescence
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Ruby
+Bow of Nylea
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Bow of Nylea.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bow of Nylea.Types = Artifact; Enchantment; Creature
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Bow of Nylea.Activate
+Bot1.Modes(You gain 3 life)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Bow of Nylea.Cast
+Bot2.Pass
+! Bot2.Battlefield.Bow of Nylea.Activate
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Life = 23
+Bot1.Battlefield.Bow of Nylea.Tapped = true
+Bot2.Battlefield.Bow of Nylea.Types = Artifact; Enchantment; Creature
+Bot2.Battlefield.Bow of Nylea.SummoningSick = true
