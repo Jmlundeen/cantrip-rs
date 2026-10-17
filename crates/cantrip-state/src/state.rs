@@ -490,7 +490,7 @@ impl GameState {
     pub fn add_mana(&mut self, player: PlayerId, mana: Mana, n: u8, source: ObjectId, restriction: Option<ManaRestriction>, lasting: bool) {
         let m = mana as usize;
         // A pool holds at most `u8::MAX` of each kind (of each restriction): what more there would be is not added, so that
-        // the count never wraps round and the sources' entries still add up to it (`docs/known-issues.md`, KI-60).
+        // the count never wraps round and the sources' entries still add up to it (`docs/known-issues.md`, KI-62).
         let held = match restriction {
             Some(r) => self.restricted_mana.iter().find(|e| e.player == player && e.restriction == r).map_or(0, |e| e.pool.0[m]),
             None => self.player(player).pool.0[m],
@@ -1195,7 +1195,7 @@ impl GameState {
 mod tests {
     use super::*;
 
-    /// A pool holds at most 255 of a kind (KI-60): mana past that is not added, and the sources' shares still add up to it.
+    /// A pool holds at most 255 of a kind (KI-62): mana past that is not added, and the sources' shares still add up to it.
     #[test]
     fn mana_past_what_a_pool_holds_is_not_added() {
         let mut s = GameState::new(2, 1);
