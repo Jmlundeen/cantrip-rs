@@ -1,0 +1,44 @@
+# A spell cast without paying its mana cost still pays what increases its cost (CR 118.9d, 601.2f). Bot1's Show and Tell
+# puts Omniscience onto the battlefield, and Bot2 puts Thalia, Guardian of Thraben ("noncreature spells cost {1} more to
+# cast") beside it. Bot1 has {U} left floating. Its Lightning Bolt, cast without paying its mana cost, costs {1}: the {U} pays
+# it. With the pool empty the second Bolt's free cast, which would cost {1} too, is not offered; the creature spell Ornithopter,
+# which Thalia does not tax, is still cast for nothing.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Omniscience
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Thalia, Guardian of Thraben
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Omniscience)
+Bot2.Choose(Thalia, Guardian of Thraben)
+? Bot1.Mana = {U}
+Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+! Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying)
+Bot1.Hand.Ornithopter.Cast(Ability: Without paying)
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island; Omniscience; Ornithopter
+Bot1.Hand = Lightning Bolt
+Bot1.Graveyard = Lightning Bolt; Show and Tell; Black Lotus
+Bot2.Battlefield = Thalia, Guardian of Thraben
+Bot2.Life = 17

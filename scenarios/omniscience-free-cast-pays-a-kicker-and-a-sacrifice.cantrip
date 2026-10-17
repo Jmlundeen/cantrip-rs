@@ -1,0 +1,47 @@
+# Additional costs are paid on a spell cast without paying its mana cost (CR 118.8, 118.9d, 601.2f). Bot1 puts Omniscience
+# onto the battlefield with Show and Tell on turn 1. Burst Lightning, cast that way and kicked, costs its kicker's {4}
+# alone: the second Black Lotus and the Island pay it, and it deals the kicked 4 damage. Village Rites ("as an additional
+# cost, sacrifice a creature") is not offered while Bot1 has no creature to sacrifice; once Ornithopter is cast (for nothing
+# too), Village Rites is cast without paying its mana cost, sacrificing it, and draws two cards.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Show and Tell
+Omniscience
+Burst Lightning
+Village Rites
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Omniscience)
+Bot1.Hand.Black Lotus.Cast(Ability: Without paying)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana = {U}{R}{R}{R}
+Bot1.Hand.Burst Lightning.Cast(Bot2; Kicked: 1; Ability: Without paying)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Bot1.Mana =
+! Bot1.Hand.Village Rites.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast(Ability: Without paying)
+Bot1.Hand.Village Rites.Cast(Ability: Without paying)
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island; Omniscience
+Bot1.Graveyard = Village Rites; Ornithopter; Burst Lightning; Black Lotus; Show and Tell; Black Lotus
+Bot1.Hand = Island; Island
+Bot2.Life = 16

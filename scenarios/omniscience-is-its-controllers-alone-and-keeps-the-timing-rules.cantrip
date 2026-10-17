@@ -1,0 +1,40 @@
+# Omniscience says "you": only its controller casts spells without paying their mana costs, and only at the times the spell
+# could be cast anyway (CR 601.3, 307.1). Bot1 puts it onto the battlefield on turn 1. On Bot2's turn 2, Bot2's Lightning
+# Bolt is not offered without paying its mana cost, though Bot2 casts it for {R} at Bot1. In that turn Bot1 may not cast
+# Embereth Shieldbreaker (a creature, at sorcery speed) or its Adventure Battle Display (a sorcery) at all, but casts its
+# own Lightning Bolt, an instant, for nothing at Bot2.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Omniscience
+Lightning Bolt
+Embereth Shieldbreaker
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Omniscience)
+Bot2.Choose(Mountain)
+[T2 Bot2.Main1]
+! Bot2.Hand.Lightning Bolt.Cast(Bot1; Ability: Without paying)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying)
+
+[Expect]
+Turn = 2
+Bot1.Life = 17
+Bot2.Life = 17
+Bot1.Hand = Embereth Shieldbreaker; Island
+Bot2.Graveyard = Lightning Bolt
