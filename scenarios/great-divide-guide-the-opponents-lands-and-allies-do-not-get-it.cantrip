@@ -1,0 +1,35 @@
+# Great Divide Guide: "you control". Bot2's own Plains and Momo, Friendly Flier (an Ally) get nothing from Bot1's Guide: its Plains
+# has only its {W} ability and Momo has nothing to activate. Bot1's Plains taps for {R} on turn 5 as the positive control.
+
+[Bot1 Deck]
+Plains
+Great Divide Guide
+Forest
+Plains
+Plains
+Island x15
+
+[Bot2 Deck]
+Plains
+Momo, Friendly Flier
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Momo, Friendly Flier.Cast
+Bot2.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Great Divide Guide.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Plains.Activate(Ability: any color)
+! Bot2.Battlefield.Momo, Friendly Flier.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate(Ability: any color; Color: Red)
+
+[Expect]
+Bot1.Mana = {R}

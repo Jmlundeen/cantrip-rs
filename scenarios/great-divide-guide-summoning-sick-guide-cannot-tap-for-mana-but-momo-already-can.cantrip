@@ -1,0 +1,31 @@
+# Great Divide Guide: the ability has {T} in its cost, so the Guide, cast this turn, cannot use it (CR 302.6) while Momo, which has
+# been under Bot1's control since turn 1, can on turn 3. The Guide's own ability is offered on turn 5 (see the first scenario).
+
+[Bot1 Deck]
+Plains
+Great Divide Guide
+Momo, Friendly Flier
+Forest
+Ornithopter
+Plains
+Plains
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Great Divide Guide.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+! Bot1.Battlefield.Great Divide Guide.Activate
+Bot1.Battlefield.Momo, Friendly Flier.Activate(Color: Red)
+
+[Expect]
+Bot1.Mana = {R}

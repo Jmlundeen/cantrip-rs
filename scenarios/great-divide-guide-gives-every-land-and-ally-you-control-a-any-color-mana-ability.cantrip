@@ -1,0 +1,37 @@
+# Great Divide Guide: "Each land and Ally you control has '{T}: Add one mana of any color.'" On turn 5 Bot1's Plains, its Forest, its
+# Momo (a Lemur Bat Ally) and the Guide itself (an Ally, no longer summoning sick) each tap for {R}, a color none of them makes by
+# itself, in the same main phase: four red mana in the pool. The Ornithopter, which is neither a land nor an Ally, is the control that
+# offers nothing to activate.
+
+[Bot1 Deck]
+Plains
+Great Divide Guide
+Momo, Friendly Flier
+Forest
+Ornithopter
+Plains
+Plains
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Great Divide Guide.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate(Ability: any color; Color: Red)
+Bot1.Battlefield.Forest.Activate(Ability: any color; Color: Red)
+Bot1.Battlefield.Momo, Friendly Flier.Activate(Color: Red)
+Bot1.Battlefield.Great Divide Guide.Activate(Color: Red)
+! Bot1.Battlefield.Ornithopter.Activate
+
+[Expect]
+Bot1.Mana = {R}{R}{R}{R}

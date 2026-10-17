@@ -1,0 +1,8 @@
+{
+  "name": "Great Divide Guide",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Human Scout Ally",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Each land and Ally you control has \"{T}: Add one mana of any color.\""
+}

@@ -1,0 +1,38 @@
+# Great Divide Guide: the ability is given by a static ability that works only while the Guide is on the battlefield (CR 611.3a, 613.1f). Bot2
+# kills it with a Lightning Bolt on turn 4 and on turn 5 Bot1's Plains no longer taps for any color (the positive control is the first scenario).
+
+[Bot1 Deck]
+Plains
+Great Divide Guide
+Momo, Friendly Flier
+Forest
+Ornithopter
+Plains
+Plains
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Great Divide Guide.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Great Divide Guide)
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Plains.Activate(Ability: any color)
+! Bot1.Battlefield.Momo, Friendly Flier.Activate
+
+[Expect]
+Bot1.Graveyard = Great Divide Guide
