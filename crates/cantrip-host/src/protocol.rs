@@ -249,6 +249,8 @@ pub enum CardChoicePurposeView {
     /// the shielded permanent or player (CR 615.7): one of the sources. `Source` is what made the shield and
     /// `PreventLeft` how much it has left to prevent.
     PreventDamageFrom,
+    /// Permanents an effect taps as it resolves (CR 701.26a), not to pay a cost (Thousand Moons Smithy).
+    Tap,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -424,6 +426,9 @@ pub struct RestrictedManaView {
     pub spend_subtypes: Vec<String>,
     /// For `ManaValueSpells` and `ManaValueOrXSpells`: the least mana value the spell may have; 0 otherwise.
     pub spend_mana_value: i32,
+    /// The permanent that produced it, for ordinary mana a rule tells apart by its source (CR 106.3: "mana produced by
+    /// Barracks of the Thousand"), which `AssignMana` options name as their `Source`; none otherwise.
+    pub source: ViewHandle,
 }
 
 /// One object the viewer can see. Characteristics are computed, never printed.

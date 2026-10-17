@@ -2184,7 +2184,7 @@ public sealed partial class TacticalPlay
             }
         }
 
-        return AutoPlay.Pay(prompt);
+        return AutoPlay.Pay(prompt, client);
     }
 
     /// <summary>

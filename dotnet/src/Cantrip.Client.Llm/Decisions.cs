@@ -480,7 +480,7 @@ public sealed class Decisions
 
         if (!prompt.HasX)
         {
-            return AutoPlay.Pay(prompt);
+            return AutoPlay.Pay(prompt, client);
         }
 
         bool owing = AutoPlay.Owing(prompt);
@@ -509,8 +509,7 @@ public sealed class Decisions
 
             // Pool mana that would pay something still owed. Assigning it can raise X on its own, which is why the
             // chosen value is an aim rather than a cap.
-            ActionOptionMessage? assign = prompt.Options.FirstOrDefault(option =>
-                option.Kind == ActionKindView.AssignMana && AutoPlay.Helps(prompt, option));
+            ActionOptionMessage? assign = AutoPlay.AssignChoice(prompt, client) is { } chosen && AutoPlay.Helps(prompt, chosen) ? chosen : null;
 
             if (assign is not null)
             {
@@ -1330,6 +1329,7 @@ public sealed class Decisions
                 ? $"{source}: return {many}{kind}(s) you control to their owner's hand."
                 : $"{source}: return {many} permanent(s) to their owner's hand.",
             CardChoicePurposeView.Untap => $"{source}: untap {many}{kind} permanent(s).",
+            CardChoicePurposeView.Tap => $"{source}: tap {many}{kind} permanent(s) you control. Tapped, they cannot attack, block or tap for mana until they untap, so choose those you can best spare.",
             CardChoicePurposeView.Attach => $"{source}: attach {many}{kind} permanent(s) you control to the creature.",
             CardChoicePurposeView.Encode => $"{source}: choose up to one creature you control to exile it encoded on (cipher).",
             CardChoicePurposeView.Behold => $"{source}: choose {many}{(kind.Length > 0 ? kind : " matching")} permanent(s) you control or card(s) in your hand to behold{(prompt.UpTo ? " as this permanent enters; if you choose none, it enters tapped" : " as a cost")}. Nothing is lost: a permanent is only chosen and a card is only revealed (to your opponent), so prefer a permanent.",

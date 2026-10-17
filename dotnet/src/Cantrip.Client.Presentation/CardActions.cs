@@ -140,14 +140,16 @@ public sealed class CardActions
     /// <summary>
     /// The offer to put one mana of this kind towards the spell, or null when none is free. Mana restricted to spells of
     /// some subtypes is told apart by them too: Dragon mana and Elf mana are different mana (CR 106.6); and mana for spells
-    /// of a mana value or greater by that mana value.
+    /// of a mana value or greater by that mana value. Ordinary mana a rule tells apart by the permanent that produced it
+    /// (CR 106.3) is offered as that permanent's (<paramref name="source"/>), apart from the rest of its kind.
     /// </summary>
-    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null, int manaValue = 0) =>
+    public ActionOptionMessage? AssignFor(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, IReadOnlyList<string>? subtypes = null, int manaValue = 0, ViewHandle source = default) =>
         Assignable.FirstOrDefault(option =>
             option.Produces.Count == 1 && option.Produces[0] == type
             && option.Filter == filter && option.Effect == effect
             && option.SpendSubtypes.SequenceEqual(subtypes ?? [])
-            && option.SpendManaValue == manaValue);
+            && option.SpendManaValue == manaValue
+            && option.Source == source);
 
     public IReadOnlyList<ActionOptionMessage> For(ViewHandle handle) =>
         _bySource.TryGetValue(handle.Value, out List<ActionOptionMessage>? options) ? options : None;

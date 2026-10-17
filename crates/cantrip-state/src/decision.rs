@@ -668,6 +668,9 @@ pub enum Purpose {
     KeepLegend,
     Exile,
     Untap,
+    /// Permanents an effect taps as it resolves (CR 701.26a), not to pay a cost: Thousand Moons Smithy's "you may tap five
+    /// untapped artifacts and/or creatures you control".
+    Tap,
     ExileToPay,
     Keep,
     PutIntoHand,

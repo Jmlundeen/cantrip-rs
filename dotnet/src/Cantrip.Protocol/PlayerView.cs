@@ -218,6 +218,14 @@ public sealed class RestrictedManaView
     /// </summary>
     [Key(6)]
     public int SpendManaValue { get; set; }
+
+    /// <summary>
+    /// The permanent that produced it, for ordinary mana a rule tells apart by its source (CR 106.3: "mana produced by
+    /// Barracks of the Thousand"): a kind of mana of its own, which an <see cref="ActionKindView.AssignMana"/> option names
+    /// as its <c>Source</c>. None for restricted mana and for mana no rule tells apart.
+    /// </summary>
+    [Key(7)]
+    public ViewHandle Source { get; set; }
 }
 
 /// <summary>

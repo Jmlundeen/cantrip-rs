@@ -93,7 +93,7 @@ internal static class PromptPresentation
         CardChoicePurposeView.PutOntoBattlefield => PromptActionView.PutOntoBattlefield,
         CardChoicePurposeView.PutIntoHand => PromptActionView.PutIntoHand,
         CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => PromptActionView.Cast,
-        CardChoicePurposeView.TapToPay => PromptActionView.Tap,
+        CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap => PromptActionView.Tap,
         CardChoicePurposeView.OrderSimultaneous => PromptActionView.OrderReplacement,
         CardChoicePurposeView.Destroy => PromptActionView.Destroy,
         CardChoicePurposeView.Vote => PromptActionView.Vote,

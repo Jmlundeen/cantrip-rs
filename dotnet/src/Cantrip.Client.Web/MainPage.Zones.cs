@@ -518,8 +518,9 @@ public sealed partial class MainPage
 
     /// <summary>
     /// The pool, one chip per kind of mana: mana that may only be spent on certain things is a chip
-    /// of its own, captioned with what it is for; while this player pays for a spell each says how much is going to it,
-    /// and one the server offers to put towards it sends one on a click.
+    /// of its own, captioned with what it is for, and so is mana a rule tells apart by the permanent that produced it
+    /// (CR 106.3), captioned with that permanent's name; while this player pays for a spell each says how much is going to
+    /// it, and one the server offers to put towards it sends one on a click.
     /// </summary>
     private List<PlayerRail.ManaChipSpec> ManaChips(GameClient client, PlayerSummaryView player)
     {
@@ -536,6 +537,22 @@ public sealed partial class MainPage
 
         foreach (RestrictedManaView restricted in player.RestrictedMana)
         {
+            if (!restricted.Source.IsNone)
+            {
+                string from = client.Object(restricted.Source)?.Name ?? "a permanent";
+                chips.Add(Chip(
+                    restricted.Type,
+                    ManaSpendFilterView.None,
+                    ManaSpendEffectView.None,
+                    [],
+                    0,
+                    restricted.Amount,
+                    $"from {from}",
+                    $"Mana {from} produced, kept apart because {from} cares whether it is spent",
+                    restricted.Source));
+                continue;
+            }
+
             chips.Add(Chip(
                 restricted.Type,
                 restricted.Filter,
@@ -572,7 +589,7 @@ public sealed partial class MainPage
 
         return chips;
 
-        PlayerRail.ManaChipSpec Chip(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue, int count, string? caption, string? tooltip)
+        PlayerRail.ManaChipSpec Chip(ManaTypeView type, ManaSpendFilterView filter, ManaSpendEffectView effect, List<string> subtypes, int manaValue, int count, string? caption, string? tooltip, ViewHandle source = default)
         {
             if (paying is null)
             {
@@ -580,13 +597,13 @@ public sealed partial class MainPage
             }
 
             int committed = paying.Committed
-                .Where(c => c.Type == type && c.Filter == filter && c.Effect == effect && c.SpendSubtypes.SequenceEqual(subtypes) && c.SpendManaValue == manaValue)
+                .Where(c => c.Type == type && c.Filter == filter && c.Effect == effect && c.SpendSubtypes.SequenceEqual(subtypes) && c.SpendManaValue == manaValue && c.Source == source)
                 .Sum(c => c.Amount);
 
             string spokenFor = committed == 0 ? string.Empty : $"{committed} to spell";
             string full = caption is null ? spokenFor : spokenFor.Length == 0 ? caption : $"{caption} · {spokenFor}";
 
-            if (_actions.AssignFor(type, filter, effect, subtypes, manaValue) is not { } assign)
+            if (_actions.AssignFor(type, filter, effect, subtypes, manaValue, source) is not { } assign)
             {
                 return new PlayerRail.ManaChipSpec(type, count, full.Length == 0 ? null : full, tooltip, null);
             }

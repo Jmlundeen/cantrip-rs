@@ -285,6 +285,47 @@ public sealed class AutoPlayPaymentTests
         Assert.Null(AutoPlay.Produce([restricted], [ColorView.Blue], owedGeneric: 0));
     }
 
+    /// <summary>
+    /// Mana a rule tells apart by its source (CR 106.3) - Barracks of the Thousand's {W} beside a Plains' - is spent where the
+    /// Barracks' text rewards it, on an artifact or creature spell, and kept otherwise: the plain {W} pays an enchantment.
+    /// </summary>
+    [Theory]
+    [InlineData(CardTypeView.Creature, true)]
+    [InlineData(CardTypeView.Artifact, true)]
+    [InlineData(CardTypeView.Enchantment, false)]
+    public void Spends_mana_told_apart_by_its_source_only_where_its_text_rewards_it(CardTypeView spellType, bool fromBarracks)
+    {
+        var barracks = new ObjectView
+        {
+            Handle = TacticsBoard.Handle(1), Name = "Barracks of the Thousand", Zone = ZoneKindView.Battlefield,
+            Owner = TacticsBoard.Me, Controller = TacticsBoard.Me, CardTypes = [CardTypeView.Artifact, CardTypeView.Land],
+            OracleText = "{T}: Add {W}.\nWhenever you cast an artifact or creature spell using mana produced by Barracks of the Thousand, create a white Gnome Soldier artifact creature token.",
+        };
+        var spell = new ObjectView
+        {
+            Handle = TacticsBoard.Handle(2), Name = "Spell", Zone = ZoneKindView.Stack,
+            Owner = TacticsBoard.Me, Controller = TacticsBoard.Me, CardTypes = [spellType],
+        };
+        GameClient client = TacticsBoard.Seated([barracks, spell]);
+        var prompt = new PayCostsPromptMessage
+        {
+            Spell = spell.Handle,
+            Total = "{W}",
+            RemainingColored = [ColorView.White],
+            Options =
+            [
+                new ActionOptionMessage { Kind = ActionKindView.AssignMana, Produces = [ManaTypeView.White] },
+                new ActionOptionMessage { Kind = ActionKindView.AssignMana, Produces = [ManaTypeView.White], Source = barracks.Handle },
+                new ActionOptionMessage { Kind = ActionKindView.CancelCasting },
+            ],
+        };
+
+        TakeActionAnswer answer = AutoPlay.Pay(prompt, client);
+
+        Assert.Equal(ActionKindView.AssignMana, answer.Kind);
+        Assert.Equal(fromBarracks ? barracks.Handle : ViewHandle.None, answer.Source);
+    }
+
     private static ActionOptionMessage Taps(ViewHandle source, ColorView color, int ability = 0) => new()
     {
         Kind = ActionKindView.ActivateAbility,

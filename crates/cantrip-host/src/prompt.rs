@@ -439,6 +439,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::KeepLegend => V::KeepLegend,
         Purpose::Exile => V::Exile,
         Purpose::Untap => V::Untap,
+        Purpose::Tap => V::Tap,
         Purpose::ExileToPay => V::ExileToPay,
         Purpose::Keep => V::Keep,
         Purpose::PutIntoHand => V::PutIntoHand,

@@ -408,6 +408,13 @@ public static class GameText
             text.Append(", unspent mana ").Append(Mana(player.Mana));
         }
 
+        // Mana a rule tells apart by the permanent that produced it (CR 106.3): "1 white from Barracks of the Thousand".
+        foreach (RestrictedManaView apart in player.RestrictedMana.Where(mana => !mana.Source.IsNone))
+        {
+            text.Append(CultureInfo.InvariantCulture,
+                $", unspent mana {apart.Amount} {apart.Type.ToString().ToLowerInvariant()} from {GameText.Named(client, apart.Source)}");
+        }
+
         if (player.PoisonCounters > 0)
         {
             text.Append(CultureInfo.InvariantCulture, $", {player.PoisonCounters} poison");

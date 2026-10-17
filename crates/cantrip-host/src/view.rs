@@ -495,7 +495,7 @@ impl<'a> Projector<'a> {
         }
 
         for p in s.seats() {
-            view.players.push(self.summarise(p));
+            view.players.push(self.summarise(p, handles));
         }
 
         // In id order so the wire bytes depend on the position and not on map enumeration order.
@@ -533,7 +533,7 @@ impl<'a> Projector<'a> {
         view
     }
 
-    fn summarise(&self, p: PlayerId) -> PlayerSummaryView {
+    fn summarise(&self, p: PlayerId, handles: &mut HandleSpace) -> PlayerSummaryView {
         let game = self.game;
         let s = &game.state;
         let player = s.player(p);
@@ -565,6 +565,28 @@ impl<'a> Projector<'a> {
         for mana in Mana::ALL {
             summary.mana[mana as usize] = i32::from(player.pool.get(mana));
         }
+        // Ordinary mana a rule tells apart by the source that produced it (CR 106.3) is a kind of its own, as restricted mana
+        // is: that source's, shown apart from the rest and named by it.
+        for source in game.mana_told_apart(p) {
+            for e in s.mana_from_of(p).filter(|e| e.restriction.is_none() && e.source == source) {
+                for mana in Mana::ALL {
+                    let n = e.pool.get(mana);
+                    if n > 0 {
+                        summary.mana[mana as usize] -= i32::from(n);
+                        let handle = handles.handle(source);
+                        match summary.restricted_mana.iter_mut().find(|r| r.source == handle && r.r#type == Some(mana_view(mana))) {
+                            Some(r) => r.amount += i32::from(n),
+                            None => summary.restricted_mana.push(RestrictedManaView {
+                                r#type: Some(mana_view(mana)),
+                                amount: i32::from(n),
+                                source: handle,
+                                ..Default::default()
+                            }),
+                        }
+                    }
+                }
+            }
+        }
         for (restriction, pool) in s.restricted_of(p) {
             for mana in Mana::ALL {
                 let n = pool.get(mana);
@@ -577,6 +599,7 @@ impl<'a> Projector<'a> {
                         effect,
                         spend_subtypes,
                         spend_mana_value,
+                        source: ViewHandle::NONE,
                     });
                 }
             }

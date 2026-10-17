@@ -308,6 +308,9 @@ public enum CardChoicePurposeView
 
     /// <summary>Whose damage a prevention shield prevents first, of two or more sources that would deal damage at the same time to the shielded permanent or player (CR 615.7): one of the sources. The prompt's <c>Source</c> made the shield and <c>PreventLeft</c> is how much it has left to prevent; the rest of it goes to the others' damage.</summary>
     PreventDamageFrom = 30,
+
+    /// <summary>The chosen permanents are tapped by an effect as it resolves (CR 701.26a), not to pay a cost: Thousand Moons Smithy's "you may tap five untapped artifacts and/or creatures you control".</summary>
+    Tap = 31,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

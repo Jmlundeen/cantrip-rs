@@ -768,7 +768,7 @@ public sealed partial class TacticalPlay
         // (Break Out) is taken, so the ordinary best-first ranking stands.
         bool losing = prompt.Purpose is CardChoicePurposeView.Discard or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.Exile
             or CardChoicePurposeView.PutOnBottom or CardChoicePurposeView.PutIntoGraveyard or CardChoicePurposeView.PutOnTop
-            or CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.Destroy
+            or CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap or CardChoicePurposeView.Destroy
             // Blight (CR 701.68a) shrinks its own creature: the one worth least takes the counters. Behold loses nothing, so the
             // ordinary best-first ranking stands (every candidate already is the quality the cost names).
             or CardChoicePurposeView.Blight

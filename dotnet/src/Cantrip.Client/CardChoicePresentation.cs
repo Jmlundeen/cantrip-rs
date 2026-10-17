@@ -22,7 +22,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         bool keep = prompt.Purpose == CardChoicePurposeView.Keep;
         bool permanents = prompt.Purpose is CardChoicePurposeView.Sacrifice or CardChoicePurposeView.ReturnToHand
             or CardChoicePurposeView.Untap or CardChoicePurposeView.Keep or CardChoicePurposeView.TapToPay
-            or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
+            or CardChoicePurposeView.Tap or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
             or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce or CardChoicePurposeView.PutCounters
             or CardChoicePurposeView.PreventDamageFrom;
         // A mulligan's bottoming is asked by the rules and has no source; an effect's (Valakut Awakening) names its own.
@@ -142,7 +142,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Exile or CardChoicePurposeView.ExileToPay => picked.Count == 0 ? "Exile nothing" : picked.Count == 1 ? "Exile it" : $"Exile {picked.Count}",
             CardChoicePurposeView.ReturnToHand => picked.Count == 1 ? "Return it" : $"Return {picked.Count}",
             CardChoicePurposeView.Untap => picked.Count == 0 ? "Untap nothing" : $"Untap {picked.Count}",
-            CardChoicePurposeView.TapToPay => picked.Count == 1 ? "Tap it" : $"Tap {picked.Count}",
+            CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap => picked.Count == 1 ? "Tap it" : $"Tap {picked.Count}",
             CardChoicePurposeView.TapToReduce => picked.Count == 0 ? "Tap nothing" : power > 0 ? $"Tap it (-{power})" : "Tap it",
             CardChoicePurposeView.PutOntoBattlefield => picked.Count == 0 ? "Put nothing" : "Put onto the battlefield",
             CardChoicePurposeView.PutIntoHand => picked.Count == 0 ? "Take nothing"
@@ -238,7 +238,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.PutOntoBattlefield => PromptActionView.PutOntoBattlefield,
         CardChoicePurposeView.PutIntoHand => PromptActionView.PutIntoHand,
         CardChoicePurposeView.Cast or CardChoicePurposeView.CastFree or CardChoicePurposeView.CastCopyFree => PromptActionView.Cast,
-        CardChoicePurposeView.TapToPay => PromptActionView.Tap,
+        CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap => PromptActionView.Tap,
         CardChoicePurposeView.OrderSimultaneous => PromptActionView.OrderReplacement,
         CardChoicePurposeView.Destroy => PromptActionView.Destroy,
         CardChoicePurposeView.Vote => PromptActionView.Vote,

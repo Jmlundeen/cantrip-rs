@@ -501,14 +501,19 @@ public sealed class ScenarioPlayer
             {
                 PlayerState me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat)
                     ?? throw new NotDrivenException("AssignMana, with no pool shown", state);
-                // Restricted mana is a chip of its own, captioned with what it is for; plain mana's caption says at most how
-                // much is spoken for ("1 to spell"). The answer's restriction says which of the two to click.
+                // Restricted mana is a chip of its own, captioned with what it is for, and so is mana a rule tells apart by
+                // the permanent that produced it, captioned "from" that permanent (CR 106.3); plain mana's caption says at
+                // most how much is spoken for ("1 to spell"). The answer's restriction, or its source, says which to click.
                 bool restricted = action.Filter != ManaSpendFilterView.None || action.Effect != ManaSpendEffectView.None;
+                bool sourced = !action.Source.IsNone;
                 static bool Captioned(ManaChipState c) => c.Caption.Length > 0 && !Regex.IsMatch(c.Caption, @"^\d+ to spell$");
+                static bool From(ManaChipState c) => c.Caption.StartsWith("from ", StringComparison.Ordinal);
                 List<ManaChipState> ofType = [.. me.Mana.Where(c => c.Type == action.Mana?.ToString() && c.Clickable)];
-                ManaChipState chip = ofType.FirstOrDefault(c => Captioned(c) == restricted)
+                ManaChipState chip = (sourced
+                        ? ofType.FirstOrDefault(From)
+                        : ofType.FirstOrDefault(c => Captioned(c) == restricted && !From(c)))
                     ?? throw new Xunit.Sdk.XunitException(
-                        $"No {(restricted ? "restricted" : "plain")} {action.Mana} in the pool to click: "
+                        $"No {(sourced ? "source's" : restricted ? "restricted" : "plain")} {action.Mana} in the pool to click: "
                         + string.Join(", ", me.Mana.Select(c => $"{c.Count} {c.Type}{(c.Caption.Length > 0 ? $" ({c.Caption})" : string.Empty)}")));
                 await _page.Page.Mouse.ClickAsync(chip.X, chip.Y);
                 return;

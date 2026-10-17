@@ -374,7 +374,7 @@ public static class AutoPlay
     /// a bot can never stall on a question it does not understand.
     /// </para>
     /// </summary>
-    public static TakeActionAnswer Pay(PayCostsPromptMessage prompt)
+    public static TakeActionAnswer Pay(PayCostsPromptMessage prompt, GameClient? client = null)
     {
         ArgumentNullException.ThrowIfNull(prompt);
 
@@ -385,7 +385,7 @@ public static class AutoPlay
 
         if (!prompt.HasX)
         {
-            if (prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.AssignMana) is { } choice)
+            if (AssignChoice(prompt, client) is { } choice)
             {
                 return Assign(choice);
             }
@@ -661,9 +661,54 @@ public static class AutoPlay
     private static bool Hurts(ActionOptionMessage option) => option.LifeCost > 0 || option.DamageToController > 0;
 
     /// <summary>Puts one mana already in the pool towards what is being paid for. Shared with <see cref="RandomPlay"/>.</summary>
+    /// <summary>
+    /// The pool mana to put towards a cost, of the kinds the server offers in the order it would spend them itself. Mana a
+    /// rule tells apart by the permanent that produced it (an option with a <c>Source</c>, CR 106.3) goes first where that
+    /// permanent's text rewards spending it on this spell ("whenever you cast an artifact or creature spell using mana
+    /// produced by ..."), and last otherwise, kept for a spell it would reward. Only mana that pays something owed, where any
+    /// does. Null when none is offered.
+    /// </summary>
+    public static ActionOptionMessage? AssignChoice(PayCostsPromptMessage prompt, GameClient? client = null)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        List<ActionOptionMessage> offered = [.. prompt.Options.Where(option => option.Kind == ActionKindView.AssignMana)];
+        List<ActionOptionMessage> helping = [.. offered.Where(option => Helps(prompt, option))];
+        List<ActionOptionMessage> pool = helping.Count > 0 ? helping : offered;
+        return pool.FirstOrDefault(option => !option.Source.IsNone && Rewarded(client, prompt, option))
+            ?? pool.FirstOrDefault(option => option.Source.IsNone)
+            ?? pool.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Whether the text of the permanent that produced this mana rewards spending it on the spell being paid for: "whenever
+    /// you cast a[n] [types] spell using mana produced by [it]", the types read off the text (none named is any spell) and
+    /// matched against the spell's.
+    /// </summary>
+    private static bool Rewarded(GameClient? client, PayCostsPromptMessage prompt, ActionOptionMessage option)
+    {
+        if (client?.Object(option.Source) is not { } source || client.Object(prompt.Spell) is not { } spell)
+        {
+            return false;
+        }
+
+        string text = Tactics.CardReading.Text(source).ToLowerInvariant();
+        int at = text.IndexOf(" spell using mana produced by", StringComparison.Ordinal);
+        int start = at < 0 ? -1 : text.LastIndexOf("cast ", at, StringComparison.Ordinal);
+        if (start < 0)
+        {
+            return false;
+        }
+
+        string[] named = [.. text[(start + "cast ".Length)..at]
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Where(word => word is not ("a" or "an" or "or" or "and/or"))];
+        return named.Length == 0 || spell.CardTypes.Exists(type => named.Contains(type.ToString().ToLowerInvariant()));
+    }
+
     public static TakeActionAnswer Assign(ActionOptionMessage option) => new()
     {
         Kind = option.Kind,
+        Source = option.Source,
         Mana = option.Produces[0],
         Filter = option.Filter,
         Effect = option.Effect,
