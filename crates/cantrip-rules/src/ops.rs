@@ -1540,8 +1540,19 @@ pub fn discard_together(cx: &mut Cx, cards: &[ObjectId]) -> Vec<ObjectId> {
 
 /// Mills (CR 701.17): the top cards together, top first, so the second card milled ends up above the first.
 pub fn mill(cx: &mut Cx, player: PlayerId, count: u32) -> Vec<ObjectId> {
-    let top: Vec<ObjectId> = cx.s().zone(Zone::library(player)).iter().take(count as usize).copied().collect();
-    let moves: Vec<Moving> = top.iter().map(|&c| Moving::to(c, Zone::graveyard(player))).collect();
+    mill_together(cx, &[(player, count)])
+}
+
+/// Several players mill at once (CR 701.17, 101.4): "each player mills", "any number of target players each mill". Every
+/// count is read before any card moves - the caller works them out first - and all the cards move in one simultaneous
+/// zone change, announced as one event, so "whenever one or more cards are milled" sees one action (CR 603.2c). Each
+/// player's cards are their library's top cards, top first.
+pub fn mill_together(cx: &mut Cx, mills: &[(PlayerId, u32)]) -> Vec<ObjectId> {
+    let mut moves: Vec<Moving> = Vec::new();
+    for &(player, count) in mills {
+        let top = cx.s().zone(Zone::library(player)).iter().take(count as usize).copied();
+        moves.extend(top.map(|c| Moving::to(c, Zone::graveyard(player))));
+    }
     move_together(cx, &moves, ZoneReason::Mill)
         .into_iter()
         .filter(|&n| cx.s().obj(n).zone.is(ZoneKind::Graveyard) || cx.s().obj(n).zone.is(ZoneKind::Exile))

@@ -684,6 +684,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::mill(self, player, count)
     }
 
+    fn mill_together(&mut self, mills: &[(PlayerId, u32)]) -> Vec<ObjectId> {
+        ops::mill_together(self, mills)
+    }
+
     fn damage(&mut self, source: ObjectId, target: Target, amount: u16) -> u16 {
         ops::damage(self, source, target, amount, false)
     }

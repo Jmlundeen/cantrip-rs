@@ -357,6 +357,11 @@ pub trait Game: Query {
     /// that were put into a graveyard or, by a replacement effect, into exile instead (CR 701.17c): the cards "from among
     /// them" an effect looks at.
     fn mill(&mut self, player: PlayerId, count: u32) -> Vec<ObjectId>;
+    /// Several players mill at once (CR 701.17, 101.4): "each player mills", "any number of target players each mill".
+    /// Each pair is a player and how many they mill, worked out before any card moves; every card moves in one
+    /// simultaneous zone change, one event, so "whenever one or more cards are milled" triggers once (CR 603.2c). The new
+    /// objects, as `mill` returns them, player by player.
+    fn mill_together(&mut self, mills: &[(PlayerId, u32)]) -> Vec<ObjectId>;
     /// Deals damage (CR 120.3) from `source` to `target`: marked on a creature, removed as loyalty from a planeswalker,
     /// lost as life by a player, each after prevention and replacement. How much was dealt, which is none when the damage
     /// was prevented or the target is gone.
