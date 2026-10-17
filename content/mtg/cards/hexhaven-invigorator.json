@@ -1,0 +1,11 @@
+{
+  "name": "Hexhaven Invigorator",
+  "manaCost": "{G}{G}{G}{G}",
+  "type": "Creature — Chimera Horror",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Vigilance\nWhenever this creature is dealt damage, you may search your library for up to that many land cards, put them onto the battlefield tapped, then shuffle.",
+  "keywords": [
+    "Vigilance"
+  ]
+}

@@ -1,0 +1,56 @@
+# Hexhaven Invigorator: combat damage counts too. Bot2's Llanowar Elves attacks on turn 8, Hexhaven blocks it, takes 1, and
+# fetches one land ("that many", CR 120.2); the Elves die to its 6 damage. Bot1 searches for a Mountain, tapped.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Hexhaven Invigorator
+Island
+Island
+Island
+Island
+Island
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Island x6
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Hexhaven Invigorator.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T8 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Block(Hexhaven Invigorator > Llanowar Elves)
+Bot1.Accept
+Bot1.Search(Mountain)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Mountain.Tapped = true
+Bot1.Battlefield.Hexhaven Invigorator.Damage = 1
+Bot2.Battlefield = Forest

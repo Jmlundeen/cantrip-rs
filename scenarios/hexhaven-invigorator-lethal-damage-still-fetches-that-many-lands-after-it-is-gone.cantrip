@@ -1,0 +1,62 @@
+# Hexhaven Invigorator: two Lightning Bolts (3 + 3) kill the 6/6. The first one's trigger fetches 3 lands, and the second one's
+# trigger is on the stack when Hexhaven is already in the graveyard: it still resolves for its controller and fetches 3 more
+# ("that many" is the 3 the Bolt dealt, CR 120.2, 603.2c). The six Mountains all arrive tapped.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Hexhaven Invigorator
+Island
+Island
+Island
+Island
+Island
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Island x6
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Hexhaven Invigorator.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hexhaven Invigorator)
+Bot1.Accept
+Bot1.Search(Mountain; Mountain; Mountain)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hexhaven Invigorator)
+Bot1.Accept
+Bot1.Search(Mountain; Mountain; Mountain)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 10
+Bot1.Graveyard = Hexhaven Invigorator
+Bot1.Library.Count = 6
