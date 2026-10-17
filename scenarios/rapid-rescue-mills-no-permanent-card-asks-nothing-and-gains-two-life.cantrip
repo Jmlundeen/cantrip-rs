@@ -20,7 +20,6 @@ Island x20
 Bot1.Hand.Forest.Play
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Rapid Rescue.Cast
-! Bot1.Choose
 [Bot1.Main2]
 ? Stack.Count = 0
 

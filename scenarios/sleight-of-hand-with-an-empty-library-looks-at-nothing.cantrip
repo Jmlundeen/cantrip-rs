@@ -17,7 +17,6 @@ Island x20
 Bot1.Hand.Island.Play
 Bot1.Battlefield.Island.Activate
 Bot1.Hand.Sleight of Hand.Cast
-! Bot1.Arrange
 [Bot1.Main2]
 
 [Expect]
