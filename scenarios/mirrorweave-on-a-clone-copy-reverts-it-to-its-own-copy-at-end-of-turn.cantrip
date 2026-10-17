@@ -1,0 +1,67 @@
+# Bot1's Clone entered as a copy of Bot2's Guerrilla Gorilla (CR 707.2, 614.1c). Mirrorweave, targeting Bot1's Llanowar Elves,
+# is a later copy effect on it (CR 613.2a, 613.7): for the turn the Clone is a Llanowar Elves, 1/1 with "{T}: Add {G}". As the
+# turn ends Mirrorweave's effect ends, and the Clone's own copy effect is what is left (CR 514.2, 707.2): on turn 4 it is a
+# Guerrilla Gorilla again, not a 0/0 Clone. Bot2's Gorilla, an Elves for the turn as well, is a Gorilla again.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Llanowar Elves
+Clone
+Black Lotus
+Mirrorweave
+Island
+Plains x7
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Clone.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Guerrilla Gorilla)
+? Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mirrorweave.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Plains; Mox Sapphire; Mox Pearl; Mox Emerald; Llanowar Elves; Llanowar Elves
+? Bot1.Battlefield.Llanowar Elves#2.Power = 1
+? Bot1.Battlefield.Llanowar Elves#2.Subtypes = Druid; Elf
+? Bot2.Battlefield = Forest; Mox Emerald; Llanowar Elves
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Sapphire; Mox Pearl; Mox Emerald; Llanowar Elves; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot1.Battlefield.Guerrilla Gorilla.Keywords = Reach
+Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla
