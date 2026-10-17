@@ -579,7 +579,7 @@ Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost
 {X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana cost may be cast that way (CR 118.6a).
 The host marks such a cast `WithoutPayingManaCost`, with the cost it comes to as its `CostText`, and the tactical bot takes it
 over the card's ordinary cast. Not built: a way given to cards in a hand used by a cast an effect makes as it resolves
-(`cast_ways_during_resolution` offers the mana cost only), and emblems that give one (Tamiyo, Field Researcher's): KI-39.
+(`cast_ways_during_resolution` offers the mana cost only), and emblems that give one (Tamiyo, Field Researcher's): KI-44.
 
 ### Hexproof from a quality
 
