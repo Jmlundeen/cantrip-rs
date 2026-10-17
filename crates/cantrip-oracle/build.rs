@@ -162,6 +162,7 @@ fn main() {
 
 fn emit(out: &mut String, konst: &str, fields: &[String]) {
     writeln!(out, "pub const {konst}: CardDef = CardDef {{").unwrap();
+    out.push_str("    oracle: true,\n");
     for f in fields {
         writeln!(out, "{f}").unwrap();
     }

@@ -1550,6 +1550,11 @@ pub struct OpeningHandAction {
 #[derive(Clone, Copy)]
 pub struct CardDef {
     pub name: &'static str,
+    /// Whether these are a card's characteristics, generated from its Oracle data (a face of a card included), rather than
+    /// a token's or an emblem's written in code: only a card's name may be chosen as a card name (CR 201.4, 114.5). The
+    /// oracle sets it; everything built on `CardDef::BLANK` leaves it false. A dungeon (CR 309), written in code, is a
+    /// card too: `CardTable::card_named` counts it.
+    pub oracle: bool,
     pub cost: ManaCost,
     /// Whether it has a mana cost at all (CR 118.6): a card without one cannot be cast for it.
     pub has_cost: bool,
@@ -1806,6 +1811,7 @@ pub struct GiftDef {
 impl CardDef {
     pub const BLANK: CardDef = CardDef {
         name: "",
+        oracle: false,
         cost: ManaCost::ZERO,
         has_cost: true,
         colors: None,
@@ -2015,6 +2021,10 @@ pub struct CardTable {
     /// A card's characteristics when nothing acts on it (the layers' fast path), made on first use: `[0]` before the
     /// ability layer, `[1]` with the abilities the rules give lands and Sieges. A pure function of the card alone.
     pub printed: Vec<[std::sync::OnceLock<Box<Chars>>; 2]>,
+    /// Per card: its name is a card's - some definition of that name is a card's (`CardDef::oracle`, or a dungeon) - so a player may
+    /// choose it (CR 201.4: "a player may not choose the name of a token unless it's also the name of a card"). False
+    /// for a name only a token or an emblem has.
+    pub card_named: Vec<bool>,
 }
 
 impl CardTable {
@@ -2073,7 +2083,11 @@ impl CardTable {
             cards.iter().position(|c| std::ptr::eq(*c, &crate::intrinsic::FACE_DOWN)).expect("the face-down values") as u16,
         );
         let undercity = cards.iter().position(|c| c.name == "Undercity" && !c.dungeon.is_empty()).map(|i| CardId(i as u16));
+        let mut card_names: Vec<&'static str> = cards.iter().filter(|c| c.oracle || !c.dungeon.is_empty()).map(|c| c.name).collect();
+        card_names.sort_unstable();
+        let card_named = cards.iter().map(|c| card_names.binary_search(&c.name).is_ok()).collect();
         let mut table = CardTable {
+            card_named,
             cards,
             anywhere,
             statics,

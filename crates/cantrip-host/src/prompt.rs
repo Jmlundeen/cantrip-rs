@@ -878,8 +878,12 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 .cards
                 .cards
                 .iter()
+                .zip(&game.cards.card_named)
+                // Only a card's name is listed: a token's or an emblem's is not one unless a card has it too (CR 201.4).
+                .filter(|&(_, &named)| named)
+                .map(|(c, _)| c)
                 // A split card has two names and a player names one of them (CR 709.4a): its halves are listed, not the whole.
-                .filter(|c| c.name != "Intrinsic" && !c.name.is_empty() && c.split.is_none() && kind.allows(c.is(CardType::Land)))
+                .filter(|c| c.split.is_none() && kind.allows(c.is(CardType::Land)))
                 .map(|c| c.name.to_string())
                 .collect();
             names.sort();
