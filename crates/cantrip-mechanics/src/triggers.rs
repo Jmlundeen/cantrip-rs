@@ -528,6 +528,39 @@ pub const fn ward_sacrifice<const N: u8>(text: &'static str) -> AbilityDef {
         .ward()
 }
 
+/// What ward's "sacrifice a Food" asks the player whose spell or ability targeted, the question on that spell or ability.
+const WARD_SACRIFICE_FOOD: Question = Question::new(
+    "SacrificeFoodUnlessCountered",
+    "Sacrifice a Food, or {source} is countered?",
+    "Ward: what it targeted can't be targeted for free",
+    "Sacrifice a Food",
+    "Let it be countered",
+)
+.no_default();
+
+fn ward_sacrifice_a_food_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Object(by) = item.subject else { return Ok(()) };
+    let payer = PlayerId(item.data[0] as u8);
+    // A cost is paid only with what it needs (CR 118.3): a player who controls no Food can't pay and is not asked, nor is one
+    // whom the ward's controller's abilities can't make sacrifice (CR 101.2). The payer chooses which Food among theirs.
+    let foods: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| g.chars(id).has_subtype(Subtype::Food)).collect();
+    if !foods.is_empty()
+        && may_cause_discard_or_sacrifice(&*g, item.controller, payer, true)
+        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_SACRIFICE_FOOD) })? == Answer::Yes
+    {
+        return crate::sacrifice_one_of(g, payer, item.object, 1, foods);
+    }
+    g.counter_item(by, item.data[1] as usize);
+    Ok(())
+}
+
+/// Ward--Sacrifice a Food (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or ability an opponent controls,
+/// counter it unless that player sacrifices a Food." Ygra, Eater of All prints it.
+pub const fn ward_sacrifice_a_food(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_sacrifice_a_food_effect, text)
+        .ward()
+}
+
 /// "Whenever you cast a spell" (CR 601.2i, 603.2): Paradox Engine, Showdown of the Skalds' chapter III, the emblems of Chandra, Torch of Defiance, Chandra, Chill
 /// of Compliance and Jace, Vryn's Prodigy print it.
 pub fn you_cast_a_spell(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
