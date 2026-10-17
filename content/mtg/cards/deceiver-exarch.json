@@ -1,0 +1,11 @@
+{
+  "name": "Deceiver Exarch",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Phyrexian Cleric",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "Flash (You may cast this spell any time you could cast an instant.)\nWhen this creature enters, choose one —\n• Untap target permanent you control.\n• Tap target permanent an opponent controls.",
+  "keywords": [
+    "Flash"
+  ]
+}

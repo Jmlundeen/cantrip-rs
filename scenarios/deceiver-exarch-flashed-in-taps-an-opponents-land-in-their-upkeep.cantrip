@@ -1,0 +1,45 @@
+# Deceiver Exarch has flash (CR 702.8): Bot1 casts it in Bot2's upkeep. Its enters trigger is modal (CR 700.2a): Bot1 chooses
+# "Tap target permanent an opponent controls" as it goes on the stack, and that mode's target is a permanent Bot2 controls - not
+# one of Bot1's own Islands (the refusal; Bot2's Island is the control). As it resolves Bot2's Island is tapped (CR 701.26a).
+# The Exarch is a 1/4.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Deceiver Exarch
+Island x11
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Upkeep]
+Bot1.Hand.Deceiver Exarch.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(2)
+! Bot1.Target(Bot1.Battlefield.Island#1)
+Bot1.Target(Bot2.Battlefield.Island)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Island#1.Tapped = true
+Bot1.Battlefield.Deceiver Exarch.Power = 1
+Bot1.Battlefield.Deceiver Exarch.Toughness = 4
+Bot1.Battlefield.Deceiver Exarch.Keywords = Flash

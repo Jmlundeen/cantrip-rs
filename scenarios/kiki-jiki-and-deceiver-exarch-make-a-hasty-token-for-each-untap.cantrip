@@ -1,0 +1,77 @@
+# The Kiki-Jiki and Deceiver Exarch combination, twice round. Kiki-Jiki copies the Exarch; the token, with haste (CR 707.9b),
+# has the Exarch's modal enters trigger (CR 603.6a), and Bot1 chooses "Untap target permanent you control" for Kiki-Jiki
+# (CR 700.2a, 701.26b), which copies again. Each activation is Bot1's choice (CR 732.1b). Bot1 attacks with the two hasty 1/4
+# tokens and the untapped Kiki-Jiki: 1 + 1 + 2 = 4 damage. The original Exarch, cast this turn, can't attack. Both tokens are
+# sacrificed at the end step (CR 603.7c).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Island
+Deceiver Exarch
+Black Lotus
+Kiki-Jiki, Mirror Breaker
+Island x8
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Deceiver Exarch.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+Bot1.Target(Bot1.Battlefield.Island#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Deceiver Exarch#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+Bot1.Target(Kiki-Jiki, Mirror Breaker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Tapped = false
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Deceiver Exarch#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+Bot1.Target(Kiki-Jiki, Mirror Breaker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Ruby; Mox Jet; Deceiver Exarch; Kiki-Jiki, Mirror Breaker; Deceiver Exarch; Deceiver Exarch
+? Bot1.Battlefield.Deceiver Exarch#3.Keywords = Flash; Haste
+? Delayed.Count = 2
+! Bot1.Attack(Deceiver Exarch#1 > Bot2)
+Bot1.Attack(Deceiver Exarch#2 > Bot2; Deceiver Exarch#3 > Bot2; Kiki-Jiki, Mirror Breaker > Bot2)
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Ruby; Mox Jet; Deceiver Exarch; Kiki-Jiki, Mirror Breaker
+Delayed.Count = 0

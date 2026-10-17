@@ -1,0 +1,39 @@
+# Deceiver Exarch's first mode, "Untap target permanent you control" (CR 701.26b): Bot1 casts it with both Islands and the Mox
+# and untaps one of its own Islands. Bot2's tapped Island is no legal target for that mode (the refusal, beside Bot1's own Island).
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Deceiver Exarch
+Island x11
+
+[Bot2 Deck]
+Island
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Deceiver Exarch.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(1)
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot1.Battlefield.Island#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Island#1.Tapped = true
+Bot1.Battlefield.Island#2.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Stack.Count = 0
