@@ -1,16 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, tokens};
+use cantrip_mechanics::{effects, tokens};
 use cantrip_oracle as oracle;
 
-/// +1: "You may discard a card. If you do, draw a card." Choosing no card declines; the draw follows only a card that was
-/// discarded. Nothing is asked of an empty hand.
+/// +1: "You may discard a card. If you do, draw a card." (`effects::may_discard_to_draw`.)
 fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let hand = g.state().zone(Zone::hand(item.controller)).to_vec();
-    if let Some(&card) = choose::cards(g, item.controller, item.object, Purpose::Discard, hand, 1, true)?.first() {
-        g.discard(card);
-        g.draw(item.controller, 1);
-    }
-    Ok(())
+    effects::may_discard_to_draw(g, item, 1)
 }
 
 /// +1: "Add two mana in any combination of colors. Spend this mana only to cast Dragon spells." A loyalty ability, so no
