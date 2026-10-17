@@ -1,0 +1,66 @@
+# Shang-Chi, Master of Kung Fu: "You may activate abilities of creatures you control as though those creatures had haste"
+# (CR 302.6) and "{T}: Add two mana of any one color. Spend this mana only to activate abilities of creature sources" (CR
+# 106.6, 602.2b). Turn 1 Bot1 casts Shang-Chi, Basking Rootwalla and Llanowar Elves (Forest and Black Lotus). Shang-Chi
+# taps for {G}{G} the turn it arrived, itself one of the creatures; that mana and the Elves' {G} would be three, yet Bramble
+# Familiar ({1}{G}) from the hand is not offered: only the Elves' {G} may pay a spell. The {G}{G} pays the Rootwalla's
+# "{1}{G}: +2/+2" (an ability of a creature source): it is a 3/3. The Elves, just cast, tap for {G}. Nothing has haste:
+# the creatures are still summoning sick (CR 302.6), so none may attack (the declare attackers step asks nothing). Turn 2 Bot2's own Llanowar Elves, cast that turn, can't tap: Shang-Chi is Bot1's, "creatures
+# you control".
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Shang-Chi, Master of Kung Fu
+Basking Rootwalla
+Llanowar Elves
+Bramble Familiar
+Island
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Shang-Chi, Master of Kung Fu.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Basking Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+Bot1.Battlefield.Shang-Chi, Master of Kung Fu.Activate(Color: Green)
+? Bot1.Mana = {G}{G} (CreatureAbilities)
+! Bot1.Hand.Bramble Familiar.Cast
+Bot1.Battlefield.Basking Rootwalla.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 3
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+? Bot1.Battlefield.Basking Rootwalla.SummoningSick = true
+? Bot1.Battlefield.Shang-Chi, Master of Kung Fu.SummoningSick = true
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot2.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Turn = 2
+Bot2.Life = 20
+Bot1.Battlefield.Shang-Chi, Master of Kung Fu.Tapped = true
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Battlefield.Basking Rootwalla.Power = 1
+Bot1.Hand = Bramble Familiar; Island
+Bot2.Battlefield.Llanowar Elves.Tapped = false

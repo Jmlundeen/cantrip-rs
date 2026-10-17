@@ -1,0 +1,44 @@
+# Shang-Chi's "You may activate abilities of creatures you control as though those creatures had haste" is a static
+# ability (CR 604.1): it works only while Shang-Chi is on the battlefield. Turn 1 Bot1 casts Shang-Chi and Llanowar Elves;
+# then Mox Ruby's {R} casts Lightning Bolt at Shang-Chi. Once it is gone, the Elves, still summoning sick (CR 302.6), can't
+# tap for mana; on turn 3, under Bot1's control since the turn began, they can.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Shang-Chi, Master of Kung Fu
+Llanowar Elves
+Mox Ruby
+Lightning Bolt
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Shang-Chi, Master of Kung Fu.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Shang-Chi, Master of Kung Fu)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Shang-Chi, Master of Kung Fu; Lightning Bolt; Black Lotus
+! Bot1.Battlefield.Llanowar Elves.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Llanowar Elves; Mox Ruby
+Bot1.Battlefield.Llanowar Elves.Tapped = true
