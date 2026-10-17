@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 const ENTER_TAPPED_AS_A_COPY: Question = Question::new(
     "CopyAsEnters",
     "enter tapped as a copy of a land?",
-    "You choose which land it copies next, and it enters tapped. If you don't, it enters untapped as itself",
+    "It enters tapped, as a copy of the land you choose next (the only land, if there is one). If you don't, it enters untapped as itself",
     "Choose a land",
     "Enter as itself",
 );

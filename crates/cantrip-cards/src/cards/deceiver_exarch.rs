@@ -19,6 +19,6 @@ static MODAL: ModalDef = modes(&[
 ]);
 
 pub static CARD: CardDef = CardDef {
-    abilities: &[modal_triggered(THIS_ENTERS, &MODAL, "When this creature enters, choose one \u{2014} Untap target permanent you control; or tap target permanent an opponent controls.")],
+    abilities: &[modal_triggered(THIS_ENTERS, &MODAL, "When this creature enters, choose one \u{2014}\n\u{2022} Untap target permanent you control.\n\u{2022} Tap target permanent an opponent controls.")],
     ..oracle::DECEIVER_EXARCH
 };

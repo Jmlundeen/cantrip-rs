@@ -1,8 +1,9 @@
 # A mode whose target can't be chosen can't be chosen (CR 700.2a, 603.3c): Bot2 controls no permanent, so Deceiver Exarch's
 # "Tap target permanent an opponent controls" is no choice, and with one mode left Bot1 is asked none (the refusal); the trigger
-# is "Untap target permanent you control", and its target, the first Bot1 controls (the refusal holds the script's cursor, so
-# the target is the default), is the Island Bot1 cast the Exarch with: it untaps and taps for {U} again. The sibling scenarios,
-# with a permanent of Bot2's out, are asked the mode.
+# is "Untap target permanent you control". Its target, the first Bot1 controls (the refusal holds the script's cursor, so the
+# target is the default), is the Island Bot1 tapped to cast the Exarch: it untaps and taps for {U} again, beside the {U} left
+# from the Lotus (were the target the Exarch, the Island would still be tapped). The sibling scenarios, with a permanent of
+# Bot2's out, are asked the mode.
 
 [Bot1 Deck]
 Island
@@ -18,13 +19,14 @@ Bot1.Hand.Island.Play
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
 Bot1.Hand.Deceiver Exarch.Cast
+Bot1.Battlefield.Island.Activate
 Bot1.Pass
 Bot2.Pass
 ! Bot1.Modes
 Bot1.Pass
 Bot2.Pass
 Bot1.Battlefield.Island.Activate
-? Bot1.Mana = {U}
+? Bot1.Mana = {U}{U}
 
 [Expect]
 Bot1.Battlefield = Island; Deceiver Exarch
