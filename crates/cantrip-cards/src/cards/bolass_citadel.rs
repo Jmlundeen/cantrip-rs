@@ -1,9 +1,6 @@
 use cantrip_api::*;
+use cantrip_mechanics::targets::filters::nonland;
 use cantrip_oracle as oracle;
-
-fn nonland(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
-    !q.chars(id).is(CardType::Land)
-}
 
 /// Each opponent loses 10 life.
 fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

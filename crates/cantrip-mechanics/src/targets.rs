@@ -549,6 +549,10 @@ pub mod filters {
     pub fn treasure(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).has_subtype(Subtype::Treasure)
     }
+    /// A nonland permanent. Bolas's Citadel sacrifices ten; Rottenmouth Viper any number.
+    pub fn nonland(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+        !q.chars(id).is(CardType::Land)
+    }
     /// An artifact or a creature. Deadly Dispute, Eviscerator's Insight and Fanatical Offering sacrifice one.
     pub fn artifact_or_creature(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         let c = q.chars(id);
