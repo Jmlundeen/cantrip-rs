@@ -1,0 +1,11 @@
+{
+  "name": "Ishgard, the Holy See",
+  "type": "Land — Town",
+  "oracleText": "This land enters tapped.\n{T}: Add {W}.",
+  "adventure": {
+    "name": "Faith & Grief",
+    "manaCost": "{3}{W}{W}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "Return up to two target artifact and/or enchantment cards from your graveyard to your hand. (Then exile this card. You may play the land later from exile.)"
+  }
+}

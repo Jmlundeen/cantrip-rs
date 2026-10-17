@@ -1,0 +1,45 @@
+# Ishgard, the Holy See // Faith & Grief, a land card with an Adventure (CR 715). Faithless Looting puts Sigarda's Aid
+# and Llanowar Elves into Bot1's graveyard in turn 1. In turn 3 Black Lotus is sacrificed for {W}{W}{W}, and Faith & Grief
+# (a sorcery, cast from the hand as the Adventure) returns "up to two target artifact and/or enchantment cards": the Lotus
+# and Sigarda's Aid, while the Elves, a creature card, may not be aimed at. The card is exiled on its adventure (CR
+# 715.3d) and in turn 5 played from there as the land play, entering tapped.
+
+[Bot1 Deck]
+Mountain
+Faithless Looting
+Black Lotus
+Ishgard, the Holy See
+Mox Pearl
+Sigarda's Aid
+Llanowar Elves
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Sigarda's Aid; Llanowar Elves)
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ishgard, the Holy See.Cast(Ability: Adventure)
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Black Lotus; Sigarda's Aid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ishgard, the Holy See
+[T5 Bot1.Main1]
+Bot1.Exile.Ishgard, the Holy See.Play
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Faithless Looting; Llanowar Elves
+Bot1.Battlefield.Ishgard, the Holy See.Tapped = true
+Exile.Count = 0
+Bot1.Hand = Black Lotus; Island; Island; Island; Island; Sigarda's Aid
