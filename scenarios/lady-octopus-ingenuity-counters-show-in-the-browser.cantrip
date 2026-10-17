@@ -1,0 +1,39 @@
+# Browser
+# What the client shows of Lady Octopus's ingenuity counters (CR 122.1): after Bot1's draw step and an Opt, the pill
+# across her art reads two, and her {T} ability, clicked from the battlefield, asks for the artifact to cast free and
+# casts Mind Stone.
+
+[Bot1 Deck]
+Island
+Lady Octopus, Inspired Inventor
+Mind Stone
+Opt
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Lady Octopus, Inspired Inventor.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Client.Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters = 2 × ingenuity
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Activate
+Bot1.Pass
+Bot1.Choose(Mind Stone)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island; Island; Lady Octopus, Inspired Inventor; Mind Stone
+Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters.Ingenuity = 2
