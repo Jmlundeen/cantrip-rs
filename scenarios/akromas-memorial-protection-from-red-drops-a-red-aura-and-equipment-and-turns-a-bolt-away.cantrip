@@ -1,0 +1,86 @@
+# Protection from red that Akroma's Memorial gives (CR 702.16) comes with state-based actions as the Memorial arrives: Bot2's
+# Quicksilver Dagger (a blue and red Aura) on Bot1's Hired Blade is put into its owner's graveyard (CR 702.16c, 704.5m), and
+# Bot1's own Dire Flail (red Equipment) becomes unattached and stays on the battlefield (CR 702.16c, 704.5n), so the Blade
+# loses its +2/+0. Afterwards Bot2 can't target the Blade with Lightning Bolt (CR 702.16b, the refusal) and bolts Bot1 instead
+# (the positive control).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Sol Ring
+Hired Blade
+Dire Flail
+Akroma's Memorial
+Mox Sapphire
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Ruby
+Mox Pearl
+Quicksilver Dagger
+Lightning Bolt
+Mountain
+Island
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Hired Blade.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dire Flail.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Quicksilver Dagger.Cast(Bot1.Battlefield.Hired Blade)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Dire Flail.Activate(Hired Blade; Ability: Equip)
+Bot1.Battlefield.Mox Sapphire.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+? Bot1.Battlefield.Hired Blade.Power = 5
+? Bot1.Battlefield.Dire Flail.AttachedTo = Hired Blade
+? Bot2.Battlefield.Quicksilver Dagger.AttachedTo = Hired Blade
+Bot1.Hand.Akroma's Memorial.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Quicksilver Dagger
+Bot1.Pass
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Hired Blade)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Hired Blade.Damage = 0
+Bot1.Battlefield.Hired Blade.Power = 3
+Bot1.Battlefield.Dire Flail.AttachedTo = (absent)
+Bot2.Graveyard = Lightning Bolt; Quicksilver Dagger

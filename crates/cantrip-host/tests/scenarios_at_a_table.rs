@@ -508,3 +508,44 @@ fn phyrexian_unlife_and_melira_are_shown_to_both_players() {
     });
     assert!(unlife && infect && melira, "not everything was shown: {unlife} {infect} {melira}");
 }
+
+/// The granted lines of the permanent named `name` in `view`, if it is shown.
+fn granted_lines(view: &cantrip_host::protocol::PlayerView, name: &str) -> Option<Vec<String>> {
+    view.objects.iter().find(|o| o.name == name).map(|o| o.granted_abilities.iter().map(|a| a.text.clone()).collect())
+}
+
+/// Protection a permanent was given (CR 702.16) is shown on it to both seats, worded as cards print it: Akroma's Memorial's
+/// "protection from black and from red" on Bot1's Hired Blade, and Mother of Runes's "protection from red". Progenitus's own
+/// protection from everything is its printed line and is not shown again as granted.
+#[test]
+fn protection_a_permanent_was_given_is_shown_and_a_printed_one_is_not_repeated() {
+    let mut memorial = [false, false];
+    play_looking("akromas-memorial-protection-from-red-drops-a-red-aura-and-equipment-and-turns-a-bolt-away", |_, views, _| {
+        for (seat, view) in views.iter().enumerate() {
+            if granted_lines(view, "Hired Blade").is_some_and(|lines| lines.iter().any(|l| l == "Protection from black and from red")) {
+                memorial[seat] = true;
+            }
+        }
+        false
+    });
+    assert_eq!(memorial, [true, true], "both seats are told the Blade has protection from black and from red");
+
+    let mut mother = false;
+    play_looking("mother-of-runes-after-blocks-leaves-the-blocker-blocking-and-prevents-its-damage", |_, views, _| {
+        mother |= granted_lines(&views[1], "Hired Blade").is_some_and(|lines| lines.iter().any(|l| l == "Protection from red"));
+        false
+    });
+    assert!(mother, "Bot2 is told the Blade Mother of Runes protected has protection from red");
+
+    let mut progenitus_seen = false;
+    play_looking("progenitus-cannot-be-targeted-blocked-enchanted-or-damaged", |_, views, _| {
+        for view in views {
+            if let Some(lines) = granted_lines(view, "Progenitus") {
+                progenitus_seen = true;
+                assert!(!lines.iter().any(|l| l.starts_with("Protection")), "Progenitus's printed protection is shown as granted: {lines:?}");
+            }
+        }
+        false
+    });
+    assert!(progenitus_seen, "the scenario never showed Progenitus");
+}

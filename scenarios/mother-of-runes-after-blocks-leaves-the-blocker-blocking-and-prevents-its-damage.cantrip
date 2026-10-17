@@ -1,0 +1,57 @@
+# Protection gained after blockers are declared doesn't remove a blocker already blocking (CR 702.16f applies only as blocks
+# are declared, 509.1b): Bot1's Hired Blade attacks and Bot2 blocks it with Embereth Shieldbreaker (red, 2/1). In the declare
+# blockers step Bot1's Mother of Runes gives the Blade protection from red: the Blade stays blocked, so Bot2 takes nothing
+# (CR 509.1h, 510.1c), the Shieldbreaker's 2 damage to it is prevented (CR 702.16e, 615), and the Blade's 3 kills the
+# Shieldbreaker.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mother of Runes
+Hired Blade
+Mox Ruby
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Embereth Shieldbreaker
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Hired Blade.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Embereth Shieldbreaker.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main1]
+Bot1.Attack(Hired Blade > Bot2)
+Bot2.Block(Embereth Shieldbreaker > Hired Blade)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mother of Runes.Activate(Hired Blade)
+Bot1.Colors(Red)
+? Combat.Blocks.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Hired Blade.Damage = 0
+Prevented = 2 Embereth Shieldbreaker > Hired Blade by Hired Blade
+Bot2.Graveyard = Embereth Shieldbreaker
