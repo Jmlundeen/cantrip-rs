@@ -18,6 +18,9 @@ impl PlayerId {
 pub struct ObjectId(pub u32);
 
 impl ObjectId {
+    /// No object: the source of mana a player's own mana ability adds (CR 605.1a: such an ability has no source object).
+    pub const NONE: ObjectId = ObjectId(u32::MAX);
+
     pub fn index(self) -> usize {
         self.0 as usize
     }

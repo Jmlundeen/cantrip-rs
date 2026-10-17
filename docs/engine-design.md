@@ -802,6 +802,37 @@ main 24.45, 33.98, 35.55, 44.43 us against this work 29.22, 31.98, 26.85, 18.83 
 last of it was in, main (2bbe5edc) against the branch, three back-to-back pairs: 10.72/11.44, 10.35/10.30, 11.24/11.22
 us. Within the noise.
 
+### Where mana came from
+
+Every unit of mana has a source (CR 106.3): the source of the ability that produced it - a mana ability's own source, a
+triggered mana ability's source (Mana Flare's additional mana is Mana Flare's, not the land's), the spell or ability
+resolving - or none for a player's own mana ability (CR 605.1a, `ObjectId::NONE`). The pools keep it beside the counts:
+`GameState::mana_from` breaks each player's pool and restricted mana down by source (and by restriction, and whether it
+lasts until end of combat), written only by the state's three mana methods (`add_mana`, `spend_mana`, `empty_mana`),
+which write the counts too, so the two cannot disagree; each entry is undone on its own (`Undo::ManaFromSet` and its
+kin), not by copying the list. Card code still says `g.add_mana(player, mana, n)`: `Cx::mana_source` says whose it is.
+
+What a payment spent is in the history, not on the spell: `actions::pay_mana_used` records one `Event::ManaSpent { player,
+source, on, cast, mana }` for each source it took mana from, as the payment completes, so a spell's records come before its
+`Cast`. "Whenever you cast a spell using mana produced by [this]" asks `History::cast_using_mana_from(spell, source)`
+(`mana_spent_to_cast` gives each source with its mana); a copy was not cast and had none spent (CR 707.10). Mana that was
+spent on anything else (an ability, "unless pays") is recorded with `cast: false`, for whatever asks next.
+
+The player chooses which mana pays a cost (CR 601.2h, 118.3a), and mana that some rule tells apart by its source is a kind
+of its own while it is: a permanent's `CardDef::mana_told_apart` rule (`ManaSourceRule`, asked of the permanents on the
+battlefield with their abilities) says which sources' mana it cares about, and `static_rules::mana_told_apart` gives the
+sources in a player's pool it tells apart, asked only while that pool's ordinary mana came from more than one source. Such
+mana is offered as an `AssignMana` option naming its source, after the ordinary mana of its kind, and a payment that would
+spend only some of a kind split among such sources is the player's choice rather than paid at once, as restricted mana is.
+The host shows it as a pool chip of its own (`RestrictedManaView::source`, captioned "from Barracks of the Thousand"); a
+scenario spends it with `Spend: W from Barracks of the Thousand` and the dump lists the pool by source (`BotN.ManaFrom`).
+Mana no rule tells apart is spent in the order it came, ordinary before lasting, as before. Barracks of the Thousand tells
+apart its own. The same records answer "mana from a Treasure was spent to cast it" (Kalain, Reclusive Painter), "spend only
+mana produced by creatures" (Myr Superion) and {S}, "mana from a snow source" (CR 107.4h; Icehide Troll), none in content
+yet; restricted mana is told apart by its restriction alone, since no card yet tells it apart by source too. The benchmark
+(`cantrip-bench --games 128`, "engine answering", 2026-10-17, main 13a3944f against the branch, three back-to-back pairs):
+9.82/9.93, 9.53/9.92, 9.81/10.06 us, about 2.5% for keeping every unit's source and recording each payment.
+
 ### Spells in an inset frame: Adventures and Omens
 
 An adventurer card (CR 715) and an omen card (CR 720) print a second set of characteristics in an inset frame:

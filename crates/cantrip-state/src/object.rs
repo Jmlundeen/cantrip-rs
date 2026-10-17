@@ -920,6 +920,42 @@ pub struct RestrictedMana {
     pub pool: ManaPool,
 }
 
+/// Where some of the mana in a player's pool came from (CR 106.3): the source that produced it, of one restriction or
+/// none (CR 106.6) and lasting until end of combat or not (CR 106.4). The breakdown of the pools by source, kept in
+/// `GameState::mana_from` beside the pools themselves (`Player::pool`, `GameState::restricted_mana`), which the entries of a
+/// player add up to: written only by the state's mana methods, which write both. An entry whose mana is all spent is gone.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ManaFrom {
+    pub player: PlayerId,
+    pub restriction: Option<ManaRestriction>,
+    /// The object that produced it (CR 106.3), `ObjectId::NONE` for a player's own mana ability (CR 605.1a).
+    pub source: ObjectId,
+    /// Mana that lasts until end of combat (CR 106.4, 500.5a).
+    pub lasting: bool,
+    pub pool: ManaPool,
+}
+
+/// Which mana of a kind a spending takes, by its source (CR 106.3).
+#[derive(Clone, Copy, Debug)]
+pub enum ManaPick<'a> {
+    /// Any: the mana that does not last first (`Player::spend_mana`'s order), then in the order it came.
+    Any,
+    /// Mana this source produced.
+    From(ObjectId),
+    /// Mana none of these sources produced.
+    Except(&'a [ObjectId]),
+}
+
+impl ManaPick<'_> {
+    pub fn takes(&self, source: ObjectId) -> bool {
+        match self {
+            ManaPick::Any => true,
+            ManaPick::From(s) => *s == source,
+            ManaPick::Except(not) => !not.contains(&source),
+        }
+    }
+}
+
 /// A limit on what some mana may be spent on (CR 106.6).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum ManaRestriction {

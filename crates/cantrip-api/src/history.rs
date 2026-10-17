@@ -247,6 +247,24 @@ impl<'a> History<'a> {
             .unwrap_or(0)
     }
 
+    /// The mana spent to cast the spell on the stack as `spell` (CR 601.2h), by the source that produced it (CR 106.3): each
+    /// source with the mana of it spent, its total cost's whole (additional costs too), once for each part of the payment it
+    /// gave to. Nothing for a copy, which was not cast and had no mana spent on it (CR 707.10), or for a spell cast without
+    /// spending mana. A spell is cast and paid for in one turn, so this turn's records hold it.
+    pub fn mana_spent_to_cast(&self, spell: ObjectId) -> impl Iterator<Item = (ObjectId, ManaPool)> + 'a {
+        self.this_turn().iter().filter_map(move |r| match r.event {
+            Event::ManaSpent { source, on, cast: true, mana, .. } if on == spell => Some((source, mana)),
+            _ => None,
+        })
+    }
+
+    /// Whether mana `source` produced was spent to cast `spell` (CR 106.3, 601.2h): "whenever you cast a spell using mana
+    /// produced by [this]". `source` is the object as it produced the mana: one that has left and come back is another (CR
+    /// 400.7).
+    pub fn cast_using_mana_from(&self, spell: ObjectId, source: ObjectId) -> bool {
+        self.mana_spent_to_cast(spell).any(|(from, _)| from == source)
+    }
+
     /// How many times this ability of this object has resolved this turn (CR 608.2m).
     pub fn resolutions(&self, source: ObjectId, ability: AbilityRef) -> usize {
         self.this_turn()

@@ -303,6 +303,15 @@ impl StateDump {
                 }
             }
             d.set(format!("{b}.Mana"), mana);
+            // The pool's mana by the source that produced it (CR 106.3), in the order it came: "{W} Barracks of the Thousand,
+            // {W}{W} Plains" (restricted mana too, without its restriction).
+            let from: Vec<String> = s
+                .mana_from_of(p)
+                .map(|e| format!("{} {}", mana_text(&e.pool), if e.source == ObjectId::NONE { "none".to_string() } else { game.name(e.source).to_string() }))
+                .collect();
+            if !from.is_empty() {
+                d.list(&format!("{b}.ManaFrom"), from, false);
+            }
             let names = |ids: &[ObjectId]| ids.iter().map(|&id| game.name(id).to_string()).collect::<Vec<_>>();
             d.list(&format!("{b}.Hand"), names(s.zone(Zone::hand(p))), false);
             // Cards this player revealed, in order, from the history (`Event::Revealed`): a beheld card (CR 701.4a), a spliced one.

@@ -180,7 +180,7 @@ impl Game {
         } else {
             // A scenario's deal: seven each, in turn order, kept.
             for p in game.state.apnap().collect::<Vec<_>>() {
-                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0 };
+                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None };
                 for _ in 0..7 {
                     ops::draw(&mut cx, p);
                 }
@@ -237,7 +237,7 @@ impl Game {
 
             let kind = self.state.agenda[at].kind;
             let flow = {
-                let mut cx = Cx { g: self, frame: at, cursor: 0 };
+                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None };
                 match kind {
                     FrameKind::Opening => turn::opening(&mut cx),
                     FrameKind::BeginStep => turn::begin_step(&mut cx),
@@ -426,6 +426,12 @@ impl Game {
         static_rules::attack_rules_allow(self, self.cards, creature)
     }
 
+    /// The sources of the ordinary mana in `player`'s pool that a rule tells apart from other mana (CR 106.3): mana the player
+    /// spends only by choosing it, which the pool shows as that source's.
+    pub fn mana_told_apart(&self, player: PlayerId) -> Vec<ObjectId> {
+        static_rules::mana_told_apart(self, self.cards, player)
+    }
+
     /// Whether `player` may look at the top card of their library any time (CR 401.2), as a permanent they control says.
     pub fn may_look_at_library_top(&self, player: PlayerId) -> bool {
         actions::may_look_at_library_top(self, self.cards, player)
@@ -439,6 +445,9 @@ pub(crate) struct Cx<'a> {
     pub frame: usize,
     /// How many of its answers have been taken.
     pub cursor: usize,
+    /// The source of the mana ability running (CR 106.3, 605): what produces the mana it adds. None outside one, where the
+    /// mana a resolving spell or ability adds is that spell's or the ability's source's.
+    pub mana_source: Option<ObjectId>,
 }
 
 impl<'a> Cx<'a> {
@@ -550,6 +559,12 @@ impl<'a> Cx<'a> {
             },
             _ => Cause::Rules,
         }
+    }
+
+    /// The source of mana added now (CR 106.3): the mana ability's source while one runs, else the spell resolving or the
+    /// source of the ability resolving; none for a player's own mana ability (CR 605.1a) or anything else.
+    pub(crate) fn mana_source(&self) -> ObjectId {
+        self.mana_source.or_else(|| self.resolving().map(|i| i.object)).unwrap_or(ObjectId::NONE)
     }
 
     /// The spell or ability resolving, when the frame being run is its resolution: the top of the stack.
@@ -1074,7 +1089,8 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u8) {
-        self.g.state.update_player(player, |p| p.pool.0[mana as usize] += amount);
+        let source = self.mana_source();
+        self.g.state.add_mana(player, mana, amount, source, None, false);
     }
 
     fn become_day(&mut self) {
@@ -1091,14 +1107,13 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_mana_until_end_of_combat(&mut self, player: PlayerId, mana: Mana, amount: u8) {
-        self.g.state.update_player(player, |p| {
-            p.lasting.0[mana as usize] = p.lasting_mana().0[mana as usize] + amount;
-            p.pool.0[mana as usize] += amount;
-        });
+        let source = self.mana_source();
+        self.g.state.add_mana(player, mana, amount, source, None, true);
     }
 
     fn add_restricted_mana(&mut self, player: PlayerId, mana: Mana, amount: u8, restriction: ManaRestriction) {
-        self.g.state.add_restricted_mana(player, restriction, mana, amount);
+        let source = self.mana_source();
+        self.g.state.add_mana(player, mana, amount, source, Some(restriction), false);
     }
 
     fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) {

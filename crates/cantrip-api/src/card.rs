@@ -1507,6 +1507,11 @@ pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// your opponents control" (Patient Zero, Uthgardt Fury) and "from creatures" (Case of the Market Melee) are the same kind.
 pub type DamageStaysRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether an ability of this permanent asks of the mana spent where it came from (CR 106.3): whether mana that `source`
+/// produced is told apart from other mana for it, given the rule's own asker. "Using mana produced by [this]" (Barracks of the
+/// Thousand) tells apart its own; "mana from a Treasure" (Kalain, Reclusive Painter) would tell apart a Treasure's.
+pub type ManaSourceRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability keeps this planeswalker on the battlefield with 0 loyalty: it isn't put into its owner's
 /// graveyard by the state-based action of CR 704.5i. Given the rule's own asker and the planeswalker. "Planeswalkers you
 /// control aren't put into their owners' graveyards for having 0 loyalty" (Sanctum Lurker). Only that state-based action
@@ -1823,6 +1828,9 @@ pub struct CardDef {
     /// Its static abilities that keep damage on permanents during cleanup steps (CR 514.2), while it is on the battlefield
     /// with its abilities. An effect that removes all damage (regeneration, CR 701.19a) still removes it.
     pub damage_stays: &'static [DamageStaysRule],
+    /// Its abilities that ask where the mana spent came from (CR 106.3), while it is on the battlefield with its abilities:
+    /// mana a rule tells apart is spent only as its payer chooses (CR 601.2h), never where other mana of its kind would do.
+    pub mana_told_apart: &'static [ManaSourceRule],
     /// Its static abilities that keep planeswalkers with 0 loyalty on the battlefield (CR 704.5i), while it is on the
     /// battlefield with its abilities.
     pub zero_loyalty_stays: &'static [ZeroLoyaltyRule],
@@ -1959,6 +1967,7 @@ impl CardDef {
         cant_gain_life: &[],
         damage_by_toughness: &[],
         damage_stays: &[],
+        mana_told_apart: &[],
         zero_loyalty_stays: &[],
         spend_any_color: &[],
         granted_once_each_turn: None,

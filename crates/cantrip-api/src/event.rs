@@ -61,6 +61,12 @@ pub enum Event {
     /// triggered mana abilities it triggers (`TriggeredDef::mana_ability`) resolve at once, where the tap happens, and only
     /// when it produced some mana (CR 106.12a).
     TappedForMana { permanent: ObjectId, player: PlayerId, produced: ManaPool },
+    /// `player` spent `mana` that `source` produced (CR 106.3; `ObjectId::NONE` for a player's own mana ability, CR 605.1a)
+    /// to pay a cost of `on` (CR 601.2h, 602.2b, 118.3a): to cast it, a spell on the stack, if `cast`; otherwise an ability
+    /// of it, or a payment as something resolves. One record for each source a payment took mana from, recorded as the
+    /// payment is made, so a spell's come before its `Cast`: "using mana produced by [this]", "mana from a Treasure was spent
+    /// to cast it" (`History::mana_spent_to_cast`). Only recorded.
+    ManaSpent { player: PlayerId, source: ObjectId, on: ObjectId, cast: bool, mana: ManaPool },
     /// A player became the monarch (CR 725.1, 725.4): it was not theirs before.
     BecameMonarch { player: PlayerId },
     /// Creatures were declared as attackers (CR 508.1): "whenever you attack" (CR 508.1m). Not for creatures put onto
@@ -168,6 +174,7 @@ impl Event {
             | Event::Searched { player, .. }
             | Event::AttackersDeclared { player, .. }
             | Event::TappedForMana { player, .. }
+            | Event::ManaSpent { player, .. }
             | Event::BecameMonarch { player }
             | Event::GaveGift { player, .. }
             | Event::Copied { player, .. }
@@ -222,6 +229,7 @@ impl Event {
             | Event::TurnedFaceUp { permanent, .. }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
+            Event::ManaSpent { source, on, .. } => source == object || on == object,
             Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } => false,
         }
     }
@@ -280,6 +288,7 @@ impl EventMask {
     /// Damage was prevented (CR 615.13).
     pub const DAMAGE_PREVENTED: EventMask = EventMask(1 << 44);
     pub const SPEED_CHANGED: EventMask = EventMask(1 << 45);
+    pub const MANA_SPENT: EventMask = EventMask(1 << 46);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -297,6 +306,7 @@ impl EventMask {
             Event::ModesChosen { .. } => EventMask::MODES_CHOSEN,
             Event::Done { .. } => EventMask::DONE,
             Event::TurnEnded { .. } => EventMask::TURN_ENDED,
+            Event::ManaSpent { .. } => EventMask::MANA_SPENT,
             other => EventMask::of(other),
         }
     }

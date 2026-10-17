@@ -46,7 +46,7 @@ struct Casting {
     player: PlayerId,
     /// The X or kicker count the line asked for (`X:`, `Kicked:`).
     x: Option<u16>,
-    spend: VecDeque<(Mana, Option<ManaRestriction>)>,
+    spend: VecDeque<Spend>,
     /// The creatures a `Convoke:` taps, in the order the payment asks (CR 702.51a), and how many cards `Delve:` exiles
     /// from the graveyard, the first offered each time (CR 702.66a).
     convoke: VecDeque<String>,
@@ -54,7 +54,7 @@ struct Casting {
 }
 
 impl Casting {
-    fn new(player: PlayerId, x: Option<u16>, spend: VecDeque<(Mana, Option<ManaRestriction>)>) -> Casting {
+    fn new(player: PlayerId, x: Option<u16>, spend: VecDeque<Spend>) -> Casting {
         Casting { player, x, spend, convoke: VecDeque::new(), delve: 0 }
     }
 }
@@ -946,9 +946,14 @@ impl<'s> Run<'s> {
             && !assign.is_empty()
             && let Some(wanted) = casting.spend.pop_front()
         {
-            return match assign.iter().find(|o| (o.mana, o.restriction) == (Some(wanted.0), wanted.1)) {
+            let game = &self.game;
+            let from = |o: &ActionOption| o.source.map(|s| game.name(s).to_string());
+            return match assign.iter().find(|o| (o.mana, o.restriction) == (Some(wanted.0), wanted.1) && from(o).map(|n| n.to_ascii_lowercase()) == wanted.2.as_ref().map(|n| n.to_ascii_lowercase())) {
                 Some(o) => Ok(Some(Answer::Act(Action::of(o)))),
-                None => fail(format!("Spend: names {wanted:?}, but the pool mana offered is {:?}", assign.iter().map(|o| o.mana).collect::<Vec<_>>())),
+                None => fail(format!(
+                    "Spend: names {wanted:?}, but the pool mana offered is {:?}",
+                    assign.iter().map(|o| (o.mana, from(o))).collect::<Vec<_>>()
+                )),
             };
         }
         if !remaining.is_zero()
@@ -2196,10 +2201,14 @@ fn colors_of(step: &ActionStep) -> R<Option<Vec<Color>>> {
     Ok(Some(out))
 }
 
-/// `Spend:` names pool mana by its symbol, and for mana that carries a restriction its name after it: `R`, `R GainsHaste`.
-/// A restriction's name has a comma in it (`LegendarySpells, CantBeCountered`), so pieces are split where a symbol
-/// begins.
-fn spend_of(step: &ActionStep) -> R<VecDeque<(Mana, Option<ManaRestriction>)>> {
+/// Pool mana a `Spend:` line names: its kind, its restriction (CR 106.6), and the name of the source that produced it, for
+/// mana a rule tells apart by its source (CR 106.3).
+type Spend = (Mana, Option<ManaRestriction>, Option<String>);
+
+/// `Spend:` names pool mana by its symbol, and for mana that carries a restriction its name after it: `R`, `R GainsHaste`;
+/// mana told apart by its source names the source after `from`: `W from Barracks of the Thousand`. A restriction's name
+/// has a comma in it (`LegendarySpells, CantBeCountered`), so pieces are split where a symbol begins.
+fn spend_of(step: &ActionStep) -> R<VecDeque<Spend>> {
     let mut out = VecDeque::new();
     if let Some(text) = step.named("Spend") {
         let mut pieces: Vec<String> = Vec::new();
@@ -2217,7 +2226,15 @@ fn spend_of(step: &ActionStep) -> R<VecDeque<(Mana, Option<ManaRestriction>)>> {
             let Some(mana) = words.next().and_then(mana_symbol) else {
                 return fail(format!("line {}: Spend: {piece} is not a kind of mana", step.line));
             };
-            let rest: Vec<&str> = words.collect();
+            let mut rest: Vec<&str> = words.collect();
+            let from = match rest.iter().position(|w| *w == "from") {
+                Some(at) => {
+                    let name = rest[at + 1..].join(" ");
+                    rest.truncate(at);
+                    Some(name)
+                }
+                None => None,
+            };
             let restriction = if rest.is_empty() {
                 None
             } else {
@@ -2226,7 +2243,7 @@ fn spend_of(step: &ActionStep) -> R<VecDeque<(Mana, Option<ManaRestriction>)>> {
                     None => return fail(format!("line {}: Spend: {piece} names something that is not a mana restriction", step.line)),
                 }
             };
-            out.push_back((mana, restriction));
+            out.push_back((mana, restriction, from));
         }
     }
     Ok(out)

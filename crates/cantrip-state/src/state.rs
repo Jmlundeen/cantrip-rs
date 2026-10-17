@@ -16,6 +16,10 @@ pub struct GameState {
     /// Restricted mana in the players' pools (CR 106.6), in the order each player's restrictions first came; an entry
     /// whose mana is all spent is gone. Empty in nearly every position.
     pub restricted_mana: Vec<RestrictedMana>,
+    /// The mana in the players' pools by the source that produced it (CR 106.3), restricted or not: what "mana produced by
+    /// [this]" and "mana from a [source]" ask of the mana spent (`Event::ManaSpent`). The entries of a player add up to
+    /// their pool and their restricted mana exactly.
+    pub mana_from: Vec<ManaFrom>,
     /// The timestamp of each kind of keyword counter on a permanent that has had one put on it since it entered (CR 613.7c):
     /// that of the latest counter of the kind, which every counter of the kind shares. A kind with no entry is as old as the
     /// permanent (it entered with them). Empty in nearly every game; rows of objects that have left are dropped as it is written.
@@ -118,7 +122,7 @@ impl GameState {
     fn position(
         &self,
     ) -> (
-        (&Vec<Player>, &Vec<RestrictedMana>, &Vec<CounterStamp>),
+        (&Vec<Player>, &Vec<RestrictedMana>, &Vec<CounterStamp>, &Vec<ManaFrom>),
         &Vec<Obj>,
         &Vec<Vec<ObjectId>>,
         &Vec<StackItem>,
@@ -130,7 +134,7 @@ impl GameState {
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>),
     ) {
         (
-            (&self.players, &self.restricted_mana, &self.counter_stamps),
+            (&self.players, &self.restricted_mana, &self.counter_stamps, &self.mana_from),
             &self.objects,
             &self.zones,
             &self.stack,
@@ -206,6 +210,11 @@ pub enum Undo {
     ObjectPopped(Box<Obj>),
     Player(PlayerId, Player),
     RestrictedManaSet(Vec<RestrictedMana>),
+    ManaFromPushed,
+    ManaFromSet(u16, ManaFrom),
+    ManaFromRemoved(u16, ManaFrom),
+    ManaFromInserted(u16),
+    ManaFromAll(Vec<ManaFrom>),
     CounterStampsSet(Vec<CounterStamp>),
     Turn(Turn),
     ZoneInserted { slot: u16, at: u16 },
@@ -257,6 +266,7 @@ impl GameState {
         GameState {
             players: vec![Player { life: 20, starting_life: 20, ..Player::default() }; players],
             restricted_mana: Vec::new(),
+            mana_from: Vec::new(),
             counter_stamps: Vec::new(),
             objects: Vec::with_capacity(128),
             zones: vec![Vec::new(); Zone::slots(players)],
@@ -403,8 +413,118 @@ impl GameState {
         self.restricted_mana.iter().any(|r| r.player == player)
     }
 
-    /// Adds `n` mana of one kind under `restriction` to `player`'s pool.
-    pub fn add_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) {
+    /// The mana in `player`'s pool by the source that produced it (CR 106.3), restricted or not.
+    pub fn mana_from_of(&self, player: PlayerId) -> impl Iterator<Item = &ManaFrom> + '_ {
+        self.mana_from.iter().filter(move |m| m.player == player)
+    }
+
+    /// Adds `n` mana of one kind that `source` produced (CR 106.3) to `player`'s pool (CR 106.4): mana `restriction` limits,
+    /// if it has one (CR 106.6), kept apart; mana that lasts until end of combat if `lasting` (CR 500.5a), which no
+    /// restricted mana does.
+    pub fn add_mana(&mut self, player: PlayerId, mana: Mana, n: u8, source: ObjectId, restriction: Option<ManaRestriction>, lasting: bool) {
+        if n == 0 {
+            return;
+        }
+        let m = mana as usize;
+        match restriction {
+            Some(r) => self.add_restricted_mana(player, r, mana, n),
+            None => self.update_player(player, |p| {
+                if lasting {
+                    p.lasting.0[m] = p.lasting_mana().0[m] + n;
+                }
+                p.pool.0[m] += n;
+            }),
+        }
+        let lasting = lasting && restriction.is_none();
+        match self.mana_from.iter().position(|e| e.player == player && e.restriction == restriction && e.source == source && e.lasting == lasting) {
+            Some(at) => {
+                let old = self.mana_from[at];
+                self.mana_from[at].pool.0[m] += n;
+                self.log(Undo::ManaFromSet(at as u16, old));
+            }
+            None => {
+                let mut pool = ManaPool::default();
+                pool.0[m] = n;
+                self.mana_from.push(ManaFrom { player, restriction, source, lasting, pool });
+                self.log(Undo::ManaFromPushed);
+            }
+        }
+    }
+
+    /// Spends up to `n` mana of one kind from `player`'s pool: of `restriction`, or ordinary mana for none, and of the
+    /// sources `pick` allows - the mana that does not last before the mana that does, then in the order it came. How much
+    /// there was to spend; each source's share is pushed onto `taken` (CR 106.3).
+    pub fn spend_mana(
+        &mut self,
+        player: PlayerId,
+        restriction: Option<ManaRestriction>,
+        mana: Mana,
+        n: u8,
+        pick: ManaPick,
+        taken: &mut Vec<(ObjectId, Mana, u8)>,
+    ) -> u8 {
+        let m = mana as usize;
+        let mut left = n;
+        for lasting in [false, true] {
+            let mut at = 0;
+            while left > 0 && at < self.mana_from.len() {
+                let e = self.mana_from[at];
+                if e.player == player && e.restriction == restriction && e.lasting == lasting && e.pool.0[m] > 0 && pick.takes(e.source) {
+                    let take = e.pool.0[m].min(left);
+                    left -= take;
+                    taken.push((e.source, mana, take));
+                    let mut after = e;
+                    after.pool.0[m] -= take;
+                    if after.pool.is_empty() {
+                        self.mana_from.remove(at);
+                        self.log(Undo::ManaFromRemoved(at as u16, e));
+                        continue;
+                    }
+                    self.mana_from[at] = after;
+                    self.log(Undo::ManaFromSet(at as u16, e));
+                }
+                at += 1;
+            }
+        }
+        let spent = n - left;
+        if spent == 0 {
+            return 0;
+        }
+        match restriction {
+            Some(r) => {
+                self.spend_restricted_mana(player, r, mana, spent);
+            }
+            None => {
+                let lasting: u8 =
+                    self.mana_from.iter().filter(|e| e.player == player && e.restriction.is_none() && e.lasting).map(|e| e.pool.0[m]).sum();
+                self.update_player(player, |p| {
+                    p.pool.0[m] -= spent;
+                    p.lasting.0[m] = lasting;
+                });
+            }
+        }
+        spent
+    }
+
+    /// Empties `player`'s pool as a step or phase ends (CR 106.4, 500.4): all of it, or, `keep_lasting`, all but the mana
+    /// that lasts until end of combat (CR 500.5a).
+    pub fn empty_mana(&mut self, player: PlayerId, keep_lasting: bool) {
+        if !self.players[player.index()].pool.is_empty() || !self.players[player.index()].lasting.is_empty() {
+            self.update_player(player, |pl| {
+                pl.pool = if keep_lasting { pl.lasting_mana() } else { ManaPool::default() };
+                pl.lasting = pl.pool;
+            });
+        }
+        self.empty_restricted_mana(player);
+        if self.mana_from.iter().any(|e| e.player == player && !(keep_lasting && e.lasting)) {
+            let old = self.mana_from.clone();
+            self.mana_from.retain(|e| e.player != player || (keep_lasting && e.lasting));
+            self.log(Undo::ManaFromAll(old));
+        }
+    }
+
+    /// Adds `n` mana of one kind under `restriction` to `player`'s pool: the pool alone, without its source (`add_mana`).
+    fn add_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) {
         if n == 0 {
             return;
         }
@@ -421,8 +541,8 @@ impl GameState {
         self.set_unsettled();
     }
 
-    /// Spends up to `n` mana of one kind under `restriction` from `player`'s pool: how many there were to spend.
-    pub fn spend_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) -> u8 {
+    /// Spends up to `n` mana of one kind under `restriction` from `player`'s pool: the pool alone (`spend_mana`).
+    fn spend_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) -> u8 {
         let Some(at) = self.restricted_mana.iter().position(|r| r.player == player && r.restriction == restriction) else {
             return 0;
         };
@@ -440,8 +560,8 @@ impl GameState {
         take
     }
 
-    /// Empties `player`'s restricted mana (CR 106.4).
-    pub fn empty_restricted_mana(&mut self, player: PlayerId) {
+    /// Empties `player`'s restricted mana (CR 106.4): the pool alone (`empty_mana`).
+    fn empty_restricted_mana(&mut self, player: PlayerId) {
         if !self.has_restricted_mana(player) {
             return;
         }
@@ -825,6 +945,15 @@ impl GameState {
             Undo::Player(p, old) => self.players[p.index()] = old,
             Undo::Turn(old) => self.turn = old,
             Undo::RestrictedManaSet(old) => self.restricted_mana = old,
+            Undo::ManaFromPushed => {
+                self.mana_from.pop();
+            }
+            Undo::ManaFromSet(at, old) => self.mana_from[at as usize] = old,
+            Undo::ManaFromRemoved(at, old) => self.mana_from.insert(at as usize, old),
+            Undo::ManaFromInserted(at) => {
+                self.mana_from.remove(at as usize);
+            }
+            Undo::ManaFromAll(old) => self.mana_from = old,
             Undo::CounterStampsSet(old) => self.counter_stamps = old,
             Undo::ZoneInserted { slot, at } => {
                 self.zones[slot as usize].remove(at as usize);
@@ -920,6 +1049,13 @@ impl GameState {
             Undo::Player(p, _) => Undo::Player(*p, self.players[p.index()]),
             Undo::Turn(_) => Undo::Turn(self.turn),
             Undo::RestrictedManaSet(_) => Undo::RestrictedManaSet(self.restricted_mana.clone()),
+            Undo::ManaFromPushed => {
+                Undo::ManaFromRemoved(self.mana_from.len() as u16 - 1, *self.mana_from.last().expect("mana"))
+            }
+            Undo::ManaFromSet(at, _) => Undo::ManaFromSet(*at, self.mana_from[*at as usize]),
+            Undo::ManaFromRemoved(at, _) => Undo::ManaFromInserted(*at),
+            Undo::ManaFromInserted(at) => Undo::ManaFromRemoved(*at, self.mana_from[*at as usize]),
+            Undo::ManaFromAll(_) => Undo::ManaFromAll(self.mana_from.clone()),
             Undo::CounterStampsSet(_) => Undo::CounterStampsSet(self.counter_stamps.clone()),
             Undo::ZoneInserted { slot, at } => {
                 Undo::ZoneRemoved { slot: *slot, at: *at, id: self.zones[*slot as usize][*at as usize] }

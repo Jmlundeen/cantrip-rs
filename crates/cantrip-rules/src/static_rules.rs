@@ -16,6 +16,40 @@ fn sources<'a>(cx: &'a Cx, has: impl Fn(&CardDef) -> bool + 'a) -> impl Iterator
     })
 }
 
+/// The sources of the ordinary mana in `player`'s pool whose mana an ability of a permanent on the battlefield tells apart
+/// (CR 106.3, `CardDef::mana_told_apart`): mana its payer chooses to spend or keep (CR 601.2h, 118.3a). Asked only while
+/// that mana came from more than one source, since one source's mana is all alike: a pool of one land's mana searches
+/// nothing. Restricted mana is told apart by its restriction alone (CR 106.6); none in content is told apart by source too.
+pub fn mana_told_apart(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> Vec<ObjectId> {
+    let s = q.state();
+    let mut from: Vec<ObjectId> = Vec::new();
+    for e in s.mana_from_of(player) {
+        if e.restriction.is_none() && !from.contains(&e.source) {
+            from.push(e.source);
+        }
+    }
+    if from.len() < 2 {
+        return Vec::new();
+    }
+    let rules: Vec<(ObjectId, PlayerId, &'static CardDef)> = s
+        .battlefield()
+        .iter()
+        .filter_map(|&id| {
+            let obj = s.obj(id);
+            let def = cards.get(cards.current(obj));
+            // A permanent that has lost all its abilities has none of these rules (CR 613.1f).
+            (!def.mana_told_apart.is_empty() && !q.lost_all_abilities(id)).then_some((id, obj.controller, def))
+        })
+        .collect();
+    if rules.is_empty() {
+        return Vec::new();
+    }
+    from.retain(|&source| {
+        rules.iter().any(|&(id, controller, def)| def.mana_told_apart.iter().any(|rule| rule(q, &Asker { source: id, controller }, source)))
+    });
+    from
+}
+
 /// The kinds of zone `player` can't cast spells from right now (CR 101.2, 601.3): those a static ability of a permanent on the
 /// battlefield forbids (Voice of Victory forbids them all on its controller's turn, Drannith Magistrate every zone but the
 /// hand), and those an effect about the player does (`EffectKind::CantCastSpellsFrom`, Avatar's Wrath). A restriction takes

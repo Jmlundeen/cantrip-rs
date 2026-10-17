@@ -1170,7 +1170,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
     candidates.iter().map(|&t| apply_cost_changes_total(&cx, player, Costed::Ability(source, ability), def.cost.mana, &[t])).collect()
 }
 
@@ -1196,7 +1196,7 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
         _ => return Vec::new(),
     };
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
     let face = granted_slot(index).and_then(|(_, face)| faces_to_cast(def).into_iter().find(|&(f, _)| f == face)).filter(|&(f, _)| f != GRANTED_FACE_WHOLE).map(|(_, d)| cx.card_id(d));
     candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
 }
@@ -1209,7 +1209,7 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
     let def = game.cards.get(obj.copy.map_or(obj.card, |c| c.card));
     let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
     Some((less_each, variable_candidates(&cx, spell, player, variable).len()))
 }
 
@@ -1221,7 +1221,7 @@ pub fn granted_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, 
     let (_, face) = granted_slot(index)?;
     let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
     let face_id = (face != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def));
     let mana = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face_id, &[]);
     Some((cost, mana))
@@ -1236,7 +1236,7 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, card: ObjectId, w
     let (granter, controller, rule) = *granted_ways_of(game.cards, &game.state, &game.log).get(k)?;
     let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
     let view = AsFace { cx: &cx, spell: card, face: cx.card_id(face_def) };
     let q: &dyn Query = if face == GRANTED_FACE_WHOLE { &cx } else { &view };
     (rule.cost)(q, &Asker { source: granter, controller }, card, player)
@@ -4441,7 +4441,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
         return None;
     }
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
     (cost != printed).then_some(cost)
@@ -4542,13 +4542,18 @@ pub fn activate_mana(
     // its mana, and of whatever restriction, but not what the triggered mana abilities it triggers add.
     let before = if def.cost.tap { mana_held(cx, player) } else { ManaPool::default() };
     if !adds_nothing {
-        match def.mana {
-            Some(effect) => effect(cx, &asker, color)?,
+        // The mana is produced by the ability's source (CR 106.3), whatever has become of it paying the cost.
+        let outer = cx.mana_source.replace(source);
+        let added = match def.mana {
+            Some(effect) => effect(cx, &asker, color),
             None => {
                 let def = ActivatedDef { restricted, ..*def };
-                add_listed(cx, player, &def, if colorless { Some(Mana::C) } else { color.map(Color::mana) })
+                add_listed(cx, player, &def, if colorless { Some(Mana::C) } else { color.map(Color::mana) });
+                Ok(())
             }
-        }
+        };
+        cx.mana_source = outer;
+        added?;
     }
     if def.cost.tap {
         let after = mana_held(cx, player);
@@ -4584,10 +4589,17 @@ fn activate_player_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, n: u8) 
     };
     let def = activated(cx, ability).expect("activated");
     pay_life_and_counters(cx, player, source, &def.cost);
-    match def.mana {
-        Some(effect) => effect(cx, &Asker { source, controller: player }, None)?,
-        None => add_listed(cx, player, def, None),
-    }
+    // Its mana has no source (CR 605.1a, 106.3).
+    let outer = cx.mana_source.replace(ObjectId::NONE);
+    let added = match def.mana {
+        Some(effect) => effect(cx, &Asker { source, controller: player }, None),
+        None => {
+            add_listed(cx, player, def, None);
+            Ok(())
+        }
+    };
+    cx.mana_source = outer;
+    added?;
     Ok(())
 }
 
@@ -4660,9 +4672,18 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
                 let mut item = stack_item(StackKind::Triggered, id, ability, controller, &[]);
                 item.subject = fired.subject;
                 item.data = fired.data;
+                // A triggered mana ability's mana is produced by its own source (CR 106.3): Mana Flare's additional mana
+                // is Mana Flare's, not the land's.
+                let outer = cx.mana_source.replace(id);
+                let mut added = Ok(());
                 for _ in 0..=again.len() {
-                    (t.effect)(cx, &item)?;
+                    added = (t.effect)(cx, &item);
+                    if added.is_err() {
+                        break;
+                    }
                 }
+                cx.mana_source = outer;
+                added?;
             }
         }
     }
@@ -4771,8 +4792,9 @@ fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
 }
 
 /// The pool units that would pay something owed, as `AssignMana` options, in the C# engine's order: colorless first,
-/// then colors the cost does not name, then the colors it names.
-fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], owed: &ManaCost) -> Vec<ActionOption> {
+/// then colors the cost does not name, then the colors it names. Ordinary mana a rule tells apart by its source (`told`,
+/// each source with its mana, CR 106.3) is offered as that source's, after the ordinary mana of its kind no rule tells apart.
+fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], told: &[(ObjectId, ManaPool)], owed: &ManaCost) -> Vec<ActionOption> {
     let named = |mana: Mana| {
         owed.symbols[mana as usize] > 0 || owed.hybrid.iter().flatten().any(|(a, b)| *a == mana || *b == mana)
     };
@@ -4795,12 +4817,57 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], o
             if kind != pass || pool.get(mana) == 0 || !pays(owed, mana) {
                 continue;
             }
-            let mut option = ActionOption::simple(ActionKind::AssignMana);
-            option.mana = Some(mana);
-            out.push(option);
+            let apart: u8 = told.iter().map(|(_, p)| p.get(mana)).sum();
+            if pool.get(mana) > apart {
+                let mut option = ActionOption::simple(ActionKind::AssignMana);
+                option.mana = Some(mana);
+                out.push(option);
+            }
+            for &(source, from) in told {
+                if from.get(mana) > 0 {
+                    let mut option = ActionOption::simple(ActionKind::AssignMana);
+                    option.mana = Some(mana);
+                    option.source = Some(source);
+                    out.push(option);
+                }
+            }
         }
     }
     out
+}
+
+/// The ordinary mana in `player`'s pool that each of the `told` sources produced (CR 106.3).
+fn told_pools(cx: &Cx, player: PlayerId, told: &[ObjectId]) -> Vec<(ObjectId, ManaPool)> {
+    let mut out: Vec<(ObjectId, ManaPool)> = told.iter().map(|&s| (s, ManaPool::default())).collect();
+    for e in cx.s().mana_from_of(player) {
+        if e.restriction.is_none()
+            && let Some(at) = told.iter().position(|&s| s == e.source)
+        {
+            for m in 0..6 {
+                out[at].1 .0[m] += e.pool.0[m];
+            }
+        }
+    }
+    out
+}
+
+/// Records what a payment for `on` spent, one `Event::ManaSpent` for each source it took mana from, in the order it first
+/// took from each (CR 106.3, 601.2h).
+fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: &[(ObjectId, Mana, u8)]) {
+    let mut by: Vec<(ObjectId, ManaPool)> = Vec::new();
+    for &(source, mana, n) in taken {
+        let at = match by.iter().position(|(s, _)| *s == source) {
+            Some(at) => at,
+            None => {
+                by.push((source, ManaPool::default()));
+                by.len() - 1
+            }
+        };
+        by[at].1 .0[mana as usize] += n;
+    }
+    for (source, mana) in by {
+        cx.record(Event::ManaSpent { player, source, on, cast, mana });
+    }
 }
 
 /// What paying for `source` is, as far as restricted mana is concerned (CR 106.6): casting it, when it is a spell on the
@@ -4874,22 +4941,22 @@ fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Ma
     pool
 }
 
-/// Takes `spent` out of the pool, restricted mana first (it is what the C# engine prefers spending). What the mana taken
-/// does to what it pays for (`ManaRestriction::effects`).
-fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u8; 6]) -> u8 {
+/// Takes `spent` out of the pool, restricted mana first (it is what the C# engine prefers spending), each unit's source
+/// pushed onto `taken`. What the mana taken does to what it pays for (`ManaRestriction::effects`).
+fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u8; 6], taken: &mut Vec<(ObjectId, Mana, u8)>) -> u8 {
     let restricted = restricted_for(cx, player, source, purpose);
     let mut used = 0u8;
     for mana in Mana::ALL {
         let mut need = spent[mana as usize];
         for (restriction, _) in &restricted {
-            let take = cx.st().spend_restricted_mana(player, *restriction, mana, need);
+            let take = cx.st().spend_mana(player, Some(*restriction), mana, need, cantrip_state::ManaPick::Any, taken);
             if take > 0 {
                 used |= restriction.effects();
             }
             need -= take;
         }
         if need > 0 {
-            cx.st().update_player(player, |p| p.spend_mana(mana, need));
+            cx.st().spend_mana(player, None, mana, need, cantrip_state::ManaPick::Any, taken);
         }
     }
     used
@@ -5106,6 +5173,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
     let mut delved: Vec<ObjectId> = Vec::new();
     // How many of the generic mana tapping has paid for as waterbend (CR 701.67b), against what waterbend may pay.
     let mut bent: u8 = 0;
+    // The mana spent, unit by unit, with the source of each (CR 106.3).
+    let mut taken: Vec<(ObjectId, Mana, u8)> = Vec::new();
     loop {
         let mut cost = owed;
         cost.generic = cost.generic.saturating_sub(generic_paid);
@@ -5117,8 +5186,25 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
         let candidates =
             if helpers.any() { pay_candidates(cx, player, source, helpers, &cost, &due, &convoking, &delved, bent) } else { Vec::new() };
         let mut decided = ways(&pool, &due);
+        // Ordinary mana a rule tells apart by its source (CR 106.3), by the source that produced it.
+        let told = if helpers.no_mana { Vec::new() } else { static_rules::mana_told_apart(cx, cx.cards(), player) };
+        let told_mana = told_pools(cx, player, &told);
         // Ordinary mana and restricted mana of a kind are different units (CR 106.6): spending only some of that kind
-        // is the player's choice, even when the pool pays the cost one way.
+        // is the player's choice, even when the pool pays the cost one way. So is spending only some of the mana of a kind
+        // that came from sources a rule tells apart (CR 106.3, 601.2h).
+        if let Ways::One(spent) = decided
+            && !told.is_empty()
+        {
+            let plain = cx.s().player(player).pool;
+            let split = Mana::ALL.iter().any(|&m| {
+                let apart: u8 = told_mana.iter().map(|(_, p)| p.get(m)).sum();
+                let groups = told_mana.iter().filter(|(_, p)| p.get(m) > 0).count() + usize::from(plain.get(m) > apart);
+                groups > 1 && spent[m as usize] > 0 && spent[m as usize] < pool.get(m)
+            });
+            if split {
+                decided = Ways::Many;
+            }
+        }
         if let Ways::One(spent) = decided {
             let player_state = cx.s().player(player);
             let restricted = restricted_for(cx, player, source, helpers.purpose);
@@ -5133,8 +5219,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
                 decided = Ways::Many;
             }
         }
-        let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, spent: [u8; 6]| {
-            *used |= take_mana(cx, player, source, helpers.purpose, &spent);
+        let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, taken: &mut Vec<(ObjectId, Mana, u8)>, spent: [u8; 6]| {
+            *used |= take_mana(cx, player, source, helpers.purpose, &spent, taken);
             for mana in Mana::ALL {
                 paid.0[mana as usize] += spent[mana as usize];
             }
@@ -5142,7 +5228,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
         if let Ways::One(spent) = decided
             && candidates.is_empty()
         {
-            spend_pool(cx, &mut paid, &mut used, spent);
+            spend_pool(cx, &mut paid, &mut used, &mut taken, spent);
             break;
         }
         let paying = !convoking.is_empty() || generic_paid > 0;
@@ -5152,7 +5238,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
             options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         } else if !helpers.no_mana {
             let restricted = restricted_for(cx, player, source, helpers.purpose);
-            options.extend(assign_options(&cx.s().player(player).pool, &restricted, &due));
+            options.extend(assign_options(&cx.s().player(player).pool, &restricted, &told_mana, &due));
         }
         options.extend(candidates);
         options.push(ActionOption::simple(ActionKind::CancelCasting));
@@ -5178,16 +5264,23 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
                         // to the options, which offer no other.
                         Some(r) => {
                             used |= r.effects();
-                            cx.st().spend_restricted_mana(player, r, mana, 1);
+                            cx.st().spend_mana(player, Some(r), mana, 1, cantrip_state::ManaPick::Any, &mut taken);
                         }
-                        None => cx.st().update_player(player, |p| p.spend_mana(mana, 1)),
+                        // Mana of the source the option names, or of none a rule tells apart (CR 106.3).
+                        None => {
+                            let pick = match action.source {
+                                Some(from) => cantrip_state::ManaPick::From(from),
+                                None => cantrip_state::ManaPick::Except(&told),
+                            };
+                            cx.st().spend_mana(player, None, mana, 1, pick, &mut taken);
+                        }
                     }
                     paid.0[mana as usize] += 1;
                     spend(&mut owed, mana);
                 }
                 ActionKind::ConfirmCasting => {
                     let Ways::One(spent) = decided else { return Err(Stop::Cancel) };
-                    spend_pool(cx, &mut paid, &mut used, spent);
+                    spend_pool(cx, &mut paid, &mut used, &mut taken, spent);
                     break;
                 }
                 ActionKind::TapToPay => {
@@ -5212,6 +5305,10 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
             },
             _ => return Err(Stop::Cancel),
         }
+    }
+    if !taken.is_empty() {
+        let cast = helpers.purpose == Paying::Casting && cx.s().obj(source).zone.is(ZoneKind::Stack);
+        record_spent(cx, player, source, cast, &taken);
     }
     if !delved.is_empty() {
         ops::exile_all(cx, &delved);
