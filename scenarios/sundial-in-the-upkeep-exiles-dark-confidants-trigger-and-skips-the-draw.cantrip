@@ -1,0 +1,49 @@
+# Ending the turn exiles the triggered abilities on the stack (CR 724.1b) and skips straight to the cleanup step (CR 724.1d).
+# Bot1 activates Sundial of the Infinite in its turn 3 upkeep with Dark Confidant's "at the beginning of your upkeep" ability on
+# the stack (the earliest the ruling allows): nothing is revealed, Bot1 loses no life, and the draw step never comes, so Bot1's
+# hand and library are as turn 1 left them. On turn 5 the Confidant's ability resolves - the positive control: it reveals the
+# Shock on top (mana value 1) and Bot1 loses 1 life, then draws.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Sol Ring
+Sundial of the Infinite
+Dark Confidant
+Island
+Shock
+Island
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dark Confidant.Cast
+[T3 Bot1.Upkeep]
+? Stack = Dark Confidant
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+[T4 Bot2.Upkeep]
+? Bot1.Life = 20
+? Bot1.Hand = Island
+? Bot1.Library.Count = 12
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.Life = 19
+Bot1.Hand = Island; Shock; Island
+Bot1.Revealed = Shock

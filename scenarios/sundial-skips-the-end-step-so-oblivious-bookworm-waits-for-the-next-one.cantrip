@@ -1,0 +1,48 @@
+# "At the beginning of your end step" abilities trigger only as an end step begins (CR 500.6); a turn ended with Sundial of the
+# Infinite before its end step has none (CR 724.1e, the ruling: "Those abilities will trigger at the beginning of the end step
+# of the next turn"). Bot1 ends its turn 3 in the first main phase: Oblivious Bookworm asks nothing that turn (the refusal), and
+# asks at the beginning of Bot1's turn 5 end step - the positive control - where Bot1 draws and discards.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Jet
+Sol Ring
+Sundial of the Infinite
+Oblivious Bookworm
+Island
+Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+! Bot1.Accept
+[T4 Bot2.Upkeep]
+? Bot1.Hand = Island; Island
+[T5 Bot1.End]
+Bot1.Accept
+Bot1.Choose(Island)
+[T6 Bot2.Upkeep]
+
+[Expect]
+Turn = 6
+Bot1.Hand = Island; Island; Mountain
+Bot1.Graveyard = Island

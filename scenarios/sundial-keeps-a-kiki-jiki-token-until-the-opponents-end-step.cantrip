@@ -1,0 +1,50 @@
+# Kiki-Jiki's token is to be sacrificed "at the beginning of the next end step" (CR 603.7): the first end step to begin after
+# the ability resolves, whoever's turn it is. Bot1 makes a hasty copy of Ornithopter on turn 3 and then ends the turn with
+# Sundial of the Infinite, so turn 3's end step never begins (CR 724.1e). The token stays through Bot2's turn 4 until that
+# turn's end step, where the delayed ability triggers and sacrifices it; it is gone by Bot1's turn 5.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Ornithopter
+Sundial of the Infinite
+Kiki-Jiki, Mirror Breaker
+Black Lotus
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Delayed = Kiki-Jiki, Mirror Breaker
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter#2.Token = true
+? Delayed.Count = 1
+[T5 Bot1.Upkeep]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Ornithopter; Sundial of the Infinite; Kiki-Jiki, Mirror Breaker
+Delayed.Count = 0
+LeftBattlefield = Black Lotus (tapped); Ornithopter
