@@ -351,6 +351,12 @@ public static partial class CardReading
         return Keywords.None;
     }
 
+    /// <summary>What a bite's first slot says it is for: the creature that deals damage equal to its power.</summary>
+    public const string BiterLabel = "to deal damage equal to its power";
+
+    /// <summary>What a bite's second slot says it is for: the one that is dealt that damage.</summary>
+    public const string VictimLabel = "to be dealt that damage";
+
     /// <summary>
     /// What a piece of rules text does to its target: a spell's text, one mode of it, or an ability as it reads.
     /// </summary>
@@ -360,6 +366,19 @@ public static partial class CardReading
         if (plain.Length == 0)
         {
             return default;
+        }
+
+        // The two slots of a bite ("Target creature you control deals damage equal to its power to target creature you don't
+        // control"), as the spell words them for a player: the creature that deals the damage is one of this seat's own, to be
+        // chosen well, and the one dealt it is damaged by that creature's power, which the question that asks it knows.
+        if (plain.Contains(BiterLabel, StringComparison.Ordinal))
+        {
+            return new EffectRead(EffectKind.Help);
+        }
+
+        if (plain.Contains(VictimLabel, StringComparison.Ordinal))
+        {
+            return new EffectRead(EffectKind.Damage);
         }
 
         if (DamageClause().Match(plain) is { Success: true } damage)

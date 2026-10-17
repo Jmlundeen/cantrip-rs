@@ -59,6 +59,9 @@ public sealed partial class TacticalPlay : IAutoPlayer
     /// </summary>
     private readonly HashSet<int> _offered = [];
 
+    /// <summary>The creature chosen to deal the damage of a bite whose second slot is asked next (Hard-Hitting Question).</summary>
+    private ViewHandle? _biter;
+
     /// <summary>What was tried this turn and changed nothing, so it is not tried again until the next.</summary>
     private readonly HashSet<(int Source, ActionKindView Kind, int Ability)> _spent = [];
 

@@ -255,6 +255,43 @@ public sealed class TacticalPromptsTests
         Assert.Empty(away.Targets);
     }
 
+    // --- A bite: one creature deals damage equal to its power to another -----------------------------------------------------
+
+    [Fact]
+    public void Bites_with_its_strongest_creature_at_the_best_creature_that_much_damage_kills()
+    {
+        // Its own Hill Giant (4/4) and Bear (1/1); the opponent's Dragon (6/6, too big for four damage), Bear (3/3) and Elf (1/1).
+        GameClient client = Seated([
+            Creature(3, "Hill Giant", 4, 4, Me), Creature(4, "Bear", 1, 1, Me),
+            Creature(5, "Dragon", 6, 6, Them, "Flying"), Creature(6, "Bear", 3, 3, Them), Creature(7, "Elf", 1, 1, Them)]);
+        TacticalPlay bot = Bot();
+
+        TargetsChosenAnswer biter = Assert.IsType<TargetsChosenAnswer>(bot.Decide(client, new ChooseTargetPromptMessage
+        {
+            Player = Me,
+            Text = "Creature you control to deal damage equal to its power",
+            Candidates = [At(3), At(4)],
+            Count = 1,
+        }));
+        Assert.Equal(At(3).Object, Assert.Single(biter.Targets).Object);
+
+        TargetsChosenAnswer victim = Assert.IsType<TargetsChosenAnswer>(bot.Decide(client, new ChooseTargetPromptMessage
+        {
+            Player = Me,
+            Text = "Creature or planeswalker you don't control to be dealt that damage",
+            Candidates = [At(5), At(6), At(7)],
+            Count = 1,
+        }));
+        Assert.Equal(At(6).Object, Assert.Single(victim.Targets).Object);
+    }
+
+    [Fact]
+    public void Reads_the_two_slots_of_a_bite_as_helping_the_first_and_damaging_the_second()
+    {
+        Assert.Equal(EffectKind.Help, CardReading.Effect("Creature you control to deal damage equal to its power").Kind);
+        Assert.Equal(EffectKind.Damage, CardReading.Effect("Creature or planeswalker you don't control to be dealt that damage").Kind);
+    }
+
     // --- Which miracle to reveal a card with ------------------------------------------------------------------------
 
     [Fact]

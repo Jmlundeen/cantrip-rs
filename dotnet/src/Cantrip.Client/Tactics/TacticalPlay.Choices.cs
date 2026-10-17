@@ -18,7 +18,21 @@ public sealed partial class TacticalPlay
         }
 
         EffectRead effect = Reading(client, prompt.Text, prompt.Source, prompt.Ability);
+
+        // A bite deals damage equal to the power of the creature chosen for its first slot, to what its second slot chooses:
+        // the damage is that creature's power, and so the one dealt it is the one worth killing with that much.
+        string plain = CardReading.Plain(prompt.Text);
+        bool biter = plain.Contains(CardReading.BiterLabel, StringComparison.Ordinal);
+        if (plain.Contains(CardReading.VictimLabel, StringComparison.Ordinal))
+        {
+            effect = new EffectRead(EffectKind.Damage, _biter is { } dealing && client.Object(dealing) is { } source ? Math.Max(source.Power ?? 0, 0) : 0);
+        }
+
         (List<TargetMessage> targets, _) = Pick(client, view, effect, prompt.Candidates, prompt.Count, prompt.Optional);
+        if (biter)
+        {
+            _biter = targets.Count > 0 && !targets[0].IsPlayer ? targets[0].Object : null;
+        }
 
         // A slot that takes several wants that many (CR 601.2c), or its minimum where it is a printed range ("one or two
         // target creatures"), so it is filled with the best of what is left.
