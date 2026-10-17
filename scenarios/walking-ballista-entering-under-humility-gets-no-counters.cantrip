@@ -1,0 +1,56 @@
+# Walking Ballista's "This creature enters with X +1/+1 counters on it" is a replacement effect of its own (CR 614.1c). CR
+# 614.12: which replacement effects apply to a permanent entering is judged on the permanent as it would exist on the
+# battlefield, "taking into account ... continuous effects that already exist and would apply to the permanent". Humility
+# ("All creatures lose all abilities and have base power and toughness 1/1") would take its abilities there, so the second
+# Ballista, cast with X = 1 under Humility, enters with no counter: a 1/1 (Humility's base 1/1). The first, cast with X = 1
+# before Humility (the positive control), has its counter and is 2/2 under Humility (base 1/1, the counter in layer 7c).
+
+[Bot1 Deck]
+Walking Ballista
+Mox Pearl
+Mox Jet
+Mox Ruby
+Plains
+Humility
+Walking Ballista
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Walking Ballista#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista#1.Power = 2
+Bot1.Battlefield.Walking Ballista#1.Toughness = 2
+Bot1.Battlefield.Walking Ballista#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Walking Ballista#2.Power = 1
+Bot1.Battlefield.Walking Ballista#2.Toughness = 1
