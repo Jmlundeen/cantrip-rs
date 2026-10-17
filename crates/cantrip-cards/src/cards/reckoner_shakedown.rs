@@ -31,10 +31,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let candidates: Vec<ObjectId> = g
         .permanents_of(item.controller)
         .into_iter()
-        .filter(|&id| {
-            let c = g.chars(id);
-            c.is(CardType::Creature) || c.has_subtype(Subtype::Vehicle)
-        })
+        .filter(|&id| targets::creature_or_vehicle(g, id))
         .collect();
     let creature = match candidates.len() {
         0 => None,

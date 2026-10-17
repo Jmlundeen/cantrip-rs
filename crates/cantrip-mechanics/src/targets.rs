@@ -90,6 +90,28 @@ fn attacking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// still is as the ability resolves, or the target is illegal. Raffine, Scheming Seer and Raubahn, Bull of Ala Mhigo print it.
 pub const ATTACKING_CREATURE: TargetSpec = target(attacking_creature_filter);
 pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
+
+/// "Creature or Vehicle" (CR 205.3g, 301.7): a permanent on the battlefield that is a creature, or a Vehicle whether or not
+/// it is crewed into a creature right now. Bounce Off and Perilous Snare target one; Reckoner Shakedown chooses one.
+pub fn creature_or_vehicle(q: &dyn Query, id: ObjectId) -> bool {
+    on_battlefield(q, id) && {
+        let c = q.chars(id);
+        c.is(CardType::Creature) || c.has_subtype(Subtype::Vehicle)
+    }
+}
+
+fn creature_or_vehicle_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if creature_or_vehicle(q, id))
+}
+
+fn creature_or_vehicle_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if creature_or_vehicle(q, id) && q.controller(id) == asker.controller)
+}
+
+/// "Target creature or Vehicle" (CR 115.1). Bounce Off prints it.
+pub const CREATURE_OR_VEHICLE: TargetSpec = target(creature_or_vehicle_filter);
+/// "Target creature or Vehicle you control" (CR 115.1, 109.5). Perilous Snare prints it.
+pub const CREATURE_OR_VEHICLE_YOU_CONTROL: TargetSpec = target(creature_or_vehicle_you_control_filter);
 /// "Target creature you don't control" (CR 109.5): any other player's creature, a teammate's included. Winds of Abandon and
 /// Bushwhack print it.
 pub const CREATURE_YOU_DONT_CONTROL: TargetSpec = target(creature_you_dont_control_filter);
