@@ -1,0 +1,41 @@
+# Greedy Freebooter: the scry is a "may". Bot2 bolts the Freebooter and Bot1 keeps the top card (an Island) on top
+# (nothing on the bottom), so the library is unchanged and Bot1 draws that Island on its next turn. The Treasure token is
+# real mana: on turn 3 Bot1 sacrifices it for {B} and casts a second Freebooter with it, along with no land drop.
+
+[Bot1 Deck]
+Swamp
+Greedy Freebooter
+Greedy Freebooter
+Plains
+Plains
+Plains
+Plains
+Island
+Forest
+Swamp
+Plains
+Plains
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Greedy Freebooter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Greedy Freebooter)
+Bot1.Arrange(Island | )
+[T3 Bot1.Main1]
+Bot1.Battlefield.Treasure Token.Activate(Color: Black)
+Bot1.Hand.Greedy Freebooter.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Greedy Freebooter
+Bot1.Battlefield = Swamp; Greedy Freebooter
+Bot1.Hand = Plains; Plains; Plains; Plains; Island

@@ -1,0 +1,38 @@
+# Greedy Freebooter: "When this creature DIES" (CR 700.4: put into a graveyard from the battlefield). Bot2 exiles it with
+# Swords to Plowshares: it never reaches a graveyard, so there is no scry and no Treasure token (the positive control, a
+# Freebooter that does die, is in the other scenarios). Bot1 gains the 1 life from Swords and is asked to scry nothing.
+
+[Bot1 Deck]
+Swamp
+Greedy Freebooter
+Plains
+Plains
+Plains
+Plains
+Plains
+Mountain
+Island
+Forest
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Greedy Freebooter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Greedy Freebooter)
+[T2 Bot2.Main2]
+! Bot1.Arrange
+
+[Expect]
+Exile = Greedy Freebooter
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Swamp
+Bot1.Life = 21
+Bot1.Library = Mountain; Island; Forest

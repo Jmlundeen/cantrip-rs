@@ -1,0 +1,39 @@
+# Greedy Freebooter: "When this creature dies, scry 1 and create a Treasure token." Bot1 casts it on turn 1 and Bot2 kills it
+# with Lightning Bolt on turn 2. The trigger scries 1 (the top card, a Mountain, is put on the bottom: the library's order
+# shows it) and creates a Treasure token under Bot1's control, which is untapped. The Freebooter is in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Greedy Freebooter
+Plains
+Plains
+Plains
+Plains
+Plains
+Mountain
+Island
+Forest
+Swamp
+Plains
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Greedy Freebooter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Greedy Freebooter)
+Bot1.Arrange( | Mountain)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Greedy Freebooter
+Bot1.Battlefield = Swamp; Treasure Token
+Bot1.Battlefield.Treasure Token.Tapped = false
+Bot1.Library = Island; Forest; Swamp; Plains; Mountain
