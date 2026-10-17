@@ -1,0 +1,40 @@
+# Spreading Seas: "When this Aura enters, draw a card. Enchanted land is an Island." Setting a land's subtype (CR 305.7, layer
+# 4) takes away the abilities of its rules text: Bot2's Mutavault is an Island named Mutavault (the ruling) that taps for {U}
+# (CR 305.6) and can no longer become a creature. Bot1 draws a card as the Aura enters.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Spreading Seas
+Island x17
+
+[Bot2 Deck]
+Mutavault
+Mox Ruby
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mutavault.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Spreading Seas.Cast(Bot2.Battlefield.Mutavault)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 5
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 6
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot2.Battlefield.Mutavault.Activate
+? Bot2.Mana = {U}
+
+[Expect]
+Bot1.Battlefield.Spreading Seas.AttachedTo = Mutavault
+Bot2.Battlefield.Mutavault.Subtypes = Island
+Bot2.Battlefield.Mutavault.Types = Land
