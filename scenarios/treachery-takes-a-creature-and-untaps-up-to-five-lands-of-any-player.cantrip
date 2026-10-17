@@ -1,0 +1,54 @@
+# Treachery: "When this Aura enters, untap up to five lands. You control enchanted creature." Bot1 pays for it with two
+# Islands and three Moxes and takes Bot2's Llanowar Elves (CR 613.1b). The enters ability untaps lands chosen as it resolves,
+# not targeted, and "they don't have to be lands you control" (its ruling): Bot1 untaps both Islands and Bot2's Forest,
+# which Bot2 tapped on their turn - three, fewer than five (CR 701.26a). A Mox is no land and is not offered; the Moxes stay
+# tapped.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Island
+Island
+Treachery
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Treachery.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Forest.Tapped = true
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mox Sapphire)
+Bot1.Choose(Bot1.Battlefield.Island#1; Bot1.Battlefield.Island#2; Bot2.Battlefield.Forest)
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Island; Island; Treachery; Llanowar Elves
+Bot1.Battlefield.Island#1.Tapped = false
+Bot1.Battlefield.Island#2.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Treachery.AttachedTo = Llanowar Elves
+Bot2.Battlefield = Forest
+Bot2.Battlefield.Forest.Tapped = false

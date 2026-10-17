@@ -1,0 +1,6 @@
+{
+  "name": "Treachery",
+  "manaCost": "{3}{U}{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nWhen this Aura enters, untap up to five lands.\nYou control enchanted creature."
+}
