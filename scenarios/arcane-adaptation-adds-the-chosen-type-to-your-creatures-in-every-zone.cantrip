@@ -2,7 +2,7 @@
 # addition to their other types. The same is true for creature spells you control and creature cards you own that aren't
 # on the battlefield." Bot1 chooses Merfolk (CR 614.12a). A static ability that says so works on objects in every zone
 # (CR 611.3a), in layer 4, adding the type and keeping the others (CR 205.1b): Bot1's Llanowar Elves is an Elf Druid Merfolk,
-# the Doomed Traveler in Bot1's hand a Human Cleric Merfolk, the Walking Ballista in its graveyard (cast for X = 0) a
+# the Doomed Traveler in Bot1's hand a Human Soldier Merfolk, the Walking Ballista in its graveyard (cast for X = 0) a
 # Construct Merfolk, the Ornithopter on top of its library a Thopter Merfolk. Bot2's creatures are not Bot1's: its Llanowar
 # Elves and the Doomed Traveler in its hand keep their types alone.
 
@@ -49,8 +49,8 @@ Stack.Count = 0
 Bot1.Battlefield.Arcane Adaptation.ChosenSubtype = Merfolk
 Bot1.Battlefield.Arcane Adaptation.Subtypes = (absent)
 Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Merfolk
-Bot1.Hand.Doomed Traveler.Subtypes = Cleric; Human; Merfolk
+Bot1.Hand.Doomed Traveler.Subtypes = Human; Merfolk; Soldier
 Bot1.Graveyard.Walking Ballista.Subtypes = Construct; Merfolk
 Bot1.Library.Ornithopter.Subtypes = Merfolk; Thopter
 Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
-Bot2.Hand.Doomed Traveler.Subtypes = Cleric; Human
+Bot2.Hand.Doomed Traveler.Subtypes = Human; Soldier

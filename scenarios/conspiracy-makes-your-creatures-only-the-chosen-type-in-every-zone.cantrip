@@ -2,7 +2,7 @@
 # true for creature spells you control and creature cards you own that aren't on the battlefield." Bot1 chooses Merfolk.
 # The type is set in layer 4 (CR 613.1d), and every other creature type is lost (the ruling; CR 205.1a): Bot1's Llanowar
 # Elves is a Merfolk and no Elf or Druid, the Walking Ballista in its graveyard (cast for X = 0) a Merfolk and no Construct,
-# the Doomed Traveler and the Ornithopter in its library a Merfolk and no Human Cleric or Thopter.
+# the Doomed Traveler and the Ornithopter in its library a Merfolk and no Human Soldier or Thopter.
 # Bot2's Llanowar Elves and the Doomed Traveler in Bot2's hand are not Bot1's, and keep their types.
 
 [Bot1 Deck]
@@ -55,4 +55,4 @@ Bot1.Library.Doomed Traveler.Subtypes = Merfolk
 Bot1.Graveyard.Walking Ballista.Subtypes = Merfolk
 Bot1.Library.Ornithopter.Subtypes = Merfolk
 Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
-Bot2.Hand.Doomed Traveler.Subtypes = Cleric; Human
+Bot2.Hand.Doomed Traveler.Subtypes = Human; Soldier
