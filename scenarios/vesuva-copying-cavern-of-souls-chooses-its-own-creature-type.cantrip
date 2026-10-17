@@ -1,0 +1,27 @@
+# Vesuva enters as a copy of Cavern of Souls, whose "As this land enters, choose a creature type" is then a replacement of
+# its own entering, applied as it enters (CR 614.12, 707.9a; the ruling: "Any 'As [this land] enters the battlefield'
+# abilities of the copied land will also work"). The Cavern named Elf; the copy is asked afresh and names Goblin - nothing
+# chosen is copied (CR 707.2). It enters tapped, as Vesuva says.
+
+[Bot1 Deck]
+Cavern of Souls
+Vesuva
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Cavern of Souls.Play
+Bot1.Modes(Elf)
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Modes(Goblin)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Cavern of Souls; Cavern of Souls
+Bot1.Battlefield.Cavern of Souls#1.ChosenSubtype = Elf
+Bot1.Battlefield.Cavern of Souls#2.ChosenSubtype = Goblin
+Bot1.Battlefield.Cavern of Souls#2.Tapped = true

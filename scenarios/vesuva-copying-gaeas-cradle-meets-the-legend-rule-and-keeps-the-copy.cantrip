@@ -1,0 +1,25 @@
+# Vesuva enters as a copy of Gaea's Cradle and copies its legendary supertype and its name (CR 707.2), so Bot1 controls two
+# legendary permanents named Gaea's Cradle and the legend rule has Bot1 choose one (CR 704.5j). Bot1 keeps the copy (the
+# newer, tapped one): the Gaea's Cradle card goes to the graveyard, not destroyed, and the Vesuva that is a Cradle stays.
+
+[Bot1 Deck]
+Gaea's Cradle
+Vesuva
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Gaea's Cradle.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Choose(Gaea's Cradle#2)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Gaea's Cradle
+Bot1.Battlefield.Gaea's Cradle.Supertypes = Legendary
+Bot1.Battlefield.Gaea's Cradle.Tapped = true
+Bot1.Graveyard = Gaea's Cradle

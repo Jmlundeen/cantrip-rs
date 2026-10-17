@@ -1,0 +1,31 @@
+# Vesuva enters as a copy of a Mutavault that is a 2/2 creature until end of turn: the animation is not a copy effect, so it
+# is no copiable value (CR 707.2; the ruling: no "non-copy effects that changed its types"). The Vesuva-Mutavault is a Land
+# and no creature, with no power or toughness, while the original stays a Land Creature. (The Mutavault pays its own {1}.)
+
+[Bot1 Deck]
+Mutavault
+Vesuva
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot1.Battlefield.Mutavault.Activate(Ability: {C})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mutavault; Mutavault
+Bot1.Battlefield.Mutavault#1.Types = Land; Creature
+Bot1.Battlefield.Mutavault#1.Power = 2
+Bot1.Battlefield.Mutavault#2.Types = Land
+Bot1.Battlefield.Mutavault#2.Power = (absent)
+Bot1.Battlefield.Mutavault#2.Tapped = true

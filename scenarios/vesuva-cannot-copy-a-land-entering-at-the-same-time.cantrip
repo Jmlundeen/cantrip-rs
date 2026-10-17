@@ -1,0 +1,51 @@
+# Vesuva and Cavern of Souls are put onto the battlefield at once by Hexhaven Invigorator's trigger (Bot1's own Lightning Bolt
+# deals it 3). Vesuva may copy only a land already on the battlefield (CR 614.12, 707.2; the ruling: "If Vesuva somehow enters
+# the battlefield at the same time as another land, Vesuva can't become a copy of that land"), so of the Forest, Bot2's
+# Island and the entering Cavern only the first two are offered: the refusal shows the Cavern is not, and Bot1 copies Bot2's
+# Island. The Cavern still asks its own creature type. Both enter tapped.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Ruby
+Hexhaven Invigorator
+Lightning Bolt
+Plains
+Plains
+Plains
+Vesuva
+Cavern of Souls
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Hexhaven Invigorator.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Hexhaven Invigorator)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Search(Vesuva; Cavern of Souls)
+Bot1.Accept
+! Bot1.Target(Cavern of Souls)
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Modes(Elf)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Ruby; Hexhaven Invigorator; Island; Cavern of Souls
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Island.Subtypes = Island
+Bot1.Battlefield.Cavern of Souls.ChosenSubtype = Elf
+Bot1.Battlefield.Cavern of Souls.Tapped = true

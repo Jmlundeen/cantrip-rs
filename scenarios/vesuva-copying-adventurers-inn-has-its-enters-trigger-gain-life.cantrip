@@ -1,0 +1,30 @@
+# Vesuva enters as a copy of Adventurer's Inn, so it has the Inn's "When this land enters, you gain 2 life" as it enters and
+# that ability triggers (CR 603.6a, 707.2; the ruling: "Any enters-the-battlefield abilities of the copied land will trigger").
+# Bot1 gains 2 for the Inn on turn 1 and 2 more for Vesuva on turn 3: 24. The copy is a Town named Adventurer's Inn, and
+# tapped, though the Inn itself enters untapped.
+
+[Bot1 Deck]
+Adventurer's Inn
+Vesuva
+Forest x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Adventurer's Inn.Play
+[T2 Bot2.Main1]
+? Bot1.Life = 22
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield = Adventurer's Inn; Adventurer's Inn
+Bot1.Battlefield.Adventurer's Inn#2.Subtypes = Town
+Bot1.Battlefield.Adventurer's Inn#2.Tapped = true
+Bot1.Battlefield.Adventurer's Inn#1.Tapped = false
+Stack.Count = 0

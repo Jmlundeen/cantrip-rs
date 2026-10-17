@@ -1,0 +1,31 @@
+# Vesuva enters as a copy of Bot1's untapped Island (CR 707.2): it copies the Island's copiable values - its name, the basic
+# supertype, the Island subtype and so its intrinsic "{T}: Add {U}" (CR 305.6) - but not whether it is tapped (the ruling), and
+# "enter tapped as a copy" makes it enter tapped whatever the Island is. The Island is the lone land on the battlefield, so
+# what to copy is not asked. On turn 5 the copy untaps with the rest and taps for {U}.
+
+[Bot1 Deck]
+Island
+Vesuva
+Forest x13
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+? Bot1.Battlefield.Island#2.Tapped = true
+? Bot1.Battlefield.Island#1.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Mana = {U}
+
+[Expect]
+Bot1.Battlefield = Island; Island
+Bot1.Battlefield.Island#2.Supertypes = Basic
+Bot1.Battlefield.Island#2.Subtypes = Island
+Bot1.Battlefield.Island#2.Types = Land
+Bot1.Battlefield.Island#2.Tapped = true
+Bot1.Battlefield.Island#1.Tapped = false
