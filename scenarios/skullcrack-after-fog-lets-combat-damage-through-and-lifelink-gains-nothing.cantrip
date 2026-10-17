@@ -1,0 +1,48 @@
+# Skullcrack's rulings: a prevention effect that resolved before it prevents nothing for the rest of the turn ("damage can't
+# be prevented this turn", CR 615.12), and nothing gains life ("players can't gain life this turn", CR 119.7), lifelink
+# included (CR 702.15b). Bot1 attacks with Bofur, Reliable Guardian (1/1 lifelink) and Llanowar Elves; nothing blocks. In
+# the declare blockers step Bot2 casts Fog and it resolves; then Bot1 casts Skullcrack at Bot2. Combat damage is dealt in
+# full - Fog prevents none of it - and Bofur's lifelink gains Bot1 nothing: Bot2 ends at 20 - 3 - 2 = 15, Bot1 at 20.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Bofur, Reliable Guardian
+Llanowar Elves
+Skullcrack
+Island x14
+
+[Bot2 Deck]
+Forest
+Fog
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Bofur, Reliable Guardian > Bot2; Llanowar Elves > Bot2)
+[T3 Bot1.Blockers]
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fog.Cast
+Bot1.Pass
+? Bot2.Graveyard = Fog
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Skullcrack.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Life = 20
+Prevented = (absent)
+Bot1.Graveyard = Skullcrack
