@@ -1,0 +1,59 @@
+# Teysa Karlov: "If a creature dying causes a triggered ability of a permanent you control to trigger, that ability triggers an
+# additional time" (CR 603.2d). Wrath of God destroys Teysa, Blood Artist and Bot2's Ornithopter at once. Both Blood Artist's
+# trigger and Teysa's rule look back (CR 603.10a; Teysa's ruling: a creature dying at the same time as Teysa, Teysa included):
+# Blood Artist triggers twice for each of the three deaths, six times, each targeting Bot2 - Bot2 loses 6, Bot1 gains 6.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Pearl
+Mox Jet
+Teysa Karlov
+Blood Artist
+Wrath of God
+Plains
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Teysa Karlov.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Blood Artist.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+? Stack.Count = 6
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 26

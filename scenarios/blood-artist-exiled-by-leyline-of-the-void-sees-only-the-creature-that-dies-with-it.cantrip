@@ -1,0 +1,49 @@
+# Bot2's Leyline of the Void: "If a card would be put into an opponent's graveyard from anywhere, exile it instead" (CR 614.1a).
+# Wrath of God destroys Bot1's Blood Artist and Bot2's Ornithopter at once: the Artist is exiled instead of dying, so it does not
+# trigger for itself (CR 700.4), but its ability looks back (CR 603.10a) and sees the Ornithopter, which goes to Bot2's own
+# graveyard and dies: one trigger, and Bot2 loses 1 while Bot1 gains 1.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Blood Artist
+Wrath of God
+Black Lotus
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Leyline of the Void
+Ornithopter
+Island x13
+
+[Actions]
+Bot2.Accept
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Blood Artist.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+
+[Expect]
+Exile.Count = 3
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot2.Life = 19
+Bot1.Life = 21

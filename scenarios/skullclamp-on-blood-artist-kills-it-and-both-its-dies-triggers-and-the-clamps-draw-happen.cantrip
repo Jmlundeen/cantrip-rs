@@ -1,0 +1,42 @@
+# Skullclamp's +1/-1 makes Blood Artist, a 0/1, a 1/0 the moment it is equipped, and it dies to the state-based action
+# (CR 704.5f). Two abilities look back at it (CR 603.10a): Skullclamp's "whenever equipped creature dies, draw two cards" - it was
+# equipped as it died - and Blood Artist's own "whenever this creature ... dies". Bot1 draws two, and Bot2 loses 1 while Bot1
+# gains 1. Skullclamp stays on the battlefield, attached to nothing (CR 704.5n).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Blood Artist
+Skullclamp
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Blood Artist.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Skullclamp.Activate(Blood Artist)
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot2.Life = 19
+Bot1.Life = 21
+Bot1.Graveyard = Blood Artist
+Bot1.Battlefield.Skullclamp.AttachedTo = (absent)

@@ -1,0 +1,50 @@
+# Blood Artist: "Whenever this creature or another creature dies, target player loses 1 life and you gain 1 life." Wrath of God
+# destroys it with Bot1's Ornithopter and Bot2's Ornithopter at once; a dies trigger looks back (CR 603.10a), so Blood Artist,
+# dying with them, triggers for each of the three, itself included (the ruling), any player's creature. Each targets Bot2:
+# Bot2 loses 3 and Bot1 gains 3.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Blood Artist
+Ornithopter
+Wrath of God
+Black Lotus
+Plains
+Plains x10
+
+[Bot2 Deck]
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Blood Artist.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+? Stack.Count = 3
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard.Count = 1

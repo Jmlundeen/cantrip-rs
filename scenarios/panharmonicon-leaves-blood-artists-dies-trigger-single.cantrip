@@ -1,0 +1,47 @@
+# Panharmonicon adds a triggering only where an artifact or creature entering causes it (CR 603.2d). Blood Artist dying to Bot2's
+# Lightning Bolt is a creature leaving, not entering: its "whenever this creature or another creature dies" triggers once, and
+# Bot2 loses 1 while Bot1 gains 1 - not 2.
+
+[Bot1 Deck]
+Swamp
+Sol Ring
+Black Lotus
+Mox Jet
+Panharmonicon
+Blood Artist
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Panharmonicon.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Blood Artist.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Blood Artist)
+Bot2.Pass
+Bot1.Target(Bot2)
+? Stack.Count = 1
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 21
+Bot1.Graveyard = Blood Artist; Black Lotus
