@@ -1,0 +1,34 @@
+# Curious Farm Animals: "Destroy UP TO ONE target artifact or enchantment" lets the ability be activated with no target at
+# all, though a Mox Sapphire is there to be chosen. The sacrifice is paid anyway and is a death: the Sapphire stays, Bot1
+# gains 3 life (23) and has the creature in its graveyard.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Curious Farm Animals
+Island x15
+
+[Bot2 Deck]
+Mox Sapphire
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Curious Farm Animals.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Curious Farm Animals.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Curious Farm Animals
+Bot2.Battlefield = Mox Sapphire
+Bot2.Graveyard.Count = 0

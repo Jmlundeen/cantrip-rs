@@ -1,0 +1,42 @@
+# Curious Farm Animals' second target kind: an enchantment. Bot2 casts Corpses of the Lost on turn 2 (its Skeleton Pirate
+# token is a 3/2 under it); on turn 3 Bot1 sacrifices the creature to destroy the enchantment: the Corpses goes to Bot2's
+# graveyard, the token stays as a plain 2/2, and Bot1 gains 3 from the death.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Curious Farm Animals
+Island x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Corpses of the Lost
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Curious Farm Animals.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Corpses of the Lost.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Curious Farm Animals.Activate(Bot2.Battlefield.Corpses of the Lost)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Graveyard = Corpses of the Lost
+Bot2.Battlefield.Skeleton Pirate.Power = 2

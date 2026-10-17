@@ -1,0 +1,30 @@
+# Curious Farm Animals: "When this creature dies, you gain 3 life" is not tied to its own ability. Bot2 kills the 1/1 with a
+# Lightning Bolt on turn 2 (it is a death, so Bot1 gains 3 and is at 23 after the Bolt hit nothing else); no ability was
+# used and nothing was destroyed.
+
+[Bot1 Deck]
+Mox Pearl
+Curious Farm Animals
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Curious Farm Animals.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Curious Farm Animals)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Curious Farm Animals
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield = Mox Ruby
+Bot1.Battlefield = Mox Pearl
