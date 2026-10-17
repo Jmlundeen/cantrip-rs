@@ -6,12 +6,7 @@ use cantrip_oracle as oracle;
 /// controller now is the Stone's. (A spell an opponent cast and you gained control of would also count: a control
 /// change of a spell on the stack nothing can make.)
 fn spell_you_cast(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    let s = view.state();
-    let obj = s.obj(affected);
-    obj.zone.is(ZoneKind::Stack)
-        && !obj.card_copy
-        && obj.cast_from.is_some()
-        && s.stack.iter().any(|i| i.kind == StackKind::Spell && i.object == affected && i.controller == s.obj(source).controller)
+    cantrip_mechanics::statics::spell_you_cast(view, source, affected)
 }
 
 pub static CARD: CardDef = CardDef {

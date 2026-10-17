@@ -27,13 +27,7 @@ fn draw_three_and_emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspe
 /// "Instant and sorcery spells you cast" (CR 601.2i, 707.10): a spell on the stack that was cast (not a copy of one)
 /// by the emblem's owner, and is an instant or a sorcery as it is on the stack.
 fn instant_or_sorcery_spell_you_cast(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, chars: &Chars) -> bool {
-    let s = view.state();
-    let obj = s.obj(affected);
-    obj.zone.is(ZoneKind::Stack)
-        && !obj.card_copy
-        && obj.cast_from.is_some()
-        && (chars.is(CardType::Instant) || chars.is(CardType::Sorcery))
-        && s.stack.iter().any(|i| i.kind == StackKind::Spell && i.object == affected && i.controller == s.obj(source).controller)
+    (chars.is(CardType::Instant) || chars.is(CardType::Sorcery)) && statics::spell_you_cast(view, source, affected)
 }
 
 pub static EMBLEM: CardDef = CardDef {

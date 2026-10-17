@@ -187,6 +187,17 @@ pub fn plus_pt<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, char
     chars.toughness = chars.toughness.map(|v| v + T);
 }
 
+/// "Spells you cast" (CR 601.2i, 707.10a): `affected` is a spell on the stack that was cast, not a copy of one, and its controller
+/// is `source`'s controller. Thrumming Stone and Ral, Crackling Wit's emblem grant their abilities to such spells.
+pub fn spell_you_cast(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId) -> bool {
+    let s = view.state();
+    let obj = s.obj(affected);
+    obj.zone.is(ZoneKind::Stack)
+        && !obj.card_copy
+        && obj.cast_from.is_some()
+        && s.stack.iter().any(|i| i.kind == StackKind::Spell && i.object == affected && i.controller == s.obj(source).controller)
+}
+
 /// "Has [an ability]" (CR 113.6, 613.1f) for the card's delayed ability number 0: a static ability that gives the objects it
 /// affects the ability the card lists first in `delayed` (the card as the source has it now, or the card it copies).
 /// Astrologian's Planisphere, Decaying Soil, Deconstruction Hammer, Footfall Crater, Hexing Squelcher, Kaldra Compleat,
