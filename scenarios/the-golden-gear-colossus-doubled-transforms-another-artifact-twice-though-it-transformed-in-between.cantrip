@@ -1,0 +1,66 @@
+# CR 701.27f limits only an ability transforming its own permanent. Panharmonicon makes The Golden-Gear Colossus's enters
+# ability trigger twice (CR 603.2d), both aimed at Dire Flail: "transform up to one other target double-faced artifact you
+# control". The first turns Dire Flail into Dire Blunderbuss; the second is an ability of the Colossus, not of the
+# Blunderbuss, so the transform in between does not stop it, and the Blunderbuss turns back into Dire Flail. Each makes two
+# Gnomes.
+
+[Bot1 Deck]
+Mountain
+Mox Sapphire
+Mox Pearl
+Tetzin, Gnome Champion
+Black Lotus
+Dire Flail
+Mox Ruby
+Ornithopter
+Ornithopter
+Ornithopter
+Mox Jet
+Island
+Island
+Panharmonicon
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Tetzin, Gnome Champion.Cast
+Bot1.Choose(Ornithopter)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Dire Flail.Cast
+Bot1.Choose(Mox Jet)
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Panharmonicon.Cast
+Bot1.Battlefield.Tetzin, Gnome Champion.Activate(Ability: Craft)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Choose(Mox Sapphire; Mox Pearl; Mox Ruby; Bot1.Battlefield.Ornithopter; Graveyard.Ornithopter#1; Graveyard.Ornithopter#2)
+Bot1.Triggers(The Golden-Gear Colossus; The Golden-Gear Colossus)
+Bot1.Target(Dire Flail)
+Bot1.Target(Dire Flail)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dire Blunderbuss.Types = Artifact
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Jet; Panharmonicon; Dire Flail; The Golden-Gear Colossus; Gnome; Gnome; Gnome; Gnome

@@ -254,7 +254,7 @@ pub static PHYREXIAN: CardDef = CardDef {
 };
 
 fn transform_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.transform(item.object);
+    g.transform_by(item.object, item);
     Ok(())
 }
 

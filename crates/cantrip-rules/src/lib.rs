@@ -795,7 +795,11 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn transform(&mut self, permanent: ObjectId) {
-        ops::transform(self, permanent);
+        ops::transform(self, permanent, None);
+    }
+
+    fn transform_by(&mut self, permanent: ObjectId, item: &StackItem) {
+        ops::transform(self, permanent, Some(item));
     }
 
     fn create_emblem(&mut self, def: CardId, player: PlayerId) -> ObjectId {

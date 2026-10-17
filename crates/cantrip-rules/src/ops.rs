@@ -699,8 +699,15 @@ fn enters_with_intrinsic_counters(cards: &CardTable, new: &mut Obj) {
 ///
 /// A permanent with daybound or nightbound "can't transform except due to its daybound (nightbound) ability"
 /// (CR 702.145b, 702.145e): day and night turn it over (`turn_over`), no effect does.
-pub fn transform(cx: &mut Cx, id: ObjectId) {
-    if !live(cx.s(), id) || crate::day_night::role(cx.chars(id).keywords).is_some() || transformed_since_its_ability(cx, id) {
+///
+/// `by` is the spell or ability whose instruction this is, when the caller names it (`Game::transform_by`); otherwise the
+/// one resolving (`Cx::resolving`), so the rule below holds for every caller.
+pub fn transform(cx: &mut Cx, id: ObjectId, by: Option<&StackItem>) {
+    let by = by.copied().or_else(|| cx.resolving().copied());
+    if !live(cx.s(), id)
+        || crate::day_night::role(cx.chars(id).keywords).is_some()
+        || by.is_some_and(|item| transformed_since(cx, &item, id))
+    {
         return;
     }
     turn_over(cx, id);
@@ -717,16 +724,15 @@ pub fn transform(cx: &mut Cx, id: ObjectId) {
 /// Aang, at the Crossroads's delayed ability (its 2025-10-02 ruling); the activated transforms of the Incubator token,
 /// Ulvenwald Oddity, Aang, Swift Savior, Norman Osborn and Temple of the Dead; Dowsing Device's and Cecil, Dark Knight's
 /// triggered ones.
-fn transformed_since_its_ability(cx: &Cx, id: ObjectId) -> bool {
-    match cx.resolving() {
-        Some(item) if item.kind != StackKind::Spell && item.object == id => cx.g.log[(item.since as usize).min(cx.g.log.len())..]
+fn transformed_since(cx: &Cx, item: &StackItem, id: ObjectId) -> bool {
+    item.kind != StackKind::Spell
+        && item.object == id
+        && cx.g.log[(item.since as usize).min(cx.g.log.len())..]
             .iter()
-            .any(|r| matches!(r.event, Event::Transformed { object } if object == id)),
-        _ => false,
-    }
+            .any(|r| matches!(r.event, Event::Transformed { object } if object == id))
 }
 
-/// Turns a permanent over (CR 701.28), once whatever is doing it has established that it may.
+/// Turns a permanent over (CR 701.27a), once whatever is doing it has established that it may.
 pub fn turn_over(cx: &mut Cx, id: ObjectId) {
     if !live(cx.s(), id) {
         return;

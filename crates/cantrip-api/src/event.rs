@@ -63,7 +63,7 @@ pub enum Event {
     /// of the spell or ability whose effect did it, the player whose action it was, or the controller of a permanent that
     /// enters with them; none for the rules themselves.
     CountersPut { object: ObjectId, kind: CounterKind, amount: i16, total: i16, by: Option<PlayerId> },
-    /// A permanent transformed (CR 701.28): its other face is up now.
+    /// A permanent transformed (CR 701.27a): its other face is up now.
     Transformed { object: ObjectId },
     /// `player` gave a gift (CR 702.174c) to `to`: an instant or sorcery spell they control whose gift cost was paid
     /// resolved, or the gift triggered ability of a permanent they control resolved.

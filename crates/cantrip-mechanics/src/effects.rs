@@ -180,9 +180,11 @@ pub const SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT: AbilityDef = ability(
 )
 .targets(&[crate::targets::ARTIFACT_OR_ENCHANTMENT]);
 
-/// "Transform this [permanent]" (CR 701.28): the ability's source. Aang, Swift Savior, Concealing Curtains, Norman Osborn and Temple of the Dead print it.
+/// "Transform this [permanent]" (CR 701.27a): the ability's source, which does nothing if it has transformed since the
+/// ability was put on the stack or, for a delayed ability, created (CR 701.27f). Aang, Swift Savior, Concealing Curtains,
+/// Norman Osborn, Temple of the Dead and Aang, at the Crossroads's delayed ability print it.
 pub fn transform_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.transform(item.object);
+    g.transform_by(item.object, item);
     Ok(())
 }
 

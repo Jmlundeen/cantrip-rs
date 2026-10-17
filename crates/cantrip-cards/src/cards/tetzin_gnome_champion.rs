@@ -46,7 +46,7 @@ fn other_double_faced_artifact_you_control(q: &dyn Query, asker: &Asker, t: Targ
 }
 
 /// "Transform up to one other target double-faced artifact you control. Create two 1/1 colorless Gnome artifact creature
-/// tokens." Only a transforming double-faced permanent turns over (CR 701.28c, the card's ruling); the Gnomes come either
+/// tokens." Only a transforming double-faced permanent turns over (CR 701.27c, the card's ruling); the Gnomes come either
 /// way.
 fn transform_and_gnomes(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(artifact) = cantrip_mechanics::targets::object(g, item, 0) {

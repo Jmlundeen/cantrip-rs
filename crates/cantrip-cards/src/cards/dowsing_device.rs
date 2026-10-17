@@ -13,7 +13,7 @@ fn pump_then_transform(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
         haste_until_end_of_turn(g, item.object, creature);
     }
     if artifacts_you_control(g, item.controller) >= 4 {
-        g.transform(item.object);
+        g.transform_by(item.object, item);
     }
     Ok(())
 }

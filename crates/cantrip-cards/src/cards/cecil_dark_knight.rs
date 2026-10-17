@@ -21,7 +21,7 @@ fn darkness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = *g.state().player(you);
     if player.life as i64 * 2 <= player.starting_life as i64 {
         g.untap(item.object);
-        g.transform(item.object);
+        g.transform_by(item.object, item);
     }
     Ok(())
 }

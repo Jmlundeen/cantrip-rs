@@ -406,9 +406,13 @@ pub trait Game: Query {
     /// the battlefield transformed", or "tapped and transformed" with `tapped` (CR 110.5b). A card with no back face stays
     /// where it is (CR 712.14a).
     fn put_onto_battlefield_transformed(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend>;
-    /// Transforms a permanent (CR 701.28): the other face is up. It stays the same object. Nothing if it is not a
-    /// double-faced permanent on the battlefield.
+    /// Transforms a permanent (CR 701.27a): the other face is up. It stays the same object (CR 712.18). Nothing if it is not
+    /// a double-faced permanent on the battlefield (CR 701.27c).
     fn transform(&mut self, permanent: ObjectId);
+    /// `transform` as the instruction of the spell or ability `item`, named explicitly: an ability of the permanent does
+    /// nothing if the permanent has transformed since the ability was put on the stack, or since a delayed ability was
+    /// created (CR 701.27f, `StackItem::since`).
+    fn transform_by(&mut self, permanent: ObjectId, item: &StackItem);
     /// Creates `count` tokens that are copies of a permanent (CR 707.2, 111.1), all at once, under `controller`.
     fn create_token_copies(&mut self, of: ObjectId, controller: PlayerId, count: u32) -> Result<Vec<ObjectId>, Suspend>;
     /// Creates `count` tokens that are copies of these copiable values (CR 707.2, 111.1), the exceptions the effect
