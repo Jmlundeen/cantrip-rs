@@ -1,0 +1,29 @@
+# Cards outside the game can't be affected by spells or abilities, except their own characteristic-defining abilities and what
+# brings them into the game (CR 400.11c). Painter's Servant makes every card in every zone blue - the colorless Mox Jet on the
+# battlefield is the positive control - but Bot1's sideboard Lightning Bolt stays red only.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Painter's Servant
+Island x17
+
+[Bot1 Sideboard]
+Lightning Bolt
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Painter's Servant.Cast
+Bot1.Colors(Blue)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Painter's Servant.ChosenColor = Blue
+Bot1.Battlefield.Mox Jet.Colors = Blue
+Bot1.Sideboard = Lightning Bolt
+Bot1.Sideboard.Lightning Bolt.Colors = Red

@@ -525,6 +525,10 @@ fn statics(
             (st.apply)(&view, id, chars);
         }
     }
+    // A card outside the game is affected by nothing but its own characteristic-defining abilities (CR 400.11c).
+    if state.obj(id).zone.is(ZoneKind::Sideboard) {
+        return;
+    }
     // The sources are in timestamp order; a continuous effect older than a source's static ability applies before it.
     // A static ability an effect granted the object (CR 613.7a) is one of them, at its own timestamp, with the object as
     // its source (CR 113.6), and applies to that object alone.

@@ -114,7 +114,20 @@ impl Session {
         let mut sideboards = Vec::new();
         let mut decklists = Vec::new();
         for (name, deck, sideboard) in &deal.seats {
-            sideboards.push(sideboard.iter().map(|c| known(name, c).map(|id| cards.fronts[id.0 as usize].unwrap_or(id))).collect::<Result<Vec<_>, _>>()?);
+            // A sideboard card the engine does not have is left out of the game rather than refusing the deal, so a decklist
+            // whose sideboard names one is still played (docs/known-issues.md, KI-37).
+            sideboards.push(
+                sideboard
+                    .iter()
+                    .filter_map(|c| match card(c) {
+                        Some(id) => Some(cards.fronts[id.0 as usize].unwrap_or(id)),
+                        None => {
+                            eprintln!("cantrip-native-host: {name}'s sideboard names {c}, which is not a card the engine has; it is left out");
+                            None
+                        }
+                    })
+                    .collect(),
+            );
             let mut list = Vec::new();
             let mut shown = Vec::new();
             for card_name in deck {
@@ -804,12 +817,15 @@ mod tests {
         assert_eq!(sideboard(&theirs, 2).count, 0);
     }
 
-    /// A sideboard naming a card the engine does not have is refused at the deal, as a deck naming one is.
+    /// A sideboard naming a card the engine does not have is dealt without it (KI-37), where a deck naming one is refused.
     #[test]
-    fn a_sideboard_card_the_engine_does_not_have_is_refused() {
+    fn a_sideboard_card_the_engine_does_not_have_is_left_out() {
         let mut dealt = deal(&[], "Island", 20);
-        dealt.seats[1].2 = vec!["No Such Card".into()];
-        assert!(Session::new(dealt).is_err());
+        dealt.seats[1].2 = vec!["No Such Card".into(), "Shock".into()];
+        let mut session = Session::new(dealt).ok().unwrap();
+        let view = session.view(2).ok().unwrap();
+        let sideboard = view.zones.iter().find(|z| z.kind == Some(ZoneKindView::Sideboard) && z.owner == 2).unwrap();
+        assert_eq!(sideboard.count, 1);
     }
 
     fn options_of(step: &Value) -> Vec<ActionOptionMessage> {

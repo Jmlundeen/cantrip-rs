@@ -634,7 +634,13 @@ impl GameScript {
                         }
                         script.sideboards[seat].push(parse_deck_entry(line, number)?)
                     }
-                    Section::BasicLandsOutside => script.basic_lands_outside.push(line.to_string()),
+                    Section::BasicLandsOutside => {
+                        let entry = parse_deck_entry(line, number)?;
+                        if entry.copies != 1 {
+                            return Err(ParseError("a [Basic Lands Outside] section names each basic land once: a sideboard holds any number of it".into()));
+                        }
+                        script.basic_lands_outside.push(entry.card)
+                    }
                     Section::Actions => script.steps.push(ScriptStep::parse(line, number)?),
                     Section::Expect => script.expectations.push(parse_expectation(line.trim_start_matches('?').trim(), number)?),
                     Section::Opening => script.chooser = opening_line(line)?,

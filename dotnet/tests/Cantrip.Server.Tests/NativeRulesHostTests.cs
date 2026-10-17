@@ -18,7 +18,7 @@ public sealed class NativeRulesHostTests
 
     private static readonly RulesSeat[] Seats =
     [
-        new("Alice", ["Island", "Island", "Lightning Bolt"]),
+        new("Alice", ["Island", "Island", "Lightning Bolt"], ["Counterspell"]),
         new("Bob", ["Swamp"]),
     ];
 
@@ -29,7 +29,7 @@ public sealed class NativeRulesHostTests
         NativeRulesHost rules = NativeRulesHost.NewGame(host, Seats, 123, new RulesGameOptions());
 
         Assert.Equal(
-            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"]},{"Name":"Bob","Deck":["Swamp"]}],"Seed":123,"Shuffle":true,"FirstPlayer":null,"Chooser":null}""",
+            """{"Cmd":"NewGame","Seats":[{"Name":"Alice","Deck":["Island","Island","Lightning Bolt"],"Sideboard":["Counterspell"]},{"Name":"Bob","Deck":["Swamp"],"Sideboard":[]}],"Seed":123,"Shuffle":true,"FirstPlayer":null,"Chooser":null,"BasicLandsOutside":[]}""",
             Assert.Single(host.Requests));
         Assert.Equal(1, rules.GameId);
         Assert.Equal([1, 2], rules.Seats);

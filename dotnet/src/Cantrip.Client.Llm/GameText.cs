@@ -650,6 +650,8 @@ public static class GameText
     {
         ZoneKindView.Battlefield => "the battlefield",
         ZoneKindView.Stack => "the stack",
+        // The cards a player owns outside the game (CR 400.11a): "went from outside the game to a hand".
+        ZoneKindView.Sideboard => "outside the game",
         _ => "a " + zone.ToString().ToLowerInvariant(),
     };
 
