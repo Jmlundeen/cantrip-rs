@@ -1,0 +1,40 @@
+# Dryad Arbor, a Land Creature - Forest Dryad with a green color indicator. It is played as a land (CR 305.1, 305.9: a
+# land creature is a land card, never cast), which is the turn's land play: with it played, a Forest cannot be played the
+# same turn (CR 305.2), and next turn one can (the positive control). It is green by its color indicator (CR 204, 202.2e).
+# As a creature it has summoning sickness (CR 302.6): the turn it arrives its "{T}: Add {G}" (CR 305.6) cannot be
+# activated and it cannot attack; on Bot1's next turn it taps for {G} and the turn after it attacks for 1.
+
+[Bot1 Deck]
+Dryad Arbor
+Forest
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+? Bot1.LandsPlayed = 1
+! Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Dryad Arbor.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Dryad Arbor.Activate
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Attack(Dryad Arbor > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 19
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Forest
+Bot1.Battlefield.Dryad Arbor.Colors = Green
+Bot1.Battlefield.Dryad Arbor.Power = 1
+Bot1.Battlefield.Dryad Arbor.Toughness = 1

@@ -1,0 +1,10 @@
+{
+  "name": "Dryad Arbor",
+  "type": "Land Creature — Forest Dryad",
+  "power": 1,
+  "toughness": 1,
+  "colorIndicator": [
+    "Green"
+  ],
+  "oracleText": "(This land isn't a spell, it's affected by summoning sickness, and it has \"{T}: Add {G}.\")"
+}
