@@ -577,6 +577,9 @@ restriction is a limit on what may be cast or activated, and an effect the mana 
 (`ManaRestriction::effects`: haste, can't be countered): `Spells(types)` pays only for casting a spell with one of the
 card types (Mishra's Workshop, Great Hall of the Biblioplex, Gideon's Memorial), `Abilities(types)` only for activating
 an ability whose source has one of them, or any source (Sunken Citadel, Steelswarm Operator, Omen Hawker),
+`SpellsFrom(zone)` only for casting a spell cast from that kind of zone and `NotSpellsFrom(zone)` for anything but that
+(CR 601.2a: `ManaPayment::Spell::from` is the zone the card was in, `Obj::cast_from` once on the stack; Interdimensional Web
+Watch's "spells from exile", Heartwood Crafter's "can't be spent to cast spells from your hand"),
 `Subtypes(SubtypeSpells)` only for casting a spell with one of up to two subtypes, a creature spell where it says so,
 uncounterable where it says so (Desolation of Smaug and Sarkhan, Fireblood's Dragon spells, Maelstrom of the Spirit
 Dragon's Dragon or Omen spells, Unclaimed Territory, Pillar of Origins and Cavern of Souls' creature spell of the chosen
@@ -604,6 +607,22 @@ cost can be paid (`Available::covers_for`), and by the options offered while pay
 nothing of this cost is still offered (CR 601.2g) and is marked `pays_nothing`, which the bots read. The restriction's
 mana goes where the player sends it: two mana of one restriction may pay one ability or two. The pool empties at the end
 of each step and phase as any mana does (CR 106.4).
+
+### Tapped for mana
+
+`Event::TappedForMana { permanent, player, produced }` is recorded when a mana ability with {T} in its cost resolves
+(CR 106.12): `produced` is the mana that ability itself added, every restriction counted, told from the player's pool
+before and after it - so a replacement of its mana counts, and the mana a triggered mana ability adds for the same tap
+does not (`actions::tapped_for_mana`). The triggered mana abilities it triggers (CR 605.1b) resolve at once, and only when
+it produced some mana (CR 106.12a); one that asks (`cantrip_mechanics::mana::add_one_mana_of_any_type_that_land_produced`,
+a type of `Label::ManaType`, "Choose which type of mana to add") suspends the activation, which runs again with the
+answer. "One mana of any type that land produced" reads `produced`: Lavaleaper, Mana Flare, and Heartbeat of Spring,
+Dictate of Karametra, Zendikar Resurgent, Mirari's Wake and Vorinclex, Voice of Hunger as written.
+
+"You may activate abilities of creatures you control as though those creatures had haste" (CR 302.6) is
+`CardDef::activate_as_though_haste`, asked (`static_rules::activates_as_though_haste`) only where a summoning-sick
+creature's {T} cost is paid: it gives no haste, so the creature still can't attack (Shang-Chi, Master of Kung Fu;
+Thousand-Year Elixir).
 
 ### Spells in an inset frame: Adventures and Omens
 

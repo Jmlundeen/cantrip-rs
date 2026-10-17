@@ -806,6 +806,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which face to cast".into()
                 } else if matches!(modes.first(), Some(Label::Miracle(..))) {
                     "Choose which miracle to reveal it with".into()
+                } else if matches!(modes.first(), Some(Label::ManaType(..))) {
+                    "Choose which type of mana to add".into()
                 } else {
                     String::new()
                 },

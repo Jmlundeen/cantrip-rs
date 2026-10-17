@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Whenever you tap a creature for mana" (CR 605.1b).
 fn creature_tapped_for_mana(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::TappedForMana { permanent, player }
+        Event::TappedForMana { permanent, player, .. }
             if *player == q.controller(source) && q.chars(*permanent).is(CardType::Creature) =>
         {
             Fired::about(Target::Object(*permanent))

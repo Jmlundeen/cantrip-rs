@@ -862,7 +862,7 @@ pub enum ManaRestriction {
     /// ("unless its controller pays", CR 118.12). A spell with flashback or kicker is still the spell it is.
     /// Artifact spells: Mishra's Workshop, Steelswarm Operator. Instant or sorcery spells: Great Hall of the Biblioplex,
     /// Tablet of Discovery (and the same limit on Abstract Paintmage and Cormela, Glamour Thief). Planeswalker spells:
-    /// Gideon's Memorial.
+    /// Gideon's Memorial. Creature spells: Rockface Village ("a creature spell"), Guildmages' Forum's kind.
     Spells(TypeSet),
     /// "Spend this mana only to activate abilities [of [type] sources]" (CR 106.6, 602.2b): only on the cost of activating
     /// an activated ability - a mana ability's included (CR 605.3a), wherever the ability functions from (a land card's
@@ -870,7 +870,8 @@ pub enum ManaRestriction {
     /// types, of any source. Never on a spell, a special action (CR 116.2: turning a face-down permanent face up,
     /// unlocking a door), a triggered ability's cost or "unless ... pays" (CR 118.12).
     /// Any source: Omen Hawker, Pit Automaton, The Enigma Jewel. Land sources: Sunken Citadel, Eumidian Lifeseed.
-    /// Artifact sources: Soldevi Machinist ("of artifacts"), Steelswarm Operator.
+    /// Artifact sources: Soldevi Machinist ("of artifacts"), Steelswarm Operator. Creature sources: Shang-Chi, Master of
+    /// Kung Fu.
     Abilities(TypeSet),
     /// "Spend this mana only to cast [a] [subtype] [or [subtype]] [creature] spell[s][, and that spell can't be
     /// countered]" (CR 106.6, 205.3): only on casting a spell that has one of these subtypes as it is on the stack (its
@@ -887,6 +888,16 @@ pub enum ManaRestriction {
     /// chosen for it (CR 202.3e, 107.3), a face-down spell's 0 (CR 708.4), the cast half's alone (CR 709.3b) - or, where it
     /// says so, whose mana cost has {X} in it. See `ManaValueSpells`.
     ManaValue(ManaValueSpells),
+    /// "Spend this mana only to cast spells from [a zone]" (CR 106.6, 601.2a): only on casting a spell that was cast from
+    /// a zone of this kind - the zone the card (or a card's copy, CR 707.12, 722.3) was in as it was put on the stack.
+    /// Never on an ability, nor on a spell cast from anywhere else. From exile: Interdimensional Web Watch (any spell
+    /// cast from exile, its ruling: not only the cards its own ability exiled).
+    SpellsFrom(ZoneKind),
+    /// "This mana can't be spent to cast spells from your [zone]" (CR 106.6, 601.2a): everything but casting a spell from
+    /// a zone of this kind - an ability, or a spell cast from anywhere else. A player casts only from their own hand (no
+    /// card lets one cast from another's), so "your hand" is the hand. From your hand: Heartwood Crafter (its prepare
+    /// spell's copy is cast from exile, CR 722.3).
+    NotSpellsFrom(ZoneKind),
 }
 
 /// "Spend this mana only to cast spells with mana value N or greater [or spells with {X} in their mana costs]"
@@ -958,7 +969,9 @@ pub enum ManaPayment {
     /// restricted by subtype (`ManaRestriction::Subtypes`), and are empty otherwise. `mana_value` is its mana value on the
     /// stack (CR 202.3), and `x` whether its mana cost has {X} in it (CR 107.3); for the advice whether a card could be
     /// cast, its mana value with X at 0, which `x` says could be raised.
-    Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool },
+    /// `from` is the kind of zone it is cast from (CR 601.2a): where the card is, for the advice; where it was, once on
+    /// the stack (`Obj::cast_from`).
+    Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool, from: ZoneKind },
     /// Activating an ability whose source has these card types (CR 602.2b, 605.3a).
     Ability { source: TypeSet },
     /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
@@ -979,6 +992,10 @@ impl ManaRestriction {
     pub const LAND_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Land]));
     pub const ARTIFACT_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Artifact]));
     pub const NONCREATURE_SPELLS: ManaRestriction = ManaRestriction::NonSpells(TypeSet::of(&[CardType::Creature]));
+    pub const CREATURE_SPELLS: ManaRestriction = ManaRestriction::Spells(TypeSet::of(&[CardType::Creature]));
+    pub const CREATURE_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Creature]));
+    pub const SPELLS_FROM_EXILE: ManaRestriction = ManaRestriction::SpellsFrom(ZoneKind::Exile);
+    pub const NOT_SPELLS_FROM_HAND: ManaRestriction = ManaRestriction::NotSpellsFrom(ZoneKind::Hand);
 
     /// "Spend this mana only to cast spells with mana value `n` or greater."
     pub const fn mana_value_at_least(n: u8) -> ManaRestriction {
@@ -994,7 +1011,7 @@ impl ManaRestriction {
     /// of `Subtypes` are named for their subtypes and those of `ManaValue` for their number (`name`). A card naming a
     /// restriction of card types not here fails the build (`Adds::only_for` is checked at compile time), since the host
     /// has no word for it on the wire.
-    pub const NAMED: [(ManaRestriction, &'static str); 10] = [
+    pub const NAMED: [(ManaRestriction, &'static str); 14] = [
         (ManaRestriction::NotNonartifactSpells, "NotNonartifactSpells"),
         (ManaRestriction::GainsHaste, "GainsHaste"),
         (ManaRestriction::LegendaryUncounterable, "LegendarySpells, CantBeCountered"),
@@ -1005,6 +1022,10 @@ impl ManaRestriction {
         (ManaRestriction::LAND_ABILITIES, "LandAbilities"),
         (ManaRestriction::ARTIFACT_ABILITIES, "ArtifactAbilities"),
         (ManaRestriction::NONCREATURE_SPELLS, "NoncreatureSpells"),
+        (ManaRestriction::CREATURE_SPELLS, "CreatureSpells"),
+        (ManaRestriction::CREATURE_ABILITIES, "CreatureAbilities"),
+        (ManaRestriction::SPELLS_FROM_EXILE, "SpellsFromExile"),
+        (ManaRestriction::NOT_SPELLS_FROM_HAND, "NotSpellsFromHand"),
     ];
 
     const fn same(self, other: ManaRestriction) -> bool {
@@ -1015,6 +1036,8 @@ impl ManaRestriction {
             (ManaRestriction::Spells(a), ManaRestriction::Spells(b))
             | (ManaRestriction::Abilities(a), ManaRestriction::Abilities(b))
             | (ManaRestriction::NonSpells(a), ManaRestriction::NonSpells(b)) => a.0 == b.0,
+            (ManaRestriction::SpellsFrom(a), ManaRestriction::SpellsFrom(b))
+            | (ManaRestriction::NotSpellsFrom(a), ManaRestriction::NotSpellsFrom(b)) => a as u8 == b as u8,
             _ => false,
         }
     }
@@ -1056,6 +1079,10 @@ impl ManaRestriction {
             // "Can't be spent to cast nonartifact spells": everything but casting a nonartifact spell.
             (ManaRestriction::NotNonartifactSpells, ManaPayment::Spell { types, .. }) => types.has(CardType::Artifact),
             (ManaRestriction::NotNonartifactSpells, _) => true,
+            (ManaRestriction::SpellsFrom(zone), ManaPayment::Spell { from, .. }) => from == zone,
+            // "Can't be spent to cast spells from your hand": everything but casting a spell from the hand.
+            (ManaRestriction::NotSpellsFrom(zone), ManaPayment::Spell { from, .. }) => from != zone,
+            (ManaRestriction::NotSpellsFrom(_), _) => true,
             (ManaRestriction::GainsHaste, _) => true,
             (ManaRestriction::LegendaryUncounterable, ManaPayment::Spell { legendary, .. }) => legendary,
             (ManaRestriction::Spells(allowed), ManaPayment::Spell { types, .. }) => allowed.0 & types.0 != 0,

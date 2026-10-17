@@ -49,9 +49,12 @@ pub enum Event {
     /// `player` searched the library of `library` (CR 701.23, 701.23f): their own, or another player's.
     Searched { player: PlayerId, library: PlayerId },
     Tapped { permanent: ObjectId },
-    /// A permanent was tapped for mana (CR 605.1b): a mana ability with {T} in its cost was activated. Recorded for the history;
-    /// the triggered mana abilities it triggers (`TriggeredDef::mana_ability`) resolve at once, where the tap happens.
-    TappedForMana { permanent: ObjectId, player: PlayerId },
+    /// A permanent was tapped for mana (CR 106.12, 605.1b): a mana ability with {T} in its cost was activated by `player` and
+    /// resolved. `produced` is the mana that ability added (CR 106.12a), of any restriction - not what the triggered mana
+    /// abilities it triggers add: "one mana of any type that land produced" reads it. Recorded for the history; the
+    /// triggered mana abilities it triggers (`TriggeredDef::mana_ability`) resolve at once, where the tap happens, and only
+    /// when it produced some mana (CR 106.12a).
+    TappedForMana { permanent: ObjectId, player: PlayerId, produced: ManaPool },
     /// A player became the monarch (CR 725.1, 725.4): it was not theirs before.
     BecameMonarch { player: PlayerId },
     /// Creatures were declared as attackers (CR 508.1): "whenever you attack" (CR 508.1m). Not for creatures put onto

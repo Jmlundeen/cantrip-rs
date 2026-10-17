@@ -300,6 +300,12 @@ pub enum ManaSpendFilterView {
     /// Spells with the mana value named beside it or greater, or with {X} in their mana costs: "spells with mana value 5
     /// or greater or spells with {X} in their mana costs".
     ManaValueOrXSpells,
+    /// Spells cast from exile: "spend this mana only to cast spells from exile".
+    SpellsFromExile,
+    /// Anything but spells cast from the hand: "this mana can't be spent to cast spells from your hand".
+    NotSpellsFromHand,
+    /// Abilities of creature sources.
+    CreatureAbilities,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

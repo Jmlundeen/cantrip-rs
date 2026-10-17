@@ -1405,6 +1405,10 @@ pub type AttackDespiteDefenderRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// of this permanent (CR 609.4b): given the rule's own asker and the permanent whose ability is activated.
 pub type SpendAnyColorRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability lets its controller activate the abilities of this creature as though it had haste (CR 302.6):
+/// given the rule's own asker and the creature whose ability is activated.
+pub type ActivateAsThoughHasteRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// A static ability that lets an ability that can only be activated at sorcery speed (a loyalty ability, CR 606.3) be
 /// activated whenever its activator could cast an instant: asked of the ability's source, its index in the source's
 /// computed list and the activator.
@@ -1688,6 +1692,11 @@ pub struct CardDef {
     /// ability would be activated. Each such instance may be activated once each turn; an instance of the same ability it
     /// has another way is not limited.
     pub granted_once_each_turn: Option<fn(&dyn Query, ObjectId, AbilityRef) -> usize>,
+    /// "You may activate abilities of creatures you control as though those creatures had haste" (CR 302.6, 702.10c): a
+    /// {T} in the cost of an activated ability of such a creature may be paid though it came under its controller's control
+    /// this turn. It gives no haste: the creature still can't attack. Shang-Chi, Master of Kung Fu and Thousand-Year
+    /// Elixir.
+    pub activate_as_though_haste: &'static [ActivateAsThoughHasteRule],
     /// Its static abilities that forbid spells and abilities to cause discards or sacrifices (CR 101.2).
     pub cause_rules: &'static [CauseRule],
     /// Its replacements of its controller's turn beginning (CR 614.10).
@@ -1803,6 +1812,7 @@ impl CardDef {
         zero_loyalty_stays: &[],
         spend_any_color: &[],
         granted_once_each_turn: None,
+        activate_as_though_haste: &[],
         cause_rules: &[],
         turn_begin: &[],
         instant_activation: &[],

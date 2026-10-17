@@ -136,6 +136,10 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         r if r == ManaRestriction::ABILITIES => ManaSpendFilterView::ActivatedAbilities,
         r if r == ManaRestriction::LAND_ABILITIES => ManaSpendFilterView::LandAbilities,
         r if r == ManaRestriction::ARTIFACT_ABILITIES => ManaSpendFilterView::ArtifactAbilities,
+        r if r == ManaRestriction::CREATURE_SPELLS => ManaSpendFilterView::CreatureSpells,
+        r if r == ManaRestriction::CREATURE_ABILITIES => ManaSpendFilterView::CreatureAbilities,
+        r if r == ManaRestriction::SPELLS_FROM_EXILE => ManaSpendFilterView::SpellsFromExile,
+        r if r == ManaRestriction::NOT_SPELLS_FROM_HAND => ManaSpendFilterView::NotSpellsFromHand,
         r => panic!("a mana restriction the wire has no word for: {}", r.name()),
     };
     let effect = match restriction.effects() {

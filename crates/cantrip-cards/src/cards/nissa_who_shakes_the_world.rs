@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// {G} too.
 fn forest_tapped_for_mana(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
-        Event::TappedForMana { permanent, player }
+        Event::TappedForMana { permanent, player, .. }
             if *player == q.controller(source) && q.chars(*permanent).has_subtype(q.words(source).subtype(Subtype::Forest)) =>
         {
             Fired::about(Target::Object(*permanent))

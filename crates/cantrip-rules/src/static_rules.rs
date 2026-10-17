@@ -165,6 +165,14 @@ pub fn spend_any_color_for(cx: &Cx, player: PlayerId, source: ObjectId) -> bool 
     })
 }
 
+/// Whether `player` may activate the abilities of `creature` as though it had haste (CR 302.6): a static ability of a
+/// permanent `player` controls says so.
+pub fn activates_as_though_haste(cx: &Cx, player: PlayerId, creature: ObjectId) -> bool {
+    sources(cx, |d| !d.activate_as_though_haste.is_empty()).any(|(id, controller, def)| {
+        controller == player && def.activate_as_though_haste.iter().any(|rule| rule(cx, &Asker { source: id, controller }, creature))
+    })
+}
+
 /// What `creature` assigns as combat damage (CR 510.1a): its power, or its toughness if a static ability says so.
 pub fn combat_damage_of(cx: &Cx, creature: ObjectId) -> u16 {
     let c = cx.chars(creature);

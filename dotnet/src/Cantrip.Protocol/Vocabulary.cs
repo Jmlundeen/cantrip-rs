@@ -364,6 +364,12 @@ public enum ManaSpendFilterView
     ManaValueSpells = 13,
     /// <summary>Only to cast a spell with the mana value named beside it or greater, or with {X} in its mana cost.</summary>
     ManaValueOrXSpells = 14,
+    /// <summary>Only to cast a spell from exile: "spend this mana only to cast spells from exile".</summary>
+    SpellsFromExile = 15,
+    /// <summary>On anything but a spell cast from the hand: "this mana can't be spent to cast spells from your hand".</summary>
+    NotSpellsFromHand = 16,
+    /// <summary>Only to activate abilities of creature sources.</summary>
+    CreatureAbilities = 17,
 }
 
 /// <summary>What spending some mana does to whatever it pays for (CR 106.6): the effect half of a restriction.</summary>

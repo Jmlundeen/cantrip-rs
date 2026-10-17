@@ -722,6 +722,9 @@ pub enum Label {
     Face(CardId),
     /// One of a card's miracle abilities, to reveal it with (CR 702.94a, 607.5).
     Miracle(MiracleOf),
+    /// A type of mana to add (CR 106.1b: white, blue, black, red, green or colorless): "one mana of any type that land
+    /// produced".
+    ManaType(Mana),
 }
 
 /// One miracle ability of a card (CR 702.94a), named without the object, which a question asked as the card is drawn may not

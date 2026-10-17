@@ -65,7 +65,12 @@ fn activated(cx: &Cx, ability: AbilityRef) -> Option<&'static ActivatedDef> {
 /// offered at all.
 fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> bool {
     let obj = cx.s().obj(source);
-    if cost.tap && (obj.tapped || summoning_sick(cx.cards(), cx.s(), &cx.g.log, source)) {
+    // A creature's {T} ability needs it under its controller's control since their turn began, unless it has haste or the
+    // ability may be activated as though it had (CR 302.6).
+    if cost.tap
+        && (obj.tapped
+            || summoning_sick(cx.cards(), cx.s(), &cx.g.log, source) && !static_rules::activates_as_though_haste(cx, controller, source))
+    {
         return false;
     }
     if let Some(loyalty) = cost.loyalty
@@ -1445,8 +1450,10 @@ fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPaym
     let back = !def.has_cost && whole.back.is_some_and(|b| std::ptr::eq(b, def));
     let mana_value = if back { whole.cost.mana_value() } else { def.cost.mana_value() };
     let (types, legendary, x) = (def.types, def.supertypes.legendary, def.cost.x > 0);
+    // Cast from where the card is (CR 601.2a).
+    let from = cx.s().obj(card).zone.kind();
     if !a.names_subtypes() {
-        return ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary, mana_value, x };
+        return ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary, mana_value, x, from };
     }
     let mut subtypes = def.subtypes;
     if std::ptr::eq(def, cx.card(cx.s().obj(card).card)) {
@@ -1455,7 +1462,7 @@ fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPaym
     if def.keywords.has(Keyword::Changeling) && (def.types.has(CardType::Creature) || def.types.has(CardType::Kindred)) {
         subtypes = Subtype::CREATURE_TYPES.into_iter().fold(subtypes, SubtypeSet::with);
     }
-    ManaPayment::Spell { types, subtypes, legendary, mana_value, x }
+    ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from }
 }
 
 impl Available {
@@ -1473,7 +1480,7 @@ impl Available {
         // A spell whose X is still to be announced (CR 601.2b) has the larger mana value the larger X is (CR 202.3e):
         // mana for spells of a mana value or greater may pay for it at an X that brings it there (Ashling, Rimebound's
         // mana and a {X}{R} spell), each X costing its {X} symbols more.
-        let ManaPayment::Spell { types, subtypes, legendary, mana_value, x } = *payment else { return false };
+        let ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from } = *payment else { return false };
         let Some(most) = self.restricted.iter().filter_map(|(r, ..)| r.least_mana_value()).max() else { return false };
         if cost.x == 0 || mana_value >= most as u32 {
             return false;
@@ -1482,7 +1489,7 @@ impl Available {
         (1..=(most as u32 - mana_value).div_ceil(per)).any(|n| {
             let mut more = *cost;
             more.generic = (more.generic as u32 + n * per).min(255) as u8;
-            self.covers_as(&more, &ManaPayment::Spell { types, subtypes, legendary, mana_value: mana_value + n * per, x })
+            self.covers_as(&more, &ManaPayment::Spell { types, subtypes, legendary, mana_value: mana_value + n * per, x, from })
         })
     }
 
@@ -4002,6 +4009,9 @@ pub fn activate_mana(
         ops::sacrifice(cx, &[source]);
     }
     let asker = Asker { source, controller: player };
+    // What the ability itself produces (CR 106.12a), told from the pool before and after it: whatever replaced or added to
+    // its mana, and of whatever restriction, but not what the triggered mana abilities it triggers add.
+    let before = if def.cost.tap { mana_held(cx, player) } else { ManaPool::default() };
     if !adds_nothing {
         match def.mana {
             Some(effect) => effect(cx, &asker, color)?,
@@ -4012,9 +4022,22 @@ pub fn activate_mana(
         }
     }
     if def.cost.tap {
-        tapped_for_mana(cx, player, source);
+        let after = mana_held(cx, player);
+        let produced = ManaPool(std::array::from_fn(|m| after.0[m].saturating_sub(before.0[m])));
+        tapped_for_mana(cx, player, source, produced)?;
     }
     Ok(())
+}
+
+/// The mana in `player`'s pool, of every restriction and none.
+fn mana_held(cx: &Cx, player: PlayerId) -> ManaPool {
+    let mut held = cx.s().player(player).pool;
+    for (_, pool) in cx.s().restricted_of(player) {
+        for m in 0..6 {
+            held.0[m] = held.0[m].saturating_add(pool.0[m]);
+        }
+    }
+    held
 }
 
 /// Activating a mana ability the player has of their own (CR 605.1a, 611.2a, 605.3): the nth of those that effects gave them.
@@ -4067,12 +4090,17 @@ fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
     (colors, colorless)
 }
 
-/// A permanent was tapped for mana (CR 605.1b): the fact is recorded, and the triggered mana abilities it triggers resolve at
-/// once, as part of the mana ability that triggered them (CR 605.4a): "whenever you tap a Forest for mana, add an additional
-/// {G}". They are looked for among the permanents whose cards have one.
-fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId) {
-    let event = Event::TappedForMana { permanent: source, player };
+/// A permanent was tapped for mana (CR 106.12, 605.1b) and produced `produced`: the fact is recorded, and, if it produced any
+/// mana, the triggered mana abilities it triggers (CR 106.12a) resolve at once, as part of the mana ability that triggered
+/// them (CR 605.4a): "whenever you tap a Forest for mana, add an additional {G}". They are looked for among the permanents
+/// whose cards have one. One that asks (a type of the mana that land produced) suspends the activation, to be run again
+/// with the answer.
+fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: ManaPool) -> R<()> {
+    let event = Event::TappedForMana { permanent: source, player, produced };
     cx.record(event);
+    if produced.is_empty() {
+        return Ok(());
+    }
     let holders: Vec<ObjectId> = cx
         .s()
         .battlefield()
@@ -4104,12 +4132,12 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId) {
                 item.subject = fired.subject;
                 item.data = fired.data;
                 for _ in 0..=again.len() {
-                    // A mana ability asks nothing (CR 605.1b): there is no one to answer.
-                    let _ = (t.effect)(cx, &item);
+                    (t.effect)(cx, &item)?;
                 }
             }
         }
     }
+    Ok(())
 }
 
 // --- Paying ----------------------------------------------------------------------------------------------------------
@@ -4264,8 +4292,8 @@ fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> 
 
 /// Casting `spell`, a spell on the stack, as it is there (CR 601.2g): its card types, supertypes, mana value with X as
 /// announced (CR 202.3e: 0 for a copy with no mana cost or of a back face, CR 707.9b, 202.3b, and for a face-down spell,
-/// CR 708.4; the cast half's alone, CR 709.3b) and whether
-/// its mana cost has {X}; its subtypes only `with_subtypes`, where some mana at hand is limited by them.
+/// CR 708.4; the cast half's alone, CR 709.3b), whether its mana cost has {X} and the zone it was cast from (CR 601.2a); its
+/// subtypes only `with_subtypes`, where some mana at hand is limited by them.
 fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
     let chars = cx.chars(spell);
     let subtypes = if with_subtypes { chars.subtypes } else { SubtypeSet::NONE };
@@ -4275,6 +4303,7 @@ fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
         legendary: chars.supertypes.legendary,
         mana_value: cx.mana_value(spell),
         x: cx.mana_cost(spell).x > 0,
+        from: cx.s().obj(spell).cast_from.unwrap_or(ZoneKind::Stack),
     }
 }
 
