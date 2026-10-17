@@ -87,6 +87,15 @@ fn buyback_apply(q: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 pub const BUYBACK: ReplacementDef = replacement(ReplacementKind::ZoneChange, buyback_applies, buyback_apply, "returned to its owner's hand by buyback")
     .own_everywhere();
 
+/// "... exile it instead" (CR 614.1a) as the `apply` of a permanent's `replacement(ReplacementKind::ZoneChange, ..)`: the
+/// object goes to the exile zone of the player whose zone it was headed for, in place of the zone it would have gone to.
+/// Rest in Peace and Garruk, Veiled Butcher print it.
+pub fn exile_instead_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::ZoneChange(z) = proposal {
+        z.to = Zone::exile(z.to.player);
+    }
+}
+
 fn exile_instead_of_dying_applies(_: &dyn Query, _: &Asker, affected: ObjectId, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
         if z.object == affected && z.from.is(ZoneKind::Battlefield) && z.to.is(ZoneKind::Graveyard))

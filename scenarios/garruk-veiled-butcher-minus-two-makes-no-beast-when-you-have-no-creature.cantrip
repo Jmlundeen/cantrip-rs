@@ -1,0 +1,53 @@
+# "If you sacrificed a creature this way": Bot1 controls no creature when it uses the -2, so it sacrifices nothing and gets no
+# Beast, while Bot2's only creature, an Elvish Mystic, is still sacrificed - and exiled instead of dying. (The control is
+# garruk-veiled-butcher-minus-two-each-player-sacrifices-and-an-opponents-creature-is-exiled.) Loyalty 5 - 2 = 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Garruk, Veiled Butcher
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Garruk, Veiled Butcher.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Garruk, Veiled Butcher.Activate(Ability: Each player sacrifices)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Elvish Mystic
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Garruk, Veiled Butcher; Mox Jet; Mox Jet
+Bot1.Battlefield.Garruk, Veiled Butcher.Counters.Loyalty = 3

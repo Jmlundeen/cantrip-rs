@@ -1,0 +1,61 @@
+# Garruk, Veiled Butcher (cast turn 1 with Black Lotus and two Mox Jets): on turn 3 the +2 gives Bot2's Questing Beast (4/4,
+# haste, cast turn 2) -4/-1 until Bot1's next turn, so it is a 0/3 and its attack on turn 4 deals no damage (Bot1 stays at 20).
+# On turn 5 Bot1's turn has begun and the Beast is a 4/4 again. The second +2 that turn takes no target ("up to one").
+# Loyalty 5 + 2 + 2 = 9.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Garruk, Veiled Butcher
+Forest x3
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Questing Beast
+Forest x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Garruk, Veiled Butcher.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Questing Beast.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Garruk, Veiled Butcher.Activate(Ability: +2: Up to one; Bot2.Battlefield.Questing Beast)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Questing Beast.Power = 0
+? Bot2.Battlefield.Questing Beast.Toughness = 3
+[T4 Bot2.Main1]
+Bot2.Attack(Questing Beast > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Questing Beast.Power = 4
+? Bot2.Battlefield.Questing Beast.Toughness = 4
+Bot1.Battlefield.Garruk, Veiled Butcher.Activate(Ability: +2: Up to one)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Garruk, Veiled Butcher.Counters.Loyalty = 9
+Bot2.Battlefield.Questing Beast.Power = 4

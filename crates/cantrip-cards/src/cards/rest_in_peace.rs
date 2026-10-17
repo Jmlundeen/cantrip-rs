@@ -19,14 +19,8 @@ fn applies(q: &dyn Query, _: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z) if z.to.is(ZoneKind::Graveyard) && (z.is_card || q.obj(z.object).token))
 }
 
-fn apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
-    if let Proposal::ZoneChange(z) = proposal {
-        z.to = Zone::exile(z.to.player);
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(THIS_ENTERS, exile_graveyards, "When this enchantment enters, exile all graveyards.")],
-    replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "exiles a card or token a graveyard would receive")],
+    replacements: &[replacement(ReplacementKind::ZoneChange, applies, cantrip_mechanics::replacements::exile_instead_apply, "exiles a card or token a graveyard would receive")],
     ..oracle::REST_IN_PEACE
 };

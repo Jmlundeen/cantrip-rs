@@ -1,0 +1,65 @@
+# "If a creature an opponent controls would die, exile it instead." On turn 3 Bot1's Lightning Bolt kills Bot2's Elvish Mystic,
+# which is exiled instead of going to the graveyard. On turn 4 Bot2's Lightning Bolt kills Bot1's own Ornithopter, which
+# is Garruk's controller's creature and goes to the graveyard as usual (the control).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Garruk, Veiled Butcher
+Mox Ruby
+Lightning Bolt
+Ornithopter
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Mox Ruby
+Lightning Bolt
+Forest
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Garruk, Veiled Butcher.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Exile = Elvish Mystic
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Exile = Elvish Mystic
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
