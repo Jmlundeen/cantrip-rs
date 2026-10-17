@@ -88,6 +88,10 @@ fn keyword_name(k: u8) -> &'static str {
         33 => "Decayed",
         34 => "CantBeBlockedByMoreThanOne",
         35 => "Islandwalk",
+        36 => "Plainswalk",
+        37 => "Swampwalk",
+        38 => "Mountainwalk",
+        39 => "Forestwalk",
         _ => "?",
     }
 }
@@ -380,9 +384,10 @@ impl StateDump {
             // The power and toughness of a creature card in a hand, a graveyard or a library (CR 604.3: a characteristic-defining
             // ability works in every zone), `Bot1.Graveyard.Sandman, Shifting Scoundrel.Power`, and its subtypes (`.Subtypes`, absent
             // with none: what a static ability that works in every zone made it, Arcane Adaptation's chosen type); a name held twice
-            // is `Name#1`, `Name#2` in zone order (a library's top first). Every card there has `.Colors` (empty when colorless): an
-            // effect may change a card's colors outside the battlefield (Mycosynth Lattice's "all cards that aren't on the
-            // battlefield ... are colorless"), and outside the game (CR 400.11c) only its own characteristic-defining abilities do.
+            // is `Name#1`, `Name#2` in zone order (a library's top first, a graveyard's bottom first). Every card there has
+            // `.Colors` (empty when colorless): an effect may change a card's colors outside the battlefield (Mycosynth Lattice's
+            // "all cards that aren't on the battlefield ... are colorless"), and outside the game (CR 400.11c) only its own
+            // characteristic-defining abilities do.
             for (zone, label) in [(Zone::hand(p), "Hand"), (Zone::graveyard(p), "Graveyard"), (Zone::library(p), "Library"), (Zone::sideboard(p), "Sideboard")] {
                 let ids = s.zone(zone).to_vec();
                 for &id in &ids {

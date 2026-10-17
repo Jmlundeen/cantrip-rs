@@ -772,9 +772,34 @@ pub enum Keyword {
     CantBeBlockedByMoreThanOne = 34,
     /// Islandwalk (CR 702.14): landwalk naming the land type Island, an evasion ability - "this creature can't be blocked as
     /// long as defending player controls an Island" (CR 702.14c). Printed or given (Lord of Atlantis's "other Merfolk ...
-    /// have islandwalk"). Each landwalk is a keyword of its own that the blocking rule reads with its land type (`LANDWALK`
-    /// in `cantrip-rules`' turn structure), so another one printed is a keyword and an entry there.
+    /// have islandwalk"). Each basic landwalk is a keyword of its own that the blocking rule reads with its land type
+    /// (`Keyword::LANDWALKS`), so a text change of the land type gives the landwalk it now names.
     Islandwalk = 35,
+    /// Plainswalk (CR 702.14), as Islandwalk.
+    Plainswalk = 36,
+    /// Swampwalk (CR 702.14), as Islandwalk.
+    Swampwalk = 37,
+    /// Mountainwalk (CR 702.14), as Islandwalk.
+    Mountainwalk = 38,
+    /// Forestwalk (CR 702.14), as Islandwalk.
+    Forestwalk = 39,
+}
+
+impl Keyword {
+    /// Each basic landwalk keyword (CR 702.14a) and the basic land type it names.
+    pub const LANDWALKS: [(Keyword, Subtype); 5] = [
+        (Keyword::Plainswalk, Subtype::Plains),
+        (Keyword::Islandwalk, Subtype::Island),
+        (Keyword::Swampwalk, Subtype::Swamp),
+        (Keyword::Mountainwalk, Subtype::Mountain),
+        (Keyword::Forestwalk, Subtype::Forest),
+    ];
+
+    /// The landwalk naming `land_type` (CR 702.14a), if it is a basic land type: what "islandwalk" is once a text-changing
+    /// effect has replaced Island with another basic land type (CR 612.2).
+    pub fn landwalk(land_type: Subtype) -> Option<Keyword> {
+        Keyword::LANDWALKS.iter().find(|&&(_, t)| t == land_type).map(|&(k, _)| k)
+    }
 }
 
 /// Day and night (CR 731.1): the designation the game itself has, belonging to no player. A game starts with neither

@@ -949,10 +949,13 @@ declare more. A multi-pair refusal in a scenario is judged by the engine's check
 
 ### Landwalk
 
-Landwalk (CR 702.14) is an evasion ability, a keyword per land type: `Keyword::Islandwalk` (Lord of Atlantis gives it in
-layer 6), which `turn::can_block` reads with the land type it names (`LANDWALK`): no creature of a defending player who
-controls a land of that type, as the layers have it now, may block it (CR 702.14c), whatever landwalk the blocker has
-(702.14d). Another landwalk printed is one more keyword and one more entry there.
+Landwalk (CR 702.14) is an evasion ability, a keyword per basic land type: `Keyword::Islandwalk`, `Plainswalk`,
+`Swampwalk`, `Mountainwalk`, `Forestwalk`, which `turn::can_block` reads with the land type each names
+(`Keyword::LANDWALKS`): no creature of a defending player who controls a land of that type, as the layers have it now, may
+block it (CR 702.14c), whatever landwalk the blocker has (702.14d). An ability that grants one names its land type through
+its source's words (CR 612.2: Lord of Atlantis with Island changed to Swamp grants swampwalk, `Keyword::landwalk`). A
+printed landwalk's land type a text change replaces is not followed (no card in content prints landwalk; known issue
+KI-52). Another kind of landwalk (nonbasic, snow) is another keyword.
 
 ### Can't attack unless
 

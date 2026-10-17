@@ -14,9 +14,12 @@ fn other_merfolk(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_fa
     affected != source && so_far.has_subtype(q.words(source).subtype(Subtype::Merfolk))
 }
 
-/// "... have islandwalk" (layer 6).
-fn islandwalk(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Islandwalk);
+/// "... have islandwalk" (layer 6): the landwalk of the land type the Lord's text names, Island unless a text-changing
+/// effect replaced it with another basic land type (CR 612.2: Trait Doctoring's Swamp makes it swampwalk).
+fn islandwalk(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    if let Some(walk) = Keyword::landwalk(q.words(source).subtype(Subtype::Island)) {
+        chars.keywords = chars.keywords.with(walk);
+    }
 }
 
 pub static CARD: CardDef = CardDef {

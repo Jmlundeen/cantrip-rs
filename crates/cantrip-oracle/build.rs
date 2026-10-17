@@ -16,18 +16,18 @@ type Card = Map<String, Value>;
 
 const TYPES: [&str; 9] = ["Artifact", "Creature", "Enchantment", "Instant", "Land", "Planeswalker", "Sorcery", "Battle", "Kindred"];
 const BASIC_LAND: [(&str, &str); 5] = [("Plains", "W"), ("Island", "U"), ("Swamp", "B"), ("Mountain", "R"), ("Forest", "G")];
-const KEYWORDS: [&str; 27] = [
+const KEYWORDS: [&str; 31] = [
     "Flying", "Haste", "Vigilance", "Trample", "FirstStrike", "DoubleStrike", "Deathtouch", "Lifelink", "Reach", "Defender",
     "Flash", "Hexproof", "Indestructible", "Menace", "Infect", "Shadow", "Shroud", "CantBeBlocked", "CantBeCountered",
     "CantSpendManaToCast", "CastFromYourGraveyard", "Daybound", "Nightbound", "Changeling", "Decayed",
-    "CantBeBlockedByMoreThanOne", "Islandwalk",
+    "CantBeBlockedByMoreThanOne", "Islandwalk", "Plainswalk", "Swampwalk", "Mountainwalk", "Forestwalk",
 ];
 const COLORS: &str = "WUBRG";
 const COLOR_NAMES: [&str; 5] = ["White", "Blue", "Black", "Red", "Green"];
 /// The Oracle words of the core keywords a card can have and still need no file of its own.
-const KEYWORD_WORDS: [&str; 20] = [
+const KEYWORD_WORDS: [&str; 24] = [
     "flying", "haste", "vigilance", "trample", "first strike", "double strike", "deathtouch", "lifelink", "reach", "defender",
-    "flash", "hexproof", "indestructible", "menace", "infect", "shadow", "shroud", "changeling", "decayed", "islandwalk",
+    "flash", "hexproof", "indestructible", "menace", "infect", "shadow", "shroud", "changeling", "decayed", "islandwalk", "plainswalk", "swampwalk", "mountainwalk", "forestwalk",
 ];
 
 fn main() {

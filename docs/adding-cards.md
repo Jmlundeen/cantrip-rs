@@ -398,8 +398,9 @@ shapes have an example:
 - **Combat**: planeswalkers are attackable (`DeclareAttackers.planeswalkers`); `Keyword::CantBeAttacked` (CR 508.1c), `EffectKind::CantAttack` and `CantBlock` for a resolved "can't attack or block" (CR 508.1c, 509.1b; the host writes each on the creature with its duration),
   `CantBeBlockedByPowerTwoOrLess`, `CantBeBlockedExceptByThreeOrMore` (`Chars::minimum_blockers`, menace's two too),
   `CantBeBlockedByMoreThanOne` (`Chars::maximum_blockers`; a JSON `keywords` entry when printed, a layer-6 grant otherwise).
-  Landwalk (CR 702.14): `Keyword::Islandwalk`, read by the blocking rule with its land type (`turn::LANDWALK`); another
-  landwalk is a keyword and an entry there.
+  Landwalk (CR 702.14): a keyword per basic land type (`Keyword::Islandwalk`, `Swampwalk`, ...), read by the blocking
+  rule with its land type (`Keyword::LANDWALKS`); a card that grants one names it through its words,
+  `Keyword::landwalk(q.words(source).subtype(Subtype::Island))` (Lord of Atlantis).
   A scenario refuses an attack or a block with `! Bot2.Attack(A > B)` / `! Bot2.Block(A > B)`.
 - **Reflexive triggers** (CR 603.12, "when you do"): `Game::reflexive_trigger`; one whose quantity is what the first part
   did ("tap up to that many target creatures") is `Game::reflexive_trigger_counted(.., count)`, and its slot's

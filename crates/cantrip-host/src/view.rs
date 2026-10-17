@@ -271,7 +271,7 @@ pub fn hexproof_from_text(qualities: HexproofFrom) -> String {
 }
 
 /// The keywords as a card's text words them, for the ones an effect gave an object or took from it.
-const KEYWORD_WORDS: [(Keyword, &str); 36] = [
+const KEYWORD_WORDS: [(Keyword, &str); 40] = [
     (Keyword::Flying, "Flying"),
     (Keyword::Haste, "Haste"),
     (Keyword::Vigilance, "Vigilance"),
@@ -308,6 +308,10 @@ const KEYWORD_WORDS: [(Keyword, &str); 36] = [
     (Keyword::Decayed, "Decayed"),
     (Keyword::CantBeBlockedByMoreThanOne, "This creature can't be blocked by more than one creature."),
     (Keyword::Islandwalk, "Islandwalk"),
+    (Keyword::Plainswalk, "Plainswalk"),
+    (Keyword::Swampwalk, "Swampwalk"),
+    (Keyword::Mountainwalk, "Mountainwalk"),
+    (Keyword::Forestwalk, "Forestwalk"),
 ];
 
 /// A rules line without its parenthesized reminder text, trimmed.

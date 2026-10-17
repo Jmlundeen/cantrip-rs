@@ -1,0 +1,65 @@
+# "Islandwalk" names a basic land type, a word of Lord of Atlantis's text (CR 612.1-612.2): when Trait Doctoring replaces
+# Island with Swamp in the Lord's text on turn 3, its "Other Merfolk ... have islandwalk" reads "... have swampwalk", and
+# Cenote Scout has swampwalk instead (CR 702.14a). Bot2 controls a Swamp and no Island, so its Misshapen Fiend can't block
+# the Scout (the refusal; CR 702.14c) - with islandwalk it could have - while it may block the Lord (the positive
+# control). The Fiend (1/1) dies to the Lord, the Lord takes 1, and the Scout deals 2: Bot2 goes to 18.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Emerald
+Lord of Atlantis
+Cenote Scout
+Island
+Island
+Island
+Trait Doctoring
+Island x11
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Misshapen Fiend
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Cenote Scout.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Misshapen Fiend.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Cenote Scout.Keywords = Islandwalk
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Trait Doctoring.Cast(Lord of Atlantis)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Replace a basic land type)
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+? Bot1.Battlefield.Cenote Scout.Keywords = Swampwalk
+Bot1.Attack(Cenote Scout; Lord of Atlantis)
+! Bot2.Block(Misshapen Fiend > Cenote Scout)
+Bot2.Block(Misshapen Fiend > Lord of Atlantis)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot2.Graveyard = Misshapen Fiend
+Bot1.Battlefield.Cenote Scout.Keywords = Swampwalk
+Bot1.Battlefield.Cenote Scout.Power = 2
+Bot1.Battlefield.Lord of Atlantis.Damage = 1

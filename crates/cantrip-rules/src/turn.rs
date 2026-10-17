@@ -545,9 +545,6 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     Ok(())
 }
 
-/// Each landwalk keyword (CR 702.14a) and the land type it names.
-const LANDWALK: [(Keyword, Subtype); 1] = [(Keyword::Islandwalk, Subtype::Island)];
-
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
 /// can block only creatures with flying, flying (CR 702.9b), shadow (CR 702.28b), landwalk (CR 702.14c), protection (CR 702.16f). Menace (CR 702.110b) is about the
 /// whole declaration, not a pair.
@@ -569,7 +566,7 @@ fn can_block(cx: &Cx, blocker: ObjectId, attacker: ObjectId, rule_sources: &[Obj
     }
     // Landwalk (CR 702.14c): not while the defending player - the blocker's controller - controls a land of its type, as the
     // layers have that land now. A creature with landwalk of its own is no exception (CR 702.14d).
-    for (walk, land_type) in LANDWALK {
+    for (walk, land_type) in Keyword::LANDWALKS {
         if a.has(walk) {
             let defending = cx.s().obj(blocker).controller;
             let has_land = cx.s().battlefield().iter().any(|&id| {
