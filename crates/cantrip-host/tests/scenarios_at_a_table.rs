@@ -369,3 +369,111 @@ fn a_card_robbery_exiles_face_down_is_named_to_the_caster_and_not_to_its_owner()
     }
     assert!(caster_saw > 0 && owner_saw > 0, "the scenario never showed both seats the face-down card");
 }
+
+/// Plays the scenario `name` at a table, Bot1 driven by the script, calling `look` with both seats' views and the step before
+/// each answer; stops early when `look` says so. The last step.
+fn play_looking(name: &str, mut look: impl FnMut(&mut Session, &[cantrip_host::protocol::PlayerView; 2], &Value) -> bool) -> Value {
+    let text = std::fs::read_to_string(scripts().join(format!("{name}.cantrip"))).unwrap();
+    let mut session = Session::scenario(&text, name, Vec::new(), &[1]).map_err(|r| r.detail).unwrap();
+    let mut step = session.step();
+    for _ in 0..20_000 {
+        let views = [session.view(1).map_err(|r| r.detail).unwrap(), session.view(2).map_err(|r| r.detail).unwrap()];
+        if look(&mut session, &views, &step) {
+            return step;
+        }
+        let scenario = &step["Scenario"];
+        if scenario["Verdict"].is_object() {
+            assert_eq!(scenario["Verdict"]["Passed"], Value::Bool(true), "{}", scenario["Verdict"]["Report"]);
+            return step;
+        }
+        let expected = &scenario["Expected"];
+        let answer: AnswerPayload = if expected["Undo"] == Value::Bool(true) {
+            AnswerPayload::TakeActionAnswer(TakeActionAnswer::new(ActionKindView::UndoManaAbility, ViewHandle::NONE))
+        } else {
+            serde_json::from_value(expected["Answer"].clone()).unwrap()
+        };
+        let id = expected["RequestId"].as_u64().unwrap() as u32;
+        let seat = expected["Seat"].as_i64().unwrap() as i32;
+        step = session.answer(id, seat, &answer).map_err(|r| r.detail).unwrap();
+    }
+    panic!("the scenario went on too long at the table");
+}
+
+/// Whether `viewer`'s view (0 or 1) says `text` beside the life total of `about`.
+fn says(views: &[cantrip_host::protocol::PlayerView; 2], viewer: usize, about: usize, text: &str) -> bool {
+    views[viewer].players[about].pending_effects.iter().any(|f| f == text)
+}
+
+/// A game drawn by a loop of mandatory actions (CR 104.4b) says so to every seat: the three-Oblivion-Ring loop ends with a
+/// `GameEndedEvent` told to both players, a draw, and its reason the loop - what the client's game-over panel and log say.
+#[test]
+fn a_game_drawn_by_a_mandatory_loop_tells_every_seat_why() {
+    let mut ended: Vec<(String, Value)> = Vec::new();
+    let last = play_looking("three-oblivion-rings-with-no-other-nonland-permanent-loop-forever-and-the-game-is-a-draw", |_, _, step| {
+        for (seat, list) in step["Events"].as_object().unwrap() {
+            for event in list.as_array().unwrap().iter().filter(|e| e["$type"] == "GameEndedEvent") {
+                ended.push((seat.clone(), event.clone()));
+            }
+        }
+        false
+    });
+    assert_eq!(last["Outcome"], "Draw");
+    let mut seats: Vec<&str> = ended.iter().map(|(s, _)| s.as_str()).collect();
+    seats.sort_unstable();
+    assert_eq!(seats, ["1", "2"], "each seat is told once: {ended:?}");
+    for (_, event) in &ended {
+        assert_eq!(event["Outcome"], "Draw");
+        assert_eq!(event["DrawReason"], "MandatoryLoop", "{event}");
+    }
+}
+
+/// Platinum Angel's state is shown to both players (CR 104.2b, 104.3): while it is out, Bot1 is told "You can't lose the game."
+/// and Bot2 that Bot1 can't ("They can't lose the game."), and Bot2 that it can't win, which Bot1 is told of Bot2. At 0 life
+/// a concession still loses (CR 104.3a): the game is over, Bot2 the winner.
+#[test]
+fn platinum_angel_is_shown_and_a_concession_still_loses() {
+    let mut shown = false;
+    let mut conceded = false;
+    play_looking("platinum-angel-keeps-its-controller-in-at-zero-life-until-it-is-destroyed", |session, views, _| {
+        let applies = says(views, 0, 0, "You can't lose the game.");
+        assert_eq!(says(views, 1, 0, "They can't lose the game."), applies, "the seats are told different things of Bot1");
+        assert_eq!(says(views, 1, 1, "You can't win the game."), applies, "Bot2 is not told it can't win");
+        assert_eq!(says(views, 0, 1, "They can't win the game."), applies, "Bot1 is not told Bot2 can't win");
+        shown |= applies;
+        if applies && views[0].players[0].life == 0 {
+            let step = session.concede(1).map_err(|r| r.detail).unwrap();
+            assert_eq!(step["Outcome"], "TeamWon");
+            assert_eq!(step["WinningTeam"], 2);
+            conceded = true;
+            return true;
+        }
+        false
+    });
+    assert!(shown, "nobody was told of the Angel");
+    assert!(conceded, "Bot1 was never at 0 life with the Angel out");
+}
+
+/// Phyrexian Unlife's state is shown to both players (CR 104.3b, 702.90b): "You don't lose the game for having 0 or less life."
+/// while it is out, and, once Bot1 is at 0 or less life, "Damage is dealt to you as though its source had infect." - each told
+/// to Bot2 of Bot1 in its own words. Melira's "You can't get poison counters." likewise.
+#[test]
+fn phyrexian_unlife_and_melira_are_shown_to_both_players() {
+    let (mut unlife, mut infect, mut melira) = (false, false, false);
+    play_looking("melira-with-phyrexian-unlife-damage-dealt-as-poison-does-nothing", |_, views, _| {
+        let at_most_zero = views[0].players[0].life <= 0;
+        let pairs = [
+            ("You don't lose the game for having 0 or less life.", "They don't lose the game for having 0 or less life.", &mut unlife),
+            ("Damage is dealt to you as though its source had infect.", "Damage is dealt to them as though its source had infect.", &mut infect),
+            ("You can't get poison counters.", "They can't get poison counters.", &mut melira),
+        ];
+        let unlife_out = says(views, 0, 0, pairs[0].0);
+        for (own, other, seen) in pairs {
+            let applies = says(views, 0, 0, own);
+            assert_eq!(says(views, 1, 0, other), applies, "the seats are told different things: {own}");
+            *seen |= applies;
+        }
+        assert_eq!(says(views, 0, 0, "Damage is dealt to you as though its source had infect."), at_most_zero && unlife_out);
+        false
+    });
+    assert!(unlife && infect && melira, "not everything was shown: {unlife} {infect} {melira}");
+}
