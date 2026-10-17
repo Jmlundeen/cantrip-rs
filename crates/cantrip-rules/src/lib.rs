@@ -845,7 +845,11 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn put_onto_battlefield_transformed(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend> {
-        ops::put_onto_battlefield_as(self, object, controller, tapped, true, ZoneReason::Other).map_err(|_| Suspend)
+        ops::put_onto_battlefield_as(self, object, controller, tapped, true, ZoneReason::Other, &[]).map_err(|_| Suspend)
+    }
+
+    fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend> {
+        ops::put_onto_battlefield_as(self, object, controller, tapped, true, ZoneReason::Other, counters).map_err(|_| Suspend)
     }
 
     fn transform(&mut self, permanent: ObjectId) {

@@ -710,7 +710,8 @@ pub fn sacrifice_and_return(cx: &mut Cx, sacrificed: &[ObjectId], returned: &[(O
     Ok(())
 }
 
-/// Puts one object onto the battlefield, with its back face up if it enters transformed (CR 712.14a).
+/// Puts one object onto the battlefield, with its back face up if it enters transformed (CR 712.14a), and entering with the
+/// counters `with` names as well (CR 122.6, 614.1c).
 pub fn put_onto_battlefield_as(
     cx: &mut Cx,
     id: ObjectId,
@@ -718,6 +719,7 @@ pub fn put_onto_battlefield_as(
     tapped: bool,
     transformed: bool,
     reason: ZoneReason,
+    with: &[(CounterKind, i16)],
 ) -> R<ObjectId> {
     // Only a double-faced card has a back face to enter with: any other stays where it is (CR 712.14a).
     if transformed && cx.cards().backs[cx.s().obj(id).card.0 as usize].is_none() {
@@ -727,7 +729,7 @@ pub fn put_onto_battlefield_as(
         object: id,
         controller,
         tapped,
-        counters: [0; CounterKind::COUNT],
+        counters: entry_counters(with),
         copy: None,
         prepared: false,
         chosen_color: None,

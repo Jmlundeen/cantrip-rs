@@ -2995,7 +2995,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             }
             if action.index == WAY_BACK_FACE {
                 // A modal double-faced card played as its back face enters as that face (CR 712.14a).
-                ops::put_onto_battlefield_as(cx, source, player, false, true, ZoneReason::PlayLand)?;
+                ops::put_onto_battlefield_as(cx, source, player, false, true, ZoneReason::PlayLand, &[])?;
             } else {
                 let moved = ops::put_onto_battlefield(cx, &[(source, player, false)], ZoneReason::PlayLand)?;
                 if let Some((granter, way)) = granted

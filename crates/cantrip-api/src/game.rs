@@ -438,6 +438,11 @@ pub trait Game: Query {
     /// the battlefield transformed", or "tapped and transformed" with `tapped` (CR 110.5b). A card with no back face stays
     /// where it is (CR 712.14a).
     fn put_onto_battlefield_transformed(&mut self, object: ObjectId, controller: PlayerId, tapped: bool) -> Result<ObjectId, Suspend>;
+    /// `put_onto_battlefield_transformed`, the object entering with these counters as well (CR 122.6, 614.1c): Esper Origins'
+    /// "put it onto the battlefield transformed ... with a finality counter on it". They are part of how it enters, put by its
+    /// controller (CR 122.6a), so a replacement of counters applies to them (CR 614.1). A card with no back face stays where it
+    /// is (CR 712.14a).
+    fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend>;
     /// Transforms a permanent (CR 701.27a): the other face is up. It stays the same object (CR 712.18). Nothing if it is not
     /// a double-faced permanent on the battlefield (CR 701.27c).
     fn transform(&mut self, permanent: ObjectId);
