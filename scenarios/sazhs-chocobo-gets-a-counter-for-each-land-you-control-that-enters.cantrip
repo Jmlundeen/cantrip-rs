@@ -1,0 +1,49 @@
+# Landfall (CR 207.2c, 603.2): two Sazh's Chocobos (0/1) each get a +1/+1 counter for every land that enters under Bot1's control,
+# each ability resolving on its own: Wooded Foothills entering is one land and the Forest it fetches another, so both
+# Chocobos have two counters and are 2/3. Bot2's Island on turn 2 puts a counter on neither (a land "you control").
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Sazh's Chocobo
+Sazh's Chocobo
+Wooded Foothills
+Island
+Island
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Sazh's Chocobo.Cast
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Sazh's Chocobo.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+? Bot1.Battlefield.Sazh's Chocobo#1.Power = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Wooded Foothills.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sazh's Chocobo#1.Power = 1
+? Bot1.Battlefield.Sazh's Chocobo#2.Power = 1
+Bot1.Battlefield.Wooded Foothills.Activate
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Sazh's Chocobo#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Sazh's Chocobo#1.Power = 2
+Bot1.Battlefield.Sazh's Chocobo#1.Toughness = 3
+Bot1.Battlefield.Sazh's Chocobo#2.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Sazh's Chocobo#2.Power = 2

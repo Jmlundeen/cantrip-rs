@@ -1,0 +1,44 @@
+# The landfall ability is on the stack when Bot2 destroys the Chocobo in response (Get Lost): it resolves and does nothing, since
+# the counter cannot go on a creature that has left the battlefield (CR 400.7). The Chocobo card in the graveyard has none, and
+# Bot1's other Chocobo, whose own ability resolves, gets its counter (the control: both abilities were on the stack).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Sazh's Chocobo
+Sazh's Chocobo
+Forest
+Forest x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Get Lost
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Sazh's Chocobo.Cast
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Sazh's Chocobo.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Get Lost.Cast(Sazh's Chocobo)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Sazh's Chocobo
+Bot1.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sazh's Chocobo.Power = 1
+Bot1.Battlefield.Map Token#1.Token = true

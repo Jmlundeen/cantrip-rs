@@ -1,0 +1,8 @@
+{
+  "name": "Sazh's Chocobo",
+  "manaCost": "{G}",
+  "type": "Creature — Bird",
+  "power": 0,
+  "toughness": 1,
+  "oracleText": "Landfall — Whenever a land you control enters, put a +1/+1 counter on this creature."
+}
