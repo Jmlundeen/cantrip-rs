@@ -1,0 +1,38 @@
+# The prepare spell is a sorcery (CR 722, 304.1): the copy in exile cannot be cast during Bot2's turn 2 (the refusal; the
+# cast on Bot1's own turn 3 with an empty stack is the positive control). "You may discard a card. If you do, draw a
+# card": Bot1 chooses no card, so nothing is discarded and nothing drawn - the hand is the one it had. The copy is still
+# cast (unprepared), and the Battlemage is still a creature, 2/2 with prowess until end of turn.
+
+[Bot1 Deck]
+Mountain
+Pompous Battlemage
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Black Lotus
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pompous Battlemage.Cast
+[T2 Bot2.Main1]
+! Bot1.Exile.Improvised Act.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Improvised Act.Cast
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Hand = Lightning Bolt; Island; Island; Island; Black Lotus
+Bot1.Battlefield.Pompous Battlemage.Prepared = (absent)
+Bot1.Battlefield.Pompous Battlemage.Power = 2
