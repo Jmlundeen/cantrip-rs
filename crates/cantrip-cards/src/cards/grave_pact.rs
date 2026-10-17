@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::each_opponent_sacrifices;
 use cantrip_oracle as oracle;
 
 /// "Whenever a creature you control dies" (CR 700.4): judged on the board as it was before it died (CR 603.10a).
@@ -17,23 +17,10 @@ fn your_creature_dies(q: &dyn Query, source: ObjectId, event: &Event) -> Option<
     }
 }
 
-/// Every player but the controller sacrifices a creature of their choice (CR 701.21a): each chooses in turn order from
-/// the active player, a lone creature is taken without asking, and every chosen creature is sacrificed at once.
+/// Every player but the controller sacrifices a creature of their choice (CR 701.21a, 101.4): each chooses in turn order
+/// from the active player, a lone creature is taken without asking, and every chosen creature is sacrificed at once.
 fn each_other_sacrifices(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let mut doomed = Vec::new();
-    for who in g.state().apnap().collect::<Vec<_>>() {
-        if who == item.controller {
-            continue;
-        }
-        let eligible: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
-        if eligible.len() <= 1 {
-            doomed.extend(eligible);
-            continue;
-        }
-        doomed.extend(choose::card(g, who, item.object, Purpose::Sacrifice, eligible)?);
-    }
-    g.sacrifice(&doomed);
-    Ok(())
+    each_opponent_sacrifices(g, item.controller, item.object, 1, |q, id| q.chars(id).is(CardType::Creature))
 }
 
 pub static CARD: CardDef = CardDef {

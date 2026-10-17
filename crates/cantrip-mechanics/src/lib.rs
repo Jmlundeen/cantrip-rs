@@ -193,9 +193,11 @@ pub fn sacrifice_chosen(
 }
 
 /// "Each opponent sacrifices `count` [kind] of their choice" (CR 701.21a, 101.4): in turn order from the active player,
-/// each opponent chooses when there is a choice and sacrifices what they chose before the next is asked. `kind` is judged
-/// on the object as well as its characteristics, so it can ask whether a permanent is a token. Portal to Phyrexia (three
-/// creatures) and Sheoldred's Edict (a nontoken creature, a creature token, a planeswalker) print it.
+/// each opponent chooses when there is a choice, all on the board as it is before anything is sacrificed, and then every
+/// chosen permanent is sacrificed at once - so a later opponent's choice can't depend on an earlier one's sacrifice, and
+/// "whenever a creature dies" sees them die together. `kind` is judged on the object as well as its characteristics, so it
+/// can ask whether a permanent is a token. Portal to Phyrexia (three creatures), Sheoldred's Edict (a nontoken creature, a
+/// creature token, a planeswalker) and Grave Pact ("each other player sacrifices a creature") print it.
 pub fn each_opponent_sacrifices(
     g: &mut dyn Game,
     controller: PlayerId,
@@ -203,25 +205,32 @@ pub fn each_opponent_sacrifices(
     count: u8,
     kind: fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<(), Suspend> {
+    let mut doomed = Vec::new();
     for who in g.state().apnap().filter(|&p| p != controller).collect::<Vec<_>>() {
         let eligible: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| kind(&*g, id)).collect();
-        sacrifice_one_of(g, who, source, count, eligible)?;
+        doomed.extend(chosen_to_sacrifice(g, who, source, count, eligible)?);
     }
+    g.sacrifice(&doomed);
     Ok(())
 }
 
 /// "[Player] sacrifices `count` of `eligible`" (CR 701.21): the permanents the effect allows are decided by the caller (a
 /// quality of the group, such as the greatest mana value among them), chosen by that player when there is a choice and all
-/// of them taken when there are no more than `count`. `sacrifice_chosen` and `each_opponent_sacrifices` filter by kind; Break
-/// Under Pressure's "with the greatest mana value among creatures and planeswalkers they control" cannot be a kind.
+/// of them taken when there are no more than `count`. `sacrifice_chosen` filters by kind; Break Under Pressure's "with the
+/// greatest mana value among creatures and planeswalkers they control" cannot be a kind.
 pub fn sacrifice_one_of(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<(), Suspend> {
-    if eligible.len() <= count as usize {
-        g.sacrifice(&eligible);
-        return Ok(());
-    }
-    let chosen = choose::cards(g, player, source, Purpose::Sacrifice, eligible, count, false)?;
+    let chosen = chosen_to_sacrifice(g, player, source, count, eligible)?;
     g.sacrifice(&chosen);
     Ok(())
+}
+
+/// What `player` will sacrifice of `eligible`: all of them when there are no more than `count`, otherwise `count` of their
+/// choice. Nothing is sacrificed yet, so that several players' choices can be sacrificed together (CR 101.4).
+fn chosen_to_sacrifice(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: u8, eligible: Vec<ObjectId>) -> Result<Vec<ObjectId>, Suspend> {
+    if eligible.len() <= count as usize {
+        return Ok(eligible);
+    }
+    choose::cards(g, player, source, Purpose::Sacrifice, eligible, count, false)
 }
 
 fn untapped_creature_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {

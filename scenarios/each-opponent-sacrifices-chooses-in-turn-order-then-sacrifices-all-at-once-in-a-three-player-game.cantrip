@@ -1,0 +1,61 @@
+# "Each opponent sacrifices a creature of their choice" with two opponents (CR 101.4, 701.21a): each opponent chooses in
+# turn order, and then all the chosen creatures are sacrificed at once. Bot1's Tithing Blade enters on turn 4: Bot2, with
+# Llanowar Elves and an Ornithopter, chooses the Ornithopter; Bot3's lone Llanowar Elves is taken without asking. Both
+# die in one event, so Bot1's Chainsaw ("Whenever one or more creatures die, put a rev counter on this Equipment") gets
+# one rev counter, not one for each sacrifice (CR 603.2c, 700.4).
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Chainsaw
+Tithing Blade
+Swamp
+Island x3
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x4
+Forest x10
+
+[Bot3 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chainsaw.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Forest.Play
+Bot3.Battlefield.Forest.Activate
+Bot3.Hand.Llanowar Elves.Cast
+[T4 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tithing Blade.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Choose(Ornithopter)
+[T4 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Llanowar Elves.Types = Creature
+Bot3.Graveyard = Llanowar Elves
+Bot1.Battlefield.Chainsaw.Counters.Rev = 1
