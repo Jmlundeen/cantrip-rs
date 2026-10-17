@@ -398,11 +398,14 @@ public sealed class ScenarioPlayer
         }
 
         // The piles' buttons, in order, as the first card still to place offers them.
+        HashSet<int> placed = [.. distributed.Placements.SelectMany(pile => pile).Select(card => card.Value)];
         int first = distributed.Placements.SelectMany(pile => pile).Select(card => card.Value).FirstOrDefault();
-        List<string> piles = first == 0 ? [] : [.. ButtonsUnder(state, first).Select(button => button.Label)];
+        List<string> piles = first == 0 ? [] : [.. ButtonsUnder(state, first, placed).Select(button => button.Label)];
         if (distributed.Placements.Any(pile => pile.Count > 0) && piles.Count != distributed.Placements.Count)
         {
-            throw new NotDrivenException($"a placement into {distributed.Placements.Count} piles, under a card offering {piles.Count}", state);
+            string cards = string.Join("; ", state.Cards.Where(c => c.Visible).Select(c => $"{c.Name} #{c.Handle} at {c.X:0},{c.Y:0} {c.W:0}x{c.H:0}"));
+            string buttons = string.Join("; ", state.Controls.Where(c => c.Kind == "button").Select(c => $"'{c.Label}' at {c.X:0},{c.Y:0}"));
+            throw new NotDrivenException($"a placement into {distributed.Placements.Count} piles, under a card offering {piles.Count} (cards: {cards}; buttons: {buttons})", state);
         }
 
         for (int i = 0; i < distributed.Placements.Count; i++)
@@ -411,7 +414,7 @@ public sealed class ScenarioPlayer
             foreach (ViewHandle card in order)
             {
                 TableState now = await _page.SettledAsync();
-                ControlState button = ButtonsUnder(now, card.Value).FirstOrDefault(b => b.Label == piles[i])
+                ControlState button = ButtonsUnder(now, card.Value, placed).FirstOrDefault(b => b.Label == piles[i])
                     ?? throw new NotDrivenException($"a \"{piles[i]}\" button under card #{card.Value}", now);
                 await _page.Page.Mouse.ClickAsync(button.X, button.Y);
             }
@@ -423,20 +426,36 @@ public sealed class ScenarioPlayer
 
     /// <summary>
     /// The buttons beneath a card still to place, left to right: those just below the row of cards to place that are nearer
-    /// its middle than any other card's of the row.
+    /// its middle than any other card's of the row. The row is the cards being placed (`placed`), so a permanent or a spell
+    /// drawn at the same height and size is not taken for one of them.
     /// </summary>
-    private static List<ControlState> ButtonsUnder(TableState state, int handle)
+    private static List<ControlState> ButtonsUnder(TableState state, int handle, HashSet<int> placed)
     {
-        CardState card = state.Cards.Where(c => c.Visible && c.Handle == handle).MaxBy(c => c.Y)
-            ?? throw new NotDrivenException($"card #{handle} to place, which is not in view", state);
-        List<CardState> row = [.. state.Cards.Where(c => c.Visible && Math.Abs(c.Y - card.Y) < 1f && Math.Abs(c.H - card.H) < 1f)];
-        return
-        [
-            .. state.Controls
-                .Where(c => c.Kind == "button" && c.Y > card.Y + (card.H / 2) && c.Y < card.Y + card.H)
-                .Where(c => row.MinBy(other => Math.Abs(other.X - c.X))?.Handle == handle)
-                .OrderBy(c => c.X),
-        ];
+        List<CardState> shown = [.. state.Cards.Where(c => c.Visible && c.Handle == handle).OrderByDescending(c => c.Y)];
+        if (shown.Count == 0)
+        {
+            throw new NotDrivenException($"card #{handle} to place, which is not in view", state);
+        }
+
+        // A card looked at may be drawn twice: in the row of cards to place, and where it is (the top of a library known to its
+        // owner). The one to place is the one with the piles' buttons under it.
+        foreach (CardState card in shown)
+        {
+            List<CardState> row = [.. state.Cards.Where(c => c.Visible && placed.Contains(c.Handle) && Math.Abs(c.Y - card.Y) < 1f && Math.Abs(c.H - card.H) < 1f)];
+            List<ControlState> buttons =
+            [
+                .. state.Controls
+                    .Where(c => c.Kind == "button" && c.Y > card.Y + (card.H / 2) && c.Y < card.Y + card.H)
+                    .Where(c => row.MinBy(other => Math.Abs(other.X - c.X))?.Handle == handle)
+                    .OrderBy(c => c.X),
+            ];
+            if (buttons.Count > 0)
+            {
+                return buttons;
+            }
+        }
+
+        return [];
     }
 
     private async Task TakeAsync(TakeActionAnswer action, TableState state, string? line)

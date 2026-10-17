@@ -34,6 +34,7 @@ Bot1.Pass
 Bot1.Battlefield.Forest.Activate(Ability: {U})
 Bot1.Hand.Opt.Cast
 Bot1.Pass
+Bot1.Arrange(Island | )
 
 [Expect]
 Turn = 3

@@ -25,6 +25,7 @@ Bot1.Hand.Island.Play
 Bot1.Battlefield.Island#1.Activate
 Bot1.Hand.Opt.Cast
 Bot1.Pass
+Bot1.Arrange(Island | )
 Bot1.Pass
 [T3 Bot1.Main2]
 ? Client.Bot1.Battlefield.Lady Octopus, Inspired Inventor.Counters = 2 × ingenuity
