@@ -1,0 +1,6 @@
+{
+  "name": "Leyline of the Guildpact",
+  "manaCost": "{G/W}{G/U}{B/G}{R/G}",
+  "type": "Enchantment",
+  "oracleText": "If this card is in your opening hand, you may begin the game with it on the battlefield.\nEach nonland permanent you control is all colors.\nLands you control are every basic land type in addition to their other types."
+}

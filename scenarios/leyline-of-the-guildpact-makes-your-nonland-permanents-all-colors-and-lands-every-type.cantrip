@@ -1,0 +1,59 @@
+# Leyline of the Guildpact. Bot1 holds two; the first begins the game on the battlefield from the opening hand (CR 103.6a:
+# Bot1 accepts once and the default declines the second). "Each nonland permanent you control is all colors" (layer 5, CR
+# 105.2, 613.1e): the Leyline itself and Bot1's Mox Ruby, a colorless artifact, are white, blue, black, red and green; Bot2's Mox Sapphire is still
+# colorless ("you control"); Bot1's Mutavault animated is a land, so it stays colorless. "Lands you control are every basic
+# land type in addition to their other types" (layer 4, CR 305.7): Mutavault keeps its abilities (it animates, and taps for
+# {C}) and is every basic land type, so it taps for {B}. The second Leyline is cast for its hybrid cost {G/W}{G/U}{B/G}{R/G}
+# (CR 107.4e) with {G}{G}{B}{R}: the Forest's {G}, the Mox Emerald's {G}, Mutavault's {B} as a Swamp and the Mox Ruby's {R}.
+
+[Bot1 Deck]
+Leyline of the Guildpact
+Leyline of the Guildpact
+Mutavault
+Mox Ruby
+Mox Emerald
+Forest
+Plains
+Plains x15
+
+[Bot2 Deck]
+Mox Sapphire
+Island x30
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+? Bot1.Battlefield.Mox Ruby.Colors = Black; Blue; Green; Red; White
+? Bot1.Battlefield.Leyline of the Guildpact.Colors = Black; Blue; Green; Red; White
+? Bot1.Battlefield.Mutavault.Subtypes = Forest; Island; Mountain; Plains; Swamp
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Mox Sapphire.Colors = (absent)
+Bot1.Hand.Forest.Play
+Bot1.Hand.Leyline of the Guildpact.Cast
+Bot1.Battlefield.Forest.Activate(Ability: Add {G})
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {B})
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Leyline of the Guildpact#2.Colors = Black; Blue; Green; Red; White
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+? Bot1.Battlefield.Mutavault.Colors = (absent)
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Leyline of the Guildpact; Leyline of the Guildpact; Mutavault; Mox Ruby; Mox Emerald; Forest
+Bot1.Battlefield.Mox Emerald.Colors = Black; Blue; Green; Red; White
+Bot1.Battlefield.Forest.Colors = (absent)
+Bot2.Battlefield.Mox Sapphire.Colors = (absent)
