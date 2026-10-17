@@ -1,0 +1,63 @@
+# Kitchen Finks and counter annihilation (CR 704.5q, 702.79a): Finks persists once and comes back with a -1/-1 counter. On
+# turn 5 Bot1's Snakeskin Veil puts a +1/+1 counter on it, and the next state-based action check removes one of each, so it
+# has no counters: a 3/2 again. Bolted on turn 6 (its hexproof was until the end of turn 5), it dies with no -1/-1 counter
+# and persists again. Bot1 gains 2 life on each of its three entries.
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Kitchen Finks
+Snakeskin Veil
+Forest
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Kitchen Finks.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Kitchen Finks)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Kitchen Finks.Counters.MinusOneMinusOne = (absent)
+? Bot1.Battlefield.Kitchen Finks.Counters.PlusOnePlusOne = (absent)
+? Bot1.Battlefield.Kitchen Finks.Power = 3
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield.Kitchen Finks.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Kitchen Finks.Power = 2
+LeftBattlefield.Count = 2

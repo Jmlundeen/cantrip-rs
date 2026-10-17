@@ -1,0 +1,63 @@
+# Melira, Sylvok Outcast and Kitchen Finks (CR 702.79a, 122.6, 101.2): persist returns Finks "with a -1/-1 counter on it",
+# but a creature Bot1 controls can't have one put on it, entering included, so it returns with none - a 3/2 - and each time
+# it dies after that it still had no -1/-1 counter, and persists again. Bolted three times, it is back every time, and Bot1
+# gains 2 life on each of its four entries.
+
+[Bot1 Deck]
+Forest
+Plains
+Sol Ring
+Mox Pearl
+Melira, Sylvok Outcast
+Kitchen Finks
+Plains
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Melira, Sylvok Outcast.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Kitchen Finks.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+Bot2.Pass
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Kitchen Finks.Counters.MinusOneMinusOne = (absent)
+? Bot1.Battlefield.Kitchen Finks.Power = 3
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 28
+Bot1.Battlefield.Kitchen Finks.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Kitchen Finks.Power = 3
+Bot1.Battlefield.Kitchen Finks.Toughness = 2
+LeftBattlefield.Count = 3

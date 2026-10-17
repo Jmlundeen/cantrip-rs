@@ -1,0 +1,53 @@
+# Kitchen Finks and Rest in Peace (CR 614.6, 700.4, 702.79a): with Bot2's Rest in Peace out, Finks Bolted on turn 4 would
+# be put into a graveyard and is exiled instead. It never dies ("put into a graveyard from the battlefield"), so persist
+# doesn't trigger and it doesn't return; Bot1 gained 2 life once, as it entered.
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Kitchen Finks
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Rest in Peace
+Mountain
+Lightning Bolt
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Rest in Peace.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Kitchen Finks.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Plains; Plains; Sol Ring; Mox Pearl
+Bot1.Graveyard.Count = 0
+Exile = Kitchen Finks; Lightning Bolt
+Stack.Count = 0

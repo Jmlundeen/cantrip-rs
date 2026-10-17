@@ -1,0 +1,49 @@
+# Kitchen Finks and Leyline of the Void (CR 614.6, 702.79a): Bot2 begins the game with Leyline of the Void on the battlefield
+# (CR 103.6a). Finks, Bolted on turn 4, would go to Bot1's graveyard and is exiled instead: it never dies, persist never
+# triggers, and nothing returns.
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Kitchen Finks
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Leyline of the Void
+Mountain
+Lightning Bolt
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot2.Accept
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Kitchen Finks.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield = Plains; Plains; Sol Ring; Mox Pearl
+Bot1.Graveyard.Count = 0
+Exile = Kitchen Finks
+Bot2.Battlefield = Leyline of the Void; Mountain
