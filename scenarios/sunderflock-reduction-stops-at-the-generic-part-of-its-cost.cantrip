@@ -1,0 +1,48 @@
+# CR 118.7a: the reduction takes off generic mana only. Show and Tell puts one Sunderflock (mana value 9, an Elemental) onto the battlefield, so X = 9 for the second, whose {7}{U}{U} has
+# only seven generic: it costs exactly {U}{U} (an Island and Mox Sapphire), not nothing - `? Bot1.Mana =` after paying shows the pool empty, and it could not be cast with less.
+# Being cast, it returns Bot2's Guerrilla Gorilla (a non-Elemental) to its hand; the first Sunderflock, put in without being cast, did not.
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Sunderflock
+Sunderflock
+Island
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Sunderflock)
+Bot2.Choose()
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sunderflock.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Island; Sunderflock; Sunderflock
+Bot2.Battlefield = Forest; Mox Emerald

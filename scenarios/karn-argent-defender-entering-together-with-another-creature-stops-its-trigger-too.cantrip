@@ -1,0 +1,31 @@
+# The ruling: "If Karn, Argent Defender and another artifact or creature enter the battlefield at the same time, neither one will cause triggered abilities to trigger." Show and Tell puts
+# Bot1's Karn and Bot2's Baleful Strix onto the battlefield together: the Strix's enters ability (draw a card) does not trigger and the stack stays empty. Bot2 draws nothing:
+# its hand is 7 after turn 2's cleanup, 6 once the Strix is put in, and stays 6 (a drawn card would make it 7).
+
+[Bot1 Deck]
+Mox Sapphire
+Black Lotus
+Show and Tell
+Karn, Argent Defender
+Island x20
+
+[Bot2 Deck]
+Baleful Strix
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Karn, Argent Defender)
+Bot2.Choose(Baleful Strix)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Karn, Argent Defender
+Bot2.Battlefield = Baleful Strix
+Bot2.Hand.Count = 6

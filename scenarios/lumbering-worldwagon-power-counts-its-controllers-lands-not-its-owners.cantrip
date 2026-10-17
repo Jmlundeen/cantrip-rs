@@ -1,0 +1,59 @@
+# Control is not ownership. Bot1 owns Lumbering Worldwagon and has two lands (the Forest and the one the Worldwagon found); on turn 2 Bot2's Dack Fayden takes it (-2: gain control of target artifact) and
+# Bot2 crews it with a Cathar Commando and a Containment Priest (power 3 + 2, Crew 4). "Power equal to the number of lands you control" now counts Bot2's lands: its one Plains, so 1 - not Bot1's two.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Lumbering Worldwagon
+Forest x17
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Black Lotus
+Dack Fayden
+Cathar Commando
+Containment Priest
+Plains x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lumbering Worldwagon.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Search(Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Dack Fayden.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Dack Fayden.Activate(Bot1.Battlefield.Lumbering Worldwagon; Ability: Gain control)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Containment Priest.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Lumbering Worldwagon.Activate(Ability: Crew)
+
+[Expect]
+Bot2.Battlefield.Lumbering Worldwagon.Power = 1
+Bot2.Battlefield.Lumbering Worldwagon.Toughness = 4
+Bot1.Battlefield = Forest; Forest

@@ -28,6 +28,7 @@ Bot2.Hand.Colorstorm Stallion.Cast
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Long Goodbye.Cast(Colorstorm Stallion)
+? Stack.Count = 2
 Bot1.Pass
 Bot2.Pass
 Bot1.Pass

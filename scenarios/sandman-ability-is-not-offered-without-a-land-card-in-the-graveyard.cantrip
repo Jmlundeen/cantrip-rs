@@ -44,3 +44,5 @@ Bot1.Pass
 [Expect]
 Bot1.Graveyard = Sandman, Shifting Scoundrel; Black Lotus
 Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Mox Ruby
+Bot1.Graveyard.Sandman, Shifting Scoundrel.Power = 2
+Bot1.Graveyard.Sandman, Shifting Scoundrel.Toughness = 2

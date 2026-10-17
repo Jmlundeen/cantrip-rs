@@ -1,11 +1,13 @@
 # "Hexproof": Bot1 casts Gigantic Big Bear on turn 1; on turn 2 Bot2 cannot cast Lightning Bolt at it (the refusal) but can cast the same Bolt at Bot1 - the
-# positive control - who goes to 17. The Bear is undamaged.
+# positive control - who goes to 17. The Bear is undamaged. Its own controller can target it (hexproof only stops opponents, CR 702.11b): Bot1 casts Snakeskin Veil at it on turn 1 and it resolves, a +1/+1 counter.
 
 [Bot1 Deck]
 Forest
 Black Lotus
 Black Lotus
 Gigantic Big Bear
+Mox Emerald
+Snakeskin Veil
 Forest x16
 
 [Bot2 Deck]
@@ -15,12 +17,17 @@ Mountain x18
 
 [Actions]
 Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
 Bot1.Hand.Black Lotus.Cast
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Black Lotus.Activate(Color: Green)
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Gigantic Big Bear.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Gigantic Big Bear)
 Bot1.Pass
 Bot2.Pass
 [T2 Bot2.Main1]
@@ -34,4 +41,5 @@ Bot1.Pass
 [Expect]
 Bot1.Life = 17
 Bot1.Battlefield.Gigantic Big Bear.Damage = 0
+Bot1.Battlefield.Gigantic Big Bear.Counters.PlusOnePlusOne = 1
 Bot2.Graveyard = Lightning Bolt

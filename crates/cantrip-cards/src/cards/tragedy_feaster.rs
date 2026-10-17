@@ -1,21 +1,18 @@
 use cantrip_api::*;
+use cantrip_mechanics::history::gained_life_this_turn;
+use cantrip_mechanics::sacrifice_chosen;
 use cantrip_mechanics::triggers::{ward_discard, YOUR_END_STEP};
-use cantrip_mechanics::choose;
 use cantrip_oracle as oracle;
 
 /// "Sacrifice a permanent unless you gained life this turn" (CR 608.2c, 701.21a). The check is made as the ability
 /// resolves, not as it triggers (the ruling: it always triggers), and counts life gained by its controller any time this turn
-/// (CR 119.3); a player who has gained life is asked nothing. Otherwise they choose a permanent they control (this creature
-/// among them) and sacrifice it.
+/// (CR 119.3). Otherwise they sacrifice a permanent they control of their choice (this creature among them; a lone permanent is
+/// taken without asking).
 fn sacrifice_unless_gained_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    if g.history().life_gained(you) > 0 {
+    if gained_life_this_turn(g, item.controller) {
         return Ok(());
     }
-    let permanents = g.permanents_of(you);
-    let chosen = choose::cards_from_kind(g, you, item.object, Purpose::Sacrifice, "permanent", permanents.clone(), permanents, 1, false)?;
-    g.sacrifice(&chosen);
-    Ok(())
+    sacrifice_chosen(g, item.controller, item.object, 1, |_| true)
 }
 
 pub static CARD: CardDef = CardDef {

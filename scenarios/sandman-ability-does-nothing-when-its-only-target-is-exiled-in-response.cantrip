@@ -1,0 +1,55 @@
+# Sandman's graveyard ability with the land target exiled in response: the whole ability does nothing (CR 608.2b), Sandman stays in the graveyard. Setup as in the previous returning scenario (Fabled Passage sacrificed on turn 1, Sandman killed by Bot2's Lightning Bolt on turn 2); on turn 3 Bot1 activates it
+# for {3}{G}{G} targeting Fabled Passage, and in response Bot2's Ghost Vacuum exiles Fabled Passage from the graveyard.
+
+[Bot1 Deck]
+Fabled Passage
+Black Lotus
+Sandman, Shifting Scoundrel
+Mox Emerald
+Mox Jet
+Mox Ruby
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Ghost Vacuum
+Mountain x14
+
+[Actions]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Forest)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sandman, Shifting Scoundrel.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sandman, Shifting Scoundrel)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Graveyard.Sandman, Shifting Scoundrel.Activate(Fabled Passage)
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Fabled Passage)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Fabled Passage
+Bot1.Graveyard = Sandman, Shifting Scoundrel; Black Lotus
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Mox Ruby
