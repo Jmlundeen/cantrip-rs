@@ -349,6 +349,16 @@ pub fn return_first_target_to_hand(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
+/// "Return target [card] from your graveyard to the battlefield" (CR 400.3): the first target, under the controller of the
+/// spell or ability, untapped; nothing if it is no longer a legal target (CR 608.2b), which for a lone required target
+/// means the spell or ability does not resolve at all. Emptiness and Ral Zarek, Guest Lecturer's −2 print it.
+pub fn return_first_target_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(card) = crate::targets::object(g, item, 0) {
+        g.put_onto_battlefield(card, item.controller, false)?;
+    }
+    Ok(())
+}
+
 /// "[This source] deals `n` damage to any target and you gain `n` life" (CR 120.3, 119.1): the first target, if it is still
 /// legal (CR 608.2b), is dealt the damage by the resolving object (as it last was if it has left, CR 113.7a), and the
 /// controller gains the life. Lightning Helix, Phlage, Titan of Fire's Fury and Demonic Pact print it.
