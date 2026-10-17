@@ -1,0 +1,58 @@
+# Browser
+# Riverchurn Monument is the first card with "any number of target players" (CR 115.1d): the page must let a player choose
+# no player at all and choose both. On turn 1 Bot1 activates "{1}, {T}: Any number of target players each mill two cards"
+# with the {C} left from casting it and chooses none ("Choose none"): nobody mills. On turn 3 it clicks both players' boxes
+# and is done with two targets: each mills two. The dock's caption says how many targets and what the slot is for.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Riverchurn Monument
+Island
+Island
+Island
+Swamp
+Forest
+Plains
+Island x10
+
+[Bot2 Deck]
+Mountain x7
+Swamp
+Forest
+Plains
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Riverchurn Monument.Cast
+Bot1.Pass
+Bot1.Battlefield.Riverchurn Monument.Activate(Ability: {1}, {T})
+? Client.Bot1.Prompt.Title = Any number of targets for Riverchurn Monument
+? Client.Bot1.Prompt.Detail = Players who each mill two cards  ·  0 of 2 chosen
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 0
+? Bot2.Graveyard.Count = 0
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Riverchurn Monument.Activate(Ability: {1}, {T})
+Bot1.Target(Bot1; Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Plains; Forest
+Bot2.Graveyard = Plains; Forest
+Bot1.Battlefield.Riverchurn Monument.Tapped = true

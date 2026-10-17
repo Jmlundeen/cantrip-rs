@@ -1,3 +1,4 @@
+# Browser
 # Hall of Echoes: "{5}: This land becomes a copy of target creature you control until end of turn. The "legend rule"
 # doesn't apply to permanents you control this turn." Bot1 casts Bofur, Reliable Guardian on turn 1 and on turn 3 pays
 # {5} with the Hall aimed at it: Bot2's Llanowar Elves is refused as the target (not Bot1's), Bofur is chosen. The Hall becomes a
@@ -49,7 +50,7 @@ Bot1.Pass
 Bot2.Pass
 Bot1.Battlefield.Mox Pearl#1.Activate
 ? Bot1.Battlefield = Bofur, Reliable Guardian; Bofur, Reliable Guardian; Sol Ring; Mox Pearl; Mox Pearl
-? Client.Bot1.Facts = The "legend rule" doesn't apply to permanents you control this turn.
+? Client.Bot1.Facts = The "legend rule" doesn't apply to permanents you control this turn
 Bot1.Hand.Bofur, Reliable Guardian.Cast
 Bot1.Pass
 Bot2.Pass
