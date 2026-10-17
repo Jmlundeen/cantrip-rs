@@ -1357,6 +1357,9 @@ pub struct TurnBeginRule {
     pub on_skip: fn(&mut dyn Game, &Asker) -> Result<(), Suspend>,
     /// What its controller is asked, in the card's words.
     pub question: &'static Question,
+    /// What it does, for the player who orders it with an effect that makes them skip the turn (CR 616.1): "you skip this
+    /// turn and untap it".
+    pub hint: &'static str,
 }
 
 /// A static ability that says whether a spell or ability may cause a player to discard cards or sacrifice permanents

@@ -585,6 +585,11 @@ pub enum EffectKind {
     /// card file can't mark a spell during casting, and a delayed trigger would go on the stack above the spell and could
     /// be answered. A kind of spell ("the next creature spell") is a filter to add when a printed card needs one.
     NextSpellCantBeCountered,
+    /// "[This player] skips their next turn" (CR 500.11, 614.10): a replacement effect of the beginning of that player's
+    /// next turn, used up by the turn it skips. "Skips their next N turns" is N of them, each waiting for the first turn
+    /// the ones before it have not skipped (CR 614.10a). About the player, so it outlives its `affected` object, which is
+    /// only the source.
+    SkipNextTurn(PlayerId),
 }
 
 impl EffectKind {
@@ -605,6 +610,7 @@ impl EffectKind {
                 | EffectKind::PlayFromGraveyard
                 | EffectKind::PlayerManaAbility(_)
                 | EffectKind::NextSpellCantBeCountered
+                | EffectKind::SkipNextTurn(_)
         )
     }
 }

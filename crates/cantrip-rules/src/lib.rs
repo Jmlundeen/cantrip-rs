@@ -865,8 +865,14 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn flip_coin(&mut self, player: PlayerId) -> bool {
         let won = self.g.state.roll_die(2) == 1;
-        self.emit(Event::CoinFlipped { player, won });
+        self.emit(Event::CoinFlipped { player, result: if won { CoinFlip::Won } else { CoinFlip::Lost } });
         won
+    }
+
+    fn flip_coin_for_heads(&mut self, player: PlayerId) -> bool {
+        let heads = self.g.state.roll_die(2) == 1;
+        self.emit(Event::CoinFlipped { player, result: if heads { CoinFlip::Heads } else { CoinFlip::Tails } });
+        heads
     }
 
     fn random(&mut self, bound: u32) -> u32 {

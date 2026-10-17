@@ -228,6 +228,7 @@ fn choose(cx: &mut Cx, proposal: &Proposal, found: &[Candidate]) -> usize {
             Proposal::Damage(d) => Some(DamageAbout { source: d.source, to: d.target, amount: d.amount }),
             _ => None,
         },
+        turn: false,
     };
     match cx.ask_core(affected(cx, proposal), ask, false) {
         Ok(Answer::Index(i)) if (i as usize) < found.len() => i as usize,

@@ -352,7 +352,9 @@ public static class GameText
 
             SurveilledEvent surveilled => $"{Seat(client, surveilled.Player)} surveilled {surveilled.Count}.",
 
-            CoinFlippedEvent flip => $"{Seat(client, flip.Player)} flipped a coin and {(flip.Won ? "won" : "lost")} the flip.",
+            CoinFlippedEvent flip => flip.Called
+                ? $"{Seat(client, flip.Player)} flipped a coin and {(flip.Won ? "won" : "lost")} the flip."
+                : $"{Seat(client, flip.Player)} flipped a coin and it came up {(flip.Heads ? "heads" : "tails")}.",
 
             TurnEndedEvent ended => (ended.Player == client.Seat ? "Your" : $"{Seat(client, ended.Player)}'s")
                 + " turn was ended: the stack was exiled and the turn went straight to its cleanup step.",

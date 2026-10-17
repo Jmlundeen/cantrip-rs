@@ -4,6 +4,17 @@ use cantrip_state::*;
 
 use crate::history::Cast;
 
+/// What a coin flip came to (CR 705.2): a flip its player called is won or lost; one that cares only whether it comes up
+/// heads (Ral Zarek, Guest Lecturer's "the number of coins that came up heads") is heads or tails, and no one wins or
+/// loses it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum CoinFlip {
+    Won,
+    Lost,
+    Heads,
+    Tails,
+}
+
 /// One thing that happened. Each names what it is about by id; a zone change names both the old object and the new
 /// one it became (CR 400.7).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -91,8 +102,9 @@ pub enum Event {
     /// A spell was copied (CR 707.10): `copy` is the new spell on the stack, controlled by `player`, who made it. It is
     /// not cast (CR 707.10a), so it is no `SpellCast`: magecraft's "or copy".
     Copied { copy: ObjectId, original: ObjectId, player: PlayerId },
-    /// A player flipped a coin (CR 705.1) and won or lost the flip (CR 705.2). A flip is a two-sided die, but no die roll.
-    CoinFlipped { player: PlayerId, won: bool },
+    /// A player flipped a coin (CR 705.1): won or lost the flip, or, for a flip that cares only whether it comes up heads,
+    /// heads or tails, which no player wins or loses (CR 705.2). A flip is a two-sided die, but no die roll.
+    CoinFlipped { player: PlayerId, result: CoinFlip },
     /// A player rolled a die with `sides` sides (CR 706.2): the `natural` result, and the `result` once whatever modifies
     /// the roll has been applied (CR 706.4). Both are what the rolled number is, each for the questions that ask for it.
     DieRolled { player: PlayerId, sides: u8, natural: u8, result: i16 },

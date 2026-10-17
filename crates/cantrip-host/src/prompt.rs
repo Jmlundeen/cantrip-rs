@@ -1032,7 +1032,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 owner: seat(owner),
             })
         }
-        RequestKind::ChooseReplacement { subject, life, sources, hints, damage } => {
+        RequestKind::ChooseReplacement { subject, life, sources, hints, damage, turn } => {
             PromptPayload::ChooseReplacementPromptMessage(ChooseReplacementPrompt {
                 player,
                 subject: subject.map_or(ViewHandle::NONE, |s| source_handle(game, handles, s)),
@@ -1042,6 +1042,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     (Some(n), _) if *n > 0 => format!("You would gain {n} life"),
                     (Some(n), _) => format!("You would lose {} life", n.unsigned_abs()),
                     (None, Some(d)) => damage_words(game, request.player, *d),
+                    // The turn effects would skip (CR 614.10) is the asked player's.
+                    (None, None) if *turn => "Your turn would begin".to_string(),
                     (None, None) => String::new(),
                 },
                 sources: sources.iter().map(|&s| source_handle(game, handles, s)).collect(),

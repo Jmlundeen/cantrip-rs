@@ -187,8 +187,9 @@ public sealed class MulliganTakenEvent : GameEventView
 }
 
 /// <summary>
-/// A coin was flipped (CR 705). Public. <see cref="Won"/> is whether <see cref="Player"/> won the flip, the way a card
-/// that says "if you lose the flip" reads it.
+/// A coin was flipped (CR 705). Public. A flip <see cref="Called"/> is won or lost: <see cref="Won"/> is whether
+/// <see cref="Player"/> won it, the way a card that says "if you lose the flip" reads it. A flip that cares only whether it
+/// comes up heads is not called, and no one wins or loses it (CR 705.2): <see cref="Heads"/> is what it came up.
 /// </summary>
 [MessagePackObject]
 public sealed class CoinFlippedEvent : GameEventView
@@ -198,6 +199,12 @@ public sealed class CoinFlippedEvent : GameEventView
 
     [Key(1)]
     public bool Won { get; set; }
+
+    [Key(2)]
+    public bool Called { get; set; }
+
+    [Key(3)]
+    public bool Heads { get; set; }
 }
 
 /// <summary>

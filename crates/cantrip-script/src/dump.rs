@@ -247,6 +247,11 @@ impl StateDump {
                 d.set(format!("{b}.Experience"), player.experience);
             }
             d.set(format!("{b}.LandsPlayed"), player.lands_played);
+            // "Skips their next N turns" (CR 500.11, 614.10): the turns still to skip, one effect each.
+            let skips = s.effects.iter().filter(|e| e.kind == EffectKind::SkipNextTurn(p)).count();
+            if skips > 0 {
+                d.set(format!("{b}.TurnsToSkip"), skips);
+            }
             let lasting = player.lasting_mana();
             let mut mana = if lasting.is_empty() {
                 mana_text(&player.pool)

@@ -325,10 +325,25 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
     Ok(Flow::Done)
 }
 
-/// Whether the player skips the turn about to begin (CR 614.10, 500.11): each permanent they control with a replacement
-/// of the beginning of their turn that applies offers it to them, in turn, and the first they accept skips the turn and
-/// does what it says it does then. The offer is the one question; nothing is asked when nothing applies.
+/// What the effect that makes a player skip their next turn does, for the player who orders it with an optional skip of the
+/// same turn (CR 616.1).
+const SKIP_NEXT_TURN_HINT: &str = "you skip this turn";
+
+/// Whether the player skips the turn about to begin (CR 614.10, 500.11). Two kinds of replacement effect skip it:
+///
+/// - a resolved spell or ability's "[that player] skips their next N turns", one `EffectKind::SkipNextTurn` for each turn
+///   to skip, which must be applied: the oldest is used up by this turn, the rest wait for the turns after it
+///   (CR 614.10a);
+/// - a permanent's "if you would begin your turn while ..., you may skip that turn instead. If you do, ..." (Time
+///   Vault, `CardDef::turn_begin`), which the player may decline. Each that applies is offered in turn, and the first
+///   accepted skips the turn and does what it says it does then.
+///
+/// With both, the player chooses which applies (CR 616.1): an optional skip chosen first is taken (declining it would
+/// leave the turn to the effect that must skip it), and the effect that must skip a turn then still waits for the next
+/// turn, as it skipped none (CR 614.10a). Nothing is asked when nothing applies.
 fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
+    let pending = cx.s().effects.iter().position(|e| e.kind == EffectKind::SkipNextTurn(player));
+    let mut optional: Vec<(ObjectId, &'static TurnBeginRule)> = Vec::new();
     for id in cx.s().battlefield().to_vec() {
         let obj = cx.s().obj(id);
         if obj.controller != player {
@@ -341,15 +356,39 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
             continue;
         }
         for rule in cx.card(card).turn_begin {
-            if (rule.applies)(&*cx, &asker, player)
-                && cx.ask_core(player, RequestKind::May { source: id, purpose: Purpose::Ask(rule.question) }, false)? == Answer::Yes
-            {
-                (rule.on_skip)(cx, &asker)?;
-                return Ok(true);
+            if (rule.applies)(&*cx, &asker, player) {
+                optional.push((id, rule));
             }
         }
     }
-    Ok(false)
+    let Some(at) = pending else {
+        for (id, rule) in optional {
+            if cx.ask_core(player, RequestKind::May { source: id, purpose: Purpose::Ask(rule.question) }, false)? == Answer::Yes {
+                (rule.on_skip)(cx, &Asker { source: id, controller: player })?;
+                return Ok(true);
+            }
+        }
+        return Ok(false);
+    };
+    if !optional.is_empty() {
+        let mut sources = vec![cx.s().effects[at].source];
+        let mut hints = vec![SKIP_NEXT_TURN_HINT];
+        for &(id, rule) in &optional {
+            sources.push(id);
+            hints.push(rule.hint);
+        }
+        let ask = RequestKind::ChooseReplacement { subject: None, life: None, sources, hints, damage: None, turn: true };
+        if let Answer::Index(i) = cx.ask_core(player, ask, false)?
+            && i > 0
+            && let Some(&(id, rule)) = optional.get(i as usize - 1)
+        {
+            (rule.on_skip)(cx, &Asker { source: id, controller: player })?;
+            return Ok(true);
+        }
+    }
+    let keep: Vec<bool> = (0..cx.s().effects.len()).map(|i| i != at).collect();
+    cx.st().effects_keep(&keep);
+    Ok(true)
 }
 
 /// CR 502.3: the active player's permanents untap, all at once. Except an exerted one, for the untap step it sits out

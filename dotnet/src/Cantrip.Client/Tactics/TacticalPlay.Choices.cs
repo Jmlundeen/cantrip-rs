@@ -775,7 +775,8 @@ public sealed partial class TacticalPlay
     /// Which replacement effect applies first (CR 616.1). Only a gain of this seat's life is ordered on purpose: an effect
     /// that turns it into a loss goes first, before anything makes the gain (and so the loss) bigger, and one that adds to
     /// it goes before one that multiplies it. Anything else, and two effects on a loss, are as good in any order to a seat
-    /// that does not know what they are.
+    /// that does not know what they are. A turn that would begin (CR 614.10) is offered with the effect that must skip it
+    /// first: taking that one keeps a "you may skip that turn" (Time Vault) for a later turn, so the default is the choice.
     /// </summary>
     private static AnswerPayload Replacement(ChooseReplacementPromptMessage prompt)
     {

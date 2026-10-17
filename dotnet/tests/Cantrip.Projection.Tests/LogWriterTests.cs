@@ -51,10 +51,14 @@ public sealed class LogWriterTests
     public void A_coin_flip_and_a_die_roll_are_read_out_with_their_outcome()
     {
         Assert.Equal(
-            ["You flip a coin: won the flip.", "Bot 2 flips a coin: lost the flip.", "You roll 4 on a d6."],
+            ["You flip a coin: won the flip.", "Bot 2 flips a coin: lost the flip.", "You flip a coin: it came up heads.",
+                "Bot 2 flips a coin: it came up tails.", "You roll 4 on a d6."],
             Lines(
-                new CoinFlippedEvent { Player = Me, Won = true },
-                new CoinFlippedEvent { Player = Rival, Won = false },
+                new CoinFlippedEvent { Player = Me, Won = true, Called = true },
+                new CoinFlippedEvent { Player = Rival, Won = false, Called = true },
+                // CR 705.2: a flip that cares only whether it comes up heads is won or lost by no one.
+                new CoinFlippedEvent { Player = Me, Heads = true },
+                new CoinFlippedEvent { Player = Rival, Heads = false },
                 new DieRolledEvent { Player = Me, Sides = 6, Result = 4 }));
     }
 

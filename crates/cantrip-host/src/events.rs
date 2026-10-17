@@ -73,7 +73,7 @@ pub enum Proto {
     Mulligan { player: PlayerId, count: i32 },
     Kept { player: PlayerId, cards: i32 },
     Die { player: PlayerId, sides: i32, result: i32 },
-    Coin { player: PlayerId, won: bool },
+    Coin { player: PlayerId, result: CoinFlip },
     /// An effect ended the turn of `player` (CR 724.1).
     TurnEnded { player: PlayerId },
     /// `player` scried `count` (CR 701.22).
@@ -202,7 +202,7 @@ impl Tracker {
             Event::DieRolled { player, sides, result, .. } => {
                 out.push(Proto::Die { player, sides: i32::from(sides), result: i32::from(result) });
             }
-            Event::CoinFlipped { player, won } => out.push(Proto::Coin { player, won }),
+            Event::CoinFlipped { player, result } => out.push(Proto::Coin { player, result }),
             Event::TurnEnded { player } => out.push(Proto::TurnEnded { player }),
             Event::Scried { player, count, .. } => out.push(Proto::Scried { player, count: i32::from(count) }),
             Event::Surveilled { player, count, .. } => out.push(Proto::Surveilled { player, count: i32::from(count) }),
@@ -506,7 +506,12 @@ impl Teller<'_> {
             Proto::Die { player, sides, result } => {
                 Some(GameEventView::DieRolledEvent(DieRolledEvent { player: seat(*player), sides: *sides, result: *result }))
             }
-            Proto::Coin { player, won } => Some(GameEventView::CoinFlippedEvent(CoinFlippedEvent { player: seat(*player), won: *won })),
+            Proto::Coin { player, result } => Some(GameEventView::CoinFlippedEvent(CoinFlippedEvent {
+                player: seat(*player),
+                won: *result == CoinFlip::Won,
+                called: matches!(result, CoinFlip::Won | CoinFlip::Lost),
+                heads: *result == CoinFlip::Heads,
+            })),
             Proto::Kept { player, cards } => Some(GameEventView::HandKeptEvent(HandKeptEvent { player: seat(*player), cards: *cards })),
             Proto::TurnEnded { player } => Some(GameEventView::TurnEndedEvent(TurnEndedEvent { player: seat(*player) })),
             Proto::Scried { player, count } => Some(GameEventView::ScriedEvent(ScriedEvent { player: seat(*player), count: *count })),

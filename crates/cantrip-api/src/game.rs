@@ -482,6 +482,10 @@ pub trait Game: Query {
     /// `player` flips a coin (CR 705.1): true if they win the flip (CR 705.2). A flip is a two-sided die whose first face
     /// wins; it is recorded as `Event::CoinFlipped` and is not a die roll.
     fn flip_coin(&mut self, player: PlayerId) -> bool;
+    /// `player` flips a coin that cares only whether it comes up heads (CR 705.2): true for heads. No one wins or loses
+    /// it, so "whenever you win a coin flip" does not trigger, and "whenever you flip a coin" does. Its face is the same
+    /// two-sided die's (the first face is heads), recorded as `Event::CoinFlipped`.
+    fn flip_coin_for_heads(&mut self, player: PlayerId) -> bool;
     /// Moves a card already in a library to `from_top` cards from its top (0 is the top): "second from the top".
     fn place_in_library(&mut self, card: ObjectId, from_top: usize);
     /// "After this phase, there is an additional combat phase" (CR 500.8), from the precombat main phase or a combat phase: a
@@ -510,6 +514,16 @@ pub trait Game: Query {
     fn give_experience(&mut self, player: PlayerId, amount: u32);
     /// `count` extra turns for `player` after the current one (CR 500.7); the most recently created is taken first.
     fn add_extra_turns(&mut self, player: PlayerId, count: u32);
+    /// "[player] skips their next `count` turns" (CR 500.11, 614.10), from `source`: a replacement effect for each turn,
+    /// applied as each of that player's turns would begin and used up by it; a turn already begun is not skipped, and
+    /// two such effects skip a turn each (CR 614.10a). Nothing for a count of zero. The effect is the player's, not the
+    /// source's, and outlives it.
+    fn skip_next_turns(&mut self, source: ObjectId, player: PlayerId, count: u32) {
+        let controller = self.obj(source).controller;
+        for _ in 0..count {
+            self.add_player_effect(controller, source, EffectKind::SkipNextTurn(player), Duration::Indefinite);
+        }
+    }
     /// A permanent with a prepare spell becomes prepared (CR 722.2): a copy of the spell is put in exile, which its
     /// controller may cast while it stays prepared. Nothing if it already is, or is not on the battlefield.
     fn become_prepared(&mut self, permanent: ObjectId);

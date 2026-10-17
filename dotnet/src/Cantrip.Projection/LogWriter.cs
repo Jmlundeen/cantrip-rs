@@ -99,7 +99,9 @@ public static class LogWriter
 
             DieRolledEvent rolled => $"{Does(rolled.Player, "roll", "rolls")} {rolled.Result} on a d{rolled.Sides}.",
 
-            CoinFlippedEvent flipped => $"{Does(flipped.Player, "flip", "flips")} a coin: {(flipped.Won ? "won" : "lost")} the flip.",
+            CoinFlippedEvent flipped => flipped.Called
+                ? $"{Does(flipped.Player, "flip", "flips")} a coin: {(flipped.Won ? "won" : "lost")} the flip."
+                : $"{Does(flipped.Player, "flip", "flips")} a coin: it came up {(flipped.Heads ? "heads" : "tails")}.",
 
             // CR 724.1: the stack is exiled (the lines after this one) and the turn goes straight to its cleanup step.
             TurnEndedEvent ended => $"{(ended.Player == seat ? "Your" : $"{NameOf(ended.Player)}'s")} turn ends.",

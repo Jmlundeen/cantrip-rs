@@ -1760,7 +1760,12 @@ pub struct MulliganTakenEvent {
 #[serde(rename_all = "PascalCase")]
 pub struct CoinFlippedEvent {
     pub player: i32,
+    /// Whether the player won a flip they called (CR 705.2); false for a flip no one calls.
     pub won: bool,
+    /// Whether the flip was called, to be won or lost; one that cares only whether it comes up heads is not (CR 705.2).
+    pub called: bool,
+    /// For a flip no one calls, whether it came up heads; false otherwise.
+    pub heads: bool,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

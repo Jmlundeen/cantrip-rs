@@ -93,7 +93,7 @@ public sealed class ProtocolJsonTests
         """{"$type":"StartingPlayerChosenEvent","Chooser":2,"Player":1}""",
         """{"$type":"MulliganTakenEvent","Player":1,"Count":1}""",
         """{"$type":"HandKeptEvent","Player":1,"Cards":6}""",
-        """{"$type":"CoinFlippedEvent","Player":2,"Won":false}""",
+        """{"$type":"CoinFlippedEvent","Player":2,"Won":false,"Called":true,"Heads":false}""",
         """{"$type":"TurnEndedEvent","Player":1}""",
         """{"$type":"ScriedEvent","Player":1,"Count":2}""",
         """{"$type":"SurveilledEvent","Player":2,"Count":1}""",
