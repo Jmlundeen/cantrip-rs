@@ -1,0 +1,64 @@
+# The three-Oblivion-Ring loop with Bot2 holding Disenchant and two untapped Plains, as in
+# oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw - but Bot2 never casts it. At every priority Bot2 could
+# stop the loop, so it is no draw while Bot2 still may (CR 104.4b's last sentence: the loop goes round as long as Bot2
+# passes, each round a chance to break it). But Disenchant is no part of the loop: no object of the loop calls for casting
+# it, and no player can be made to take an action that would end a loop but those its objects call for (CR 732.5). The only
+# thing Bot2 does in the loop is pass; the loop's own actions are all mandatory. Round after round Bot2 passes, the position
+# coming back the same each time, until the loop has gone round far more often than anyone could mean to let it go round
+# and then stop: it is a loop of mandatory actions (CR 732.4), and the game is a draw, Disenchant still in Bot2's hand.
+
+[Bot1 Deck]
+Oblivion Ring
+Oblivion Ring
+Oblivion Ring
+Plains
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Turn = 9
+Step = Main1
+Stack.Count = 1
+Bot2.Battlefield = Plains; Plains
+Bot2.Battlefield.Plains#1.Tapped = false
+Bot2.Battlefield.Plains#2.Tapped = false
+Bot2.Hand = Disenchant; Island; Island; Island; Island; Island; Island
+Bot1.Status = (absent)
+Bot2.Status = (absent)

@@ -1,0 +1,56 @@
+# A loop of mandatory actions that raises a life total each time round is a draw, where one that lowers it ends in a loss
+# (worldgorger-dragon-loop-with-rampaging-ferocidon-ends-when-its-controller-runs-out-of-life): CR 104.4b. Bot2 has
+# Authority of the Consuls ("Creatures your opponents control enter tapped. Whenever a creature an opponent controls
+# enters, you gain 1 life."). On turn 3 Bot1 animates its Entombed Worldgorger Dragon and the loop of the draw scenarios
+# begins, every step of it forced; each time the Dragon enters - tapped - the Authority's ability, Bot2's alone, gains Bot2 1
+# life. A life total going up never reaches what ends a game (CR 704.5a is 0 or less), and nothing here asks how much life
+# anyone has: round after round the board is the same but for Bot2's life, no player can do anything but pass, and the loop
+# has no way to stop. It goes round until the rules judge it endless, and the game is a draw. (Bot2's life total then is
+# the engine's to say, not the rules': it is only more than 20.)
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Authority of the Consuls
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Authority of the Consuls.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield = Plains; Authority of the Consuls
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Bot1.Status = (absent)
+Bot2.Status = (absent)
+Bot1.Life = 20
+Turn = 3
+Step = Main1
+Stack.Count = 1

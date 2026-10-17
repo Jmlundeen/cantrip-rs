@@ -1,0 +1,67 @@
+# A loop whose only choice is a "may" that would not stop it, always declined, is a draw (CR 104.4b, 732.4). Bot2 has
+# Fecundity ("Whenever a creature dies, that creature's controller may draw a card"). On turn 7 Bot1 animates its Entombed
+# Worldgorger Dragon and the loop of the draw scenarios begins: each time Animate Dead's leaves ability sacrifices the
+# Dragon, Fecundity's ability lets Bot1, its controller, draw a card, and Bot1 declines every time. The loop has an optional
+# action in it, so it is no draw while Bot1 may still choose otherwise; but drawing would not stop it either - it would only
+# take Bot1 towards drawing from an empty library - and Bot1 is never made to take it (CR 732.5 would allow holding a player
+# to an action a loop object calls for, but no rule requires it; the engine never refuses a decline, `loops.rs`, KI-54).
+# Round after round Bot1 declines and the position comes back
+# the same, until the loop has gone round far more often than anyone could mean to and then stop: no player has any way to
+# stop it, and the game is a draw, with Bot1's library as it was.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Fecundity
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fecundity.Cast
+[T7 Bot1.Main1]
+? Bot2.Battlefield = Forest; Forest; Forest; Fecundity
+? Bot1.Library.Count = 7
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Turn = 7
+Step = Main1
+Bot1.Library.Count = 7
+Bot1.Status = (absent)
+Bot2.Status = (absent)

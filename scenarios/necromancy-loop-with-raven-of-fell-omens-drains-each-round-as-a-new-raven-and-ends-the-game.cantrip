@@ -1,0 +1,62 @@
+# A "triggers only once each turn" ability in a loop of mandatory actions that ends the loop, because each time round it is a
+# new object's (CR 400.7). Bot2 Entombs its own Worldgorger Dragon on turn 2; Bot1 casts Raven of Fell Omens ("Whenever you
+# commit a crime, each opponent loses 1 life and you gain 1 life. This ability triggers only once each turn.") on turn 3 and
+# Necromancy on turn 5. Necromancy's enters ability targets the Dragon in Bot2's graveyard, the only creature card in a
+# graveyard - a crime (CR 700.13: targeting a card in an opponent's graveyard) - and the Raven's ability triggers, the only
+# trigger then, and drains. The Dragon, Bot1's, exiles Necromancy, the Raven and Bot1's Swamps; Necromancy's leaves ability
+# sacrifices it, to Bot2's graveyard; its leaves ability returns them all, new objects. Necromancy's enters ability targets
+# the Dragon again, its only choice, another crime - and the Raven that sees it is another object than the one whose ability
+# triggered before, with no triggering of its own this turn (CR 400.7: a permanent that leaves and returns is a new object
+# with no memory of its previous existence), so it triggers and drains again. Every round is forced and comes back to the same board
+# with Bot2 a life lower and Bot1 a life higher: after twenty rounds Bot2 is at 0 and loses (CR 704.5a), Bot1 at 40. Were
+# the limit counted for the card rather than for the object, the Raven would drain once and the loop would be a draw.
+
+[Bot1 Deck]
+Swamp
+Raven of Fell Omens
+Necromancy
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Entomb
+Island
+Island
+Island
+Island
+Island
+Island
+Worldgorger Dragon
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Worldgorger Dragon)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Raven of Fell Omens.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+? Bot2.Graveyard = Entomb; Worldgorger Dragon
+Bot1.Hand.Necromancy.Cast
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot2.Life = 0
+Bot1.Life = 40
+Turn = 5
+Step = Main1

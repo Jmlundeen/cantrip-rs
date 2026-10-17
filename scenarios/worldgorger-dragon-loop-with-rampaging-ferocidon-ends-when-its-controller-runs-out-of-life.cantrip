@@ -1,0 +1,66 @@
+# A loop of mandatory actions that changes a life total each time round is no draw: it goes on until the life runs out
+# (CR 104.4b, 704.5a). Bot2 has Rampaging Ferocidon ("Whenever another creature enters, this creature deals 1 damage to that
+# creature's controller"). On turn 7 Bot1 animates its Entombed Worldgorger Dragon, and the Dragon loop of the draw
+# scenarios begins: the Dragon exiles Animate Dead and Bot1's Swamps, Animate Dead's leaves ability sacrifices it, its
+# leaves ability returns them, and Animate Dead, whose only choice of host is the Dragon, returns it - each step forced, at
+# every priority nobody able to do anything but pass or tap a Swamp for mana that buys nothing. Each time the Dragon enters,
+# the Ferocidon's ability, Bot2's alone (APNAP, CR 101.4), deals 1 damage to Bot1. Every round comes back to the same
+# board, but with Bot1 a life lower, so the position never repeats: the twentieth time the Dragon enters Bot1 is at 0 life
+# and loses the game (CR 704.5a), and Bot2 wins. Had the life total been left out of what makes a position, the loop would
+# have been found a draw at its second round.
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mountain
+Rampaging Ferocidon
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Rampaging Ferocidon.Cast
+[T7 Bot1.Main1]
+? Bot1.Graveyard = Entomb; Worldgorger Dragon
+? Bot2.Battlefield = Mountain; Mountain; Mountain; Rampaging Ferocidon
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost
+Bot1.Life = 0
+Bot2.Life = 20
+Turn = 7
+Step = Main1

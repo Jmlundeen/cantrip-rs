@@ -1,0 +1,63 @@
+# A loop of mandatory actions that puts a counter on a permanent each time round never comes back to the same position, and
+# still has no way to stop: the game is a draw (CR 104.4b). Bot2 has Chainsaw ("Whenever one or more creatures die, put a rev
+# counter on this Equipment"), cast on turn 4 with no creature for its enters ability to damage. On turn 5 Bot1 animates
+# its Entombed Worldgorger Dragon and the loop of the draw scenarios begins, every step of it forced; each time Animate
+# Dead's leaves ability sacrifices the Dragon, Chainsaw's ability, Bot2's alone, puts a rev counter on it. The counters only
+# grow: nothing reads them but Chainsaw's own "+X/+0" for a creature it equips, and it equips none, and no rule ends anything
+# by them. So round after round the board is the same but for one more counter, no player can do anything but pass, and
+# nothing will ever be different: the loop goes round until the rules judge it endless, and the game is a draw - not a game
+# that never ends. (How many counters Chainsaw has then is the engine's to say, not the rules': the rules only make it a
+# draw.)
+
+[Bot1 Deck]
+Swamp
+Entomb
+Animate Dead
+Swamp
+Swamp
+Swamp
+Swamp
+Worldgorger Dragon
+Swamp x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Chainsaw
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Worldgorger Dragon)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Chainsaw.Cast
+[T5 Bot1.Main1]
+? Bot2.Battlefield = Mountain; Mountain; Chainsaw
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Animate Dead.Cast(Bot1.Graveyard.Worldgorger Dragon)
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Bot1.Status = (absent)
+Bot2.Status = (absent)
+Bot1.Life = 20
+Bot2.Life = 20
+Turn = 5
+Step = Main1
+Stack.Count = 1

@@ -1,0 +1,77 @@
+# A loop of mandatory actions with a mandatory draw in it is no draw: the library runs out, and the player who draws from
+# it empty loses (CR 104.4b, 704.5b). Bot2 Entombs its own Worldgorger Dragon on turn 2 and casts Robot Domination on turn
+# 8 ("Whenever one or more creature cards are put into your graveyard from anywhere, you draw a card, lose 1 life, and put a
+# plan counter on this enchantment"), with one card left in its library. On turn 9 Bot1 casts Necromancy on the Dragon, the
+# only creature card in a graveyard, and the loop of the Necromancy draw scenario begins: the Dragon, Bot1's, exiles
+# Necromancy and Bot1's Swamps; Necromancy's leaves ability sacrifices it, and it goes to its owner's graveyard, Bot2's
+# (CR 404.1); its leaves ability returns them, and Necromancy's enters ability targets it again, its only choice. Each time
+# the Dragon goes to Bot2's graveyard, Robot Domination's ability, Bot2's alone, makes Bot2 draw, lose 1 life and put a
+# plan counter on it. The first time Bot2 draws its last card (19 life, one plan counter); the second time it draws from an
+# empty library (18 life, two counters - the third, which would sacrifice it, never comes), and loses the game as the
+# state-based actions are next checked (CR 704.5b). Bot1 wins. Each round came back to the board it left, but with Bot2's
+# library a card shorter, and then with Bot2 having drawn from an empty library: never the same position twice.
+
+[Bot1 Deck]
+Swamp
+Necromancy
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp
+Swamp
+Swamp
+Robot Domination
+Island
+Island
+Island
+Worldgorger Dragon
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Worldgorger Dragon)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Robot Domination.Cast
+[T9 Bot1.Main1]
+? Bot2.Library.Count = 1
+? Bot2.Graveyard = Entomb; Worldgorger Dragon
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Necromancy.Cast
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot2.Library.Count = 0
+Bot2.Life = 18
+Bot2.Battlefield.Robot Domination.Counters.Plan = 2
+Bot1.Life = 20
+Turn = 9
+Step = Main1
