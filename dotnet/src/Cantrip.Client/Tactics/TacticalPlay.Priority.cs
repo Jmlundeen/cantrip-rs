@@ -2123,8 +2123,54 @@ public sealed partial class TacticalPlay
     }
 
     /// <summary>
-    /// Whether to pay an optional cost (CR 118.12): to keep a spell from being countered when it can, and for a copy
-    /// of Chain Lightning when there is something for the copy to hit.
+    /// Whether a payment is worth what it costs (CR 118.12), read by what paying does (<see cref="UnlessPaysPromptMessage.Verb"/>)
+    /// against the life it takes (<see cref="UnlessPaysPromptMessage.Life"/>): the life left afterwards must stay above a
+    /// floor that is higher the less the payment buys.
+    /// </summary>
+    private bool WorthPaying(GameClient client, UnlessPaysPromptMessage prompt)
+    {
+        int life = client.View is { } seen ? LifeOf(seen, client.Seat) : 20;
+        bool spare(int floor) => prompt.Life <= 0 || life - prompt.Life >= floor;
+
+        return prompt.Verb switch
+        {
+            // Keeping a spell or a permanent: worth any mana, and life while it is not short.
+            "Countered" or "Sacrificed" => spare(4),
+
+            // A land untapped is worth two life while there is life to spend and something to cast with it.
+            "EnterUntapped" => spare(6)
+                && client.MyHand().Any(card => !IsLand(card) && card.ManaValue <= Lands(client, client.Seat) + 1),
+
+            // A card back, while life is not short (Master of Death's 1 life, Decaying Soil's {1}).
+            "ReturnToHand" or "ReturnToBattlefield" => spare(5),
+
+            // A card chosen once paid (Zoraline's {W}{B} and 2 life): only with one in the graveyard for it to return -
+            // a nonland permanent card of at most that mana value - and life to spare.
+            "ReturnPermanentCard" => spare(6)
+                && client.Zone(ZoneKindView.Graveyard, client.Seat)
+                    .Any(card => IsPermanentCard(card) && !IsLand(card) && card.ManaValue <= prompt.Amount),
+
+            // Lim-Dûl's Vault: another five for a life each is a way to lose to itself.
+            "LookAgain" => false,
+
+            // Mana Vault's {4} in the upkeep, when nothing can be cast, buys back three mana: a mana lost every turn to
+            // save a point of life. Not with rocks valued as the mana they make.
+            "UntapSource" => Policy("rocks") <= 0,
+
+            // Chain Lightning's copy, when there is something for the copy to hit, and only a few times a turn.
+            "CopySpell" => client.View is not { } view
+                || (_copies < CopiesPerTurn
+                    && client.Object(prompt.Subject) is { } copied
+                    && Mode(client, view, CardReading.Text(copied).Split('.')[0]) > Policy("margin")
+                    && ++_copies > 0),
+
+            // A token copy, a transformation, an artifact put onto the battlefield: something for mana.
+            _ => spare(5),
+        };
+    }
+
+    /// <summary>
+    /// Whether to pay an optional cost (CR 118.12), as <see cref="WorthPaying"/> judges it, making the mana it needs.
     /// </summary>
     private TakeActionAnswer Unless(GameClient client, UnlessPaysPromptMessage prompt)
     {
@@ -2145,18 +2191,12 @@ public sealed partial class TacticalPlay
 
         _unlessOwed = prompt.Remaining;
 
-        if (prompt.Source != _unless)
+        // Decided once for the payment, at its first question: paying mana takes several answers. A payment of life alone
+        // is one question, and a source that asks again later (Master of Death each upkeep) is asked afresh.
+        if (prompt.Source != _unless || prompt.Total is "{0}" or "")
         {
             _unless = prompt.Source;
-
-            // Mana Vault's {4} in the upkeep, when nothing can be cast, buys back three mana: a mana lost every turn
-            // to save a point of life. Not with rocks valued as the mana they make.
-            _paying = (prompt.Verb != "UntapSource" || Policy("rocks") <= 0)
-                && (prompt.Verb.Length == 0 || client.View is not { } view || prompt.Verb != "CopySpell"
-                || (_copies < CopiesPerTurn
-                    && client.Object(prompt.Subject) is { } copied
-                    && Mode(client, view, CardReading.Text(copied).Split('.')[0]) > Policy("margin")
-                    && ++_copies > 0));
+            _paying = WorthPaying(client, prompt);
         }
 
         if (!_paying)

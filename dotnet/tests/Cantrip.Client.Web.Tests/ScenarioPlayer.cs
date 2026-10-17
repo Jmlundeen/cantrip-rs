@@ -421,8 +421,18 @@ public sealed class ScenarioPlayer
                 await _page.ClickAsync("Okay", "button");
                 return;
 
+            // A payment's dock is its pay button (once the cost is covered) and its decline, each named by the card for what
+            // it does ("Pay {W}{B} and 2 life", "Enters tapped", "Let it be countered"): pay is the first, decline the last.
+            case ActionKindView.PayCost when state.Prompt == "UnlessPaysPromptMessage" && state.Dock is { Count: >= 2 }:
+                await ClickDockAsync(0);
+                return;
+
             case ActionKindView.PayCost:
                 await ClickButtonStartingAsync("Pay");
+                return;
+
+            case ActionKindView.DeclineCost when state.Prompt == "UnlessPaysPromptMessage" && state.Dock is { Count: >= 1 } dock:
+                await ClickDockAsync(dock.Count - 1);
                 return;
 
             case ActionKindView.DeclineCost:

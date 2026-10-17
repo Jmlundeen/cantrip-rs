@@ -956,7 +956,18 @@ pub struct UnlessPaysPrompt {
     pub remaining_colored: Vec<ColorView>,
     pub options: Vec<ActionOptionMessage>,
     pub remaining_hybrid: Vec<HybridSymbolView>,
+    /// What paying does, in card vocabulary (`Question::verb`): "Countered" for "unless pays", "CopySpell", "ReturnToHand".
     pub verb: String,
+    /// The life the cost takes besides its mana (CR 119.4): "{W}{B} and 2 life" is `Total` {W}{B} and 2.
+    pub life: i32,
+    /// An amount the verb carries (`Question::amount`): the greatest mana value a card returned may have.
+    pub amount: i32,
+    /// The card's words for the payment, after the source's name, `{cost}` and `{subject}` where the cost and the subject's
+    /// name go; `Detail` says more, and `Yes` and `No` name the buttons.
+    pub question: String,
+    pub detail: String,
+    pub yes: String,
+    pub no: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

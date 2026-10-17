@@ -654,7 +654,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::UnlessPays { source, subject, total, options, .. } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
+        RequestKind::UnlessPays { source, subject, total, life, question, options } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
             player,
             source: source_handle(game, handles, *source),
             subject: source_handle(game, handles, *subject),
@@ -664,7 +664,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             remaining_colored: remaining_colored(total),
             remaining_hybrid: remaining_hybrid(total),
             options: options_messages(game, handles, options),
-            verb: "pay".into(),
+            verb: question.verb.into(),
+            life: i32::from(*life),
+            amount: i32::from(question.amount),
+            question: question.ask.into(),
+            detail: question.detail.into(),
+            yes: question.yes.into(),
+            no: question.no.into(),
         }),
         RequestKind::ChooseCards { source, purpose, cards, eligible, count, up_to, kind } => {
             let owner = if *purpose == Purpose::TakeFromHand {

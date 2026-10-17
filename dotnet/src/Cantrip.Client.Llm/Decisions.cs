@@ -536,16 +536,20 @@ public sealed class Decisions
     /// </summary>
     private AnswerPayload Unless(GameClient client, UnlessPaysPromptMessage prompt)
     {
-        if (prompt.Source != _unless)
+        // A payment of life alone is one question, so a source that asks again later (each upkeep) is asked afresh.
+        if (prompt.Source != _unless || prompt.Total is "{0}" or "")
         {
             _unless = prompt.Source;
 
             string source = GameText.Named(client, prompt.Source);
             string subject = GameText.Named(client, prompt.Subject);
 
-            _paying = Yes(prompt.Verb.Length > 0
-                ? $"{source} lets you pay {prompt.Total} to {prompt.Verb} {subject}. Pay it?"
-                : $"{source} will affect {subject} unless you pay {prompt.Total}. Pay it?");
+            // The card's own words for what paying does, with the whole cost, life included, and what declining means.
+            string question = prompt.Question.Length > 0 ? prompt.Words(prompt.Question, subject) : $"pay {prompt.CostText()}?";
+            string detail = prompt.Words(prompt.Detail, subject);
+            string no = prompt.No.Length > 0 ? $" Declining: {prompt.Words(prompt.No, subject)}." : string.Empty;
+            _paying = Yes($"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
+                + $"It costs {prompt.CostText()}; you have {client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Life} life. Pay it?");
         }
 
         return _paying

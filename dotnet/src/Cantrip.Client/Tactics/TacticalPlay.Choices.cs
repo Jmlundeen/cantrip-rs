@@ -706,13 +706,7 @@ public sealed partial class TacticalPlay
 
         bool accept = prompt.Verb switch
         {
-            // A land untapped is worth two life while there is life to spend and something to cast with it.
-            "PayLife" => life - prompt.Amount >= 6
-                && client.MyHand().Any(card => !IsLand(card) && card.ManaValue <= Lands(client, client.Seat) + 1),
-            "PayLifeUnlessCountered" => life - prompt.Amount >= 4,
-
-            // Master of Death: one life for a creature back in hand, while life is not short.
-            "PayLifeToReturn" => life - prompt.Amount >= 5,
+            // Payments of life - a shockland's, ward's, Master of Death's - are the payment prompt's (WorthPaying).
             "DiscardUnlessCountered" => client.MyHand().Count > prompt.Amount,
 
             // Ward—Sacrifice N permanents (Emrakul, the Exigent Doom; Ulamog, the Defiler): a price paid only out of a wide
@@ -737,7 +731,7 @@ public sealed partial class TacticalPlay
             "PromiseGiftCard" or "PromiseGiftTreasure" or "PromiseGiftOctopus" or "PromiseGiftExtraTurn" => false,
 
             // Each of these is a way to lose to itself, or to hand an opponent something.
-            "PayLifeToLookAgain" or "Sacrifice" or "HaveControllerDraw" or "PutIntoGraveyard" or "PutOnBottom"
+            "Sacrifice" or "HaveControllerDraw" or "PutIntoGraveyard" or "PutOnBottom"
                 or "ChooseOddOrEven" or "ProtectFromColorless" => false,
 
             // Chain Lightning's copy, when there is something for it to hit — and only a few times a turn, and only

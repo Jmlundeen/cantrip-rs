@@ -281,7 +281,7 @@ public sealed partial class TacticalPlay
     {
         PriorityPromptMessage => "priority",
         PayCostsPromptMessage pay => $"pay {pay.Remaining} for {NameOf(client, pay.Spell)}{(pay.HasX ? $" with X={pay.X}" : string.Empty)}",
-        UnlessPaysPromptMessage unless => $"pay {unless.Remaining} or not ({NameOf(client, unless.Source)})",
+        UnlessPaysPromptMessage unless => $"pay {unless.CostText()} or not ({unless.Verb}, {NameOf(client, unless.Source)})",
         DeclareAttackersPromptMessage => "attack",
         DeclareBlockersPromptMessage => "block",
         ChooseTargetPromptMessage => "target",

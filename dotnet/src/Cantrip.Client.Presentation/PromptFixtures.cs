@@ -230,14 +230,15 @@ public static class PromptFixtures
         "unless-pays-return",
         "unless-pays-return-gone",
         "may",
-        "may-pay-life",
+        "unless-pays-life",
         "may-promise-gift",
         "may-promise-gift-tapped-fish",
-        "may-pay-life-to-look-again",
-        "may-pay-life-to-return",
+        "unless-pays-life-to-look-again",
+        "unless-pays-life-to-return",
         "may-reveal-again",
         "may-reveal-for-ripple",
-        "may-pay-life-unless-countered",
+        "unless-pays-life-unless-countered",
+        "unless-pays-mana-and-life",
         "may-discard-unless-countered",
         "may-cast",
         "may-cast-transformed",
@@ -1196,6 +1197,10 @@ public static class PromptFixtures
                     Player = Viewer,
                     Source = new ViewHandle(TheirHandCard),
                     Subject = new ViewHandle(OnStack),
+                    Verb = "Countered",
+                    Question = "pay {cost}, or {subject} is countered?",
+                    Yes = "Pay {cost}",
+                    No = "Let it be countered",
                     Total = "{3}",
                     Remaining = "{0}",
                     Options =
@@ -1213,6 +1218,10 @@ public static class PromptFixtures
                     Player = Viewer,
                     Source = new ViewHandle(TheirHandCard),
                     Subject = new ViewHandle(OnStack),
+                    Verb = "Countered",
+                    Question = "pay {cost}, or {subject} is countered?",
+                    Yes = "Pay {cost}",
+                    No = "Let it be countered",
                     Total = "{3}",
                     Remaining = "{1}",
                     RemainingGeneric = 1,
@@ -1234,6 +1243,10 @@ public static class PromptFixtures
                     Source = new ViewHandle(OnStack),
                     Subject = new ViewHandle(OnStack),
                     Verb = "CopySpell",
+                    Question = "pay {cost} to copy {subject}?",
+                    Detail = "You choose a new target for the copy",
+                    Yes = "Pay {cost}",
+                    No = "Don't copy",
                     Total = "{R}{R}",
                     Remaining = "{0}",
                     Options =
@@ -1255,6 +1268,9 @@ public static class PromptFixtures
                     Source = new ViewHandle(MyVault),
                     Subject = new ViewHandle(MyVault),
                     Verb = "UntapSource",
+                    Question = "pay {cost} to untap {subject}?",
+                    Yes = "Pay {cost}",
+                    No = "Leave it tapped",
                     Total = "{4}",
                     Remaining = "{0}",
                     Options =
@@ -1275,6 +1291,9 @@ public static class PromptFixtures
                     Source = new ViewHandle(OnStack),
                     Subject = new ViewHandle(MyGrave),
                     Verb = "ReturnToHand",
+                    Question = "pay {cost} to return {subject} to your hand?",
+                    Yes = "Pay {cost}",
+                    No = "Leave it",
                     Total = "{1}",
                     Remaining = "{0}",
                     Options =
@@ -1295,6 +1314,9 @@ public static class PromptFixtures
                     Source = new ViewHandle(OnStack),
                     Subject = ViewHandle.None,
                     Verb = "ReturnToHand",
+                    Question = "pay {cost} to return {subject} to your hand?",
+                    Yes = "Pay {cost}",
+                    No = "Leave it",
                     Total = "{1}",
                     Remaining = "{0}",
                     Options =
@@ -1317,43 +1339,80 @@ public static class PromptFixtures
                 Announce(view, "Into the Flood Maw", "{U}", "Gift a tapped Fish (You may promise an opponent a gift as you cast this spell. If you do, they create a tapped 1/1 blue Fish creature token before its other effects.)", Viewer);
                 return new MayPromptMessage { Player = Viewer, Source = new ViewHandle(OnStack), Verb = "PromiseGiftTappedFish" };
 
-            case "may-pay-life":
-                return new MayPromptMessage
+            // A shockland's "As this land enters, you may pay 2 life. If you don't, it enters tapped": life alone, no mana.
+            case "unless-pays-life":
+                return new UnlessPaysPromptMessage
                 {
                     Player = Viewer,
                     Source = new ViewHandle(HandSwamp),
-                    Verb = "PayLife",
-                    Amount = 2,
+                    Subject = new ViewHandle(HandSwamp),
+                    Verb = "EnterUntapped",
+                    Question = "pay {cost}?",
+                    Detail = "If you don't, it enters tapped",
+                    Yes = "Pay {cost}",
+                    No = "Enters tapped",
+                    Total = "{0}",
+                    Remaining = "{0}",
+                    Life = 2,
+                    Options =
+                    [
+                        new ActionOptionMessage { Kind = ActionKindView.PayCost, Source = new ViewHandle(HandSwamp) },
+                        new ActionOptionMessage { Kind = ActionKindView.DeclineCost, Source = new ViewHandle(HandSwamp) },
+                    ],
                 };
 
             // Lim-Dûl's Vault: the same life price bought over and over, with the cards it is about in the library
             // rather than in the dock, so the hint has to say where they can be seen.
-            case "may-pay-life-to-look-again":
+            case "unless-pays-life-to-look-again":
                 Announce(view, "Lim-Dûl's Vault", "{U}{B}",
                     "Look at the top five cards of your library. As many times as you choose, you may pay 1 life, put "
                         + "those cards on the bottom of your library in any order, then look at the top five cards of "
                         + "your library. Then shuffle and put the last cards you looked at this way on top in any order.",
                     Viewer);
-                return new MayPromptMessage
+                return new UnlessPaysPromptMessage
                 {
                     Player = Viewer,
                     Source = new ViewHandle(OnStack),
-                    Verb = "PayLifeToLookAgain",
-                    Amount = 1,
+                    Subject = new ViewHandle(OnStack),
+                    Verb = "LookAgain",
+                    Question = "pay {cost} to look again?",
+                    Detail = "The cards you are looking at go on the bottom  ·  click your library to see them",
+                    Yes = "Pay {cost}",
+                    No = "Keep these",
+                    Total = "{0}",
+                    Remaining = "{0}",
+                    Life = 1,
+                    Options =
+                    [
+                        new ActionOptionMessage { Kind = ActionKindView.PayCost, Source = new ViewHandle(OnStack) },
+                        new ActionOptionMessage { Kind = ActionKindView.DeclineCost, Source = new ViewHandle(OnStack) },
+                    ],
                 };
 
-            // Master of Death: the card is the ability's source, in its owner's graveyard; Amount is the life paid.
-            case "may-pay-life-to-return":
+            // Master of Death: the card is the ability's source, in its owner's graveyard.
+            case "unless-pays-life-to-return":
                 Announce(view, "Master of Death", "{1}{U}{B}",
                     "At the beginning of your upkeep, if this card is in your graveyard, you may pay 1 life. If you "
                         + "do, return it to your hand.",
                     Viewer);
-                return new MayPromptMessage
+                return new UnlessPaysPromptMessage
                 {
                     Player = Viewer,
                     Source = new ViewHandle(OnStack),
-                    Verb = "PayLifeToReturn",
-                    Amount = 1,
+                    Subject = new ViewHandle(OnStack),
+                    Verb = "ReturnToHand",
+                    Question = "pay {cost} to return {subject} to your hand?",
+                    Detail = "It is in your graveyard",
+                    Yes = "Pay {cost}",
+                    No = "Leave it",
+                    Total = "{0}",
+                    Remaining = "{0}",
+                    Life = 1,
+                    Options =
+                    [
+                        new ActionOptionMessage { Kind = ActionKindView.PayCost, Source = new ViewHandle(OnStack) },
+                        new ActionOptionMessage { Kind = ActionKindView.DeclineCost, Source = new ViewHandle(OnStack) },
+                    ],
                 };
 
             // Ad Nauseam: Amount is what the card just revealed cost, since the next one's price is unknown.
@@ -1381,11 +1440,54 @@ public static class PromptFixtures
                     Amount = 4,
                 };
 
-            case "may-pay-life-unless-countered":
+            case "unless-pays-life-unless-countered":
                 // Ward — Pay 3 life (CR 702.21a): the caster who just targeted a warded permanent is the one asked,
                 // not its controller — Sedgemoor Witch's shape, life rather than mana.
-                Announce(view, "Lightning Bolt", "{R}", "Lightning Bolt deals 3 damage to any target.", Rival);
-                return new MayPromptMessage { Player = Rival, Source = new ViewHandle(OnStack), Verb = "PayLifeUnlessCountered", Amount = 3 };
+                Announce(view, "Lightning Bolt", "{R}", "Lightning Bolt deals 3 damage to any target.", Viewer);
+                return new UnlessPaysPromptMessage
+                {
+                    Player = Viewer,
+                    Source = new ViewHandle(TheirHandCard),
+                    Subject = new ViewHandle(OnStack),
+                    Verb = "Countered",
+                    Question = "pay {cost}, or {subject} is countered?",
+                    Yes = "Pay {cost}",
+                    No = "Let it be countered",
+                    Total = "{0}",
+                    Remaining = "{0}",
+                    Life = 3,
+                    Options =
+                    [
+                        new ActionOptionMessage { Kind = ActionKindView.PayCost, Source = new ViewHandle(TheirHandCard) },
+                        new ActionOptionMessage { Kind = ActionKindView.DeclineCost, Source = new ViewHandle(TheirHandCard) },
+                    ],
+                };
+
+            case "unless-pays-mana-and-life":
+                // Zoraline, Cosmos Caller's "you may pay {W}{B} and 2 life. When you do, return target nonland permanent
+                // card with mana value 3 or less from your graveyard to the battlefield": one payment, mana and life.
+                Announce(view, "Zoraline, Cosmos Caller", "{1}{W}{B}", "Whenever Zoraline enters or attacks, you may pay {W}{B} and 2 life. When you do, return target nonland permanent card with mana value 3 or less from your graveyard to the battlefield with a finality counter on it.", Viewer);
+                return new UnlessPaysPromptMessage
+                {
+                    Player = Viewer,
+                    Source = new ViewHandle(OnStack),
+                    Subject = new ViewHandle(OnStack),
+                    Verb = "ReturnPermanentCard",
+                    Amount = 3,
+                    Question = "pay {cost} to return a nonland permanent card with mana value 3 or less from your graveyard to the battlefield?",
+                    Detail = "It returns with a finality counter on it",
+                    Yes = "Pay {cost}",
+                    No = "Don't pay",
+                    Total = "{W}{B}",
+                    Remaining = "{W}{B}",
+                    RemainingColored = [ColorView.White, ColorView.Black],
+                    Life = 2,
+                    Options =
+                    [
+                        Tap(MySwamp),
+                        new ActionOptionMessage { Kind = ActionKindView.DeclineCost, Source = new ViewHandle(OnStack) },
+                    ],
+                };
 
             case "may-discard-unless-countered":
                 // Ward — Discard a card (CR 702.21a): Sunset Saboteur's shape, a card out of hand rather than life.

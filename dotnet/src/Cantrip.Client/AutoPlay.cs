@@ -44,7 +44,9 @@ public static class AutoPlay
                 return true;
 
             case UnlessPaysPromptMessage unless:
-                client.Answer(PayUnless(unless));
+                // Pays, but not Lim-Dûl's Vault's "as many times as you choose, you may pay 1 life": a seat that always
+                // pays buys look after look until it has no life left and dies to it (CR 704.5a).
+                client.Answer(unless.Verb == "LookAgain" ? Answer(unless.Options.First(option => option.Kind == ActionKindView.DeclineCost)) : PayUnless(unless));
                 return true;
 
             case ChooseCardsPromptMessage choose:
@@ -103,9 +105,8 @@ public static class AutoPlay
             case MayPromptMessage may:
                 // Does it: a search it may make is one it would rather make, and saying yes exercises more of the game.
                 // Not a Chain of Smog copy, though: two seats that always copy it pass it back and forth for ever.
-                // Nor Lim-Dûl's Vault's "as many times as you choose, you may pay 1 life": a seat that always says
-                // yes buys look after look until it has none left and dies to it (CR 704.5a).
-                client.Answer(new MayChosenAnswer { Accept = may.Verb is not ("CopySpell" or "PayLifeToLookAgain" or "RevealAgain") });
+                // Nor Ad Nauseam's "you may repeat this process", which reveals until it dies to it.
+                client.Answer(new MayChosenAnswer { Accept = may.Verb is not ("CopySpell" or "RevealAgain") });
                 return true;
 
             case AssignCombatDamagePromptMessage assign:

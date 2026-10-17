@@ -1683,11 +1683,52 @@ public sealed class UnlessPaysPromptMessage : PromptPayload
     public List<HybridSymbolView> RemainingHybrid { get; set; } = [];
 
     /// <summary>
-    /// What paying buys, in card vocabulary, when it buys something rather than stopping it: "CopySpell" for Chain
-    /// Lightning's copy of <see cref="Subject"/>. Empty for "unless pays", where paying keeps the subject.
+    /// What paying does, in card vocabulary, which the bots read it by: "Countered" for "unless pays" (paying keeps
+    /// <see cref="Subject"/> from being countered), "Sacrificed" likewise for a permanent, and for "you may pay. If you
+    /// do" what paying buys - "CopySpell", "UntapSource", "ReturnToHand", "ReturnToBattlefield", "ReturnPermanentCard"
+    /// (a card chosen once paid, its mana value at most <see cref="Amount"/>), "CreateCopyToken", "Transform",
+    /// "PutOntoBattlefield", "LookAgain", "EnterUntapped".
     /// </summary>
     [Key(9)]
     public string Verb { get; set; } = string.Empty;
+
+    /// <summary>The life the cost takes besides its mana (CR 119.4): "{W}{B} and 2 life" is a <see cref="Total"/> of {W}{B} and 2.</summary>
+    [Key(10)]
+    public int Life { get; set; }
+
+    /// <summary>An amount the verb carries: for "ReturnPermanentCard", the greatest mana value the card may have.</summary>
+    [Key(11)]
+    public int Amount { get; set; }
+
+    /// <summary>
+    /// The card's words for the payment, after the source's name: <c>{cost}</c> and <c>{subject}</c> stand where the cost
+    /// (<see cref="CostText"/>) and the subject's name go, here and in <see cref="Detail"/>, <see cref="Yes"/> and <see cref="No"/>.
+    /// </summary>
+    [Key(12)]
+    public string Question { get; set; } = string.Empty;
+
+    /// <summary>What the payment means beyond its buttons ("If you don't, it enters tapped"). May be empty.</summary>
+    [Key(13)]
+    public string Detail { get; set; } = string.Empty;
+
+    /// <summary>The button that pays, named for what it does.</summary>
+    [Key(14)]
+    public string Yes { get; set; } = string.Empty;
+
+    /// <summary>The button that declines, named for what it does.</summary>
+    [Key(15)]
+    public string No { get; set; } = string.Empty;
+
+    /// <summary>The whole cost in words: "{W}{B} and 2 life", "{3}", "2 life".</summary>
+    public string CostText()
+    {
+        bool mana = Total.Length > 0 && Total != "{0}";
+        return Life <= 0 ? (mana ? Total : "{0}") : mana ? $"{Total} and {Life} life" : $"{Life} life";
+    }
+
+    /// <summary>One of the card's texts with the cost and the subject's name put in.</summary>
+    public string Words(string text, string subject) =>
+        (text ?? string.Empty).Replace("{cost}", CostText(), StringComparison.Ordinal).Replace("{subject}", subject, StringComparison.Ordinal);
 
     /// <summary>Declining, which is always among the options.</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.DeclineCost };

@@ -501,6 +501,36 @@ public sealed class DecisionTests
     }
 
     [Fact]
+    public void Asks_a_payment_in_the_cards_words_with_its_whole_cost_and_pays_it_when_told()
+    {
+        // Zoraline, Cosmos Caller: "you may pay {W}{B} and 2 life. When you do, return target nonland permanent card ...".
+        var chooser = new ScriptedChooser([[0]]);
+
+        AnswerPayload answer = new Decisions(chooser).Answer(
+            Seated(Card(1, "Zoraline, Cosmos Caller")),
+            new UnlessPaysPromptMessage
+            {
+                Player = Me,
+                Source = Handle(1),
+                Subject = Handle(1),
+                Verb = "ReturnPermanentCard",
+                Question = "pay {cost} to return a nonland permanent card with mana value 3 or less from your graveyard to the battlefield?",
+                Detail = "It returns with a finality counter on it",
+                No = "Don't pay",
+                Total = "{W}{B}",
+                Remaining = "{0}",
+                Life = 2,
+                Options = [new() { Kind = ActionKindView.PayCost }, new() { Kind = ActionKindView.DeclineCost }],
+            });
+
+        Assert.Equal(ActionKindView.PayCost, Assert.IsType<TakeActionAnswer>(answer).Kind);
+        string heading = chooser.Asked[0].Heading;
+        Assert.Contains("pay {W}{B} and 2 life to return a nonland permanent card", heading, StringComparison.Ordinal);
+        Assert.Contains("finality counter", heading, StringComparison.Ordinal);
+        Assert.Contains("Declining: Don't pay", heading, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Puts_the_trigger_chosen_to_resolve_first_on_the_stack_last()
     {
         // The last ability named goes on the stack last and therefore resolves first (CR 603.3b), so the question is

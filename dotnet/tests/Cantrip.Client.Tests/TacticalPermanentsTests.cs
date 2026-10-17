@@ -906,6 +906,66 @@ public sealed class TacticalPermanentsTests
         Assert.Equal(ActionKindView.ActivateAbility, Assert.IsType<TakeActionAnswer>(Without("rocks").Decide(client, Untap())).Kind);
     }
 
+    [Theory]
+    // A card of mana value 3 or less in its graveyard for the payment to return, and life to spare.
+    [InlineData(2, 20, ActionKindView.PayCost)]
+    // Nothing the reflexive ability could return: the payment buys nothing.
+    [InlineData(4, 20, ActionKindView.DeclineCost)]
+    // Two life is too much of what is left.
+    [InlineData(2, 7, ActionKindView.DeclineCost)]
+    public void Pays_mana_and_life_for_a_card_back_only_with_one_to_return_and_life_to_spare(int manaValue, int life, ActionKindView expected)
+    {
+        // Zoraline, Cosmos Caller's "you may pay {W}{B} and 2 life. When you do, return target nonland permanent card with
+        // mana value 3 or less from your graveyard to the battlefield": the card is chosen once paid, so the seat looks for one.
+        ObjectView dead = Creature(4, "Bear", 2, 2);
+        dead.Zone = ZoneKindView.Graveyard;
+        dead.ZoneOwner = Me;
+        dead.ManaValue = manaValue;
+        GameClient client = Seated([dead], myLife: life);
+
+        TakeActionAnswer answer = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, new UnlessPaysPromptMessage
+        {
+            Player = Me,
+            Source = Handle(30),
+            Subject = Handle(30),
+            Verb = "ReturnPermanentCard",
+            Amount = 3,
+            Total = "{W}{B}",
+            Remaining = "{0}",
+            Life = 2,
+            Options = [new() { Kind = ActionKindView.PayCost }, new() { Kind = ActionKindView.DeclineCost }],
+        }));
+
+        Assert.Equal(expected, answer.Kind);
+    }
+
+    [Theory]
+    // Ward—Pay 3 life (CR 702.21a): the spell kept, while the life left is not short.
+    [InlineData("Countered", 10, ActionKindView.PayCost)]
+    [InlineData("Countered", 6, ActionKindView.DeclineCost)]
+    // A shockland's 2 life with nothing in hand to cast: entering tapped costs nothing.
+    [InlineData("EnterUntapped", 20, ActionKindView.DeclineCost)]
+    // Lim-Dûl's Vault's look again: never.
+    [InlineData("LookAgain", 20, ActionKindView.DeclineCost)]
+    public void Weighs_a_payment_of_life_by_what_paying_does(string verb, int life, ActionKindView expected)
+    {
+        GameClient client = Seated([], myLife: life);
+
+        TakeActionAnswer answer = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, new UnlessPaysPromptMessage
+        {
+            Player = Me,
+            Source = Handle(30),
+            Subject = Handle(31),
+            Verb = verb,
+            Total = "{0}",
+            Remaining = "{0}",
+            Life = 3,
+            Options = [new() { Kind = ActionKindView.PayCost }, new() { Kind = ActionKindView.DeclineCost }],
+        }));
+
+        Assert.Equal(expected, answer.Kind);
+    }
+
     [Fact]
     public void Oko_does_not_make_an_Elk_of_what_makes_its_own_mana()
     {

@@ -1382,32 +1382,31 @@ public sealed partial class MainPage
     {
         string source = client.Object(prompt.Source)?.Name ?? "A spell";
         string subject = client.Object(prompt.Subject)?.Name ?? "it";
+        string cost = prompt.CostText();
 
-        Prompt(
-            prompt.Verb switch
-            {
-                "CopySpell" => $"{source}: pay {prompt.Total} to copy {subject}?",
-                "UntapSource" => $"{source}: pay {prompt.Total} to untap {subject}?",
-                "CreateCopyToken" => $"{source}: pay {prompt.Total} to create a copy of {subject}?",
-                "ReturnToHand" => prompt.Subject == ViewHandle.None
-                    ? $"{source}: pay {prompt.Total}? That card has left your graveyard, so paying returns nothing"
-                    : $"{source}: pay {prompt.Total} to return {subject} to your hand?",
-                _ => $"{source}: pay {prompt.Total} or lose {subject}?",
-            },
-            _actions.Pay is not null
-                ? $"{prompt.Total} is covered"
-                : _actions.Any
-                    ? $"{prompt.Remaining} still to pay  ·  tap a land"
-                    : $"{prompt.Remaining} still to pay  ·  nothing untapped can pay it");
+        // The card's words for what paying does ("pay {W}{B} and 2 life to return ..."), and under them where the payment
+        // stands: the life part needs nothing doing, the mana part is covered or still owed.
+        string question = prompt.Question.Length > 0 ? prompt.Words(prompt.Question, subject) : $"pay {cost}?";
+        string title = question.Contains("{source}", StringComparison.Ordinal)
+            ? question.Replace("{source}", source, StringComparison.Ordinal)
+            : $"{source}: {question}";
+        string standing = _actions.Pay is not null
+            ? prompt.Total is "{0}" or "" ? "" : $"{prompt.Total} is covered"
+            : _actions.Any
+                ? $"{prompt.Remaining} still to pay  ·  tap a land"
+                : $"{prompt.Remaining} still to pay  ·  nothing untapped can pay it";
+        string detail = prompt.Words(prompt.Detail, subject);
+
+        Prompt(title, string.Join("  ·  ", new[] { detail, standing }.Where(part => part.Length > 0)));
 
         if (_actions.Pay is { } pay)
         {
-            AddButton($"Pay {prompt.Total}", () => Send(client, AnswerFor(pay)), primary: true);
+            AddButton(prompt.Yes.Length > 0 ? prompt.Words(prompt.Yes, subject) : $"Pay {cost}", () => Send(client, AnswerFor(pay)), primary: true);
         }
 
         if (_actions.Decline is { } decline)
         {
-            AddButton("Don't pay", () => Send(client, AnswerFor(decline)), primary: _actions.Pay is null);
+            AddButton(prompt.No.Length > 0 ? prompt.Words(prompt.No, subject) : "Don't pay", () => Send(client, AnswerFor(decline)), primary: _actions.Pay is null);
         }
     }
 
@@ -1583,27 +1582,6 @@ public sealed partial class MainPage
 
         switch (prompt.Verb)
         {
-            case "PayLife":
-                Ask($"{Named("This land")}: pay {prompt.Amount} life?", "If you don't, it enters tapped", $"Pay {prompt.Amount} life", "Enter tapped");
-                return;
-
-            case "PayLifeToLookAgain":
-                Ask(
-                    $"{source}: pay {prompt.Amount} life to look again?",
-                    "The cards you are looking at go on the bottom  ·  click your library to see them",
-                    $"Pay {prompt.Amount} life",
-                    "Keep these");
-                return;
-
-            // Master of Death: the card is in its owner's graveyard, so the dock says where the payment sends it.
-            case "PayLifeToReturn":
-                Ask(
-                    $"{source}: pay {prompt.Amount} life to return it to your hand?",
-                    "It is in your graveyard",
-                    $"Pay {prompt.Amount} life",
-                    "Leave it");
-                return;
-
             // Ad Nauseam: Amount is the life the card just revealed cost, not a price for the next one.
             case "RevealAgain":
                 Ask(
@@ -1632,10 +1610,6 @@ public sealed partial class MainPage
                     "Cast any with the spell's name for free  ·  the rest go on the bottom",
                     "Reveal",
                     "Don't reveal");
-                return;
-
-            case "PayLifeUnlessCountered":
-                Ask($"Pay {prompt.Amount} life, or {source} is countered?", "Ward", $"Pay {prompt.Amount} life", "Don't pay");
                 return;
 
             case "DiscardUnlessCountered":
