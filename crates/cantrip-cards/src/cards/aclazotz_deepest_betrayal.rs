@@ -35,16 +35,6 @@ fn create_bat(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "When Aclazotz dies, return it to the battlefield tapped and transformed under its owner's control." The card it became
-/// in the graveyard, if it is still there (CR 400.7e); a permanent that is not a double-faced card (a copy of Aclazotz) has
-/// no back face and stays in the graveyard (CR 712.14a).
-fn return_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
-    let owner = g.obj(card).owner;
-    g.put_onto_battlefield_transformed(card, owner, true)?;
-    Ok(())
-}
-
 /// "Activate only if a player has one or fewer cards in hand": any player's hand, an opponent's too.
 fn a_player_has_one_or_fewer_cards_in_hand(q: &dyn Query, _: &Asker) -> bool {
     let state = q.state();
@@ -65,7 +55,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ATTACKS, each_opponent_discards, "Whenever Aclazotz attacks, each opponent discards a card. For each opponent who can't, you draw a card."),
         triggered(when_asked(EventMask::DISCARDED, opponent_discards_a_land_card), create_bat, "Whenever an opponent discards a land card, create a 1/1 black Bat creature token with flying."),
-        triggered(THIS_DIES, return_transformed, "When Aclazotz dies, return it to the battlefield tapped and transformed under its owner's control.")
+        triggered(THIS_DIES, effects::return_it_tapped_and_transformed, "When Aclazotz dies, return it to the battlefield tapped and transformed under its owner's control.")
             .look_back(),
     ],
     back: Some(&BACK),

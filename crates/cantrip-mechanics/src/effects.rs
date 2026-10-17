@@ -263,6 +263,17 @@ pub fn transform_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     Ok(())
 }
 
+/// "When [this] dies, return it to the battlefield tapped and transformed under its owner's control" (CR 712.14a): the card
+/// it became in the graveyard, if it is still there (CR 400.7e); a permanent that is not a double-faced card (a copy of one)
+/// has no back face and stays in the graveyard. The trigger looks back (CR 603.10a). Aclazotz, Deepest Betrayal and Ojer
+/// Axonil, Deepest Might print it.
+pub fn return_it_tapped_and_transformed(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(card) = g.found_after_move(item.object) else { return Ok(()) };
+    let owner = g.obj(card).owner;
+    g.put_onto_battlefield_transformed(card, owner, true)?;
+    Ok(())
+}
+
 /// "Untap this [permanent]" (CR 701.26): the ability's source. Basalt Monolith and Grim Monolith print it.
 pub fn untap_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.untap(item.object);
