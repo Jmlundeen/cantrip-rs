@@ -1,0 +1,38 @@
+# Konstrari Charm, first mode: "deals 6 damage to target creature with flying." Bot2 controls Ornithopter (flying) and Llanowar Elves
+# (no flying): the Elves are refused as the target (beside the positive control, the Ornithopter chosen next), and the 6 damage
+# destroys the Ornithopter (toughness 2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Konstrari Charm
+Plains x17
+
+[Bot2 Deck]
+Mox Emerald
+Ornithopter
+Llanowar Elves
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Konstrari Charm.Cast
+Bot1.Modes(1)
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Ornithopter)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Mox Emerald; Llanowar Elves
+Bot1.Graveyard = Konstrari Charm

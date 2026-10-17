@@ -1,0 +1,39 @@
+# Konstrari Charm with its target gone (CR 608.2b): Bot1 casts the damage mode at Bot2's Ornithopter, then in response Bot1's own
+# Lightning Bolt kills the Ornithopter. The Charm resolves with no legal target and does nothing, so the Charm and the Bolt are in
+# Bot1's graveyard, the Ornithopter in Bot2's, and Bot2 lost nothing else (still 20 life).
+
+[Bot1 Deck]
+Mox Ruby x2
+Mox Emerald
+Konstrari Charm
+Lightning Bolt
+Plains x15
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Konstrari Charm.Cast
+Bot1.Modes(1)
+Bot1.Target(Ornithopter)
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Konstrari Charm; Lightning Bolt
+Bot2.Life = 20
+Stack.Count = 0

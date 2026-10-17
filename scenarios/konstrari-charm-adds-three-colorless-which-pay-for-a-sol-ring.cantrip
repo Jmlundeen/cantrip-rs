@@ -1,0 +1,31 @@
+# Konstrari Charm, third mode: "Add {C}{C}{C}." It has no target and is a spell, not a mana ability: Bot1 casts the Charm with two
+# Moxen, then (the mana pool surviving while the Charm resolves and Bot1 holds priority) spends one {C} on a Sol Ring ({1}),
+# leaving {C}{C} in the pool. The Charm itself needed no creature on either side.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Konstrari Charm
+Sol Ring
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Konstrari Charm.Cast
+Bot1.Modes(3)
+Bot2.Pass
+? Bot1.Mana = {C}{C}{C}
+Bot1.Hand.Sol Ring.Cast
+Bot2.Pass
+? Bot1.Mana = {C}{C}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Sol Ring
+Bot1.Graveyard = Konstrari Charm
