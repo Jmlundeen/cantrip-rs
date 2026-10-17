@@ -1,0 +1,31 @@
+# Consign to Memory counters an opponent's colorless spell and its replicate copy targets the same spell (CR 702.56a, 707.10c).
+
+[Bot1 Deck]
+Island
+Island
+Island
+Consign to Memory
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T1 Bot1.Main2]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main2]
+Bot2.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Consign to Memory.Cast(Stack.Ornithopter; Kicked: 1)
+
+[Expect]
+Bot2.Graveyard.Ornithopter.Power = 0
+Bot2.Graveyard.Count = 3
+Bot1.Graveyard = Consign to Memory
+Stack.Count = 0
