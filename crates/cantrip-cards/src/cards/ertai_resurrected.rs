@@ -20,10 +20,8 @@ fn counter_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
             g.counter(spell);
             controller
         }
-        Target::Ability(serial) => {
-            let Some(at) = g.state().stack.iter().position(|i| i.serial == serial) else { return Ok(()) };
-            let countered = g.state().stack[at];
-            g.counter_item(countered.object, at);
+        Target::Ability(_) => {
+            let Some(countered) = cantrip_mechanics::counter_target_ability(g, item, 0) else { return Ok(()) };
             countered.controller
         }
         _ => return Ok(()),

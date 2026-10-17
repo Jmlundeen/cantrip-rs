@@ -294,3 +294,27 @@ pub fn plus<const N: u16>(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
         d.amount = d.amount.saturating_add(N);
     }
 }
+
+/// "If [this card] would be put into a graveyard from anywhere, reveal [it] and shuffle it into its owner's library instead"
+/// (CR 614.1a, 701.20a, 701.24a): whether this move is that. An ability that says where it functions functions there
+/// (CR 113.6b), so the replacement is `own_everywhere`: from a hand, a library, the stack and the battlefield alike, and only
+/// on the card's own move.
+fn this_would_be_put_into_a_graveyard(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::ZoneChange(z) if z.to.is(ZoneKind::Graveyard) && z.object == asker.source)
+}
+
+/// "... reveal it and shuffle it into its owner's library instead."
+fn reveal_and_shuffle_into_library(q: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::ZoneChange(z) = proposal {
+        // A card only ever goes to its owner's graveyard (CR 400.3), so that player's library is its owner's.
+        z.to = Zone::library(q.obj(z.object).owner);
+        z.reveal = true;
+        z.shuffle = true;
+    }
+}
+
+/// "If [this card] would be put into a graveyard from anywhere, reveal [this card] and shuffle it into its owner's library
+/// instead." Blightsteel Colossus and Progenitus print it.
+pub const REVEAL_AND_SHUFFLE_INTO_LIBRARY_INSTEAD_OF_GRAVEYARD: ReplacementDef =
+    replacement(ReplacementKind::ZoneChange, this_would_be_put_into_a_graveyard, reveal_and_shuffle_into_library, "shuffles it into its owner's library")
+        .own_everywhere();

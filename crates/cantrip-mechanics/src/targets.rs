@@ -145,6 +145,13 @@ fn spell_or_ability_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// the stack (a mana ability never is, CR 605.3b). Spellskite and Ertai Resurrected print it.
 pub const SPELL_OR_ABILITY: TargetSpec = target(spell_or_ability_filter);
 
+/// "Target activated or triggered ability" (CR 115.1): an ability on the stack, which a mana ability never is (CR 605.3b).
+/// Stifle ("target") and Tishana's Tidebinder ("up to one target") print it.
+pub fn activated_or_triggered_ability_filter(_: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Ability(_))
+}
+pub const ACTIVATED_OR_TRIGGERED_ABILITY: TargetSpec = target(activated_or_triggered_ability_filter);
+
 /// "Target spell or ability with a single target" (CR 115.1, 115.7a): exactly one target across every slot, counted with
 /// repeats, as the item was announced; re-asked as the spell resolves (CR 608.2b). Untimely Malfunction and Bolt Bend print it.
 pub const SPELL_OR_ABILITY_WITH_A_SINGLE_TARGET: TargetSpec = target(spell_or_ability_with_a_single_target_filter);

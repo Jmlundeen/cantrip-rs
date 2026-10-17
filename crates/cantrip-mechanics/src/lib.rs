@@ -399,6 +399,20 @@ pub fn counter_target(g: &mut dyn Game, item: &StackItem, slot: usize) -> Option
     Some(spell)
 }
 
+/// Counters the targeted activated or triggered ability (CR 701.6, 115.1), if it is still a legal target (CR 608.2b): the
+/// ability as it was on the stack, so a caller can go on to read whose it was and what its source is. Stifle, Tishana's
+/// Tidebinder and Ertai Resurrected print it.
+pub fn counter_target_ability(g: &mut dyn Game, item: &StackItem, slot: usize) -> Option<StackItem> {
+    if slot >= item.target_count as usize || !g.target_legal(item, slot) {
+        return None;
+    }
+    let Target::Ability(serial) = item.targets[slot] else { return None };
+    let at = g.state().stack.iter().position(|i| i.serial == serial)?;
+    let countered = g.state().stack[at];
+    g.counter_item(countered.object, at);
+    Some(countered)
+}
+
 /// What "counter [it] unless [its controller] pays [cost]" asks the payer (CR 118.12a): ward's (CR 702.21a) and the
 /// counterspells' that leave it to the spell's controller (Mana Leak, No More Lies).
 pub const COUNTERED_UNLESS_PAID: Question =
