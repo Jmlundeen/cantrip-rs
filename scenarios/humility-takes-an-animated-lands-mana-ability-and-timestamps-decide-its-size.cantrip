@@ -1,0 +1,62 @@
+# Humility on animated lands (its ruling: "Removes all creature abilities. This includes mana abilities. Animated lands
+# will also lose the ability to tap for mana."). On turn 5 Bot1 animates its first Mutavault ("becomes a 2/2 creature
+# with all creature types until end of turn", an effect with that moment's timestamp) and then casts Humility: in layer
+# 7b Mutavault's 2/2 applies first and Humility's 1/1 after it (CR 613.7), so it is a 1/1 - still a land with every
+# creature type (layer 4 is not Humility's) - and has no abilities, its {T}: Add {C} among them (refused; it has been
+# under Bot1's control since turn 3, so summoning sickness is not why). The second Mutavault is not a creature when
+# Humility enters, so it keeps its abilities: it taps for {C} (the positive control) to pay its own {1}, and the 2/2
+# its effect sets is later than Humility's 1/1, so it is a 2/2 - a creature with no abilities from then on.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Sol Ring
+Humility
+Mutavault
+Mutavault
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mutavault.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mutavault.Play
+Bot1.Battlefield.Mutavault#1.Activate(Ability: {1})
+Bot1.Battlefield.Mox Jet.Activate
+Bot2.Pass
+? Bot1.Battlefield.Mutavault#1.Power = 2
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Humility.Cast
+Bot2.Pass
+! Bot1.Battlefield.Mutavault#1.Activate
+Bot1.Battlefield.Mutavault#2.Activate(Ability: {1})
+Bot1.Battlefield.Mutavault#2.Activate(Ability: Add)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Mutavault#1.Types = Land; Creature
+Bot1.Battlefield.Mutavault#1.Subtypes = (every creature type)
+Bot1.Battlefield.Mutavault#1.Power = 1
+Bot1.Battlefield.Mutavault#1.Toughness = 1
+Bot1.Battlefield.Mutavault#1.Tapped = False
+Bot1.Battlefield.Mutavault#2.Types = Land; Creature
+Bot1.Battlefield.Mutavault#2.Power = 2
+Bot1.Battlefield.Mutavault#2.Toughness = 2
+Bot1.Battlefield.Mutavault#2.Tapped = True

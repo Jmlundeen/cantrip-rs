@@ -1,0 +1,83 @@
+# Humility takes the abilities of creatures only. Bot2's M.O.D.O.K. is a creature whose "Creatures your opponents
+# control get -1/-1" is a static ability: Humility takes it (and M.O.D.O.K.'s flying and lifelink) in layer 6, so it no
+# longer applies (CR 613.1f, 613.8a). Bot1's Warleader's Call is an enchantment, not a creature: its "Creatures you
+# control get +1/+1" goes on applying, in layer 7c after Humility's base 1/1 (CR 613.4b, 613.4c). Bot1's Llanowar Elves
+# is 1/1 before Humility (1/1, +1/+1, -1/-1) and 2/2 after it (1/1 base, +1/+1): it would be 1/1 if M.O.D.O.K.'s
+# ability still applied, or if Warleader's Call's no longer did. M.O.D.O.K. itself is a 1/1 with no keywords.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Sol Ring
+Llanowar Elves
+Warleader's Call
+Humility
+Plains x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Sol Ring
+M.O.D.O.K.
+Swamp x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Warleader's Call.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.M.O.D.O.K..Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+? Bot1.Battlefield.Llanowar Elves.Toughness = 1
+? Bot2.Battlefield.M.O.D.O.K..Keywords = Flying; Lifelink
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot2.Battlefield.M.O.D.O.K..Power = 1
+Bot2.Battlefield.M.O.D.O.K..Toughness = 1
+Bot2.Battlefield.M.O.D.O.K..Keywords = (absent)
+Bot1.Battlefield.Warleader's Call.Types = Enchantment

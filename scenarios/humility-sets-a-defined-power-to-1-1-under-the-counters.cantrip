@@ -1,0 +1,76 @@
+# Humility against the other sublayers of layer 7 (CR 613.4): Bot2's Tarmogoyf defines its own power and toughness
+# (a characteristic-defining ability, layer 7a) - with Bot1's Lightning Bolt in a graveyard it is 1/2 before Humility.
+# Humility takes that ability in layer 6 (its */1+* then counts as 0/1, CR 604.3, 613.1f), and sets 1/1 in layer 7b
+# after it either way: Tarmogoyf is 1/1, not 1/2. Bot1's Walking Ballista (X = 2) removes one of its +1/+1 counters to
+# deal 1 damage to Bot2 before Humility (the positive control for its abilities). Under Humility it has no abilities, so
+# it can't remove its other counter (the refusal), and that +1/+1 counter still applies on top of the base 1/1 (layer
+# 7c): a 2/2, where Humility's 1/1 alone, or a 0/0 with its counter, would be 1/1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Sol Ring
+Lightning Bolt
+Walking Ballista
+Humility
+Plains x10
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Tarmogoyf
+Forest x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+Bot1.Battlefield.Walking Ballista.Activate(Ability: Remove a +1/+1 counter; Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Tarmogoyf.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Tarmogoyf.Power = 1
+? Bot2.Battlefield.Tarmogoyf.Toughness = 2
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Humility.Cast
+Bot2.Pass
+! Bot1.Battlefield.Walking Ballista.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 16
+Bot1.Graveyard = Lightning Bolt
+Bot2.Battlefield.Tarmogoyf.Power = 1
+Bot2.Battlefield.Tarmogoyf.Toughness = 1
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista.Power = 2
+Bot1.Battlefield.Walking Ballista.Toughness = 2

@@ -1,0 +1,67 @@
+# Humility: "All creatures lose all abilities and have base power and toughness 1/1." Bot1's first Inspiring Overseer
+# (a 2/1 with flying) enters before Humility, and its "When this creature enters, you gain 1 life and draw a card"
+# triggers and resolves (the positive control: Bot1 goes to 21 and draws). Then Humility makes it a 1/1 with no flying.
+# The second Overseer enters under Humility: a creature on the battlefield has no abilities, and an enters trigger is
+# looked for on the permanent as it is on the battlefield (CR 603.2, 603.6a, 613.1f), so it never triggers - Bot1 stays at
+# 21 with an empty hand. Both are 1/1 (CR 613.4b) and neither has flying.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Inspiring Overseer
+Humility
+Plains
+Inspiring Overseer
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+[T2 Bot2.Main1]
+? Bot1.Life = 21
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield.Inspiring Overseer.Keywords = Flying
+? Bot1.Battlefield.Inspiring Overseer.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Inspiring Overseer#1.Power = 1
+Bot1.Battlefield.Inspiring Overseer#1.Toughness = 1
+Bot1.Battlefield.Inspiring Overseer#1.Keywords = (absent)
+Bot1.Battlefield.Inspiring Overseer#2.Power = 1
+Bot1.Battlefield.Inspiring Overseer#2.Toughness = 1
+Bot1.Battlefield.Inspiring Overseer#2.Keywords = (absent)
+Bot1.Battlefield.Humility.Types = Enchantment

@@ -1,0 +1,61 @@
+# Humility's "lose all abilities" is a layer-6 effect with Humility's timestamp (CR 613.1f, 613.7): it takes the
+# abilities granted before it and leaves those granted after. Bot1's first Llanowar Elves gets Rancor ("Enchanted
+# creature gets +2/+0 and has trample") on turn 1, before Humility (turn 3): it loses that trample. The second Elves and
+# its Rancor come on turn 5, after Humility: that Rancor's timestamp is later (CR 613.7d, 613.7e), so that Elves keeps
+# trample. Both are 3/1 - Humility's base 1/1, then Rancor's +2/+0 in layer 7c, which is Rancor's ability, not the
+# creature's, and applies either way.
+
+[Bot1 Deck]
+Forest
+Plains
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Rancor
+Rancor
+Humility
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Bot1.Battlefield.Llanowar Elves#2)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves#1.Keywords = (absent)
+Bot1.Battlefield.Llanowar Elves#1.Power = 3
+Bot1.Battlefield.Llanowar Elves#1.Toughness = 1
+Bot1.Battlefield.Llanowar Elves#2.Keywords = Trample
+Bot1.Battlefield.Llanowar Elves#2.Power = 3
+Bot1.Battlefield.Llanowar Elves#2.Toughness = 1
