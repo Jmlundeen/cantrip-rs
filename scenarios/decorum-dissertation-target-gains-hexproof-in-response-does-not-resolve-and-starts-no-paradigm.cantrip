@@ -1,0 +1,48 @@
+# Decorum Dissertation aimed at Bot2, which responds with Dawn's Truce (Mox Pearl and Mox Ruby) and has hexproof: its only target is
+# illegal, so the spell does not resolve (CR 608.2b). Bot2 draws nothing and loses no life. It is put into the graveyard, not exiled
+# (paradigm's "exile this spell" is part of resolving), and since no spell with its name has resolved, no paradigm trigger exists: on turn 5 no copy
+# is offered (`! Bot1.Accept`). The positive control is the paradigm scenario where it resolves.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Black Lotus
+Decorum Dissertation
+Island x3
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Dawn's Truce
+Island x4
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Decorum Dissertation.Cast(Bot2)
+Bot1.Pass
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+[T3 Bot1.Main2]
+? Exile.Count = 0
+[T5 Bot1.Main1]
+! Bot1.Accept
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 0
+Bot1.Graveyard = Decorum Dissertation; Black Lotus
+Bot2.Life = 20
+Bot2.Library.Count = 11
+Bot2.Graveyard = Dawn's Truce

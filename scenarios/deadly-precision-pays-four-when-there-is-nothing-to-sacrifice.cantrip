@@ -1,0 +1,45 @@
+# Deadly Precision with {4} payable and NOTHING to sacrifice (CR 601.2b): Bot1 controls only a Swamp, no artifact and no creature. Two Dark
+# Rituals turn the Swamp's {B} into {B}{B}{B}{B}{B} in the pool (B -> BBB, then B of those -> BBB again: 5), which pays {B} plus {4}. The only
+# way left to pay the additional cost is {4}, so no choice between the ways is asked (`! Bot1.Modes`), and Bot2's Llanowar Elves is destroyed. The
+# other scenarios, in which a sacrifice is possible, ask the choice; deadly-precision-cannot-be-cast-with-no-artifact-or-creature-and-under-five-mana
+# is the refusal when {4} is not payable either.
+
+[Bot1 Deck]
+Swamp
+Dark Ritual
+Dark Ritual
+Deadly Precision
+Island x3
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}{B}{B}
+Bot1.Hand.Deadly Precision.Cast(Bot2.Battlefield.Llanowar Elves)
+! Bot1.Modes
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Swamp
+Bot1.Graveyard = Deadly Precision; Dark Ritual; Dark Ritual
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Llanowar Elves

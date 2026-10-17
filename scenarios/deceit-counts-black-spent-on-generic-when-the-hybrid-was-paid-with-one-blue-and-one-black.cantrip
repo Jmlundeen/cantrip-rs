@@ -1,0 +1,51 @@
+# Ruling 2025-11-17: the abilities care about what mana was spent to pay Deceit's TOTAL cost, not just the hybrid symbols. Bot1 pays with Mox Sapphire,
+# four Mox Jets and Mox Ruby: one blue, four black and one red are spent in all, and only one blue could have gone into the hybrid. Black spent is four, so
+# the {B}{B} ability happens (Bot2 discards the Lightning Bolt) and the {U}{U} one does not (one blue): Llanowar Elves stays. The harness cannot name which
+# symbol each mana pays (the engine decides the split once the choice is not ambiguous), so the split of hybrid and generic is not forced here; what is
+# proven is that every mana spent counts, the generic's black included, and the single blue never reaches two.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Ruby
+Deceit
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Lightning Bolt
+Forest x4
+Forest x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Deceit.Cast
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 5
