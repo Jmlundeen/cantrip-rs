@@ -1,0 +1,44 @@
+# Fireball's damage is divided as it resolves, only among the targets still legal then (its ruling; CR 608.2b). Bot1 casts
+# Fireball with X = 4 at Bot2 and Bot2's Ornithopter ({5}{R}: one target beyond the first), then in response kills the
+# Ornithopter with Lightning Bolt. The Fireball resolves with one legal target, Bot2, which is dealt all 4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Fireball
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Fireball.Cast(X: 4)
+Bot1.Target(Bot2; Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+? Stack = Lightning Bolt; Fireball
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 16
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Fireball; Lightning Bolt; Black Lotus

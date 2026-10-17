@@ -1,0 +1,49 @@
+# A spell with {X} cast for its flashback cost still announces X and pays it (Snapcaster Mage's ruling; CR 107.3a), and on
+# the stack X is the number announced (CR 202.3e). Bot1 casts Fireball (X = 1) at Bot2, then Snapcaster Mage gives it
+# flashback for its mana cost, {X}{R}; cast again with X = 1 it is mana value 2, so Bot2's Spell Snare ("counter target
+# spell with mana value 2") counters it, and it is exiled rather than put into the graveyard (CR 702.34a). Bot2 took 1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Fireball
+Snapcaster Mage
+Island
+Island x10
+
+[Bot2 Deck]
+Island
+Spell Snare
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Fireball.Cast(X: 1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Graveyard.Fireball.Cast(X: 1)
+Bot1.Target(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Spell Snare.Cast(Stack.Fireball)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 19
+Exile = Fireball
+Bot2.Graveyard = Spell Snare

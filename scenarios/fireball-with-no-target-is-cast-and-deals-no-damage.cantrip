@@ -1,0 +1,30 @@
+# "Any number of targets" includes zero (CR 115.1d; Fireball's ruling: "You may cast Fireball with zero targets, regardless
+# of the value chosen for X ... no damage will actually be dealt"). Bot1 casts Fireball with X = 2 and no target: it costs
+# {2}{R} (no target beyond the first), all three red floated are spent, and nobody is dealt damage.
+
+[Bot1 Deck]
+Black Lotus
+Fireball
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fireball.Cast(X: 2)
+Bot1.Target()
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Life = 20
+Bot2.Life = 20
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Graveyard = Fireball; Black Lotus

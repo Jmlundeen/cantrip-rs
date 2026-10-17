@@ -1,0 +1,62 @@
+# Mana value is the mana cost's alone (CR 202.3), whatever the total cost was (CR 601.2f; Thalia's ruling), and X counts
+# on the stack (CR 202.3e). Bot2 has Thalia, Guardian of Thraben, so Bot1's Lightning Bolt costs {1}{R} - and is still
+# mana value 1, so Bot1's Chalice of the Void with one counter counters it. Fireball with X = 0 (no target) is mana value
+# 1, costs {1}{R} from Black Lotus's three red (Lotus cast on turn 1, before Thalia), and is countered too. On turn 5
+# Fireball with X = 1, mana value 2, costs {2}{R} and resolves, dealing Bot2 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Chalice of the Void
+Lightning Bolt
+Fireball
+Fireball
+Black Lotus
+Mountain x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Chalice of the Void.Cast(X: 1)
+[T1 Bot1.Main2]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack = Chalice of the Void; Lightning Bolt
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fireball.Cast(X: 0)
+Bot1.Target()
+Bot1.Pass
+? Bot1.Mana = {R}
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Fireball.Cast(X: 1)
+Bot1.Target(Bot2)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Mana =
+Bot2.Life = 19
+Bot1.Graveyard = Fireball; Fireball; Black Lotus; Lightning Bolt

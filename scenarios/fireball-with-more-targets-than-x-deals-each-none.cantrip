@@ -1,0 +1,29 @@
+# "Divided evenly, rounded down": X = 1 among two targets is 0 each (its ruling: "if the number of legal targets ... is
+# greater than X, none of them will be dealt any damage"). Bot1's Fireball at Bot2 and Bot2's Ornithopter costs {2}{R} -
+# X, red, and one more for the second target - and neither is dealt damage.
+
+[Bot1 Deck]
+Black Lotus
+Fireball
+Mountain x10
+
+[Bot2 Deck]
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fireball.Cast(X: 1)
+Bot1.Target(Bot2; Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot2.Life = 20
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Graveyard = Fireball; Black Lotus

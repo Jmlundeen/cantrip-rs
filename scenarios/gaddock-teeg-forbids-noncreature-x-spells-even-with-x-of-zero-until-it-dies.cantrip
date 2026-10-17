@@ -1,0 +1,54 @@
+# Gaddock Teeg: "Noncreature spells with {X} in their mana costs can't be cast" (CR 101.2, 601.3), its controller's too,
+# whatever X would be: with {R} floating Bot1 may cast neither Fireball ({X}{R}, X = 0 would cost {R}) nor Engineered
+# Explosives ({X}, X = 0 would cost nothing). Walking Ballista is a creature spell with {X}, which it does not forbid: cast
+# with X = 0 it dies as a 0/0. On turn 2 Bot2's Lightning Bolt kills Teeg, and on turn 3 Fireball (X = 1) and Engineered
+# Explosives (X = 0) are cast.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Gaddock Teeg
+Mox Ruby
+Fireball
+Engineered Explosives
+Walking Ballista
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gaddock Teeg.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Mana = {R}
+! Bot1.Hand.Fireball.Cast
+! Bot1.Hand.Engineered Explosives.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gaddock Teeg)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fireball.Cast(X: 1)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Hand.Engineered Explosives.Cast(X: 0)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Graveyard = Fireball; Gaddock Teeg; Walking Ballista
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Mox Ruby; Mountain; Engineered Explosives
