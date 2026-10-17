@@ -181,6 +181,17 @@ pub const fn loyalty(n: i8) -> Cost {
     Cost { loyalty: Some(n), ..Cost::NONE }
 }
 
+/// The loyalty cost "−X" (CR 606.4, 107.3): `loyalty_minus_x()`.
+pub const LOYALTY_MINUS_X: i8 = i8::MIN;
+
+/// A loyalty cost of "−X" (CR 606.4, 107.3): X is announced as the ability is activated (CR 601.2b by way of 602.2b), up
+/// to the loyalty the permanent has, since a cost can't remove counters that aren't there (CR 118.3); that many loyalty
+/// counters are removed as the cost is paid, and the ability reads X as `StackItem::x`. Chandra, Chill of Compliance,
+/// Ugin, the Spirit Dragon and Tezzeret the Seeker print it.
+pub const fn loyalty_minus_x() -> Cost {
+    loyalty(LOYALTY_MINUS_X)
+}
+
 /// "Pay N life" (CR 119.4).
 pub const fn life(n: u8) -> Cost {
     Cost { life: n, ..Cost::NONE }

@@ -2030,6 +2030,13 @@ public sealed class PayCostsPromptMessage : PromptPayload
     [Key(21)]
     public List<ViewHandle> Attackers { get; set; } = [];
 
+    /// <summary>
+    /// Announcing the X of a "−X" loyalty cost (CR 606.4, 107.3): X loyalty counters come off <see cref="Spell"/>, the
+    /// permanent, and no mana is paid. <see cref="MostAffordable"/> is its loyalty.
+    /// </summary>
+    [Key(22)]
+    public bool XRemovesLoyalty { get; set; }
+
     /// <summary>Giving up on the spell, which is always among the options (CR 733.1).</summary>
     public override AnswerPayload Default() => new TakeActionAnswer { Kind = ActionKindView.CancelCasting };
 }

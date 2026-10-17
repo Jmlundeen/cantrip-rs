@@ -259,6 +259,9 @@ pub enum RequestKind {
         /// Announcing X or how many times it is kicked (CR 601.2b), with the value so far, rather than paying.
         announcing: bool,
         x: u16,
+        /// The X being announced is a "−X" loyalty cost's (CR 606.4, 107.3): it removes that many loyalty counters from
+        /// `source`, up to the loyalty it has, and costs no mana.
+        loyalty: bool,
         /// The creatures whose cost to attack this pays (CR 508.1h-j), when it is one: `source` is then the permanent
         /// whose static ability makes attacking cost something (the first, when several do). Empty for anything else.
         attackers: Vec<ObjectId>,

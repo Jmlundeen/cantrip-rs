@@ -70,6 +70,7 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     }
     if let Some(loyalty) = cost.loyalty
         && loyalty < 0
+        && loyalty != LOYALTY_MINUS_X
         && obj.counters(CounterKind::Loyalty) < -(loyalty as i16)
     {
         return false;
@@ -3574,6 +3575,12 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 /// Announcing X or the number of times a spell is kicked (CR 601.2b), as the C# engine asks it: a pay-costs
 /// question that raises and lowers the value until confirmed.
 fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16) -> R<u16> {
+    announce_x(cx, player, spell, base, kicker, x_symbols, cap, false)
+}
+
+/// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`).
+#[allow(clippy::too_many_arguments)]
+fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16, loyalty: bool) -> R<u16> {
     let most: u16 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
         _ => cap,
@@ -3595,7 +3602,7 @@ fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kick
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, attackers: Vec::new() };
+        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, loyalty, attackers: Vec::new() };
         match cx.ask_core(player, ask, true)? {
             Answer::Act(a) => match a.kind {
                 ActionKind::IncreaseX => n += 1,
@@ -3640,6 +3647,11 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         let n = announce(cx, player, source, mana, None, mana.x, cap)?;
         mana.generic += n as u8 * mana.x;
         item.x = n;
+    }
+    // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
+    if def.cost.loyalty == Some(LOYALTY_MINUS_X) {
+        let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
+        item.x = announce_x(cx, player, source, mana, None, 0, cap, true)?;
     }
     let life = announce_life(cx, player, source, &mut mana)?;
     // CR 602.2a, 701.27f: put on the stack now, before its costs are paid.
@@ -3741,10 +3753,11 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     }
     if let Some(loyalty) = def.cost.loyalty {
         let turn = cx.s().turn.number;
+        let change = if loyalty == LOYALTY_MINUS_X { -(item.x as i16) } else { loyalty as i16 };
         cx.st().update_obj(source, |o| {
             o.loyalty_turn = turn;
             let n = &mut o.counters[CounterKind::Loyalty as usize];
-            *n = (*n + loyalty as i16).max(0);
+            *n = (*n + change).max(0);
         });
     }
     if def.cost.sacrifice_self {
@@ -4446,7 +4459,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, attackers: helpers.attackers.to_vec() };
+        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, loyalty: false, attackers: helpers.attackers.to_vec() };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {

@@ -67,7 +67,7 @@ abilities: &[
 ```
 
 - **Costs**: `TAP`, `SACRIFICE_THIS`, `cost("{1}{U}")` (mana symbols as printed, read at compile time; `cost("{1}, {T}")`
-  includes the tap), `loyalty(n)`, `life(n)`, `sacrifice(n, filter)`, `discard(n, filter)`, `remove_counters(kind, n)`,
+  includes the tap), `loyalty(n)` (and `loyalty_minus_x()` for "−X", X read as `item.x`), `life(n)`, `sacrifice(n, filter)`, `discard(n, filter)`, `remove_counters(kind, n)`,
   `DISCARD_THIS`, `EXILE_THIS`, `EXERT`, joined with `.and(..)`; `return_tapped_to_hand(n, filter)` is "return N tapped
   [permanents]", whose permanents are chosen once the mana is paid, so one tapped for mana while paying may be among
   them (web-slinging, `cantrip_mechanics::web_slinging::way(cost, text)`); craft (CR 702.167a) is

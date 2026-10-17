@@ -913,6 +913,9 @@ pub struct PayCostsPrompt {
     /// The attacking creatures whose cost to attack this pays (CR 508.1h-j); `spell` is then the permanent that makes
     /// attacking cost something. Empty for any other payment.
     pub attackers: Vec<ViewHandle>,
+    /// Announcing the X of a "−X" loyalty cost (CR 606.4, 107.3): X loyalty counters come off `spell`, the permanent, and
+    /// no mana is paid; `most_affordable` is its loyalty.
+    pub x_removes_loyalty: bool,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

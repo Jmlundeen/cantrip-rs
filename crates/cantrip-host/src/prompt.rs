@@ -609,7 +609,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
         RequestKind::Priority { options } => {
             PromptPayload::PriorityPromptMessage(PriorityPrompt { player, options: options_messages(game, handles, options) })
         }
-        RequestKind::PayCosts { source, total, remaining, options, announcing, x, attackers } => {
+        RequestKind::PayCosts { source, total, remaining, options, announcing, x, loyalty, attackers } => {
             let def = game.cards.get(game.state.obj(*source).card);
             let kicker = def.kicker;
             let spends_no_mana = game.chars(*source).has(Keyword::CantSpendManaToCast);
@@ -629,7 +629,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 multikicker: kicker.is_some_and(|k| k.multi),
                 kicker_paid: kicker.is_some() && *x > 0,
                 announces_x_or_kicks: *announcing,
-                most_affordable: -1,
+                // A "−X" loyalty cost reaches as far as the loyalty there is (CR 606.4, 118.3); mana is not asked.
+                most_affordable: if *loyalty { i32::from(game.state.obj(*source).counters(CounterKind::Loyalty).max(0)) } else { -1 },
+                x_removes_loyalty: *loyalty,
                 spends_no_mana,
                 attackers: handles_of(handles, attackers),
                 ..Default::default()
