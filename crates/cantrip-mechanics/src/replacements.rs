@@ -187,6 +187,31 @@ fn that_much_life_plus_one(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     }
 }
 
+/// "If you would draw a card while your library has no cards in it": one draw (CR 121.1), judged before any card is moved,
+/// with nothing left to draw (CR 121.6a).
+fn you_would_draw_from_nothing(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::Draw(d) if d.player == asker.controller && q.state().zone(Zone::library(d.player)).is_empty())
+}
+
+/// The draw does not happen (CR 614.6).
+fn not_drawn(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::Draw(d) = proposal {
+        d.replaced = true;
+    }
+}
+
+/// "You win the game instead": unless a player can't win or an opponent can't lose (Platinum Angel), when it does nothing
+/// and the draw is still replaced, so nobody loses for it either (CR 104.2b, Laboratory Maniac's ruling).
+fn win_instead(g: &mut dyn Game, asker: &Asker, _: &Proposal, _: &Proposal) {
+    g.win_game(asker.controller);
+}
+
+/// "If you would draw a card while your library has no cards in it, you win the game instead" (CR 614.1a, 121.6). Each draw
+/// of an instruction to draw several is asked about on its own. Laboratory Maniac and Jace, Wielder of Mysteries print it.
+pub const WIN_INSTEAD_OF_DRAWING_FROM_AN_EMPTY_LIBRARY: ReplacementDef =
+    replacement(ReplacementKind::Draw, you_would_draw_from_nothing, not_drawn, "wins the game instead of drawing from an empty library")
+        .then(win_instead);
+
 /// "If you would gain life, you gain twice that much life instead." Each applies once to each gain, so two make four
 /// times as much (Boon Reflection's ruling); a life total set higher is a gain of the difference (CR 119.5), doubled.
 /// Boon Reflection, Rhox Faithmender, Alhammarret's Archive and The Wind Crystal print it.

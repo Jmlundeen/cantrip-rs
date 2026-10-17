@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::amass::amass;
-use cantrip_mechanics::effects::target_opponent_loses_1_life_you_gain_1;
+use cantrip_mechanics::effects::target_player_loses_1_life_you_gain_1;
 use cantrip_mechanics::hand::discard_chosen_nonland_from_revealed_hand;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
@@ -37,9 +37,9 @@ pub static CARD: CardDef = CardDef {
         chapter(1, reveal_and_discard, "I \u{2014} Target opponent reveals their hand. You choose a nonland card from it. That player discards that card.")
             .targets(&[targets::OPPONENT]),
         chapter(2, amass_goblins, "II \u{2014} Amass Goblins 1."),
-        chapter(3, target_opponent_loses_1_life_you_gain_1, "III, IV \u{2014} Target opponent loses 1 life and you gain 1 life.")
+        chapter(3, target_player_loses_1_life_you_gain_1, "III, IV \u{2014} Target opponent loses 1 life and you gain 1 life.")
             .targets(&[targets::OPPONENT]),
-        chapter(4, target_opponent_loses_1_life_you_gain_1, "III, IV \u{2014} Target opponent loses 1 life and you gain 1 life.")
+        chapter(4, target_player_loses_1_life_you_gain_1, "III, IV \u{2014} Target opponent loses 1 life and you gain 1 life.")
             .targets(&[targets::OPPONENT]),
     ],
     ..oracle::DOWN_DOWN_TO_GOBLIN_TOWN

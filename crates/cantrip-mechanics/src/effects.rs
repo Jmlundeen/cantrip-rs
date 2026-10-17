@@ -215,11 +215,12 @@ pub fn each_opponent_loses_1_life(g: &mut dyn Game, item: &StackItem) -> Result<
     Ok(())
 }
 
-/// "Target opponent loses 1 life and you gain 1 life" (CR 119.3): the first target, a player; with it gone the ability does not
-/// resolve (CR 608.2b), so nothing is gained. Blood Hustler and Down, Down to Goblin-town print it.
-pub fn target_opponent_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Player(opponent) = item.targets[0] else { return Ok(()) };
-    g.lose_life(opponent, 1);
+/// "Target player loses 1 life and you gain 1 life" (CR 119.3), and "target opponent ...": the first target, a player, whichever
+/// its slot allows; with it gone the ability does not resolve (CR 608.2b), so nothing is gained. Blood Artist prints it of a
+/// player; Blood Hustler and Down, Down to Goblin-town of an opponent.
+pub fn target_player_loses_1_life_you_gain_1(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Player(player) = item.targets[0] else { return Ok(()) };
+    g.lose_life(player, 1);
     g.gain_life(item.controller, 1);
     Ok(())
 }
