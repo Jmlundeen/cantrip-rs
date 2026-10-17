@@ -3,7 +3,7 @@ use cantrip_mechanics::Animation;
 use cantrip_oracle as oracle;
 
 /// "{4}: This artifact becomes a 4/4 artifact creature until end of turn." It is an artifact already, and a Kindred
-/// and a Shapeshifter, and keeps all of that: the Creature type is added to its types (CR 205.1b, layer 4) and its base
+/// and a Shapeshifter, and keeps all of that: Artifact and Creature, the types its text names, are added to its types (CR 205.1b, layer 4) and its base
 /// power and toughness are set (layer 7b, CR 613.4b), so counters and pumps count on top. Its text names no color and
 /// no creature type, so it changes neither. A Core that has left the battlefield is a new object that the ability does
 /// not affect (CR 400.7).
@@ -13,7 +13,7 @@ use cantrip_oracle as oracle;
 /// Outlaws or a search for a type all see it. Mirror Entity, Universal Automaton and the other changelings need only
 /// their content file and their own text.
 fn animate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let animation = Animation { power: 4, toughness: 4, colors: None, subtype: None, all_creature_types: false, keywords: Keywords::NONE, ability: None };
+    let animation = Animation { power: 4, toughness: 4, colors: None, types: TypeSet::of(&[CardType::Artifact]), subtypes: &[], all_creature_types: false, keywords: Keywords::NONE, ability: None };
     cantrip_mechanics::animate(g, item.object, item.object, &animation, Duration::EndOfTurn);
     Ok(())
 }

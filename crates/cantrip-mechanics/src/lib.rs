@@ -687,14 +687,22 @@ pub fn surveil_into_graveyard(
     Ok(binned)
 }
 
-/// What "becomes a P/T [colors] [subtype] creature with [keywords]" makes of a permanent (CR 205.1b, 613.1). `colors`
-/// and `subtype` are `None` when the text names none ("becomes a 4/4 artifact creature"): the permanent keeps its own.
-/// "With all creature types" gives it every one besides (layer 4).
-pub struct Animation {
+/// What "becomes a P/T [colors] [subtypes] [types] creature with [keywords]" makes of a permanent (CR 205.1b, 613.1).
+/// `colors` is `None` when the text names none ("becomes a 4/4 artifact creature"): the permanent keeps its own.
+/// `subtypes` are the creature types the text names, read through the permanent's words (CR 612), and empty when it
+/// names none; "with all creature types" gives it every one besides (layer 4). `types` are the card types the text names
+/// beside Creature, `TypeSet::NONE` for a plain "creature": Inkmoth Nexus ("a 1/1 Phyrexian Blinkmoth artifact
+/// creature"), Blinkmoth Nexus and Mishra's Factory print "artifact creature", and so do Firdoch Core and Iron Man Armor,
+/// which are artifacts already.
+pub struct Animation<'a> {
     pub power: i16,
     pub toughness: i16,
     pub colors: Option<ColorSet>,
-    pub subtype: Option<Subtype>,
+    /// Card types added beside Creature (layer 4).
+    pub types: TypeSet,
+    /// Creature types added (layer 4): two for "Construct Hero" (Iron Man Armor) and "Phyrexian Blinkmoth" (Inkmoth
+    /// Nexus), one for "Horror" (Restless Cottage).
+    pub subtypes: &'a [Subtype],
     /// "with all creature types" (CR 205.3m): Mutavault, Soulstone Sanctuary.
     pub all_creature_types: bool,
     pub keywords: Keywords,
@@ -702,18 +710,19 @@ pub struct Animation {
     pub ability: Option<AbilityRef>,
 }
 
-/// "[Until end of turn,] this land becomes a P/T [colors] [subtype] creature with [keywords]. It's still a land", for the
-/// `duration` the text gives (Great Hall of the Biblioplex has none: `Duration::Indefinite`): the creature type is added
-/// (layer 4) with its subtype or all creature types, the colors replace its own (5), the keywords and the ability are granted (6) and the base
-/// power and toughness set (7b), so counters and pumps count on top. Celestial Colonnade and Creeping Tar Pit print it
-/// until end of turn, Firdoch Core names no colors or creature type and leaves those two out, and Great Hall of the
-/// Biblioplex gives a triggered ability.
+/// "[Until end of turn,] this land becomes a P/T [colors] [subtypes] [types] creature with [keywords]. It's still a land",
+/// for the `duration` the text gives (Great Hall of the Biblioplex has none: `Duration::Indefinite`): the creature type and
+/// any other card types the text names are added (layer 4) with its subtypes or all creature types, the colors replace
+/// its own (5), the keywords and the ability are granted (6) and the base power and toughness set (7b), so counters and
+/// pumps count on top. Celestial Colonnade and Creeping Tar Pit print it until end of turn, Firdoch Core names no colors
+/// or creature type and leaves those two out, Inkmoth Nexus adds the artifact type and two creature types, and Great Hall
+/// of the Biblioplex gives a triggered ability.
 pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Animation, duration: Duration) {
     if !g.is_on_battlefield(permanent) || g.obj(permanent).became.is_some() {
         return;
     }
-    g.add_effect(source, permanent, EffectKind::AddTypes(TypeSet::of(&[CardType::Creature])), duration);
-    if let Some(subtype) = a.subtype {
+    g.add_effect(source, permanent, EffectKind::AddTypes(a.types.with(CardType::Creature)), duration);
+    for &subtype in a.subtypes {
         g.add_effect(source, permanent, EffectKind::AddSubtype(subtype), duration);
     }
     if a.all_creature_types {
