@@ -1,0 +1,38 @@
+# Glorious Decay, second mode: "deals 4 damage to target creature with flying." Bot2 has an Elvish Mystic (no flying) and an
+# Ornithopter (0/2 with flying). The target question refuses the Mystic (a refusal beside the Ornithopter, the positive
+# control, which is dealt 4 and dies). The Mystic stays undamaged.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Glorious Decay
+Island x17
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glorious Decay.Cast
+Bot1.Modes(deals 4 damage)
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Elvish Mystic.Damage = 0
+Bot1.Graveyard = Glorious Decay

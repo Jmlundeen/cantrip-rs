@@ -1,0 +1,62 @@
+# Glorious Decay, third mode, aimed at Plunder the Trollshaws in Bot2's graveyard. In response Bot2 casts that Plunder from the
+# graveyard with flashback (an instant; a card on the stack is a new object, CR 400.7), so the Decay's only target is illegal
+# as it tries to resolve and it does not resolve (CR 608.2b, and the ruling): Bot1 draws nothing. Bot1's hand is the cards it
+# started with and the turn's draw. Plunder, exiled by its flashback, is in exile; Bot2 drew two cards from it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Glorious Decay
+Island x17
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Plunder the Trollshaws
+Forest
+Forest
+Forest
+Island x7
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Hand.Plunder the Trollshaws.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Plunder the Trollshaws
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glorious Decay.Cast
+Bot1.Modes(Exile target card)
+Bot1.Target(Bot2.Graveyard.Plunder the Trollshaws)
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Battlefield.Mox Jet#4.Activate
+Bot2.Graveyard.Plunder the Trollshaws.Cast(Ability: Flashback)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Plunder the Trollshaws
+Bot1.Graveyard = Glorious Decay
+Bot1.Hand.Count = 5
+Bot2.Hand.Count = 4

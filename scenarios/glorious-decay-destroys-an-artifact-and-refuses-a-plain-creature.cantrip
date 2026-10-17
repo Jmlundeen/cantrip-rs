@@ -1,0 +1,37 @@
+# Glorious Decay, first mode: "Destroy target artifact." Bot2 has an Elvish Mystic (a creature, not an artifact) and a Mox Emerald (an artifact).
+# The target question refuses the Mystic and takes the Mox Emerald, which goes to Bot2's graveyard; the Mystic is untouched
+# and nothing is drawn (the draw belongs to the third mode).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Glorious Decay
+Island x17
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Glorious Decay.Cast
+Bot1.Modes(Destroy target artifact)
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Mox Emerald
+Bot2.Battlefield.Elvish Mystic.Damage = 0
+Bot1.Graveyard = Glorious Decay
+Bot1.Hand.Count = 5
