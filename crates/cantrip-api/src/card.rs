@@ -272,11 +272,16 @@ pub struct CostDelta {
     /// (X is 0 in any mana cost not on the stack, CR 107.3). A hybrid symbol, which the payer would split as the
     /// reduction is applied (118.7e), is refused: no card that reduces by one is built.
     pub less: ManaCost,
+    /// The least mana the total cost comes to (CR 601.2f: "once the total cost is determined, any effects that directly
+    /// affect the total cost are applied"): "each spell that would cost less than three mana to cast costs three mana to
+    /// cast" (Trinisphere). Applied after every increase and every reduction, by generic mana making up the difference, the
+    /// greatest of them where several apply; 0 for none. It changes no mana cost, so no mana value (CR 202.3).
+    pub at_least: u8,
 }
 
 impl CostDelta {
     /// No change.
-    pub const NONE: CostDelta = CostDelta { more: 0, less: ManaCost::ZERO, life: 0 };
+    pub const NONE: CostDelta = CostDelta { more: 0, less: ManaCost::ZERO, life: 0, at_least: 0 };
 
     /// "Costs {n} more."
     pub const fn more(n: u8) -> CostDelta {
@@ -297,11 +302,17 @@ impl CostDelta {
     pub const fn less_mana(mana: ManaCost) -> CostDelta {
         CostDelta { less: mana, ..CostDelta::NONE }
     }
+
+    /// "Costs [n] mana to cast" where it would cost less: the total cost's least mana (CR 601.2f, `at_least`).
+    pub const fn at_least(n: u8) -> CostDelta {
+        CostDelta { at_least: n, ..CostDelta::NONE }
+    }
 }
 
 /// A static ability that changes what something costs (CR 601.2f, 118.7): what it does to the cost of `costed` when
 /// `player` pays, by the permanent `source` that has it (`CostDelta::NONE` when it does not apply). Every increase is
-/// applied first, then every reduction, and no part of the cost goes below zero (CR 601.2f).
+/// applied first, then every reduction, and no part of the cost goes below zero (CR 601.2f); then what sets the least the
+/// total may come to (`CostDelta::at_least`).
 ///
 /// `targets` are the targets announced for it, in slot order: the total cost is determined after the targets are
 /// chosen (CR 601.2c, 601.2f, 602.2b), so "equip abilities you activate that target this creature cost {2} less" and

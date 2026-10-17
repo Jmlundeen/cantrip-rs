@@ -1117,6 +1117,23 @@ pub fn apply_cost_changes_total(cx: &Cx, player: PlayerId, costed: Costed, cost:
     change_total(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
 }
 
+/// `apply_cost_changes_total` with the least the total may come to (`CostDelta::at_least`) not yet applied but returned, for
+/// a cast whose own reductions (harmonize, emerge, a sacrifice for each) are still to come: that least is applied once they
+/// are (CR 601.2f).
+fn apply_cost_changes_before_least(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> (ManaCost, u32, u8) {
+    change_parts(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
+}
+
+/// The total cost brought up to the least mana an effect says it costs (CR 601.2f, `CostDelta::at_least`): generic mana
+/// makes up the difference, and the cost's own symbols are kept.
+fn at_least(mut cost: ManaCost, least: u8) -> ManaCost {
+    let value = cost.mana_value();
+    if value < least as u32 {
+        cost.generic = cost.generic.saturating_add((least as u32 - value) as u8);
+    }
+    cost
+}
+
 /// The permanents on the battlefield whose cards change costs: found from the board, not from the card table (which
 /// holds every card), and empty, so unallocated, in nearly every game.
 fn cost_change_sources(cx: &Cx) -> Vec<ObjectId> {
@@ -1283,10 +1300,25 @@ fn change_total(
     sources: &[ObjectId],
     player: PlayerId,
     costed: Costed,
-    mut cost: ManaCost,
+    cost: ManaCost,
     face: Option<CardId>,
     targets: &[Target],
 ) -> (ManaCost, u32) {
+    let (cost, life, least) = change_parts(cx, sources, player, costed, cost, face, targets);
+    (at_least(cost, least), life)
+}
+
+/// The increases and reductions applied (CR 601.2f), the life the changes add (CR 118.8), and the least mana the total may
+/// come to, which is applied last (`CostDelta::at_least`), once every reduction is.
+fn change_parts(
+    cx: &Cx,
+    sources: &[ObjectId],
+    player: PlayerId,
+    costed: Costed,
+    mut cost: ManaCost,
+    face: Option<CardId>,
+    targets: &[Target],
+) -> (ManaCost, u32, u8) {
     let view;
     let q: &dyn Query = match (face, costed) {
         (Some(face), Costed::Spell(spell)) => {
@@ -1312,15 +1344,17 @@ fn change_total(
     // The ability's own change ("this ability costs ... less", power-up), asked for this ability alone.
     let ability_own = ability.and_then(|a| activated(cx, a)).and_then(|d| d.cost_change);
     if sources.is_empty() && own.is_empty() && ability_own.is_none() {
-        return (cost, 0);
+        return (cost, 0, 0);
     }
     let mut more = 0u32;
     let mut less = ManaCost::ZERO;
     let mut life = 0u32;
+    let mut least = 0u8;
     let mut add = |delta: CostDelta| {
         more += delta.more as u32;
         less = less.plus(&delta.less);
         life += delta.life as u32;
+        least = least.max(delta.at_least);
     };
     for change in own {
         add(change(q, id, player, costed, targets));
@@ -1350,7 +1384,7 @@ fn change_total(
         let room = cost.mana_value().saturating_sub(1);
         cost.generic -= discount.min(room).min(cost.generic as u32) as u8;
     }
-    (cost, life)
+    (cost, life, least)
 }
 
 /// A cost reduced by an amount of mana (CR 118.7): its generic part takes generic mana off only (118.7a); each colored
@@ -3512,8 +3546,8 @@ fn cast(
         extra = extra.and(added);
         cost.mana = add_cost(cost.mana, added.mana);
     }
-    let added_life;
-    (cost.mana, added_life) = apply_cost_changes_total(cx, player, Costed::Spell(spell), cost.mana, &targets);
+    let (added_life, least);
+    (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets);
     if added_life > 0 {
         cost.life = (cost.life as u32 + added_life).min(255) as u8;
         let owed = cost.life as i32 + extra.life as i32 + life as i32 + x_life as i32;
@@ -3553,6 +3587,9 @@ fn cast(
         let reduction: u32 = chosen.iter().map(|&id| cx.mana_value(id)).sum();
         cost.mana.generic = cost.mana.generic.saturating_sub(reduction.min(255) as u8);
     }
+    // CR 601.2f: "once the total cost is determined, any effects that directly affect the total cost are applied" - the least
+    // it may come to (Trinisphere), after every increase and reduction, before the total is locked in and paid.
+    cost.mana = at_least(cost.mana, least);
     // CR 701.67b: the tapping pays only the generic mana of the waterbend cost, whatever else the total has.
     let waterbend = def.kicker.filter(|k| k.waterbend).map_or(0, |k| k.cost.generic.saturating_mul(item.kicked));
     // CR 702.180b, 601.2h: the creature is tapped as the total cost is paid. It is tapped before the mana is, since a cost
@@ -5602,5 +5639,17 @@ mod tests {
     fn a_reduction_takes_nothing_below_zero() {
         // CR 601.2f: the mana is reduced to nothing, {0}, and no further.
         assert_eq!(reduce(mana("{1}{U}"), &mana("{3}{U}{U}")), ManaCost::ZERO);
+    }
+
+    #[test]
+    fn a_least_total_is_made_up_with_generic_mana_and_keeps_the_colored_symbols() {
+        // CR 601.2f, Trinisphere: {B} comes to {2}{B}, {1}{B} to {2}{B}, {0} to {3}.
+        assert_eq!(at_least(mana("{B}"), 3), mana("{2}{B}"));
+        assert_eq!(at_least(mana("{1}{B}"), 3), mana("{2}{B}"));
+        assert_eq!(at_least(ManaCost::ZERO, 3), mana("{3}"));
+        // A total of three or more is left as it is, and no least (0) changes nothing.
+        assert_eq!(at_least(mana("{W}{U}{B}"), 3), mana("{W}{U}{B}"));
+        assert_eq!(at_least(mana("{5}{R}"), 3), mana("{5}{R}"));
+        assert_eq!(at_least(mana("{U}"), 0), mana("{U}"));
     }
 }
