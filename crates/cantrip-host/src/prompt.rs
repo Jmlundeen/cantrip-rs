@@ -239,7 +239,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     }
     // What restricts the mana: of pool mana to assign, or of the mana a mana ability adds (CR 106.6).
     if let Some(restriction) = o.restriction {
-        (m.filter, m.effect, m.spend_subtypes) = restriction_view(restriction);
+        (m.filter, m.effect, m.spend_subtypes, m.spend_mana_value) = restriction_view(restriction);
     }
     m.pays_nothing = o.pays_nothing;
     let candidates: Vec<TargetMessage> = o.target_candidates.iter().filter_map(|t| target_message(handles, *t)).collect();

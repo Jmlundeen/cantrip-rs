@@ -293,6 +293,13 @@ pub enum ManaSpendFilterView {
     SubtypeSpells,
     /// Creature spells with one of the subtypes named beside it: "a creature spell of the chosen type".
     SubtypeCreatureSpells,
+    /// Spells that are not creature spells: "a noncreature spell".
+    NoncreatureSpells,
+    /// Spells with the mana value named beside it (`spend_mana_value`) or greater: "spells with mana value 4 or greater".
+    ManaValueSpells,
+    /// Spells with the mana value named beside it or greater, or with {X} in their mana costs: "spells with mana value 5
+    /// or greater or spells with {X} in their mana costs".
+    ManaValueOrXSpells,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -397,6 +404,8 @@ pub struct RestrictedManaView {
     /// For `SubtypeSpells` and `SubtypeCreatureSpells`: the subtypes, any one of which the spell must have; empty for a
     /// chosen type never chosen, which no spell has.
     pub spend_subtypes: Vec<String>,
+    /// For `ManaValueSpells` and `ManaValueOrXSpells`: the least mana value the spell may have; 0 otherwise.
+    pub spend_mana_value: i32,
 }
 
 /// One object the viewer can see. Characteristics are computed, never printed.
@@ -627,6 +636,8 @@ pub struct ActionOptionMessage {
     pub effect: ManaSpendEffectView,
     /// The subtypes `filter` names, as `RestrictedManaView::spend_subtypes`.
     pub spend_subtypes: Vec<String>,
+    /// The mana value `filter` names, as `RestrictedManaView::spend_mana_value`.
+    pub spend_mana_value: i32,
     pub spell_name: String,
     pub produces_of_any_color_each: i32,
     pub sacrifice_candidates: Vec<ViewHandle>,
@@ -662,6 +673,7 @@ impl ActionOptionMessage {
             filter: ManaSpendFilterView::None,
             effect: ManaSpendEffectView::None,
             spend_subtypes: Vec::new(),
+            spend_mana_value: 0,
             spell_name: String::new(),
             produces_of_any_color_each: 0,
             sacrifice_candidates: Vec::new(),
@@ -1147,6 +1159,8 @@ pub struct TakeActionAnswer {
     pub effect: ManaSpendEffectView,
     /// The subtypes `filter` names, as `RestrictedManaView::spend_subtypes`.
     pub spend_subtypes: Vec<String>,
+    /// The mana value `filter` names, as `RestrictedManaView::spend_mana_value`.
+    pub spend_mana_value: i32,
 }
 
 impl TakeActionAnswer {
@@ -1164,6 +1178,7 @@ impl TakeActionAnswer {
             filter: ManaSpendFilterView::None,
             effect: ManaSpendEffectView::None,
             spend_subtypes: Vec::new(),
+            spend_mana_value: 0,
         }
     }
 
@@ -1175,6 +1190,7 @@ impl TakeActionAnswer {
         answer.filter = option.filter;
         answer.effect = option.effect;
         answer.spend_subtypes = option.spend_subtypes.clone();
+        answer.spend_mana_value = option.spend_mana_value;
         answer
     }
 }

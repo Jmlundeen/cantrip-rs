@@ -1225,8 +1225,7 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
     let a = available(cx, player);
     let chars = cx.chars(source);
     if cx.s().obj(source).zone.is(ZoneKind::Stack) {
-        let subtypes = if a.names_subtypes() { chars.subtypes } else { SubtypeSet::NONE };
-        a.covers_for(cost, &ManaPayment::Spell { types: chars.types, subtypes, legendary: chars.supertypes.legendary })
+        a.covers_for(cost, &spell_payment(cx, source, a.names_subtypes()))
     } else {
         a.covers_for(cost, &ManaPayment::Ability { source: chars.types })
     }
@@ -1399,9 +1398,16 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
 /// which the payment judges again on the stack. Its subtypes are the face's, a changeling face's every creature type
 /// (CR 702.73a), and for the whole card those effects give it where it is. They are only worked out when some mana at hand
 /// is restricted by subtype.
+///
+/// Its mana value is the face's with X at 0 (CR 202.3e), or for the back face of a nonmodal double-faced card its front
+/// face's (CR 712.8c); `x`, whether its mana cost has {X} in it, says it could be more (`Available::covers_for`).
 fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPayment {
+    let whole = cx.card(cx.s().obj(card).card);
+    let back = !def.has_cost && whole.back.is_some_and(|b| std::ptr::eq(b, def));
+    let mana_value = if back { whole.cost.mana_value() } else { def.cost.mana_value() };
+    let (types, legendary, x) = (def.types, def.supertypes.legendary, def.cost.x > 0);
     if !a.names_subtypes() {
-        return ManaPayment::Spell { types: def.types, subtypes: SubtypeSet::NONE, legendary: def.supertypes.legendary };
+        return ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary, mana_value, x };
     }
     let mut subtypes = def.subtypes;
     if std::ptr::eq(def, cx.card(cx.s().obj(card).card)) {
@@ -1410,7 +1416,7 @@ fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPaym
     if def.keywords.has(Keyword::Changeling) && (def.types.has(CardType::Creature) || def.types.has(CardType::Kindred)) {
         subtypes = Subtype::CREATURE_TYPES.into_iter().fold(subtypes, SubtypeSet::with);
     }
-    ManaPayment::Spell { types: def.types, subtypes, legendary: def.supertypes.legendary }
+    ManaPayment::Spell { types, subtypes, legendary, mana_value, x }
 }
 
 impl Available {
@@ -1422,6 +1428,27 @@ impl Available {
     }
 
     pub fn covers_for(&self, cost: &ManaCost, payment: &ManaPayment) -> bool {
+        if self.covers_as(cost, payment) {
+            return true;
+        }
+        // A spell whose X is still to be announced (CR 601.2b) has the larger mana value the larger X is (CR 202.3e):
+        // mana for spells of a mana value or greater may pay for it at an X that brings it there (Ashling, Rimebound's
+        // mana and a {X}{R} spell), each X costing its {X} symbols more.
+        let ManaPayment::Spell { types, subtypes, legendary, mana_value, x } = *payment else { return false };
+        let Some(most) = self.restricted.iter().filter_map(|(r, ..)| r.least_mana_value()).max() else { return false };
+        if cost.x == 0 || mana_value >= most as u32 {
+            return false;
+        }
+        let per = cost.x as u32;
+        (1..=(most as u32 - mana_value).div_ceil(per)).any(|n| {
+            let mut more = *cost;
+            more.generic = (more.generic as u32 + n * per).min(255) as u8;
+            self.covers_as(&more, &ManaPayment::Spell { types, subtypes, legendary, mana_value: mana_value + n * per, x })
+        })
+    }
+
+    /// `covers_for` at the cost as it is.
+    fn covers_as(&self, cost: &ManaCost, payment: &ManaPayment) -> bool {
         if !self.restricted.iter().any(|(r, ..)| r.may_pay(payment)) {
             return self.covers(cost);
         }
@@ -4074,13 +4101,27 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], o
 fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> ManaPayment {
     match purpose {
         Paying::Casting if cx.s().obj(source).zone.is(ZoneKind::Stack) => {
-            let chars = cx.chars(source);
             // The subtypes, only where some of the player's mana is limited by them.
-            let subtypes = if cx.s().restricted_of(player).any(|(r, _)| r.names_subtypes()) { chars.subtypes } else { SubtypeSet::NONE };
-            ManaPayment::Spell { types: chars.types, subtypes, legendary: chars.supertypes.legendary }
+            spell_payment(cx, source, cx.s().restricted_of(player).any(|(r, _)| r.names_subtypes()))
         }
         Paying::Activating => ManaPayment::Ability { source: cx.chars(source).types },
         _ => ManaPayment::Other,
+    }
+}
+
+/// Casting `spell`, a spell on the stack, as it is there (CR 601.2g): its card types, supertypes, mana value with X as
+/// announced (CR 202.3e: 0 for a copy with no mana cost or of a back face, CR 707.9b, 202.3b, and for a face-down spell,
+/// CR 708.4; the cast half's alone, CR 709.3b) and whether
+/// its mana cost has {X}; its subtypes only `with_subtypes`, where some mana at hand is limited by them.
+fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
+    let chars = cx.chars(spell);
+    let subtypes = if with_subtypes { chars.subtypes } else { SubtypeSet::NONE };
+    ManaPayment::Spell {
+        types: chars.types,
+        subtypes,
+        legendary: chars.supertypes.legendary,
+        mana_value: cx.mana_value(spell),
+        x: cx.mana_cost(spell).x > 0,
     }
 }
 

@@ -194,8 +194,16 @@ pub trait Query {
     /// An object's mana value (CR 202.3): its mana cost's, or 0 for a copy that has none (CR 707.9b). Each {X} in it
     /// is the value chosen while it is a spell on the stack, as it last was there once it has left (CR 202.3e,
     /// 608.2h), and 0 anywhere else.
+    ///
+    /// The back face of a nonmodal double-faced object, up, has no mana cost but the mana value of its front face's
+    /// (CR 202.3b, 712.8c, 712.8e: a transformed permanent, a spell cast transformed); a copy of that face has 0.
     fn mana_value(&self, id: ObjectId) -> u32 {
-        let cost = self.mana_cost(id);
+        let obj = self.obj(id);
+        let front = self.card(obj.card);
+        let cost = match front.back {
+            Some(back) if obj.transformed && obj.copy.is_none() && !back.has_cost && !front.back_land && !self.chars(id).no_cost => front.cost,
+            _ => self.mana_cost(id),
+        };
         let x = if self.obj(id).zone.is(ZoneKind::Stack) {
             self.obj(id).x
         } else {

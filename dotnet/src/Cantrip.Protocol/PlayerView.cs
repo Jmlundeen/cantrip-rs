@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 164;
+    public const int ProtocolVersion = 165;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -202,6 +202,13 @@ public sealed class RestrictedManaView
     /// </summary>
     [Key(5)]
     public List<string> SpendSubtypes { get; set; } = [];
+
+    /// <summary>
+    /// For <see cref="ManaSpendFilterView.ManaValueSpells"/> and <see cref="ManaSpendFilterView.ManaValueOrXSpells"/>: the
+    /// least mana value the spell may have ("mana value 4 or greater"). 0 otherwise.
+    /// </summary>
+    [Key(6)]
+    public int SpendManaValue { get; set; }
 }
 
 /// <summary>

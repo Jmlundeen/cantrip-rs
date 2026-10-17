@@ -1878,6 +1878,10 @@ public sealed class ActionOptionMessage
     /// <summary>The subtypes <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendSubtypes"/>.</summary>
     [Key(28)]
     public List<string> SpendSubtypes { get; set; } = [];
+
+    /// <summary>The mana value <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendManaValue"/>.</summary>
+    [Key(29)]
+    public int SpendManaValue { get; set; }
 }
 
 /// <summary>
@@ -2619,6 +2623,10 @@ public sealed class TakeActionAnswer : AnswerPayload
     /// <summary>The subtypes <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendSubtypes"/>.</summary>
     [Key(13)]
     public List<string> SpendSubtypes { get; set; } = [];
+
+    /// <summary>The mana value <see cref="Filter"/> names, as <see cref="RestrictedManaView.SpendManaValue"/>.</summary>
+    [Key(14)]
+    public int SpendManaValue { get; set; }
 }
 
 /// <summary>

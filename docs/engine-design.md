@@ -482,14 +482,21 @@ an ability whose source has one of them, or any source (Sunken Citadel, Steelswa
 `Subtypes(SubtypeSpells)` only for casting a spell with one of up to two subtypes, a creature spell where it says so,
 uncounterable where it says so (Desolation of Smaug and Sarkhan, Fireblood's Dragon spells, Maelstrom of the Spirit
 Dragon's Dragon or Omen spells, Unclaimed Territory, Pillar of Origins and Cavern of Souls' creature spell of the chosen
-type), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` are the three single cards' own. A subtype
-is any of hundreds, so the pool's list holds whatever restrictions the game made; those of card types are a named list
+type), `NonSpells(types)` only for casting a spell with none of the card types (Chandra, Chill of Compliance and Narset
+of the Ancient Way's "a noncreature spell": an artifact creature spell is a creature spell), `ManaValue(ManaValueSpells)`
+only for casting a spell whose mana value on the stack is N or greater, X counted as announced and a split card's cast
+half alone, or, where it says so, whose mana cost has {X} (Ashling, Rimebound's 4; Troyan, Gutsy Explorer's 5 or {X}),
+and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` are the three single cards' own. A subtype
+is any of hundreds, so the pool's list holds whatever restrictions the game made; those with no subtype or number are a named list
 (`ManaRestriction::NAMED`, which the build checks a card's `.only_for` against). A mana ability's restriction is made
 concrete as it is activated (`actions::restriction_from`): its subtype words read through its source's words (CR 612),
 "the chosen type" the source's `chosen_subtype` (CR 607.2a), or none - no spell - for a source that never entered. A spell
 is judged by its characteristics on the stack (`cx.chars`: changeling, text and type changes count); the advice whether
 a card in hand is castable (`spell_kind`) takes the face's subtypes, its changeling and the whole card's own as it is in
-the hand. A spell's subtypes are only worked out where some mana at hand is restricted by subtype. A copy of a spell had
+the hand. A spell's subtypes are only worked out where some mana at hand is restricted by subtype. `ManaPayment::Spell`
+carries the spell's mana value (`Query::mana_value` on the stack; for the advice, the face's with X at 0, a nonmodal back
+face's its front face's, CR 712.8c) and whether its mana cost has {X}: a card with {X} still to announce is offered when
+some X would bring it to a mana value the restricted mana pays for (`Available::covers_for`). A copy of a spell had
 no mana spent on it, so it gets nothing the mana did to the original (CR 707.10). What a payment is for
 is `ManaPayment`, judged as the cost is paid (`actions::payment_for`): casting a spell on the stack (CR 601.2g), activating
 an ability of a source in any zone - a mana ability's own mana cost too (CR 605.3a) - or anything else, which no

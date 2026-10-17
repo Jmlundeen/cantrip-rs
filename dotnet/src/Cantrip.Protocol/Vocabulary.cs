@@ -358,6 +358,12 @@ public enum ManaSpendFilterView
     SubtypeSpells = 10,
     /// <summary>Only to cast a creature spell with one of the subtypes named beside it: "a creature spell of the chosen type".</summary>
     SubtypeCreatureSpells = 11,
+    /// <summary>Only to cast a spell that is not a creature spell: "a noncreature spell".</summary>
+    NoncreatureSpells = 12,
+    /// <summary>Only to cast a spell with the mana value named beside it or greater: "spells with mana value 4 or greater".</summary>
+    ManaValueSpells = 13,
+    /// <summary>Only to cast a spell with the mana value named beside it or greater, or with {X} in its mana cost.</summary>
+    ManaValueOrXSpells = 14,
 }
 
 /// <summary>What spending some mana does to whatever it pays for (CR 106.6): the effect half of a restriction.</summary>

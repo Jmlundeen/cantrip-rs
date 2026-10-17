@@ -112,11 +112,17 @@ pub fn color_of(view: ColorView) -> Color {
 }
 
 /// What a restriction on mana is, as the wire says it (CR 106.6): what the mana may be spent on, what it does to what it
-/// pays for, and the subtypes the spell must have one of. Every restriction has its own, so `restriction_of` reads it
-/// back.
-pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, ManaSpendEffectView, Vec<String>) {
+/// pays for, the subtypes the spell must have one of and the least mana value it may have. Every restriction has its
+/// own, so `restriction_of` reads it back.
+pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, ManaSpendEffectView, Vec<String>, i32) {
     let mut subtypes = Vec::new();
+    let mut mana_value = 0;
     let filter = match restriction {
+        ManaRestriction::ManaValue(m) => {
+            mana_value = i32::from(m.at_least);
+            if m.or_x { ManaSpendFilterView::ManaValueOrXSpells } else { ManaSpendFilterView::ManaValueSpells }
+        }
+        r if r == ManaRestriction::NONCREATURE_SPELLS => ManaSpendFilterView::NoncreatureSpells,
         ManaRestriction::Subtypes(s) => {
             subtypes = s.subtypes.iter().flatten().map(|t| t.name().to_string()).collect();
             if s.creature { ManaSpendFilterView::SubtypeCreatureSpells } else { ManaSpendFilterView::SubtypeSpells }
@@ -137,13 +143,17 @@ pub fn restriction_view(restriction: ManaRestriction) -> (ManaSpendFilterView, M
         MANA_MAKES_UNCOUNTERABLE => ManaSpendEffectView::CantBeCountered,
         _ => ManaSpendEffectView::None,
     };
-    (filter, effect, subtypes)
+    (filter, effect, subtypes, mana_value)
 }
 
 /// The restriction a filter, an effect and subtypes from the wire name; none for unrestricted mana.
-pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, subtypes: &[String]) -> Option<ManaRestriction> {
+pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, subtypes: &[String], mana_value: i32) -> Option<ManaRestriction> {
     if (filter, effect) == (ManaSpendFilterView::None, ManaSpendEffectView::None) {
         return None;
+    }
+    if matches!(filter, ManaSpendFilterView::ManaValueSpells | ManaSpendFilterView::ManaValueOrXSpells) {
+        let at_least = u8::try_from(mana_value).ok()?;
+        return Some(ManaRestriction::ManaValue(ManaValueSpells { at_least, or_x: filter == ManaSpendFilterView::ManaValueOrXSpells }));
     }
     if matches!(filter, ManaSpendFilterView::SubtypeSpells | ManaSpendFilterView::SubtypeCreatureSpells) {
         if subtypes.len() > 2 {
@@ -160,7 +170,7 @@ pub fn restriction_of(filter: ManaSpendFilterView, effect: ManaSpendEffectView, 
             uncounterable: effect == ManaSpendEffectView::CantBeCountered,
         }));
     }
-    ManaRestriction::NAMED.into_iter().map(|(r, _)| r).find(|&r| restriction_view(r) == (filter, effect, Vec::new()))
+    ManaRestriction::NAMED.into_iter().map(|(r, _)| r).find(|&r| restriction_view(r) == (filter, effect, Vec::new(), 0))
 }
 
 pub fn mana_view(mana: Mana) -> ManaTypeView {
@@ -528,13 +538,14 @@ impl<'a> Projector<'a> {
             for mana in Mana::ALL {
                 let n = pool.get(mana);
                 if n > 0 {
-                    let (filter, effect, spend_subtypes) = restriction_view(restriction);
+                    let (filter, effect, spend_subtypes, spend_mana_value) = restriction_view(restriction);
                     summary.restricted_mana.push(RestrictedManaView {
                         r#type: Some(mana_view(mana)),
                         amount: i32::from(n),
                         filter,
                         effect,
                         spend_subtypes,
+                        spend_mana_value,
                     });
                 }
             }

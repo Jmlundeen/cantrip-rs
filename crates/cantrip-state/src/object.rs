@@ -846,6 +846,34 @@ pub enum ManaRestriction {
     /// characteristics there, CR 601.2g: a changeling creature spell is every creature type, CR 702.73a; a type an effect
     /// gave it or took away counts). See `SubtypeSpells`.
     Subtypes(SubtypeSpells),
+    /// "Spend this mana only to cast [a] non[type] spell[s]" (CR 106.6, 205.2a): only on casting a spell (CR 601.2g) that
+    /// has none of these card types as it is on the stack - an artifact creature spell is a creature spell, so no
+    /// noncreature spell. Never on an ability. Noncreature: Chandra, Chill of Compliance, Narset of the Ancient Way, The
+    /// Emperor of Palamecia, Immortus, Master of Eternity, Nardole, Resourceful Cyborg.
+    NonSpells(TypeSet),
+    /// "Spend this mana only to cast spells with mana value N or greater [or spells with {X} in their mana costs]"
+    /// (CR 106.6, 202.3): only on casting a spell whose mana value on the stack is at least N - with each {X} the number
+    /// chosen for it (CR 202.3e, 107.3), a face-down spell's 0 (CR 708.4), the cast half's alone (CR 709.3b) - or, where it
+    /// says so, whose mana cost has {X} in it. See `ManaValueSpells`.
+    ManaValue(ManaValueSpells),
+}
+
+/// "Spend this mana only to cast spells with mana value N or greater [or spells with {X} in their mana costs]"
+/// (CR 106.6, 202.3, 107.3). Mana value 4 or greater: Ashling, Rimebound. Mana value 5 or greater or {X}: Troyan, Gutsy
+/// Explorer. (Helga, Skittish Seer's is for creature spells only, which this does not say.)
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ManaValueSpells {
+    /// The least mana value the spell may have.
+    pub at_least: u8,
+    /// "... or spells with {X} in their mana costs": a spell whose mana cost has an {X}, whatever its mana value.
+    pub or_x: bool,
+}
+
+impl ManaValueSpells {
+    /// Whether a spell of this mana value, with or without {X} in its mana cost, may be paid for with the mana.
+    fn admits(self, mana_value: u32, x: bool) -> bool {
+        mana_value >= self.at_least as u32 || (self.or_x && x)
+    }
 }
 
 /// "Spend this mana only to cast [a] [subtype] [or [subtype]] [creature] spell[s]" (CR 106.6, 205.3).
@@ -896,8 +924,10 @@ impl SubtypeSpells {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ManaPayment {
     /// Casting a spell with these card types (CR 601.2g-h). Its subtypes are worked out only where some mana at hand is
-    /// restricted by subtype (`ManaRestriction::Subtypes`), and are empty otherwise.
-    Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool },
+    /// restricted by subtype (`ManaRestriction::Subtypes`), and are empty otherwise. `mana_value` is its mana value on the
+    /// stack (CR 202.3), and `x` whether its mana cost has {X} in it (CR 107.3); for the advice whether a card could be
+    /// cast, its mana value with X at 0, which `x` says could be raised.
+    Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool },
     /// Activating an ability whose source has these card types (CR 602.2b, 605.3a).
     Ability { source: TypeSet },
     /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
@@ -917,11 +947,23 @@ impl ManaRestriction {
     pub const ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::NONE);
     pub const LAND_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Land]));
     pub const ARTIFACT_ABILITIES: ManaRestriction = ManaRestriction::Abilities(TypeSet::of(&[CardType::Artifact]));
+    pub const NONCREATURE_SPELLS: ManaRestriction = ManaRestriction::NonSpells(TypeSet::of(&[CardType::Creature]));
 
-    /// The restrictions with no subtype in them, each with the name a scenario and the dump write it by. Those of
-    /// `Subtypes` are named for their subtypes (`name`). A card naming a restriction of card types not here fails the
-    /// build (`Adds::only_for` is checked at compile time), since the host has no word for it on the wire.
-    pub const NAMED: [(ManaRestriction, &'static str); 9] = [
+    /// "Spend this mana only to cast spells with mana value `n` or greater."
+    pub const fn mana_value_at_least(n: u8) -> ManaRestriction {
+        ManaRestriction::ManaValue(ManaValueSpells { at_least: n, or_x: false })
+    }
+
+    /// "Spend this mana only to cast spells with mana value `n` or greater or spells with {X} in their mana costs."
+    pub const fn mana_value_at_least_or_x(n: u8) -> ManaRestriction {
+        ManaRestriction::ManaValue(ManaValueSpells { at_least: n, or_x: true })
+    }
+
+    /// The restrictions with no subtype or number in them, each with the name a scenario and the dump write it by. Those
+    /// of `Subtypes` are named for their subtypes and those of `ManaValue` for their number (`name`). A card naming a
+    /// restriction of card types not here fails the build (`Adds::only_for` is checked at compile time), since the host
+    /// has no word for it on the wire.
+    pub const NAMED: [(ManaRestriction, &'static str); 10] = [
         (ManaRestriction::NotNonartifactSpells, "NotNonartifactSpells"),
         (ManaRestriction::GainsHaste, "GainsHaste"),
         (ManaRestriction::LegendaryUncounterable, "LegendarySpells, CantBeCountered"),
@@ -931,6 +973,7 @@ impl ManaRestriction {
         (ManaRestriction::ABILITIES, "Abilities"),
         (ManaRestriction::LAND_ABILITIES, "LandAbilities"),
         (ManaRestriction::ARTIFACT_ABILITIES, "ArtifactAbilities"),
+        (ManaRestriction::NONCREATURE_SPELLS, "NoncreatureSpells"),
     ];
 
     const fn same(self, other: ManaRestriction) -> bool {
@@ -938,16 +981,16 @@ impl ManaRestriction {
             (ManaRestriction::NotNonartifactSpells, ManaRestriction::NotNonartifactSpells)
             | (ManaRestriction::GainsHaste, ManaRestriction::GainsHaste)
             | (ManaRestriction::LegendaryUncounterable, ManaRestriction::LegendaryUncounterable) => true,
-            (ManaRestriction::Spells(a), ManaRestriction::Spells(b)) | (ManaRestriction::Abilities(a), ManaRestriction::Abilities(b)) => {
-                a.0 == b.0
-            }
+            (ManaRestriction::Spells(a), ManaRestriction::Spells(b))
+            | (ManaRestriction::Abilities(a), ManaRestriction::Abilities(b))
+            | (ManaRestriction::NonSpells(a), ManaRestriction::NonSpells(b)) => a.0 == b.0,
             _ => false,
         }
     }
 
-    /// Whether the wire has a word for it: one of `NAMED`, or any of `Subtypes`.
+    /// Whether the wire has a word for it: one of `NAMED`, or any of `Subtypes` or `ManaValue`.
     pub const fn is_known(self) -> bool {
-        if let ManaRestriction::Subtypes(_) = self {
+        if let ManaRestriction::Subtypes(_) | ManaRestriction::ManaValue(_) = self {
             return true;
         }
         let mut i = 0;
@@ -965,9 +1008,20 @@ impl ManaRestriction {
         matches!(self, ManaRestriction::Subtypes(_))
     }
 
+    /// The least mana value of a spell it pays for, where it limits mana by that (`ManaValue`): what a spell with {X}
+    /// still to be announced could reach (advice).
+    pub fn least_mana_value(self) -> Option<u8> {
+        match self {
+            ManaRestriction::ManaValue(m) => Some(m.at_least),
+            _ => None,
+        }
+    }
+
     /// Whether mana under this restriction may be spent on `payment` (CR 106.6).
     pub fn may_pay(self, payment: &ManaPayment) -> bool {
         match (self, *payment) {
+            (ManaRestriction::NonSpells(barred), ManaPayment::Spell { types, .. }) => barred.0 & types.0 == 0,
+            (ManaRestriction::ManaValue(m), ManaPayment::Spell { mana_value, x, .. }) => m.admits(mana_value, x),
             // "Can't be spent to cast nonartifact spells": everything but casting a nonartifact spell.
             (ManaRestriction::NotNonartifactSpells, ManaPayment::Spell { types, .. }) => types.has(CardType::Artifact),
             (ManaRestriction::NotNonartifactSpells, _) => true,
@@ -994,6 +1048,9 @@ impl ManaRestriction {
     /// One of `Subtypes` is its subtypes (spaces left out) and "Spells" ("DragonSpells", "DragonOrOmenSpells", "ElfCreatureSpells"),
     /// "NoTypeCreatureSpells" for a chosen type never chosen, with ", CantBeCountered" after it for its effect.
     pub fn name(self) -> String {
+        if let ManaRestriction::ManaValue(m) = self {
+            return format!("ManaValue{}OrGreater{}Spells", m.at_least, if m.or_x { "OrX" } else { "" });
+        }
         if let ManaRestriction::Subtypes(s) = self {
             let types: Vec<String> = s.subtypes.iter().flatten().map(|t| t.name().replace(' ', "")).collect();
             let mut name = if types.is_empty() { "NoType".to_string() } else { types.join("Or") };
@@ -1018,6 +1075,16 @@ impl ManaRestriction {
         };
         if let Some((r, _)) = ManaRestriction::NAMED.iter().find(|(_, n)| matches(n)) {
             return Some(*r);
+        }
+        // A mana value restriction: "ManaValue4OrGreaterSpells", "ManaValue5OrGreaterOrXSpells".
+        if let [one] = text.as_slice()
+            && let Some(rest) = one.strip_prefix("manavalue")
+        {
+            let (n, or_x) = match rest.strip_suffix("orgreaterorxspells") {
+                Some(n) => (n, true),
+                None => (rest.strip_suffix("orgreaterspells")?, false),
+            };
+            return Some(ManaRestriction::ManaValue(ManaValueSpells { at_least: n.parse().ok()?, or_x }));
         }
         // A subtype restriction: "DragonSpells", "DragonOrOmenSpells", "ElfCreatureSpells", with "CantBeCountered".
         let uncounterable = text.iter().any(|w| w == "cantbecountered");
@@ -1220,6 +1287,10 @@ mod tests {
         all.push(ManaRestriction::Subtypes(SubtypeSpells::either(Subtype::Dragon, Subtype::Omen)));
         all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [Some(Subtype::Elf), None], chosen: false, creature: true, uncounterable: true }));
         all.push(ManaRestriction::Subtypes(SubtypeSpells { subtypes: [None, None], chosen: false, creature: true, uncounterable: false }));
+        all.push(ManaRestriction::mana_value_at_least(4));
+        all.push(ManaRestriction::mana_value_at_least_or_x(5));
+        all.push(ManaRestriction::mana_value_at_least(12));
+        all.extend(ManaRestriction::NAMED.map(|(r, _)| r));
         for r in all {
             let name = r.name();
             assert_eq!(ManaRestriction::parse(name.split_whitespace()), Some(r), "{name}");

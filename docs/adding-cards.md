@@ -321,7 +321,9 @@ shapes have an example:
   activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`),
   `ManaRestriction::Subtypes(..)` "spend this mana only to cast [subtype] [creature] spells" (`SubtypeSpells::of(Dragon)`,
   `::either(Dragon, Omen)`, `SubtypeSpells::CHOSEN_TYPE_CREATURE` for "a creature spell of the chosen type",
-  `.uncounterable()` for Cavern of Souls), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the
+  `.uncounterable()` for Cavern of Souls), `ManaRestriction::NONCREATURE_SPELLS` "spend this mana only to cast a noncreature
+  spell", `ManaRestriction::mana_value_at_least(4)` "spells with mana value 4 or greater" (and `mana_value_at_least_or_x(5)`
+  "... or spells with {X} in their mana costs"), and `NotNonartifactSpells`, `GainsHaste` and `LegendaryUncounterable` the
   rest. A mana ability's subtype is read through its source's words and its chosen type as it is activated; an effect
   that adds the mana reads `g.words(item.object).subtype(..)` itself. A new restriction of card types is added to
   `ManaRestriction::NAMED` (the build fails on a card naming one that is not there), and the host gives it a word on the
