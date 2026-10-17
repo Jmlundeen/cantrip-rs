@@ -1,0 +1,37 @@
+# Laboratory Maniac: "If you would draw a card while your library has no cards in it, you win the game instead" (CR 614.1a,
+# 121.6). Bot1's deck is eight cards, so after its opening hand its library holds one. Ancestral Recall has Bot1 draw three, each
+# draw on its own (CR 121.2): the first finds the library with a card in it and draws it as usual; the second would be from an
+# empty library and is replaced - Bot1 wins the game (CR 104.2b) there and then, rather than losing for drawing from an empty
+# library (CR 704.5b).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Laboratory Maniac
+Ancestral Recall
+Island
+Island
+Island
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Laboratory Maniac.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 0

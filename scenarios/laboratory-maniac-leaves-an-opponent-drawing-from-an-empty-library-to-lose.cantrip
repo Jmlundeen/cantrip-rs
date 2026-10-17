@@ -1,0 +1,39 @@
+# Laboratory Maniac replaces only its controller's draws: "If you would draw a card". Bot1's Ancestral Recall makes Bot2, whose
+# library holds one card, draw three: the first is drawn, the other two are draws from an empty library that nothing replaces, and
+# Bot2 loses the game to the state-based action for them (CR 121.4, 704.5b) - not to a win of Bot1's (CR 104.2b).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Laboratory Maniac
+Ancestral Recall
+Island x10
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Laboratory Maniac.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot2.LostTo = EmptyLibrary
+Bot2.Hand.Count = 8
