@@ -1,0 +1,49 @@
+# "Combat damage can't be prevented" says nothing of other damage. On turn 5 Bot1 (Frenzied Baloth on the battlefield) casts
+# Pyroclasm; in response Bot2 gives Mother of Runes protection from red, which prevents Pyroclasm's 2 damage to her. The
+# damage to the unprotected Baloth is dealt (it dies), so Pyroclasm did resolve. (Combat damage is the control in
+# frenzied-baloth-combat-damage-ignores-protection.)
+
+[Bot1 Deck]
+Black Lotus
+Frenzied Baloth
+Mox Ruby
+Pyroclasm
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mox Pearl
+Mother of Runes
+Plains x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Frenzied Baloth.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot2.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot2.Colors(Red)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Frenzied Baloth; Pyroclasm; Black Lotus
+Bot2.Battlefield.Mother of Runes.Damage = 0
+Bot2.Battlefield.Mother of Runes.Tapped = true

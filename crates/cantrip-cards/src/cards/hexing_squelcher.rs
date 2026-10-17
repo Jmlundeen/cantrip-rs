@@ -10,10 +10,6 @@ fn your_spells(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far:
     o.zone.kind() == ZoneKind::Stack && so_far.types != TypeSet::NONE && o.controller == q.state().obj(source).controller
 }
 
-fn uncounterable(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::CantBeCountered);
-}
-
 fn other_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     affected != source && so_far.is(CardType::Creature) && q.state().obj(affected).controller == q.state().obj(source).controller
 }
@@ -22,7 +18,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[WARD],
     delayed: &[WARD],
     statics: &[
-        static_ability(Layer::Ability, your_spells, uncounterable, "Spells you control can't be countered.")
+        static_ability(Layer::Ability, your_spells, cantrip_mechanics::statics::cant_be_countered, "Spells you control can't be countered.")
             .everywhere(),
         static_ability(Layer::Ability, other_creatures_you_control, cantrip_mechanics::statics::grant_delayed_ability, "Other creatures you control have \"Ward\u{2014}Pay 2 life.\""),
     ],

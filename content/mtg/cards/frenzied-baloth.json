@@ -1,0 +1,13 @@
+{
+  "name": "Frenzied Baloth",
+  "manaCost": "{G}{G}",
+  "type": "Creature — Beast",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "This spell can't be countered.\nTrample, haste\nCreature spells you control can't be countered.\nCombat damage can't be prevented.",
+  "keywords": [
+    "CantBeCountered",
+    "Trample",
+    "Haste"
+  ]
+}

@@ -1,0 +1,37 @@
+# "Combat damage can't be prevented" (CR 615.12). Bot2 casts The One Ring on turn 2: protection from everything until its next
+# turn (CR 702.16j) would prevent all damage to Bot2. On turn 3 Bot1's Frenzied Baloth (cast on turn 1 with Black Lotus) hits
+# for 3 anyway. The control, with the same Ring and no Baloth effect, is
+# questing-beast-that-lost-all-abilities-has-its-damage-prevented.
+
+[Bot1 Deck]
+Black Lotus
+Frenzied Baloth
+Forest x4
+Forest x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+The One Ring
+Forest x4
+Forest x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Frenzied Baloth.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.The One Ring.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Frenzied Baloth > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

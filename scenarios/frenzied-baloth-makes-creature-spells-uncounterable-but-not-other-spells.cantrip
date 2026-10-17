@@ -1,0 +1,69 @@
+# "Creature spells you control can't be countered." Bot1 resolves Frenzied Baloth on turn 1. On turn 3 Bot2 (holding two
+# Counterspells and four mana) counters Bot1's Elvish Mystic - the Counterspell resolves and the Mystic still enters -
+# and then counters Bot1's Lightning Bolt, a noncreature spell, which is countered (the positive control): Bot2 stays at 20.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Frenzied Baloth
+Mox Ruby
+Elvish Mystic
+Lightning Bolt
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Counterspell
+Counterspell
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Frenzied Baloth.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+? Stack = Elvish Mystic
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Elvish Mystic)
+? Stack = Counterspell; Elvish Mystic
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Elvish Mystic; Forest; Forest; Frenzied Baloth; Mox Emerald; Mox Ruby
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard.Count = 2
+Bot2.Life = 20
