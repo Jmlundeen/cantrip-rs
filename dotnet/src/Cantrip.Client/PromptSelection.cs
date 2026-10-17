@@ -21,6 +21,12 @@ public sealed class PromptSelection
     /// </summary>
     public List<int> Pending { get; } = [];
 
+    /// <summary>
+    /// The attacker the last click sent more blockers at than it may be blocked by (CR 509.1b), whose extra blockers are
+    /// still picked up; -1 for none.
+    /// </summary>
+    public int BlockLimit { get; set; } = -1;
+
     public Dictionary<(int Source, int Creature), int> DamageShares { get; } = [];
     /// <summary>A divided target's own share (CR 601.2d), keyed by candidate handle.</summary>
     public Dictionary<int, int> DividedShares { get; } = [];
@@ -65,6 +71,7 @@ public sealed class PromptSelection
         Attacking.Clear();
         Blocking.Clear();
         Pending.Clear();
+        BlockLimit = -1;
         DamageShares.Clear();
         DividedShares.Clear();
         Targeting = null;

@@ -81,4 +81,31 @@ public sealed class CombatSelectionTests(WebClient web)
 
         Assert.Empty(table.Errors);
     }
+
+    [Fact]
+    public async Task An_attacker_that_cant_be_blocked_by_more_than_one_creature_takes_one_of_the_blockers_picked_up()
+    {
+        await using TablePage table = await TablePage.OpenAsync(web, "prompt=blockers-one-at-most", WebClient.Pictures(nameof(CombatSelectionTests)));
+        await table.SettledAsync(state => state.Fixture == "blockers-one-at-most");
+
+        await table.ClickCardAsync("Vampire Nighthawk");
+        await table.SettledAsync(state => state.Selected == 1);
+        await table.ClickCardAsync("Gurmag Angler");
+        await table.SettledAsync(state => state.Selected == 2);
+
+        // Savannah Lions takes one blocker (CR 509.1b); the other stays picked up, and the dock says why.
+        await table.ClickCardAsync("Savannah Lions");
+        TableState one = await table.SettledAsync(state => state.Selected == 1 && state.Controls.Any(control => control.Label == "Block with 1"));
+        Assert.Equal("Savannah Lions can't be blocked by more than one creature", one.Detail);
+        await table.PictureAsync("one-blocker-at-most");
+
+        // A second click on it sends nothing more; the one still held may block the Serra Angel.
+        await table.ClickCardAsync("Savannah Lions");
+        await table.SettledAsync(state => state.Selected == 1 && state.Controls.Any(control => control.Label == "Block with 1"));
+        await table.ClickCardAsync("Serra Angel");
+        TableState both = await table.SettledAsync(state => state.Selected == 0 && state.Controls.Any(control => control.Label == "Block with 2"));
+        Assert.Equal("2 attacking  ·  2 blocking", both.Detail);
+
+        Assert.Empty(table.Errors);
+    }
 }

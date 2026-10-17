@@ -877,6 +877,10 @@ pub struct DeclareBlockersPrompt {
     pub allowed: Vec<BlockMessage>,
     /// The fewest creatures that may block each of `attackers`, index for index.
     pub minimum_blockers: Vec<i32>,
+    /// The most creatures that may block each of `attackers`, index for index (CR 509.1b): 1 for "can't be blocked by more
+    /// than one creature", 0 for any number.
+    #[serde(default)]
+    pub maximum_blockers: Vec<i32>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

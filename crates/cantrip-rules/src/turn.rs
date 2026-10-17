@@ -627,11 +627,15 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
         }
     }
     // Menace (CR 702.110b) and "except by three or more creatures" (CR 509.1b): an attacker that can't be blocked by
-    // fewer than so many creatures is offered only if that many could.
+    // fewer than so many creatures is offered only if that many could, and not at all if it can't be blocked by that many
+    // either ("can't be blocked by more than one creature" as well, CR 509.1b: the restrictions are cumulative).
     let menace: Vec<ObjectId> = attackers
         .iter()
         .copied()
-        .filter(|&a| allowed.iter().filter(|p| p.1 == a).count() < cx.chars(a).minimum_blockers() as usize)
+        .filter(|&a| {
+            let c = cx.chars(a);
+            allowed.iter().filter(|p| p.1 == a).count() < c.minimum_blockers() as usize || c.minimum_blockers() > c.maximum_blockers()
+        })
         .collect();
     allowed.retain(|p| !menace.contains(&p.1));
     if !allowed.is_empty() {

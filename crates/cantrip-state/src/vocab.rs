@@ -702,6 +702,10 @@ pub enum Keyword {
     /// A core keyword because a keyword counter gives it (CR 122.1b) in layer 6: the blocking rule reads it, and the
     /// layers give an object that has it once layer 6 is done the rules' triggered ability (`intrinsic::DECAYED`).
     Decayed = 33,
+    /// "This creature can't be blocked by more than one creature" (CR 509.1b): an evasion ability, a restriction on the
+    /// declaration of blockers. Printed (Stalking Tiger, Charging Rhino, Ironhoof Ox) or given (Meltstrider's Resolve,
+    /// Familiar Ground, Challenger Troll, Vorrac Battlehorns).
+    CantBeBlockedByMoreThanOne = 34,
 }
 
 /// Day and night (CR 731.1): the designation the game itself has, belonging to no player. A game starts with neither

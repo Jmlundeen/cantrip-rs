@@ -223,7 +223,14 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
                 .filter(|&a| (blocks.iter().filter(|b| b.1 == a).count() as u8) < game.chars(a).minimum_blockers())
                 .collect();
             blocks.retain(|b| !once.contains(&b.1));
-            Answer::Block(blocks)
+            // "Can't be blocked by more than one creature": the blockers past the most it allows are left out.
+            let mut kept: Vec<(ObjectId, ObjectId)> = Vec::new();
+            for b in blocks {
+                if kept.iter().filter(|k| k.1 == b.1).count() < usize::from(game.chars(b.1).maximum_blockers()) {
+                    kept.push(b);
+                }
+            }
+            Answer::Block(kept)
         }
         // The whole total on the first candidate.
         RequestKind::ChooseDividedTargets { candidates, total, .. } => {

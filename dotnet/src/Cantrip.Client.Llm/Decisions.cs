@@ -740,7 +740,7 @@ public sealed class Decisions
                         + "Which of your creatures block it?",
                     Note = Minimums(client, prompt),
                     Choices = [.. able.Select(blocker => GameText.Creature(client, blocker))],
-                    Picks = able.Count,
+                    Picks = Math.Min(able.Count, prompt.MaximumFor(0)),
                     UpTo = true,
                 });
 
@@ -755,8 +755,12 @@ public sealed class Decisions
 
         foreach (ViewHandle blocker in prompt.Eligible)
         {
+            // An attacker already blocked by as many creatures as it may be (CR 509.1b) is no longer offered.
             List<ViewHandle> attackers =
-                [.. prompt.Allowed.Where(pair => pair.Blocker == blocker).Select(pair => pair.Attacker)];
+            [
+                .. prompt.Allowed.Where(pair => pair.Blocker == blocker).Select(pair => pair.Attacker)
+                    .Where(attacker => answer.Blocks.Count(block => block.Attacker == attacker) < prompt.MaximumFor(prompt.Attackers.IndexOf(attacker))),
+            ];
 
             if (attackers.Count == 0)
             {
@@ -782,7 +786,10 @@ public sealed class Decisions
         return Legal(prompt, answer);
     }
 
-    /// <summary>Drops any block that gives an attacker fewer creatures than it may be blocked by (CR 509.1b).</summary>
+    /// <summary>
+    /// Drops any block that gives an attacker fewer creatures than it may be blocked by, and the blocks past the most it
+    /// may be blocked by (CR 509.1b).
+    /// </summary>
     private static BlockersDeclaredAnswer Legal(DeclareBlockersPromptMessage prompt, BlockersDeclaredAnswer answer)
     {
         for (int i = 0; i < prompt.Attackers.Count; i++)
@@ -794,6 +801,13 @@ public sealed class Decisions
             if (blocking > 0 && blocking < minimum)
             {
                 answer.Blocks.RemoveAll(block => block.Attacker == attacker);
+            }
+
+            int most = prompt.MaximumFor(i);
+            if (blocking > most)
+            {
+                List<BlockMessage> over = [.. answer.Blocks.Where(block => block.Attacker == attacker).Skip(most)];
+                answer.Blocks.RemoveAll(over.Contains);
             }
         }
 
@@ -1916,6 +1930,11 @@ public sealed class Decisions
                 parts.Add(string.Create(
                     CultureInfo.InvariantCulture,
                     $"{GameText.Named(client, prompt.Attackers[i])} cannot be blocked by fewer than {minimum} creatures"));
+            }
+
+            if (prompt.MaximumFor(i) == 1)
+            {
+                parts.Add($"{GameText.Named(client, prompt.Attackers[i])} cannot be blocked by more than one creature");
             }
         }
 

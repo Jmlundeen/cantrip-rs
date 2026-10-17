@@ -104,6 +104,12 @@ impl Chars {
         self.abilities = [None; MAX_ABILITIES];
     }
 
+    /// The most creatures that may block it (CR 509.1b): one for "can't be blocked by more than one creature", otherwise
+    /// any number. With a minimum above it (menace as well), it can't be blocked at all.
+    pub fn maximum_blockers(&self) -> u8 {
+        if self.has(Keyword::CantBeBlockedByMoreThanOne) { 1 } else { u8::MAX }
+    }
+
     /// The fewest creatures that may block it (CR 509.1b): menace's two, "except by three or more creatures"'s three,
     /// otherwise one. A creature blocked by fewer, but at least one, is not blocked legally.
     pub fn minimum_blockers(&self) -> u8 {

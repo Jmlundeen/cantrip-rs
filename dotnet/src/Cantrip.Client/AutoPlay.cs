@@ -201,7 +201,9 @@ public static class AutoPlay
                 }
             }
 
-            if (gang.Count < Math.Max(2, Minimum(prompt, attackerHandle)) || damage < (attacker.Toughness ?? 0))
+            // "Can't be blocked by more than one creature" (CR 509.1b) takes no gang.
+            if (gang.Count < Math.Max(2, Minimum(prompt, attackerHandle)) || damage < (attacker.Toughness ?? 0)
+                || gang.Count > prompt.MaximumFor(prompt.Attackers.IndexOf(attackerHandle)))
             {
                 continue;
             }

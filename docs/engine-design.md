@@ -682,6 +682,18 @@ open to it costs nothing, and a requirement to attack a certain player (or a goa
 counts that player while attacking them is free. The board is searched for these only as attackers are declared. The
 benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
 
+### Blocked by at most one creature
+
+"Can't be blocked by more than one creature" (CR 509.1b) is `Keyword::CantBeBlockedByMoreThanOne`, an evasion ability, so
+"loses all abilities" takes it: printed (a content `keywords` entry: Stalking Tiger, Charging Rhino, Ironhoof Ox, none in
+content yet) or given in layer 6 (Meltstrider's Resolve; Familiar Ground, Challenger Troll, Vorrac Battlehorns, Sunder Shaman
+and Bristling Boar print the same). `Chars::maximum_blockers` is the counterpart of `minimum_blockers`: a declaration giving an
+attacker more blockers is refused (`validate`, CR 509.1b), and an attacker whose minimum is above its maximum (menace as well:
+the restrictions are cumulative) is offered no block at all (`turn::declare_blockers`). The question carries both per attacker
+(`DeclareBlockersPrompt::maximum_blockers`, 0 for any number); the web client sends at most that many of the creatures picked up
+at the attacker clicked and says why the rest are still held; the tactical, random, automatic and language-model seats never
+declare more. A multi-pair refusal in a scenario is judged by the engine's check of that declaration.
+
 ### Attacking as though it didn't have defender
 
 A creature with defender can't attack (CR 702.3b). "Can attack as though it didn't have defender" is a permission about

@@ -552,11 +552,8 @@ public sealed partial class TacticalPlay
             }
         }
 
-        int[] minimum = [.. attackers.Select(attacker =>
-        {
-            int index = prompt.Attackers.IndexOf(attacker.Handle);
-            return index >= 0 && index < prompt.MinimumBlockers.Count ? Math.Max(prompt.MinimumBlockers[index], 1) : 1;
-        })];
+        int[] minimum = [.. attackers.Select(attacker => prompt.MinimumFor(prompt.Attackers.IndexOf(attacker.Handle)))];
+        int[] maximum = [.. attackers.Select(attacker => prompt.MaximumFor(prompt.Attackers.IndexOf(attacker.Handle)))];
 
         // An attacker sent at one of this seat's planeswalkers costs the planeswalker loyalty and the seat no life.
         List<ObjectView> walkers = [];
@@ -579,7 +576,7 @@ public sealed partial class TacticalPlay
         int attackerSeat = attacking[0].Controller;
         var combat = new Combat(
             _model, attackers, blockers, LifeOf(view, attackerSeat), LifeOf(view, client.Seat), allowed, minimum, Policy("connect"),
-            [.. walkers.Select(walker => (LoyaltyOf(walker), _model.Worth(walker)))], aims);
+            [.. walkers.Select(walker => (LoyaltyOf(walker), _model.Worth(walker)))], aims, maximum);
 
         Combat.Result result = combat.BestBlocks((1 << attackers.Count) - 1, budget: 20000);
 

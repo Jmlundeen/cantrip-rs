@@ -494,6 +494,14 @@ public sealed class RandomPlay : IAutoPlayer
             {
                 answer.Blocks.RemoveAll(block => block.Attacker == attacker);
             }
+
+            // More than it may be blocked by ("can't be blocked by more than one creature", CR 509.1b): the first stay.
+            int most = prompt.MaximumFor(i);
+            if (blocking > most)
+            {
+                List<BlockMessage> over = [.. answer.Blocks.Where(block => block.Attacker == attacker).Skip(most)];
+                answer.Blocks.RemoveAll(over.Contains);
+            }
         }
 
         return answer;

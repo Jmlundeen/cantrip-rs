@@ -363,6 +363,7 @@ public static class PromptFixtures
         "attackers-goaded",
         "blockers",
         "blockers-restricted",
+        "blockers-one-at-most",
         "assign-damage",
         "player-aura",
         "waiting",
@@ -2512,6 +2513,24 @@ public static class PromptFixtures
                             Block(MyBrute, TheirRecruit),
                             Block(MyLurker, TheirSentinel), Block(MyBrute, TheirSentinel),
                         ],
+                };
+
+            case "blockers-one-at-most":
+                // Savannah Lions can't be blocked by more than one creature (CR 509.1b): both of the viewer's creatures may
+                // block it, but only one of them at a time.
+                UnderAttack(view);
+                return new DeclareBlockersPromptMessage
+                {
+                    Player = Viewer,
+                    Eligible = [new ViewHandle(MyLurker), new ViewHandle(MyBrute)],
+                    Attackers = [new ViewHandle(TheirRecruit), new ViewHandle(TheirSentinel)],
+                    MinimumBlockers = [1, 1],
+                    MaximumBlockers = [1, 0],
+                    Allowed =
+                    [
+                        Block(MyLurker, TheirRecruit), Block(MyLurker, TheirSentinel),
+                        Block(MyBrute, TheirRecruit), Block(MyBrute, TheirSentinel),
+                    ],
                 };
 
             case "assign-damage":

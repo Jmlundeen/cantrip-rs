@@ -2353,6 +2353,20 @@ public sealed class DeclareBlockersPromptMessage : PromptPayload
     [Key(4)]
     public List<int> MinimumBlockers { get; set; } = [];
 
+    /// <summary>
+    /// The most creatures that may block each of <see cref="Attackers"/>, index for index: 1 for "can't be blocked by more
+    /// than one creature" (CR 509.1b), 0 for any number. A declaration giving an attacker more is refused.
+    /// </summary>
+    [Key(5)]
+    public List<int> MaximumBlockers { get; set; } = [];
+
+    /// <summary>The fewest creatures that may block the attacker at <paramref name="index"/>, at least 1.</summary>
+    public int MinimumFor(int index) => index >= 0 && index < MinimumBlockers.Count ? Math.Max(MinimumBlockers[index], 1) : 1;
+
+    /// <summary>The most creatures that may block the attacker at <paramref name="index"/>; <see cref="int.MaxValue"/> for any number.</summary>
+    public int MaximumFor(int index) =>
+        index >= 0 && index < MaximumBlockers.Count && MaximumBlockers[index] > 0 ? MaximumBlockers[index] : int.MaxValue;
+
     /// <summary>Blocking with nobody.</summary>
     public override AnswerPayload Default() => new BlockersDeclaredAnswer();
 }

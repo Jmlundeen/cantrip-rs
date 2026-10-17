@@ -257,6 +257,8 @@ never comes, the refusal holds if, with priority in the declare-blockers step, t
 player, the attacker is attacking that player, and no such block was made; otherwise it fails as proving nothing.
 The pairs of one refusal are one declaration: `! Bot2.Block(Bear > Moonshadow)` holds for an attacker with menace (a lone blocker is not
 legal, CR 702.110b), while naming two blockers for it, `! Bot2.Block(Bear#1 > Moonshadow; Bear#2 > Moonshadow)`, would fail.
+Pairs each allowed alone are judged together by the engine's own check of the declaration: `! Bot2.Block(Bear#1 > Rover; Bear#2 >
+Rover)` holds for an attacker that "can't be blocked by more than one creature" (CR 509.1b).
 
 `! Bot1.Attack()` says declaring no attackers at all is refused at the next declaration (a creature must attack, CR 508.1d).
 `! Bot1.Battlefield.Llanowar Elves.Activate` right after an `Attack` line is checked while that declaration's cost to attack is

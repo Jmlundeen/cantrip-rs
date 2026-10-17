@@ -327,6 +327,34 @@ public sealed class RandomPlayTests
         Assert.Contains(2, counts);
     }
 
+    [Fact]
+    public void Leaves_out_blockers_past_an_attackers_maximum()
+    {
+        // "Can't be blocked by more than one creature" (CR 509.1b): a declaration of two on it would be refused whole.
+        var prompt = new DeclareBlockersPromptMessage
+        {
+            Player = Me,
+            Attackers = [Handle(1)],
+            Eligible = [Handle(3), Handle(4), Handle(5)],
+            MinimumBlockers = [1],
+            MaximumBlockers = [1],
+            Allowed = [Pair(3, 1), Pair(4, 1), Pair(5, 1)],
+        };
+
+        var bot = new RandomPlay(seed: 5);
+        var counts = new HashSet<int>();
+
+        for (int i = 0; i < Draws; i++)
+        {
+            int blocking = Assert.IsType<BlockersDeclaredAnswer>(bot.Decide(prompt)).Blocks.Count;
+            Assert.True(blocking is 0 or 1, $"declared {blocking} blockers against a maximum of 1");
+            counts.Add(blocking);
+        }
+
+        Assert.Contains(0, counts);
+        Assert.Contains(1, counts);
+    }
+
     // --- Choosing ----------------------------------------------------------------------------------------------------
 
     [Fact]

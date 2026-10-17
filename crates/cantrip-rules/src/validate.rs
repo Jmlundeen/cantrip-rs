@@ -264,6 +264,11 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 (blocks.iter().filter(|b| b.1 == a).count() as u8) < game.chars(a).minimum_blockers()
             }) {
                 no("a creature can't be blocked by fewer creatures than it requires (CR 509.1b, 702.110b)")
+            } else if blocks.iter().any(|&(_, a)| {
+                // "Can't be blocked by more than one creature" (CR 509.1b).
+                blocks.iter().filter(|b| b.1 == a).count() > usize::from(game.chars(a).maximum_blockers())
+            }) {
+                no("a creature can't be blocked by more creatures than it allows (CR 509.1b)")
             } else {
                 Ok(())
             }

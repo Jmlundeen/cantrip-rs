@@ -31,6 +31,7 @@ public sealed partial class MainPage
     private Dictionary<int, AttackChoice> _attacking => _selection.Attacking;
     private Dictionary<int, int> _blocking => _selection.Blocking;
     private List<int> _pending => _selection.Pending;
+    private int _blockLimit { get => _selection.BlockLimit; set => _selection.BlockLimit = value; }
     private Dictionary<(int Source, int Creature), int> _shares => _selection.DamageShares;
     private Dictionary<int, int> _dividedShares => _selection.DividedShares;
     private ActionOptionMessage? _targeting { get => _selection.Targeting; set => _selection.Targeting = value; }
@@ -709,11 +710,18 @@ public sealed partial class MainPage
         _needsRedraw = true;
     }
 
-    /// <summary>Has every blocker picked up that may block the attacker do so, and the arrows to it go in.</summary>
+    /// <summary>
+    /// Has every blocker picked up that may block the attacker do so, and the arrows to it go in - as many as the attacker
+    /// may be blocked by (CR 509.1b: "can't be blocked by more than one creature"): the rest stay picked up, and the dock
+    /// says why.
+    /// </summary>
     private void AssignBlocks(GameClient client, DeclareBlockersPromptMessage prompt, int attackerIndex)
     {
         ViewHandle attacker = prompt.Attackers[attackerIndex];
-        List<int> sent = [.. _pending.Where(blocker => MayBlock(prompt, blocker, attacker))];
+        List<int> able = [.. _pending.Where(blocker => MayBlock(prompt, blocker, attacker))];
+        int room = prompt.MaximumFor(attackerIndex) - _blocking.Count(pair => pair.Value == attackerIndex && !able.Contains(pair.Key));
+        List<int> sent = [.. able.Take(Math.Max(room, 0))];
+        _blockLimit = sent.Count < able.Count ? attackerIndex : -1;
         RetireArrows(sent, CardBounds(attacker));
 
         foreach (int blocker in sent)
@@ -729,6 +737,7 @@ public sealed partial class MainPage
     private void PutDown()
     {
         _pending.Clear();
+        _blockLimit = -1;
         _needsRedraw = true;
     }
 

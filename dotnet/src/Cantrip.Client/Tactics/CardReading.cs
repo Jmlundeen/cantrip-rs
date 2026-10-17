@@ -29,6 +29,9 @@ public enum Keywords
 
     /// <summary>Shadow (CR 702.28b): it blocks, and is blocked by, only creatures with shadow.</summary>
     Shadow = 1 << 17,
+
+    /// <summary>"Can't be blocked by more than one creature" (CR 509.1b): no gang block.</summary>
+    OneBlocker = 1 << 18,
 }
 
 /// <summary>What an effect does to the thing it is aimed at, as far as this seat can tell from its words.</summary>
@@ -305,6 +308,13 @@ public static partial class CardReading
         if (trimmed.Length == 0)
         {
             return Keywords.None;
+        }
+
+        // "Can't be blocked by more than one creature" (CR 509.1b) limits blockers; it does not stop them.
+        if (trimmed.Contains("can't be blocked by more than one creature", StringComparison.Ordinal)
+            && (trimmed.StartsWith("this creature", StringComparison.Ordinal) || trimmed.Length < 60))
+        {
+            return Keywords.OneBlocker;
         }
 
         if (trimmed.Contains("can't be blocked", StringComparison.Ordinal) && !trimmed.Contains("except", StringComparison.Ordinal)

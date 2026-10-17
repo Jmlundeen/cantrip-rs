@@ -1996,9 +1996,14 @@ public sealed partial class MainPage
                 i => _blocking.Values.Count(attacker => attacker == i) is > 0 and var n && n < prompt.MinimumBlockers[i],
                 -1);
 
+        // The attacker the last click sent too many blockers at (CR 509.1b): those over its most are still picked up.
+        int limitIndex = _blockLimit >= 0 && _blockLimit < prompt.Attackers.Count && _pending.Count > 0 ? _blockLimit : -1;
+
         Prompt(
             "Declare blockers",
-            _pending.Count > 0
+            limitIndex >= 0
+                ? $"{client.Object(prompt.Attackers[limitIndex])?.Name} can't be blocked by more than {Blockers(prompt.MaximumFor(limitIndex))}"
+                : _pending.Count > 0
                 ? $"Choose an attacker to block ({_pending.Count} selected)"
                 : shortIndex >= 0
                     ? $"{client.Object(prompt.Attackers[shortIndex])?.Name} needs {prompt.MinimumBlockers[shortIndex]} or more blockers"
@@ -2034,6 +2039,9 @@ public sealed partial class MainPage
             });
         }
     }
+
+    /// <summary>"one creature", "two creatures": how many blockers an attacker may have at most.</summary>
+    private static string Blockers(int count) => count == 1 ? "one creature" : $"{count} creatures";
 
     /// <summary>Divides each creature's combat damage among what it may hit (CR 510.1c-d, 702.19b).</summary>
     private void FillAssignDamage(GameClient client, AssignCombatDamagePromptMessage prompt)

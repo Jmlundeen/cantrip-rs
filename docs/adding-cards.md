@@ -377,7 +377,8 @@ shapes have an example:
 - **Entering with counters** (CR 122.6, 614.1c): `Game::put_onto_battlefield_with_counters` and
   `create_tokens_with_counters`; `mechanics::tokens::incubate` (CR 701.53). **`Game::win_game`** (CR 104.2b).
 - **Combat**: planeswalkers are attackable (`DeclareAttackers.planeswalkers`); `Keyword::CantBeAttacked` (CR 508.1c), `EffectKind::CantAttack` and `CantBlock` for a resolved "can't attack or block" (CR 508.1c, 509.1b; the host writes each on the creature with its duration),
-  `CantBeBlockedByPowerTwoOrLess`, `CantBeBlockedExceptByThreeOrMore` (`Chars::minimum_blockers`, menace's two too).
+  `CantBeBlockedByPowerTwoOrLess`, `CantBeBlockedExceptByThreeOrMore` (`Chars::minimum_blockers`, menace's two too),
+  `CantBeBlockedByMoreThanOne` (`Chars::maximum_blockers`; a JSON `keywords` entry when printed, a layer-6 grant otherwise).
   A scenario refuses an attack or a block with `! Bot2.Attack(A > B)` / `! Bot2.Block(A > B)`.
 - **Reflexive triggers** (CR 603.12, "when you do"): `Game::reflexive_trigger`; one whose quantity is what the first part
   did ("tap up to that many target creatures") is `Game::reflexive_trigger_counted(.., count)`, and its slot's

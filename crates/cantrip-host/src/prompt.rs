@@ -960,6 +960,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .map(|&(blocker, attacker)| BlockMessage { blocker: handles.handle(blocker), attacker: handles.handle(attacker) })
                     .collect(),
                 minimum_blockers: attackers.iter().map(|&a| i32::from(game.chars(a).minimum_blockers())).collect(),
+                maximum_blockers: attackers
+                    .iter()
+                    .map(|&a| match game.chars(a).maximum_blockers() {
+                        u8::MAX => 0,
+                        most => i32::from(most),
+                    })
+                    .collect(),
             })
         }
         RequestKind::DiscardToHandSize { count, hand } => PromptPayload::DiscardPromptMessage(DiscardPrompt {

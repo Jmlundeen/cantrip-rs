@@ -86,6 +86,7 @@ fn keyword_name(k: u8) -> &'static str {
         28 => "SplitSecond",
         32 => "Changeling",
         33 => "Decayed",
+        34 => "CantBeBlockedByMoreThanOne",
         _ => "?",
     }
 }

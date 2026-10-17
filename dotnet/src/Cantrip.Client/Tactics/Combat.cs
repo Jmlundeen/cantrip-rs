@@ -83,6 +83,7 @@ public sealed class Combat
     private readonly IReadOnlyList<Unit> _blockers;
     private readonly bool[,] _allowed;
     private readonly int[] _minimum;
+    private readonly int[] _maximum;
     private readonly int _attackerLife;
     private readonly int _defenderLife;
     private readonly double _connect;
@@ -100,6 +101,9 @@ public sealed class Combat
     /// For each attacker, which of <paramref name="walkers"/> it attacks (CR 508.1b), or -1 for the player. Null when
     /// every attacker attacks the player.
     /// </param>
+    /// <param name="maximum">
+    /// The most blockers each attacker may have (CR 509.1b), or null to go by "can't be blocked by more than one creature".
+    /// </param>
     public Combat(
         TacticalModel model,
         IReadOnlyList<Unit> attackers,
@@ -110,7 +114,8 @@ public sealed class Combat
         int[]? minimum = null,
         double connect = 0,
         IReadOnlyList<(int Loyalty, double Worth)>? walkers = null,
-        int[]? aims = null)
+        int[]? aims = null,
+        int[]? maximum = null)
     {
         ArgumentNullException.ThrowIfNull(model);
         ArgumentNullException.ThrowIfNull(attackers);
@@ -127,12 +132,18 @@ public sealed class Combat
 
         _allowed = allowed ?? new bool[_blockers.Count, attackers.Count];
         _minimum = minimum ?? new int[attackers.Count];
+        _maximum = maximum ?? new int[attackers.Count];
 
         for (int a = 0; a < attackers.Count; a++)
         {
             if (minimum is null)
             {
                 _minimum[a] = attackers[a].Has(Keywords.Menace) ? 2 : 1;
+            }
+
+            if (maximum is null)
+            {
+                _maximum[a] = attackers[a].Has(Keywords.OneBlocker) ? 1 : int.MaxValue;
             }
 
             if (allowed is null)
@@ -306,12 +317,15 @@ public sealed class Combat
         return new Result(value, (int[])blocks.Clone(), damage, attackersDead, blockersDead, attackerGains, defenderGains);
     }
 
-    /// <summary>Whether a declaration gives every blocked attacker as many blockers as it needs (CR 509.1b).</summary>
+    /// <summary>
+    /// Whether a declaration gives every blocked attacker as many blockers as it needs, and no more than it may have
+    /// (CR 509.1b).
+    /// </summary>
     private bool Legal(List<int> attackers, int[] blocks)
     {
         foreach (int a in attackers)
         {
-            if (_minimum[a] <= 1)
+            if (_minimum[a] <= 1 && _maximum[a] == int.MaxValue)
             {
                 continue;
             }
@@ -325,7 +339,7 @@ public sealed class Combat
                 }
             }
 
-            if (blocking > 0 && blocking < _minimum[a])
+            if ((blocking > 0 && blocking < _minimum[a]) || blocking > _maximum[a])
             {
                 return false;
             }

@@ -1374,6 +1374,16 @@ impl<'s> Run<'s> {
                         }
                     }
                 }
+                // The declaration the line names, the first candidate for each side of each pair.
+                let mut pairs: Vec<(ObjectId, ObjectId)> = Vec::new();
+                for spec in action.positional() {
+                    if let Some((blk, atk)) = spec.split_once('>')
+                        && let (Some(&b), Some(&a)) =
+                            (self.objects(action, blk.trim(), eligible)?.first(), self.objects(action, atk.trim(), attackers)?.first())
+                    {
+                        pairs.push((b, a));
+                    }
+                }
                 for spec in action.positional() {
                     let parts: Vec<&str> = spec.split('>').collect();
                     if parts.len() != 2 {
@@ -1400,9 +1410,14 @@ impl<'s> Run<'s> {
                         }
                         continue;
                     }
+                    // Fewer blockers than an attacker requires (menace): the declaration is refused (CR 509.1b). A line of
+                    // several pairs is one declaration, which the engine's own check of the answer judges as a whole (more
+                    // blockers than "can't be blocked by more than one creature" allows, CR 509.1b).
                     let short = targets.iter().any(|&a| {
                         given.iter().find(|g| g.0 == a).is_some_and(|g| (g.1 as u8) < self.game.chars(a).minimum_blockers())
-                    });
+                    }) || (pairs.len() > 1
+                        && pairs.iter().all(|p| allowed.contains(p))
+                        && check_answer(&self.game, request, &Answer::Block(pairs.clone())).is_err());
                     if !short && blockers.iter().any(|&b| targets.iter().any(|&a| allowed.contains(&(b, a)))) {
                         return fail(format!("line {line} says {text} must not be allowed, but it is"));
                     }

@@ -353,6 +353,30 @@ public sealed class CombatTests
     }
 
     [Fact]
+    public void An_attacker_that_cant_be_blocked_by_more_than_one_creature_is_never_gang_blocked()
+    {
+        // A 4/4 that is lethal unblocked, which the two 3/3s would kill together (CR 509.1b): only one of them may block it.
+        var combat = new Combat(Model, [A(1, 4, 4, Keywords.OneBlocker)], [A(2, 3, 3), A(3, 3, 3)], 20, 4);
+        Combat.Result result = combat.BestBlocks(attacking: 1);
+        Assert.Equal(1, result.Blocks.Count(b => b == 0));
+
+        // Without the restriction the same two do block it together.
+        var free = new Combat(Model, [A(1, 4, 4)], [A(2, 3, 3), A(3, 3, 3)], 20, 4);
+        Assert.Equal([0, 0], free.BestBlocks(attacking: 1).Blocks);
+    }
+
+    [Fact]
+    public void The_one_blocker_limit_is_read_off_the_printed_line_and_off_what_an_aura_grants()
+    {
+        Assert.Equal(
+            Keywords.OneBlocker,
+            CardReading.KeywordsOf(Creature(1, "Stalking Tiger", 3, 3, text: "This creature can't be blocked by more than one creature.")));
+        ObjectView rover = Creature(2, "Edge Rover", 2, 4, text: "Reach");
+        rover.GrantedAbilities.Add(new AbilityTextView { Text = "This creature can't be blocked by more than one creature." });
+        Assert.Equal(Keywords.Reach | Keywords.OneBlocker, CardReading.KeywordsOf(rover));
+    }
+
+    [Fact]
     public void A_flier_is_not_blocked_from_the_ground()
     {
         var combat = new Combat(Model, [A(1, 2, 2, Keywords.Flying)], [A(2, 5, 5), A(3, 1, 3, Keywords.Reach)], 20, 20);
