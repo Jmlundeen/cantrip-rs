@@ -1,0 +1,6 @@
+{
+  "name": "Helm of Awakening",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "Spells cost {1} less to cast."
+}

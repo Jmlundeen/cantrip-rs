@@ -1,0 +1,44 @@
+# CR 601.2f: the total cost is the mana cost plus increases less reductions, and only then do effects that directly
+# affect the total apply - Trinisphere's "costs three mana" comes last (its ruling). Helm of Awakening ("spells cost {1}
+# less") is cast first with two Moxen; Trinisphere then costs {2} (Helm applies, and Trinisphere is not yet on the
+# battlefield to apply to itself), so Black Lotus's three red leave one. On turn 3 Sol Ring, {1} reduced to {0}, costs
+# three: the three red floated are all spent. Had Trinisphere's minimum come before Helm's reduction, Sol Ring would cost
+# {2} and leave a red.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Helm of Awakening
+Black Lotus
+Trinisphere
+Sol Ring
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Helm of Awakening.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Trinisphere.Cast
+? Bot1.Mana = {R}
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+? Bot1.Mana = {R}{R}{R}
+Bot1.Hand.Sol Ring.Cast
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Battlefield = Mox Ruby; Mox Ruby; Mox Ruby; Helm of Awakening; Trinisphere; Mountain; Sol Ring
