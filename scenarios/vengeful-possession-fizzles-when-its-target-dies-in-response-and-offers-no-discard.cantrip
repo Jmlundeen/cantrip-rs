@@ -1,0 +1,53 @@
+# Vengeful Possession has one target (CR 608.2b): when Bot2 kills its own Llanowar Elves in response with Lightning Bolt, the spell does
+# not resolve, so nothing happens, "you may discard a card" included: ! Bot1.Choose holds although Bot1 holds cards. Bot1 draws nothing.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Vengeful Possession
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Vengeful Possession.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+! Bot1.Choose
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Vengeful Possession
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot2.Battlefield = Forest; Mountain

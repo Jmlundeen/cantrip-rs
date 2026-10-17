@@ -1,0 +1,48 @@
+# "You may discard a card. If you do, draw a card": Bot1 declines the discard (Choose() picks none), so it draws nothing (the draw
+# follows a card actually discarded, CR 608.2c). The stolen creature (Bot2's Llanowar Elves, untapped and not summoning sick by haste)
+# is Bot1's until end of turn: it taps for mana for Bot1 (G), which proves control, untap and haste in one - a summoning-sick creature
+# could not use its {T} ability. A Vengeful Possession needs {2}{R}: three Mountains.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Vengeful Possession
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Vengeful Possession.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Choose()
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 10
+Bot1.Graveyard = Vengeful Possession
