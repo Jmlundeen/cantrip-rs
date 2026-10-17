@@ -1,0 +1,6 @@
+{
+  "name": "Prismatic Omen",
+  "manaCost": "{1}{G}",
+  "type": "Enchantment",
+  "oracleText": "Lands you control are every basic land type in addition to their other types."
+}

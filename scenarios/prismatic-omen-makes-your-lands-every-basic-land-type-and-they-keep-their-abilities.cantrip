@@ -1,0 +1,64 @@
+# Prismatic Omen: "Lands you control are every basic land type in addition to their other types." CR 305.7's last sentence:
+# a land that gains land types in addition to its own keeps its land types and rules text and gains each new type's mana
+# ability (CR 305.6). So Bot1's Mutavault is a Plains Island Swamp Mountain Forest that taps for {U} (a mana ability it never
+# had) and still has "{T}: Add {C}" and its animation, which Bot1 activates (it becomes a 2/2). The ruling: name and
+# supertypes are unchanged, so it is no basic land and Bot1's Forest stays a basic one. Bot2's Island is not Bot1's to
+# change ("you control"): it is only an Island and taps for no {G}. A Mountain of Bot1's is now a Forest too, which Utopia
+# Sprawl ("Enchant Forest") may enchant; before the Omen it could not (the refusal and its positive control).
+
+[Bot1 Deck]
+Mutavault
+Mox Emerald
+Prismatic Omen
+Utopia Sprawl
+Mountain
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Utopia Sprawl.Cast(Mountain)
+Bot1.Hand.Prismatic Omen.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Forest; Island; Mountain; Plains; Swamp
+? Bot2.Battlefield.Island.Subtypes = Island
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {U})
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Hand.Utopia Sprawl.Cast(Mountain)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Black)
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Battlefield.Mountain.Activate(Ability: Add {R})
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+? Bot1.Battlefield.Mutavault.Power = 2
+[T6 Bot2.Main1]
+! Bot2.Battlefield.Island.Activate(Ability: Add {G})
+Bot2.Battlefield.Island.Activate(Ability: Add {U})
+? Bot2.Mana = {U}
+
+[Expect]
+Turn = 6
+Bot1.Battlefield.Utopia Sprawl.AttachedTo = Mountain
+Bot1.Battlefield.Mountain.Subtypes = Forest; Island; Mountain; Plains; Swamp
+Bot1.Battlefield.Mountain.Supertypes = Basic
+Bot1.Battlefield.Mutavault.Supertypes = (absent)
+Bot2.Battlefield.Island.Subtypes = Island

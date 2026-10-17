@@ -1,0 +1,51 @@
+# Prismatic Omen, then Blood Moon: the same two layer-4 effects as in the other order, independent of each other (CR
+# 613.8a), applied in timestamp order (CR 613.7). The Omen first makes Mutavault every basic land type; Blood Moon then sets
+# its subtype to Mountain alone (CR 305.7: it loses its old land types, the five the Omen gave it among them, and its
+# rules text's abilities). Mutavault is only a Mountain: it taps for {R} and not {U}, and has no {C} ability. Bot1's basic
+# Forest is no nonbasic land, so the Moon leaves it alone and the Omen still makes it every basic land type (it taps for
+# {U}: the positive control of the Omen still applying).
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Emerald
+Prismatic Omen
+Blood Moon
+Forest
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Prismatic Omen.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Forest; Island; Mountain; Plains; Swamp
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate(Ability: Add {G})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {U})
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate(Ability: Add {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Mutavault.Subtypes = Mountain
+Bot1.Battlefield.Forest.Subtypes = Forest; Island; Mountain; Plains; Swamp

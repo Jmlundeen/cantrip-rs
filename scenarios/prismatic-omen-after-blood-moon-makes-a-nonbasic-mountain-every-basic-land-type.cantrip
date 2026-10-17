@@ -1,0 +1,50 @@
+# Blood Moon, then Prismatic Omen. Both apply in layer 4 and neither depends on the other (CR 613.8a: Blood Moon changes
+# no land's being a land Bot1 controls, and the Omen no land's being nonbasic, nor either's existence), so they apply in
+# timestamp order (CR 613.7). Blood Moon first sets Mutavault's subtype to Mountain, taking the abilities of its rules
+# text (CR 305.7: "{T}: Add {C}" and the animation); the Omen then adds every basic land type (CR 305.7's last sentence),
+# so Mutavault is a Plains Island Swamp Mountain Forest with the five basic mana abilities (CR 305.6) and nothing else (the
+# judges' reading of Blood Moon and Prismatic Omen, "Blood Moon, Progenitor of Dependency"). It taps for {U}; it cannot
+# tap for {C} nor become a 2/2.
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Emerald
+Blood Moon
+Prismatic Omen
+Forest
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Prismatic Omen.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Forest; Island; Mountain; Plains; Swamp
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {C})
+! Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {U})
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Mutavault.Subtypes = Forest; Island; Mountain; Plains; Swamp
+Bot1.Battlefield.Mutavault.Types = Land
+Bot1.Battlefield.Forest.Subtypes = Forest; Island; Mountain; Plains; Swamp
