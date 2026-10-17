@@ -141,8 +141,12 @@ calling, means it was not the same thing. Leave that in its own card.
    - **Actions:** every ability, special action and cost the card offers is clickable, with its cost and what it
      does shown, and distinguishable from the card's other actions.
    - **Bots:** the tactical bot and the language-model client handle every new question and action on purpose.
-   A card that only uses what the client already shows and asks needs no client change - the review confirms it. Any
-   card that needs one makes the change in the same work, and proves it with a browser scenario: `# Browser` at the
+   A card that only uses what the client already shows and asks needs no client change - the review confirms it.
+   **Browser tests are only for a new user interaction**: a prompt, action, cost display or piece of state the client
+   did not have before. A card that reuses existing prompts and actions gets no browser scenario and runs no browser
+   tests, and a bot-only change (the tactical bot, the language-model client) is proven by unit tests, not the
+   browser. A card that does add an interaction makes the change in the same work, and proves it with a browser
+   scenario: `# Browser` at the
    top and `? Client.` checks of what the page shows (`docs/scenarios-in-the-browser.md`), run with
    `tools\test.cmd /filter "ScenarioInBrowser"` (or `tools\scenario-in-browser.cmd name` to watch). If the browser
    driver cannot click its way through the new prompt or action, extend `ScenarioPlayer`/`TablePage` - the same rule as
@@ -151,7 +155,8 @@ calling, means it was not the same thing. Leave that in its own card.
 9. **Verify:** plain `cargo run --profile cards -p cantrip-script --bin corpus` shows `0 fail` and no fewer passing
    than before; `set CANTRIP_VERIFY=1 & cargo test --profile cards --workspace` is green; if the core or mechanics
    changed, the benchmark and `tools\test.cmd`; if the client, the host or the protocol changed, `tools\test.cmd /noweb`
-   and the card's browser scenarios; other wall-clock tests only when the change touches what they cover (CLAUDE.md).
+   and, only if it added a new user interaction, that interaction's browser scenarios; other wall-clock tests only
+   when the change touches what they cover (CLAUDE.md).
 10. **Review** (below), then commit: `Card: <Name>` - the content JSON, the card file and its scenarios - one card per
     commit; core, mechanics and client changes in their own commits before it (`Engine: ...`, `Mechanics: ...`,
     `Client: ...`). Commit and push as CLAUDE.md says; a contributor without push access opens a pull request with the
@@ -238,7 +243,8 @@ reads it with the Oracle text, the rulings and the CR open:
   card, which should have been shared;
 - the client: everything the card puts into the game is shown, every question it asks has a true caption, every
   action it offers is clickable with its cost, the bots answer its questions on purpose, and a browser scenario proves
-  whatever the client had to learn - or the reviewer confirms the card needs nothing the client did not already do.
+  each new user interaction the client had to learn - or the reviewer confirms the card needs nothing the client did
+  not already do (then no browser scenario is owed).
 
 The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
 land. Self-reported "exact" is not proof.
@@ -254,7 +260,8 @@ The coordinator dispatches, lands and keeps the queue; it does not implement car
    lacks), never faked; the client work a card needs (step 8) is part of the card, not a follow-up; one commit per
    card; at the end `git rebase main`, the corpus and the verify tests; no push; a report of implemented cards with
    their coverage and what each needed from the client, skipped cards with their gaps, and anything odd found in the
-   core. Browser tests are heavy: one agent at a time runs them, so an agent runs only its own cards' browser scenarios.
+   core. Card agents run no browser tests unless a card added a new user interaction; then one agent at a time runs
+   only that interaction's browser scenarios.
 3. **Gaps** that several skipped cards share become a core-feature agent: the core open to it, each feature built to
    its rule, the waiting cards implemented, the benchmark run. Feature agents work on separate rules areas; running agents
    are told what landed so they rebase.
