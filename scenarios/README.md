@@ -207,7 +207,9 @@ A preparation card's spell (CR 722.3c) is named in a line by its own name, `Bot1
 Arguments are separated by `;`, because card names contain commas. Names can be qualified when they are ambiguous:
 `Stack.Duress`, `Bot2.Battlefield.Grizzly Bears`, `Island#2`. Copies are numbered in battlefield order, and top first
 for libraries, graveyards and the stack (`Stack.Duress#1` is the topmost Duress; unnumbered, a name takes the first
-candidate the question offers, which for two spells of that name on the stack is the bottom-most). A target shared by two players' permanents must be qualified. Same-named cards
+candidate the question offers, which for two spells of that name on the stack is the bottom-most). An activated or
+triggered ability on the stack is named for its source, `Stack.Locus of Enlightenment` the topmost of that source's and
+`Stack.Locus of Enlightenment#2` the one under it. A target shared by two players' permanents must be qualified. Same-named cards
 in one place are interchangeable, so the first one offered is used.
 
 A permanent is named by the name it shows, so a transformed one is written by its **back face's** name:

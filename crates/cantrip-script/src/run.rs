@@ -1279,14 +1279,19 @@ impl<'s> Run<'s> {
             let p = player_of(b);
             return Ok(candidates.iter().copied().find(|&t| t == Target::Player(p)));
         }
-        // An ability on the stack is named for its source, as `Stack.Name`; the topmost of that name.
+        // An ability on the stack is named for its source, as `Stack.Name`: the topmost of that name, or with `#n` the nth
+        // from the top (`Stack.Name#2`, the one under it).
         if let Some((zone, name)) = spec.split_once('.')
             && zone.eq_ignore_ascii_case("Stack")
         {
+            let (name, nth) = match name.rsplit_once('#') {
+                Some((n, k)) if k.trim().parse::<usize>().is_ok_and(|k| k > 0) => (n, k.trim().parse::<usize>().unwrap() - 1),
+                _ => (name, 0),
+            };
             let stack = &self.game.state.stack;
-            let found = candidates.iter().copied().filter(|t| matches!(t, Target::Ability(_))).rev().find(|t| {
+            let found = candidates.iter().copied().filter(|t| matches!(t, Target::Ability(_))).rev().filter(|t| {
                 matches!(t, Target::Ability(n) if stack.iter().any(|i| i.serial == *n && self.game.name(i.object).eq_ignore_ascii_case(name.trim())))
-            });
+            }).nth(nth);
             if found.is_some() {
                 return Ok(found);
             }
