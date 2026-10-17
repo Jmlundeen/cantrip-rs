@@ -1,0 +1,49 @@
+# Fling reads the sacrificed creature's power as it last existed on the battlefield (CR 608.2h): a Clone that entered as a copy
+# of Ulvenwald Oddity (CR 707.2) was a 4/4, though the Clone card is a 0/0 once it is in the graveyard (CR 707.4: the copy
+# effect ends as it leaves). Bot2 casts the Oddity on turn 2; Bot1 clones it on turn 3 and flings the Clone at Bot2: 4 damage.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Sapphire
+Mox Ruby
+Clone
+Fling
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ulvenwald Oddity.Power = 4
+Bot1.Hand.Fling.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Fling; Clone; Black Lotus

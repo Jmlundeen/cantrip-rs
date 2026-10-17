@@ -1,0 +1,46 @@
+# Fling reads the sacrificed creature's power as it last existed on the battlefield (CR 608.2h), with the layers applied
+# (CR 613.4b): under Humility ("all creatures ... have base power and toughness 1/1") Hired Blade, printed 3/2, was a 1/1. In
+# the graveyard Humility no longer reaches it and it is a 3/2 card again, so a power read there would deal 3. Bot1 casts
+# Humility on turn 1, Hired Blade with flash on Bot2's turn 2, and on turn 3 flings it at Bot2: 1 damage.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Humility
+Hired Blade
+Fling
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Humility.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Hired Blade.Power = 1
+Bot1.Hand.Fling.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Fling; Hired Blade; Black Lotus
+Bot1.Graveyard.Hired Blade.Power = 3

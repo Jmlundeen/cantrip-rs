@@ -1,0 +1,45 @@
+# "The sacrificed creature" is the one Fling's own additional cost sacrificed (CR 601.2h, 608.2h), not another creature
+# sacrificed while Fling is being cast. Bot1 casts Fling at Bot2 sacrificing Hired Blade (3/2) and pays its {1} with Ashnod's
+# Altar's mana ability (CR 605.3a, 601.2g), which sacrifices Ornithopter (0/2) as its cost: Bot2 takes 3, not 0. The mana is
+# paid before the sacrifice (CR 601.2h lets costs be paid in any order), so Ornithopter is under Hired Blade in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Sol Ring
+Ornithopter
+Ashnod's Altar
+Hired Blade
+Fling
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Fling.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Ornithopter)
+Bot1.Choose(Hired Blade)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Fling; Hired Blade; Ornithopter; Black Lotus
