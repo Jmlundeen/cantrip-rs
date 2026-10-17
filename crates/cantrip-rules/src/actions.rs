@@ -1874,6 +1874,13 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
             offer(id, options);
         }
     }
+    // A land card its owner exiled on an Adventure (CR 715.3d): "for as long as that card remains exiled, that player may
+    // play it" - as a land play, at the time and within the number of land plays the rules allow (CR 305.1, 305.2).
+    for &id in cx.s().zone(Zone::exile(player)) {
+        if cx.s().obj(id).on_adventure {
+            offer(id, options);
+        }
+    }
     // The land cards in the graveyard that a way a permanent gives lets the player play (CR 305.1, 604): once during each of
     // their turns, say. Looked for only when the graveyard holds a land card.
     let mut granted: Option<Vec<(ObjectId, PlayerId, &'static GrantedWay)>> = None;
@@ -2055,7 +2062,10 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 continue;
             }
             let def = cx.card(obj.card);
-            if def.is(CardType::Land) {
+            // A land card is played, never cast (CR 305.1, 305.9), but one with an Adventure may be cast as that (CR 715.3:
+            // Lindblum, Industrial Regency's Mage Siege), and only as that.
+            let land = def.is(CardType::Land);
+            if land && def.inset_faces().next().is_none() {
                 continue;
             }
             let asker = Asker { source: id, controller: player };
@@ -2086,7 +2096,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             // Will does for Force of Will's, Daze's or web-slinging's; one whose text names the hand is not (warp, CR
             // 702.185a). `elsewhere` is a rule or permission that has it cast from this other zone.
             let from_elsewhere = |way: &WayDef, elsewhere: bool| way.from == ZoneKind::Hand && !way.only_from && !zone.is(ZoneKind::Hand) && elsewhere;
-            if instant == instants {
+            if instant == instants && !land {
                 if def.split.is_none()
                     && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted || from_graveyard || retrace)
                     && (def.has_cost || instead.is_some())
@@ -2161,7 +2171,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             }
             // An alternative cost that may be used whenever an instant could be cast, whatever the card is (sneak, CR 702.190a).
             // From another zone by a permission (sneak names no zone), unless the permission says when (CR 601.3).
-            if instants {
+            if instants && !land {
                 for (n, way) in def.ways.iter().enumerate() {
                     if !way.instant_speed || !own {
                         continue;
@@ -2193,7 +2203,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             if zone.is(ZoneKind::Graveyard) && own {
                 let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s()));
                 if !ways.is_empty() {
-                    for (face_way, face_def) in faces_to_cast(def) {
+                    for (face_way, face_def) in faces_to_cast(def).into_iter().filter(|&(f, _)| !(land && f == GRANTED_FACE_WHOLE)) {
                         let face_instant = if face_way == GRANTED_FACE_WHOLE { instant } else { speed.face(face_def) };
                         if face_instant != instants {
                             continue;
