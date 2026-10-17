@@ -65,6 +65,8 @@ keeps it).
 | [KI-46](#ki-46-the-lore-counter-a-player-puts-on-a-saga-as-their-main-phase-begins-has-no-player-putting-it) | The lore counter a player puts on a Saga as their main phase begins has no player putting it | Medium | Open |
 | [KI-47](#ki-47-containment-priest-judges-a-card-entering-transformed-by-its-front-face) | Containment Priest judges a card entering transformed by its front face | Medium | Open |
 | [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
+| [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
+| [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 
 ## Issues
 
@@ -569,3 +571,35 @@ it (no card in content has one) and to who puts the counter (CR 122.6a: the perm
 also the ability's controller). A fix calls `put_onto_battlefield_with_counters`.
 
 **Scenarios.** none: no card reaches it.
+
+### KI-49: The tactical bot does not know infect or poison
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-17, review of Inkmoth Nexus |
+
+**Notes.** The engine is right: damage from a source with infect is -1/-1 counters to a creature and poison counters to a
+player (CR 702.90b-c, 120.3b, 120.3d), and ten poison counters lose the game (CR 704.5c). The tactical bot
+(`dotnet/src/Cantrip.Client/Tactics`) has no notion of either: `CardReading.cs` passes "infect" over as a keyword it does
+not know, and nothing in the bot reads a player's poison counters, so it scores an infect creature's damage (Inkmoth
+Nexus, Blightsteel Colossus) as life lost, races and blocks as if it were, and does not see a player near ten poison. A fix
+reads infect into `Keywords` and gives the bot's damage and race arithmetic a poison clock beside the life one. The web
+client shows poison on the player rail and the language-model client in its text, so a person and the model are not
+affected.
+
+**Scenarios.** none: a bot's judgement is not a rules outcome; a bot-lab duel with infect decks would show it.
+
+### KI-50: An animation that replaces creature types is unexercised
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | mechanics | 2026-10-17, review of Inkmoth Nexus |
+
+**Notes.** An effect that makes an object "a [creature types] artifact creature" without saying it is still what it was
+keeps its card types and other subtypes but replaces its creature types with those named (CR 205.1b). `Animation` in
+`cantrip-mechanics` has `replaces_creature_types` for it (a `LoseAllCreatureTypes` effect before the named types), set by
+Iron Man Armor ("a 0/0 Construct Hero artifact creature"). The line runs in the Armor's scenarios, but the Armor has no
+creature types of its own to lose, so no scenario shows a creature type being replaced. It would need the Armor to have a
+creature type before it animates (an effect that gives every permanent a creature type), which no card in content does.
+
+**Scenarios.** none yet: Iron Man Armor could reach it with such an effect.
