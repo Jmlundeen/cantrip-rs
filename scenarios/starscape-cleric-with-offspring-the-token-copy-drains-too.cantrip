@@ -1,0 +1,47 @@
+# Offspring {2}{B} paid (CR 702.175a): Starscape Cleric enters and its 1/1 token copy follows (copying the abilities), so there are two
+# "whenever you gain life" abilities. Lightning Helix on turn 3 gains Bot1 3 life in one event: both trigger and Bot2 loses 2 more,
+# 20 - 3 - 2 = 15. Bot1 is on 23. The battlefield: five Moxen, the Cleric and the token, 7 permanents.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Starscape Cleric
+Lightning Helix
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Starscape Cleric.Cast(Kicked: 1)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 15
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Starscape Cleric#1.Token = (absent)
+Bot1.Battlefield.Starscape Cleric#2.Power = 1
+Bot1.Battlefield.Starscape Cleric#2.Token = true
+Bot1.Battlefield.Starscape Cleric#2.Keywords = CantBlock; Flying

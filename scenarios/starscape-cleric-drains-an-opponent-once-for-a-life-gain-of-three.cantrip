@@ -1,0 +1,39 @@
+# Starscape Cleric cast without offspring, then Lightning Helix gains Bot1 3 life in one event: "whenever you gain life" triggers
+# once (CR 603.2c) however much, so Bot2 loses 1 more life: 20 - 3 (Helix) - 1 = 16. Bot1 is on 23 and there is no token copy:
+# the battlefield holds two Jets, Ruby, Pearl and the Cleric, 5 permanents.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Starscape Cleric
+Lightning Helix
+Island
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Starscape Cleric.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Pass
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 16
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Starscape Cleric.Keywords = CantBlock; Flying
+Bot1.Battlefield.Starscape Cleric.Power = 2
