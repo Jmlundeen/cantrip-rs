@@ -1,0 +1,42 @@
+# Ral Zarek, Guest Lecturer's −1: "Any number of target players each discard a card." Bot1 targets both players, Bot2
+# first. As it resolves the target players choose in turn order from the active player, whatever order they were
+# targeted in (CR 101.4, the card's ruling): Bot1, whose turn it is, chooses Lightning Bolt, then Bot2 chooses
+# Ornithopter, and the two are discarded together. Ral is left at 2 loyalty.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Lightning Bolt
+Swamp
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x22
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Any number)
+Bot1.Target(Bot2; Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot2.Choose(Ornithopter)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 2
+Bot2.Graveyard = Ornithopter
+Bot2.Hand.Count = 6
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Counters.Loyalty = 2

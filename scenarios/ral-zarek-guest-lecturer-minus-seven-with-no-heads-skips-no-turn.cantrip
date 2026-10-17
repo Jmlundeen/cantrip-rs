@@ -1,0 +1,42 @@
+# Ral Zarek, Guest Lecturer's −7 with every one of the five coins tails: X is 0, so Bot2 skips no turn and its turn 10
+# follows Bot1's turn 9 as usual. No one wins or loses these flips (CR 705.2); only heads count. The climb to 7 loyalty is
+# that of ral-zarek-guest-lecturer-minus-seven-skips-a-turn-of-the-opponent-for-each-head.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Swamp x20
+
+[Bot2 Deck]
+Island x24
+
+[Dice]
+2; 2; 2; 2; 2
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Bot2; Ability: Flip five coins)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Ral Zarek, Guest Lecturer
+[T10 Bot2.Main1]
+
+[Expect]
+Turn = 10
+ActivePlayer = Bot2

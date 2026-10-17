@@ -1,0 +1,65 @@
+# Browser
+# What Bot1's page shows of Ral Zarek, Guest Lecturer's âˆ’7 made against it. Bot2 casts Ral on turn 2 and climbs to 7 with
+# four +1s; on turn 10 the âˆ’7 flips one head of five. The log reads each flip as heads or tails, which no one wins or loses
+# (CR 705.2), and the facts beside Bot1's life total say it skips its next turn. Bot1's Time Vault is tapped (it entered
+# so on turn 1, and Bot1 took its turns), so as Bot1's turn would begin two effects would skip it, and the page asks
+# which applies first (CR 616.1), each button saying what its effect does. Bot1 clicks Ral's: the turn is skipped, the
+# fact is gone, and Bot2 takes turn 11.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Time Vault
+Island x21
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Swamp x20
+
+[Dice]
+1; 2; 2; 2; 2
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Time Vault.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot2.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T6 Bot2.Main1]
+Bot2.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T8 Bot2.Main1]
+Bot2.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T10 Bot2.Main1]
+Bot2.Battlefield.Ral Zarek, Guest Lecturer.Activate(Bot1; Ability: Flip five coins)
+Bot2.Pass
+Bot1.Pass
+? Bot1.TurnsToSkip = 1
+? Client.Bot1.Facts = You skip your next turn
+? Client.Bot1.Log.Has = Bot2 flips a coin: it came up heads.
+? Client.Bot1.Log.Has = Bot2 flips a coin: it came up tails.
+[T10 Bot2.End]
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Your turn would begin: which applies first?
+? Client.Bot1.Dock = Ral Zarek, Guest Lecturer: you skip this turn; Time Vault: you skip this turn and untap this artifact
+Bot1.Replace(Ral Zarek, Guest Lecturer)
+[T11 Bot2.Main1]
+? Client.Bot1.Facts =
+
+[Expect]
+Turn = 11
+ActivePlayer = Bot2
+Bot1.Battlefield.Time Vault.Tapped = True

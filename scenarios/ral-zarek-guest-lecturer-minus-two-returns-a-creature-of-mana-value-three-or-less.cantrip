@@ -1,0 +1,51 @@
+# Ral Zarek, Guest Lecturer's −2: "Return target creature card with mana value 3 or less from your graveyard to the
+# battlefield." Bot1 fills its graveyard with its own −1 (turns 1 and 3: Passageway Seer, mana value 4, then Jacked
+# Rabbit, {X}{1}{W}), climbs back to 2 with a +1 on turn 5, and on turn 7 may not target the Seer, but may target the
+# Rabbit: in a graveyard X is 0, so its mana value is 2 (CR 202.3e, the card's ruling). It enters untapped under Bot1's
+# control with no +1/+1 counters (ravenous's X is 0, CR 107.3b), a 1/2. Ral, at 0 loyalty, is put into the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Passageway Seer
+Jacked Rabbit
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Any number)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Passageway Seer)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Any number)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Jacked Rabbit)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Bot1.Graveyard.Passageway Seer; Ability: Return target)
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Bot1.Graveyard.Jacked Rabbit; Ability: Return target)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Jacked Rabbit.Tapped = False
+Bot1.Battlefield.Jacked Rabbit.Power = 1
+Bot1.Battlefield.Jacked Rabbit.Toughness = 2
+Bot1.Graveyard = Ral Zarek, Guest Lecturer; Passageway Seer

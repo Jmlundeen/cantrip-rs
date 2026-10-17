@@ -1,0 +1,56 @@
+# The other order of ral-zarek-guest-lecturer-skip-waits-while-time-vault-skips-the-turn-first (CR 616.1): Bot2 chooses
+# Ral Zarek's effect for the turn that would begin, so that turn is skipped by it and the effect is used up (CR 614.10a);
+# Time Vault, which did not apply, stays tapped. On Bot2's next turn the Vault offers its skip again on its own (no choice
+# between effects is asked), and Bot2 declines it and takes turn 11.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Swamp x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Time Vault
+Island x21
+
+[Dice]
+1; 2; 2; 2; 2
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Time Vault.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Bot2; Ability: Flip five coins)
+Bot1.Pass
+Bot2.Pass
+Bot2.Replace(Ral Zarek, Guest Lecturer)
+[T10 Bot1.Main1]
+? Bot2.Battlefield.Time Vault.Tapped = True
+Bot2.Decline
+[T11 Bot2.Main1]
+
+[Expect]
+Turn = 11
+ActivePlayer = Bot2
+Bot2.Battlefield.Time Vault.Tapped = True

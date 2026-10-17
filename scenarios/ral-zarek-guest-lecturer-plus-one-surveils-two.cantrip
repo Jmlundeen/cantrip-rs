@@ -1,0 +1,36 @@
+# Ral Zarek, Guest Lecturer's +1: "Surveil 2" (CR 701.25a): Bot1 looks at the top two cards of its library, Lightning Bolt
+# and Mox Pearl, keeps the Mox on top and puts the Bolt into its graveyard. Ral goes from 3 loyalty to 4.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Swamp
+Swamp
+Swamp
+Lightning Bolt
+Mox Pearl
+Swamp x14
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mox Pearl | Lightning Bolt)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 15
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Counters.Loyalty = 4

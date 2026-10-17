@@ -1,0 +1,62 @@
+# Two replacement effects of one turn beginning (CR 614.10, 616.1): Ral Zarek's −7 has made Bot2 skip its next turn (one
+# head of five), and Bot2's Time Vault is tapped ("If you would begin your turn while this artifact is tapped, you may skip
+# that turn instead. If you do, untap this artifact"). Bot2, whose turn it is, chooses which applies, and chooses Time
+# Vault: the turn is skipped and the Vault untaps. Ral's effect skipped nothing, so it waits for Bot2's next turn
+# (CR 614.10a) and skips that one, with no question, as the Vault is untapped now. Turn 10 and turn 11 are Bot1's, and
+# Bot2's turn after that is turn 12. Bot2 cast the Vault on turn 2 (it enters tapped) and took turns 4, 6 and 8, the
+# default declining the Vault's offer.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Swamp x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Time Vault
+Island x21
+
+[Dice]
+1; 2; 2; 2; 2
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Time Vault.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T9 Bot1.Main1]
+? Bot2.Battlefield.Time Vault.Tapped = True
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Bot2; Ability: Flip five coins)
+Bot1.Pass
+Bot2.Pass
+? Bot2.TurnsToSkip = 1
+Bot2.Replace(Time Vault)
+[T10 Bot1.Main1]
+? Bot2.Battlefield.Time Vault.Tapped = False
+? Bot2.TurnsToSkip = 1
+[T11 Bot1.Main1]
+[T12 Bot2.Main1]
+
+[Expect]
+Turn = 12
+ActivePlayer = Bot2
+Bot2.Battlefield.Time Vault.Tapped = False

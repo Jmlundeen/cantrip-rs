@@ -1,0 +1,38 @@
+# Ral Zarek, Guest Lecturer's −1 discards only for the players it targets: with Bot2 the one target, Bot2 discards
+# Ornithopter and Bot1, untargeted, is asked nothing and keeps its three cards (the control is
+# ral-zarek-guest-lecturer-minus-one-makes-each-target-player-discard-active-player-first, where Bot1 is a target too).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Lightning Bolt
+Swamp
+Swamp
+Swamp x16
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x22
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Any number)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Ornithopter)
+
+[Expect]
+Turn = 1
+Bot1.Graveyard =
+Bot1.Hand.Count = 3
+Bot2.Graveyard = Ornithopter

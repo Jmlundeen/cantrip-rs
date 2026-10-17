@@ -1,0 +1,54 @@
+# Ral Zarek, Guest Lecturer's −7: "Flip five coins. Target opponent skips their next X turns, where X is the number of
+# coins that came up heads." Ral is cast on turn 1 and climbs to 7 with four +1s (turns 1, 3, 5, 7; each surveil 2
+# keeps the cards on top). On turn 9 the −7 flips heads, tails, heads, heads, tails (the dice: face 1 is heads), so Bot2
+# skips its next three turns (CR 500.11, 614.10): the turns that would be Bot2's are proceeded past as though they did
+# not exist, and each skipped turn has no number, so Bot1 takes turns 10, 11 and 12 and Bot2's next turn is turn 13. One
+# skip is used up by each turn it skips (CR 614.10a). Ral, at 0 loyalty, is put into the graveyard (CR 704.5i).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Ral Zarek, Guest Lecturer
+Swamp x20
+
+[Bot2 Deck]
+Island x24
+
+[Dice]
+1; 2; 1; 1; 2
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Ral Zarek, Guest Lecturer.Cast
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Ability: Surveil)
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Ral Zarek, Guest Lecturer.Counters.Loyalty = 7
+Bot1.Battlefield.Ral Zarek, Guest Lecturer.Activate(Bot2; Ability: Flip five coins)
+Bot1.Pass
+Bot2.Pass
+? Bot2.TurnsToSkip = 3
+? Bot1.Graveyard = Ral Zarek, Guest Lecturer
+[T10 Bot1.Main1]
+? ActivePlayer = Bot1
+? Bot2.TurnsToSkip = 2
+[T11 Bot1.Main1]
+? Bot2.TurnsToSkip = 1
+[T12 Bot1.Main1]
+? ActivePlayer = Bot1
+[T13 Bot2.Main1]
+
+[Expect]
+Turn = 13
+ActivePlayer = Bot2
