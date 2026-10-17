@@ -15,7 +15,7 @@ pub const fn sub(subtype: Subtype) -> u16 {
 }
 
 /// The subtype a template's number names, as `source`'s text has that word now (CR 612.2).
-fn word(q: &dyn Query, source: ObjectId, n: u16) -> Subtype {
+pub fn word(q: &dyn Query, source: ObjectId, n: u16) -> Subtype {
     let printed = Subtype::ALL.into_iter().find(|&s| s as u16 == n).expect("a subtype's number");
     q.words(source).subtype(printed)
 }

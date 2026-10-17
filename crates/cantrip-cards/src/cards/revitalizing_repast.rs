@@ -4,7 +4,7 @@ use cantrip_oracle as oracle;
 
 /// Put a +1/+1 counter on target creature. It gains indestructible until end of turn.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Target::Object(creature) = item.targets[0] {
+    if let Some(creature) = targets::object(g, item, 0) {
         g.add_counters(creature, CounterKind::PlusOne, 1);
         cantrip_mechanics::effects::gain_indestructible_until_end_of_turn(g, item.object, creature);
     }

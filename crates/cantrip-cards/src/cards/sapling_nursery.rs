@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{affinity, effects::gain_indestructible_until_end_of_turn, tokens, triggers};
+use cantrip_mechanics::{affinity, lands, effects::gain_indestructible_until_end_of_turn, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// The 3/4 green Treefolk creature token with reach that Sapling Nursery makes.
@@ -39,7 +39,7 @@ fn protect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 pub static CARD: CardDef = CardDef {
-    own_cost_changes: &[affinity::for_land_type::<{ Subtype::Forest as usize }>],
+    own_cost_changes: &[affinity::for_land_type::<{ lands::sub(Subtype::Forest) }>],
     abilities: &[
         triggered(when_asked(EventMask::ZONE_CHANGE, triggers::landfall), create_treefolk, "Landfall \u{2014} Whenever a land you control enters, create a 3/4 green Treefolk creature token with reach."),
         ability(cost("{1}{G}").and(EXILE_THIS), protect, "{1}{G}, Exile this enchantment: Treefolk and Forests you control gain indestructible until end of turn."),
