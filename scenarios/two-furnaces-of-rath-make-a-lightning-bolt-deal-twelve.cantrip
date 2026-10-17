@@ -1,0 +1,45 @@
+# Two Furnaces of Rath are two replacement effects, each applied once to the damage (CR 614.5): 3 is doubled to 6 and doubled
+# again to 12 (the ruling), whichever Bot2, to whom it would be dealt, has apply first (CR 616.1). Bot2 goes from 20 to 8.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Furnace of Rath
+Furnace of Rath
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furnace of Rath.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furnace of Rath.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 8

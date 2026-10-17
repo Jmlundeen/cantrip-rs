@@ -1,0 +1,62 @@
+# Furnace of Rath's ruling (CR 616.1, 615.7): when damage meets the Furnace's doubling and a prevention shield, the player it
+# would be dealt to orders them - whoever controls the Furnace. Bot2's Furnace; Bot2 Bolts Bot1, who shields itself with Healing
+# Salve in response. Bot1 has the Salve apply first: 3 is prevented, nothing is left to double (CR 615.6), and Bot1 takes 0.
+# At the second Bolt, with a second Salve, Bot1 has the Furnace apply first: 6, of which 3 are prevented, so Bot1 takes 3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Healing Salve
+Healing Salve
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Furnace of Rath
+Lightning Bolt
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Furnace of Rath.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1)
+Bot1.Replace(Healing Salve)
+? Bot1.Life = 20
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1)
+Bot1.Replace(Furnace of Rath)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Prevented = 3 Lightning Bolt > Bot1 by Healing Salve; 3 Lightning Bolt > Bot1 by Healing Salve
+Bot1.Graveyard = Healing Salve; Healing Salve

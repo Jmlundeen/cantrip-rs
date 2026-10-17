@@ -1,0 +1,37 @@
+# Furnace of Rath doubles Healer's Hawk's 1 combat damage to 2 (CR 614.1a, 510.2), and the doubled damage is still dealt by the
+# Hawk (the ruling), so lifelink gains its controller as much as it dealt (CR 702.15b, 120.3f): Bot2 loses 2, Bot1 gains 2.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Pearl
+Furnace of Rath
+Healer's Hawk
+Mountain x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Furnace of Rath.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Healer's Hawk > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
