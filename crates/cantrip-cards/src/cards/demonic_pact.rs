@@ -10,7 +10,7 @@ fn damage_and_gain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Target opponent discards two cards": their choice (CR 701.9). With its only target illegal the ability does not resolve at
 /// all (CR 608.2b), so the target is always there; `targets::player` is the legality check all the same.
 fn discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    for opponent in targets::player(g, item, 0) {
+    if let Some(opponent) = targets::player(g, item, 0) {
         discard_chosen(g, opponent, item.object, 2)?;
     }
     Ok(())
