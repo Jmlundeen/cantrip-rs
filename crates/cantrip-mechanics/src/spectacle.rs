@@ -3,12 +3,11 @@
 //!
 //! A card with spectacle lists `way(cost, text)` among its `ways`.
 
-use crate::history::an_opponent_lost_life_this_turn;
 use cantrip_api::*;
 
 /// "Lost life", not a lower life total (CR 119.3): asked of the event history.
 pub fn opponent_lost_life(q: &dyn Query, asker: &Asker) -> bool {
-    an_opponent_lost_life_this_turn(q, asker.controller)
+    crate::history::an_opponent_lost_life(q, asker)
 }
 
 /// The alternative cost of spectacle: cast from the hand for `cost` (CR 118.9), if an opponent lost life this turn.

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, history::an_opponent_lost_life_this_turn, top_of_library};
+use cantrip_mechanics::{choose, history::an_opponent_lost_life, top_of_library};
 use cantrip_oracle as oracle;
 
 /// "At the beginning of your second main phase" (CR 505.1a, 603.2): the postcombat main phase of a turn of the controller's.
@@ -8,11 +8,6 @@ fn your_second_main_phase(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fi
         Event::StepBegan { step: Step::PostcombatMain } if q.state().turn.active == me.controller => Fired::PLAIN,
         _ => None,
     }
-}
-
-/// The intervening "if an opponent lost life this turn" (CR 603.4): checked as it triggers and again as it resolves.
-fn an_opponent_lost_life(q: &dyn Query, asker: &Asker) -> bool {
-    an_opponent_lost_life_this_turn(q, asker.controller)
 }
 
 /// "Exile the top two cards of your library. Choose one of them. Until end of turn, you may play that card." Both cards

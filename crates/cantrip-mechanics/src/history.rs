@@ -78,6 +78,12 @@ pub fn an_opponent_lost_life_this_turn(q: &dyn Query, player: PlayerId) -> bool 
     opponents_who_lost_life_this_turn(q, player) > 0
 }
 
+/// `an_opponent_lost_life_this_turn` as a condition of the ability's controller: a triggered ability's intervening "if an
+/// opponent lost life this turn" (CR 603.4) - Fireglass Mentor, Flamecache Gecko - and spectacle's.
+pub fn an_opponent_lost_life(q: &dyn Query, asker: &Asker) -> bool {
+    an_opponent_lost_life_this_turn(q, asker.controller)
+}
+
 /// Whether `object` arrived where it is this turn (CR 400.7: it is the object a move this turn made), in whatever zone:
 /// Night Nurse's "put there from anywhere this turn", and, on the battlefield, `entered_this_turn`.
 pub fn arrived_this_turn(q: &dyn Query, object: ObjectId) -> bool {
