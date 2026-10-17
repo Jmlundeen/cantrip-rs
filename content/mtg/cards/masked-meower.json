@@ -1,0 +1,11 @@
+{
+  "name": "Masked Meower",
+  "manaCost": "{R}",
+  "type": "Creature — Spider Cat Hero",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Haste\nDiscard a card, Sacrifice this creature: Draw a card.",
+  "keywords": [
+    "Haste"
+  ]
+}

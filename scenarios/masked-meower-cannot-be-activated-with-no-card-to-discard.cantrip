@@ -1,0 +1,36 @@
+# The discard is part of the cost (CR 602.2b), so with an empty hand the ability is not offered: Bot1 casts five Moxen, a Mountain and the Meower on turn 1,
+# emptying its hand, and the refusal holds. On turn 3, with the card drawn in hand, it is the positive control: the ability is activated, discarding that card.
+
+[Bot1 Deck]
+Mountain
+Masked Meower
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Plains
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Masked Meower.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+? Bot1.Hand.Count = 0
+! Bot1.Battlefield.Masked Meower.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Plains)
+
+[Expect]
+Bot1.Graveyard.Count = 2
+Bot1.Hand.Count = 1

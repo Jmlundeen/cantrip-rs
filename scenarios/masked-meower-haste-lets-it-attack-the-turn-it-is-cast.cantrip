@@ -1,0 +1,19 @@
+# Masked Meower has haste: cast on turn 1 with a Mountain, it attacks at once for 1 (20 - 1 = 19).
+
+[Bot1 Deck]
+Mountain
+Masked Meower
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Masked Meower.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Attack(Masked Meower > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19

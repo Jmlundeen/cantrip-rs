@@ -1,0 +1,29 @@
+# "Discard a card, Sacrifice this creature: Draw a card." Both halves are the cost: Bot1 chooses the Mountain to discard, the Meower is sacrificed, and the
+# ability draws the top card of the library (a Plains). The Meower and the Mountain are in the graveyard, the hand is the same size and now holds the Plains.
+
+[Bot1 Deck]
+Island
+Masked Meower
+Mountain
+Mountain
+Island
+Island
+Island
+Plains
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Masked Meower.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Mountain)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 1
+Bot1.Graveyard.Count = 2
+Bot1.Hand = Island; Island; Island; Island; Plains
