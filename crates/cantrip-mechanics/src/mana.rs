@@ -51,13 +51,9 @@ pub fn enters_tapped_unless_your_turn(g: &mut dyn Game, entering: &mut Entering)
 }
 
 /// "As this land enters, you may pay 2 life. If you don't, it enters tapped" (CR 614.12a): the shocklands'. Only a
-/// player with the life to pay is asked. Blood Crypt and Breeding Pool print it.
+/// player with the life to pay is asked (CR 119.4, `Game::may_pay`). Blood Crypt and Breeding Pool print it.
 pub fn enters_tapped_unless_pay_two_life(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    let paid = g.state().player(entering.controller).life >= 2
-        && g.ask(entering.controller, RequestKind::May { source: entering.object, purpose: Purpose::Ask(&PAY_TWO_LIFE_OR_TAPPED) })? == Answer::Yes;
-    if paid {
-        g.lose_life(entering.controller, 2);
-    } else {
+    if !g.may_pay(entering.controller, entering.object, entering.object, life(2), &PAY_TWO_LIFE_OR_TAPPED)? {
         entering.tapped = true;
     }
     Ok(())
@@ -66,11 +62,7 @@ pub fn enters_tapped_unless_pay_two_life(g: &mut dyn Game, entering: &mut Enteri
 /// "As this land enters, you may pay 3 life. If you don't, it enters tapped" (CR 614.12a): the modal double-faced
 /// pain lands'. Soporific Springs and Shatterskull, the Hammer Pass print it.
 pub fn enters_tapped_unless_pay_three_life(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    let paid = g.state().player(entering.controller).life >= 3
-        && g.ask(entering.controller, RequestKind::May { source: entering.object, purpose: Purpose::Ask(&PAY_THREE_LIFE_OR_TAPPED) })? == Answer::Yes;
-    if paid {
-        g.lose_life(entering.controller, 3);
-    } else {
+    if !g.may_pay(entering.controller, entering.object, entering.object, life(3), &PAY_THREE_LIFE_OR_TAPPED)? {
         entering.tapped = true;
     }
     Ok(())
@@ -129,8 +121,8 @@ pub fn sunburst(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend
 
 /// What a land that may be paid for with 2 life asks as it enters: "Pay 2 life" or "Enters tapped".
 pub const PAY_TWO_LIFE_OR_TAPPED: Question =
-    Question::new("PayLife", "pay 2 life?", "If you don't, it enters tapped", "Pay 2 life", "Enters tapped").amount(2).no_default();
+    Question::new("EnterUntapped", "pay {cost}?", "If you don't, it enters tapped", "Pay {cost}", "Enters tapped").no_default();
 
 /// What a land that may be paid for with 3 life asks as it enters: "Pay 3 life" or "Enters tapped".
 pub const PAY_THREE_LIFE_OR_TAPPED: Question =
-    Question::new("PayLife", "pay 3 life?", "If you don't, it enters tapped", "Pay 3 life", "Enters tapped").amount(3).no_default();
+    Question::new("EnterUntapped", "pay {cost}?", "If you don't, it enters tapped", "Pay {cost}", "Enters tapped").no_default();

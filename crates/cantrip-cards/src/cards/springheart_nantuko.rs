@@ -2,6 +2,14 @@ use cantrip_api::*;
 use cantrip_mechanics::{attach::attached_object, bestow, tokens, triggers::LANDFALL};
 use cantrip_oracle as oracle;
 
+const COPY: Question = Question::new(
+    "CreateCopyToken",
+    "pay {cost} to create a token that's a copy of {subject}?",
+    "If you don't, you create a 1/1 green Insect",
+    "Pay {cost}",
+    "Make an Insect",
+);
+
 /// The 1/1 green Insect creature token it makes.
 pub static INSECT: CardDef = CardDef {
     name: "Insect",
@@ -27,7 +35,7 @@ fn landfall_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(host) = host
         && g.chars(host).is(CardType::Creature)
         && g.obj(host).controller == item.controller
-        && g.unless_pays(item.controller, me, host, mana("{1}{G}"))?
+        && g.may_pay(item.controller, me, host, cost("{1}{G}"), &COPY)?
     {
         let values = g.copiable_values(host);
         created = !g.create_token_copies_of(values, item.controller, 1)?.is_empty();

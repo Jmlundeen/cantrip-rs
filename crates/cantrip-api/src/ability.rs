@@ -197,6 +197,12 @@ pub const fn life(n: u8) -> Cost {
     Cost { life: n, ..Cost::NONE }
 }
 
+/// A cost of this mana alone, worked out as the effect runs: Override's {1} per artifact, Flash's creature's mana cost
+/// less {2} (`Game::may_pay`).
+pub const fn of_mana(mana: ManaCost) -> Cost {
+    Cost { mana, ..Cost::NONE }
+}
+
 /// An activated ability (CR 602) that uses the stack: pay `cost`, then `effect` as it resolves. A loyalty ability is
 /// activated at sorcery speed (CR 606.3).
 pub const fn ability(cost: Cost, effect: Effect, text: &'static str) -> AbilityDef {

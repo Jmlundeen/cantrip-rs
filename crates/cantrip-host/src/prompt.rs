@@ -654,7 +654,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::UnlessPays { source, subject, total, options } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
+        RequestKind::UnlessPays { source, subject, total, options, .. } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
             player,
             source: source_handle(game, handles, *source),
             subject: source_handle(game, handles, *subject),

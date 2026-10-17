@@ -384,7 +384,7 @@ fn ward_matches(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired>
 fn ward_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    if !g.unless_pays(payer, item.object, by, generic(N))? {
+    if !g.may_pay(payer, item.object, by, Cost { mana: generic(N), ..Cost::NONE }, &crate::COUNTERED_UNLESS_PAID)? {
         g.counter_item(by, item.data[1] as usize);
     }
     Ok(())
@@ -398,54 +398,19 @@ pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
         .ward()
 }
 
-const WARD_LIFE_DETAIL: &str = "Ward: what it targeted can't be targeted for free";
-
-/// What ward's life cost asks the player whose spell or ability targeted, the question on that spell or ability: pay it,
-/// or have it countered. A static question for each amount from 0 to 60, which says the number in its words and carries
-/// it for the client; an amount beyond that (a ward that pays life equal to a power) is asked without the number.
-fn ward_life_question(n: u8) -> &'static Question {
-    const ANY: Question = Question::new(
-        "PayLifeUnlessCountered",
-        "Pay the life, or {source} is countered?",
-        WARD_LIFE_DETAIL,
-        "Pay the life",
-        "Let it be countered",
-    )
-    .no_default();
-    macro_rules! amounts {
-        ($($i:literal)*) => {
-            match n {
-                $($i => {
-                    const Q: Question = Question::new(
-                        "PayLifeUnlessCountered",
-                        concat!("Pay ", $i, " life, or {source} is countered?"),
-                        WARD_LIFE_DETAIL,
-                        concat!("Pay ", $i, " life"),
-                        "Let it be countered",
-                    )
-                    .amount($i)
-                    .no_default();
-                    &Q
-                })*
-                _ => &ANY,
-            }
-        };
-    }
-    amounts!(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
-        41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60)
-}
-
-/// Ward's life cost, paid or not (CR 702.21a, 118.12): the payer is asked whether to pay `amount` life when they have that
-/// much (CR 119.4), and the spell or ability that targeted is countered unless they do.
+/// Ward's life cost, paid or not (CR 702.21a, 118.12a): the payer may pay `amount` life when they have that much (CR
+/// 119.4), and the spell or ability that targeted is countered unless they do. A cost is at most 255 life; beyond that
+/// (a power above 255) the payer must have it all, and the rest is lost with the 255 paid.
 fn ward_pay_life(g: &mut dyn Game, item: &StackItem, amount: i32) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    // A cost of life is paid only by a player with that much (CR 119.4), so nobody else is asked; the payer says whether
-    // to pay, as the C# engine's unlessPaysLife asked it.
+    let life = u8::try_from(amount.max(0)).unwrap_or(u8::MAX);
     let paid = g.state().player(payer).life >= amount
-        && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_life_question(amount.clamp(0, 255) as u8)) })? == Answer::Yes;
+        && g.may_pay(payer, item.object, by, Cost { life, ..Cost::NONE }, &crate::COUNTERED_UNLESS_PAID)?;
     if paid {
-        g.lose_life(payer, amount);
+        if amount > i32::from(life) {
+            g.lose_life(payer, amount - i32::from(life));
+        }
     } else {
         g.counter_item(by, item.data[1] as usize);
     }

@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{effects, triggers};
 use cantrip_oracle as oracle;
 
+const TRANSFORM: Question = Question::new("Transform", "pay {cost} to transform {subject}?", "", "Pay {cost}", "Don't transform");
+
 /// "Whenever this creature transforms into [this face]" (CR 701.27e): the ability is that face's, so it is there to see
 /// only once the permanent has turned over to it (CR 603.2, 603.6). A permanent that enters with this face up has not
 /// transformed (CR 712.14).
@@ -33,7 +35,7 @@ fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// ability was put onto the stack (CR 701.27f; its ruling). The mana paid is no spell's, so mana for spells can't pay it
 /// (CR 106.6).
 fn pay_to_transform(g: &mut dyn Game, item: &StackItem, cost: ManaCost) -> Result<(), Suspend> {
-    if g.unless_pays(item.controller, item.object, item.object, cost)? {
+    if g.may_pay(item.controller, item.object, item.object, of_mana(cost), &TRANSFORM)? {
         g.transform_by(item.object, item);
     }
     Ok(())

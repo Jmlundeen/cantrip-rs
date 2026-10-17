@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, triggers};
 use cantrip_oracle as oracle;
 
+const RETURN: Question = Question::new("ReturnToHand", "pay {cost} to return {subject} to your hand?", "", "Pay {cost}", "Leave it");
+
 /// "At the beginning of your upkeep, exile a card from your graveyard." Not optional: with one card there it is that
 /// card, with several its controller chooses one, and with none nothing happens.
 fn exile_from_graveyard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -50,7 +52,7 @@ fn nontoken_creature_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &
 fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Target::Object(card) = item.subject else { return Ok(()) };
     let you = item.controller;
-    if g.unless_pays(you, item.object, card, mana("{1}"))? && is_live(g, card) && g.obj(card).zone == Zone::graveyard(you) {
+    if g.may_pay(you, item.object, card, cost("{1}"), &RETURN)? && is_live(g, card) && g.obj(card).zone == Zone::graveyard(you) {
         g.return_to_hand(&[card]);
     }
     Ok(())

@@ -321,7 +321,13 @@ actually changed, so the history's `life_gained`/`life_lost` count it. Damage is
 lost to it is a separate event (Bloodletter of Aclazotz doubles the loss, not the damage nor its lifelink). Lifelink is one gain
 per source of a simultaneous damage event, however many recipients (`ops::DamageBatch`, CR 120.3f and Angel of Vitality's
 ruling). The shared effects are in `cantrip_mechanics::replacements`. A cost's payability (CR 119.4) is judged on the payment,
-not on what a replacement makes of the loss. Not built, because no card in content has one: exchanges of life totals, costs
+not on what a replacement makes of the loss. A cost paid as an effect resolves - "you may pay {W}{B} and 2 life. When you
+do", "counter it unless its controller pays {3}", a shockland's "you may pay 2 life" (CR 118.12, 608.2d) - is one payment,
+`Game::may_pay` (`actions::may_pay`, asked as `RequestKind::UnlessPays` with its `life` and the card's `Question`): the
+payer is not asked without the life (`actions::can_pay_life`), may activate mana abilities while there is mana to pay (CR
+605.3a), and may pay once the pool covers the mana and the life total still covers the life, so a mana ability that costs
+life (Mana Confluence) can leave only declining. The mana and the life are paid together, and "if they do" asks whether
+they paid (CR 118.12). Not built, because no card in content has one: exchanges of life totals, costs
 that gain life, and "can't lose life" (CR 119.8).
 
 "Damage can't be prevented" (CR 615.12) is asked by `ops::damage_can_be_prevented` before any prevention: a turn an effect said

@@ -1067,6 +1067,11 @@ impl<'s> Run<'s> {
             (V::PayCost, RequestKind::UnlessPays { options, .. }) => {
                 options.iter().find(|o| o.kind == ActionKind::PayCost).map(|o| Answer::Act(Action::of(o)))
             }
+            // A payment of life alone (a shockland's 2 life, ward's): accepting it is paying it, as a "you may" is answered.
+            // One with mana in it is paid with `PayCost`.
+            (V::Accept, RequestKind::UnlessPays { options, total, .. }) if *total == ManaCost::ZERO => {
+                options.iter().find(|o| o.kind == ActionKind::PayCost).map(|o| Answer::Act(Action::of(o)))
+            }
             (V::Decline, RequestKind::UnlessPays { options, .. }) => {
                 options.iter().find(|o| o.kind == ActionKind::DeclineCost).map(|o| Answer::Act(Action::of(o)))
             }

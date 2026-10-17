@@ -3,13 +3,15 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
+const UNTAP: Question = Question::new("UntapSource", "pay {cost} to untap {subject}?", "", "Pay {cost}", "Leave it tapped");
+
 /// You may pay {4}. If you do, untap this artifact. Nobody untaps what has left the battlefield.
 fn pay_to_untap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let vault = item.object;
     if !targets::permanent(g, vault) {
         return Ok(());
     }
-    if g.unless_pays(item.controller, vault, vault, mana("{4}"))? && targets::permanent(g, vault) {
+    if g.may_pay(item.controller, vault, vault, cost("{4}"), &UNTAP)? && targets::permanent(g, vault) {
         g.untap(vault);
     }
     Ok(())

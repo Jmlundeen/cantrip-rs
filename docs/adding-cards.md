@@ -151,7 +151,7 @@ What a `CardDef` can carry (see `crates/cantrip-api/src/card.rs`):
 
 An effect is `fn(&mut dyn Game, &StackItem) -> Result<(), Suspend>`. It reads the game through `Query` (`g.state()`,
 `g.chars(id)`, `g.obj(id)`, `g.permanents_of(p)`...) and changes it only through `Game`'s operations (`draw`,
-`damage`, `move_together`, `put_onto_battlefield`, `create_tokens`, `counter`, `unless_pays`, `add_effect`...). The
+`damage`, `move_together`, `put_onto_battlefield`, `create_tokens`, `counter`, `may_pay`, `add_effect`...). The
 full list is `crates/cantrip-api/src/game.rs`.
 
 **Asking a question:** `let answer = g.ask(player, RequestKind::...)?;`. The first time it is reached, the effect
@@ -169,8 +169,17 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
 - A "you may" is worded by the card: `effects::ask_may(g, player, source, Purpose::Ask(&ASK))` with a `const ASK: Question`
   beside it - the question in the card's words ("pay 2 life?", shown after the source's name), what it means beyond its
   buttons, and the buttons named for what each answer does ("Pay 2 life", "Enters tapped"), not Yes and No; a verb the
-  bots read it by (`PayLife`, `Draw`, `SearchLibrary`); `.no_default()` when saying yes costs or risks something.
+  bots read it by (`Draw`, `SearchLibrary`); `.no_default()` when saying yes costs or risks something.
   `Purpose::Optional` shows only the card's text and Yes and No.
+- A payment as the effect resolves - "you may pay {W}{B} and 2 life. If you do / When you do", "unless [a player] pays
+  {3}" (CR 118.12) - is `g.may_pay(payer, source, subject, cost("{W}{B}").and(life(2)), &ASK)`, never a life check, a
+  "may" and a `lose_life` by hand: it asks the whole cost as one payment, offers mana abilities while there is mana to
+  pay, judges the life as it is paid (CR 119.4) and says whether it was paid. Its `Question` says what paying does, with
+  `{cost}` and `{subject}` where the cost and the subject's name go ("pay {cost} to untap {subject}?", "Pay {cost}",
+  "Leave it tapped"), and its verb is what the bots weigh the cost against: `Countered` and `Sacrificed` (paying keeps
+  the subject), `CopySpell`, `UntapSource`, `ReturnToHand`, `ReturnToBattlefield`, `ReturnPermanentCard` (a card chosen
+  once paid, its greatest mana value the `amount`), `CreateCopyToken`, `Transform`, `PutOntoBattlefield`, `LookAgain`,
+  `EnterUntapped`. A new verb gets its weighing in the tactical bot's `WorthPaying`.
 - Most questions are asked through `cantrip_mechanics::choose` (`card`, `cards`, `card_from`, `cards_from`, `player`,
   `one_of`), which return the thing chosen. The core checks every answer against its question before the card sees
   it, so a card never matches on an answer of the wrong shape.
@@ -184,7 +193,7 @@ stops there (`?` carries the `Suspend` out). Once the question is answered, the 
 | modes, piles, options | `ChooseModes { modes: Vec<Label>, eligible, count }` | `Modes(...)` |
 | colors | `ChooseColors { choices, count }` | `Colors(...)` |
 | may | `May { purpose }` | `Accept` / `Decline` |
-| unless a player pays | `g.unless_pays(...)` asks it | `PayCost` / `Decline` |
+| a payment ("you may pay", "unless pays") | `g.may_pay(...)` asks it (`UnlessPays`) | `PayCost` (`Accept` for one of life alone) / `Decline` |
 | distribute cards | `DistributeCards { cards, destinations, may_shuffle }` | `Arrange(... \| ...)` |
 | search a library | `SearchLibrary` (use `mechanics::search_library`, which names where the cards found go: the question says it) | `Search(...)` |
 

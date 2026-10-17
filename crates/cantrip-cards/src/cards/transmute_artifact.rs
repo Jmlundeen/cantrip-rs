@@ -2,6 +2,14 @@ use cantrip_api::*;
 use cantrip_mechanics::{choose, search_library};
 use cantrip_oracle as oracle;
 
+const ENTER: Question = Question::new(
+    "PutOntoBattlefield",
+    "pay {cost} to put {subject} onto the battlefield?",
+    "If you don't, it goes to the graveyard",
+    "Pay {cost}",
+    "Put it in the graveyard",
+);
+
 /// Sacrifice an artifact; if you do, search for an artifact card. At most the sacrificed artifact's mana value it
 /// enters; above, you may pay the difference to put it onto the battlefield, else it goes to its owner's graveyard.
 /// Then shuffle, even when nothing was sacrificed.
@@ -19,7 +27,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
                     true
                 } else {
                     let diff = generic((cost - value) as u8);
-                    g.unless_pays(player, item.object, card, diff)?
+                    g.may_pay(player, item.object, card, of_mana(diff), &ENTER)?
                 };
                 if enter {
                     g.put_onto_battlefield(card, player, false)?;

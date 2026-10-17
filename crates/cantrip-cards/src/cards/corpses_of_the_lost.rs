@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::statics::{have_haste, plus_pt};
-use cantrip_mechanics::{effects, targets, tokens, triggers};
+use cantrip_mechanics::{targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// The 2/2 black Skeleton Pirate creature token.
@@ -15,7 +15,7 @@ pub static SKELETON_PIRATE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-const ASK: Question = Question::new("PayLifeToReturn", "pay 1 life to return this enchantment to your hand?", "", "Pay 1 life", "Leave it").amount(1);
+const ASK: Question = Question::new("ReturnToHand", "pay {cost} to return {subject} to its owner's hand?", "", "Pay {cost}", "Leave it");
 
 /// "Skeletons you control" (CR 613.1f): creatures under the controller's control with the creature type Skeleton as
 /// the text of this card reads it (CR 612).
@@ -41,10 +41,10 @@ fn descended_this_turn(q: &dyn Query, asker: &Asker) -> bool {
 }
 
 /// "You may pay 1 life. If you do, return this enchantment to its owner's hand." The life is paid as the ability
-/// resolves, even if the enchantment has left; it is returned only if it is still on the battlefield.
+/// resolves, even if the enchantment has left, by a player with the life to pay (CR 119.4); it is returned only if it is
+/// still on the battlefield.
 fn pay_to_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
-        g.lose_life(item.controller, 1);
+    if g.may_pay(item.controller, item.object, item.object, life(1), &ASK)? {
         g.return_to_hand(&[item.object]);
     }
     Ok(())

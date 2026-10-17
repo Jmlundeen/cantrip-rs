@@ -185,7 +185,7 @@ default declines, so a scenario that does not care about such a card need say no
 | `Bot1.Channel.Activate` | a mana ability the player has of their own (CR 611.2a), named by the card that gave it and no zone: it has no source, so it is offered wherever that card has gone |
 | `Bot1.Battlefield.Squandered Resources.Activate(Sacrifice: Strip Mine; Color: C)` | a cost that sacrifices one of several permanents names which; `Color: C` (or `Colorless`) answers colorless where the ability's type can be it (CR 106.7) |
 | `Bot1.Pass` · `Bot1.PayCost` · `Bot1.Decline` · `Bot1.Undo` · `Bot1.Cancel` | priority, unless-costs, mana undo, cancel a spell or ability at any question before it is on the stack |
-| `Bot1.Accept` · `Bot1.Decline` | a "you may" choice, such as Path to Exile's search (default: decline) |
+| `Bot1.Accept` · `Bot1.Decline` | a "you may" choice, such as Path to Exile's search (default: decline); `Accept` also pays a payment of life alone (a shockland's 2 life, ward's), which has no mana to make first |
 | `Bot1.Choose(Lightning Bolt; Island)` | Duress, Brainstorm (last chosen ends on top) |
 | `Bot1.Choose(Graveyard.Black Lotus)` | craft's materials (CR 702.167a), permanents and graveyard cards in one question: qualify the zone where a name is in both (default: the fewest it takes, the first offered); a refusal `! Bot1.Choose(Ornithopter)` holds when no such material may be chosen, and one naming only choosable materials holds when that is no answer the question accepts (one of "two creatures") |
 | `Bot1.Discard(Island)` · `Bot1.Search(Black Lotus)` | hand size, library search (`Search()` finds nothing) |

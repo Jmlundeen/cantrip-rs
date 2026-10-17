@@ -4586,17 +4586,40 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
     Ok((paid, used))
 }
 
-/// "Unless [payer] pays [cost]" (CR 118.12): the payer may activate mana abilities, then pay once the pool covers the
-/// cost, or decline.
-pub fn unless_pays(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, total: ManaCost) -> R<bool> {
+/// Whether `player` could pay `life` life now (CR 119.4): any amount of 0 (CR 119.4b), otherwise only with a life total
+/// at least that high. ("Can't lose life", CR 119.8, would make it unpayable too; no card in content has it.)
+pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u8) -> bool {
+    life == 0 || cx.s().player(player).life >= i32::from(life)
+}
+
+/// A cost paid as a spell or ability resolves (CR 118.12, 608.2d): "[payer] may pay [cost]. If they do", and "unless
+/// [payer] pays [cost]" (CR 118.12a), which means the same. It is one payment of the whole cost, its mana and its life
+/// together. The payer may activate mana abilities while asked, when the cost has mana in it (CR 605.3a, 118.3c); paying
+/// is offered once the pool covers the mana and the life total covers the life (CR 118.3), and the life is judged as it
+/// is paid (CR 119.4): a player without that much life is not asked at all, and one whose mana ability takes it below
+/// that (Mana Confluence's life, a painland's damage) can no longer pay, and is offered only declining. Whether it was
+/// paid.
+pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<bool> {
+    assert!(only_mana_and_life(cost), "a cost paid during resolution is mana and life; its other parts are not built");
+    let total = cost.mana;
+    let life = cost.life;
+    if !can_pay_life(cx, payer, life) {
+        return Ok(false);
+    }
     loop {
-        let pool = spendable(cx, payer, source, Paying::Other);
-        let mut options = mana_options_while_paying(cx, payer, source, Paying::Other);
-        if !matches!(ways(&pool, &total), Ways::None) {
-            options.push(ActionOption::simple(ActionKind::PayCost));
+        // Once a mana ability has cost the payer the life the payment needs, there is nothing left to do but decline.
+        let mut options = Vec::new();
+        if can_pay_life(cx, payer, life) {
+            if total != ManaCost::ZERO {
+                options = mana_options_while_paying(cx, payer, source, Paying::Other);
+            }
+            let pool = spendable(cx, payer, source, Paying::Other);
+            if total == ManaCost::ZERO || !matches!(ways(&pool, &total), Ways::None) {
+                options.push(ActionOption::simple(ActionKind::PayCost));
+            }
         }
         options.push(ActionOption::simple(ActionKind::DeclineCost));
-        let answer = cx.ask_core(payer, RequestKind::UnlessPays { source, subject, total, options }, false)?;
+        let answer = cx.ask_core(payer, RequestKind::UnlessPays { source, subject, total, life, question, options }, false)?;
         let Answer::Act(action) = answer else { return Ok(false) };
         match action.kind {
             ActionKind::ActivateAbility => {
@@ -4604,12 +4627,68 @@ pub fn unless_pays(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: Obje
                 activate_mana(cx, payer, from, action.index, action.color, action.mana == Some(Mana::C), &action.targets)?;
             }
             ActionKind::PayCost => {
-                pay_mana(cx, payer, source, total)?;
+                if total != ManaCost::ZERO {
+                    pay_mana(cx, payer, source, total)?;
+                }
+                if life > 0 {
+                    ops::change_life(cx, payer, -i32::from(life));
+                }
                 return Ok(true);
             }
             _ => return Ok(false),
         }
     }
+}
+
+/// Whether a cost is only mana and life, the parts a payment during resolution pays. Every field is named, so a new kind
+/// of cost part is looked at here.
+fn only_mana_and_life(cost: &Cost) -> bool {
+    let Cost {
+        mana,
+        life: _,
+        tap,
+        sacrifice_self,
+        discard_self,
+        permanents,
+        loyalty,
+        remove_counters,
+        remove_any_counter,
+        exile_self,
+        discard,
+        pay_x_life,
+        exile_from_graveyard,
+        exile_from_graveyard_of,
+        exert,
+        tap_creatures,
+        emerge,
+        exile_from_hand,
+        tap_permanents,
+        unattach_self,
+        return_self,
+        variable,
+        discard_hand,
+        collect_evidence,
+        behold,
+        blight,
+        tap_to_reduce,
+        materials,
+    } = *cost;
+    mana.x == 0
+        && !(tap || sacrifice_self || discard_self || remove_any_counter || exile_self || pay_x_life || exert || emerge)
+        && !(tap_permanents || unattach_self || return_self || discard_hand || tap_to_reduce)
+        && permanents.is_none()
+        && loyalty.is_none()
+        && remove_counters.is_none()
+        && discard.is_none()
+        && exile_from_graveyard == 0
+        && exile_from_graveyard_of.is_none()
+        && tap_creatures.is_none()
+        && exile_from_hand.is_none()
+        && variable.is_none()
+        && collect_evidence == 0
+        && behold.is_none()
+        && blight == 0
+        && materials.is_none()
 }
 
 /// Whether an object is somewhere it can be found by its id: still the same object.

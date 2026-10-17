@@ -1,7 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::choose;
-use cantrip_mechanics::effects;
 use cantrip_oracle as oracle;
 
 const TYPES: [Subtype; 5] = [Subtype::Plains, Subtype::Island, Subtype::Swamp, Subtype::Mountain, Subtype::Forest];
@@ -13,11 +12,7 @@ fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     let chosen = choose::one_of(g, entering.controller, entering.object, (0..5).map(|i| Label::Card(card, i)).collect())?;
     entering.chosen_subtype = Some(TYPES[chosen as usize]);
 
-    let paid = g.state().player(entering.controller).life >= 2
-        && effects::ask_may(g, entering.controller, entering.object, Purpose::Ask(&cantrip_mechanics::mana::PAY_TWO_LIFE_OR_TAPPED))?;
-    if paid {
-        g.lose_life(entering.controller, 2);
-    } else {
+    if !g.may_pay(entering.controller, entering.object, entering.object, life(2), &cantrip_mechanics::mana::PAY_TWO_LIFE_OR_TAPPED)? {
         entering.tapped = true;
     }
     Ok(())

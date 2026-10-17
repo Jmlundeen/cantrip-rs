@@ -675,8 +675,15 @@ pub trait Game: Query {
     fn reveal(&mut self, player: PlayerId, cards: &[ObjectId]);
     /// Whether target `slot` of the resolving item is still legal (CR 608.2b).
     fn target_legal(&self, item: &StackItem, slot: usize) -> bool;
-    /// "Unless [payer] pays [cost]" (CR 118.12): asks, and pays if they choose to and can. Whether it was paid.
-    fn unless_pays(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: ManaCost) -> Result<bool, Suspend>;
+    /// A cost paid as the spell or ability resolves (CR 118.12, 608.2d): "[payer] may pay [cost]. If they do, ...", and
+    /// "... unless [payer] pays [cost]" (CR 118.12a). `cost` is its mana and its life (`cost("{W}{B}").and(life(2))`), one
+    /// payment shown whole: the payer may make mana for it while asked (CR 605.3a), and may pay only once the pool covers
+    /// the mana and their life total the life, judged as it is paid (CR 118.3, 119.4) - a payer without the life is not
+    /// asked, and one whose mana ability costs them the life they needed (a painland) can only decline. `subject` is what
+    /// the payment is about, and `question` says what paying does, in the card's words (`{cost}` and `{subject}` where
+    /// the cost and the subject's name go), its verb what the bots read it by. Whether it was paid: "if they do" (CR
+    /// 118.12) asks exactly that, not what the paid-for effect did.
+    fn may_pay(&mut self, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: crate::card::Cost, question: &'static Question) -> Result<bool, Suspend>;
     /// Whether `card` could be cast now by the ability's controller as an effect resolves (CR 608.2g), from where it
     /// is: it is not a land and has a legal target for every target it needs. The mana is not asked: a player who
     /// finds they cannot pay gives the cast up (CR 733.1).

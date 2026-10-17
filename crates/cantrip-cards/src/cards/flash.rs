@@ -3,6 +3,8 @@ use cantrip_mechanics::hand;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
+const KEEP: Question = Question::new("Sacrificed", "pay {cost}, or {subject} is sacrificed?", "", "Pay {cost}", "Sacrifice it");
+
 /// You may put a creature card from your hand onto the battlefield. If you do, sacrifice it unless you pay its mana
 /// cost reduced by {2}. The card is chosen as the spell resolves (CR 608.2d); one that cannot be paid for (a card with
 /// no mana cost) is sacrificed outright.
@@ -15,7 +17,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let mut cost = def.cost;
     cost.generic = cost.generic.saturating_sub(2);
-    if !def.has_cost || !g.unless_pays(player, item.object, entered, cost)? {
+    if !def.has_cost || !g.may_pay(player, item.object, entered, of_mana(cost), &KEEP)? {
         g.sacrifice(&[entered]);
     }
     Ok(())

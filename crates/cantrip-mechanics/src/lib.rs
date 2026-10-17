@@ -352,13 +352,18 @@ pub fn counter_target(g: &mut dyn Game, item: &StackItem, slot: usize) -> Option
     Some(spell)
 }
 
+/// What "counter [it] unless [its controller] pays [cost]" asks the payer (CR 118.12a): ward's (CR 702.21a) and the
+/// counterspells' that leave it to the spell's controller (Mana Leak, No More Lies).
+pub const COUNTERED_UNLESS_PAID: Question =
+    Question::new("Countered", "pay {cost}, or {subject} is countered?", "", "Pay {cost}", "Let it be countered");
+
 /// "Counter target spell unless its controller pays `cost`" (CR 118.12, 701.6): the spell's controller is asked, and may
 /// make mana for it while asked; the cost is judged as the effect resolves, so a card whose cost depends on the board
 /// (Override's {1} per artifact) reads it first and passes it. Mana Leak and Miscalculation print it with a fixed cost.
 pub fn counter_unless_pays(g: &mut dyn Game, item: &StackItem, slot: usize, cost: ManaCost) -> Result<Option<ObjectId>, Suspend> {
     let Some(spell) = targets::object(g, item, slot) else { return Ok(None) };
     let payer = g.controller(spell);
-    if !g.unless_pays(payer, item.object, spell, cost)? {
+    if !g.may_pay(payer, item.object, spell, Cost { mana: cost, ..Cost::NONE }, &COUNTERED_UNLESS_PAID)? {
         g.counter(spell);
     }
     Ok(Some(spell))

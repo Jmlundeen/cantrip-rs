@@ -266,8 +266,12 @@ pub enum RequestKind {
         /// whose static ability makes attacking cost something (the first, when several do). Empty for anything else.
         attackers: Vec<ObjectId>,
     },
-    /// "Unless [a player] pays" (CR 118.12): activate mana abilities, pay once the pool covers it, or decline.
-    UnlessPays { source: ObjectId, subject: ObjectId, total: ManaCost, options: Vec<ActionOption> },
+    /// A cost paid as a spell or ability resolves (CR 118.12, 608.2d): "[a player] may pay [cost]. If they do, ...", and
+    /// "... unless [a player] pays [cost]" (CR 118.12a). One payment of the whole cost, `total` mana and `life` life:
+    /// activate mana abilities while there is mana to pay (CR 605.3a), pay once the pool covers the mana and the life
+    /// total covers the life (CR 118.3, 119.4), or decline. `question` is the card's words for what paying does, with
+    /// `{cost}` and `{subject}` where the cost and the subject's name go; its verb is what the bots read it by.
+    UnlessPays { source: ObjectId, subject: ObjectId, total: ManaCost, life: u8, question: &'static Question, options: Vec<ActionOption> },
     /// Choose `count` (or up to `count`) of `eligible`, from among `cards` (all of which the player sees).
     /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
     /// "nonland"), empty otherwise: the dock words the choice as the card does.
