@@ -1,6 +1,6 @@
-# "You draw a card and lose 1 life", in that order: at 1 life, Bot1's upkeep trigger draws the card and then the life
-# loss (1 -> 0) makes it lose the game as a state-based action (CR 704.5a). The hand shows the card was drawn first: 3 cards
-# left after turn 1's plays, +1 from Arena = 4 (the draw step is never reached).
+# At 1 life, Phyrexian Arena's upkeep trigger resolves completely - the draw and the loss of 1 life - before state-based actions
+# are checked (CR 704.3, 608.2), so Bot1 holds the drawn card (3 left after turn 1's plays, +1 = 4) when the life total of 0
+# makes it lose the game (CR 704.5a). The draw step is never reached.
 
 [Life]
 Bot1: 1
