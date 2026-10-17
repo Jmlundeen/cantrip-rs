@@ -1,0 +1,82 @@
+# Doc Aurlock, Grizzled Genius: "Spells you cast from your graveyard or from exile cost {2} less to cast" (CR 601.2f,
+# 118.7a). Bot1's Faithless Looting flashed back from the graveyard costs {R} of its {2}{R}: the one Mountain tapped pays it.
+# Stomp, Bonecrusher Giant's Adventure, cast from the hand, costs its full {1}{R}; Bonecrusher Giant cast from exile, on its
+# adventure, costs {R} of its {2}{R}. Bot2's own Faithless Looting flashed back with Doc on Bot1's side costs Bot2 the full
+# {2}{R}: it takes all three of Bot2's Mountains' mana.
+
+[Bot1 Deck]
+Forest
+Island
+Mountain
+Doc Aurlock, Grizzled Genius
+Faithless Looting
+Bonecrusher Giant
+Mountain
+Island x20
+
+[Bot2 Deck]
+Mountain
+Faithless Looting
+Mountain
+Mountain
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Faithless Looting.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Doc Aurlock, Grizzled Genius.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mountain#3.Activate
+Bot2.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+? Bot2.Mana =
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Island; Island)
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bonecrusher Giant.Cast(Bot2; Ability: Stomp)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Exile = Faithless Looting; Faithless Looting; Bonecrusher Giant
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Exile.Bonecrusher Giant.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 9
+Bot1.Battlefield = Forest; Island; Mountain; Mountain; Doc Aurlock, Grizzled Genius; Bonecrusher Giant
+Bot2.Life = 18
+Exile = Faithless Looting; Faithless Looting

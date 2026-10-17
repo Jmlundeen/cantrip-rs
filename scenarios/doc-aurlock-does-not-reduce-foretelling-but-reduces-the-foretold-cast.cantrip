@@ -1,0 +1,51 @@
+# Doc Aurlock, Grizzled Genius reduces plotting, not the other special actions (CR 116.2): foretelling Delayed Blast Fireball
+# on turn 5 still costs {2} (the pool's {G}{U}{R} is left with {R}). Cast from exile on turn 9 for its foretell cost
+# {4}{R}{R}, it is a spell cast from exile and costs {2} less (CR 601.2f, 118.7a): {2}{R}{R}, which four lands pay, leaving
+# the pool empty. Cast from exile, it deals 5 damage to Bot2. (The refused second land play only waits for Bot1's priority
+# after the foretell's payment, where the pool is read: the land for the turn was played.)
+
+[Bot1 Deck]
+Forest
+Island
+Doc Aurlock, Grizzled Genius
+Mountain
+Delayed Blast Fireball
+Mountain
+Island
+Island x20
+
+[Bot2 Deck]
+Island x25
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Doc Aurlock, Grizzled Genius.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {U}{R}{G}
+Bot1.Hand.Delayed Blast Fireball.Activate(Ability: Foretell; Spend: G, U)
+! Bot1.Hand.Island.Play
+? Bot1.Mana = {R}
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T9 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Exile.Delayed Blast Fireball.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 9
+Bot2.Life = 15
+Bot1.Graveyard = Delayed Blast Fireball
