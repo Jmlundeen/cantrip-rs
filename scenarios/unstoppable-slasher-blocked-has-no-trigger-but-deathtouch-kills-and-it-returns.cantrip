@@ -1,0 +1,51 @@
+# The Slasher attacks into Bot2's Quantum Riddler (4/6) and is blocked: no combat damage is dealt to a player, so Bot2 does
+# not lose half their life (20 stays 20). Deathtouch (CR 702.2) kills the Riddler with 2 damage; the Riddler's 4 damage kills the
+# 2/3 Slasher, which had no counters, and it returns tapped with two stun counters.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Unstoppable Slasher
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Quantum Riddler
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Unstoppable Slasher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Quantum Riddler.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Unstoppable Slasher > Bot2)
+Bot2.Block(Quantum Riddler > Unstoppable Slasher)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Quantum Riddler; Black Lotus
+Bot1.Battlefield.Unstoppable Slasher.Tapped = true
+Bot1.Battlefield.Unstoppable Slasher.Counters.Stun = 2
+Bot1.Graveyard.Count = 0

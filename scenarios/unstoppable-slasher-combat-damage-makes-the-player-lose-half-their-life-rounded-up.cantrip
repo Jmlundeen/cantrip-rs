@@ -1,0 +1,42 @@
+# Bot2 is at 15. The Slasher deals 2 combat damage (13), then its trigger makes Bot2 lose half of their life rounded up
+# (CR 107.1a): half of 13 is 6.5, rounded up 7, so Bot2 ends at 6 - not 7 (which rounding down would give).
+
+[Life]
+Bot2: 15
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Unstoppable Slasher
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Unstoppable Slasher.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Unstoppable Slasher > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 6
+Bot1.Battlefield.Unstoppable Slasher.Keywords = Deathtouch
+Bot1.Battlefield.Unstoppable Slasher.Counters.Stun = (absent)

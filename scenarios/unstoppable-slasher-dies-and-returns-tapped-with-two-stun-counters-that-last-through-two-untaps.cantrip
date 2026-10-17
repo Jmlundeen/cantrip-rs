@@ -1,0 +1,58 @@
+# "When this creature dies, if it had no counters on it, return it to the battlefield tapped under its owner's control with two
+# stun counters on it." Bot2 kills the Slasher with Dismember on turn 2 (-5/-5, paid with mana): it comes back tapped with two
+# stun counters (CR 122.1g: instead of untapping, a stun counter is removed). Bot1's untap step on turn 3 only removes one
+# (1 left, still tapped), turn 5's removes the other (none left, still tapped), and turn 7's finally untaps it.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Unstoppable Slasher
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Unstoppable Slasher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Unstoppable Slasher)
+Bot2.Modes()
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Unstoppable Slasher.Tapped = true
+? Bot1.Battlefield.Unstoppable Slasher.Counters.Stun = 2
+? Bot1.Battlefield.Unstoppable Slasher.SummoningSick = true
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Unstoppable Slasher.Tapped = true
+? Bot1.Battlefield.Unstoppable Slasher.Counters.Stun = 1
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Unstoppable Slasher.Tapped = true
+? Bot1.Battlefield.Unstoppable Slasher.Counters.Stun = (absent)
+[T7 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Unstoppable Slasher.Tapped = false
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Dismember

@@ -1,0 +1,43 @@
+# "When this creature dies": Swords to Plowshares exiles it, which is not dying (CR 700.4), so the Slasher does not return
+# (positive control: unstoppable-slasher-dies-and-returns-tapped-with-two-stun-counters-that-last-through-two-untaps). Its controller
+# gains life equal to its power (2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Unstoppable Slasher
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Unstoppable Slasher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Unstoppable Slasher)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile = Unstoppable Slasher
+Bot1.Life = 22
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard.Count = 0

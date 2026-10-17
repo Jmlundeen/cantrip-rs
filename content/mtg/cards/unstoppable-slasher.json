@@ -1,0 +1,11 @@
+{
+  "name": "Unstoppable Slasher",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Zombie Assassin",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Deathtouch\nWhenever this creature deals combat damage to a player, they lose half their life, rounded up.\nWhen this creature dies, if it had no counters on it, return it to the battlefield tapped under its owner's control with two stun counters on it.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

@@ -1,0 +1,56 @@
+# "If it had no counters on it": counters of any kind count, stun counters included. Bot2 kills the Slasher on turn 2 (it returns
+# tapped with two stun counters) and again on turn 4, when its turn-3 untap step has left it one stun counter: this time it had a
+# counter on it as it died, so it stays in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Unstoppable Slasher
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Dismember
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Unstoppable Slasher.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Unstoppable Slasher)
+Bot2.Modes()
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Unstoppable Slasher.Counters.Stun = 2
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Unstoppable Slasher.Counters.Stun = 1
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Unstoppable Slasher)
+Bot2.Modes()
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Unstoppable Slasher
+Bot1.Battlefield.Count = 3
+Bot2.Graveyard = Dismember; Dismember
