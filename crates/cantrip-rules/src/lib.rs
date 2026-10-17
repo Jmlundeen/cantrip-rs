@@ -409,6 +409,12 @@ impl Game {
         static_rules::may_attack_despite_defender(self, self.cards, creature)
     }
 
+    /// Whether the static abilities on the battlefield let `creature` attack (CR 508.1c): "this creature can't attack unless
+    /// ..." (Patchwork Beastie). A resolved "can't attack" effect is asked of the effects.
+    pub fn attack_rules_allow(&self, creature: ObjectId) -> bool {
+        static_rules::attack_rules_allow(self, self.cards, creature)
+    }
+
     /// Whether `player` may look at the top card of their library any time (CR 401.2), as a permanent they control says.
     pub fn may_look_at_library_top(&self, player: PlayerId) -> bool {
         actions::may_look_at_library_top(self, self.cards, player)

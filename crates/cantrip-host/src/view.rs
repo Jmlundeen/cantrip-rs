@@ -1012,6 +1012,10 @@ impl<'a> Projector<'a> {
                 };
                 view.granted_abilities.push(AbilityTextView { text: format!("{what}{}.", self.until_text(e.duration)), spent: false });
             }
+            // "Can't attack" from a static ability while its condition holds (CR 508.1c: Patchwork Beastie without delirium).
+            if c.is(CardType::Creature) && !game.attack_rules_allow(id) {
+                view.granted_abilities.push(AbilityTextView { text: "Can't attack.".to_string(), spent: false });
+            }
             // A creature with defender that may attack as though it didn't have it right now (CR 702.3b, 609.4): by a resolved
             // effect, with how long it lasts (Assault Formation), or while a static ability's condition holds (Demon Wall with a
             // counter on it). It still has defender, so its face says both.

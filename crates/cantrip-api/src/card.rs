@@ -1271,6 +1271,15 @@ pub type CastRule = fn(&dyn Query, &Asker, PlayerId, ZoneKind) -> bool;
 /// Lookout).
 pub type BlockRule = fn(&dyn Query, ObjectId, ObjectId, ObjectId) -> bool;
 
+/// A static ability that says a creature can't attack (CR 508.1c), usually unless something holds: asked, while the object
+/// that has it is on the battlefield with its abilities, of each creature that could otherwise be declared an attacker (the
+/// object itself or another), with the object as `source`; false keeps the creature from attacking at all. "Delirium - This
+/// creature can't attack or block unless there are four or more card types among cards in your graveyard" (Patchwork
+/// Beastie); Sea Serpent's and Dandân's "can't attack unless defending player controls an Island" read the opponent, which in a
+/// duel is the one defending player whatever the creature attacks. It is judged as attackers are declared: a creature whose
+/// condition fails afterwards stays attacking (CR 506.4).
+pub type AttackRule = fn(&dyn Query, ObjectId, ObjectId) -> bool;
+
 /// A static ability that makes attacking cost something (CR 508.1d, 508.1h): "creatures can't attack you unless their
 /// controller pays {2} for each creature they control that's attacking you" (Propaganda, Ghostly Prison, Windborn Muse),
 /// "creatures can't attack you or planeswalkers you control unless their controller pays {1} for each of those creatures"
@@ -1668,6 +1677,8 @@ pub struct CardDef {
     pub cast_rules: &'static [CastRule],
     /// Its static abilities that limit blocking (CR 509.1b), while it is on the battlefield.
     pub block_rules: &'static [BlockRule],
+    /// Its static abilities that keep creatures from attacking (CR 508.1c), while it is on the battlefield.
+    pub attack_rules: &'static [AttackRule],
     /// Its static abilities that make attacking cost something (CR 508.1d, 508.1h), while it is on the battlefield.
     pub attack_costs: &'static [AttackCostRule],
     /// Its static abilities that let creatures attack as though they didn't have defender (CR 702.3b, 609.4), while it is
@@ -1808,6 +1819,7 @@ impl CardDef {
         dungeon: &[],
         cast_rules: &[],
         block_rules: &[],
+        attack_rules: &[],
         attack_costs: &[],
         attacks_despite_defender: &[],
         targeting_rules: &[],
@@ -1903,6 +1915,9 @@ pub struct CardTable {
     pub any_cast_limit: bool,
     /// Which cards have block rules (CR 509.1b): looked at only for the blocker and the attacker of a possible block.
     pub block_rules: Vec<bool>,
+    /// Which cards have attack rules (CR 508.1c), and whether any does: the battlefield is searched for them only then.
+    pub attack_rules: Vec<bool>,
+    pub any_attack_rules: bool,
     /// Per card: it has a targeting rule. Read to find the few battlefield sources of one, never to ask the table.
     pub targeting_rules: Vec<bool>,
     /// Which cards have a triggered mana ability: looked for among the permanents only when a permanent is tapped for mana.
@@ -1980,6 +1995,8 @@ impl CardTable {
         let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();
         let designators: Vec<bool> = cards.iter().map(|c| c.ascend || c.storied).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
+        let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
+        let any_attack_rules = attack_rules.iter().any(|&a| a);
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
         let mana_triggers: Vec<bool> =
             cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))).collect();
@@ -2002,6 +2019,8 @@ impl CardTable {
             any_replaces,
             any_cast_limit,
             block_rules,
+            attack_rules,
+            any_attack_rules,
             targeting_rules,
             mana_triggers,
             cost_changes,

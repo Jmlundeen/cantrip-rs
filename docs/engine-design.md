@@ -694,6 +694,19 @@ the restrictions are cumulative) is offered no block at all (`turn::declare_bloc
 at the attacker clicked and says why the rest are still held; the tactical, random, automatic and language-model seats never
 declare more. A multi-pair refusal in a scenario is judged by the engine's check of that declaration.
 
+### Can't attack unless
+
+A static ability that keeps a creature from attacking (CR 508.1c), "this creature can't attack unless ...", is a
+`CardDef::attack_rules` entry (`AttackRule`, the creature asked with the permanent as its source), the counterpart of
+`block_rules` (CR 509.1b), which "can't block unless ..." is. `static_rules::attack_rules_allow` asks the permanents on the
+battlefield that have one and have not lost their abilities (CR 613.1f), only when some card in the table has one; a creature
+it refuses is not offered as an attacker (`turn::declare_attackers`), so no seat can declare it, and the host lists "Can't
+attack." with its granted abilities while that holds. It is judged as attackers are declared: an attacking creature whose
+condition fails later stays attacking (CR 506.4, Patchwork Beastie's ruling). Patchwork Beastie's delirium; Sea Serpent's and
+Dandân's "unless defending player controls an Island" are the same rule in a duel. Not built, as no card in content needs it: a
+rule that refuses some of one creature's attacks and not others (the prompt's `Forbidden` pairs, which the clients already
+read, are never filled).
+
 ### Attacking as though it didn't have defender
 
 A creature with defender can't attack (CR 702.3b). "Can attack as though it didn't have defender" is a permission about

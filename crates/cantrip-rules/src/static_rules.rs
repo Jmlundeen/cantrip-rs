@@ -272,3 +272,16 @@ pub fn activation_barred(cx: &Cx, forbidders: &[ObjectId], source: ObjectId, def
         cx.card(cx.cards().current(obj)).activation_rules.iter().any(|rule| !rule(cx, &asker, source, def))
     })
 }
+
+/// Whether the static abilities of the permanents on the battlefield let `creature` attack (CR 508.1c): each attack rule of
+/// each permanent that has not lost its abilities (CR 613.1f), asked of the creature with the permanent as its source
+/// ("this creature can't attack unless ...", Patchwork Beastie). The battlefield is searched only when some card has one.
+pub fn attack_rules_allow(q: &dyn Query, cards: &CardTable, creature: ObjectId) -> bool {
+    if !cards.any_attack_rules {
+        return true;
+    }
+    q.state().battlefield().iter().all(|&id| {
+        let card = cards.current(q.state().obj(id));
+        !cards.attack_rules[card.0 as usize] || q.lost_all_abilities(id) || cards.get(card).attack_rules.iter().all(|rule| rule(q, id, creature))
+    })
+}
