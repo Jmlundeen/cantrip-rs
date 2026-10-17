@@ -1057,6 +1057,11 @@ pub enum ZoneKind {
     /// 400.11a, 108.3b). Nothing affects them but what brings them into the game (CR 400.11c), and only their owner may
     /// look at them.
     Sideboard = 8,
+    /// Not a zone: the battlefield's phased-out permanents (CR 110.5, 702.26b), kept apart from the battlefield's list because
+    /// a phased-out permanent is treated as though it does not exist. Phasing moves no object between zones (CR 702.26d): a
+    /// permanent here is the same object it was, with its counters, status and attachments, and a token here goes on
+    /// existing.
+    PhasedOut = 9,
 }
 
 impl ZoneKind {
@@ -1075,6 +1080,7 @@ impl ZoneKind {
             ZoneKind::Gone => "Gone",
             ZoneKind::Command => "Command",
             ZoneKind::Sideboard => "Sideboard",
+            ZoneKind::PhasedOut => "PhasedOut",
         }
     }
 }
@@ -1136,6 +1142,8 @@ impl Zone {
     pub const GONE: Zone = Zone::new(ZoneKind::Gone, PlayerId(0));
     /// The command zone, shared: an emblem in it is its owner's by its `owner`.
     pub const COMMAND: Zone = Zone::new(ZoneKind::Command, PlayerId(0));
+    /// The phased-out permanents, shared as the battlefield is (CR 702.26b): each is its controller's by its `controller`.
+    pub const PHASED_OUT: Zone = Zone::new(ZoneKind::PhasedOut, PlayerId(0));
 
     pub fn library(p: PlayerId) -> Zone {
         Zone::new(ZoneKind::Library, p)
@@ -1164,6 +1172,7 @@ impl Zone {
             5 => ZoneKind::Stack,
             7 => ZoneKind::Command,
             8 => ZoneKind::Sideboard,
+            9 => ZoneKind::PhasedOut,
             _ => ZoneKind::Gone,
         }
     }
@@ -1180,12 +1189,13 @@ impl Zone {
             ZoneKind::Gone => 4 * players + 2,
             ZoneKind::Command => 4 * players + 3,
             ZoneKind::Sideboard => 4 * players + 4 + self.player.index(),
+            ZoneKind::PhasedOut => 5 * players + 4,
             k => (k as usize) * players + self.player.index(),
         }
     }
 
     pub fn slots(players: usize) -> usize {
-        5 * players + 4
+        5 * players + 5
     }
 }
 

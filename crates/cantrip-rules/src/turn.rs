@@ -107,9 +107,9 @@ pub fn next_step(game: &mut Game) {
 fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
     let mut queue = s.extra_turns.clone();
     let mut taker = None;
-    while let Some(p) = queue.pop() {
-        if !s.player(p).lost {
-            taker = Some(p);
+    while let Some(t) = queue.pop() {
+        if !s.player(t.player).lost {
+            taker = Some(t);
             break;
         }
     }
@@ -117,22 +117,41 @@ fn next_turn_taker(s: &mut GameState, after: PlayerId) -> PlayerId {
         s.set_extra_turns(queue);
     }
     let rotation = s.turn.rotation;
-    match taker {
+    let (player, extra) = match taker {
         // An extra turn: the rotation stays where it was, at the player whose ordinary turn this one follows.
-        Some(p) => {
+        Some(t) => {
             if rotation.is_none() {
                 s.update_turn(|t| t.rotation = Some(after));
             }
-            p
+            (t.player, t.id)
         }
         // The rotation goes on from the last ordinary turn, not from an extra turn taken since (CR 500.7).
         None => {
             if rotation.is_some() {
                 s.update_turn(|t| t.rotation = None);
             }
-            next_in_game(s, rotation.unwrap_or(after))
+            (next_in_game(s, rotation.unwrap_or(after)), 0)
+        }
+    };
+    if s.turn.extra != extra {
+        s.update_turn(|t| t.extra = extra);
+    }
+    // "At the beginning of that turn's [step]" waits for one extra turn (CR 603.7): once that turn has ended without the
+    // step, or will never be taken, the ability never triggers.
+    let stale = |d: &cantrip_state::Delayed, s: &GameState| {
+        matches!(d.when, DelayedWhen::ExtraTurnStep { turn, .. } if turn != extra && !s.extra_turns.iter().any(|t| t.id == turn))
+    };
+    if s.delayed.iter().any(|d| stale(d, s)) {
+        let mut at = 0;
+        while at < s.delayed.len() {
+            if stale(&s.delayed[at], s) {
+                s.delayed_remove(at);
+            } else {
+                at += 1;
+            }
         }
     }
+    player
 }
 
 /// The start of the game (CR 103): who goes first, the opening hands, mulligans.
@@ -274,6 +293,8 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
                 p.turns_taken += 1;
                 p.lands_played = 0;
             });
+            // CR 502.1: first, the active player's phased-out permanents phase in.
+            crate::phasing::untap_step(cx, active);
             // CR 502.2: the untap step's second turn-based action reads what the previous turn's active player cast,
             // before the counts are cleared for this turn.
             crate::day_night::check_untap_step(cx);
@@ -882,11 +903,17 @@ fn cleanup(cx: &mut Cx) -> R<()> {
             ops::discard_together(cx, &cards);
         }
     }
-    // CR 514.2: all damage marked on permanents is removed, except where a static ability says it isn't ("damage isn't
-    // removed from this creature during cleanup steps"). Having been dealt deathtouch damage matters only to the next
-    // check of state-based actions (CR 704.5h), so that record goes either way.
-    let damaged: Vec<ObjectId> =
-        cx.s().battlefield().iter().copied().filter(|&id| cx.s().obj(id).damage > 0 || cx.s().obj(id).deathtouched).collect();
+    // CR 514.2: all damage marked on permanents, phased-out ones included, is removed, except where a static ability says it
+    // isn't ("damage isn't removed from this creature during cleanup steps"). Having been dealt deathtouch damage matters
+    // only to the next check of state-based actions (CR 704.5h), so that record goes either way.
+    let damaged: Vec<ObjectId> = cx
+        .s()
+        .battlefield()
+        .iter()
+        .chain(cx.s().zone(Zone::PHASED_OUT))
+        .copied()
+        .filter(|&id| cx.s().obj(id).damage > 0 || cx.s().obj(id).deathtouched)
+        .collect();
     if !damaged.is_empty() {
         let stays = crate::static_rules::damage_stays(cx, &damaged);
         for id in damaged {

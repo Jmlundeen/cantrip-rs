@@ -417,6 +417,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   card (CR 701.4a) is revealed from a hand, a beheld permanent is not
 - `BotN.Crimes` (present once the player has committed a crime, CR 700.13): the spells, and the sources of the abilities,
   by which they committed one, in order, from the history - one per spell or ability however many of its targets were crimes
+- `BotN.PhasedOut` (with `.Count`): the phased-out permanents the player controlled as they phased out (CR 702.26b), apart
+  from `BotN.Battlefield`, each with the same keys as a permanent there (`BotN.PhasedOut.<Name>.Tapped`, `.Counters...`,
+  `.AttachedTo`)
 - `BotN.Battlefield.<Name>.Tapped` and `.Types` (computed card types, `Land; Creature` for an animated land); for
   creatures also `.Power`, `.Toughness`, `.Damage` and `.SummoningSick`
 - `BotN.Battlefield.<Name>.Token` (`true`) for a token, absent for a card

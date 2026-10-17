@@ -5378,16 +5378,21 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 }
 
 /// Whether `player` could pay `life` life now (CR 119.4): any amount of 0 (CR 119.4b), otherwise only with a life total
-/// at least that high, and not while they can't lose life (CR 119.8).
+/// at least that high, and not while they can't lose life or their life total can't change (CR 119.8).
 pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u8) -> bool {
     // CR 119.4b: 0 life can always be paid.
     life == 0 || payable_life(cx, player) >= i32::from(life)
 }
 
 /// The most life `player` may pay (CR 119.4): their life total, or none at all while they can't lose life (CR 119.8: "a cost
-/// that involves having that player pay life can't be paid").
+/// that involves having that player pay life can't be paid") or their life total can't change (Teferi's Protection's ruling:
+/// "You can't pay a cost that includes the payment of any amount of life other than 0 life").
 pub fn payable_life(cx: &Cx, player: PlayerId) -> i32 {
-    if static_rules::cant_lose_life(cx, cx.cards(), player) { 0 } else { cx.s().player(player).life }
+    if static_rules::cant_lose_life(cx, cx.cards(), player) || ops::life_total_cant_change(cx.s(), player) {
+        0
+    } else {
+        cx.s().player(player).life
+    }
 }
 
 /// A cost paid as a spell or ability resolves (CR 118.12, 608.2d): "[payer] may pay [cost]. If they do", and "unless

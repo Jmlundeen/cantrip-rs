@@ -407,8 +407,9 @@ pub fn unattach(cx: &mut Cx, attachment: ObjectId) {
 
 /// Exiles cards with a permanent's ability (CR 607.2a, 610.3), linking each to it and to where it came from.
 pub fn exile_with(cx: &mut Cx, cards: &[ObjectId], by: ObjectId, until_leaves: bool) -> Vec<ObjectId> {
-    // CR 610.3b: the duration has ended before the exile began, so nothing is exiled.
-    if until_leaves && !(live(cx.s(), by) && cx.s().obj(by).zone.is(ZoneKind::Battlefield)) {
+    // CR 610.3b: the duration has ended before the exile began, so nothing is exiled. A permanent phased out has not left
+    // (CR 702.26d).
+    if until_leaves && !crate::phasing::still_on_battlefield(cx.s(), by) {
         return Vec::new();
     }
     let from: Vec<Zone> = cards.iter().map(|&c| cx.s().obj(c).zone).collect();
@@ -560,7 +561,8 @@ pub fn return_exiled(cx: &mut Cx) -> R<bool> {
         for &id in cx.s().zone(Zone::exile(p)) {
             if let Some(link) = cx.s().obj(id).exiled
                 && link.until_leaves
-                && !(live(cx.s(), link.by) && cx.s().obj(link.by).zone.is(ZoneKind::Battlefield))
+                // Phasing out is no leaving (CR 702.26d; Teferi's Protection's ruling on Banishing Light).
+                && !crate::phasing::still_on_battlefield(cx.s(), link.by)
             {
                 due.push((id, link));
             }
@@ -2133,6 +2135,11 @@ pub fn each_opponent_loses_life(cx: &mut Cx, player: PlayerId, amount: i32) -> i
     total
 }
 
+/// Whether `player`'s life total can't change (CR 119.7, 119.8): a resolved effect says so (`EffectKind::LifeTotalCantChange`).
+pub fn life_total_cant_change(s: &GameState, player: PlayerId) -> bool {
+    !s.effects.is_empty() && s.effects.iter().any(|e| e.kind == EffectKind::LifeTotalCantChange(player))
+}
+
 /// `player`'s life total goes up or down by `delta` (CR 119.3). Every gain and loss of life comes here: an effect's, a
 /// cost's (CR 119.4), damage (CR 120.3a), lifelink (CR 702.15b) and a life total set to a number (CR 119.5).
 pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
@@ -2142,6 +2149,11 @@ pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
     // CR 119.7: a player who can't gain life gains none, and nothing happens: no life gain event, so nothing that
     // triggers on one (CR 119.9) triggers, and no replacement effect of a life gain event does anything.
     if blocked(cx, player, delta) {
+        return;
+    }
+    // CR 119.7, 119.8: a player whose life total can't change gains and loses none, and nothing replaces what can't happen
+    // (Teferi's Protection's rulings: "Words of Worship's effect ... ends up replacing the event with nothing").
+    if life_total_cant_change(cx.s(), player) {
         return;
     }
     // CR 614.1a, 616.1: "you gain that much life plus 1 instead", "they lose twice that much life instead". The event

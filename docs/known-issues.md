@@ -75,6 +75,8 @@ keeps it).
 | [KI-62](#ki-62-a-pool-holds-at-most-255-mana-of-one-kind) | A pool holds at most 255 mana of one kind | Low | Open |
 | [KI-63](#ki-63-control-from-a-static-ability-or-a-lapsed-condition-is-settled-only-as-state-based-actions-are-checked) | Control from a static ability, or a lapsed condition, is settled only as state-based actions are checked | Low | Unexercised |
 | [KI-64](#ki-64-no-card-in-content-lets-one-control-changing-effect-decide-another) | No card in content lets one control-changing effect decide another | Low | Unexercised |
+| [KI-65](#ki-65-a-prepared-permanent-that-phases-out-loses-its-preparation-copy-for-good) | A prepared permanent that phases out loses its preparation copy for good | Low | Unexercised |
+| [KI-66](#ki-66-phasing-in-a-multiplayer-game-after-a-player-leaves-is-unbuilt) | Phasing in a multiplayer game after a player leaves is unbuilt | Low | Unexercised |
 
 ## Issues
 
@@ -786,3 +788,32 @@ controller. No card in content reads a controller in that window that a scenario
 gives control to (gain control of a Mind Control, and the creature it enchants follows). No card in content can take control
 of an Aura that gives control: Opalescence leaves Auras alone, and the stealing cards target creatures. The repeat has no
 scenario.
+
+### KI-65: A prepared permanent that phases out loses its preparation copy for good
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, Teferi's Protection |
+
+**Notes.** A prepare spell's copy in exile ceases to exist once what prepared it is no longer on the battlefield and prepared
+(`settle::state_based_actions`, CR 722.3c), and a phased-out permanent is not on the battlefield's list, so phasing a
+prepared permanent out (Teferi's Protection, Oubliette) ends its copy. CR 722.3c says that "as a permanent ... phases in
+prepared, its controller creates a copy" again; `phasing::phase_in` makes none. A fix creates the copy as a prepared permanent
+phases in (`ops::become_prepared`'s copy-making, without the event of becoming prepared).
+
+**Scenarios.** none yet: a prepare card under Teferi's Protection would show it.
+
+### KI-66: Phasing in a multiplayer game after a player leaves is unbuilt
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, Teferi's Protection |
+
+**Notes.** A phased-out permanent its owner owns leaves the game with them (CR 702.26k: `ops::leave_game` walks every zone list,
+the phased-out one included). But one that phased out under the control of a player who has left phases in "during the next
+untap step after that player's next turn would have begun" (CR 702.26n), and `phasing::untap_step` phases in only what phased
+out under the active player, so it never phases in; and a permanent another player owns that the leaving player controlled
+while it was phased out is not exiled with what they control (CR 800.4a reads the battlefield). No scenario has a third player
+with phased-out permanents.
+
+**Scenarios.** none yet.

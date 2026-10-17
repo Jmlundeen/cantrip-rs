@@ -586,6 +586,43 @@ once its turn-based actions are done (514.3a), and then marks `Turn::cleanup_aga
 everyone has passed. Ultima, Time Stop, Sundial of the Infinite, Glorious End, Day's Undoing, Hurkyl's Final
 Meditation, Discontinuity and Obeka, Brute Chronologist end the turn.
 
+### Extra turns and "that turn"
+
+An extra turn (CR 500.7) is a `cantrip_state::ExtraTurn` in `GameState::extra_turns`, the most recently created last and taken
+first: whose it is and a number that names it (`Game::add_extra_turn`). The turn being taken carries that number in
+`Turn::extra` (0 for a turn of the ordinary rotation), which is what "that turn" means to an ability that made it:
+`DelayedWhen::ExtraTurnStep { step, turn }` triggers at that step of that turn alone, and is dropped as the next turn begins
+once that turn has ended without the step (an effect ended it, CR 724.1e) or will never be taken (skipped, CR 500.11). Final
+Fortune and Last Chance's "at the beginning of that turn's end step, you lose the game" is
+`cantrip_mechanics::delayed::extra_turn_then_lose`.
+
+### Phasing
+
+A permanent's phased-in or phased-out status (CR 110.5, 702.26) is `Marks::phased`, a `Phased` saying how it phased out: under
+whose control, directly or indirectly with what it is attached to (702.26g), and "until [a permanent] leaves the
+battlefield" (610.4), tapped as it returns or not. A phased-out permanent is treated as though it does not exist (702.26b), so
+it is kept off the battlefield's list - which every rule that looks at the battlefield reads - in `Zone::PHASED_OUT`
+(`ZoneKind::PhasedOut`, "not a zone", as `Gone` is), as the same object (702.26d): no zone change, no new object, no
+"leaves" or "enters" trigger, counters, damage, status, attachments and the effects on it kept, a token still in existence
+(704.5d leaves it alone), and its characteristics worked out as on the battlefield for what it shows. `phasing.rs` is the
+whole of it: `phase_out` (attachments phase out indirectly, recursively, and everything is removed from combat, 506.4;
+"until" a permanent that has already left phases nothing out, 610.4b), the untap step's first turn-based action (502.1:
+what phased out directly under the active player phases in, with what phased out indirectly with it, before anything
+untaps; not one phased out "until", 610.4a), and `phase_in_returning`, the one-shot effect that phases a permanent in once
+the permanent it waited for has left (610.4), checked with the returns of exiled cards after the state-based actions. An
+attachment that phased out directly phases in unattached if what it was attached to is gone (702.26i), for the state-based
+actions. "Until [this] leaves the battlefield" goes on while its source is phased out (`phasing::still_on_battlefield`:
+Banishing Light's ruling), "for as long as" durations end (702.26f: `WhileSourceOnBattlefield` asks the battlefield), and a
+resolved effect never includes a phased-out permanent (702.26e, `add_effect`). Cleanup removes damage from phased-out
+permanents too (514.2). Events: `PhasedOut`, `PhasedIn` (recorded; nothing triggers on them). The phasing keyword itself
+(702.26a's phasing out in the untap step) has no card here. Teferi's Protection (`Game::phase_out`) and Oubliette
+(`Game::phase_out_until_leaves`) use it; the host shows a phased-out permanent with the battlefield, marked
+`ObjectView::phased_out`, and the script dump lists them as `BotN.PhasedOut`.
+
+"Your life total can't change" (CR 119.7, 119.8) is `EffectKind::LifeTotalCantChange`, a player effect `ops::change_life`
+asks before any replacement (nothing replaces what can't happen) and `actions::can_pay_life` asks of a cost of more than 0
+life. Damage is still dealt; only its loss of life doesn't happen.
+
 ### Winning, losing and drawing
 
 A player loses to the state-based actions of CR 704.5a-c through `ops::loses_to_state_based_actions`, which leaves out each

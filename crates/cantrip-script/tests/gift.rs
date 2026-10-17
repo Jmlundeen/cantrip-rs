@@ -144,7 +144,7 @@ fn gave(game: &Game, to: u8, gift: Gift) -> usize {
 #[test]
 fn an_extra_turn_is_taken_by_the_chosen_opponent_after_this_one() {
     let mut game = deal(&["Probe Extra Turn"], &[]);
-    play(&mut game, [&[("Probe Extra Turn", "")], &[]], |g| g.state.extra_turns == [PlayerId(1)]);
+    play(&mut game, [&[("Probe Extra Turn", "")], &[]], |g| g.state.extra_turns.iter().map(|t| t.player).eq([PlayerId(1)]));
     assert_eq!(gave(&game, 1, Gift::ExtraTurn), 1);
     // Seat 1's turn 2 and then, with nothing else, its extra turn 3; seat 0 resumes on turn 4.
     play(&mut game, [&[], &[]], |g| g.state.turn.number == 3);

@@ -11,6 +11,7 @@ mod designations;
 mod layers;
 mod loops;
 mod ops;
+mod phasing;
 mod replace;
 mod resolve;
 mod settle;
@@ -836,6 +837,14 @@ impl cantrip_api::Game for Cx<'_> {
         ops::turn_face_up(self, permanent, player);
     }
 
+    fn phase_out(&mut self, permanents: &[ObjectId]) {
+        phasing::phase_out(self, permanents, None, false);
+    }
+
+    fn phase_out_until_leaves(&mut self, permanent: ObjectId, source: ObjectId, tapped: bool) {
+        phasing::phase_out(self, &[permanent], Some(source), tapped);
+    }
+
     fn unlock_door(&mut self, permanent: ObjectId, door: u8, player: PlayerId) {
         ops::unlock_door(self, permanent, door, player);
     }
@@ -1060,12 +1069,21 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_extra_turns(&mut self, player: PlayerId, count: u32) {
-        if self.g.state.player(player).lost {
-            return;
+        for _ in 0..count {
+            self.add_extra_turn(player);
         }
+    }
+
+    fn add_extra_turn(&mut self, player: PlayerId) -> Option<u32> {
+        if self.g.state.player(player).lost {
+            return None;
+        }
+        // A number no other extra turn has had (the timestamps only count up), never 0, which names an ordinary turn.
+        let id = self.g.state.timestamp() + 1;
         let mut turns = self.g.state.extra_turns.clone();
-        turns.extend(std::iter::repeat(player).take(count as usize));
+        turns.push(cantrip_state::ExtraTurn { player, id });
         self.g.state.set_extra_turns(turns);
+        Some(id)
     }
 
     fn gave_gift(&mut self, player: PlayerId, to: PlayerId, gift: Gift) {
@@ -1189,6 +1207,10 @@ impl cantrip_api::Game for Cx<'_> {
         // An object that has changed zones is a new object the effect knows nothing of (CR 400.7, 611.2c), and "for as long
         // as [the source] remains on the battlefield" is over before it begins once the source has left (CR 611.2b).
         if !(live(&self.g.state, affected) || kind.outlives_affected()) {
+            return;
+        }
+        // A phased-out permanent is in no set of objects an effect affects, even one naming it (CR 702.26e).
+        if self.g.state.obj(affected).zone.is(ZoneKind::PhasedOut) && !kind.outlives_affected() {
             return;
         }
         if duration == Duration::WhileSourceOnBattlefield

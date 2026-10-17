@@ -140,6 +140,24 @@ pub struct Marks {
     /// Who controlled it before the control-changing effects that apply to it now (CR 613.1b): it goes back to them
     /// when the last of those ends. `None` while no such effect applies.
     pub control_base: Option<PlayerId>,
+    /// Phased out (CR 110.5, 702.26b), and how: what says when it phases in. `None` while it is phased in. The object is in
+    /// `Zone::PHASED_OUT` exactly while this is set.
+    pub phased: Option<Phased>,
+}
+
+/// How a permanent phased out (CR 702.26), which decides how it phases in.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Phased {
+    /// Who controlled it as it phased out: it phases in during that player's untap step (CR 502.1), under their control.
+    pub under: PlayerId,
+    /// It phased out indirectly, with the permanent it is attached to (CR 702.26g), and phases in with that one alone.
+    pub indirect: bool,
+    /// It phased out "until [that permanent] leaves the battlefield" (CR 610.4): it phases in once that object has left,
+    /// and not in an untap step (CR 610.4a).
+    pub until_leaves: Option<ObjectId>,
+    /// "Tap that creature as it phases in this way" (Oubliette): it phases in tapped by that second one-shot effect
+    /// (CR 610.4), which is no tapping event.
+    pub tapped_as_it_returns: bool,
 }
 
 /// A card exiled by a permanent's ability, and remembered as exiled with it (CR 607.2a, 610.3).
@@ -556,6 +574,11 @@ pub enum EffectKind {
     /// The player can't gain life (CR 119.7): Screaming Nemesis's "for the rest of the game" (`Duration::Indefinite`). It is
     /// about the player and outlives its `affected` object, which is only the source.
     CantGainLife(PlayerId),
+    /// The player's life total can't change (CR 119.7, 119.8; Teferi's Protection's "until your next turn"): they gain no
+    /// life and lose none, a life total set to another number stays as it is, and a cost of more than 0 life can't be paid
+    /// (the rulings). Damage is still dealt to them; only the loss of life it would cause doesn't happen. About the player,
+    /// so it outlives its `affected` object, which is only the source.
+    LifeTotalCantChange(PlayerId),
     /// The player can't cast spells from these zones (CR 101.2, 601.3, 611.2c): Avatar's Wrath's "until your next turn, your
     /// opponents can't cast spells from anywhere other than their hands", one effect for each player affected, who are the
     /// opponents as it resolves. Only casting is stopped: an activated ability is no spell, and a copy of a spell put onto
@@ -635,6 +658,7 @@ impl EffectKind {
                 | EffectKind::InstantLoyalty(_)
                 | EffectKind::NoMaximumHandSize
                 | EffectKind::CantGainLife(_)
+                | EffectKind::LifeTotalCantChange(_)
                 | EffectKind::CantCastSpellsFrom(..)
                 | EffectKind::ReplacementRule(_)
                 | EffectKind::CreaturesCantBlock(_)
@@ -840,6 +864,11 @@ pub enum DelayedWhen {
     /// ability: two made the same turn both trigger on the next such event (Doublecast's ruling). Doublecast, Teach by
     /// Example, Galvanic Iteration, Chandra, the Firebrand, Ral, Storm Conduit and Loki Laufeyson print it.
     NextThisTurn,
+    /// "At the beginning of that turn's [step]" for an extra turn an effect created (CR 500.7, 603.7): Final Fortune, Last
+    /// Chance, Warrior's Oath. Triggers once, at that step of that turn alone (`Turn::extra`); if that turn ends without
+    /// the step (Sundial of the Infinite) or is never taken (skipped, CR 500.11), it never triggers, and it is dropped as
+    /// the next turn begins.
+    ExtraTurnStep { step: Step, turn: u32 },
 }
 
 impl DelayedWhen {
@@ -1378,6 +1407,17 @@ pub struct Turn {
     pub ending: bool,
     /// Players were given priority in this cleanup step (CR 514.3a), so another cleanup step follows it.
     pub cleanup_again: bool,
+    /// The extra turn this turn is (CR 500.7), by its `ExtraTurn::id`: what "that turn" names in an ability that created it
+    /// (Final Fortune's "at the beginning of that turn's end step"). 0 for a turn of the ordinary rotation.
+    pub extra: u32,
+}
+
+/// An extra turn waiting to be taken (CR 500.7): whose it is, and the number that names it, unique in the game, by which an
+/// effect that created it refers to "that turn" (`DelayedWhen::ExtraTurnStep`, `Turn::extra`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ExtraTurn {
+    pub player: PlayerId,
+    pub id: u32,
 }
 
 impl Turn {

@@ -47,7 +47,7 @@ pub struct GameState {
     pub attackers: Vec<Attacker>,
     pub blocks: Vec<Block>,
     /// Extra turns waiting to be taken (CR 500.7): the most recently created last, and taken first.
-    pub extra_turns: Vec<PlayerId>,
+    pub extra_turns: Vec<ExtraTurn>,
     /// What the rules watch to find a loop of mandatory actions (CR 104.4b, 732.4): see `LoopWatch`.
     pub loop_watch: LoopWatch,
     /// The basic land cards a Limited event supplies (Magic Tournament Rules: a Limited sideboard holds any number of basic
@@ -195,7 +195,7 @@ impl GameState {
         &Turn,
         &Vec<ContinuousEffect>,
         (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<LastKnown>, &Vec<PlayPermission>),
-        (&Vec<Attacker>, &Vec<Block>, &Vec<PlayerId>, &LoopWatch),
+        (&Vec<Attacker>, &Vec<Block>, &Vec<ExtraTurn>, &LoopWatch),
         &Vec<Frame>,
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>),
     ) {
@@ -310,7 +310,7 @@ pub enum Undo {
     MembersPopped(Vec<ObjectId>),
     AttackersSet(Vec<Attacker>),
     BlocksSet(Vec<Block>),
-    ExtraTurnsSet(Vec<PlayerId>),
+    ExtraTurnsSet(Vec<ExtraTurn>),
     LoopWatchSet(LoopWatch),
     StaticsSeen(bool),
     FramePushed,
@@ -881,7 +881,7 @@ impl GameState {
         }
     }
 
-    pub fn set_extra_turns(&mut self, turns: Vec<PlayerId>) {
+    pub fn set_extra_turns(&mut self, turns: Vec<ExtraTurn>) {
         let old = std::mem::replace(&mut self.extra_turns, turns);
         self.log(Undo::ExtraTurnsSet(old));
     }

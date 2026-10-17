@@ -92,6 +92,11 @@ pub enum Event {
     /// (CR 116.2b, 701.40b, 701.58b), or the controller of the spell or ability whose effect turned it up. The same
     /// object, now with its normal characteristics.
     TurnedFaceUp { permanent: ObjectId, player: PlayerId },
+    /// A permanent phased out (CR 702.26b), directly or `indirect`ly with what it is attached to (CR 702.26g), under
+    /// `controller`'s control. No zone change (CR 702.26d): the same object, which nothing sees until it phases in.
+    PhasedOut { permanent: ObjectId, controller: PlayerId, indirect: bool },
+    /// A phased-out permanent phased in (CR 702.26c): the same object, which no "enters" ability sees enter (CR 702.26d).
+    PhasedIn { permanent: ObjectId },
     StepBegan { step: Step },
     /// `amount` counters of `kind` were put on a permanent (CR 122.6), as many as the replacement effects left (CR 614.1a),
     /// or it entered with them. `total` is how many of that kind it has once they are on it, so "when the fourth plan
@@ -255,6 +260,8 @@ impl Event {
             | Event::Suspected { permanent }
             | Event::EnteredFaceDown { permanent, .. }
             | Event::TurnedFaceUp { permanent, .. }
+            | Event::PhasedOut { permanent, .. }
+            | Event::PhasedIn { permanent }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::ManaSpent { source, on, .. } => source == object || on == object,

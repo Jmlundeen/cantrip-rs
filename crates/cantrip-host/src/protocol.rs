@@ -521,6 +521,9 @@ pub struct ObjectView {
     pub solved: bool,
     /// A suspected permanent (CR 701.60b): it has menace and "This creature can't block" while it is.
     pub suspected: bool,
+    /// A phased-out permanent (CR 702.26b): still a permanent, known to the players, but treated as though it does not exist
+    /// until it phases in.
+    pub phased_out: bool,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

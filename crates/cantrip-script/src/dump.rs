@@ -419,162 +419,166 @@ impl StateDump {
             let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).map(|&id| game.name(id).to_string()).collect();
             d.list(&format!("{b}.Emblems"), emblems, false);
 
-            let permanents: Vec<ObjectId> = s.battlefield().iter().copied().filter(|&id| s.obj(id).controller == p).collect();
-            d.list(&format!("{b}.Battlefield"), names(&permanents), false);
-            for &id in &permanents {
-                let name = game.name(id);
-                let same: Vec<ObjectId> = permanents.iter().copied().filter(|&o| game.name(o) == name).collect();
-                let label = if same.len() == 1 {
-                    name.to_string()
-                } else {
-                    format!("{name}#{}", same.iter().position(|&o| o == id).unwrap() + 1)
-                };
-                let key = format!("{b}.Battlefield.{label}");
-                let obj = s.obj(id);
-                let c = game.chars(id);
-                d.set(format!("{key}.Tapped"), obj.tapped);
-                // Face down (CR 708): the card it is turned up as (the dump sees everything).
-                if obj.face_down {
-                    d.set(format!("{key}.FaceDown"), true);
-                    d.set(format!("{key}.FaceDownName"), game.cards.get(obj.card).name);
-                }
-                if obj.token {
-                    d.set(format!("{key}.Token"), true);
-                }
-                // A Room (CR 709.5): its unlocked doors by name, and the mana value they leave it, whatever the doors are.
-                let room = game.cards.get(c.card);
-                if room.is_room() {
-                    let doors: Vec<String> = room.unlocked_doors(obj.marks.doors).map(|half| half.name.to_string()).collect();
-                    d.list(&format!("{key}.Doors"), doors, true);
-                    d.set(format!("{key}.ManaValue"), game.mana_value(id));
-                }
-                if obj.prepared {
-                    d.set(format!("{key}.Prepared"), true);
-                }
-                // What an Aura or Equipment is attached to (CR 301.5a, 303.4), by name, while it is attached to anything.
-                if let Some(host) = obj.attached_to
-                    && s.obj(host).became.is_none()
-                {
-                    d.set(format!("{key}.AttachedTo"), game.name(host));
-                }
-                if obj.marks.monstrous {
-                    d.set(format!("{key}.Monstrous"), true);
-                }
-                if obj.marks.solved {
-                    d.set(format!("{key}.Solved"), true);
-                }
-                if game.is_suspected(id) {
-                    d.set(format!("{key}.Suspected"), true);
-                }
-                if game.is_saddled(id) {
-                    d.set(format!("{key}.Saddled"), true);
-                }
-                if obj.marks.exerted_by.is_some() {
-                    d.set(format!("{key}.Exerted"), true);
-                }
-                // The players who goaded it (CR 701.15a), while any goad lasts.
-                let mut goaders: Vec<usize> =
-                    s.effects.iter().filter(|e| e.affected == id && e.kind == EffectKind::Goaded).map(|e| e.controller.0 as usize + 1).collect();
-                if !goaders.is_empty() {
-                    goaders.sort_unstable();
-                    goaders.dedup();
-                    let names: Vec<String> = goaders.iter().map(|n| format!("Bot{n}")).collect();
-                    d.set(format!("{key}.GoadedBy"), names.join("; "));
-                }
-                if let Some(chosen) = obj.marks.chosen_player {
-                    d.set(format!("{key}.ChosenPlayer"), chosen.0 + 1);
-                }
-                if let Some(odd) = obj.marks.chosen_odd {
-                    d.set(format!("{key}.ChosenParity"), if odd { "odd" } else { "even" });
-                }
-                // The modes its modal abilities have chosen, from the history (`Event::ModesChosen`), numbered from 1.
-                let chosen = game.history().all().iter().fold(0u8, |acc, r| match r.event {
-                    Event::ModesChosen { source, modes, .. } if source == id => acc | modes,
-                    _ => acc,
-                });
-                if chosen != 0 {
-                    let taken: Vec<String> = (0..8).filter(|&m| chosen & (1 << m) != 0).map(|m| (m + 1).to_string()).collect();
-                    d.set(format!("{key}.ChosenModes"), taken.join(", "));
-                }
-                if let Some(chosen) = obj.marks.chosen_card {
-                    d.set(format!("{key}.ChosenName"), game.cards.get(chosen).name);
-                }
-                if obj.class_level > 0 {
-                    d.set(format!("{key}.ClassLevel"), obj.class_level);
-                }
-                // The C# engine lists a card's own types first and the types effects added after them, in the order
-                // they were added: "Creature; Artifact" for a Metamorph copying a creature, "Artifact; Creature" for a
-                // Sol Ring animated by an emblem.
-                let own = game.cards.get(c.card).types;
-                let types: Vec<String> = TYPE_ORDER
-                    .iter()
-                    .filter(|&&t| c.is(t) && own.has(t))
-                    .chain(TYPE_ORDER.iter().filter(|&&t| c.is(t) && !own.has(t)))
-                    .map(|t| t.name().to_string())
-                    .collect();
-                d.list(&format!("{key}.Types"), types, true);
-                // Its computed supertypes (CR 205.4), absent when it has none: `Legendary`, `Basic; Snow`.
-                let supertypes: Vec<String> = [(c.supertypes.basic, "Basic"), (c.supertypes.legendary, "Legendary"), (c.supertypes.snow, "Snow")]
-                    .into_iter()
-                    .filter(|&(has, _)| has)
-                    .map(|(_, name)| name.to_string())
-                    .collect();
-                if !supertypes.is_empty() {
-                    d.list(&format!("{key}.Supertypes"), supertypes, true);
-                }
-                let subtypes = subtype_names(&c);
-                if !subtypes.is_empty() {
-                    d.list(&format!("{key}.Subtypes"), subtypes, true);
-                }
-                let mut colors: Vec<String> = c.colors.iter().map(|c| c.name().to_string()).collect();
-                if !colors.is_empty() {
-                    colors.sort();
-                    d.list(&format!("{key}.Colors"), colors, true);
-                }
-                let mut keywords: Vec<String> =
-                    (0..64u8).filter(|&k| c.keywords.0 & (1u64 << k) != 0).map(|k| keyword_name(k).to_string()).collect();
-                if !keywords.is_empty() {
-                    keywords.sort();
-                    d.list(&format!("{key}.Keywords"), keywords, true);
-                }
-                // Its "hexproof from [quality]" abilities (CR 702.11d), as the qualities' words: `Black; White`, `Monocolored`.
-                if !c.hexproof_from.is_empty() {
-                    let h = c.hexproof_from;
-                    let mut qualities: Vec<String> = h.colors().iter().map(|c| c.name().to_string()).collect();
-                    if h.has(HexproofFrom::MONOCOLORED) {
-                        qualities.push("Monocolored".to_string());
+            // The battlefield, and its phased-out permanents (CR 702.26b) apart, as `BotN.PhasedOut` under the player who controlled
+            // them as they phased out, with the same keys for each.
+            for (row, zone) in [("Battlefield", Zone::BATTLEFIELD), ("PhasedOut", Zone::PHASED_OUT)] {
+                let permanents: Vec<ObjectId> = s.zone(zone).iter().copied().filter(|&id| s.obj(id).controller == p).collect();
+                d.list(&format!("{b}.{row}"), names(&permanents), false);
+                for &id in &permanents {
+                    let name = game.name(id);
+                    let same: Vec<ObjectId> = permanents.iter().copied().filter(|&o| game.name(o) == name).collect();
+                    let label = if same.len() == 1 {
+                        name.to_string()
+                    } else {
+                        format!("{name}#{}", same.iter().position(|&o| o == id).unwrap() + 1)
+                    };
+                    let key = format!("{b}.{row}.{label}");
+                    let obj = s.obj(id);
+                    let c = game.chars(id);
+                    d.set(format!("{key}.Tapped"), obj.tapped);
+                    // Face down (CR 708): the card it is turned up as (the dump sees everything).
+                    if obj.face_down {
+                        d.set(format!("{key}.FaceDown"), true);
+                        d.set(format!("{key}.FaceDownName"), game.cards.get(obj.card).name);
                     }
-                    if h.has(HexproofFrom::MULTICOLORED) {
-                        qualities.push("Multicolored".to_string());
+                    if obj.token {
+                        d.set(format!("{key}.Token"), true);
                     }
-                    qualities.extend(h.types().iter().map(|t| t.name().to_string()));
-                    qualities.sort();
-                    d.list(&format!("{key}.HexproofFrom"), qualities, true);
-                }
-                // Its protection from colors (CR 702.16a), printed or granted, as the colors' words: `Black; Red`.
-                if !c.protection.is_empty() {
-                    let mut colors: Vec<String> = c.protection.iter().map(|c| c.name().to_string()).collect();
-                    colors.sort();
-                    d.list(&format!("{key}.ProtectionFrom"), colors, true);
-                }
-                if c.is(CardType::Creature) {
-                    d.set(format!("{key}.Power"), c.power.unwrap_or(0));
-                    d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));
-                    d.set(format!("{key}.Damage"), obj.damage);
-                    d.set(format!("{key}.SummoningSick"), summoning_sick(game.cards, s, &game.log, id));
-                }
-                // A colour chosen as it entered and kept on it (CR 614.12a).
-                if let Some(color) = obj.chosen_color {
-                    d.set(format!("{key}.ChosenColor"), color.name());
-                }
-                // A creature type chosen as it entered and kept on it (CR 614.12a).
-                if let Some(subtype) = obj.chosen_subtype {
-                    d.set(format!("{key}.ChosenSubtype"), subtype.name());
-                }
-                for kind in CounterKind::ALL {
-                    let n = obj.counters(kind);
-                    if n != 0 {
-                        d.set(format!("{key}.Counters.{}", counter_token(kind)), n);
+                    // A Room (CR 709.5): its unlocked doors by name, and the mana value they leave it, whatever the doors are.
+                    let room = game.cards.get(c.card);
+                    if room.is_room() {
+                        let doors: Vec<String> = room.unlocked_doors(obj.marks.doors).map(|half| half.name.to_string()).collect();
+                        d.list(&format!("{key}.Doors"), doors, true);
+                        d.set(format!("{key}.ManaValue"), game.mana_value(id));
+                    }
+                    if obj.prepared {
+                        d.set(format!("{key}.Prepared"), true);
+                    }
+                    // What an Aura or Equipment is attached to (CR 301.5a, 303.4), by name, while it is attached to anything.
+                    if let Some(host) = obj.attached_to
+                        && s.obj(host).became.is_none()
+                    {
+                        d.set(format!("{key}.AttachedTo"), game.name(host));
+                    }
+                    if obj.marks.monstrous {
+                        d.set(format!("{key}.Monstrous"), true);
+                    }
+                    if obj.marks.solved {
+                        d.set(format!("{key}.Solved"), true);
+                    }
+                    if game.is_suspected(id) {
+                        d.set(format!("{key}.Suspected"), true);
+                    }
+                    if game.is_saddled(id) {
+                        d.set(format!("{key}.Saddled"), true);
+                    }
+                    if obj.marks.exerted_by.is_some() {
+                        d.set(format!("{key}.Exerted"), true);
+                    }
+                    // The players who goaded it (CR 701.15a), while any goad lasts.
+                    let mut goaders: Vec<usize> =
+                        s.effects.iter().filter(|e| e.affected == id && e.kind == EffectKind::Goaded).map(|e| e.controller.0 as usize + 1).collect();
+                    if !goaders.is_empty() {
+                        goaders.sort_unstable();
+                        goaders.dedup();
+                        let names: Vec<String> = goaders.iter().map(|n| format!("Bot{n}")).collect();
+                        d.set(format!("{key}.GoadedBy"), names.join("; "));
+                    }
+                    if let Some(chosen) = obj.marks.chosen_player {
+                        d.set(format!("{key}.ChosenPlayer"), chosen.0 + 1);
+                    }
+                    if let Some(odd) = obj.marks.chosen_odd {
+                        d.set(format!("{key}.ChosenParity"), if odd { "odd" } else { "even" });
+                    }
+                    // The modes its modal abilities have chosen, from the history (`Event::ModesChosen`), numbered from 1.
+                    let chosen = game.history().all().iter().fold(0u8, |acc, r| match r.event {
+                        Event::ModesChosen { source, modes, .. } if source == id => acc | modes,
+                        _ => acc,
+                    });
+                    if chosen != 0 {
+                        let taken: Vec<String> = (0..8).filter(|&m| chosen & (1 << m) != 0).map(|m| (m + 1).to_string()).collect();
+                        d.set(format!("{key}.ChosenModes"), taken.join(", "));
+                    }
+                    if let Some(chosen) = obj.marks.chosen_card {
+                        d.set(format!("{key}.ChosenName"), game.cards.get(chosen).name);
+                    }
+                    if obj.class_level > 0 {
+                        d.set(format!("{key}.ClassLevel"), obj.class_level);
+                    }
+                    // The C# engine lists a card's own types first and the types effects added after them, in the order
+                    // they were added: "Creature; Artifact" for a Metamorph copying a creature, "Artifact; Creature" for a
+                    // Sol Ring animated by an emblem.
+                    let own = game.cards.get(c.card).types;
+                    let types: Vec<String> = TYPE_ORDER
+                        .iter()
+                        .filter(|&&t| c.is(t) && own.has(t))
+                        .chain(TYPE_ORDER.iter().filter(|&&t| c.is(t) && !own.has(t)))
+                        .map(|t| t.name().to_string())
+                        .collect();
+                    d.list(&format!("{key}.Types"), types, true);
+                    // Its computed supertypes (CR 205.4), absent when it has none: `Legendary`, `Basic; Snow`.
+                    let supertypes: Vec<String> = [(c.supertypes.basic, "Basic"), (c.supertypes.legendary, "Legendary"), (c.supertypes.snow, "Snow")]
+                        .into_iter()
+                        .filter(|&(has, _)| has)
+                        .map(|(_, name)| name.to_string())
+                        .collect();
+                    if !supertypes.is_empty() {
+                        d.list(&format!("{key}.Supertypes"), supertypes, true);
+                    }
+                    let subtypes = subtype_names(&c);
+                    if !subtypes.is_empty() {
+                        d.list(&format!("{key}.Subtypes"), subtypes, true);
+                    }
+                    let mut colors: Vec<String> = c.colors.iter().map(|c| c.name().to_string()).collect();
+                    if !colors.is_empty() {
+                        colors.sort();
+                        d.list(&format!("{key}.Colors"), colors, true);
+                    }
+                    let mut keywords: Vec<String> =
+                        (0..64u8).filter(|&k| c.keywords.0 & (1u64 << k) != 0).map(|k| keyword_name(k).to_string()).collect();
+                    if !keywords.is_empty() {
+                        keywords.sort();
+                        d.list(&format!("{key}.Keywords"), keywords, true);
+                    }
+                    // Its "hexproof from [quality]" abilities (CR 702.11d), as the qualities' words: `Black; White`, `Monocolored`.
+                    if !c.hexproof_from.is_empty() {
+                        let h = c.hexproof_from;
+                        let mut qualities: Vec<String> = h.colors().iter().map(|c| c.name().to_string()).collect();
+                        if h.has(HexproofFrom::MONOCOLORED) {
+                            qualities.push("Monocolored".to_string());
+                        }
+                        if h.has(HexproofFrom::MULTICOLORED) {
+                            qualities.push("Multicolored".to_string());
+                        }
+                        qualities.extend(h.types().iter().map(|t| t.name().to_string()));
+                        qualities.sort();
+                        d.list(&format!("{key}.HexproofFrom"), qualities, true);
+                    }
+                    // Its protection from colors (CR 702.16a), printed or granted, as the colors' words: `Black; Red`.
+                    if !c.protection.is_empty() {
+                        let mut colors: Vec<String> = c.protection.iter().map(|c| c.name().to_string()).collect();
+                        colors.sort();
+                        d.list(&format!("{key}.ProtectionFrom"), colors, true);
+                    }
+                    if c.is(CardType::Creature) {
+                        d.set(format!("{key}.Power"), c.power.unwrap_or(0));
+                        d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));
+                        d.set(format!("{key}.Damage"), obj.damage);
+                        d.set(format!("{key}.SummoningSick"), summoning_sick(game.cards, s, &game.log, id));
+                    }
+                    // A colour chosen as it entered and kept on it (CR 614.12a).
+                    if let Some(color) = obj.chosen_color {
+                        d.set(format!("{key}.ChosenColor"), color.name());
+                    }
+                    // A creature type chosen as it entered and kept on it (CR 614.12a).
+                    if let Some(subtype) = obj.chosen_subtype {
+                        d.set(format!("{key}.ChosenSubtype"), subtype.name());
+                    }
+                    for kind in CounterKind::ALL {
+                        let n = obj.counters(kind);
+                        if n != 0 {
+                            d.set(format!("{key}.Counters.{}", counter_token(kind)), n);
+                        }
                     }
                 }
             }

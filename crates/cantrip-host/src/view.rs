@@ -65,6 +65,9 @@ pub fn zone_kind_view(kind: ZoneKind) -> ZoneKindView {
         ZoneKind::Sideboard => ZoneKindView::Sideboard,
         // Where a token that left, or an object that never was, would be: the closest thing the wire has.
         ZoneKind::Gone => ZoneKindView::Exile,
+        // A phased-out permanent is still a permanent (CR 702.26d), drawn on the battlefield as phased out
+        // (`ObjectView::phased_out`).
+        ZoneKind::PhasedOut => ZoneKindView::Battlefield,
     }
 }
 
@@ -417,6 +420,7 @@ pub fn observable(game: &Game, viewer: PlayerId, extra: &HashSet<ObjectId>) -> H
         visible.extend(s.zone(Zone::exile(p)).iter().copied());
     }
     visible.extend(s.battlefield().iter().copied());
+    visible.extend(s.zone(Zone::PHASED_OUT).iter().copied());
     visible.extend(s.zone(Zone::COMMAND).iter().copied());
     // "You may look at the top card of your library any time" (CR 401.2): its player sees it while a permanent says so.
     if game.may_look_at_library_top(viewer)
@@ -636,10 +640,14 @@ impl<'a> Projector<'a> {
         // total, in the ability's own words
         // and named for the object it came from (the words may say "that creature"). The other seat is told whose it is. So is
         // one that triggers at each such step for the rest of the game (paradigm, CR 702.192a): the card it came from may be
-        // anywhere, or nowhere it can be seen.
+        // anywhere, or nowhere it can be seen; and one waiting for a step of an extra turn (Final Fortune's "at the beginning of
+        // that turn's end step, you lose the game"), whose spell is gone.
         for d in s.delayed.iter().filter(|d| {
             d.controller == p
-                && matches!(d.when, DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::EachStep { .. })
+                && matches!(
+                    d.when,
+                    DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::EachStep { .. } | DelayedWhen::ExtraTurnStep { .. }
+                )
         }) {
             let text = game.cards.ability(d.ability).text();
             let from = game.cards.get(game.chars(d.source).card).name;
@@ -685,6 +693,20 @@ impl<'a> Projector<'a> {
             if let Some(text) = self.prevention_text(e, whom) {
                 summary.pending_effects.push(text);
             }
+        }
+        // A player's own protection, hexproof and unchanging life total (CR 702.16j, 702.11c, 119.7-119.8): resolved effects about
+        // the player (Teferi's Protection, The One Ring, Dawn's Truce), with how long they last.
+        for e in s.effects.iter() {
+            let you = if p == self.viewer { "You" } else { "They" };
+            let text = match e.kind {
+                EffectKind::PlayerProtectionFromEverything if e.controller == p => format!("{you} have protection from everything"),
+                EffectKind::PlayerHexproof if e.controller == p => format!("{you} have hexproof"),
+                EffectKind::LifeTotalCantChange(q) if q == p => {
+                    format!("{} life total can't change", if p == self.viewer { "Your" } else { "Their" })
+                }
+                _ => continue,
+            };
+            summary.pending_effects.push(format!("{text}{}.", self.until_text(e.duration)));
         }
         // "Players can't gain life" (CR 119.7): from a permanent's static ability while it is on the battlefield, or a resolved
         // effect about the player (Screaming Nemesis's "for the rest of the game"), as it applies now.
@@ -781,12 +803,14 @@ impl<'a> Projector<'a> {
             ZoneKind::Library => s.zone(Zone::library(owner)).to_vec(),
             ZoneKind::Hand => s.zone(Zone::hand(owner)).to_vec(),
             ZoneKind::Graveyard => s.zone(Zone::graveyard(owner)).to_vec(),
-            ZoneKind::Battlefield => s.battlefield().to_vec(),
+            // The phased-out permanents too: players know of them though the game treats them as though they don't exist (CR
+            // 702.26b), each shown as phased out.
+            ZoneKind::Battlefield => s.battlefield().iter().chain(s.zone(Zone::PHASED_OUT)).copied().collect(),
             ZoneKind::Stack => stack_entries(s).iter().map(StackEntry::key).collect(),
             ZoneKind::Exile => s.seats().flat_map(|p| s.zone(Zone::exile(p)).to_vec()).collect(),
             ZoneKind::Command => s.zone(Zone::COMMAND).to_vec(),
             ZoneKind::Sideboard => s.zone(Zone::sideboard(owner)).to_vec(),
-            ZoneKind::Gone => Vec::new(),
+            ZoneKind::Gone | ZoneKind::PhasedOut => Vec::new(),
         };
         let count = contents.len() as i32;
         let zone = Zone::new(kind, owner);
@@ -1002,7 +1026,9 @@ impl<'a> Projector<'a> {
         let obj = s.obj(id);
         let c = game.chars(id);
         let def = game.cards.get(c.card);
-        let on_battlefield = obj.zone.is(ZoneKind::Battlefield);
+        // A phased-out permanent is shown as the permanent it still is (CR 702.26d), marked phased out.
+        let phased_out = obj.zone.is(ZoneKind::PhasedOut);
+        let on_battlefield = obj.zone.is(ZoneKind::Battlefield) || phased_out;
         let zone = if item.is_some() { Zone::STACK } else { obj.zone };
 
         let mut counters: Vec<CounterView> = CounterKind::ALL
@@ -1063,6 +1089,7 @@ impl<'a> Projector<'a> {
             monstrous: obj.marks.monstrous,
             solved: on_battlefield && obj.marks.solved,
             suspected: on_battlefield && effect(EffectKind::Suspected),
+            phased_out,
             exerted: obj.marks.exerted_by.is_some(),
             saddled: game.is_saddled(id),
             goaded: effect(EffectKind::Goaded),
@@ -1223,6 +1250,14 @@ impl<'a> Projector<'a> {
             view.face_down_name = if looks { real.to_string() } else { String::new() };
         }
         if on_battlefield && let Some(host) = game.attached_to(id) {
+            view.attached_to = handles.handle(host);
+        }
+        // An Aura or Equipment that phased out with what it is attached to is still attached to it (CR 702.26g).
+        if phased_out
+            && let Some(host) = obj.attached_to
+            && live(s, host)
+            && s.obj(host).zone.is(ZoneKind::PhasedOut)
+        {
             view.attached_to = handles.handle(host);
         }
         if obj.zone.is(ZoneKind::Exile)

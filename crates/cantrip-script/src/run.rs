@@ -1220,7 +1220,7 @@ impl<'s> Run<'s> {
 
     fn holder(&self, id: ObjectId) -> PlayerId {
         let obj = self.game.state.obj(id);
-        if obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::Stack) { obj.controller } else { obj.owner }
+        if obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::Stack) || obj.zone.is(ZoneKind::PhasedOut) { obj.controller } else { obj.owner }
     }
 
     /// A zone's objects as the C# engine lists them: libraries, graveyards and the stack top first.
@@ -1239,6 +1239,7 @@ impl<'s> Run<'s> {
             ZoneKind::Hand => s.seats().flat_map(|p| s.zone(Zone::hand(p)).to_vec()).collect(),
             ZoneKind::Command => s.zone(Zone::COMMAND).to_vec(),
             ZoneKind::Sideboard => s.seats().flat_map(|p| s.zone(Zone::sideboard(p)).to_vec()).collect(),
+            ZoneKind::PhasedOut => s.zone(Zone::PHASED_OUT).to_vec(),
             ZoneKind::Gone => Vec::new(),
         };
         ids.retain(|&id| live(s, id));

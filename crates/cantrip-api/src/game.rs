@@ -555,6 +555,9 @@ pub trait Game: Query {
     fn give_experience(&mut self, player: PlayerId, amount: u32);
     /// `count` extra turns for `player` after the current one (CR 500.7); the most recently created is taken first.
     fn add_extra_turns(&mut self, player: PlayerId, count: u32);
+    /// One extra turn for `player` after the current one (CR 500.7), and the number naming it, for an ability that says
+    /// "that turn" (`DelayedWhen::ExtraTurnStep`); none for a player who has left the game (CR 800.4a).
+    fn add_extra_turn(&mut self, player: PlayerId) -> Option<u32>;
     /// "[player] skips their next `count` turns" (CR 500.11, 614.10), from `source`: a replacement effect for each turn,
     /// applied as each of that player's turns would begin and used up by it; a turn already begun is not skipped, and
     /// two such effects skip a turn each (CR 614.10a). Nothing for a count of zero. The effect is the player's, not the
@@ -652,6 +655,13 @@ pub trait Game: Query {
     /// `player` turns a face-down permanent face up (CR 701.40b, 708.2, 708.8): the player taking the special action, or
     /// the controller of the effect that turns it up. Recorded as `Event::TurnedFaceUp`. Nothing if it is not one.
     fn turn_face_up(&mut self, permanent: ObjectId, player: PlayerId);
+    /// "[These permanents] phase out" (CR 702.26b), all at once: each one still on the battlefield, and indirectly what is
+    /// attached to it (CR 702.26g). They phase in during the untap step of the player who controlled them (CR 502.1).
+    fn phase_out(&mut self, permanents: &[ObjectId]);
+    /// "[It] phases out until [source] leaves the battlefield" (CR 610.4): it phases in once `source` has left, not in an
+    /// untap step, and is tapped as it does if `tapped` ("tap that creature as it phases in this way"). Nothing if `source`
+    /// has already left (CR 610.4b).
+    fn phase_out_until_leaves(&mut self, permanent: ObjectId, source: ObjectId, tapped: bool);
     /// `player` unlocks a door of a Room (CR 709.5f): the permanent is given that half's unlocked designation, which
     /// triggers "when you unlock this door" (CR 709.5h). `door` is `DOOR_LEFT` or `DOOR_RIGHT`. Nothing if the permanent is
     /// not a Room on the battlefield or the door is already unlocked.

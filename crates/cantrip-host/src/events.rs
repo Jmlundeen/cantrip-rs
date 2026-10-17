@@ -310,8 +310,8 @@ impl Tracker {
             }
         }
         if state.extra_turns.len() > self.extra_turns {
-            for p in &state.extra_turns[self.extra_turns..] {
-                out.push(Proto::ExtraTurn { player: *p, count: 1 });
+            for t in &state.extra_turns[self.extra_turns..] {
+                out.push(Proto::ExtraTurn { player: t.player, count: 1 });
             }
         }
         self.extra_turns = state.extra_turns.len();

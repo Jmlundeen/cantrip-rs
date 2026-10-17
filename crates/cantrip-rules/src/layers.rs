@@ -115,7 +115,9 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
         return chars;
     }
 
-    let on_battlefield = obj.zone.is(ZoneKind::Battlefield) && obj.became.is_none();
+    // A phased-out permanent keeps its counters and the effects on it (CR 702.26d, 702.26f), so it is worked out as it is on
+    // the battlefield, though no rule asks while it is phased out: what it shows, and what it is again as it phases in.
+    let on_battlefield = (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) && obj.became.is_none();
     // What could apply at all, found once: most objects have no effects, no statics touch them, and no counters.
     // A spell's text can be changed too (CR 612.1: "target spell or permanent").
     let has_effects = (on_battlefield || spell) && state.effects.iter().any(|e| e.affected == id);

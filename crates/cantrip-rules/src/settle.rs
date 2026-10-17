@@ -27,7 +27,7 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
         if cx.s().is_over() {
             break;
         }
-        if ops::return_exiled(cx)? {
+        if ops::return_exiled(cx)? || crate::phasing::phase_in_returning(cx) {
             continue;
         }
         if !cx.s().triggers.is_empty() {
@@ -53,7 +53,7 @@ pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
         if cx.s().is_over() {
             break;
         }
-        if ops::return_exiled(cx)? {
+        if ops::return_exiled(cx)? || crate::phasing::phase_in_returning(cx) {
             acted = true;
             continue;
         }
@@ -127,14 +127,14 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         acted = true;
     }
 
-    // CR 704.5d: a token anywhere but the battlefield ceases to exist.
+    // CR 704.5d: a token anywhere but the battlefield ceases to exist; a phased-out one is still on it (CR 702.26d).
     let gone: Vec<(Zone, ObjectId)> = cx
         .s()
         .zones
         .iter()
         .flatten()
         .copied()
-        .filter(|&id| cx.s().obj(id).token && !cx.s().obj(id).zone.is(ZoneKind::Battlefield))
+        .filter(|&id| cx.s().obj(id).token && !cx.s().obj(id).zone.is(ZoneKind::Battlefield) && !cx.s().obj(id).zone.is(ZoneKind::PhasedOut))
         .map(|id| (cx.s().obj(id).zone, id))
         .collect();
     for (zone, id) in gone {
@@ -1072,6 +1072,7 @@ pub fn step_began(cx: &mut Cx, step: Step) {
         let (due, used_up) = match d.when {
             DelayedWhen::Step { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), true),
             DelayedWhen::EachStep { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), false),
+            DelayedWhen::ExtraTurnStep { step: s, turn } => (s == step && cx.s().turn.extra == turn, true),
             DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn => (false, false),
         };
         if due {

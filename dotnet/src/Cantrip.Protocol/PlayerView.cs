@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 181;
+    public const int ProtocolVersion = 182;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -604,6 +604,14 @@ public sealed class ObjectView
     /// </summary>
     [Key(56)]
     public bool Suspected { get; set; }
+
+    /// <summary>
+    /// Whether this permanent is phased out (CR 702.26b): it is shown with the battlefield, but the game treats it as though
+    /// it does not exist - nothing can target it, it can't attack or block, its abilities do nothing - until it phases in
+    /// (CR 502.1, 610.4).
+    /// </summary>
+    [Key(57)]
+    public bool PhasedOut { get; set; }
 
     /// <summary>
     /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell,
