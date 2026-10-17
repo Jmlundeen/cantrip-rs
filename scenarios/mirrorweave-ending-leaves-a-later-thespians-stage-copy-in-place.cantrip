@@ -1,0 +1,60 @@
+# Copy effects apply in timestamp order (CR 613.2a, 613.7), and one ending leaves the later ones (CR 611.2b). Bot1's Thespian's
+# Stage is a copy of Mutavault "except it has this ability"; animated, it is a creature, and Mirrorweave targets it: Bot1's
+# Ornithopter becomes a copy of it until end of turn - an unanimated Mutavault with the Stage's copy ability (CR 707.9b), a
+# land and no creature. That Ornithopter-Mutavault then uses the copy ability to become a copy of Bot1's Plains, with no
+# duration (a later timestamp). As the turn ends Mirrorweave's effect ends, and the Stage's later one is still there: on turn 6
+# the Ornithopter is a Plains, not an Ornithopter.
+
+[Bot1 Deck]
+Thespian's Stage
+Sol Ring
+Ornithopter
+Black Lotus
+Mutavault
+Plains
+Forest
+Mirrorweave
+Forest x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Ability: {C})
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mutavault.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Mutavault; Ability: copy of target)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mutavault#1.Activate(Ability: 2/2)
+Bot1.Battlefield.Mutavault#2.Activate(Ability: {C})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault#1.Types = Land; Creature
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mirrorweave.Cast(Mutavault#1)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault#2.Types = Land
+Bot1.Battlefield.Mutavault#2.Activate(Bot1.Battlefield.Plains; Ability: copy of target)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Plains#1.Subtypes = Plains
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mutavault; Sol Ring; Plains; Mutavault; Plains
+Bot1.Battlefield.Plains#1.Types = Land
+Bot1.Battlefield.Plains#1.Subtypes = Plains
+Bot1.Battlefield.Plains#1.Tapped = true
+Bot1.Battlefield.Mutavault#1.Types = Land

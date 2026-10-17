@@ -1,0 +1,50 @@
+# "Each other creature becomes a copy" is a continuous effect from a resolving spell: the set of creatures it affects is fixed
+# as it resolves (CR 611.2c). Bot1's Ornithopter, on the battlefield then, is a copy of Bot2's Guerrilla Gorilla for the turn;
+# the Llanowar Elves Bot1 casts afterwards, the same turn, is a 1/1 Elf and nothing else.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Plains
+Mox Emerald
+Llanowar Elves
+Plains
+Plains
+Mirrorweave
+Plains x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mirrorweave.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Guerrilla Gorilla; Plains; Mox Emerald; Llanowar Elves
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Subtypes = Druid; Elf

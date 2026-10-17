@@ -1,0 +1,67 @@
+# Bot1's Phyrexian Metamorph entered as an artifact copy of Bot2's Guerrilla Gorilla. Mirrorweave, targeting Bot1's Llanowar
+# Elves, applies a later copy effect to it in layer 1 (CR 613.2a, 613.7): it is a Llanowar Elves and nothing else, not an
+# artifact - the Metamorph's exception was part of the copy effect overwritten. As the turn ends Mirrorweave's effect ends and
+# the Metamorph's own copy is what is left (CR 514.2, 707.2): on turn 4 it is an artifact Guerrilla Gorilla again. Bot2's
+# Gorilla, a Llanowar Elves for the turn as well, is a Gorilla again.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Llanowar Elves
+Phyrexian Metamorph
+Black Lotus
+Mirrorweave
+Plains x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Modes(1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mirrorweave.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Plains; Mox Sapphire; Mox Pearl; Mox Emerald; Llanowar Elves; Llanowar Elves
+? Bot1.Battlefield.Llanowar Elves#2.Types = Creature
+? Bot1.Battlefield.Llanowar Elves#2.Power = 1
+? Bot2.Battlefield = Forest; Mox Emerald; Llanowar Elves
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Sapphire; Mox Pearl; Mox Emerald; Llanowar Elves; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Types = Creature; Artifact
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla
+Bot2.Battlefield.Guerrilla Gorilla.Types = Creature

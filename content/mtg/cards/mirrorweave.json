@@ -1,0 +1,6 @@
+{
+  "name": "Mirrorweave",
+  "manaCost": "{2}{W/U}{W/U}",
+  "type": "Instant",
+  "oracleText": "Each other creature becomes a copy of target nonlegendary creature until end of turn."
+}

@@ -1,0 +1,59 @@
+# Mirrorweave targets Bot1's Mutavault while it is a 2/2 creature: its animation is no copy effect, so only the printed land is
+# copied (CR 707.2; the ruling: "Each other creature will become an unanimated Mutavault"). Bot1's Llanowar Elves and Bot2's
+# Guerrilla Gorilla become Lands named Mutavault - no longer creatures - until end of turn, and are themselves again on turn 4.
+
+[Bot1 Deck]
+Mutavault
+Mox Emerald
+Llanowar Elves
+Mox Pearl
+Black Lotus
+Plains
+Plains
+Mirrorweave
+Plains x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes)
+Bot1.Battlefield.Mutavault.Activate(Ability: {C})
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mirrorweave.Cast(Mutavault)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mutavault; Mox Emerald; Mutavault; Mox Pearl
+? Bot1.Battlefield.Mutavault#1.Types = Land; Creature
+? Bot1.Battlefield.Mutavault#2.Types = Land
+? Bot2.Battlefield = Forest; Mox Emerald; Mutavault
+? Bot2.Battlefield.Mutavault.Types = Land
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mutavault; Mox Emerald; Llanowar Elves; Mox Pearl
+Bot1.Battlefield.Mutavault.Types = Land
+Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla
+Bot2.Battlefield.Guerrilla Gorilla.Power = 2

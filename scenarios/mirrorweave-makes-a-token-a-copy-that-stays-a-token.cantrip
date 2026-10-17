@@ -1,0 +1,52 @@
+# Fable of the Mirror-Breaker's Goblin Shaman is a token; Mirrorweave makes it a copy of Ornithopter until end of turn (CR 707.2).
+# Being a token is no copiable value (CR 707.2, 111.1), so it is still a token, now a 0/2 artifact Ornithopter with flying - as
+# the ruling has it for a token target, the copying creatures don't become tokens; a token stays one. As the turn ends it is a
+# 2/2 Goblin Shaman token again (CR 514.2).
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Fable of the Mirror-Breaker
+Ornithopter
+Plains
+Mox Pearl
+Plains
+Mirrorweave
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Fable of the Mirror-Breaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Choose()
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mirrorweave.Cast(Ornithopter)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Token = true
+? Bot1.Battlefield.Ornithopter#1.Power = 0
+? Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+? Bot1.Battlefield.Ornithopter#1.Types = Artifact; Creature
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Ruby; Fable of the Mirror-Breaker; Goblin Shaman; Ornithopter; Mox Pearl; Plains
+Bot1.Battlefield.Goblin Shaman.Token = true
+Bot1.Battlefield.Goblin Shaman.Power = 2
+Bot1.Battlefield.Goblin Shaman.Subtypes = Goblin; Shaman

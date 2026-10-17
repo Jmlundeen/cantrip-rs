@@ -1,0 +1,53 @@
+# Mirrorweave makes Bot1's Llanowar Elves a copy of Ornithopter, a 0/2 flier, in layer 1 (CR 613.1a, 707.2). What else applies
+# to the Elves applies to the copy on top, in the later layers (CR 613.1, 613.4; the ruling: "Noncopy effects that have
+# already applied to the other creatures will continue to apply to them"): Snakeskin Veil's +1/+1 counter and its hexproof
+# until end of turn, and Rancor's +2/+0 and trample, still attached. The copy is a 3/3 artifact Ornithopter with flying,
+# hexproof and trample.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Snakeskin Veil
+Rancor
+Black Lotus
+Mirrorweave
+Forest x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Rancor.Cast(Llanowar Elves)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Mirrorweave.Cast(Ornithopter)
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Ornithopter; Ornithopter; Rancor
+Bot1.Battlefield.Ornithopter#1.Power = 3
+Bot1.Battlefield.Ornithopter#1.Toughness = 3
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying; Hexproof; Trample
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#1.Colors = (absent)
+Bot1.Battlefield.Rancor.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying

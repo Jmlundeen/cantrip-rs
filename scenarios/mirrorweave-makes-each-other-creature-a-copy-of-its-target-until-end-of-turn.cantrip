@@ -1,0 +1,71 @@
+# Mirrorweave targets Bot2's Guerrilla Gorilla: every other creature on the battlefield, either player's, becomes a copy of it
+# until end of turn (CR 707.2, 611.2c) - Bot1's Llanowar Elves, Ornithopter and Bofur, and Bot2's Llanowar Elves are each a
+# 2/2 green Guerrilla Gorilla with reach. Ornithopter is no longer an artifact, and Bofur, copying a nonlegendary creature, is
+# no longer legendary: copiable values are the whole of what it is (CR 707.2, 613.2a). The Gorilla itself is untouched. Bofur,
+# legendary, can't be the target (the refusal; the cast at the Gorilla is its control). As the turn ends each is what it was
+# (CR 514.2): on turn 5 they are themselves again.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Mox Pearl
+Bofur, Reliable Guardian
+Black Lotus
+Mirrorweave
+Plains x8
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Guerrilla Gorilla
+Llanowar Elves
+Forest x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+! Bot1.Hand.Mirrorweave.Cast(Bofur, Reliable Guardian)
+Bot1.Hand.Mirrorweave.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Plains; Mox Emerald; Guerrilla Gorilla; Guerrilla Gorilla; Mox Pearl; Guerrilla Gorilla
+? Bot1.Battlefield.Guerrilla Gorilla#2.Types = Creature
+? Bot1.Battlefield.Guerrilla Gorilla#2.Keywords = Reach
+? Bot1.Battlefield.Guerrilla Gorilla#3.Supertypes = (absent)
+? Bot1.Battlefield.Guerrilla Gorilla#3.Power = 2
+? Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla; Guerrilla Gorilla
+? Bot2.Battlefield.Guerrilla Gorilla#2.Colors = Green
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Emerald; Llanowar Elves; Ornithopter; Mox Pearl; Bofur, Reliable Guardian
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Bofur, Reliable Guardian.Supertypes = Legendary
+Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla; Llanowar Elves
