@@ -1,0 +1,52 @@
+# The enters trigger is independent of its source once triggered (CR 113.7a, 603.4, 608.2h): Doomsday Excruciator is cast on
+# turn 3 (Mox Jet's {B}, Dark Ritual, Black Lotus), and with the trigger on the stack Bot2 exiles it with Swords to Plowshares
+# (Bot1 gains 6, 26). "If it was cast" was true as it entered, so the trigger still resolves, from last-known information: every
+# library is cut to its bottom six. Bot1's library of nine (after the turn-3 draw) loses three Swamps, Bot2's of twelve loses six
+# Islands: nine cards face down, plus the Excruciator itself face up (Swords exiles it normally) is ten in exile. No upkeep draw
+# ever happens: it never reaches an upkeep.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Black Lotus
+Doomsday Excruciator
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mox Pearl
+Swords to Plowshares
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Doomsday Excruciator.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Doomsday Excruciator)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield = Mox Jet
+Bot1.Library.Count = 6
+Bot2.Library.Count = 6
+Exile.Count = 10
+Exile.FaceDown = Swamp; Swamp; Swamp; Island; Island; Island; Island; Island; Island
+Stack.Count = 0

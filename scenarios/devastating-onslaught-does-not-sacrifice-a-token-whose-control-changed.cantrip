@@ -1,0 +1,77 @@
+# "Sacrifice them at the beginning of the next end step" is done by Bot1, who can only sacrifice what Bot1 controls (CR 701.21a,
+# 603.7c). Bot1's Devastating Onslaught (X=2) makes two Llanowar Elves tokens. Bot2, with five Moxen, then casts a Lightning
+# Bolt and, in response, Sudden Substitution (split second), exchanging control of the Bolt and one Elves token: Bot2 now
+# controls that token, Bot1 the Bolt (Bot1 chooses new targets and aims it at Bot2, 17). At the end step Bot1 sacrifices only the
+# token it still controls; the one Bot2 holds stays on the battlefield under Bot2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Llanowar Elves
+Devastating Onslaught
+Island x12
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Lightning Bolt
+Sudden Substitution
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Llanowar Elves; X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves#2.Token = true
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sudden Substitution.Cast
+Bot2.Target(Stack.Lightning Bolt)
+Bot2.Target(Bot1.Battlefield.Llanowar Elves#3)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Token = true
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 20
+Bot1.Battlefield = Mox Emerald; Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; Llanowar Elves
+Bot1.Battlefield.Count = 6
+Bot2.Battlefield = Mox Sapphire; Mox Sapphire; Mox Jet; Mox Pearl; Mox Ruby; Llanowar Elves
+Bot2.Battlefield.Count = 6
+Bot2.Battlefield.Llanowar Elves.Token = true

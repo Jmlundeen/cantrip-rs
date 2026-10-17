@@ -42,6 +42,7 @@ Bot2.Pass
 
 [Expect]
 Exile.Count = 7
+Exile.FaceDown = Swamp; Swamp; Swamp; Swamp; Island; Island; Island
 Bot1.Library.Count = 4
 Bot2.Library.Count = 5
 Bot1.Battlefield = Mox Jet; Doomsday Excruciator

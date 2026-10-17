@@ -1,0 +1,44 @@
+# Baseline of "{5}, {T}: Draw a card. This ability costs {1} less to activate for each page counter on this artifact.": with no page
+# counter it costs the full {5}. Bot1 taps all five Moxen for it (the pool is empty afterwards, so it cost exactly five), draws
+# the library's Island, and the Diary is tapped. (The Diary was cast on turn 1 with Mox Pearl and Mox Jet, which untap on turn 3.)
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Diary of Dreams
+Island x14
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Diary of Dreams.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield.Diary of Dreams.Counters.Page = (absent)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Diary of Dreams.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Diary of Dreams.Tapped = true
+Bot1.Mana =

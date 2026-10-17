@@ -1,0 +1,45 @@
+# The sibling of the keep-the-token scenario: Devastating Onslaught for X=1 copies Thalia, Guardian of Thraben, the legend rule
+# (CR 704.5j) has Bot1 choose, and Bot1 keeps the ORIGINAL: the token is put into the graveyard and ceases to exist, and Thalia
+# stays on the battlefield. Nothing is left to sacrifice at the end step; Thalia is still there and nothing of hers is in the graveyard.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Thalia, Guardian of Thraben
+Devastating Onslaught
+Island x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Thalia, Guardian of Thraben; X: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Thalia, Guardian of Thraben#1)
+? Bot1.Battlefield.Thalia, Guardian of Thraben.Token = (absent)
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Mox Emerald; Thalia, Guardian of Thraben
+Bot1.Graveyard = Devastating Onslaught
+Stack.Count = 0

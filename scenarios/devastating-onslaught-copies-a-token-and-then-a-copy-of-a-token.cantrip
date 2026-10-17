@@ -1,0 +1,55 @@
+# Ruling 2025-07-25: "If the copied permanent is a token, the tokens that are created copy the original characteristics of that
+# token." Bot1 casts Devastating Onslaught (X=1) on its Llanowar Elves, making token A, and then a second Onslaught (X=1) on
+# token A itself, making token B, a copy of a copy of a token: both are 1/1 green Elf Druid creatures with haste and the
+# Elves' mana ability, exactly as the Elves is. Six mana pay for both (Black Lotus's {R}{R}{R}, Mox Ruby, Mox Jet, Mox
+# Emerald; the Elves would add more). All tokens are sacrificed at the beginning of the end step: the original Elves remains.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Jet
+Devastating Onslaught
+Devastating Onslaught
+Llanowar Elves
+Island x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Devastating Onslaught.Cast(Llanowar Elves; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves#2.Token = true
+Bot1.Hand.Devastating Onslaught.Cast(Llanowar Elves#2; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+? Bot1.Battlefield.Llanowar Elves#1.Token = (absent)
+? Bot1.Battlefield.Llanowar Elves#3.Token = true
+? Bot1.Battlefield.Llanowar Elves#3.Subtypes = Druid; Elf
+? Bot1.Battlefield.Llanowar Elves#3.Colors = Green
+? Bot1.Battlefield.Llanowar Elves#3.Power = 1
+? Bot1.Battlefield.Llanowar Elves#3.Keywords = Haste
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Jet; Llanowar Elves
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Devastating Onslaught; Devastating Onslaught; Black Lotus
+Stack.Count = 0

@@ -2,8 +2,9 @@ use cantrip_api::*;
 use cantrip_mechanics::{delayed, haste_until_end_of_turn, targets};
 use cantrip_oracle as oracle;
 
-/// "Create X tokens that are copies of target artifact or creature you control" (CR 707.2, 111.1): X is the value chosen as
-/// the spell was cast (a copy of the spell has an X of 0, CR 107.3), and the tokens enter together. "Those tokens gain
+/// "Create X tokens that are copies of target artifact or creature you control" (CR 707.2, 111.1): X is the value announced as
+/// the spell was cast (a copy of the spell has the same X, CR 707.10; a spell cast without paying its mana cost has an X of 0,
+/// CR 107.3b), and the tokens enter together. "Those tokens gain
 /// haste until end of turn." "Sacrifice them at the beginning of the next end step" (CR 603.7c): a delayed ability about
 /// exactly these tokens. If the target is no longer legal the spell does not resolve (CR 608.2b) and nothing is made.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

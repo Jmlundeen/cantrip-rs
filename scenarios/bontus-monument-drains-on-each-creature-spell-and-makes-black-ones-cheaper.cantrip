@@ -1,0 +1,49 @@
+# Bontu's Monument: "Whenever you cast a creature spell, each opponent loses 1 life and you gain 1 life" (the shared drain
+# effect). Bot1 casts the Monument with three Moxen (no drain: it was not on the battlefield yet and is no creature), then Mox
+# Sapphire (an artifact spell: no drain, 20 / 20, the control), then Orcish Bowmasters, a creature spell: Bot2 19, Bot1 21
+# (the Bowmasters then pings Bot2 as it enters: 18, and amasses an Orc Army). The Bowmasters is black, so it costs {B} instead of
+# {1}{B}: Mox Jet's single {B} is all that pays for it.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Bontu's Monument
+Mox Jet
+Mox Sapphire
+Orcish Bowmasters
+Island x13
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Bontu's Monument.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+? Bot1.Life = 20
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Orcish Bowmasters.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 21
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Emerald; Mox Jet; Mox Sapphire; Bontu's Monument; Orcish Bowmasters; Orc Army
+Stack.Count = 0

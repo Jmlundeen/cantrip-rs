@@ -1,0 +1,66 @@
+# CR 701.47a: with several Armies you choose which gets the counters. Bot1 controls two: the Orc Army token from Orcish
+# Bowmasters's amass Orcs 1 (a 1/1) and Woodland Changeling (a 2/2 with every creature type, Army and Goblin among them).
+# Chapter II's "Amass Goblins 1" asks Bot1, who picks the Changeling: it gets the +1/+1 counter (3/3) and, already a Goblin
+# (changeling), no creature type is added. The Orc Army is untouched - still a 1/1 Army Orc, not a Goblin. No Goblin Army token
+# is made. (Turn 1: Bowmasters + Changeling; turn 3: the Saga, chapter I; turn 5: chapter II.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Mox Ruby
+Orcish Bowmasters
+Woodland Changeling
+Down, Down to Goblin-town
+Island x3
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Orcish Bowmasters.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Down, Down to Goblin-town.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Woodland Changeling)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Woodland Changeling.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Woodland Changeling.Power = 3
+? Bot1.Battlefield.Orc Army.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Orc Army.Power = 1
+? Bot1.Battlefield.Orc Army.Subtypes = Army; Orc
+
+[Expect]
+Bot1.Battlefield.Woodland Changeling.Power = 3
+Bot1.Battlefield.Woodland Changeling.Toughness = 3
+Bot1.Battlefield.Woodland Changeling.Subtypes = (every creature type)
+Bot1.Battlefield.Orc Army.Subtypes = Army; Orc
+Bot1.Battlefield.Orc Army.Power = 1
+Bot1.Battlefield.Count = 8

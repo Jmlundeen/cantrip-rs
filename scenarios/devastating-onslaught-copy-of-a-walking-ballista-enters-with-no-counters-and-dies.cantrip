@@ -1,0 +1,50 @@
+# Ruling 2025-07-25: "Any 'enters with' abilities of the copied permanent will also work", and the copy does not copy counters.
+# Bot1's Walking Ballista (cast for X=2 on turn 1, two +1/+1 counters) is copied by Devastating Onslaught: the token's "enters
+# with X +1/+1 counters" has X = 0 (CR 107.3g, the token was never cast), so it enters as a 0/0 and dies as a state-based action
+# (CR 704.5f). The original keeps its two counters. Had the token copied the counters it would have lived to the end step.
+# LeftBattlefield records the token's one trip, so a token really was created.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Walking Ballista
+Devastating Onslaught
+Island x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Walking Ballista; X: 1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+? LeftBattlefield.Count = 1
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Mox Emerald; Walking Ballista
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Devastating Onslaught
+LeftBattlefield.Count = 1

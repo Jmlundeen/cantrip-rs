@@ -1,0 +1,73 @@
+# Six page counters are one more than the {5} the Diary can give back: the cost is only {T}, not a negative amount of mana
+# (generic mana only, CR 118.7a). Bot1 casts the Diary on turn 1 with Black Lotus's {B}{B}{B} and then chains five Dark Rituals
+# (five counters; eleven {B} float), turn 3 plays the drawn Swamp, and turn 5 casts the drawn sixth Dark Ritual with the Swamp's {B}:
+# six counters, three {B} floating. Activating the Diary then takes nothing from the pool and draws a card.
+
+[Bot1 Deck]
+Black Lotus
+Diary of Dreams
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Dark Ritual
+Swamp
+Dark Ritual
+Island x10
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Diary of Dreams.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Diary of Dreams.Counters.Page = 5
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Diary of Dreams.Counters.Page = 6
+? Bot1.Mana = {B}{B}{B}
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Diary of Dreams.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B}{B}{B}
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Diary of Dreams.Counters.Page = 6
+Bot1.Battlefield.Diary of Dreams.Tapped = true

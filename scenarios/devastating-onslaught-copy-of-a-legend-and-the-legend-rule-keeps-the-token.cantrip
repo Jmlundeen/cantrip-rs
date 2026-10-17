@@ -1,0 +1,47 @@
+# (Thalia taxes every noncreature spell {1}, hers too: four Moxen pay for the Onslaught.) Devastating Onslaught for X=1 copies Bot1's Thalia, Guardian of Thraben, a legendary creature: the token is a legendary Thalia
+# too, so the legend rule (CR 704.5j) has Bot1 choose one to keep. Bot1 keeps the TOKEN: the original Thalia goes to the graveyard
+# and the token, the only Thalia left, is sacrificed at the beginning of the end step (CR 603.7c). At the end Bot1 has no Thalia
+# at all, one Thalia card in the graveyard. (The scenario with the original kept is the sibling.)
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Thalia, Guardian of Thraben
+Devastating Onslaught
+Island x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Thalia, Guardian of Thraben; X: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Thalia, Guardian of Thraben#2)
+? Bot1.Battlefield.Thalia, Guardian of Thraben.Token = true
+? Bot1.Graveyard = Thalia, Guardian of Thraben; Devastating Onslaught
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Mox Emerald
+Bot1.Graveyard = Thalia, Guardian of Thraben; Devastating Onslaught
+Stack.Count = 0

@@ -1,0 +1,56 @@
+# Ruling 2025-07-25: "Any 'enters with' abilities of the copied permanent will also work." Callous Sell-Sword enters with a +1/+1
+# counter for each creature that died under its controller's control this turn. Bot1 casts Devastating Onslaught (X=1) on its
+# Sell-Sword; in response Bot2 Lightning Bolts Bot1's Ornithopter, which dies. The token Sell-Sword then enters with ONE counter
+# (a 3/3), counted as it enters (the Sell-Sword original has none: it entered before the Ornithopter died). The token is
+# sacrificed at the end step.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Callous Sell-Sword
+Devastating Onslaught
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Callous Sell-Sword.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Callous Sell-Sword; X: 1)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Callous Sell-Sword#2.Token = true
+? Bot1.Battlefield.Callous Sell-Sword#2.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Callous Sell-Sword#2.Power = 3
+? Bot1.Battlefield.Callous Sell-Sword#1.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Mox Sapphire; Callous Sell-Sword
+Bot1.Battlefield.Callous Sell-Sword.Power = 2
+Bot1.Graveyard = Devastating Onslaught; Ornithopter

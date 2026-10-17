@@ -1,0 +1,49 @@
+# CR 107.3b: a spell with {X} cast without paying its mana cost has X = 0. Bloodbraid Challenger's cascade (CR 702.85a) exiles
+# the Island, then reaches Devastating Onslaught (mana value 1 with X = 0, less than the Challenger's 5) and Bot1 casts it free,
+# targeting Mox Pearl: X is 0, so no token is made - at the moment it has resolved Bot1 controls only the Forest, four Moxen and
+# (once it resolves) the Challenger. The Onslaught goes to the graveyard, the Island to the bottom of the library.
+
+[Bot1 Deck]
+Forest
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Bloodbraid Challenger
+Island
+Island
+Devastating Onslaught
+Island x4
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Bloodbraid Challenger.Cast
+? Stack.Count = 2
+Bot1.Accept
+Bot1.Target(Mox Pearl)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+? Bot1.Graveyard = Devastating Onslaught
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Ruby; Mox Emerald; Mox Jet; Mox Pearl; Bloodbraid Challenger
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard = Devastating Onslaught
+Stack.Count = 0

@@ -1,8 +1,8 @@
 # "Target artifact or creature you control": Devastating Onslaught for X=1 targets Bot1's Sol Ring, a non-creature artifact
-# (positive control for the creature case). The Sol Ring token has the Sol Ring's printed ability and is on the battlefield
-# until the next end step, when it is sacrificed (CR 603.7c): Bot1 pays {1}{1}{R} with Mox Ruby and the Sol Ring's {C}{C}.
-# The Sol Ring token taps for mana at once - artifacts do not have summoning sickness for mana abilities, haste or not - and
-# pays for the Ornithopter ({0} is free, so the mana is just shown in the pool).
+# (positive control for the creature case). Bot1 pays {1}{1}{R} with Mox Ruby and the Sol Ring's {C}{C}. The Sol Ring token is
+# a copy with the Sol Ring's printed ability and is on the battlefield until the next end step, when it is sacrificed (CR
+# 603.7c). It is untapped (the original is tapped) and taps for {C}{C} at once - artifacts have no summoning sickness for
+# mana abilities - which the pool shows. At the end step only the original Sol Ring and the Mox remain.
 
 [Bot1 Deck]
 Mox Ruby

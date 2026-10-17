@@ -1,0 +1,51 @@
+# CR 707.10: a copy of a spell copies "the value of X". Bot1 casts Devastating Onslaught for X=1 targeting Mox Sapphire, and in
+# response flashes in Lutri, the Spellchaser (Black Lotus's {R}{R}{R}), whose trigger copies the Onslaught; Bot1 keeps the copy's
+# target. The copy resolves first with X=1 and makes one Mox Sapphire token; then the original makes another: two tokens,
+# not one (a copy with X=0 would make none). Both are sacrificed at the end step, leaving the original Sapphire.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Devastating Onslaught
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Devastating Onslaught.Cast(Mox Sapphire; X: 1)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+[T3 Bot1.End]
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Sapphire; Lutri, the Spellchaser
+Bot1.Graveyard = Devastating Onslaught; Black Lotus
+Stack.Count = 0
