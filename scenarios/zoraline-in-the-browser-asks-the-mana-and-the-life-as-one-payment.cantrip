@@ -1,0 +1,46 @@
+# Browser
+# Zoraline, Cosmos Caller: "Whenever Zoraline enters or attacks, you may pay {W}{B} and 2 life. When you do, return target
+# nonland permanent card with mana value 3 or less from your graveyard to the battlefield with a finality counter on it."
+# Bot1's page asks the payment in the card's words, with the whole cost - mana and life - in the question (CR 118.12), and
+# says what paying gets rather than "pay or lose". With {B} in the pool it says {W} is still to pay and offers declining,
+# and once Mox Pearl has made the {W} the button pays "{W}{B} and 2 life". The Ornithopter returns with a finality counter.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Black Lotus
+Entomb
+Zoraline, Cosmos Caller
+Swamp
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Zoraline, Cosmos Caller.Cast
+Bot1.Pass
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Zoraline, Cosmos Caller: pay {W}{B} and 2 life to return a nonland permanent card with mana value 3 or less from your graveyard to the battlefield?
+? Client.Bot1.Prompt.Detail = It returns with a finality counter on it  ·  the card is chosen once you have paid  ·  {W} still to pay  ·  tap a land
+? Client.Bot1.Dock = Don't pay
+Bot1.Battlefield.Mox Pearl.Activate
+? Client.Bot1.Dock = Pay {W}{B} and 2 life; Don't pay
+Bot1.PayCost
+Bot1.Target(Ornithopter)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Ornithopter.Counters.Finality = 1

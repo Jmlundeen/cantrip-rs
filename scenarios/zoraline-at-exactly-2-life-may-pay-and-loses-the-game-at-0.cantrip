@@ -1,0 +1,43 @@
+# Zoraline, Cosmos Caller: "you may pay {W}{B} and 2 life". A player may pay life only with at least that much (CR 119.4):
+# at exactly 2 Bot1 may, and pays. Its life is then 0 and it loses the game as a state-based action (CR 704.5a) before
+# the reflexive trigger is ever put on the stack.
+
+[Life]
+Bot1: 2
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Black Lotus
+Entomb
+Zoraline, Cosmos Caller
+Swamp
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Zoraline, Cosmos Caller.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.PayCost
+
+[Expect]
+Bot1.Life = 0
+Bot1.Status = Lost
+Result = Bot2 won

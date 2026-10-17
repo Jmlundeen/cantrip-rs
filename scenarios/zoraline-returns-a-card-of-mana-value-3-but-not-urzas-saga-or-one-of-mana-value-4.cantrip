@@ -1,0 +1,66 @@
+# Zoraline, Cosmos Caller: "return target nonland permanent card with mana value 3 or less from your graveyard". Bot1's
+# graveyard holds Urza's Saga (an Enchantment Land: a land card, so not a nonland card, CR 205.2a), Cogwork Librarian
+# (mana value 4) and Coalition Relic (mana value 3, the most it may have); Bot2's holds an Ornithopter it Entombed, a
+# card that would do but is not in Bot1's graveyard. Turn 3 Bot1 pays for her enters trigger and the
+# reflexive trigger's target is chosen: the Saga, the Librarian and Bot2's Ornithopter are not candidates, the Relic is (and the Black Lotus
+# sacrificed for the payment, mana value 0), and the Relic returns with a finality counter.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Entomb
+Thought Scour
+Zoraline, Cosmos Caller
+Urza's Saga
+Cogwork Librarian
+Black Lotus
+Swamp
+Coalition Relic
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp x17
+Ornithopter
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Coalition Relic)
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Ornithopter)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Entomb; Coalition Relic; Thought Scour; Cogwork Librarian; Urza's Saga
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Zoraline, Cosmos Caller.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.PayCost
+! Bot1.Target(Urza's Saga)
+! Bot1.Target(Cogwork Librarian)
+! Bot1.Target(Bot2.Graveyard.Ornithopter)
+Bot1.Target(Coalition Relic)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Coalition Relic.Counters.Finality = 1
+Bot1.Graveyard = Black Lotus; Entomb; Thought Scour; Cogwork Librarian; Urza's Saga

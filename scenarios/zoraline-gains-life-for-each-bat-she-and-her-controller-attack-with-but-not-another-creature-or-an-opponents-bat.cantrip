@@ -1,0 +1,53 @@
+# Zoraline, Cosmos Caller: "Whenever a Bat you control attacks, you gain 1 life." Turn 3 Bot1 attacks with Zoraline (a Bat
+# Cleric), Momo, Friendly Flier (a Lemur Bat Ally) and Thraben Inspector (a Human Soldier): two Bats, two lives, and her own
+# "enters or attacks" trigger, three triggers in all. Bot1 has no {B} left to pay for that one and declines it. Turn 4
+# Bot2's own Momo attacks Bot1: a Bat Bot1 doesn't control, so no life (CR 109.5), and Bot1 takes its 1 damage.
+# 20 + 2 - 1 = 21.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Black Lotus
+Zoraline, Cosmos Caller
+Momo, Friendly Flier
+Thraben Inspector
+Plains x13
+
+[Bot2 Deck]
+Plains
+Momo, Friendly Flier
+Plains x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Zoraline, Cosmos Caller.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Decline
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Momo, Friendly Flier.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Momo, Friendly Flier.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Zoraline, Cosmos Caller > Bot2; Momo, Friendly Flier > Bot2; Thraben Inspector > Bot2)
+Bot1.Decline
+[T3 Bot1.Main2]
+? Bot1.Life = 22
+[T4 Bot2.Main1]
+Bot2.Attack(Momo, Friendly Flier > Bot1)
+? Stack.Count = 0
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 15
