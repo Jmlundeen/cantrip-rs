@@ -1,0 +1,52 @@
+# Known bug: ops::copy_spell builds the copy from the original, so a copy of a spell cast from a graveyard inherits `cast_from`; a copy
+# is never cast (CR 707.10), so "if this spell was cast from a graveyard" is false for it and it draws one card, not two
+# (docs/known-issues.md; the same fault makes Sevinne's Reclamation's copy offer to copy itself again).
+# Plunder the Trollshaws is cast on turn 1 (draws one) and again from the graveyard with flashback on turn 3 (Black Lotus' blue
+# and a Mox Sapphire pay {3}{U}); with it on the stack Bot1 flashes in Lutri, the Spellchaser ({1}{R}{U}: Mox Ruby, Mox Sapphire,
+# Mox Jet), whose enters trigger copies it. The copy resolves first and draws ONE; the original draws two. Cards drawn in all:
+# the turn-3 draw, 1, 1 and 2, so the library, 20 - 7 in the hand, is 8.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Plunder the Trollshaws
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Plunder the Trollshaws.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Plunder the Trollshaws
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Graveyard.Plunder the Trollshaws.Cast(Ability: Flashback)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Plunder the Trollshaws
+Stack.Count = 0
+Bot1.Library.Count = 8

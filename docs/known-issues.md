@@ -305,6 +305,7 @@ the other cast-only fields) in the copy, beside `spent`.
 
 **Scenarios.**
 - [`scenarios/ruthless-negotiation-a-copy-of-a-flashed-back-spell-was-not-cast-so-only-the-original-draws.cantrip`](../scenarios/ruthless-negotiation-a-copy-of-a-flashed-back-spell-was-not-cast-so-only-the-original-draws.cantrip) - Lutri copies a flashed-back Negotiation; only the original may draw (marked `# Known bug`).
+- [`scenarios/plunder-the-trollshaws-copy-of-a-flashbacked-spell-draws-only-one.cantrip`](../scenarios/plunder-the-trollshaws-copy-of-a-flashbacked-spell-draws-only-one.cantrip) - Lutri copies a flashed-back Plunder the Trollshaws; the copy draws one, the original two (marked `# Known bug`).
 
 ### KI-33: Chain Lightning's payer copies without being asked whether to
 
