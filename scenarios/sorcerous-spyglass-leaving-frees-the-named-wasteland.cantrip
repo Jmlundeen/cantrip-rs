@@ -1,0 +1,50 @@
+# Sorcerous Spyglass's bar lasts only while it is on the battlefield (CR 611.3): Bot1's Spyglass names Wasteland on turn 3 and
+# Bot2's Wasteland is refused its destroy ability; on turn 4 Bot2 destroys the Spyglass with Disenchant and then the same
+# Wasteland destroys Bot1's, which it could not before.
+
+[Bot1 Deck]
+Wasteland
+Mox Jet
+Mox Pearl
+Sorcerous Spyglass
+Island x10
+
+[Bot2 Deck]
+Wasteland
+Plains
+Mox Pearl
+Mox Jet
+Disenchant
+Island x10
+
+[Actions]
+Bot1.Hand.Wasteland.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sorcerous Spyglass.Cast
+Bot1.Name(Wasteland)
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Wasteland.Activate(Ability: Destroy)
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Sorcerous Spyglass)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Sorcerous Spyglass
+Bot2.Battlefield.Wasteland.Activate(Bot1.Battlefield.Wasteland; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Mox Jet; Mox Pearl
+Bot1.Graveyard = Wasteland; Sorcerous Spyglass
+Bot2.Graveyard = Wasteland; Disenchant

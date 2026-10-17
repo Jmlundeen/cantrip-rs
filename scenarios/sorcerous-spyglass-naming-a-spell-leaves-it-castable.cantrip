@@ -1,0 +1,32 @@
+# Sorcerous Spyglass only stops activated abilities of sources with the chosen name (CR 602.5), not casting a spell: Bot1 looks at
+# Bot2's hand as the Spyglass enters and names Lightning Bolt, and on turn 2 Bot2 still casts that very card (casting is not
+# activating an ability, CR 601 vs 602) for 3 damage to Bot1.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Sorcerous Spyglass
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sorcerous Spyglass.Cast
+Bot1.Name(Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Sorcerous Spyglass.ChosenName = Lightning Bolt
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt

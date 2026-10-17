@@ -1,0 +1,47 @@
+# Sorcerous Spyglass: as it enters Bot1 looks at Bot2's hand (CR 614.12a) and names Wasteland (any card name, CR 201.4). From
+# then on no Wasteland's destroy ability can be activated, by Bot1 (the Spyglass's own controller) or by Bot2 (CR 602.5), but
+# the {T}: Add {C} ability of each can (a mana ability, CR 605.1a). Strip Mine, not the chosen name, still destroys Bot1's
+# Wasteland on turn 4: the positive control that Bot2's activated abilities in general are untouched.
+
+[Bot1 Deck]
+Wasteland
+Mox Jet
+Mox Pearl
+Sorcerous Spyglass
+Island x10
+
+[Bot2 Deck]
+Wasteland
+Strip Mine
+Island x12
+
+[Actions]
+Bot1.Hand.Wasteland.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sorcerous Spyglass.Cast
+Bot1.Name(Wasteland)
+? Bot1.Battlefield.Sorcerous Spyglass.ChosenName = Wasteland
+! Bot1.Battlefield.Wasteland.Activate(Ability: Destroy)
+Bot1.Battlefield.Wasteland.Activate(Ability: #1)
+? Bot1.Mana = {C}
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Wasteland.Activate(Ability: Destroy)
+Bot2.Battlefield.Wasteland.Activate(Ability: #1)
+? Bot2.Mana = {C}
+Bot2.Hand.Strip Mine.Play
+Bot2.Battlefield.Strip Mine.Activate(Bot1.Battlefield.Wasteland; Ability: Destroy)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Bot1.Battlefield = Mox Jet; Mox Pearl; Sorcerous Spyglass
+Bot1.Graveyard = Wasteland
+Bot2.Battlefield = Wasteland
+Bot2.Graveyard = Strip Mine
