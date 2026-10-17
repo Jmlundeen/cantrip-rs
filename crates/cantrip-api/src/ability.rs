@@ -736,6 +736,33 @@ fn lose_all_abilities(_: &dyn LayerQuery, _: ObjectId, chars: &mut crate::Chars)
     chars.lose_all_abilities();
 }
 
+/// A static ability by which every object `affects` accepts loses all abilities except mana abilities (CR 613.1f, layer
+/// 6): "all lands lose all abilities except mana abilities" (Blood Sun). It is `loses_all_abilities` in every other way -
+/// the object's static abilities from layer 6 on, its replacement effects ("enters tapped": Blood Sun's ruling), cost
+/// changes, play rules and triggered abilities other than mana abilities are gone, what its static abilities did in layers
+/// 1 to 5 stays (CR 613.6: Urborg, Tomb of Yawgmoth's, the ruling), and what is granted it later is kept (the ruling) -
+/// but it keeps each mana ability it has at its timestamp: an activated ability that adds mana (CR 605.1a, an ability
+/// that costs mana is not one, the ruling) or a triggered mana ability (CR 605.1b), the basic land types' among them (CR
+/// 305.6).
+pub const fn loses_all_abilities_except_mana_abilities(affects: StaticAffects, text: &'static str) -> StaticDef {
+    StaticDef { text, layer: Layer::Ability, affects, apply: lose_all_abilities_except_mana_abilities, loses_all: true, ..StaticDef::BLANK }
+}
+
+fn lose_all_abilities_except_mana_abilities(view: &dyn LayerQuery, _: ObjectId, chars: &mut crate::Chars) {
+    let cards = view.cards();
+    let kept = chars.abilities.map(|a| {
+        a.filter(|&a| match cards.ability(a) {
+            AbilityDef::Activated(d) => d.is_mana_ability(),
+            AbilityDef::Triggered(t) => t.mana_ability,
+            _ => false,
+        })
+    });
+    chars.lose_all_abilities();
+    for (slot, ability) in kept.into_iter().flatten().enumerate() {
+        chars.abilities[slot] = Some(ability);
+    }
+}
+
 /// A static ability that sets the land subtypes of every land `affects` accepts (CR 305.7, layer 4): "nonbasic lands are
 /// Mountains" (Blood Moon, Magus of the Moon), "enchanted land is an Island" (Spreading Seas, Convincing Mirage), "this
 /// land is the chosen type" (Multiversal Passage). `apply` sets them with `Chars::set_land_subtypes`, which takes away

@@ -1423,34 +1423,46 @@ fn land_text_lost(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<O
     objects
 }
 
-/// Whether a land about to enter the battlefield would lose the abilities of its rules text there to a static ability
-/// that sets land subtypes (CR 305.7), judged as it would exist on the battlefield (CR 614.12) - as `card`, with the copy
-/// effect it enters with if any: then its own "enters tapped" and "as this enters" replacements do not apply (Blood
-/// Moon's and Magus of the Moon's rulings). Only the abilities of permanents that have not lost theirs to another such
-/// ability apply (`land_text_lost`).
+/// Whether a permanent about to enter the battlefield would lose the abilities of its rules text there, judged as it would
+/// exist on the battlefield (CR 614.12) - as `card`, with the copy effect it enters with if any: then its own "enters
+/// tapped", "enters with" and "as this enters" replacements do not apply. Either to a static ability that sets land
+/// subtypes (CR 305.7: Blood Moon's and Magus of the Moon's rulings), of a permanent that has not lost its abilities to
+/// another such ability (`land_text_lost`), or to a static ability by which it loses its abilities (CR 613.1f: "all lands
+/// lose all abilities except mana abilities", Blood Sun's ruling; "all creatures lose all abilities"), of a permanent whose
+/// such ability applies (`lost_to_statics`) - no replacement effect is a mana ability (CR 605.1). What the effects would
+/// make of it is judged on its own card's values, as KI-52 says of the lands.
 pub fn loses_rules_text_entering(cards: &CardTable, state: &GameState, log: &[Record], object: ObjectId, card: CardId, copy: Option<&Copiable>) -> bool {
     if !state.statics_seen {
         return false;
     }
-    let setters = {
+    let (setters, strippers) = {
         let found = static_sources(cards, state);
-        if found.setters.is_empty() {
+        if found.setters.is_empty() && found.strippers.is_empty() {
             return false;
         }
-        found.setters.clone()
+        (found.setters.clone(), found.strippers.clone())
     };
     let so_far = match copy {
         Some(c) => initial(cards, c.card, Some(c)),
         None => *printed(cards, card, false),
     };
-    if !so_far.is(CardType::Land) {
+    let statics = |source: ObjectId| cards.get(cards.current(state.obj(source))).statics;
+    if !setters.is_empty() && so_far.is(CardType::Land) {
+        let lost = land_text_lost(cards, state, log);
+        let view = View { cards, state, log, stop: Layer::Type };
+        if setters.iter().any(|&(source, from)| {
+            !lost.contains(&source) && statics(source).iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, object, &so_far))
+        }) {
+            return true;
+        }
+    }
+    if strippers.is_empty() {
         return false;
     }
-    let lost = land_text_lost(cards, state, log);
-    let view = View { cards, state, log, stop: Layer::Type };
-    setters.iter().any(|&(source, from)| {
-        !lost.contains(&source)
-            && cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, object, &so_far))
+    let applying = lost_to_statics(cards, state, log).applying;
+    let view = View { cards, state, log, stop: Layer::Ability };
+    strippers.iter().any(|&(source, from)| {
+        applying.contains(&source) && statics(source).iter().any(|s| s.loses_all && s.from == from && (s.affects)(&view, source, object, &so_far))
     })
 }
 
@@ -1841,6 +1853,42 @@ mod tests {
     };
     static WOODS: CardDef =
         CardDef { name: "Woods", types: TypeSet::of(&[CardType::Land]), subtypes: SubtypeSet::of(&[Subtype::Forest]), ..CardDef::BLANK };
+
+    fn draw_nothing(_: &mut dyn Game, _: &StackItem) -> Result<(), Suspend> {
+        Ok(())
+    }
+
+    /// Blood Sun's shape: "all lands lose all abilities except mana abilities".
+    static SUN: CardDef = CardDef {
+        name: "Sun",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[loses_all_abilities_except_mana_abilities(land, "")],
+        ..CardDef::BLANK
+    };
+    /// A Swamp with a mana ability, an ability that costs mana and adds none, and a keyword.
+    static VAULT: CardDef = CardDef {
+        name: "Vault",
+        types: TypeSet::of(&[CardType::Land]),
+        subtypes: SubtypeSet::of(&[Subtype::Swamp]),
+        keywords: Keywords::of(&[Keyword::Indestructible]),
+        abilities: &[mana_ability(TAP, add(Mana::C), ""), ability(cost("{1}"), draw_nothing, "")],
+        ..CardDef::BLANK
+    };
+
+    /// CR 613.1f, 605.1a, 305.6: a land that loses all abilities except mana abilities keeps its printed mana ability and
+    /// its basic land type's, and loses the ability that costs mana and its keyword; the rules read off its card are gone
+    /// (`lost_all_abilities`). A land card elsewhere is not affected.
+    #[test]
+    fn a_land_losing_all_but_its_mana_abilities_keeps_them_alone() {
+        let cards = CardTable::new([&SUN, &VAULT]);
+        let (state, ids) = battlefield(&cards, &["Sun", "Vault"]);
+        let vault = chars(&cards, &state, &[], ids[1]);
+        let kept: Vec<AbilityRef> = vault.abilities().collect();
+        let card = cards.find("Vault").unwrap();
+        assert_eq!(kept, [AbilityRef { card, index: 0 }, AbilityRef { card: cards.intrinsic, index: Mana::B as u8 }]);
+        assert!(!vault.has(Keyword::Indestructible));
+        assert!(lost_all_abilities(&cards, &state, &[], ids[1]));
+    }
 
     /// CR 613.8a(b): an earlier effect depends on a later one that would change what it applies to, judged on the object as
     /// the earlier one found it - its own application must not hide the change. Limb, the older, would make Woods a Saproling,

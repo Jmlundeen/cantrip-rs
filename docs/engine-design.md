@@ -222,7 +222,10 @@ would go over unclickable.
   before a later Elf to Goblin), and waits for it; free effects go in timestamp order, as do the members of a loop among
   themselves (613.8b), and the order is worked out again after each (613.8c). Judged on the object being worked out, an
   effect that would change what another applies to once its own prerequisites have applied counts too (a chain:
-  "creatures are artifacts" after "lands are creatures" after the effect that makes it a land); a dependency through
+  "creatures are artifacts" after "lands are creatures" after the effect that makes it a land), and an earlier effect that
+  applied is asked again of the object as it found it with the later one applied, so its own application cannot hide the
+  dependency (`in_order`'s snapshots: Life and Limb making a nonbasic Forest a Saproling before Blood Moon takes the Forest
+  type - Blood Moon applies first and Life and Limb not at all); a dependency through
   another object alone is not seen (known issue KI-41). Of 613.8a(b)'s four criteria, "what it applies to" and "what it
   does" are judged here; "existence" is a static ability's taken away by "loses all abilities", ordered by
   `lost_to_statics`; no text change the engine has rewrites another effect's text. The words of rules text follow the
@@ -240,8 +243,10 @@ would go over unclickable.
   (`StaticSources::granted`) while it still has the ability, applied among the other sources' abilities at its timestamp.
 - **"Loses all abilities" (613.1f)** comes from a resolved effect (`EffectKind::LoseAllAbilities`: Oko's Elk, The Wondrous
   Wasp) or a static ability (`loses_all_abilities(affects, text)`, a `StaticDef` with `loses_all`: Eaten by Piranhas; Darksteel
-  Mutation, Kenrith's Transformation, Frogify and Humility print the same). Either is a layer-6 effect at its timestamp, so an
-  ability gained after it stays (613.7). Every rule read off a card - its static abilities from layer 6 on, cost changes,
+  Mutation, Kenrith's Transformation, Frogify and Humility print the same; `loses_all_abilities_except_mana_abilities` keeps
+  the mana abilities the object has at its timestamp, 605.1: Blood Sun). Either is a layer-6 effect at its timestamp, so an
+  ability gained after it stays (613.7). A permanent about to enter that such a static ability would strip is judged as it
+  would be on the battlefield (614.12, `layers::loses_rules_text_entering`): its own `enters` replacements do not apply. Every rule read off a card - its static abilities from layer 6 on, cost changes,
   replacement effects, play rules, trigger, block and activation rules, granted ways, miracles - asks the one answer,
   `Query::lost_all_abilities` (`layers::lost_all_abilities`): the effects, then `layers::lost_to_statics`, the permanents such
   static abilities took everything from, worked out once per position and history length (an `affects` may read the past) and
