@@ -1,0 +1,54 @@
+# Patchwork Beastie with delirium (CR 702.138a): in Bot1's turn-3 upkeep Bot1 accepts "you may mill a card" and an Island goes
+# to its graveyard (a land); Lightning Bolt (an instant) and Haywire Mite, sacrificed to exile Bot2's Mox Sapphire (an artifact
+# creature), make four card types. Now the Beastie may attack, and does: Bot2 takes 3 from the Bolt and 3 from the Beastie.
+
+[Bot1 Deck]
+Forest
+Patchwork Beastie
+Mox Ruby
+Haywire Mite
+Lightning Bolt
+Forest
+Plains
+Island
+Plains x12
+
+[Bot2 Deck]
+Mox Sapphire
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Patchwork Beastie.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Upkeep]
+Bot1.Accept
+? Bot1.Graveyard = Island
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Mox Sapphire)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Haywire Mite; Lightning Bolt; Island
+Bot1.Attack(Patchwork Beastie > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 22
+Exile = Mox Sapphire
+Bot1.Battlefield.Patchwork Beastie.Tapped = true

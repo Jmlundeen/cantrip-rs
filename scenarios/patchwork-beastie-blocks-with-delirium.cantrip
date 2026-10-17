@@ -1,0 +1,54 @@
+# Patchwork Beastie may block once its controller has delirium (CR 509.1b, 702.138a): Bot1's graveyard gets a land (the
+# upkeep mill Bot1 accepts), an instant (Lightning Bolt) and an artifact creature (Haywire Mite, sacrificed) in turn 3, and in
+# Bot2's turn 4 the Beastie blocks Curious Farm Animals and kills it.
+
+[Bot1 Deck]
+Forest
+Patchwork Beastie
+Mox Ruby
+Haywire Mite
+Lightning Bolt
+Forest
+Plains
+Island
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Sapphire
+Curious Farm Animals
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Patchwork Beastie.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+[T3 Bot1.Upkeep]
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Haywire Mite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Haywire Mite.Activate(Mox Sapphire)
+[T4 Bot2.Main1]
+Bot2.Attack(Curious Farm Animals > Bot1)
+Bot1.Block(Patchwork Beastie > Curious Farm Animals)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Curious Farm Animals
+Bot2.Life = 20
+Bot1.Battlefield.Patchwork Beastie.Damage = 1

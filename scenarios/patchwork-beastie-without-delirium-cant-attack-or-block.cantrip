@@ -1,0 +1,42 @@
+# "Delirium - This creature can't attack or block unless there are four or more card types among cards in your graveyard"
+# (CR 508.1c, 509.1b): Bot1's graveyard is empty, so in turn 3 Patchwork Beastie may not attack while Ornithopter is offered
+# in the same declaration (the positive control), and in Bot2's turn 4 it may not block Curious Farm Animals while Ornithopter
+# blocks it. Bot1 declines the upkeep mill ("you may"), so its library keeps its card.
+
+[Bot1 Deck]
+Forest
+Patchwork Beastie
+Ornithopter
+Forest x17
+
+[Bot2 Deck]
+Plains
+Curious Farm Animals
+Plains x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Patchwork Beastie.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+[T3 Bot1.Upkeep]
+Bot1.Decline
+[T3 Bot1.Main1]
+! Bot1.Attack(Patchwork Beastie > Bot2)
+[T4 Bot2.Main1]
+Bot2.Attack(Curious Farm Animals > Bot1)
+! Bot1.Block(Patchwork Beastie > Curious Farm Animals)
+Bot1.Block(Ornithopter > Curious Farm Animals)
+? Combat.Blocks = Ornithopter > Curious Farm Animals
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 12
+Bot2.Battlefield.Curious Farm Animals.Damage = 0

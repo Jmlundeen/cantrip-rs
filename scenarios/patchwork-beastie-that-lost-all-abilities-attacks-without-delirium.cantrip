@@ -1,0 +1,38 @@
+# The restriction is an ability of Patchwork Beastie (CR 508.1c, 613.1f): enchanted by Eaten by Piranhas, it is a 1/1 Skeleton
+# with no abilities, so it attacks though Bot1's graveyard is empty. Before the Aura it may not (the refusal), with Ornithopter
+# offered beside it.
+
+[Bot1 Deck]
+Forest
+Patchwork Beastie
+Ornithopter
+Island
+Mox Sapphire
+Eaten by Piranhas
+Forest x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Patchwork Beastie.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Patchwork Beastie > Bot2)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Patchwork Beastie)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Patchwork Beastie > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Patchwork Beastie.Tapped = true
