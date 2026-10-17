@@ -1,0 +1,43 @@
+# Mosswood Dreadknight: "until the end of your next turn" (CR 611.2). Bot2 Bolts the Dreadknight on turn 2, Bot2's turn, so
+# Bot1's next turn is turn 3. Bot1 casts nothing then, and on turn 5, with {B} and {G} to spare, Dread Whispers is no longer
+# offered from the graveyard: the card stays there.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mosswood Dreadknight
+Mox Jet
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mosswood Dreadknight.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Mosswood Dreadknight)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Graveyard.Mosswood Dreadknight.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Mosswood Dreadknight
+Bot1.Life = 20
