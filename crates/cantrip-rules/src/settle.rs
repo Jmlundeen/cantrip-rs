@@ -204,7 +204,11 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
                 continue;
             }
         }
-        if chars.is(CardType::Planeswalker) && obj.counters(CounterKind::Loyalty) <= 0 {
+        // CR 704.5i, unless a static ability says a planeswalker isn't put there for having 0 loyalty.
+        if chars.is(CardType::Planeswalker)
+            && obj.counters(CounterKind::Loyalty) <= 0
+            && !crate::static_rules::zero_loyalty_stays(cx, id)
+        {
             to_graveyard.push(id);
         }
     }

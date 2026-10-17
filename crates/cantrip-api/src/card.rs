@@ -1384,6 +1384,12 @@ pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// your opponents control" (Patient Zero, Uthgardt Fury) and "from creatures" (Case of the Market Melee) are the same kind.
 pub type DamageStaysRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability keeps this planeswalker on the battlefield with 0 loyalty: it isn't put into its owner's
+/// graveyard by the state-based action of CR 704.5i. Given the rule's own asker and the planeswalker. "Planeswalkers you
+/// control aren't put into their owners' graveyards for having 0 loyalty" (Sanctum Lurker). Only that state-based action
+/// is changed: a planeswalker that is destroyed or has its loyalty abilities' costs to pay is judged as always.
+pub type ZeroLoyaltyRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability lets this creature attack as though it didn't have defender (CR 702.3b, 609.4): given the
 /// rule's own asker and the creature. Demon Wall's "as long as this creature has a counter on it, it can attack as
 /// though it didn't have defender"; Rolling Stones' "Wall creatures can attack as though they didn't have defender" and
@@ -1666,6 +1672,9 @@ pub struct CardDef {
     /// Its static abilities that keep damage on permanents during cleanup steps (CR 514.2), while it is on the battlefield
     /// with its abilities. An effect that removes all damage (regeneration, CR 701.19a) still removes it.
     pub damage_stays: &'static [DamageStaysRule],
+    /// Its static abilities that keep planeswalkers with 0 loyalty on the battlefield (CR 704.5i), while it is on the
+    /// battlefield with its abilities.
+    pub zero_loyalty_stays: &'static [ZeroLoyaltyRule],
     /// "You may spend mana as though it were mana of any color to activate abilities of creatures you control" (CR 609.4b):
     /// Agatha's Soul Cauldron, Mycosynth Lattice's kind.
     pub spend_any_color: &'static [SpendAnyColorRule],
@@ -1781,6 +1790,7 @@ impl CardDef {
         cant_gain_life: &[],
         damage_by_toughness: &[],
         damage_stays: &[],
+        zero_loyalty_stays: &[],
         spend_any_color: &[],
         cause_rules: &[],
         turn_begin: &[],

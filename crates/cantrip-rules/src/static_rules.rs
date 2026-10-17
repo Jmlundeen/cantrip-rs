@@ -72,6 +72,17 @@ pub fn damage_stays(cx: &Cx, damaged: &[ObjectId]) -> Vec<ObjectId> {
         .collect()
 }
 
+/// Whether the planeswalker, with 0 loyalty, stays on the battlefield (CR 704.5i): a static ability of a permanent on the
+/// battlefield says it isn't put into its owner's graveyard for having 0 loyalty (`CardDef::zero_loyalty_stays`), while
+/// that permanent has its abilities (CR 613.1f). Asked only of a planeswalker with no loyalty, so the battlefield is
+/// searched then.
+pub fn zero_loyalty_stays(cx: &Cx, planeswalker: ObjectId) -> bool {
+    sources(cx, |d| !d.zero_loyalty_stays.is_empty()).any(|(id, controller, def)| {
+        let asker = Asker { source: id, controller };
+        def.zero_loyalty_stays.iter().any(|rule| rule(cx, &asker, planeswalker))
+    })
+}
+
 /// Whether `player` can't gain life (CR 119.7): a resolved effect about them says so (`EffectKind::CantGainLife`, Screaming
 /// Nemesis's "for the rest of the game"), or a static ability of a permanent on the battlefield does (`CardDef::cant_gain_life`,
 /// Sunspine Lynx's "Players can't gain life"), which stops when the permanent leaves or loses its abilities (CR 611.3a,
