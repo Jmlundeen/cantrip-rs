@@ -1,0 +1,35 @@
+# Stingerquill Charm's third mode: a 2/2 colorless Wizard Soldier token named Cadet, which "gains haste until end of
+# turn" (CR 702.10): on turn 1 it is not summoning-sick, attacks and deals 2 to Bot2. The token is named Cadet, colorless,
+# a Wizard Soldier, and by turn 3 it has lost the haste.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Stingerquill Charm
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stingerquill Charm.Cast
+Bot1.Modes(3)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Cadet.Keywords = Haste
+[Bot1.DeclareAttackers]
+Bot1.Attack(Cadet > Bot2)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Cadet.Token = true
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Toughness = 2
+Bot1.Battlefield.Cadet.Colors = (absent)
+Bot1.Battlefield.Cadet.Subtypes = Soldier; Wizard
+Bot1.Battlefield.Cadet.Keywords = (absent)

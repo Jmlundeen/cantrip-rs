@@ -1,0 +1,32 @@
+# Stingerquill Charm's second mode: "Target creature gains first strike and deathtouch until end of turn." Bot1's
+# Ornithopter has both while the turn lasts (checked in the main phase) and neither on turn 3, when the effect has ended
+# (CR 514.2); the mode targets a creature only, so Bot2 as a target is refused beside the creature as the control.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Stingerquill Charm
+Ornithopter
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stingerquill Charm.Cast
+Bot1.Modes(2)
+! Bot1.Target(Bot2)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; FirstStrike; Flying
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Graveyard = Stingerquill Charm
