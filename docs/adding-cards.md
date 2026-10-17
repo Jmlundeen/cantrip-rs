@@ -332,8 +332,10 @@ shapes have an example:
 - **Mana**: `PlayGrant.any_type` / `CastTerms.any_type` (mana of any type pays, CR 609.4b). Mana with a restriction on
   what it may be spent on (CR 106.6) is added by a mana ability with `.only_for(restriction)` (or `g.add_restricted_mana(..)`
   from an effect): `ManaRestriction::Spells(types)` is "spend this mana only to cast [type] spells" (`ARTIFACT_SPELLS`,
-  `INSTANT_OR_SORCERY_SPELLS`, `PLANESWALKER_SPELLS`), `ManaRestriction::Abilities(types)` "spend this mana only to
-  activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`),
+  `INSTANT_OR_SORCERY_SPELLS`, `PLANESWALKER_SPELLS`, `CREATURE_SPELLS`), `ManaRestriction::Abilities(types)` "spend this mana only to
+  activate abilities [of [type] sources]" (`ABILITIES` for any source, `LAND_ABILITIES`, `ARTIFACT_ABILITIES`, `CREATURE_ABILITIES`),
+  `SPELLS_FROM_EXILE` "spend this mana only to cast spells from exile", `NOT_SPELLS_FROM_HAND` "this mana can't be
+  spent to cast spells from your hand",
   `ManaRestriction::Subtypes(..)` "spend this mana only to cast [subtype] [creature] spells" (`SubtypeSpells::of(Dragon)`,
   `::either(Dragon, Omen)`, `SubtypeSpells::CHOSEN_TYPE_CREATURE` for "a creature spell of the chosen type",
   `.uncounterable()` for Cavern of Souls), `ManaRestriction::NONCREATURE_SPELLS` "spend this mana only to cast a noncreature
@@ -342,7 +344,11 @@ shapes have an example:
   rest. A mana ability's subtype is read through its source's words and its chosen type as it is activated; an effect
   that adds the mana reads `g.words(item.object).subtype(..)` itself. A new restriction of card types is added to
   `ManaRestriction::NAMED` (the build fails on a card naming one that is not there), and the host gives it a word on the
-  wire (`restriction_view`). "N mana in any combination of colors" is `cantrip_mechanics::choose_colors`.
+  wire (`restriction_view`). "N mana in any combination of colors" is `cantrip_mechanics::choose_colors`. "Whenever a player taps a land
+  for mana, that player adds one mana of any type that land produced" is `mana::a_player_taps_a_land_for_mana` (or a matcher
+  of the card's own over `mana::land_tapped_for_mana`) with `mana::add_one_mana_of_any_type_that_land_produced`, as a
+  `.mana_ability()` trigger. "You may activate abilities of creatures you control as though those creatures had haste" is
+  `CardDef::activate_as_though_haste`.
 - **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
   Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads
   `item.gift.is_some()` and a target filter `gift::promised(q, asker.source)`. An instant or sorcery gives it as it

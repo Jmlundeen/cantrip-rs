@@ -126,3 +126,52 @@ pub const PAY_TWO_LIFE_OR_TAPPED: Question =
 /// What a land that may be paid for with 3 life asks as it enters: "Pay 3 life" or "Enters tapped".
 pub const PAY_THREE_LIFE_OR_TAPPED: Question =
     Question::new("EnterUntapped", "pay {cost}?", "If you don't, it enters tapped", "Pay {cost}", "Enters tapped").no_default();
+
+/// "Whenever [a player / you] tap[s] a land for mana" (CR 106.12, 106.12a, 605.1b): the land, the player who tapped it and
+/// the mana its ability produced, for a triggered mana ability's matcher to narrow ("a basic land", "you") and hand to
+/// `that_land_produced`. Only a land as it is once tapped: a land creature counts, a creature that isn't a land doesn't.
+/// Lavaleaper, Mana Flare, Heartbeat of Spring, Dictate of Karametra, Zendikar Resurgent and Mirari's Wake trigger on it.
+pub fn land_tapped_for_mana(q: &dyn Query, event: &Event) -> Option<(ObjectId, PlayerId, ManaPool)> {
+    match *event {
+        Event::TappedForMana { permanent, player, produced } if q.chars(permanent).is(CardType::Land) => Some((permanent, player, produced)),
+        _ => None,
+    }
+}
+
+/// The trigger of "that player adds one mana of any type that land produced": about the land, with the player who tapped
+/// it (`data[0]`) and the types of mana it produced (`data[1]`, a bit for each `Mana` it produced), which the ability
+/// resolving reads (`add_one_mana_of_any_type_that_land_produced`).
+pub fn that_land_produced(land: ObjectId, player: PlayerId, produced: ManaPool) -> Option<Fired> {
+    let types = Mana::ALL.iter().filter(|&&m| produced.get(m) > 0).fold(0u32, |types, &m| types | 1 << m as u32);
+    Some(Fired { subject: Target::Object(land), data: [player.0 as u32, types] })
+}
+
+/// "That player adds one mana of any type that land produced" (CR 106.12a, 605.1b, 605.4a): a triggered mana ability's
+/// effect, so it resolves at once as the land's mana ability does. The type is one of the land's own ability produced -
+/// the mana a triggered mana ability added for it is not the land's (Zendikar Resurgent's ruling: the land's mana ability)
+/// - and colorless is a type (CR 106.1b). With more than one, the player who adds it chooses (Mana Flare's, Vorinclex's
+/// rulings). The mana is plain: no restriction or rider of the land's mana comes with it (Mana Flare's, Mirari's Wake's
+/// rulings). Lavaleaper, Mana Flare, Heartbeat of Spring, Dictate of Karametra, Zendikar Resurgent, Mirari's Wake and
+/// Vorinclex, Voice of Hunger print it.
+pub fn add_one_mana_of_any_type_that_land_produced(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let player = PlayerId(item.data[0] as u8);
+    let types: Vec<Mana> = Mana::ALL.into_iter().filter(|&m| item.data[1] & 1 << m as u32 != 0).collect();
+    let mana = match types.as_slice() {
+        [] => return Ok(()),
+        [one] => *one,
+        _ => {
+            let source = item.object;
+            types[crate::choose::one_of(g, player, source, types.iter().map(|&m| Label::ManaType(m)).collect())? as usize]
+        }
+    };
+    g.add_mana(player, mana, 1);
+    Ok(())
+}
+
+/// "Whenever a player taps a land for mana, that player adds one mana of any type that land produced" (CR 106.12a, 605.1b):
+/// any player's land, as the triggered mana ability's matcher with `add_one_mana_of_any_type_that_land_produced`. Mana
+/// Flare, Heartbeat of Spring, Dictate of Karametra and Zhur-Taa Ancient print it.
+pub fn a_player_taps_a_land_for_mana(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    let (land, player, produced) = land_tapped_for_mana(q, event)?;
+    that_land_produced(land, player, produced)
+}

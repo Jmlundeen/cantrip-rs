@@ -11,6 +11,13 @@ pub fn your_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, 
     so_far.is(CardType::Creature) && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// "Creatures" / "all creatures" (CR 613.1f): every creature on the battlefield, whoever controls it, judged on what the
+/// earlier layers made the object. Intruder Alarm and Lavaleaper ("All creatures have haste") use it as
+/// `StaticDef::affects`.
+pub fn all_creatures(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, so_far: &Chars) -> bool {
+    so_far.is(CardType::Creature)
+}
+
 /// "Planeswalkers you control" (CR 613.1f, layer 6): every planeswalker under the source's controller's control, judged on what
 /// the earlier layers made it, and by control, not ownership. Avatar of Burgeoning Echoes and Way of the Pyromancer use it as
 /// `StaticDef::affects`.

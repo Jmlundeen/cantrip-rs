@@ -1,6 +1,6 @@
 //! Prepare (CR 722): a permanent with a prepare spell that is prepared lets its controller cast a copy of that spell
 //! (`CardDef::prepare`); `Game::become_prepared` makes it prepared later, and this is "enters prepared".
-//! Carnivorous Cultivator, Emeritus of Abundance, Emeritus of Ideation, Skycoach Conductor and Pompous Battlemage print it.
+//! Carnivorous Cultivator, Emeritus of Abundance, Emeritus of Ideation, Skycoach Conductor, Pompous Battlemage and Heartwood Crafter print it.
 
 use cantrip_api::*;
 
