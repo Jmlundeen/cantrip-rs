@@ -88,6 +88,31 @@ pub fn exile_same_name_from_graveyard_hand_and_library(g: &mut dyn Game, searche
     Ok(())
 }
 
+/// "Choose a card name. Search target opponent's graveyard, hand, and library for up to four cards with that name and exile
+/// them. Then that player shuffles." - the effect of the resolving `item`, whose first target is the opponent. The name is
+/// chosen as it resolves, not as it was put on the stack (CR 608.2c), and may be any card name, a basic land's included
+/// (CR 201.4a). The controller searches the three zones in the order the text names them, choosing among the cards with the
+/// name in each, in all up to four (a player need not take them all, CR 701.23b); everything found is exiled at once and the
+/// owner shuffles (CR 701.23, 406.2). An opponent no longer a legal target means nothing happens (CR 608.2b). Ancient
+/// Vendetta and The Rise of Sozin's chapter II print it.
+pub fn exile_up_to_four_named_from_graveyard_hand_and_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    // Up to this many cards in all, whichever zones they are found in.
+    const MOST: u8 = 4;
+    let you = item.controller;
+    let Some(owner) = crate::targets::player(g, item, 0) else { return Ok(()) };
+    let name = g.ask(you, RequestKind::ChooseName { source: item.object, looked_at: Vec::new(), suggestion: None, kind: NameKind::Any })?;
+    // A card has "that name" when it is the card name chosen; with no name chosen nothing has it.
+    let named = |q: &dyn Query, c: ObjectId| matches!(name, Answer::Name(Some(wanted)) if object_has_name(q, c, wanted));
+    let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| named(g, c)).collect();
+    let mut found = crate::choose::cards(g, you, item.object, Purpose::Exile, graveyard, MOST, true)?;
+    let hand: Vec<ObjectId> = g.state().zone(Zone::hand(owner)).iter().copied().filter(|&c| named(g, c)).collect();
+    let remaining = MOST - found.len() as u8;
+    found.extend(crate::choose::cards(g, you, item.object, Purpose::Exile, hand, remaining, true)?);
+    let remaining = MOST - found.len() as u8;
+    search_to_exile(g, you, owner, item.object, Find::ONE.up_to(remaining), &found, named)?;
+    Ok(())
+}
+
 /// "Search your library for [cards], put them into your hand, then shuffle" (CR 701.23): the cards found, as they are
 /// in the hand. Demonic Tutor (`Find::ANY`) and Expedition Map (`Find::ONE.revealed()`) print it.
 pub fn search_to_hand(
