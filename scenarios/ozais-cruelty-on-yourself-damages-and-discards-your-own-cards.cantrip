@@ -1,0 +1,39 @@
+# "Target player" includes the caster: Bot1 targets themselves, takes 2 damage and chooses two cards of their own
+# hand to discard (the Cruelty is on the stack, no longer in hand, when the discard is chosen).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ozai's Cruelty
+Swamp
+Island
+Forest
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Island
+Mountain
+Plains
+Forest
+Ornithopter
+Mox Sapphire
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ozai's Cruelty.Cast(Bot1)
+Bot1.Choose(Island; Forest)
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot1.Hand = Swamp
+Bot1.Graveyard.Count = 3
+Bot2.Hand.Count = 7

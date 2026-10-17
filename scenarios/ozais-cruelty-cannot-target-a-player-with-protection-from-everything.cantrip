@@ -1,0 +1,51 @@
+# "Target player": a player with protection from everything (The One Ring, CR 702.16j) is not a legal target (CR 115.2,
+# 702.16b), so the Cruelty is not offered aimed at Bot2 - but the same cast aimed at Bot1 is (positive control), and it
+# damages and makes Bot1 discard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Ozai's Cruelty
+Island
+Forest
+Mountain
+10 Swamp
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+The One Ring
+Swamp
+Island
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.The One Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Ozai's Cruelty.Cast(Bot2)
+Bot1.Hand.Ozai's Cruelty.Cast(Bot1)
+Bot1.Choose(Island; Forest)
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 18
+Bot1.Graveyard.Count = 3
+Bot1.Hand = Mountain; Swamp

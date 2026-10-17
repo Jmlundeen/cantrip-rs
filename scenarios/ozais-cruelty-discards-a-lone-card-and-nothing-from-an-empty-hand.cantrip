@@ -1,0 +1,55 @@
+# With fewer than two cards the player discards what they have (CR 701.9b), and with none is asked nothing, yet the
+# damage is still dealt. Bot2 plays out all but one card on its turn 2 (everything but Mox Sapphire costs {0}): the
+# first Cruelty takes that lone card (asked, as a discard always is), the second finds an empty hand and asks no
+# question (`! Bot2.Choose`), and each deals its 2 damage (20 - 4 = 16).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Black Lotus
+Swamp
+Ozai's Cruelty
+Ozai's Cruelty
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Ornithopter
+Lotus Petal
+Mox Sapphire
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Lotus Petal.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ozai's Cruelty.Cast(Bot2)
+Bot2.Choose(Mox Sapphire)
+Bot1.Hand.Ozai's Cruelty.Cast(Bot2)
+! Bot2.Choose
+
+[Expect]
+Bot2.Life = 16
+Bot2.Hand.Count = 0
+Bot2.Graveyard = Mox Sapphire
+Bot1.Graveyard = Ozai's Cruelty; Ozai's Cruelty; Black Lotus

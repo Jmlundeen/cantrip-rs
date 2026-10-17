@@ -1,0 +1,40 @@
+# Ozai's Cruelty: 2 damage to target player, and that player discards two cards - their choice (CR 701.9), not the
+# caster's and not random. Bot2 holds seven cards and picks Island and Forest; the other five stay in hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ozai's Cruelty
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Island
+Mountain
+Plains
+Forest
+Ornithopter
+Mox Sapphire
+10 Swamp
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ozai's Cruelty.Cast(Bot2)
+Bot2.Choose(Island; Forest)
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot2.Graveyard.Count = 2
+Bot2.Hand = Swamp; Mountain; Plains; Ornithopter; Mox Sapphire
+Bot2.Hand.Count = 5
+Bot1.Graveyard = Ozai's Cruelty
