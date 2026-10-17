@@ -1,0 +1,30 @@
+# Yuriko's second mode: "Surveil 2." (CR 701.25) Bot1 casts her main phase turn 1, chooses the surveil mode, sees Mox Jet
+# and Mox Pearl on top, puts the Jet into the graveyard and keeps the Pearl on top. The other mode's target is not asked.
+
+[Bot1 Deck]
+Yuriko, Hope from the Shadows
+Island x6
+Mox Jet
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Yuriko, Hope from the Shadows.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Surveil 2)
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Mox Pearl | Mox Jet)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Mox Jet
+Bot1.Library.Count = 11
+Bot1.Battlefield.Yuriko, Hope from the Shadows.Power = 1

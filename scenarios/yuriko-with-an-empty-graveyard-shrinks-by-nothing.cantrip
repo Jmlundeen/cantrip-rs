@@ -1,0 +1,45 @@
+# X is the number of cards in your graveyard: with none, Yuriko's first mode is -0/-0 and the Hired Blade stays 3/2 (it is
+# not an error to choose it). Bot1 flashes Yuriko in at Bot2's end step, its graveyard empty.
+
+[Bot1 Deck]
+Mox Sapphire
+Yuriko, Hope from the Shadows
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Pearl
+Mox Emerald
+Hired Blade
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Hired Blade.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Yuriko, Hope from the Shadows.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Target creature gets -X/-0)
+Bot1.Target(Bot2.Battlefield.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Hired Blade.Power = 3
+Bot2.Battlefield.Hired Blade.Toughness = 2
+Bot1.Graveyard.Count = 0
