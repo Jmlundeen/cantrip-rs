@@ -1,0 +1,42 @@
+# Two Doomed Travelers die to one Wrath of God (CR 701.8): each has its own dies trigger, so Bot1 ends with two Spirit tokens
+# (the Wrath has already finished, so they live), and both Travelers and the Wrath are in the graveyard.
+
+[Bot1 Deck]
+Plains
+Doomed Traveler
+Doomed Traveler
+Wrath of God
+Plains
+Plains
+Plains
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Battlefield.Plains#4.Activate
+Bot1.Hand.Wrath of God.Cast
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Plains; Plains; Plains; Spirit; Spirit
+Bot1.Graveyard = Wrath of God; Doomed Traveler; Doomed Traveler
+Bot1.Battlefield.Spirit#1.Token = true
+Bot1.Battlefield.Spirit#2.Token = true
+Stack.Count = 0

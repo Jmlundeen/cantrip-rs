@@ -1,0 +1,37 @@
+# Bot1's Leyline of the Void: "If a card would be put into an opponent's graveyard from anywhere, exile it instead" (CR 614).
+# Bot1's Lightning Bolt kills Bot2's Doomed Traveler, but the Traveler is exiled in place of going to the graveyard, so it never
+# dies (CR 700.4) and its trigger does not happen: Bot2 has no Spirit and an empty graveyard. The only thing that keeps the
+# Spirit away is the replacement (the Bolt alone, in doomed-traveler-dying-to-a-bolt..., leaves one).
+
+[Bot1 Deck]
+Leyline of the Void
+Mox Ruby
+Lightning Bolt
+Island x4
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Doomed Traveler
+Island x18
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Doomed Traveler.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Doomed Traveler)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Exile = Doomed Traveler
+Bot2.Battlefield = Mox Pearl
+Bot1.Battlefield = Leyline of the Void; Mox Ruby

@@ -1,0 +1,63 @@
+# A token copy of a Doomed Traveler has its dies ability (CR 707.2, 111.1). The Fire Crystal copies the Traveler on turn 3 and
+# sacrifices the token at the beginning of the next end step (CR 603.7): the token goes to the graveyard (a death, CR 700.4)
+# and then ceases to exist (CR 111.7), and "When this creature dies" still makes a 1/1 white flying Spirit for Bot1. The real
+# Traveler is untouched, the graveyard stays empty (the token is no card), and the Spirit is a token.
+# Turn 1: the Moxen are free; Pearl's {W} casts the Traveler, Mountain + Ruby (R R) + Jet + Sapphire pay the Crystal.
+# Turn 3: both Mountains and four Moxen pay {4}{R}{R}.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+The Fire Crystal
+Doomed Traveler
+Mountain
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doomed Traveler.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Fire Crystal.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.The Fire Crystal.Activate(Bot1.Battlefield.Doomed Traveler)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Doomed Traveler#2.Token = true
+? Bot1.Battlefield.Spirit = (absent)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; The Fire Crystal; Doomed Traveler; Spirit
+Bot1.Battlefield.Doomed Traveler.Token = (absent)
+Bot1.Battlefield.Spirit.Token = true
+Bot1.Battlefield.Spirit.Keywords = Flying; Haste
+Bot1.Battlefield.Spirit.Colors = White
+Bot2.Battlefield.Count = 0

@@ -1,0 +1,40 @@
+# "Dies" means put into a graveyard from the battlefield (CR 700.4): Bot2's Petty Theft (Brazen Borrower's Adventure) returns
+# the Traveler to its owner's hand, so nothing triggers: Bot1 has no Spirit token.
+
+[Bot1 Deck]
+Plains
+Doomed Traveler
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Brazen Borrower
+Island
+Island
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Brazen Borrower.Cast(Bot1.Battlefield.Doomed Traveler; Ability: Adventure)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Doomed Traveler; Plains; Plains; Plains; Plains; Plains
+Bot1.Battlefield = Plains
+Exile = Brazen Borrower

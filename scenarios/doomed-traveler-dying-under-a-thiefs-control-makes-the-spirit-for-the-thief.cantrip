@@ -1,0 +1,55 @@
+# The Spirit is made by the ability's controller, who is the Traveler's controller as it died (CR 603.3a, 603.10a), not its
+# owner. Bot2's Sudden Substitution exchanges its own Lightning Bolt (aimed at Bot1) for Bot1's Traveler: Bot2 now controls
+# the Traveler, Bot1 the Bolt, and Bot1 aims it at the Traveler. It dies under Bot2's control: the card goes to its owner
+# Bot1's graveyard, but the Spirit token goes to Bot2 and Bot1 gets nothing. No life changes.
+
+[Bot1 Deck]
+Plains
+Doomed Traveler
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Mox Jet
+Lightning Bolt
+Sudden Substitution
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Sudden Substitution.Cast
+Bot2.Target(Stack.Lightning Bolt)
+Bot2.Target(Bot1.Battlefield.Doomed Traveler)
+Bot1.Target(Bot2.Battlefield.Doomed Traveler)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Doomed Traveler
+Bot1.Battlefield = Plains
+Bot2.Battlefield = Island; Mox Sapphire; Mox Ruby; Mox Pearl; Mox Jet; Spirit
+Bot2.Battlefield.Spirit.Token = true
+Bot2.Battlefield.Spirit.Keywords = Flying
