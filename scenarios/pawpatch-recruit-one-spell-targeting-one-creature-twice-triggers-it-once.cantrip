@@ -1,0 +1,43 @@
+# Known bug: a creature that becomes the target of two target slots of one spell becomes a target once, so a "becomes the target" ability triggers once, not once per slot (the Pawpatch Recruit ruling; the engine emits BecameTarget per target slot).
+# Pawpatch Recruit: Bot2's Kolaghan's Command destroys Bot1's Ornithopter and also deals 2 damage to the same Ornithopter. The Recruit triggers once: one counter, 3/2.
+
+[Bot1 Deck]
+Forest
+Pawpatch Recruit
+Forest
+Llanowar Elves
+Ornithopter
+Forest x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Kolaghan's Command
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Kolaghan's Command.Cast
+Bot2.Modes(Destroy target artifact; deals 2 damage)
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Pawpatch Recruit.Power = 3
+Bot1.Battlefield.Pawpatch Recruit.Toughness = 2

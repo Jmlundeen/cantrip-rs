@@ -1,0 +1,47 @@
+# Pawpatch Recruit: "Whenever a creature you control becomes the target of a spell ... an opponent controls" is one trigger for each creature (the ruling): Bot2's Kolaghan's
+# Command destroys Bot1's Ornithopter and deals 2 damage to its Llanowar Elves, two different creatures, so the Recruit triggers twice and Bot1 puts both +1/+1 counters on the
+# Recruit (4/3). Both creatures are still there when the abilities resolve above the Command.
+
+[Bot1 Deck]
+Forest
+Pawpatch Recruit
+Forest
+Llanowar Elves
+Ornithopter
+Forest x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Kolaghan's Command
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Kolaghan's Command.Cast
+Bot2.Modes(Destroy target artifact; deals 2 damage)
+Bot2.Target(Bot1.Battlefield.Ornithopter)
+Bot2.Target(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot1.Target(Pawpatch Recruit)
+Bot1.Target(Pawpatch Recruit)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Pawpatch Recruit.Power = 4
+Bot1.Battlefield.Pawpatch Recruit.Toughness = 3
+Bot1.Battlefield.Count = 3
