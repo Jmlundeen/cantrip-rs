@@ -1,0 +1,48 @@
+# Warp - {B}, Pay 2 life (CR 702.185a): on turn 1 Bot1 casts Timeline Culler from its hand for {B} and 2 life (18) and it attacks
+# at once (haste): Bot2 takes 2. At the beginning of the end step it is exiled; on turn 3 Bot1 may cast it from exile for its
+# mana cost {B}{B} (the warp way is for the hand and the graveyard only: no second warp from exile, and no life paid), and it stays on the
+# battlefield through that turn's end step, as it was not cast for its warp cost.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Timeline Culler
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Timeline Culler.Cast(Ability: Warp)
+[T1 Bot1.Main1]
+? Bot1.Life = 18
+Bot1.Attack(Timeline Culler > Bot2)
+[T2 Bot2.Main1]
+? Exile = Timeline Culler
+? Bot2.Life = 18
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Exile.Timeline Culler.Cast(Ability: Warp)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Exile.Timeline Culler.Cast
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Timeline Culler.Power = 2
+Bot1.Battlefield.Timeline Culler.Keywords = Haste
+Bot1.Life = 18
+Exile.Count = 0

@@ -1,0 +1,64 @@
+# "You may cast this card from your graveyard using its warp ability": Timeline Culler, cast normally on turn 1 for {B}{B}, is
+# killed by Bot2's Dismember on turn 2. On turn 3 Bot1 casts it from its graveyard for the warp cost {B} and 2 life (18), it attacks
+# with haste (Bot2 takes 2), and at the beginning of the end step it is exiled (CR 702.185a), so the graveyard is empty again and
+# it can be cast from exile on turn 5 for {B}{B}, without paying life.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Timeline Culler
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Timeline Culler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Timeline Culler)
+Bot2.Modes()
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Timeline Culler
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Graveyard.Timeline Culler.Cast(Ability: graveyard)
+? Bot1.Life = 18
+Bot1.Attack(Timeline Culler > Bot2)
+[T4 Bot2.Main1]
+? Exile = Timeline Culler
+? Bot1.Graveyard.Count = 0
+? Bot2.Life = 18
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Exile.Timeline Culler.Cast
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Timeline Culler.Power = 2
+Bot1.Life = 18
+Exile.Count = 0
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Dismember

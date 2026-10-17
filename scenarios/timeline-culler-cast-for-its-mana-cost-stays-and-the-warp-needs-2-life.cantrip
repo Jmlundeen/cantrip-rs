@@ -1,0 +1,43 @@
+# At 1 life Bot1 cannot pay the warp cost's 2 life, so `Cast(Ability: Warp)` is not offered (CR 119.4), but the card can still be cast for
+# its mana cost {B}{B}, and cast that way it is not warped (CR 702.185c): it attacks with haste and is still on the battlefield on turn 2,
+# with no life paid. (Compare timeline-culler-warped-from-hand-attacks-with-haste-is-exiled-and-recast-from-exile-later.)
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Timeline Culler
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Timeline Culler.Cast(Ability: Warp)
+Bot1.Hand.Timeline Culler.Cast
+[T1 Bot1.Main1]
+Bot1.Attack(Timeline Culler > Bot2)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Timeline Culler.Power = 2
+Bot1.Life = 1
+Bot2.Life = 18
+Exile.Count = 0

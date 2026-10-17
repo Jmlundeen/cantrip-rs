@@ -1,0 +1,52 @@
+# The graveyard permission is only "using its warp ability": a card in the graveyard has no other way to be cast. Bot1 is at 1 life, so it
+# cannot pay the warp cost's 2 life (CR 119.4), and with {B}{B} to spare the Culler in the graveyard is still not offered at its
+# mana cost (`! Bot1.Graveyard.Timeline Culler.Cast` refuses every way). The positive control is
+# timeline-culler-warped-from-the-graveyard-after-dying-then-exiled-and-recast-from-exile, the same position at 20 life.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Timeline Culler
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Dismember
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Timeline Culler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Timeline Culler)
+Bot2.Modes()
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Graveyard.Timeline Culler.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Timeline Culler
+Bot1.Life = 1
+Bot1.Battlefield.Count = 3
