@@ -382,7 +382,7 @@ pub(crate) fn damage_may_change(cx: &Cx) -> bool {
         _ => false,
     }) || cx.s().battlefield().iter().any(|&id| {
         live(cx.s(), id)
-            && !cx.s().lost_all_abilities(id)
+            && !cx.lost_all_abilities(id)
             && cards.get(card_of(cx, id)).replacements.iter().any(|r| r.kind == ReplacementKind::Damage)
     })
 }
