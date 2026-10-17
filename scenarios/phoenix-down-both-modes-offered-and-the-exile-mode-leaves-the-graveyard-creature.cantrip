@@ -1,0 +1,51 @@
+# Phoenix Down: with a creature card with mana value 4 or less in Bot1's graveyard (Auriok Salvagers, milled by Thought Scour) and a Spirit
+# on the battlefield (Bot2's Bloodghast) both modes are legal, so Bot1 is asked to choose one and picks "Exile target Skeleton, Spirit,
+# or Zombie": the Bloodghast is exiled and the Salvagers stay in the graveyard.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Plains
+Thought Scour
+Phoenix Down
+Island
+Auriok Salvagers
+Island x15
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Bloodghast
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Hand.Phoenix Down.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Bloodghast.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Phoenix Down.Activate
+Bot1.Modes(Exile target Skeleton)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Phoenix Down; Bloodghast
+Bot1.Graveyard = Thought Scour; Island; Auriok Salvagers
+Bot1.Battlefield.Count = 4

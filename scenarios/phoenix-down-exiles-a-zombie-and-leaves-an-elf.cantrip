@@ -1,0 +1,51 @@
+# Phoenix Down: "Exile target Skeleton, Spirit, or Zombie." Bot2 controls a Master of Death (Zombie Wizard) and a Llanowar Elves (an Elf Druid, none of
+# the three types): only the Master of Death is a legal target, so it alone is exiled by the ability. The Phoenix Down is exiled as a
+# cost, and the Elves stay.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Phoenix Down
+Island x16
+
+[Bot2 Deck]
+Swamp
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Master of Death
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Phoenix Down.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Master of Death.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Phoenix Down.Activate
+! Bot1.Target(Llanowar Elves)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Phoenix Down; Master of Death
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Stack.Count = 0

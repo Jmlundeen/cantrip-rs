@@ -1,0 +1,39 @@
+# Phoenix Down: "from your graveyard". Bot2 mills its own Llanowar Elves (Thought Scour) and Bot1's graveyard holds no creature card, so on
+# turn 3 the return mode is not offered at all and there is no Spirit, Skeleton or Zombie either: the Phoenix Down cannot be activated
+# (every mode needs a target). With a Spirit in play (the other scenarios) it can.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Phoenix Down
+Island x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Thought Scour
+Island x5
+Llanowar Elves
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Phoenix Down.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Thought Scour.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+! Bot1.Battlefield.Phoenix Down.Activate
+
+[Expect]
+Bot1.Battlefield.Phoenix Down.Tapped = false
+Bot2.Graveyard = Thought Scour; Island; Llanowar Elves

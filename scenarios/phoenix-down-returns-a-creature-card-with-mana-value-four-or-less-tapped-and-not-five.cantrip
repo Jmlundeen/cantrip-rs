@@ -1,0 +1,43 @@
+# Phoenix Down: "{1}{W}, {T}, Exile this artifact: Choose one - Return target creature card with mana value 4 or less from your graveyard to
+# the battlefield tapped." Thought Scour mills Auriok Salvagers (mana value 4) and Harvester of Misery (5): the Harvester is refused as a
+# target (mana value 5, CR 202.3) while the Salvagers are returned, tapped (CR 614.1c). The Phoenix Down is exiled as a cost, so it is
+# gone even though the ability is still on the stack.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Thought Scour
+Phoenix Down
+Island
+Auriok Salvagers
+Harvester of Misery
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Hand.Phoenix Down.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Battlefield.Phoenix Down.Activate
+! Bot1.Target(Harvester of Misery)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Auriok Salvagers.Tapped = true
+Bot1.Graveyard = Thought Scour; Harvester of Misery
+Exile = Phoenix Down
+Stack.Count = 0
