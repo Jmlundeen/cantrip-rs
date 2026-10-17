@@ -1,0 +1,57 @@
+# Origin of Metalbending, first mode: "Destroy target artifact or enchantment." Bot2 has an Elvish Mystic (a creature, neither),
+# a Mox Jet (an artifact) and Connecting the Dots (an enchantment). On turn 3 Bot1's first cast refuses the Mystic (beside the
+# Mox, the positive control) and destroys the Mox; the second destroys the enchantment. The Mystic is untouched.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Origin of Metalbending
+Origin of Metalbending
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Elvish Mystic
+Connecting the Dots
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Connecting the Dots.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Origin of Metalbending.Cast
+Bot1.Modes(Destroy target artifact or enchantment)
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Mox Jet)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Mox Jet
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Origin of Metalbending.Cast
+Bot1.Modes(Destroy target artifact or enchantment)
+Bot1.Target(Connecting the Dots)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Connecting the Dots; Mox Jet
+Bot2.Battlefield.Elvish Mystic.Damage = 0
+Bot1.Graveyard = Origin of Metalbending; Origin of Metalbending

@@ -1,0 +1,69 @@
+# Origin of Metalbending, second mode: "Put a +1/+1 counter on target creature you control. It gains indestructible until end of
+# turn." In response to Bot2's Damnation (destroy all creatures) on turn 4, Bot1 aims it at Hercules, Prince of Power: the
+# counter makes it a 4/4 and indestructible lets it survive the Damnation (CR 702.12b), while Bot1's Ornithopter and Bot2's
+# Elvish Mystic die. Bot2's Mystic is refused as the target (beside Hercules, the positive control). Once the turn ends
+# indestructible is gone, but the counter stays.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Ornithopter
+Origin of Metalbending
+Island x14
+
+[Bot2 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Emerald
+Damnation
+Elvish Mystic
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Battlefield.Mox Jet#4.Activate
+Bot2.Hand.Damnation.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Origin of Metalbending.Cast
+Bot1.Modes(Put a +1/+1 counter)
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Hercules, Prince of Power.Keywords = Indestructible
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Hercules, Prince of Power.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Hercules, Prince of Power.Power = 4
+Bot1.Battlefield.Hercules, Prince of Power.Keywords = (absent)
+Bot1.Graveyard = Ornithopter; Origin of Metalbending
+Bot2.Graveyard = Damnation; Elvish Mystic

@@ -1,0 +1,52 @@
+# The counter mode's target is checked as the spell resolves (CR 608.2b): Bot1 aims Origin of Metalbending at Hercules, Prince of
+# Power on Bot1's own turn 3, Bot2 destroys Hercules in response with Get Lost (cast from the open Mox Pearl and Mox Jet), and the
+# Origin does nothing - the new Hercules card in the graveyard has no counter (it is a new object, CR 400.7), and Bot1's other
+# creature, Ornithopter, is not a target and gets neither the counter nor indestructible. Bot1 gets two Map tokens.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Ornithopter
+Origin of Metalbending
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Get Lost
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Origin of Metalbending.Cast
+Bot1.Modes(Put a +1/+1 counter)
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Get Lost.Cast(Hercules, Prince of Power)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Origin of Metalbending; Hercules, Prince of Power
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Map Token#1.Token = true
