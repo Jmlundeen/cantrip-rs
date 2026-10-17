@@ -142,3 +142,28 @@ pub fn return_subject_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     }
     Ok(())
 }
+
+/// "Take an extra turn after this one. At the beginning of that turn's end step, you lose the game." (CR 500.7, 603.7): the
+/// extra turn is the resolving spell's controller's, and the delayed ability (the card's `delayed` number `ability`,
+/// `LOSE_AT_THAT_END_STEP`) waits for that turn's end step alone. If that turn is skipped (CR 500.11) or ends without an end
+/// step (Sundial of the Infinite, CR 724.1e), it never triggers (Final Fortune's ruling). Final Fortune and Last Chance print it.
+pub fn extra_turn_then_lose(g: &mut dyn Game, item: &StackItem, ability: u8) {
+    let Some(turn) = g.add_extra_turn(item.controller) else { return };
+    let card = ability_card(g, item);
+    g.delayed_trigger(
+        DelayedWhen::ExtraTurnStep { step: Step::End, turn },
+        item.object,
+        item.controller,
+        AbilityRef::delayed(card, ability),
+        Target::None,
+    );
+}
+
+/// "You lose the game" (CR 104.3e): the body of `LOSE_AT_THAT_END_STEP`.
+fn lose_the_game(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.lose_game(item.controller);
+    Ok(())
+}
+
+/// The delayed ability `extra_turn_then_lose` sets up; a card lists it among its `delayed` abilities.
+pub const LOSE_AT_THAT_END_STEP: AbilityDef = delayed_trigger(lose_the_game, "At the beginning of that turn's end step, you lose the game.");
