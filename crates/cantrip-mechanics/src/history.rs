@@ -72,6 +72,12 @@ pub fn opponents_who_lost_life_this_turn(q: &dyn Query, player: PlayerId) -> usi
     q.state().opponents(player).filter(|&p| h.life_lost(p) > 0).count()
 }
 
+/// Whether an opponent of `player` has lost life this turn (CR 119.3: "lost life", not a lower life total - one who gained 2
+/// and lost 1 still did). Spectacle, Fireglass Mentor and Flamecache Gecko ask it.
+pub fn an_opponent_lost_life_this_turn(q: &dyn Query, player: PlayerId) -> bool {
+    opponents_who_lost_life_this_turn(q, player) > 0
+}
+
 /// Whether `object` arrived where it is this turn (CR 400.7: it is the object a move this turn made), in whatever zone:
 /// Night Nurse's "put there from anywhere this turn", and, on the battlefield, `entered_this_turn`.
 pub fn arrived_this_turn(q: &dyn Query, object: ObjectId) -> bool {
