@@ -1,0 +1,11 @@
+{
+  "name": "Thousand Moons Smithy",
+  "manaCost": "{2}{W}{W}",
+  "type": "Legendary Artifact",
+  "oracleText": "When Thousand Moons Smithy enters, create a white Gnome Soldier artifact creature token with \"This creature's power and toughness are each equal to the number of artifacts and/or creatures you control.\"\nAt the beginning of your first main phase, you may tap five untapped artifacts and/or creatures you control. If you do, transform Thousand Moons Smithy.",
+  "backFace": {
+    "name": "Barracks of the Thousand",
+    "type": "Legendary Artifact Land",
+    "oracleText": "(Transforms from Thousand Moons Smithy.)\n{T}: Add {W}.\nWhenever you cast an artifact or creature spell using mana produced by Barracks of the Thousand, create a white Gnome Soldier artifact creature token with \"This creature's power and toughness are each equal to the number of artifacts and/or creatures you control.\""
+  }
+}

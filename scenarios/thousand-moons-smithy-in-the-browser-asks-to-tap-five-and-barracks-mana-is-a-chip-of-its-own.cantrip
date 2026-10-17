@@ -1,0 +1,51 @@
+# Browser
+# Thousand Moons Smithy's first-main-phase trigger in the browser: the "you may" says what tapping five does, and the choice
+# of the five is captioned as a tap by an effect, not a cost, clicked on the battlefield (CR 701.26a). Bot1 taps the Gnome
+# Soldier and four Ornithopters, and the Smithy transforms into Barracks of the Thousand. On turn 5 the Barracks' {W} and a
+# Plains' {W} are in the pool: the Barracks' is a chip of its own, captioned with where it came from (CR 106.3), which Bot1
+# clicks to pay for Healer's Hawk (a Gnome Soldier); the Plains' {W} pays for Authority of the Consuls, making none.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Healer's Hawk
+Authority of the Consuls
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Thousand Moons Smithy: tap five untapped artifacts and/or creatures you control to transform it?
+? Client.Bot1.Prompt.Detail = You choose the five next; they stay tapped until they untap
+Bot1.Accept
+? Client.Bot1.Prompt.Title = Thousand Moons Smithy: choose 5 permanents to tap
+Bot1.Choose(Gnome Soldier; Ornithopter#1; Ornithopter#2; Ornithopter#3; Ornithopter#4)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Barracks of the Thousand.Activate
+? Client.Bot1.Mana = 1 White; 1 White (from Barracks of the Thousand)
+Bot1.Hand.Healer's Hawk.Cast(Spend: W from Barracks of the Thousand)
+Bot1.Hand.Authority of the Consuls.Cast
+? Stack = Authority of the Consuls
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Authority of the Consuls; Barracks of the Thousand; Gnome Soldier; Gnome Soldier; Healer's Hawk; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Plains

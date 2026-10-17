@@ -1,0 +1,46 @@
+# Mana is produced by the source of the ability that adds it (CR 106.3), whatever paid that ability's cost: on turn 5 Barracks
+# of the Thousand's {W} pays Crystal Grotto's "{1}, {T}: Add one mana of any color", and the Grotto's {W} casts Healer's Hawk.
+# No mana the Barracks produced was spent to cast the Hawk (its {W} was spent on the Grotto's ability), so there is no new Gnome
+# Soldier.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Crystal Grotto
+Healer's Hawk
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose(Gnome Soldier; Ornithopter#1; Ornithopter#2; Ornithopter#3; Ornithopter#4)
+Bot1.Hand.Crystal Grotto.Play
+Bot1.Arrange(Healer's Hawk | )
+[T5 Bot1.Main1]
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Battlefield.Crystal Grotto.Activate(Ability: any color; Color: White)
+? Bot1.ManaFrom = {W} Crystal Grotto
+Bot1.Hand.Healer's Hawk.Cast
+? Stack = Healer's Hawk
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Barracks of the Thousand; Crystal Grotto; Gnome Soldier; Healer's Hawk; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Plains

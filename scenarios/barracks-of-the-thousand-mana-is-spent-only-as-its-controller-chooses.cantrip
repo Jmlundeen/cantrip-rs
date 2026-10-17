@@ -1,0 +1,55 @@
+# Mana Barracks of the Thousand produced is told apart from other mana (CR 106.3): with a {W} from it and a {W} from a Plains
+# in the pool, a spell costing {W} is paid with whichever its controller chooses (CR 601.2h, 118.3a), offered as two kinds of
+# {W}. On turn 5 Bot1 pays Authority of the Consuls with the Plains' {W} (`Spend: W`), keeping the Barracks',
+# which then casts Healer's Hawk: a Gnome Soldier. On turn 9 Bot1 pays the second Authority with the Barracks' {W}
+# (`Spend: W from Barracks of the Thousand`), so the Hawk is cast with the Plains' and makes none; the Plains is tapped first
+# then, so the mana that came first is not what the choice takes.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Authority of the Consuls
+Healer's Hawk
+Authority of the Consuls
+Healer's Hawk
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose(Gnome Soldier; Ornithopter#1; Ornithopter#2; Ornithopter#3; Ornithopter#4)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Battlefield.Plains.Activate
+? Bot1.ManaFrom = {W} Barracks of the Thousand; {W} Plains
+Bot1.Hand.Authority of the Consuls.Cast(Spend: W)
+Bot1.Hand.Healer's Hawk.Cast
+? Stack = Barracks of the Thousand; Healer's Hawk
+[T9 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Hand.Authority of the Consuls.Cast(Spend: W from Barracks of the Thousand)
+Bot1.Hand.Healer's Hawk.Cast
+? Stack = Healer's Hawk
+[T9 Bot1.Main2]
+
+[Expect]
+Turn = 9
+Bot1.Battlefield = Authority of the Consuls; Authority of the Consuls; Barracks of the Thousand; Gnome Soldier; Gnome Soldier; Healer's Hawk; Healer's Hawk; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Plains

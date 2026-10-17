@@ -1,0 +1,48 @@
+# At the beginning of Bot1's first main phase on turn 3, Thousand Moons Smithy's trigger asks whether to tap five untapped
+# artifacts and/or creatures. Six are there (the Smithy, its Gnome Soldier and four Ornithoppers); Bot1 accepts and chooses
+# five, the Smithy itself among them (an effect's tap, not a {T} cost, CR 701.26a), leaving the fourth Ornithopter untapped.
+# The Smithy transforms (CR 701.27a) into Barracks of the Thousand, a legendary artifact land that stays the same tapped
+# permanent (CR 712.18), so it adds no mana this turn: its {T} ability is not offered. The Gnome Soldier counts the
+# Barracks, still an artifact, and the four Ornithopters: 6/6.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose(Thousand Moons Smithy; Gnome Soldier; Ornithopter#1; Ornithopter#2; Ornithopter#3)
+! Bot1.Battlefield.Barracks of the Thousand.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Barracks of the Thousand.Tapped = true
+Bot1.Battlefield.Barracks of the Thousand.Types = Artifact; Land
+Bot1.Battlefield.Barracks of the Thousand.Supertypes = Legendary
+Bot1.Battlefield = Barracks of the Thousand; Gnome Soldier; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Plains
+Bot1.Battlefield.Gnome Soldier.Tapped = true
+Bot1.Battlefield.Gnome Soldier.Power = 6
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Bot1.Battlefield.Ornithopter#3.Tapped = true
+Bot1.Battlefield.Ornithopter#4.Tapped = false

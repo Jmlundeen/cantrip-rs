@@ -1,0 +1,52 @@
+# Barracks of the Thousand triggers for "an artifact or creature spell" cast using its mana, whatever else paid for it too
+# (CR 601.2h: its {W} is some of the mana spent). On turn 3 its {W} casts Authority of the Consuls, an enchantment: no Gnome
+# Soldier. On turn 5 its {W} and a Plains' {W} pay Mind Stone's {2}, an artifact spell: a Gnome Soldier. On turn 7 its {W}
+# and Mind Stone's {C} pay Cathar Commando's {1}{W}, a creature spell: another.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Authority of the Consuls
+Mind Stone
+Cathar Commando
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose(Gnome Soldier; Ornithopter#1; Ornithopter#2; Ornithopter#3; Ornithopter#4)
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Hand.Authority of the Consuls.Cast
+? Stack = Authority of the Consuls
+[T5 Bot1.Main1]
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Mind Stone.Cast
+? Stack = Barracks of the Thousand; Mind Stone
+[T7 Bot1.Main1]
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: {T}: Add {C}.)
+Bot1.Hand.Cathar Commando.Cast
+? Stack = Barracks of the Thousand; Cathar Commando
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Authority of the Consuls; Barracks of the Thousand; Cathar Commando; Gnome Soldier; Gnome Soldier; Gnome Soldier; Mind Stone; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Plains

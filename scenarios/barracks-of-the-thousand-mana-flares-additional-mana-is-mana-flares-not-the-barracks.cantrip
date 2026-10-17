@@ -1,0 +1,52 @@
+# The source of mana an ability produces is that ability's source (CR 106.3): tapping Barracks of the Thousand with Mana Flare
+# out adds the Barracks' {W} and, by Mana Flare's triggered mana ability, a {W} whose source is Mana Flare. On turn 7 Bot1
+# casts Healer's Hawk with the plain {W} (`Spend: W`), which is Mana Flare's: no Gnome Soldier. The second Hawk is cast with
+# the Barracks' {W}: a Gnome Soldier. (Turn 3 taps the Smithy among the five; turn 5 casts Mana Flare with the Barracks', a
+# Plains' and a Mountain's mana, an enchantment spell that makes none.)
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Ornithopter
+Healer's Hawk
+Mountain
+Mana Flare
+Healer's Hawk
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose(Thousand Moons Smithy; Gnome Soldier; Ornithopter#1; Ornithopter#2; Ornithopter#3)
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Mana Flare.Cast
+? Stack = Mana Flare
+[T7 Bot1.Main1]
+Bot1.Battlefield.Barracks of the Thousand.Activate
+? Bot1.ManaFrom = {W} Barracks of the Thousand; {W} Mana Flare
+Bot1.Hand.Healer's Hawk.Cast(Spend: W)
+Bot1.Hand.Healer's Hawk.Cast
+? Stack = Barracks of the Thousand; Healer's Hawk
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Barracks of the Thousand; Gnome Soldier; Gnome Soldier; Healer's Hawk; Healer's Hawk; Mana Flare; Mountain; Ornithopter; Ornithopter; Ornithopter; Plains

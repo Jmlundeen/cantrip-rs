@@ -1,0 +1,64 @@
+# Thousand Moons Smithy's enter trigger makes a white Gnome Soldier artifact creature token whose power and toughness are
+# the number of artifacts and/or creatures its controller controls (CR 604.3): the Smithy and the token itself count, each
+# Ornithopter (an artifact and a creature) counts once, a Plains does not, and Bot2's own Ornithopter does not. At the
+# beginning of Bot1's first main phase on turn 3 only four untapped artifacts and/or creatures are there, so tapping five is
+# impossible and nothing is asked (CR 609.3). A Sol Ring makes five; Bot2's first main phase on turn 4 asks nothing ("your"),
+# and on turn 5 the question is asked and Bot1 declines: the Smithy stays a Smithy and nothing is tapped.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Sol Ring
+Plains
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+? Bot1.Battlefield.Gnome Soldier.Power = 2
+? Bot1.Battlefield.Gnome Soldier.Toughness = 2
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Gnome Soldier.Power = 4
+Bot2.Hand.Ornithopter.Cast
+? Bot1.Battlefield.Gnome Soldier.Power = 4
+[T3 Bot1.Main1]
+? Stack = Thousand Moons Smithy
+Bot1.Pass
+! Bot1.Accept
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Sol Ring.Cast
+[T4 Bot2.Upkeep]
+? Bot1.Battlefield.Gnome Soldier.Power = 5
+[T4 Bot2.Main1]
+? Stack.Count = 0
+! Bot1.Accept
+[T5 Bot1.Main1]
+Bot1.Decline
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Thousand Moons Smithy.Tapped = false
+Bot1.Battlefield.Gnome Soldier.Tapped = false
+Bot1.Battlefield.Gnome Soldier.Power = 5
+Bot1.Battlefield.Gnome Soldier.Toughness = 5
+Bot1.Battlefield.Gnome Soldier.Colors = White
+Bot1.Battlefield.Gnome Soldier.Types = Artifact; Creature
+Bot1.Battlefield.Gnome Soldier.Subtypes = Gnome; Soldier
+Bot1.Battlefield.Gnome Soldier.Token = true
+Bot1.Battlefield.Ornithopter#1.Tapped = false
+Bot1.Battlefield.Sol Ring.Tapped = false

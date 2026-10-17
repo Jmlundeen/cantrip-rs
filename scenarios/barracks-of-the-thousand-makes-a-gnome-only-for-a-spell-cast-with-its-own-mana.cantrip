@@ -1,0 +1,58 @@
+# Barracks of the Thousand: "Whenever you cast an artifact or creature spell using mana produced by Barracks of the Thousand,
+# create a white Gnome Soldier" (CR 106.3, 601.2h). Turn 3 transforms the Smithy, tapping the Gnome Soldier and four
+# Ornithopters and leaving the Barracks untapped. Its {W} casts a Healer's Hawk: a second Gnome Soldier. On turn 5 a
+# Healer's Hawk cast with a Plains' {W} makes none, and on turn 7 an Ornithopter cast for no mana at all makes none either:
+# no mana the Barracks produced was spent on them. Bot2's Ornithopter on turn 4 is not a spell Bot1 cast ("you").
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thousand Moons Smithy
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Healer's Hawk
+Healer's Hawk
+Ornithopter
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thousand Moons Smithy.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Accept
+Bot1.Choose(Gnome Soldier; Ornithopter#1; Ornithopter#2; Ornithopter#3; Ornithopter#4)
+Bot1.Battlefield.Barracks of the Thousand.Activate
+Bot1.Hand.Healer's Hawk.Cast
+? Stack = Barracks of the Thousand; Healer's Hawk
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Gnome Soldier#2.Power = 8
+Bot2.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healer's Hawk.Cast
+? Stack = Healer's Hawk
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Barracks of the Thousand; Gnome Soldier; Gnome Soldier; Healer's Hawk; Healer's Hawk; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Ornithopter; Plains
+Bot1.Battlefield.Gnome Soldier#1.Power = 10
+Bot1.Battlefield.Gnome Soldier#2.Toughness = 10
+Bot2.Battlefield = Ornithopter
