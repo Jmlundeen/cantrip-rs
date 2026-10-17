@@ -908,7 +908,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             eligible: (0..choices.len() as i32).collect(),
             count: 1,
             at_most: 1,
-            heading: subtype_heading(choices, *purpose),
+            heading: subtype_heading(game.cards.get(game.chars(*source).card).name, choices, *purpose),
             detail: match purpose {
                 WordUse::Chosen => String::new(),
                 WordUse::Replaced => "Every instance of it in the target's text is replaced".into(),
@@ -1349,13 +1349,13 @@ mod tests {
 }
 
 /// What a choice of a subtype says it is for: "Choose a creature type" for one an effect names from now on (the heading the
-/// bots read it by), and for a word of a text change (CR 612.1) which word it is - the one replaced, or the one replacing it -
+/// bots read it by), and for a word of a text change (CR 612.1), after the spell's name, which word it is - the one replaced, or the one replacing it -
 /// and its kind, a creature type or a basic land type.
-fn subtype_heading(choices: &[Subtype], purpose: WordUse) -> String {
+fn subtype_heading(source: &str, choices: &[Subtype], purpose: WordUse) -> String {
     let kind = if choices.first().is_some_and(|s| s.is_creature_type()) { "creature type" } else { "basic land type" };
     match purpose {
         WordUse::Chosen => "Choose a creature type".into(),
-        WordUse::Replaced => format!("Choose the {kind} to replace"),
-        WordUse::Replacing => format!("Choose the {kind} that replaces it"),
+        WordUse::Replaced => format!("{source}: choose the {kind} to replace"),
+        WordUse::Replacing => format!("{source}: choose the {kind} that replaces it"),
     }
 }

@@ -81,8 +81,8 @@ public sealed partial class TacticalPlay
     /// <summary>A creature type or basic land type of a text change (CR 612.1): the one to replace, or the one replacing it.</summary>
     private static int? TextChangeSubtype(GameClient client, PlayerView view, ChooseModesPromptMessage prompt)
     {
-        bool replaced = prompt.Heading.StartsWith("Choose the ", StringComparison.Ordinal) && prompt.Heading.EndsWith(" to replace", StringComparison.Ordinal);
-        bool replacing = prompt.Heading.StartsWith("Choose the ", StringComparison.Ordinal) && prompt.Heading.EndsWith(" that replaces it", StringComparison.Ordinal);
+        bool replaced = prompt.Heading.Contains(": choose the ", StringComparison.Ordinal) && prompt.Heading.EndsWith(" to replace", StringComparison.Ordinal);
+        bool replacing = prompt.Heading.Contains(": choose the ", StringComparison.Ordinal) && prompt.Heading.EndsWith(" that replaces it", StringComparison.Ordinal);
         if (!(replaced || replacing) || prompt.Eligible.Count == 0)
         {
             return null;

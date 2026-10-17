@@ -427,7 +427,10 @@ public static partial class CardReading
                 UsesIt: plain.Contains("copy", StringComparison.Ordinal));
         }
 
-        if (plain.Contains("gain control of target", StringComparison.Ordinal))
+        // "Gain control of target creature" (Act of Treason, Old Man of the Sea), or an Aura's "you control enchanted
+        // creature" (Mind Control, Treachery), aimed as its enchant ability targets.
+        if (plain.Contains("gain control of target", StringComparison.Ordinal)
+            || plain.Contains("you control enchanted creature", StringComparison.Ordinal))
         {
             return new EffectRead(EffectKind.Steal);
         }
