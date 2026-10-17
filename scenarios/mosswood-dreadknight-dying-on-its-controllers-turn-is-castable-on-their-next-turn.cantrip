@@ -1,0 +1,45 @@
+# Mosswood Dreadknight: "until the end of your next turn" (CR 611.2), where it dies on its controller's own turn. Bot1 Bolts
+# its own Dreadknight on turn 3; its next turn is turn 5, not the rest of turn 3, so on turn 5 Bot1 casts Dread Whispers from
+# the graveyard (drawing a card, losing 1 life), and the card goes into exile on its Adventure (CR 715.4).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mosswood Dreadknight
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mosswood Dreadknight.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Mosswood Dreadknight)
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Mosswood Dreadknight.Cast(Ability: Adventure)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 19
+Exile = Mosswood Dreadknight

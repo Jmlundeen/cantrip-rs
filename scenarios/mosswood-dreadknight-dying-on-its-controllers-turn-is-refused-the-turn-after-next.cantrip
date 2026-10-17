@@ -1,0 +1,41 @@
+# Mosswood Dreadknight: "until the end of your next turn" (CR 611.2). Bot1 Bolts its own Dreadknight on turn 3, so the
+# permission lasts through turn 5, Bot1's next turn; on turn 7, with {1}{B} untapped, Dread Whispers is no longer offered.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mosswood Dreadknight
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mosswood Dreadknight.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Mosswood Dreadknight)
+Bot1.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
+! Bot1.Graveyard.Mosswood Dreadknight.Cast
+[T7 Bot1.Main2]
+
+[Expect]
+Turn = 7
+Bot1.Life = 20
+Bot1.Graveyard = Mosswood Dreadknight; Lightning Bolt
