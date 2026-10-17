@@ -1,0 +1,41 @@
+# Oblivious Bookworm: "At the beginning of your end step, you may draw a card. If you do, discard a card unless a
+# permanent entered the battlefield face down under your control this turn or you turned a permanent face up this
+# turn." With no face-down permanent anywhere, the "unless" never holds.
+#
+# Turn 1 Bot1 casts the Bookworm off two Moxes and declines its draw at the end step: nothing is drawn and nothing is
+# discarded. On turn 3 Bot1 accepts: it draws Counterspell and must discard a card (CR 608.2c: "if you do" is the draw
+# having happened), and discards the Counterspell.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Oblivious Bookworm
+Island x4
+Island
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+[T1 Bot1.End]
+Bot1.Decline
+[T2 Bot2.Main1]
+? Bot1.Hand.Count = 4
+? Bot1.Library.Count = 12
+? Bot1.Graveyard.Count = 0
+[T3 Bot1.End]
+Bot1.Accept
+Bot1.Choose(Counterspell)
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 10
+Bot1.Graveyard = Counterspell

@@ -1,0 +1,26 @@
+# Oblivious Bookworm: "If you do, discard a card" follows a card actually drawn (CR 608.2c). Bot1's deck is its opening
+# hand, so its library is empty when it accepts the turn-1 end-step draw: nothing is drawn, nothing is discarded (four
+# Islands stay in hand), and having tried to draw from an empty library Bot1 loses the game (CR 704.5b).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Oblivious Bookworm
+Island x4
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+[T1 Bot1.End]
+Bot1.Accept
+
+[Expect]
+Result = Bot2 won
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 0

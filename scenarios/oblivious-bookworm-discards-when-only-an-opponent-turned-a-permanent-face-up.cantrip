@@ -1,0 +1,59 @@
+# Oblivious Bookworm: "you turned a permanent face up this turn". On Bot1's turn 3 Bot2 manifests dread (Turn Inside
+# Out and Lightning Bolt on its own Llanowar Elves, off Black Lotus) and then turns the manifested Fervent Champion face
+# up for {R}, the Lotus's last mana. A permanent was turned face up this turn, but by Bot2, and it entered face down
+# under Bot2's control: Bot1's end-step draw is still followed by a discard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Oblivious Bookworm
+Island x4
+Island
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Swamp x2
+Swamp
+Fervent Champion
+Swamp x11
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+[T1 Bot1.End]
+Bot1.Decline
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Turn Inside Out.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Arrange(Fervent Champion | Swamp)
+Bot2.Battlefield.#1.Activate
+? Bot2.Battlefield.Fervent Champion.FaceDown = (absent)
+[T3 Bot1.End]
+Bot1.Accept
+Bot1.Choose(Counterspell)
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 10
+Bot1.Graveyard = Counterspell
+Bot2.Battlefield.Fervent Champion.Power = 1

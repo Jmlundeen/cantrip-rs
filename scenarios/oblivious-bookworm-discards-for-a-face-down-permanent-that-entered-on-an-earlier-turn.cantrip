@@ -1,0 +1,52 @@
+# Oblivious Bookworm: "entered the battlefield face down ... this turn". The manifested Llanowar Elves entered face down
+# on turn 1 and is still face down on turn 3, but nothing entered face down or was turned face up on turn 3, so the
+# end-step draw is followed by a discard. The same opening as the scenario that turns the Elves face up in response,
+# without the turning up: that one keeps the Counterspell, this one must discard a card and discards it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Oblivious Bookworm
+Llanowar Elves
+Island
+Forest
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Llanowar Elves | Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+[T3 Bot1.End]
+Bot1.Accept
+Bot1.Choose(Counterspell)
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 6
+Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield..FaceDownName = Llanowar Elves

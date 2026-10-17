@@ -1,0 +1,58 @@
+# Oblivious Bookworm: a permanent entered the battlefield face down under Bot1's control this turn, so the end-step draw
+# is not followed by a discard (CR 708.3, 701.40a, 701.62a).
+#
+# Turn 1 Bot1 casts the Bookworm and declines its end-step draw. On turn 3 Black Lotus makes {R}{R}{R}: Turn Inside Out
+# on Bot1's own Llanowar Elves, then Lightning Bolt kills them, and "when it dies this turn, manifest dread" puts the
+# Snapcaster Mage onto the battlefield face down (the Island into the graveyard). At the end step Bot1 draws Counterspell
+# and keeps it: the hand, empty before, holds only Counterspell, which a discard would have taken.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Sapphire
+Oblivious Bookworm
+Forest
+Black Lotus
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Snapcaster Mage
+Island
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+Bot1.Hand.Forest.Play
+[T1 Bot1.End]
+Bot1.Decline
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Snapcaster Mage | Island)
+? Bot1.Hand.Count = 0
+? Bot1.Battlefield..FaceDown = true
+[T3 Bot1.End]
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Bot1.Hand = Counterspell
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield..FaceDownName = Snapcaster Mage

@@ -1,0 +1,60 @@
+# Oblivious Bookworm: "you turned a permanent face up this turn" (CR 701.40b, 708.8), read as the ability resolves - so a
+# permanent turned face up with the trigger on the stack counts (the ruling: only once it begins to resolve is it too
+# late). The face-down permanent entered on turn 1, not this turn: only the turning up can make the "unless" hold.
+#
+# Turn 1: Black Lotus for {R}{R}{R}, Mox Emerald for Llanowar Elves, Turn Inside Out on them and Lightning Bolt: they die
+# and manifest dread puts a second Llanowar Elves onto the battlefield face down. Turn 3 Bot1 draws the Forest, plays it
+# and casts the Bookworm with Mox Sapphire. At the end step, with the Bookworm's trigger on the stack, Bot1 turns the
+# manifested Elves face up for {G} from Mox Emerald (a special action, no stack). Then it draws Counterspell and keeps it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Oblivious Bookworm
+Llanowar Elves
+Island
+Forest
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Llanowar Elves | Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Oblivious Bookworm.Cast
+[T3 Bot1.End]
+? Stack.Count = 1
+? Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield.#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+? Stack.Count = 1
+? Bot1.Battlefield.Llanowar Elves.FaceDown = (absent)
+Bot1.Accept
+
+[Expect]
+Turn = 3
+Bot1.Hand = Counterspell
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield.Llanowar Elves.Power = 1
