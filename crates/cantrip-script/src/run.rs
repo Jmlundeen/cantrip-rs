@@ -391,7 +391,7 @@ impl<'s> Run<'s> {
                     .iter()
                     .map(|o| {
                         let src = o.source.map(name).unwrap_or_default();
-                        let desc = describe(g.cards, &g.state, o);
+                        let desc = describe(g.cards, &g.state, &g.log, o);
                         format!("{:?} {src} #{} {desc}{}", o.kind, o.index, o.mana.map(|m| format!(" {m:?}")).unwrap_or_default())
                     })
                     .collect();
@@ -1880,7 +1880,7 @@ impl<'s> Run<'s> {
             } else {
                 offered.retain(|o| {
                     // An Adventure or an Omen says which face of the card is cast, as the C# engine's description does.
-                    let text = describe(g.cards, &g.state, o);
+                    let text = describe(g.cards, &g.state, &g.log, o);
                     let text = match o.index {
                         WAY_ADVENTURE => format!("as its Adventure, {text}"),
                         WAY_OMEN => format!("as its Omen, {text}"),

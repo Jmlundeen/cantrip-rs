@@ -445,7 +445,7 @@ impl StateDump {
                     d.set(format!("{key}.Power"), c.power.unwrap_or(0));
                     d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));
                     d.set(format!("{key}.Damage"), obj.damage);
-                    d.set(format!("{key}.SummoningSick"), summoning_sick(game.cards, s, id));
+                    d.set(format!("{key}.SummoningSick"), summoning_sick(game.cards, s, &game.log, id));
                 }
                 // A colour chosen as it entered and kept on it (CR 614.12a).
                 if let Some(color) = obj.chosen_color {

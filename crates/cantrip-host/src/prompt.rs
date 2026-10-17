@@ -230,7 +230,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     m.targets_required = i32::from(o.targets_required);
     m.targets_optional = o.targets_optional;
     m.color_choices = colors_view(o.color_choices);
-    m.description = describe(game.cards, &game.state, o).to_string();
+    m.description = describe(game.cards, &game.state, &game.log, o).to_string();
     if m.kind == ActionKindView::UnlockDoor {
         m.description = format!("Unlock {} {}", m.spell_name, m.cost_text);
     }

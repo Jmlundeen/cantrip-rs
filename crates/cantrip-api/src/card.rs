@@ -5,6 +5,7 @@ use cantrip_state::*;
 
 use crate::chars::Chars;
 use crate::event::{Event, EventMask};
+use crate::history::History;
 use crate::game::{CastTerms, CastWay, Game, Query, Suspend};
 use crate::replace::{GrantedReplacementDef, ReplacementDef};
 
@@ -131,12 +132,16 @@ pub enum Layer {
     End,
 }
 
-/// What a static ability's functions may read while the layers are being applied: the state, and other objects'
-/// characteristics as the layers before the one being applied leave them (CR 613.8 is not modelled; reading only
-/// earlier layers is what keeps it finite).
+/// What a static ability's functions may read while the layers are being applied: the state, the event history, and
+/// other objects' characteristics as the layers before the one being applied leave them (CR 613.8 is not modelled;
+/// reading only earlier layers is what keeps it finite).
 pub trait LayerQuery {
     fn state(&self) -> &GameState;
     fn cards(&self) -> &CardTable;
+    /// Every event since the game began (`crate::history`): what a static ability's condition about the past asks, "as
+    /// long as you've lost life this turn" (CR 611.3a: its effect is not locked in, so the layers ask it again whenever
+    /// characteristics are computed, and the answer follows each event as it is recorded and each turn as it begins).
+    fn history(&self) -> History<'_>;
     /// Another object's characteristics, through the layers before the one being applied.
     fn chars(&self, id: ObjectId) -> Chars;
     /// Another object's characteristics with its own characteristic-defining abilities of power and toughness applied too

@@ -69,9 +69,11 @@ pub fn put_into_graveyard_from_battlefield_this_turn(q: &dyn Query, owner: Playe
         .collect()
 }
 
-/// Whether `permanent` entered the battlefield this turn (CR 400.7: it is the object that move made).
-pub fn entered_this_turn(q: &dyn Query, permanent: ObjectId) -> bool {
-    q.history()
+/// Whether `permanent` entered the battlefield this turn (CR 400.7: it is the object that move made). Asked of a history
+/// so that a static ability's condition reads it too (`LayerQuery::history`): Shardmage's Rescue's "as long as this Aura
+/// entered this turn", The Wandering Emperor's, power-up's cost.
+pub fn entered_this_turn(history: History<'_>, permanent: ObjectId) -> bool {
+    history
         .select(EventQuery::kind(EventMask::ZONE_CHANGE).to(ZoneKind::Battlefield).this_turn())
         .any(|r| matches!(r.event, Event::ZoneChange { new, .. } if new == permanent))
 }

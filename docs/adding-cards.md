@@ -229,6 +229,11 @@ Any question about the past is answered there, never with a new field in the sta
 3. **The core only records.** If an event a card needs is not recorded, record it (an `Event` variant emitted where
    the rules do the thing, or `Cx::record` for one no ability triggers on); never add a counter.
 
+A static ability's condition asks it too: its functions are handed a `LayerQuery`, whose `history()` is the same
+history (`view.history().life_lost(you) > 0` for Essence Channeler's "as long as you've lost life this turn",
+`history::entered_this_turn(view.history(), source)` for Shardmage's Rescue). The layers ask it again whenever
+characteristics are computed (CR 611.3a), so the effect starts the moment the event is recorded and stops as the turn ends.
+
 **A card file that is only `CardDef { ..oracle::X }` is a stub**, and `crates/cantrip-cards/tests/no_stub_cards.rs` fails on
 one for a card whose Oracle text is more than core keywords (a card that is all core keywords needs no file). The
 exceptions are a draft-only card (`draftAbilities` in its JSON) and a file that starts a comment `// Characteristics only:`

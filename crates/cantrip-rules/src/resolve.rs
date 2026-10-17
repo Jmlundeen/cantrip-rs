@@ -167,7 +167,7 @@ pub fn target_legal(cards: &CardTable, state: &GameState, events: &[Record], ite
     let q = Reader { cards, state, events };
     // A slot of its own sees what the slots before it chose (CR 601.2c).
     let earlier = if item.target_count > 1 { &item.targets[..slot] } else { &[][..] };
-    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false }, &asker, target) && layers::can_target(cards, state, &asker, target)
+    (spec.filter)(&Given { q: &q, earlier, subject: item.subject, slot_player, gift: false }, &asker, target) && layers::can_target(cards, state, events, &asker, target)
 }
 
 /// A `Query` that also says what the earlier target slots chose, for the filter of a later one.
@@ -249,11 +249,11 @@ impl Query for Reader<'_> {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        layers::chars(self.cards, self.state, id)
+        layers::chars(self.cards, self.state, self.events, id)
     }
 
     fn can_target(&self, asker: &Asker, target: Target) -> bool {
-        layers::can_target(self.cards, self.state, asker, target)
+        layers::can_target(self.cards, self.state, self.events, asker, target)
     }
 }
 

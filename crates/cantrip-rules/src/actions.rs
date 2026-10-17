@@ -65,7 +65,7 @@ fn activated(cx: &Cx, ability: AbilityRef) -> Option<&'static ActivatedDef> {
 /// offered at all.
 fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> bool {
     let obj = cx.s().obj(source);
-    if cost.tap && (obj.tapped || summoning_sick(cx.cards(), cx.s(), source)) {
+    if cost.tap && (obj.tapped || summoning_sick(cx.cards(), cx.s(), &cx.g.log, source)) {
         return false;
     }
     if let Some(loyalty) = cost.loyalty
@@ -1001,7 +1001,7 @@ impl Query for AsFace<'_> {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        if id == self.spell { layers::chars_as_face(self.cx.cards(), self.cx.s(), id, self.face) } else { self.cx.chars(id) }
+        if id == self.spell { layers::chars_as_face(self.cx.cards(), self.cx.s(), &self.cx.g.log, id, self.face) } else { self.cx.chars(id) }
     }
 
     fn card_id(&self, def: &'static CardDef) -> CardId {
@@ -2406,7 +2406,7 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
 /// The text an option is matched by and a menu row shows: an alternative cost's, a granted way's or an ability's. A cast a
 /// standing permission lets a card have (CR 601.3) says what the permission changes: "Flashback {2}{R}" for a flashback granted
 /// (Snapcaster Mage), "Cast without paying its mana cost", "Cast by paying {1}{U} instead".
-pub fn describe(cards: &CardTable, state: &GameState, option: &ActionOption) -> std::borrow::Cow<'static, str> {
+pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption) -> std::borrow::Cow<'static, str> {
     let Some(source) = option.source else { return "".into() };
     if option.kind == ActionKind::CastSpell
         && option.index == 0
@@ -2431,13 +2431,13 @@ pub fn describe(cards: &CardTable, state: &GameState, option: &ActionOption) -> 
         if let Some((_, face_def)) = faces_to_cast(def).into_iter().find(|&(f, _)| f == face)
             && (face != GRANTED_FACE_WHOLE || def.inset_faces().next().is_some() || def.back.is_some_and(|b| b.has_cost))
         {
-            return format!("{}: {}", face_def.name, describe_way(cards, state, option, source)).into();
+            return format!("{}: {}", face_def.name, describe_way(cards, state, log, option, source)).into();
         }
     }
-    describe_way(cards, state, option, source).into()
+    describe_way(cards, state, log, option, source).into()
 }
 
-fn describe_way(cards: &CardTable, state: &GameState, option: &ActionOption, source: ObjectId) -> &'static str {
+fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption, source: ObjectId) -> &'static str {
     match option.kind {
         ActionKind::CastSpell if matches!(option.index, WAY_ADVENTURE | WAY_OMEN) => {
             cards.get(state.obj(source).card).inset_face(option.index).map_or("", |a| a.name)
@@ -2462,7 +2462,7 @@ fn describe_way(cards: &CardTable, state: &GameState, option: &ActionOption, sou
                 _ => "",
             }),
         ActionKind::ActivateAbility => {
-            let chars = layers::chars(cards, state, source);
+            let chars = layers::chars(cards, state, log, source);
             chars.abilities().nth(option.index as usize).map(|a| cards.ability(a).text()).unwrap_or("")
         }
         _ => "",

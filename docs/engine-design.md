@@ -138,8 +138,8 @@ nothing out of them: what an object was is read from its row, frozen as it left,
 also the last-known-information record for one-off mechanics. A question about the past ("life gained this turn",
 "the first card drawn in its controller's draw step") is a query over it: written in the card's file when one card
 asks it, moved to `cantrip_mechanics::history` when a second printed card asks it in the same words. The core only
-records events; no per-turn counter answers a history question. One static ability (Shardmage's Rescue) keeps a
-`controlled_since` field because layers cannot read the history.
+records events; no per-turn counter answers a history question, the layers' included: a static ability's condition reads
+the history through `LayerQuery::history` (below).
 
 - **Causes are recorded.** Each event names what produced it, which serves explanations, debugging and the AI's
   features.
@@ -193,6 +193,16 @@ question over writing each card as explicit stages, which the spike measured, an
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.
+- **A static ability whose condition is about the past** ("as long as you've lost life this turn", "as long as this Aura
+  entered this turn") asks the event history (`LayerQuery::history`, the same records `q.history()` reads). The effect of
+  a static ability is not locked in (CR 611.3a): the layers apply it whenever its condition holds as characteristics are
+  computed. The history is a pure function of the position - kept beside the state, restored with it as the game tree
+  moves, never cached - so every layers entry point (`layers::chars`, `can_target`, `targeting_rule`, `summoning_sick`,
+  `describe`) is handed the log with the state. No cache holds characteristics: only the static-ability source list is
+  cached on the epoch, and which permanents have static abilities does not depend on the history, so recording an event
+  (which does not move the epoch) needs no invalidation; the condition's answer changes the moment an event is recorded
+  and the moment a new turn begins. Essence Channeler and Shardmage's Rescue read it; the "this turn" conditions printed on
+  Tenured Concocter, Thornfist Striker, Brightspear Zealot, Eyekite and the celebration cards are the same shape.
 - **No strings at runtime:** keywords, types, subtypes and colors are enums or bitsets, card behavior is reached by
   function index, and nothing about a card is read from JSON while a game runs.
 
@@ -660,7 +670,7 @@ answering ... us per decision", one thread). The spike
 decision (2026-10-15), 5.90 us after ending the turn (CR 724) and the exact cleanup step (2026-10-16, 5.99 us before); 6.03-6.45 us after mana
 restricted to abilities of [type] sources (CR 106.6), against 6.08-6.14 us before on the same, noisy, machine. Costs that depend
 on the targets (CR 601.2c, 601.2f) and hexproof from a quality (CR 702.11d), 2026-10-16, three runs alternating with
-origin/main: 5.80, 6.03, 5.83 us before and 5.95, 5.89, 5.82 us after (5.89 mean both). Craft's materials as a cost (CR 702.167a): 5.65-5.94 us against 5.52-6.24 us before, interleaved on a busy machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16). The solved designation, suspect and the play-rule walk (`each_play_rule`), alternating with the build before them: 6.38, 6.83, 6.33 us against 6.36, 6.50, 6.08 us (2026-10-16, a busy machine). Damage redirection and damage that stays (CR 614.1a, 616.1, 514.2), seven runs alternating with origin/main on a busy machine: best 6.46 us against 6.36 us before, medians lost in the noise (2026-10-16). The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
+origin/main: 5.80, 6.03, 5.83 us before and 5.95, 5.89, 5.82 us after (5.89 mean both). Craft's materials as a cost (CR 702.167a): 5.65-5.94 us against 5.52-6.24 us before, interleaved on a busy machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16). The solved designation, suspect and the play-rule walk (`each_play_rule`), alternating with the build before them: 6.38, 6.83, 6.33 us against 6.36, 6.50, 6.08 us (2026-10-16, a busy machine). Damage redirection and damage that stays (CR 614.1a, 616.1, 514.2), seven runs alternating with origin/main on a busy machine: best 6.46 us against 6.36 us before, medians lost in the noise (2026-10-16). Static abilities reading the event history (the log handed to every layers entry point, CR 611.3a), six runs alternating with the build before on a busy machine: best 6.43 us against 6.34 us before, medians 7.0 and 8.1 us (2026-10-16). The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
 the cost in the layers, not in the new features' own code:
 
 - `chars()` rebuilt a card's printed values for every object on every question, and scanned the battlefield for

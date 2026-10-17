@@ -880,7 +880,7 @@ impl<'a> Projector<'a> {
             tapped: obj.tapped,
             damage_marked: i32::from(obj.damage),
             counters,
-            summoning_sick: on_battlefield && summoning_sick(game.cards, s, id),
+            summoning_sick: on_battlefield && summoning_sick(game.cards, s, &game.log, id),
             produces_mana: c.abilities().any(|a| matches!(game.cards.ability(a), AbilityDef::Activated(d) if d.is_mana_ability())),
             monstrous: obj.marks.monstrous,
             solved: on_battlefield && obj.marks.solved,

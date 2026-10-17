@@ -633,7 +633,7 @@ fn consider(
     found: &mut Found,
     mut later: Option<&mut Found>,
 ) {
-    let chars = layers::chars(cx.cards(), cx.s(), source);
+    let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
     let controller = cx.s().obj(source).controller;
     for ability in chars.abilities() {
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
@@ -646,7 +646,7 @@ fn consider(
                 continue;
             }
             // "Ward abilities of those creatures don't trigger" (CR 702.21a, Nowhere to Run): asked only of a ward that matched.
-            if t.ward && layers::targeting_rule(cx.cards(), cx.s(), TargetingRuleKind::SuppressWard, source) {
+            if t.ward && layers::targeting_rule(cx.cards(), cx.s(), &cx.g.log, TargetingRuleKind::SuppressWard, source) {
                 continue;
             }
             let triggering = Triggering { source, controller, def: t, permanent };
@@ -843,7 +843,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
             .filter(|&id| cards.anywhere[cx.s().obj(id).card.0 as usize] || (granted && cx.s().obj(id).zone.is(ZoneKind::Stack)))
             .collect();
         for id in elsewhere {
-            let chars = layers::chars(cx.cards(), cx.s(), id);
+            let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
             for ability in chars.abilities() {
                 if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
                     && t.anywhere

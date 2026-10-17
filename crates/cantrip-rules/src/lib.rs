@@ -390,7 +390,7 @@ impl Game {
 
     /// An object's characteristics.
     pub fn chars(&self, id: ObjectId) -> Chars {
-        layers::chars(self.cards, &self.state, id)
+        layers::chars(self.cards, &self.state, &self.log, id)
     }
 
     /// The name an object shows (its copiable values' name).
@@ -564,11 +564,11 @@ impl Query for Game {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        layers::chars(self.cards, &self.state, id)
+        layers::chars(self.cards, &self.state, &self.log, id)
     }
 
     fn can_target(&self, asker: &Asker, target: Target) -> bool {
-        layers::can_target(self.cards, &self.state, asker, target)
+        layers::can_target(self.cards, &self.state, &self.log, asker, target)
     }
 }
 
@@ -590,11 +590,11 @@ impl Query for Cx<'_> {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        layers::chars(self.g.cards, &self.g.state, id)
+        layers::chars(self.g.cards, &self.g.state, &self.g.log, id)
     }
 
     fn can_target(&self, asker: &Asker, target: Target) -> bool {
-        layers::can_target(self.g.cards, &self.g.state, asker, target)
+        layers::can_target(self.g.cards, &self.g.state, &self.g.log, asker, target)
     }
 }
 

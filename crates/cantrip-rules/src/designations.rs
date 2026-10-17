@@ -82,7 +82,7 @@ pub fn combat_damage(cx: &mut Cx, source: ObjectId, victim: PlayerId, amount: u1
     }
     // A creature, as it last existed (CR 603.10): it may have died dealing the damage.
     let creature = if cx.s().obj(source).zone.is(ZoneKind::Battlefield) {
-        crate::layers::chars(cx.cards(), cx.s(), source).is(CardType::Creature)
+        crate::layers::chars(cx.cards(), cx.s(), &cx.g.log, source).is(CardType::Creature)
     } else {
         cx.s().last_known(source).is_some_and(|l| l.types.has(CardType::Creature))
     };

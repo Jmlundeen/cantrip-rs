@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 fn instant_loyalty(q: &dyn Query, asker: &Asker, source: ObjectId, index: u8, activator: PlayerId) -> bool {
     source == asker.source
         && activator == asker.controller
-        && cantrip_mechanics::history::entered_this_turn(q, source)
+        && cantrip_mechanics::history::entered_this_turn(q.history(), source)
         && q.chars(source).abilities().nth(index as usize).and_then(|a| q.activated_ability(a)).is_some_and(|d| d.is_loyalty_ability())
 }
 

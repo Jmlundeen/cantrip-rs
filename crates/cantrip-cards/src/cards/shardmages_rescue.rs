@@ -1,13 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, targets};
+use cantrip_mechanics::{attach::attached_object, history::entered_this_turn, targets};
 use cantrip_oracle as oracle;
 
-/// "As long as this Aura entered this turn, enchanted creature has hexproof" (CR 702.11): every new object records the
-/// turn it was made in `controlled_since`, which for an Aura is the turn it entered. A static ability is computed by the
-/// layers, which read the state and not the event history, so this is the one "entered this turn" not asked of the
-/// history; it would be wrong only for an Aura whose control changed the turn it entered.
+/// "As long as this Aura entered this turn, enchanted creature has hexproof" (CR 702.11, 611.3a): asked of the event
+/// history whenever the layers apply, so it holds from the moment the Aura is on the battlefield until the turn ends, and
+/// an Aura that left and came back is a new object that entered when it came back (CR 400.7).
 fn enchanted_and_entered_this_turn(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
-    attached_object(view, source, affected, so_far) && view.state().obj(source).controlled_since == view.state().turn.number
+    attached_object(view, source, affected, so_far) && entered_this_turn(view.history(), source)
 }
 
 fn hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

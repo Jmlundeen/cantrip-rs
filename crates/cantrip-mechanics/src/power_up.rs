@@ -18,7 +18,7 @@ use crate::history::entered_this_turn;
 /// the mana cost it has now, a copy's being the one it copies (CR 707.2). An object that left and came back entered
 /// anew (CR 400.7).
 pub fn reduction(q: &dyn Query, permanent: ObjectId, _: PlayerId, _: Costed, _: &[Target]) -> CostDelta {
-    if !entered_this_turn(q, permanent) {
+    if !entered_this_turn(q.history(), permanent) {
         return CostDelta::NONE;
     }
     CostDelta::less_mana(q.mana_cost(permanent))

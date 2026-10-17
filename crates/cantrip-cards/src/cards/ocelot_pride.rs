@@ -27,7 +27,7 @@ fn cats(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     let tokens: Vec<ObjectId> =
-        g.permanents_of(you).into_iter().filter(|&t| g.obj(t).token && entered_this_turn(g, t)).collect();
+        g.permanents_of(you).into_iter().filter(|&t| g.obj(t).token && entered_this_turn(g.history(), t)).collect();
     if tokens.iter().all(|&t| g.obj(t).copy.is_none()) {
         let copies: Vec<(CardId, PlayerId)> = tokens.iter().map(|&t| (g.obj(t).card, you)).collect();
         // A copy has the copiable values of what it copies (CR 707.2), not the words of Ocelot Pride's text.

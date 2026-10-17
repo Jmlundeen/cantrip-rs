@@ -129,7 +129,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         // it on elsewhere, so that it was "exiled this way".
         let madness = change.madness && to.is(ZoneKind::Exile);
         if from.is(ZoneKind::Battlefield) {
-            let c = layers::chars(cx.cards(), cx.s(), m.id);
+            let c = layers::chars(cx.cards(), cx.s(), &cx.g.log, m.id);
             let words = cantrip_api::words(cx.s(), m.id);
             cx.st().last_known_push(LastKnown {
                 id: m.id,
@@ -1022,7 +1022,7 @@ pub fn become_prepared(cx: &mut Cx, permanent: ObjectId) {
     if !live(cx.s(), permanent) || !cx.s().obj(permanent).zone.is(ZoneKind::Battlefield) || cx.s().obj(permanent).prepared {
         return;
     }
-    let card = layers::chars(cx.cards(), cx.s(), permanent).card;
+    let card = layers::chars(cx.cards(), cx.s(), &cx.g.log, permanent).card;
     let Some(spell) = cx.cards().get(card).prepare else { return };
     let spell = cx.cards().id_of(spell);
     let controller = cx.s().obj(permanent).controller;
@@ -1509,7 +1509,7 @@ pub fn deal_damage_with(
     }
     // Protection prevents the damage (CR 702.16e, 702.16j) unless it can't be prevented (CR 615.12). Where replacement
     // effects applied, protection was ordered with them (CR 616.1) and has prevented it already if it applies.
-    let source_chars = layers::chars(cx.cards(), cx.s(), source);
+    let source_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
     match target {
         Target::None | Target::Ability(_) => None,
         Target::Player(p) => {
@@ -1535,7 +1535,7 @@ pub fn deal_damage_with(
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
                 return None;
             }
-            let target_chars = layers::chars(cx.cards(), cx.s(), id);
+            let target_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
             let source_controller = cx.s().obj(source).controller;
             if target_chars.protected_from_by(&source_chars, source_controller) && damage_can_be_prevented(cx, source, combat) {
                 return None;
@@ -1592,8 +1592,8 @@ pub(crate) fn protection_prevents(cx: &Cx, source: ObjectId, target: Target, com
             if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
                 return None;
             }
-            let target_chars = layers::chars(cx.cards(), cx.s(), id);
-            let source_chars = layers::chars(cx.cards(), cx.s(), source);
+            let target_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
+            let source_chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
             if !target_chars.protected_from_by(&source_chars, cx.s().obj(source).controller) {
                 return None;
             }
@@ -1709,7 +1709,7 @@ pub fn destroy_together(cx: &mut Cx, ids: &[ObjectId], reason: ZoneReason) -> Ve
         .iter()
         .copied()
         .filter(|&id| live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield))
-        .filter(|&id| !layers::chars(cx.cards(), cx.s(), id).has(Keyword::Indestructible))
+        .filter(|&id| !layers::chars(cx.cards(), cx.s(), &cx.g.log, id).has(Keyword::Indestructible))
         .map(|id| Moving::to(id, Zone::graveyard(cx.s().obj(id).owner)))
         .collect();
     move_together(cx, &moves, reason)
@@ -1870,7 +1870,7 @@ fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
     if !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return;
     }
-    let chars = layers::chars(cx.cards(), cx.s(), id);
+    let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
     if !chars.has_subtype(Subtype::Siege) {
         return;
     }
@@ -1896,7 +1896,7 @@ pub fn add_lore_counters(cx: &mut Cx) {
         if cx.s().obj(id).controller != active {
             continue;
         }
-        let chars = layers::chars(cx.cards(), cx.s(), id);
+        let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
         if chars.has_subtype(Subtype::Saga)
             && chars.abilities().any(|a| matches!(cx.cards().ability(a), AbilityDef::Triggered(t) if t.chapter > 0))
         {
@@ -2075,12 +2075,12 @@ pub fn fight(cx: &mut Cx, first: ObjectId, second: ObjectId) {
     let fights = |cx: &Cx, id: ObjectId| {
         live(cx.s(), id)
             && cx.s().obj(id).zone.is(ZoneKind::Battlefield)
-            && layers::chars(cx.cards(), cx.s(), id).is(CardType::Creature)
+            && layers::chars(cx.cards(), cx.s(), &cx.g.log, id).is(CardType::Creature)
     };
     if !fights(cx, first) || !fights(cx, second) {
         return;
     }
-    let power = |cx: &Cx, id: ObjectId| layers::chars(cx.cards(), cx.s(), id).power.unwrap_or(0).max(0) as u16;
+    let power = |cx: &Cx, id: ObjectId| layers::chars(cx.cards(), cx.s(), &cx.g.log, id).power.unwrap_or(0).max(0) as u16;
     let (a, b) = (power(cx, first), power(cx, second));
     if first == second {
         damage(cx, first, Target::Object(first), a.saturating_mul(2), false);

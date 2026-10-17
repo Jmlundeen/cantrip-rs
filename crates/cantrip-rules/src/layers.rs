@@ -4,18 +4,23 @@
 //! Characteristics are not cached per object: a game has a few dozen objects and a handful of effects. What is shared
 //! is what does not depend on the object: a card's own values (`CardTable::printed`) and the list of static-ability
 //! sources, found once per position (`GameState::epoch`, which every write and undo moves).
+//!
+//! Every entry point takes the event history beside the state (`log`): a static ability's condition may ask about the
+//! past ("as long as you've lost life this turn", `LayerQuery::history`), and its effect is not locked in (CR 611.3a), so it
+//! is read afresh with everything else. Recording an event does not move the epoch, and nothing cached here depends on the
+//! history: which permanents have static abilities is a question of the state alone.
 
 use cantrip_api::*;
 use cantrip_state::ContinuousEffect;
 
-pub fn chars(cards: &CardTable, state: &GameState, id: ObjectId) -> Chars {
-    chars_before(cards, state, id, Layer::End)
+pub fn chars(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> Chars {
+    chars_before(cards, state, log, id, Layer::End)
 }
 
 /// An object's characteristics as if it were the face `face` of its card (CR 715.4, 709.3, 712.8a): a card in hand
 /// judged as the Adventure, Omen, half or back face it would be cast as. The face's own printed values replace the card's.
-pub fn chars_as_face(cards: &CardTable, state: &GameState, id: ObjectId, face: CardId) -> Chars {
-    let mut chars = chars(cards, state, id);
+pub fn chars_as_face(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, face: CardId) -> Chars {
+    let mut chars = chars(cards, state, log, id);
     let printed = initial(cards, face, None);
     chars.card = face;
     chars.name = printed.name;
@@ -35,6 +40,8 @@ pub fn chars_as_face(cards: &CardTable, state: &GameState, id: ObjectId, face: C
 struct View<'a> {
     cards: &'a CardTable,
     state: &'a GameState,
+    /// The event history (`cantrip_api::history`), which a static ability's condition may ask about the past.
+    log: &'a [Record],
     stop: Layer,
 }
 
@@ -47,12 +54,16 @@ impl LayerQuery for View<'_> {
         self.cards
     }
 
+    fn history(&self) -> History<'_> {
+        History { records: self.log, turn: self.state.turn.number }
+    }
+
     fn chars(&self, id: ObjectId) -> Chars {
-        chars_before(self.cards, self.state, id, self.stop)
+        chars_before(self.cards, self.state, self.log, id, self.stop)
     }
 
     fn chars_with_defined_pt(&self, id: ObjectId) -> Chars {
-        chars_before(self.cards, self.state, id, Layer::PtSet)
+        chars_before(self.cards, self.state, self.log, id, Layer::PtSet)
     }
 }
 
@@ -64,7 +75,7 @@ const LAYERS: [Layer; 8] =
 
 /// The characteristics with every layer before `stop` applied (CR 613.1): the copiable values, then each layer's
 /// static abilities and other continuous effects in turn, statics before effects, each in timestamp order.
-pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: Layer) -> Chars {
+pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, stop: Layer) -> Chars {
     let obj = state.obj(id);
     let spell = obj.zone.is(ZoneKind::Stack);
     // The copiable values (CR 707.2): a copy effect's, or the face of the card that is up (CR 711.2).
@@ -172,11 +183,11 @@ pub fn chars_before(cards: &CardTable, state: &GameState, id: ObjectId, stop: La
             counters(obj, &mut chars);
         }
         if has_hone && layer == Layer::PtModify {
-            hone(cards, state, id, honed, &mut chars);
+            hone(cards, state, log, id, honed, &mut chars);
         }
         // CR 613.7: within a layer, static abilities and other continuous effects apply in timestamp order, interleaved.
         if has_own || !sources.is_empty() || !granted.is_empty() {
-            statics(cards, state, id, def, (colors.is_some(), pt.is_some()), sources, on_battlefield, layer, &fx, &granted, &mut chars);
+            statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), sources, on_battlefield, layer, &fx, &granted, &mut chars);
         } else {
             for e in &fx {
                 apply_effect(e, layer, &mut chars);
@@ -458,6 +469,7 @@ fn printed(cards: &CardTable, card: CardId, rules: bool) -> &Chars {
 fn statics(
     cards: &CardTable,
     state: &GameState,
+    log: &[Record],
     id: ObjectId,
     def: &CardDef,
     overrides: (bool, bool),
@@ -468,7 +480,7 @@ fn statics(
     granted: &[(u32, &'static StaticDef)],
     chars: &mut Chars,
 ) {
-    let view = View { cards, state, stop: layer };
+    let view = View { cards, state, log, stop: layer };
     // CR 707.9d: a copy that states its colors or its power and toughness does not copy a characteristic-defining
     // ability that would define them.
     let overridden = (layer == Layer::Color && overrides.0) || (layer == Layer::PtDefine && overrides.1);
@@ -627,11 +639,11 @@ fn counters(obj: &Obj, chars: &mut Chars) {
 /// lost its abilities still gives it, and one that mentions no hone counter does too (the rulings). Each permanent with hone
 /// counters attached to `id` gives one +1/+0 per counter while it is an Equipment; a creature gets nothing from a power it
 /// lacks.
-fn hone(cards: &CardTable, state: &GameState, id: ObjectId, honed: &[ObjectId], chars: &mut Chars) {
+fn hone(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, honed: &[ObjectId], chars: &mut Chars) {
     for &equipment in honed {
         let e = state.obj(equipment);
         // Its types are settled by layer 4, before any power is: what it is attached to cannot change them.
-        if e.attached_to == Some(id) && chars_before(cards, state, equipment, Layer::Color).has_subtype(Subtype::Equipment) {
+        if e.attached_to == Some(id) && chars_before(cards, state, log, equipment, Layer::Color).has_subtype(Subtype::Equipment) {
             let bonus = e.counters(CounterKind::Hone);
             chars.power = chars.power.map(|v| v + bonus);
         }
@@ -715,7 +727,7 @@ pub fn live(state: &GameState, id: ObjectId) -> bool {
 
 /// The rules' half of target legality (CR 115.4, 702.11, 702.16): the target still exists where it was, and nothing
 /// about it forbids `asker`'s source from targeting it.
-pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: Target) -> bool {
+pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &Asker, target: Target) -> bool {
     match target {
         Target::None => false,
         // An ability on the stack can be targeted while it is there (CR 115.1, 115.5).
@@ -734,16 +746,16 @@ pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: T
             }
             let obj = state.obj(id);
             if obj.zone.is(ZoneKind::Battlefield) {
-                let target_chars = chars(cards, state, id);
+                let target_chars = chars(cards, state, log, id);
                 // Shroud: no player may target it (CR 702.18a); hexproof: no opponent (CR 702.11b).
                 if target_chars.has(Keyword::Shroud) {
                     return false;
                 }
                 let opponent = obj.controller != asker.controller;
-                if target_chars.has(Keyword::Hexproof) && opponent && !targeting_rule(cards, state, TargetingRuleKind::IgnoreHexproof, id) {
+                if target_chars.has(Keyword::Hexproof) && opponent && !targeting_rule(cards, state, log, TargetingRuleKind::IgnoreHexproof, id) {
                     return false;
                 }
-                let mut source_chars = chars(cards, state, asker.source);
+                let mut source_chars = chars(cards, state, log, asker.source);
                 // A card that is not on the battlefield or the stack and asks for a target is about to be cast: it
                 // moves to the stack before its targets are chosen (CR 601.2a), so it is judged as the spell it
                 // will be, which protection from spells (CR 702.16a) turns away.
@@ -756,7 +768,7 @@ pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: T
                 // battlefield or as it last was). A hexproof ability, so what ignores hexproof ignores it (CR 702.11e).
                 if opponent
                     && target_chars.hexproof_from.covers(source_chars.colors, source_chars.types)
-                    && !targeting_rule(cards, state, TargetingRuleKind::IgnoreHexproof, id)
+                    && !targeting_rule(cards, state, log, TargetingRuleKind::IgnoreHexproof, id)
                 {
                     return false;
                 }
@@ -771,8 +783,8 @@ pub fn can_target(cards: &CardTable, state: &GameState, asker: &Asker, target: T
 
 /// Whether a targeting rule of `kind` (CR 609.4, 702.11, 702.21) applies to `subject`: some permanent on the battlefield has a static
 /// ability that names it. Found from the board, so asked only when it would change the answer (a hexproof target, a ward trigger).
-pub fn targeting_rule(cards: &CardTable, state: &GameState, kind: TargetingRuleKind, subject: ObjectId) -> bool {
-    let view = View { cards, state, stop: Layer::Ability };
+pub fn targeting_rule(cards: &CardTable, state: &GameState, log: &[Record], kind: TargetingRuleKind, subject: ObjectId) -> bool {
+    let view = View { cards, state, log, stop: Layer::Ability };
     state.battlefield().iter().any(|&source| {
         let obj = state.obj(source);
         let card = cards.current(obj);
@@ -785,9 +797,9 @@ pub fn targeting_rule(cards: &CardTable, state: &GameState, kind: TargetingRuleK
 
 /// Summoning sickness (CR 302.6): a creature that has not been under its controller's control continuously since
 /// their most recent turn began, and has no haste.
-pub fn summoning_sick(cards: &CardTable, state: &GameState, id: ObjectId) -> bool {
+pub fn summoning_sick(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> bool {
     let obj = state.obj(id);
-    let c = chars(cards, state, id);
+    let c = chars(cards, state, log, id);
     c.is(CardType::Creature) && !c.has(Keyword::Haste) && obj.controlled_since >= state.player(obj.controller).turn_began
 }
 

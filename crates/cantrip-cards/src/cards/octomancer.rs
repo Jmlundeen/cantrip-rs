@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// "Target creature token that entered the battlefield this turn" (CR 115.1): a creature token on the battlefield that
 /// entered it this turn, under any player's control.
 fn creature_token_that_entered_this_turn(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).token && history::entered_this_turn(q, id))
+    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).token && history::entered_this_turn(q.history(), id))
 }
 
 /// "Gift an Octopus" (CR 702.174i): the 8/8 blue Octopus is a token of its own, and its gift triggered ability (CR 702.174b)

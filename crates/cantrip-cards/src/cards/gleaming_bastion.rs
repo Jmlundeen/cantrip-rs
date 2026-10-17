@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// entered this turn); a basic land is a land with the basic supertype (CR 205.4a), read through the layers. The land
 /// itself is not basic, so it never counts itself.
 fn entered_or_controls_basic(q: &dyn Query, asker: &Asker) -> bool {
-    history::entered_this_turn(q, asker.source)
+    history::entered_this_turn(q.history(), asker.source)
         || q.permanents_of(asker.controller).into_iter().any(|id| {
             let chars = q.chars(id);
             chars.is(CardType::Land) && chars.supertypes.basic
