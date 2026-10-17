@@ -3,9 +3,9 @@ use cantrip_oracle as oracle;
 
 /// "Tap an untapped permanent you control" (CR 118.3): any untapped permanent of the ability's controller, a creature that has
 /// not been under its control since the start of the turn included (it is not the {T} symbol of that creature, CR 302.6).
-/// Never this creature itself: its {T} is the other part of the same cost, and one permanent can't be tapped for both.
+/// Never this creature itself: the core leaves out the source of a cost that also has {T}.
 fn untapped_permanent_you_control(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
-    id != asker.source && q.controller(id) == asker.controller && !q.obj(id).tapped
+    q.controller(id) == asker.controller && !q.obj(id).tapped
 }
 
 pub static CARD: CardDef = CardDef {

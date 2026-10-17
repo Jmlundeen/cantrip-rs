@@ -122,7 +122,7 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     }
     if let Some(p) = cost.permanents {
         let asker = Asker { source, controller };
-        let mut candidates = cx.permanents_of(controller).into_iter().filter(|&id| pays_permanents(cx, &p, &asker, id)).count();
+        let mut candidates = cx.permanents_of(controller).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).count();
         // Tapped permanents are judged once the mana abilities have been activated (CR 601.2g-h): an untapped one that
         // passes the filter and one of its controller's mana abilities could tap will do.
         if p.tapped && candidates < p.count as usize {
@@ -480,9 +480,11 @@ fn pay_exiles(cx: &mut Cx, chosen: &[ObjectId]) {
 }
 
 /// Whether `id` may pay a permanents cost now: it passes the cost's filter, and is tapped if the cost asks for tapped
-/// permanents ("return a tapped creature you control", CR 702.188a).
-fn pays_permanents(cx: &Cx, p: &PermanentCost, asker: &Asker, id: ObjectId) -> bool {
-    (!p.tapped || cx.s().obj(id).tapped) && (p.filter)(cx, asker, id)
+/// permanents ("return a tapped creature you control", CR 702.188a). When the cost taps permanents and also has {T}
+/// ("{T}, Tap an untapped creature you control"), the source is not one of them: it is tapped by the {T} part of the same
+/// cost, and one permanent can't be tapped to pay both (CR 118.3, 602.2b).
+fn pays_permanents(cx: &Cx, cost: &Cost, p: &PermanentCost, asker: &Asker, id: ObjectId) -> bool {
+    !(cost.tap && cost.tap_permanents && id == asker.source) && (!p.tapped || cx.s().obj(id).tapped) && (p.filter)(cx, asker, id)
 }
 
 /// The untapped permanents `player`'s mana abilities could tap as they are activated now (CR 601.2g, 605.3a): each one
@@ -519,7 +521,7 @@ fn permanents_after_mana(cost: &Cost) -> bool {
 fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
     let Some(p) = cost.permanents else { return Ok(Vec::new()) };
     let asker = Asker { source, controller: player };
-    let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, &p, &asker, id)).collect();
+    let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).collect();
     if p.tapped && eligible.len() < p.count as usize {
         return Err(Stop::Cancel);
     }
@@ -748,7 +750,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 option.target_candidates = cx
                     .permanents_of(player)
                     .into_iter()
-                    .filter(|&o| pays_permanents(cx, &p, &asker, o))
+                    .filter(|&o| pays_permanents(cx, &def.cost, &p, &asker, o))
                     .map(Target::Object)
                     .collect();
                 option.targets_required = p.count;
@@ -2258,7 +2260,7 @@ fn emerge_reduction(cx: &Cx, player: PlayerId, card: ObjectId, cost: &Cost) -> u
     let Some(p) = cost.permanents.filter(|_| cost.emerge) else { return 0 };
     let asker = Asker { source: card, controller: player };
     let mut values: Vec<u32> =
-        cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, &p, &asker, id)).map(|id| cx.mana_value(id)).collect();
+        cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).map(|id| cx.mana_value(id)).collect();
     values.sort_unstable_by(|a, b| b.cmp(a));
     values.iter().take(p.count as usize).sum::<u32>().min(255) as u8
 }
