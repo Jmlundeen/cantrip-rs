@@ -1,0 +1,39 @@
+# Insidious Fungus, third mode, "you may": with a land card in hand Bot1 is asked and chooses none (the opening hand holds
+# a Plains): the Plains stays in hand and nothing but the Fungus's own sacrifice and the draw happened.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Insidious Fungus
+Plains
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insidious Fungus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Insidious Fungus.Activate
+Bot1.Modes(3)
+Bot2.Pass
+Bot1.Choose()
+? Bot1.Battlefield.Count = 3
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Insidious Fungus
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby
+Bot1.Hand = Plains; Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Library.Count = 11

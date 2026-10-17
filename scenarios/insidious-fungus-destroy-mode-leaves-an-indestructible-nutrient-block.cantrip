@@ -1,0 +1,39 @@
+# Insidious Fungus's "Destroy target artifact" against an indestructible artifact (CR 702.12b): Bot2's Nutrient Block stays on the
+# battlefield and Bot2 draws nothing (it was not put into a graveyard). The Fungus is sacrificed all the same.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Insidious Fungus
+Plains x16
+
+[Bot2 Deck]
+Mox Emerald
+Nutrient Block
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insidious Fungus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Nutrient Block.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Insidious Fungus.Activate
+Bot1.Modes(1)
+Bot1.Target(Nutrient Block)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Insidious Fungus
+Bot2.Battlefield = Mox Emerald; Nutrient Block
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 6

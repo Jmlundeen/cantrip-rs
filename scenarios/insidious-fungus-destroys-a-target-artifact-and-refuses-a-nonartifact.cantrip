@@ -1,0 +1,42 @@
+# Insidious Fungus, first mode: "{2}, Sacrifice this creature: ... Destroy target artifact." Bot2 controls Ornithopter (an artifact
+# creature) and Llanowar Elves (not an artifact): the Elves are refused as the target (beside the positive control, the Ornithopter
+# chosen next). The Fungus is sacrificed as a cost and goes to the graveyard; the Ornithopter is destroyed.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Insidious Fungus
+Plains x16
+
+[Bot2 Deck]
+Mox Emerald
+Ornithopter
+Llanowar Elves
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insidious Fungus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Insidious Fungus.Activate
+Bot1.Modes(1)
+! Bot1.Target(Llanowar Elves)
+Bot1.Target(Ornithopter)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Insidious Fungus
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Mox Emerald; Llanowar Elves

@@ -1,0 +1,44 @@
+# Insidious Fungus: "{2}, Sacrifice this creature" is a cost, paid when the ability is activated (CR 602.2b), so the Fungus is already
+# in the graveyard while the ability waits on the stack. In response Bot1 kills Bot2's Ornithopter (the ability's target) with its
+# own Lightning Bolt: the ability then has no legal target and does nothing (CR 608.2b); Bot1 does not get the Fungus back.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Ruby
+Insidious Fungus
+Lightning Bolt
+Plains x14
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insidious Fungus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Insidious Fungus.Activate
+Bot1.Modes(1)
+Bot1.Target(Ornithopter)
+? Bot1.Graveyard = Insidious Fungus
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Insidious Fungus
+Bot2.Graveyard = Ornithopter
+Stack.Count = 0

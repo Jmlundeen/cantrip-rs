@@ -1,0 +1,39 @@
+# Insidious Fungus, second mode: "Destroy target enchantment." Bot2 controls Fastbond (an enchantment) and Mox Emerald (an artifact):
+# the Mox is refused as the target (beside the positive control, the Fastbond chosen next), and the Fastbond is destroyed.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Insidious Fungus
+Plains x16
+
+[Bot2 Deck]
+Mox Emerald
+Fastbond
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insidious Fungus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fastbond.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Insidious Fungus.Activate
+Bot1.Modes(2)
+! Bot1.Target(Mox Emerald)
+Bot1.Target(Fastbond)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Insidious Fungus
+Bot2.Graveyard = Fastbond
+Bot2.Battlefield = Mox Emerald

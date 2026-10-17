@@ -1,0 +1,44 @@
+# Insidious Fungus, third mode: "Draw a card. Then you may put a land card from your hand onto the battlefield tapped." Bot1's
+# opening hand holds no land; the turn-3 draw is a Plains, and the Fungus's draw is an Island - the card just drawn is in the hand
+# when the choice is made, so Bot1 may choose the Island (the Plains was the other candidate). It enters tapped though Bot1 never
+# tapped it, and uses no land play: Bot1 then plays the Plains as its land for the turn (LandsPlayed 0 before, 1 after).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Insidious Fungus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Plains
+Island
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insidious Fungus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Insidious Fungus.Activate
+Bot1.Modes(3)
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot1.Battlefield.Island.Tapped = true
+? Bot1.LandsPlayed = 0
+Bot1.Hand.Plains.Play
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Insidious Fungus
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Island; Plains
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Plains.Tapped = false
+Bot1.LandsPlayed = 1

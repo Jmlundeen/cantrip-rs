@@ -1,0 +1,38 @@
+# Insidious Fungus, third mode with no land card in hand: the cards in hand and the card drawn are all Lightning Bolts, so
+# "you may put a land card from your hand onto the battlefield tapped" has nothing to offer and Bot1 is asked nothing (the bare
+# refusal). The control, where a land card is offered, is the other Fungus scenarios.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Insidious Fungus
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Insidious Fungus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Insidious Fungus.Activate
+Bot1.Modes(3)
+Bot2.Pass
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Insidious Fungus
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby
