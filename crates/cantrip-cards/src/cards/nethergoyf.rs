@@ -3,14 +3,13 @@ use cantrip_mechanics::escape;
 use cantrip_oracle as oracle;
 
 /// "Its power is equal to the number of card types among cards in your graveyard and its toughness is equal to that number
-/// plus 1" (CR 604.3, 205.2a): counted over its controller's graveyard alone, and over its owner's while it is not on the
-/// battlefield, where it has no controller (CR 108.4).
+/// plus 1" (CR 604.3, 205.2a): counted over its controller's graveyard (the engine keeps the owner as controller off the battlefield and stack, CR 108.4a;
+/// a spell has its caster as controller, CR 108.4).
 fn size(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
     let state = q.state();
     let obj = state.obj(source);
-    let who = if obj.zone.is(ZoneKind::Battlefield) { obj.controller } else { obj.owner };
     let mut seen = TypeSet::NONE;
-    for &card in state.zone(Zone::graveyard(who)) {
+    for &card in state.zone(Zone::graveyard(obj.controller)) {
         for t in q.chars(card).types.iter() {
             seen = seen.with(t);
         }
