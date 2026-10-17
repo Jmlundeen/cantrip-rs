@@ -1,0 +1,56 @@
+# Proft, Sinister Mastermind: the threshold counts YOUR graveyard (CR 601.3), and the discard ability has no threshold.
+# On turn 2 Bot2 casts two Town Greeters with Moxen and a Forest, milling seven cards into ITS graveyard. On turn 3 Bot1
+# has an empty graveyard and {B}{B}{B} floating (a Dark Ritual): Proft is refused although the mana is there and Bot2
+# has seven cards in its own graveyard. With the same card and the same mana, "{B}, Discard this card: Target creature
+# gets -3/-1" is allowed: it kills Bot2's 1/1 Town Greeter, and Proft is in Bot1's graveyard afterwards.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Proft, Sinister Mastermind
+Dark Ritual
+Swamp x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Forest
+Town Greeter
+Town Greeter
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Forest x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Town Greeter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Town Greeter.Cast
+[T3 Bot1.Main1]
+? Bot2.Graveyard.Count = 7
+? Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+! Bot1.Hand.Proft, Sinister Mastermind.Cast
+Bot1.Hand.Proft, Sinister Mastermind.Activate(Bot2.Battlefield.Town Greeter)
+
+[Expect]
+Bot1.Graveyard = Proft, Sinister Mastermind; Dark Ritual
+Bot2.Graveyard.Count = 8
+Bot2.Battlefield = Forest; Mox Emerald; Mox Sapphire; Mox Jet; Town Greeter

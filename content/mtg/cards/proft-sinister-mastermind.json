@@ -1,0 +1,11 @@
+{
+  "name": "Proft, Sinister Mastermind",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Human Rogue",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Threshold — You can't cast this spell unless there are seven or more cards in your graveyard.\nMenace\n{B}, Discard this card: Target creature gets -3/-1 until end of turn.",
+  "keywords": [
+    "Menace"
+  ]
+}

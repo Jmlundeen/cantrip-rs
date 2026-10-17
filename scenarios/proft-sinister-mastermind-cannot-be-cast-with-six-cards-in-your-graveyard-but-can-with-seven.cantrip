@@ -1,0 +1,47 @@
+# Proft, Sinister Mastermind: "Threshold - You can't cast this spell unless there are seven or more cards in your graveyard."
+# On turn 1 Bot1's graveyard gets six cards: Town Greeter mills four, then a Lotus Petal (sacrificed for {B}) and a Dark
+# Ritual cast with it go there. On turn 3 Proft is drawn and, with six cards in the graveyard, is refused. The second Dark
+# Ritual is cast, resolves and is the seventh card; its {B}{B}{B} then pays for Proft, which is now allowed and resolves
+# (positive control: the same card, the same mana, only the count changed).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Forest
+Town Greeter
+Lotus Petal
+Dark Ritual
+Dark Ritual
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Guerrilla Gorilla
+Proft, Sinister Mastermind
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Town Greeter.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Hand.Dark Ritual.Cast
+[T2 Bot2.Main1]
+? Bot1.Graveyard.Count = 6
+[T3 Bot1.Main1]
+! Bot1.Hand.Proft, Sinister Mastermind.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Proft, Sinister Mastermind.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Proft, Sinister Mastermind.Power = 5
+Bot1.Battlefield.Proft, Sinister Mastermind.Toughness = 5
+Bot1.Graveyard.Count = 7
