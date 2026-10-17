@@ -1,0 +1,8 @@
+{
+  "name": "Corpsejack Menace",
+  "manaCost": "{2}{B}{G}",
+  "type": "Creature — Fungus",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "If one or more +1/+1 counters would be put on a creature you control, twice that many +1/+1 counters are put on it instead."
+}

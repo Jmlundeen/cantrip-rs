@@ -1,0 +1,59 @@
+# Corpsejack Menace doubles +1/+1 counters put on "a creature you control"; Ozolith, the Shattered Spire adds one to those put on
+# "an artifact or creature you control" (CR 614.1a, 122.6). Ozolith's ability puts one counter on Bot1's Sol Ring, an artifact
+# that is no creature: the Menace does not apply, and Ozolith makes it 2. Two turns later it puts one on Bot1's Ornithopter, an
+# artifact creature: both apply, Bot1 chooses the Menace first (CR 616.1), 1 becomes 2, Ozolith is judged again and adds one
+# (CR 616.1f): 3, where Ozolith first would have made (1 + 1) x 2 = 4.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Black Lotus
+Ornithopter
+Ozolith, the Shattered Spire
+Corpsejack Menace
+Sol Ring
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ozolith, the Shattered Spire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Corpsejack Menace.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Sol Ring; Ability: Put a +1/+1)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Sol Ring.Counters.PlusOnePlusOne = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Ozolith, the Shattered Spire.Activate(Ornithopter; Ability: Put a +1/+1)
+Bot1.Replace(Corpsejack Menace)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Sol Ring.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 3

@@ -1,0 +1,60 @@
+# Corpsejack Menace doubles the +1/+1 counters put on a creature Bot1 controls, and only those: "twice that many +1/+1 counters"
+# (CR 614.1a, 122.6). Gev, Scaled Scorch gives Bot1's other creatures an additional +1/+1 counter as they enter while an opponent
+# has lost life this turn (Gev's attack makes Bot2 lose 3). Bolted, Kitchen Finks persists: it returns with persist's -1/-1 counter
+# and Gev's +1/+1 counter (CR 702.79a, 614.1c), and the Menace makes the +1/+1 counter two but leaves the -1/-1 counter one. One of
+# each is then removed as a state-based action (CR 704.5q): Finks is a 4/3 with one +1/+1 counter. (Doubling both kinds would
+# leave a 3/2 with none.)
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Ruby
+Black Lotus
+Corpsejack Menace
+Gev, Scaled Scorch
+Kitchen Finks
+Forest
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Corpsejack Menace.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kitchen Finks.Cast
+Bot1.Pass
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Gev, Scaled Scorch > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 17
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Kitchen Finks)
+Bot1.Pass
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Kitchen Finks.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Kitchen Finks.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Kitchen Finks.Power = 4
+Bot1.Battlefield.Kitchen Finks.Toughness = 3

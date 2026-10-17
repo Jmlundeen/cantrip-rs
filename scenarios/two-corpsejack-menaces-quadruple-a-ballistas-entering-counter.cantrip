@@ -1,0 +1,45 @@
+# Two Corpsejack Menaces are two replacement effects, each applied once to the event (CR 614.5): Walking Ballista cast for X = 1
+# enters with 1 x 2 x 2 = 4 +1/+1 counters (the ruling: "four times the original number").
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Mox Emerald
+Corpsejack Menace
+Corpsejack Menace
+Walking Ballista
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Corpsejack Menace.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Corpsejack Menace.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 4

@@ -1,0 +1,58 @@
+# Corpsejack Menace: "If one or more +1/+1 counters would be put on a creature you control, twice that many +1/+1 counters are
+# put on it instead" (CR 614.1a, 122.6). Bot1's Walking Ballista cast for X = 1 enters with twice its one counter (the ruling: a
+# creature entering with counters), and its own "{4}: Put a +1/+1 counter on this creature" then puts two more: 4. Bot2's
+# Walking Ballista, cast for X = 1 too, is no creature Bot1 controls and keeps its one.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Black Lotus
+Sol Ring
+Corpsejack Menace
+Walking Ballista
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island
+Sol Ring
+Walking Ballista
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Corpsejack Menace.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Walking Ballista.Activate(Ability: {4})
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 4
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1

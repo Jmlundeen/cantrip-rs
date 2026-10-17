@@ -1,0 +1,53 @@
+# Persist returns Kitchen Finks "with a -1/-1 counter on it" (CR 702.79a, 122.6): a -1/-1 counter is no +1/+1 counter, so
+# neither Hardened Scales nor Corpsejack Menace, both about +1/+1 counters alone (CR 614.1a), changes it. Bolted, Finks comes
+# back a 2/1 with that one -1/-1 counter and no +1/+1 counter, and Bot1 gains 2 life each time it enters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Black Lotus
+Hardened Scales
+Corpsejack Menace
+Kitchen Finks
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Hardened Scales.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Corpsejack Menace.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kitchen Finks.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Kitchen Finks)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Kitchen Finks.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Kitchen Finks.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Kitchen Finks.Power = 2
+Bot1.Battlefield.Kitchen Finks.Toughness = 1
+Bot1.Life = 24
