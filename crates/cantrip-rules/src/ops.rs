@@ -1770,9 +1770,24 @@ pub struct DamageBatch {
     /// What each source with lifelink has dealt, and who controls it: one life gain event per source, however many
     /// recipients it dealt damage to (CR 120.3f; Angel of Vitality's and Leyline of Hope's rulings).
     lifelink: Vec<(ObjectId, PlayerId, u32)>,
+    /// For each player dealt damage in it, whether the damage is dealt as though its source had infect (Phyrexian Unlife's "as
+    /// long as you have 0 or less life"): judged once, as the event begins for that player, since all of it is dealt at once
+    /// (CR 120.2, 510.2) - a life total the event itself takes to 0 makes none of it poison.
+    as_infect: Vec<(PlayerId, bool)>,
 }
 
 impl DamageBatch {
+    /// Whether this event's damage to `player` is dealt as though its source had infect (CR 702.90b): asked of the static
+    /// abilities the first time the event deals `player` damage, before it changes their life.
+    fn as_though_infect(&mut self, cx: &Cx, player: PlayerId) -> bool {
+        if let Some(&(_, infect)) = self.as_infect.iter().find(|(p, _)| *p == player) {
+            return infect;
+        }
+        let infect = crate::static_rules::damage_as_though_infect(cx, cx.cards(), player);
+        self.as_infect.push((player, infect));
+        infect
+    }
+
     /// The life the event's sources with lifelink cause their controllers to gain (CR 120.3f), once the damage is all
     /// dealt: one gain for each source.
     pub fn gain_lifelink(&mut self, cx: &mut Cx) {
@@ -1821,9 +1836,9 @@ pub fn deal_damage_with(
                 return prevented(cx, by);
             }
 
-            if source_chars.has(Keyword::Infect) {
+            if source_chars.has(Keyword::Infect) || batch.as_though_infect(cx, p) {
                 // Damage from a source with infect is dealt to a player as that many poison counters (CR 702.90b,
-                // 120.3b).
+                // 120.3b), and so is damage dealt "as though its source had infect" (Phyrexian Unlife).
                 put_player_counters(cx, p, amount, 0);
             } else {
                 change_life(cx, p, -(amount as i32));
@@ -2250,6 +2265,11 @@ pub fn add_lore_counters(cx: &mut Cx) {
 
 /// Puts poison and energy counters on a player (CR 122.1, 122.6): an event replacement effects can change.
 pub fn put_player_counters(cx: &mut Cx, player: PlayerId, poison: u16, energy: u16) {
+    // CR 101.2: a player who can't get counters of a kind gets none (Melira, Sylvok Outcast), and no replacement effect of
+    // the event that doesn't happen applies.
+    let banned = |cx: &Cx, kind| crate::static_rules::player_counters_banned(cx, cx.cards(), player, kind);
+    let poison = if poison > 0 && banned(cx, PlayerCounter::Poison) { 0 } else { poison };
+    let energy = if energy > 0 && banned(cx, PlayerCounter::Energy) { 0 } else { energy };
     let (poison, energy) = replace::player_counters(cx, player, poison, energy);
     cx.st().update_player(player, |p| {
         p.poison = (p.poison as u32 + poison as u32).min(255) as u8;
@@ -2570,16 +2590,21 @@ pub fn become_copy(cx: &mut Cx, source: ObjectId, id: ObjectId, values: Copiable
 
 /// An effect states that a player loses the game (CR 104.3e): they leave it at once, and if one player is left, that player
 /// has won (CR 104.2a).
+/// A player who "can't lose the game" (Platinum Angel, CR 104.3) does not.
 pub fn lose_game(cx: &mut Cx, player: PlayerId) {
-    if cx.s().player(player).lost || cx.s().is_over() {
+    if cx.s().player(player).lost || cx.s().is_over() || crate::static_rules::doesnt_lose(&*cx, cx.cards(), player, LossReason::Effect) {
         return;
     }
     cx.st().update_player(player, |pl| pl.lost = true);
     crate::designations::monarch_left(cx);
+    cx.record(Event::GameLost { player, reason: LossReason::Effect });
     leave_game(cx, player);
     let left: Vec<PlayerId> = cx.s().apnap().collect();
     match left.len() {
-        0 => cx.st().set_outcome(Outcome::Draw),
+        0 => {
+            cx.st().set_outcome(Outcome::Draw);
+            cx.record(Event::GameDrawn { reason: DrawReason::AllLost });
+        }
         1 => cx.st().set_outcome(Outcome::Won(left[0])),
         _ => {}
     }
@@ -2590,19 +2615,36 @@ pub fn give_poison(cx: &mut Cx, player: PlayerId, amount: u32) {
     put_player_counters(cx, player, amount.min(u16::MAX as u32) as u16, 0);
 }
 
+/// The way `player` loses the game to the next state-based action check (CR 704.5a-c), if they do: 0 or less life, a draw
+/// attempted from an empty library since the last check, ten or more poison counters, in that order, leaving out each
+/// that a static ability says they don't lose for (CR 104.3: Platinum Angel, Phyrexian Unlife).
+pub fn loses_to_state_based_actions(cx: &Cx, player: PlayerId) -> Option<LossReason> {
+    let p = cx.s().player(player);
+    [(p.life <= 0, LossReason::Life), (p.drew_from_empty, LossReason::EmptyLibrary), (p.poison >= 10, LossReason::Poison)]
+        .into_iter()
+        .find(|&(applies, reason)| applies && !crate::static_rules::doesnt_lose(cx, cx.cards(), player, reason))
+        .map(|(_, reason)| reason)
+}
+
 /// An effect states that a player wins the game (CR 104.2b): every opponent has lost, which ends the game with them
 /// the winner (CR 104.2a). A player who has lost wins nothing; one who is about to lose to a state-based action
-/// (CR 704.5a-c) both wins and loses at once, and loses (CR 104.3f).
+/// (CR 704.5a-c) both wins and loses at once, and loses (CR 104.3f). A player who can't win the game (Platinum Angel's
+/// "your opponents can't win the game") does not, and nor does one with an opponent who can't lose it: winning is every
+/// opponent losing (CR 104.2b, 104.3e).
 pub fn win_game(cx: &mut Cx, player: PlayerId) {
-    let p = *cx.s().player(player);
-    if p.lost || p.life <= 0 || p.drew_from_empty || p.poison >= 10 || cx.s().is_over() {
+    if cx.s().player(player).lost || loses_to_state_based_actions(cx, player).is_some() || cx.s().is_over() {
         return;
     }
-    for o in cx.s().opponents(player).collect::<Vec<_>>() {
-        if !cx.s().player(o).lost {
-            cx.st().update_player(o, |pl| pl.lost = true);
-            crate::designations::monarch_left(cx);
-        }
+    let opponents: Vec<PlayerId> = cx.s().opponents(player).collect();
+    if crate::static_rules::cant_win(&*cx, cx.cards(), player)
+        || opponents.iter().any(|&o| crate::static_rules::doesnt_lose(&*cx, cx.cards(), o, LossReason::Effect))
+    {
+        return;
+    }
+    for o in opponents {
+        cx.st().update_player(o, |pl| pl.lost = true);
+        crate::designations::monarch_left(cx);
+        cx.record(Event::GameLost { player: o, reason: LossReason::Effect });
     }
     cx.st().set_outcome(Outcome::Won(player));
 }

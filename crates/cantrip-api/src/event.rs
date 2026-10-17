@@ -157,6 +157,33 @@ pub enum Event {
     /// `player`'s speed became `speed` (CR 702.179): set to 1 by the state-based action (CR 704.5aa), or increased
     /// (CR 702.179c-d). Never for an increase that changed nothing.
     SpeedChanged { player: PlayerId, speed: u8 },
+    /// `player` lost the game (CR 104.3), and why: recorded as they leave it (CR 800.4a).
+    GameLost { player: PlayerId, reason: LossReason },
+    /// The game ended in a draw (CR 104.4), and why.
+    GameDrawn { reason: DrawReason },
+}
+
+/// Why a player loses the game (CR 104.3): what a "can't lose the game" or "don't lose the game for ..." effect is asked
+/// about (Platinum Angel, Phyrexian Unlife), and what the history records of a loss.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum LossReason {
+    /// 0 or less life (CR 104.3b, 704.5a).
+    Life,
+    /// Attempted to draw from an empty library (CR 104.3c, 704.5b).
+    EmptyLibrary,
+    /// Ten or more poison counters (CR 104.3d, 704.5c).
+    Poison,
+    /// An effect states that the player loses the game (CR 104.3e), or an opponent wins it (CR 104.2b).
+    Effect,
+}
+
+/// Why a game is a draw (CR 104.4).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum DrawReason {
+    /// Every player still in the game lost at once (CR 104.4a).
+    AllLost,
+    /// A loop of mandatory actions no player can stop (CR 104.4b, 732.4).
+    MandatoryLoop,
 }
 
 impl Event {
@@ -187,7 +214,8 @@ impl Event {
             | Event::Scried { player, .. }
             | Event::Surveilled { player, .. }
             | Event::SpeedChanged { player, .. }
-            | Event::CrimeCommitted { player, .. } => Some(player),
+            | Event::CrimeCommitted { player, .. }
+            | Event::GameLost { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::BecameTarget { controller, .. } | Event::EnteredFaceDown { controller, .. } => Some(controller),
             Event::Damage { target: Target::Player(p), .. } | Event::DamagePrevented { target: Target::Player(p), .. } => Some(p),
@@ -230,7 +258,7 @@ impl Event {
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::ManaSpent { source, on, .. } => source == object || on == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } => false,
         }
     }
 }
@@ -289,6 +317,8 @@ impl EventMask {
     pub const DAMAGE_PREVENTED: EventMask = EventMask(1 << 44);
     pub const SPEED_CHANGED: EventMask = EventMask(1 << 45);
     pub const MANA_SPENT: EventMask = EventMask(1 << 46);
+    /// A player lost the game, or the game was drawn: recorded only, for the history and the host.
+    pub const GAME_OVER: EventMask = EventMask(1 << 47);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -306,6 +336,7 @@ impl EventMask {
             Event::ModesChosen { .. } => EventMask::MODES_CHOSEN,
             Event::Done { .. } => EventMask::DONE,
             Event::TurnEnded { .. } => EventMask::TURN_ENDED,
+            Event::GameLost { .. } | Event::GameDrawn { .. } => EventMask::GAME_OVER,
             Event::ManaSpent { .. } => EventMask::MANA_SPENT,
             other => EventMask::of(other),
         }

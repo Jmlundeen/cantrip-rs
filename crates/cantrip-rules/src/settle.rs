@@ -68,22 +68,30 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     let mut acted = false;
     let mut leavers = Vec::new();
 
-    // CR 704.5a, 704.5b: a player at 0 life or who drew from an empty library loses.
+    // CR 704.5a, 704.5b, 704.5c: a player at 0 life, who attempted to draw from an empty library since the last check, or
+    // with ten or more poison counters loses - unless a static ability says they don't lose that way (CR 104.3: Platinum
+    // Angel, Phyrexian Unlife), in which case the game goes on and the draw from an empty library is forgotten with this
+    // check.
     for p in cx.s().seats().collect::<Vec<_>>() {
         let player = *cx.s().player(p);
-        // CR 704.5c: ten or more poison counters lose the game too.
-        if !player.lost && (player.life <= 0 || player.drew_from_empty || player.poison >= 10) {
+        if player.lost {
+            continue;
+        }
+        if let Some(reason) = ops::loses_to_state_based_actions(cx, p) {
             cx.st().update_player(p, |pl| {
                 pl.lost = true;
                 pl.drew_from_empty = false;
             });
             crate::designations::monarch_left(cx);
-            leavers.push(p);
+            leavers.push((p, reason));
             acted = true;
+        } else if player.drew_from_empty {
+            cx.st().update_player(p, |pl| pl.drew_from_empty = false);
         }
     }
     // They all lost at once; the game goes on without them, or ends with the one left (CR 800.4a, 104.2a).
-    for p in leavers {
+    for (p, reason) in leavers {
+        cx.record(Event::GameLost { player: p, reason });
         ops::leave_game(cx, p);
     }
 
@@ -384,7 +392,10 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     if acted {
         let left: Vec<PlayerId> = cx.s().apnap().collect();
         match left.len() {
-            0 => cx.st().set_outcome(Outcome::Draw),
+            0 => {
+                cx.st().set_outcome(Outcome::Draw);
+                cx.record(Event::GameDrawn { reason: DrawReason::AllLost });
+            }
             1 => cx.st().set_outcome(Outcome::Won(left[0])),
             _ => {}
         }

@@ -64,7 +64,7 @@ pub enum Proto {
     Counters { object: ObjectId, name: String, count: i32 },
     Transformed { object: ObjectId, from: String, to: String },
     Lost { player: PlayerId, reason: LossReasonView },
-    Ended { outcome: GameOutcomeView, winning_team: i32 },
+    Ended { outcome: GameOutcomeView, winning_team: i32, draw_reason: DrawReasonView },
     Monarch { player: PlayerId },
     ExtraTurn { player: PlayerId, count: i32 },
     /// Entries told earlier that no longer stand: a mana ability taken back, and with it what it was told to have done.
@@ -108,6 +108,8 @@ pub struct Tracker {
     /// What made the latest log record, and the sequence the first entry it made was or will be given: a resolution
     /// that stopped to ask a question carries on in a later collection.
     run: Option<(Cause, u64)>,
+    /// Why the game was drawn, once the history has said (CR 104.4).
+    draw_reason: DrawReasonView,
 }
 
 fn spell_facts(game: &Game, spell: ObjectId) -> (Vec<Target>, Option<i32>, Vec<String>, i32, Option<PlayerId>) {
@@ -204,6 +206,23 @@ impl Tracker {
             }
             Event::CoinFlipped { player, result } => out.push(Proto::Coin { player, result }),
             Event::TurnEnded { player } => out.push(Proto::TurnEnded { player }),
+            // A loss the rules recorded says why (CR 104.3): Phyrexian Unlife's player at -2 life loses to poison, not life.
+            Event::GameLost { player, reason } if !self.lost.get(player.index()).copied().unwrap_or(true) => {
+                self.lost[player.index()] = true;
+                let reason = match reason {
+                    LossReason::Life => LossReasonView::Life,
+                    LossReason::EmptyLibrary => LossReasonView::EmptyLibrary,
+                    LossReason::Poison => LossReasonView::Poison,
+                    LossReason::Effect => LossReasonView::Effect,
+                };
+                out.push(Proto::Lost { player, reason });
+            }
+            Event::GameDrawn { reason } => {
+                self.draw_reason = match reason {
+                    DrawReason::AllLost => DrawReasonView::AllLost,
+                    DrawReason::MandatoryLoop => DrawReasonView::MandatoryLoop,
+                };
+            }
             Event::Scried { player, count, .. } => out.push(Proto::Scried { player, count: i32::from(count) }),
             Event::Surveilled { player, count, .. } => out.push(Proto::Surveilled { player, count: i32::from(count) }),
             _ => {}
@@ -300,8 +319,8 @@ impl Tracker {
         if state.is_over() && !self.ended {
             self.ended = true;
             out.push(match state.outcome {
-                Outcome::Won(p) => Proto::Ended { outcome: GameOutcomeView::TeamWon, winning_team: seat(p) },
-                _ => Proto::Ended { outcome: GameOutcomeView::Draw, winning_team: 0 },
+                Outcome::Won(p) => Proto::Ended { outcome: GameOutcomeView::TeamWon, winning_team: seat(p), draw_reason: DrawReasonView::None },
+                _ => Proto::Ended { outcome: GameOutcomeView::Draw, winning_team: 0, draw_reason: self.draw_reason },
             });
         }
         out
@@ -487,9 +506,11 @@ impl Teller<'_> {
                 (!h.is_none()).then(|| GameEventView::TransformedEvent(TransformedEvent { object: h, from: from.clone(), to: to.clone() }))
             }
             Proto::Lost { player, reason } => Some(GameEventView::PlayerLostEvent(PlayerLostEvent { player: seat(*player), reason: *reason })),
-            Proto::Ended { outcome, winning_team } => {
-                Some(GameEventView::GameEndedEvent(GameEndedEvent { outcome: *outcome, winning_team: *winning_team }))
-            }
+            Proto::Ended { outcome, winning_team, draw_reason } => Some(GameEventView::GameEndedEvent(GameEndedEvent {
+                outcome: *outcome,
+                winning_team: *winning_team,
+                draw_reason: *draw_reason,
+            })),
             Proto::Retracted { sequences } => Some(GameEventView::EventsRetractedEvent(EventsRetractedEvent {
                 sequences: sequences.iter().map(|&s| s as i64).collect(),
             })),

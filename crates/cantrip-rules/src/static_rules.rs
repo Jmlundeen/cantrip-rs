@@ -321,3 +321,48 @@ pub fn attack_rules_allow(q: &dyn Query, cards: &CardTable, creature: ObjectId) 
         !cards.attack_rules[card.0 as usize] || q.lost_all_abilities(id) || cards.get(card).attack_rules.iter().all(|rule| rule(q, id, creature))
     })
 }
+
+/// Whether a static ability of a permanent on the battlefield with its abilities (CR 613.1f) says `test` of its own rules.
+/// Asked only where the rules need the answer - a player about to lose or win, damage to a player, counters about to be put -
+/// so the battlefield is searched then.
+fn any_static<R: Copy + 'static>(q: &dyn Query, cards: &'static CardTable, rules: fn(&CardDef) -> &'static [R], test: impl Fn(R, &Asker) -> bool) -> bool {
+    let s = q.state();
+    s.battlefield().iter().any(|&id| {
+        let obj = s.obj(id);
+        let list = rules(cards.get(cards.current(obj)));
+        !list.is_empty() && !q.lost_all_abilities(id) && {
+            let asker = Asker { source: id, controller: obj.controller };
+            list.iter().any(|&rule| test(rule, &asker))
+        }
+    })
+}
+
+/// Whether `player` doesn't lose the game for `reason` (CR 104.3, 704.5a-c): a static ability says so (`CardDef::loss_rules`:
+/// Platinum Angel's "you can't lose the game", Phyrexian Unlife's "you don't lose the game for having 0 or less life").
+pub fn doesnt_lose(q: &dyn Query, cards: &'static CardTable, player: PlayerId, reason: LossReason) -> bool {
+    any_static(q, cards, |d| d.loss_rules, |rule, asker| rule(q, asker, player, reason))
+}
+
+/// Whether `player` can't win the game (CR 104.2b): Platinum Angel's "your opponents can't win the game" (`CardDef::win_rules`).
+pub fn cant_win(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
+    any_static(q, cards, |d| d.win_rules, |rule, asker| rule(q, asker, player))
+}
+
+/// Whether damage dealt to `player` now is dealt as though its source had infect (CR 702.90b): Phyrexian Unlife's
+/// (`CardDef::infect_damage_to`).
+pub fn damage_as_though_infect(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
+    any_static(q, cards, |d| d.infect_damage_to, |rule, asker| rule(q, asker, player))
+}
+
+/// Whether `object`, controlled by `controller` (as it enters, the player it enters under), can't have `kind` counters put on
+/// it (CR 122.6, 101.2): Melira, Sylvok Outcast's "creatures you control can't have -1/-1 counters put on them"
+/// (`CardDef::counter_bans`).
+pub fn counters_banned(q: &dyn Query, cards: &'static CardTable, object: ObjectId, controller: PlayerId, kind: CounterKind) -> bool {
+    any_static(q, cards, |d| d.counter_bans, |rule, asker| rule(q, asker, object, controller, kind))
+}
+
+/// Whether `player` can't get `kind` counters (CR 122.1, 101.2): Melira's "you can't get poison counters"
+/// (`CardDef::player_counter_bans`).
+pub fn player_counters_banned(q: &dyn Query, cards: &'static CardTable, player: PlayerId, kind: PlayerCounter) -> bool {
+    any_static(q, cards, |d| d.player_counter_bans, |rule, asker| rule(q, asker, player, kind))
+}

@@ -469,6 +469,13 @@ pub fn zone_change(cx: &mut Cx, change: ZoneChange) -> ZoneChange {
 /// remain once every effect has applied. The permanent is judged as it is now, or as it would exist on the
 /// battlefield if it is entering (CR 614.12).
 pub fn counters(cx: &mut Cx, object: ObjectId, controller: PlayerId, entering: bool, counts: [i16; CounterKind::COUNT]) -> [i16; CounterKind::COUNT] {
+    if counts.iter().all(|&n| n <= 0) {
+        return counts;
+    }
+    // CR 101.2, 122.6: counters of a kind the permanent can't have put on it are not put on it (Melira, Sylvok Outcast's
+    // "creatures you control can't have -1/-1 counters put on them"), entering with them included; no replacement effect sees
+    // them, and none adds them back.
+    let counts = without_banned(cx, object, controller, counts);
     if !possible(cx, Some(object)) || counts.iter().all(|&n| n <= 0) {
         return counts;
     }
@@ -477,9 +484,19 @@ pub fn counters(cx: &mut Cx, object: ObjectId, controller: PlayerId, entering: b
     let mut proposal = Proposal::Counters(CounterPlacement { object, controller, entering, counts, putter });
     apply(cx, &mut proposal);
     match proposal {
-        Proposal::Counters(placement) => placement.counts,
+        Proposal::Counters(placement) => without_banned(cx, object, controller, placement.counts),
         _ => unreachable!("an effect cannot change the kind of the event"),
     }
+}
+
+/// `counts` less every kind `object`, controlled by `controller`, can't have put on it (CR 101.2, 122.6).
+fn without_banned(cx: &Cx, object: ObjectId, controller: PlayerId, mut counts: [i16; CounterKind::COUNT]) -> [i16; CounterKind::COUNT] {
+    for (i, n) in counts.iter_mut().enumerate() {
+        if *n > 0 && crate::static_rules::counters_banned(cx, cx.cards(), object, controller, CounterKind::ALL[i]) {
+            *n = 0;
+        }
+    }
+    counts
 }
 
 /// Counters that would be put on a player (CR 122.6): how many poison and energy counters remain once every effect has

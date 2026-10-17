@@ -33,7 +33,7 @@ pub fn priority_options(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
     if split_second(cx) {
         return options;
     }
-    activated_options(cx, player, &mut options);
+    activated_options(cx, player, &std::cell::OnceCell::new(), false, &mut options);
     let available = std::cell::OnceCell::new();
     castable(cx, player, &available, true, &mut options);
     if sorcery_timing(cx, player) {
@@ -1777,7 +1777,42 @@ fn any_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 
     }
 }
 
-fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
+/// Whether `player`, given priority now, could cast a spell or activate an ability that isn't a mana ability with as much
+/// as they like of each kind of mana they can make now (CR 104.4b): what tapping lands that come back untapped round a loop
+/// could buy. Mana of a kind nothing of theirs makes is still none; every cost but the mana's is judged as it is.
+pub fn could_act_with_more_mana(cx: &Cx, player: PlayerId) -> bool {
+    let mut more = available(cx, player);
+    for n in more.fixed.iter_mut().filter(|n| **n > 0) {
+        *n = u8::MAX;
+    }
+    for n in more.flex.iter_mut().filter(|n| **n > 0) {
+        *n = u16::MAX as u32;
+    }
+    for (_, fixed, flex) in more.restricted.iter_mut() {
+        for n in fixed.iter_mut().filter(|n| **n > 0) {
+            *n = u8::MAX;
+        }
+        if *flex > 0 {
+            *flex = u16::MAX as u32;
+        }
+    }
+    more.consume = 0;
+    let unlimited = std::cell::OnceCell::new();
+    let _ = unlimited.set(more);
+    let mut options = Vec::new();
+    if !split_second(cx) {
+        activated_options(cx, player, &unlimited, true, &mut options);
+        castable(cx, player, &unlimited, true, &mut options);
+        if sorcery_timing(cx, player) {
+            castable(cx, player, &unlimited, false, &mut options);
+        }
+    }
+    !options.is_empty()
+}
+
+/// The activated abilities `player` may activate now, judged with the mana `available` could pay (`unlimited`: as though
+/// any cost could be paid, `could_act_with_more_mana`).
+fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, unlimited: bool, options: &mut Vec<ActionOption>) {
     // Abilities of permanents, then abilities that function from the hand (cycling) and the graveyard (unearth).
     let sources: Vec<ObjectId> = cx
         .s()
@@ -1789,7 +1824,6 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
         .chain(cx.s().zone(Zone::graveyard(player)).iter().copied())
         .collect();
     let forbidders = static_rules::activation_forbidders(cx);
-    let available = std::cell::OnceCell::new();
     for id in sources {
         let zone = cx.s().obj(id).zone.kind();
         let chars = cx.chars(id);
@@ -1843,7 +1877,7 @@ fn activated_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>)
             let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
             let judged = owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
             // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
-            let own = (judged && def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
+            let own = (judged && !unlimited && def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
             let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
             let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };

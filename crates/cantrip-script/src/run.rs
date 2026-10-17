@@ -204,6 +204,11 @@ impl<'s> Run<'s> {
                 player.life = life;
             }
         }
+        for &(seat, poison) in &script.poison {
+            if let Some(player) = game.state.players.get_mut(seat) {
+                player.poison = poison;
+            }
+        }
         Ok(Run {
             script,
             game,

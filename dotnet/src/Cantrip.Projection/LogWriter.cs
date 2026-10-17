@@ -27,7 +27,12 @@ public static class LogWriter
 
         return text is null
             ? null
-            : new Line(text, reader.Named, entry is PlayerLostEvent ? LogEntryKind.PlayerLost : LogEntryKind.Event);
+            : new Line(text, reader.Named, entry switch
+            {
+                PlayerLostEvent => LogEntryKind.PlayerLost,
+                GameEndedEvent { Outcome: GameOutcomeView.Draw } => LogEntryKind.GameDrawn,
+                _ => LogEntryKind.Event,
+            });
     }
 
     /// <summary>One seat's reading of one view, collecting the objects a line names as it names them.</summary>
@@ -339,7 +344,13 @@ public static class LogWriter
         {
             if (ended.Outcome != GameOutcomeView.TeamWon)
             {
-                return "The game is a draw.";
+                return ended.DrawReason switch
+                {
+                    DrawReasonView.MandatoryLoop =>
+                        "The game is a draw: it is in a loop of mandatory actions that no player can stop (CR 104.4b).",
+                    DrawReasonView.AllLost => "The game is a draw: every player lost at once (CR 104.4a).",
+                    _ => "The game is a draw.",
+                };
             }
 
             List<int> winners = [.. view.Players.Where(p => p.Team == ended.WinningTeam).Select(p => p.Seat)];

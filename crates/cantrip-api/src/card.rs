@@ -573,6 +573,72 @@ pub struct PermanentCost {
 }
 
 impl Cost {
+    /// Whether the cost is {T} and nothing else (CR 107.5): what a basic land's mana ability costs. Every part is named, so
+    /// a part added to `Cost` must be judged here too.
+    pub fn is_tap_only(&self) -> bool {
+        let Cost {
+            mana,
+            tap,
+            sacrifice_self,
+            discard_self,
+            permanents,
+            loyalty,
+            life,
+            remove_counters,
+            put_counters,
+            remove_any_counter,
+            remove_counters_among,
+            exile_self,
+            discard,
+            pay_x_life,
+            exile_from_graveyard,
+            exile_from_graveyard_of,
+            exert,
+            tap_creatures,
+            emerge,
+            exile_from_hand,
+            tap_permanents,
+            unattach_self,
+            return_self,
+            variable,
+            discard_hand,
+            collect_evidence,
+            behold,
+            blight,
+            tap_to_reduce,
+            materials,
+        } = *self;
+        tap && mana.is_zero() && mana.x == 0
+            && !sacrifice_self
+            && !discard_self
+            && permanents.is_none()
+            && loyalty.is_none()
+            && life == 0
+            && remove_counters.is_none()
+            && put_counters.is_none()
+            && !remove_any_counter
+            && remove_counters_among.is_none()
+            && !exile_self
+            && discard.is_none()
+            && !pay_x_life
+            && exile_from_graveyard == 0
+            && exile_from_graveyard_of.is_none()
+            && !exert
+            && tap_creatures.is_none()
+            && !emerge
+            && exile_from_hand.is_none()
+            && !tap_permanents
+            && !unattach_self
+            && !return_self
+            && variable.is_none()
+            && !discard_hand
+            && collect_evidence == 0
+            && behold.is_none()
+            && blight == 0
+            && !tap_to_reduce
+            && materials.is_none()
+    }
+
     /// This cost paid `n` times over (escalate, CR 702.120a, once for each mode beyond the first): its mana, life,
     /// discards, permanents and graveyard exiles each multiplied. The parts that can only be paid once are left as
     /// they are.
@@ -1526,6 +1592,36 @@ pub type UnpreventableRule = fn(&dyn Query, &Asker, ObjectId, bool) -> bool;
 /// Lynx), "Your opponents can't gain life" (Knight of Dusk's Shadow). `cantrip_mechanics::statics` has both.
 pub type LifeGainRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
 
+/// A static ability that says a player doesn't lose the game (CR 104.3): true for `player` and the way they would lose.
+/// "You can't lose the game" is true for every reason (Platinum Angel); "you don't lose the game for having 0 or less life"
+/// for `LossReason::Life` alone (Phyrexian Unlife).
+pub type LossRule = fn(&dyn Query, &Asker, PlayerId, crate::event::LossReason) -> bool;
+
+/// A static ability that says a player can't win the game (CR 104.2b): true for `player`. Platinum Angel's "your opponents
+/// can't win the game".
+pub type WinRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
+
+/// A static ability under which damage dealt to `player` is dealt as though its source had infect (CR 702.90b): true for
+/// that player now. Phyrexian Unlife.
+pub type InfectDamageRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
+
+/// A static ability that says a permanent can't have counters of a kind put on it (CR 122.6, 101.2): true for `object` as
+/// it would have them - `controller` its controller then, which for a permanent entering with counters is the player it
+/// enters under - and `kind`. Melira, Sylvok Outcast; Solemnity.
+pub type CounterBan = fn(&dyn Query, &Asker, ObjectId, PlayerId, CounterKind) -> bool;
+
+/// The counters a player may get (CR 122.1), for `PlayerCounterBan`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum PlayerCounter {
+    Poison,
+    Energy,
+    Experience,
+}
+
+/// A static ability that says a player can't get counters of a kind (CR 122.1, 101.2): true for `player` and `kind`.
+/// Melira, Sylvok Outcast's "you can't get poison counters"; Solemnity's "players can't get counters".
+pub type PlayerCounterBan = fn(&dyn Query, &Asker, PlayerId, PlayerCounter) -> bool;
+
 /// Whether a static ability makes this creature assign combat damage equal to its toughness rather than its power
 /// (CR 510.1a): given the rule's own asker.
 pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
@@ -1850,6 +1946,24 @@ pub struct CardDef {
     /// Its static abilities that stop players from gaining life (CR 119.7), while it is on the battlefield: the gain, the
     /// part of an exchange or a new life total that would raise the total, does not happen (CR 119.5).
     pub cant_gain_life: &'static [LifeGainRule],
+    /// Its static abilities that keep a player from losing the game (CR 104.3, 704.5a-c), while it is on the battlefield with
+    /// its abilities: "you can't lose the game" (Platinum Angel), "you don't lose the game for having 0 or less life"
+    /// (Phyrexian Unlife). A concession still loses (CR 104.3a), and nothing stops a draw (CR 104.4).
+    pub loss_rules: &'static [LossRule],
+    /// Its static abilities that keep a player from winning the game (CR 104.2b), while it is on the battlefield with its
+    /// abilities: "your opponents can't win the game" (Platinum Angel). The last player left still wins (CR 104.2a).
+    pub win_rules: &'static [WinRule],
+    /// Its static abilities that make damage dealt to a player be dealt as though its source had infect (CR 702.90b, 120.3b),
+    /// while it is on the battlefield with its abilities: Phyrexian Unlife's "as long as you have 0 or less life".
+    pub infect_damage_to: &'static [InfectDamageRule],
+    /// Its static abilities that keep counters from being put on permanents (CR 122.6, 101.2), while it is on the battlefield
+    /// with its abilities: Melira, Sylvok Outcast's "creatures you control can't have -1/-1 counters put on them", Solemnity's
+    /// "artifacts, creatures, enchantments, and lands can't have counters put on them". It entering with counters is
+    /// counters being put on it too (CR 122.6).
+    pub counter_bans: &'static [CounterBan],
+    /// Its static abilities that keep players from getting counters (CR 122.1, 101.2), while it is on the battlefield with
+    /// its abilities: Melira's "you can't get poison counters", Solemnity's "players can't get counters".
+    pub player_counter_bans: &'static [PlayerCounterBan],
     /// "Each creature you control assigns combat damage equal to its toughness rather than its power" (CR 510.1a):
     /// Assault Formation, Doran, the Siege Tower.
     pub damage_by_toughness: &'static [DamageByToughnessRule],
@@ -1993,6 +2107,11 @@ impl CardDef {
         targeting_rules: &[],
         unpreventable_damage: &[],
         cant_gain_life: &[],
+        loss_rules: &[],
+        win_rules: &[],
+        infect_damage_to: &[],
+        counter_bans: &[],
+        player_counter_bans: &[],
         damage_by_toughness: &[],
         damage_stays: &[],
         mana_told_apart: &[],

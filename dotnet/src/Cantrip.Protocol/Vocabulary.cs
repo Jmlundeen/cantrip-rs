@@ -127,6 +127,19 @@ public enum GameOutcomeView
     Draw = 2,
 }
 
+/// <summary>Why a game is a draw (CR 104.4).</summary>
+public enum DrawReasonView
+{
+    /// <summary>A game that was won, or a draw with no reason given.</summary>
+    None = 0,
+
+    /// <summary>Every player left in the game lost at once (CR 104.4a).</summary>
+    AllLost = 1,
+
+    /// <summary>The game entered a loop of mandatory actions that no player could stop (CR 104.4b).</summary>
+    MandatoryLoop = 2,
+}
+
 /// <summary>Why a player is no longer in the game (CR 104.3).</summary>
 public enum LossReasonView
 {

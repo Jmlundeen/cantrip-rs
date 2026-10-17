@@ -533,6 +533,26 @@ once its turn-based actions are done (514.3a), and then marks `Turn::cleanup_aga
 everyone has passed. Ultima, Time Stop, Sundial of the Infinite, Glorious End, Day's Undoing, Hurkyl's Final
 Meditation, Discontinuity and Obeka, Brute Chronologist end the turn.
 
+### Winning, losing and drawing
+
+A player loses to the state-based actions of CR 704.5a-c through `ops::loses_to_state_based_actions`, which leaves out each
+way a static ability says the player doesn't lose (`CardDef::loss_rules`: Platinum Angel's "you can't lose the game",
+Phyrexian Unlife's "you don't lose the game for having 0 or less life"); a draw from an empty library is forgotten with the
+check that saw it (704.5b: "since the last time state-based actions were checked"). An effect that says a player loses
+(`lose_game`, 104.3e) is stopped the same way, and one that says a player wins (`win_game`, 104.2b) does nothing for a player
+who can't win (`CardDef::win_rules`) or who has an opponent who can't lose. A concession is the host's and is never stopped
+(104.3a). Every loss records `Event::GameLost` with its `LossReason`, and a draw `Event::GameDrawn` with its `DrawReason`,
+which the host tells each seat (`PlayerLostEvent`, `GameEndedEvent.DrawReason`).
+
+A loop of mandatory actions is a draw (CR 104.4b, 732.4), found by `loops.rs`. A question with more than one legal answer is
+a real choice and clears the watch (`GameState::loop_watch`, journalled like any other write); a priority with nothing to do
+but pass - and tap a mana ability whose whole cost is {T}, which only fills a pool, since every spell or ability that mana
+could pay for is offered at priority whether or not it can be paid yet - is none. After `WATCH_AFTER` such priorities in a
+row with something on the stack, each priority's position is fingerprinted up to the identity of objects (objects numbered
+by where they are, references to objects that left followed to what they became, timestamps by their order; the history and
+last-known information left out), and a position seen again is the loop going round: the game is a draw. A normal game pays
+a comparison per priority. A loop a player could stop is left to the players (CR 732.2-732.3, `docs/known-issues.md`).
+
 ### Casting: when a cost's choices are made
 
 A spell's costs are chosen and paid in the order of CR 601.2b-h, as the C# engine asked them: the permanents a cost

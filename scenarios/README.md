@@ -143,6 +143,12 @@ A scenario that needs a player near death says so instead of playing the life aw
 total (not the starting life of the format, so "half your starting life total" is unchanged), one player per line, `Bot1: 1`.
 A player it does not name starts at 20.
 
+## Poison counters: `[Poison]`
+
+A `[Poison]` section gives a player the poison counters they begin the game with, one player per line, `Bot2: 9`, for a
+scenario that needs a player near ten (CR 122.1f, 704.5c) without playing the counters onto them. A player it does not name
+begins with none.
+
 ## How lines are played
 
 There is **one cursor for the whole list**. When the engine asks a player something, the line under the cursor is
@@ -362,6 +368,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 `Key = Value` against the dump. A failing script prints every key. The keys are:
 
 - `Turn`, `Step`, `ActivePlayer`, `PriorityPlayer`, `Result` (`InProgress`, `Bot1 won`, `Draw`)
+- `DrawReason` (`MandatoryLoop`, `AllLost`), why a drawn game is drawn (CR 104.4b: a loop of mandatory actions no player
+  can stop; CR 104.4a: every player left lost at once), from the history; absent for a game not drawn
 - `Monarch` (`Bot1`), once a player has become the monarch (CR 725) and absent until then; `Initiative` likewise (CR 726)
 - `DayNight` (`Day`, `Night`), once the game has a designation (CR 731.1) and absent while it is neither. The game's
   own, so it names no player.
@@ -382,6 +390,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `Exile` lists a card exiled face down as `(face down)` (CR 406.3), and `Exile.FaceDown` says what those cards are (the dump sees
   everything; a player's view does not)
 - `BotN.Life`, `.Poison`, `.Energy`, `.Status` (`Lost`, once the player has lost the game and absent until then), `.Mana` (`{U}{U}`), `.LandsPlayed`
+- `BotN.LostTo` (`Life`, `EmptyLibrary`, `Poison`, `Effect`), how the player lost the game (CR 104.3), from the history; absent
+  until they have
 - `BotN.ManaFrom` (with `.Count`), the pool's mana by the source that produced it (CR 106.3), restricted mana too and without
   its restriction: `{W} Barracks of the Thousand; {W}{W} Plains` (`none` for a player's own mana ability); absent while the pool is empty
 - `BotN.Experience` — counters on the player by name (CR 122.1), one key per kind and only for a kind they have any

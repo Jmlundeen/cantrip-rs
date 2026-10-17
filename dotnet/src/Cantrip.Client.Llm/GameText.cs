@@ -364,7 +364,12 @@ public static class GameText
             PlayerLostEvent lost => $"{Seat(client, lost.Player)} lost the game ({Loss(lost.Reason)}).",
 
             GameEndedEvent ended => ended.Outcome == GameOutcomeView.Draw
-                ? "The game ended in a draw."
+                ? ended.DrawReason switch
+                {
+                    DrawReasonView.MandatoryLoop => "The game ended in a draw: a loop of mandatory actions no player could stop (CR 104.4b).",
+                    DrawReasonView.AllLost => "The game ended in a draw: every player lost at once.",
+                    _ => "The game ended in a draw.",
+                }
                 : $"The game is over; team {ended.WinningTeam} won.",
 
             // Tapping, shuffling and library arrangement are all visible in the position itself, and a line for each

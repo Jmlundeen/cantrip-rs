@@ -9,6 +9,7 @@ mod attach;
 mod day_night;
 mod designations;
 mod layers;
+mod loops;
 mod ops;
 mod replace;
 mod resolve;
@@ -414,6 +415,26 @@ impl Game {
         static_rules::cant_gain_life(self, self.cards, player)
     }
 
+    /// Whether `player` doesn't lose the game for `reason` right now (CR 104.3): a static ability on the battlefield says so.
+    pub fn doesnt_lose(&self, player: PlayerId, reason: LossReason) -> bool {
+        static_rules::doesnt_lose(self, self.cards, player, reason)
+    }
+
+    /// Whether `player` can't win the game right now (CR 104.2b): a static ability on the battlefield says so.
+    pub fn cant_win(&self, player: PlayerId) -> bool {
+        static_rules::cant_win(self, self.cards, player)
+    }
+
+    /// Whether damage dealt to `player` right now is dealt as though its source had infect (CR 702.90b).
+    pub fn damage_as_though_infect(&self, player: PlayerId) -> bool {
+        static_rules::damage_as_though_infect(self, self.cards, player)
+    }
+
+    /// Whether `player` can't get `kind` counters right now (CR 122.1, 101.2).
+    pub fn player_counters_banned(&self, player: PlayerId, kind: PlayerCounter) -> bool {
+        static_rules::player_counters_banned(self, self.cards, player, kind)
+    }
+
     /// Whether `creature` may attack as though it didn't have defender right now (CR 702.3b, 609.4): an effect or a static
     /// ability on the battlefield says so. Whether it has defender at all is asked of its characteristics.
     pub fn may_attack_despite_defender(&self, creature: ObjectId) -> bool {
@@ -464,6 +485,8 @@ impl<'a> Cx<'a> {
     }
 
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
+        // A real choice, asked or answered on a re-run, means no loop through here is a mandatory one (CR 104.4b).
+        loops::asked(self, &kind);
         let frame = &self.g.state.agenda[self.frame];
         if self.cursor < frame.answers.len() {
             let answer = frame.answers[self.cursor].clone();
@@ -669,6 +692,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend {
+        loops::asked(self, &kind);
         let id = self.g.state.request_id();
         let at = self.frame;
         self.g.state.update_frame(at, |f| {
@@ -983,6 +1007,10 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn give_experience(&mut self, player: PlayerId, amount: u32) {
+        // CR 101.2: a player who can't get experience counters gets none (Solemnity's "players can't get counters").
+        if static_rules::player_counters_banned(&*self, self.g.cards, player, PlayerCounter::Experience) {
+            return;
+        }
         self.g.state.update_player(player, |p| p.experience = p.experience.saturating_add(amount.min(255) as u8));
     }
 

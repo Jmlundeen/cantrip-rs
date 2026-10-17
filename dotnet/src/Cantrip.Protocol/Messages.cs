@@ -339,6 +339,10 @@ public sealed class GameEndedEvent : GameEventView
     /// <summary>The team left standing, or zero for a draw.</summary>
     [Key(1)]
     public int WinningTeam { get; set; }
+
+    /// <summary>For a draw, why (CR 104.4).</summary>
+    [Key(2)]
+    public DrawReasonView DrawReason { get; set; }
 }
 
 /// <summary>

@@ -69,6 +69,9 @@ keeps it).
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Unexercised |
 | [KI-52](#ki-52-which-lands-lost-their-rules-text-to-a-subtype-setting-effect-is-judged-on-layers-1-to-3) | Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3 | Low | Unexercised |
 | [KI-53](#ki-53-a-copy-holds-at-most-four-abilities-added-by-exceptions) | A copy holds at most four abilities added by exceptions | Low | Unexercised |
+| [KI-54](#ki-54-a-loop-a-player-could-stop-has-no-shortcut-and-a-seat-that-never-stops-it-goes-round-forever) | A loop a player could stop has no shortcut, and a seat that never stops it goes round forever | Medium | Open |
+| [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
+| [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 
 ## Issues
 
@@ -635,3 +638,55 @@ Stage ability (CR 113.2c), so a chain of five Stages copying one another loses o
 A fix grows the array or refuses the copy loudly; instances beyond the second of the same ability change no play.
 
 **Scenarios.** none: no scenario builds the chain.
+### KI-54: A loop a player could stop has no shortcut, and a seat that never stops it goes round forever
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine / client | 2026-10-17, CR 104.4b loop detection |
+
+**Notes.** `loops.rs` makes a loop of mandatory actions a draw (CR 104.4b, 732.4). A loop in which some player has a real
+choice - an instant to cast, a second creature card for Animate Dead to enchant (the Worldgorger Dragon loop with another
+creature card in a graveyard) - is not a draw, rightly (CR 104.4b's last sentence), but nothing implements the shortcut that
+ends it (CR 732.2-732.3: the players name a number of iterations, and then the player who must makes a different choice):
+each iteration is played out, and a seat that keeps making the same choice (a bot passing with a breaking instant in hand)
+goes round until it chooses otherwise. Two smaller simplifications in what counts as no choice: a mana ability whose whole
+cost is {T} is treated as no choice, when nothing more mana could pay for is castable, even when its effect does more than
+add mana (a painland's damage); and the fingerprint leaves out the event history, so a forced loop whose rounds differ only
+in what the history would answer later (a "once each turn" or "the Nth time this turn" trigger that would end it on a later
+round) is wrongly found a draw - a false draw, not only a missed one. No card in content makes such a loop yet. A fix for the
+first is a shortcut proposal (CR 732.2a) the client can offer and the bots can answer; for the last, the fingerprint takes in
+the history of the turn as the rules that read it would see it.
+
+**Scenarios.**
+- [`scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip`](../scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip)
+  and [`scenarios/worldgorger-dragon-loop-ends-when-animate-dead-chooses-another-creature-card.cantrip`](../scenarios/worldgorger-dragon-loop-ends-when-animate-dead-chooses-another-creature-card.cantrip):
+  loops with a choice, played round by hand until the script breaks them (not marked: they show the rules-correct "no draw").
+
+### KI-55: Spellskite can't choose between two instances of "target" that hold the same object
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, Spellskite |
+
+**Notes.** "Change a target of target spell or ability to [this]" (CR 115.7b, `ops::change_a_target_to`) asks which target to
+change as a choice among the targets. When the same object is the target of two different instances of "target" on the spell
+(CR 115.3) and both could be changed, the choice names that object once, and the first instance is the one changed; the rules
+let Spellskite's controller choose either (the 2020-08-07 ruling), and the results differ when the instances do different
+things. A fix asks the choice by instance (each labelled with its slot's text). No spell in content with two instances of
+"target" that may share an object has been put under a Spellskite.
+
+**Scenarios.** none yet.
+
+### KI-56: A counter ban judges an entering permanent as the object it was before it moved
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, Melira, Sylvok Outcast |
+
+**Notes.** `CardDef::counter_bans` (Melira's "creatures you control can't have -1/-1 counters put on them") is asked of a
+permanent entering with counters (CR 122.6) with the player it enters under, but its characteristics are read from the object
+in the zone it comes from, not as the permanent it will be (CR 614.12): a card entering as a copy of a creature, or a
+noncreature card entering as a creature, is judged by its own characteristics. Moonshadow and a persisting Kitchen Finks,
+creature cards entering as themselves, are judged rightly.
+
+**Scenarios.** none yet.

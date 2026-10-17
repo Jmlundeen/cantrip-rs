@@ -686,6 +686,24 @@ impl<'a> Projector<'a> {
         if game.cant_gain_life(p) {
             summary.pending_effects.push(format!("{} can't gain life.", if p == self.viewer { "You" } else { "They" }));
         }
+        // What keeps the player in the game, or out of winning it (CR 104.2b, 104.3), and how damage and counters reach them
+        // (CR 702.90b, 122.1), from the static abilities that apply now: Platinum Angel, Phyrexian Unlife, Melira.
+        let (they, them) = if p == self.viewer { ("You", "you") } else { ("They", "them") };
+        let reasons = [LossReason::Life, LossReason::EmptyLibrary, LossReason::Poison, LossReason::Effect];
+        if reasons.iter().all(|&r| game.doesnt_lose(p, r)) {
+            summary.pending_effects.push(format!("{they} can't lose the game."));
+        } else if game.doesnt_lose(p, LossReason::Life) {
+            summary.pending_effects.push(format!("{they} don't lose the game for having 0 or less life."));
+        }
+        if game.cant_win(p) {
+            summary.pending_effects.push(format!("{they} can't win the game."));
+        }
+        if game.damage_as_though_infect(p) {
+            summary.pending_effects.push(format!("Damage is dealt to {them} as though its source had infect."));
+        }
+        if game.player_counters_banned(p, PlayerCounter::Poison) {
+            summary.pending_effects.push(format!("{they} can't get poison counters."));
+        }
         if player.room != 0
             && let Some(dungeon) = game.cards.undercity
         {

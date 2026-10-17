@@ -43,6 +43,9 @@ public enum LogEntryKind
 
     /// <summary>A player lost the game, and why: what the game-over panel says as well as the log.</summary>
     PlayerLost = 1,
+
+    /// <summary>The game was drawn, and why (CR 104.4): what the game-over panel says as well as the log.</summary>
+    GameDrawn = 2,
 }
 
 /// <summary>One line of the game log, as one seat reads it.</summary>

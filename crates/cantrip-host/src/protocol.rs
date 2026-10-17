@@ -158,6 +158,17 @@ pub enum GameOutcomeView {
     Draw,
 }
 
+/// Why a game is a draw (CR 104.4): `None` for a game that was won, or a draw the engine gave no reason for.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum DrawReasonView {
+    #[default]
+    None,
+    /// Every player left lost at once (CR 104.4a).
+    AllLost,
+    /// A loop of mandatory actions no player could stop (CR 104.4b).
+    MandatoryLoop,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum LossReasonView {
     Life,
@@ -1803,6 +1814,7 @@ pub struct PlayerLostEvent {
 pub struct GameEndedEvent {
     pub outcome: GameOutcomeView,
     pub winning_team: i32,
+    pub draw_reason: DrawReasonView,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

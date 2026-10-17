@@ -86,9 +86,13 @@ public sealed partial class MainPage
     }
 
     /// <summary>
-    /// What took each player out, one sentence each, in the order they went: the log's own lines for it, since the
-    /// outcome says only which team won.
+    /// What took each player out, one sentence each, in the order they went, and why a drawn game is drawn: the log's own
+    /// lines for it, since the outcome says only which team won.
     /// </summary>
     private static string WhyItEnded(GameClient client) =>
-        string.Join(" ", client.Log.Where(entry => entry.Kind == LogEntryKind.PlayerLost).Select(entry => entry.Text));
+        string.Join(
+            " ",
+            client.Log
+                .Where(entry => entry.Kind is LogEntryKind.PlayerLost or LogEntryKind.GameDrawn)
+                .Select(entry => entry.Text));
 }

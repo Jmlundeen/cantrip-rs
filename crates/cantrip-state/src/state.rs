@@ -48,6 +48,8 @@ pub struct GameState {
     pub blocks: Vec<Block>,
     /// Extra turns waiting to be taken (CR 500.7): the most recently created last, and taken first.
     pub extra_turns: Vec<PlayerId>,
+    /// What the rules watch to find a loop of mandatory actions (CR 104.4b, 732.4): see `LoopWatch`.
+    pub loop_watch: LoopWatch,
     /// The basic land cards a Limited event supplies (Magic Tournament Rules: a Limited sideboard holds any number of basic
     /// lands), of which each player always has one more outside the game (`Zone::sideboard`): one brought into the game is
     /// replaced there. Empty for a constructed game. Fixed at the deal, so no part of the journal.
@@ -79,6 +81,17 @@ pub struct GameState {
     /// the layers for one position and history, as `lost_to_statics` is (`applying` unused: a land's own such ability keeps
     /// applying and is not counted).
     pub land_text_lost: std::cell::RefCell<LostToStatics>,
+}
+
+/// What the rules watch to find a loop of mandatory actions (CR 104.4b, 732.4). `forced` counts the priorities given, with
+/// something on the stack, since a player last had a real choice (a question with more than one legal answer); once it is
+/// high enough, each such priority's position is fingerprinted into `seen`, and a position seen again with no real choice
+/// made in between is a loop no player can stop: the game is a draw. Any real choice clears both. Empty in nearly every
+/// position.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
+pub struct LoopWatch {
+    pub forced: u16,
+    pub seen: Vec<u64>,
 }
 
 /// The layers' list of the permanents a "loses all abilities" static ability took everything from, made for one epoch
@@ -139,7 +152,7 @@ impl GameState {
         &Turn,
         &Vec<ContinuousEffect>,
         (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<LastKnown>, &Vec<PlayPermission>),
-        (&Vec<Attacker>, &Vec<Block>, &Vec<PlayerId>),
+        (&Vec<Attacker>, &Vec<Block>, &Vec<PlayerId>, &LoopWatch),
         &Vec<Frame>,
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>),
     ) {
@@ -151,7 +164,7 @@ impl GameState {
             &self.turn,
             &self.effects,
             (&self.triggers, &self.delayed, &self.last_known, &self.permissions),
-            (&self.attackers, &self.blocks, &self.extra_turns),
+            (&self.attackers, &self.blocks, &self.extra_turns, &self.loop_watch),
             &self.agenda,
             (&self.rng, self.next_timestamp, &self.outcome, self.unsettled, &self.members, &self.left_stack),
         )
@@ -255,6 +268,7 @@ pub enum Undo {
     AttackersSet(Vec<Attacker>),
     BlocksSet(Vec<Block>),
     ExtraTurnsSet(Vec<PlayerId>),
+    LoopWatchSet(LoopWatch),
     StaticsSeen(bool),
     FramePushed,
     FramePopped(Frame),
@@ -292,6 +306,7 @@ impl GameState {
             attackers: Vec::new(),
             blocks: Vec::new(),
             extra_turns: Vec::new(),
+            loop_watch: LoopWatch::default(),
             outside_supply: Vec::new(),
             statics_seen: false,
             agenda: Vec::new(),
@@ -809,6 +824,13 @@ impl GameState {
         }
     }
 
+    pub fn set_loop_watch(&mut self, watch: LoopWatch) {
+        if self.loop_watch != watch {
+            let old = std::mem::replace(&mut self.loop_watch, watch);
+            self.log(Undo::LoopWatchSet(old));
+        }
+    }
+
     pub fn set_extra_turns(&mut self, turns: Vec<PlayerId>) {
         let old = std::mem::replace(&mut self.extra_turns, turns);
         self.log(Undo::ExtraTurnsSet(old));
@@ -1017,6 +1039,7 @@ impl GameState {
             Undo::AttackersSet(old) => self.attackers = old,
             Undo::BlocksSet(old) => self.blocks = old,
             Undo::ExtraTurnsSet(old) => self.extra_turns = old,
+            Undo::LoopWatchSet(old) => self.loop_watch = old,
             Undo::StaticsSeen(old) => self.statics_seen = old,
             Undo::FramePushed => {
                 self.agenda.pop();
@@ -1099,6 +1122,7 @@ impl GameState {
             Undo::AttackersSet(_) => Undo::AttackersSet(self.attackers.clone()),
             Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),
             Undo::ExtraTurnsSet(_) => Undo::ExtraTurnsSet(self.extra_turns.clone()),
+            Undo::LoopWatchSet(_) => Undo::LoopWatchSet(self.loop_watch.clone()),
             Undo::StaticsSeen(_) => Undo::StaticsSeen(self.statics_seen),
             Undo::FramePushed => Undo::FramePopped(self.agenda.last().expect("a frame").clone()),
             Undo::FramePopped(_) => Undo::FramePushed,

@@ -136,6 +136,13 @@ impl StateDump {
                 Outcome::Won(p) => format!("{} won", bot(p)),
             },
         );
+        // Why a drawn game is drawn (CR 104.4), from the history: absent for a game not drawn.
+        if let Some(reason) = game.log.iter().find_map(|r| match r.event {
+            Event::GameDrawn { reason } => Some(reason),
+            _ => None,
+        }) {
+            d.set("DrawReason", format!("{reason:?}"));
+        }
 
         let stack: Vec<String> = s.stack.iter().rev().map(|item| game.name(item.object).to_string()).collect();
         d.list("Stack", stack, true);
@@ -271,6 +278,13 @@ impl StateDump {
             d.set(format!("{b}.Poison"), player.poison);
             if player.lost {
                 d.set(format!("{b}.Status"), "Lost");
+            }
+            // How they lost (CR 104.3), from the history: absent for a player who has not, or who left another way.
+            if let Some(reason) = game.log.iter().find_map(|r| match r.event {
+                Event::GameLost { player, reason } if player == p => Some(reason),
+                _ => None,
+            }) {
+                d.set(format!("{b}.LostTo"), format!("{reason:?}"));
             }
             d.set(format!("{b}.Energy"), player.energy);
             if player.experience > 0 {
