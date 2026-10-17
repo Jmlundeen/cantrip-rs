@@ -1,0 +1,58 @@
+# Casting Sanar's prepare spell unprepares it as it is cast (CR 722.3d), so a Wild Idea that is countered still leaves Sanar unprepared
+# and nothing is found: Bot2 answers with Counterspell (two Mox Sapphires). The copy of the card ceases to exist (a copy of a card in
+# the graveyard is not a card, CR 707.10a, 704.5e). Casting it still counts as casting a sorcery spell, so Sanar can make its Treasure.
+# Bot1's library holds a Lightning Bolt, which a resolved Wild Idea would have fetched: it stays in the library, the hand holds only Plains.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Sanar, Unfinished Genius
+Plains
+Plains
+Lightning Bolt
+Plains x13
+
+[Bot2 Deck]
+Mox Sapphire x2
+Counterspell
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sanar, Unfinished Genius.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Wild Idea.Cast
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Wild Idea)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sanar, Unfinished Genius.Prepared = (absent)
+Bot1.Battlefield.Sanar, Unfinished Genius.Activate
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Counterspell
+Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Library.Count = 14
+Bot1.Hand = Plains; Plains

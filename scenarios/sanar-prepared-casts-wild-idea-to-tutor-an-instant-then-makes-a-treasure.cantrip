@@ -1,0 +1,54 @@
+# Sanar, Unfinished Genius "enters prepared" (CR 722.3a): its Wild Idea copy is in exile and Sanar is prepared. On turn 3 Bot1 casts
+# that copy for {3}{U}{R} (five Moxen), which unprepares Sanar (CR 722.3d) and finds an instant or sorcery card: Plains is refused as
+# a find (beside the positive control, Lightning Bolt), which goes to Bot1's hand. The copy ceases to exist after resolving. Casting
+# it was casting a sorcery spell, so Sanar's "Activate only if you've cast an instant or sorcery spell this turn" is satisfied and
+# {T} makes a Treasure token (Sanar has been Bot1's since turn 1, so the {T} is not summoning-sick).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Sanar, Unfinished Genius
+Plains
+Plains
+Lightning Bolt
+Plains x11
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sanar, Unfinished Genius.Cast
+Bot2.Pass
+? Bot1.Battlefield.Sanar, Unfinished Genius.Prepared = true
+? Exile = Wild Idea
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Wild Idea.Cast
+Bot2.Pass
+! Bot1.Search(Plains)
+Bot1.Search(Lightning Bolt)
+? Bot1.Battlefield.Sanar, Unfinished Genius.Prepared = (absent)
+Bot1.Battlefield.Sanar, Unfinished Genius.Activate
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Hand = Plains; Plains; Lightning Bolt
+Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Battlefield.Sanar, Unfinished Genius.Tapped = true
+Bot1.Graveyard.Count = 0

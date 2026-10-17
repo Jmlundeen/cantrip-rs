@@ -1,0 +1,40 @@
+# Sanar's "{T}: Create a Treasure token. Activate only if you've cast an instant or sorcery spell this turn." (CR 602.5b). On turn 3 Bot1
+# has cast only a creature spell (Ornithopter): the activation is refused. After it casts Lightning Bolt, an instant, the same
+# activation (the positive control) makes the Treasure.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Sanar, Unfinished Genius
+Ornithopter
+Lightning Bolt
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Sanar, Unfinished Genius.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+! Bot1.Battlefield.Sanar, Unfinished Genius.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+Bot1.Battlefield.Sanar, Unfinished Genius.Activate
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Treasure Token.Token = true
+Bot2.Life = 17
+Bot1.Battlefield.Sanar, Unfinished Genius.Tapped = true
