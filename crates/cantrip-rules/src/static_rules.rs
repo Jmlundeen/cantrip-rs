@@ -117,6 +117,17 @@ pub fn zero_loyalty_stays(cx: &Cx, planeswalker: ObjectId) -> bool {
     })
 }
 
+/// Whether a static ability of a permanent on the battlefield says the "legend rule" doesn't apply to `legend` (CR 704.5j,
+/// `CardDef::legend_rule_exempt`: Mirror Gallery), while that permanent has its abilities (CR 613.1f): once it leaves, the
+/// rule applies the next time state-based actions are checked (Mirror Gallery's ruling). Asked only of a legendary
+/// permanent, so the battlefield is searched then.
+pub fn legend_rule_exempt(cx: &Cx, legend: ObjectId) -> bool {
+    sources(cx, |d| !d.legend_rule_exempt.is_empty()).any(|(id, controller, def)| {
+        let asker = Asker { source: id, controller };
+        def.legend_rule_exempt.iter().any(|rule| rule(cx, &asker, legend))
+    })
+}
+
 /// Whether `player` can't gain life (CR 119.7): a resolved effect about them says so (`EffectKind::CantGainLife`, Screaming
 /// Nemesis's "for the rest of the game"), or a static ability of a permanent on the battlefield does (`CardDef::cant_gain_life`,
 /// Sunspine Lynx's "Players can't gain life"), which stops when the permanent leaves or loses its abilities (CR 611.3a,

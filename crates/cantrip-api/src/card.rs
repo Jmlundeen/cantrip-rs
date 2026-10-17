@@ -1642,6 +1642,11 @@ pub type ManaSourceRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// is changed: a planeswalker that is destroyed or has its loyalty abilities' costs to pay is judged as always.
 pub type ZeroLoyaltyRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability says the "legend rule" doesn't apply to this legendary permanent (CR 704.5j), given the rule's
+/// own asker and the permanent: "The 'legend rule' doesn't apply" (Mirror Gallery, every permanent). Only that state-based
+/// action is changed.
+pub type LegendRuleExemption = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability lets this creature attack as though it didn't have defender (CR 702.3b, 609.4): given the
 /// rule's own asker and the creature. Demon Wall's "as long as this creature has a counter on it, it can attack as
 /// though it didn't have defender"; Rolling Stones' "Wall creatures can attack as though they didn't have defender" and
@@ -1990,6 +1995,9 @@ pub struct CardDef {
     /// Its static abilities that keep planeswalkers with 0 loyalty on the battlefield (CR 704.5i), while it is on the
     /// battlefield with its abilities.
     pub zero_loyalty_stays: &'static [ZeroLoyaltyRule],
+    /// Its static abilities that keep the "legend rule" (CR 704.5j) from applying to some permanents, while it is on the
+    /// battlefield with its abilities.
+    pub legend_rule_exempt: &'static [LegendRuleExemption],
     /// "You may spend mana as though it were mana of any color to activate abilities of creatures you control" (CR 609.4b):
     /// Agatha's Soul Cauldron; "Players may spend mana as though it were mana of any color": Mycosynth Lattice.
     pub spend_any_color: &'static [SpendAnyColorRule],
@@ -2130,6 +2138,7 @@ impl CardDef {
         damage_stays: &[],
         mana_told_apart: &[],
         zero_loyalty_stays: &[],
+        legend_rule_exempt: &[],
         spend_any_color: &[],
         granted_once_each_turn: None,
         activate_as_though_haste: &[],

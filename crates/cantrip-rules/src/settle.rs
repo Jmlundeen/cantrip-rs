@@ -171,8 +171,12 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
             bound.push(crate::day_night::Bound { id, daybound });
         }
         let obj = cx.s().obj(id);
-        // CR 704.5j: not for a player for whom an effect says the legend rule doesn't apply (Hall of Echoes).
-        if chars.supertypes.legendary && !cx.s().effects.iter().any(|e| e.kind == EffectKind::NoLegendRule(obj.controller)) {
+        // CR 704.5j: not for a player for whom an effect says the legend rule doesn't apply (Hall of Echoes), nor for a
+        // permanent a static ability exempts (Mirror Gallery).
+        if chars.supertypes.legendary
+            && !cx.s().effects.iter().any(|e| e.kind == EffectKind::NoLegendRule(obj.controller))
+            && !crate::static_rules::legend_rule_exempt(cx, id)
+        {
             legends.push((id, chars.name));
         }
         if chars.has_subtype(Subtype::Saga) {
