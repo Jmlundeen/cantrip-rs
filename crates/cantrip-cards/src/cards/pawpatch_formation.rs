@@ -22,3 +22,5 @@ static MODAL: ModalDef = modes(&[
 ]);
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::PAWPATCH_FORMATION };
+
+pub static EXTRA: &[&CardDef] = &[&tokens::FOOD];

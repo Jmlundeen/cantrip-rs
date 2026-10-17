@@ -14,3 +14,5 @@ pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::THIS_DIES, scry_and_treasure, "When this creature dies, scry 1 and create a Treasure token.").look_back()],
     ..oracle::GREEDY_FREEBOOTER
 };
+
+pub static EXTRA: &[&CardDef] = &[&tokens::TREASURE];

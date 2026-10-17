@@ -51,3 +51,5 @@ pub static CARD: CardDef = CardDef {
     ],
     ..oracle::OBSESSIVE_PURSUIT
 };
+
+pub static EXTRA: &[&CardDef] = &[&tokens::CLUE];
