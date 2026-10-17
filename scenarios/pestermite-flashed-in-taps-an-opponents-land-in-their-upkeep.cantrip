@@ -1,0 +1,40 @@
+# Pestermite has flash (CR 702.8): Bot1 casts it in Bot2's upkeep, after Bot2's lands untapped. Its enters trigger targets
+# Bot2's Island as it goes on the stack (CR 603.3d), and as it resolves Bot1 chooses to tap it (CR 701.26a): in Bot2's main
+# phase the Island is still tapped. Pestermite is a 2/1 flier.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Pestermite
+Island x11
+
+[Bot2 Deck]
+Island
+Island x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Upkeep]
+Bot1.Hand.Pestermite.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Island)
+Bot2.Pass
+Bot1.Pass
+Bot1.Modes(Tap)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Island.Tapped = true
+Bot1.Battlefield.Pestermite.Keywords = Flash; Flying
+Bot1.Battlefield.Pestermite.Power = 2
+Bot1.Battlefield.Pestermite.Toughness = 1

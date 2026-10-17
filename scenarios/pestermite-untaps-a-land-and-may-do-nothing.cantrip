@@ -1,0 +1,50 @@
+# "You may tap or untap target permanent" (CR 608.2d, 701.26b): Bot1's first Pestermite, cast with both Islands and the Mox,
+# targets a tapped Island of Bot1's and untaps it - the extra mana pays nothing yet, but the Island is untapped. The second
+# Pestermite targets Bot2's untapped Island and Bot1 chooses to do nothing: it stays untapped.
+
+[Bot1 Deck]
+Island
+Island
+Mox Sapphire
+Pestermite
+Black Lotus
+Pestermite
+Island x9
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Pestermite.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Island#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Untap)
+? Bot1.Battlefield.Island#1.Tapped = false
+? Bot1.Battlefield.Island#2.Tapped = true
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Pestermite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Do nothing)
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mox Sapphire; Pestermite; Pestermite
+Bot1.Battlefield.Island#1.Tapped = false
+Bot2.Battlefield.Island.Tapped = false
+Stack.Count = 0

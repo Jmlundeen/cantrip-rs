@@ -1,0 +1,12 @@
+{
+  "name": "Pestermite",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Faerie Rogue",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Flash\nFlying\nWhen this creature enters, you may tap or untap target permanent.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}

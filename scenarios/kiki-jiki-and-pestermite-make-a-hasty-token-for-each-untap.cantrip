@@ -1,0 +1,88 @@
+# The Kiki-Jiki and Pestermite combination, three times round. Kiki-Jiki copies Pestermite; the token enters with haste (CR
+# 707.9b) and its own copy of Pestermite's enters trigger (CR 603.6a), which targets Kiki-Jiki and untaps it (CR 701.26b), so
+# Kiki-Jiki can copy again. Each activation is Bot1's own choice, so the loop is as long as Bot1 makes it (CR 732.1b: no
+# forced loop). Bot1 stops after three tokens and attacks with them and Kiki-Jiki - all with haste - while the original
+# Pestermite, cast this turn, can't: 2 + 2 + 2 + 2 = 8 damage. At the end step each token's delayed ability sacrifices it
+# (CR 603.7c): three of them, and none is left waiting.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Island
+Pestermite
+Black Lotus
+Kiki-Jiki, Mirror Breaker
+Island x8
+
+[Bot2 Deck]
+Plains x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Pestermite.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Island#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Do nothing)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Pestermite#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Kiki-Jiki, Mirror Breaker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Untap)
+? Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Tapped = false
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Pestermite#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Kiki-Jiki, Mirror Breaker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Untap)
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Pestermite#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Kiki-Jiki, Mirror Breaker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Untap)
+? Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Ruby; Mox Jet; Pestermite; Kiki-Jiki, Mirror Breaker; Pestermite; Pestermite; Pestermite
+? Delayed.Count = 3
+? Bot1.Battlefield.Pestermite#4.Keywords = Flash; Flying; Haste
+! Bot1.Attack(Pestermite#1 > Bot2)
+Bot1.Attack(Pestermite#2 > Bot2; Pestermite#3 > Bot2; Pestermite#4 > Bot2; Kiki-Jiki, Mirror Breaker > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 12
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 12
+Bot1.Battlefield = Island; Island; Mox Sapphire; Mox Ruby; Mox Jet; Pestermite; Kiki-Jiki, Mirror Breaker
+Delayed.Count = 0
+Bot1.Graveyard = Black Lotus

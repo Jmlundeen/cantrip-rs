@@ -1,0 +1,59 @@
+# Thespian's Stage becomes a Dark Depths with no ice counters and wins the legend rule (CR 704.5j); its state trigger goes on the
+# stack (CR 603.8). In response Bot1 flashes in Pestermite, untaps the Stage (CR 701.26b), and uses the Stage's own copy ability
+# again to become a copy of Bot2's Island (CR 707.2: the newer copy effect overwrites the older). The trigger has no
+# intervening "if" (CR 603.4): as it resolves "sacrifice it" is the same object, an Island now but still on the battlefield, so
+# it is sacrificed, and because it was, Bot1 creates Marit Lage (CR 608.2c).
+
+[Bot1 Deck]
+Dark Depths
+Mox Pearl
+Sol Ring
+Mox Sapphire
+Black Lotus
+Pestermite
+Thespian's Stage
+Plains x8
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Dark Depths.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Battlefield.Thespian's Stage.Activate(Bot1.Battlefield.Dark Depths; Ability: copy of target)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Dark Depths#2)
+? Stack = Dark Depths
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Pestermite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Dark Depths)
+Bot1.Pass
+Bot2.Pass
+Bot1.Modes(Untap)
+Bot1.Battlefield.Dark Depths.Activate(Bot2.Battlefield.Island; Ability: copy of target)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Island.Subtypes = Island
+? Stack = Island
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Sol Ring; Mox Sapphire; Pestermite; Marit Lage
+Bot1.Graveyard = Thespian's Stage; Black Lotus; Dark Depths
+Stack.Count = 0
