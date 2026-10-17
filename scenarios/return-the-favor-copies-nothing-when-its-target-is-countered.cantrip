@@ -1,0 +1,48 @@
+# Return the Favor's only target gone: Bot2's Lightning Bolt is aimed at Bot1, Bot1 casts Return the Favor (copy mode,
+# Black Lotus's {R}{R}{R}) at it and, holding priority, Counterspells the Bolt (Island and Mox Sapphire). Its only target
+# illegal, Return the Favor does not resolve (CR 608.2b): no copy, nobody is dealt damage.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Return the Favor
+Counterspell
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.Lightning Bolt)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+? Stack.Count = 3
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Return the Favor; Counterspell; Black Lotus
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0

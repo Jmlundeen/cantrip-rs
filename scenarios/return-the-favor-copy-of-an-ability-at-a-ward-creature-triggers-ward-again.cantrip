@@ -1,0 +1,63 @@
+# A copy of an ability that targets becomes a source targeting its targets as it is put on the stack (CR 115.2, 702.21a):
+# Bot1's Goblin Bombardment ability aimed at Bot2's Hexing Squelcher ("Ward-Pay 2 life") triggers ward, and Bot1 pays.
+# Bot1 then copies the ability with Return the Favor, keeping the Squelcher as the copy's target: ward triggers once more
+# for the copy, and Bot1 pays again (20 - 4 = 16). The copy and the original each deal 1: the 2/2 Squelcher dies.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Goblin Bombardment
+Ornithopter
+Black Lotus
+Return the Favor
+Mountain x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Hexing Squelcher
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Hexing Squelcher.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Goblin Bombardment.Activate(Bot2.Battlefield.Hexing Squelcher; Sacrifice: Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Life = 18
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.Goblin Bombardment)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Hexing Squelcher)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Life = 16
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Graveyard = Hexing Squelcher
+Stack.Count = 0
