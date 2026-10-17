@@ -1,0 +1,62 @@
+# Planar Void beside Rest in Peace (rest-in-peace-replaces-the-death-so-the-dies-trigger-never-happens is the same game
+# with Rest in Peace): Planar Void's "Whenever another card is put into a graveyard from anywhere, exile that card" is a
+# triggered ability (CR 603.2), not a replacement (CR 614.1a), and it has no enters ability. Bot1 Bolts Bot2 on turn 1
+# (17), then casts Planar Void on turn 3: the Bolt already in the graveyard stays there. Bot2's Haywire Mite ("When this
+# creature dies, you gain 2 life") is Bolted on turn 5: the Mite really dies, so its dies trigger fires (CR 700.4) and
+# Bot2 gains 2 (19). While Planar Void's triggers wait on the stack (one for the second Bolt, CR 608.2n, one for the
+# Mite), both cards are in their graveyards; then both are exiled.
+
+[Bot1 Deck]
+Mountain
+Lightning Bolt
+Swamp
+Planar Void
+Mountain
+Lightning Bolt
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mountain
+Haywire Mite
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot1.Graveyard = Lightning Bolt
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Mountain; Swamp; Planar Void
+? Bot1.Graveyard = Lightning Bolt
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+Bot1.Triggers(Planar Void; Planar Void)
+? Stack.Count = 3
+? Bot2.Graveyard = Haywire Mite
+? Bot1.Graveyard.Count = 2
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 19
+Bot2.Battlefield = Mountain
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Lightning Bolt
+Exile = Haywire Mite; Lightning Bolt
