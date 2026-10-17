@@ -1,0 +1,49 @@
+# Essence Channeler against a later "loses all abilities" (CR 613.1f, 613.7): Bot2's Lightning Bolt takes Bot1 to 17 in Bot2's
+# turn, so Bot1's Channeler has flying and vigilance; then Bot2's Oko, Thief of Crowns +1 makes it a green Elk with base power
+# and toughness 3/3 that loses all abilities. It no longer has the static ability, so it has neither keyword though Bot1 has
+# still lost life this turn.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Island
+Oko, Thief of Crowns
+Lightning Bolt
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Essence Channeler.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+? Bot1.Life = 17
+? Bot1.Battlefield.Essence Channeler.Keywords = Flying; Vigilance
+Bot2.Battlefield.Oko, Thief of Crowns.Activate(Bot1.Battlefield.Essence Channeler; Ability: Elk)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Essence Channeler.Keywords = (absent)
+Bot1.Battlefield.Essence Channeler.Subtypes = Elk
+Bot1.Battlefield.Essence Channeler.Power = 3
+Bot1.Battlefield.Essence Channeler.Toughness = 3

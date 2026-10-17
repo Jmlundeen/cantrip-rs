@@ -1,0 +1,43 @@
+# Essence Channeler: "As long as you've lost life this turn, this creature has flying and vigilance" (CR 119.3, 611.3a: the
+# effect of a static ability is not locked in, it applies whenever its condition holds). Bot1's Channeler has neither keyword
+# while Bot1 has lost no life (checked in its own turn and again early in Bot2's turn); Bot2's Lightning Bolt to Bot1 in Bot2's
+# own turn is life lost "this turn" (any player's turn), so the Channeler has both from that moment, in Bot2's turn. In Bot1's
+# next turn Bot1 has lost no life that turn, so both are gone again: the condition reads this turn's events, not the game's.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x5
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Essence Channeler.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Essence Channeler.Keywords = (absent)
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Essence Channeler.Keywords = (absent)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main2]
+? Bot1.Life = 17
+? Bot1.Battlefield.Essence Channeler.Keywords = Flying; Vigilance
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Life = 17
+Bot1.Battlefield.Essence Channeler.Keywords = (absent)
+Bot1.Battlefield.Essence Channeler.Power = 2
+Bot1.Battlefield.Essence Channeler.Toughness = 1

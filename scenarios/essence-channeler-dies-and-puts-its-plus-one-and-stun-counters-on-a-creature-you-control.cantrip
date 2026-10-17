@@ -1,0 +1,73 @@
+# Essence Channeler: "When this creature dies, put its counters on target creature you control" - every kind of counter it had as
+# it died, not only +1/+1 counters, put on (not moved), by its last existence on the battlefield (CR 603.10a, 608.2h; rulings
+# 2024-07-26). Bot1's Swords to Plowshares on its own Llanowar Elves gains Bot1 1 life, and the Channeler gets a +1/+1 counter
+# (3/2). Bot2's Lodestone Needle taps it and puts two stun counters on it, and Bot2's Lightning Bolt kills it. The trigger can't
+# target Bot2's Llanowar Elves (refused: "you control") and targets one of Bot1's two Ornithopters, which gets one +1/+1 counter
+# and two stun counters: a 1/3. The other Ornithopter gets nothing.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Ornithopter
+Ornithopter
+Mox Emerald
+Llanowar Elves
+Swords to Plowshares
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Ruby
+Island
+Llanowar Elves
+Lodestone Needle
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Essence Channeler.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot1.Life = 21
+? Bot1.Battlefield.Essence Channeler.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lodestone Needle.Cast
+Bot2.Target(Bot1.Battlefield.Essence Channeler)
+[T3 Bot1.End]
+? Bot1.Battlefield.Essence Channeler.Counters.Stun = 2
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Essence Channeler)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Ornithopter#1)
+
+[Expect]
+Bot1.Graveyard = Essence Channeler; Swords to Plowshares
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#1.Counters.Stun = 2
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#1.Toughness = 3
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = (absent)
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#2.Power = 0

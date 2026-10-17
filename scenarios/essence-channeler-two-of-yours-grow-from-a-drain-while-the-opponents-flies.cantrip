@@ -1,0 +1,57 @@
+# Essence Channeler, two of it and one an opponent's: "you" is each Channeler's own controller (CR 109.5). Bot1 controls two,
+# Bot2 one. Bot1's Tendrils of Agony (storm count zero) drains Bot2 for 2: Bot1 gains 2, so each of Bot1's Channelers triggers and
+# gets a +1/+1 counter (two triggers, one per Channeler), while Bot2's does not ("whenever you gain life" is its controller's
+# life). Bot2 lost life this turn, so Bot2's Channeler has flying and vigilance; Bot1 lost none, so neither of Bot1's has them.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Plains
+Black Lotus
+Essence Channeler
+Essence Channeler
+Tendrils of Agony
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Essence Channeler.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Essence Channeler.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Essence Channeler.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Tendrils of Agony.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Life = 18
+Bot1.Battlefield.Essence Channeler#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Essence Channeler#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Essence Channeler#1.Keywords = (absent)
+Bot1.Battlefield.Essence Channeler#2.Keywords = (absent)
+Bot2.Battlefield.Essence Channeler.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Essence Channeler.Power = 2
+Bot2.Battlefield.Essence Channeler.Keywords = Flying; Vigilance

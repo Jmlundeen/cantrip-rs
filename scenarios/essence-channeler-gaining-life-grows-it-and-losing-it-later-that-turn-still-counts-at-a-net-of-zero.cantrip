@@ -1,0 +1,54 @@
+# Essence Channeler: "Whenever you gain life, put a +1/+1 counter on this creature", and its first ability "cares whether you've
+# lost life this turn, not how your life total has changed" (ruling 2024-07-26). Bot1's Tendrils of Agony (storm count zero:
+# the turn's first spell) drains Bot2 for 2: Bot1 gains 2, so the Channeler gets a counter (3/2), but gaining is not losing, so
+# it has no flying or vigilance yet. Then Bot1's Thoughtseize makes Bot1 lose 2 life: Bot1 is back at 20, no lower than the turn
+# began, and the Channeler has flying and vigilance all the same. Bot2's Lightning Bolt is the card Thoughtseize takes
+# (on top of the Island Bot2 discarded to hand size in its turn).
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Black Lotus
+Mox Jet
+Swamp
+Tendrils of Agony
+Thoughtseize
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Island x6
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Essence Channeler.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Tendrils of Agony.Cast(Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Thoughtseize.Cast(Bot2)
+? Stack = Thoughtseize
+? Bot1.Life = 22
+? Bot1.Battlefield.Essence Channeler.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Essence Channeler.Keywords = (absent)
+Bot1.Choose(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot2.Graveyard = Lightning Bolt; Island
+Bot1.Battlefield.Essence Channeler.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Essence Channeler.Power = 3
+Bot1.Battlefield.Essence Channeler.Toughness = 2
+Bot1.Battlefield.Essence Channeler.Keywords = Flying; Vigilance

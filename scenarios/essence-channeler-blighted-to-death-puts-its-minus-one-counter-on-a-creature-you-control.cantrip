@@ -1,0 +1,51 @@
+# Essence Channeler: "If Essence Channeler has -1/-1 counters on it when it dies, that ability will include those as well"
+# (ruling 2024-07-26). Bot1 casts Requiting Hex at Bot2's Llanowar Elves and blights 1 onto its own Channeler (2/1), which dies
+# with the -1/-1 counter as the spell is cast (CR 704.5f). Its trigger puts that -1/-1 counter on one of Bot1's Ornithopters
+# (0/2 -> -1/1), not on the other. The Hex then destroys the Elves and Bot1 gains 2 life: the Channeler is gone and does not grow.
+
+[Bot1 Deck]
+Mox Pearl
+Plains
+Essence Channeler
+Ornithopter
+Ornithopter
+Mox Jet
+Requiting Hex
+Plains x10
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Essence Channeler.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Choose(Essence Channeler)
+Bot1.Target(Ornithopter#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Requiting Hex; Essence Channeler
+Bot1.Battlefield.Ornithopter#1.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Ornithopter#1.Power = -1
+Bot1.Battlefield.Ornithopter#1.Toughness = 1
+Bot1.Battlefield.Ornithopter#2.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Ornithopter#2.Toughness = 2
+Bot2.Graveyard = Llanowar Elves
