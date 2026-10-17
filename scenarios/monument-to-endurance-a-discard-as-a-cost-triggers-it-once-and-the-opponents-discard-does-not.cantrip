@@ -1,0 +1,39 @@
+# Monument to Endurance: Bot1 pays the Monument with Black Lotus, then activates Masked Meower (Discard a card, Sacrifice this creature: Draw a card) discarding an Island. That discard
+# triggers the Monument once (CR 603.2) and Bot1 chooses "Create a Treasure token" as the ability goes on the stack: one Treasure and the Meower's own
+# draw. Bot2's cleanup discard on turn 2 (it draws to eight every turn it does nothing) is not "you discard": no second Treasure, no life lost by Bot2.
+
+[Bot1 Deck]
+Mountain
+Masked Meower
+Black Lotus
+Monument to Endurance
+Island
+Island
+Island
+Plains
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Monument to Endurance.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Masked Meower.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+Bot1.Modes(Create a Treasure)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Treasure Token.Types = Artifact
+Bot1.Battlefield.Count = 3
+Bot2.Life = 20
+Bot1.Hand.Count = 4

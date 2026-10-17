@@ -1,0 +1,38 @@
+# Monument to Endurance: Black Lotus pays for it, then Lion's Eye Diamond discards a hand of four Islands (and is sacrificed): four discards, four triggers (CR 603.2). As they go on the stack Bot1
+# chooses draw, then Treasure (draw refused the second time), and the third is left the one mode not yet chosen this turn, the 3 life loss; the fourth ability, with
+# every mode spent, is removed from the stack (CR 603.3c, 700.2). Bot1 draws one card (hand 1), has a Treasure, and Bot2 is at 17.
+
+[Bot1 Deck]
+Black Lotus
+Monument to Endurance
+Lion's Eye Diamond
+Island
+Island
+Island
+Island
+Plains
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Monument to Endurance.Cast
+Bot1.Pass
+Bot1.Hand.Lion's Eye Diamond.Cast
+Bot1.Pass
+Bot1.Battlefield.Lion's Eye Diamond.Activate(Color: Red)
+Bot1.Modes(Draw a card)
+! Bot1.Modes(Draw a card)
+Bot1.Modes(Create a Treasure)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand = Plains
+Bot1.Battlefield.Treasure Token.Types = Artifact
+Stack.Count = 0

@@ -1,0 +1,44 @@
+# Monument to Endurance: "hasn't been chosen this turn". On turn 1 Bot1 discards to a Masked Meower and chooses the Treasure mode; on turn 3 a second Meower's discard may choose it
+# again (the history is of this turn only): two Treasures.
+
+[Bot1 Deck]
+Mountain
+Masked Meower
+Masked Meower
+Black Lotus
+Monument to Endurance
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Monument to Endurance.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Masked Meower.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+Bot1.Modes(Create a Treasure)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Masked Meower.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+Bot1.Modes(Create a Treasure)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Treasure Token#1.Types = Artifact
+Bot1.Battlefield.Treasure Token#2.Types = Artifact
