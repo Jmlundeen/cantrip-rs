@@ -1,0 +1,89 @@
+# Locus of Enlightenment: "Whenever you activate an ability that isn't a mana ability, copy it." Any ability its controller
+# activates, of any source, not only those Locus has (CR 602.2, 603.2); a mana ability is no trigger (CR 605.1a), nor is an
+# opponent's activation. Bot1 crafts Locus on turn 7 (as in the crafting scenario: it has Mox Ruby's "{T}: Add {R}").
+# On turn 8 Bot2 activates its Aether Spellbomb's "{1}, Sacrifice: Draw a card": one card, no copy (hand 7). On turn 9
+# Bot1 taps Locus for {R} with the Mox Ruby ability it has - nothing goes on the stack - and spends it on its own
+# Spellbomb's draw ability: Locus copies it, and Bot1 draws two (hand 1 -> 3, the Spellbomb cast from it first).
+
+[Bot1 Deck]
+Island
+The Enigma Jewel
+Walking Ballista
+Goblin Bombardment
+Mox Ruby
+Mox Jet
+Black Lotus
+Mountain
+Ornithopter
+Ornithopter
+Aether Spellbomb
+Island x10
+
+[Bot2 Deck]
+Swamp
+Aether Spellbomb
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Enigma Jewel.Cast
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Aether Spellbomb.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Craft)
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Add)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Choose(Graveyard.Walking Ballista; Goblin Bombardment; Mox Ruby; Mox Jet)
+[T8 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot2.Hand.Count = 7
+[T9 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot2.Pass
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Locus of Enlightenment.Activate(Ability: Add {R})
+? Stack.Count = 0
+? Bot1.Mana = {R}
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot2.Hand.Count = 7
+Bot1.Graveyard = Aether Spellbomb; Black Lotus
+Bot2.Graveyard = Aether Spellbomb
+Bot1.Battlefield.Locus of Enlightenment.Tapped = true
+Stack.Count = 0

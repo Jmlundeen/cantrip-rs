@@ -1,0 +1,80 @@
+# The Enigma Jewel // Locus of Enlightenment. The Jewel enters tapped (turn 1). On turn 7 Bot1 crafts it ("Craft with four
+# or more nonlands with activated abilities {8}{U}"), paying {C}{C} of the cost with the Jewel's own mana (the ruling: a
+# craft ability is an activated ability) and exiling the Walking Ballista from the graveyard and Goblin Bombardment, Mox
+# Ruby and Mox Jet from the battlefield; the Ornithopter (no activated ability) and a land are no materials. Locus returns
+# transformed, untapped, with the abilities of the four cards (CR 702.167c). Bot1 activates the Bombardment's
+# "Sacrifice a creature: ... 1 damage to any target" of Locus at Bot2; Locus's trigger copies it (CR 707.10) and the copy
+# is given a new target, Bot1 (CR 707.10c). The copy was not activated, so it does not trigger Locus again: each player
+# takes exactly 1. That ability may be activated only once each turn: refused with a second Ornithopter to sacrifice,
+# and offered again on turn 9, where Bot1 keeps the copy's target (Bot2 takes 2 more).
+
+[Bot1 Deck]
+Island
+The Enigma Jewel
+Walking Ballista
+Goblin Bombardment
+Mox Ruby
+Mox Jet
+Black Lotus
+Mountain
+Ornithopter
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Enigma Jewel.Cast
+Bot2.Pass
+? Bot1.Battlefield.The Enigma Jewel.Tapped = true
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Craft)
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Add)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Choose(Ornithopter)
+! Bot1.Choose(Island)
+Bot1.Choose(Graveyard.Walking Ballista; Goblin Bombardment; Mox Ruby; Mox Jet)
+Bot2.Pass
+? Bot1.Battlefield.Locus of Enlightenment.Tapped = false
+Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+Bot1.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+? Bot2.Life = 19
+? Stack.Count = 0
+! Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+Bot1.Pass
+Bot1.Target(Bot2)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 17
+Exile = Walking Ballista; Goblin Bombardment; Mox Ruby; Mox Jet
+Bot1.Battlefield = Island; Mountain; Locus of Enlightenment
+Bot1.Graveyard = Ornithopter; Ornithopter; Black Lotus
+Stack.Count = 0

@@ -1,0 +1,41 @@
+# The Enigma Jewel: "The Enigma Jewel enters tapped." (CR 614.1c) and "{T}: Add {C}{C}. Spend this mana only to activate
+# abilities." (CR 106.6). Cast on turn 1, it enters tapped, so its mana ability is not offered that turn. On turn 3 it
+# untaps; its {C}{C} cannot cast Sol Ring, a spell, but pays Aether Spellbomb's "{1}, Sacrifice: Draw a card" (the
+# Spellbomb cast with the Island, so no other mana is at hand).
+
+[Bot1 Deck]
+Island
+The Enigma Jewel
+Island
+Aether Spellbomb
+Sol Ring
+Island x15
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Enigma Jewel.Cast
+Bot2.Pass
+? Bot1.Battlefield.The Enigma Jewel.Tapped = true
+! Bot1.Battlefield.The Enigma Jewel.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot2.Pass
+Bot1.Battlefield.The Enigma Jewel.Activate
+? Bot1.Mana = {C}{C} (Abilities)
+! Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {C} (Abilities)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; The Enigma Jewel
+Bot1.Battlefield.The Enigma Jewel.Tapped = true
+Bot1.Graveyard = Aether Spellbomb
+Bot1.Hand.Count = 6

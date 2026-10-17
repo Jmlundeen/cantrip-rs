@@ -1,0 +1,85 @@
+# Locus of Enlightenment: "Whenever you activate an ability that isn't a mana ability, copy it." The copy is made even if
+# the ability was countered before the trigger resolves: it is copied as it last was on the stack (CR 707.10, 608.2h; the
+# Rings of Brighthearth ruling, "they resolve even if that ability is countered"). Bot1 crafts Locus on turn 7 as in the
+# crafting scenario and activates the Goblin Bombardment ability it has, sacrificing an Ornithopter, at Bot2. With Locus's
+# trigger on the stack Bot2 flashes in Ertai Resurrected, whose trigger counters the original ability (Bot1, its
+# controller, draws a card). The trigger then copies it, keeping Bot2 as the target: Bot2 takes 1, from the copy alone.
+
+[Bot1 Deck]
+Island
+The Enigma Jewel
+Walking Ballista
+Goblin Bombardment
+Mox Ruby
+Mox Jet
+Black Lotus
+Mountain
+Ornithopter
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Mox Sapphire
+Ertai Resurrected
+Swamp x5
+Swamp x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Enigma Jewel.Cast
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T6 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Craft)
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Add)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Choose(Graveyard.Walking Ballista; Goblin Bombardment; Mox Ruby; Mox Jet)
+Bot2.Pass
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+Bot1.Pass
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Swamp#3.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ertai Resurrected.Cast
+Bot1.Pass
+Bot2.Modes(1)
+Bot2.Target(Stack.Locus of Enlightenment#2)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Hand.Count = 2
+Bot1.Pass
+Bot1.Target(Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot2.Battlefield = Swamp; Swamp; Swamp; Mox Sapphire; Ertai Resurrected
+Stack.Count = 0
