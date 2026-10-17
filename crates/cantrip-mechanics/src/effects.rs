@@ -404,6 +404,29 @@ pub fn return_first_target_to_hand(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
+/// "Exile target [permanent]", remembered as exiled with the ability's source (CR 607.2a), so that its linked ability
+/// ("return the exiled card") finds it; nothing if the target is no longer legal (CR 608.2b). The card stays in exile
+/// whatever happens to the source: it is not "until [this] leaves the battlefield" (CR 610.3). Oblivion Ring, Parallax
+/// Wave and Skyclave Apparition print it.
+pub fn exile_first_target_with_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(permanent) = crate::targets::object(g, item, 0) {
+        g.exile_with(&[permanent], item.object, false);
+    }
+    Ok(())
+}
+
+/// "Return the exiled card(s) to the battlefield under [their] owner's control" (CR 607.2a, 110.2a): every card exiled
+/// with the ability's source, together (CR 101.4), each under its owner's control; an Aura among them chooses what it
+/// enchants as it enters (CR 303.4f). The cards are new objects (CR 400.7). Oblivion Ring, Worldgorger Dragon, Parallax
+/// Wave ("each player returns ... all cards they own exiled with it") and Touch the Spirit Realm print it.
+pub fn return_exiled_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let cards: Vec<(ObjectId, PlayerId)> = g.exiled_with(item.object).into_iter().map(|card| (card, g.obj(card).owner)).collect();
+    if !cards.is_empty() {
+        g.put_all_onto_battlefield(&cards)?;
+    }
+    Ok(())
+}
+
 /// "Return target [card] from your graveyard to the battlefield" (CR 400.3): the first target, under the controller of the
 /// spell or ability, untapped; nothing if it is no longer a legal target (CR 608.2b), which for a lone required target
 /// means the spell or ability does not resolve at all. Emptiness and Ral Zarek, Guest Lecturer's −2 print it.

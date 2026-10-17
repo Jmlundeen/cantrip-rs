@@ -21,14 +21,6 @@ fn target_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
         && matches!(t, Target::Object(id) if !q.obj(id).token && q.mana_value(id) <= 4)
 }
 
-/// "Exile up to one target ...", remembered as exiled with this creature (CR 607.2a).
-fn exile_permanent(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(permanent) = targets::object(g, item, 0) {
-        g.exile_with(&[permanent], item.object, false);
-    }
-    Ok(())
-}
-
 /// "The exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled
 /// card."
 fn illusion_for_owner(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -44,7 +36,7 @@ fn illusion_for_owner(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::THIS_ENTERS, exile_permanent, "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.")
+        triggered(triggers::THIS_ENTERS, cantrip_mechanics::effects::exile_first_target_with_this, "When this creature enters, exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less.")
             .targets(&[up_to_one(target_filter)]),
         triggered(triggers::THIS_LEAVES, illusion_for_owner, "When this creature leaves the battlefield, the exiled card's owner creates an X/X blue Illusion creature token, where X is the mana value of the exiled card.")
             .look_back(),

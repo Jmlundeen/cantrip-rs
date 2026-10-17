@@ -1,33 +1,15 @@
 use cantrip_api::*;
 use cantrip_mechanics::triggers;
-use cantrip_mechanics::{fading, targets};
+use cantrip_mechanics::{effects, fading, targets};
 use cantrip_oracle as oracle;
-
-/// "Exile target creature", remembered as exiled with this enchantment (CR 607.2a): it stays there when this leaves.
-fn exile_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if let Some(creature) = targets::object(g, item, 0) {
-        g.exile_with(&[creature], item.object, false);
-    }
-    Ok(())
-}
-
-/// "Each player returns to the battlefield all cards they own exiled with it": together, each under its owner's control.
-fn return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let cards: Vec<(ObjectId, PlayerId)> =
-        g.exiled_with(item.object).into_iter().map(|card| (card, g.obj(card).owner)).collect();
-    if !cards.is_empty() {
-        g.put_all_onto_battlefield(&cards)?;
-    }
-    Ok(())
-}
 
 pub static CARD: CardDef = CardDef {
     enters: Some(fading::enters::<5>),
     abilities: &[
-        ability(remove_counters(CounterKind::Fade, 1), exile_creature, "Remove a fade counter from Parallax Wave: Exile target creature.")
+        ability(remove_counters(CounterKind::Fade, 1), effects::exile_first_target_with_this, "Remove a fade counter from Parallax Wave: Exile target creature.")
             .targets(&[targets::CREATURE]),
         fading::upkeep("At the beginning of your upkeep, remove a fade counter from Parallax Wave. If you can't, sacrifice it."),
-        triggered(triggers::THIS_LEAVES, return_exiled, "When Parallax Wave leaves the battlefield, each player returns to the battlefield all cards they own exiled with it.")
+        triggered(triggers::THIS_LEAVES, effects::return_exiled_to_battlefield, "When Parallax Wave leaves the battlefield, each player returns to the battlefield all cards they own exiled with it.")
             .look_back(),
     ],
     ..oracle::PARALLAX_WAVE

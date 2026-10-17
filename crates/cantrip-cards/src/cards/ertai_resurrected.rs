@@ -3,15 +3,6 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
-/// "Target spell, activated ability, or triggered ability" (CR 115.1): a spell or an ability on the stack.
-fn spell_or_ability(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    match t {
-        Target::Ability(_) => true,
-        Target::Object(id) => q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id),
-        _ => false,
-    }
-}
-
 /// "Another target creature or planeswalker."
 fn another_creature_or_planeswalker(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if id != asker.source && targets::permanent(q, id) && {
@@ -52,7 +43,7 @@ fn destroy_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 static MODAL: ModalDef = modes(&[
     mode(counter_and_draw, "Counter target spell, activated ability, or triggered ability. Its controller draws a card.")
-        .targets(&[target(spell_or_ability)]),
+        .targets(&[targets::SPELL_OR_ABILITY]),
     mode(destroy_and_draw, "Destroy another target creature or planeswalker. Its controller draws a card.")
         .targets(&[target(another_creature_or_planeswalker)]),
 ])

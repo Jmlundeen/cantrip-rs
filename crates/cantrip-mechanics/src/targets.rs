@@ -132,6 +132,19 @@ fn spell_or_ability_with_a_single_target_filter(q: &dyn Query, _: &Asker, t: Tar
     }
 }
 
+fn spell_or_ability_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    let stack = &q.state().stack;
+    match t {
+        Target::Object(id) => stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id),
+        Target::Ability(serial) => stack.iter().any(|i| i.kind != StackKind::Spell && i.serial == serial),
+        _ => false,
+    }
+}
+
+/// "Target spell or ability" and "target spell, activated ability, or triggered ability" (CR 115.1): a spell or an ability on
+/// the stack (a mana ability never is, CR 605.3b). Spellskite and Ertai Resurrected print it.
+pub const SPELL_OR_ABILITY: TargetSpec = target(spell_or_ability_filter);
+
 /// "Target spell or ability with a single target" (CR 115.1, 115.7a): exactly one target across every slot, counted with
 /// repeats, as the item was announced; re-asked as the spell resolves (CR 608.2b). Untimely Malfunction and Bolt Bend print it.
 pub const SPELL_OR_ABILITY_WITH_A_SINGLE_TARGET: TargetSpec = target(spell_or_ability_with_a_single_target_filter);

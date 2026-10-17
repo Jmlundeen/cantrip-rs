@@ -21,16 +21,6 @@ fn channel(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Return what the channel exiled to the battlefield, each under its owner's control (CR 110.2a).
-fn return_exiled(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let cards: Vec<(ObjectId, PlayerId)> =
-        g.exiled_with(item.object).into_iter().map(|card| (card, g.obj(card).owner)).collect();
-    if !cards.is_empty() {
-        g.put_all_onto_battlefield(&cards)?;
-    }
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, exile_until_leaves, "When this enchantment enters, exile up to one target artifact or creature until this enchantment leaves the battlefield.")
@@ -39,6 +29,6 @@ pub static CARD: CardDef = CardDef {
             .targets(&[targets::ARTIFACT_OR_CREATURE])
             .from(ZoneKind::Hand),
     ],
-    delayed: &[delayed_trigger(return_exiled, "Return it to the battlefield under its owner's control.")],
+    delayed: &[delayed_trigger(cantrip_mechanics::effects::return_exiled_to_battlefield, "Return it to the battlefield under its owner's control.")],
     ..oracle::TOUCH_THE_SPIRIT_REALM
 };
