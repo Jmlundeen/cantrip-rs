@@ -1,0 +1,46 @@
+# CR 613.1f, 702.18a: "You have shroud" is a static ability of True Believer; under Humility ("all creatures lose all
+# abilities") True Believer has none, so its controller has no shroud. Bot1 casts True Believer, then Humility, on turn 1.
+# On turn 2 Bot2's Lightning Bolt targets Bot1. The refusal before Humility is cast (Bot2 holding Simian Spirit Guide's red
+# mana in response to Humility) shows the shroud is there until Humility resolves.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+True Believer
+Black Lotus
+Mox Sapphire
+Humility
+Island x14
+
+[Bot2 Deck]
+Mountain
+Simian Spirit Guide
+Lightning Bolt
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.True Believer.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Hand.Simian Spirit Guide.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield = Plains; True Believer; Humility; Mox Pearl; Mox Sapphire
+Bot1.Battlefield.True Believer.Power = 1

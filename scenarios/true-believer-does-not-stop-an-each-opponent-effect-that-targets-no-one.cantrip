@@ -1,0 +1,47 @@
+# CR 702.18a, 115.10a: shroud stops only targeting. Fiery Confluence's "2 damage to each opponent" chooses no target, so
+# it reaches True Believer's controller. Bot1 casts True Believer on turn 1; on turn 2 Bot2's Lightning Bolt can't target
+# Bot1 (refusal, with the red mana to cast it; the positive control is the Bolt at Bot1 once True Believer is gone, in
+# true-believer-gives-its-controller-shroud-against-every-spell-their-own-included), but Fiery Confluence with its second
+# mode three times deals Bot1 6 damage.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+True Believer
+Island x17
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Emerald
+Fiery Confluence
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.True Believer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Fiery Confluence.Cast
+Bot2.Modes(2; 2; 2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Life = 14
+Bot2.Life = 20
+Bot1.Battlefield = Plains; Mox Pearl; True Believer
+Bot2.Graveyard = Fiery Confluence

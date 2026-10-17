@@ -1,0 +1,51 @@
+# CR 702.18a: "You have shroud" - True Believer's controller can't be the target of spells or abilities, their own
+# included (shroud, unlike hexproof, is not only about opponents). Bot1 casts True Believer on turn 1; its own Ancestral
+# Recall can't target Bot1 (refusal) but can target Bot2 (the positive control: the spell is castable). On turn 2 Bot2's
+# Lightning Bolt can't target Bot1 (refusal); it kills True Believer instead, and once that has left the battlefield the
+# shroud is gone (CR 611.3a): the second Bolt targets Bot1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+True Believer
+Mox Sapphire
+Ancestral Recall
+Island x15
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.True Believer.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+? Bot1.Battlefield.True Believer.Power = 2
+! Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Hand.Ancestral Recall.Cast(Bot2)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.True Believer)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = True Believer; Ancestral Recall
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Bot2.Hand.Count = 7
