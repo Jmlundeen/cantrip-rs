@@ -1,0 +1,48 @@
+# Under Opalescence, Oubliette is a 3/3 creature (each other non-Aura enchantment is a creature with base power and toughness
+# equal to its mana value), the only creature there is, so its "When this enchantment enters, target creature phases out until
+# this enchantment leaves the battlefield" must target itself. It phases out until it leaves the battlefield - but a phased-out
+# permanent has not left (CR 702.26d), so it never phases in: not in Bot1's untap step (CR 610.4a), nor ever after (CR 610.4).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Opalescence
+Oubliette
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Opalescence.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oubliette.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Oubliette.Power = 3
+? Stack = Oubliette
+Bot1.Pass
+Bot2.Pass
+? Bot1.PhasedOut = Oubliette
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot1.PhasedOut = Oubliette
+Bot1.PhasedOut.Oubliette.Tapped = false
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Opalescence; Swamp
