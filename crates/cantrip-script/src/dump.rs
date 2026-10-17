@@ -92,6 +92,21 @@ fn keyword_name(k: u8) -> &'static str {
     }
 }
 
+/// An object's subtypes as the dump lists them, sorted: every creature type (Changeling, CR 702.73a) is one entry,
+/// `(every creature type)`, not three hundred.
+fn subtype_names(c: &Chars) -> Vec<String> {
+    let every = Subtype::CREATURE_TYPES.iter().all(|&t| c.subtypes.has(t));
+    let mut subtypes: Vec<String> = c
+        .subtypes
+        .iter()
+        .filter(|t| !(every && t.is_creature_type()))
+        .map(|t| t.name().to_string())
+        .chain(every.then(|| "(every creature type)".to_string()))
+        .collect();
+    subtypes.sort();
+    subtypes
+}
+
 fn counter_token(kind: CounterKind) -> &'static str {
     kind.token()
 }
@@ -362,12 +377,13 @@ impl StateDump {
             let mut graveyard = names(s.zone(Zone::graveyard(p)));
             graveyard.reverse();
             d.list(&format!("{b}.Graveyard"), graveyard, true);
-            // The power and toughness of a creature card in a hand or a graveyard (CR 604.3: a characteristic-defining ability works
-            // in every zone), `Bot1.Graveyard.Sandman, Shifting Scoundrel.Power`; a name held twice is `Name#1`, `Name#2` in zone order.
-            // Every card there has `.Colors` (empty when colorless): an effect may change a card's colors in a hand or a graveyard
-            // (Mycosynth Lattice's "all cards that aren't on the battlefield ... are colorless"), and outside the game (CR
-            // 400.11c) only its own characteristic-defining abilities change it.
-            for (zone, label) in [(Zone::hand(p), "Hand"), (Zone::graveyard(p), "Graveyard"), (Zone::sideboard(p), "Sideboard")] {
+            // The power and toughness of a creature card in a hand, a graveyard or a library (CR 604.3: a characteristic-defining
+            // ability works in every zone), `Bot1.Graveyard.Sandman, Shifting Scoundrel.Power`, and its subtypes (`.Subtypes`, absent
+            // with none: what a static ability that works in every zone made it, Arcane Adaptation's chosen type); a name held twice
+            // is `Name#1`, `Name#2` in zone order (a library's top first). Every card there has `.Colors` (empty when colorless): an
+            // effect may change a card's colors outside the battlefield (Mycosynth Lattice's "all cards that aren't on the
+            // battlefield ... are colorless"), and outside the game (CR 400.11c) only its own characteristic-defining abilities do.
+            for (zone, label) in [(Zone::hand(p), "Hand"), (Zone::graveyard(p), "Graveyard"), (Zone::library(p), "Library"), (Zone::sideboard(p), "Sideboard")] {
                 let ids = s.zone(zone).to_vec();
                 for &id in &ids {
                     let c = game.chars(id);
@@ -387,6 +403,10 @@ impl StateDump {
                     }
                     d.set(format!("{key}.Power"), c.power.unwrap_or(0));
                     d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));
+                    let subtypes = subtype_names(&c);
+                    if !subtypes.is_empty() {
+                        d.list(&format!("{key}.Subtypes"), subtypes, true);
+                    }
                 }
             }
 
@@ -497,11 +517,8 @@ impl StateDump {
                 if !supertypes.is_empty() {
                     d.list(&format!("{key}.Supertypes"), supertypes, true);
                 }
-                // Every creature type (Changeling, CR 702.73a) is one entry, not three hundred.
-                let every = Subtype::CREATURE_TYPES.iter().all(|&t| c.subtypes.has(t));
-                let mut subtypes: Vec<String> = c.subtypes.iter().filter(|t| !(every && t.is_creature_type())).map(|t| t.name().to_string()).chain(every.then(|| "(every creature type)".to_string())).collect();
+                let subtypes = subtype_names(&c);
                 if !subtypes.is_empty() {
-                    subtypes.sort();
                     d.list(&format!("{key}.Subtypes"), subtypes, true);
                 }
                 let mut colors: Vec<String> = c.colors.iter().map(|c| c.name().to_string()).collect();
