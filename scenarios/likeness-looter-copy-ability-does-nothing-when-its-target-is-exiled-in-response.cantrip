@@ -1,0 +1,57 @@
+# Likeness Looter's "{X}: This creature becomes a copy of target creature card in your graveyard with mana value X, ..."
+# with its one target gone: Bot1 pays X=2 at Embereth Shieldbreaker on turn 3 and Bot2, in response, exiles the
+# Shieldbreaker with Ghost Vacuum. The target is illegal as the ability resolves, so it does nothing (CR 608.2b): the
+# Looter stays a 1/1 Likeness Looter with its own abilities.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Likeness Looter
+Embereth Shieldbreaker
+Island x2
+Island x20
+
+[Bot2 Deck]
+Mountain
+Ghost Vacuum
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Likeness Looter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Ghost Vacuum.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Likeness Looter.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Embereth Shieldbreaker)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Likeness Looter.Activate(Ability: becomes a copy; X: 2)
+Bot1.Target(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Battlefield.Ghost Vacuum.Activate(Bot1.Graveyard.Embereth Shieldbreaker)
+Bot2.Pass
+Bot1.Pass
+? Exile = Embereth Shieldbreaker
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Exile = Embereth Shieldbreaker
+Bot1.Battlefield.Likeness Looter.Power = 1
+Bot1.Battlefield.Likeness Looter.Subtypes = Faerie; Shapeshifter
+Bot1.Battlefield.Likeness Looter.Keywords = Flying

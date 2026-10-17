@@ -1,0 +1,68 @@
+# Likeness Looter's "{X}: This creature becomes a copy of target creature card in your graveyard with mana value X,
+# except it has flying and this ability. Activate only as a sorcery." On turn 3 Bot1 bolts Bot2's Llanowar Elves (into
+# Bot2's graveyard), loots away Thraben Inspector, and pays X=1: the Lightning Bolt in its graveyard (no creature card) and
+# Bot2's Elves (not in Bot1's graveyard), both of mana value 1, are refused, and the Inspector is chosen. The Looter
+# becomes a 1/2 Thraben Inspector with flying and makes no Clue: it doesn't enter, so "when this creature enters" never
+# triggers (the ruling). On turn 4, Bot2's, the ability is not offered though Bot1 has the mana and a target: only as a
+# sorcery (CR 602.5d).
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Likeness Looter
+Mox Ruby
+Lightning Bolt
+Thraben Inspector
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Likeness Looter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Likeness Looter.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Thraben Inspector)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Likeness Looter.Activate(Ability: becomes a copy; X: 1)
+! Bot1.Target(Lightning Bolt)
+! Bot1.Target(Bot2.Graveyard.Llanowar Elves)
+Bot1.Target(Thraben Inspector)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Thraben Inspector.Keywords = Flying
+? Bot1.Battlefield.Thraben Inspector.Power = 1
+? Bot1.Battlefield.Thraben Inspector.Toughness = 2
+[T4 Bot2.Main1]
+! Bot1.Battlefield.Thraben Inspector.Activate(Ability: becomes a copy)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Island; Island; Mox Jet; Mox Sapphire; Mox Ruby; Thraben Inspector
+Bot1.Graveyard = Thraben Inspector; Lightning Bolt
+Bot2.Graveyard = Llanowar Elves

@@ -1,0 +1,74 @@
+# Likeness Looter: "{T}: Draw a card, then discard a card" and "{X}: This creature becomes a copy of target creature card
+# in your graveyard with mana value X, except it has flying and this ability. Activate only as a sorcery." Bot1 loots
+# away Argothian Elder on turn 3 and Embereth Shieldbreaker on turn 5, then pays X=2: with X announced first (CR
+# 601.2b-c) the Elder, of mana value 4, is no legal target, and the Shieldbreaker is. The Looter becomes an Embereth
+# Shieldbreaker with flying - a 2/1 red Human Knight - and stays one past the end of the turn: the effect states no
+# duration (CR 611.2b). On turn 7 it has no loot ability (the Shieldbreaker's text has none) but has "this ability":
+# X=4 makes it an Argothian Elder - a 2/2 green Elf Druid with "{T}: Untap two target lands" - with flying.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Likeness Looter
+Argothian Elder
+Embereth Shieldbreaker
+Swamp
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Likeness Looter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Likeness Looter.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Argothian Elder)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Likeness Looter.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Embereth Shieldbreaker)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Likeness Looter.Activate(Ability: becomes a copy; X: 2)
+! Bot1.Target(Argothian Elder)
+Bot1.Target(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Flying
+? Bot1.Battlefield.Embereth Shieldbreaker.Toughness = 1
+? Bot1.Battlefield.Embereth Shieldbreaker.Subtypes = Human; Knight
+? Bot1.Battlefield.Embereth Shieldbreaker.Colors = Red
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Embereth Shieldbreaker.Activate(Ability: Draw a card)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Embereth Shieldbreaker.Activate(Ability: becomes a copy; X: 4)
+Bot1.Target(Argothian Elder)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Argothian Elder.Keywords = Flying
+Bot1.Battlefield.Argothian Elder.Power = 2
+Bot1.Battlefield.Argothian Elder.Toughness = 2
+Bot1.Battlefield.Argothian Elder.Subtypes = Druid; Elf
+Bot1.Battlefield.Argothian Elder.Colors = Green
+Bot1.Graveyard = Embereth Shieldbreaker; Argothian Elder

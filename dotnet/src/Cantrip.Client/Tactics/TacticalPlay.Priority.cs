@@ -2038,6 +2038,25 @@ public sealed partial class TacticalPlay
             return AutoPlay.Announce(prompt, _kick ? Math.Clamp(prompt.MostAffordable, 0, 1) : 0);
         }
 
+        // An X that a target's mana value must equal, where the targets are creature cards in this seat's graveyard
+        // (Likeness Looter's "target creature card in your graveyard with mana value X"): the costliest of them the mana
+        // reaches, worth the most to copy. The targets are chosen after X (CR 601.2b-c), so the largest X affordable would
+        // most often have nothing to target; with none in reach the ability is given up.
+        if (prompt.AnnouncesXOrKicks && prompt.HasX && prompt.Kicker.Length == 0 && client.Object(prompt.Spell) is { } source
+            && CardReading.Plain(CardReading.Text(source)).Contains("creature card in your graveyard with mana value x", StringComparison.Ordinal))
+        {
+            int reach = AutoPlay.AnnouncedValue(prompt);
+            ObjectView? best = client.Zone(ZoneKindView.Graveyard, client.Seat)
+                .Where(card => IsCreature(card) && card.ManaValue <= reach)
+                .MaxBy(card => card.ManaValue);
+            if (best is null && prompt.Options.Find(option => option.Kind == ActionKindView.CancelCasting) is { } none)
+            {
+                return AutoPlay.Answer(none);
+            }
+
+            return AutoPlay.Announce(prompt, best?.ManaValue ?? 0);
+        }
+
         // X is announced before anything is paid (CR 601.2b), at what the mana reaches: not counting the mana that
         // would cost the last of its life, which the payment will not take.
         if (prompt.AnnouncesXOrKicks && prompt.Kicker.Length == 0 && !prompt.XPaidInLife && !prompt.XRemovesLoyalty && client.View is { } announcing

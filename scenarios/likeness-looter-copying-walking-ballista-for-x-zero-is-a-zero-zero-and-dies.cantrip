@@ -1,0 +1,42 @@
+# Likeness Looter's copy ability with X=0 at Walking Ballista ({X}{X}, "enters with X +1/+1 counters", 0/0). "If a card
+# in your graveyard has {X} in its mana cost, X is considered to be 0" (the ruling, CR 107.3, 202.3): the Ballista has
+# mana value 0, so X=0 targets it. The Looter becomes a 0/0 Walking Ballista with flying and no counters - it doesn't
+# enter, so "enters with" doesn't apply (the ruling, CR 614.12) - and dies to state-based actions (CR 704.5f): the
+# Likeness Looter card is put into Bot1's graveyard beside the Ballista.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Likeness Looter
+Walking Ballista
+Island x2
+Island x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Likeness Looter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Likeness Looter.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Walking Ballista)
+Bot1.Battlefield.Likeness Looter.Activate(Ability: becomes a copy; X: 0)
+Bot1.Target(Walking Ballista)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Jet; Mox Sapphire
+Bot1.Graveyard = Likeness Looter; Walking Ballista
