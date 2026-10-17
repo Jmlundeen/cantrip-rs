@@ -72,6 +72,7 @@ keeps it).
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 | [KI-60](#ki-60-infects--1-1-counters-are-counters-an-effect-puts) | Infect's -1/-1 counters are counters an effect puts | Low | Suspected |
 | [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
+| [KI-62](#ki-62-a-pool-holds-at-most-255-mana-of-one-kind) | A pool holds at most 255 mana of one kind | Low | Open |
 
 ## Issues
 
@@ -735,3 +736,17 @@ implemented card reaches:
   abilities applied to the object as its layer 4 is worked out.
 
 **Scenarios.** none: no implemented card reaches them.
+### KI-62: A pool holds at most 255 mana of one kind
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-17, the loop hardening |
+
+**Notes.** A pool holds each kind of mana as a `u8` (`ManaPool`, and each restriction's and each source's share of it), and
+`GameState::add_mana` adds no more than brings a kind to 255: what more a mana ability would add is lost, where the rules
+have no limit (CR 106.4). Before, the count wrapped round (mana lost, the pool no longer the sum of its `mana_from`
+entries) in a release build and panicked in a debug one. Only an infinite-mana loop gets there: a seat that taps its lands
+each time round a Worldgorger Dragon loop is made to stop only after some hundred rounds (`loops::BUSY_STEP` events, then
+`ROUNDS_TO_CHOOSE` rounds), by which three lands of one color have made 255. A fix widens the counts.
+
+**Scenarios.** none yet.

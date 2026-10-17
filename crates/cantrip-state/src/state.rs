@@ -448,10 +448,17 @@ impl GameState {
     /// if it has one (CR 106.6), kept apart; mana that lasts until end of combat if `lasting` (CR 500.5a), which no
     /// restricted mana does.
     pub fn add_mana(&mut self, player: PlayerId, mana: Mana, n: u8, source: ObjectId, restriction: Option<ManaRestriction>, lasting: bool) {
+        let m = mana as usize;
+        // A pool holds at most `u8::MAX` of each kind (of each restriction): what more there would be is not added, so that
+        // the count never wraps round and the sources' entries still add up to it (`docs/known-issues.md`, KI-60).
+        let held = match restriction {
+            Some(r) => self.restricted_mana.iter().find(|e| e.player == player && e.restriction == r).map_or(0, |e| e.pool.0[m]),
+            None => self.player(player).pool.0[m],
+        };
+        let n = n.min(u8::MAX - held);
         if n == 0 {
             return;
         }
-        let m = mana as usize;
         match restriction {
             Some(r) => self.add_restricted_mana(player, r, mana, n),
             None => self.update_player(player, |p| {
@@ -1141,5 +1148,23 @@ impl GameState {
         let drop = mark.0.saturating_sub(self.journal.base).min(self.journal.entries.len() as u32);
         self.journal.entries.drain(..drop as usize);
         self.journal.base += drop;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A pool holds at most 255 of a kind (KI-60): mana past that is not added, and the sources' shares still add up to it.
+    #[test]
+    fn mana_past_what_a_pool_holds_is_not_added() {
+        let mut s = GameState::new(2, 1);
+        let p = PlayerId(0);
+        for i in 0..300u32 {
+            s.add_mana(p, Mana::B, 1, ObjectId(i), None, false);
+        }
+        assert_eq!(s.player(p).pool.get(Mana::B), u8::MAX);
+        let shares: u32 = s.mana_from_of(p).map(|e| e.pool.get(Mana::B) as u32).sum();
+        assert_eq!(shares, u8::MAX as u32);
     }
 }
