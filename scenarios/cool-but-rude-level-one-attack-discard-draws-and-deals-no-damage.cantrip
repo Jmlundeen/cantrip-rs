@@ -1,0 +1,40 @@
+# Cool but Rude, level 1: "Whenever you attack, you may discard a card. If you do, draw a card." Turn 1 Bot1 casts
+# Ornithopter (free) and the Class (a Mox Ruby and a Mox Jet pay {1}{R}). Turn 3 Bot1 draws Island and attacks with the
+# Ornithopter: the trigger asks for a discard as it resolves, Bot1 discards a Mountain and draws Swamp (the next card).
+# The discard is no damage at level 1: the second ability exists only from level 2 (CR 716.2a), and the Ornithopter
+# has 0 power, so Bot2 stays at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Cool but Rude
+Ornithopter
+Lightning Bolt
+Mountain
+Mountain
+Island
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cool but Rude.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Choose(Mountain)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 4
+? Bot2.Life = 20
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Mountain; Island; Swamp
+Bot1.Graveyard = Mountain
+Bot2.Life = 20
+Bot1.Battlefield.Cool but Rude.ClassLevel = (absent)

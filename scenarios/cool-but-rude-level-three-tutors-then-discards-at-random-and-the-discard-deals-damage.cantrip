@@ -1,0 +1,48 @@
+# Cool but Rude, level 3: "When this Class becomes level 3, search your library for a card, put it into your hand, shuffle,
+# then discard a card at random." Turn 1 Bot1 empties its hand into the Class and its two levels, so the only card in hand
+# when the search ends is the Lightning Bolt it found: the random discard can only take it (the library keeps its other ten
+# cards). That discard is one of Bot1's, so the level 2 ability deals 2 damage to Bot2 (CR 701.9, 716.2a).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Cool but Rude
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cool but Rude.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 2)
+Bot1.Pass
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 3)
+Bot1.Pass
+Bot1.Search(Lightning Bolt)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Cool but Rude.ClassLevel = 3
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 10
+Bot2.Life = 18
+Bot1.Life = 20

@@ -1,0 +1,35 @@
+# Cool but Rude, level 1: the discard is a "may" and the draw is "if you do". Same position as the scenario where the
+# discard is taken, but Bot1 chooses no card: nothing is discarded and nothing is drawn (Swamp stays on the library).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Cool but Rude
+Ornithopter
+Lightning Bolt
+Mountain
+Mountain
+Island
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cool but Rude.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Mountain; Mountain; Island
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 11
+Bot2.Life = 20

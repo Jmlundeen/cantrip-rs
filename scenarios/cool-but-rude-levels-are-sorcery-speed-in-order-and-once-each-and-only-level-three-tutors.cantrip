@@ -1,0 +1,59 @@
+# A Class's level abilities (CR 716.2b): "{1}{R}: Level 2" and "{1}{R}: Level 3" are activated only as a sorcery and each
+# only while the Class is the level before. On turn 3, with plenty of mana: Level 2 is refused in the beginning of combat
+# step (sorcery speed); in main phase 2 Level 3 is refused at level 1, Level 2 is made (the positive control for both) and
+# can't be made again, and reaching level 2 does not search the library (the tutoring is "becomes level 3": the library
+# keeps its ten cards and the hand stays empty); Level 3 is then made, and only that one searches (Lightning Bolt) and, the
+# hand holding only that card, discards it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Cool but Rude
+Plains
+Lightning Bolt
+Plains x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cool but Rude.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T3 Bot1.BeginCombat]
+! Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 2)
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 3)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 2)
+Bot1.Pass
+! Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 2)
+? Bot1.Battlefield.Cool but Rude.ClassLevel = 2
+? Bot1.Library.Count = 10
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 3)
+Bot1.Pass
+Bot1.Search(Lightning Bolt)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Cool but Rude.ClassLevel = 3
+Bot1.Library.Count = 9
+Bot1.Hand.Count = 0
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 18

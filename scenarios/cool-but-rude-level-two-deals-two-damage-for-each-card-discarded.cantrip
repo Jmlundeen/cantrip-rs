@@ -1,0 +1,47 @@
+# Cool but Rude, level 2: "Whenever you discard a card, this Class deals 2 damage to each opponent." Each card of a
+# discard is its own event (CR 701.9a), so two cards discarded together trigger it twice. Turn 1 Bot1 casts the Class
+# and, with the other two mana of a Mountain and the Moxen, pays {1}{R} for Level 2 (still no damage: nothing has been
+# discarded). Turn 3 Faithless Looting draws two and discards two cards (a Bolt and a Swamp): 2 + 2 damage, Bot2 at 16.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Jet
+Mountain
+Cool but Rude
+Faithless Looting
+Lightning Bolt
+Island
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cool but Rude.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Cool but Rude.Activate(Ability: Level 2)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Cool but Rude.ClassLevel = 2
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Lightning Bolt; Swamp)
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 20
+Bot1.Hand = Island; Plains
+Bot1.Graveyard = Faithless Looting; Swamp; Lightning Bolt
+Bot1.Battlefield.Cool but Rude.ClassLevel = 2
