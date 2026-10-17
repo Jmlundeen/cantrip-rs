@@ -1,0 +1,55 @@
+# Repurposing Bay reads the sacrificed artifact's mana value as it last was on the battlefield (CR 608.2h, 202.3e): Walking Ballista is
+# cast with X = 1 (mana value 2 on the stack) but X is 0 on the battlefield, so its mana value is 0 and the search is for a mana value 1
+# artifact. Sol Ring is found; the refusals are Mind Stone (mana value 2) and Blasting Station (mana value 3, which would be the
+# mana value 1 + the 2 it had on the stack).
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Walking Ballista
+Repurposing Bay
+Island
+Sol Ring
+Mind Stone
+Blasting Station
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Repurposing Bay.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Repurposing Bay.Activate
+Bot1.Choose(Walking Ballista)
+! Bot1.Search(Mind Stone)
+! Bot1.Search(Blasting Station)
+Bot1.Search(Sol Ring)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Walking Ballista
+Bot1.Battlefield = Island; Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; Repurposing Bay; Sol Ring
