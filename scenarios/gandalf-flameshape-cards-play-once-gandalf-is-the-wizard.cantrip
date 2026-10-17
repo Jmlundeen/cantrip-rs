@@ -1,0 +1,55 @@
+# Gandalf, Goblins' Bane: Flameshape (the Adventure) exiles the top two cards of Bot1's library face down - a Mountain and a
+# Lightning Bolt - "for as long as they remain exiled, you may play them if you control a Wizard". With no Wizard, the Bolt
+# is not offered, though an untapped Mox Ruby could pay for it. On turn 3 Bot1 casts Gandalf, an Avatar Wizard, from its Adventure exile (CR 715.4); now it plays the
+# exiled Mountain as its land and casts the exiled Bolt at Bot2. The Bolt is a noncreature spell: Gandalf gets +1/+1 and
+# deals 1 damage to Bot2. Bot2 takes 3 + 1.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Gandalf, Goblins' Bane
+Mox Ruby
+Island
+Island
+Island
+Mountain
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gandalf, Goblins' Bane.Cast(Ability: Flameshape)
+Bot1.Pass
+! Bot1.Exile.Lightning Bolt.Cast
+[T2 Bot2.Main1]
+? Exile.Count = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Gandalf, Goblins' Bane.Cast
+Bot1.Pass
+Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Bot2.Life = 16
+Bot1.Battlefield.Gandalf, Goblins' Bane.Power = 3
+Bot1.Battlefield.Gandalf, Goblins' Bane.Toughness = 4
+Bot1.Graveyard = Lightning Bolt
+Bot1.LandsPlayed = 1

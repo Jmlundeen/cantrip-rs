@@ -1,0 +1,50 @@
+# Browser
+# As a person sees it: Bot1 casts Flameshape, Gandalf's Adventure, from the card menu; the two cards it exiles face down are
+# Bot1's to see, and each says over its art that it is playable while it stays there "if you control a Wizard" - the
+# condition read as the conditional it is while Bot1 has none. Once Gandalf is cast from its Adventure exile, Bot1 casts the
+# exiled Lightning Bolt from there.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Gandalf, Goblins' Bane
+Island
+Island
+Island
+Mountain
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gandalf, Goblins' Bane.Cast(Ability: Flameshape)
+Bot1.Pass
+[T2 Bot2.Main1]
+? Client.Bot1.Exile.Lightning Bolt.Annotation = Playable while it stays here, if you control a Wizard
+? Client.Bot1.Exile.Mountain.Annotation = Playable while it stays here, if you control a Wizard
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Gandalf, Goblins' Bane.Cast
+Bot1.Pass
+Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Life = 16

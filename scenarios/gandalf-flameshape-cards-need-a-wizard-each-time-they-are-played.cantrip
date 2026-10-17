@@ -1,0 +1,60 @@
+# Gandalf, Goblins' Bane: Flameshape's "you may play them if you control a Wizard" is asked each time a card would be played
+# (CR 601.3, 305.1). Flameshape exiles an Island and a Lightning Bolt face down. On turn 3, with no Wizard, the Island is not
+# offered as Bot1's land play (it plays a Forest from its hand instead); once Sylvan Safekeeper, a Human Wizard, is on the
+# battlefield, the exiled Bolt is cast at Bot2. Bot2 Bolts the Safekeeper on turn 4, and on turn 5 the exiled Island is
+# refused again while Bot1 still has its land play - it plays an Island from its hand. The Island stays in exile, as does
+# Gandalf, on its Adventure (CR 715.4).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Gandalf, Goblins' Bane
+Forest
+Sylvan Safekeeper
+Island
+Plains
+Island
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gandalf, Goblins' Bane.Cast(Ability: Flameshape)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Exile.Count = 3
+[T3 Bot1.Main1]
+! Bot1.Exile.Island.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sylvan Safekeeper.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sylvan Safekeeper)
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Graveyard = Sylvan Safekeeper; Lightning Bolt
+! Bot1.Exile.Island.Play
+Bot1.Hand.Island.Play
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile.Count = 2
+Bot2.Life = 17
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Forest; Island; Mountain; Mox Ruby

@@ -1,0 +1,14 @@
+{
+  "name": "Gandalf, Goblins' Bane",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Avatar Wizard",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Whenever you cast a noncreature spell, Gandalf gets +1/+1 until end of turn and deals 1 damage to each opponent.",
+  "adventure": {
+    "name": "Flameshape",
+    "manaCost": "{1}{R}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "Look at the top two cards of your library and exile them face down. For as long as they remain exiled, you may play them if you control a Wizard."
+  }
+}

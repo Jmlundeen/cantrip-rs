@@ -1,0 +1,56 @@
+# Gandalf, Goblins' Bane: "Whenever you cast a noncreature spell, Gandalf gets +1/+1 until end of turn and deals 1 damage
+# to each opponent." A creature spell (Llanowar Elves) triggers nothing. Bot1's Lightning Bolt at Bot2 does; Bot2 answers
+# the trigger with its own Bolt at Gandalf - an opponent's spell, which triggers nothing either - and Gandalf dies. The
+# trigger still resolves: Gandalf, as it last was, deals the 1 damage (CR 113.7a), though there is no Gandalf left to get
+# +1/+1. Bot2 takes 3 + 1.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Forest
+Gandalf, Goblins' Bane
+Llanowar Elves
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gandalf, Goblins' Bane.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+? Stack.Count = 1
+Bot1.Pass
+? Bot1.Battlefield.Gandalf, Goblins' Bane.Power = 2
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Gandalf, Goblins' Bane)
+? Stack.Count = 3
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 16
+Bot1.Graveyard = Lightning Bolt; Gandalf, Goblins' Bane
+Bot2.Graveyard = Lightning Bolt
