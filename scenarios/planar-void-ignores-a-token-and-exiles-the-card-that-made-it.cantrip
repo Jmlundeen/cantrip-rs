@@ -1,0 +1,50 @@
+# A token is not a card (CR 108.2, 111.1), so it does not trigger the Void on its way to the graveyard (CR 111.7). Lingering
+# Souls makes two Spirits and is exiled itself as a card leaving the stack - its flashback is gone with it. Lightning Bolt
+# kills a Spirit: the only trigger on the stack is the Bolt's own (one trigger, not two), and the Bolt is exiled.
+# Bot1 keeps one Spirit and no graveyard holds a card.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Planar Void
+Lingering Souls
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spirit)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lingering Souls; Lightning Bolt
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Count = 6
+Stack.Count = 0

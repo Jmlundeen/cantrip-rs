@@ -154,10 +154,9 @@ the line goes.
 
 **Notes.** These scenarios name a card no file defines, so they cannot run. Each tests an interaction already
 written into the engine that is unproven until the card exists: Diabolic Edict, Quest for Ancient Secrets, Doomed
-Traveler, Innocent Blood, Planar Void.
+Traveler, Innocent Blood.
 
 **Scenarios.**
-- [`scenarios/planar-void-exiles-a-spell-that-paused-for-its-opponents-choice-as-it-lands-in-the-graveyard.cantrip`](../scenarios/planar-void-exiles-a-spell-that-paused-for-its-opponents-choice-as-it-lands-in-the-graveyard.cantrip)
 - [`scenarios/quest-for-ancient-secrets-sees-a-spell-that-paused-for-its-opponents-choice-land-in-the-graveyard.cantrip`](../scenarios/quest-for-ancient-secrets-sees-a-spell-that-paused-for-its-opponents-choice-land-in-the-graveyard.cantrip)
 - [`scenarios/quest-for-ancient-secrets-counts-both-an-innocent-blood-sacrifice-and-the-spell-itself.cantrip`](../scenarios/quest-for-ancient-secrets-counts-both-an-innocent-blood-sacrifice-and-the-spell-itself.cantrip)
 - [`scenarios/dying-pest-tokens-hand-over-their-trigger-order.cantrip`](../scenarios/dying-pest-tokens-hand-over-their-trigger-order.cantrip)

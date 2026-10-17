@@ -1,0 +1,45 @@
+# Rest in Peace replaces every card going to a graveyard with exile (CR 614.1a), so nothing is ever "put into a graveyard"
+# and the Void never triggers: after Lightning Bolt resolves the stack is empty. (Without Rest in Peace the Bolt's trigger
+# would be on the stack there; planar-void-exiles-a-spell-from-the-stack-whoever-cast-it is that control.) The Bolt is
+# exiled by the replacement.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Planar Void
+Rest in Peace
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rest in Peace.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard.Count = 0
+Bot2.Life = 17
+Stack.Count = 0

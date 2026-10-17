@@ -1,0 +1,47 @@
+# Two cards put into graveyards at the same time, each triggering the Void: Wrath of God destroys an Ornithopter of each
+# player together, and the Void (an enchantment, so it stays) exiles both and then the Wrath itself. The positive control of
+# planar-void-destroyed-with-a-creature-exiles-neither, which is the same game with the Void among the casualties.
+
+[Bot1 Deck]
+Swamp
+Planar Void
+Ornithopter
+Swamp x4
+Swamp x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Plains
+Plains
+Wrath of God
+Ornithopter
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Wrath of God.Cast
+[T4 Bot2.Main2]
+
+[Expect]
+Exile = Ornithopter; Ornithopter; Wrath of God
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Swamp; Planar Void

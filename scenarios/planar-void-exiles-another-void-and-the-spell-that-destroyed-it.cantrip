@@ -1,0 +1,40 @@
+# Each Void sees the other's move: Bot1 destroys its own Planar Void with Disenchant while Bot2's Void is out. The Void that
+# was destroyed is a card put into a graveyard and so is Disenchant, and Bot2's Void exiles both. Bot2's Void is untouched.
+
+[Bot1 Deck]
+Swamp
+Planar Void
+Mox Pearl
+Disenchant
+Swamp x3
+Swamp x20
+
+[Bot2 Deck]
+Mox Jet
+Planar Void
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Planar Void.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Planar Void)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Planar Void; Disenchant
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Swamp; Mox Pearl
+Bot2.Battlefield = Mox Jet; Planar Void

@@ -1,0 +1,39 @@
+# Entomb puts a card of Bot1's choice from its library into its graveyard (CR 701.23): a card put into a graveyard from a
+# library, exiled by the Void; Entomb itself leaves the stack for the graveyard and is exiled too.
+
+[Bot1 Deck]
+Swamp
+Planar Void
+Entomb
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Ornithopter
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Entomb; Ornithopter
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 12

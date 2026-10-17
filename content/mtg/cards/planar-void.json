@@ -1,0 +1,6 @@
+{
+  "name": "Planar Void",
+  "manaCost": "{B}",
+  "type": "Enchantment",
+  "oracleText": "Whenever another card is put into a graveyard from anywhere, exile that card."
+}

@@ -1,0 +1,48 @@
+# The ability is not a leaves-the-battlefield ability, so it does not look back (CR 603.10a; ruling: it does not trigger
+# "on any other cards going to the graveyard at the same time"). Engineered Explosives, with one charge counter (sunburst, one
+# color spent), destroys every nonland permanent of mana value 1 at once: Planar Void and Bot2's Llanowar Elves reach the
+# graveyards together, and with the Void gone the Elves are not exiled. The Explosives, sacrificed as a cost while the Void was
+# still there, is exiled by it; the mana value 0 Moxes are left alone (the control that the right permanents were destroyed).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Planar Void
+Engineered Explosives
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Engineered Explosives.Cast(X: 1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Engineered Explosives.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Planar Void
+Bot2.Graveyard = Llanowar Elves
+Exile = Engineered Explosives
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl
+Bot2.Battlefield = Forest

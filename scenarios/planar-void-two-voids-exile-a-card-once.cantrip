@@ -1,0 +1,41 @@
+# Each of two Voids, one per player, triggers for the same Lightning Bolt. The trigger resolved first exiles it; the other
+# is about a graveyard object that is no longer there (CR 400.7), so it does nothing - the Bolt is exiled once, not twice,
+# and nothing is left in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Planar Void
+Mox Ruby
+Lightning Bolt
+Swamp x3
+Swamp x20
+
+[Bot2 Deck]
+Mox Jet
+Planar Void
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Planar Void.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Swamp; Planar Void; Mox Ruby
+Bot2.Battlefield = Mox Jet; Planar Void
+Bot2.Life = 17

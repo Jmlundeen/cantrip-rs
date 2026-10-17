@@ -1,0 +1,44 @@
+# A card that leaves the graveyard is a new object (CR 400.7). Bot1's Lightning Bolt kills its own Ornithopter, and with the
+# Void's triggers for the Bolt and the Ornithopter on the stack Bot1 casts Shallow Grave, returning the Ornithopter to the
+# battlefield. The trigger that was about the graveyard card finds nothing to exile: the Ornithopter stays on the battlefield,
+# while the Bolt and the Shallow Grave (which enters the graveyard after resolving, with its own trigger) are exiled.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Planar Void
+Ornithopter
+Lightning Bolt
+Shallow Grave
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Shallow Grave.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Planar Void; Ornithopter
+Exile = Lightning Bolt; Shallow Grave
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
+Stack.Count = 0

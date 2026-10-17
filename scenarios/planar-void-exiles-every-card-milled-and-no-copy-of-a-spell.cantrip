@@ -1,0 +1,61 @@
+# Brain Freeze with storm (cast after Lightning Bolt this turn): the copy and the original each make Bot2 mill three, six
+# cards put into a graveyard from a library, each exiled by the Void in its own trigger. A copy of a spell is not a card
+# (CR 707.10, 108.2) and ceases to exist, so only the two real spells - Bolt and Brain Freeze - and the six milled cards
+# are exiled: eight cards, no graveyard holds one, and Bot2's library is down the six.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Planar Void
+Lightning Bolt
+Brain Freeze
+Island x20
+
+[Bot2 Deck]
+Island x7
+Island
+Mountain
+Swamp
+Forest
+Plains
+Mox Emerald
+Mox Diamond
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot2)
+Bot1.Target(Bot2)
+? Stack.Count = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Lightning Bolt; Brain Freeze; Mountain; Swamp; Forest; Plains; Mox Emerald; Mox Diamond
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
+Bot2.Library.Count = 8
+Stack.Count = 0

@@ -1,0 +1,37 @@
+# "From anywhere": Lightning Bolt goes from the stack to Bot1's graveyard as it finishes resolving, and the Ornithopter it
+# destroyed (a creature card put into a graveyard from the battlefield, dying, CR 700.4) arrives in Bot2's. Both
+# trigger the Void together and both are exiled, so neither graveyard holds a card.
+
+[Bot1 Deck]
+Swamp
+Planar Void
+Mountain
+Lightning Bolt
+Swamp x3
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Island x6
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Planar Void.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island
+Exile = Lightning Bolt; Ornithopter
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard.Count = 0
