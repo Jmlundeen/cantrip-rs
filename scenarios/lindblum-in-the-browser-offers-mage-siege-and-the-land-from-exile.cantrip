@@ -1,0 +1,38 @@
+# Browser
+# Lindblum, Industrial Regency in the page: the land card in hand offers Mage Siege with its {2}{R}, cast in Bot2's turn;
+# on its adventure the card lights the Exile button, and in Bot1's turn 3 it is played from there by a click (CR 715.3d,
+# 305.1), entering tapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Lindblum, Industrial Regency
+Island
+Island
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lindblum, Industrial Regency.Cast(Ability: Adventure)
+? Client.Bot1.Menu = Cast Mage Siege {2}{R}
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Client.Bot1.Exile.Lit = true
+Bot1.Exile.Lindblum, Industrial Regency.Play
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Lindblum, Industrial Regency.Tapped = true
+Bot1.Battlefield.Wizard.Power = 0

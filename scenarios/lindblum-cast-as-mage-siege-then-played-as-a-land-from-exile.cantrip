@@ -1,0 +1,49 @@
+# Lindblum, Industrial Regency // Mage Siege, a land card with an Adventure (CR 715). In Bot2's turn 2 Bot1 casts Mage
+# Siege, an instant, from its hand (CR 715.3a: only the Adventure is judged, so the land card is cast), and gets the 0/1
+# black Wizard; the card is exiled on its adventure (CR 715.3d). "For as long as that card remains exiled, that player may
+# play it": in turn 3 Bot1 has played a Mountain, so playing Lindblum from exile is refused (one land play, CR 305.2), as
+# is casting Mage Siege again from there (CR 715.3d); in turn 5 it is played from exile and enters tapped. Then Mox Pearl,
+# a noncreature spell, makes the Wizard deal 1 damage to Bot2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Lindblum, Industrial Regency
+Mountain
+Mox Pearl
+Island
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lindblum, Industrial Regency.Cast(Ability: Adventure)
+? Stack = Mage Siege
+Bot1.Pass
+Bot2.Pass
+? Exile = Lindblum, Industrial Regency
+? Bot1.Battlefield.Wizard.Power = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Exile.Lindblum, Industrial Regency.Play
+! Bot1.Exile.Lindblum, Industrial Regency.Cast
+[T5 Bot1.Main1]
+Bot1.Exile.Lindblum, Industrial Regency.Play
+? Bot1.Battlefield.Lindblum, Industrial Regency.Tapped = true
+Bot1.Hand.Mox Pearl.Cast
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Bot1.Battlefield.Lindblum, Industrial Regency.Tapped = true
+Bot1.Battlefield.Wizard.Toughness = 1
+Bot2.Life = 19

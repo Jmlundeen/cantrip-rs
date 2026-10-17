@@ -1,0 +1,53 @@
+# Lindblum, Industrial Regency: a land card is never cast as itself (CR 305.9) - with three mana untapped, the cast of the
+# card itself (`Ability: #1`) is refused beside the Adventure cast that is taken. Bot2 counters
+# Mage Siege: an Adventure that leaves the stack other than by resolving is not exiled (CR 715.3d, the ruling), so the
+# second Lindblum goes to the graveyard, where it may not be played (no Wizard is made). The first is played from the hand
+# in turn 3 - "This land enters tapped" - and in turn 5, untapped, it adds {R}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Lindblum, Industrial Regency
+Lindblum, Industrial Regency
+Island
+Island
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Lindblum, Industrial Regency.Cast(Ability: #1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lindblum, Industrial Regency.Cast(Ability: Adventure)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Mage Siege)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Lindblum, Industrial Regency
+! Bot1.Graveyard.Lindblum, Industrial Regency.Play
+Bot1.Hand.Lindblum, Industrial Regency.Play
+? Bot1.Battlefield.Lindblum, Industrial Regency.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Battlefield.Lindblum, Industrial Regency.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Lindblum, Industrial Regency
+Bot2.Graveyard = Counterspell
+Exile.Count = 0
+Bot1.Battlefield.Lindblum, Industrial Regency.Tapped = true

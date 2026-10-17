@@ -1,0 +1,11 @@
+{
+  "name": "Lindblum, Industrial Regency",
+  "type": "Land — Town",
+  "oracleText": "This land enters tapped.\n{T}: Add {R}.",
+  "adventure": {
+    "name": "Mage Siege",
+    "manaCost": "{2}{R}",
+    "type": "Instant — Adventure",
+    "oracleText": "Create a 0/1 black Wizard creature token with \"Whenever you cast a noncreature spell, this token deals 1 damage to each opponent.\""
+  }
+}
