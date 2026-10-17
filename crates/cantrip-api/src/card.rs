@@ -386,6 +386,10 @@ pub struct Cost {
     pub life: u8,
     /// Remove this many counters of this kind from the source (CR 602.1, 118.3).
     pub remove_counters: Option<(CounterKind, u8)>,
+    /// Put this many counters of this kind on the source (CR 118.3, 602.2b): "{T}, Put a page counter on this artifact"
+    /// (Mazemind Tome), "Put a -1/-1 counter on this creature" (Devoted Druid). Always payable; they are put by the
+    /// activating player, so replacement effects on counters being put apply (CR 614.1a).
+    pub put_counters: Option<(CounterKind, u8)>,
     /// Remove a counter of any kind from the source (CR 118.3): the payer names the kind when it has more than one.
     pub remove_any_counter: bool,
     /// Remove this many counters, of any kinds, from among the permanents the payer controls that pass the filter (CR 118.3,
@@ -585,6 +589,9 @@ impl Cost {
             (None, b) => b,
             (a, None) => a,
         };
+        if c.put_counters.is_none() {
+            c.put_counters = other.put_counters;
+        }
         c.life += other.life;
         c.exile_from_graveyard += other.exile_from_graveyard;
         if c.exile_from_graveyard_of.is_none() {
@@ -646,6 +653,7 @@ impl Cost {
             loyalty: None,
             life: 0,
             remove_counters: None,
+            put_counters: None,
             remove_any_counter: false,
             remove_counters_among: None,
             exile_self: false,
@@ -884,6 +892,7 @@ impl TriggeredDef {
         sums_per_subject: false,
         triggers_each_turn: 0,
         chapter: 0,
+        state: None,
         modal: None,
         divide: None,
         subject_chooses_targets: false,
@@ -934,6 +943,10 @@ pub struct TriggeredDef {
     /// A Saga's chapter ability (CR 714.2): it triggers when lore counters are put on its source and their number
     /// becomes at least this, having been less. `listens` and `matches` are not used; the core owns the trigger.
     pub chapter: u8,
+    /// A state trigger (CR 603.8): it triggers when this game state is true, asked of its source and controller, rather
+    /// than on an event - at once, and again only once it has left the stack (resolved, countered or otherwise) and the
+    /// state still holds. `listens` and `matches` are not used; the core owns the trigger.
+    pub state: Option<TriggerCondition>,
     /// A modal ability's modes (CR 700.2): "choose one". Chosen, with each chosen mode's targets, as the ability is put on
     /// the stack (CR 603.3c); `effect` and `targets` are then unused.
     pub modal: Option<&'static ModalDef>,

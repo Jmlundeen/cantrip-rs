@@ -643,6 +643,10 @@ fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: 
             *c = (*c - n as i16).max(0);
         });
     }
+    // Counters a cost puts on its source are put by the player paying it (CR 118.3): what replaces counters being put applies.
+    if let Some((kind, n)) = cost.put_counters {
+        ops::add_counters(cx, source, kind, n as i16);
+    }
 }
 
 /// The kind of counter a cost that removes a counter of any kind takes from the source (CR 118.3): the only kind it has,
@@ -5017,6 +5021,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
         permanents,
         loyalty,
         remove_counters,
+        put_counters,
         remove_any_counter,
         remove_counters_among,
         exile_self,
@@ -5046,6 +5051,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
         && loyalty.is_none()
         && remove_counters.is_none()
         && remove_counters_among.is_none()
+        && put_counters.is_none()
         && discard.is_none()
         && exile_from_graveyard == 0
         && exile_from_graveyard_of.is_none()

@@ -87,6 +87,12 @@ pub const fn remove_counters_among(n: u8, filter: ObjectFilter) -> Cost {
     Cost { remove_counters_among: Some((n, filter)), ..Cost::NONE }
 }
 
+/// "Put N [kind] counters on this [permanent]" as a cost (CR 118.3, 602.2b): Mazemind Tome's page counter, Devoted Druid's
+/// -1/-1 counter.
+pub const fn put_counters(kind: CounterKind, n: u8) -> Cost {
+    Cost { put_counters: Some((kind, n)), ..Cost::NONE }
+}
+
 /// "Exile N cards from your graveyard" other than this one.
 pub const fn exile_from_graveyard(n: u8) -> Cost {
     Cost { exile_from_graveyard: n, ..Cost::NONE }
@@ -258,6 +264,15 @@ pub const fn when_asked(listens: EventMask, matches: AskedMatch) -> Trigger {
 /// A triggered ability (CR 603): when `trigger` triggers, `effect` as it resolves.
 pub const fn triggered(trigger: Trigger, effect: Effect, text: &'static str) -> AbilityDef {
     AbilityDef::Triggered(TriggeredDef { text, listens: trigger.listens, matches: trigger.matches, asked: trigger.asked, effect, ..TriggeredDef::BLANK })
+}
+
+/// A state-triggered ability (CR 603.8): "when [a game state is true], [effect]". It triggers as soon as `state` holds of
+/// its source, and not again until it has left the stack; then, if its source is still there and the state still holds, it
+/// triggers again. Mazemind Tome ("when there are four or more page counters on this artifact"), Dandân ("when you control
+/// no Islands, sacrifice Dandân") and Lurking Jackals ("when an opponent has 10 or less life, if this is an enchantment, it
+/// becomes ...") print one.
+pub const fn state_triggered(state: TriggerCondition, effect: Effect, text: &'static str) -> AbilityDef {
+    AbilityDef::Triggered(TriggeredDef { text, state: Some(state), effect, ..TriggeredDef::BLANK })
 }
 
 /// A modal activated ability (CR 700.2): pay `cost`, choose among `modes` as it is activated (CR 602.2b).

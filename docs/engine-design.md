@@ -309,6 +309,14 @@ controller; for a delayed triggered ability it is the delayed ability's own cont
 or ability that created it (CR 603.7d-e), whoever controls its source afterwards and wherever the source has gone. Its
 intervening "if" is asked with the same controller as it triggers.
 
+A state trigger (CR 603.8: Mazemind Tome's "when there are four or more page counters on this artifact", Dandân's "when
+you control no Islands") listens for no event: `state_triggered` gives it a `TriggeredDef::state` condition, asked of each
+permanent and emblem after every event (in `collect_batch`'s `consider`, on the characteristics already found there) and
+again each time a player would receive priority (`settle::state_triggers`, for a state that changed with no event). It
+triggers while the condition holds unless it has already triggered and not left the stack - found this batch, pending, or
+on the stack (`state_trigger_waiting`) - so it triggers again once it has resolved or been countered, if the state still
+holds; an object that changed zones is a new one with a new ability (CR 400.7).
+
 A delayed triggered ability waits as a `Delayed` record in the state, on no object (CR 603.7): once at the next such step
 (`DelayedWhen::Step`), at each such step for the rest of the game (`EachStep`: paradigm, CR 702.192a, which goes on whatever
 happens to the card it came from), or on events this turn, until an event or until a player's next turn.

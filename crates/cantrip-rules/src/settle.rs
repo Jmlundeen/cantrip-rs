@@ -26,6 +26,7 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
         if ops::return_exiled(cx)? {
             continue;
         }
+        state_triggers(cx);
         if !cx.s().triggers.is_empty() {
             put_triggers_on_stack(cx)?;
             continue;
@@ -645,6 +646,19 @@ fn consider(
     let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
     let controller = cx.s().obj(source).controller;
     for ability in chars.abilities() {
+        // A state trigger (CR 603.8) triggers as soon as its state is true, so it is asked after every event, of the board as
+        // it is now (never of a look-back pass), as well as each time a player would receive priority (`state_triggers`).
+        if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
+            && let Some(state) = t.state
+        {
+            if (later.is_some() || !look_back)
+                && state(cx, &Asker { source, controller })
+                && !state_trigger_waiting(cx, source, ability, found, later.as_deref())
+            {
+                found.push((state_trigger(source, ability, controller), t, Again::new()));
+            }
+            continue;
+        }
         if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
             && (later.is_some() || t.look_back == look_back)
             && let Some(fired) = if t.chapter > 0 { chapter_reached(source, t.chapter, event) } else if t.listens.intersects(mask) { t.fires(cx, &Asker { source, controller }, event) } else { None }
@@ -674,6 +688,45 @@ fn consider(
                 again,
             ));
         }
+    }
+}
+
+/// The triggering of a state trigger (CR 603.8): about no event, so nothing is its subject.
+fn state_trigger(source: ObjectId, ability: AbilityRef, controller: PlayerId) -> PendingTrigger {
+    PendingTrigger { source, ability, controller, subject: Target::None, data: [0; 2], members: Span::default(), count: None, since: None }
+}
+
+/// Whether a state trigger of `source` has triggered and not yet left the stack (CR 603.8): found for this batch, waiting
+/// to be put on the stack, or on it. Until then it doesn't trigger again. An object that has changed zones is a new object
+/// (CR 400.7), whose ability is another.
+fn state_trigger_waiting(cx: &Cx, source: ObjectId, ability: AbilityRef, found: &Found, later: Option<&Found>) -> bool {
+    let this = |t: &PendingTrigger| t.source == source && t.ability == ability;
+    found.iter().chain(later.into_iter().flatten()).any(|(t, _, _)| this(t))
+        || cx.s().triggers.iter().any(this)
+        || cx.s().stack.iter().any(|i| i.kind == StackKind::Triggered && i.object == source && i.ability == ability)
+}
+
+/// The state triggers whose states are true each time a player would receive priority (CR 603.8, 117.5): of the permanents
+/// and of the emblems in the command zone (CR 114.4). A state that became true with no event to ask it after, such as an
+/// effect ending, is found here.
+fn state_triggers(cx: &mut Cx) {
+    let mut found: Found = Vec::new();
+    let sources: Vec<ObjectId> = cx.s().battlefield().iter().chain(cx.s().zone(Zone::COMMAND)).copied().collect();
+    for source in sources {
+        let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, source);
+        let controller = cx.s().obj(source).controller;
+        for ability in chars.abilities() {
+            if let AbilityDef::Triggered(t) = cx.cards().ability(ability)
+                && let Some(state) = t.state
+                && state(cx, &Asker { source, controller })
+                && !state_trigger_waiting(cx, source, ability, &found, None)
+            {
+                found.push((state_trigger(source, ability, controller), t, Again::new()));
+            }
+        }
+    }
+    for (trigger, _, _) in found {
+        cx.st().trigger_push(trigger);
     }
 }
 
