@@ -1,7 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::tokens::{self, GNOME};
 use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
-use cantrip_mechanics::{choose, craft};
+use cantrip_mechanics::{craft, library};
 use cantrip_oracle as oracle;
 
 /// Whether a permanent is a double-faced artifact: an artifact represented by a double-faced card, or a token copy of one
@@ -28,11 +28,7 @@ fn tetzin_or_double_faced_artifact_enters(q: &dyn Query, me: &Asker, event: &Eve
 /// "Mill three cards. You may put an artifact card from among them into your hand." (CR 701.17) The cards milled are the
 /// ones it may take from, as they are in the graveyard; choosing none declines.
 fn mill_three_take_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let milled = g.mill(item.controller, 3);
-    let artifacts: Vec<ObjectId> = milled.iter().copied().filter(|&c| g.chars(c).is(CardType::Artifact)).collect();
-    let chosen = choose::cards_from_kind(g, item.controller, item.object, Purpose::PutIntoHand, "artifact", milled, artifacts, 1, true)?;
-    g.return_to_hand(&chosen);
-    Ok(())
+    library::mill_then_may_take_into_hand(g, item.controller, item.object, 3, "artifact", |c| c.is(CardType::Artifact))
 }
 
 /// "Craft with six artifacts": six from among other permanents you control and/or cards from your graveyard (CR 702.167b).

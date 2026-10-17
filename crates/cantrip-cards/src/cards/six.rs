@@ -1,17 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, retrace};
+use cantrip_mechanics::{library, retrace};
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
 /// Mill three cards. You may put a land card from among them into your hand (CR 701.17c); nobody is asked when no
 /// land is among them.
 fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let player = item.controller;
-    let among = g.mill(player, 3);
-    let eligible: Vec<ObjectId> = among.iter().copied().filter(|&c| g.chars(c).is(CardType::Land)).collect();
-    let chosen = choose::cards_from(g, player, item.object, Purpose::PutIntoHand, among, eligible, 1, true)?;
-    g.return_to_hand(&chosen);
-    Ok(())
+    library::mill_then_may_take_into_hand(g, item.controller, item.object, 3, "land", |c| c.is(CardType::Land))
 }
 
 /// During your turn, nonland permanent cards in your graveyard have retrace (CR 702.81a): the permission is Six's, so

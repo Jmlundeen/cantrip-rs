@@ -238,6 +238,26 @@ pub fn reveal_top_take_one_rest_to_graveyard(
     Ok(())
 }
 
+/// "Mill `count` cards. You may put a [`kind`] card from among them into your hand" (CR 701.17, 701.17c): the cards milled
+/// are the ones it may take from, as they are where they went (a graveyard, or exile by a replacement effect); `wanted`
+/// says which of them qualify, `kind` is how the question words it. Nobody is asked when none qualifies, and choosing none
+/// declines. Six (a land), Tetzin, Gnome Champion (an artifact), Barrowgoyf (a creature, after its own
+/// "you may mill") and Dredger's Insight (an artifact, creature, or land) print it.
+pub fn mill_then_may_take_into_hand(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    count: u32,
+    kind: &'static str,
+    wanted: fn(&Chars) -> bool,
+) -> Result<(), Suspend> {
+    let milled = g.mill(player, count);
+    let takeable: Vec<ObjectId> = milled.iter().copied().filter(|&c| wanted(&g.chars(c))).collect();
+    let chosen = crate::choose::cards_from_kind(g, player, source, Purpose::PutIntoHand, kind, milled, takeable, 1, true)?;
+    g.return_to_hand(&chosen);
+    Ok(())
+}
+
 /// "In any order" (CR 401.4): `player` puts `cards` on one `end` of their library (`DestinationKind::LibraryTop` or
 /// `LibraryBottom`) in the order they choose, the first lowest. Nobody is asked about fewer than two cards. The cards in
 /// that order, for `put_into_library` or `arrange_library`. Bow of Nylea and Valakut Awakening put cards on the bottom,
