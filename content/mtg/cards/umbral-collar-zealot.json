@@ -1,0 +1,8 @@
+{
+  "name": "Umbral Collar Zealot",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Human Cleric",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Sacrifice another creature or artifact: Surveil 1. (Look at the top card of your library. You may put it into your graveyard.)"
+}

@@ -1,0 +1,41 @@
+# Umbral Collar Zealot: "Sacrifice another creature or artifact: Surveil 1." On turn 3 the Zealot is the only creature or
+# artifact Bot1 has, so its ability is not offered (`!`): "another" excludes the Zealot itself. On turn 5, after Bot1 casts
+# Llanowar Elves, the same ability is offered (the positive control): the Elves is sacrificed (a cost, CR 602.2b), Bot1 surveils 1
+# and puts the Mountain on top of its library into the graveyard. The Zealot survives.
+
+[Bot1 Deck]
+Swamp
+Forest
+Umbral Collar Zealot
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Umbral Collar Zealot.Cast
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Umbral Collar Zealot.Activate
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Umbral Collar Zealot.Activate
+Bot1.Choose(Llanowar Elves)
+Bot1.Arrange( | Mountain)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Forest; Island; Umbral Collar Zealot
+Bot1.Graveyard = Mountain; Llanowar Elves

@@ -1,0 +1,34 @@
+# Umbral Collar Zealot: "another creature or ARTIFACT", with no timing restriction (CR 602.5). On turn 1 Bot1 casts it with a
+# Swamp and Mox Jet; during Bot2's turn 2 it sacrifices the Mox Jet (an artifact, not a creature) and surveils 1, keeping the
+# Mountain on top of its library (nothing goes to the graveyard but the Mox).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Umbral Collar Zealot
+Island
+Island
+Island
+Island
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Umbral Collar Zealot.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Umbral Collar Zealot.Activate
+Bot1.Choose(Mox Jet)
+Bot1.Arrange(Mountain | )
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Umbral Collar Zealot
+Bot1.Graveyard = Mox Jet
+Bot1.Library.Count = 11
