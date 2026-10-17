@@ -1,0 +1,8 @@
+{
+  "name": "Lavaleaper",
+  "manaCost": "{3}{R}",
+  "type": "Creature — Elemental",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "All creatures have haste.\nWhenever a player taps a basic land for mana, that player adds one mana of any type that land produced."
+}

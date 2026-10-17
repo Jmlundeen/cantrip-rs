@@ -1,0 +1,47 @@
+# "One mana of any type that land produced" is a type the land's own mana ability produced (CR 106.12a, 605.1b; Zendikar
+# Resurgent's and Heartbeat of Spring's rulings), not mana another triggered mana ability added for the same tap. With
+# Yavimaya, Cradle of Growth every land is a Forest, so Nissa, Who Shakes the World adds an additional {G} for the basic
+# Mountain tapped for {R}; Lavaleaper's mana is still of the Mountain's one type, {R}, so it is added with no question
+# (`! Bot1.Modes`) - had Nissa's {G} counted, Bot1 would be asked to choose between {R} and {G}. The pool is {R}{R}{G}.
+# Lavaleaper comes on turn 1 (Black Lotus and the Mountain), Nissa on turn 3 (a Forest tapped under Lavaleaper and a
+# second Lotus).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Lavaleaper
+Forest
+Black Lotus
+Nissa, Who Shakes the World
+Yavimaya, Cradle of Growth
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lavaleaper.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}{G}
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Nissa, Who Shakes the World.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+! Bot1.Modes
+Bot1.Battlefield.Mountain.Activate(Ability: {R})
+? Bot1.Mana = {R}{R}{G}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Forest; Lavaleaper; Mountain; Nissa, Who Shakes the World; Yavimaya, Cradle of Growth

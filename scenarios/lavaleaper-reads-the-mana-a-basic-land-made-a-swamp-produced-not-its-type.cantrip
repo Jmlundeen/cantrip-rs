@@ -1,0 +1,42 @@
+# Lavaleaper adds "one mana of any type that land produced" (CR 106.12a): the mana the land's ability made, not the
+# land's printed basic type. Urborg, Tomb of Yawgmoth makes each land a Swamp, so a basic Mountain has "{T}: Add {B}" too
+# (CR 305.7); tapped that way it produced {B} alone, so Lavaleaper adds {B} with no question of type (`! Bot1.Modes`):
+# {B}{B}, no {R}. The second Mountain tapped for {R}
+# is the control ({R}{R}), and Urborg itself, legendary and not basic (CR 205.4c), taps for its {B} alone.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Lavaleaper
+Urborg, Tomb of Yawgmoth
+Mountain
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lavaleaper.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+! Bot1.Modes
+Bot1.Battlefield.Mountain.Activate(Ability: {B})
+? Bot1.Mana = {B}{B}
+[T3 Bot1.Main2]
+? Bot1.Mana =
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate
+? Bot1.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate(Ability: {R})
+? Bot1.Mana = {R}{R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Lavaleaper; Mountain; Mountain; Urborg, Tomb of Yawgmoth

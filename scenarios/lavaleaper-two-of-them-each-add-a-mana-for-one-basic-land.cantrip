@@ -1,0 +1,42 @@
+# Two Lavaleapers: each has its own triggered mana ability, so a basic Forest tapped once triggers both (CR 603.2, 605.4a),
+# each adding one mana of the type the Forest produced - {G}{G}{G}. Each reads the Forest's own {G}, not the other
+# Lavaleaper's (CR 106.12a). The first Lavaleaper is paid with Black Lotus and the Mountain on turn 1; the second on turn 3
+# with the Mountain under the first ({R}{R}) and a second Lotus.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Lavaleaper
+Black Lotus
+Lavaleaper
+Forest
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lavaleaper.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {R}{R}
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lavaleaper.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}{G}{G}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Forest; Lavaleaper; Lavaleaper; Mountain

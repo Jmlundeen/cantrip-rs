@@ -1,0 +1,54 @@
+# Lavaleaper: "Whenever a player taps a basic land for mana, that player adds one mana of any type that land produced"
+# (CR 106.12a, 605.1b, 605.4a) and "All creatures have haste" (CR 702.10, 613.1f). Turn 1: Bot1's Mountain, tapped before
+# Lavaleaper is out, gives {R} alone; Lavaleaper (paid with Black Lotus) attacks the turn it arrives. Turn 2: Bot2 - "a
+# player", "that player" - taps its basic Island for {U}{U} into its own pool (Bot1's stays empty), casts Snapcaster Mage
+# with it, and the Mage attacks at once under Bot1's Lavaleaper (still tapped from its attack). Turn 3: Bayou, a Swamp
+# Forest but not basic (CR 205.4c), taps for {B} alone, the control; then Bot1's basic Mountain taps for {R}{R} - the {B}
+# already in the pool is no mana the Mountain produced, so there is no choice of type to make (`! Bot1.Modes`).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Lavaleaper
+Bayou
+Mountain x16
+
+[Bot2 Deck]
+Island
+Snapcaster Mage
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {R}
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lavaleaper.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Lavaleaper)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana = {U}{U}
+? Bot1.Mana =
+Bot2.Hand.Snapcaster Mage.Cast
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.DeclareAttackers]
+Bot2.Attack(Snapcaster Mage)
+[T3 Bot1.Main1]
+Bot1.Hand.Bayou.Play
+Bot1.Battlefield.Bayou.Activate(Ability: {B})
+? Bot1.Mana = {B}
+! Bot1.Modes
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Mana = {B}{R}{R}
+
+[Expect]
+Turn = 3
+Bot2.Life = 16
+Bot1.Life = 18
+Bot2.Battlefield = Island; Snapcaster Mage
