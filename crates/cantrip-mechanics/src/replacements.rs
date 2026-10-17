@@ -227,3 +227,26 @@ pub const DAMAGE_TO_YOU_AND_YOUR_OTHER_PERMANENTS_IS_DEALT_TO_THIS: ReplacementD
     dealt_to_this_creature_instead,
     "the damage is dealt to this creature instead",
 );
+
+/// "If a source you control would deal noncombat damage to an opponent or a permanent an opponent controls" (CR 614.1,
+/// 120.3): damage of any source its controller controls (a spell or an ability on the stack, a permanent), of an amount
+/// above zero (damage already prevented to nothing is no damage to add to, CR 615.6) that is not combat damage, dealt to
+/// an opponent of the controller or a permanent an opponent controls. Artist's Talent (at level 3, with `plus::<2>`) and
+/// Tomik, Izzet Sparkmage (with `plus::<1>`) print it.
+pub fn noncombat_damage_you_deal_to_an_opponent_or_their_permanent(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    let Proposal::Damage(d) = proposal else { return false };
+    d.amount > 0
+        && !d.combat
+        && q.controller(d.source) == asker.controller
+        && match d.target {
+            Target::Player(player) => q.state().opponents(asker.controller).any(|opponent| opponent == player),
+            recipient => recipient.object().is_some_and(|id| q.controller(id) != asker.controller),
+        }
+}
+
+/// "... it deals that much damage plus `N` instead" (CR 614.1): the damage about to be dealt is `N` greater.
+pub fn plus<const N: u16>(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+    if let Proposal::Damage(d) = proposal {
+        d.amount = d.amount.saturating_add(N);
+    }
+}

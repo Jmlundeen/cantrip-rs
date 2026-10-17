@@ -44,6 +44,7 @@ keeps it).
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-or-fireglass-mentor) | An exile that a replacement sends elsewhere is not exercised by Hex Magic or Fireglass Mentor | Low | Unexercised |
 | [KI-27](#ki-27-a-creature-targeted-twice-by-one-spell-becomes-a-target-twice) | A creature targeted twice by one spell becomes a target twice | Medium | Open |
+| [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
 
 ## Issues
 
@@ -247,3 +248,20 @@ deleted.
 
 **Scenarios.**
 - [`scenarios/pawpatch-recruit-one-spell-targeting-one-creature-twice-triggers-it-once.cantrip`](../scenarios/pawpatch-recruit-one-spell-targeting-one-creature-twice-triggers-it-once.cantrip) - Kolaghan's Command on one Ornithopter twice gives the Recruit two counters, one is right (marked `# Known bug`).
+### KI-28: Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | mechanics | 2026-10-16, review of Tomik, Izzet Sparkmage |
+
+**Notes.** `replacements::noncombat_damage_you_deal_to_an_opponent_or_their_permanent` (Tomik, Izzet Sparkmage; Artist's Talent
+at level 3) asks `q.controller(d.source)` for "a source you control". A damage source that is a card outside the battlefield and the
+stack has no controller (CR 108.4a); for an ability of such a card the controller is the player who controls the ability
+(CR 110.2, 113.8), and for the damage of a spell it is the spell's controller. `q.controller` of such a card answers its owner, so
+damage dealt by an ability a card has in a graveyard or exile (an activated ability that works from there, a Cycling-style
+trigger) is judged by its owner rather than by the player who activated or controls the ability. No card in the engine deals
+noncombat damage from such an ability while an opponent controls Tomik or a level 3 Artist's Talent, so nothing shows it. A fix
+reads the controller of the stack item that is dealing the damage (the `DamageEvent` would have to carry it) and keeps
+`q.controller` for permanents.
+
+**Scenarios.** none yet.
