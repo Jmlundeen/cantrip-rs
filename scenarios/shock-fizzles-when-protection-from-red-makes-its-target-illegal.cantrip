@@ -1,0 +1,38 @@
+# Shock: Bot2's Shock names Mother of Runes; Bot1 taps her in response for protection from red, so the target is illegal as
+# the spell resolves (CR 702.16b, 608.2b) and no damage is dealt. Mother came in on turn 1 and is under Bot1's control since
+# the start of turn 3, so the Shock waits for turn 4 (CR 302.6).
+
+[Bot1 Deck]
+Mox Pearl
+Mother of Runes
+Ornithopter
+Plains x4
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Shock
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Mother of Runes)
+Bot1.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot1.Colors(Red)
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield.Mother of Runes.Damage = 0
+Bot1.Graveyard.Count = 0
+Bot2.Graveyard = Shock

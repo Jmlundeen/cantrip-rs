@@ -1,0 +1,6 @@
+{
+  "name": "Shock",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Shock deals 2 damage to any target."
+}
