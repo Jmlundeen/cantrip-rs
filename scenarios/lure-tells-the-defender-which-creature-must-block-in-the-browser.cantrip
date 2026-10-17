@@ -1,0 +1,43 @@
+# Browser
+# What a player sees of Lure's requirement (CR 509.1c): Bot2's Llanowar Elves wears Lure and attacks Bot1, whose Llanowar
+# Elves is able to block it. The blockers dock says the Elves must block it and holds its button until it does; Bot1 blocks,
+# and both Elves die.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Black Lotus
+Lure
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Lure.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Pass
+? Client.Bot1.Prompt.Detail = Llanowar Elves is able to block Llanowar Elves and must
+Bot1.Block(Llanowar Elves > Llanowar Elves)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Llanowar Elves
+Bot2.Graveyard = Lure; Llanowar Elves; Black Lotus

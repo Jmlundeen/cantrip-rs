@@ -1,0 +1,45 @@
+# Browser
+# What a player sees of Maze of Ith's prevention and of Skullcrack's rules for the turn. Bot1's Guerrilla Gorilla attacks;
+# Bot2 Mazes it after blocks, and the Gorilla's face says the combat damage dealt to and dealt by it is prevented this turn
+# (CR 615.1). Bot1 then casts Skullcrack at Bot2: beside both players the page says damage can't be prevented this turn
+# (CR 615.12) and that they can't gain life (CR 119.7). The Gorilla's 2 is dealt after all.
+
+[Bot1 Deck]
+Mountain
+Mox Emerald
+Mox Ruby
+Guerrilla Gorilla
+Skullcrack
+Island x14
+
+[Bot2 Deck]
+Maze of Ith
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Maze of Ith.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Guerrilla Gorilla > Bot2)
+[T3 Bot1.Blockers]
+Bot1.Pass
+Bot2.Battlefield.Maze of Ith.Activate(Guerrilla Gorilla)
+Bot1.Pass
+? Client.Bot1.Battlefield.Guerrilla Gorilla.Rules = Reach / Sacrifice this creature: Destroy target noncreature artifact or noncreature enchantment. Activate only as a sorcery. / Prevent all combat damage that would be dealt to and dealt by it this turn (Maze of Ith).
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Skullcrack.Cast(Bot2)
+Bot1.Pass
+? Client.Bot1.Facts = You can't gain life; Damage can't be prevented this turn
+? Client.Bot1.OpponentFacts = They can't gain life; Damage can't be prevented this turn
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 15

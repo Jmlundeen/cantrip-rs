@@ -373,6 +373,58 @@ public sealed class ScenarioPlayer
                 return;
             }
 
+            case CombatDamageAssignedAnswer assigned:
+            {
+                // How creatures divide their combat damage (CR 510.1c-d, 702.22j-k): the dock seeds each share with the
+                // engine's division, and each share's − and + are named for it, "Less of Ox's damage to Bear (now 1)" (the
+                // player trampled over is "the defender"). Each share is stepped to what the answer gives it - none where the
+                // answer leaves it out - lowering every share first so there is room to raise; then Deal damage.
+                string NameOfHandle(ViewHandle handle) => state.Cards.FirstOrDefault(c => c.Handle == handle.Value)?.Name ?? string.Empty;
+                int Wanted(string source, string to) => assigned.Shares
+                    .Where(s => NameOfHandle(s.Source) == source && (to == "the defender" ? s.Creature.IsNone : !s.Creature.IsNone && NameOfHandle(s.Creature) == to))
+                    .Sum(s => s.Amount);
+
+                foreach (bool lowering in new[] { true, false })
+                {
+                    for (int guard = 0; guard < 256; guard++)
+                    {
+                        TableState now = await _page.SettledAsync();
+                        ControlState? step = null;
+                        foreach (ControlState less in now.Controls.Where(c => c.Kind == "button" && c.Label.StartsWith("Less of ", StringComparison.Ordinal)))
+                        {
+                            int of = less.Label.LastIndexOf("'s damage to ", StringComparison.Ordinal);
+                            int at = less.Label.LastIndexOf(" (now ", StringComparison.Ordinal);
+                            string source = less.Label["Less of ".Length..of];
+                            string to = less.Label[(of + "'s damage to ".Length)..at];
+                            int share = int.Parse(less.Label[(at + " (now ".Length)..^1], System.Globalization.CultureInfo.InvariantCulture);
+                            int wanted = Wanted(source, to);
+                            if (lowering && share > wanted)
+                            {
+                                step = less;
+                                break;
+                            }
+
+                            if (!lowering && share < wanted)
+                            {
+                                step = now.Controls.FirstOrDefault(c => c.Kind == "button" && c.Label == "More" + less.Label["Less".Length..])
+                                    ?? throw new NotDrivenException($"a + for {source}'s damage to {to}", now);
+                                break;
+                            }
+                        }
+
+                        if (step is null)
+                        {
+                            break;
+                        }
+
+                        await _page.Page.Mouse.ClickAsync(step.X, step.Y);
+                    }
+                }
+
+                await ClickButtonStartingAsync("Deal damage");
+                return;
+            }
+
             case ReplacementChosenAnswer replacement:
                 // Which of several replacement effects applies first (CR 616.1): the dock has a button for each, "Source: what
                 // it does", in the order the question offers them.

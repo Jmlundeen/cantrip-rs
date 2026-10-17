@@ -1,0 +1,48 @@
+# Browser
+# What a player sees of banding as the defender (CR 702.22j): Bot2's Ulvenwald Oddity (4/4 trample) attacks Bot1, who blocks
+# it with Benalish Hero and Guerrilla Gorilla. In the damage step Bot1's page is asked to divide the Oddity's damage - the
+# dock says it is the opponent's creature's, by banding - among Bot1's own blockers, with no share for any player: all 4 on
+# the Hero, the Gorilla dealt nothing, Bot1 dealt nothing.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Attack(Ulvenwald Oddity > Bot1)
+Bot1.Block(Benalish Hero > Ulvenwald Oddity; Guerrilla Gorilla > Ulvenwald Oddity)
+[T2 Bot2.Blockers]
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Banding: divide their creature's combat damage
+Bot1.AssignDamage(Ulvenwald Oddity > Benalish Hero: 4)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 20
+Bot1.Graveyard = Benalish Hero
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 0

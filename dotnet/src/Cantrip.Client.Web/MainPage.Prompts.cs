@@ -2253,27 +2253,32 @@ public sealed partial class MainPage
 
             foreach (ViewHandle blocker in division.Creatures)
             {
-                AddShareRow(division, blocker.Value, client.Object(blocker)?.Name ?? "a creature");
+                string name = client.Object(blocker)?.Name ?? "a creature";
+                AddShareRow(division, blocker.Value, name, source, name);
             }
 
             if (division.MayAssignToDefender)
             {
-                AddShareRow(division, 0, $"{NameOf(client, division.Defender)}  (trample)");
+                AddShareRow(division, 0, $"{NameOf(client, division.Defender)}  (trample)", source, "the defender");
             }
         }
     }
 
-    private void AddShareRow(DamageDivisionMessage division, int creature, string name)
+    /// <summary>
+    /// A share's row: − and + beside how much of the source's damage goes to it. Each button is named for what it does and
+    /// the share it changes ("More of Ulvenwald Oddity's damage to Benalish Hero (now 2)"), as a person reading it hears it.
+    /// </summary>
+    private void AddShareRow(DamageDivisionMessage division, int creature, string name, string source, string to)
     {
         (int Source, int Creature) key = (division.Source.Value, creature);
         int share = _shares.GetValueOrDefault(key);
         bool room = Assigned(division) < division.Damage;
 
-        _buttons.Children.Add(Stepper(
-            6,
-            Step("−", share > 0, () => _shares[key] = Math.Max(0, share - 1)),
-            new SymbolText(13, Theme.Fg) { Text = $"{share}  {name}" },
-            Step("+", room, () => _shares[key] = share + 1)));
+        DockButton less = Step("−", share > 0, () => _shares[key] = Math.Max(0, share - 1));
+        DockButton more = Step("+", room, () => _shares[key] = share + 1);
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(less, $"Less of {source}'s damage to {to} (now {share})");
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(more, $"More of {source}'s damage to {to} (now {share})");
+        _buttons.Children.Add(Stepper(6, less, new SymbolText(13, Theme.Fg) { Text = $"{share}  {name}" }, more));
     }
 
     private int Assigned(DamageDivisionMessage division) =>
