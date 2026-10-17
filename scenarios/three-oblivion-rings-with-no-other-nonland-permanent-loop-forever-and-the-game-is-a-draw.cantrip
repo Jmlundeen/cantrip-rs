@@ -1,0 +1,64 @@
+# The Oblivion Ring ruling's involuntary loop, which ends the game in a draw (CR 104.4b, 732.4). Nobody but Bot1 has a
+# nonland permanent. Turn 5: Ring A's enters ability has no legal target ("another target nonland permanent": the
+# only nonland permanent is A itself) and is removed from the stack (CR 603.3d); A exiles nothing. Turn 7: Ring B's
+# enters ability has exactly one legal target, A, so it is chosen without asking: A is exiled with B, and A's leaves
+# ability returns nothing (A exiled nothing). Turn 9: Ring C's enters ability has one legal target, B (A is in exile):
+# B is exiled with C, so B's leaves ability triggers alone and returns A, a new object (CR 400.7). A's enters
+# ability has one legal target, C (B is in exile): C is exiled with A, C's leaves ability returns B, B's enters ability
+# targets A, its only choice, and so on: each Ring's leaves ability and the next Ring's enters ability trigger one at a
+# time, never together (each enters only as the previous leaves ability resolves), so there is no order to choose; every
+# target is the lone legal one; and at every priority neither player can do anything but pass or tap a land for mana
+# (Bot1's hand is only Plains, Bot2's only Islands, nothing is castable with a trigger on the stack). The position -
+# two Rings on the battlefield, one holding the third in exile, the next trigger on the stack - comes round again with
+# no player having made a choice: a loop of mandatory actions with no way to stop it, so the game is a draw.
+
+[Bot1 Deck]
+Oblivion Ring
+Oblivion Ring
+Oblivion Ring
+Plains
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Count = 4
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T7 Bot1.Main2]
+? Exile = Oblivion Ring
+? Bot1.Battlefield.Count = 5
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Turn = 9
+Step = Main1
+Stack.Count = 1
+Bot1.Hand = Plains; Plains; Plains
+Bot1.Status = (absent)
+Bot2.Status = (absent)

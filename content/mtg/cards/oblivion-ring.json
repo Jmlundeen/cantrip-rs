@@ -1,0 +1,6 @@
+{
+  "name": "Oblivion Ring",
+  "manaCost": "{2}{W}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, exile another target nonland permanent.\nWhen this enchantment leaves the battlefield, return the exiled card to the battlefield under its owner's control."
+}

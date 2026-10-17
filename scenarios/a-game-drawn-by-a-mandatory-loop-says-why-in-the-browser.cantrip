@@ -1,0 +1,57 @@
+# Browser
+# The three-Oblivion-Ring loop (CR 104.4b) at a table, Bot1 a browser page: the game is a draw, and the page says why - the
+# game log, which the game-over panel reads its detail from, says the game is in a loop of mandatory actions that no player
+# can stop. The headless scenario of the same loop says why each Ring's ability has one target and why no one can stop it.
+
+[Bot1 Deck]
+Oblivion Ring
+Oblivion Ring
+Oblivion Ring
+Plains
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Count = 4
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T7 Bot1.Main2]
+? Exile = Oblivion Ring
+? Bot1.Battlefield.Count = 5
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+
+[Expect]
+Result = Draw
+DrawReason = MandatoryLoop
+Turn = 9
+Step = Main1
+Stack.Count = 1
+Bot1.Hand = Plains; Plains; Plains
+Bot1.Status = (absent)
+Bot2.Status = (absent)
+Client.Bot1.Over = true
+Client.Bot1.Log.Has = The game is a draw: it is in a loop of mandatory actions that no player can stop (CR 104.4b).

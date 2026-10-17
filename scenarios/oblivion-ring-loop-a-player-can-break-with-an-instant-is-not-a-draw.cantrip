@@ -1,0 +1,100 @@
+# The three-Oblivion-Ring loop again (CR 104.4b), but Bot2 holds Disenchant with two untapped Plains: at every priority
+# Bot2 could cast it, so the loop contains an optional action and is no draw (CR 104.4b: "Loops that contain an optional
+# action don't result in a draw"). Bot2 passes thirty times, letting the loop go round five times (two passes for each
+# Ring that leaves, three Rings to a round), far past where a loop of mandatory actions is found; the game must still be
+# going. Then Bot2 breaks it. After the thirtieth pass, as after the sixth, Ring A has just been exiled with Ring B and
+# A's leaves ability (which will return C) is on the stack, B alone on the battlefield; Disenchant destroys B. B's leaves
+# ability returns A, whose enters ability has no other nonland permanent to target and is removed (CR 603.3d); then the
+# old A's leaves ability returns C, whose enters ability exiles A, whose leaves ability returns nothing (it is a new A,
+# CR 400.7, that exiled nothing). One Ring is left on the battlefield holding one in exile, and the game goes on.
+
+[Bot1 Deck]
+Oblivion Ring
+Oblivion Ring
+Oblivion Ring
+Plains
+Plains
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Count = 4
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+[T7 Bot1.Main2]
+? Exile = Oblivion Ring
+? Bot1.Battlefield.Count = 5
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Oblivion Ring.Cast
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+Bot2.Pass
+? Bot1.Battlefield.Oblivion Ring.Tapped = false
+? Exile.Count = 2
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Oblivion Ring)
+
+[Expect]
+Result = InProgress
+Stack.Count = 0
+Bot1.Battlefield.Oblivion Ring.Tapped = false
+Exile = Oblivion Ring
+Bot1.Graveyard = Oblivion Ring
+Bot1.Hand = Plains; Plains; Plains

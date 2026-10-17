@@ -1,0 +1,51 @@
+# The Oblivion Ring ruling (CR 607.2a, 603.6c): Bot2 Disenchants the Ring in response to its enters ability. The Ring's
+# leaves ability triggers and resolves first, and returns nothing - nothing has been exiled with it yet. Then the enters
+# ability resolves and exiles Bot2's Ornithopter, with nothing left to ever bring it back.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Oblivion Ring
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Plains
+Ornithopter
+Disenchant
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Hand.Oblivion Ring.Cast
+Bot1.Pass
+? Stack = Oblivion Ring
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Oblivion Ring)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Oblivion Ring
+Bot2.Battlefield = Forest; Plains
+Stack.Count = 0
