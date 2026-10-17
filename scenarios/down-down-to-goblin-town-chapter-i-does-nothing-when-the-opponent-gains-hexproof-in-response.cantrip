@@ -1,0 +1,50 @@
+# CR 608.2b: chapter I targets an opponent. Bot2 answers the chapter ability on the stack with Dawn's Truce (it and its
+# permanents gain hexproof), so its only target is illegal on resolution: the chapter does not resolve - Bot1 never sees the
+# hand and nothing is discarded, the Lightning Bolt stays in Bot2's hand. (The Saga is cast on turn 3 with all three Moxen;
+# Bot2 set up its two Moxen on turn 2. Dawn's Truce goes to Bot2's graveyard, the Bolt does not.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Down, Down to Goblin-town
+Island x3
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Dawn's Truce
+Lightning Bolt
+Island x3
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Down, Down to Goblin-town.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot1.Choose
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Dawn's Truce
+? Bot2.Hand.Count = 5
+
+[Expect]
+Bot2.Graveyard = Dawn's Truce
+Bot2.Hand = Island; Island; Island; Island; Lightning Bolt
+Bot1.Battlefield.Down, Down to Goblin-town.Counters.Lore = 1
+Stack.Count = 0

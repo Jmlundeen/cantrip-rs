@@ -1,4 +1,46 @@
 use cantrip_api::*;
+use cantrip_mechanics::amass::amass;
+use cantrip_mechanics::effects::target_opponent_loses_1_life_you_gain_1;
+use cantrip_mechanics::hand::discard_chosen_nonland_from_revealed_hand;
+use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-pub static CARD: CardDef = CardDef { ..oracle::DOWN_DOWN_TO_GOBLIN_TOWN };
+/// The 0/0 black Goblin Army creature token amass makes.
+pub static GOBLIN_ARMY: CardDef = CardDef {
+    name: "Goblin Army",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Black)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Goblin, Subtype::Army]),
+    power: Some(0),
+    toughness: Some(0),
+    ..CardDef::BLANK
+};
+
+pub static EXTRA: &[&CardDef] = &[&GOBLIN_ARMY];
+
+/// I - "Target opponent reveals their hand. You choose a nonland card from it. That player discards that card." With its
+/// target illegal the chapter does not resolve at all (CR 608.2b).
+fn reveal_and_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Some(opponent) = item.targets[0].player() else { return Ok(()) };
+    discard_chosen_nonland_from_revealed_hand(g, item, opponent)?;
+    Ok(())
+}
+
+/// II - "Amass Goblins 1" (CR 701.47a).
+fn amass_goblins(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    amass(g, item.controller, item.object, &GOBLIN_ARMY, Subtype::Goblin, 1)
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        chapter(1, reveal_and_discard, "I \u{2014} Target opponent reveals their hand. You choose a nonland card from it. That player discards that card.")
+            .targets(&[targets::OPPONENT]),
+        chapter(2, amass_goblins, "II \u{2014} Amass Goblins 1."),
+        chapter(3, target_opponent_loses_1_life_you_gain_1, "III, IV \u{2014} Target opponent loses 1 life and you gain 1 life.")
+            .targets(&[targets::OPPONENT]),
+        chapter(4, target_opponent_loses_1_life_you_gain_1, "III, IV \u{2014} Target opponent loses 1 life and you gain 1 life.")
+            .targets(&[targets::OPPONENT]),
+    ],
+    ..oracle::DOWN_DOWN_TO_GOBLIN_TOWN
+};

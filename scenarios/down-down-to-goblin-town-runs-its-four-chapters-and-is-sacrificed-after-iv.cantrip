@@ -1,0 +1,62 @@
+# Down, Down to Goblin-town cast on turn 1 (Mox Jet, Mox Pearl, Mox Ruby). I: Bot1 sees Bot2's hand (Lightning Bolt and
+# Islands), may only take the nonland card - the Island is refused, the Bolt is the positive control - and Bot2 discards the
+# Bolt. II (turn 3): no Army, so a 0/0 black Goblin Army token is created and gets a +1/+1 counter: a 1/1 Goblin Army.
+# III (turn 5): Bot2 loses 1 life and Bot1 gains 1. IV (turn 7): the same again, and the Saga, having reached its last chapter
+# and with nothing on the stack, is sacrificed (CR 714.4) - the Army stays.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Down, Down to Goblin-town
+Island x3
+Island x14
+
+[Bot2 Deck]
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Down, Down to Goblin-town.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Lightning Bolt
+? Bot2.Hand.Count = 6
+? Bot1.Battlefield.Down, Down to Goblin-town.Counters.Lore = 1
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Down, Down to Goblin-town.Counters.Lore = 2
+? Bot1.Battlefield.Goblin Army.Token = true
+? Bot1.Battlefield.Goblin Army.Power = 1
+? Bot1.Battlefield.Goblin Army.Toughness = 1
+? Bot1.Battlefield.Goblin Army.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Goblin Army.Subtypes = Army; Goblin
+? Bot1.Battlefield.Goblin Army.Colors = Black
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Life = 21
+? Bot1.Battlefield.Down, Down to Goblin-town.Counters.Lore = 3
+[T7 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby; Goblin Army
+Bot1.Graveyard = Down, Down to Goblin-town
+Stack.Count = 0
