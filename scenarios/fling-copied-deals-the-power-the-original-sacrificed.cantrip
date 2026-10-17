@@ -1,0 +1,47 @@
+# A copy of Fling was not cast and sacrificed nothing, yet deals damage: "When determining how much damage a copy of Fling
+# deals, it checks the power of the creature sacrificed to pay for the original Fling" (CR 707.10, its own example). Bot1 flings
+# a Walking Ballista with one +1/+1 counter at Bot2 and copies the Fling with Return the Favor, the copy aimed at Bot2 too: each deals 1.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Jet
+Mox Ruby
+Walking Ballista
+Fling
+Return the Favor
+Island
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Fling.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Return the Favor.Cast
+Bot1.Modes(Copy target)
+Bot1.Target(Stack.Fling)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Graveyard = Fling; Return the Favor; Black Lotus; Walking Ballista

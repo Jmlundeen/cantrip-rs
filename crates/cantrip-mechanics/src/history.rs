@@ -170,9 +170,17 @@ pub fn mode_not_chosen_before(q: &dyn Query, asker: &Asker, mode: u8) -> bool {
 
 /// "The sacrificed creature's power" (CR 601.2h, 608.2h): the power of what `spell`'s additional cost sacrificed, as it last
 /// existed on the battlefield, pumps, counters and copy effects included. The sacrifice is the last one from the battlefield
-/// in the history before the spell was cast. Kazuul's Fury and Fling print it.
+/// in the history before the spell was cast. A copy of the spell was never cast: it reads what the original sacrificed (CR
+/// 707.10, whose example is Fling), through a copy of a copy too. Kazuul's Fury and Fling print it.
 pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
     let records = q.history().all();
+    let mut spell = spell;
+    while let Some(original) = records.iter().find_map(|r| match r.event {
+        Event::Copied { copy, original, .. } if copy == spell && original != spell => Some(original),
+        _ => None,
+    }) {
+        spell = original;
+    }
     let Some(cast) = records.iter().rposition(|r| matches!(r.event, Event::Cast(c) if c.spell == spell)) else { return 0 };
     records[..cast]
         .iter()
