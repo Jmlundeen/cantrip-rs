@@ -1,0 +1,59 @@
+# Split second (CR 702.61b) leaves special actions such as turning a face-down permanent face up (CR 116.2b, 708.8, the ruling)
+# open to a player with priority. On turn 1 Bot1 has Turn Inside Out and Lightning Bolt kill its Llanowar Elves, and manifest
+# dread puts a second Llanowar Elves onto the battlefield face down. On turn 5 Bot1 casts Krosan Grip at its own Mox Sapphire
+# and, with Grip on the stack, turns the manifested Elves face up for {G} (CR 701.40b): it is a Llanowar Elves again before
+# Grip resolves.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Llanowar Elves
+Turn Inside Out
+Lightning Bolt
+Llanowar Elves
+Island
+Mountain
+Krosan Grip
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Turn Inside Out.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Llanowar Elves | Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+? Bot1.Battlefield..FaceDown = true
+Bot1.Hand.Krosan Grip.Cast(Bot1.Battlefield.Mox Sapphire)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Stack = Krosan Grip
+Bot1.Battlefield.#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+? Bot1.Battlefield.Llanowar Elves.FaceDown = (absent)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.FaceDown = (absent)
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield = Forest; Mountain; Mox Emerald; Llanowar Elves
+Bot1.Graveyard = Krosan Grip; Mox Sapphire; Island; Llanowar Elves; Lightning Bolt; Turn Inside Out; Black Lotus

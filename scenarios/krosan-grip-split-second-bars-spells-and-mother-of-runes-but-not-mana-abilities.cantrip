@@ -1,0 +1,70 @@
+# Krosan Grip: split second (CR 702.61a) - as long as it is on the stack, players can't cast spells or activate abilities that
+# aren't mana abilities, but they still get priority (the ruling) and may activate mana abilities (CR 702.61b). Bot1 casts Grip
+# at Bot2's Sol Ring. With it on the stack Bot2 can't activate Mother of Runes nor cast Lightning Bolt (the refusals), but taps
+# Llanowar Elves for {G}. Grip destroys the Sol Ring (CR 701.8); once it has left the stack Bot2 may act again (the ruling): it
+# activates Mother and bolts Bot1 (the positive controls), in the same main phase.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Krosan Grip
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Pearl
+Mox Emerald
+Sol Ring
+Mother of Runes
+Llanowar Elves
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Krosan Grip.Cast(Bot2.Battlefield.Sol Ring)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Stack = Krosan Grip
+! Bot2.Battlefield.Mother of Runes.Activate
+! Bot2.Hand.Lightning Bolt.Cast
+Bot2.Battlefield.Llanowar Elves.Activate
+? Bot2.Mana = {G}
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Sol Ring
+Bot1.Pass
+Bot2.Battlefield.Mother of Runes.Activate(Mother of Runes)
+Bot2.Colors(Red)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Krosan Grip
+Bot2.Graveyard = Lightning Bolt; Sol Ring
+Bot2.Battlefield.Mother of Runes.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Tapped = true

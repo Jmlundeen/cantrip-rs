@@ -1,0 +1,57 @@
+# Split second doesn't stop triggered abilities (CR 702.61b, the ruling): casting Krosan Grip, a noncreature spell, triggers
+# Bot1's Harmonic Prodigy's prowess, which goes on the stack above Grip and resolves first (+1/+1 until end of turn). Grip
+# then destroys Bot2's Oblivion Ring, an enchantment (CR 701.8), and the Ring's leaves-the-battlefield ability returns the
+# Mox Ruby it had exiled (CR 603.6c, 610.3).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Harmonic Prodigy
+Krosan Grip
+Island
+Island x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Oblivion Ring
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Harmonic Prodigy.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Oblivion Ring.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Target(Mox Ruby)
+[T3 Bot1.Main1]
+? Exile = Mox Ruby
+Bot1.Hand.Krosan Grip.Cast(Bot2.Battlefield.Oblivion Ring)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Harmonic Prodigy.Power = 2
+? Stack = Krosan Grip
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Harmonic Prodigy.Power = 2
+Bot1.Battlefield.Harmonic Prodigy.Toughness = 4
+Bot1.Battlefield = Forest; Mox Emerald; Mox Ruby; Mox Jet; Harmonic Prodigy
+Bot2.Graveyard = Oblivion Ring; Black Lotus
+Bot1.Graveyard = Krosan Grip
+Exile.Count = 0

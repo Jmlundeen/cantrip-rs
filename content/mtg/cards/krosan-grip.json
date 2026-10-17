@@ -1,0 +1,6 @@
+{
+  "name": "Krosan Grip",
+  "manaCost": "{2}{G}",
+  "type": "Instant",
+  "oracleText": "Split second (As long as this spell is on the stack, players can't cast spells or activate abilities that aren't mana abilities.)\nDestroy target artifact or enchantment."
+}
