@@ -1,0 +1,62 @@
+# Vesuva ("You may have this land enter tapped as a copy of any land on the battlefield") entering under Life and Limb and
+# Humility. CR 614.12 judges each replacement effect that modifies how it enters on the permanent as it would exist on the
+# battlefield, "taking into account replacement effects that have already modified how it enters". Before the copy, Vesuva is
+# a land of no type - no Forest, no creature - so it keeps its own ability and becomes a copy of Overgrown Tomb. As that
+# copy it is a Swamp Forest, which Life and Limb makes a 1/1 Saproling creature and Humility then takes the abilities of
+# (CR 613.1f), so the copied "As this land enters, you may pay 2 life. If you don't, it enters tapped" (CR 707.9a) no longer
+# applies: Bot1 is not asked for life and stays at 20. It enters tapped by Vesuva's own replacement. The Overgrown Tomb itself
+# asks nothing either (overgrown-tomb-entering-as-a-life-and-limb-creature-under-humility-asks-nothing-and-enters-untapped).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Life and Limb
+Humility
+Plains
+Overgrown Tomb
+Vesuva
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Overgrown Tomb.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Overgrown Tomb)
+! Bot1.Accept
+? Bot1.Life = 20
+? Bot1.Battlefield.Overgrown Tomb#2.Tapped = true
+? Bot1.Battlefield.Overgrown Tomb#2.Types = Land; Creature
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Overgrown Tomb#2.Subtypes = Forest; Saproling; Swamp
+Bot1.Battlefield.Overgrown Tomb#2.Power = 1

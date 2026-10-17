@@ -1,0 +1,63 @@
+# Daybound's "if it is night, this permanent enters transformed" is a static ability of the permanent (CR 702.145b), and which
+# replacement effects modify how a permanent enters is judged on it as it would exist on the battlefield (CR 614.12: "taking
+# into account ... continuous effects that already exist and would apply to the permanent"). Under Humility ("All creatures
+# lose all abilities") an Outland Liberator would have no daybound there, so cast at night it enters front face up (KI-59).
+# The first Liberator, cast on turn 1 before Humility, makes it day (CR 702.145d); Bot2 casts nothing on turn 2, so turn 3 is
+# night and that Liberator is Frenzied Trapbreaker (the positive control of "enters transformed" is
+# day-and-night-swap-with-the-spells-cast-and-a-daybound-card-enters-transformed-at-night). On turn 3 Bot1 casts Humility,
+# then the second Liberator at night: an Outland Liberator, a 1/1 with no keyword. It stays night all turn (the spells of a
+# turn change it only at the next untap step, CR 731.2).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Outland Liberator
+Plains
+Humility
+Outland Liberator
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+? DayNight = Day
+[T3 Bot1.Main1]
+? DayNight = Night
+? Bot1.Battlefield.Frenzied Trapbreaker.Keywords = Nightbound
+Bot1.Hand.Plains.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Outland Liberator.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Outland Liberator.Keywords = (absent)
+
+[Expect]
+DayNight = Night
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby; Frenzied Trapbreaker; Plains; Humility; Outland Liberator
+Bot1.Battlefield.Outland Liberator.Keywords = (absent)
+Bot1.Battlefield.Outland Liberator.Power = 1
+Bot1.Battlefield.Outland Liberator.Toughness = 1
+Bot1.Battlefield.Frenzied Trapbreaker.Power = 1

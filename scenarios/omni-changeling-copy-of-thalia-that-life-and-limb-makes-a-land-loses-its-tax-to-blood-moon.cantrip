@@ -1,0 +1,87 @@
+# A creature another effect makes a nonbasic land loses its rules text to Blood Moon too (CR 305.7), and every rule read
+# off its card goes with it (KI-52: whether a land loses its rules text is judged on it as layer 4 leaves it, not as layers 1
+# to 3 made it). Omni-Changeling, entering under Life and Limb alone, keeps its copy ability (it would be a Forest land there,
+# but nothing takes its abilities) and copies Bot2's Thalia, Guardian of Thraben "except it has changeling" (CR 707.9b): a
+# Saproling, so Life and Limb makes it a 1/1 Forest land too. Under both Thalias Blood Moon costs {2}{R} plus {2}
+# ("Noncreature spells cost {1} more to cast"). Once Blood Moon is on the battlefield, Bot1's Omni-Thalia is a nonbasic land
+# Blood Moon makes a Mountain - Blood Moon applies to it only after Life and Limb made it a land (CR 613.8a) - and it loses
+# its rules text, its tax among it; Bot2's Thalia, no Saproling and no land, keeps hers. So Bot1's Lotus Petal ({0}) costs
+# {1}: Mox Pearl alone pays it. (Bot2's Thalia is the only creature to copy, so the copy's choice
+# takes it by default: a name with a comma cannot be written in a choice.)
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Life and Limb
+Island
+Omni-Changeling
+Blood Moon
+Lotus Petal
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Omni-Changeling.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield.Thalia, Guardian of Thraben.Types = Creature; Land
+[T7 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Thalia, Guardian of Thraben.Subtypes = (every creature type); Mountain
+[T9 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lotus Petal.Tapped = false
+? Bot1.Battlefield.Mox Sapphire.Tapped = false
+
+[Expect]
+Bot2.Battlefield.Thalia, Guardian of Thraben.Types = Creature
+Bot1.Battlefield.Thalia, Guardian of Thraben.Subtypes = (every creature type); Mountain

@@ -1,0 +1,59 @@
+# Everflowing Chalice's "This artifact enters with a charge counter on it for each time it was kicked" is a replacement
+# effect of its own (CR 614.1c). CR 614.12: which replacement effects apply is judged on the permanent as it would exist on the
+# battlefield, "taking into account ... continuous effects that already exist and would apply to the permanent". Under March
+# of the Machines ("Each noncreature artifact is an artifact creature with power and toughness each equal to its mana value",
+# layers 4 and 7b) the Chalice would be an artifact creature there, so Humility ("All creatures lose all abilities and have
+# base power and toughness 1/1", layers 6 and 7b), later than March, takes its abilities: kicked once, it enters with no
+# charge counter, a 1/1 (Humility's base power and toughness applies after March's, by timestamp). The positive control of
+# the counter is everflowing-chalice-kicked-once-enters-with-one-charge-counter-and-taps-for-one-colorless. Black Lotus pays
+# for March, so no other artifact is left for March to make a 0/0; Ancient Tomb deals Bot1 2 damage.
+
+[Bot1 Deck]
+Island
+Black Lotus
+March of the Machines
+Plains
+Plains
+Ancient Tomb
+Humility
+Everflowing Chalice
+Simian Spirit Guide
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.March of the Machines.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Ancient Tomb.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Ancient Tomb.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Everflowing Chalice.Cast(Kicked: 1)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Simian Spirit Guide.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Everflowing Chalice.Types = Artifact; Creature
+
+[Expect]
+Turn = 7
+Bot1.Life = 18
+Bot1.Battlefield = Island; March of the Machines; Plains; Plains; Ancient Tomb; Humility; Everflowing Chalice
+Bot1.Battlefield.Everflowing Chalice.Counters.Charge = (absent)
+Bot1.Battlefield.Everflowing Chalice.Power = 1
+Bot1.Battlefield.Everflowing Chalice.Toughness = 1

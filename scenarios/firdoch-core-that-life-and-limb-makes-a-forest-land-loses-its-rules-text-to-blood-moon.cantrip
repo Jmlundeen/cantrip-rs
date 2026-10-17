@@ -1,0 +1,62 @@
+# Firdoch Core (Kindred Artifact - Shapeshifter, changeling: every creature type) is a Saproling, so Life and Limb ("All
+# Forests and all Saprolings are 1/1 green Saproling creatures and Forest lands in addition to their other types") makes it a
+# nonbasic Forest land in layer 4. Blood Moon ("Nonbasic lands are Mountains") applies to it only once it is a land, so Blood
+# Moon's effect depends on Life and Limb's and applies after it (CR 613.8a): it is a Mountain, and a land whose subtype an
+# effect sets loses the abilities of its rules text and has "{T}: Add {R}" (CR 305.7) - here "{T}: Add one mana of any color"
+# goes. (A rule read off its card rather than an ability it has goes too:
+# omni-changeling-copy-of-thalia-that-life-and-limb-makes-a-land-loses-its-tax-to-blood-moon.) Before
+# Blood Moon, under Life and Limb alone, the any-color ability pays for Blood Moon (the positive control); afterwards it can't
+# be activated, and the Core taps for {R}.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Firdoch Core
+Life and Limb
+Blood Moon
+Mountain
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Firdoch Core.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact; Land; Creature
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: any color; Color: Blue)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Firdoch Core.Activate(Ability: any color; Color: Blue)
+Bot1.Battlefield.Firdoch Core.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+? Bot1.ManaFrom = {R} Firdoch Core
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Ruby; Mox Jet; Mox Sapphire; Firdoch Core; Mountain; Life and Limb; Blood Moon
+Bot1.Battlefield.Firdoch Core.Subtypes = (every creature type); Mountain

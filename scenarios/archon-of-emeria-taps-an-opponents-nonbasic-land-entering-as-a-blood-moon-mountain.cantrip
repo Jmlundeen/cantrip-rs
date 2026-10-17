@@ -1,0 +1,54 @@
+# Archon of Emeria: "Nonbasic lands your opponents control enter tapped" (CR 614.1c). CR 614.12 judges the land as it would
+# exist on the battlefield, "taking into account ... continuous effects that already exist and would apply to the permanent":
+# under Blood Moon ("Nonbasic lands are Mountains") Bot2's Taiga would be a Mountain there, but Blood Moon sets only its land
+# subtype (CR 305.7), not its supertypes, so it is still a nonbasic land and enters tapped - whatever its own rules text lost.
+# Bot2's basic Mountain, played on turn 6, enters untapped (the positive control). Bot1 casts its Moxen and Blood Moon on turn 1 and
+# the Archon on turn 3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Blood Moon
+Archon of Emeria
+Plains x12
+
+[Bot2 Deck]
+Taiga
+Mountain
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Archon of Emeria.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Taiga.Play
+? Bot2.Battlefield.Taiga.Tapped = true
+? Bot2.Battlefield.Taiga.Subtypes = Mountain
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+? Bot2.Battlefield.Mountain.Tapped = false
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Sapphire; Mox Ruby; Mox Emerald; Blood Moon; Archon of Emeria
+Bot2.Battlefield.Taiga.Subtypes = Mountain

@@ -1,0 +1,67 @@
+# Omni-Changeling's "You may have this creature enter as a copy of any creature on the battlefield, except it has
+# changeling" is a replacement effect of its own (CR 614.1c), and CR 614.12 judges which replacement effects apply on the
+# permanent as it would exist on the battlefield, "taking into account ... continuous effects that already exist and would
+# apply to the permanent". There it is a Saproling (changeling, CR 702.73a), so Life and Limb ("All Forests and all
+# Saprolings are 1/1 green Saproling creatures and Forest lands in addition to their other types") makes it a nonbasic
+# Forest land, and Blood Moon ("Nonbasic lands are Mountains"), which depends on Life and Limb and applies after it
+# (CR 613.8a), makes it a Mountain that has lost the abilities of its rules text (CR 305.7; Blood Moon's ruling: such a land
+# does not choose "as" it enters). So Bot1 is not asked to copy the Ornithopter: Omni-Changeling enters as itself, a 1/1
+# green Mountain creature land of every creature type (KI-52). The positive control of the copy is
+# omni-changeling-convoked-with-three-artifact-creatures-enters-as-a-copy-with-changeling.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Black Lotus
+Life and Limb
+Blood Moon
+Ornithopter
+Omni-Changeling
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Omni-Changeling.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+? Bot1.Battlefield.Omni-Changeling.Types = Creature; Land
+? Bot1.Battlefield.Omni-Changeling.Power = 1
+
+[Expect]
+Bot1.Battlefield.Omni-Changeling.Subtypes = (every creature type); Mountain
+Bot1.Battlefield.Omni-Changeling.Toughness = 1
+Bot1.Battlefield.Ornithopter.Power = 0
