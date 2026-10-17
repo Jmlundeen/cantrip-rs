@@ -1,0 +1,40 @@
+# Roiling Canopy: "at least five other Forests" - the fifth Forest to enter has four others, so nothing triggers and the Elves
+# stay 1/1 (the boundary under the sixth-forest scenario, which is the positive control). The Canopy is not a Forest, so it
+# does not make up the fifth.
+
+[Bot1 Deck]
+Roiling Canopy
+Llanowar Elves
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+? Bot1.Battlefield.Roiling Canopy.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Stack.Count = 0
+[T11 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Stack.Count = 0

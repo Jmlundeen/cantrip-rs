@@ -1,0 +1,43 @@
+# Roiling Canopy: "target creature you control". Bot1 controls no creature (Bot2's Llanowar Elves is not one it controls), so
+# the triggered ability has no legal target and is removed (CR 603.3d): no target is ever asked for, and the opponent's Elves
+# stay 1/1. Five other Forests are there when the sixth enters on turn 13.
+
+[Bot1 Deck]
+Roiling Canopy
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Count = 7
+Stack.Count = 0

@@ -1,0 +1,38 @@
+# Roiling Canopy: "Forest" is read through the layers (CR 613). Yavimaya, Cradle of Growth makes each land a Forest, so the
+# Canopy is itself one of the five other Forests (with Yavimaya and three Islands) when the sixth land, an Island, enters
+# on turn 11: it is a Forest you control, the trigger happens and the Elves become 4/4. The fifth land (turn 9, four
+# others) did not trigger it.
+
+[Bot1 Deck]
+Yavimaya, Cradle of Growth
+Roiling Canopy
+Llanowar Elves
+Island
+Island
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Yavimaya, Cradle of Growth.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Roiling Canopy.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+
+[T11 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T11 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 4
+Stack.Count = 0

@@ -1,0 +1,46 @@
+# Roiling Canopy: the intervening "if" is checked again as the ability resolves (CR 603.4). Bot1 has Overgrown Tomb and four
+# basic Forests when the fifth basic enters and triggers (5 others); in response Bot2 sacrifices Wasteland to destroy the Tomb.
+# On resolution only four other Forests remain, so the ability does nothing and the Elves stay 1/1. The Tomb is in Bot1's
+# graveyard.
+
+[Bot1 Deck]
+Roiling Canopy
+Overgrown Tomb
+Llanowar Elves
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Wasteland
+Island x19
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Overgrown Tomb.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Overgrown Tomb)
+[T13 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Graveyard = Overgrown Tomb
+Stack.Count = 0

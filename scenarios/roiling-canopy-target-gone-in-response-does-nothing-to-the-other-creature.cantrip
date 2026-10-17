@@ -1,0 +1,50 @@
+# Roiling Canopy: the ability's one target (Llanowar Elves) is killed in response by Bot2's Lightning Bolt, so it is countered on
+# resolution (CR 608.2b) and the Birds of Paradise, which was never its target, stay 0/1.
+
+[Bot1 Deck]
+Roiling Canopy
+Llanowar Elves
+Birds of Paradise
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Battlefield.Forest.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Target(Llanowar Elves)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T13 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves
+Bot1.Battlefield.Birds of Paradise.Power = 0
+Bot1.Battlefield.Birds of Paradise.Toughness = 1
+Stack.Count = 0

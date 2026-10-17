@@ -1,0 +1,41 @@
+# Roiling Canopy: Overgrown Tomb already on the battlefield is one of the "five other Forests" (it has the Forest land type, CR
+# 305.6): Tomb and four basics, then the fifth basic Forest enters and triggers it (turn 13). The fourth basic (turn 11) has only
+# Tomb and three basics as others and does not.
+
+[Bot1 Deck]
+Roiling Canopy
+Overgrown Tomb
+Llanowar Elves
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Overgrown Tomb.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 4
+Stack.Count = 0

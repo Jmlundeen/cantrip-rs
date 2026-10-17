@@ -1,0 +1,58 @@
+# Roiling Canopy: "a Forest you control" and "other Forests" you control. Bot2 plays a Forest every turn from turn 2 and has
+# five by turn 10, yet Bot1's fifth Forest (turn 11, four of Bot1's own others) does not trigger it; and Bot2's sixth Forest
+# entering on turn 12, while Bot1 controls six Forests, does not trigger it either. The Elves stay 1/1.
+
+[Bot1 Deck]
+Roiling Canopy
+Llanowar Elves
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x14
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+? Bot1.Battlefield.Roiling Canopy.Tapped = true
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T10 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+
+[T12 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T12 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Count = 6
+Stack.Count = 0

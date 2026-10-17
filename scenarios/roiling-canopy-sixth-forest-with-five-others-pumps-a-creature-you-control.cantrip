@@ -1,0 +1,41 @@
+# Roiling Canopy: the sixth Forest to enter, with five other Forests under Bot1's control, triggers (CR 603.4: the "if" holds as it
+# enters and as the ability resolves) and the Llanowar Elves it targets become 4/4. The Canopy itself is not a Forest and
+# is not counted. The fifth Forest (four others, turn 11) is the control that did not trigger: see the boundary scenario.
+
+[Bot1 Deck]
+Roiling Canopy
+Llanowar Elves
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+? Bot1.Battlefield.Roiling Canopy.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 4
+Bot1.Battlefield.Llanowar Elves.Toughness = 4
+Stack.Count = 0
