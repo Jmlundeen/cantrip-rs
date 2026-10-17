@@ -1,0 +1,44 @@
+# "Whenever you draw your second card each turn, each opponent loses 1 life and you gain 1 life." The Eagle is cast in
+# turn 1 (nothing in a graveyard, so its enters trigger has no target). In turn 3 the draw step's card is the first
+# (nothing yet: 20 and 20), Brainstorm then draws the second, third and fourth cards: only the second triggers, so
+# the drain happens exactly once (Bot2 19, Bot1 21), not three times.
+
+[Bot1 Deck]
+Raven Eagle
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Brainstorm
+Island
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Raven Eagle.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+? Bot2.Life = 20
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Hand.Count = 3

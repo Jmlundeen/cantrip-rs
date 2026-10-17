@@ -1,0 +1,50 @@
+# Raven Eagle: "Whenever this creature enters or attacks, exile up to one target card from a graveyard. If a creature card
+# is exiled this way, create a Clue token." Bot1 kills its own Hired Blade with Stab on turn 1, so a creature card and a
+# noncreature card (the Stab) are in its graveyard; in turn 3 the Eagle enters and its trigger exiles the Hired Blade: a
+# Clue is created. The Stab stays in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Hired Blade
+Stab
+Raven Eagle
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hired Blade.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Stab.Cast(Bot1.Battlefield.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Raven Eagle.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Hired Blade)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Hired Blade
+Bot1.Graveyard = Stab
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mox Pearl; Raven Eagle; Clue Token
+Bot1.Battlefield.Clue Token.Token = true

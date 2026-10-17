@@ -1,0 +1,41 @@
+# The Eagle is not on the battlefield when Bot1 draws its second card (Brainstorm's first card, in turn 3), so nothing
+# triggers - not then, and not when it is cast afterwards: no draw happens after it arrives. Still 20 and 20 (the ruling:
+# it does not matter that it was out at any other time, but it must be there when the second card is drawn).
+
+[Bot1 Deck]
+Raven Eagle
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Brainstorm
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Raven Eagle.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Count = 5

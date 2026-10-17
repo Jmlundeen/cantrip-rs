@@ -1,0 +1,56 @@
+# The Eagle's trigger on both of its events. Turn 3, entering: Bot1 targets the Stab (a noncreature card) in its graveyard,
+# which is exiled with no Clue. Turn 5, attacking: it targets the Hired Blade (a creature card) and gets the Clue. The
+# attack also deals its 2 damage (20 -> 18). Nothing is left in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Hired Blade
+Stab
+Raven Eagle
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hired Blade.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Stab.Cast(Bot1.Battlefield.Hired Blade)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Raven Eagle.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Stab)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mox Pearl; Raven Eagle
+? Exile = Stab
+[T5 Bot1.Main1]
+Bot1.Attack(Raven Eagle > Bot2)
+Bot1.Target(Bot1.Graveyard.Hired Blade)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Stab; Hired Blade
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Swamp; Mox Jet; Mox Ruby; Mox Pearl; Raven Eagle; Clue Token
+Bot2.Life = 18
