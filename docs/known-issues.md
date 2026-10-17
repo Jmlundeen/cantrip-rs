@@ -59,6 +59,8 @@ keeps it).
 | [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-42](#ki-42-a-permissions-enters-tapped-is-judged-from-where-the-land-is-not-from-the-way-it-was-played) | A permission's "enters tapped" is judged from where the land is, not from the way it was played | Low | Unexercised |
+| [KI-43](#ki-43-a-permissions-enters-tapped-is-judged-from-where-the-land-is-not-from-the-way-it-was-played) | A permission's "enters tapped" is judged from where the land is, not from the way it was played | Low | Unexercised |
+| [KI-44](#ki-44-a-modal-double-faced-cards-back-face-cast-by-a-permission-is-not-exercised) | A modal double-faced card's back face cast by a permission is not exercised | Low | Unexercised |
 
 ## Issues
 
@@ -465,3 +467,19 @@ Of several ways that could play the same land, the engine also takes the one tha
 carries the permission used on the PlayLand move into the entry's `ZoneChange`.
 
 **Scenarios.** None yet: no card in the engine both plays a land by an effect and could face a Lightstall Inquisitor's card.
+
+### KI-40: A modal double-faced card's back face cast by a permission is not exercised
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-16, review of Inside Information |
+
+**Notes.** A permission to cast a card from where it is (CR 601.3) now lets a modal double-faced card be cast as its back face
+(CR 712.11b) and a split card as either half (CR 709.3, an aftermath half only from a graveyard), for what the permission says
+to pay (`actions::castable`, `face_cast`). The split halves are proven (Inside Information with Life // Death); no card in
+content is a modal double-faced card whose back face is a spell rather than a land, so the back-face cast from exile runs in no
+scenario. (Two transforming cards, Jennifer Walters and Norman Osborn, give their back faces a mana cost in content, which makes
+`back.has_cost` true for them; whether that offers a back-face cast it should not is worth a look.) A scenario is owed when a
+spell-backed modal double-faced card is added.
+
+**Scenarios.** None yet.

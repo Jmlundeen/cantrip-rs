@@ -2441,40 +2441,51 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     }
                 }
             }
+            // What a face cast by the permission costs (CR 118.9, 601.2f): what it names instead, or life equal to the face's
+            // mana value, and what it adds; the face's own mana cost from the hand.
+            let face_covered = |face: &CardDef, by_permission: bool| {
+                let a = available.get_or_init(|| self::available(cx, player));
+                if !by_permission {
+                    return a.covers_for(&least_cost(cx, a, player, id, face, face.cost, &[]), &spell_kind(cx, a, id, face));
+                }
+                if life_grant && !can_pay_other(cx, id, player, &life_for_mana_value(face)) {
+                    return false;
+                }
+                let mut least = least_cost(cx, a, player, id, face, instead.unwrap_or(face.cost), &[]);
+                least.generic = least.generic.saturating_add(more);
+                if any_type {
+                    least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                }
+                a.covers_for(&least, &spell_kind(cx, a, id, face))
+            };
+            let face_speed = |face: &'static CardDef| speed.face(face) && !grant.is_some_and(|g| g.sorcery_speed);
             // A split card's halves (CR 709.3): each cast for its own cost at its own speed, from the hand, or for an
-            // aftermath half (CR 702.127a) from the graveyard only.
+            // aftermath half (CR 702.127a) from the graveyard only; or, but for an aftermath half, from wherever a permission
+            // lets the card be cast (CR 601.3, 709.3).
             if let Some((left, right)) = def.split {
                 for (way, half) in [(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)] {
                     let from = if half.aftermath { ZoneKind::Graveyard } else { ZoneKind::Hand };
-                    if !zone.is(from)
-                        || !own
-                        || speed.face(half) != instants
-                    {
+                    let by_permission = permitted_whole && !half.aftermath && !zone.is(ZoneKind::Hand);
+                    if (!(zone.is(from) && own) && !by_permission) || face_speed(half) != instants {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
-                    if {
-                        let a = available.get_or_init(|| self::available(cx, player));
-                        a.covers_for(&least_cost(cx, a, player, id, half, half.cost, &[]), &spell_kind(cx, a, id, half))
-                    } && offer_spell(cx, &asker, half, &mut option)
-                    {
+                    if face_covered(half, by_permission) && offer_spell(cx, &asker, half, &mut option) {
                         options.push(option);
                     }
                 }
             }
-            // A modal double-faced card's back face, from the hand, at the speed of the back face's own type (CR 712.2,
-            // 712.8a): the back face of a transforming card has no mana cost and is not cast.
-            if zone.is(ZoneKind::Hand)
+            // A modal double-faced card's back face, from the hand or wherever a permission lets the card be cast (CR 712.11b,
+            // 601.3), at the speed of the back face's own type (CR 712.2, 712.8a): the back face of a transforming card has no
+            // mana cost and is not cast.
+            let back_by_permission = permitted_whole && !zone.is(ZoneKind::Hand);
+            if (zone.is(ZoneKind::Hand) || back_by_permission)
                 && let Some(back) = def.back
                 && back.has_cost
-                && speed.face(back) == instants
+                && face_speed(back) == instants
             {
                 let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
-                if {
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_for(&least_cost(cx, a, player, id, back, back.cost, &[]), &spell_kind(cx, a, id, back))
-                } && offer_spell(cx, &asker, back, &mut option)
-                {
+                if face_covered(back, back_by_permission) && offer_spell(cx, &asker, back, &mut option) {
                     options.push(option);
                 }
             }
@@ -2576,6 +2587,37 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 options.push(option);
             }
         }
+    }
+}
+
+/// The life a cast of `card` by `player` by this way pays instead of its mana cost (CR 118.9, 119.4), for the menu row and the
+/// seats that weigh it: a permission's life equal to the face's mana value (Inside Information), or Bolas's Citadel's for the
+/// top of the library. None for a cast paid in mana.
+pub fn life_for_cast(q: &dyn Query, cards: &CardTable, player: PlayerId, card: ObjectId, way: u8) -> Option<u8> {
+    let state = q.state();
+    let obj = state.obj(card);
+    let def = cards.get(obj.card);
+    if !obj.zone.is(ZoneKind::Hand)
+        && state.permissions.iter().any(|p| p.card == card && p.player == player && p.grant.life_for_mana_value)
+    {
+        return Some(life_for_mana_value(face_cast(def, way)).life);
+    }
+    let mut top = false;
+    if way == 0 && state.zone(Zone::library(player)).first() == Some(&card) {
+        each_play_rule(q, cards, player, false, |_, rule| top |= matches!(rule, PlayRule::LibraryTop));
+    }
+    top.then(|| life_for_mana_value(def).life)
+}
+
+/// The face of a card cast by a way of casting it: the card itself, its Adventure or Omen, a split card's half or a modal
+/// double-faced card's back face (CR 715.3, 720.3, 709.3, 712.11b).
+fn face_cast(def: &'static CardDef, way: u8) -> &'static CardDef {
+    match (way, def.split) {
+        (WAY_SPLIT_LEFT, Some((left, _))) => left,
+        (WAY_SPLIT_RIGHT, Some((_, right))) => right,
+        (WAY_BACK_FACE, _) => def.back.unwrap_or(def),
+        (0, _) => def,
+        _ => def.inset_face(way).unwrap_or(def),
     }
 }
 
@@ -2715,12 +2757,12 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
     let Some(source) = option.source else { return "".into() };
     // "Pay life equal to its mana value rather than pay its mana cost" (CR 118.9): the life, for the face cast.
     if option.kind == ActionKind::CastSpell
-        && matches!(option.index, 0 | WAY_ADVENTURE)
+        && matches!(option.index, 0 | WAY_ADVENTURE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE)
         && state.obj(source).zone != Zone::hand(state.obj(source).owner)
         && state.permissions.iter().any(|p| p.card == source && p.grant.life_for_mana_value)
     {
         let def = cards.get(state.obj(source).card);
-        let face = if option.index == 0 { def } else { def.inset_face(option.index).unwrap_or(def) };
+        let face = face_cast(def, option.index);
         let life = life_for_mana_value(face).life;
         return match face.name {
             _ if option.index == 0 => format!("Cast by paying {life} life instead").into(),
@@ -2856,7 +2898,9 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             let permitted = match action.index {
                 0 => permission_for(cx, source, player).filter(|p| !p.grant.adventure_only),
                 WAY_ADVENTURE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player),
-                WAY_OMEN if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player).filter(|p| !p.grant.adventure_only),
+                WAY_OMEN | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => {
+                    permission_for(cx, source, player).filter(|p| !p.grant.adventure_only)
+                }
                 _ => None,
             };
             let instead = permitted.and_then(|p| p.grant.instead);
@@ -2866,8 +2910,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             // cast (CR 715.3a), or from the top of a library by a permanent's rule (Bolas's Citadel).
             let def = cx.card(cx.s().obj(source).card);
             let (instead, life) = if permitted.is_some_and(|p| p.grant.life_for_mana_value) {
-                let face = if action.index == 0 { def } else { def.inset_face(action.index).unwrap_or(def) };
-                (Some(ManaCost::ZERO), life_for_mana_value(face).life)
+                (Some(ManaCost::ZERO), life_for_mana_value(face_cast(def, action.index)).life)
             } else if cx.s().obj(source).zone.is(ZoneKind::Library) && land_rules(cx, player).top_for_life {
                 (Some(ManaCost::ZERO), life_for_mana_value(def).life)
             } else {

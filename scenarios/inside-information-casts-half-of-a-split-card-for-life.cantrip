@@ -1,0 +1,31 @@
+# Inside Information exiles Life // Death: a split card is cast as one of its halves (CR 709.3), and a permission to cast it
+# from exile lets either half be cast (CR 601.3). Bot1 casts Life for 1 life, its mana value, with no mana left.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Inside Information
+Plains x14
+
+[Bot2 Deck]
+Island x7
+Life // Death
+Island x9
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Inside Information.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot1.Exile.Life // Death.Cast(Ability: Life)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Exile.Count = 0
+Bot2.Graveyard = Life // Death
