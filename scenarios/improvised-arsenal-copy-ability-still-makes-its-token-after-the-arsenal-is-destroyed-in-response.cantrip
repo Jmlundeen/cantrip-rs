@@ -1,0 +1,56 @@
+# Improvised Arsenal's "{4}{R}: Create a token that's a copy of this Equipment" uses the Equipment's last known information if it has
+# left the battlefield (CR 707.2, 608.2h): Bot2 answers the activation on turn 3 with Disenchant on the Arsenal, which goes to the
+# graveyard, and the ability still resolves, making a token copy of it. Bot1 ends with the token and the Arsenal card in its graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Improvised Arsenal
+Plains
+Plains
+Mountain
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Improvised Arsenal.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Improvised Arsenal.Activate(Ability: Create a token)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Improvised Arsenal)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Improvised Arsenal
+Bot1.Battlefield.Improvised Arsenal.Token = true
+Bot2.Graveyard = Disenchant

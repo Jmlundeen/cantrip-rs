@@ -1,0 +1,65 @@
+# Improvised Arsenal: "{4}{R}: Create a token that's a copy of this Equipment" (CR 707.2, 111.4). On turn 3 Bot1 pays {4}{R} (a
+# Mountain and four Moxen); the token has the Arsenal's abilities and static (a copy), and being an artifact it adds one to the count
+# (artifacts: four Moxen, two Ornithopters, the Arsenal and its token = 8). On turn 5 each Equipment is equipped for {R} (Equip {R},
+# paid with the second Mountain and Mox Ruby) to its own Ornithopter: both are 8/2, and attacking together they deal 16.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Ornithopter
+Ornithopter
+Improvised Arsenal
+Mountain
+Mountain
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Improvised Arsenal.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Improvised Arsenal.Activate(Ability: Create a token)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Improvised Arsenal#2.Token = true
+? Bot1.Battlefield.Improvised Arsenal#2.Types = Artifact
+? Bot1.Battlefield.Improvised Arsenal#2.Subtypes = Equipment
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Improvised Arsenal#1.Activate(Bot1.Battlefield.Ornithopter#1; Ability: Equip {R})
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Improvised Arsenal#2.Activate(Bot1.Battlefield.Ornithopter#2; Ability: Equip {R})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Power = 8
+? Bot1.Battlefield.Ornithopter#2.Power = 8
+Bot1.Attack(Ornithopter#1 > Bot2; Ornithopter#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 4
+Bot1.Battlefield.Improvised Arsenal#1.AttachedTo = Ornithopter
+Bot1.Battlefield.Improvised Arsenal#2.AttachedTo = Ornithopter

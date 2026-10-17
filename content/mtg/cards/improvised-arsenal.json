@@ -1,0 +1,6 @@
+{
+  "name": "Improvised Arsenal",
+  "manaCost": "{1}{R}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature gets +1/+0 for each artifact you control.\n{4}{R}: Create a token that's a copy of this Equipment.\nEquip {R}"
+}
