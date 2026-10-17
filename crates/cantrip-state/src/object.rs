@@ -71,7 +71,7 @@ pub struct Obj {
     /// computed ability list): "activate only once each turn" (CR 602.5b-c), counted for this object and for each
     /// instance of the ability on its own.
     pub activated_turn: u32,
-    pub activated_mask: u8,
+    pub activated_mask: u32,
     /// What it is attached to (CR 301.5, 303.4): an Aura's or Equipment's host. Only meaningful while the host is
     /// still the object it was (`live`) and where an attachment may be; state-based actions clear it otherwise
     /// (CR 704.5m-n). Kept on the row of an object that left, as last-known information.
@@ -772,6 +772,11 @@ impl DelayedWhen {
     }
 }
 
+/// The most abilities an object has at once, printed and granted (`Chars::abilities`, `LastKnown::abilities`): enough for a
+/// Locus of Enlightenment or an Agatha's Soul Cauldron's creature to have every activated ability of the cards it takes them
+/// from (CR 702.167c), and the width of `Obj::activated_mask`.
+pub const MAX_ABILITIES: usize = 32;
+
 /// An object's characteristics as it last existed on the battlefield (CR 608.2h, 603.10), kept when it leaves.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct LastKnown {
@@ -784,7 +789,7 @@ pub struct LastKnown {
     pub keywords: Keywords,
     /// Its abilities as it last had them, those granted by effects included: a leaves-the-battlefield ability it was given still
     /// triggers (CR 603.10a).
-    pub abilities: [Option<AbilityRef>; 8],
+    pub abilities: [Option<AbilityRef>; MAX_ABILITIES],
     /// The words of its text as it last had them (CR 612): an ability of it that resolves after it has gone reads them.
     pub words: Words,
 }

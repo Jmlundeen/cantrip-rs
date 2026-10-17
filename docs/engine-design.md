@@ -540,6 +540,12 @@ not its old position, since its effect may have taken an item under it (Ertai Re
 the limit, and `actions::granted_limit_reached` counts that ability's activations by the object this turn in the history
 (CR 602.5b); an unlimited instance of the same ability is used first.
 
+An object holds up to `MAX_ABILITIES` (32) abilities, printed and granted (`Chars::abilities`, `LastKnown::abilities`), and
+`Obj::activated_mask` is as wide: Locus has every activated ability of the cards used to craft it (CR 702.167c), nine or
+more from five ordinary artifacts, which the old eight dropped without a word. The ability copying, the activation limit
+and the wider list measured, base (`cf999fa8`) then this branch, three back-to-back pairs on a loaded machine (other agents
+building): 25.38 / 16.20, 9.83 / 10.98, 12.79 / 12.22 us per decision - no difference past the noise (2026-10-17).
+
 ### Station
 
 Station (CR 702.184a) is `cantrip_mechanics::station::ability(text)`: "tap another untapped creature you control" as a cost

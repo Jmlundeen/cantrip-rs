@@ -1,0 +1,86 @@
+# Locus of Enlightenment "has each activated ability of the exiled cards used to craft it" (CR 702.167c), however many:
+# crafted on turn 9 with Walking Ballista (two abilities), Aether Spellbomb (two), Pyrite Spellbomb (two), Mind Stone (two)
+# and Goblin Bombardment (one), it has nine besides its own trigger. The last of them, granted after the other eight, are
+# usable: on turn 11 Bot1 activates the Bombardment's (Bot2 takes 1, and 1 from the copy), then Mind Stone's
+# "{1}, {T}, Sacrifice this artifact: Draw a card", which sacrifices Locus as its cost: Locus is gone by the time the
+# ability is activated (CR 602.2i), so it does not trigger (the Rings of Brighthearth ruling) and Bot1 draws one.
+
+[Bot1 Deck]
+Island
+The Enigma Jewel
+Walking Ballista
+Aether Spellbomb
+Pyrite Spellbomb
+Mind Stone
+Goblin Bombardment
+Mountain
+Island
+Black Lotus
+Mountain
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Swamp x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.The Enigma Jewel.Cast
+Bot2.Pass
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Pyrite Spellbomb.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Mind Stone.Cast
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Goblin Bombardment.Cast
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Craft)
+Bot1.Battlefield.The Enigma Jewel.Activate(Ability: Add)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mind Stone.Activate(Ability: Add)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Choose(Graveyard.Walking Ballista; Aether Spellbomb; Pyrite Spellbomb; Mind Stone; Goblin Bombardment)
+[T11 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 0
+Bot1.Battlefield.Locus of Enlightenment.Activate(Bot2; Sacrifice: Ornithopter; Ability: Sacrifice a creature)
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Locus of Enlightenment.Activate(Ability: Sacrifice this artifact)
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+[T11 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Count = 1
+Bot1.Battlefield = Island; Island; Mountain; Mountain
+Stack.Count = 0

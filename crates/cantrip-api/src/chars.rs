@@ -2,7 +2,6 @@
 
 use cantrip_state::*;
 
-pub const MAX_ABILITIES: usize = 8;
 
 /// One object's characteristics as the layer system computed them.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

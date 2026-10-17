@@ -9,7 +9,7 @@ pub use cantrip_state::{
     Target, TypeSet, Word, Words, Zone, ZoneKind, ZoneKinds, ZoneReason, DelayedWhen, ExileLink, Expiry, PlayCondition, PlayGrant, PlayPermission, LastKnown, ManaPayment, ManaRestriction, ManaValueSpells, SubtypeSpells, MANA_GIVES_HASTE, MANA_MAKES_UNCOUNTERABLE, Destination, DestinationKind, TotalAtMost, DamageDivision, DamageAbout, AttackCost, SearchDestination, WAY_ADVENTURE, WAY_BACK_FACE, WAY_GRANTED, WAY_GRANTED_SLOTS, WAY_GRANTED_STRIDE, GRANTED_FACE_WHOLE, GRANTED_FACE_LEFT, GRANTED_FACE_RIGHT, GRANTED_FACE_ADVENTURE, GRANTED_FACE_BACK, GRANTED_FACE_OMEN, WAY_OMEN, granted_way, granted_slot, granted_face_way, WAY_BESTOW, WAY_OVERLOAD, WAY_SPLIT_LEFT, WAY_SPLIT_RIGHT, WAY_TRANSFORMED,
 };
 
-pub use cantrip_state::{DOOR_LEFT, DOOR_RIGHT, PAY_CONVOKE, PAY_DELVE, PAY_IMPROVISE, PAY_WATERBEND, PLAYER_MANA_ABILITY};
+pub use cantrip_state::{DOOR_LEFT, DOOR_RIGHT, PAY_CONVOKE, PAY_DELVE, PAY_IMPROVISE, PAY_WATERBEND, PLAYER_MANA_ABILITY, MAX_ABILITIES};
 
 mod ability;
 mod card;
