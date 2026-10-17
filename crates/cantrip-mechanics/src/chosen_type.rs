@@ -6,7 +6,13 @@ use cantrip_api::*;
 /// "As this enters, choose a creature type" (CR 614.12a): asked of the entering permanent's controller, any creature type,
 /// and kept on the permanent as `chosen_subtype`. The type chosen, if one was.
 pub fn choose_creature_type(g: &mut dyn Game, entering: &mut Entering) -> Result<Option<Subtype>, Suspend> {
-    let ask = RequestKind::ChooseSubtype { source: entering.object, choices: Subtype::CREATURE_TYPES.to_vec() };
+    choose_type_among(g, entering, Subtype::CREATURE_TYPES.to_vec())
+}
+
+/// "As this enters, choose [one of these types]" (CR 614.12a): `choose_creature_type` among `choices` only, in the order
+/// given (Eclipsed Realms' eight, read through its words).
+pub fn choose_type_among(g: &mut dyn Game, entering: &mut Entering, choices: Vec<Subtype>) -> Result<Option<Subtype>, Suspend> {
+    let ask = RequestKind::ChooseSubtype { source: entering.object, choices };
     let Answer::Subtype(chosen) = g.ask(entering.controller, ask)? else { return Ok(None) };
     entering.chosen_subtype = Some(chosen);
     Ok(Some(chosen))
