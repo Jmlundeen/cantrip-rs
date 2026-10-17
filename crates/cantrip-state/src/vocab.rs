@@ -591,9 +591,21 @@ impl Words {
         other.changes.into_iter().flatten().fold(self, |w, (from, to)| w.changed(from, to))
     }
 
-    /// The word printed as `printed`, as the text has it now.
+    /// The word printed as `printed`, as the text has it now. The changes apply in timestamp order (CR 613.7) unless one
+    /// depends on another (CR 613.8a): a change of "Goblin" depends on a later change that makes a word "Goblin", as
+    /// applying that one changes what the first does, so it waits for it (613.8b). For one word that is: the earliest change
+    /// not yet applied whose word it is now, again and again, each change once. Two changes of the same word each take the
+    /// other's word away, a loop applied in timestamp order: the earlier.
     pub fn word(&self, printed: Word) -> Word {
-        self.changes.iter().flatten().fold(printed, |w, &(from, to)| if w == from { to } else { w })
+        let mut word = printed;
+        let mut applied = [false; Words::MAX];
+        while let Some(i) = (0..Words::MAX).find(|&i| !applied[i] && self.changes[i].is_some_and(|(from, _)| from == word)) {
+            applied[i] = true;
+            if let Some((_, to)) = self.changes[i] {
+                word = to;
+            }
+        }
+        word
     }
 
     /// The color word printed as `printed`, as the text has it now: "destroy target blue permanent" says `color(Blue)`.
@@ -1168,5 +1180,21 @@ impl AbilityRef {
 
     pub fn is_delayed(self) -> bool {
         self.index >= AbilityRef::DELAYED
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// CR 613.7, 613.8a(b): text changes chain whichever order they came in; a loop of two changes of one word applies the
+    /// earlier.
+    #[test]
+    fn text_changes_of_a_word_apply_by_dependency() {
+        let (elf, goblin, dragon) = (Word::Subtype(Subtype::Elf), Word::Subtype(Subtype::Goblin), Word::Subtype(Subtype::Dragon));
+        assert_eq!(Words::NONE.changed(elf, goblin).changed(goblin, dragon).word(elf), dragon);
+        assert_eq!(Words::NONE.changed(goblin, dragon).changed(elf, goblin).word(elf), dragon);
+        assert_eq!(Words::NONE.changed(elf, goblin).changed(elf, dragon).word(elf), goblin);
+        assert_eq!(Words::NONE.changed(elf, goblin).changed(goblin, elf).word(elf), elf);
     }
 }

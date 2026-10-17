@@ -1,7 +1,7 @@
-# Text changes apply in timestamp order (CR 613.7b), not in any order that would make them chain: here Goblin to Dragon comes
-# first and finds no Goblin in Llanowar Elves' type line, so it changes nothing, and Elf to Goblin after it leaves a Goblin
-# Druid, not a Dragon. The same two spells in the other order are artificial-evolution-twice-composes-in-timestamp-order-
-# goblin-then-dragon.
+# Text changes in the other order: Goblin to Dragon comes first and finds no Goblin in Llanowar Elves' type line, and Elf
+# to Goblin comes after it. Applying the later change would change what the earlier one does (it would find a Goblin), so
+# the earlier depends on it and waits (CR 613.8a(b), 613.8b): Elf becomes Goblin, then Goblin becomes Dragon - a Dragon
+# Druid, as in timestamp order the other way round (artificial-evolution-twice-composes-in-timestamp-order-goblin-then-dragon).
 
 [Bot1 Deck]
 Island
@@ -42,4 +42,4 @@ Bot1.Modes(Goblin)
 Turn = 3
 Stack.Count = 0
 Bot1.Graveyard = Artificial Evolution; Artificial Evolution
-Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Goblin
+Bot2.Battlefield.Llanowar Elves.Subtypes = Dragon; Druid

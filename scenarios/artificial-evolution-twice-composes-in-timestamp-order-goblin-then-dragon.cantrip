@@ -1,6 +1,6 @@
 # Text changes apply in timestamp order (CR 613.7b): the first Artificial Evolution changes Elf to Goblin in Llanowar Elves'
 # type line, and the second then finds a Goblin there and changes it to Dragon, so Elf became Dragon in two steps. Its
-# other type, Druid, is untouched. The reverse order is artificial-evolution-twice-in-the-other-order-changes-only-the-elf.
+# other type, Druid, is untouched. The reverse order is artificial-evolution-twice-in-the-other-order-still-makes-the-elf-a-dragon-by-dependency.
 
 [Bot1 Deck]
 Island
