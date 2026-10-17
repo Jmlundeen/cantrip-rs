@@ -1,0 +1,52 @@
+# Sneak {W} on a creature (CR 702.190a-b): the permanent spell enters tapped and attacking the same player as the creature
+# returned to pay its sneak cost, here Bot2 although Bot2's Liliana of the Veil could also be attacked (CR 702.190b; the
+# ruling: not a choice, as for other creatures put onto the battlefield attacking, CR 508.4). Bot1 attacks Bot2 with
+# Ornithopter on turn 3 and nobody blocks; in the declare blockers step Bot1 casts Leonardo for {W} from a Plains, returning
+# the Ornithopter. Leonardo resolves tapped and attacking Bot2, unblocked (CR 508.4d), and deals 1 combat damage with
+# lifelink: Bot2 at 19, Liliana untouched at 3, Bot1 gains 1 (21), and "whenever you gain life" puts a +1/+1 counter on him.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Leonardo, Cutting Edge
+Plains x17
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Hand.Leonardo, Cutting Edge.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Plains.Activate
+? Stack = Leonardo, Cutting Edge
+? Combat.Attackers.Count = 0
+? Bot1.Hand = Ornithopter; Plains; Plains; Plains; Plains; Plains
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Leonardo, Cutting Edge > Bot2
+? Bot1.Battlefield.Leonardo, Cutting Edge.Tapped = true
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 21
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3
+Bot1.Battlefield = Plains; Leonardo, Cutting Edge
+Bot1.Battlefield.Leonardo, Cutting Edge.Tapped = true
+Bot1.Battlefield.Leonardo, Cutting Edge.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Leonardo, Cutting Edge.Power = 2
+Bot1.Hand = Ornithopter; Plains; Plains; Plains; Plains; Plains

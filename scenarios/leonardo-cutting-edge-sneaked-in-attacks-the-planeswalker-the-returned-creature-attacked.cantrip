@@ -1,0 +1,54 @@
+# Browser
+# The sneaked permanent attacks what the returned creature was attacking (CR 702.190b), a planeswalker as well as a player.
+# Bot1 attacks with two creatures, Ornithopter at Bot2 and Healer's Hawk at Bot2's Liliana of the Veil (loyalty 3), and
+# returns the Hawk to cast Leonardo for his sneak cost {W}. Leonardo enters tapped and attacking Liliana, not Bot2 and not
+# what the other attacker attacks: his 1 lifelink damage takes Liliana to 2 and gains Bot1 1 life (damage to a planeswalker
+# is damage, CR 702.15b), which puts a +1/+1 counter on him; the Ornithopter (0/2) deals none, so Bot2 stays at 20.
+# In the browser, Leonardo's menu in the hand names the sneak cast with its cost, and once he resolves the page stands him
+# in the combat group attacking Liliana, apart from the Ornithopter's at Bot2.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Healer's Hawk
+Leonardo, Cutting Edge
+Plains x16
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healer's Hawk.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2; Healer's Hawk > Liliana of the Veil)
+[T3 Bot1.DeclareBlockers]
+? Client.Bot1.Hand.Leonardo, Cutting Edge.Actions = Cast Leonardo, Cutting Edge — Sneak {W}
+Bot1.Hand.Leonardo, Cutting Edge.Cast(Ability: Sneak)
+Bot1.Choose(Healer's Hawk)
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers = Ornithopter > Bot2; Leonardo, Cutting Edge > Liliana of the Veil
+? Client.Bot1.Combat = Attacking Bot2: Ornithopter; Attacking Liliana of the Veil: Leonardo, Cutting Edge
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 21
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2
+Bot1.Battlefield = Plains; Ornithopter; Leonardo, Cutting Edge
+Bot1.Battlefield.Leonardo, Cutting Edge.Tapped = true
+Bot1.Battlefield.Leonardo, Cutting Edge.Counters.PlusOnePlusOne = 1
+Bot1.Hand = Healer's Hawk; Plains; Plains; Plains; Plains

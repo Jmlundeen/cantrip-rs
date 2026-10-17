@@ -1,0 +1,58 @@
+# A creature put onto the battlefield attacking a planeswalker that is no longer on the battlefield enters, but is never an
+# attacking creature (CR 508.4a, 506.3c), and a sneaked one still enters tapped (CR 702.190b). Bot1 attacks Bot2's Liliana of
+# the Veil (loyalty 3) with Ornithopter and, in the declare blockers step, casts Leonardo for his sneak cost {W}, returning
+# the Ornithopter. With Leonardo on the stack Bot1 casts Lightning Bolt at Liliana, which resolves first: she dies with no
+# loyalty (CR 704.5i). Leonardo resolves tapped and not attacking, so he deals no combat damage: nobody gains or loses life,
+# and he gets no counter.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Leonardo, Cutting Edge
+Lightning Bolt
+Mountain
+Plains x15
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Ornithopter > Liliana of the Veil)
+[T3 Bot1.DeclareBlockers]
+Bot1.Hand.Leonardo, Cutting Edge.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightning Bolt.Cast(Liliana of the Veil)
+Bot1.Battlefield.Mountain.Activate
+? Stack = Lightning Bolt; Leonardo, Cutting Edge
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Liliana of the Veil; Black Lotus
+? Stack = Leonardo, Cutting Edge
+Bot1.Pass
+Bot2.Pass
+? Combat.Attackers.Count = 0
+? Bot1.Battlefield.Leonardo, Cutting Edge.Tapped = true
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 20
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Bot1.Battlefield = Plains; Mountain; Leonardo, Cutting Edge
+Bot1.Battlefield.Leonardo, Cutting Edge.Tapped = true
+Bot1.Battlefield.Leonardo, Cutting Edge.Counters.PlusOnePlusOne = (absent)
+Bot1.Hand = Ornithopter; Plains; Plains; Plains

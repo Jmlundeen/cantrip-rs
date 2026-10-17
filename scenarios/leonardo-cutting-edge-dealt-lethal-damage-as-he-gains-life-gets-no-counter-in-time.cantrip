@@ -1,0 +1,41 @@
+# The ruling: if Leonardo is dealt lethal damage at the same time that you gain life, he won't receive a counter from his
+# last ability in time to save him. Leonardo (1/1, lifelink) attacks on turn 5 and Bot2's Guerrilla Gorilla blocks: the combat
+# damage is dealt at once (CR 510.2), Bot1 gains 1 from his lifelink, and he dies to the Gorilla's 2 as a state-based action
+# (CR 704.5g) before his trigger is put on the stack (CR 704.3, 117.5); it resolves with him gone (CR 400.7) and puts no
+# counter on anything. The Gorilla survives his 1 damage.
+
+[Bot1 Deck]
+Plains
+Leonardo, Cutting Edge
+Plains x18
+
+[Bot2 Deck]
+Forest
+Guerrilla Gorilla
+Forest x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Leonardo, Cutting Edge.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Leonardo, Cutting Edge > Bot2)
+[T5 Bot1.DeclareBlockers]
+Bot2.Block(Guerrilla Gorilla > Leonardo, Cutting Edge)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Graveyard = Leonardo, Cutting Edge
+Bot2.Battlefield.Guerrilla Gorilla.Damage = 1
