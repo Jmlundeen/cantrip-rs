@@ -1,0 +1,67 @@
+# The -2 with two creatures each. Players choose in turn order, the active player (Bot1, Garruk's controller) first: Bot1 chooses its
+# Elvish Mystic (not the Ornithopter, the first offered), then Bot2 its Ornithopter (not the Mystic, the first offered). If the
+# order were reversed each line would meet the other player's question and the defaults would sacrifice the wrong creatures.
+# "If you sacrificed a creature this way": Bot1 did, and gets the Beast. Bot2's Ornithopter is exiled (an opponent's creature
+# that would die), Bot1's Mystic goes to the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Garruk, Veiled Butcher
+Ornithopter
+Elvish Mystic
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Ornithopter
+Forest
+Forest
+Forest
+Forest
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Garruk, Veiled Butcher.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Garruk, Veiled Butcher.Activate(Ability: Each player sacrifices)
+Bot1.Pass
+Bot1.Choose(Elvish Mystic)
+Bot2.Choose(Ornithopter)
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Beast; Forest; Garruk, Veiled Butcher; Mox Jet; Mox Jet; Ornithopter
+Bot1.Graveyard = Elvish Mystic; Black Lotus
+Bot2.Battlefield = Elvish Mystic; Mox Emerald
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Garruk, Veiled Butcher.Counters.Loyalty = 3

@@ -52,6 +52,8 @@ Bot2.Pass
 Bot1.Attack(Elvish Mystic > Bot2; Ornithopter > Bot2)
 ? Stack.Count = 1
 [T3 Bot1.Main2]
+? Bot1.Battlefield.Elvish Mystic.Keywords = Trample
+? Bot1.Battlefield.Elvish Mystic.Power = 3
 ? Bot2.Life = 15
 ? Bot1.Battlefield.Garruk, Curse Breaker.Counters.Loyalty = 1
 [T4 Bot2.Main1]

@@ -1,0 +1,56 @@
+# Same as garruk-veiled-butcher-minus-three-draws-a-card-when-the-opponent-has-one-card, but Bot2 cast all eight of its Moxen
+# and has an empty hand: it discards nothing, so it did not discard two nonland cards and Bot1 draws a card (hand 5).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Garruk, Veiled Butcher
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mox Jet x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Garruk, Veiled Butcher.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 0
+Bot1.Battlefield.Garruk, Veiled Butcher.Activate(Ability: Each opponent discards two)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Garruk, Veiled Butcher.Counters.Loyalty = 2

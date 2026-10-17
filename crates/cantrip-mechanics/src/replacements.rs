@@ -101,10 +101,10 @@ fn exile_instead_of_dying_applies(_: &dyn Query, _: &Asker, affected: ObjectId, 
         if z.object == affected && z.from.is(ZoneKind::Battlefield) && z.to.is(ZoneKind::Graveyard))
 }
 
-fn exile_instead_of_dying_apply(_: &dyn Query, _: &Asker, _: ObjectId, proposal: &mut Proposal) {
-    if let Proposal::ZoneChange(z) = proposal {
-        z.to = Zone::exile(z.to.player);
-    }
+/// `exile_instead_apply` as the `apply` of a `granted_replacement`, which is also told the object it is about. Suplex, Mawloc
+/// and Yawgmoth's Will's resolved effects print it.
+pub fn exile_instead_apply_granted(q: &dyn Query, asker: &Asker, _: ObjectId, proposal: &mut Proposal) {
+    exile_instead_apply(q, asker, proposal);
 }
 
 /// "If that creature would die this turn, exile it instead" (CR 614.1a, 700.4, 611.2c): a replacement effect the spell or
@@ -112,7 +112,7 @@ fn exile_instead_of_dying_apply(_: &dyn Query, _: &Asker, _: ObjectId, proposal:
 /// graveyard is replaced, so a creature returned to its hand goes there. List it among a card's `granted_replacements`
 /// and make the effect with `exile_if_it_would_die` before anything can kill the creature. Suplex and Mawloc print it.
 pub const EXILE_INSTEAD_OF_DYING: GrantedReplacementDef =
-    granted_replacement(ReplacementKind::ZoneChange, exile_instead_of_dying_applies, exile_instead_of_dying_apply, "exiled instead of dying");
+    granted_replacement(ReplacementKind::ZoneChange, exile_instead_of_dying_applies, exile_instead_apply_granted, "exiled instead of dying");
 
 /// Makes `EXILE_INSTEAD_OF_DYING` (the card's replacement number `index`) about `creature` until end of turn. It names the
 /// object, so it does not follow the creature if it leaves and returns as a new object (CR 400.7).

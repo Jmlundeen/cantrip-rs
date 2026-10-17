@@ -57,6 +57,8 @@ Bot2.Pass
 Bot1.Attack(Elvish Mystic > Bot2; Ornithopter > Bot2.Battlefield.Liliana of the Veil)
 ? Stack.Count = 1
 [T3 Bot1.Main2]
+? Bot1.Battlefield.Elvish Mystic.Keywords = Trample
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
 
 [Expect]
 Bot2.Life = 17

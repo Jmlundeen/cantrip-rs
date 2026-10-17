@@ -1,0 +1,57 @@
+# The -3's "for each opponent who didn't discard two nonland cards": Bot2 has cast seven Moxen on turn 2 and holds one card (a
+# Mox Jet). It discards it (all it has) and has not discarded two nonland cards, so Bot1 draws a card: hand 3 Forests after
+# turn 1, 4 after the turn-3 draw, 5. The control with two nonland cards discarded is
+# garruk-veiled-butcher-minus-three-draws-nothing-when-two-nonland-cards-are-discarded.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+Garruk, Veiled Butcher
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mox Jet x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Garruk, Veiled Butcher.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 1
+Bot1.Battlefield.Garruk, Veiled Butcher.Activate(Ability: Each opponent discards two)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Hand.Count = 0
+Bot2.Graveyard.Count = 1
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Garruk, Veiled Butcher.Counters.Loyalty = 2

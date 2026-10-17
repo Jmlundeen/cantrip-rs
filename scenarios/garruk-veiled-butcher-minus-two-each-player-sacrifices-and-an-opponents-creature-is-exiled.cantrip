@@ -66,5 +66,6 @@ Exile = Elvish Mystic; Ornithopter
 Bot2.Graveyard.Count = 0
 Bot2.Battlefield = Mox Emerald
 Bot1.Battlefield.Garruk, Veiled Butcher.Counters.Loyalty = 1
+Bot1.Battlefield = Beast; Garruk, Veiled Butcher; Mox Jet; Mox Jet
 Bot1.Battlefield.Beast.Power = 4
 Bot1.Battlefield.Beast.Keywords = Trample
