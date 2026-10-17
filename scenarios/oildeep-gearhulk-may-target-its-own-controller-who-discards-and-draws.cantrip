@@ -1,0 +1,39 @@
+# "Look at target player's hand": the player may be the Gearhulk's own controller. Bot1 targets itself, looks at its remaining two cards (a Mountain
+# and an Island) and chooses the Mountain: Bot1 discards it and draws the next card of its library (a Swamp). Its hand is still two cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Oildeep Gearhulk
+Mountain
+Island
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Oildeep Gearhulk.Cast
+Bot1.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mountain)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Graveyard = Mountain
+Bot1.Hand = Island; Swamp
+Bot1.Library.Count = 10

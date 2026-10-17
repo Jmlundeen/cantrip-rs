@@ -1,0 +1,40 @@
+# "Target player" may be its own controller. Bot1 spends its whole hand (two more Moxen beside the Gearhulk's four mana sources) so its hand is empty when the
+# enters trigger resolves with Bot1 as the target: there is no card to choose, so no choice is asked, and "if you do" is not met - nobody
+# discards and Bot1 does NOT draw. Its library keeps all its cards.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Oildeep Gearhulk
+Mox Ruby
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Oildeep Gearhulk.Cast
+Bot1.Pass
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 10
+Bot1.Graveyard.Count = 0

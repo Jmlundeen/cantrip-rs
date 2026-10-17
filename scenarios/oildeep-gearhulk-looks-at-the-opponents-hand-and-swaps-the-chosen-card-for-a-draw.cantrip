@@ -1,0 +1,45 @@
+# Oildeep Gearhulk: "look at target player's hand. You may choose a card from it. If you do, that player discards that card, then draws a card."
+# Bot1 casts it on turn 1 off two Mox Sapphires and two Mox Jets, targets Bot2, looks at its hand and chooses the Lightning Bolt: Bot2
+# discards it and then draws the top card of its library, so its hand is still seven cards, now a Mountain in place of the Bolt, and its library one
+# card shorter. Bot2's graveyard holds the Bolt (it was discarded, not exiled). The Gearhulk is a 4/4.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Oildeep Gearhulk
+Island x2
+Island x10
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Island x5
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Oildeep Gearhulk.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand = Counterspell; Island; Island; Island; Island; Island; Mountain
+Bot2.Library.Count = 12
+Bot1.Battlefield.Oildeep Gearhulk.Power = 4
+Bot1.Battlefield.Oildeep Gearhulk.Toughness = 4

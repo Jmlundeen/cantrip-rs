@@ -1,0 +1,49 @@
+# Oildeep Gearhulk, "ward {1}": Bot2 has a Mox Ruby and an Island, spends the Ruby on the Lightning Bolt and
+# pays the ward {1} with the Island, so the Bolt is not countered and deals 3 damage to the 4/4 (it survives). The negative control is
+# the neighbouring scenario, where the opponent cannot pay.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Oildeep Gearhulk
+Island x2
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Oildeep Gearhulk.Cast
+Bot1.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Oildeep Gearhulk)
+Bot2.Battlefield.Island.Activate
+Bot2.PayCost
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Oildeep Gearhulk.Damage = 3
+Bot2.Graveyard = Lightning Bolt
