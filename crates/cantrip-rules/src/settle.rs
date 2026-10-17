@@ -159,7 +159,8 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
             bound.push(crate::day_night::Bound { id, daybound });
         }
         let obj = cx.s().obj(id);
-        if chars.supertypes.legendary {
+        // CR 704.5j: not for a player for whom an effect says the legend rule doesn't apply (Hall of Echoes).
+        if chars.supertypes.legendary && !cx.s().effects.iter().any(|e| e.kind == EffectKind::NoLegendRule(obj.controller)) {
             legends.push((id, chars.name));
         }
         if chars.has_subtype(Subtype::Saga) {

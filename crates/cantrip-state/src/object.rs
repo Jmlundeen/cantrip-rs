@@ -608,6 +608,11 @@ pub enum EffectKind {
     /// the ones before it have not skipped (CR 614.10a). About the player, so it outlives its `affected` object, which is
     /// only the source.
     SkipNextTurn(PlayerId),
+    /// "The 'legend rule' doesn't apply to permanents [this player] controls" (CR 704.5j, 611.2c) for as long as it lasts:
+    /// Hall of Echoes's "this turn". About the player, so it reaches legends that arrive later and outlives its `affected`
+    /// object, which is only the source. When it ends, the legend rule applies at once to what they control (its ruling).
+    /// The static abilities with these words (Mirror Box, Brothers Yamazaki's pair) are not built.
+    NoLegendRule(PlayerId),
 }
 
 impl EffectKind {
@@ -629,6 +634,7 @@ impl EffectKind {
                 | EffectKind::PlayerManaAbility(_)
                 | EffectKind::NextSpellCantBeCountered
                 | EffectKind::SkipNextTurn(_)
+                | EffectKind::NoLegendRule(_)
         ) || matches!(self, EffectKind::Prevention { to, .. } if to.object().is_none())
     }
 }

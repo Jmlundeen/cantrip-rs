@@ -596,6 +596,13 @@ impl<'a> Projector<'a> {
             let turns = if skips == 1 { "turn".to_string() } else { format!("{skips} turns") };
             summary.pending_effects.push(format!("{who} skip {whose} next {turns}."));
         }
+        // "The 'legend rule' doesn't apply to permanents you control this turn" (CR 704.5j, 611.2c): a rule about the player, on
+        // no object.
+        if let Some(e) = s.effects.iter().find(|e| e.kind == EffectKind::NoLegendRule(p)) {
+            let whose = if p == self.viewer { "you" } else { "they" };
+            let until = if e.duration == Duration::EndOfTurn { " this turn" } else { "" };
+            summary.pending_effects.push(format!("The \"legend rule\" doesn't apply to permanents {whose} control{until}."));
+        }
         // "Whenever [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b): a delayed triggered ability that
         // waits for its event, on no object, so the page says it beside its controller's life total, in the ability's own words
         // and named for the object it came from (the words may say "that creature"). The other seat is told whose it is. So is
