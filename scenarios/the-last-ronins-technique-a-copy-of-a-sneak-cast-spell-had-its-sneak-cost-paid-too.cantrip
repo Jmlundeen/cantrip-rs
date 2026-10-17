@@ -1,7 +1,8 @@
-# A copy of a spell is not cast (CR 707.10), so its sneak cost was not paid even when the original's was. Bot1 sneaks The Last
-# Ronin's Technique in (Mox Pearl and a Plains) with the Ornithopter returned, and with it on the stack casts Lutri, the Spellchaser (flash), whose
-# enters trigger copies it. The copy resolves first: three untapped tokens that are not attacking. The original then makes
-# three tapped, attacking tokens, which deal 3 combat damage (Bot2 at 17); the copy's tokens deal none.
+# A copy of a spell is not cast, but it copies the alternative cost the original was cast for (CR 707.10): a copy of a
+# sneak-cast spell had its sneak cost paid too. Bot1 sneaks The Last Ronin's Technique in (Mox Pearl and a Plains) with the
+# Ornithopter returned, and with it on the stack casts Lutri, the Spellchaser (flash), whose enters trigger copies it. The
+# copy resolves first: three tapped tokens attacking Bot2. The original then makes three more, and the six deal 6 combat
+# damage (Bot2 at 14).
 
 [Bot1 Deck]
 Black Lotus
@@ -40,9 +41,9 @@ Bot1.Pass
 Bot1.Pass
 [T3 Bot1.Main2]
 ? Bot1.Battlefield.Ninja Turtle Spirit#4.Tapped = true
-? Bot1.Battlefield.Ninja Turtle Spirit#1.Tapped = false
+? Bot1.Battlefield.Ninja Turtle Spirit#1.Tapped = true
 ? Bot1.Battlefield.Ninja Turtle Spirit#1.Token = true
 
 [Expect]
-Bot2.Life = 17
+Bot2.Life = 14
 Bot1.Battlefield.Count = 9

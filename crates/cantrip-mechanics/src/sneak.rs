@@ -34,7 +34,8 @@ pub const fn way(cost: ManaCost, text: &'static str) -> WayDef {
 }
 
 /// "If this spell's sneak cost was paid": it was cast for its first alternative cost, which a card with sneak lists first
-/// and, so far, alone. A copy of the spell was not cast, so nothing was paid for it, sneak or otherwise (CR 707.10, 601.2b).
-pub fn paid(q: &dyn Query, item: &StackItem) -> bool {
-    item.way == 1 && !q.obj(item.object).card_copy
+/// and, so far, alone. A copy of the spell was not cast, but it copies the alternative cost the original was cast for (CR
+/// 707.10): its sneak cost was paid too.
+pub fn paid(_: &dyn Query, item: &StackItem) -> bool {
+    item.way == 1
 }
