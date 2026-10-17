@@ -867,17 +867,6 @@ impl CounterKind {
             _ => None,
         }
     }
-
-    /// The keyword counters as a bitset of `CounterKind` indices, for a quick "has it any" test.
-    pub const KEYWORD_MASK: u64 = {
-        let mut mask = 0u64;
-        let mut i = 0;
-        while i < Self::KEYWORDS.len() {
-            mask |= 1u64 << Self::KEYWORDS[i] as u8;
-            i += 1;
-        }
-        mask
-    };
 }
 
 /// The steps of a turn (CR 500), in order.

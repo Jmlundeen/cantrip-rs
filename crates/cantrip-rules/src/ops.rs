@@ -1777,8 +1777,13 @@ pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
     let put = counts[kind as usize];
     // CR 613.7c: a counter gets a timestamp as it is put on, and every counter of its kind already there gets the same one;
     // the ability a keyword counter gives applies in layer 6 at it (CR 613.1f, 122.1b).
-    if put > 0 && CounterKind::KEYWORD_MASK & (1 << kind as u8) != 0 && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        cx.st().stamp_counters(id, kind);
+    // Every keyword kind put, the replacements' too.
+    if cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+        for k in CounterKind::KEYWORDS {
+            if counts[k as usize] > 0 {
+                cx.st().stamp_counters(id, k);
+            }
+        }
     }
     if put > 0 {
         let by = cx.actor();
