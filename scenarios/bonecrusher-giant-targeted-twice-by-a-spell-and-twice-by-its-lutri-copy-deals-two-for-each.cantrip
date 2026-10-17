@@ -1,0 +1,56 @@
+# A copy of a spell is put onto the stack with the original's targets (CR 707.10), and each object it targets becomes a
+# target of the copy - once, however many instances of "target" chose it (CR 115.3, 601.2c). Bot1 casts Trash the Town at
+# its own Bonecrusher Giant with two modes (counters and trample), then Lutri, the Spellchaser copies it and Bot1 keeps both
+# of the copy's targets on the Giant. The Giant becomes the target of two spells, once each: two triggers, 4 damage to Bot1,
+# not 8. Both spells resolve: four counters and trample.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Bonecrusher Giant
+Black Lotus
+Mox Sapphire
+Trash the Town
+Lutri, the Spellchaser
+Mountain
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Bonecrusher Giant.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Trash the Town.Cast
+Bot1.Modes(1; 2)
+Bot1.Target(Bonecrusher Giant)
+Bot1.Target(Bonecrusher Giant)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Life = 16
+Bot1.Battlefield.Bonecrusher Giant.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Bonecrusher Giant.Keywords = Trample
+Bot1.Battlefield.Lutri, the Spellchaser.SummoningSick = true

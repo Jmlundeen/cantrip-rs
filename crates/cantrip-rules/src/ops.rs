@@ -34,6 +34,26 @@ pub(crate) fn commit_crime(cx: &mut Cx, player: PlayerId, by: ObjectId, targets:
     }
 }
 
+/// Each object or player among `targets` becomes a target of `by` (CR 601.2c, 602.2b, 603.3d), once: one chosen for several
+/// instances of the word "target" (CR 115.3) becomes the target of that spell or ability once, not once per instance, so a
+/// ward or "whenever this becomes the target" ability triggers once for it. Called as a spell is cast, an ability activated
+/// or put on the stack, a copy put on the stack (CR 707.10) and targets changed or chosen anew (CR 115.7), with that
+/// procedure's targets; an empty slot (`Target::None`) is no target.
+pub(crate) fn became_targets(cx: &mut Cx, targets: impl IntoIterator<Item = Target>, by: ObjectId, controller: PlayerId) {
+    let mut seen = [Target::None; cantrip_state::MAX_TARGETS];
+    let mut n = 0;
+    for target in targets {
+        if target == Target::None || seen[..n].contains(&target) {
+            continue;
+        }
+        if n < seen.len() {
+            seen[n] = target;
+            n += 1;
+        }
+        cx.emit(Event::BecameTarget { target, by, controller });
+    }
+}
+
 /// One object about to move, and how it arrives if it is entering the battlefield.
 #[derive(Clone, Copy)]
 pub struct Moving {
@@ -1126,9 +1146,7 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     if new_targets {
         item = retarget(cx, top, copy, spell, copier)?;
     }
-    for &t in item.targets().iter().filter(|&&t| t != Target::None) {
-        cx.emit(Event::BecameTarget { target: t, by: copy, controller: copier });
-    }
+    became_targets(cx, item.targets().iter().copied(), copy, copier);
     cx.emit(Event::Copied { copy, original: spell, player: copier });
     Ok(Some(copy))
 }
@@ -1200,11 +1218,7 @@ pub fn choose_new_targets(cx: &mut Cx, spell: ObjectId, chooser: PlayerId) -> R<
     };
     let before = cx.s().stack[at];
     let after = retarget(cx, at, spell, spell, chooser)?;
-    for &t in after.targets().iter().filter(|&&t| t != Target::None) {
-        if !before.targets().contains(&t) {
-            cx.emit(Event::BecameTarget { target: t, by: spell, controller: after.controller });
-        }
-    }
+    became_targets(cx, after.targets().iter().copied().filter(|t| !before.targets().contains(t)), spell, after.controller);
     Ok(())
 }
 
@@ -1265,9 +1279,7 @@ pub fn change_target(cx: &mut Cx, of: Target, chooser: PlayerId) -> R<()> {
         };
     }
     cx.st().stack_set(at, changed);
-    for &t in changed.targets().iter().filter(|&&t| t != Target::None) {
-        cx.emit(Event::BecameTarget { target: t, by: item.object, controller: item.controller });
-    }
+    became_targets(cx, changed.targets().iter().copied(), item.object, item.controller);
     Ok(())
 }
 

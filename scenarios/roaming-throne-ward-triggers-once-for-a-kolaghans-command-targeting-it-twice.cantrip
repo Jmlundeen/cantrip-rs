@@ -1,0 +1,51 @@
+# Ward (CR 702.21a) triggers when its permanent "becomes the target" of an opponent's spell, and a permanent chosen for two
+# instances of "target" (CR 115.3) becomes the target of that spell once (CR 601.2c). Bot2's Kolaghan's Command destroys
+# Bot1's Roaming Throne, an artifact creature with ward {2}, and also deals 2 damage to it: one ward trigger goes on the
+# stack, not two. Bot2 has five mana, three for the Command and two for one ward payment, so the Command resolves and the
+# Throne is destroyed. (Two triggers would ask for {2} twice and counter the Command.)
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Roaming Throne
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Kolaghan's Command
+Mountain x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Roaming Throne.Cast
+Bot1.Modes(Wizard)
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Kolaghan's Command.Cast
+Bot2.Modes(Destroy target artifact; deals 2 damage)
+Bot2.Target(Bot1.Battlefield.Roaming Throne)
+Bot2.Target(Bot1.Battlefield.Roaming Throne)
+? Stack.Count = 2
+Bot2.PayCost
+? Bot2.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Graveyard = Roaming Throne; Black Lotus
+Bot2.Graveyard = Kolaghan's Command; Black Lotus

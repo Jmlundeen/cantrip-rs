@@ -3039,9 +3039,7 @@ fn cast(
     }
     let nth = cx.history().casts_by(player).count().min(255) as u8;
     cx.emit(Event::SpellCast { spell, player, nth });
-    for &t in targets.iter().filter(|&&t| t != Target::None) {
-        cx.emit(Event::BecameTarget { target: t, by: spell, controller: player });
-    }
+    ops::became_targets(cx, targets.iter().copied(), spell, player);
     ops::commit_crime(cx, player, spell, targets);
     Ok(())
 }
@@ -3774,9 +3772,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         pay_materials(cx, source, &materials);
     }
     cx.emit(Event::AbilityActivated { source, ability, player });
-    for &t in targets.iter().filter(|&&t| t != Target::None) {
-        cx.emit(Event::BecameTarget { target: t, by: source, controller: player });
-    }
+    ops::became_targets(cx, targets.iter().copied(), source, player);
     ops::commit_crime(cx, player, source, &targets);
     Ok(())
 }

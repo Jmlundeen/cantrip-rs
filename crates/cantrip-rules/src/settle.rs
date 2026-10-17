@@ -601,9 +601,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
     item.spec_of[..of.len()].copy_from_slice(&of);
     item.shares[..shares.len()].copy_from_slice(&shares);
     cx.st().stack_push(item);
-    for &t in targets.iter().filter(|&&t| t != Target::None) {
-        cx.emit(Event::BecameTarget { target: t, by: trigger.source, controller: trigger.controller });
-    }
+    ops::became_targets(cx, targets.iter().copied(), trigger.source, trigger.controller);
     // The controller of a triggered ability puts it on the stack (CR 603.3a) and is who commits its crime (CR 700.13).
     ops::commit_crime(cx, trigger.controller, trigger.source, &targets);
     Ok(())

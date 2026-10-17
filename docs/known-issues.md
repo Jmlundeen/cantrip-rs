@@ -43,7 +43,6 @@ keeps it).
 | [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-or-fireglass-mentor) | An exile that a replacement sends elsewhere is not exercised by Hex Magic or Fireglass Mentor | Low | Unexercised |
-| [KI-27](#ki-27-a-creature-targeted-twice-by-one-spell-becomes-a-target-twice) | A creature targeted twice by one spell becomes a target twice | Medium | Open |
 | [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
 
 ## Issues
@@ -238,16 +237,6 @@ deleted.
 
 **Scenarios.** None yet.
 
-### KI-27: A creature targeted twice by one spell becomes a target twice
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, review of Pawpatch Recruit |
-
-**Notes.** A creature that a spell or ability targets more than once (Kolaghan's Command destroying an artifact creature and also dealing damage to it) "becomes the target" once (the Pawpatch Recruit, Surrak, Elusive Hunter and ward rulings: such an ability triggers only once for that creature, and once for each different creature). The engine emits `Event::BecameTarget` for every target slot (`crates/cantrip-rules/src/actions.rs`, where targets are announced, near `ops::commit_crime`), so each slot triggers it. A fix emits one `BecameTarget` per distinct target of a spell or ability.
-
-**Scenarios.**
-- [`scenarios/pawpatch-recruit-one-spell-targeting-one-creature-twice-triggers-it-once.cantrip`](../scenarios/pawpatch-recruit-one-spell-targeting-one-creature-twice-triggers-it-once.cantrip) - Kolaghan's Command on one Ornithopter twice gives the Recruit two counters, one is right (marked `# Known bug`).
 ### KI-28: Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack
 
 | Severity | Status | Area | Found |

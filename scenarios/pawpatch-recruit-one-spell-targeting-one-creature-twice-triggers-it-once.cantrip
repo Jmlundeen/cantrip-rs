@@ -1,4 +1,3 @@
-# Known bug: a creature that becomes the target of two target slots of one spell becomes a target once, so a "becomes the target" ability triggers once, not once per slot (the Pawpatch Recruit ruling; the engine emits BecameTarget per target slot).
 # Pawpatch Recruit: Bot2's Kolaghan's Command destroys Bot1's Ornithopter and also deals 2 damage to the same Ornithopter. The Recruit triggers once: one counter, 3/2.
 
 [Bot1 Deck]

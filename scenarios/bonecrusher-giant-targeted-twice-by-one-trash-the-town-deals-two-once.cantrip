@@ -1,0 +1,44 @@
+# Bonecrusher Giant: "Whenever this creature becomes the target of a spell, this creature deals 2 damage to that spell's
+# controller." Bot1 casts Trash the Town at its own Giant with two modes, the counters and the trample: the Giant is chosen
+# for two instances of "target" (CR 115.3) but becomes the target of the spell once (CR 601.2c), so it triggers once and
+# Bot1 takes 2, not 4. Both modes still happen to it.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Bonecrusher Giant
+Trash the Town
+Mountain x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Bonecrusher Giant.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Trash the Town.Cast
+Bot1.Modes(1; 2)
+Bot1.Target(Bonecrusher Giant)
+Bot1.Target(Bonecrusher Giant)
+? Stack.Count = 2
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 18
+Bot1.Battlefield.Bonecrusher Giant.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Bonecrusher Giant.Keywords = Trample

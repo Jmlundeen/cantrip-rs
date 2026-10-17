@@ -274,6 +274,11 @@ object the instruction never finds (CR 400.7). Aang, at the Crossroads's delayed
 activated transforms of the Incubator token, Ulvenwald Oddity, Aang, Swift Savior, Norman Osborn and Temple of the
 Dead, and Dowsing Device's and Cecil, Dark Knight's triggered ones are what it governs. Nothing in content converts (CR 701.28), so no convert event is recorded.
 
+Becoming a target is `Event::BecameTarget { target, by, controller }`, emitted by `ops::became_targets` as a spell is cast,
+an ability activated or put on the stack, a copy put on the stack (CR 707.10) and targets changed or chosen anew (CR 115.7):
+once per distinct object or player, since one chosen for several instances of "target" (CR 115.3) becomes the target of that
+spell or ability once (CR 601.2c) - ward, Bonecrusher Giant and Pawpatch Recruit trigger once for it.
+
 A crime (CR 700.13) is `Event::CrimeCommitted { player, by }`, emitted by `ops::commit_crime` from the three procedures that
 choose targets for a new object - casting a spell (CR 601.2i), activating an ability (CR 602.2) and putting a triggered
 ability on the stack (CR 603.3d), the trigger's controller the criminal - after their `BecameTarget` events, once for the
