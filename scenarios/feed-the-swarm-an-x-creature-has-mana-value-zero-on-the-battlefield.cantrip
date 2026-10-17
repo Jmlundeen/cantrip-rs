@@ -1,0 +1,32 @@
+# Feed the Swarm: "You lose life equal to that permanent's mana value." Bot2's Walking Ballista, cast for X = 1 ({X}{X} paid
+# as {2}), has mana value 0 on the battlefield (CR 202.3e: X is 0 anywhere but the stack), so destroying it costs Bot1 no
+# life at all - not the 2 of the cost it was cast with.
+
+[Bot1 Deck]
+Black Lotus
+Feed the Swarm
+Swamp x18
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Walking Ballista
+Forest x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Feed the Swarm.Cast(Bot2.Battlefield.Walking Ballista)
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Walking Ballista
+Bot2.Battlefield = Mox Emerald; Mox Emerald
+Bot1.Graveyard = Feed the Swarm; Black Lotus

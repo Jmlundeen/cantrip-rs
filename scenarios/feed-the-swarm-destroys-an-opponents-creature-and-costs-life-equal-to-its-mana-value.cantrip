@@ -1,0 +1,42 @@
+# Feed the Swarm: "Destroy target creature or enchantment an opponent controls. You lose life equal to that permanent's
+# mana value." Bot2's Llanowar Elves (mana value 1) is destroyed and Bot1 loses exactly 1 life (20 -> 19). The refusals
+# beside it: Bot1's own creature is not a legal target ("an opponent controls") and neither is a noncreature
+# nonenchantment permanent (Mox Emerald); the Elves, a creature an opponent controls, is the positive control for both.
+
+[Bot1 Deck]
+Black Lotus
+Feed the Swarm
+Faerie Dreamthief
+Mox Jet
+Swamp x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Emerald
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faerie Dreamthief.Cast
+Bot1.Arrange(Swamp |)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Hand.Feed the Swarm.Cast(Bot1.Battlefield.Faerie Dreamthief)
+! Bot1.Hand.Feed the Swarm.Cast(Bot2.Battlefield.Mox Emerald)
+Bot1.Hand.Feed the Swarm.Cast(Bot2.Battlefield.Llanowar Elves)
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 20
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Mox Emerald
+Bot1.Battlefield = Faerie Dreamthief; Mox Jet
+Bot1.Graveyard = Feed the Swarm; Black Lotus

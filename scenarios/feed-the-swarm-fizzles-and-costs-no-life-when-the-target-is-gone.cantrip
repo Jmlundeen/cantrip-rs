@@ -1,0 +1,36 @@
+# Feed the Swarm: with its only target gone before it resolves (CR 608.2b) the spell does not resolve, so Bot1 loses no
+# life ("You don't lose any life", the ruling). Bot2 answers by burning its own Llanowar Elves with Lightning Bolt. The
+# Elves is in the graveyard because of the Bolt, not Feed the Swarm, and Bot1 stays at 20; the scenario where the Elves
+# is destroyed by Feed the Swarm costs 1, the positive control.
+
+[Bot1 Deck]
+Black Lotus
+Feed the Swarm
+Swamp x18
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Forest x16
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Feed the Swarm.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Ruby.Activate
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 20
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot1.Graveyard = Feed the Swarm; Black Lotus
+Stack.Count = 0

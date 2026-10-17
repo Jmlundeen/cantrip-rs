@@ -1,0 +1,33 @@
+# Feed the Swarm's other target kind: "enchantment an opponent controls". Bot2's Assault Formation (a noncreature
+# enchantment, mana value 2) is destroyed and Bot1 loses 2 life (20 -> 18), twice what the Elves cost in the creature
+# scenario, so the life lost follows the permanent's mana value and not a fixed amount.
+
+[Bot1 Deck]
+Black Lotus
+Feed the Swarm
+Swamp x18
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Assault Formation
+Forest x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Assault Formation.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Feed the Swarm.Cast(Bot2.Battlefield.Assault Formation)
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 20
+Bot2.Graveyard = Assault Formation
+Bot2.Battlefield = Forest; Mox Emerald
+Bot1.Graveyard = Feed the Swarm; Black Lotus

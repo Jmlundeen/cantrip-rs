@@ -1,0 +1,6 @@
+{
+  "name": "Feed the Swarm",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target creature or enchantment an opponent controls. You lose life equal to that permanent's mana value."
+}
