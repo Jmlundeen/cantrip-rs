@@ -1,0 +1,75 @@
+# Phasing moves no object between zones (CR 702.26d): a Clone phased out and in is the same object, still the copy it became as
+# it entered (CR 707.2), and it does not enter again - nothing asks what it copies, and its copied "When this creature enters"
+# does not trigger again. Bot1's Clone enters as a copy of Bot2's Thraben Inspector and makes a Clue. Bot2's Oubliette phases it
+# out; Bot1 destroys Oubliette with Disenchant, and the Clone phases in, tapped, still a Thraben Inspector, with no second Clue.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Clone
+Disenchant
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Thraben Inspector
+Oubliette
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Thraben Inspector
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Oubliette.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Battlefield.Thraben Inspector)
+Bot2.Pass
+Bot1.Pass
+? Bot1.PhasedOut = Thraben Inspector
+[T5 Bot1.Main1]
+? Bot1.PhasedOut = Thraben Inspector
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Disenchant.Cast(Oubliette)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Thraben Inspector; Clue Token
+Bot1.Battlefield.Thraben Inspector.Tapped = true
+Bot1.Battlefield.Thraben Inspector.Power = 1
+Bot2.Battlefield = Plains; Mox Jet; Thraben Inspector; Clue Token; Swamp
+Bot2.Graveyard = Oubliette

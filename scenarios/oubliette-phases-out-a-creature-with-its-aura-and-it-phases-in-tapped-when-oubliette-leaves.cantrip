@@ -1,0 +1,69 @@
+# Oubliette: "target creature phases out until this enchantment leaves the battlefield. Tap that creature as it phases in this
+# way." Bot1 enchants Bot2's Ornithopter with Rancor and then Oubliettes it: the Aura phases out with it, indirectly (CR
+# 702.26g), and stays attached; Rancor does not go to a graveyard, so its own ability never returns it to hand. A creature
+# phased out "until" an event does not phase in during its controller's untap step (CR 610.4a): it is still phased out in Bot2's
+# turn 4. Bot2 destroys Oubliette with Disenchant, and the Ornithopter phases in at once (CR 610.4; the ruling: "immediately
+# after Oubliette leaves the battlefield"), tapped, with Rancor attached (CR 702.26g: it phases in with it), a 2/2 again.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Mox Pearl
+Rancor
+Oubliette
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Ornithopter
+Plains
+Disenchant
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Oubliette.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.PhasedOut = Ornithopter
+? Bot1.PhasedOut = Rancor
+? Bot1.PhasedOut.Rancor.AttachedTo = Ornithopter
+[T4 Bot2.Main1]
+? Bot2.PhasedOut = Ornithopter
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Oubliette)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 4
+Bot2.Battlefield = Plains; Plains; Ornithopter
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Power = 2
+Bot2.PhasedOut.Count = 0
+Bot1.Battlefield.Rancor.AttachedTo = Ornithopter
+Bot1.Graveyard = Oubliette
+Bot1.Hand = Swamp; Swamp

@@ -1,0 +1,56 @@
+# Oubliette's ruling: "If Oubliette leaves the battlefield before its triggered ability resolves, the target creature won't be
+# phased out or tapped" (CR 610.4b: the event the phasing lasts until has already happened). Bot2 answers the trigger by
+# destroying Oubliette with Disenchant; the trigger resolves and Bot2's Ornithopter stays on the battlefield, untapped.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Pearl
+Oubliette
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Plains
+Ornithopter
+Mox Pearl
+Disenchant
+Plains
+Plains
+Plains
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Oubliette.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Oubliette)
+Bot2.Pass
+Bot1.Pass
+? Stack = Oubliette
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield = Plains; Ornithopter; Mox Pearl
+Bot2.Battlefield.Ornithopter.Tapped = false
+Bot2.PhasedOut.Count = 0
+Bot1.Graveyard = Oubliette
