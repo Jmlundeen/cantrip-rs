@@ -93,6 +93,29 @@ pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, 
     recorded_spec(state, item, specs, slot)
 }
 
+/// Every target spec a spell on the stack chose its targets for, numbered as `StackItem::spec_of` records them (CR 601.2c):
+/// a modal spell's are those of the modes it was cast with, in printed order, a mode chosen twice twice (CR 700.2c-d), each
+/// spec that has no words of its own labelled with its mode's text, so that whoever chooses its targets again knows which
+/// mode they are for; any other spell's are those of the face it is on the stack as (CR 715.3b, 720.3b, 709.3b), an
+/// Aura's its enchant ability (CR 303.4a), followed by those of the cards spliced onto it (CR 702.47c). A copy of a spell
+/// has the same modes and spliced text (CR 707.10, 707.10c), so its targets are read the same way.
+pub(crate) fn spell_specs(cards: &CardTable, state: &GameState, item: &StackItem) -> Vec<TargetSpec> {
+    if let Some(modal) = modal_of(cards, state, item) {
+        let mut specs = Vec::new();
+        for (i, mode) in modal.modes.iter().enumerate() {
+            for _ in 0..modal.times(item.modes, i) {
+                specs.extend(mode.targets.iter().map(|s| if s.label.is_empty() { s.labelled(mode.text) } else { *s }));
+            }
+        }
+        return specs;
+    }
+    let mut specs = target_specs(cards, state, item).to_vec();
+    for &spliced in item.data.iter().filter(|&&d| d != 0 && item.kind == StackKind::Spell) {
+        specs.extend_from_slice(cards.get(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets));
+    }
+    specs
+}
+
 /// Runs the chosen modes of a modal item in printed order (CR 700.2d), each as if it were a spell of its own with
 /// its own targets in slot 0 onward; a mode whose every target has become illegal does nothing (CR 608.2b).
 pub fn run_modes(cx: &mut Cx, item: &StackItem, modal: &ModalDef) -> Result<(), Suspend> {

@@ -1,0 +1,73 @@
+# Lutri, the Spellchaser copies Bot1's Fiery Confluence, cast with "deals 2 damage to each opponent" once and "Destroy target
+# artifact" twice, at Bot2's Mox Pearl and Mox Jet. The copy has the same three modes (CR 707.10, 707.10c) and Bot1 may choose
+# new targets for it: each instance of the repeated mode is its own target, asked on its own in printed order (CR 700.2d,
+# 115.7d) - Mox Emerald for the first and Sol Ring for the second - and the mode that targets nothing asks nothing. The copy
+# resolves first: 2 damage to Bot2, Mox Emerald and Sol Ring destroyed; then the original: 2 more, Mox Pearl and Mox Jet
+# destroyed. Left on its old targets, the copy would destroy nothing and Mox Emerald and Sol Ring would survive.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Black Lotus
+Fiery Confluence
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Sol Ring
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fiery Confluence.Cast
+Bot1.Modes(2; 3; 3)
+Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Mox Jet)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+Bot1.Target(Sol Ring)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Mox Pearl; Mox Jet
+? Bot2.Life = 18
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard.Count = 4
+Bot2.Life = 16

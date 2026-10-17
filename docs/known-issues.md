@@ -40,7 +40,6 @@ keeps it).
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
 | [KI-4](#ki-4-scenarios-waiting-on-cards) | Scenarios waiting on cards the engine does not have | Low | Open |
 | [KI-5](#ki-5-a-spell-that-has-left-the-stack-is-judged-by-its-printed-keywords) | A spell that has left the stack is judged by its printed characteristics | Low | Suspected |
-| [KI-9](#ki-9-a-copy-of-a-modal-spell-cannot-be-given-new-targets) | A copy of a modal spell cannot be given new targets | Medium | Open |
 | [KI-22](#ki-22-an-ability-that-transforms-its-source-ignores-whether-it-has-transformed-since) | An ability that transforms its source ignores a transform since it was put on the stack | Low | Open |
 | [KI-24](#ki-24-under-bolass-citadel-the-top-of-a-library-is-cast-only-for-life) | Under Bolas's Citadel the top of a library is cast only for life | Medium | Open |
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
@@ -90,6 +89,7 @@ the line goes.
 
 | Path | Covered instead by | Why no scenario |
 | --- | --- | --- |
+| Retargeting a copy (`ops::retarget`): "up to" slots of a modal spell, each-opponent slots, spliced text (CR 702.47c) and kicked-spell targets | nothing | No modal spell in content has an "up to" mode target, no copyable spell has an each-opponent target, and no scenario copies a spliced or kicked spell. |
 | A granted cast of a back face (`GRANTED_FACE_BACK`, `faces_to_cast`) | nothing | No implemented double-faced card has a castable back face. |
 | The transformed cast's `cast_only_if_met` check (`could_cast_transformed_during_resolution`) | nothing | Only Berserk has a "cast only" condition, and it has no back face. |
 | A "loses all abilities" effect older than an ability granted later (CR 613.1f, 613.7) | Rust test | No implemented card does both. |
@@ -150,21 +150,6 @@ information for a spell that leaves the stack, fixes it. No implemented card gra
 no scenario can reach it yet.
 
 **Scenarios.** None yet; the first card that gives a creature spell flying on the stack (then a second flier cast under Momo) reaches it.
-### KI-9: A copy of a modal spell cannot be given new targets
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, Restoration Magic copied by Leyline of Resonance |
-
-**Notes.** "You may choose new targets for the copy" (CR 707.10c, 115.7d) is offered by `retarget` in
-`crates/cantrip-rules/src/ops.rs` from `cx.card(obj.card).spell_targets()`, the spell's printed target slots. A modal spell's
-targets are those of the modes it was cast with (`ModeDef::targets`, chosen by `StackItem::modes`, as `cast_modes`/the target-spec
-builder in `crates/cantrip-rules/src/actions.rs` reads them), so the copy keeps its old targets and is never asked.
-Affects every modal spell (spree, tiered, escalate, "choose one") that is copied with a chance to retarget (Leyline of
-Resonance, Lutri, storm and replicate copies). A fix has `retarget` take the specs of the copy's chosen modes.
-
-**Scenarios.**
-- [`scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip`](../scenarios/restoration-magic-copy-may-be-aimed-at-a-new-target.cantrip) - the copy of a Cura aimed at a Plains (marked `# Known bug`).
 
 ### KI-25: A Spacecraft's power and toughness box is not drawn before it is a creature
 

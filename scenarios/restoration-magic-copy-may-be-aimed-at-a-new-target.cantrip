@@ -1,4 +1,3 @@
-# Known bug: a copy of a modal spell is not offered new targets, so the copy of Cura stays on Mother of Runes (docs/known-issues.md, KI-9).
 # The ruling of 2025-06-06 on Restoration Magic: a copy may have new targets (CR 707.10c). Leyline of Resonance copies
 # Bot1's Cura at Mother of Runes and Bot1 aims the copy at its Plains; both resolve, so the Plains and Mother of Runes each
 # gain hexproof and indestructible and Bot1 gains 6 life.

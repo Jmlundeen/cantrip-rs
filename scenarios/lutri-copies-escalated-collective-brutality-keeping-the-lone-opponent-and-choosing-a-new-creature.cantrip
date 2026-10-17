@@ -1,0 +1,74 @@
+# Lutri, the Spellchaser copies Bot1's Collective Brutality, escalated once (Bot1 discards an Island) to choose
+# "Target creature gets -2/-2 until end of turn" at Bot2's Llanowar Elves and "Target opponent loses 2 life and you gain 2
+# life" at Bot2. The copy has the same two modes and pays nothing, the escalate cost included (CR 707.10, 707.10c,
+# 702.120a: no modes question, no discard). Bot1 may choose new targets for it: the creature becomes Bot2's Ornithopter;
+# Bot2 is the only opponent, so the drain's target cannot change and is not asked (the next answer is priority). The copy
+# resolves first: Ornithopter dies and Bot2 loses 2; then the original: the Elves die and Bot2 loses 2 more. Bot1 gains 4.
+# Left on its old targets, the copy would give the Elves -4/-4 and Ornithopter would survive.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Ruby
+Mox Sapphire
+Collective Brutality
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Collective Brutality.Cast
+Bot1.Modes(2; 3)
+Bot1.Target(Llanowar Elves)
+Bot1.Target(Bot2)
+Bot1.Choose(Island)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Target(Ornithopter)
+? Stack.Count = 2
+? Bot1.Hand.Count = 0
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Mox Emerald; Llanowar Elves
+? Bot2.Life = 18
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Emerald
+Bot2.Graveyard.Count = 2
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Graveyard = Collective Brutality; Island

@@ -1110,37 +1110,53 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
 /// `asked_about` what the question names. Returns the item as it now is.
 fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, chooser: PlayerId) -> R<StackItem> {
     let mut item = cx.s().stack[top];
-    let obj = *cx.s().obj(object);
-    // An instant's or sorcery's targets, or a permanent spell's: an Aura's is its enchant ability (CR 303.4a, 707.10c). Those
-    // of the face it is on the stack as - an Adventure, an Omen, a half (CR 715.3b, 720.3b, 709.3b) - not of its card.
-    let specs = cx.card(obj.copy.map_or(obj.card, |c| c.card)).spell_targets();
+    // The specs its targets were chosen for (`resolve::spell_specs`): a modal spell's are its modes', which a copy keeps
+    // and does not choose again (CR 707.10c, 700.2); an instant's or sorcery's, or a permanent spell's (an Aura's enchant
+    // ability, CR 303.4a); the face's it is on the stack as, not its card's (CR 715.3b, 720.3b, 709.3b).
+    let specs = crate::resolve::spell_specs(cx.cards(), cx.s(), &item);
     let asker = Asker { source: object, controller: chooser };
     for (at, spec) in specs.iter().enumerate() {
         // The targets chosen for this slot, as `target_legal` reads them (`StackItem::spec_of`).
         let run = item.spec_targets(at);
-        let current: Vec<Target> = item.targets[run.clone()].to_vec();
-        // A slot that chose no target (CR 601.2c) has none to change (CR 115.7d).
-        if current.iter().all(|&t| t == Target::None) {
-            continue;
-        }
-        let candidates = crate::actions::target_candidates(cx, &asker, spec);
-        if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
-            continue;
-        }
-        let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
-            source: asked_about,
-            purpose: Purpose::Targets,
-            candidates: candidates.clone(),
-            optional: false,
-            least: current.len() as u8,
-            count: current.len() as u8,
-            any_number: false,
+        // A slot of one target for each opponent (`TargetSpec::EACH_OPPONENT`) is a slot for each, in seat order, each
+        // asked on its own with the opponent it is for (`resolve::expand_specs`); any other is asked whole.
+        let parts: Vec<(std::ops::Range<usize>, TargetSpec, Option<PlayerId>)> = if spec.max == TargetSpec::EACH_OPPONENT {
+            let each = TargetSpec { min: 0, max: 1, ..*spec };
+            let opponents: Vec<PlayerId> = cx.s().seats().filter(|&p| p != item.controller).collect();
+            run.clone().zip(opponents).map(|(t, p)| (t..t + 1, each, Some(p))).collect()
+        } else {
+            vec![(run, *spec, None)]
         };
-        if let Answer::Targets(chosen) = cx.ask_core(chooser, ask, false)?
-            && chosen.len() == current.len()
-            && chosen.iter().all(|t| candidates.contains(t))
-        {
-            item.targets[run].copy_from_slice(&chosen);
+        for (run, spec, slot_player) in parts {
+            let current: Vec<Target> = item.targets[run.clone()].to_vec();
+            // A slot that chose no target (CR 601.2c) has none to change (CR 115.7d); the copy keeps the number of
+            // targets the original chose for it.
+            if current.iter().all(|&t| t == Target::None) {
+                continue;
+            }
+            // A slot sees what the slots before it now target (CR 601.2c: "another target creature").
+            let earlier = if item.target_count > 1 { &item.targets[..run.start] } else { &[][..] };
+            let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, Target::None, slot_player);
+            if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
+                continue;
+            }
+            let ask = RequestKind::ChooseTarget { label: spec.label, slot_player,
+                source: asked_about,
+                purpose: Purpose::Targets,
+                candidates: candidates.clone(),
+                optional: false,
+                least: current.len() as u8,
+                count: current.len() as u8,
+                any_number: false,
+            };
+            // Each target of a slot is a different object or player (CR 115.3), and a legal one (CR 115.7d).
+            if let Answer::Targets(chosen) = cx.ask_core(chooser, ask, false)?
+                && chosen.len() == current.len()
+                && chosen.iter().all(|t| candidates.contains(t))
+                && chosen.iter().enumerate().all(|(i, t)| !chosen[..i].contains(t))
+            {
+                item.targets[run].copy_from_slice(&chosen);
+            }
         }
     }
     cx.st().stack_set(top, item);

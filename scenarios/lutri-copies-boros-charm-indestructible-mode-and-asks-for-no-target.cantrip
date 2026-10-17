@@ -1,0 +1,60 @@
+# Lutri, the Spellchaser copies Bot1's Boros Charm, cast with "Permanents you control gain indestructible until end of turn",
+# a mode with no target. The copy has the same mode (CR 707.10, 707.10c), and with no target there is nothing to choose anew
+# (CR 115.7d): Bot1 is asked for no target as the copy is made (its other modes' targets are not offered, though Bot2 and
+# Lutri would be legal for them). Both resolve and give Bot1's permanents indestructible; Bot2's are untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Boros Charm
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(Permanents you control gain indestructible)
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Pass
+! Bot1.Target
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Boros Charm
+Bot2.Life = 20
+Bot1.Battlefield.Lutri, the Spellchaser.Keywords = Flash; Indestructible
+Bot1.Battlefield.Mox Jet.Keywords = Indestructible
+Bot2.Battlefield.Mox Emerald.Keywords = (absent)
