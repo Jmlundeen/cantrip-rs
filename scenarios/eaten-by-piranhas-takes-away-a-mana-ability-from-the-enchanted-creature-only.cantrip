@@ -1,0 +1,42 @@
+# "Enchanted creature loses all abilities": Bot2's Elvish Mystic ({T}: Add {G}) is enchanted on turn 3 and on turn 4 its mana
+# ability is refused (CR 613.1f), while Llanowar Elves, which is not enchanted, taps for mana on the same turn (the control,
+# so the refusal is not "no creature may tap yet": both have been there since turn 2).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Eaten by Piranhas
+Island x17
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Elvish Mystic
+Llanowar Elves
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Elvish Mystic.Activate
+Bot2.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Bot2.Mana = {G}
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Elvish Mystic.Tapped = false
+Bot2.Battlefield.Elvish Mystic.Subtypes = Skeleton

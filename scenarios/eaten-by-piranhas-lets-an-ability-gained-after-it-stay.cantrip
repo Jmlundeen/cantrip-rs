@@ -1,0 +1,38 @@
+# "Loses all abilities" applies at the Aura's timestamp (CR 613.7, 613.1f): an ability the creature gains after it is kept.
+# Bot1 enchants its own Ornithopter (flying gone, a 1/1), then casts Revitalizing Repast on it: the +1/+1 counter makes it
+# 2/2 and "it gains indestructible until end of turn" is a later effect, so it has indestructible. The scenario that gives
+# indestructible before the Aura shows it lost.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Ornithopter
+Eaten by Piranhas
+Revitalizing Repast
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = (absent)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Revitalizing Repast.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Indestructible
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Subtypes = Skeleton

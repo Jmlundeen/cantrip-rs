@@ -1,0 +1,54 @@
+# Eaten by Piranhas sets base power and toughness only (layer 7b, ruling): a +1/+1 counter put on Bot1's Ornithopter before the
+# Aura still counts (0/2 + 1 = a 2/2 once the base is 1/1), and Battlefield Improvisation's +2/+2 on turn 3 takes it to 4/4
+# whenever it began to apply; at the next turn the pump has ended and it is a 2/2 again. Revitalizing Repast also gave it
+# indestructible until end of turn, before the Aura: "loses all abilities" is later and takes that away too, as it takes
+# the Ornithopter's own flying.
+
+[Bot1 Deck]
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Ornithopter
+Revitalizing Repast
+Eaten by Piranhas
+Battlefield Improvisation
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Revitalizing Repast.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+? Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = (absent)
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Battlefield Improvisation.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 4
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = (absent)
+Bot1.Battlefield.Ornithopter.Colors = Black

@@ -1,0 +1,46 @@
+# Static abilities go too (CR 613.1f): with Thalia, Guardian of Thraben out, Eaten by Piranhas costs {2}{U} (noncreature
+# spells cost {1} more), so Bot1 taps all three Moxen for it and nothing is left in the pool. Once it resolves Thalia has lost
+# first strike and the tax: Bot1's next noncreature spell, a Mox Jet, is cast for its plain {0} with nothing to pay it with.
+# Thalia is 1/1 black Skeleton.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Eaten by Piranhas
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Thalia, Guardian of Thraben
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Thalia, Guardian of Thraben.Keywords = FirstStrike
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Thalia, Guardian of Thraben)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Thalia, Guardian of Thraben.Keywords = (absent)
+Bot1.Hand.Mox Jet.Cast
+
+[Expect]
+Bot1.Battlefield.Mox Jet#2.Tapped = false
+Bot2.Battlefield.Thalia, Guardian of Thraben.Power = 1
+Bot2.Battlefield.Thalia, Guardian of Thraben.Toughness = 1
+Bot2.Battlefield.Thalia, Guardian of Thraben.Supertypes = Legendary

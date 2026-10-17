@@ -1,0 +1,63 @@
+# Eaten by Piranhas has flash: Bot1 casts it in Bot2's end step onto Bot2's Curious Farm Animals (CR 702.8a). The creature
+# loses all abilities (CR 613.1f), its activated one included: in Bot1's upkeep Bot2, holding three Moxen and with Bot1's
+# Mox Sapphire to destroy, is not offered "{2}, Sacrifice this creature: Destroy up to one target artifact or enchantment",
+# while its Haywire Mite's own sacrifice ability is (the positive control), exiling the Mox. The Mite's "When this creature
+# dies, you gain 2 life" triggers; then Bot1's Lightning Bolt kills the Farm Animals, whose "When this creature dies, you gain
+# 3 life" it no longer has (it left as a Skeleton with no abilities, CR 603.10a): Bot2 ends at 22, not 25.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Eaten by Piranhas
+Lightning Bolt
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Jet
+Mox Ruby
+Curious Farm Animals
+Haywire Mite
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Curious Farm Animals)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Curious Farm Animals.Subtypes = Skeleton
+[T3 Bot1.Upkeep]
+! Bot2.Battlefield.Curious Farm Animals.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Haywire Mite.Activate(Bot1.Battlefield.Mox Sapphire)
+[T3 Bot1.Main1]
+? Bot2.Life = 22
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Curious Farm Animals)
+
+[Expect]
+Bot2.Life = 22
+Bot2.Graveyard = Curious Farm Animals; Haywire Mite
+Bot1.Graveyard = Eaten by Piranhas; Lightning Bolt
+Bot1.Battlefield = Mox Jet; Mox Ruby
+Exile = Mox Sapphire

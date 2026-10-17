@@ -1,0 +1,48 @@
+# The Aura's effects last only while it enchants the creature (CR 611.3a): Eaten by Piranhas makes Bot2's Ornithopter a black
+# Skeleton creature 1/1 with no flying, then Bot2's Haywire Mite exiles the Aura ("exile target noncreature artifact or
+# noncreature enchantment"), and the Ornithopter is again a colorless 0/2 Artifact Creature - Thopter with flying.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Eaten by Piranhas
+Island x17
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Ornithopter
+Haywire Mite
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Types = Creature
+? Bot2.Battlefield.Ornithopter.Keywords = (absent)
+? Bot2.Battlefield.Ornithopter.Colors = Black
+? Bot2.Battlefield.Ornithopter.Power = 1
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Haywire Mite.Activate(Eaten by Piranhas)
+
+[Expect]
+Exile = Eaten by Piranhas
+Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot2.Battlefield.Ornithopter.Subtypes = Thopter
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Ornithopter.Colors = (absent)
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Life = 22

@@ -1,0 +1,46 @@
+# Layers 1 to 5 come before layer 6 (CR 613.1, 613.6): Painter's Servant's "All cards that aren't on the battlefield, spells,
+# and permanents are the chosen color in addition to their other colors" is a layer-5 effect, applied before Eaten by Piranhas
+# takes its abilities away in layer 6, so it still paints everything green - Bot1's Island and Mox, Bot2's Island. The Servant
+# itself is black only: the Aura's "is black" is layer 5 too, later in timestamp order, and sets its color.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Eaten by Piranhas
+Island
+Island x16
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Painter's Servant
+Island
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Painter's Servant.Cast
+Bot2.Colors(Green)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Island.Colors = Green
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Painter's Servant)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Painter's Servant.Colors = Black
+Bot2.Battlefield.Painter's Servant.Subtypes = Skeleton
+Bot1.Battlefield.Island.Colors = Green
+Bot1.Battlefield.Mox Sapphire.Colors = Green
+Bot2.Battlefield.Island.Colors = Green
+Bot1.Battlefield.Eaten by Piranhas.Colors = Blue; Green

@@ -1,0 +1,55 @@
+# A replacement effect is an ability too (CR 614.1, 613.1f): while Bot2's Dauthi Voidwalker has its abilities, Bot1's Shock is
+# exiled with a void counter instead of going to Bot1's graveyard ("If a card would be put into an opponent's graveyard from
+# anywhere, instead exile it"). Once Eaten by Piranhas enchants the Voidwalker, it has no replacement effect and no shadow, and
+# Bot1's Lightning Bolt goes to Bot1's graveyard as it resolves.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Island
+Shock
+Eaten by Piranhas
+Lightning Bolt
+Mountain
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Swamp
+Dauthi Voidwalker
+Swamp x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Dauthi Voidwalker.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Dauthi Voidwalker.Keywords = Shadow
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Exile = Shock
+? Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Dauthi Voidwalker)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Exile = Shock
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 15
+Bot2.Battlefield.Dauthi Voidwalker.Keywords = (absent)
