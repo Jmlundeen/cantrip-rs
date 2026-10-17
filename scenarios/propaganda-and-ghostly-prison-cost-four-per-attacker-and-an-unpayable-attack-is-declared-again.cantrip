@@ -1,0 +1,72 @@
+# Propaganda: "Creatures can't attack you unless their controller pays {2} for each creature they control that's attacking
+# you." With Ghostly Prison beside it the costs add up (CR 508.1h; Propaganda's ruling: more than one is cumulative), so each
+# attacker costs {4}. On turn 3 Bot1 declares both Llanowar Elves: {8}, and attacking has tapped both Elves (CR 508.1f), so
+# the six mana left can't pay it. Bot1 gives the payment up, the declaration is taken back (CR 508.1, 733) - both Elves
+# untapped again - and Bot1 attacks with one Elves, paying {4} with the four Moxen. Bot2 takes 1; the other Elves never
+# attacked and stays untapped, and Forest and Mox Emerald are left unspent.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Island x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Propaganda
+Ghostly Prison
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Propaganda.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Ghostly Prison.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Attack(Llanowar Elves#1; Llanowar Elves#2)
+? Combat.AttackCost = {8}
+? Bot1.Battlefield.Llanowar Elves#2.Tapped = true
+Bot1.Cancel
+Bot1.Attack(Llanowar Elves#1)
+? Combat.AttackCost = {4}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves#1.Tapped = true
+Bot1.Battlefield.Llanowar Elves#2.Tapped = false
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Mana =
