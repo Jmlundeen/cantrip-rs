@@ -1,0 +1,55 @@
+# Different evasion abilities are cumulative (CR 509.1b): Callous Inspector has menace ("can't be blocked except by two or more
+# creatures", CR 702.110b) and, enchanted by Meltstrider's Resolve, "can't be blocked by more than one creature", so no
+# declaration can block it. Bot2 may block it neither with one creature nor with two; its Curious Farm Animals blocks the other
+# attacker, Elvish Mystic, instead (the positive control: Bot2 is asked to declare blockers). The Inspector's 1 damage gets
+# through.
+
+[Bot1 Deck]
+Swamp
+Callous Inspector
+Forest
+Elvish Mystic
+Meltstrider's Resolve
+Forest x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Curious Farm Animals
+Haywire Mite
+Plains x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Callous Inspector.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Meltstrider's Resolve.Cast(Callous Inspector)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+? Bot1.Battlefield.Callous Inspector.Keywords = CantBeBlockedByMoreThanOne; Menace
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Callous Inspector; Elvish Mystic > Bot2)
+! Bot2.Block(Haywire Mite > Callous Inspector)
+! Bot2.Block(Curious Farm Animals > Callous Inspector; Haywire Mite > Callous Inspector)
+Bot2.Block(Curious Farm Animals > Elvish Mystic)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 22
+Bot1.Graveyard = Elvish Mystic
+Bot2.Graveyard = Curious Farm Animals

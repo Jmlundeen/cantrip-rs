@@ -1,0 +1,47 @@
+# Warbriar Blessing's ruling, the same trigger: "If the target creature is an illegal target when the triggered ability tries to
+# resolve, the ability doesn't resolve" (CR 608.2b). Meltstrider's Resolve's trigger targets Bot2's Haywire Mite, which Bot2
+# sacrifices in response (exiling Bot1's Mox Jet): Edge Rover deals and is dealt nothing.
+
+[Bot1 Deck]
+Forest
+Edge Rover
+Mox Jet
+Forest
+Meltstrider's Resolve
+Forest x15
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Haywire Mite
+Plains x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Edge Rover.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Meltstrider's Resolve.Cast(Edge Rover)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Haywire Mite)
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Haywire Mite.Activate(Mox Jet)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Mox Jet
+Bot2.Graveyard = Haywire Mite
+Bot2.Life = 22
+Bot1.Battlefield.Edge Rover.Damage = 0
+Bot1.Battlefield.Edge Rover.Toughness = 4

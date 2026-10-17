@@ -1,0 +1,56 @@
+# "Can't be blocked by more than one creature" (CR 509.1b): Bot1 attacks with Edge Rover, enchanted by Meltstrider's Resolve,
+# and an unenchanted Elvish Mystic. Bot2 may not put two of its creatures in front of the Rover, while two may block the Mystic
+# together (the positive control) and one alone may block the Rover. The Rover (2/4) kills the Curious Farm Animals and keeps 1
+# damage; the Mystic, double-blocked, deals its 1 to the Haywire Mite and dies.
+
+[Bot1 Deck]
+Forest
+Edge Rover
+Forest
+Elvish Mystic
+Meltstrider's Resolve
+Forest x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Curious Farm Animals
+Haywire Mite
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Edge Rover.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Haywire Mite.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Meltstrider's Resolve.Cast(Edge Rover)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Edge Rover; Elvish Mystic > Bot2)
+! Bot2.Block(Curious Farm Animals > Edge Rover; Haywire Mite > Edge Rover)
+! Bot2.Block(Curious Farm Animals > Edge Rover; Ornithopter > Edge Rover)
+Bot2.Block(Curious Farm Animals > Edge Rover; Haywire Mite > Elvish Mystic; Ornithopter > Elvish Mystic)
+? Combat.Blocks = Curious Farm Animals > Edge Rover; Haywire Mite > Elvish Mystic; Ornithopter > Elvish Mystic
+Bot1.AssignDamage(Elvish Mystic > Haywire Mite: 1)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Haywire Mite; Curious Farm Animals
+Bot1.Graveyard = Elvish Mystic
+Bot1.Battlefield.Edge Rover.Damage = 1
+Bot2.Life = 25

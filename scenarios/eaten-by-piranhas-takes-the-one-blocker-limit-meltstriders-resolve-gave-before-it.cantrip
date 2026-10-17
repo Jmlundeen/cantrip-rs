@@ -1,0 +1,61 @@
+# Two Auras, in timestamp order (CR 613.7e, 613.1f): Bot1's Meltstrider's Resolve gives Edge Rover "can't be blocked by more
+# than one creature" and +0/+2; Bot2's Eaten by Piranhas, attached later, makes it a 1/1 Skeleton that loses all abilities -
+# the granted restriction too, since it was granted earlier - and the +0/+2 still applies after the base 1/1 (layer 7c over
+# 7b): a 1/3. Two of Bot2's creatures may now block it together, and do.
+
+[Bot1 Deck]
+Forest
+Edge Rover
+Forest
+Meltstrider's Resolve
+Forest x16
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Curious Farm Animals
+Ornithopter
+Eaten by Piranhas
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Edge Rover.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Meltstrider's Resolve.Cast(Edge Rover)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+? Bot1.Battlefield.Edge Rover.Keywords = CantBeBlockedByMoreThanOne; Reach
+[T3 Bot1.End]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Eaten by Piranhas.Cast(Edge Rover)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Edge Rover.Keywords = (absent)
+? Bot1.Battlefield.Edge Rover.Toughness = 3
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Edge Rover > Bot2)
+Bot2.Block(Curious Farm Animals > Edge Rover; Ornithopter > Edge Rover)
+? Combat.Blocks = Curious Farm Animals > Edge Rover; Ornithopter > Edge Rover
+Bot1.AssignDamage(Edge Rover > Curious Farm Animals: 1)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Edge Rover.Power = 1
+Bot1.Battlefield.Edge Rover.Toughness = 3
+Bot1.Battlefield.Edge Rover.Damage = 1
+Bot2.Graveyard = Curious Farm Animals
+Bot2.Life = 23

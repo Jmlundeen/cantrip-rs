@@ -1,0 +1,44 @@
+# "When this Aura enters, enchanted creature fights up to one target creature an opponent controls" (CR 701.14a): Bot1's
+# Edge Rover, a 2/2, is enchanted, so it is 2/4 ("gets +0/+2") by the time the trigger resolves. It and Bot2's Curious Farm
+# Animals (1/1) deal damage equal to their power to each other: the Farm Animals die (Bot2 gains 3 from its own trigger), and
+# the Rover keeps 1 damage. It has "can't be blocked by more than one creature" (CR 509.1b) beside its reach.
+
+[Bot1 Deck]
+Forest
+Edge Rover
+Forest
+Meltstrider's Resolve
+Forest x16
+
+[Bot2 Deck]
+Plains
+Curious Farm Animals
+Plains x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Edge Rover.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Meltstrider's Resolve.Cast(Edge Rover)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Curious Farm Animals)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Curious Farm Animals
+Bot2.Life = 23
+Bot1.Battlefield.Edge Rover.Damage = 1
+Bot1.Battlefield.Edge Rover.Power = 2
+Bot1.Battlefield.Edge Rover.Toughness = 4
+Bot1.Battlefield.Edge Rover.Keywords = CantBeBlockedByMoreThanOne; Reach
+Bot1.Battlefield.Meltstrider's Resolve.AttachedTo = Edge Rover

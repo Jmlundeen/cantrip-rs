@@ -1,0 +1,51 @@
+# Warbriar Blessing's ruling, the same trigger: "If the enchanted creature is no longer on the battlefield, the target creature
+# won't deal or be dealt damage" (CR 701.14b). Bot2 answers Meltstrider's Resolve's trigger with Lightning Bolt on the
+# enchanted Elvish Mystic (1/3 with the Aura): it dies, the Aura goes to the graveyard (CR 704.5m), and Bot2's Curious Farm
+# Animals is not damaged.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Forest
+Meltstrider's Resolve
+Forest x16
+
+[Bot2 Deck]
+Plains
+Mox Ruby
+Curious Farm Animals
+Lightning Bolt
+Plains x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Curious Farm Animals.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Meltstrider's Resolve.Cast(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Curious Farm Animals)
+Bot1.Pass
+? Bot1.Battlefield.Elvish Mystic.Toughness = 3
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Meltstrider's Resolve; Elvish Mystic
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Meltstrider's Resolve; Elvish Mystic
+Bot2.Graveyard = Lightning Bolt
+Stack.Count = 0
+Bot2.Battlefield.Curious Farm Animals.Damage = 0
+Bot2.Life = 20
