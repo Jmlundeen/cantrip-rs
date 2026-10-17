@@ -15,7 +15,7 @@ fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
-            when_asked(EventMask::ZONE_CHANGE, triggers::another_creature_you_control_enters),
+            triggers::ANOTHER_CREATURE_YOU_CONTROL_ENTERS,
             rally,
             "Whenever another creature you control enters, it gets +2/+0 and gains haste until end of turn.",
         ),

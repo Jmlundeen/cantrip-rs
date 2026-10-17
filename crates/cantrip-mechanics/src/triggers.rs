@@ -1056,6 +1056,7 @@ pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHAN
 pub const CREATURE_YOU_CONTROL_ATTACKS: Trigger = when_asked(EventMask::ATTACKS, creature_you_control_attacks);
 pub const OPPONENTS_CREATURE_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, opponents_creature_enters);
 pub const ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, artifact_you_control_enters);
+pub const ANOTHER_CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_enters);
 pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_dies);
 pub const ARTIFACT_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, artifact_spell_you_cast);
