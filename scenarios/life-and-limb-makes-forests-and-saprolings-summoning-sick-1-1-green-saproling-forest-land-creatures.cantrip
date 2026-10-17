@@ -1,0 +1,72 @@
+# Life and Limb: "All Forests and all Saprolings are 1/1 green Saproling creatures and Forest lands in addition to their
+# other types." One effect in three layers (CR 613.6): layer 4 adds the types (CR 205.1b: Creature and the creature type
+# Saproling, Land and the land type Forest - the ruling), layer 5 makes it green, layer 7b makes it 1/1. A Forest is a
+# Saproling too after it, and a Saproling a Forest, but the effect applies once: it changes nothing about its own reach.
+# - Bot1's Forest, played the turn Life and Limb arrives, is a 1/1 green Land Creature - Forest Saproling, summoning sick
+#   (CR 302.6, the reminder text), and so is Bot2's, wherever it is ("all").
+# - Woodland Changeling is every creature type (Changeling, a characteristic-defining ability applying first in layer 4,
+#   CR 613.3), a Saproling among them: it is a Forest land as well, so it has "{T}: Add {G}" (CR 305.6), and is 1/1 green.
+# - A Forest played on turn 3 can't be tapped for mana that turn (summoning sickness, the ruling), while the turn-1 Forest,
+#   under Bot1's control since the turn began, can (the positive control). On turn 5 the Changeling taps for {G} and the
+#   turn-3 Forest attacks for 1.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Life and Limb
+Woodland Changeling
+Forest
+Plains
+Plains x15
+
+[Bot2 Deck]
+Forest
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Forest.Types = Land; Creature
+? Bot1.Battlefield.Forest.Subtypes = Forest; Saproling
+? Bot1.Battlefield.Forest.Colors = Green
+? Bot1.Battlefield.Forest.Power = 1
+? Bot1.Battlefield.Forest.SummoningSick = true
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+? Bot2.Battlefield.Forest.Types = Land; Creature
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+! Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Woodland Changeling.Types = Creature; Land
+? Bot1.Battlefield.Woodland Changeling.Subtypes = (every creature type); Forest
+? Bot1.Battlefield.Woodland Changeling.Power = 1
+? Bot1.Battlefield.Woodland Changeling.Toughness = 1
+? Bot1.Battlefield.Woodland Changeling.Colors = Green
+[T5 Bot1.Main1]
+Bot1.Battlefield.Woodland Changeling.Activate
+? Bot1.Mana = {G}
+Bot1.Attack(Forest#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 19
+Bot2.Battlefield.Forest.Subtypes = Forest; Saproling
+Bot2.Battlefield.Forest.Colors = Green
+Bot1.Battlefield.Life and Limb.Types = Enchantment

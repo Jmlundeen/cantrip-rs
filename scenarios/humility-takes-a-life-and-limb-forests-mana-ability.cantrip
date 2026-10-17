@@ -1,0 +1,55 @@
+# Life and Limb makes Bot1's basic Forest a 1/1 green Saproling creature land; Humility ("All creatures lose all abilities
+# and have base power and toughness 1/1") then arrives. The Forest's "{T}: Add {G}" is the intrinsic ability of its basic
+# land type (CR 305.6), an ability it has from the start of layer 6 like any other, and Humility's layer-6 effect takes it
+# (CR 613.1f): the Forest can no longer be tapped for mana. Bot1's Plains is no Forest and no creature, so it keeps its
+# "{T}: Add {W}" (the positive control). Life and Limb is no creature and keeps its ability: the Forest is still a 1/1
+# green Saproling creature.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Life and Limb
+Humility
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Life and Limb.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Humility.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Plains.Activate
+? Bot1.Mana = {W}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Forest.Types = Land; Creature
+Bot1.Battlefield.Forest.Subtypes = Forest; Saproling
+Bot1.Battlefield.Forest.Colors = Green
+Bot1.Battlefield.Forest.Power = 1
+Bot1.Battlefield.Forest.Toughness = 1
+Bot1.Battlefield.Forest.Tapped = false
