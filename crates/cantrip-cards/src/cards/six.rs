@@ -6,7 +6,8 @@ use cantrip_oracle as oracle;
 /// Mill three cards. You may put a land card from among them into your hand (CR 701.17c); nobody is asked when no
 /// land is among them.
 fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::mill_then_may_take_into_hand(g, item.controller, item.object, 3, "land", |c| c.is(CardType::Land))
+    library::mill_then_may_take_into_hand(g, item.controller, item.object, 3, "land", |c| c.is(CardType::Land))?;
+    Ok(())
 }
 
 /// During your turn, nonland permanent cards in your graveyard have retrace (CR 702.81a): the permission is Six's, so

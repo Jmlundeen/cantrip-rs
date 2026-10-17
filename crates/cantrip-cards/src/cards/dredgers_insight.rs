@@ -22,7 +22,8 @@ fn artifact_or_creature_cards_leave_your_graveyard(q: &dyn Query, me: &Asker, ev
 fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     library::mill_then_may_take_into_hand(g, item.controller, item.object, 4, "artifact, creature, or land", |c| {
         c.is(CardType::Artifact) || c.is(CardType::Creature) || c.is(CardType::Land)
-    })
+    })?;
+    Ok(())
 }
 
 pub static CARD: CardDef = CardDef {

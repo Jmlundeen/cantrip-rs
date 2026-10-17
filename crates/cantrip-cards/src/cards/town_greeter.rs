@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// way, you gain 2 life.
 fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let taken = library::mill_and_take_one(g, player, item.object, 4, "land", |c| c.is(CardType::Land))?;
+    let taken = library::mill_then_may_take_into_hand(g, player, item.object, 4, "land", |c| c.is(CardType::Land))?;
     if let Some(&in_hand) = taken.first()
         && g.obj(in_hand).zone == Zone::hand(player)
         && g.chars(in_hand).subtypes.has(Subtype::Town)

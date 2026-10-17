@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 
 /// "Mill four cards. You may put a creature card from among them into your hand."
 fn mill_four_take_a_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::mill_and_take_one(g, item.controller, item.object, 4, "creature", |c| c.is(CardType::Creature))?;
+    library::mill_then_may_take_into_hand(g, item.controller, item.object, 4, "creature", |c| c.is(CardType::Creature))?;
     Ok(())
 }
 

@@ -28,7 +28,8 @@ fn tetzin_or_double_faced_artifact_enters(q: &dyn Query, me: &Asker, event: &Eve
 /// "Mill three cards. You may put an artifact card from among them into your hand." (CR 701.17) The cards milled are the
 /// ones it may take from, as they are in the graveyard; choosing none declines.
 fn mill_three_take_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    library::mill_then_may_take_into_hand(g, item.controller, item.object, 3, "artifact", |c| c.is(CardType::Artifact))
+    library::mill_then_may_take_into_hand(g, item.controller, item.object, 3, "artifact", |c| c.is(CardType::Artifact))?;
+    Ok(())
 }
 
 /// "Craft with six artifacts": six from among other permanents you control and/or cards from your graveyard (CR 702.167b).

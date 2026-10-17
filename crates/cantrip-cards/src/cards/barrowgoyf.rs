@@ -9,7 +9,8 @@ fn mill_and_take(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    library::mill_then_may_take_into_hand(g, item.controller, item.object, item.data[0], "creature", |c| c.is(CardType::Creature))
+    library::mill_then_may_take_into_hand(g, item.controller, item.object, item.data[0], "creature", |c| c.is(CardType::Creature))?;
+    Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
