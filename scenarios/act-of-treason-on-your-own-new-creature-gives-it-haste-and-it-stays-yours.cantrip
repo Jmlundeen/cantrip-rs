@@ -1,0 +1,41 @@
+# Act of Treason "can target any creature, even one that's untapped or one you already control" (its ruling). Bot1 casts
+# Llanowar Elves and then Act of Treason on it: Bot1 gains control of what it already controls (CR 613.1b), and the Elves
+# gains haste, so though it came under Bot1's control this turn it attacks Bot2 for 1 (CR 302.6, 702.10). When the effect
+# ends with the turn, its controller is the one it had before any control effect: Bot1 still (CR 613.1b).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Forest
+Llanowar Elves
+Act of Treason
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.SummoningSick = true
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Act of Treason.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+Bot1.Attack(Llanowar Elves > Bot2)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Forest; Mountain; Llanowar Elves
+Bot2.Life = 19

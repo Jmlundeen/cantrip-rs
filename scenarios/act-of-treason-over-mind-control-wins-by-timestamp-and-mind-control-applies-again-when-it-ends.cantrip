@@ -1,0 +1,67 @@
+# Two control-changing effects on one creature apply in timestamp order (CR 613.1b, 613.7), so the later decides who
+# controls it. Bot1's Mind Control (a static ability, at the Aura's timestamp) takes Bot2's Llanowar Elves. On Bot2's turn
+# Bot2 casts Act of Treason on it: the later effect, so Bot2 controls it, untapped and with haste, and it attacks Bot1 for
+# 1. When the turn ends Act of Treason's effect ends (CR 514.2) and Mind Control, which never stopped applying, decides
+# again: the Elves is Bot1's. Bot1 has controlled it since their turn began, so it taps for {G} (CR 302.6).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Island
+Mind Control
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Mox Emerald
+Act of Treason
+Forest x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Control.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.Keywords = Haste
+? Bot1.Battlefield.Mind Control.AttachedTo = Llanowar Elves
+Bot2.Attack(Llanowar Elves > Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Island; Island; Mind Control; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Life = 19
+Bot2.Battlefield = Forest; Mox Ruby; Mox Emerald
+Bot2.Graveyard = Act of Treason

@@ -1,0 +1,47 @@
+# Act of Treason: "Gain control of target creature until end of turn. Untap that creature. It gains haste until end of
+# turn." Bot2's Llanowar Elves is tapped (Bot2 tapped it for mana on their turn). Bot1 takes it (CR 613.1b, layer 2): it is
+# untapped, and though it came under Bot1's control this turn it can attack, as it has haste (CR 302.6, 702.10): it attacks
+# Bot2 for 1. When the turn ends, the effects end (CR 514.2) and the Elves is Bot2's again, without haste (CR 611.2a, 613.1b).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Act of Treason
+Mountain x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+? Bot2.Battlefield.Llanowar Elves.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Act of Treason.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Tapped = false
+? Bot1.Battlefield.Llanowar Elves.Keywords = Haste
+Bot1.Attack(Llanowar Elves > Bot2)
+[T6 Bot2.Main1]
+? Bot2.Battlefield.Llanowar Elves.Keywords = (absent)
+
+[Expect]
+Bot1.Battlefield = Mountain; Mountain; Mountain
+Bot1.Graveyard = Act of Treason
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Life = 19

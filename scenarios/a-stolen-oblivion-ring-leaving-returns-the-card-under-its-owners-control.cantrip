@@ -1,0 +1,76 @@
+# Oblivion Ring's leaves ability returns "the exiled card to the battlefield under its owner's control" - not its own
+# controller's. Bot1's Oblivion Ring exiles Bot1's own Llanowar Elves (it may: "another target nonland permanent"). With
+# Opalescence on the battlefield the Ring is a 3/3 creature (CR 613.1d), so Bot2 takes it with Act of Treason (CR 613.1b)
+# and bolts it: it leaves under Bot2's control, so the leaves ability is Bot2's (CR 603.3a), and it returns the Elves under
+# the control of its owner, Bot1 (CR 110.2a). The Ring goes to its owner's graveyard, Bot1's (CR 400.3).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Opalescence
+Oblivion Ring
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mountain
+Act of Treason
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Oblivion Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+? Bot1.Battlefield.Oblivion Ring.Power = 3
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Oblivion Ring)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Oblivion Ring)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet; Mox Ruby; Mox Emerald; Opalescence; Llanowar Elves
+Bot1.Graveyard = Oblivion Ring
+Bot2.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet
+Bot2.Graveyard = Lightning Bolt; Act of Treason
