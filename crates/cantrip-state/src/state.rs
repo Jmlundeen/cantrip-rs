@@ -116,6 +116,9 @@ pub struct StaticSources {
     /// "Equipped creature gets +3/+3"), whatever abilities they have lost before it: the layers ask each whether it still
     /// has the ability.
     pub granted: Vec<ObjectId>,
+    /// Whether a source of `list` has a static ability that continues an effect begun in an earlier layer
+    /// (`StaticDef::continues`, CR 613.6): only then do the layers note which effects began to apply to an object.
+    pub continuing: bool,
 }
 
 impl GameState {
@@ -292,7 +295,7 @@ impl GameState {
             unsettled: true,
             journal: Journal::default(),
             epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), honed: Vec::new(), granted: Vec::new() }),
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), honed: Vec::new(), granted: Vec::new(), continuing: false }),
             lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
         }
     }

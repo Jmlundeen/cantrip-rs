@@ -61,7 +61,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[
         static_ability(Layer::Type, other_creatures, food_artifacts_too, OTHER_CREATURES),
         // CR 613.6: the effect that began in layer 4 applies to the same creatures in layer 6.
-        static_ability(Layer::Ability, other_creatures, grant_delayed_ability, OTHER_CREATURES),
+        static_ability(Layer::Ability, other_creatures, grant_delayed_ability, OTHER_CREATURES).continues(),
     ],
     ..oracle::YGRA_EATER_OF_ALL
 };

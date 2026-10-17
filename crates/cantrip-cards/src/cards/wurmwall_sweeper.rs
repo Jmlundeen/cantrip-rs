@@ -19,8 +19,8 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::Type, station::charged::<4>, station::is_a_creature, FOUR_PLUS),
-        static_ability(Layer::Ability, station::charged::<4>, flying, FOUR_PLUS),
-        static_ability(Layer::PtSet, station::charged::<4>, station::base_pt::<2, 2>, FOUR_PLUS),
+        static_ability(Layer::Ability, station::charged::<4>, flying, FOUR_PLUS).continues(),
+        static_ability(Layer::PtSet, station::charged::<4>, station::base_pt::<2, 2>, FOUR_PLUS).continues(),
     ],
     ..oracle::WURMWALL_SWEEPER
 };

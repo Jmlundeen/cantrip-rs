@@ -247,7 +247,14 @@ would go over unclickable.
   static abilities took everything from, worked out once per position and history length (an `affects` may read the past) and
   free while no such ability is on the battlefield. A source's static abilities of layers 1 to 5 have applied by the time
   layer 6 takes them (613.6: Painter's Servant enchanted by Eaten by Piranhas, or turned into an Elk, still paints everything),
-  so the static-source list keeps such a source and leaves it out from layer 6 on. One "loses all abilities" ability that
+  so the static-source list keeps such a source and leaves it out from layer 6 on - all but the effects that had begun by
+  then. **An effect in parts (613.6)** is one `StaticDef` per layer, each later part marked `.continues()` (Opalescence:
+  layers 4 and 7b; Puppet Crafting, Eaten by Piranhas, Ygra, Kaito, Wurmwall Sweeper). As an object's characteristics are
+  worked out, the layers note the static abilities that applied to it (`Begun`, only while a source has an effect in parts); a
+  later part applies to it exactly when its first part did - "the same set of objects", whatever its words say by then - and
+  goes on applying though its source loses its abilities in a layer between, if the first part was of layers 1 to 5 or is the
+  "loses all abilities" ability that took its own source's (Humility made a creature: `Stripped::applying`). A layer-6 part
+  of a source that loses its abilities in layer 6 never begins (613.8a: it depends on the effect that removes it). One "loses all abilities" ability that
   would take another's source's applies first (613.8a dependency), each taking the other's in timestamp order (613.8b); no
   card in content can make two of them meet (an Aura is no creature), so that order has no scenario. The host lists every
   rules line of an object that lost all abilities as lost, not only its keywords and activated and triggered abilities.

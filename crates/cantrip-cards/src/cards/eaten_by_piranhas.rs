@@ -26,9 +26,9 @@ pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE),
     statics: &[
         static_ability(Layer::Type, attached_object, skeleton_creature, "Enchanted creature is a Skeleton creature."),
-        static_ability(Layer::Color, attached_object, black, "Enchanted creature is black."),
-        loses_all_abilities(attached_object, "Enchanted creature loses all abilities."),
-        static_ability(Layer::PtSet, attached_object, base_one_one, "Enchanted creature has base power and toughness 1/1."),
+        static_ability(Layer::Color, attached_object, black, "Enchanted creature is black.").continues(),
+        loses_all_abilities(attached_object, "Enchanted creature loses all abilities.").continues(),
+        static_ability(Layer::PtSet, attached_object, base_one_one, "Enchanted creature has base power and toughness 1/1.").continues(),
     ],
     ..oracle::EATEN_BY_PIRANHAS
 };

@@ -769,6 +769,12 @@ impl StaticDef {
         StaticDef { lost_pt: Some((power, toughness)), ..self }
     }
 
+    /// It is a later part of the effect of the static ability before it in the card's list (CR 613.6,
+    /// `StaticDef::continues`): it applies, in its own later layer, to the same objects that part applied to.
+    pub const fn continues(self) -> StaticDef {
+        StaticDef { continues: true, ..self }
+    }
+
     /// The zone its source functions from, where not the battlefield (CR 113.6b).
     pub const fn from(self, from: ZoneKind) -> StaticDef {
         StaticDef { from, ..self }

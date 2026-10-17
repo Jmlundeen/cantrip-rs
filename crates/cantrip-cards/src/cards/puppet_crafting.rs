@@ -41,7 +41,8 @@ pub static CARD: CardDef = CardDef {
             attached_object,
             base_five_five,
             "Enchanted permanent is a Construct creature with base power and toughness 5/5 in addition to its other types.",
-        ),
+        )
+        .continues(),
     ],
     ..oracle::PUPPET_CRAFTING
 };

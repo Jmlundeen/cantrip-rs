@@ -50,7 +50,6 @@ keeps it).
 | [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
-| [KI-36](#ki-36-an-ability-that-loses-its-sources-abilities-stops-applying-in-its-later-layers) | An ability that loses its source's abilities stops applying in its later layers | Low | Open |
 | [KI-37](#ki-37-a-sideboard-card-the-engine-does-not-have-is-left-out-of-the-game) | A sideboard card the engine does not have is left out of the game | Low | Open |
 | [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
@@ -357,27 +356,6 @@ them out, so it plans with less mana than it has. The view has no word for the p
 a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
 
 **Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
-
-### KI-36: An ability that loses its source's abilities stops applying in its later layers
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-16, Eaten by Piranhas review |
-
-**Notes.** CR 613.6: an effect that has started to apply in one layer goes on applying in the later ones, "even if the ability
-generating the effect is removed during this process". A card's static abilities are one `StaticDef` per layer, and
-`layers::statics` drops every layer-6-and-later part of a source that lost all its abilities, so a single ability that spans a
-layer before 6 and one after loses its later part: Opalescence or March of the Machines made to lose its abilities (layer 4, then
-7b), Kenrith's Transformation on a creature that loses its abilities, Ygra, Eater of All under Eaten by Piranhas (layer 4,
-then 6: the other creatures stay Food artifacts but lose the granted "You gain 3 life"). A
-fix groups a card's `StaticDef`s by ability, so the later parts of one that applied earlier keep applying to the set of objects
-fixed then. A "loses all abilities" ability that takes its own source's (Humility made a creature) already goes on applying
-(`Stripped::applying`).
-
-**Scenarios.**
-- [`scenarios/eaten-by-piranhas-on-ygra-leaves-the-other-creatures-foods-with-the-ability.cantrip`](../scenarios/eaten-by-piranhas-on-ygra-leaves-the-other-creatures-foods-with-the-ability.cantrip) -
-  `# Known bug`: Bot2's Llanowar Elves are still a Food after Piranhas takes Ygra's abilities, but can't activate the
-  granted ability.
 
 ### KI-37: A sideboard card the engine does not have is left out of the game
 

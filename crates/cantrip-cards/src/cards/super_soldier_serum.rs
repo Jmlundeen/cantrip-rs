@@ -54,8 +54,8 @@ pub static CARD: CardDef = CardDef {
     .targets(&[targets::EQUIPMENT_YOU_CONTROL.between(0, TargetSpec::ANY_NUMBER)])],
     statics: &[
         static_ability(Layer::Type, attached_object, legendary_soldier_too, "Enchanted creature is a legendary Soldier in addition to its other types."),
-        static_ability(Layer::Ability, attached_object, first_strike_and_vigilance, "Enchanted creature has first strike and vigilance."),
-        static_ability(Layer::PtModify, attached_object, plus_two_plus_two, "Enchanted creature gets +2/+2."),
+        static_ability(Layer::Ability, attached_object, first_strike_and_vigilance, "Enchanted creature has first strike and vigilance.").continues(),
+        static_ability(Layer::PtModify, attached_object, plus_two_plus_two, "Enchanted creature gets +2/+2.").continues(),
     ],
     ..oracle::SUPER_SOLDIER_SERUM
 };

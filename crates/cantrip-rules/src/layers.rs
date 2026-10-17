@@ -167,6 +167,8 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     }
     // The static abilities effects have granted it that it still has once layer 6 is done, each with its timestamp.
     let mut granted: Vec<(u32, &'static StaticDef)> = Vec::new();
+    // The effects in parts that began to apply to it in the layers done so far (CR 613.6).
+    let mut begun = Begun { noting: found.as_ref().is_some_and(|f| f.continuing), parts: Vec::new() };
     for layer in LAYERS {
         if layer >= stop {
             break;
@@ -191,7 +193,7 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
         // CR 613.7, 613.8: within a layer, static abilities and other continuous effects apply in timestamp order,
         // interleaved, unless one depends on another.
         let givers = (sources, others);
-        statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), givers, on_battlefield, layer, &fx, &granted, &mut chars);
+        statics(cards, state, log, id, def, (colors.is_some(), pt.is_some()), givers, on_battlefield, layer, &fx, &granted, &mut begun, &mut chars);
         if layer == Layer::Ability {
             intrinsic_keyword_abilities(cards, &mut chars);
         }
@@ -321,6 +323,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
             .map(|&(source, from, _)| (source, from))
             .collect();
         made.strippers = strippers;
+        made.continuing = made.list.iter().any(|&(source, _, _)| cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.continues));
         made.granted.clear();
         for e in &state.effects {
             if let EffectKind::AddAbility(ability) = e.kind
@@ -500,6 +503,7 @@ fn statics(
     layer: Layer,
     fx: &[ContinuousEffect],
     granted: &[(u32, &'static StaticDef)],
+    begun: &mut Begun,
     chars: &mut Chars,
 ) {
     let view = View { cards, state, log, stop: layer };
@@ -532,8 +536,61 @@ fn statics(
     let mut given: Vec<(u32, ObjectId, &'static StaticDef)> =
         if on_battlefield { others.iter().flat_map(|&holder| granted_to_others(cards, state, log, holder, layer)).collect() } else { Vec::new() };
     given.sort_by_key(|&(timestamp, _, _)| timestamp);
-    let merge = Merge::new(cards, state, layer, on_battlefield, fx, granted, &given, sources, &stripped);
-    in_order(&view, id, merge, chars);
+    let merge = Merge::new(cards, state, layer, on_battlefield, fx, granted, &given, sources, &stripped, &begun.parts);
+    let mut noted = Noted { on: begun.noting, parts: Vec::new() };
+    in_order(&view, id, merge, &mut noted, chars);
+    begun.parts.append(&mut noted.parts);
+}
+
+/// The parts of effects in parts (`StaticDef::continues`, CR 613.6) that began to apply to the object being worked out, in
+/// the layers done so far: each static ability's source and the part that applied. "If an effect starts to apply in one
+/// layer ..., it will continue to be applied to the same set of objects in each other applicable layer": a later part
+/// applies to the object exactly when its first part did, as this object's characteristics were being worked out - after
+/// the effects before it in that layer and as the dependency system ordered them - and so to the objects that part's
+/// words named then, though they no longer fit those words ("all noncreature artifacts become 2/2 artifact creatures",
+/// CR 613.6's third example). Noted only while some static-ability source has an effect in parts (`noting`).
+struct Begun {
+    noting: bool,
+    parts: Vec<(ObjectId, *const StaticDef)>,
+}
+
+/// What one layer notes for `Begun`: the static abilities that applied to the object in it.
+struct Noted {
+    on: bool,
+    parts: Vec<(ObjectId, *const StaticDef)>,
+}
+
+impl Noted {
+    /// Applies `entry` to the object, noting a static ability that applied to it.
+    fn apply(&mut self, entry: &Entry, view: &View, id: ObjectId, chars: &mut Chars) {
+        match *entry {
+            Entry::Static(source, st) if self.on => {
+                if (st.affects)(view, source, id, chars) {
+                    (st.apply)(view, source, chars);
+                    self.parts.push((source, st));
+                }
+            }
+            _ => entry.apply(view, id, chars),
+        }
+    }
+
+    /// Applies `entry`, which `Entry::reach` has said applies to the object.
+    fn apply_reached(&mut self, entry: &Entry, view: &View, id: ObjectId, chars: &mut Chars) {
+        entry.apply_reached(view, id, chars);
+        if let Entry::Static(source, st) = *entry
+            && self.on
+        {
+            self.parts.push((source, st));
+        }
+    }
+}
+
+/// The first part of the effect `statics[i]` is a part of (CR 613.6): itself, unless it continues the one before it.
+fn first_part(statics: &[StaticDef], mut i: usize) -> usize {
+    while i > 0 && statics[i].continues {
+        i -= 1;
+    }
+    i
 }
 
 thread_local! {
@@ -547,11 +604,11 @@ thread_local! {
 /// apply to it. If one's answer changed, it depends on the later effect, and the layer is worked out again from the start
 /// by the dependency system (`by_dependency`). A layer with no effect whose reach can change before one that does
 /// something costs what timestamp order costs; an anthem with the pumps after it, a look at the anthem after each.
-fn in_order(view: &View, id: ObjectId, mut merge: Merge, chars: &mut Chars) {
+fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, chars: &mut Chars) {
     // None, or one: nothing to order.
     let Some(first) = merge.next() else { return };
     let Some(second) = merge.next() else {
-        first.apply(view, id, chars);
+        noted.apply(&first, view, id, chars);
         return;
     };
     let mut entries = ENTRIES.with(|pool| pool.borrow_mut().pop()).unwrap_or_default();
@@ -570,6 +627,7 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, chars: &mut Chars) {
         return;
     }
     let before = *chars;
+    let noted_before = noted.parts.len();
     // Bit `k` of `conditional`: the `k`th entry's reach can change; of `reached`: it applied when its turn came.
     let mut conditional = 0u64;
     let mut reached = 0u64;
@@ -584,7 +642,7 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, chars: &mut Chars) {
                 reached |= u64::from(reach) << k;
             }
             if reach {
-                entry.apply_reached(view, id, chars);
+                noted.apply_reached(entry, view, id, chars);
                 // The earlier effects whose reach can change, asked again.
                 let mut earlier = conditional & ((1 << k) - 1);
                 while earlier != 0 {
@@ -600,7 +658,8 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, chars: &mut Chars) {
     };
     if depends {
         *chars = before;
-        by_dependency(view, id, entries.clone(), chars);
+        noted.parts.truncate(noted_before);
+        by_dependency(view, id, entries.clone(), noted, chars);
     }
     ENTRIES.with(|pool| pool.borrow_mut().push(entries));
 }
@@ -614,6 +673,9 @@ enum Entry {
     Granted(&'static StaticDef),
     /// A static ability of `ObjectId` (its own, or one an effect granted it) that applies to the objects it says.
     Static(ObjectId, &'static StaticDef),
+    /// A later part of the effect of a static ability of `ObjectId` whose first part applied to the object in an earlier
+    /// layer (CR 613.6, `Begun`): it applies to it, whatever its words say of it by now.
+    Continued(ObjectId, &'static StaticDef),
 }
 
 impl Entry {
@@ -628,7 +690,7 @@ impl Entry {
     fn conditional(&self) -> bool {
         match self {
             Entry::Static(..) => true,
-            Entry::Granted(_) => false,
+            Entry::Granted(_) | Entry::Continued(..) => false,
             Entry::Effect(e) => matches!(e.kind, EffectKind::ChangeText { .. } | EffectKind::AddAllCreatureTypes),
         }
     }
@@ -637,7 +699,7 @@ impl Entry {
     fn reach(&self, view: &View, id: ObjectId, chars: &Chars) -> bool {
         match *self {
             Entry::Static(source, st) => (st.affects)(view, source, id, chars),
-            Entry::Granted(_) => true,
+            Entry::Granted(_) | Entry::Continued(..) => true,
             Entry::Effect(e) => match e.kind {
                 EffectKind::ChangeText { from: Word::Subtype(from), .. } => {
                     chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling))
@@ -654,7 +716,7 @@ impl Entry {
         match *self {
             Entry::Effect(e) => apply_effect(&e, view.stop, chars),
             Entry::Granted(st) => (st.apply)(view, id, chars),
-            Entry::Static(source, st) => (st.apply)(view, source, chars),
+            Entry::Static(source, st) | Entry::Continued(source, st) => (st.apply)(view, source, chars),
         }
     }
 
@@ -662,6 +724,7 @@ impl Entry {
         match *self {
             Entry::Effect(e) => apply_effect(&e, view.stop, chars),
             Entry::Granted(st) => (st.apply)(view, id, chars),
+            Entry::Continued(source, st) => (st.apply)(view, source, chars),
             Entry::Static(source, st) => {
                 if (st.affects)(view, source, id, chars) {
                     (st.apply)(view, source, chars);
@@ -688,11 +751,16 @@ struct Merge<'a> {
     /// From layer 6 on, the permanents a "loses all abilities" static ability has stripped, and those whose such
     /// abilities apply.
     stripped: &'a Stripped,
+    /// The parts of effects that began to apply to the object in the layers before this one (`Begun`).
+    begun: &'a [(ObjectId, *const StaticDef)],
     /// The next of each: source, given, effect, granted.
     next: [usize; 4],
-    /// The current source's static abilities (none once it has lost them), and the next of them.
+    /// The current source's static abilities, and the next of them.
     statics: Option<&'static [StaticDef]>,
     within: usize,
+    /// Whether the current source has lost all its abilities by this layer, and whether it is to its own "loses all
+    /// abilities" ability, which applies (`Stripped::applying`).
+    lost: (bool, bool),
     /// Each sequence's next entry's timestamp, worked out once it was last moved past (`settled`).
     head: [Option<u32>; 4],
     settled: [bool; 4],
@@ -710,6 +778,7 @@ impl<'a> Merge<'a> {
         given: &'a [(u32, ObjectId, &'static StaticDef)],
         sources: &'a [(ObjectId, ZoneKind, bool)],
         stripped: &'a Stripped,
+        begun: &'a [(ObjectId, *const StaticDef)],
     ) -> Merge<'a> {
         Merge {
             cards,
@@ -721,9 +790,11 @@ impl<'a> Merge<'a> {
             given,
             sources,
             stripped,
+            begun,
             next: [0; 4],
             statics: None,
             within: 0,
+            lost: (false, false),
             head: [None; 4],
             settled: [false; 4],
         }
@@ -739,22 +810,32 @@ impl<'a> Merge<'a> {
                     let statics = match self.statics {
                         Some(statics) => statics,
                         None => {
-                            // CR 613.1f, 613.8a: a permanent that has lost all its abilities has no static abilities from
-                            // layer 6 on. Before it, they have applied (CR 613.6), and so has the "loses all abilities" ability
-                            // of one that took its own (Humility made a creature), which goes on applying (CR 613.6).
-                            let gone = layer >= Layer::Ability
-                                && (lost || self.stripped.lost.contains(&source))
-                                && !self.stripped.applying.contains(&source);
-                            let statics: &'static [StaticDef] = if gone { &[] } else { self.source_statics(source) };
+                            let gone = layer >= Layer::Ability && (lost || self.stripped.lost.contains(&source));
+                            self.lost = (gone, gone && self.stripped.applying.contains(&source));
+                            let statics = self.source_statics(source);
                             self.statics = Some(statics);
                             statics
                         }
                     };
                     let on_battlefield = self.on_battlefield;
-                    while statics
-                        .get(self.within)
-                        .is_some_and(|st| st.own || st.layer != layer || st.from != from || !(on_battlefield || st.everywhere))
-                    {
+                    let (gone, applying) = self.lost;
+                    let begun = self.begun;
+                    // CR 613.1f, 613.8a: a permanent that has lost all its abilities has no static abilities from layer 6
+                    // on. CR 613.6: an effect that started to apply before then goes on applying in the layers after -
+                    // one whose first part is of layers 1 to 5, or the "loses all abilities" ability that took its own
+                    // source's (Humility made a creature) and its later parts - and a later part applies only to what its
+                    // first part applied to (`Begun`).
+                    let skip = |i: usize, st: &StaticDef| {
+                        if st.own || st.layer != layer || st.from != from || !(on_battlefield || st.everywhere) {
+                            return true;
+                        }
+                        let first = &statics[first_part(statics, i)];
+                        if gone && !(first.layer < Layer::Ability || (applying && first.loses_all)) {
+                            return true;
+                        }
+                        st.continues && !begun.iter().any(|&(s, part)| s == source && std::ptr::eq(part, first))
+                    };
+                    while statics.get(self.within).is_some_and(|st| skip(self.within, st)) {
                         self.within += 1;
                     }
                     if self.within < statics.len() {
@@ -809,7 +890,7 @@ impl<'a> Merge<'a> {
                 let (source, _, _) = self.sources[self.next[0]];
                 let st = &self.statics.unwrap_or(&[])[self.within];
                 self.within += 1;
-                Entry::Static(source, st)
+                if st.continues { Entry::Continued(source, st) } else { Entry::Static(source, st) }
             }
             1 => {
                 let (_, holder, st) = self.given[self.next[1]];
@@ -838,11 +919,11 @@ impl<'a> Merge<'a> {
 /// only once what it waits for has applied ("lands are creatures", waiting for the effect that makes this a land, before
 /// "creatures are artifacts") counts as changing it, as it does for the lands already on the battlefield. A dependency
 /// through another object alone is not seen (known issue KI-41).
-fn by_dependency(view: &View, id: ObjectId, mut pending: Vec<Entry>, chars: &mut Chars) {
+fn by_dependency(view: &View, id: ObjectId, mut pending: Vec<Entry>, noted: &mut Noted, chars: &mut Chars) {
     while !pending.is_empty() {
         let i = ready(view, id, &pending, chars);
         let entry = pending.remove(i);
-        entry.apply(view, id, chars);
+        noted.apply(&entry, view, id, chars);
     }
 }
 
@@ -1417,7 +1498,7 @@ mod tests {
         let view = View { cards: &cards, state: &state, log: &[], stop: Layer::Type };
         let mut chars = *printed(&cards, cards.find("Holder").unwrap(), false);
         chars.types = start;
-        by_dependency(&view, ObjectId(1), pending.to_vec(), &mut chars);
+        by_dependency(&view, ObjectId(1), pending.to_vec(), &mut Noted { on: false, parts: Vec::new() }, &mut chars);
         chars.types
     }
 
@@ -1479,5 +1560,104 @@ mod tests {
             Entry::Effect(effect(9, EffectKind::AddTypes(types(&[CardType::Artifact])))),
         ];
         assert_eq!(types_after(&pending, TypeSet::NONE), types(&[CardType::Artifact]));
+    }
+
+    // --- Effects in parts (CR 613.6), with static abilities made for the purpose on permanents of a real state.
+
+    fn other_non_aura_enchantment(_: &dyn LayerQuery, source: ObjectId, id: ObjectId, c: &Chars) -> bool {
+        id != source && c.is(CardType::Enchantment) && !c.has_subtype(Subtype::Aura)
+    }
+    fn noncreature_artifact(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+        c.is(CardType::Artifact) && !c.is(CardType::Creature)
+    }
+    fn creature_too(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+        c.types = c.types.with(CardType::Creature);
+    }
+    fn base<const P: i16, const T: i16>(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+        c.power = Some(P);
+        c.toughness = Some(T);
+    }
+
+    /// Opalescence's shape, its base power and toughness fixed at 4/4 (its mana value): layer 4, then 7b.
+    static ANIMATOR: CardDef = CardDef {
+        name: "Animator",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[
+            static_ability(Layer::Type, other_non_aura_enchantment, creature_too, ""),
+            static_ability(Layer::PtSet, other_non_aura_enchantment, base::<4, 4>, "").continues(),
+        ],
+        ..CardDef::BLANK
+    };
+    /// Humility's shape: layer 6, then 7b.
+    static HUMBLER: CardDef = CardDef {
+        name: "Humbler",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[loses_all_abilities(creature, ""), static_ability(Layer::PtSet, creature, base::<1, 1>, "").continues()],
+        ..CardDef::BLANK
+    };
+    /// "All noncreature artifacts are 2/2 artifact creatures" (CR 613.6's third example, as a static ability).
+    static MARCH: CardDef = CardDef {
+        name: "March",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[
+            static_ability(Layer::Type, noncreature_artifact, creature_too, ""),
+            static_ability(Layer::PtSet, noncreature_artifact, base::<2, 2>, "").continues(),
+        ],
+        ..CardDef::BLANK
+    };
+    static RELIC: CardDef = CardDef { name: "Relic", types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
+
+    /// Puts each named card onto the battlefield in turn, with timestamps in that order (CR 613.7d).
+    fn battlefield(cards: &CardTable, names: &[&str]) -> (GameState, Vec<ObjectId>) {
+        let mut state = GameState::new(2, 0);
+        let ids = names
+            .iter()
+            .enumerate()
+            .map(|(k, name)| {
+                let mut obj = Obj::new(cards.find(name).unwrap(), PlayerId(0), Zone::BATTLEFIELD);
+                obj.timestamp = k as u32 + 1;
+                let id = state.push_obj(obj);
+                state.zone_push(Zone::BATTLEFIELD, id);
+                id
+            })
+            .collect();
+        state.see_statics();
+        (state, ids)
+    }
+
+    fn pt(cards: &CardTable, state: &GameState, id: ObjectId) -> (Option<i16>, Option<i16>) {
+        let c = chars(cards, state, &[], id);
+        (c.power, c.toughness)
+    }
+
+    /// CR 613.6, its third example: the part of an effect in layer 7b applies to the permanents its layer-4 part applied to,
+    /// "even though those permanents aren't noncreature artifacts by then".
+    #[test]
+    fn a_later_part_applies_to_the_objects_its_first_part_applied_to() {
+        let cards = CardTable::new([&MARCH, &RELIC]);
+        let (state, ids) = battlefield(&cards, &["March", "Relic"]);
+        let relic = chars(&cards, &state, &[], ids[1]);
+        assert!(relic.is(CardType::Creature) && relic.is(CardType::Artifact));
+        assert_eq!((relic.power, relic.toughness), (Some(2), Some(2)));
+    }
+
+    /// CR 613.6, 613.1f, 613.7 (the rulings of Opalescence and Humility): an Opalescence that loses its abilities to
+    /// Humility in layer 6 has already begun to apply in layer 4, so its layer-7b part goes on applying, to what its
+    /// layer-4 part applied to; Humility's own 7b part goes on applying though Humility took its own abilities. Timestamp
+    /// order decides in 7b: with Opalescence, Humility, Opalescence, the second Opalescence is 1/1 and the other two 4/4;
+    /// Humility first, everything is 4/4; Humility last, everything is 1/1.
+    #[test]
+    fn an_effect_that_began_before_its_source_lost_its_abilities_goes_on_applying() {
+        let cards = CardTable::new([&ANIMATOR, &HUMBLER]);
+        let sizes = |names: &[&str]| {
+            let (state, ids) = battlefield(&cards, names);
+            ids.iter().map(|&id| pt(&cards, &state, id).0).collect::<Vec<_>>()
+        };
+        assert_eq!(sizes(&["Animator", "Humbler", "Animator"]), [Some(4), Some(4), Some(1)]);
+        assert_eq!(sizes(&["Humbler", "Animator", "Animator"]), [Some(4), Some(4), Some(4)]);
+        assert_eq!(sizes(&["Animator", "Animator", "Humbler"]), [Some(1), Some(1), Some(1)]);
+        // One Opalescence: it animates Humility alone, which is 1/1 if Humility is the later, 4/4 if the earlier.
+        assert_eq!(sizes(&["Animator", "Humbler"]), [None, Some(1)]);
+        assert_eq!(sizes(&["Humbler", "Animator"]), [Some(4), None]);
     }
 }

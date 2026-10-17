@@ -120,6 +120,10 @@ statics: &[static_ability(Layer::PtModify, attached_object, plus_one, "Equipped 
 statics: &[characteristic_defining(Layer::PtDefine, power_is_creatures, "...")],
 statics: &[loses_all_abilities(attached_object, "Enchanted creature loses all abilities.")],  // never a hand-made layer-6 clear:
                                                                   // the core must know (cost changes, replacements, triggers)
+statics: &[static_ability(Layer::Type, others, creature_too, T), static_ability(Layer::PtSet, others, base_pt, T).continues()],
+                                                                  // one ability over several layers (CR 613.6): the later parts
+                                                                  // `.continues()` the one before, apply to what the first part
+                                                                  // applied to, and outlive their source's abilities
 replacements: &[replacement(ReplacementKind::ZoneChange, applies, apply, "shuffles it into its owner's library").own_everywhere()],
 ways: &[way(cost("{1}{B}"), ZoneKind::Hand, "Pay {1}{B}; an opponent draws a card")],  // keywords: flashback::way(cost(..), text)
 kicker: kicker(mana("{2}{B}")),                                   // `multikicker(..)`

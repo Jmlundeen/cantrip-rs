@@ -1,4 +1,3 @@
-# Known bug: KI-36 - Ygra's static ability spans layers 4 and 6; once it has applied in layer 4 it goes on applying in layer 6 though Eaten by Piranhas takes it away (CR 613.6), and the engine drops its layer-6 part
 # Eaten by Piranhas on Ygra herself: she loses all abilities in layer 6 and is a 1/1 black Skeleton creature. Her "Other
 # creatures are Food artifacts ... and have '{2}, {T}, Sacrifice this permanent: You gain 3 life'" has applied in layer 4
 # before that (Bot2's Llanowar Elves are a Food artifact), and an effect that has started to apply in one layer goes on

@@ -185,6 +185,13 @@ pub struct StaticDef {
     /// abilities a card prints (static abilities of layer 6 on, cost changes, replacement effects, play rules, trigger
     /// rules) agrees with what layer 6 did (`Query::lost_all_abilities`).
     pub loses_all: bool,
+    /// It is a later part of the same effect as the static ability before it in the card's list (CR 613.6): one
+    /// ability that applies in several layers ("each other non-Aura enchantment is a creature ... and has base power and
+    /// base toughness each equal to its mana value", layers 4 and 7b) is written as one `StaticDef` per layer, the first
+    /// part as itself and each later one marked `continues()`. A later part applies to the same set of objects the first
+    /// part applied to as the object's characteristics were worked out, whatever its own `affects` would say by then, and
+    /// it goes on applying though its source loses its abilities in a layer between them (`layers.rs`).
+    pub continues: bool,
 }
 
 fn affects_nothing(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, _: &Chars) -> bool {
@@ -205,6 +212,7 @@ impl StaticDef {
             from: ZoneKind::Battlefield,
             lost_pt: None,
             loses_all: false,
+            continues: false,
         };
 }
 
@@ -2124,6 +2132,16 @@ impl CardTable {
             // (`layers::lost_to_statics`), and a characteristic-defining ability is no such ability (CR 604.3).
             for s in card.statics.iter().filter(|s| s.loses_all) {
                 assert!(!s.everywhere && !s.own, "{}: a static ability that makes objects lose all abilities affects permanents", card.name);
+            }
+            // A later part of an effect (CR 613.6) follows the part before it, in a later layer, from the same zone: the
+            // layers apply it to the objects that part applied to, which they know only once that part's layer is done.
+            for (i, s) in card.statics.iter().enumerate().filter(|(_, s)| s.continues) {
+                let before = i.checked_sub(1).map(|j| &card.statics[j]);
+                assert!(
+                    before.is_some_and(|b| b.layer < s.layer && b.from == s.from && b.everywhere == s.everywhere && !b.own && !s.own),
+                    "{}: a static ability that continues an effect follows its earlier part, in a later layer (CR 613.6)",
+                    card.name
+                );
             }
         }
         let anywhere = cards

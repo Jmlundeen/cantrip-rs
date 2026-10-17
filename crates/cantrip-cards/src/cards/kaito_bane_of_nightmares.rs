@@ -92,8 +92,8 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::Type, affects, become_a_ninja_creature, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a Ninja creature."),
-        static_ability(Layer::Ability, affects, hexproof, "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof."),
-        static_ability(Layer::PtSet, affects, three_four, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4."),
+        static_ability(Layer::Ability, affects, hexproof, "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof.").continues(),
+        static_ability(Layer::PtSet, affects, three_four, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4.").continues(),
     ],
     ..oracle::KAITO_BANE_OF_NIGHTMARES
 };
