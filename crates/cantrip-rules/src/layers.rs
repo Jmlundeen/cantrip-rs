@@ -623,13 +623,18 @@ thread_local! {
     /// Lists of a layer's entries to reuse: working out one object's layer asks for others' (`View::chars`), each with its
     /// own list, so they are taken and given back rather than shared.
     static ENTRIES: std::cell::RefCell<Vec<Vec<Entry>>> = const { std::cell::RefCell::new(Vec::new()) };
+    /// Lists of `in_order`'s snapshots to reuse, as `ENTRIES`.
+    static SNAPSHOTS: std::cell::RefCell<Vec<Vec<(usize, Chars)>>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 
 /// Applies a layer's effects (`merge`) to the object in timestamp order (CR 613.7), watching for a dependency (CR 613.8a):
 /// each time an effect does something to the object, the earlier effects whose reach can change are asked again whether they
 /// apply to it. If one's answer changed, it depends on the later effect, and the layer is worked out again from the start
-/// by the dependency system (`by_dependency`). A layer with no effect whose reach can change before one that does
-/// something costs what timestamp order costs; an anthem with the pumps after it, a look at the anthem after each.
+/// by the dependency system (`by_dependency`). An earlier effect that applied is asked twice: of the object as it is now,
+/// and of the object as it found it with the later effect applied - its own application can hide the change, as Life and
+/// Limb's making a Forest a Saproling hides that Blood Moon's makes it no Forest (CR 613.8a(b): "applying the other would
+/// change ... what it applies to"). A layer with no effect whose reach can change before one that does something costs
+/// what timestamp order costs; an anthem with the pumps after it, a look at the anthem after each.
 fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, chars: &mut Chars) {
     // None, or one: nothing to order.
     let Some(first) = merge.next() else { return };
@@ -657,6 +662,9 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, char
     // Bit `k` of `conditional`: the `k`th entry's reach can change; of `reached`: it applied when its turn came.
     let mut conditional = 0u64;
     let mut reached = 0u64;
+    // The object as each conditional entry that applied found it.
+    let mut found = SNAPSHOTS.with(|pool| pool.borrow_mut().pop()).unwrap_or_default();
+    found.clear();
     let depends = 'apply: {
         for (k, entry) in entries.iter().enumerate() {
             if k == 64 {
@@ -668,6 +676,17 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, char
                 reached |= u64::from(reach) << k;
             }
             if reach {
+                // And those that applied, of the object as they found it with this one applied.
+                for &(a, as_found) in found.iter() {
+                    let mut then = as_found;
+                    entry.apply(view, id, &mut then);
+                    if !entries[a].reach(view, id, &then) {
+                        break 'apply true;
+                    }
+                }
+                if entry.conditional() {
+                    found.push((k, *chars));
+                }
                 noted.apply_reached(entry, view, id, chars);
                 // The earlier effects whose reach can change, asked again.
                 let mut earlier = conditional & ((1 << k) - 1);
@@ -682,6 +701,7 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, char
         }
         false
     };
+    SNAPSHOTS.with(|pool| pool.borrow_mut().push(found));
     if depends {
         *chars = before;
         noted.parts.truncate(noted_before);
@@ -1792,5 +1812,47 @@ mod tests {
         // One Opalescence: it animates Humility alone, which is 1/1 if Humility is the later, 4/4 if the earlier.
         assert_eq!(sizes(&["Animator", "Humbler"]), [None, Some(1)]);
         assert_eq!(sizes(&["Humbler", "Animator"]), [Some(4), None]);
+    }
+
+    fn forest_or_saproling(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+        c.has_subtype(Subtype::Forest) || c.has_subtype(Subtype::Saproling)
+    }
+    fn saproling_forest(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+        c.types = c.types.with(CardType::Creature).with(CardType::Land);
+        c.subtypes = c.subtypes.with(Subtype::Saproling).with(Subtype::Forest);
+    }
+    fn no_forest(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+        c.subtypes = c.subtypes.without(Subtype::Forest);
+    }
+
+    /// Life and Limb's shape: "Forests and Saprolings are Saproling creatures and Forest lands".
+    static LIMB: CardDef = CardDef {
+        name: "Limb",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[static_ability(Layer::Type, forest_or_saproling, saproling_forest, "")],
+        ..CardDef::BLANK
+    };
+    /// "Lands are no Forests", what Blood Moon does to a nonbasic Forest's Forest type.
+    static UNFOREST: CardDef = CardDef {
+        name: "Unforest",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[static_ability(Layer::Type, land, no_forest, "")],
+        ..CardDef::BLANK
+    };
+    static WOODS: CardDef =
+        CardDef { name: "Woods", types: TypeSet::of(&[CardType::Land]), subtypes: SubtypeSet::of(&[Subtype::Forest]), ..CardDef::BLANK };
+
+    /// CR 613.8a(b): an earlier effect depends on a later one that would change what it applies to, judged on the object as
+    /// the earlier one found it - its own application must not hide the change. Limb, the older, would make Woods a Saproling,
+    /// which would keep Limb applying once Unforest takes the Forest type; but applying Unforest changes what Limb applies to,
+    /// so Unforest applies first and Limb then does not apply: Woods is a land and no creature, whichever is older.
+    #[test]
+    fn an_effect_whose_own_application_hides_the_dependency_still_waits() {
+        let cards = CardTable::new([&LIMB, &UNFOREST, &WOODS]);
+        for names in [["Limb", "Unforest", "Woods"], ["Unforest", "Limb", "Woods"]] {
+            let (state, ids) = battlefield(&cards, &names);
+            let woods = chars(&cards, &state, &[], ids[2]);
+            assert!(!woods.is(CardType::Creature) && !woods.has_subtype(Subtype::Saproling), "{names:?}");
+        }
     }
 }
