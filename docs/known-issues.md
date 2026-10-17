@@ -265,3 +265,33 @@ reads the controller of the stack item that is dealing the damage (the `DamageEv
 `q.controller` for permanents.
 
 **Scenarios.** none yet.
+
+### KI-29: A permanent entering with others is affected by their "enters with" replacements
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-16, review of Gev, Scaled Scorch |
+
+**Notes.** Permanents that enter at the same time do not affect one another's entering (CR 614.12; Gev, Scaled Scorch's ruling: when
+Gev and other creatures enter together, those creatures get no counter). `move_together` in `crates/cantrip-rules/src/ops.rs`
+works out each object's `replace::zone_change` inside the loop that puts the objects on the battlefield, so an object moved
+later in the same batch sees the earlier ones already on the battlefield and their replacement effects apply to it. A fix
+works out every object's replacements before any of them is put on the battlefield (or judges them against the battlefield as
+it was before the move).
+
+**Scenarios.**
+- [`scenarios/gev-and-another-creature-entering-together-get-no-counters.cantrip`](../scenarios/gev-and-another-creature-entering-together-get-no-counters.cantrip) - Second Sunrise returns Gev and an Ornithopter after an opponent lost life; the Ornithopter must get no counter (marked `# Known bug`).
+
+### KI-30: A permanent's name is not part of its last-known information
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-16, review of The End |
+
+**Notes.** `LastKnown` (`crates/cantrip-state/src/object.rs`) records types, subtypes, colors, power, toughness, keywords,
+abilities and words but no name, so "the same name as that permanent" asked after it has left the battlefield (CR 608.2h) cannot
+use last-known information: a card, copy effect, face-down or transformed state is gone with the old object (CR 400.7). Cards
+read `library::object_names` before moving the object (The End, Deadly Cover-Up), which is right for them; a card that must ask
+after the move needs the name kept in `LastKnown`.
+
+**Scenarios.** None yet.

@@ -1,0 +1,50 @@
+# Gev's counters are "for each opponent who lost life this turn": in a three-player game Bot1 bolts Bot2 and Bot3 (each loses
+# 3, to 17), so an Ornithopter entering afterwards gets two +1/+1 counters, a 2/4 (CR 614.1c, 122.6). Two bolts on one
+# opponent would count that opponent once; here each of the two has lost life.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Gev, Scaled Scorch
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Ornithopter
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Bot3 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot3.Life = 17
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4

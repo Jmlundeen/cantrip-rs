@@ -1,0 +1,45 @@
+# Gev, Scaled Scorch has "Ward--Pay 2 life" (CR 702.21a). Bot2 casts Lightning Bolt at Gev twice with a Mountain and a Mox Ruby: the
+# first time it declines to pay 2 life and the Bolt is countered (Gev survives, Bot2 stays at 20); the second time it pays
+# (Bot2 goes to 18), the Bolt resolves and Gev, a 3/2, dies.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Gev, Scaled Scorch
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gev, Scaled Scorch)
+Bot2.Decline
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Gev, Scaled Scorch.Damage = 0
+? Bot2.Life = 20
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Gev, Scaled Scorch)
+Bot2.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Gev, Scaled Scorch
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

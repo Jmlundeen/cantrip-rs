@@ -1,0 +1,52 @@
+# Gev, Scaled Scorch: "Whenever you cast a Lizard spell, Gev deals 1 damage to target opponent." After Gev, Bot1 casts an Ornithopter
+# (not a Lizard: no damage) and then Magebane Lizard (a Lizard creature spell): Gev deals 1 to Bot2, who goes to 19. In
+# Bot2's turn 4 Bot2 casts its own Magebane Lizard, a creature spell, with two lands: it is not a spell Bot1 cast, so Bot1 stays
+# at 20 and Bot2 at 19 (Bot1's Magebane Lizard punishes noncreature spells only).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Gev, Scaled Scorch
+Black Lotus
+Ornithopter
+Magebane Lizard
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Magebane Lizard
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Magebane Lizard.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Magebane Lizard.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot2.Battlefield = Mountain; Mountain; Magebane Lizard

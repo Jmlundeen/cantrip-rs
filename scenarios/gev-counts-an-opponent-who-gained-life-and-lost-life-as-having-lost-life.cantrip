@@ -1,0 +1,52 @@
+# Gev, Scaled Scorch cares whether an opponent lost life this turn, not how their life total changed (the ruling; CR 119.3). In
+# turn 3 Gev attacks and Bot2 blocks with a Healer's Hawk: the Hawk's lifelink gains Bot2 1 life (21) and the Hawk dies. In the
+# second main phase Bot1 casts Magebane Lizard, a Lizard spell: Gev deals 1 damage to Bot2 (back to 20, the life total it began the
+# turn with), and the Lizard, entering after that, gets one +1/+1 counter, a 2/5, because Bot2 lost life even though its total
+# did not go down. Gev himself, entering before any life was lost, has none.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Gev, Scaled Scorch
+Magebane Lizard
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Healer's Hawk
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Gev, Scaled Scorch > Bot2)
+Bot2.Block(Healer's Hawk > Gev, Scaled Scorch)
+[T3 Bot1.Main2]
+? Bot2.Life = 21
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Magebane Lizard.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Healer's Hawk
+Bot1.Battlefield.Magebane Lizard.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Magebane Lizard.Power = 2
+Bot1.Battlefield.Magebane Lizard.Toughness = 5
+Bot1.Battlefield.Gev, Scaled Scorch.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,62 @@
+# Known bug: a creature entering at the same time as Gev gets a counter from him (CR 614.12; the Gev ruling), KI-29.
+# Gev, Scaled Scorch only affects creatures that enter while he is already on the battlefield (the ruling): a creature that enters
+# at the same time as Gev gets no counter though an opponent has lost life this turn. In Bot2's turn 4 Bot1 bolts Bot2 in the
+# upkeep (an opponent has lost life), Bot2 casts Wrath of God and Gev and Bot1's Ornithopter die, and Bot1 answers with Second
+# Sunrise, which returns Gev, the Ornithopter and Black Lotus at once: the Ornithopter enters as a plain 0/2.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Mox Ruby
+Black Lotus
+Gev, Scaled Scorch
+Ornithopter
+Second Sunrise
+Lightning Bolt
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Black Lotus
+Wrath of God
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Black Lotus.Cast
+[T4 Bot2.Upkeep]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Wrath of God.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Second Sunrise.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mountain; Black Lotus; Gev, Scaled Scorch; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Gev, Scaled Scorch.Counters.PlusOnePlusOne = (absent)

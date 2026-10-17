@@ -1,0 +1,45 @@
+# Gev, Scaled Scorch: "Other creatures you control enter with an additional +1/+1 counter on them for each opponent who lost life
+# this turn." Gev is cast first (Mox Jet and Mox Ruby). The first Ornithopter enters while no opponent has lost life this turn:
+# no counter. Then Lightning Bolt (from Black Lotus's red) takes Bot2 to 17, and the second Ornithopter enters with one
+# counter, a 1/3. Gev himself got none (he entered before any life was lost, and the effect says "other").
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Gev, Scaled Scorch
+Black Lotus
+Ornithopter
+Lightning Bolt
+Ornithopter
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gev, Scaled Scorch.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Gev, Scaled Scorch.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Power = 1
+Bot1.Battlefield.Ornithopter#2.Toughness = 3
