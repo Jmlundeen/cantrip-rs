@@ -1,0 +1,31 @@
+# "Landfall -- whenever a land you control enters" is for any reason, not only playing a land (the ruling): Bot1 plays Fabled Passage
+# (one trigger: Bot2 19), then cracks it ({T}, sacrifice) to search for a Mountain put onto the battlefield tapped (a second
+# trigger: Bot2 18). The Passage leaving the battlefield is not a land entering.
+
+[Bot1 Deck]
+Mox Jet
+Iridescent Vinelasher
+Fabled Passage
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iridescent Vinelasher.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Fabled Passage.Play
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Mountain)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield = Mox Jet; Iridescent Vinelasher; Mountain

@@ -1,0 +1,40 @@
+# Iridescent Vinelasher with offspring {2} paid (Mox Jet, Mox Ruby and Mox Pearl): as it enters a 1/1 token copy of it is created
+# (CR 702.175a), which has landfall too. Playing a Mountain then triggers both Vinelashers, one damage each (CR 603.2): Bot2
+# goes from 20 to 18. The token is not cast, and being a copy it does not make another token (its offspring was not paid).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Iridescent Vinelasher
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Iridescent Vinelasher.Cast(Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Iridescent Vinelasher#2.Token = true
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Iridescent Vinelasher#2.Power = 1
+Bot1.Battlefield.Iridescent Vinelasher#2.Toughness = 1
+Bot1.Battlefield.Iridescent Vinelasher#1.Token = (absent)
+Bot1.Battlefield.Count = 6

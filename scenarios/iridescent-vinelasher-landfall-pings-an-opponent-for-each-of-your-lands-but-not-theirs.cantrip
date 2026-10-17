@@ -1,0 +1,40 @@
+# Iridescent Vinelasher: "Landfall -- Whenever a land you control enters, this creature deals 1 damage to target opponent."
+# Cast unkicked on turn 1 (no offspring token), the Mountain Bot1 plays then triggers it: Bot2 takes 1 (19). Bot2's own land in
+# turn 2 is a land Bot1 does not control: no trigger, Bot2 stays at 19. Bot1's second land in turn 3 takes Bot2 to 18.
+
+[Bot1 Deck]
+Mox Jet
+Iridescent Vinelasher
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iridescent Vinelasher.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Battlefield.Iridescent Vinelasher.Power = 1
+Bot1.Battlefield.Iridescent Vinelasher.Toughness = 2
+Bot1.Battlefield.Count = 4

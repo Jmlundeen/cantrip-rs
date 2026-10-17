@@ -1,0 +1,43 @@
+# CR 608.2b: the landfall ability targets Bot2. Bot2 answers with Dawn's Truce (it gains hexproof), so the target is illegal as
+# the ability tries to resolve and it does nothing: Bot2 stays at 20. The next land, played after Truce's hexproof has ended
+# with the turn, is the positive control: Bot2 takes the 1 damage.
+
+[Bot1 Deck]
+Mox Jet
+Iridescent Vinelasher
+Mountain
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Dawn's Truce
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Iridescent Vinelasher.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 20
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
