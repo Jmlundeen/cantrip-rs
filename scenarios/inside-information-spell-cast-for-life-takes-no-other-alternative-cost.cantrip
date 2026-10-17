@@ -1,0 +1,41 @@
+# Inside Information: a spell cast this way is paid for with life "rather than pay its mana cost", an alternative cost, so no
+# other alternative cost may be used with it (CR 118.9a, ruling 2026-06-29). Bot1 exiles Bot2's Fireblast; with two Mountains
+# of its own, Fireblast's "sacrifice two Mountains rather than pay this spell's mana cost" is not offered from exile, and Bot1
+# casts it at Bot2 for 6 life, its mana value.
+
+[Bot1 Deck]
+Mountain
+Mox Jet
+Black Lotus
+Inside Information
+Mountain
+Plains x12
+
+[Bot2 Deck]
+Island x8
+Fireblast
+Island x8
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Inside Information.Cast(Bot2; X: 1)
+Bot1.Pass
+! Bot1.Exile.Fireblast.Cast(Bot2; Ability: sacrifice)
+Bot1.Exile.Fireblast.Cast(Bot2; Ability: 6 life)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Exile.Count = 0
+Bot1.Life = 14
+Bot2.Life = 16
+Bot1.Battlefield.Mountain#1.Tapped = false
+Bot2.Graveyard = Fireblast; Island

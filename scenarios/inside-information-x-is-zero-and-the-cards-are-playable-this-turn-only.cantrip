@@ -1,0 +1,52 @@
+# Inside Information exiles Bot2's top two cards, a Meltdown and a Lightning Bolt. Meltdown cast for life has X = 0 (CR 107.3,
+# ruling 2026-06-29): Bot1 pays 1 life, its mana value with X as 0, and it destroys only the artifacts of mana value 0 - the
+# Mox Ruby and Bot1's own Mox Jet, not Bot2's Mind Stone (2). "You may play those cards this turn": on turn 5 the Bolt still
+# in exile is not offered, though Bot1 has the life to pay for it.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Inside Information
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby
+Mind Stone
+Island
+Island x4
+Island
+Meltdown
+Lightning Bolt
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Mind Stone.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Inside Information.Cast(Bot2; X: 2)
+Bot1.Pass
+Bot1.Exile.Meltdown.Cast(Ability: 1 life)
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile = Lightning Bolt
+Bot1.Life = 19
+Bot1.Graveyard = Mox Jet; Inside Information; Black Lotus
+Bot2.Graveyard = Meltdown; Mox Ruby
+Bot2.Battlefield = Island; Mind Stone

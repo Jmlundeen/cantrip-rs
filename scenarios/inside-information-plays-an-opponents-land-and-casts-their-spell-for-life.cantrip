@@ -1,0 +1,39 @@
+# Inside Information with X = 2: the top two cards of Bot2's library, a Lightning Bolt and a Mountain, are exiled, and Bot1 may
+# play them this turn. With no mana left at all, Bot1 casts the Bolt at Bot2 by paying 1 life, its mana value, rather than its
+# mana cost (CR 118.9, 119.4), and plays the Mountain from exile as its land play (CR 305.1). The Bolt goes to Bot2's
+# graveyard, its owner's (CR 400.3).
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Inside Information
+Plains x14
+
+[Bot2 Deck]
+Island x7
+Lightning Bolt
+Mountain
+Island x8
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Inside Information.Cast(Bot2; X: 2)
+Bot1.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2; Ability: 1 life)
+Bot1.Pass
+Bot1.Exile.Mountain.Play
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Exile.Count = 0
+Bot1.Life = 19
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Mountain.Tapped = false
+Bot1.LandsPlayed = 1
