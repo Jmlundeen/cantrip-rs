@@ -1,0 +1,40 @@
+# Laughing Jasper Flint is a Lizard Rogue, so Bot1 controls one outlaw (CR 700.12) and at the beginning of its turn-3 upkeep exiles the top
+# 1 card of Bot2's library, Lightning Bolt. Bot1 casts it from exile during the upkeep paying its {R} with a Mox Jet's black mana ("mana of any
+# type can be spent", CR 609.4b); it resolves into its owner Bot2's graveyard (above the Island Bot2 discarded to hand size on turn 2) and deals 3 damage to Bot2: 17.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Laughing Jasper Flint
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x8
+Lightning Bolt
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Laughing Jasper Flint.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Exile.Count = 0
+Bot2.Graveyard = Lightning Bolt; Island

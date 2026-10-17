@@ -1,0 +1,39 @@
+# "Until end of turn, you may cast spells from among those cards": Flint exiles Bot2's Lightning Bolt in the turn-3 upkeep and Bot1 does
+# not cast it; on Bot2's turn 4 the permission is gone (CR 514.2: it ended at cleanup), so `! Bot1.Exile.Lightning Bolt.Cast(Bot2)`
+# is not offered even at instant speed with the Moxen untapped. The cast in the upkeep, the positive control, is the sibling scenario.
+# The Bolt stays in exile.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Laughing Jasper Flint
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x8
+Lightning Bolt
+Island x11
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Laughing Jasper Flint.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.Upkeep]
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot1.Pass
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Stack.Count = 0
+Exile = Lightning Bolt
+Bot2.Life = 20

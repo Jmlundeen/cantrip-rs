@@ -1,0 +1,63 @@
+# "Creatures you control but don't own are Mercenaries in addition to their other types": on turn 3 Bot1 casts Thieving Skydiver kicked with
+# X 1 and takes Bot2's Ornithopter (mana value 0, an artifact creature Bot2 owns), which becomes a Mercenary - an outlaw (CR 700.12) - while
+# Bot2's own Llanowar Elves, which Bot1 does not control, and Bot1's own creatures are not changed. On turn 5 Flint's upkeep trigger
+# counts three outlaws, Flint (Lizard Rogue), the Skydiver (Merfolk Rogue) and the Ornithopter (Mercenary Thopter), and exiles the top 3 cards of
+# Bot2's library; with only the two it would own it would exile 2. Together with the 1 card exiled in the turn-3 upkeep, when Flint was
+# alone, 4 cards are in exile (Bot1 cast none of them).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Laughing Jasper Flint
+Thieving Skydiver
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Island x5
+Island
+Island
+Island x6
+Lightning Bolt
+Island
+Island x7
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Laughing Jasper Flint.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Subtypes = Mercenary; Thopter
+? Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
+[T5 Bot1.Draw]
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 4
+Bot1.Battlefield.Ornithopter.Subtypes = Mercenary; Thopter
+Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf
