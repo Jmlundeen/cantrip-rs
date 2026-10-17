@@ -1,0 +1,34 @@
+# Seedship Impact: "an artifact or ENCHANTMENT", and "2 or less" includes 2. Bot2's Obsessive Pursuit (mana value 2) is destroyed and
+# Bot1 gets a Lander token. The Clue token the Pursuit made stays (it was not the target).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Seedship Impact
+Forest x17
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Obsessive Pursuit
+Swamp x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Obsessive Pursuit.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Seedship Impact.Cast(Bot2.Battlefield.Obsessive Pursuit)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Swamp; Mox Jet; Clue Token
+Bot2.Graveyard = Obsessive Pursuit
+Bot1.Battlefield = Forest; Mox Emerald; Lander Token

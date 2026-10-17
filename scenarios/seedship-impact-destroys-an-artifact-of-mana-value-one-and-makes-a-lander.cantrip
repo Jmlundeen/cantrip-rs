@@ -1,0 +1,41 @@
+# Seedship Impact: "Destroy target artifact or enchantment. If its mana value was 2 or less, create a Lander token." Bot2's Sol Ring
+# (mana value 1) is destroyed and Bot1, not Bot2, gets an untapped Lander token. The target question refuses a creature
+# (Bot2's Llanowar Elves) and a land: only artifacts and enchantments.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Seedship Impact
+Forest x17
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sol Ring
+Llanowar Elves
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+! Bot1.Hand.Seedship Impact.Cast(Bot2.Battlefield.Llanowar Elves)
+! Bot1.Hand.Seedship Impact.Cast(Bot2.Battlefield.Forest)
+Bot1.Hand.Seedship Impact.Cast(Bot2.Battlefield.Sol Ring)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Llanowar Elves; Mox Emerald
+Bot2.Graveyard = Sol Ring
+Bot1.Battlefield = Forest; Mox Emerald; Lander Token
+Bot1.Battlefield.Lander Token.Token = true
+Bot1.Battlefield.Lander Token.Tapped = false

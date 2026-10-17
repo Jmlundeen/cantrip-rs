@@ -1,0 +1,39 @@
+# Seedship Impact: the Lander depends on the target's mana value, not on whether it was destroyed. Bot2's Ornithopter (an
+# artifact creature, mana value 0) is the target; in response Bot2 casts Boros Charm for "permanents you control gain
+# indestructible until end of turn". The destroy does nothing (CR 702.12b), the Ornithopter stays, and Bot1 still creates a
+# Lander because the mana value was 2 or less.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Seedship Impact
+Forest x17
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Ornithopter
+Boros Charm
+Mountain x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Seedship Impact.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Boros Charm.Cast
+Bot2.Modes(2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Pearl; Mox Ruby; Ornithopter
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+Bot1.Battlefield = Forest; Mox Emerald; Lander Token

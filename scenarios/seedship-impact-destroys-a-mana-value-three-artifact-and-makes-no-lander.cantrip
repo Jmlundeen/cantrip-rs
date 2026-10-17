@@ -1,0 +1,37 @@
+# Seedship Impact: "If its mana value was 2 or less, create a Lander token." Bot2's Basalt Monolith has mana value 3: it is
+# destroyed and no Lander is created (the positive control, mana values 1 and 2, are the other scenarios).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Seedship Impact
+Forest x17
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Mox Jet
+Basalt Monolith
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Basalt Monolith.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Seedship Impact.Cast(Bot2.Battlefield.Basalt Monolith)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Island; Mox Pearl; Mox Jet
+Bot2.Graveyard = Basalt Monolith
+Bot1.Battlefield = Forest; Mox Emerald
