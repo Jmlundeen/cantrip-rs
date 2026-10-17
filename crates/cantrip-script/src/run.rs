@@ -1968,6 +1968,15 @@ impl<'s> Run<'s> {
         let on_source: Vec<&ActionOption> = offered.iter().filter(|o| o.source == first.source).collect();
         let mut indices: Vec<u8> = on_source.iter().map(|o| o.index).collect();
         indices.dedup();
+        // Two instances of one ability (CR 113.2c: Locus of Enlightenment crafted with two of a card) are interchangeable,
+        // as same-named cards in one place are: the first offered is used.
+        if let Some(source) = first.source {
+            let chars = self.game.chars(source);
+            let ability_at = |i: u8| chars.abilities().nth(i as usize);
+            if indices.iter().all(|&i| ability_at(i).is_some() && ability_at(i) == ability_at(indices[0])) {
+                indices.truncate(1);
+            }
+        }
         if indices.len() > 1 {
             return fail(format!(
                 "line {}: {} has {} abilities to activate; say which with Ability: ...",
