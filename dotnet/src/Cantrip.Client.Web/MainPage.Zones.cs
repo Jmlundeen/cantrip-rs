@@ -489,7 +489,8 @@ public sealed partial class MainPage
                 Lit: playable.Count > 0));
         }
 
-        // A sideboard holds cards outside the game, which for now means a companion (CR 702.139).
+        // A sideboard holds the cards a player owns outside the game (CR 400.11a): only its owner may look at it, so only its
+        // owner's rail has the button. A companion waits there too (CR 702.139).
         IReadOnlyList<ObjectView> sideboard = client.Zone(ZoneKindView.Sideboard, seat);
         if (sideboard.Count > 0)
         {
@@ -499,7 +500,7 @@ public sealed partial class MainPage
                 seat == client.Seat
                     ? offered
                         ? "Your companion is waiting outside the game. Click to look, and to put it into your hand for {3}"
-                        : "The cards you own outside the game"
+                        : "Your sideboard: the cards you own outside the game. Only you can see them"
                     : $"The card {name} revealed as their companion",
                 _peek == (ZoneKindView.Sideboard, seat),
                 () => { TogglePeek(ZoneKindView.Sideboard, seat); RedrawNow(); }));

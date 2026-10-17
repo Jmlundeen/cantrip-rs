@@ -891,7 +891,7 @@ public sealed class ScenarioPlayer
     }
 
     private const string ClientKeys =
-        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
+        "Stack, Hand, Battlefield, OpponentBattlefield, OpponentHand (the cards known in it), each with .Count; <Row>.<Card>.TypeLine, .Rules, .Status, .Annotation, .Counters (the pills drawn on it, like 3 × incubation), .FaceDownName (what a face-down card really is, to the page that may look at it; empty to one that may not) or .Damage (the marked damage drawn beside its power and toughness, like -3; rows Stack, Hand, Battlefield, OpponentBattlefield, Exile, Graveyard); Facts, OpponentFacts (beside the life total); Mana (the pool's chips, like 2 Blue (land abilities)); Exile.Lit, .Caption, .Tooltip and OpponentExile.*; Sideboard.Caption, .Tooltip, OpponentSideboard.Caption; Graveyard.Lit, .Note; Button.<label> (shown or absent), Arrows (the latest resolution's targets), Over, Prompt.Title, Prompt.Detail, Prompt.Modes, Log.Has (a line of the game log, by its text), Confirm (the button the last choice of cards was confirmed with), Menu (the rows of the card menu last opened), Dock (the dock's buttons), Combat (each combat group as its ground is captioned, with its attackers: Attacking Bot2: Ornithopter); Hand.<Card>.Actions, Battlefield.<Card>.Actions (what the card offers to do, as its menu words it)";
 
     private string? Read(string what, TableState state)
     {
@@ -899,6 +899,7 @@ public sealed class ScenarioPlayer
         PlayerState? me = state.Players?.FirstOrDefault(p => p.Seat == state.Seat);
         PlayerState? them = state.Players?.FirstOrDefault(p => p.Seat != state.Seat);
         static ZoneButtonState? Exile(PlayerState? player) => player?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Exile", StringComparison.Ordinal));
+        static ZoneButtonState? Sideboard(PlayerState? player) => player?.Zones?.FirstOrDefault(z => z.Text.StartsWith("Sideboard", StringComparison.Ordinal));
         return what switch
         {
             "Facts" => string.Join("; ", me?.Facts ?? []),
@@ -911,6 +912,10 @@ public sealed class ScenarioPlayer
             "OpponentExile.Lit" => (Exile(them)?.Lit ?? false) ? "true" : "false",
             "OpponentExile.Caption" => Exile(them)?.Text ?? string.Empty,
             "OpponentExile.Tooltip" => Exile(them)?.Tooltip ?? string.Empty,
+            // The button into the cards a player owns outside the game (CR 400.11a): on its owner's rail alone.
+            "Sideboard.Caption" => Sideboard(me)?.Text ?? string.Empty,
+            "Sideboard.Tooltip" => Sideboard(me)?.Tooltip ?? string.Empty,
+            "OpponentSideboard.Caption" => Sideboard(them)?.Text ?? string.Empty,
             "Graveyard.Lit" => (me?.GraveyardLit ?? false) ? "true" : "false",
             "Graveyard.Note" => me?.GraveyardNote ?? string.Empty,
             "Stack" => Names("stack"),

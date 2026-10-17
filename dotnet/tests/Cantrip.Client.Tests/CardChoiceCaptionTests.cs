@@ -199,4 +199,24 @@ public sealed class CardChoiceCaptionTests
         Assert.Equal("Reveal it", shown.Confirm);
         Assert.Equal("Reveal nothing", CardChoicePresentation.Describe(client, reveal, []).Confirm);
     }
+
+    /// <summary>
+    /// A card put into the hand from outside the game (North Wind Avatar, CR 400.11b) comes from the chooser's sideboard,
+    /// which nothing on the table shows: the caption says so, and the tray is named for it.
+    /// </summary>
+    [Fact]
+    public void A_card_from_outside_the_game_says_so_and_names_the_sideboard()
+    {
+        ObjectView bolt = Card(3, "Lightning Bolt", ZoneKindView.Sideboard, Me, CardTypeView.Instant);
+        ObjectView counterspell = Card(4, "Counterspell", ZoneKindView.Sideboard, Me, CardTypeView.Instant);
+        GameClient client = Seated([Spell(), bolt, counterspell]);
+
+        ChooseCardsPromptMessage fetch = Choice(CardChoicePurposeView.PutIntoHand, 1, true, bolt, counterspell);
+        CardChoicePresentation shown = CardChoicePresentation.Describe(client, fetch, []);
+        Assert.Equal("Strategic Betrayal: choose up to 1 card you own from outside the game to put into your hand", shown.Title);
+        Assert.Equal("0 of 1 chosen  ·  from your sideboard, which only you can see", shown.Detail);
+        Assert.StartsWith("Your sideboard", shown.TrayTitle, StringComparison.Ordinal);
+        Assert.Equal("Take nothing", shown.Confirm);
+        Assert.Equal("Put into your hand", CardChoicePresentation.Describe(client, fetch, [3]).Confirm);
+    }
 }

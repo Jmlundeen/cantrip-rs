@@ -61,10 +61,15 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         // "Any number of": every one of several that may be chosen, as the rules text says when it does not name a count.
         bool anyNumber = prompt.UpTo && prompt.Count >= 255;
         string budget = prompt.MaximumManaValue > 0 || prompt.Purpose == CardChoicePurposeView.CastCopyFree ? $" (total mana value {prompt.MaximumManaValue} or less left to spend)" : string.Empty;
+        // Cards brought into the game from outside it (CR 400.11b: North Wind Avatar) are the chooser's sideboard, which only they
+        // may look at: the caption says where they come from, since nothing on the table shows it.
+        bool outside = prompt.Cards.Count > 0 && prompt.Cards.All(card => client.Object(card)?.Zone == ZoneKindView.Sideboard);
+        string from = outside ? " you own from outside the game" : string.Empty;
         string where = table switch
         {
             ZoneKindView.Battlefield when prompt.Count > 0 => "  ·  click them on the battlefield",
             ZoneKindView.Hand when prompt.Count > 0 => "  ·  click them in your hand",
+            _ when outside => "  ·  from your sideboard, which only you can see",
             _ => string.Empty,
         };
         int power = Cantrip.Core.Decisions.TotalPower.Of(prompt.Eligible, prompt.Powers, picked.Select(h => new ViewHandle(h)));
@@ -104,9 +109,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             // A prevention shield two or more sources would deal damage to at once (CR 615.7): whose damage it prevents first.
             : prompt.Purpose == CardChoicePurposeView.PreventDamageFrom
                 ? $"{source}: choose the source whose damage the shield prevents first"
-            : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind} to {verb}{budget}"
-            : anyNumber ? $"{source}: choose any number of {many} to {verb}{budget}"
-            : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many} to {verb}{budget}";
+            : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind}{from} to {verb}{budget}"
+            : anyNumber ? $"{source}: choose any number of {many}{from} to {verb}{budget}"
+            : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many}{from} to {verb}{budget}";
         string detail = craft
             ? $"{picked.Count} chosen  ·  exiled with {source} to pay the craft cost; {source} returns transformed"
             : prompt.Purpose == CardChoicePurposeView.PreventDamageFrom
@@ -215,6 +220,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             ZoneKindView.Library => "library",
             ZoneKindView.Exile => "exile",
             ZoneKindView.Stack => "stack",
+            ZoneKindView.Sideboard => "sideboard",
             _ => "hand",
         };
         return $"{name} {zone}";

@@ -212,6 +212,9 @@ public static class LogWriter
                 ZoneChangeReasonView.Searched =>
                     $"{Does(actor, "search", "searches")} {their} library and {(actor == seat ? "take" : "takes")} {card}.",
 
+                // A card brought into the game from outside it (CR 400.11b): from its owner's sideboard, which only they see.
+                ZoneChangeReasonView.PutIntoHand when moved.From == ZoneKindView.Sideboard =>
+                    $"{Does(actor, "put", "puts")} {card} into {their} hand from outside the game.",
                 ZoneChangeReasonView.PutIntoHand => $"{Does(actor, "put", "puts")} {card} into {their} hand.",
 
                 ZoneChangeReasonView.Milled => $"{Does(actor, "mill", "mills")} {card}.",
@@ -377,6 +380,7 @@ public static class LogWriter
         ZoneKindView.Hand => "a hand",
         ZoneKindView.Stack => "the stack",
         ZoneKindView.Exile => "exile",
+        ZoneKindView.Sideboard => "outside the game",
         _ => kind.ToString().ToLowerInvariant(),
     };
 

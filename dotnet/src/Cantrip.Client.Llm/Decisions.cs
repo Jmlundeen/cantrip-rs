@@ -1238,7 +1238,7 @@ public sealed class Decisions
             CardChoicePurposeView.Exile => $"{source}: exile {many}{kind} card(s){where}.",
             CardChoicePurposeView.PutOnTop => $"{source}: put {many} card(s) on top of the library, last chosen on top.",
             CardChoicePurposeView.PutOntoBattlefield => $"{source}: put {many}{kind} card(s) onto the battlefield.",
-            CardChoicePurposeView.PutIntoHand => $"{source}: put {many}{kind} card(s) into your hand.",
+            CardChoicePurposeView.PutIntoHand => $"{source}: put {many}{kind} card(s){where} into your hand.",
             CardChoicePurposeView.PutIntoGraveyard => $"{source}: put {many}{kind} card(s) into the graveyard.",
             CardChoicePurposeView.Reveal => $"{source}: choose {many}{kind} card(s) to reveal. What happens to a revealed card is on the card's text.",
             CardChoicePurposeView.ReturnToHand => prompt.Kind.Length > 0
@@ -1284,6 +1284,8 @@ public sealed class Decisions
                 ZoneKindView.Library => $"{GameText.Whose(client, place.ZoneOwner)} library",
                 ZoneKindView.Exile => "exile",
                 ZoneKindView.Stack => "the stack",
+                // The cards the chooser owns outside the game (CR 400.11a), which only they may look at.
+                ZoneKindView.Sideboard => $"outside the game ({GameText.Whose(client, place.ZoneOwner)} sideboard)",
                 _ => $"{GameText.Whose(client, place.ZoneOwner)} hand",
             })
             .Distinct()];
