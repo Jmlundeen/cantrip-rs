@@ -475,6 +475,19 @@ pub static OCTOPUS: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A 4/4 green Beast creature token with trample. Garruk, Curse Breaker and Garruk, Veiled Butcher make it.
+pub static BEAST_4_4_TRAMPLE: CardDef = CardDef {
+    name: "Beast",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Beast]),
+    power: Some(4),
+    toughness: Some(4),
+    keywords: Keywords::of(&[Keyword::Trample]),
+    ..CardDef::BLANK
+};
+
 /// A 1/1 white Rabbit creature token. Jacked Rabbit and Hop to It make it.
 pub static RABBIT: CardDef = CardDef {
     name: "Rabbit",

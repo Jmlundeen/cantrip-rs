@@ -212,6 +212,15 @@ pub fn untap_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// "Untap [N] target [permanents]" (CR 701.26, 608.2b): each target that is still legal as the ability resolves. Argothian
+/// Elder, Candelabra of Tawnos and Garruk, Curse Breaker print it (for lands).
+pub fn untap_targets(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    for permanent in crate::targets::legal_objects(g, item) {
+        g.untap(permanent);
+    }
+    Ok(())
+}
+
 /// "You may [do something]" (CR 117.3, 609.3): asks `player` whether to, for `purpose`, and says whether they did. The
 /// question is the usual `May`, so a scenario answers it with `Accept` or `Decline`. Ad Nauseam, Cori-Steel Cutter and Currency Converter ask
 /// it.
