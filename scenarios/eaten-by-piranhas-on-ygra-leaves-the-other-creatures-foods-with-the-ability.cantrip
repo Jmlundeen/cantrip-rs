@@ -1,0 +1,65 @@
+# Known bug: KI-36 - Ygra's static ability spans layers 4 and 6; once it has applied in layer 4 it goes on applying in layer 6 though Eaten by Piranhas takes it away (CR 613.6), and the engine drops its layer-6 part
+# Eaten by Piranhas on Ygra herself: she loses all abilities in layer 6 and is a 1/1 black Skeleton creature. Her "Other
+# creatures are Food artifacts ... and have '{2}, {T}, Sacrifice this permanent: You gain 3 life'" has applied in layer 4
+# before that (Bot2's Llanowar Elves are a Food artifact), and an effect that has started to apply in one layer goes on
+# applying in the later ones "even if the ability generating the effect is removed during this process" (CR 613.6): the
+# Elves still have the ability, and Bot2 activates it. Ygra's own "Whenever a Food ..." is gone, so she gets no counters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Sapphire
+Eaten by Piranhas
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Ygra, Eater of All)
+Bot2.Pass
+? Bot1.Battlefield.Ygra, Eater of All.Subtypes = Skeleton
+? Bot1.Battlefield.Ygra, Eater of All.Power = 1
+? Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Food
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Llanowar Elves.Activate(Ability: You gain 3 life)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot2.Life = 23
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Ygra, Eater of All.Counters.PlusOnePlusOne = (absent)

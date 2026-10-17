@@ -1,0 +1,54 @@
+# "Whenever a Food is put into a graveyard from the battlefield": Bot2's Llanowar Elves is a Food because of Ygra, and
+# Swords to Plowshares exiles it. It goes to exile, not to a graveyard, so Ygra's ability does not trigger (the stack is
+# empty once the Swords has resolved) and Ygra gets no counters. Bot2 gains 1 life, the Elves' power.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Pearl
+Swords to Plowshares
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Llanowar Elves.Subtypes = Druid; Elf; Food
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Exile = Llanowar Elves
+Bot2.Life = 21
+Bot1.Battlefield.Ygra, Eater of All.Counters.PlusOnePlusOne = (absent)

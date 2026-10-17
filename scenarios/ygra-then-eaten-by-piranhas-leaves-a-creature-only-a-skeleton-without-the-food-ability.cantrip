@@ -1,0 +1,59 @@
+# Ygra first, Eaten by Piranhas later on Bot2's Llanowar Elves ("Enchanted creature loses all abilities and is a black
+# Skeleton creature with base power and toughness 1/1"). Neither changes what the other applies to - the Elves are a
+# creature either way - so they apply in timestamp order (CR 613.7). Layer 4: Ygra's makes them a Food artifact, then
+# Piranhas' makes them a Skeleton creature and nothing else (CR 205.1a). Layer 6: Ygra's grants "{2}, {T}, Sacrifice this
+# permanent: You gain 3 life", then Piranhas' takes every ability (CR 613.1f) - the refusal, with Bot2's mana for it floating.
+# The other order is eaten-by-piranhas-then-ygra-leaves-a-food-skeleton-that-has-the-food-ability.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Sol Ring
+Ygra, Eater of All
+Mox Sapphire
+Eaten by Piranhas
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ygra, Eater of All.Cast
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Eaten by Piranhas.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+! Bot2.Battlefield.Llanowar Elves.Activate(Ability: You gain 3 life)
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Llanowar Elves.Types = Creature
+Bot2.Battlefield.Llanowar Elves.Subtypes = Skeleton
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Life = 20

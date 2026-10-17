@@ -358,13 +358,16 @@ a source when the actions offered for it include a mana ability, or the view say
 generating the effect is removed during this process". A card's static abilities are one `StaticDef` per layer, and
 `layers::statics` drops every layer-6-and-later part of a source that lost all its abilities, so a single ability that spans a
 layer before 6 and one after loses its later part: Opalescence or March of the Machines made to lose its abilities (layer 4, then
-7b), Kenrith's Transformation on a creature that loses its abilities. No card in content reaches it: the only "loses all
-abilities" static is an Aura's, and no permanent with a multi-layer static can become a creature that loses its abilities. A
+7b), Kenrith's Transformation on a creature that loses its abilities, Ygra, Eater of All under Eaten by Piranhas (layer 4,
+then 6: the other creatures stay Food artifacts but lose the granted "You gain 3 life"). A
 fix groups a card's `StaticDef`s by ability, so the later parts of one that applied earlier keep applying to the set of objects
 fixed then. A "loses all abilities" ability that takes its own source's (Humility made a creature) already goes on applying
 (`Stripped::applying`).
 
-**Scenarios.** None can be written with the cards in content.
+**Scenarios.**
+- [`scenarios/eaten-by-piranhas-on-ygra-leaves-the-other-creatures-foods-with-the-ability.cantrip`](../scenarios/eaten-by-piranhas-on-ygra-leaves-the-other-creatures-foods-with-the-ability.cantrip) -
+  `# Known bug`: Bot2's Llanowar Elves are still a Food after Piranhas takes Ygra's abilities, but can't activate the
+  granted ability.
 
 ### KI-37: A sideboard card the engine does not have is left out of the game
 
