@@ -1,0 +1,47 @@
+# Grim Bauble with no creature an opponent controls: its enters trigger has no legal target and is removed from the stack (CR
+# 603.3d, 608.2b), so no target is asked (`! Bot1.Target`). On turn 3 "{2}{B}, {T}, Sacrifice this artifact: Surveil 2" (CR 701.25): the
+# Bauble is sacrificed as a cost; the top two cards, Forest and Swamp, are looked at (Mountain was the turn-3 draw), Forest
+# stays on top and Swamp goes to the graveyard (the surveil is two cards, not one).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Grim Bauble
+Plains
+Plains
+Plains
+Mountain
+Forest
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grim Bauble.Cast
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Grim Bauble.Activate
+Bot1.Arrange(Forest | Swamp)
+? Bot1.Library.Count = 11
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Swamp; Grim Bauble
+Bot1.Library.Count = 11
+Bot1.Library = Forest; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Ruby

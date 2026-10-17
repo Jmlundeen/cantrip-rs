@@ -1,0 +1,35 @@
+# Grim Bauble's -2/-2 lasts until end of turn (CR 611.2, 514.2): Bot2's Concealing Curtains (0/4) is a -2/2 on turn 3 after the
+# trigger resolves, and an ordinary 0/4 again on turn 4 once cleanup has ended the effect.
+
+[Bot1 Deck]
+Mox Jet
+Grim Bauble
+Plains x15
+
+[Bot2 Deck]
+Mox Jet
+Concealing Curtains
+Plains x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grim Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Concealing Curtains.Power = -2
+? Bot2.Battlefield.Concealing Curtains.Toughness = 2
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Concealing Curtains.Power = 0
+? Bot2.Battlefield.Concealing Curtains.Toughness = 4
+
+[Expect]
+Turn = 4
+Bot2.Battlefield = Mox Jet; Concealing Curtains
