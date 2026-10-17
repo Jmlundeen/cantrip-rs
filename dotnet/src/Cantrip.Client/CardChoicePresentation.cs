@@ -114,11 +114,16 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             // Banding (CR 702.22c, 508.1e): the attackers that attack in a band with the source.
             : prompt.Purpose == CardChoicePurposeView.Band
                 ? $"{source} has banding: choose attacking creatures to band with it, or none"
+            // Sylvan Library: the cards each later paid for or put back, not the ones that go back.
+            : prompt.Purpose == CardChoicePurposeView.PayLifeOrPutOnTop
+                ? $"{source}: choose {prompt.Count} cards in your hand drawn this turn - for each, pay {prompt.Life} life or put it on top of your library"
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind}{from} to {verb}{budget}"
             : anyNumber ? $"{source}: choose any number of {many}{from} to {verb}{budget}"
             : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many}{from} to {verb}{budget}";
         string detail = craft
             ? $"{picked.Count} chosen  ·  exiled with {source} to pay the craft cost; {source} returns transformed"
+            : prompt.Purpose == CardChoicePurposeView.PayLifeOrPutOnTop
+            ? $"{picked.Count} of {prompt.Count} chosen  ·  you are asked about each in turn; the cards not chosen stay{where}"
             : prompt.Purpose == CardChoicePurposeView.PreventDamageFrom
             ? $"It has {prompt.PreventLeft} damage left to prevent; what it can't prevent of the others' damage is dealt{where}"
             : prompt.Purpose == CardChoicePurposeView.Band
@@ -174,6 +179,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Reveal => picked.Count == 0 ? "Reveal nothing" : "Reveal it",
             CardChoicePurposeView.PreventDamageFrom => "Prevent its damage first",
             CardChoicePurposeView.Band => picked.Count == 0 ? "No band" : picked.Count == 1 ? "Band with it" : $"Band with {picked.Count}",
+            CardChoicePurposeView.PayLifeOrPutOnTop => picked.Count == 1 ? "Choose it" : "Choose them",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",

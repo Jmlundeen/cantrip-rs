@@ -1246,6 +1246,10 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     [Key(18)]
     public int PreventLeft { get; set; }
 
+    /// <summary>For <see cref="CardChoicePurposeView.PayLifeOrPutOnTop"/>, the life each chosen card costs to keep (Sylvan Library's 4).</summary>
+    [Key(20)]
+    public int Life { get; set; }
+
     /// <summary>
     /// For <see cref="CardChoicePurposeView.Band"/>, the eligible creatures without banding, of which a band may have at most
     /// one (CR 702.22c).

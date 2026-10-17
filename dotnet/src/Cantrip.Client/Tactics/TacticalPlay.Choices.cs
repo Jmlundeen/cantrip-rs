@@ -827,6 +827,8 @@ public sealed partial class TacticalPlay
         // (Break Out) is taken, so the ordinary best-first ranking stands.
         bool losing = prompt.Purpose is CardChoicePurposeView.Discard or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.Exile
             or CardChoicePurposeView.PutOnBottom or CardChoicePurposeView.PutIntoGraveyard or CardChoicePurposeView.PutOnTop
+            // Sylvan Library's two cards are paid for or put back, so the ones worth least are chosen and the best kept free.
+            or CardChoicePurposeView.PayLifeOrPutOnTop
             or CardChoicePurposeView.ExileToPay or CardChoicePurposeView.TapToPay or CardChoicePurposeView.Tap or CardChoicePurposeView.Destroy
             // Blight (CR 701.68a) shrinks its own creature: the one worth least takes the counters. Behold loses nothing, so the
             // ordinary best-first ranking stands (every candidate already is the quality the cost names).
@@ -1091,6 +1093,10 @@ public sealed partial class TacticalPlay
                 && Pick(client, view, copy, Guess(client, view, CardReading.Text(copied).Split('.')[0]), 1, optional: true).Worth > Policy("margin")
                 && ++_copies > 0,
 
+            // Dredge N (CR 702.52a): the card back for N cards milled in place of a draw. Taken while the library keeps at
+            // least ten cards afterwards, so the mill never brings an empty library, and losing to it, close.
+            "Dredge" => (Summary(view, client.Seat)?.LibraryCount ?? 0) - prompt.Amount >= 10,
+
             // Obeka (CR 724.1): asked of the player whose turn it is, so ending it gives up the rest of this seat's own turn.
             // Worth it only to stop an opponent's spell or ability waiting beneath the resolving one, when none of this
             // seat's own would be exiled with it.
@@ -1120,10 +1126,29 @@ public sealed partial class TacticalPlay
     /// multiply apply to those today, so their order changes nothing, and with +1/+1 counters beside them the seat does not
     /// weigh one kind against the other. Damage to this seat
     /// or its permanent is made as little as it can be: a prevention effect goes before one that doubles or adds to it
-    /// (Furnace of Rath's ruling: 5 damage, 4 prevented, then doubled, is 2 rather than 6).
+    /// (Furnace of Rath's ruling: 5 damage, 4 prevented, then doubled, is 2 rather than 6). A card this seat would draw
+    /// (CR 121.6) goes to the effect that does most for it: one that wins the game first (Laboratory Maniac); then one that
+    /// draws two instead (Thought Reflection), so that each of the two meets the others; then one that puts a card into
+    /// its hand instead (dredge, Underrealm Lich, Abundance); then the rest, and last one that discards (Chains of
+    /// Mephistopheles). An effect that hands the draw to an opponent (Notion Thief, Hullbreacher's Treasure) goes before
+    /// the effects that would make it two, and after those that would keep the card.
     /// </summary>
     private static AnswerPayload Replacement(ChooseReplacementPromptMessage prompt)
     {
+        if (prompt.Event == "You would draw a card" && prompt.Hints.Count > 0)
+        {
+            bool keeps = prompt.Hints.Any(hint => hint.Contains("hand instead", StringComparison.Ordinal));
+            int Rank(string hint) =>
+                hint.Contains("wins the game", StringComparison.Ordinal) ? 0
+                : hint.Contains("skips the draw", StringComparison.Ordinal) || hint.Contains("Treasure", StringComparison.Ordinal) ? (keeps ? 5 : 1)
+                : hint.Contains("draws two", StringComparison.Ordinal) ? 2
+                : hint.Contains("hand instead", StringComparison.Ordinal) ? 3
+                : hint.Contains("discards", StringComparison.Ordinal) ? 6
+                : 4;
+            int best = Enumerable.Range(0, prompt.Hints.Count).MinBy(i => Rank(prompt.Hints[i]));
+            return new ReplacementChosenAnswer { Index = best };
+        }
+
         if (prompt.Event.Contains(" would be put on ", StringComparison.Ordinal))
         {
             if (prompt.Event.Contains("-1/-1", StringComparison.Ordinal))

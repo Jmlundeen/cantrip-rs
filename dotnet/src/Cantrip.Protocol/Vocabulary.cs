@@ -331,6 +331,9 @@ public enum CardChoicePurposeView
     /// (CR 702.22h).
     /// </summary>
     Band = 32,
+
+    /// <summary>Cards in the chooser's hand drawn this turn, for each of which they then pay the prompt's <c>Life</c> life or put it on top of their library (Sylvan Library): the cards the payments are about, not those that go back.</summary>
+    PayLifeOrPutOnTop = 33,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>
