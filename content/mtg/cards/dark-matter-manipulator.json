@@ -1,0 +1,8 @@
+{
+  "name": "Dark Matter Manipulator",
+  "manaCost": "{B}",
+  "type": "Creature — Human Warlock",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "When this creature enters, mill three cards.\nThis creature gets +2/+0 for every seven cards in your graveyard."
+}

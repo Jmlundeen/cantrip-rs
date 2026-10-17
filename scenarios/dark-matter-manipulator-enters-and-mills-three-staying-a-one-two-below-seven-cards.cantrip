@@ -1,0 +1,29 @@
+# Dark Matter Manipulator: "When this creature enters, mill three cards" and "+2/+0 for every seven cards in your graveyard".
+# Bot1 casts it on turn 1 with a Mox Jet: the top three cards of its library (an Island, a Swamp and a Plains) go to its
+# graveyard in that order, the library loses exactly three, and with three cards in the graveyard (not a full seven) it is
+# still a 1/2.
+
+[Bot1 Deck]
+Mox Jet
+Dark Matter Manipulator
+Island x5
+Island
+Swamp
+Plains
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Matter Manipulator.Cast
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Plains; Swamp; Island
+Bot1.Library.Count = 10
+Bot1.Battlefield.Dark Matter Manipulator.Power = 1
+Bot1.Battlefield.Dark Matter Manipulator.Toughness = 2
+Bot1.Battlefield.Dark Matter Manipulator.Subtypes = Human; Warlock

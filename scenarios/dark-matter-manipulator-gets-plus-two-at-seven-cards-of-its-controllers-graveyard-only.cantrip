@@ -1,0 +1,47 @@
+# Dark Matter Manipulator: "+2/+0 for every seven cards in YOUR graveyard". Turn 1 Bot1 casts one (Mox Jet; mills three), then
+# Faithless Looting (a Mox Ruby; draws two, discards two, and itself: six cards in the graveyard, still a 1/2, checked) and a
+# Lightning Bolt at Bot2 (a second Ruby): seven cards, so it is a 3/2. On turn 2 Bot2 casts its own Manipulator: it mills three and
+# has three cards in its graveyard, so it is a 1/2, whatever Bot1's graveyard holds (Bot1's is 3/2 still).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Ruby
+Dark Matter Manipulator
+Faithless Looting
+Lightning Bolt
+Island
+Island x3
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Dark Matter Manipulator
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Matter Manipulator.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Island; Plains)
+? Bot1.Graveyard.Count = 6
+? Bot1.Battlefield.Dark Matter Manipulator.Power = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Matter Manipulator.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard.Count = 7
+Bot1.Battlefield.Dark Matter Manipulator.Power = 3
+Bot1.Battlefield.Dark Matter Manipulator.Toughness = 2
+Bot2.Graveyard.Count = 3
+Bot2.Battlefield.Dark Matter Manipulator.Power = 1
+Bot2.Life = 17
