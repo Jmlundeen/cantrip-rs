@@ -814,20 +814,39 @@ public sealed class TacticalPlayTests
     }
 
     [Fact]
-    public void Discards_two_cards_for_an_Ill_Timed_Explosion_only_while_the_other_side_has_more_creatures()
+    public void Discards_two_cards_for_an_Ill_Timed_Explosion_only_when_the_damage_kills_more_of_theirs_than_of_its_own()
     {
-        // Ill-Timed Explosion: damage to every creature, this seat's own among them, so the price of two cards is paid
-        // only when more creatures stand across the table than on this seat's side.
+        // Ill-Timed Explosion: damage to every creature, this seat's own among them, equal to the greatest mana value of the
+        // two cards discarded. It is paid for only when that kills more creatures across the table than on this seat's side.
         ObjectView explosion = InHand(20, "Ill-Timed Explosion", CardTypeView.Sorcery, 4, "Draw two cards. Then you may discard two cards.");
         explosion.Zone = ZoneKindView.Stack;
         explosion.ZoneOwner = 0;
         explosion.Controller = Me;
         MayPromptMessage prompt = new() { Player = Me, Source = Handle(20), Verb = "DiscardForSweep" };
 
-        GameClient outnumbered = Seated([explosion, Creature(1, "Mine", 2, 2), Creature(2, "Theirs", 2, 2, Them), Creature(3, "Theirs too", 2, 2, Them)]);
-        GameClient even = Seated([explosion, Creature(1, "Mine", 2, 2), Creature(2, "Theirs", 2, 2, Them)]);
+        ObjectView bigSpell = InHand(30, "Big Spell", CardTypeView.Sorcery, 5, "Draw a card.");
+        ObjectView smallSpell = InHand(31, "Small Spell", CardTypeView.Instant, 1, "Draw a card.");
+        ObjectView spareLand = InHand(32, "Mountain", CardTypeView.Land, 0);
+        ObjectView otherLand = InHand(33, "Mountain", CardTypeView.Land, 0);
 
-        Assert.True(Assert.IsType<MayChosenAnswer>(Bot().Decide(outnumbered, prompt)).Accept);
+        // Five damage kills both of their 4/4s and its one 2/2, and the discards include the five-drop.
+        GameClient big = Seated([explosion, bigSpell, smallSpell, spareLand, Creature(1, "Mine", 2, 2), Creature(2, "Theirs", 4, 4, Them), Creature(3, "Theirs too", 4, 4, Them)]);
+        Assert.True(Assert.IsType<MayChosenAnswer>(Bot().Decide(big, prompt)).Accept);
+
+        List<ViewHandle> discarded = [.. Assert.IsType<CardsChosenAnswer>(Bot().Decide(big, new ChooseCardsPromptMessage
+        {
+            Player = Me, Owner = Me, Source = Handle(20), Purpose = CardChoicePurposeView.Discard,
+            Cards = [Handle(30), Handle(31), Handle(32)], Eligible = [Handle(30), Handle(31), Handle(32)], Count = 2,
+        })).Cards];
+        Assert.Equal(2, discarded.Count);
+        Assert.Contains(Handle(30), discarded);
+
+        // Outnumbering them is not enough when the best it can discard is a one-drop: one damage kills none of their 4/4s.
+        GameClient small = Seated([explosion, smallSpell, spareLand, otherLand, Creature(1, "Mine", 1, 1), Creature(2, "Theirs", 4, 4, Them), Creature(3, "Theirs too", 4, 4, Them)]);
+        Assert.False(Assert.IsType<MayChosenAnswer>(Bot().Decide(small, prompt)).Accept);
+
+        // And when the damage kills as many of its own as of theirs, it keeps its cards.
+        GameClient even = Seated([explosion, bigSpell, smallSpell, spareLand, Creature(1, "Mine", 2, 2), Creature(2, "Theirs", 2, 2, Them)]);
         Assert.False(Assert.IsType<MayChosenAnswer>(Bot().Decide(even, prompt)).Accept);
     }
 

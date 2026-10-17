@@ -314,6 +314,47 @@ public sealed partial class TacticalPlay
         return 0.3 + worth - (0.15 * Math.Max(card.ManaValue - lands - landsHeld - 1, 0));
     }
 
+    /// <summary>
+    /// The two cards Ill-Timed Explosion has this seat discard: the card it wants least, and, with it, the other card of most
+    /// mana value, since the damage is the greatest mana value of the two. Empty with fewer than two to choose from.
+    /// </summary>
+    private List<ObjectView> SweepDiscards(GameClient client, IEnumerable<ViewHandle> eligible)
+    {
+        List<ViewHandle> ranked = Ranked(client, eligible);
+        if (ranked.Count < 2 || client.Object(ranked[^1]) is not { } worst)
+        {
+            return [];
+        }
+
+        ObjectView? highest = ranked.Take(ranked.Count - 1)
+            .Select(client.Object)
+            .OfType<ObjectView>()
+            .OrderByDescending(card => card.ManaValue)
+            .FirstOrDefault();
+
+        return highest is null ? [] : [highest, worst];
+    }
+
+    /// <summary>
+    /// Whether Ill-Timed Explosion's damage, the greatest mana value among the two cards <see cref="SweepDiscards"/> would
+    /// have this seat discard, kills more creatures across the table than this seat's own (toughness less damage marked, at
+    /// most that much).
+    /// </summary>
+    private bool SweepPays(GameClient client, PlayerView view)
+    {
+        List<ObjectView> discards = SweepDiscards(client, client.MyHand().Select(card => card.Handle));
+        if (discards.Count < 2)
+        {
+            return false;
+        }
+
+        int damage = discards.Max(card => card.ManaValue);
+        bool Dies(ObjectView creature) => (creature.Toughness ?? 0) - creature.DamageMarked <= damage;
+
+        return view.Players.Where(player => player.Seat != client.Seat).Sum(player => Creatures(client, player.Seat).Count(Dies))
+            > Creatures(client, client.Seat).Count(Dies);
+    }
+
     /// <summary>These cards from the one this seat wants most to the one it wants least.</summary>
     private List<ViewHandle> Ranked(GameClient client, IEnumerable<ViewHandle> cards)
     {
@@ -434,6 +475,12 @@ public sealed partial class TacticalPlay
                 : prompt.Eligible.OrderByDescending(card => client.Object(card)?.Power ?? 0).First();
             _stationWith = ViewHandle.None;
             return new CardsChosenAnswer { Cards = [chosen] };
+        }
+
+        // Ill-Timed Explosion: the two cards that make the damage biggest for the least loss (see SweepDiscards).
+        if (prompt.Purpose == CardChoicePurposeView.Discard && !prompt.UpTo && most == 2 && client.Object(prompt.Source)?.Name == "Ill-Timed Explosion")
+        {
+            return new CardsChosenAnswer { Cards = [.. SweepDiscards(client, prompt.Eligible).Select(card => card.Handle)] };
         }
 
         // What to behold (CR 701.4a): a permanent on the battlefield before a card from the hand, since revealing a card tells the
@@ -676,11 +723,9 @@ public sealed partial class TacticalPlay
             // kill — life loss is not a payment and nothing stops a player revealing past zero.
             "RevealAgain" => life >= 10,
 
-            // Ill-Timed Explosion: damage to every creature, this seat's own included, for the price of two cards. Worth it
-            // while the creatures across the table outnumber this seat's; how much damage it is comes from the cards the
-            // next question has it discard.
-            "DiscardForSweep" => view.Players.Where(player => player.Seat != client.Seat).Sum(player => Creatures(client, player.Seat).Count())
-                > Creatures(client, client.Seat).Count(),
+            // Ill-Timed Explosion: damage to every creature, this seat's own included, for the price of two cards. Worth it only
+            // when the damage the discards would make (see SweepDiscards) kills more creatures across the table than this seat's.
+            "DiscardForSweep" => SweepPays(client, view),
 
             // Pia's Revolution: three damage to keep an artifact out of its owner's hand, while it cannot get close.
             "TakeDamageInsteadOfReturn" => life - prompt.Amount >= 10,
