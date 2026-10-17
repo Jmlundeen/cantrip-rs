@@ -64,6 +64,30 @@ pub fn search_to_exile(
     Ok(moved)
 }
 
+/// "Search [`owner`]'s graveyard, hand, and library for any number of cards with the same name as" an object whose `names` the
+/// caller read before it moved (`object_names`: CR 608.2h, the object as it last existed, since a move makes a new object,
+/// CR 400.7, and a card's copy, face-down or transformed state is gone with it) "and exile them.
+/// That player shuffles, then draws a card for each card exiled from their hand this way" (CR 701.23, 701.23a, 406.2):
+/// `searcher` (the spell's controller) does the searching, in the order the text names the zones; each zone is a search for
+/// any number (CR 701.23b), so cards of the name may be left. A card matches by sharing one of `names` (CR 201.2); the cards found go to exile together, and `owner` draws one card for each that
+/// reached exile from their hand. Deadly Cover-Up (the owner of a card it exiled) and The End (the controller of the
+/// permanent it exiled) print it.
+pub fn exile_same_name_from_graveyard_hand_and_library(g: &mut dyn Game, searcher: PlayerId, owner: PlayerId, source: ObjectId, names: &[&'static str]) -> Result<(), Suspend> {
+    let has_name = |q: &dyn Query, c: ObjectId| object_names(q, c).iter().any(|n| names.contains(n));
+    let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(owner)).iter().copied().filter(|&c| has_name(g, c)).collect();
+    let mut found = crate::choose::cards(g, searcher, source, Purpose::Exile, graveyard, u8::MAX, true)?;
+    let in_graveyard = found.len();
+    let hand: Vec<ObjectId> = g.state().zone(Zone::hand(owner)).iter().copied().filter(|&c| has_name(g, c)).collect();
+    found.extend(crate::choose::cards(g, searcher, source, Purpose::Exile, hand, u8::MAX, true)?);
+    let cards_found = found.len();
+    // The library is searched and everything found goes to exile together; the owner shuffles (CR 701.23, 406.2).
+    let moved = search_to_exile(g, searcher, owner, source, Find::ONE.up_to(u8::MAX), &found, |q, c| has_name(q, c))?;
+    // A card for each one that actually reached exile from the hand: a replacement may have sent one elsewhere.
+    let from_hand = moved[in_graveyard..cards_found].iter().filter(|&&c| g.obj(c).zone.is(ZoneKind::Exile)).count();
+    g.draw(owner, from_hand as u32);
+    Ok(())
+}
+
 /// "Search your library for [cards], put them into your hand, then shuffle" (CR 701.23): the cards found, as they are
 /// in the hand. Demonic Tutor (`Find::ANY`) and Expedition Map (`Find::ONE.revealed()`) print it.
 pub fn search_to_hand(
