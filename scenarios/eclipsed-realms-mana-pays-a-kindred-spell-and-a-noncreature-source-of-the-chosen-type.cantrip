@@ -1,0 +1,49 @@
+# Eclipsed Realms' "a spell of the chosen type or ... an ability of a source of the chosen type" (CR 106.6, 205.3, 602.2b)
+# asks no card type: Goblin chosen, its {R} pays for Firdoch Core (a changeling Kindred artifact, every creature type, CR
+# 702.73a) on turn 1 with Black Lotus's, for Tarfire (a Kindred Instant - Goblin) at Bot2 on turn 3, and on turn 5, with
+# the Core's own {R} and two Mountains', for the Core's "{4}: This artifact becomes a 4/4 artifact creature until end of
+# turn" - an ability of a noncreature source of the type. Secluded Courtyard, whose mana says "creature", refuses the same.
+
+[Bot1 Deck]
+Eclipsed Realms
+Black Lotus
+Firdoch Core
+Tarfire
+Mountain
+Mountain
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Eclipsed Realms.Play
+Bot1.Modes(Goblin)
+Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Firdoch Core.Cast(Spend: R GoblinSpellsOrAbilities, R, R)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Red)
+Bot1.Hand.Tarfire.Cast(Bot2; Spend: R GoblinSpellsOrAbilities)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Red)
+Bot1.Battlefield.Firdoch Core.Activate(Ability: any color; Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Firdoch Core.Activate(Ability: becomes; Spend: R GoblinSpellsOrAbilities, R, R, R)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Life = 18
+Bot1.Battlefield.Firdoch Core.Power = 4
+Bot1.Mana =

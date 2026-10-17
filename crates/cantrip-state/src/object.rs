@@ -996,8 +996,8 @@ pub enum ManaPayment {
     /// `from` is the kind of zone it is cast from (CR 601.2a): where the card is, for the advice; where it was, once on
     /// the stack (`Obj::cast_from`).
     Spell { types: TypeSet, subtypes: SubtypeSet, legendary: bool, mana_value: u32, x: bool, from: ZoneKind },
-    /// Activating an ability whose source has these card types (CR 602.2b, 605.3a), and these subtypes - worked out only
-    /// where some mana at hand is restricted by subtype, as for a spell.
+    /// Activating an ability whose source has these card types and these subtypes as it is activated (CR 602.2b, 605.3a):
+    /// both always filled, from the source's characteristics.
     Ability { source: TypeSet, subtypes: SubtypeSet },
     /// Anything else: a special action, "unless ... pays", a cost a resolving effect asks for.
     Other,

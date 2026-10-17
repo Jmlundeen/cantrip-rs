@@ -1,8 +1,10 @@
 # Mudflat Village. "{T}: Add {B}. Spend this mana only to cast a creature spell" (CR 106.6): on turn 1 that {B}, the only
 # mana, can't cast Dark Ritual (the refusal) but casts Callous Inspector. Bot2's Lightning Bolts kill the Inspector (a
-# Human) on turn 2 and Blazing Rootwalla (a Lizard) on turn 4. Turn 5: "{1}{B}, {T}, Sacrifice this land: Return target Bat,
-# Lizard, Rat, or Squirrel card from your graveyard to your hand" can't target the Inspector's card but returns the
-# Rootwalla's, paid with the Swamp and the Mountain; the Village is in the graveyard.
+# Human) on turn 2 and Blazing Rootwalla (a Lizard) on turn 4, and on turn 6 Bot2's own Rootwalla. Turn 7: "{1}{B}, {T},
+# Sacrifice this land: Return target Bat,
+# Lizard, Rat, or Squirrel card from your graveyard to your hand" can't target the Inspector's card, nor Bot2's Rootwalla
+# (a Lizard, in another graveyard), but returns Bot1's Rootwalla, paid with the Swamp
+# and the Mountain; the Village is in the graveyard.
 
 [Bot1 Deck]
 Mudflat Village
@@ -18,7 +20,10 @@ Mountain
 Lightning Bolt
 Mountain
 Lightning Bolt
-Mountain x16
+Blazing Rootwalla
+Lightning Bolt
+Mountain
+Mountain x13
 
 [Actions]
 Bot1.Hand.Mudflat Village.Play
@@ -46,19 +51,31 @@ Bot2.Battlefield.Mountain#1.Activate
 Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Blazing Rootwalla)
 Bot2.Pass
 Bot1.Pass
-[T5 Bot1.Main1]
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Blazing Rootwalla.Cast
+Bot2.Pass
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Blazing Rootwalla)
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
 Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Mountain.Activate
 ! Bot1.Battlefield.Mudflat Village.Activate(Ability: Return; Bot1.Graveyard.Callous Inspector)
+! Bot1.Battlefield.Mudflat Village.Activate(Ability: Return; Bot2.Graveyard.Blazing Rootwalla)
 Bot1.Battlefield.Mudflat Village.Activate(Ability: Return; Bot1.Graveyard.Blazing Rootwalla)
 Bot1.Pass
 Bot2.Pass
 
 [Expect]
-Turn = 5
+Turn = 7
 Bot1.Life = 19
-Bot1.Hand = Blazing Rootwalla; Dark Ritual; Island; Island; Island
+Bot1.Hand = Blazing Rootwalla; Dark Ritual; Island; Island; Island; Island
 Bot1.Graveyard = Mudflat Village; Callous Inspector
+Bot2.Graveyard = Blazing Rootwalla; Lightning Bolt; Lightning Bolt; Lightning Bolt
 Bot1.Battlefield = Clue Token; Mountain; Swamp
 Bot1.Mana =

@@ -196,9 +196,10 @@ public sealed class RestrictedManaView
     public ManaSpendEffectView Effect { get; set; }
 
     /// <summary>
-    /// For <see cref="ManaSpendFilterView.SubtypeSpells"/> and <see cref="ManaSpendFilterView.SubtypeCreatureSpells"/>:
-    /// the subtypes, any one of which the spell must have ("Dragon", "Omen"). Empty for a chosen type never chosen,
-    /// which no spell has.
+    /// For <see cref="ManaSpendFilterView.SubtypeSpells"/>, <see cref="ManaSpendFilterView.SubtypeCreatureSpells"/>,
+    /// <see cref="ManaSpendFilterView.SubtypeSpellsOrAbilities"/> and <see cref="ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities"/>:
+    /// the subtypes, any one of which the spell (or the ability's source) must have ("Dragon", "Omen"). Empty for a chosen
+    /// type never chosen, which nothing has.
     /// </summary>
     [Key(5)]
     public List<string> SpendSubtypes { get; set; } = [];

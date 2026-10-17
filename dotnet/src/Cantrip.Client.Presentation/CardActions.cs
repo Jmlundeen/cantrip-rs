@@ -580,9 +580,12 @@ public sealed class CardActions
         ManaSpendFilterView.NoncreatureSpells => "noncreature spells",
         ManaSpendFilterView.ManaValueSpells => $"spells with mana value {manaValue} or greater",
         ManaSpendFilterView.ManaValueOrXSpells => $"spells with mana value {manaValue} or greater or with {{X}} in their mana costs",
-        ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells or ManaSpendFilterView.SubtypeSpellsOrAbilities
-            or ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities when subtypes is not { Count: > 0 } =>
+        ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells when subtypes is not { Count: > 0 } =>
             "spells of a chosen type, and no type was chosen",
+        ManaSpendFilterView.SubtypeSpellsOrAbilities when subtypes is not { Count: > 0 } =>
+            "spells and abilities of sources of a chosen type, and no type was chosen",
+        ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities when subtypes is not { Count: > 0 } =>
+            "creature spells and abilities of creature sources of a chosen type, and no type was chosen",
         ManaSpendFilterView.SubtypeSpells => $"{Subtypes(subtypes)} spells",
         ManaSpendFilterView.SubtypeCreatureSpells => $"{Subtypes(subtypes)} creature spells",
         ManaSpendFilterView.SubtypeSpellsOrAbilities => $"{Subtypes(subtypes)} spells and abilities of {Subtypes(subtypes)} sources",

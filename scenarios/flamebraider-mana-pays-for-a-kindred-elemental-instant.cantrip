@@ -1,0 +1,47 @@
+# Flamebraider's "Elemental spells" are spells with the subtype Elemental of any card type (CR 106.6, 205.3), not only
+# creature spells: on turn 5 its {U}{R} and three lands' mana pay for Ashling's Command, a Kindred Instant - Elemental,
+# modes 2 and 4 (Bot1 draws two cards and makes two Treasures). Flamebraider came on turn 1 (Black Lotus and the Mountain).
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Flamebraider
+Ashling's Command
+Island
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Flamebraider.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Flamebraider.Activate
+Bot1.Colors(Blue; Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Mana = {U}{U}{R} {U} (ElementalSpellsOrAbilities) {R} (ElementalSpellsOrAbilities)
+Bot1.Hand.Ashling's Command.Cast(Spend: U ElementalSpellsOrAbilities, R ElementalSpellsOrAbilities)
+Bot1.Modes(2; 4)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Ashling's Command; Black Lotus
+Bot1.Battlefield = Flamebraider; Island; Island; Mountain; Treasure Token; Treasure Token
+Bot1.Hand.Count = 5

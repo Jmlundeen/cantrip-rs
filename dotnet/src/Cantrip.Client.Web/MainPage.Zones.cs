@@ -636,9 +636,14 @@ public sealed partial class MainPage
             ManaSpendFilterView.ManaValueSpells => $"Spend this mana only to cast spells with mana value {manaValue} or greater.",
             ManaSpendFilterView.ManaValueOrXSpells =>
                 $"Spend this mana only to cast spells with mana value {manaValue} or greater or spells with {{X}} in their mana costs.",
-            ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells or ManaSpendFilterView.SubtypeSpellsOrAbilities
-                or ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities when subtypes.Count == 0 =>
+            ManaSpendFilterView.SubtypeSpells or ManaSpendFilterView.SubtypeCreatureSpells when subtypes.Count == 0 =>
                 "Spend this mana only to cast a spell of the chosen type. No type was chosen, so it can't be spent on any spell.",
+            ManaSpendFilterView.SubtypeSpellsOrAbilities when subtypes.Count == 0 =>
+                "Spend this mana only to cast a spell of the chosen type or activate an ability of a source of the chosen type. "
+                + "No type was chosen, so it can't be spent on anything.",
+            ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities when subtypes.Count == 0 =>
+                "Spend this mana only to cast a creature spell of the chosen type or activate an ability of a creature source of the "
+                + "chosen type. No type was chosen, so it can't be spent on anything.",
             ManaSpendFilterView.SubtypeSpells => $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} spells.",
             ManaSpendFilterView.SubtypeCreatureSpells => $"Spend this mana only to cast {CardActions.Subtypes(subtypes)} creature spells.",
             ManaSpendFilterView.SubtypeCreatureSpellsOrAbilities =>

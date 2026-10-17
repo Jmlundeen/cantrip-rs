@@ -626,6 +626,12 @@ Dictate of Karametra, Zendikar Resurgent, Mirari's Wake and Vorinclex, Voice of 
 creature's {T} cost is paid: it gives no haste, so the creature still can't attack (Shang-Chi, Master of Kung Fu;
 Thousand-Year Elixir).
 
+The restrictions by zone, by creature source and by a subtype's spells or sources, `produced` and the haste permission were
+benchmarked (`cantrip-bench --games 128`, "engine answering", 2026-10-16, with about twenty agents building on the machine):
+main 24.45, 33.98, 35.55, 44.43 us against this work 29.22, 31.98, 26.85, 18.83 us alternately, and again once the
+last of it was in, main (2bbe5edc) against the branch, three back-to-back pairs: 10.72/11.44, 10.35/10.30, 11.24/11.22
+us. Within the noise.
+
 ### Spells in an inset frame: Adventures and Omens
 
 An adventurer card (CR 715) and an omen card (CR 720) print a second set of characteristics in an inset frame:

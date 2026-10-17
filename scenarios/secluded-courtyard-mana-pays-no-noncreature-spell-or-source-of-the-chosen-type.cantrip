@@ -1,0 +1,47 @@
+# Secluded Courtyard's mana is only for "a creature spell of the chosen type or ... an ability of a creature source of the
+# chosen type" (CR 106.6, 602.2b): a Goblin that is no creature gets none. Goblin chosen, its {R} on turn 1, the only mana,
+# can't cast Tarfire, a Kindred Instant - Goblin (the refusal). Firdoch Core, a changeling Kindred artifact (every creature
+# type, CR 702.73a, but no creature), is cast with Black Lotus. Turn 5 the Courtyard's {R}, the Core's own {R} and the two
+# Mountains' make four mana, yet the Core's "{4}: This artifact becomes a 4/4 artifact creature" is not offered: an
+# ability of a noncreature source, which the Courtyard's mana can't pay. Eclipsed Realms' scenario is the positive control
+# (the same spell and ability paid by mana with no "creature").
+
+[Bot1 Deck]
+Secluded Courtyard
+Black Lotus
+Firdoch Core
+Tarfire
+Mountain
+Mountain
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Secluded Courtyard.Play
+Bot1.Modes(Goblin)
+Bot1.Battlefield.Secluded Courtyard.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (GoblinCreatureSpellsOrAbilities)
+! Bot1.Hand.Tarfire.Cast(Bot2)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Firdoch Core.Cast(Spend: R, R, R)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Secluded Courtyard.Activate(Ability: any color; Color: Red)
+Bot1.Battlefield.Firdoch Core.Activate(Ability: any color; Color: Red)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+? Bot1.Mana = {R}{R}{R} {R} (GoblinCreatureSpellsOrAbilities)
+! Bot1.Battlefield.Firdoch Core.Activate(Ability: becomes)
+
+[Expect]
+Turn = 5
+Bot2.Life = 20
+Bot1.Battlefield.Firdoch Core.Types = Kindred; Artifact
+Bot1.Hand = Island; Island; Island; Tarfire
