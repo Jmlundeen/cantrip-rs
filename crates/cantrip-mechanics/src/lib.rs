@@ -236,6 +236,13 @@ pub fn delirium(q: &dyn Query, player: PlayerId) -> bool {
     types.iter().count() >= 4
 }
 
+/// Threshold (ability word, CR 207.2c): seven or more cards in `player`'s graveyard, counted as the question is asked.
+/// Cabal Ritual's "threshold" (the resolving spell is on the stack, so not counted) and Proft, Sinister Mastermind's
+/// "can't cast this spell unless there are seven or more cards in your graveyard" read it.
+pub fn threshold(q: &dyn Query, player: PlayerId) -> bool {
+    q.state().zone(Zone::graveyard(player)).len() >= 7
+}
+
 /// "Tap an untapped creature you control" as a cost (CR 118.3): one creature its payer chooses, summoning sick or not,
 /// since it is not the {T} symbol of that creature (CR 107.5, 302.6). Earthcraft, Kyren Negotiations and Springleaf Drum
 /// print it.

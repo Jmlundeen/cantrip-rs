@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// stack as it resolves, so it is not counted.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let amount = if g.state().zone(Zone::graveyard(player)).len() >= 7 { 5 } else { 3 };
+    let amount = if cantrip_mechanics::threshold(g, player) { 5 } else { 3 };
     g.add_mana(player, Mana::B, amount);
     Ok(())
 }
