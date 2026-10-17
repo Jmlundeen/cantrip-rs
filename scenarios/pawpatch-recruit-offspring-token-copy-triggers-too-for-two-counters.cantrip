@@ -1,0 +1,45 @@
+# Pawpatch Recruit: cast with offspring {2} (its additional cost) it makes a 1/1 token copy as it enters (CR 702.175a), and the
+# token has the ability too. Bot2's Lightning Bolt targeting the Llanowar Elves triggers both: two abilities, each with its own
+# target other than the Elves - both put on the original Recruit, which becomes 4/3 while the token stays 1/1.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Forest
+Forest
+Pawpatch Recruit
+Forest
+Forest x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast(Kicked: 1)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Target(Pawpatch Recruit)
+Bot1.Target(Pawpatch Recruit)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Pawpatch Recruit#1.Power = 4
+Bot1.Battlefield.Pawpatch Recruit#1.Toughness = 3
+Bot1.Battlefield.Pawpatch Recruit#2.Power = 1
+Bot1.Graveyard = Llanowar Elves

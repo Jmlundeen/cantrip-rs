@@ -1,0 +1,39 @@
+# Pawpatch Recruit: "other than that creature". When the Recruit is the creature Bot2's Lightning Bolt targets, the counter must go
+# on a different creature: the Llanowar Elves become 2/2. The Bolt then kills the Recruit.
+
+[Bot1 Deck]
+Forest
+Pawpatch Recruit
+Forest
+Llanowar Elves
+Forest
+Mountain
+Lightning Bolt
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Forest
+Lightning Bolt
+Llanowar Elves
+Yavimaya Hollow
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Pawpatch Recruit)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Graveyard = Pawpatch Recruit

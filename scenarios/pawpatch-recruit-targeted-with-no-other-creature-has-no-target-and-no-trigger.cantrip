@@ -1,0 +1,34 @@
+# Pawpatch Recruit: alone on the battlefield and targeted by Bot2's Lightning Bolt, there is no creature other than that creature to
+# put a counter on, so the triggered ability has no legal target and is removed (CR 603.3d): only the Bolt is on the stack.
+
+[Bot1 Deck]
+Forest
+Pawpatch Recruit
+Forest
+Llanowar Elves
+Forest
+Mountain
+Lightning Bolt
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Forest
+Lightning Bolt
+Llanowar Elves
+Yavimaya Hollow
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Pawpatch Recruit)
+? Stack.Count = 1
+[Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Pawpatch Recruit

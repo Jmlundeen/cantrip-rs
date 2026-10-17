@@ -1,0 +1,50 @@
+# Pawpatch Recruit: "a creature you control ... an opponent controls". Bot1 bolts its own Elves on turn 5 (an ability controlled by
+# Bot1 itself, not an opponent) and then, with Bot2's Elves in play, bolts those: neither puts a counter on anything. Bot2's
+# Bolt on Bot1's Elves in scenario one is the positive control.
+
+[Bot1 Deck]
+Forest
+Pawpatch Recruit
+Forest
+Llanowar Elves
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain
+Forest x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+? Stack.Count = 1
+[Bot1.Main2]
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+? Stack.Count = 1
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Pawpatch Recruit.Power = 2
+Bot1.Battlefield.Count = 5
+Bot1.Graveyard.Count = 3
+Bot2.Battlefield = Forest

@@ -1,0 +1,49 @@
+# Pawpatch Recruit: only "a creature you control" on the battlefield. Bot1's Llanowar Elves is countered by Bot2's Counterspell while
+# it is still a spell on the stack (a creature spell is not a creature, CR 110.1), and Bot2's Lightning Bolt aimed at Bot1 itself
+# (a player) targets no creature: nothing triggers either time and the Recruit stays 2/1.
+
+[Bot1 Deck]
+Forest
+Pawpatch Recruit
+Forest
+Llanowar Elves
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island
+Island
+Counterspell
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast
+Bot1.Battlefield.Forest.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Llanowar Elves)
+? Stack.Count = 2
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 1
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Pawpatch Recruit.Power = 2
+Bot1.Life = 17
+Bot1.Graveyard = Llanowar Elves

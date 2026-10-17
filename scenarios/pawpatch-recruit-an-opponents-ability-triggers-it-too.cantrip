@@ -1,0 +1,38 @@
+# Pawpatch Recruit: "a spell or ability an opponent controls". Bot2's Yavimaya Hollow ({G}, {T}: Regenerate target creature) targets
+# Bot1's Llanowar Elves, an activated ability, and the Recruit gets its counter (3/2).
+
+[Bot1 Deck]
+Forest
+Pawpatch Recruit
+Forest
+Llanowar Elves
+Forest
+Mountain
+Lightning Bolt
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Forest
+Lightning Bolt
+Llanowar Elves
+Yavimaya Hollow
+Forest x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Pawpatch Recruit.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Yavimaya Hollow.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Ability: Regenerate; Bot1.Battlefield.Llanowar Elves)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Pawpatch Recruit.Power = 3
