@@ -1,0 +1,33 @@
+# Sacrifice is not destruction (CR 701.21a): Bot2's only artifact besides a Mox is Nutrient Block, indestructible, and Bot2 chooses to
+# sacrifice it; it goes to the graveyard anyway and, put there from the battlefield, its trigger draws Bot2 a card. Bot2 keeps the
+# Mox Jet it could have sacrificed instead. Bot2 holds 6 cards before (7, +1 for the turn-2 draw, -2 cast) and 7 after.
+
+[Bot1 Deck]
+Mox Emerald
+Pick Your Poison
+Plains x18
+
+[Bot2 Deck]
+Mox Jet
+Nutrient Block
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Nutrient Block.Cast
+[T3 Bot1.Main1]
+? Bot2.Hand.Count = 6
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(1)
+Bot2.Pass
+Bot2.Choose(Nutrient Block)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Nutrient Block
+Bot2.Hand.Count = 7
+Bot2.Battlefield = Mox Jet

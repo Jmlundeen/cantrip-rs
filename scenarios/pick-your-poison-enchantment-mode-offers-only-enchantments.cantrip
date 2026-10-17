@@ -1,0 +1,44 @@
+# Pick Your Poison, second mode: "Each opponent sacrifices an enchantment of their choice." Bot2 controls Fastbond and Fecundity
+# (enchantments) and three Moxen (not enchantments) and chooses Fastbond; Mox Emerald is refused as a choice, beside the positive
+# control, the Fastbond chosen next.
+
+[Bot1 Deck]
+Mox Emerald
+Pick Your Poison
+Plains x18
+
+[Bot2 Deck]
+Mox Emerald x2
+Mox Jet
+Mox Ruby
+Fastbond
+Fecundity
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Hand.Fastbond.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Fecundity.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(2)
+Bot2.Pass
+! Bot2.Choose(Mox Emerald)
+Bot2.Choose(Fastbond)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Fastbond
+Bot2.Battlefield = Mox Emerald; Mox Emerald; Mox Jet; Mox Ruby; Fecundity

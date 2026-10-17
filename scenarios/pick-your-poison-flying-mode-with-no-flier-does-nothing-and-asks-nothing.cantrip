@@ -1,0 +1,32 @@
+# Pick Your Poison, third mode, with nothing to sacrifice: Bot2 controls only Llanowar Elves, which does not fly, so nothing is
+# sacrificed and Bot2 is not asked to choose anything (the bare refusal). The spell still resolves: a mode with no target is always
+# castable. The control with a flier is the other flying scenario.
+
+[Bot1 Deck]
+Mox Emerald
+Pick Your Poison
+Plains x18
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(3)
+Bot2.Pass
+! Bot2.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Mox Emerald; Llanowar Elves
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Pick Your Poison

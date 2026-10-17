@@ -1,0 +1,37 @@
+# Pick Your Poison, first mode: "Each opponent sacrifices an artifact of their choice." Bot2 controls Mox Jet, Mox Emerald,
+# Ornithopter (an artifact creature) and Llanowar Elves (not an artifact) and chooses the Mox Jet: only it goes (CR 701.21a). The
+# Elves, which is not an artifact, were never a choice; the Ornithopter, which is, was and stays.
+
+[Bot1 Deck]
+Mox Emerald
+Pick Your Poison
+Plains x18
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Ornithopter
+Llanowar Elves
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(1)
+Bot2.Pass
+! Bot2.Choose(Llanowar Elves)
+Bot2.Choose(Mox Jet)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Jet
+Bot2.Battlefield = Mox Emerald; Ornithopter; Llanowar Elves
+Bot1.Graveyard = Pick Your Poison

@@ -1,0 +1,43 @@
+# "Each opponent sacrifices an artifact of their choice": with three players both opponents sacrifice, each choosing from their own
+# artifacts (CR 101.4, 701.21a). Bot2 has Mox Jet and Mox Ruby, Bot3 has Mox Pearl and Ornithopter. Bot2 sacrifices Mox Ruby and Bot3
+# the Ornithopter; each keeps the other, and Bot1's own Mox is untouched.
+
+[Bot1 Deck]
+Mox Emerald
+Pick Your Poison
+Plains x18
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Plains x18
+
+[Bot3 Deck]
+Mox Pearl
+Ornithopter
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot3.Main1]
+Bot3.Hand.Mox Pearl.Cast
+Bot3.Hand.Ornithopter.Cast
+[T4 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Pick Your Poison.Cast
+Bot1.Modes(1)
+Bot2.Pass
+Bot3.Pass
+Bot2.Choose(Mox Ruby)
+Bot3.Choose(Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Ruby
+Bot2.Battlefield = Mox Jet
+Bot3.Graveyard = Ornithopter
+Bot3.Battlefield = Mox Pearl
+Bot1.Battlefield = Mox Emerald
