@@ -1,0 +1,49 @@
+# "Until your next end step, you may play those cards" (CR 500.4, 611.2): Seek the Beast is an instant, cast in Bot2's turn 2 (its end
+# step) with Mox Ruby and Mox Emerald. It exiles the Mountain and the Llanowar Elves; Bot1's next end step is turn 3's, so in turn 3
+# Bot1 plays the Mountain from exile as its land drop, and then the permission ends as that end step begins: in turn 5 the Elves in
+# exile cannot be cast (! Bot1.Exile.Llanowar Elves.Cast, with the Forest's mana available - the positive control is Seek the Beast's
+# own Druid, cast from exile at the same time), and stay there.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Questing Druid
+Island
+Island
+Island
+Mountain
+Llanowar Elves
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.End]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Questing Druid.Cast(Ability: Adventure)
+Bot1.Pass
+[T3 Bot1.Main1]
+? Exile = Mountain; Llanowar Elves; Questing Druid
+Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Questing Druid.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Exile.Llanowar Elves.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield = Forest; Mox Emerald; Mox Ruby; Mountain; Questing Druid

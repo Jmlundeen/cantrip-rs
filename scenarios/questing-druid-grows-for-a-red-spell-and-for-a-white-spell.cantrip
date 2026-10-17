@@ -1,0 +1,47 @@
+# Questing Druid grows for a red spell (Lightning Bolt, turn 1) and a white spell (Swords to Plowshares exiling Bot2's Ornithopter,
+# turn 3), one counter each (CR 603.2): a 3/3. The Druid's own green cast and the colorless Moxen trigger nothing.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Questing Druid
+Mox Ruby
+Mox Pearl
+Lightning Bolt
+Swords to Plowshares
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Questing Druid.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Questing Druid.Power = 2
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Questing Druid.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Questing Druid.Power = 3
+Bot2.Life = 17
+Bot2.Battlefield.Count = 0
+Exile = Ornithopter

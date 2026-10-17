@@ -1,0 +1,55 @@
+# Questing Druid: "Whenever you cast a spell that's white, blue, black, or red, put a +1/+1 counter on this creature." Boros Charm
+# is red and white, and still triggers it only once (the ruling: one counter, not two). Mox Ruby and Mox Pearl (colorless artifact
+# spells), Ornithopter (colorless) and Llanowar Elves (green) cast while the Druid is on the battlefield trigger nothing; neither does
+# the Druid's own casting (it is not on the battlefield yet). Everything happens in turn 1 but the Elves, cast in turn 3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Questing Druid
+Mox Ruby
+Mox Pearl
+Boros Charm
+Ornithopter
+Llanowar Elves
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Questing Druid.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Questing Druid.Power = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Questing Druid.Power = 2
+? Bot1.Battlefield.Questing Druid.Counters.PlusOnePlusOne = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Questing Druid.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Questing Druid.Power = 2
+Bot1.Battlefield.Questing Druid.Toughness = 2
+Bot1.Battlefield.Llanowar Elves.Tapped = false

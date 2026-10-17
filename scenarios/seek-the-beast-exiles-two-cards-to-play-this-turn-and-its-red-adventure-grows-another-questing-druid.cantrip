@@ -1,0 +1,58 @@
+# Seek the Beast (Questing Druid's Adventure, CR 715): cast in turn 3 for {1}{R} while a first Questing Druid is on the battlefield. The
+# Adventure is a red instant while on the stack, so it triggers the first Druid (+1/+1 counter, a 2/2), though the card is green
+# otherwise. It exiles the top two cards of Bot1's library (Mountain, Llanowar Elves) and "until your next end step" - this turn's, the
+# turn being Bot1's own - Bot1 may play them: the Mountain as the turn's land drop and the Elves cast with Mox Emerald's mana. The
+# resolved Adventure is exiled, not put into the graveyard, and in turn 5 the Druid is cast from exile as a creature.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Questing Druid
+Questing Druid
+Mox Ruby
+Island
+Island
+Island
+Mountain
+Llanowar Elves
+Forest x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Questing Druid.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Questing Druid.Cast(Ability: Adventure)
+Bot1.Pass
+Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile = Questing Druid
+? Bot1.Battlefield.Questing Druid.Power = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Questing Druid.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald; Mox Ruby; Mountain; Llanowar Elves; Questing Druid; Questing Druid
+Bot1.Battlefield.Questing Druid#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Questing Druid#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Library.Count = 11
+Bot1.Graveyard.Count = 0
