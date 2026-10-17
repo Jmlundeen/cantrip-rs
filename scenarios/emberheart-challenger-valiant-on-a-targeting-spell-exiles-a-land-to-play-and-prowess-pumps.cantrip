@@ -1,0 +1,40 @@
+# Emberheart Challenger: Rancor, a spell its controller controls, targets it for the first time this turn, so the valiant
+# ability exiles the top card of Bot1's library (a Mountain) and Bot1 may play it this turn (a land, played from exile as the
+# turn's land drop). The trigger resolves before Rancor, whose cast also triggers prowess: the Challenger is
+# 2/2 + 2/+0 (Rancor) + 1/+1 (prowess, a noncreature spell cast) = 5/3 with trample.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Emberheart Challenger
+Rancor
+Island x2
+Mountain
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emberheart Challenger.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Emberheart Challenger)
+Bot1.Pass
+Bot1.Pass
+Bot1.Exile.Mountain.Play
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Emerald; Emberheart Challenger; Rancor; Mountain
+Bot1.Battlefield.Emberheart Challenger.Power = 5
+Bot1.Battlefield.Emberheart Challenger.Toughness = 3
+Bot1.Battlefield.Emberheart Challenger.Keywords = Haste; Trample
+Bot1.Library.Count = 14

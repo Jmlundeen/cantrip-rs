@@ -1,0 +1,52 @@
+# Emberheart Challenger's valiant counts only spells and abilities ITS CONTROLLER controls. On turn 2 Bot2 casts Lightning
+# Bolt at the Challenger (that targeting is not Bot1's and does not use up the "first time"), and Bot1 responds with
+# Snakeskin Veil on it: Bot1's first targeting that turn, so valiant triggers and exiles Mox Sapphire from the top of
+# Bot1's library. The Veil resolves (+1/+1 counter, hexproof), so the Bolt, whose target is now illegal, does nothing:
+# the Challenger lives as a 3/3. "Until end of turn, you may play that card": it is Bot2's turn and an artifact
+# cannot be cast then, so the permission ends unused, and on Bot1's turn 3 the Mox Sapphire may not be cast
+# (a refusal, with the positive control in emberheart-challenger-valiant-on-a-nonland-card-cast-from-exile-the-same-turn).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Emberheart Challenger
+Snakeskin Veil
+Island x2
+Mox Sapphire
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x5
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emberheart Challenger.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Emberheart Challenger)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Emberheart Challenger)
+[T3 Bot1.Main1]
+? Exile = Mox Sapphire
+! Bot1.Exile.Mox Sapphire.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mox Sapphire
+Bot2.Graveyard = Lightning Bolt
+Bot2.Life = 20
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Emerald; Emberheart Challenger
+Bot1.Battlefield.Emberheart Challenger.Power = 3
+Bot1.Battlefield.Emberheart Challenger.Toughness = 3
+Bot1.Battlefield.Emberheart Challenger.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Snakeskin Veil

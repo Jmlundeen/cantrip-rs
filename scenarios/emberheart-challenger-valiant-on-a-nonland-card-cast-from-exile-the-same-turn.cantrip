@@ -1,0 +1,42 @@
+# Emberheart Challenger's valiant exiles the top card and "you may play that card" until end of turn: a nonland card is
+# CAST from exile, paid for as usual (this one costs {0}). On Bot1's own turn 3 Snakeskin Veil targets the Challenger for
+# the first time that turn (+1/+1 counter, hexproof); the trigger exiles Mox Sapphire, which Bot1 then casts from exile the
+# same turn and which stays on the battlefield. Power: 2 + the counter + 1 prowess for the Veil + 1 prowess for the Mox
+# Sapphire (both noncreature spells) = 5. Positive control for the scenario where the permission expires unused.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Emberheart Challenger
+Snakeskin Veil
+Island x2
+Island
+Mox Sapphire
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emberheart Challenger.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Emberheart Challenger)
+Bot1.Pass
+Bot1.Pass
+Bot1.Exile.Mox Sapphire.Cast
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Emerald; Emberheart Challenger; Mox Sapphire
+Bot1.Battlefield.Emberheart Challenger.Power = 5
+Bot1.Battlefield.Emberheart Challenger.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Emberheart Challenger.Keywords = Haste; Hexproof
