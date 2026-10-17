@@ -1,0 +1,6 @@
+{
+  "name": "Mind Control",
+  "manaCost": "{3}{U}{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nYou control enchanted creature."
+}

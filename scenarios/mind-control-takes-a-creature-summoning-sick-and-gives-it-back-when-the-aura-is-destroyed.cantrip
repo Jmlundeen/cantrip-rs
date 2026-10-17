@@ -1,0 +1,69 @@
+# "You control enchanted creature" is a control-changing static ability (CR 613.1b, layer 2) that applies for as long as
+# Mind Control is attached to the creature (CR 611.3a). Bot1's Mind Control takes Bot2's Llanowar Elves: Bot1 has not
+# controlled it continuously since their turn began, so it can't attack and its {T} ability can't be activated (CR 302.6); Bot1's
+# Ornithopter is offered in the same declaration. Bot2 destroys the Aura on their turn with Disenchant: the effect ends and the Elves is Bot2's again (Bot2's battlefield),
+# but it came under Bot2's control this turn, so it is summoning sick for Bot2 too and its mana ability is refused (CR
+# 302.6). The positive control is the same activation on Bot2's next turn, which adds {G}.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ornithopter
+Island
+Island
+Mind Control
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Plains
+Disenchant
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Control.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.SummoningSick = true
+? Bot1.Battlefield.Mind Control.AttachedTo = Llanowar Elves
+! Bot1.Battlefield.Llanowar Elves.Activate
+! Bot1.Attack(Llanowar Elves > Bot2)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mind Control)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Llanowar Elves.SummoningSick = true
+! Bot2.Battlefield.Llanowar Elves.Activate
+[T6 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+? Bot2.Mana = {G}
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Ornithopter; Island; Island
+Bot1.Graveyard = Mind Control
+Bot2.Battlefield = Forest; Plains; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Graveyard = Disenchant
