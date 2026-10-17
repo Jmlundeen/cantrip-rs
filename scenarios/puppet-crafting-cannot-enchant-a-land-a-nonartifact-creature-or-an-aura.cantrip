@@ -1,0 +1,44 @@
+# "Enchant artifact or non-Aura enchantment": Bot2's Plains (a land), Bot1's Llanowar Elves (a nonartifact creature) and Rancor
+# (an Aura enchantment, on the Elves) are refused as targets, each beside the positive control, Mox Jet (an artifact), which is then
+# enchanted. Turn 1: two Mox Emeralds pay for the Elves and Rancor; turn 3: the third Emerald and Mox Jet pay for the Puppet Crafting.
+
+[Bot1 Deck]
+Mox Emerald x3
+Mox Jet
+Llanowar Elves
+Rancor
+Puppet Crafting
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Rancor.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Puppet Crafting.Cast(Bot2.Battlefield.Plains)
+! Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Llanowar Elves)
+! Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Rancor)
+Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Mox Jet)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mox Jet.Power = 5
+Bot1.Battlefield.Puppet Crafting.AttachedTo = Mox Jet
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot1.Battlefield.Rancor.AttachedTo = Llanowar Elves

@@ -1,0 +1,31 @@
+# Puppet Crafting: "Enchanted permanent is a Construct creature with base power and toughness 5/5 in addition to its other types."
+# Bot1's Mox Jet (a noncreature artifact, no power or toughness) becomes a 5/5: it is still an artifact (the "in addition"), is now also
+# a creature (layer 4) and a Construct, and has base 5/5 (layer 7b). The Aura is attached to it. Mox Emerald and Mox Jet pay {1}{G}
+# (the Jet tapped for mana first, then enchanted).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Puppet Crafting
+Plains x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Mox Jet)
+Bot2.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Mox Jet.Power = 5
+? Bot1.Battlefield.Mox Jet.Toughness = 5
+
+[Expect]
+Bot1.Battlefield.Mox Jet.Types = Artifact; Creature
+Bot1.Battlefield.Mox Jet.Subtypes = Construct
+Bot1.Battlefield.Mox Jet.Power = 5
+Bot1.Battlefield.Mox Jet.Toughness = 5
+Bot1.Battlefield.Puppet Crafting.AttachedTo = Mox Jet

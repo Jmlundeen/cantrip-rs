@@ -1,0 +1,33 @@
+# Puppet Crafting's "or non-Aura enchantment": Bot1's Fastbond (a plain enchantment) is a legal host and becomes a 5/5 Construct
+# creature that is still an enchantment ("in addition to its other types"). Mox Emerald pays for Fastbond; a second Emerald and Mox
+# Jet pay {1}{G} for the Puppet Crafting.
+
+[Bot1 Deck]
+Mox Emerald x2
+Mox Jet
+Fastbond
+Puppet Crafting
+Plains x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Fastbond.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Fastbond)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Fastbond.Types = Enchantment; Creature
+Bot1.Battlefield.Fastbond.Subtypes = Construct
+Bot1.Battlefield.Fastbond.Power = 5
+Bot1.Battlefield.Fastbond.Toughness = 5
+Bot1.Battlefield.Puppet Crafting.AttachedTo = Fastbond

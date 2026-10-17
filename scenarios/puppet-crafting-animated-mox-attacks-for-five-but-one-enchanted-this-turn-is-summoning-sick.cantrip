@@ -1,0 +1,46 @@
+# Puppet Crafting makes a Mox a creature, so summoning sickness applies (CR 302.6): Mox Ruby has been Bot1's since turn 1 and is
+# enchanted at once, so on turn 3 it attacks as a 5/5 and deals 5 (20 -> 15). Mox Jet, which Bot1 draws and casts on turn 3 and
+# enchants then, has not been under its control since the turn began: the attack with it is refused (beside Ruby's, the positive
+# control) and, being a creature with a {T} ability, it can't tap for mana either; the Mox Emerald it doesn't touch still can.
+
+[Bot1 Deck]
+Mox Emerald x2
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Puppet Crafting
+Puppet Crafting
+Mox Jet
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Mox Ruby)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Mox Jet)
+Bot2.Pass
+? Bot1.Battlefield.Mox Jet.Power = 5
+! Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Attack(Mox Jet > Bot2)
+Bot1.Attack(Mox Ruby > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = false
+Bot1.Battlefield.Mox Jet.SummoningSick = true
+Bot1.Battlefield.Mox Ruby.SummoningSick = false

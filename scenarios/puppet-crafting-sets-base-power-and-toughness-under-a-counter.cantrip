@@ -1,0 +1,37 @@
+# "Base power and toughness 5/5" is layer 7b (CR 613.4b), under counters (7c): Bot1's Ornithopter (a creature already, 0/2 with
+# flying) becomes a 5/5 under Puppet Crafting - a Construct as well as a Thopter, still an artifact creature with flying - and a
+# +1/+1 counter from Snakeskin Veil on top of that makes it 6/6.
+
+[Bot1 Deck]
+Mox Emerald x2
+Mox Jet
+Mox Ruby
+Ornithopter
+Puppet Crafting
+Snakeskin Veil
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 5
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 6
+Bot1.Battlefield.Ornithopter.Toughness = 6
+Bot1.Battlefield.Ornithopter.Subtypes = Construct; Thopter
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof

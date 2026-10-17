@@ -1,0 +1,38 @@
+# Puppet Crafting as a spell with its target gone (CR 608.2b, 303.4f): Bot1 casts it on Mox Jet and Bot2 responds with Disenchant,
+# destroying the Jet. The Aura spell has no legal target on resolution and doesn't resolve - it never enters the battlefield and is put
+# into the graveyard - so Bot1 has no creature and the Aura is not attached to anything.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Puppet Crafting
+Plains x17
+
+[Bot2 Deck]
+Mox Pearl x2
+Disenchant
+Plains x17
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Puppet Crafting.Cast(Bot1.Battlefield.Mox Jet)
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Jet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Puppet Crafting; Mox Jet
+Bot1.Battlefield = Mox Emerald
+Stack.Count = 0
+Bot2.Graveyard = Disenchant
