@@ -2183,6 +2183,16 @@ public sealed partial class TacticalPlay
             return creature;
         }
 
+        // Sunburst (CR 702.44a): a counter for each color of mana spent to cast it, so generic mana is paid with a color not
+        // yet spent on it wherever one is offered - Engineered Explosives paid with a red and a black has two counters, with
+        // two red one.
+        if (!prompt.AnnouncesXOrKicks && prompt.RemainingGeneric > 0 && client.Object(prompt.Spell) is { } sunburst
+            && CardReading.Plain(CardReading.Text(sunburst)).Contains("sunburst", StringComparison.Ordinal)
+            && NewColorFor(prompt) is { } colorful)
+        {
+            return colorful.Kind == ActionKindView.AssignMana ? AutoPlay.Assign(colorful) : AutoPlay.Answer(colorful);
+        }
+
         // Generic mana, with nothing else owed and nothing to choose but which source: the one that leaves the most
         // behind. A Plains pays {1} as well as a Plateau does, and the Plateau is what the next red spell needs.
         bool onlyGeneric = !prompt.HasX && prompt.RemainingGeneric > 0 && prompt.RemainingColored.Count == 0
@@ -2220,6 +2230,22 @@ public sealed partial class TacticalPlay
         }
 
         return AutoPlay.Pay(prompt, client);
+    }
+
+    /// <summary>
+    /// What pays a sunburst spell's generic mana with a color not yet spent on it (CR 702.44a): pool mana of such a color put
+    /// towards it, else a source that makes that color alone and costs nothing else to use. Null when none is offered.
+    /// </summary>
+    private static ActionOptionMessage? NewColorFor(PayCostsPromptMessage prompt)
+    {
+        HashSet<ManaTypeView> spent = [.. prompt.Committed.Where(mana => mana.Amount > 0).Select(mana => mana.Type)];
+        bool Fresh(ActionOptionMessage option) =>
+            option.Produces.Count == 1 && option.Produces[0] != ManaTypeView.Colorless && !spent.Contains(option.Produces[0]);
+
+        return prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.AssignMana && Fresh(option))
+            ?? prompt.Options.FirstOrDefault(option => option.Kind == ActionKindView.ActivateAbility && Fresh(option)
+                && !option.PaysNothing && option.ProducesOfAnyOneColor == 0 && option.ProducesOfAnyColorEach == 0
+                && option.SacrificeCandidates.Count == 0 && option.LifeCost == 0 && option.DamageToController == 0);
     }
 
     /// <summary>
