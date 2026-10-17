@@ -1,0 +1,63 @@
+# Platinum Angel: "You can't lose the game" (CR 104.3, 704.5a). Bot1 begins at 3 life and casts the Angel on turn 3 off
+# Sol Ring, Mox Pearl, Black Lotus and two Plains. Bot2 Bolts Bot1 to 0 on turn 4: the state-based action that would make
+# Bot1 lose does not, and the game goes on with Bot1 at 0 life. On turn 6 Bot2 Disenchants the Angel; at the next check
+# Bot1, still at 0 life, loses (the 2009-10-01 ruling), and Bot2, the one player left, wins (CR 104.2a).
+
+[Life]
+Bot1: 3
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Black Lotus
+Platinum Angel
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Plains
+Plains
+Lightning Bolt
+Disenchant
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Platinum Angel.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 0
+? Result = InProgress
+? Bot1.Status = (absent)
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Platinum Angel)
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost
+Bot1.LostTo = Life
+Bot1.Life = 0

@@ -1,0 +1,64 @@
+# Platinum Angel and drawing from an empty library (CR 704.5b, 104.3c). Bot1's library holds one card after the opening
+# hand, drawn on turn 3, so turn 5's draw is attempted from an empty library: with the Angel out Bot1 doesn't lose, and the
+# state-based action looks only at a draw attempted since the last check (CR 704.5b), so once that check has passed the
+# attempt is gone. On turn 6 Bot2 Disenchants the Angel and Bot1 does not lose: nothing has been drawn from the empty
+# library since. Then Bot2's Ancestral Recall makes Bot1 draw three cards from the empty library, with no Angel, and Bot1
+# loses (CR 704.5b, 121.4).
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Black Lotus
+Platinum Angel
+Island
+Island
+
+[Bot2 Deck]
+Plains
+Plains
+Disenchant
+Ancestral Recall
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Platinum Angel.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T5 Bot1.Main1]
+? Bot1.Library.Count = 0
+? Result = InProgress
+? Bot1.Status = (absent)
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Hand.Disenchant.Cast(Platinum Angel)
+[T6 Bot2.Main2]
+? Result = InProgress
+? Bot1.Status = (absent)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot1)
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost
+Bot1.LostTo = EmptyLibrary

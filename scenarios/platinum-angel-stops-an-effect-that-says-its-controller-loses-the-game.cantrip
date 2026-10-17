@@ -1,0 +1,46 @@
+# Platinum Angel against "you lose the game" (CR 104.3e): no game effect makes its controller lose (the 2009-10-01 ruling).
+# Bot1 casts the Angel on turn 3, then Glorious End on turn 5: the turn ends, and at the beginning of Bot1's next end step,
+# turn 7's, its delayed ability says Bot1 loses the game. With the Angel out Bot1 doesn't, and the game goes on into turn 8.
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Black Lotus
+Platinum Angel
+Glorious End
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Platinum Angel.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Glorious End.Cast
+[T7 Bot1.Main2]
+? Delayed = Glorious End
+[T8 Bot2.Main1]
+
+[Expect]
+Result = InProgress
+Bot1.Status = (absent)
+Delayed.Count = 0
+Bot1.Battlefield.Platinum Angel.Tapped = false

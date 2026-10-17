@@ -1,0 +1,11 @@
+{
+  "name": "Platinum Angel",
+  "manaCost": "{7}",
+  "type": "Artifact Creature — Angel",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying\nYou can't lose the game and your opponents can't win the game.",
+  "keywords": [
+    "Flying"
+  ]
+}
