@@ -1,5 +1,4 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::object_has_name;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -31,13 +30,6 @@ fn choose_land_name(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities." (CR 602.5,
-/// 605.1a.) A source is anything with the name, in any zone it has the ability in: a land on the battlefield, a land card's
-/// channel or cycling in a hand. It binds every player, the Hamlet's controller too; with no name chosen it stops nothing.
-fn may_activate(q: &dyn Query, asker: &Asker, source: ObjectId, def: &ActivatedDef) -> bool {
-    def.is_mana_ability() || !q.obj(asker.source).marks.chosen_card.is_some_and(|name| object_has_name(q, source, name))
-}
-
 /// "Lands with the chosen name have "{T}: Add {C}."" (CR 613.1f): the land, a permanent (CR 109.2), has the Hamlet's own
 /// delayed ability 0 for as long as it has the name and the Hamlet is on the battlefield.
 fn named_land(view: &dyn LayerQuery, source: ObjectId, _: ObjectId, chars: &Chars) -> bool {
@@ -52,6 +44,6 @@ pub static CARD: CardDef = CardDef {
     ],
     delayed: &[mana_ability(TAP, add(Mana::C), "{T}: Add {C}.")],
     statics: &[static_ability(Layer::Ability, named_land, cantrip_mechanics::statics::grant_delayed_ability, "Lands with the chosen name have \"{T}: Add {C}.\"")],
-    activation_rules: &[may_activate],
+    activation_rules: &[cantrip_mechanics::statics::chosen_name_activations_barred],
     ..oracle::PETRIFIED_HAMLET
 };

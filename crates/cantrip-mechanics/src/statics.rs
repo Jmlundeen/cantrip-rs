@@ -198,6 +198,14 @@ pub fn spell_you_cast(view: &dyn LayerQuery, source: ObjectId, affected: ObjectI
         && s.stack.iter().any(|i| i.kind == StackKind::Spell && i.object == affected && i.controller == s.obj(source).controller)
 }
 
+/// "Activated abilities of sources with the chosen name can't be activated unless they're mana abilities." (CR 602.5, 605.1a) as a
+/// `CardDef::activation_rules` entry: a source is anything with the name (`library::object_has_name`), in any zone it has the
+/// ability in. It binds every player, the permanent's controller too; with no name chosen it stops nothing. Petrified Hamlet (a
+/// land card name) and Sorcerous Spyglass (any card name) print it.
+pub fn chosen_name_activations_barred(q: &dyn Query, asker: &Asker, source: ObjectId, def: &ActivatedDef) -> bool {
+    def.is_mana_ability() || !q.obj(asker.source).marks.chosen_card.is_some_and(|name| crate::library::object_has_name(q, source, name))
+}
+
 /// "Has [an ability]" (CR 113.6, 613.1f) for the card's delayed ability number 0: a static ability that gives the objects it
 /// affects the ability the card lists first in `delayed` (the card as the source has it now, or the card it copies).
 /// Astrologian's Planisphere, Decaying Soil, Deconstruction Hammer, Footfall Crater, Hexing Squelcher, Kaldra Compleat,

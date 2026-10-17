@@ -1,29 +1,9 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose;
 use cantrip_oracle as oracle;
 
-/// As this creature enters, look at an opponent's hand, then choose any card name (CR 614.12a). The opponent is chosen
-/// first; the name an unscripted player takes is the costliest nonland card in the hand looked at.
+/// As this creature enters, look at an opponent's hand, then choose any card name (CR 614.12a).
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    let you = entering.controller;
-    let source = entering.object;
-    let opponents: Vec<PlayerId> = g.state().opponents(you).collect();
-    let Some(opponent) = choose::player(g, you, source, opponents, "LookAtHand", 0)? else { return Ok(()) };
-    let hand = g.state().zone(Zone::hand(opponent)).to_vec();
-    let mut suggestion: Option<(u32, CardId)> = None;
-    for &card in &hand {
-        let id = g.chars(card).card;
-        let def = g.card(id);
-        if !def.is(CardType::Land) && suggestion.is_none_or(|(value, _)| def.cost.mana_value() > value) {
-            // A split card has two names and a player names one of them (CR 709.4a): its left half's.
-            let named = def.split.map_or(id, |(left, _)| g.card_id(left));
-            suggestion = Some((def.cost.mana_value(), named));
-        }
-    }
-    if let Answer::Name(name) = g.ask(you, RequestKind::ChooseName { source, looked_at: hand, suggestion: suggestion.map(|s| s.1), kind: NameKind::Any })? {
-        entering.chosen_card = name;
-    }
-    Ok(())
+    cantrip_mechanics::hand::look_at_an_opponents_hand_then_choose_a_name(g, entering)
 }
 
 /// Spells your opponents cast with the chosen name cost {2} more to cast. Activated abilities of sources with the
