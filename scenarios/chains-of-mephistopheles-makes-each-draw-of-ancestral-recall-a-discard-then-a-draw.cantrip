@@ -1,0 +1,41 @@
+# Chains of Mephistopheles: "If a player would draw a card except the first one they draw in each of their draw steps, that
+# player discards a card instead. If the player discards a card this way, they draw a card." (CR 614.1a, 121.6) Ancestral
+# Recall's three draws are each replaced on their own (CR 121.2, its ruling): for each, Bot1 discards a card of its
+# choosing, then draws one - a draw Chains does not replace again (CR 614.5). Bot1 holds two cards when it resolves, discards
+# the Forest, the Plains and then the first Island it drew, and ends with two cards drawn this way; three cards have left its
+# library.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Chains of Mephistopheles
+Ancestral Recall
+Forest
+Plains
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Choose(Forest)
+Bot1.Choose(Plains)
+Bot1.Choose(Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 17
+Bot1.Graveyard = Ancestral Recall; Island; Plains; Forest

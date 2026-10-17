@@ -1,0 +1,50 @@
+# Two Chains of Mephistopheles: "the effect is cumulative ... each of them will modify each draw ... the player must discard
+# if possible. Once the player fails to discard and instead 'mills' a card, all further effects of additional Chains of
+# Mephistopheles will not do anything" (its ruling; CR 614.5). Bot1 holds the Forest and an Island as Ancestral Recall
+# resolves in its turn 3 main phase:
+# - the first draw: one Chains has Bot1 discard the Forest and draw, and the other replaces that draw - Bot1 discards the
+#   Island and draws a card, which neither Chains replaces again;
+# - the second: Bot1 discards that card for the first Chains and would draw, but for the second it has nothing to discard,
+#   so it mills a card and draws nothing;
+# - the third: nothing to discard for the first Chains, so a card is milled and nothing is drawn, and nothing is left for the
+#   second to replace.
+# Bot1 ends with an empty hand: three cards discarded, two milled, one drawn (and discarded).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Chains of Mephistopheles
+Chains of Mephistopheles
+Ancestral Recall
+Forest
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chains of Mephistopheles.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand = Mox Sapphire; Ancestral Recall; Forest; Island
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Choose(Forest)
+Bot1.Choose(Island)
+Bot1.Choose(Island)
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 16
+Bot1.Graveyard = Ancestral Recall; Island; Island; Island; Island; Forest; Black Lotus

@@ -1,0 +1,45 @@
+# Chains of Mephistopheles: "except the first one they draw in each of their draw steps" - "a player's normal card draw on
+# their turn is exempt from this effect. All other draws will be affected" (its ruling). Bot2's turn 2 draw and Bot1's
+# turn 3 draw are each the first card of the player's draw step and are drawn as usual: no discard (Bot2 holds eight cards
+# then, and both graveyards stay as they were). Still in its turn 3 draw step, Bot1 casts Ancestral Recall: those three
+# draws are not the first of the step, and each is a discard and then a draw.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Chains of Mephistopheles
+Ancestral Recall
+Forest
+Plains
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chains of Mephistopheles.Cast
+[T2 Bot2.Main1]
+? Bot2.Hand.Count = 8
+? Bot2.Graveyard.Count = 0
+[T3 Bot1.Draw]
+? Bot1.Hand = Ancestral Recall; Forest; Plains; Island
+? Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Choose(Forest)
+Bot1.Choose(Plains)
+Bot1.Choose(Island)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 16
+Bot1.Graveyard = Ancestral Recall; Island; Plains; Forest

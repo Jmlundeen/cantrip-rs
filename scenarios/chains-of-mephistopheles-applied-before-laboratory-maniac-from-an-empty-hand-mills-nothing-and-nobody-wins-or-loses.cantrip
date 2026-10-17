@@ -1,0 +1,46 @@
+# Chains of Mephistopheles applied before Laboratory Maniac (CR 616.1) with nothing in hand and nothing in the library: there
+# is no card to discard, so the draw becomes a mill of one card, which from an empty library mills nothing (CR 614.6: the
+# impossible instruction is ignored). The draw was replaced, so Laboratory Maniac has no draw left to replace, and Bot1
+# neither wins nor loses for drawing from an empty library (CR 704.5b): it never tried to draw. Bot1 casts its whole
+# seven-card deck on turn 1 and has Chains apply first to each of Ancestral Recall's three draws.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Sapphire
+Chains of Mephistopheles
+Laboratory Maniac
+Ancestral Recall
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Laboratory Maniac.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Chains of Mephistopheles)
+Bot1.Replace(Chains of Mephistopheles)
+Bot1.Replace(Chains of Mephistopheles)
+[T1 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.LostTo = (absent)
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 0
+Bot1.Graveyard = Ancestral Recall; Black Lotus

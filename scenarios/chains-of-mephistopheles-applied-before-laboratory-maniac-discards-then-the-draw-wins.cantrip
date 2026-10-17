@@ -1,0 +1,42 @@
+# Chains of Mephistopheles and Laboratory Maniac, as in the scenario beside this one, but Bot1 has Chains apply first to
+# Ancestral Recall's first draw from its empty library (CR 616.1): it discards the Forest instead, and so draws a card - a
+# draw that Chains does not replace again (CR 614.5) but Laboratory Maniac does, the library still being empty, so Bot1 wins
+# the game then (CR 104.2b), with the Forest in its graveyard.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Chains of Mephistopheles
+Laboratory Maniac
+Ancestral Recall
+Forest
+Plains
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Laboratory Maniac.Cast
+[T3 Bot1.Main1]
+? Bot1.Library.Count = 0
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Chains of Mephistopheles)
+Bot1.Choose(Forest)
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot1.Hand = Plains
+Bot1.Graveyard = Forest; Black Lotus

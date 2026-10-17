@@ -1,0 +1,45 @@
+# Chains of Mephistopheles: "If the player doesn't discard a card this way, they mill a card." With an empty hand there is
+# nothing to discard (nobody is asked to choose one), so each of Ancestral Recall's draws becomes a mill of one card and
+# "the player doesn't draw a card at all" (its ruling; CR 614.6, 701.17). Bot1 casts everything it holds on turn 1, so its
+# hand is empty as Ancestral Recall resolves: the Forest, the Plains and the Mountain on top of its library are milled one at
+# a time, and its hand stays empty.
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Chains of Mephistopheles
+Ancestral Recall
+Forest
+Plains
+Mountain
+Island x17
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 17
+Bot1.Graveyard = Ancestral Recall; Mountain; Plains; Forest

@@ -1,0 +1,57 @@
+# Chains of Mephistopheles and Notion Thief, both Bot1's, both replace each of Bot2's Ancestral Recall draws, and Bot2, the
+# drawing player, chooses (CR 616.1). Bot2 has Notion Thief apply first each time: it skips the draw, and Bot1 draws instead.
+# That draw is part of what replaced Bot2's, but Chains has not had its opportunity at it yet (CR 614.5), and it is a draw of
+# Bot1's outside Bot1's draw step: Bot1 discards a card (the Forest, then the Islands it draws) and draws one. Bot1 ends
+# with one card, having discarded three; Bot2 discards nothing and draws nothing.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Sapphire
+Chains of Mephistopheles
+Notion Thief
+Forest
+Island x20
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Notion Thief.Cast
+[T2 Bot2.Main1]
+? Bot2.Hand.Count = 8
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Replace(Notion Thief)
+Bot1.Choose(Forest)
+Bot2.Replace(Notion Thief)
+Bot1.Choose(Island)
+Bot2.Replace(Notion Thief)
+Bot1.Choose(Island)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Island
+Bot1.Library.Count = 17
+Bot1.Graveyard = Island; Island; Forest; Black Lotus
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 19
+Bot2.Graveyard = Ancestral Recall

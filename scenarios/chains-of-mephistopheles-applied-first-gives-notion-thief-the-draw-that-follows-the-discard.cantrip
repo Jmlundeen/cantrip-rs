@@ -1,0 +1,56 @@
+# Chains of Mephistopheles and Notion Thief, both Bot1's, as in the scenario beside this one, but Bot2 has Chains apply
+# first to each of its Ancestral Recall draws (CR 616.1): it discards a Swamp, and so draws a card - and Notion Thief, which
+# has not yet had its opportunity, replaces that draw, so Bot1 draws instead. Chains has had its opportunity at that draw
+# (CR 614.5), so Bot1's draws are plain: Bot1 draws three cards and discards none; Bot2 discards three Swamps and draws
+# nothing.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Sapphire
+Chains of Mephistopheles
+Notion Thief
+Forest
+Island x20
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Notion Thief.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Replace(Chains of Mephistopheles)
+Bot2.Choose(Swamp)
+Bot2.Replace(Chains of Mephistopheles)
+Bot2.Choose(Swamp)
+Bot2.Replace(Chains of Mephistopheles)
+Bot2.Choose(Swamp)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Forest; Island; Island; Island
+Bot1.Library.Count = 17
+Bot1.Graveyard = Black Lotus
+Bot2.Hand.Count = 3
+Bot2.Library.Count = 19
+Bot2.Graveyard = Ancestral Recall; Swamp; Swamp; Swamp
