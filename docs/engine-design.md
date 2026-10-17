@@ -467,6 +467,9 @@ Rich), "if you control a Wizard" (`ControlsSubtype`, Flameshape), asked whenever
 permission as much as a cast - and so are its other terms (`actions::permission_stands`: a warp card's later turn).
 A permission may also be for the card's Adventure alone (`PlayGrant::adventure_only`, CR 715.3: Mosswood Dreadknight's "cast it
 from your graveyard as an Adventure"): neither the card itself nor another face of it is cast by it.
+A spell cast by a permission may be paid for with life equal to its mana value rather than its mana cost
+(`PlayGrant::life_for_mana_value`, CR 118.9, 119.4: Inside Information), as Bolas's Citadel's rule pays for the top of a library
+(`actions::life_for_mana_value`, the face cast, X as 0); no other alternative cost goes with it (CR 118.9a).
 
 The cleanup step removes all marked damage (CR 514.2) except from a permanent a static ability keeps it on:
 `CardDef::damage_stays` (`DamageStaysRule`, asked of each damaged permanent by the permanents on the battlefield with their

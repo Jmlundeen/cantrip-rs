@@ -2273,11 +2273,15 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             }
             // What a permission to cast it from here says to pay instead of its mana cost (CR 118.9).
             let grant = if permitted { permission_for(cx, id, player).map(|p| p.grant) } else { None };
-            let instead = grant.and_then(|g| g.instead);
+            // Or life equal to its mana value (CR 118.9, 119.4): nothing in mana, and the life payable.
+            let life_grant = grant.is_some_and(|g| g.life_for_mana_value);
+            let instead = if life_grant { Some(ManaCost::ZERO) } else { grant.and_then(|g| g.instead) };
             let any_type = grant.is_some_and(|g| g.any_type);
             let more = grant.map_or(0, |g| g.more);
             // A permission to cast it only as its Adventure (CR 715.3) casts neither the card itself nor another face of it.
             let permitted_whole = permitted && !grant.is_some_and(|g| g.adventure_only);
+            // A cost paid "rather than" the mana cost is itself an alternative cost: no other may be used with it (CR 118.9a).
+            let alternatives = permitted_whole && !life_grant;
             let speed = Speed { cx, flash, granters: &flash_granters, player, card: id };
             let instant = speed.whole(def) && !grant.is_some_and(|g| g.sorcery_speed);
             // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard";
@@ -2291,7 +2295,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 && (instant == instants || (instants && def.ways.iter().any(|w| w.instant_speed)))
                 && cx.chars(id).has(Keyword::Retrace)
                 && can_pay_other(cx, id, player, &RETRACE);
-            let elsewhere = permitted_whole || from_graveyard || retrace || adventured;
+            let elsewhere = alternatives || from_graveyard || retrace || adventured;
             // Whether a way of casting it from the hand is open to it here (CR 118.9, 601.3): one that names no zone is an
             // alternative cost that may be paid whatever zone a rule or permission has the spell cast from, as Yawgmoth's
             // Will does for Force of Will's, Daze's or web-slinging's; one whose text names the hand is not (warp, CR
@@ -2300,7 +2304,8 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             if instant == instants && !land {
                 if def.split.is_none()
                     && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted_whole || from_graveyard || retrace)
-                    && (def.has_cost || instead.is_some())
+                    && (def.has_cost || (instead.is_some() && !life_grant))
+                    && (!life_grant || can_pay_other(cx, id, player, &life_for_mana_value(def)))
                     && additional_payable
                     && def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
                     && (def.additional_choice.is_empty()
@@ -2496,6 +2501,9 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     if permitted && !zone.is(ZoneKind::Hand) && !from_graveyard && grant.is_some_and(|g| g.adventure_only) && way != WAY_ADVENTURE {
                         continue;
                     }
+                    if life_grant && !from_graveyard && !can_pay_other(cx, id, player, &life_for_mana_value(inset)) {
+                        continue;
+                    }
                     let face_instant = speed.face(inset) && !grant.is_some_and(|g| g.sorcery_speed);
                     if face_instant != instants {
                         continue;
@@ -2559,14 +2567,19 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
     {
         let def = cx.card(cx.s().obj(id).card);
         let instant = Speed { cx, flash, granters: &flash_granters, player, card: id }.whole(def);
-        let life = Cost { life: def.cost.mana_value().min(255) as u8, ..Cost::NONE };
-        if !def.is(CardType::Land) && def.has_cost && instant == instants && can_pay_other(cx, id, player, &life) {
+        if !def.is(CardType::Land) && def.has_cost && instant == instants && can_pay_other(cx, id, player, &life_for_mana_value(def)) {
             let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
             if offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option) {
                 options.push(option);
             }
         }
     }
+}
+
+/// "Pay life equal to its mana value rather than pay its mana cost" (CR 118.9, 119.4): the life, as a cost, for a card or the
+/// face of it cast, its X counted as 0 (CR 107.3). Bolas's Citadel's rule and Inside Information's permission pay it.
+fn life_for_mana_value(def: &CardDef) -> Cost {
+    Cost { life: def.cost.mana_value().min(255) as u8, ..Cost::NONE }
 }
 
 /// The most an emerge cost could come down by right now (CR 702.119a): the mana values of the richest permanents it could
@@ -2697,6 +2710,20 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
 /// (Snapcaster Mage), "Cast without paying its mana cost", "Cast by paying {1}{U} instead".
 pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption) -> std::borrow::Cow<'static, str> {
     let Some(source) = option.source else { return "".into() };
+    // "Pay life equal to its mana value rather than pay its mana cost" (CR 118.9): the life, for the face cast.
+    if option.kind == ActionKind::CastSpell
+        && matches!(option.index, 0 | WAY_ADVENTURE)
+        && state.obj(source).zone != Zone::hand(state.obj(source).owner)
+        && state.permissions.iter().any(|p| p.card == source && p.grant.life_for_mana_value)
+    {
+        let def = cards.get(state.obj(source).card);
+        let face = if option.index == 0 { def } else { def.inset_face(option.index).unwrap_or(def) };
+        let life = life_for_mana_value(face).life;
+        return match face.name {
+            _ if option.index == 0 => format!("Cast by paying {life} life instead").into(),
+            name => format!("{name}: cast by paying {life} life instead").into(),
+        };
+    }
     if option.kind == ActionKind::CastSpell
         && option.index == 0
         && let Some(grant) = state.permissions.iter().find(|p| p.card == source && (p.grant.instead.is_some() || p.grant.exile_after)).map(|p| p.grant)
@@ -2832,9 +2859,14 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             let instead = permitted.and_then(|p| p.grant.instead);
             let any_type = permitted.is_some_and(|p| p.grant.any_type);
             let more = permitted.map_or(0, |p| p.grant.more);
-            // From the top of a library by a permanent's permission: life instead of the mana cost (CR 118.9).
-            let (instead, life) = if cx.s().obj(source).zone.is(ZoneKind::Library) && land_rules(cx, player).top_for_life {
-                (Some(ManaCost::ZERO), cx.card(cx.s().obj(source).card).cost.mana_value().min(255) as u8)
+            // Life equal to its mana value instead of the mana cost (CR 118.9, 119.4): by a permission that says so, of the face
+            // cast (CR 715.3a), or from the top of a library by a permanent's rule (Bolas's Citadel).
+            let def = cx.card(cx.s().obj(source).card);
+            let (instead, life) = if permitted.is_some_and(|p| p.grant.life_for_mana_value) {
+                let face = if action.index == 0 { def } else { def.inset_face(action.index).unwrap_or(def) };
+                (Some(ManaCost::ZERO), life_for_mana_value(face).life)
+            } else if cx.s().obj(source).zone.is(ZoneKind::Library) && land_rules(cx, player).top_for_life {
+                (Some(ManaCost::ZERO), life_for_mana_value(def).life)
             } else {
                 (instead, 0)
             };

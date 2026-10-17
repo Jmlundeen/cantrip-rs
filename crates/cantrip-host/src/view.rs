@@ -928,6 +928,9 @@ impl<'a> Projector<'a> {
         if grant.more > 0 && spell {
             text.push_str(&format!(", a spell costs {{{}}} more", grant.more));
         }
+        if grant.life_for_mana_value && spell {
+            text.push_str(", a spell for life equal to its mana value");
+        }
         if grant.lands && grant.enters_tapped && land {
             text.push_str(", a land enters tapped");
         }

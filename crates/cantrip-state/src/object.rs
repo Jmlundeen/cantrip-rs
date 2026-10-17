@@ -738,6 +738,10 @@ pub struct PlayGrant {
     /// It may be cast only as its Adventure (CR 715.3, 715.3d): Mosswood Dreadknight's "you may cast it from your graveyard as
     /// an Adventure". Its card as itself, or another face, is not cast by this permission.
     pub adventure_only: bool,
+    /// A spell cast by it is paid for with life equal to its mana value rather than its mana cost (CR 118.9, 119.4): Inside
+    /// Information's "pay life equal to its mana value rather than pay its mana cost", as Bolas's Citadel's rule pays for the
+    /// top of a library. An X in its cost is 0 (CR 107.3), and no other alternative cost may be used with it (CR 118.9a).
+    pub life_for_mana_value: bool,
 }
 
 /// A condition on a standing permission to play a card, worked out whenever the permission is asked.
@@ -753,7 +757,7 @@ pub enum PlayCondition {
 
 impl PlayGrant {
     /// "You may cast it": for as long as it stays where it is, for its mana cost.
-    pub const CAST: PlayGrant = PlayGrant { instead: None, lands: false, expiry: Expiry::Never, any_type: false, more: 0, later_turns: false, exile_after: false, when: None, sorcery_speed: false, enters_tapped: false, adventure_only: false };
+    pub const CAST: PlayGrant = PlayGrant { instead: None, lands: false, expiry: Expiry::Never, any_type: false, more: 0, later_turns: false, exile_after: false, when: None, sorcery_speed: false, enters_tapped: false, adventure_only: false, life_for_mana_value: false };
 }
 
 /// A standing permission to play or cast one card from a zone it could not be played from (CR 601.3, 305.1): "until
