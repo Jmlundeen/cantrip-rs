@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::{damage_target, targets};
 use cantrip_oracle as oracle;
 
-const COPY: Question = Question::new("CopySpell", "pay {cost} to copy {subject}?", "You choose a new target for the copy", "Pay {cost}", "Don't copy");
+const COPY: Question = Question::new("CopySpell", "pay {cost} to copy {subject}?", "You may choose a new target for the copy", "Pay {cost}", "Don't copy");
 
 /// Three damage to any target; then that player, or that permanent's controller, may pay {R}{R}, and if they do, copy
 /// this spell and choose a new target for the copy (CR 707.10, 707.10c). Paying is the choice to copy. A target that

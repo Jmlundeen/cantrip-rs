@@ -1380,7 +1380,7 @@ public sealed partial class MainPage
 
     private void FillUnlessPays(GameClient client, UnlessPaysPromptMessage prompt)
     {
-        string source = client.Object(prompt.Source)?.Name ?? "A spell";
+        string source = client.Object(prompt.Source)?.Name ?? "This card";
         string subject = client.Object(prompt.Subject)?.Name ?? "it";
         string cost = prompt.CostText();
 
@@ -1390,12 +1390,18 @@ public sealed partial class MainPage
         string title = question.Contains("{source}", StringComparison.Ordinal)
             ? question.Replace("{source}", source, StringComparison.Ordinal)
             : $"{source}: {question}";
-        string standing = _actions.Pay is not null
-            ? prompt.Total is "{0}" or "" ? "" : $"{prompt.Total} is covered"
-            : _actions.Any
-                ? $"{prompt.Remaining} still to pay  ·  tap a land"
-                : $"{prompt.Remaining} still to pay  ·  nothing untapped can pay it";
-        string detail = prompt.Words(prompt.Detail, subject);
+        string standing = prompt.LifeShort
+            ? $"you no longer have the {prompt.Life} life it takes"
+            : _actions.Pay is not null
+                ? prompt.Total is "{0}" or "" ? "" : $"{prompt.Total} is covered"
+                : _actions.Any
+                    ? $"{prompt.Remaining} still to pay  ·  tap a land"
+                    : $"{prompt.Remaining} still to pay  ·  nothing untapped can pay it";
+
+        // Decaying Soil's card, gone from the graveyard since the trigger: paying is still the choice, but buys nothing.
+        string detail = prompt.Subject == ViewHandle.None && prompt.Question.Contains("{subject}", StringComparison.Ordinal)
+            ? "That card has left where it was, so paying gets nothing"
+            : prompt.Words(prompt.Detail, subject);
 
         Prompt(title, string.Join("  ·  ", new[] { detail, standing }.Where(part => part.Length > 0)));
 

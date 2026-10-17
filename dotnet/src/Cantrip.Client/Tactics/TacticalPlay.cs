@@ -94,6 +94,9 @@ public sealed partial class TacticalPlay : IAutoPlayer
     private string _unlessOwed = string.Empty;
     private int _unlessStalls;
 
+    /// <summary>Whether this seat's last answer to a payment made mana for it, so the next question is the same payment.</summary>
+    private bool _unlessContinuing;
+
     /// <summary>The colors of whatever this seat last protected something from, for the color it is then asked to name.</summary>
     private List<ColorView> _threat = [];
 

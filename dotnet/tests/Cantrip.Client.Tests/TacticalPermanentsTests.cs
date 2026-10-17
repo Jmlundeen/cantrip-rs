@@ -939,6 +939,43 @@ public sealed class TacticalPermanentsTests
         Assert.Equal(expected, answer.Kind);
     }
 
+    [Fact]
+    public void Makes_the_mana_for_a_payment_a_land_at_a_time_and_weighs_the_same_sources_next_payment_afresh()
+    {
+        // Zoraline's {W}{B} and 2 life from an empty pool: a Plains, then a Swamp, then the payment - the amount still owed
+        // going down each time is progress, not a stall. Her next payment (her attack, the graveyard now empty) is a new
+        // question: nothing for it to return, so it is declined.
+        ObjectView dead = Creature(4, "Bear", 2, 2);
+        dead.Zone = ZoneKindView.Graveyard;
+        dead.ZoneOwner = Me;
+        dead.ManaValue = 2;
+        GameClient client = Seated([Land(1, "Plains"), Land(2, "Swamp"), dead]);
+        TacticalPlay bot = Bot();
+
+        ActionOptionMessage plains = new() { Kind = ActionKindView.ActivateAbility, Source = Handle(1), Produces = [ManaTypeView.White], Affordable = true };
+        ActionOptionMessage swamp = new() { Kind = ActionKindView.ActivateAbility, Source = Handle(2), Produces = [ManaTypeView.Black], Affordable = true };
+        UnlessPaysPromptMessage Asked(string remaining, List<ColorView> colored, params ActionOptionMessage[] options) => new()
+        {
+            Player = Me,
+            Source = Handle(30),
+            Subject = Handle(30),
+            Verb = "ReturnPermanentCard",
+            Amount = 3,
+            Total = "{W}{B}",
+            Remaining = remaining,
+            RemainingColored = colored,
+            Life = 2,
+            Options = [.. options, new() { Kind = ActionKindView.DeclineCost }],
+        };
+
+        Assert.Equal(ActionKindView.ActivateAbility, Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked("{W}{B}", [ColorView.White, ColorView.Black], plains, swamp))).Kind);
+        Assert.Equal(ActionKindView.ActivateAbility, Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked("{B}", [ColorView.Black], swamp))).Kind);
+        Assert.Equal(ActionKindView.PayCost, Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked("{0}", [], new ActionOptionMessage { Kind = ActionKindView.PayCost }))).Kind);
+
+        GameClient emptied = Seated([Land(1, "Plains", tapped: true), Land(2, "Swamp", tapped: true)]);
+        Assert.Equal(ActionKindView.DeclineCost, Assert.IsType<TakeActionAnswer>(bot.Decide(emptied, Asked("{0}", [], new ActionOptionMessage { Kind = ActionKindView.PayCost }))).Kind);
+    }
+
     [Theory]
     // Ward—Pay 3 life (CR 702.21a): the spell kept, while the life left is not short.
     [InlineData("Countered", 10, ActionKindView.PayCost)]

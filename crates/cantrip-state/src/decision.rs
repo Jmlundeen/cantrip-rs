@@ -271,7 +271,18 @@ pub enum RequestKind {
     /// activate mana abilities while there is mana to pay (CR 605.3a), pay once the pool covers the mana and the life
     /// total covers the life (CR 118.3, 119.4), or decline. `question` is the card's words for what paying does, with
     /// `{cost}` and `{subject}` where the cost and the subject's name go; its verb is what the bots read it by.
-    UnlessPays { source: ObjectId, subject: ObjectId, total: ManaCost, life: u8, question: &'static Question, options: Vec<ActionOption> },
+    /// `remaining` is the mana the pool does not cover yet, and `life_payable` whether the life total still covers the
+    /// life (false once a mana ability has cost the life the payment needed).
+    UnlessPays {
+        source: ObjectId,
+        subject: ObjectId,
+        total: ManaCost,
+        remaining: ManaCost,
+        life: u8,
+        life_payable: bool,
+        question: &'static Question,
+        options: Vec<ActionOption>,
+    },
     /// Choose `count` (or up to `count`) of `eligible`, from among `cards` (all of which the player sees).
     /// `kind` is what the asking card calls what may be chosen when it says more than "card" ("artifact or creature",
     /// "nonland"), empty otherwise: the dock words the choice as the card does.

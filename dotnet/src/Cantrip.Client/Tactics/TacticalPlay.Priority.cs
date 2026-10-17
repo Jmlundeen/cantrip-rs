@@ -2176,8 +2176,10 @@ public sealed partial class TacticalPlay
     {
         // Paying has to get somewhere. A source that itself costs mana to use - Chromatic Star with every land tapped -
         // is activated, cannot be paid for, and leaves the same question with the same amount owed: asked that way
-        // twice, the cost is one this seat cannot pay, and it says no.
-        if (prompt.Source == _unless && prompt.Remaining == _unlessOwed)
+        // twice, the cost is one this seat cannot pay, and it says no. The payment goes on only while this seat is making mana
+        // for it: any other question from the same source is a new payment (Zoraline's attack after her entering).
+        bool continuing = _unlessContinuing && prompt.Source == _unless;
+        if (continuing && prompt.Remaining == _unlessOwed)
         {
             if (++_unlessStalls >= 2)
             {
@@ -2191,14 +2193,21 @@ public sealed partial class TacticalPlay
 
         _unlessOwed = prompt.Remaining;
 
-        // Decided once for the payment, at its first question: paying mana takes several answers. A payment of life alone
-        // is one question, and a source that asks again later (Master of Death each upkeep) is asked afresh.
-        if (prompt.Source != _unless || prompt.Total is "{0}" or "")
+        // Decided once for the payment, at its first question: paying mana takes several answers.
+        if (!continuing)
         {
             _unless = prompt.Source;
             _paying = WorthPaying(client, prompt);
         }
 
+        TakeActionAnswer answer = Paying(client, prompt);
+        _unlessContinuing = answer.Kind == ActionKindView.ActivateAbility;
+        return answer;
+    }
+
+    /// <summary>The answer to a payment once it is decided: decline, or make the mana and pay.</summary>
+    private TakeActionAnswer Paying(GameClient client, UnlessPaysPromptMessage prompt)
+    {
         if (!_paying)
         {
             return AutoPlay.Answer(prompt.Options.First(option => option.Kind == ActionKindView.DeclineCost));

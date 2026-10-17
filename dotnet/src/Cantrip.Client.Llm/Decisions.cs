@@ -95,6 +95,9 @@ public sealed class Decisions
     /// <summary>Whether that decision was to pay.</summary>
     private bool _paying;
 
+    /// <summary>Whether the last answer to a payment made mana for it, so the next question is the same payment.</summary>
+    private bool _unlessContinuing;
+
     public Decisions(IChooser chooser)
     {
         ArgumentNullException.ThrowIfNull(chooser);
@@ -536,8 +539,9 @@ public sealed class Decisions
     /// </summary>
     private AnswerPayload Unless(GameClient client, UnlessPaysPromptMessage prompt)
     {
-        // A payment of life alone is one question, so a source that asks again later (each upkeep) is asked afresh.
-        if (prompt.Source != _unless || prompt.Total is "{0}" or "")
+        // The payment goes on only while this seat is making mana for it: any other question is a new payment, asked afresh
+        // (Zoraline's attack after her entering, Master of Death each upkeep).
+        if (!_unlessContinuing || prompt.Source != _unless)
         {
             _unless = prompt.Source;
 
@@ -552,9 +556,11 @@ public sealed class Decisions
                 + $"It costs {prompt.CostText()}; you have {client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Life} life. Pay it?");
         }
 
-        return _paying
+        TakeActionAnswer answer = _paying
             ? AutoPlay.PayUnless(prompt)
             : AutoPlay.Answer(prompt.Options.First(option => option.Kind == ActionKindView.DeclineCost));
+        _unlessContinuing = answer.Kind == ActionKindView.ActivateAbility;
+        return answer;
     }
 
     // --- Combat ------------------------------------------------------------------------------------------------------

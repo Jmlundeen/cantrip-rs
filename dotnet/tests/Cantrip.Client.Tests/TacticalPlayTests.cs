@@ -298,10 +298,10 @@ public sealed class TacticalPlayTests
             ],
         };
 
-        List<ActionKindView> answers = [.. Enumerable.Range(0, 4).Select(_ => Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked())).Kind)];
+        // Declining ends the payment, so the engine asks nothing more of it: three answers, the third the decline.
+        List<ActionKindView> answers = [.. Enumerable.Range(0, 3).Select(_ => Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked())).Kind)];
 
-        Assert.Equal(ActionKindView.ActivateAbility, answers[0]);
-        Assert.Equal(ActionKindView.DeclineCost, answers[^1]);
+        Assert.Equal([ActionKindView.ActivateAbility, ActionKindView.ActivateAbility, ActionKindView.DeclineCost], answers);
     }
 
     [Fact]

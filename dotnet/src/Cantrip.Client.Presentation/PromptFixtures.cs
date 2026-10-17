@@ -1244,7 +1244,7 @@ public static class PromptFixtures
                     Subject = new ViewHandle(OnStack),
                     Verb = "CopySpell",
                     Question = "pay {cost} to copy {subject}?",
-                    Detail = "You choose a new target for the copy",
+                    Detail = "You may choose a new target for the copy",
                     Yes = "Pay {cost}",
                     No = "Don't copy",
                     Total = "{R}{R}",

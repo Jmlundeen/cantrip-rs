@@ -75,7 +75,7 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     {
         return false;
     }
-    if cost.life > 0 && cx.s().player(controller).life < cost.life as i32 {
+    if !can_pay_life(cx, controller, cost.life) {
         return false;
     }
     if cost.return_self && !obj.zone.is(ZoneKind::Battlefield) {
@@ -4100,6 +4100,36 @@ enum Ways {
     Many,
 }
 
+/// What of `owed` the pool does not cover, for the payer to make mana for: each colored symbol the pool has the color for
+/// is covered, a hybrid or Phyrexian symbol by either of its colors, and the generic mana by what is left over. Advice for
+/// the prompt, not a payment: the pool is spent once it covers the whole cost.
+fn uncovered(pool: &ManaPool, owed: &ManaCost) -> ManaCost {
+    let mut left = pool.0;
+    let mut out = *owed;
+    for mana in Mana::ALL {
+        let i = mana as usize;
+        let take = left[i].min(out.symbols[i]);
+        left[i] -= take;
+        out.symbols[i] -= take;
+    }
+    for slot in out.hybrid.iter_mut() {
+        if let Some((a, b)) = *slot {
+            if let Some(m) = [a, b].into_iter().find(|&m| left[m as usize] > 0) {
+                left[m as usize] -= 1;
+                *slot = None;
+            }
+        }
+    }
+    for (i, n) in out.phyrexian.iter_mut().enumerate() {
+        let take = left[i].min(*n);
+        left[i] -= take;
+        *n -= take;
+    }
+    let spare: u32 = left.iter().map(|&n| n as u32).sum();
+    out.generic = out.generic.saturating_sub(spare.min(255) as u8);
+    out
+}
+
 fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
     let mut left = pool.0;
     let mut spent = [0u8; 6];
@@ -4609,17 +4639,20 @@ pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId
     loop {
         // Once a mana ability has cost the payer the life the payment needs, there is nothing left to do but decline.
         let mut options = Vec::new();
-        if can_pay_life(cx, payer, life) {
+        let pool = spendable(cx, payer, source, Paying::Other);
+        let remaining = uncovered(&pool, &total);
+        let life_payable = can_pay_life(cx, payer, life);
+        if life_payable {
             if total != ManaCost::ZERO {
                 options = mana_options_while_paying(cx, payer, source, Paying::Other);
             }
-            let pool = spendable(cx, payer, source, Paying::Other);
             if total == ManaCost::ZERO || !matches!(ways(&pool, &total), Ways::None) {
                 options.push(ActionOption::simple(ActionKind::PayCost));
             }
         }
         options.push(ActionOption::simple(ActionKind::DeclineCost));
-        let answer = cx.ask_core(payer, RequestKind::UnlessPays { source, subject, total, life, question, options }, false)?;
+        let ask = RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options };
+        let answer = cx.ask_core(payer, ask, false)?;
         let Answer::Act(action) = answer else { return Ok(false) };
         match action.kind {
             ActionKind::ActivateAbility => {

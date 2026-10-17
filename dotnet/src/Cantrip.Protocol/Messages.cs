@@ -1696,6 +1696,10 @@ public sealed class UnlessPaysPromptMessage : PromptPayload
     [Key(10)]
     public int Life { get; set; }
 
+    /// <summary>The life total no longer covers <see cref="Life"/>: a mana ability made for the payment cost it, and only declining is left.</summary>
+    [Key(16)]
+    public bool LifeShort { get; set; }
+
     /// <summary>An amount the verb carries: for "ReturnPermanentCard", the greatest mana value the card may have.</summary>
     [Key(11)]
     public int Amount { get; set; }

@@ -654,18 +654,19 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ..Default::default()
             })
         }
-        RequestKind::UnlessPays { source, subject, total, life, question, options } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
+        RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options } => PromptPayload::UnlessPaysPromptMessage(UnlessPaysPrompt {
             player,
             source: source_handle(game, handles, *source),
             subject: source_handle(game, handles, *subject),
             total: total.to_string(),
-            remaining: total.to_string(),
-            remaining_generic: i32::from(total.generic),
-            remaining_colored: remaining_colored(total),
-            remaining_hybrid: remaining_hybrid(total),
+            remaining: remaining.to_string(),
+            remaining_generic: i32::from(remaining.generic),
+            remaining_colored: remaining_colored(remaining),
+            remaining_hybrid: remaining_hybrid(remaining),
             options: options_messages(game, handles, options),
             verb: question.verb.into(),
             life: i32::from(*life),
+            life_short: !*life_payable,
             amount: i32::from(question.amount),
             question: question.ask.into(),
             detail: question.detail.into(),

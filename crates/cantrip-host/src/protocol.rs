@@ -960,6 +960,8 @@ pub struct UnlessPaysPrompt {
     pub verb: String,
     /// The life the cost takes besides its mana (CR 119.4): "{W}{B} and 2 life" is `Total` {W}{B} and 2.
     pub life: i32,
+    /// The life total no longer covers the life (a mana ability made for the payment cost it): only declining is left.
+    pub life_short: bool,
     /// An amount the verb carries (`Question::amount`): the greatest mana value a card returned may have.
     pub amount: i32,
     /// The card's words for the payment, after the source's name, `{cost}` and `{subject}` where the cost and the subject's
