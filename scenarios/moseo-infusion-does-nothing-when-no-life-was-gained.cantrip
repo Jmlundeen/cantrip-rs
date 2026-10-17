@@ -1,0 +1,43 @@
+# Moseo's infusion ability has an intervening "if you gained life this turn" (CR 603.4): Bot1 gained none on turn 1, so at its end
+# step the ability never goes on the stack - no target is asked (`! Bot1.Target`) - and the Llanowar Elves Entomb put into the
+# graveyard stays there. Bot2 gaining life is no help: nothing is gained here. The positive control is the sibling scenarios.
+# Moseo's enters trigger still makes the Pest: 5 permanents (four Moxen, Moseo) and the Pest, 6.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Moseo, Vein's New Dean
+Entomb
+Island
+Llanowar Elves
+Island x12
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Moseo, Vein's New Dean.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Search(Llanowar Elves)
+Bot1.Pass
+[T1 Bot1.End]
+! Bot1.Target
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Pest.Power = 1
+Bot1.Graveyard = Entomb; Llanowar Elves

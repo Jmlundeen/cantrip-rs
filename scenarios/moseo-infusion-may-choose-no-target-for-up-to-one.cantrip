@@ -1,0 +1,44 @@
+# "Return up to one target creature card": Bot1 gained 1 life (the Pest attacked) and Moseo's end-step ability offers the
+# Llanowar Elves (mana value 1), but Bot1 chooses no target with `Bot1.Target()`, so nothing is returned (CR 601.2c, 115.1).
+# The Elves stay in the graveyard and Bot1 is on 21.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Moseo, Vein's New Dean
+Entomb
+Island
+Island
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Moseo, Vein's New Dean.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Pest > Bot2)
+[T3 Bot1.End]
+Bot1.Target()
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Graveyard = Entomb; Llanowar Elves

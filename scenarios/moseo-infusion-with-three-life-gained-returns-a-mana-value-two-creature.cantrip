@@ -1,0 +1,49 @@
+# Moseo's infusion ability with X = 3: Bot1 gains 3 with Lightning Helix on turn 3 (the Helix is also drawn on turn 3, the
+# first library draw before any search), so at its end step Moseo may return a creature card with mana value 3 or less -
+# Baleful Strix (mana value 2), which the one-life scenario could not return. It is Bot1's creature: the Strix's own enters
+# trigger draws a card. Bot1: 20 + 3 = 23. The Strix is on the battlefield, the Entomb in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Moseo, Vein's New Dean
+Entomb
+Island
+Lightning Helix
+Baleful Strix
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Moseo, Vein's New Dean.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Baleful Strix)
+Bot1.Pass
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Target(Baleful Strix)
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield.Baleful Strix.Power = 1
+Bot1.Graveyard = Lightning Helix; Entomb

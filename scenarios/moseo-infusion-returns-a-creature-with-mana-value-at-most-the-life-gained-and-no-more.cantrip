@@ -1,0 +1,52 @@
+# Moseo's infusion ability with X = 1: the Pest token Moseo made attacks on turn 3 and gains Bot1 1 life ("Whenever this token
+# attacks, you gain 1 life"), so at the beginning of Bot1's end step Moseo returns a creature card with mana value 1 or less.
+# Bot1's graveyard holds Llanowar Elves (mana value 1) and Baleful Strix (mana value 2, too big: `! Bot1.Target(Baleful Strix)`);
+# the positive control is the Elves chosen on the next line (and the 3-life scenario, where the Strix is returned). Bot1 is on 21.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Moseo, Vein's New Dean
+Entomb
+Entomb
+Island
+Llanowar Elves
+Baleful Strix
+Island x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Moseo, Vein's New Dean.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Llanowar Elves)
+Bot1.Pass
+Bot1.Hand.Entomb.Cast
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Search(Baleful Strix)
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Pest > Bot2)
+[T3 Bot1.End]
+! Bot1.Target(Baleful Strix)
+Bot1.Target(Llanowar Elves)
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Graveyard = Entomb; Baleful Strix; Entomb
