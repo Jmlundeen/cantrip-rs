@@ -415,6 +415,11 @@ impl Game {
         static_rules::cant_gain_life(self, self.cards, player)
     }
 
+    /// Whether `player` can't lose life right now (CR 119.8): a static ability on the battlefield says so.
+    pub fn cant_lose_life(&self, player: PlayerId) -> bool {
+        static_rules::cant_lose_life(self, self.cards, player)
+    }
+
     /// Whether `player` doesn't lose the game for `reason` right now (CR 104.3): a static ability on the battlefield says so.
     pub fn doesnt_lose(&self, player: PlayerId, reason: LossReason) -> bool {
         static_rules::doesnt_lose(self, self.cards, player, reason)

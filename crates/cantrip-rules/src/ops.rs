@@ -2071,13 +2071,14 @@ pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
     }
     // CR 119.7: a player who can't gain life gains none, and nothing happens: no life gain event, so nothing that
     // triggers on one (CR 119.9) triggers, and no replacement effect of a life gain event does anything.
-    if delta > 0 && crate::static_rules::cant_gain_life(&*cx, cx.cards(), player) {
+    if blocked(cx, player, delta) {
         return;
     }
     // CR 614.1a, 616.1: "you gain that much life plus 1 instead", "they lose twice that much life instead". The event
-    // history records the life that actually changed.
+    // history records the life that actually changed. A gain an effect turned into a loss, or a loss into a gain, the player
+    // can't have is nothing (the Platinum Emperion rulings).
     let delta = crate::replace::life_change(cx, player, delta);
-    if delta == 0 {
+    if delta == 0 || blocked(cx, player, delta) {
         return;
     }
     cx.st().update_player(player, |p| p.life = p.life.saturating_add(delta));
@@ -2085,6 +2086,16 @@ pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
     // CR 702.179d: an opponent losing life during the turn of a player with speed.
     if delta < 0 {
         crate::speed::life_lost(cx, player);
+    }
+}
+
+/// Whether `player` can't have this change of life: a gain while they can't gain life (CR 119.7), a loss while they can't lose
+/// life (CR 119.8).
+fn blocked(cx: &Cx, player: PlayerId, delta: i32) -> bool {
+    if delta > 0 {
+        crate::static_rules::cant_gain_life(cx, cx.cards(), player)
+    } else {
+        crate::static_rules::cant_lose_life(cx, cx.cards(), player)
     }
 }
 

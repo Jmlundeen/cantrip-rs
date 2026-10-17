@@ -413,6 +413,14 @@ life, and a permanent that has lost all its abilities has none of these. No life
 not happen, so "whenever you gain life" does not trigger (CR 119.9); paying life is a loss and is still allowed. The host shows
 "You can't gain life." / "They can't gain life." beside a player's total while it applies (`Game::cant_gain_life`).
 
+A loss does not happen while the player can't lose life (CR 119.8, `static_rules::cant_lose_life`: a static ability's
+`CardDef::cant_lose_life`, a `LifeLossRule`; Platinum Emperion's "your life total can't change" is both rules). Damage is still
+dealt - lifelink still gains, "whenever damage is dealt to you" still triggers - and only the life it would take is not lost (the
+Emperion rulings). `change_life` asks both rules before the replacement effects and again of what they leave, so an effect that
+would turn the event into a gain or a loss the player can't have leaves nothing. Such a player can't pay life (CR 119.8, 119.4b:
+`actions::payable_life` is 0 for them): a cost with life in it is not offered, Phyrexian symbols are paid with mana, and X paid
+in life is announced at 0. The host shows "You can't lose life." or, with both, "Your life total can't change." beside the total.
+
 Replacement effects of a gain or loss of life (CR 614.1a: "you gain that much life plus 1 instead", "they lose twice that much
 life instead", "that player loses that much life instead") are `ReplacementKind::LifeChange` effects over a
 `Proposal::LifeChange { player, amount }`, `amount` signed (a gain above zero, a loss below), applied by `change_life` through
@@ -433,7 +441,7 @@ life (Mana Confluence) can leave only declining. The mana and the life are paid 
 they paid (CR 118.12). "You may pay {X}" where the text leaves X to the payer (CR 107.3f) is `Game::may_pay_x`
 (`actions::may_pay_x`): the same question with its `x`, raised and lowered (`IncreaseX`, `DecreaseX`) while mana is made, any
 X from 0 up, and the X paid is what it returns, for "when you do" to carry (Fire Lord Sozin). Not built, because no card in content has one: exchanges of life totals, costs
-that gain life, and "can't lose life" (CR 119.8).
+that gain life, and an effect a spell or ability makes that a player can't lose life (CR 119.8: "can't lose life this turn").
 
 "Damage can't be prevented" (CR 615.12) is asked by `ops::damage_can_be_prevented` before any prevention: a turn an effect said
 so (Bonecrusher Giant's Stomp) or a `CardDef::unpreventable_damage` static (Questing Beast's combat damage,

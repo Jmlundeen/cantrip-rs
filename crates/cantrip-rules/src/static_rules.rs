@@ -147,6 +147,13 @@ pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId
     })
 }
 
+/// Whether `player` can't lose life (CR 119.8): a static ability of a permanent on the battlefield with its abilities says so
+/// (`CardDef::cant_lose_life`: Platinum Emperion's "your life total can't change"). Asked only when a player would lose or
+/// pay life.
+pub fn cant_lose_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId) -> bool {
+    any_static(q, cards, |d| d.cant_lose_life, |rule, asker| rule(q, asker, player))
+}
+
 /// Whether `creature` may attack as though it didn't have defender (CR 702.3b, 609.4): a resolved effect says so this turn
 /// (`EffectKind::CanAttackDespiteDefender`, Assault Formation's {G} ability), or a static ability of a permanent on the
 /// battlefield does (`CardDef::attacks_despite_defender`: Demon Wall's "as long as this creature has a counter on it",

@@ -1091,7 +1091,7 @@ fn added_life_payable(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, 
         return true;
     }
     let (_, added) = change_total(cx, &a.changers, player, Costed::Spell(card), ManaCost::ZERO, face_of(cx, card, def), targets);
-    added == 0 || cx.s().player(player).life >= added as i32 + def.additional_cost.map_or(0, |c| c.life as i32)
+    added == 0 || payable_life(cx, player) >= added as i32 + def.additional_cost.map_or(0, |c| c.life as i32)
 }
 
 /// The face `def` is of the card `card`, where it is one of its faces rather than the card itself (an Adventure, an Omen, a
@@ -1422,7 +1422,7 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
 
 /// `least_cost`'s Phyrexian symbols paid with life where the life total allows, and the cost changes applied.
 fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, mut cost: ManaCost, targets: &[Target]) -> ManaCost {
-    let mut life = cx.s().player(player).life;
+    let mut life = if cost.phyrexian.iter().any(|&n| n > 0) { payable_life(cx, player) } else { 0 };
     for (i, n) in cost.phyrexian.into_iter().enumerate() {
         for _ in 0..n {
             if life > 2 {
@@ -1513,13 +1513,14 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     }
     let mut flex = [0u32; 64];
     let mut consume: u32 = 0;
-    // Mana abilities of the player's own (CR 605.1a): paid with life, as often as the life total allows (CR 119.4).
+    // Mana abilities of the player's own (CR 605.1a): paid with life, as often as the life total allows (CR 119.4), and never
+    // while the player can't lose life (CR 119.8).
     for effect in cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player) {
         let EffectKind::PlayerManaAbility(ability) = effect.kind else { continue };
         if let Some(def) = activated(cx, ability)
             && def.cost.life > 0
         {
-            let times = (cx.s().player(player).life.max(0) as u32 / def.cost.life as u32).min(100);
+            let times = (payable_life(cx, player).max(0) as u32 / def.cost.life as u32).min(100);
             for m in 0..6 {
                 fixed[m] = fixed[m].saturating_add((def.adds.0[m] as u32 * times).min(255) as u8);
             }
@@ -3339,7 +3340,7 @@ fn cast(
         // X paid in life is announced up to the life there is (CR 119.4), and X creatures sacrificed up to the creatures
         // there are (CR 601.2b).
         let cap = if extra.pay_x_life {
-            cx.s().player(player).life.clamp(0, 1000) as u16
+            payable_life(cx, player).clamp(0, 1000) as u16
         } else if let Some(variable) = extra.variable.filter(|_| sacrifices_x) {
             variable_candidates(cx, spell, player, variable).len() as u16
         } else {
@@ -3511,7 +3512,7 @@ fn cast(
     if added_life > 0 {
         cost.life = (cost.life as u32 + added_life).min(255) as u8;
         let owed = cost.life as i32 + extra.life as i32 + life as i32 + x_life as i32;
-        if cx.s().player(player).life < owed {
+        if payable_life(cx, player) < owed {
             return Err(Stop::Cancel);
         }
     }
@@ -4109,7 +4110,7 @@ fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut Man
     }
     let mut life = 0u8;
     if !symbols.is_empty() {
-        let have = cx.s().player(player).life.max(0) as usize;
+        let have = payable_life(cx, player).max(0) as usize;
         let most = symbols.len().min(have / 2) as u8;
         if most > 0 {
             // Advice: the fewest symbols that, paid with life, leave a cost the player could pay.
@@ -4336,7 +4337,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     let added_life;
     (mana, added_life) = apply_cost_changes_total(cx, player, Costed::Ability(source, ability), mana, &targets);
     let life = life as u32 + added_life;
-    if added_life > 0 && cx.s().player(player).life < life as i32 + def.cost.life as i32 {
+    if added_life > 0 && payable_life(cx, player) < life as i32 + def.cost.life as i32 {
         return Err(Stop::Cancel);
     }
 
@@ -5377,9 +5378,16 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 }
 
 /// Whether `player` could pay `life` life now (CR 119.4): any amount of 0 (CR 119.4b), otherwise only with a life total
-/// at least that high. ("Can't lose life", CR 119.8, would make it unpayable too; no card in content has it.)
+/// at least that high, and not while they can't lose life (CR 119.8).
 pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u8) -> bool {
-    life == 0 || cx.s().player(player).life >= i32::from(life)
+    // CR 119.4b: 0 life can always be paid.
+    life == 0 || payable_life(cx, player) >= i32::from(life)
+}
+
+/// The most life `player` may pay (CR 119.4): their life total, or none at all while they can't lose life (CR 119.8: "a cost
+/// that involves having that player pay life can't be paid").
+pub fn payable_life(cx: &Cx, player: PlayerId) -> i32 {
+    if static_rules::cant_lose_life(cx, cx.cards(), player) { 0 } else { cx.s().player(player).life }
 }
 
 /// A cost paid as a spell or ability resolves (CR 118.12, 608.2d): "[payer] may pay [cost]. If they do", and "unless

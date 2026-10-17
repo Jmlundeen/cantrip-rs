@@ -426,7 +426,8 @@ pub struct Cost {
     pub permanents: Option<PermanentCost>,
     /// A loyalty cost (CR 606.4): positive adds, negative removes.
     pub loyalty: Option<i8>,
-    /// Pay this much life (CR 119.4): payable only with at least that much.
+    /// Pay this much life (CR 119.4): payable only with at least that much, and not at all while the payer can't lose life
+    /// (CR 119.8).
     pub life: u8,
     /// Remove this many counters of this kind from the source (CR 602.1, 118.3).
     pub remove_counters: Option<(CounterKind, u8)>,
@@ -1592,6 +1593,10 @@ pub type UnpreventableRule = fn(&dyn Query, &Asker, ObjectId, bool) -> bool;
 /// Lynx), "Your opponents can't gain life" (Knight of Dusk's Shadow). `cantrip_mechanics::statics` has both.
 pub type LifeGainRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
 
+/// A static ability that says a player can't lose life (CR 119.8): true for `player`. Platinum Emperion's "your life total
+/// can't change" is this and a `LifeGainRule` together.
+pub type LifeLossRule = fn(&dyn Query, &Asker, PlayerId) -> bool;
+
 /// A static ability that says a player doesn't lose the game (CR 104.3): true for `player` and the way they would lose.
 /// "You can't lose the game" is true for every reason (Platinum Angel); "you don't lose the game for having 0 or less life"
 /// for `LossReason::Life` alone (Phyrexian Unlife).
@@ -1965,6 +1970,10 @@ pub struct CardDef {
     /// Its static abilities that stop players from gaining life (CR 119.7), while it is on the battlefield: the gain, the
     /// part of an exchange or a new life total that would raise the total, does not happen (CR 119.5).
     pub cant_gain_life: &'static [LifeGainRule],
+    /// Its static abilities that stop players from losing life (CR 119.8), while it is on the battlefield with its abilities:
+    /// the loss - damage's, a payment's, an effect's, a new life total's that would lower the total - does not happen, and a
+    /// cost that pays more than 0 life can't be paid.
+    pub cant_lose_life: &'static [LifeLossRule],
     /// Its static abilities that keep a player from losing the game (CR 104.3, 704.5a-c), while it is on the battlefield with
     /// its abilities: "you can't lose the game" (Platinum Angel), "you don't lose the game for having 0 or less life"
     /// (Phyrexian Unlife). A concession still loses (CR 104.3a), and nothing stops a draw (CR 104.4).
@@ -2129,6 +2138,7 @@ impl CardDef {
         targeting_rules: &[],
         unpreventable_damage: &[],
         cant_gain_life: &[],
+        cant_lose_life: &[],
         loss_rules: &[],
         win_rules: &[],
         infect_damage_to: &[],
