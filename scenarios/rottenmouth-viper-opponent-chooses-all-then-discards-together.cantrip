@@ -1,0 +1,46 @@
+# Rottenmouth Viper's punishment: each opponent makes all of their choices, one for each blight counter, and then the
+# actions happen together (the rulings, CR 101.4). Bot2 controls Marauding Mako ("whenever you discard one or more cards,
+# put that many +1/+1 counters on this creature"). On turn 3 the Viper attacks with its second counter, and Bot2 chooses
+# to discard twice: both Lightning Bolts are discarded at once, so the Mako triggers once, for two counters - not once for
+# each. (On turn 1, entering, the Viper's one counter cost Bot2 4 life.)
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Rottenmouth Viper
+Island x10
+
+[Bot2 Deck]
+Mountain
+Marauding Mako
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Rottenmouth Viper)
+Bot2.Choose()
+Bot2.Modes(Lose 4 life)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Marauding Mako.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Rottenmouth Viper > Bot2)
+Bot2.Modes(Discard a card)
+Bot2.Choose(Lightning Bolt)
+Bot2.Modes(Discard a card)
+Bot2.Choose(Lightning Bolt)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Battlefield.Marauding Mako.Counters.PlusOnePlusOne = 2
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Bot2.Life = 10

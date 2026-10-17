@@ -1,7 +1,7 @@
 use cantrip_api::*;
+use cantrip_mechanics::choose;
 use cantrip_mechanics::targets::filters::nonland;
 use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
-use cantrip_mechanics::{choose, choose_from_hand};
 use cantrip_oracle as oracle;
 
 /// The choices of each opponent, as `labels` below.
@@ -12,23 +12,30 @@ const LOSE: u8 = 2;
 /// "Put a blight counter on it. Then for each blight counter on it, each opponent loses 4 life unless that player sacrifices
 /// a nonland permanent of their choice or discards a card." The counter goes on it only while it is on the battlefield
 /// (`add_counters` puts none on an object that has left, CR 400.7); the counters are counted on it, or as it last existed
-/// there (CR 608.2h). For each, the opponents choose in turn order (CR 101.4) - to sacrifice a nonland permanent, to discard
-/// a card, or to lose 4 life, which is the one choice left to a player with neither - and then the sacrifices, the discards
-/// and the losses of life happen together; then again for the next counter.
+/// there (CR 608.2h).
+///
+/// Each opponent in turn order (CR 101.4) makes all of their choices - one for each counter: to sacrifice a nonland
+/// permanent, to discard a card, or to lose 4 life, a permanent or card already chosen not chosen again, and losing 4 life
+/// the one choice left to a player with neither - and then all the actions happen together (the rulings): the sacrifices
+/// and the discards at once, then the life, 4 for each time it was chosen.
 fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::Blight, 1);
     let counters = g.obj(item.object).counters(CounterKind::Blight).max(0);
     let card = g.card_id(&CARD);
-    for _ in 0..counters {
-        let (mut sacrificed, mut discarded, mut losers) = (Vec::new(), Vec::new(), Vec::new());
-        for opponent in g.state().opponents(item.controller).collect::<Vec<_>>() {
-            let asker = Asker { source: item.object, controller: opponent };
-            let permanents: Vec<ObjectId> = g.permanents_of(opponent).into_iter().filter(|&id| nonland(g, &asker, id)).collect();
+    let (mut sacrificed, mut discarded, mut losses) = (Vec::new(), Vec::new(), Vec::new());
+    let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| g.state().opponents(item.controller).any(|o| o == p)).collect();
+    for opponent in opponents {
+        let asker = Asker { source: item.object, controller: opponent };
+        for _ in 0..counters {
+            let permanents: Vec<ObjectId> =
+                g.permanents_of(opponent).into_iter().filter(|&id| nonland(g, &asker, id) && !sacrificed.contains(&id)).collect();
+            let hand = g.state().zone(Zone::hand(opponent)).to_vec();
+            let cards: Vec<ObjectId> = hand.iter().copied().filter(|c| !discarded.contains(c)).collect();
             let mut options = Vec::new();
             if !permanents.is_empty() {
                 options.push(SACRIFICE);
             }
-            if !g.state().zone(Zone::hand(opponent)).is_empty() {
+            if !cards.is_empty() {
                 options.push(DISCARD);
             }
             options.push(LOSE);
@@ -40,15 +47,15 @@ fn blight_and_punish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
             };
             match choice {
                 SACRIFICE => sacrificed.extend(choose::cards(g, opponent, item.object, Purpose::Sacrifice, permanents, 1, false)?),
-                DISCARD => discarded.extend(choose_from_hand(g, opponent, item.object, 1)?),
-                _ => losers.push(opponent),
+                DISCARD => discarded.extend(choose::cards_from(g, opponent, item.object, Purpose::Discard, hand, cards, 1, false)?),
+                _ => losses.push(opponent),
             }
         }
-        g.sacrifice(&sacrificed);
-        g.discard_together(&discarded);
-        for player in losers {
-            g.lose_life(player, 4);
-        }
+    }
+    g.sacrifice(&sacrificed);
+    g.discard_together(&discarded);
+    for player in losses {
+        g.lose_life(player, 4);
     }
     Ok(())
 }
