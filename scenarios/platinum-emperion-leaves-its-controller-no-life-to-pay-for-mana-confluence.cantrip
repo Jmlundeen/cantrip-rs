@@ -1,0 +1,35 @@
+# Platinum Emperion: "You can't pay any amount of life except 0" (CR 119.8: a cost that has its controller pay life can't be paid;
+# CR 119.4b). Before it arrives, Mana Confluence's "{T}, Pay 1 life: Add one mana of any color" is paid, and Bot1 goes to 19
+# (the positive control). Once Emperion is on the battlefield the ability is not offered at all, though Bot1 has 19 life.
+
+[Bot1 Deck]
+Mana Confluence
+Mox Sapphire
+Mox Pearl
+Show and Tell
+Platinum Emperion
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mana Confluence.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Confluence.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Pass
+Bot1.Choose(Platinum Emperion)
+Bot2.Choose()
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Mana Confluence.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Mana Confluence.Tapped = false

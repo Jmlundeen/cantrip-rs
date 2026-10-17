@@ -1,0 +1,53 @@
+# Platinum Emperion: "You can't pay any amount of life except 0" (CR 119.8). Before it arrives Bot1 pays Gitaxian Probe's {U/P} with
+# 2 life (CR 107.4f), with no blue mana to pay it otherwise: 18 (the positive control). With Emperion out, the second Probe can't be
+# cast that way and Bot1 has no blue mana, so it is not offered. Bot2's Tainted Remedy would turn Bot1's Healing Salve gain of 3
+# into a loss of 3 (CR 614.1a), but a gain Bot1 can't have meets no replacement (CR 119.7), and the Emperion ruling: "effects that
+# replace an event with having you ... lose life will end up replacing the event with nothing": Bot1 stays at 18.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Gitaxian Probe
+Gitaxian Probe
+Show and Tell
+Platinum Emperion
+Healing Salve
+Plains x10
+
+[Bot2 Deck]
+Black Lotus
+Tainted Remedy
+Island x13
+
+[Actions]
+Bot1.Hand.Gitaxian Probe.Cast(Bot2)
+Bot1.Modes(1)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Life = 18
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Pass
+Bot1.Choose(Platinum Emperion)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Tainted Remedy.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Hand.Gitaxian Probe.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand = Gitaxian Probe; Plains; Plains

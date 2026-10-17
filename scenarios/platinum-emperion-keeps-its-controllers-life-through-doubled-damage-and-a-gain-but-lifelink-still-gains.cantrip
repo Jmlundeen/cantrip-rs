@@ -1,0 +1,72 @@
+# Platinum Emperion: "Your life total can't change" (CR 119.7, 119.8). It doesn't prevent damage, it changes its result (the
+# ruling): Bot2's Healer's Hawk deals Bot1 2 combat damage under Bot2's Furnace of Rath, and Bot1 loses no life, but the damage
+# was dealt, so lifelink still gains Bot2 2 (the ruling). Bot2's Bolt, doubled to 6, takes nothing off either, and nothing is
+# prevented. Bot1's Healing Salve, "target player gains 3 life" on itself, resolves and gains nothing (the ruling).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Show and Tell
+Platinum Emperion
+Healing Salve
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Pearl
+Furnace of Rath
+Healer's Hawk
+Lightning Bolt
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Pass
+Bot1.Choose(Platinum Emperion)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Furnace of Rath.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Healer's Hawk > Bot1)
+[T4 Bot2.Main2]
+? Bot2.Life = 22
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 22
+Prevented = (absent)
+Bot1.Graveyard = Healing Salve; Show and Tell
