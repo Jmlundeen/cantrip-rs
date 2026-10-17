@@ -1,0 +1,63 @@
+# Infusion asks whether YOU gained life this turn: Bot2 gains 3 with Lightning Helix in response to Bot1's Curse, which does
+# not count for Bot1. The Curse gives -2/-2: Bot2's Hercules, Prince of Power (3/3) survives as a 1/1 (destroy all creatures
+# would have killed it), and both Ornithopters die. Bot1 took 3 from the Helix and gained nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Emerald
+Withering Curse
+Ornithopter
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Hercules, Prince of Power
+Lightning Helix
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Hercules, Prince of Power.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Withering Curse.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Helix.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 23
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 23
+Bot1.Graveyard = Ornithopter; Withering Curse
+Bot1.Battlefield.Count = 3
+Bot2.Graveyard = Lightning Helix
+Bot2.Battlefield.Hercules, Prince of Power.Power = 1
+Bot2.Battlefield.Hercules, Prince of Power.Toughness = 1

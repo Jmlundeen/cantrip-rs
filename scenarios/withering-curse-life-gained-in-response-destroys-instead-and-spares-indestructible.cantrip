@@ -1,0 +1,61 @@
+# Infusion is checked as the Curse resolves (CR 608.2c): Bot1 casts Withering Curse with no life gained yet, then gains 3 with
+# Lightning Helix in response. The Curse resolves "destroy all creatures instead": Bot2's Ornithopter is destroyed, and
+# Bot2's Arwen, Mortal Queen (2/2 with an indestructible counter) survives - untouched, still a 2/2, because no -2/-2 was
+# applied (that would have killed her, CR 704.5f).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Jet
+Mox Emerald
+Lightning Helix
+Withering Curse
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Mox Jet
+Arwen, Mortal Queen
+Ornithopter
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Arwen, Mortal Queen.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Withering Curse.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 23
+Bot1.Graveyard = Withering Curse; Lightning Helix
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Arwen, Mortal Queen.Power = 2
+Bot2.Battlefield.Arwen, Mortal Queen.Toughness = 2
