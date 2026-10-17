@@ -1,0 +1,39 @@
+# Obsessive Pursuit: the attack trigger targets an attacking creature (CR 115.1, 608.2b). Bot1 attacks with its only creature,
+# the Thraben Inspector, and Bot2 kills it with Lightning Bolt in response to the trigger: the target is gone, so the ability
+# does nothing (no counters, nobody is left to gain lifelink). The Inspector is in the graveyard, Bot2 took no damage.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Obsessive Pursuit
+Thraben Inspector
+Swamp x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Obsessive Pursuit.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Thraben Inspector > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Thraben Inspector)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Thraben Inspector
+Bot2.Life = 20
+Bot2.Graveyard = Lightning Bolt

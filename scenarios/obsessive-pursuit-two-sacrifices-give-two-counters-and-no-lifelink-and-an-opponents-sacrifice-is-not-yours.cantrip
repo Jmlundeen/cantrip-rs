@@ -1,0 +1,49 @@
+# Obsessive Pursuit: two sacrifices are X = 2: two counters and no lifelink (the threshold is three), and a permanent the
+# OPPONENT sacrifices is not one "you've sacrificed". Bot1 sacrifices two Clues ({2} each) on turn 3 and Bot2 sacrifices its own
+# Lotus Petal in that same turn before the attack, so Bot2's sacrifice would make it three if it counted. The Inspector
+# attacks as a 3/4 without lifelink: Bot2 loses 3 and Bot1 gains nothing (18 after the two Pursuit triggers).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Obsessive Pursuit
+Thraben Inspector
+Swamp x12
+
+[Bot2 Deck]
+Lotus Petal
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Obsessive Pursuit.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Lotus Petal.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Attack(Thraben Inspector > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Thraben Inspector.Power = 3
+Bot1.Battlefield.Thraben Inspector.Toughness = 4
+Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Thraben Inspector.Keywords = (absent)
+Bot2.Life = 17
+Bot1.Life = 18
+Bot2.Graveyard = Lotus Petal

@@ -1,0 +1,49 @@
+# Obsessive Pursuit: "Whenever you attack, put X +1/+1 counters on target attacking creature, where X is the number of
+# permanents you've sacrificed this turn. If X is three or more, that creature gains lifelink until end of turn."
+# Turn 1: Bot1 casts the Pursuit (it enters: lose 1 life, create a Clue) and Thraben Inspector (another Clue). Turn 3, upkeep:
+# another Clue and another life lost (checked: 18, three Clues). Bot1 sacrifices a Lotus Petal (for mana) and two Clues ({2}
+# each), three permanents, then attacks with the Inspector: it gets three counters (4/5) and lifelink, deals 4 and Bot1 gains 4.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Obsessive Pursuit
+Thraben Inspector
+Lotus Petal
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Obsessive Pursuit.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+? Bot1.Life = 18
+? Bot1.Battlefield.Count = 8
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Clue Token.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Attack(Thraben Inspector > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Thraben Inspector.Power = 4
+Bot1.Battlefield.Thraben Inspector.Toughness = 5
+Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Thraben Inspector.Keywords = Lifelink
+Bot2.Life = 16
+Bot1.Life = 22

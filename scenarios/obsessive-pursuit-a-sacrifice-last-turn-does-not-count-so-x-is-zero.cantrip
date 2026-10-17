@@ -1,0 +1,36 @@
+# Obsessive Pursuit: X is "the number of permanents you've sacrificed THIS turn". On turn 1 Bot1 sacrifices a Lotus Petal for
+# the white mana that casts Thraben Inspector. On turn 3 it attacks with the Inspector having sacrificed nothing that turn:
+# X is 0, so the ability puts no counters on it and gives it no lifelink (the Inspector stays 1/2). Bot2 loses 1 and Bot1
+# gains nothing. (The positive control, three sacrifices in the attack's own turn, is in the other scenario.)
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Obsessive Pursuit
+Thraben Inspector
+Lotus Petal
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Obsessive Pursuit.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: White)
+Bot1.Hand.Thraben Inspector.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Thraben Inspector > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Thraben Inspector.Power = 1
+Bot1.Battlefield.Thraben Inspector.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Thraben Inspector.Keywords = (absent)
+Bot2.Life = 19
+Bot1.Life = 18
