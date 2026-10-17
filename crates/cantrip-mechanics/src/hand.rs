@@ -88,7 +88,7 @@ pub fn may_put_onto_battlefield(
     Ok(Some(g.put_onto_battlefield(card, player, false)?))
 }
 
-/// "As this enters, look at an opponent's hand, then choose any card name." (CR 614.12a, 701.9): the opponent is chosen first
+/// "As this enters, look at an opponent's hand, then choose any card name." (CR 614.12a, 201.4): the opponent is chosen first
 /// and the hand looked at, then the name; the name is left in `entering.chosen_card`. An unscripted player names the costliest
 /// nonland card in the hand looked at. Anointed Peacekeeper and Sorcerous Spyglass print it.
 pub fn look_at_an_opponents_hand_then_choose_a_name(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {

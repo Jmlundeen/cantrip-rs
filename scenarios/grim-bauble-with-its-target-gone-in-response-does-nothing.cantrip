@@ -1,0 +1,46 @@
+# Grim Bauble's enters trigger targets Bot2's Ornithopter; in response Bot2 Bolts its own Ornithopter, so the target is illegal as the
+# trigger tries to resolve (CR 608.2b) and nothing happens: Bot2's other creature, Concealing Curtains, is not shrunk (it stays 0/4)
+# and the Bauble stays on the battlefield.
+
+[Bot1 Deck]
+Mox Jet
+Grim Bauble
+Plains x15
+
+[Bot2 Deck]
+Mox Jet
+Mountain
+Lightning Bolt
+Ornithopter
+Concealing Curtains
+Plains x14
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Grim Bauble.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot2.Battlefield = Mox Jet; Mountain; Concealing Curtains
+Bot2.Battlefield.Concealing Curtains.Toughness = 4
+Bot2.Battlefield.Concealing Curtains.Power = 0
+Bot1.Battlefield = Mox Jet; Grim Bauble

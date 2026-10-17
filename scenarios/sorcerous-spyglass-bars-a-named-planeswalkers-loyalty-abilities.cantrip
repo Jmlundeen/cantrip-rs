@@ -1,0 +1,47 @@
+# A loyalty ability is an activated ability (CR 606.1, 602.5), so naming a planeswalker with Sorcerous Spyglass bars it. Bot2 casts Narset,
+# Parter of Veils on turn 2 and uses her -2 (the positive control: she works before the Spyglass); Bot1 casts the Spyglass on turn 3,
+# looks at Bot2's hand and names Narset, and on turn 4 Bot2, whose Narset is untouched at three loyalty and has not activated this
+# turn, is refused her ability (the refusal), though the Spyglass says nothing about her static ability.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Sorcerous Spyglass
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Narset, Parter of Veils
+Island x3
+Island x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate(Ability: {U})
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Narset, Parter of Veils.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Narset, Parter of Veils.Activate(Ability: Look)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sorcerous Spyglass.Cast
+Bot1.Name(Narset, Parter of Veils)
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Narset, Parter of Veils.Activate(Ability: Look)
+
+[Expect]
+Turn = 4
+Bot2.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3

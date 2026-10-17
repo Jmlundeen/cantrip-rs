@@ -1,0 +1,39 @@
+# Sorcerous Spyglass affects cards regardless of the zone they are in (ruling 2021-03-19; CR 602.5): Bot1 looks at Bot2's hand as the
+# Spyglass enters and names Miscalculation, so Bot2 can't activate its cycling from the hand, though it has the three Moxen to pay
+# {2} (the refusal). The positive control is Footfall Crater, an unnamed card with cycling {1}, cycled right after: Bot2 draws.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Sorcerous Spyglass
+Island x12
+
+[Bot2 Deck]
+Miscalculation
+Footfall Crater
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sorcerous Spyglass.Cast
+Bot1.Name(Miscalculation)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+! Bot2.Hand.Miscalculation.Activate(Ability: Cycling)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Footfall Crater.Activate(Ability: Cycling)
+
+[Expect]
+Turn = 2
+Bot2.Graveyard = Footfall Crater
+Bot2.Hand.Count = 5
