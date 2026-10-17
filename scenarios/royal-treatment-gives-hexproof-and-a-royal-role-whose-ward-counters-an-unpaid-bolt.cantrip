@@ -1,0 +1,46 @@
+# Royal Treatment on Ornithopter: the creature gains hexproof until end of turn and a Royal Role token is created attached
+# to it (CR 111.10m, 303.4): +1/+1, so a 1/3, and ward {1}. The hexproof the spell gives first does not stop the Role,
+# which the effect attaches without targeting (the Role rulings). On Bot2's turn the hexproof is gone (CR 514.2), and
+# Bot2 casts Lightning Bolt at the Ornithopter with its only mana, so it cannot pay ward's {1} and the Bolt is countered
+# (CR 702.21a). The next scenario is the control, in which Bot2 pays.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Royal Treatment
+Island x17
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Royal Treatment.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+? Bot1.Battlefield.Royal.AttachedTo = Ornithopter
+? Bot1.Battlefield.Royal.Token = true
+? Bot1.Battlefield.Royal.Subtypes = Aura; Role
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Forest; Ornithopter; Royal
+Bot1.Battlefield.Royal.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Damage = 0
+Bot1.Graveyard = Royal Treatment
+Bot2.Graveyard = Lightning Bolt

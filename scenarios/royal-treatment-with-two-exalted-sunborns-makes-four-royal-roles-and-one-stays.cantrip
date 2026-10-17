@@ -1,0 +1,47 @@
+# With two Exalted Sunborns out, both replacements apply to Royal Treatment's Royal Role, one after the other in the
+# order Bot1 chooses (CR 616.1): one becomes two, then four (CR 614.1a). All four are created attached to the targeted
+# Sunborn, and the state-based action keeps one of the four, the rest going to the graveyard, where tokens cease to exist
+# (CR 704.5z, 704.5d). That Sunborn is a 5/6, the other a 4/5.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Mox Emerald
+Exalted Sunborn
+Exalted Sunborn
+Royal Treatment
+Island x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Exalted Sunborn.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Exalted Sunborn.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Royal Treatment.Cast(Bot1.Battlefield.Exalted Sunborn#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Replace(Exalted Sunborn)
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Pearl; Mox Emerald; Exalted Sunborn; Exalted Sunborn; Royal
+Bot1.Battlefield.Royal.AttachedTo = Exalted Sunborn
+Bot1.Battlefield.Exalted Sunborn#1.Power = 5
+Bot1.Battlefield.Exalted Sunborn#1.Toughness = 6
+Bot1.Battlefield.Exalted Sunborn#2.Power = 4
+LeftBattlefield = Black Lotus (tapped); Royal; Royal; Royal

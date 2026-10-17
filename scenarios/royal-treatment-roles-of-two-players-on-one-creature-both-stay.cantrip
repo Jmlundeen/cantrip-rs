@@ -1,0 +1,64 @@
+# A permanent may have several Roles if each is controlled by a different player (CR 704.5z, the Role rulings). Bot2's
+# Royal Treatment gives its Ornithopter Bot2's Royal Role. On Bot1's next turn a kicked Thieving Skydiver takes the
+# Ornithopter: its enters trigger targets Bot2's creature, whose ward {1} triggers for Bot1, who pays it (CR 702.21a).
+# The Role stays Bot2's (CR 303.4e). Then Bot1's own Royal Treatment on its new Ornithopter makes a Royal Role Bot1
+# controls: two Roles on one creature, of two controllers, so neither goes - the Ornithopter is a 2/4.
+
+[Bot1 Deck]
+Forest
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Thieving Skydiver
+Royal Treatment
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Royal Treatment
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Royal Treatment.Cast(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thieving Skydiver.Cast(Kicked: 1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Forest#2.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot2.Battlefield.Royal.AttachedTo = Ornithopter
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Royal Treatment.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Mox Sapphire; Mox Pearl; Mox Emerald; Thieving Skydiver; Ornithopter; Royal
+Bot2.Battlefield = Forest; Royal
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Royal.AttachedTo = Ornithopter
+Bot2.Battlefield.Royal.AttachedTo = Ornithopter
+Bot1.Graveyard = Royal Treatment
+LeftBattlefield.Count = 0

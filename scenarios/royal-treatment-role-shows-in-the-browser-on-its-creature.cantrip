@@ -1,0 +1,32 @@
+# Browser
+# What the client shows of a Role token (CR 111.10m, 303.7): Royal Treatment is cast from the hand at the Ornithopter
+# with the Forest's mana, and the Royal Role it creates is a token enchantment, an Aura Role, drawn with its rules text;
+# the Ornithopter's face lists the hexproof the spell gave it and the ward {1} the Role grants after its own flying,
+# and its power and toughness are the Role's +1/+1.
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Royal Treatment
+Island x17
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Royal Treatment.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Client.Bot1.Battlefield.Royal.TypeLine = Token Enchantment - Aura Role
+? Client.Bot1.Battlefield.Royal.Rules = Enchant creature / Enchanted creature gets +1/+1 and has ward {1}.
+? Client.Bot1.Battlefield.Ornithopter.Rules = Flying / Hexproof / Ward {1}
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Forest; Ornithopter; Royal
+Bot1.Battlefield.Royal.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3

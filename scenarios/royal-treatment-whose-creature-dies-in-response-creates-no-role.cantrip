@@ -1,0 +1,33 @@
+# Bot2 casts Royal Treatment at its Ornithopter and Bot1 answers with Lightning Bolt, which resolves first and kills it.
+# Royal Treatment's only target is gone, so it does not resolve (CR 608.2b): no Royal Role token is created - nothing
+# left the battlefield but the Ornithopter.
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Royal Treatment
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Royal Treatment.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Royal Treatment; Ornithopter
+LeftBattlefield = Ornithopter
+Bot1.Graveyard = Lightning Bolt

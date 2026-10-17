@@ -1,0 +1,38 @@
+# With Exalted Sunborn out, Royal Treatment's one Royal Role becomes two (CR 614.1a, 111.1), both created attached to
+# the targeted creature, here the Sunborn itself. They are the same player's two Roles on one permanent, so the
+# state-based action keeps one and puts the other into the graveyard (CR 704.5z; the Role rulings: of two that arrive
+# together the player keeps one - two copies of one token, so either is the same game). The Sunborn is a 5/6, not a 6/7.
+
+[Bot1 Deck]
+Plains
+Mox Jet
+Mox Emerald
+Exalted Sunborn
+Royal Treatment
+Island x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Exalted Sunborn.Cast(Ability: Warp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Royal Treatment.Cast(Bot1.Battlefield.Exalted Sunborn)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Plains; Mox Jet; Mox Emerald; Exalted Sunborn; Royal
+Bot1.Battlefield.Royal.AttachedTo = Exalted Sunborn
+Bot1.Battlefield.Exalted Sunborn.Power = 5
+Bot1.Battlefield.Exalted Sunborn.Toughness = 6
+LeftBattlefield = Royal
