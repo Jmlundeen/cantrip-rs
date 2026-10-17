@@ -1,0 +1,41 @@
+# Fog: "Prevent all combat damage that would be dealt this turn." Deathtouch destroys only a creature that has been dealt
+# damage by it (CR 702.2b), and lifelink gains only the damage dealt (CR 702.15b): damage that is prevented is never dealt
+# (CR 615.1). Bot1's Bofur, Reliable Guardian (1/1 lifelink) attacks and Bot2's Dragon Sniper (1/1 deathtouch) blocks it;
+# Bot1 casts Fog after blocks. Neither creature is dealt damage, so both live, and Bot1 gains nothing: 20.
+
+[Bot1 Deck]
+Plains
+Forest
+Bofur, Reliable Guardian
+Fog
+Island x14
+
+[Bot2 Deck]
+Forest
+Dragon Sniper
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Bofur, Reliable Guardian.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Dragon Sniper.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Bofur, Reliable Guardian > Bot2)
+Bot2.Block(Dragon Sniper > Bofur, Reliable Guardian)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Fog.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield = Bofur, Reliable Guardian; Forest; Plains
+Bot2.Battlefield = Dragon Sniper; Forest
+Prevented = 1 Bofur, Reliable Guardian > Dragon Sniper by Fog; 1 Dragon Sniper > Bofur, Reliable Guardian by Fog
