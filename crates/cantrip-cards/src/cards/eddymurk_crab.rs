@@ -16,15 +16,6 @@ fn less_per_instant_and_sorcery_in_your_graveyard(q: &dyn Query, _: ObjectId, pl
     CostDelta::less(cards.min(255) as u8)
 }
 
-/// "This creature enters tapped if it's not your turn" (CR 614.1c): it is its controller's turn when the active player is
-/// the one it enters under.
-fn enters_tapped_if_not_your_turn(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    if g.state().turn.active != entering.controller {
-        entering.tapped = true;
-    }
-    Ok(())
-}
-
 /// "Tap up to two target creatures": each target still legal is tapped (CR 608.2b).
 fn tap_them(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     for creature in targets::legal_objects(g, item) {
@@ -35,7 +26,7 @@ fn tap_them(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     own_cost_changes: &[less_per_instant_and_sorcery_in_your_graveyard],
-    enters: Some(enters_tapped_if_not_your_turn),
+    enters: Some(cantrip_mechanics::mana::enters_tapped_unless_your_turn),
     abilities: &[triggered(THIS_ENTERS, tap_them, "When this creature enters, tap up to two target creatures.")
         .targets(&[targets::CREATURE.between(0, 2)])],
     ..oracle::EDDYMURK_CRAB

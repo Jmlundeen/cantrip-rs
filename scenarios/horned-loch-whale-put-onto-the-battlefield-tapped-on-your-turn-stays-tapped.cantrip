@@ -1,0 +1,41 @@
+# "Enters tapped unless it's your turn" only ever sets tapped (CR 614.1c): it cannot untap a permanent that an instruction puts
+# onto the battlefield tapped. Raph & Mikey attack on Bot1's own turn and put the first creature card revealed, Horned
+# Loch-Whale, onto the battlefield tapped and attacking; it is Bot1's turn, so the Whale's own clause does nothing, and the
+# Whale stays tapped. (The turn-1 scenario, cast untapped, is the control for the clause itself.)
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Black Lotus
+Sol Ring
+Raph & Mikey, Troublemakers
+Forest
+Horned Loch-Whale
+Forest
+Forest
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Raph & Mikey, Troublemakers.Cast
+Bot1.Pass
+Bot2.Pass
+[Bot1.DeclareAttackers]
+Bot1.Attack(Raph & Mikey, Troublemakers)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Horned Loch-Whale.Tapped = true
+Bot1.Battlefield.Horned Loch-Whale.Power = 6

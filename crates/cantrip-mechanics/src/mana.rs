@@ -29,6 +29,16 @@ pub fn enters_tapped(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Su
     Ok(())
 }
 
+/// "This creature enters tapped unless it's your turn" / "enters tapped if it's not your turn" (CR 614.1c): it only ever sets
+/// tapped, so a permanent an instruction puts onto the battlefield tapped stays tapped. It is its controller's turn when the
+/// active player is the one it enters under. Eddymurk Crab and Horned Loch-Whale print it.
+pub fn enters_tapped_unless_your_turn(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    if g.state().turn.active != entering.controller {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
 /// "As this land enters, you may pay 2 life. If you don't, it enters tapped" (CR 614.12a): the shocklands'. Only a
 /// player with the life to pay is asked. Blood Crypt and Breeding Pool print it.
 pub fn enters_tapped_unless_pay_two_life(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {

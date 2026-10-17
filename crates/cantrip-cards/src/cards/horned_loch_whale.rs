@@ -28,14 +28,8 @@ pub static LAGOON_BREACH: CardDef = CardDef {
     ..oracle::LAGOON_BREACH
 };
 
-/// "This creature enters tapped unless it's your turn" (CR 614.1c): its controller is the active player.
-fn enters_tapped_unless_your_turn(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.tapped = g.state().turn.active != entering.controller;
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    enters: Some(enters_tapped_unless_your_turn),
+    enters: Some(cantrip_mechanics::mana::enters_tapped_unless_your_turn),
     abilities: &[ward::<2>("Ward {2}")],
     adventure: Some(&LAGOON_BREACH),
     ..oracle::HORNED_LOCH_WHALE
