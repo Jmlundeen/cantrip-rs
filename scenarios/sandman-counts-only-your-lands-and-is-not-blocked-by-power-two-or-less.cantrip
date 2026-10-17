@@ -1,0 +1,48 @@
+# "Sandman's power and toughness are each equal to the number of lands you control": on turn 3 Bot1 has two Forests, a Mox Jet (an artifact, not a land) and Sandman,
+# and Bot2 has a Plains (not Bot1's): so Sandman is 2/2, not 3/3 and not 1/1. "Sandman can't be blocked by creatures with power 2 or less": Bot2's Containment
+# Priest (power 2) cannot block it (the refusal) and Cathar Commando (power 3) can (the positive control); the 2/2 and the 3/1 kill each other.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Jet
+Sandman, Shifting Scoundrel
+Forest
+Island
+Island
+Forest x10
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Containment Priest
+Cathar Commando
+Plains x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sandman, Shifting Scoundrel.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Containment Priest.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+? Bot1.Battlefield.Sandman, Shifting Scoundrel.Power = 2
+? Bot1.Battlefield.Sandman, Shifting Scoundrel.Toughness = 2
+Bot1.Attack(Sandman, Shifting Scoundrel > Bot2)
+! Bot2.Block(Containment Priest > Sandman, Shifting Scoundrel)
+Bot2.Block(Cathar Commando > Sandman, Shifting Scoundrel)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Graveyard = Sandman, Shifting Scoundrel; Black Lotus
+Bot2.Graveyard = Cathar Commando; Black Lotus
+Bot2.Battlefield = Plains; Containment Priest

@@ -1,0 +1,57 @@
+# "{3}{G}{G}: Return this card and target land card from your graveyard to the battlefield tapped." Turn 1 Bot1 plays Fabled Passage and sacrifices it for a Forest, then casts
+# Sandman with a Black Lotus; the ability is not offered while Sandman is on the battlefield (the refusal: it works from the graveyard). Turn 2 Bot2's Lightning Bolt kills
+# Sandman (a 1/1 with one land). Turn 3, with two Forests and three Moxen, Bot1 activates it from the graveyard (the positive control) with Fabled Passage as the target:
+# both return tapped, together, so Sandman is 3/3 (Forest, Forest, Passage). Fabled Passage's own search is not repeated.
+
+[Bot1 Deck]
+Fabled Passage
+Black Lotus
+Sandman, Shifting Scoundrel
+Mox Emerald
+Mox Jet
+Mox Ruby
+Forest
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Search(Forest)
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sandman, Shifting Scoundrel.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Sandman, Shifting Scoundrel.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sandman, Shifting Scoundrel)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Graveyard.Sandman, Shifting Scoundrel.Activate(Fabled Passage)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield = Forest; Forest; Fabled Passage; Sandman, Shifting Scoundrel; Mox Emerald; Mox Jet; Mox Ruby
+Bot1.Battlefield.Sandman, Shifting Scoundrel.Tapped = true
+Bot1.Battlefield.Fabled Passage.Tapped = true
+Bot1.Battlefield.Sandman, Shifting Scoundrel.Power = 3
+Bot1.Battlefield.Sandman, Shifting Scoundrel.Toughness = 3

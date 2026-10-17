@@ -1,0 +1,46 @@
+# "Return this card and target land card from your graveyard": the ability needs a target. Sandman is in Bot1's graveyard (killed by Bot2's Lightning Bolt) and Bot1 can pay {3}{G}{G}
+# (two Forests and three Moxen), but its graveyard holds only a Black Lotus besides: no land card, so the ability is not offered (the refusal; the previous scenario, with a
+# Fabled Passage in the graveyard, is the positive control).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Sandman, Shifting Scoundrel
+Mox Emerald
+Mox Jet
+Mox Ruby
+Forest
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sandman, Shifting Scoundrel.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Sandman, Shifting Scoundrel)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+! Bot1.Graveyard.Sandman, Shifting Scoundrel.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Sandman, Shifting Scoundrel; Black Lotus
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Mox Ruby
