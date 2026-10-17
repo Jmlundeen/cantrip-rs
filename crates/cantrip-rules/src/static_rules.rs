@@ -389,6 +389,13 @@ pub fn counters_banned(q: &dyn Query, cards: &'static CardTable, object: ObjectI
     any_static(q, cards, |d| d.counter_bans, |rule, asker| rule(q, asker, object, controller, kind))
 }
 
+/// Whether a permanent on the battlefield has a rule about the counters a permanent can't have put on it
+/// (`CardDef::counter_bans`), whatever its abilities: the guard of judging a permanent about to enter with counters as it
+/// would exist on the battlefield (CR 614.12, 122.6).
+pub fn counter_bans_possible(state: &GameState, cards: &'static CardTable) -> bool {
+    state.battlefield().iter().any(|&id| !cards.get(cards.current(state.obj(id))).counter_bans.is_empty())
+}
+
 /// Whether `player` can't get `kind` counters (CR 122.1, 101.2): Melira's "you can't get poison counters"
 /// (`CardDef::player_counter_bans`).
 pub fn player_counters_banned(q: &dyn Query, cards: &'static CardTable, player: PlayerId, kind: PlayerCounter) -> bool {

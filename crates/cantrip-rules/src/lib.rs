@@ -181,7 +181,7 @@ impl Game {
         } else {
             // A scenario's deal: seven each, in turn order, kept.
             for p in game.state.apnap().collect::<Vec<_>>() {
-                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None };
+                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
                 for _ in 0..7 {
                     ops::draw(&mut cx, p);
                 }
@@ -238,7 +238,7 @@ impl Game {
 
             let kind = self.state.agenda[at].kind;
             let flow = {
-                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None };
+                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None };
                 match kind {
                     FrameKind::Opening => turn::opening(&mut cx),
                     FrameKind::BeginStep => turn::begin_step(&mut cx),
@@ -474,6 +474,10 @@ pub(crate) struct Cx<'a> {
     /// The source of the mana ability running (CR 106.3, 605): what produces the mana it adds. None outside one, where the
     /// mana a resolving spell or ability adds is that spell's or the ability's source's.
     pub mana_source: Option<ObjectId>,
+    /// A permanent about to enter the battlefield, as it would exist there (CR 614.12): what `Query::chars` and
+    /// `Query::lost_all_abilities` answer of it while the effects that modify how it enters are judged
+    /// (`ops::judged_entering`).
+    pub entering: Option<ops::WouldExist>,
 }
 
 impl<'a> Cx<'a> {
@@ -654,11 +658,17 @@ impl Query for Cx<'_> {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        layers::chars(self.g.cards, &self.g.state, &self.g.log, id)
+        match self.entering {
+            Some(e) if e.object == id => e.chars,
+            _ => layers::chars(self.g.cards, &self.g.state, &self.g.log, id),
+        }
     }
 
     fn lost_all_abilities(&self, id: ObjectId) -> bool {
-        layers::lost_all_abilities(self.g.cards, &self.g.state, &self.g.log, id)
+        match self.entering {
+            Some(e) if e.object == id => e.lost,
+            _ => layers::lost_all_abilities(self.g.cards, &self.g.state, &self.g.log, id),
+        }
     }
 
     fn can_target(&self, asker: &Asker, target: Target) -> bool {

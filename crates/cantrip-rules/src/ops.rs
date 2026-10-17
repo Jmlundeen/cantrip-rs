@@ -156,22 +156,24 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         // Replacement effects of the permanents in play, and of the card itself (CR 614, 616): they change where it goes,
         // how it arrives, or what it arrives with.
         let entry = m.entering.filter(|_| to.is(ZoneKind::Battlefield));
-        let change = replace::zone_change(
-            cx,
-            ZoneChange {
-                object: m.id,
-                from,
-                to,
-                reason,
-                controller: entry.map_or(old.controller, |e| e.controller),
-                tapped: entry.is_some_and(|e| e.tapped),
-                counters: [0; CounterKind::COUNT],
-                reveal: false,
-                shuffle: false,
-                is_card: !old.token && !old.card_copy,
-                madness: false,
-            },
-        );
+        let proposed = ZoneChange {
+            object: m.id,
+            from,
+            to,
+            reason,
+            controller: entry.map_or(old.controller, |e| e.controller),
+            tapped: entry.is_some_and(|e| e.tapped),
+            counters: [0; CounterKind::COUNT],
+            reveal: false,
+            shuffle: false,
+            is_card: !old.token && !old.card_copy,
+            madness: false,
+        };
+        // A permanent entering is judged as it would exist on the battlefield (CR 614.12).
+        let change = match entry {
+            Some(e) => judged_entering(cx, &e, false, |cx| replace::zone_change(cx, proposed)),
+            None => replace::zone_change(cx, proposed),
+        };
         let to = change.to;
         // Madness (CR 702.35a) exiled a discarded card in place of its graveyard, one of the replacements above: it was
         // still discarded, and the linked ability is queued below, once the exiled card exists - if no later effect sent
@@ -276,7 +278,13 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             enters_with_intrinsic_counters(cx.cards(), &mut new);
             // Counters it enters with are counters put on it (CR 122.6, 614.1a): replacements that change how many
             // apply to them, the permanent judged as it would exist on the battlefield (CR 614.12).
-            new.counters = replace::counters(cx, m.id, new.controller, true, true, new.counters);
+            let (controller, counts) = (new.controller, new.counters);
+            new.counters = match m.entering {
+                Some(e) => judged_entering(cx, &Entering { counters: counts, ..e }, counts.iter().any(|&n| n > 0), |cx| {
+                    replace::counters(cx, m.id, controller, true, true, counts)
+                }),
+                None => replace::counters(cx, m.id, controller, true, true, counts),
+            };
         }
         plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, last_known });
     }
@@ -587,71 +595,133 @@ pub fn move_to_for(cx: &mut Cx, id: ObjectId, to: Zone, reason: ZoneReason) -> O
 }
 
 /// The entering replacements an object about to enter has of its own (CR 614.12), applied to `entering`.
+///
+/// Which of them apply is judged on the permanent as it would exist on the battlefield (`as_it_would_exist`): one that would
+/// have lost all its abilities there (Humility, Dress Down) or the abilities of its rules text (CR 305.7: a nonbasic land
+/// under Blood Moon, Blood Moon's ruling) has none of its own "enters tapped", "enters with" and "as this enters"
+/// replacements, nor daybound's "enters transformed" - a Walking Ballista enters with no counters, a Clone copies nothing.
 pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     // CR 708.3: a face-down permanent has no abilities, so none of its card's "enters" replacements apply.
     if cx.s().obj(entering.object).copy.is_some_and(|c| c.card == cx.cards().face_down) {
         return Ok(());
     }
-    // CR 702.145b: at night a daybound card enters transformed.
-    if crate::day_night::enters_transformed(cx, entering.object) {
+    // Most positions have no static ability that could take an entering permanent's abilities: then it has its own.
+    let may_lose = layers::abilities_may_be_lost(cx.cards(), cx.s());
+    let lost = |cx: &mut Cx, entering: &Entering| may_lose && as_it_would_exist(cx, entering).lost;
+    // CR 702.145b: at night a daybound card enters transformed - daybound's static ability, of the permanent as it would
+    // exist on the battlefield front face up (CR 614.12), which a "loses all abilities" effect takes.
+    if crate::day_night::enters_transformed(cx, entering.object)
+        && (!may_lose || as_it_would_exist(cx, entering).chars.has(Keyword::Daybound))
+    {
         entering.transformed = true;
     }
     choose_protector(cx, entering)?;
     let card = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
-    // CR 305.7, 614.12: a land that would lose the abilities of its rules text on the battlefield to an effect that sets
-    // its subtype ("nonbasic lands are Mountains") has none of its own entering replacements: it is judged as it would
-    // exist there (Blood Moon's ruling: it does not enter tapped, nor choose "as" it enters). Nor has a permanent that
-    // would lose all its abilities there (Humility, Dress Down: `enters_without_abilities`).
-    let object = entering.object;
-    let lost = |cx: &Cx, card: CardId, copy: Option<&Copiable>| layers::loses_rules_text_entering(cx.cards(), cx.s(), &cx.g.log, object, card, copy);
     if let Some(enters) = cx.cards().get(card).enters
-        && !lost(cx, card, entering.copy.as_ref())
-        && !enters_without_abilities(cx, entering)
+        && !lost(cx, entering)
     {
         enters(cx, entering)?;
     }
     // CR 707.9a: what it entered as a copy of has its own "enters with" and "enters tapped" to apply, as the copy
-    // enters; a copy of a kicked permanent was never kicked itself (CR 702.33d).
+    // enters; a copy of a kicked permanent was never kicked itself (CR 702.33d). They are judged on it as that copy
+    // (CR 614.12: "taking into account replacement effects that have already modified how it enters").
     if let Some(copy) = entering.copy
         && copy.card != card
         && let Some(enters) = cx.cards().get(copy.card).enters
-        && !lost(cx, copy.card, Some(&copy))
-        && !enters_without_abilities(cx, entering)
+        && !lost(cx, entering)
     {
         enters(cx, entering)?;
     }
     Ok(())
 }
 
-/// Whether the permanent about to enter would have lost all its abilities once it is on the battlefield (CR 613.1f), so that
-/// none of its own "enters with" and "as this enters" replacement effects applies (CR 614.12: which replacement effects apply
-/// is judged on "the permanent as it would exist on the battlefield, taking into account replacement effects that have
-/// already modified how it enters the battlefield, ... and continuous effects that already exist and would apply to the
-/// permanent", as Yixlid Jailer's example has it). A creature entering under Humility or Dress Down: a Walking Ballista
-/// enters with no counters, a Clone copies nothing. Worked out by putting it on the battlefield for the moment of the
-/// question - under the player it enters under, with the face it enters with and as the copy a replacement already made it
-/// - and taking that back, so every layer judges it as it would be there. Asked only while a "loses all abilities" static
-/// ability is on the battlefield; no resolved effect can name an object that is not there yet.
-fn enters_without_abilities(cx: &mut Cx, entering: &Entering) -> bool {
-    if !layers::loses_all_static_applies(cx.cards(), cx.s()) {
-        return false;
-    }
+/// A permanent about to enter the battlefield as it would exist there (CR 614.12): what the replacement effects that
+/// modify how it enters are judged on.
+#[derive(Clone, Copy)]
+pub(crate) struct WouldExist {
+    pub object: ObjectId,
+    pub chars: Chars,
+    /// It would have lost all its abilities there (CR 613.1f), or a land the abilities of its rules text (CR 305.7).
+    pub lost: bool,
+}
+
+/// The permanent `entering` would be on the battlefield (CR 614.12): "check the characteristics of the permanent as it
+/// would exist on the battlefield, taking into account replacement effects that have already modified how it enters the
+/// battlefield ..., continuous effects from the permanent's own static abilities that would apply to it once it's on the
+/// battlefield, and continuous effects that already exist and would apply to the permanent." Worked out by putting it on the
+/// battlefield for the moment of the question - under the player it enters under, with the face, the copy effect, the
+/// choices and the counters the replacements applied so far gave it, and the timestamp of a permanent entering now
+/// (CR 613.7d), the latest - and taking that back, so every layer judges it as it would be there, other objects' static
+/// abilities and its own alike. Objects entering with it are not there (CR 614.12, 101.4). No resolved effect can name it
+/// (CR 611.2c, 400.7), so only static abilities change it; callers ask only where one could change the answer.
+pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist {
     let id = entering.object;
     let mark = cx.s().mark();
     let from = cx.s().obj(id).zone;
     cx.st().zone_remove(from, id);
+    let timestamp = cx.st().timestamp();
     cx.st().update_obj(id, |o| {
         o.zone = Zone::BATTLEFIELD;
         o.controller = entering.controller;
         o.transformed = entering.transformed;
+        o.timestamp = timestamp;
+        o.counters = entering.counters;
         if entering.copy.is_some() {
             o.copy = entering.copy;
         }
+        o.chosen_color = entering.chosen_color;
+        o.chosen_subtype = entering.chosen_subtype;
+        o.marks.chosen_player = entering.chosen_player;
+        o.marks.chosen_card = entering.chosen_card;
+        o.marks.chosen_odd = entering.chosen_odd;
+        o.attached_to = entering.attach;
+        o.attached_player = entering.attach_player;
     });
     cx.st().zone_push(Zone::BATTLEFIELD, id);
+    // It arrives as a new object (CR 400.7): of the effects on it where it is, only those a permanent spell carries to the
+    // permanent it becomes (CR 400.7a, `carry_effects`) would apply to it there.
+    if cx.s().effects.iter().any(|e| e.affected == id) {
+        let carried = |e: &cantrip_state::ContinuousEffect| from.is(ZoneKind::Stack) && matches!(e.kind, EffectKind::ChangeText { .. });
+        let keep: Vec<bool> = cx.s().effects.iter().map(|e| e.affected != id || carried(e)).collect();
+        cx.st().effects_keep(&keep);
+    }
+    note_statics(cx, id);
+    let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
     let lost = layers::lost_all_abilities(cx.cards(), cx.s(), &cx.g.log, id);
     cx.st().revert(mark);
-    lost
+    WouldExist { object: id, chars, lost }
+}
+
+/// Runs `f` with `entering` judged as it would exist on the battlefield (CR 614.12) by every effect that reads it
+/// (`Query::chars`, `Query::lost_all_abilities`): the replacement effects that modify how it enters ("creatures your opponents
+/// control enter tapped") and the rules that limit the counters it enters with (CR 122.6). Worked out only where some effect
+/// could read it - a replacement effect that could apply, or counters to put on it - and where it could be other than its
+/// card's own values where it is: a static ability that could apply to it there (its own or another's), a copy effect or a
+/// face it enters with, an effect on it, or a Room (CR 709.5: on the battlefield only its unlocked doors).
+///
+/// Judged once, before the replacements apply: one that changes how it enters ("enters under your control") is not taken
+/// into account by those after it (KI-61).
+fn judged_entering<T>(cx: &mut Cx, entering: &Entering, counters: bool, f: impl FnOnce(&mut Cx) -> T) -> T {
+    if !(crate::replace::possible(cx, Some(entering.object)) || (counters && crate::static_rules::counter_bans_possible(cx.s(), cx.cards()))) {
+        return f(cx);
+    }
+    let id = entering.object;
+    let obj = cx.s().obj(id);
+    let differs = layers::static_sources_present(cx.cards(), cx.s())
+        || cx.cards().statics[cx.cards().face(obj.card, entering.transformed).0 as usize]
+        || entering.copy.is_some()
+        || obj.copy.is_some()
+        || entering.transformed != obj.transformed
+        || cx.s().effects.iter().any(|e| e.affected == id)
+        || cx.cards().get(obj.card).is_room();
+    if !differs {
+        return f(cx);
+    }
+    let would = as_it_would_exist(cx, entering);
+    let outer = cx.entering.replace(would);
+    let done = f(cx);
+    cx.entering = outer;
+    done
 }
 
 /// Who may protect a battle `controller` controls (CR 310.9a, 310.12a), in turn order: for a Siege each opponent still in
@@ -1088,22 +1158,20 @@ fn create_tokens_onto(
         }
         // A token enters the battlefield as it is created (CR 111.1): the replacements of a permanent's entry apply to it
         // as to any other's (CR 614.1c), "enters tapped" and the counters one gives as it arrives.
-        let change = replace::zone_change(
-            cx,
-            ZoneChange {
-                object: id,
-                from: if spell.is_some() { Zone::STACK } else { Zone::GONE },
-                to: Zone::BATTLEFIELD,
-                reason: if spell.is_some() { ZoneReason::Resolve } else { ZoneReason::Created },
-                controller,
-                tapped: entering.tapped,
-                counters: [0; CounterKind::COUNT],
-                reveal: false,
-                shuffle: false,
-                is_card: false,
-                madness: false,
-            },
-        );
+        let proposed = ZoneChange {
+            object: id,
+            from: if spell.is_some() { Zone::STACK } else { Zone::GONE },
+            to: Zone::BATTLEFIELD,
+            reason: if spell.is_some() { ZoneReason::Resolve } else { ZoneReason::Created },
+            controller,
+            tapped: entering.tapped,
+            counters: [0; CounterKind::COUNT],
+            reveal: false,
+            shuffle: false,
+            is_card: false,
+            madness: false,
+        };
+        let change = judged_entering(cx, &entering, false, |cx| replace::zone_change(cx, proposed));
         // An effect that sends it elsewhere instead (CR 614.1a): a token anywhere but the battlefield ceases to exist
         // (CR 111.7), so it is never created. No implemented effect does this to a token yet.
         if !change.to.is(ZoneKind::Battlefield) {
@@ -1113,7 +1181,9 @@ fn create_tokens_onto(
         for (n, with) in entering.counters.iter_mut().zip(change.counters) {
             *n += with;
         }
-        entering.counters = replace::counters(cx, id, controller, true, true, entering.counters);
+        let counts = entering.counters;
+        entering.counters =
+            judged_entering(cx, &entering, counts.iter().any(|&n| n > 0), |cx| replace::counters(cx, id, controller, true, true, counts));
         arriving.push((id, controller, entering));
     }
     for (id, controller, entering) in arriving {
@@ -2878,43 +2948,75 @@ mod tests {
     /// The same of an artifact, which "all creatures" does not reach.
     static GROWN_RELIC: CardDef = CardDef { name: "Grown Relic", types: TypeSet::of(&[CardType::Artifact]), enters: Some(two_counters), ..CardDef::BLANK };
 
-    /// The counters each card in Bot1's hand would enter with, Humbler put onto the battlefield first if `humbled`; each card
-    /// is still in the hand afterwards.
-    fn entering_counters(humbled: bool) -> Vec<(&'static str, i16)> {
-        let cards: &'static CardTable = Box::leak(Box::new(CardTable::new([&HUMBLER, &GROWN, &GROWN_RELIC])));
-        let deck = vec![cards.id_of(&HUMBLER), cards.id_of(&GROWN), cards.id_of(&GROWN_RELIC)];
+    fn artifact(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+        c.is(CardType::Artifact) && !c.is(CardType::Creature)
+    }
+
+    fn add_creature(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+        c.types = c.types.with(CardType::Creature);
+    }
+
+    /// March of the Machines' first half: "Each noncreature artifact is an artifact creature."
+    static ANIMATOR: CardDef = CardDef {
+        name: "Animator",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[static_ability(Layer::Type, artifact, add_creature, "")],
+        ..CardDef::BLANK
+    };
+
+    fn entering(id: ObjectId) -> Entering {
+        Entering {
+            object: id,
+            controller: PlayerId(0),
+            tapped: false,
+            counters: [0; CounterKind::COUNT],
+            copy: None,
+            prepared: false,
+            chosen_color: None,
+            chosen_subtype: None,
+            chosen_player: None,
+            chosen_card: None,
+            chosen_odd: None,
+            attach: None,
+            attach_player: None,
+            x: 0,
+            transformed: false,
+            protector: None,
+            instead: None,
+        }
+    }
+
+    /// A game with Bot1's hand holding `on_battlefield`'s cards, put onto the battlefield in that order, and then Grown and
+    /// Grown Relic, left in the hand (returned).
+    fn game_with(on_battlefield: &[&'static CardDef]) -> (Game, Vec<ObjectId>) {
+        let cards: &'static CardTable = Box::leak(Box::new(CardTable::new([&HUMBLER, &ANIMATOR, &GROWN, &GROWN_RELIC])));
+        let mut deck: Vec<CardId> = on_battlefield.iter().map(|&d| cards.id_of(d)).collect();
+        deck.extend([cards.id_of(&GROWN), cards.id_of(&GROWN_RELIC)]);
         let mut game = Game::new(cards, &Setup { decks: vec![deck, Vec::new()], ..Setup::default() });
         let hand = Zone::hand(PlayerId(0));
         let held: Vec<ObjectId> = game.state.zone(hand).to_vec();
-        let humbler = held[0];
-        if humbled {
-            game.state.zone_remove(hand, humbler);
-            game.state.update_obj(humbler, |o| o.zone = Zone::BATTLEFIELD);
-            game.state.zone_push(Zone::BATTLEFIELD, humbler);
+        for &id in &held[..on_battlefield.len()] {
+            let timestamp = game.state.timestamp();
+            game.state.zone_remove(hand, id);
+            game.state.update_obj(id, |o| {
+                o.zone = Zone::BATTLEFIELD;
+                o.timestamp = timestamp;
+            });
+            game.state.zone_push(Zone::BATTLEFIELD, id);
             game.state.see_statics();
         }
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None };
+        (game, held[on_battlefield.len()..].to_vec())
+    }
+
+    /// The counters each of Grown and Grown Relic would enter with, `on_battlefield` there first; each card is still in the
+    /// hand afterwards.
+    fn entering_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i16)> {
+        let (mut game, held) = game_with(on_battlefield);
+        let hand = Zone::hand(PlayerId(0));
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
         let mut out = Vec::new();
-        for &id in &held[1..] {
-            let mut entering = Entering {
-                object: id,
-                controller: PlayerId(0),
-                tapped: false,
-                counters: [0; CounterKind::COUNT],
-                copy: None,
-                prepared: false,
-                chosen_color: None,
-                chosen_subtype: None,
-                chosen_player: None,
-                chosen_card: None,
-                chosen_odd: None,
-                attach: None,
-                attach_player: None,
-                x: 0,
-                transformed: false,
-                protector: None,
-                instead: None,
-            };
+        for &id in &held {
+            let mut entering = entering(id);
             assert!(prepare_entry(&mut cx, &mut entering).is_ok());
             assert!(cx.s().obj(id).zone == hand && cx.s().zone(hand).contains(&id) && !cx.s().battlefield().contains(&id));
             out.push((cx.cards().get(cx.s().obj(id).card).name, entering.counters[CounterKind::PlusOne as usize]));
@@ -2927,7 +3029,37 @@ mod tests {
     /// so does the creature with nothing on the battlefield. The question leaves both cards where they were.
     #[test]
     fn an_entering_permanent_that_would_lose_its_abilities_has_no_enters_replacement() {
-        assert_eq!(entering_counters(false), [("Grown", 2), ("Grown Relic", 2)]);
-        assert_eq!(entering_counters(true), [("Grown", 0), ("Grown Relic", 2)]);
+        assert_eq!(entering_counters(&[]), [("Grown", 2), ("Grown Relic", 2)]);
+        assert_eq!(entering_counters(&[&HUMBLER]), [("Grown", 0), ("Grown Relic", 2)]);
+    }
+
+    /// CR 614.12: "continuous effects that already exist and would apply to the permanent" are those of every layer, other
+    /// objects' type-changing ones included: an artifact that "each noncreature artifact is an artifact creature" would make a
+    /// creature there loses its "enters with" to "all creatures lose all abilities" (Everflowing Chalice under March of the
+    /// Machines and Humility), whichever of the two came first; the creature card does as before.
+    #[test]
+    fn an_entering_artifact_another_effect_would_make_a_creature_is_judged_as_one() {
+        assert_eq!(entering_counters(&[&ANIMATOR]), [("Grown", 2), ("Grown Relic", 2)]);
+        assert_eq!(entering_counters(&[&ANIMATOR, &HUMBLER]), [("Grown", 0), ("Grown Relic", 0)]);
+        assert_eq!(entering_counters(&[&HUMBLER, &ANIMATOR]), [("Grown", 0), ("Grown Relic", 0)]);
+    }
+
+    /// `as_it_would_exist` reads the entering object through every layer as it would be on the battlefield, and leaves it,
+    /// its zone and the battlefield as they were; with the answer on `Cx::entering`, `Query::chars` and
+    /// `Query::lost_all_abilities` answer so of that object and of no other.
+    #[test]
+    fn the_object_about_to_enter_is_answered_as_it_would_exist_and_left_where_it_is() {
+        let (mut game, held) = game_with(&[&ANIMATOR, &HUMBLER]);
+        let relic = held[1];
+        let row = *game.state.obj(relic);
+        let battlefield = game.state.battlefield().to_vec();
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
+        let would = as_it_would_exist(&mut cx, &entering(relic));
+        assert!(would.chars.is(CardType::Creature) && would.chars.is(CardType::Artifact) && would.lost);
+        assert!(*cx.s().obj(relic) == row && cx.s().battlefield() == battlefield.as_slice());
+        assert!(!cx.chars(relic).is(CardType::Creature) && !cx.lost_all_abilities(relic));
+        cx.entering = Some(would);
+        assert!(cx.chars(relic).is(CardType::Creature) && cx.lost_all_abilities(relic));
+        assert!(!cx.chars(held[0]).is(CardType::Artifact));
     }
 }

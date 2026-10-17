@@ -62,17 +62,16 @@ keeps it).
 | [KI-44](#ki-44-a-hand-way-is-not-offered-to-a-cast-made-while-an-effect-resolves-and-no-emblem-gives-a-way) | A hand way is not offered to a cast made while an effect resolves, and no emblem gives a way | Low | Open |
 | [KI-45](#ki-45-the-number-a-cost-sacrifices-is-kept-as-the-spells-x) | The number a cost sacrifices is kept as the spell's X | Low | Suspected |
 | [KI-46](#ki-46-the-lore-counter-a-player-puts-on-a-saga-as-their-main-phase-begins-has-no-player-putting-it) | The lore counter a player puts on a Saga as their main phase begins has no player putting it | Medium | Open |
-| [KI-47](#ki-47-containment-priest-judges-a-card-entering-transformed-by-its-front-face) | Containment Priest judges a card entering transformed by its front face | Medium | Open |
 | [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
-| [KI-52](#ki-52-which-lands-lost-their-rules-text-to-a-subtype-setting-effect-is-judged-on-layers-1-to-3) | Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3 | Low | Unexercised |
 | [KI-53](#ki-53-a-copy-holds-at-most-four-abilities-added-by-exceptions) | A copy holds at most four abilities added by exceptions | Low | Unexercised |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-has-no-shortcut-and-a-seat-that-never-stops-it-goes-round-forever) | A loop a player could stop has no shortcut, and a seat that never stops it goes round forever | Medium | Open |
 | [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 | [KI-60](#ki-60-infects--1-1-counters-are-counters-an-effect-puts) | Infect's -1/-1 counters are counters an effect puts | Low | Suspected |
+| [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 
 ## Issues
 
@@ -522,24 +521,6 @@ counters.
 - [`scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip`](../scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip)
   (marked `# Known bug`): one lore counter becomes two, so chapters II and III trigger together.
 
-### KI-47: Containment Priest judges a card entering transformed by its front face
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine / card | 2026-10-17, scenarios of Esper Origins |
-
-**Notes.** "If a nontoken creature would enter and it wasn't cast, exile it instead" looks at the permanent as it would exist on
-the battlefield (CR 614.12; Containment Priest's ruling: "If a noncreature card wasn't cast and is entering the battlefield as a
-creature ..., it will be exiled"). `containment_priest.rs` reads `q.chars(z.object)`, the card where it is, and a card put onto
-the battlefield transformed (`put_onto_battlefield_transformed`, CR 712.14a) has only its front face's characteristics there
-(CR 712.8a): Esper Origins (a sorcery) entering as Summon: Esper Maduin (a creature), or The Legend of Roku (an enchantment)
-returning as Avatar Roku, is not exiled. `Proposal::ZoneChange` does not say the object will enter transformed (the core's
-`Entering::transformed` does), so the card cannot ask; a fix gives replacements the entering permanent's characteristics (the
-same is owed to a face-down permanent, CR 708).
-
-**Scenarios.**
-- [`scenarios/esper-origins-entering-transformed-under-containment-priest-is-exiled-instead.cantrip`](../scenarios/esper-origins-entering-transformed-under-containment-priest-is-exiled-instead.cantrip)
-  (marked `# Known bug`): Summon: Esper Maduin enters under Containment Priest.
 
 ### KI-48: Emperor of Bones puts its finality counter on after the creature enters
 
@@ -612,37 +593,6 @@ entirely would start the land's characteristics from its own card when `layers::
 thespians-stage-copying-urborg-under-blood-moon-keeps-the-name-and-loses-the-ability-it-kept,
 clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: they assert this reading and pass.
 
-### KI-52: Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, Magus of the Moon |
-
-**Notes.** `layers::land_text_lost` finds the lands a "nonbasic lands are Mountains" effect takes the rules text of by asking the
-effect's `affects` of each permanent as layers 1 to 3 left it, as `lost_to_statics` does for layer 6, so that the question never
-asks for the layer it is answering. The layer-4 effect itself is applied to each land in its place in layer 4 (CR 613.7, 613.8),
-and takes the land's abilities there. The two disagree only for an object a layer-4 effect makes a land or stops being one (Hydro-
-Man, Fluid Felon becoming a land; a land animated into a non-land by an effect that sets its types): such an object under Magus of
-the Moon is a Mountain and loses the abilities among its abilities, but `Query::lost_all_abilities` does not say so, so the rules
-its card prints apart from its abilities (replacement effects, cost changes, static abilities of other objects) would still apply.
-Hydro-Man prints none. Life and Limb (2026-10-17) is another such effect: it makes every Saproling a Forest land, so a Woodland
-Changeling under Life and Limb and Blood Moon is a Mountain (blood-moon-after-life-and-limb-...) without being counted here; it
-prints nothing but Changeling, so nothing differs. A permanent about to enter (`layers::loses_rules_text_entering`, CR 614.12) is
-likewise judged by its own card or the copy it enters as, without the layer 1-4 effects of other objects - for a subtype-setting
-effect and for a "loses all abilities" one alike - and that is reachable now: Overgrown Tomb (or Stomping Ground, Temple Garden,
-Breeding Pool) entering under Life and Limb and Humility would be a creature, so Humility would take its "as this enters, you may
-pay 2 life", but the engine still asks; Everflowing Chalice entering under March of the Machines (or Mycosynth Lattice and March)
-and Humility still gets its charge counters; Enchanted Evening, Opalescence and Humility do the same to any non-Aura permanent
-with an "enters" replacement. A fix applies the other objects' effects of layers 1 to 4 to the entering object, as it would
-exist on the battlefield, before asking.
-
-**Update.** The "loses all abilities" half of the entering case is fixed: `ops::prepare_entry` (`enters_without_abilities`,
-CR 614.12) puts the object on the battlefield for the question and asks whether a "loses all abilities" static would take its
-abilities there, so the Overgrown Tomb scenario passes. What remains is the subtype-setting half for an object that only another
-effect would make a nonbasic land as it enters, and the on-battlefield case above.
-
-**Scenarios.** overgrown-tomb-entering-as-a-life-and-limb-creature-under-humility-asks-nothing-and-enters-untapped (passes);
-on the battlefield none differs yet.
 
 ### KI-53: A copy holds at most four abilities added by exceptions
 
@@ -703,13 +653,14 @@ things. A fix asks the choice by instance (each labelled with its slot's text). 
 | Low | Unexercised | engine | 2026-10-17, Melira, Sylvok Outcast |
 
 **Notes.** `CardDef::counter_bans` (Melira's "creatures you control can't have -1/-1 counters put on them") is asked of a
-permanent entering with counters (CR 122.6) with the player it enters under, but its characteristics are read from the object
-in the zone it comes from, not as the permanent it will be (CR 614.12): a card entering as a copy of a creature, or a
-noncreature card entering as a creature, is judged by its own characteristics. Moonshadow and a persisting Kitchen Finks,
-creature cards entering as themselves, are judged rightly. Solemnity's ban (artifacts, creatures, enchantments, lands) is asked
-the same way, and so are the replacements of +1/+1 counters keyed to the permanent's types
-(`cantrip_mechanics::replacements::plus_one_counters_applies`: Hardened Scales, Corpsejack Menace, Ozolith, Michelangelo) for a
-permanent entering with counters: a Walking Ballista, a Saga, Dark Depths and a planeswalker entering as themselves are right.
+permanent entering with counters (CR 122.6) with the player it enters under. Its characteristics should be those of the
+permanent as it would exist on the battlefield (CR 614.12): `ops::judged_entering` now answers `Query::chars` of the entering
+object so while its counters are judged, for Solemnity's ban (artifacts, creatures, enchantments, lands) and the replacements
+of +1/+1 counters keyed to the permanent's types (`cantrip_mechanics::replacements::plus_one_counters_applies`: Hardened
+Scales, Corpsejack Menace, Ozolith, Michelangelo) as well, which should cover a card entering as a copy of a creature or a
+noncreature card entering as a creature; but no scenario reaches either yet: no implemented effect returns a noncreature card
+with a -1/-1 counter, and a persisting Clone is a creature card. Moonshadow, a persisting Kitchen Finks, a Walking Ballista, a
+Saga, Dark Depths and a planeswalker entering as themselves are judged rightly.
 
 **Scenarios.** none yet.
 
@@ -744,21 +695,6 @@ granted copy, CR 612.3).
 
 **Scenarios.** none: no card in content prints landwalk.
 
-### KI-59: A daybound permanent entering at night under Humility or Dress Down enters transformed
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, review of Dress Down |
-
-**Notes.** Daybound's "if it is night, this permanent enters transformed" is a static ability of the permanent (CR
-702.145b), and which of a permanent's own entering replacements apply is judged on it as it would exist on the battlefield
-(CR 614.12): under Humility or Dress Down a daybound creature has no abilities there, so it should enter front face up even at
-night. `ops::prepare_entry` asks `day_night::enters_transformed` from the printed keyword before the CR 614.12 question
-(`enters_without_abilities`) that its other entering replacements go through. A fix puts that branch under the same
-question, with a scenario of a daybound creature cast at night under Humility.
-
-**Scenarios.** none yet.
-
 ### KI-60: Infect's -1/-1 counters are counters an effect puts
 
 | Severity | Status | Area | Found |
@@ -771,3 +707,31 @@ put as an effect's (`ops::add_counters`), combat damage's included, though comba
 (CR 510.2). No ruling says which they are; a wither source would ask the same (none is in content).
 
 **Scenarios.** none yet: an infect creature dealing combat damage to a creature whose controller has a Doubling Season.
+
+### KI-61: Limits of judging a permanent as it would exist, and a land as layer 4 leaves it
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, review of the CR 614.12 change |
+
+**Notes.** `ops::as_it_would_exist` (CR 614.12) and `layers::land_text_lost` (CR 305.7) leave these cases, none of which an
+implemented card reaches:
+- `ops::judged_entering` works the entering permanent out once, before its zone-change replacements apply, so one that changes
+  how it enters ("enters under your control instead") is not taken into account by those after it (614.12: "taking into
+  account replacement effects that have already modified how it enters"), and one that sends it elsewhere (Containment Priest)
+  leaves the rest still judging a permanent.
+- A permanent leaving at the same moment as one enters (`sacrifice_and_return`, Goblin Welder) is still on the battlefield
+  while the entering one is judged, so its static abilities count among those that would apply to it.
+- The trial object does not carry its `tapped`, a Room's cast door (CR 709.5d) or a battle's protector, and a token copy of a
+  permanent spell is judged without the text change `carry_effects` gives it.
+- `prepare_entry`'s guard (`layers::abilities_may_be_lost`) looks at the battlefield only: a permanent whose own static
+  ability would take its own abilities or set its own land subtype is not asked.
+- A replacement of the entering object's own that functions from every zone (`own_everywhere`) is read off its card where it
+  is, while `Query::lost_all_abilities` of it answers as it would exist.
+- `land_text_lost` judges a land-subtype-setting ability on the object as layer 4 leaves it. For an ability keyed on the subtype
+  it overwrites ("All Mountains are Plains": Conversion, Glaciers) that misses the lands it applied to; in a dependency loop
+  (CR 613.8b) the ability may have applied before an effect that changed the object's land-ness; and while the question is
+  being answered (`finding`), the layer-4 abilities of lands that lose their text still apply. A fix records which setting
+  abilities applied to the object as its layer 4 is worked out.
+
+**Scenarios.** none: no implemented card reaches them.

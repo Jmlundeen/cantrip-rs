@@ -246,7 +246,7 @@ would go over unclickable.
   Mutation, Kenrith's Transformation, Frogify and Humility print the same; `loses_all_abilities_except_mana_abilities` keeps
   the mana abilities the object has at its timestamp, 605.1: Blood Sun). Either is a layer-6 effect at its timestamp, so an
   ability gained after it stays (613.7). A permanent about to enter that such a static ability would strip is judged as it
-  would be on the battlefield (614.12, `layers::loses_rules_text_entering`): its own `enters` replacements do not apply. Every rule read off a card - its static abilities from layer 6 on, cost changes,
+  would be on the battlefield (614.12, below): its own `enters` replacements do not apply. Every rule read off a card - its static abilities from layer 6 on, cost changes,
   replacement effects, play rules, trigger, block and activation rules, granted ways, miracles - asks the one answer,
   `Query::lost_all_abilities` (`layers::lost_all_abilities`): the effects, then `layers::lost_to_statics`, the permanents such
   static abilities took everything from, worked out once per position and history length (an `affects` may read the past) and
@@ -268,14 +268,27 @@ would go over unclickable.
   the same), whose `apply` calls `Chars::set_land_subtypes`: the land's land types are replaced (its other subtypes, an animated
   land's creature types, stay) and every ability it has in layer 4 - its rules text's and its copy effects' - is taken; the
   basic land type's mana ability follows in layer 6 (305.6), and what other effects grant it after. `layers::land_text_lost`
-  finds, once per position and history, the lands such abilities took the rules text of, judged on layers 1 to 3 (KI-52), and
+  finds, once per position and history, the lands such abilities took the rules text of, judged on each as layer 4 leaves it (every
+  effect that makes it a land or stops it being one is one the setting ability depends on, 613.8a; the limits are KI-61), and
   orders the abilities whose sources are lands as `lost_to_statics` does. Such a land's static abilities apply in no layer from
   4 on - each depends on the setting effect, which applies first whatever the timestamps (613.8a: Urborg under Magus makes
   nothing a Swamp, either order) - and `Query::lost_all_abilities` answers for it, so every rule its card prints is gone. The
   setting ability itself applies whatever its source loses in layer 6 (613.6: Magus under Eaten by Piranhas), and a land's own
   ability that sets its own subtype (Multiversal Passage) goes on applying and does not count it as having lost its text. A land
-  about to enter is judged as it would be on the battlefield (614.12, `layers::loses_rules_text_entering`): under such an
-  effect its own `enters` replacements - "enters tapped", "as this enters" - do not apply. A resolved effect that sets a land's
+  about to enter is judged as it would be on the battlefield (614.12, below): under such an effect its own `enters`
+  replacements - "enters tapped", "as this enters" - do not apply.
+- **A permanent about to enter is judged as it would exist on the battlefield (614.12)**: `ops::as_it_would_exist` puts it
+  there for the moment of the question - under the player it enters under, with the face, copy effect, choices and counters
+  the replacements applied so far gave it, at a new (the latest) timestamp - reads its characteristics and
+  `lost_all_abilities` through every layer, other objects' static abilities and its own alike, and reverts. One answer serves
+  every entering check: `prepare_entry` applies its own `enters` replacements, and daybound's "enters transformed", only if it
+  would keep its abilities (asked only while a "loses all abilities" or land-subtype-setting static ability is on the
+  battlefield, `layers::abilities_may_be_lost`), and asks again as the copy once a copy replacement chose one; and
+  `ops::judged_entering` sets the answer on `Cx::entering` while the replacement effects of its zone change and the counters
+  it enters with are judged, so `Query::chars` and `Query::lost_all_abilities` of the entering object answer as it would be
+  there ("creatures your opponents control enter tapped" taps a Forest Life and Limb would make a creature; Containment
+  Priest exiles a card entering transformed into a creature) - asked only where a replacement effect could apply
+  (`replace::possible`) or a counter ban could limit its counters. A resolved effect that sets a land's
   subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
   such a land other than abilities stay (KI-51).
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both

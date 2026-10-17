@@ -1185,7 +1185,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
     candidates.iter().map(|&t| apply_cost_changes_total(&cx, player, Costed::Ability(source, ability), def.cost.mana, &[t])).collect()
 }
 
@@ -1211,7 +1211,7 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
         _ => return Vec::new(),
     };
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
     let face = granted_slot(index).and_then(|(_, face)| faces_to_cast(def).into_iter().find(|&(f, _)| f == face)).filter(|&(f, _)| f != GRANTED_FACE_WHOLE).map(|(_, d)| cx.card_id(d));
     candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
 }
@@ -1224,7 +1224,7 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
     let def = game.cards.get(obj.copy.map_or(obj.card, |c| c.card));
     let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
     Some((less_each, variable_candidates(&cx, spell, player, variable).len()))
 }
 
@@ -1236,7 +1236,7 @@ pub fn granted_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, 
     let (_, face) = granted_slot(index)?;
     let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
     let face_id = (face != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def));
     let mana = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face_id, &[]);
     Some((cost, mana))
@@ -1251,7 +1251,7 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, card: ObjectId, w
     let (granter, controller, rule) = *granted_ways_of(game.cards, &game.state, &game.log).get(k)?;
     let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
     let view = AsFace { cx: &cx, spell: card, face: cx.card_id(face_def) };
     let q: &dyn Query = if face == GRANTED_FACE_WHOLE { &cx } else { &view };
     (rule.cost)(q, &Asker { source: granter, controller }, card, player)
@@ -4505,7 +4505,7 @@ pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: Object
         return None;
     }
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
-    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
     let printed = special_action_printed_cost(&cx, source, ability, def);
     let cost = special_action_cost(&cx, player, source, ability, def);
     (cost != printed).then_some(cost)

@@ -1376,8 +1376,15 @@ pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], 
 /// sets land subtypes (`StaticDef::sets_land_subtypes`), found once per position and history, and empty, at the cost of a
 /// look at the source list, while no such ability is on the battlefield.
 ///
-/// Each such ability applies in layer 4 to what its `affects` accepts, judged on the characteristics layers 1 to 3 made
-/// (CR 613.1). It applies whatever its source loses in layer 6 (CR 613.6: Magus of the Moon's ruling). One that would
+/// Each such ability applies in layer 4 to what its `affects` accepts (CR 613.1d). Every other layer-4 effect that would
+/// change whether it applies to an object - one that makes the object a land (Life and Limb's Saprolings, Hydro-Man) or
+/// stops it being one - is one it depends on, and applies before it (CR 613.8a); and once it has applied, the object is
+/// still a land of the kind it names. So it is judged on the object as layer 4 leaves it: a Firdoch Core that Life and
+/// Limb makes a Forest land is a nonbasic land Blood Moon makes a Mountain, and loses its rules text with it. That reading
+/// holds for every such ability in content; it would not for one keyed on the subtype it overwrites ("All Mountains are
+/// Plains"), nor in a dependency loop (CR 613.8b), nor while the question is being answered for a land's own layer-4 ability
+/// whose text is lost (`finding`) (KI-61). It applies
+/// whatever its source loses in layer 6 (CR 613.6: Magus of the Moon's ruling). One that would
 /// take the abilities of another such ability's source - a land - is applied first, since the other's existence depends
 /// on it (CR 613.8a), and the abilities it takes no longer apply; where each would take the other's, the earlier timestamp
 /// goes first (CR 613.8b). A land whose own ability sets its own subtype (Multiversal Passage's "this land is the chosen
@@ -1404,7 +1411,7 @@ fn land_text_lost(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<O
         if !obj.zone.is(ZoneKind::Battlefield) || obj.became.is_some() {
             return false;
         }
-        let so_far = chars_before(cards, state, log, id, Layer::Type);
+        let so_far = chars_before(cards, state, log, id, Layer::Color);
         so_far.is(CardType::Land)
             && cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, id, &so_far))
     };
@@ -1426,53 +1433,25 @@ fn land_text_lost(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<O
     objects
 }
 
-/// Whether a permanent about to enter the battlefield would lose the abilities of its rules text there, judged as it would
-/// exist on the battlefield (CR 614.12) - as `card`, with the copy effect it enters with if any: then its own "enters
-/// tapped", "enters with" and "as this enters" replacements do not apply. Either to a static ability that sets land
-/// subtypes (CR 305.7: Blood Moon's and Magus of the Moon's rulings), of a permanent that has not lost its abilities to
-/// another such ability (`land_text_lost`), or to a static ability by which it loses its abilities (CR 613.1f: "all lands
-/// lose all abilities except mana abilities", Blood Sun's ruling; "all creatures lose all abilities"), of a permanent whose
-/// such ability applies (`lost_to_statics`) - no replacement effect is a mana ability (CR 605.1). What the effects would
-/// make of it is judged on its own card's values, as KI-52 says of the lands.
-pub fn loses_rules_text_entering(cards: &CardTable, state: &GameState, log: &[Record], object: ObjectId, card: CardId, copy: Option<&Copiable>) -> bool {
-    if !state.statics_seen {
-        return false;
-    }
-    let (setters, strippers) = {
+/// Whether any static ability could apply to an object on the battlefield: a permanent, emblem or card whose card has static
+/// abilities, or a hone counter, is where its abilities function. The guard of `ops::judged_entering`: without one, a
+/// permanent about to enter is on the battlefield what its card or copy effect makes it.
+pub fn static_sources_present(cards: &CardTable, state: &GameState) -> bool {
+    state.statics_seen && {
         let found = static_sources(cards, state);
-        if found.setters.is_empty() && found.strippers.is_empty() {
-            return false;
-        }
-        (found.setters.clone(), found.strippers.clone())
-    };
-    let so_far = match copy {
-        Some(c) => initial(cards, c.card, Some(c)),
-        None => *printed(cards, card, false),
-    };
-    let statics = |source: ObjectId| cards.get(cards.current(state.obj(source))).statics;
-    if !setters.is_empty() && so_far.is(CardType::Land) {
-        let lost = land_text_lost(cards, state, log);
-        let view = View { cards, state, log, stop: Layer::Type };
-        if setters.iter().any(|&(source, from)| {
-            !lost.contains(&source) && statics(source).iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, object, &so_far))
-        }) {
-            return true;
-        }
+        !found.list.is_empty() || !found.honed.is_empty() || !found.granted.is_empty()
     }
-    if strippers.is_empty() {
-        return false;
-    }
-    let applying = lost_to_statics(cards, state, log).applying;
-    let view = View { cards, state, log, stop: Layer::Ability };
-    strippers.iter().any(|&(source, from)| {
-        applying.contains(&source) && statics(source).iter().any(|s| s.loses_all && s.from == from && (s.affects)(&view, source, object, &so_far))
-    })
 }
 
-/// Whether a "loses all abilities" static ability (CR 613.1f) of a permanent that has not lost its own abilities to an
-/// effect is on the battlefield: the guard of every question about what such an ability would take.
-pub fn loses_all_static_applies(cards: &CardTable, state: &GameState) -> bool {
-    state.statics_seen && !static_sources(cards, state).strippers.is_empty()
+/// Whether a permanent could lose abilities to a static ability once on the battlefield (CR 613.1f, 305.7): a "loses all
+/// abilities" static ability of a permanent that has not lost its own abilities to an effect, or one that sets land subtypes,
+/// is on the battlefield. The guard of every question about what a permanent about to enter would have there (CR 614.12,
+/// `ops::as_it_would_exist`): no resolved effect can name an object that is not there yet.
+pub fn abilities_may_be_lost(cards: &CardTable, state: &GameState) -> bool {
+    state.statics_seen && {
+        let found = static_sources(cards, state);
+        !found.strippers.is_empty() || !found.setters.is_empty()
+    }
 }
 
 /// What `lost_to_statics` found: the permanents that lost all their abilities to a static ability, and the sources whose

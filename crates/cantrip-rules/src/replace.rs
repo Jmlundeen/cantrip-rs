@@ -89,7 +89,7 @@ fn card_of(cx: &Cx, id: ObjectId) -> CardId {
 
 /// Whether any effect could apply to an event about `subject`: a permanent with replacements, or the subject's own
 /// card, which has some that function from every zone. The guard that keeps the hot path free of replacement work.
-fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
+pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
     // An effect a spell or ability made, which lasts (CR 611.2).
     if cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::Replacement(_) | EffectKind::ReplacementRule(_) | EffectKind::Prevention { .. })) {
         return true;
