@@ -411,12 +411,15 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     }
 
     // Effects on objects that are gone apply to nothing (CR 611.2c); dropping them keeps the list short.
-    // "For as long as [source] remains on the battlefield" ends with it (CR 611.2b).
+    // "For as long as [source] remains on the battlefield" ends with it (CR 611.2b), and "for as long as it has a [kind]
+    // counter on it" with the last such counter (`ops::end_counter_durations` ends it as the counter comes off; this is the
+    // backstop for any other path).
     let state = cx.s();
     let applies = |e: &cantrip_state::ContinuousEffect| {
         (live(state, e.affected) || e.kind.outlives_affected())
             && (e.duration != Duration::WhileSourceOnBattlefield
                 || (live(state, e.source) && state.obj(e.source).zone.is(ZoneKind::Battlefield)))
+            && e.duration.counters_hold(state.obj(e.affected))
     };
     if state.effects.iter().any(|e| !applies(e)) {
         let alive: Vec<bool> = state.effects.iter().map(applies).collect();

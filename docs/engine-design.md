@@ -940,6 +940,17 @@ abilities once it has it. "Except it's legendary" (CR 707.9b) is `Copiable::lege
 the effect grants may pay for the cast (Emrakul, the Exigent Doom's ruling). The card leaving exile any other way is a
 new object that is never cast as this one, and the effect lasts as long as its affected object.
 
+### Effects that last while a counter is on the object
+
+"For as long as it has a [kind] counter on it" (CR 611.2b) is `Duration::WhileHasCounter(kind)`. `add_effect` refuses to
+start one on an object with no counter of that kind (a replacement kept it off), and the effect ends the moment the last
+one comes off - `ops::end_counter_durations`, called wherever counters are removed (`add_counters` with a negative amount,
+a cost that removes counters, a stun counter replacing an untap, damage to a planeswalker), with the state-based check as
+the backstop - and is deleted, so a counter put on again later does not bring it back. Its source leaving changes nothing.
+A control effect that ends this way gives the permanent back (CR 613.1b). Eluge, the Shoreless Sea; Aquitect's Will,
+Xolatoyac, the Smiling Flood and Quicksilver Fountain print the same words. The paths no printed card can show (a counter
+put back without a new effect; an effect begun without a counter) are `crates/cantrip-script/tests/counter_duration.rs`.
+
 ### Restricted mana
 
 Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction present
