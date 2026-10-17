@@ -58,6 +58,7 @@ keeps it).
 | [KI-23](#ki-23-a-creature-fighting-itself-cr-70114c-is-implemented-but-no-scenario-can-reach-it) | A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it | Low | Unexercised |
 | [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
+| [KI-42](#ki-42-a-permissions-enters-tapped-is-judged-from-where-the-land-is-not-from-the-way-it-was-played) | A permission's "enters tapped" is judged from where the land is, not from the way it was played | Low | Unexercised |
 
 ## Issues
 
@@ -447,3 +448,20 @@ effects that set types (Oko's Elk) name their object. A fix asks the question ov
 at the cost of their characteristics part-way through the layer.
 
 **Scenarios.** None: no pair of implemented cards reaches it.
+
+### KI-42: A permission's "enters tapped" is judged from where the land is, not from the way it was played
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-16, review of Lightstall Inquisitor |
+
+**Notes.** "Each land played this way enters tapped" (CR 305.1, 614.1c; `PlayGrant::enters_tapped`) is the core's replacement
+`replace::Origin::PlayedTapped`, which works out from the land's zone and the permissions on it (`actions::land_play_permission`)
+whether the land play was made by the permission: the action does not carry the way it was played. Two paths would get it wrong,
+and no printed card in the engine reaches either: a land with such a permission played by a resolving effect instead
+(`actions::play_land_during_resolution`, which would enter tapped though it was not "played this way"), and a land in a graveyard
+with such a permission played by a way a permanent grants (`granted_slot`), which `played_by_permission_from` does not know of.
+Of several ways that could play the same land, the engine also takes the one that lets it enter untapped rather than asking. A fix
+carries the permission used on the PlayLand move into the entry's `ZoneChange`.
+
+**Scenarios.** None yet: no card in the engine both plays a land by an effect and could face a Lightstall Inquisitor's card.

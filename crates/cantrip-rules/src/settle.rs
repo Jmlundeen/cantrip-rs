@@ -901,7 +901,7 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                         Again::new(),
                     ));
                     // "Until" is used up by the event that ends the wait (CR 603.7b), and "when you next" by the event it
-                    // triggers on (CR 603.7c).
+                    // triggers on (CR 603.7b).
                     if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::NextThisTurn)
                         && let Some(at) = cx.s().delayed.iter().position(|x| *x == d)
                     {

@@ -28,7 +28,7 @@ pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
     g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(this, 0), Target::None);
 }
 
-/// Sets up the card's delayed ability number `ability` to trigger "when you next [event] this turn" (CR 603.7b-c): once, the
+/// Sets up the card's delayed ability number `ability` to trigger "when you next [event] this turn" (CR 603.7b): once, the
 /// first time its `listens`/`matches` accept an event this turn, controlled by the resolving ability's controller; it ends
 /// with the turn if it never does. `source` is the object its `matches` is asked of, as for `this_turn`. Each call is a
 /// separate ability, so two activations both trigger on the same next event. The ability is the card as the source has it

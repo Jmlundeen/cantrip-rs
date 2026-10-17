@@ -338,7 +338,7 @@ A delayed triggered ability waits as a `Delayed` record in the state, on no obje
 (`DelayedWhen::Step`), at each such step for the rest of the game (`EachStep`: paradigm, CR 702.192a, which goes on whatever
 happens to the card it came from), or on events: each one this turn (`ThisTurn`), until an event (`UntilEvent`), until a
 player's next turn (`UntilNextTurnOf`), or the next one this turn (`NextThisTurn`: "when you next cast ... this turn", CR
-603.7b-c, used up by the event it triggers on and ended with the turn if none comes; two made in one turn both trigger on
+603.7b, used up by the event it triggers on and ended with the turn if none comes; two made in one turn both trigger on
 that event, Doublecast's ruling).
 
 An instruction to transform (CR 701.27) is `ops::transform`, which turns a double-faced permanent over and records

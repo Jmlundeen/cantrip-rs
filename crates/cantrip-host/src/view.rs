@@ -603,8 +603,9 @@ impl<'a> Projector<'a> {
             let until = if e.duration == Duration::EndOfTurn { " this turn" } else { "" };
             summary.pending_effects.push(format!("The \"legend rule\" doesn't apply to permanents {whose} control{until}."));
         }
-        // "Whenever [event] this turn" / "when you next [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b-c):
-        // a delayed triggered ability that waits for its event, on no object, so the page says it beside its controller's life total, in the ability's own words
+        // "Whenever [event] this turn" / "when you next [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b):
+        // a delayed triggered ability that waits for its event, on no object, so the page says it beside its controller's life
+        // total, in the ability's own words
         // and named for the object it came from (the words may say "that creature"). The other seat is told whose it is. So is
         // one that triggers at each such step for the rest of the game (paradigm, CR 702.192a): the card it came from may be
         // anywhere, or nowhere it can be seen.
@@ -913,11 +914,16 @@ impl<'a> Projector<'a> {
         if grant.exile_after {
             text.push_str(", then exiled");
         }
-        // What the permission adds to playing it: a spell's extra cost (CR 601.2f), a land's entering tapped (CR 614.1c).
-        if grant.more > 0 {
+        // What the permission adds to playing it, for what the card can be played as: a spell's extra cost (CR 601.2f), a land's
+        // entering tapped (CR 614.1c). A modal double-faced card may be either (CR 712.4).
+        let chars = self.game.chars(permission.card);
+        let def = self.game.cards.get(chars.card);
+        let land = chars.is(CardType::Land) || def.back_land;
+        let spell = !chars.is(CardType::Land) || def.back.is_some_and(|b| b.has_cost);
+        if grant.more > 0 && spell {
             text.push_str(&format!(", a spell costs {{{}}} more", grant.more));
         }
-        if grant.lands && grant.enters_tapped {
+        if grant.lands && grant.enters_tapped && land {
             text.push_str(", a land enters tapped");
         }
         text

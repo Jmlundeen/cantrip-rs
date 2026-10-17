@@ -819,7 +819,7 @@ pub enum DelayedWhen {
     UntilEvent,
     /// "Until your next turn, whenever [event]" (CR 603.7b, 611.2b): as `ThisTurn`, until that player's next turn begins.
     UntilNextTurnOf(PlayerId),
-    /// "When you next [event] this turn" (CR 603.7b-c): triggers once, the first time its `listens`/`matches` accept an event
+    /// "When you next [event] this turn" (CR 603.7b): triggers once, the first time its `listens`/`matches` accept an event
     /// this turn, and is then used up; one that never triggers ends with the turn, as `ThisTurn` does. Each is its own
     /// ability: two made the same turn both trigger on the next such event (Doublecast's ruling). Doublecast, Teach by
     /// Example, Galvanic Iteration, Chandra, the Firebrand, Ral, Storm Conduit and Loki Laufeyson print it.
