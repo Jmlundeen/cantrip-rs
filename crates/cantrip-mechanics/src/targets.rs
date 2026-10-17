@@ -182,6 +182,14 @@ fn artifact_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Artifact))
 }
 
+fn creature_with_flying_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).has(Keyword::Flying))
+}
+
+/// "Target creature with flying" (CR 115.1, 702.9), read from its computed characteristics. Bow of Nylea and Pawpatch
+/// Formation print it.
+pub const CREATURE_WITH_FLYING: TargetSpec = target(creature_with_flying_filter);
+
 /// "Target creature or enchantment" (CR 115.1): the filter itself, for a card that adds to it ("an opponent controls").
 /// Shredder's Technique prints it as it is and Feed the Swarm adds the opponent.
 pub fn creature_or_enchantment(q: &dyn Query, _: &Asker, t: Target) -> bool {
@@ -295,7 +303,7 @@ fn enchantment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Enchantment))
 }
 
-/// "Target enchantment" (CR 115.1). Requisition Raid and Heritage Reclamation print it.
+/// "Target enchantment" (CR 115.1). Requisition Raid, Heritage Reclamation and Pawpatch Formation print it.
 pub const ENCHANTMENT: TargetSpec = target(enchantment_filter);
 /// "Target artifact or creature you control" (CR 115.1, 205.2a). Concerted Care, Oko, Thief of Crowns (the permanent it exchanges),
 /// Ozolith, the Shattered Spire and Three Steps Ahead print it.

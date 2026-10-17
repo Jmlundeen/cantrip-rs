@@ -16,11 +16,6 @@ fn deathtouch(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Deathtouch);
 }
 
-/// "Target creature with flying" (CR 115.1).
-fn creature_with_flying(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).has(Keyword::Flying))
-}
-
 /// One of "up to four target cards from your graveyard" (CR 115.1): a mode's target slots are one target each, so the
 /// four are four optional slots, and a card an earlier one chose is not a target again (CR 115.3).
 fn card_in_your_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -61,7 +56,7 @@ static MODAL: ModalDef = modes(&[
     mode(counter_on_creature, "Put a +1/+1 counter on target creature.")
         .targets(&[targets::CREATURE]),
     mode(two_damage, "Bow of Nylea deals 2 damage to target creature with flying.")
-        .targets(&[target(creature_with_flying)]),
+        .targets(&[targets::CREATURE_WITH_FLYING]),
     mode(|g, item| effects::gain_life(g, item, 3), "You gain 3 life."),
     mode(bottom_in_any_order, "Put up to four target cards from your graveyard on the bottom of your library in any order.")
         .targets(&[UP_TO_ONE_CARD, UP_TO_ONE_CARD, UP_TO_ONE_CARD, UP_TO_ONE_CARD]),
