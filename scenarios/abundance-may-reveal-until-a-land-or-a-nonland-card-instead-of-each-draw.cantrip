@@ -1,0 +1,51 @@
+# Abundance: "If you would draw a card, you may instead choose land or nonland and reveal cards from the top of your library
+# until you reveal a card of the chosen kind. Put that card into your hand and put all other cards revealed this way on the
+# bottom of your library in any order." (CR 614.1a, 121.6, 701.20) "If you use this on a multi-card draw, each replaced draw
+# is handled separately" (its ruling): for Ancestral Recall's first draw Bot1 takes the effect and chooses nonland - the
+# Forest and the Plains are revealed before Ornithopter, which goes to its hand, and the two lands go to the bottom in the
+# order Bot1 gives; for the second it declines, and draws the Island; for the third it takes it and chooses land, and the
+# Mountain on top is revealed and taken.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Abundance
+Ancestral Recall
+Plains
+Plains
+Forest
+Plains
+Ornithopter
+Island
+Mountain
+Swamp
+Swamp
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Abundance.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Accept
+Bot1.Modes(Nonland)
+Bot1.Arrange(Plains; Forest)
+Bot1.Decline
+Bot1.Accept
+Bot1.Modes(Land)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Ornithopter; Island; Mountain
+Bot1.Library = Swamp; Swamp; Plains; Forest
+Bot1.Revealed = Forest; Plains; Ornithopter; Mountain
