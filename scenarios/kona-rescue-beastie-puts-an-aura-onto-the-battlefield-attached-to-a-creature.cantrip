@@ -1,0 +1,39 @@
+# Kona, Rescue Beastie: a permanent card from the hand includes an Aura, which is put onto the battlefield without being cast, so
+# it isn't targeted and chooses what it enchants as it enters (CR 303.4f). Kona attacks on turn 3, and Bot1 puts Rancor in:
+# it enchants Kona (the only creature it can enchant), which becomes 6/3 with trample (+2/+0 and trample). Rancor was never cast.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Kona, Rescue Beastie
+Rancor
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kona, Rescue Beastie.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Kona, Rescue Beastie > Bot2)
+[T3 Bot1.Main2]
+Bot1.Choose(Rancor)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Rancor.AttachedTo = Kona, Rescue Beastie
+Bot1.Battlefield.Kona, Rescue Beastie.Power = 6
+Bot1.Battlefield.Kona, Rescue Beastie.Keywords = Trample
+Bot2.Life = 16

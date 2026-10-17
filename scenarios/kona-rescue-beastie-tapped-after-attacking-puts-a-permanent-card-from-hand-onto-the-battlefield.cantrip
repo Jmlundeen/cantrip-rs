@@ -1,0 +1,48 @@
+# Kona, Rescue Beastie, Survival: "At the beginning of your second main phase, if Kona is tapped, you may put a permanent card
+# from your hand onto the battlefield." Kona is cast on turn 1 with four Moxen, attacks on turn 3 (no vigilance, so tapped) and at
+# the second main phase Bot1 may choose among the permanent cards in hand (Forest, Sol Ring) but not Lightning Bolt (an instant,
+# not a permanent card: the refusal, beside the Forest taken on the next line). The Forest is put onto the battlefield, not
+# played: Bot1 has played no land (LandsPlayed 0). On Bot2's turn 4 Kona is still tapped, but it is not Bot1's second main
+# phase: nothing is asked (CR 603.2, "your").
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Kona, Rescue Beastie
+Forest
+Lightning Bolt
+Sol Ring
+Island x20
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kona, Rescue Beastie.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Kona, Rescue Beastie.Tapped = false
+Bot1.Attack(Kona, Rescue Beastie > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Kona, Rescue Beastie.Tapped = true
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Forest)
+[T4 Bot2.Main2]
+! Bot1.Choose
+[Bot2.End]
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = false
+Bot1.Hand = Lightning Bolt; Sol Ring
+Bot1.LandsPlayed = 0
+Bot2.Life = 16

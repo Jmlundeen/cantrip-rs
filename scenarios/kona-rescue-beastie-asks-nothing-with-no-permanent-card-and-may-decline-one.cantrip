@@ -1,0 +1,45 @@
+# Kona, Rescue Beastie: "you may put a permanent card from your hand". Turn 3: Kona attacks; the hand holds only Lightning Bolt
+# and a third drawn: no permanent card, so the trigger asks nothing (the refusal) and the hand is unchanged. Turn 5: Kona
+# attacks again (it untapped in the untap step) with a Forest drawn into the hand; the choice is offered and Bot1 declines it
+# by choosing none ("may"): the Forest stays in hand.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Kona, Rescue Beastie
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Forest
+Island x20
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kona, Rescue Beastie.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Kona, Rescue Beastie > Bot2)
+[T3 Bot1.Main2]
+! Bot1.Choose
+? Bot1.Hand = Lightning Bolt; Lightning Bolt; Lightning Bolt
+[T5 Bot1.Main1]
+Bot1.Attack(Kona, Rescue Beastie > Bot2)
+[T5 Bot1.Main2]
+Bot1.Choose()
+[T5 Bot1.End]
+
+[Expect]
+Bot1.Hand = Lightning Bolt; Lightning Bolt; Lightning Bolt; Forest
+Bot2.Life = 12
