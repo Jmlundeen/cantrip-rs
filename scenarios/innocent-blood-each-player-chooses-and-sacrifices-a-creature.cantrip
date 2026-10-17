@@ -1,0 +1,43 @@
+# Innocent Blood on turn 3 with two creatures on each side: "Each player sacrifices a creature of their choice." The caster
+# is a player too, so Bot1 chooses first (as the active player, CR 101.4) and sacrifices its own Ornithopter, not the Llanowar
+# Elves it cast first, keeping the Elves; Bot2 chooses its Ornithopter, keeping the Elves. Each side loses exactly one creature and the spell
+# itself ends in its owner's graveyard.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Swamp
+Ornithopter
+Innocent Blood
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Choose(Ornithopter)
+Bot2.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Swamp; Llanowar Elves
+Bot1.Graveyard = Innocent Blood; Ornithopter
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Graveyard = Ornithopter

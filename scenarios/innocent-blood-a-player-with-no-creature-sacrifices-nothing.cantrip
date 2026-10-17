@@ -1,0 +1,32 @@
+# Innocent Blood while Bot2 controls no creature: Bot2 has nothing to sacrifice and that does not stop the spell, so the
+# caster still sacrifices the creature they control (a single creature is no choice, so no question is asked) - the spell
+# does as much as it can (CR 101.3, 608.2c). Bot2's noncreature permanents (a land and a Mox) are untouched: what is
+# sacrificed is a creature only.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Innocent Blood
+Swamp x20
+
+[Bot2 Deck]
+Mox Jet
+Swamp
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Innocent Blood.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp
+Bot1.Graveyard = Innocent Blood; Ornithopter
+Bot2.Battlefield = Mox Jet; Swamp
+Bot2.Graveyard.Count = 0

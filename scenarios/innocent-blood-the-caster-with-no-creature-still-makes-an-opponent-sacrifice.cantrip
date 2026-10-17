@@ -1,0 +1,27 @@
+# Innocent Blood while the caster controls no creature: "each player" includes the caster, who has nothing to sacrifice,
+# and the opponent still sacrifices their only creature (no choice, so no question). The spell does not need the caster to
+# have a creature, and it has no target.
+
+[Bot1 Deck]
+Swamp
+Innocent Blood
+Swamp x20
+
+[Bot2 Deck]
+Ornithopter
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Innocent Blood.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp
+Bot1.Graveyard = Innocent Blood
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter

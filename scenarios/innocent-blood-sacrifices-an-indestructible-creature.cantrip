@@ -1,0 +1,44 @@
+# Innocent Blood against an indestructible creature: sacrifice is not destruction (CR 701.21a, 702.12b), so Bot2's
+# Iron-Shield Elf, made indestructible in response by discarding a card, is Bot2's only creature and is sacrificed anyway.
+# Bot1's Ornithopter is sacrificed too.
+
+[Bot1 Deck]
+Swamp
+Ornithopter
+Innocent Blood
+Swamp x20
+
+[Bot2 Deck]
+Mox Jet
+Swamp
+Iron-Shield Elf
+Swamp
+Swamp x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Iron-Shield Elf.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Pass
+Bot2.Battlefield.Iron-Shield Elf.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Iron-Shield Elf.Keywords = Indestructible
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp
+Bot1.Graveyard = Innocent Blood; Ornithopter
+Bot2.Battlefield = Mox Jet; Swamp
+Bot2.Graveyard = Iron-Shield Elf; Swamp

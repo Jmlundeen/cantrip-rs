@@ -1,0 +1,39 @@
+# Innocent Blood and a token: a creature token is a creature, so Bot1 may sacrifice one of the three Rabbits Hop to It made
+# (the second, not the first). It goes to the graveyard for an instant and then ceases to exist (CR 111.7, 704.5d), so no
+# graveyard holds it: Bot1's graveyard is just Hop to It and Innocent Blood, and two Rabbits stay. Bot2 has no creature.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Hop to It
+Swamp
+Innocent Blood
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Hop to It.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 6
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Choose(Rabbit#2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Pearl; Plains; Rabbit; Rabbit; Swamp
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard = Innocent Blood; Hop to It
+Bot2.Battlefield.Count = 0

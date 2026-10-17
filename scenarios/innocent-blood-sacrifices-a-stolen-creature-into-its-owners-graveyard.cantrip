@@ -1,0 +1,49 @@
+# Innocent Blood and a creature under another player's control: a player sacrifices a creature they control (CR 701.21a), and a
+# permanent that leaves goes to its owner's graveyard (CR 400.3). Bot1 steals Bot2's only creature (Llanowar Elves) with
+# Vengeful Possession, so Bot1 controls two creatures and Bot2 none. Bot1 chooses the stolen Elves (not the Ornithopter that was
+# offered first): it goes to Bot2's graveyard, its owner's, Bot2 has nothing of its own to sacrifice, and Bot1 keeps Ornithopter.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Mox Jet
+Mox Emerald
+Ornithopter
+Vengeful Possession
+Innocent Blood
+Swamp x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Vengeful Possession.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Choose()
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Innocent Blood.Cast
+Bot1.Choose(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Swamp; Mox Ruby; Mox Jet; Mox Emerald; Ornithopter
+Bot1.Graveyard = Innocent Blood; Vengeful Possession
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Llanowar Elves
