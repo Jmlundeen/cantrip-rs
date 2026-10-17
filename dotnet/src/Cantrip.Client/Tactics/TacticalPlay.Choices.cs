@@ -1063,9 +1063,33 @@ public sealed partial class TacticalPlay
     /// it goes before one that multiplies it. Anything else, and two effects on a loss, are as good in any order to a seat
     /// that does not know what they are. A turn that would begin (CR 614.10) is offered with the effect that must skip it
     /// first: taking that one keeps a "you may skip that turn" (Time Vault) for a later turn, so the default is the choice.
+    /// Counters put on this seat's own permanent (it is the one asked, CR 616.1) are made as many as they can be: an effect
+    /// that adds one (Hardened Scales' "that many plus one") goes before one that doubles them (Doubling Season), so one
+    /// counter becomes four rather than three. An event with -1/-1 counters in it is left to the default: only effects that
+    /// multiply apply to those today, so their order changes nothing, and with +1/+1 counters beside them the seat does not
+    /// weigh one kind against the other. Damage to this seat
+    /// or its permanent is made as little as it can be: a prevention effect goes before one that doubles or adds to it
+    /// (Furnace of Rath's ruling: 5 damage, 4 prevented, then doubled, is 2 rather than 6).
     /// </summary>
     private static AnswerPayload Replacement(ChooseReplacementPromptMessage prompt)
     {
+        if (prompt.Event.Contains(" would be put on ", StringComparison.Ordinal))
+        {
+            if (prompt.Event.Contains("-1/-1", StringComparison.Ordinal))
+            {
+                return prompt.Default();
+            }
+
+            int adds = prompt.Hints.FindIndex(hint => hint.Contains("plus", StringComparison.Ordinal) || hint.Contains("one more", StringComparison.Ordinal));
+            return adds < 0 ? prompt.Default() : new ReplacementChosenAnswer { Index = adds };
+        }
+
+        if (prompt.Event.Contains(" damage from ", StringComparison.Ordinal))
+        {
+            int prevents = prompt.Hints.FindIndex(hint => hint.Contains("prevent", StringComparison.OrdinalIgnoreCase));
+            return prevents < 0 ? prompt.Default() : new ReplacementChosenAnswer { Index = prevents };
+        }
+
         if (!prompt.Event.StartsWith("You would gain", StringComparison.Ordinal))
         {
             return prompt.Default();
