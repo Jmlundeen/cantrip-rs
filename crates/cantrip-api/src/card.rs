@@ -375,6 +375,11 @@ pub struct Cost {
     pub remove_counters: Option<(CounterKind, u8)>,
     /// Remove a counter of any kind from the source (CR 118.3): the payer names the kind when it has more than one.
     pub remove_any_counter: bool,
+    /// Remove this many counters, of any kinds, from among the permanents the payer controls that pass the filter (CR 118.3,
+    /// 122.1): "remove three counters from among creatures you control" (the casts Dawnhand Dissident permits; Tayam,
+    /// Luminous Enigma's ability). Which counters, from which permanents, is chosen as the cost is chosen (CR 601.2h), and
+    /// they are removed as it is paid. Payable only while there are that many counters among them.
+    pub remove_counters_among: Option<(u8, ObjectFilter)>,
     /// Exile this card (from the zone the ability functions in: eternalize, CR 702.129a).
     pub exile_self: bool,
     /// Discard this many cards from your hand that pass the filter (CR 701.9), chosen as the cost is chosen.
@@ -422,8 +427,8 @@ pub struct Cost {
     /// The quality's name ("Dragon") is what the prompt says.
     pub behold: Option<(u8, ObjectFilter, &'static str)>,
     /// Blight N (CR 701.68a): put this many -1/-1 counters on a creature you control, chosen as the cost is chosen and
-    /// put as it is paid. Payable only with a creature to put them on (CR 701.68b). Requiting Hex, Cinder Strike,
-    /// Paid when a spell is cast only: an activation does not choose or pay it yet.
+    /// put as it is paid. Payable only with a creature to put them on (CR 701.68b). A spell's (Requiting Hex, Cinder
+    /// Strike) or an activated ability's (Dawnhand Dissident, Gristle Glutton, Sting-Slinger).
     pub blight: u8,
     /// Harmonize's additional part (CR 702.180a-b): tap up to one untapped creature you control, and the total cost comes down
     /// by generic mana equal to its power (never by colored mana, CR 601.2f). The creature is chosen as the cost is chosen
@@ -516,6 +521,7 @@ impl Cost {
         c.life = self.life.saturating_mul(n);
         c.exile_from_graveyard = self.exile_from_graveyard.saturating_mul(n);
         c.blight = self.blight.saturating_mul(n);
+        c.remove_counters_among = self.remove_counters_among.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
         c.exile_from_hand = self.exile_from_hand.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
         c.discard = self.discard.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
         c.permanents = self.permanents.map(|p| PermanentCost { count: p.count.saturating_mul(n), ..p }).filter(|_| n > 0);
@@ -560,6 +566,12 @@ impl Cost {
         if c.remove_counters.is_none() {
             c.remove_counters = other.remove_counters;
         }
+        // Two removals from among permanents are one choice, of the first's permanents: no card has two with different filters.
+        c.remove_counters_among = match (self.remove_counters_among, other.remove_counters_among) {
+            (Some((a, f)), Some((b, _))) => Some((a.saturating_add(b), f)),
+            (None, b) => b,
+            (a, None) => a,
+        };
         c.life += other.life;
         c.exile_from_graveyard += other.exile_from_graveyard;
         if c.exile_from_graveyard_of.is_none() {
@@ -622,6 +634,7 @@ impl Cost {
             life: 0,
             remove_counters: None,
             remove_any_counter: false,
+            remove_counters_among: None,
             exile_self: false,
             discard: None,
             pay_x_life: false,
@@ -1141,6 +1154,27 @@ impl GrantedWay {
     pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, lands: false, gains: None, flashback: false };
 }
 
+/// A static ability of a permanent that lets a player cast cards in exile (CR 601.3, 604.1): "you may cast spells from among
+/// cards exiled with this" (Rona, Disciple of Gix; Kheru Mind-Eater), "during your turn, you may cast creature spells from
+/// among cards you own exiled with this creature by removing three counters from among creatures you control in addition to
+/// paying their other costs" (Dawnhand Dissident). It is a permission, not a way of paying: the card is cast for its mana
+/// cost or any alternative cost it has (CR 601.2b, 118.9), as its own Adventure or Omen too where `allows` says so, at the
+/// time its type allows (Dawnhand Dissident's ruling: "normally ... only during your main phase while the stack is empty"),
+/// and `additional` is owed on top of whatever it is cast for (CR 118.8, 601.2f). It functions while the permanent is on the
+/// battlefield and has its abilities; a cast begun by it goes on if the permanent leaves while it is paid for (the same
+/// card's ruling: sacrificed to pay an additional cost, or destroyed in response).
+#[derive(Clone, Copy)]
+pub struct ExileCast {
+    /// What a cast by it is called on the menu, and on the card in exile it may cast.
+    pub text: &'static str,
+    /// Whether `player` may cast `card`, a card in exile, by it now: asked of the permanent (`Asker`, its controller "you"),
+    /// with the card as the spell it would be (its Adventure or Omen through a view of that face, CR 715.3a, 720.3a), so
+    /// "creature spells" refuses a creature card's instant Adventure.
+    pub allows: fn(&dyn Query, &Asker, ObjectId, PlayerId) -> bool,
+    /// The additional cost owed on each cast by it (CR 118.8); `Cost::NONE` for none.
+    pub additional: Cost,
+}
+
 /// A static ability of a permanent that gives cards in a hand miracle (CR 702.94a): "each instant and sorcery card in your
 /// hand has miracle {2}" (Lorehold, the Historian), "nonland cards in your hand have miracle {0}" (Molecule Man), "each
 /// enchantment card in your hand has miracle; its miracle cost is equal to its mana cost reduced by {4}" (Aminatou, Veil
@@ -1639,6 +1673,9 @@ pub struct CardDef {
     pub ability_alternatives: &'static [AbilityAlternative],
     /// Ways it gives cards in graveyards to be cast, while it is on the battlefield (CR 604, 118.9).
     pub granted_ways: &'static [GrantedWay],
+    /// Its static abilities that let a player cast cards in exile (CR 601.3, 604.1), while it is on the battlefield with its
+    /// abilities: "you may cast spells from among cards exiled with this".
+    pub exile_casts: &'static [ExileCast],
     /// Miracle it gives cards in its controller's hand, while it is on the battlefield (CR 702.94a, 113.6): Lorehold, the
     /// Historian's "each instant and sorcery card in your hand has miracle {2}".
     pub granted_miracles: &'static [GrantedMiracle],
@@ -1813,6 +1850,7 @@ impl CardDef {
         ability_discounts: &[],
         ability_alternatives: &[],
         granted_ways: &[],
+        exile_casts: &[],
         granted_miracles: &[],
         opening_hand: None,
         back: None,

@@ -173,6 +173,7 @@ public sealed class RandomPlay : IAutoPlayer
             DeclareBlockersPromptMessage blockers => Block(blockers),
             ChooseTargetPromptMessage target => Target(target),
             ChooseDividedTargetsPromptMessage divided => Divided(divided),
+            RemoveCountersPromptMessage remove => RemoveCounters(remove),
             ChooseModesPromptMessage modes => Modes(modes),
             ChooseCardsPromptMessage cards => Cards(cards),
             SearchLibraryPromptMessage search => Search(search),
@@ -562,6 +563,28 @@ public sealed class RandomPlay : IAutoPlayer
         }
 
         return new TargetsDividedAnswer { Shares = shares };
+    }
+
+    /// <summary>Counters removed from among permanents (CR 118.3): each one drawn from the pools with some left.</summary>
+    private AnswerPayload RemoveCounters(RemoveCountersPromptMessage prompt)
+    {
+        int[] taken = new int[prompt.Pools.Count];
+        for (int i = 0; i < prompt.Total; i++)
+        {
+            List<int> open = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] < prompt.Pools[p].Count)];
+            if (open.Count == 0)
+            {
+                return prompt.Default();
+            }
+
+            taken[open[_random.Next(open.Count)]]++;
+        }
+
+        return new CountersRemovedAnswer
+        {
+            Removals = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] > 0).Select(p =>
+                new CounterPoolMessage { Object = prompt.Pools[p].Object, Counter = prompt.Pools[p].Counter, Count = taken[p] })],
+        };
     }
 
     /// <summary>Drawn modes, as many as the choice asks for, or a drawn number of them where it offers a range.</summary>

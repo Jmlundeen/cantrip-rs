@@ -239,6 +239,19 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
         RequestKind::ChoosePlayer { candidates, .. } => Answer::Player(candidates[random.below(candidates.len())]),
         RequestKind::CollectEvidence { cards, .. } => Answer::Cards(cards.clone()),
         RequestKind::Craft { cards, minimum, .. } => Answer::Cards(cards[..*minimum as usize].to_vec()),
+        // As many as there are from each pool in turn.
+        RequestKind::RemoveCounters { pools, total, .. } => {
+            let mut left = *total as u16;
+            let mut taken = Vec::new();
+            for p in pools {
+                let n = p.count.min(left);
+                if n > 0 {
+                    taken.push((p.object, p.kind, n));
+                    left -= n;
+                }
+            }
+            Answer::Counters(taken)
+        }
         RequestKind::TapForPower { purpose: Purpose::TapToReduce, .. } => Answer::Cards(Vec::new()),
         RequestKind::TapForPower { cards, powers, minimum, .. } => {
             // Everything that may be tapped, the most that can be asked: always enough if anything is.

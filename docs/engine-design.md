@@ -529,6 +529,36 @@ Unstable Glyphbridge (Sandswirl Wanderglyph's "they can't attack you or planeswa
 Guide-Mural (Master's Manufactory asks whether an artifact entered under your control this turn, whatever happened to it
 since: the history does not keep the controller or the types an object entered with).
 
+### Blight, counters from among permanents, and casting from exile by a permanent's leave
+
+Blight N (CR 701.68a) is `Cost::blight`, paid by a spell's cost (Requiting Hex) and by an activated ability's (Dawnhand
+Dissident; Gristle Glutton and Sting-Slinger print it too). An activation chooses the creature after its mana is paid, as a
+spell's additional cost does (CR 601.2g-h by way of 602.2b): from what is there then, and with no creature left the activation is
+taken back (CR 701.68b). The creature need not survive the counters (the rulings). 701.68d's "whenever a player blights" has no
+event yet: no card in content triggers on it.
+
+"Remove N counters from among [permanents you control]" (CR 118.3, 122.1) is `Cost::remove_counters_among`, a count and a filter
+over the payer's permanents: counters of any kinds, from any of them. It is payable while there are that many among them, and
+is asked as `RequestKind::RemoveCounters` - each kind on each permanent a `CounterPool` with how many there are, answered with
+`Answer::Counters` (how many of which kind from which permanent, adding up to the total, which `validate` checks) - chosen
+after the mana like blight and removed as the cost is paid (`ops::add_counters`, so a Siege's last defense counter still
+triggers). The host sends it as `RemoveCountersPromptMessage`; the web client offers a button for each kind on each permanent
+and takes one of a permanent's counters on a click on it. Dawnhand Dissident's casts pay it; Tayam, Luminous Enigma's ability is
+the same cost on an activated ability, which `activate` pays too, though no card in content has it there yet.
+
+A permanent's static ability that lets a player cast cards in exile (CR 601.3, 604.1) is `CardDef::exile_casts`, an `ExileCast`:
+whether a card may be cast by it now (asked of the permanent, its controller "you", with the card as the face that would be
+cast, so "creature spells" refuses a creature card's instant Adventure) and an additional cost owed on each cast by it (CR 118.8,
+601.2f). It is a permission, not a way of paying: `castable` treats the card as permitted, so it is cast for its mana cost or any
+alternative cost it has (Solitude's evoke), at the speed its type gives (a flash creature at instant speed, the rulings), and the
+additional cost joins `extra` in `actions::cast`, which finds the permission as the cast begins (`exile_cast_permission`), so the
+permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling). A permanent that has lost its abilities gives
+none, and "cards exiled with this" are those its own ability linked (`Query::exiled_with`, CR 607.2a), so a flickered one finds
+none (CR 400.7). A card that a play permission of its own lets be cast, or a card on an Adventure, is cast by that instead; two
+such permissions on one card are not offered as a choice, since no card in content can have both. The host shows the
+permission's text on the card while it would allow the cast (`exile_cast_texts`). Rona, Disciple of Gix and Kheru Mind-Eater
+print the same kind of ability with no additional cost.
+
 ### What a cost chose, for the effect to read
 
 An activated ability's cost may choose permanents - tap, sacrifice or return them (CR 601.2h by way of 602.2b), crew's and
@@ -882,7 +912,7 @@ answering ... us per decision", one thread). The spike
 decision (2026-10-15), 5.90 us after ending the turn (CR 724) and the exact cleanup step (2026-10-16, 5.99 us before); 6.03-6.45 us after mana
 restricted to abilities of [type] sources (CR 106.6), against 6.08-6.14 us before on the same, noisy, machine. Costs that depend
 on the targets (CR 601.2c, 601.2f) and hexproof from a quality (CR 702.11d), 2026-10-16, three runs alternating with
-origin/main: 5.80, 6.03, 5.83 us before and 5.95, 5.89, 5.82 us after (5.89 mean both). Craft's materials as a cost (CR 702.167a): 5.65-5.94 us against 5.52-6.24 us before, interleaved on a busy machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16). The solved designation, suspect and the play-rule walk (`each_play_rule`), alternating with the build before them: 6.38, 6.83, 6.33 us against 6.36, 6.50, 6.08 us (2026-10-16, a busy machine). Damage redirection and damage that stays (CR 614.1a, 616.1, 514.2), seven runs alternating with origin/main on a busy machine: best 6.46 us against 6.36 us before, medians lost in the noise (2026-10-16). Static abilities reading the event history (the log handed to every layers entry point, CR 611.3a), six runs alternating with the build before on a busy machine: best 6.43 us against 6.34 us before, medians 7.0 and 8.1 us (2026-10-16). Static "loses all abilities", "blocked by at most one creature" and "can't attack unless" (CR 613.1f, 509.1b, 508.1c), alternating with the build before on a machine shared with other builds (2026-10-16): 14.72, 27.31, 10.57, 28.13 us after against 14.53, 25.60, 11.08, 147.72 us before - lost in the noise, as nothing new runs while no card with such an ability is on the battlefield. The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
+origin/main: 5.80, 6.03, 5.83 us before and 5.95, 5.89, 5.82 us after (5.89 mean both). Craft's materials as a cost (CR 702.167a): 5.65-5.94 us against 5.52-6.24 us before, interleaved on a busy machine. The enduring story's look at the board as each event happens (CR 702.195c, 2026-10-16) measured 6.15-6.55 us against 6.01-6.37 us before, alternating the two builds. Stack items record each target's slot (`StackItem::spec_of`, 16 bytes more per stack item): 5.92-6.42 us (best 5.92) against 5.87-5.99 us (best 5.87) before (2026-10-16). The solved designation, suspect and the play-rule walk (`each_play_rule`), alternating with the build before them: 6.38, 6.83, 6.33 us against 6.36, 6.50, 6.08 us (2026-10-16, a busy machine). Damage redirection and damage that stays (CR 614.1a, 616.1, 514.2), seven runs alternating with origin/main on a busy machine: best 6.46 us against 6.36 us before, medians lost in the noise (2026-10-16). Static abilities reading the event history (the log handed to every layers entry point, CR 611.3a), six runs alternating with the build before on a busy machine: best 6.43 us against 6.34 us before, medians 7.0 and 8.1 us (2026-10-16). Static "loses all abilities", "blocked by at most one creature" and "can't attack unless" (CR 613.1f, 509.1b, 508.1c), alternating with the build before on a machine shared with other builds (2026-10-16): 14.72, 27.31, 10.57, 28.13 us after against 14.53, 25.60, 11.08, 147.72 us before - lost in the noise, as nothing new runs while no card with such an ability is on the battlefield. Blight in activated abilities, counters removed from among permanents and permanents' permissions to cast from exile (CR 701.68a, 118.3, 601.3), alternating with main on a machine shared with other builds (2026-10-16): 11.20, 10.97, 10.05, 15.58 us after against 10.91, 11.32 us before - lost in the noise. The last six feature landings had taken it from 6.93 to 7.5-7.8 us; a sampling profile found
 the cost in the layers, not in the new features' own code:
 
 - `chars()` rebuilt a card's printed values for every object on every question, and scanned the battlefield for

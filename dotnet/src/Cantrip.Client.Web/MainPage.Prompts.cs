@@ -148,6 +148,10 @@ public sealed partial class MainPage
                 FillDivideTargets(client, divide);
                 break;
 
+            case RemoveCountersPromptMessage remove:
+                FillRemoveCounters(client, remove);
+                break;
+
             case UnlessPaysPromptMessage unless:
                 FillUnlessPays(client, unless);
                 break;
@@ -718,6 +722,92 @@ public sealed partial class MainPage
                 Step("−", share > 0, () => _dividedShares[handle] = Math.Max(0, share - 1)),
                 new SymbolText(13, Theme.Fg) { Text = $"{share}  {name}" },
                 Step("+", assigned < prompt.Total && canAddTarget, () => _dividedShares[handle] = share + 1)));
+        }
+    }
+
+    /// <summary>
+    /// Removing counters from among permanents as a cost (CR 118.3): "by removing three counters from among creatures you
+    /// control". Each kind of counter on each permanent the cost may take from is a button that takes one more of them, saying
+    /// how many of how many are taken; a click on a permanent takes one of its own, the first kind with some left. The cost is
+    /// paid once the total is reached.
+    /// </summary>
+    private void FillRemoveCounters(GameClient client, RemoveCountersPromptMessage prompt)
+    {
+        string source = client.Object(prompt.Source)?.Name ?? "A spell";
+        int taken = _selection.CounterRemovals.Values.Sum();
+        string counters = prompt.Total == 1 ? "a counter" : $"{prompt.Total} counters";
+
+        Prompt(
+            $"{source}: remove {counters}",
+            $"Any kinds, from among the permanents shown  ·  {taken} of {prompt.Total} chosen  ·  click a permanent to take one of its counters, or a button below");
+
+        AddButton(
+            $"Remove {counters}",
+            () => Send(client, new CountersRemovedAnswer
+            {
+                Removals =
+                [
+                    .. prompt.Pools
+                        .Select(pool => (pool, n: _selection.CounterRemovals.GetValueOrDefault((pool.Object.Value, pool.Counter))))
+                        .Where(chosen => chosen.n > 0)
+                        .Select(chosen => new CounterPoolMessage { Object = chosen.pool.Object, Counter = chosen.pool.Counter, Count = chosen.n }),
+                ],
+            }),
+            enabled: taken == prompt.Total,
+            primary: true).Tooltip = $"Remove the {counters} chosen" + Suffix(PassKey);
+
+        if (taken > 0)
+        {
+            AddButton("Clear", () =>
+            {
+                _selection.CounterRemovals.Clear();
+                _needsRedraw = true;
+            });
+        }
+
+        foreach (CounterPoolMessage pool in prompt.Pools)
+        {
+            int n = _selection.CounterRemovals.GetValueOrDefault((pool.Object.Value, pool.Counter));
+            ObjectView? card = client.Object(pool.Object);
+            string name = card?.Name ?? "a permanent";
+
+            // Two permanents of one name are told apart by their order on the battlefield: "Walking Ballista #2".
+            List<ViewHandle> named = [.. prompt.Pools.Select(p => p.Object).Distinct().Where(h => client.Object(h)?.Name == card?.Name)];
+            if (named.Count > 1)
+            {
+                name += $" #{named.IndexOf(pool.Object) + 1}";
+            }
+            AddButton(
+                $"Take a {pool.Counter} counter from {name} ({n} of {pool.Count})",
+                () =>
+                {
+                    _selection.CounterRemovals[(pool.Object.Value, pool.Counter)] = n + 1;
+                    _needsRedraw = true;
+                },
+                enabled: n < pool.Count && taken < prompt.Total);
+        }
+    }
+
+    /// <summary>
+    /// A click on a permanent while counters are being removed from among permanents: one more of its counters, of the first
+    /// kind it still has some of, while the total is not reached.
+    /// </summary>
+    private void TakeCounterFrom(RemoveCountersPromptMessage prompt, ViewHandle permanent)
+    {
+        if (_selection.CounterRemovals.Values.Sum() >= prompt.Total)
+        {
+            return;
+        }
+
+        foreach (CounterPoolMessage pool in prompt.Pools.Where(pool => pool.Object == permanent))
+        {
+            int n = _selection.CounterRemovals.GetValueOrDefault((pool.Object.Value, pool.Counter));
+            if (n < pool.Count)
+            {
+                _selection.CounterRemovals[(pool.Object.Value, pool.Counter)] = n + 1;
+                _needsRedraw = true;
+                return;
+            }
         }
     }
 

@@ -438,6 +438,33 @@ public sealed class DecisionTests
     }
 
     [Fact]
+    public void Removes_counters_for_a_cost_one_question_per_counter_naming_kind_and_creature()
+    {
+        // The Ballista's one counter is taken first; then only the Caryatid's are left, which needs no question.
+        var chooser = new ScriptedChooser([1]);
+
+        AnswerPayload answer = new Decisions(chooser).Answer(
+            Seated(Creature(5, "Sylvan Caryatid", 0, 1), Creature(6, "Walking Ballista", 1, 1)),
+            new RemoveCountersPromptMessage
+            {
+                Player = Me,
+                Source = Handle(9),
+                Total = 3,
+                Pools =
+                [
+                    new CounterPoolMessage { Object = Handle(5), Counter = "-1/-1", Count = 2 },
+                    new CounterPoolMessage { Object = Handle(6), Counter = "+1/+1", Count = 1 },
+                ],
+            });
+
+        var removed = Assert.IsType<CountersRemovedAnswer>(answer);
+        Assert.Equal(["5 -1/-1 2", "6 +1/+1 1"], removed.Removals.Select(r => $"{r.Object.Value} {r.Counter} {r.Count}"));
+        Assert.Contains("-1/-1 counter from", chooser.Asked[0].Choices[0], StringComparison.Ordinal);
+        Assert.Contains("+1/+1 counter from", chooser.Asked[0].Choices[1], StringComparison.Ordinal);
+        Assert.Single(chooser.Asked);
+    }
+
+    [Fact]
     public void Chooses_as_many_modes_as_the_spell_asks_for_and_no_repeats()
     {
         var chooser = new ScriptedChooser([1], [0]);

@@ -210,6 +210,7 @@ pub enum ScriptVerb {
     Block,
     AssignDamage,
     Divide,
+    RemoveCounters,
     Target,
     Modes,
     Replace,
@@ -240,7 +241,7 @@ impl ScriptVerb {
         )
     }
 
-    pub const ALL: [ScriptVerb; 30] = [
+    pub const ALL: [ScriptVerb; 31] = [
         ScriptVerb::Play,
         ScriptVerb::Cast,
         ScriptVerb::Activate,
@@ -260,6 +261,7 @@ impl ScriptVerb {
         ScriptVerb::Block,
         ScriptVerb::AssignDamage,
         ScriptVerb::Divide,
+        ScriptVerb::RemoveCounters,
         ScriptVerb::Target,
         ScriptVerb::Modes,
         ScriptVerb::Replace,
@@ -294,6 +296,7 @@ impl ScriptVerb {
             ScriptVerb::Block => "Block",
             ScriptVerb::AssignDamage => "AssignDamage",
             ScriptVerb::Divide => "Divide",
+            ScriptVerb::RemoveCounters => "RemoveCounters",
             ScriptVerb::Target => "Target",
             ScriptVerb::Modes => "Modes",
             ScriptVerb::Replace => "Replace",

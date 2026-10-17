@@ -19,6 +19,7 @@
 //! | `May`                  | `MayPromptMessage` (the verb is the purpose's name)                                |
 //! | `ChoosePlayer`         | `ChoosePlayerPromptMessage`                                                        |
 //! | `ChooseDividedTargets` | `ChooseDividedTargetsPromptMessage`                                                |
+//! | `RemoveCounters`       | `RemoveCountersPromptMessage`                                                      |
 //! | `DeclareAttackers`     | `DeclareAttackersPromptMessage`                                                    |
 //! | `AssignCombatDamage`   | `AssignCombatDamagePromptMessage`                                                  |
 //! | `DeclareBlockers`      | `DeclareBlockersPromptMessage`                                                     |
@@ -77,6 +78,10 @@ pub fn request_objects(request: &Request) -> HashSet<ObjectId> {
         RequestKind::TapForPower { source, cards, .. } | RequestKind::CollectEvidence { source, cards, .. } | RequestKind::Craft { source, cards, .. } => {
             add(&[*source]);
             add(cards);
+        }
+        RequestKind::RemoveCounters { source, pools, .. } => {
+            add(&[*source]);
+            add(&pools.iter().map(|p| p.object).collect::<Vec<_>>());
         }
         RequestKind::DeclareAttackers { eligible, requirements, battles, planeswalkers, .. } => {
             add(battles);
@@ -898,6 +903,17 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             candidates: candidates.iter().map(|&p| seat(p)).collect(),
             verb: (*verb).to_string(),
             amount: i32::from(*amount),
+        }),
+        // Counters removed from among permanents as a cost (CR 118.3): each kind on each permanent, named as the counters on
+        // the table are.
+        RequestKind::RemoveCounters { source, pools, total } => PromptPayload::RemoveCountersPromptMessage(RemoveCountersPrompt {
+            player,
+            source: source_handle(game, handles, *source),
+            total: i32::from(*total),
+            pools: pools
+                .iter()
+                .map(|p| CounterPoolMessage { object: handles.handle(p.object), counter: p.kind.name().to_string(), count: i32::from(p.count) })
+                .collect(),
         }),
         RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional } => {
             let source_handle = source_handle(game, handles, *source);

@@ -39,6 +39,7 @@ public sealed class ProtocolJsonTests
         """{"$type":"ChooseDividedTargetsPromptMessage","Player":1,"Ability":4,"Source":4,"Text":"divided as you choose","Candidates":[{"Player":2,"Object":0},{"Player":0,"Object":5}],"Total":3,"MaxTargets":0,"Optional":false}""",
         """{"$type":"ChooseStartingPlayerPromptMessage","Player":2,"Candidates":[1,2]}""",
         """{"$type":"MulliganPromptMessage","Player":1,"Mulligans":1,"Keeps":6}""",
+        """{"$type":"RemoveCountersPromptMessage","Player":1,"Source":4,"Total":3,"Pools":[{"Object":5,"Counter":"-1/-1","Count":2},{"Object":6,"Counter":"+1/+1","Count":1}]}""",
     ];
 
     public static TheoryData<string> Answers =>
@@ -60,6 +61,7 @@ public sealed class ProtocolJsonTests
         """{"$type":"PlayerChosenAnswer","Player":2}""",
         """{"$type":"ColorsChosenAnswer","Colors":["Blue"]}""",
         """{"$type":"TargetsDividedAnswer","Shares":[{"Target":{"Player":0,"Object":5},"Amount":2},{"Target":{"Player":2,"Object":0},"Amount":1}]}""",
+        """{"$type":"CountersRemovedAnswer","Removals":[{"Object":5,"Counter":"-1/-1","Count":2},{"Object":6,"Counter":"+1/+1","Count":1}]}""",
     ];
 
     public static TheoryData<string> Events =>

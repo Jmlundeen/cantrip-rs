@@ -82,6 +82,11 @@ pub const fn remove_counters(kind: CounterKind, n: u8) -> Cost {
     Cost { remove_counters: Some((kind, n)), ..Cost::NONE }
 }
 
+/// "Remove N counters from among [permanents you control that pass the filter]", of any kinds (CR 118.3, 122.1).
+pub const fn remove_counters_among(n: u8, filter: ObjectFilter) -> Cost {
+    Cost { remove_counters_among: Some((n, filter)), ..Cost::NONE }
+}
+
 /// "Exile N cards from your graveyard" other than this one.
 pub const fn exile_from_graveyard(n: u8) -> Cost {
     Cost { exile_from_graveyard: n, ..Cost::NONE }

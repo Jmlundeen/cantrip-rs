@@ -310,6 +310,7 @@ fn answers(verb: ScriptVerb, kind: &RequestKind) -> bool {
         V::Modes => matches!(kind, RequestKind::ChooseModes { .. } | RequestKind::ChooseSubtype { .. }),
         V::Target => matches!(kind, RequestKind::ChooseTarget { .. }),
         V::Divide => matches!(kind, RequestKind::ChooseDividedTargets { .. }),
+        V::RemoveCounters => matches!(kind, RequestKind::RemoveCounters { .. }),
         V::Colors => matches!(kind, RequestKind::ChooseColors { .. }),
         V::PlayFirst | V::DrawFirst => matches!(kind, RequestKind::ChooseStartingPlayer { .. }),
         V::Mulligan | V::Keep => matches!(kind, RequestKind::Mulligan { .. }),
@@ -336,6 +337,7 @@ fn kind_name(kind: &RequestKind) -> &'static str {
         RequestKind::TapForPower { .. } => "TapForPower",
         RequestKind::CollectEvidence { .. } => "CollectEvidence",
         RequestKind::Craft { .. } => "Craft",
+        RequestKind::RemoveCounters { .. } => "RemoveCounters",
         RequestKind::DeclareAttackers { .. } => "DeclareAttackers",
         RequestKind::DeclareBlockers { .. } => "DeclareBlockers",
         RequestKind::AssignCombatDamage { .. } => "AssignCombatDamage",
@@ -405,6 +407,10 @@ impl<'s> Run<'s> {
             }
             RequestKind::Craft { cards, minimum, maximum, .. } => {
                 format!("Craft {minimum} to {maximum} of [{}]", cards.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
+            }
+            RequestKind::RemoveCounters { pools, total, .. } => {
+                let list: Vec<String> = pools.iter().map(|p| format!("{}: {} {}", name(p.object), p.kind.token(), p.count)).collect();
+                format!("RemoveCounters {total} from among [{}]", list.join("; "))
             }
             other => format!("{} {other:?}", kind_name(other)),
         }
@@ -771,6 +777,7 @@ impl<'s> Run<'s> {
                 Answer::Placements { placements: placements.iter().map(|p| p.iter().map(|&id| one(id)).collect()).collect(), shuffle: *shuffle }
             }
             Answer::Divided(v) => Answer::Divided(v.iter().map(|&(t, n)| (target(t), n)).collect()),
+            Answer::Counters(v) => Answer::Counters(v.iter().map(|&(o, k, n)| (one(o), k, n)).collect()),
             other => other.clone(),
         }
     }
@@ -1028,6 +1035,19 @@ impl<'s> Run<'s> {
             RequestKind::ChooseDividedTargets { candidates, total, .. } => {
                 Answer::Divided(if *total > 0 && !candidates.is_empty() { vec![(candidates[0], *total)] } else { Vec::new() })
             }
+            // Counters from among permanents (CR 118.3): as many as there are from each pool in turn, the first offered first.
+            RequestKind::RemoveCounters { pools, total, .. } => {
+                let mut left = *total as u16;
+                let mut taken = Vec::new();
+                for p in pools {
+                    let n = p.count.min(left);
+                    if n > 0 {
+                        taken.push((p.object, p.kind, n));
+                        left -= n;
+                    }
+                }
+                Answer::Counters(taken)
+            }
             RequestKind::ChooseColors { choices, count, .. } => match self.colors.take() {
                 Some(named) if named.len() == *count as usize && named.iter().all(|&c| choices.has(c)) => Answer::Colors(named),
                 _ => Answer::Colors(choices.iter().take(*count as usize).collect()),
@@ -1115,6 +1135,7 @@ impl<'s> Run<'s> {
                 self.choose_target(step, candidates, *least, *count)?
             }
             (V::Divide, RequestKind::ChooseDividedTargets { candidates, .. }) => Some(self.divide(step, candidates)?),
+            (V::RemoveCounters, RequestKind::RemoveCounters { pools, total, .. }) => Some(self.remove_counters(step, pools, *total)?),
             (V::Colors, RequestKind::ChooseColors { choices, count, .. }) => {
                 let mut colors = Vec::new();
                 for spec in step.positional() {
@@ -1772,6 +1793,50 @@ impl<'s> Run<'s> {
             return fail(format!("line {}: not a choice the question allows", step.line));
         }
         Ok(Answer::Modes(chosen))
+    }
+
+    /// `RemoveCounters(Grizzly Bears: 2; Hill Giant: PlusOnePlusOne 1)`: each permanent named, with how many counters come off
+    /// it, and the kind (as the dump spells it) where it has more than one.
+    fn remove_counters(&self, step: &ActionStep, pools: &[CounterPool], total: u8) -> R<Answer> {
+        let mut objects: Vec<Target> = Vec::new();
+        for p in pools {
+            if !objects.contains(&Target::Object(p.object)) {
+                objects.push(Target::Object(p.object));
+            }
+        }
+        let mut taken = Vec::new();
+        for piece in step.positional() {
+            let Some((who, amount)) = piece.rsplit_once(':') else {
+                return fail(format!("line {}: RemoveCounters wants \"permanent: [kind] amount\", not \"{piece}\"", step.line));
+            };
+            let (kind, amount) = match amount.trim().rsplit_once(' ') {
+                Some((kind, amount)) => (Some(kind.trim()), amount),
+                None => (None, amount.trim()),
+            };
+            let Ok(amount) = amount.parse::<u16>() else {
+                return fail(format!("line {}: {amount} is not a number of counters", step.line));
+            };
+            let Some(Target::Object(object)) = self.target(step, who.trim(), &objects)? else {
+                return fail(format!("line {}: {} has no counters the cost may take", step.line, who.trim()));
+            };
+            let on: Vec<&CounterPool> = pools.iter().filter(|p| p.object == object).collect();
+            let pool = match kind {
+                Some(kind) => on.iter().find(|p| p.kind.token().eq_ignore_ascii_case(kind) || p.kind.name().eq_ignore_ascii_case(kind)),
+                None if on.len() == 1 => on.first(),
+                None => return fail(format!("line {}: {} has more than one kind of counter; name the kind", step.line, who.trim())),
+            };
+            let Some(pool) = pool else {
+                return fail(format!("line {}: {} has no such counters", step.line, who.trim()));
+            };
+            taken.push((object, pool.kind, amount));
+        }
+        // In the order the question offers the pools, as a page answering it sends them, so the two are the same answer.
+        taken.sort_by_key(|&(o, k, _)| pools.iter().position(|p| p.object == o && p.kind == k));
+        let sum: u32 = taken.iter().map(|t| t.2 as u32).sum();
+        if sum != total as u32 {
+            return fail(format!("line {}: {sum} counters named, {total} to remove", step.line));
+        }
+        Ok(Answer::Counters(taken))
     }
 
     /// `Divide(Guerrilla Gorilla: 1; Llanowar Elves: 1)`: each target named, with its share of the total.

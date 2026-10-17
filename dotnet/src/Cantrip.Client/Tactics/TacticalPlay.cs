@@ -292,6 +292,7 @@ public sealed partial class TacticalPlay : IAutoPlayer
             DeclareBlockersPromptMessage blockers => Block(client, view, blockers),
             ChooseTargetPromptMessage target => Target(client, view, target),
             ChooseDividedTargetsPromptMessage divided => Divide(client, view, divided),
+            RemoveCountersPromptMessage remove => RemoveCounters(client, remove),
             ChooseModesPromptMessage modes => Modes(client, view, modes),
             ChooseCardsPromptMessage cards => Cards(client, view, cards),
             SearchLibraryPromptMessage search => Search(client, view, search),

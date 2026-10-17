@@ -890,6 +890,30 @@ public sealed class TacticalPlayTests
     }
 
     [Fact]
+    public void Counters_removed_for_a_cost_are_minus_ones_first_and_never_the_plus_one_a_creature_lives_on()
+    {
+        // "Remove three counters from among creatures you control" (Dawnhand Dissident's casts): the -1/-1 counters cost
+        // nothing to lose, a 0/1 Walking Ballista's only +1/+1 counter is the creature itself, the 3/3's is a point.
+        GameClient client = Seated([Creature(3, "Caryatid", 0, 1), Creature(4, "Ballista", 1, 1), Creature(5, "Bear", 3, 3)]);
+
+        CountersRemovedAnswer answer = Assert.IsType<CountersRemovedAnswer>(Bot().Decide(client, new RemoveCountersPromptMessage
+        {
+            Player = Me,
+            Total = 3,
+            Pools =
+            [
+                new CounterPoolMessage { Object = new ViewHandle(4), Counter = "+1/+1", Count = 1 },
+                new CounterPoolMessage { Object = new ViewHandle(5), Counter = "+1/+1", Count = 1 },
+                new CounterPoolMessage { Object = new ViewHandle(3), Counter = "-1/-1", Count = 2 },
+            ],
+        }));
+
+        Assert.Equal(
+            ["3 -1/-1 2", "5 +1/+1 1"],
+            answer.Removals.Select(r => $"{r.Object.Value} {r.Counter} {r.Count}").Order());
+    }
+
+    [Fact]
     public void A_mode_it_could_not_pay_for_is_not_chosen_over_one_it_could()
     {
         GameClient client = Seated([Creature(3, "Giant", 6, 6, Them)]);

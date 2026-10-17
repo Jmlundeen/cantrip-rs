@@ -189,6 +189,22 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
+        (RequestKind::RemoveCounters { pools, total, .. }, Answer::Counters(taken)) => {
+            let mut sum = 0u32;
+            for (i, &(object, kind, n)) in taken.iter().enumerate() {
+                let Some(pool) = pools.iter().find(|p| p.object == object && p.kind == kind) else {
+                    return no("not a kind of counter on a permanent the cost may take from");
+                };
+                if n == 0 || n > pool.count {
+                    return no(format!("{n} {} counters taken, {} there", kind.name(), pool.count));
+                }
+                if taken[..i].iter().any(|&(o, k, _)| o == object && k == kind) {
+                    return no("the same counters named twice");
+                }
+                sum += n as u32;
+            }
+            if sum != *total as u32 { no(format!("{sum} counters removed, {total} wanted (CR 118.3)")) } else { Ok(()) }
+        }
         (RequestKind::CollectEvidence { cards, values, minimum, .. }, Answer::Cards(chosen)) => {
             let total: u32 = chosen.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| values[i] as u32).sum();
             if !distinct(chosen) || !chosen.iter().all(|c| cards.contains(c)) {

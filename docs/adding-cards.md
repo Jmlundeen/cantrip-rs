@@ -67,7 +67,7 @@ abilities: &[
 ```
 
 - **Costs**: `TAP`, `SACRIFICE_THIS`, `cost("{1}{U}")` (mana symbols as printed, read at compile time; `cost("{1}, {T}")`
-  includes the tap), `loyalty(n)` (and `loyalty_minus_x()` for "−X", X read as `item.x`), `life(n)`, `sacrifice(n, filter)`, `discard(n, filter)`, `remove_counters(kind, n)`,
+  includes the tap), `loyalty(n)` (and `loyalty_minus_x()` for "−X", X read as `item.x`), `life(n)`, `sacrifice(n, filter)`, `discard(n, filter)`, `remove_counters(kind, n)`, `remove_counters_among(n, filter)` ("remove N counters from among creatures you control", any kinds), `blight::cost(n)` (blight N, CR 701.68a),
   `DISCARD_THIS`, `EXILE_THIS`, `EXERT`, joined with `.and(..)`; `return_tapped_to_hand(n, filter)` is "return N tapped
   [permanents]", whose permanents are chosen once the mana is paid, so one tapped for mana while paying may be among
   them (web-slinging, `cantrip_mechanics::web_slinging::way(cost, text)`); craft (CR 702.167a) is
@@ -408,6 +408,12 @@ shapes have an example:
   and the effect goes on. `cantrip_mechanics::land_until_cast::ability::<N>(cost, text)` is the whole "{N}, Exile this
   card from your hand: Target land gains "{T}: Add ..." until this card is cast from exile. You may cast this card for as
   long as it remains exiled" (Emrakul, the Exigent Doom; Glamorous Outlaw and its cycle).
+- **Casting cards in exile by a permanent's static ability** (CR 601.3, 604.1): `CardDef.exile_casts`, an `ExileCast { text,
+  allows, additional }` - `allows(q, asker, card, player)` asked of the permanent with the card as the face that would be cast
+  ("you may cast creature spells from among cards you own exiled with this creature": `q.exiled_with(asker.source)`, its
+  controller, its owner, the turn), and `additional` the cost owed on top of whatever it is cast for (Dawnhand Dissident's
+  `remove_counters_among(3, targets::filters::creature)`; `Cost::NONE` for Rona, Disciple of Gix). The card's own alternative
+  costs stay open to it.
 - **Ward with a cost other than mana** (CR 702.21a, 118.12): `triggers::ward_life::<N>`, `ward_discard`, and
   `ward_sacrifice::<N>` ("Sacrifice N permanents": refused with fewer, and under Tamiyo, Collector of Tales).
 - **Turns**: `DelayedWhen::UntilNextTurnOf(p)`; `DelayedWhen::EachStep` for "at the beginning of each [step] ... for the

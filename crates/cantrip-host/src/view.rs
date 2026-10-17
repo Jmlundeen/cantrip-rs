@@ -1037,6 +1037,14 @@ impl<'a> Projector<'a> {
                 text: self.permission_text(permission),
             });
         }
+        // A permanent's permission to cast a card in exile (CR 601.3), while it would allow the cast: what it adds to the cost
+        // ("Cast by removing three counters from among creatures you control").
+        if zone.is(ZoneKind::Exile) && !s.battlefield().is_empty() {
+            for (player, text) in exile_cast_texts(game, id) {
+                let prefix = if player == self.viewer { String::new() } else { format!("{}: ", self.names.get(player.index()).cloned().unwrap_or_default()) };
+                view.play_permissions.push(PlayPermissionView { seat: seat(player), text: format!("{prefix}{text}") });
+            }
+        }
         if (on_battlefield || zone.is(ZoneKind::Stack)) && !obj.face_down {
             self.ability_changes(&mut view, id, &c, obj.copy);
         }

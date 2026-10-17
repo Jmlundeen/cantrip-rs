@@ -152,6 +152,9 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     if cost.blight > 0 && blight_candidates(cx, controller).is_empty() {
         return false;
     }
+    if !counters_among_payable(cx, source, controller, cost) {
+        return false;
+    }
     if let Some(t) = cost.tap_creatures {
         let (_, powers) = tap_candidates(cx, source, controller, &t);
         if powers.iter().map(|&p| p as u32).sum::<u32>() < t.power as u32 {
@@ -316,6 +319,53 @@ fn choose_blight(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
 fn pay_blight(cx: &mut Cx, cost: &Cost, chosen: Option<ObjectId>) {
     if let Some(creature) = chosen {
         ops::add_counters(cx, creature, CounterKind::MinusOne, cost.blight as i16);
+    }
+}
+
+/// What a cost that removes counters from among permanents may take them from (CR 118.3, 122.1): each kind of counter on
+/// each permanent the payer controls that passes the filter, with how many there are, in battlefield order.
+fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, filter: ObjectFilter) -> Vec<CounterPool> {
+    let asker = Asker { source, controller };
+    let mut pools = Vec::new();
+    for id in cx.permanents_of(controller) {
+        if !filter(cx, &asker, id) {
+            continue;
+        }
+        let obj = cx.s().obj(id);
+        for kind in CounterKind::ALL {
+            let count = obj.counters(kind);
+            if count > 0 {
+                pools.push(CounterPool { object: id, kind, count: count as u16 });
+            }
+        }
+    }
+    pools
+}
+
+/// Whether there are counters enough among the permanents a cost removes them from (CR 118.3).
+fn counters_among_payable(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> bool {
+    cost.remove_counters_among
+        .is_none_or(|(n, filter)| counter_pools(cx, source, controller, filter).iter().map(|p| p.count as u32).sum::<u32>() >= n as u32)
+}
+
+/// Chooses the counters a cost removes from among permanents (CR 601.2h), always asked, even when the choice is forced. Too
+/// few left (some gone since the action was offered) is a cost that can't be paid, and the spell or ability is taken back.
+fn choose_counters_among(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<(ObjectId, CounterKind, u16)>> {
+    let Some((total, filter)) = cost.remove_counters_among else { return Ok(Vec::new()) };
+    let pools = counter_pools(cx, source, player, filter);
+    if pools.iter().map(|p| p.count as u32).sum::<u32>() < total as u32 {
+        return Err(Stop::Cancel);
+    }
+    match cx.ask_core(player, RequestKind::RemoveCounters { source, pools, total }, true)? {
+        Answer::Counters(taken) => Ok(taken),
+        _ => Err(Stop::Cancel),
+    }
+}
+
+/// Pays a removal of counters from among permanents (CR 118.3): each chosen number of each kind comes off its permanent.
+fn pay_counters_among(cx: &mut Cx, taken: &[(ObjectId, CounterKind, u16)]) {
+    for &(object, kind, n) in taken {
+        ops::add_counters(cx, object, kind, -(n as i16));
     }
 }
 
@@ -2016,6 +2066,70 @@ fn granted_ways_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<(Obj
     ways
 }
 
+/// The permissions the permanents on the battlefield give to cast cards in exile (CR 601.3, 604.1), each with the permanent
+/// and its controller. Nothing is allocated while no permanent has one; a permanent that has lost its abilities gives none.
+fn exile_casts_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<(ObjectId, PlayerId, &'static ExileCast)> {
+    let mut casts = Vec::new();
+    for &id in s.battlefield() {
+        let obj = s.obj(id);
+        let def = cards.get(cards.current(obj));
+        if def.exile_casts.is_empty() || crate::layers::lost_all_abilities(cards, s, log, id) {
+            continue;
+        }
+        for cast in def.exile_casts {
+            casts.push((id, obj.controller, cast));
+        }
+    }
+    casts
+}
+
+/// The permissions permanents give now to cast `card`, a card in exile, as itself (CR 601.3): each with the player it lets
+/// cast it and what it is called, for the card's face to say.
+pub fn exile_cast_texts(game: &crate::Game, card: ObjectId) -> Vec<(PlayerId, &'static str)> {
+    let (q, cards, log): (&dyn Query, &CardTable, &[Record]) = (game, game.cards, &game.log);
+    let s = q.state();
+    if !s.obj(card).zone.is(ZoneKind::Exile) {
+        return Vec::new();
+    }
+    exile_casts_of(cards, s, log)
+        .into_iter()
+        .filter(|&(granter, controller, cast)| (cast.allows)(q, &Asker { source: granter, controller }, card, controller))
+        .map(|(_, controller, cast)| (controller, cast.text))
+        .collect()
+}
+
+/// The first of `casts` that lets `player` cast `card` from exile now, as the card itself or, with `face`, as that face of
+/// it (its Adventure or Omen, judged through a view of that face alone, CR 715.3a, 720.3a): the permanent and the permission.
+fn exile_cast_for(
+    cx: &Cx,
+    casts: &[(ObjectId, PlayerId, &'static ExileCast)],
+    card: ObjectId,
+    face: Option<CardId>,
+    player: PlayerId,
+) -> Option<(ObjectId, &'static ExileCast)> {
+    let view = face.map(|face| AsFace { cx, spell: card, face });
+    let q: &dyn Query = match &view {
+        Some(view) => view,
+        None => cx,
+    };
+    casts.iter().find(|&&(granter, controller, c)| (c.allows)(q, &Asker { source: granter, controller }, card, player)).map(|&(granter, _, c)| (granter, c))
+}
+
+/// The permission a permanent gives `player` to cast `card`, a card in exile, as the face `face` (the card itself for
+/// none), if nothing else lets them cast it from there (CR 601.3): a permission of its own, a prepare spell's copy or a card
+/// on an Adventure. What the cast owes on top of its cost (CR 118.8) is the permission's.
+fn exile_cast_permission(cx: &Cx, card: ObjectId, face: Option<CardId>, player: PlayerId) -> Option<(ObjectId, &'static ExileCast)> {
+    let obj = cx.s().obj(card);
+    if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure || obj.card_copy || permission_for(cx, card, player).is_some() {
+        return None;
+    }
+    let casts = exile_casts_of(cx.cards(), cx.s(), &cx.g.log);
+    if casts.is_empty() {
+        return None;
+    }
+    exile_cast_for(cx, &casts, card, face, player)
+}
+
 /// Whether the additional costs a card has (CR 118.8) could be paid, whatever way it is cast.
 fn extra_payable(cx: &Cx, id: ObjectId, player: PlayerId, def: &CardDef) -> bool {
     def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
@@ -2076,6 +2190,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
         .chain(cx.s().seats().map(Zone::exile))
         .filter(|zone| !barred.contains(zone.kind()));
     let granted: std::cell::OnceCell<Vec<(ObjectId, PlayerId, &'static GrantedWay)>> = std::cell::OnceCell::new();
+    let exile_casts: std::cell::OnceCell<Vec<(ObjectId, PlayerId, &'static ExileCast)>> = std::cell::OnceCell::new();
     for zone in zones {
         let own = zone.player == player;
         for &id in cx.s().zone(zone) {
@@ -2092,10 +2207,24 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             let adventured = zone.is(ZoneKind::Exile) && own && obj.on_adventure;
             // Or by a permission to cast it from where it is (CR 601.3), from any zone it was granted for.
             let permitted = !zone.is(ZoneKind::Hand) && permission_for(cx, id, player).is_some();
-            if zone.is(ZoneKind::Exile) && !prepared_copy && !adventured && !permitted {
+            // Or by a static ability of a permanent that lets cards in exile be cast (CR 601.3, 604.1), judged on the card
+            // as itself here and on its Adventure or Omen below: one that is not otherwise castable from there.
+            let def = cx.card(obj.card);
+            let by_exile_cast = zone.is(ZoneKind::Exile) && !prepared_copy && !adventured && !permitted;
+            let casts: &[(ObjectId, PlayerId, &'static ExileCast)] =
+                if by_exile_cast { exile_casts.get_or_init(|| exile_casts_of(cx.cards(), cx.s(), &cx.g.log)) } else { &[] };
+            let exile_cast = if casts.is_empty() { None } else { exile_cast_for(cx, casts, id, None, player) };
+            if by_exile_cast
+                && exile_cast.is_none()
+                && (casts.is_empty() || def.inset_faces().all(|(_, _, inset)| exile_cast_for(cx, casts, id, Some(cx.card_id(inset)), player).is_none()))
+            {
                 continue;
             }
-            let def = cx.card(obj.card);
+            // The additional cost the permission adds to every way it casts the card by (CR 118.8, 601.2f), and whether it
+            // could be paid.
+            let additional = exile_cast.map(|(_, c)| c.additional);
+            let additional_payable = additional.is_none_or(|a| can_pay_other(cx, id, player, &a));
+            let permitted = permitted || exile_cast.is_some();
             // A land card is played, never cast (CR 305.1, 305.9), but one with an Adventure may be cast as that (CR 715.3:
             // Lindblum, Industrial Regency's Mage Siege), and only as that.
             let land = def.is(CardType::Land);
@@ -2134,6 +2263,7 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                 if def.split.is_none()
                     && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted || from_graveyard || retrace)
                     && (def.has_cost || instead.is_some())
+                    && additional_payable
                     && def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
                     && (def.additional_choice.is_empty()
                         || def.additional_choice.iter().any(|c| can_pay_other(cx, id, player, &c.cost)))
@@ -2142,6 +2272,9 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     let covered = |targets: &[Target]| {
                         let mut least = least_cost(cx, a, player, id, def, instead.unwrap_or(def.cost), targets);
                         least.generic = least.generic.saturating_add(more);
+                        if let Some(additional) = additional {
+                            least = add_cost(least, additional.mana);
+                        }
                         if any_type {
                             // Mana of any type pays every symbol of it (CR 609.4b).
                             least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
@@ -2178,11 +2311,11 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                         continue;
                     }
                     // An additional cost is owed with every way of casting it (CR 118.8, 601.2f).
-                    if !can_pay_other(cx, id, player, &way.cost) || !extra_payable(cx, id, player, def) {
+                    if !can_pay_other(cx, id, player, &way.cost) || !extra_payable(cx, id, player, def) || !additional_payable {
                         continue;
                     }
                     let a = available.get_or_init(|| self::available(cx, player));
-                    if !way_covered(cx, a, player, id, def, &way.cost) {
+                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra))) {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
@@ -2218,11 +2351,11 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
                     {
                         continue;
                     }
-                    if !can_pay_other(cx, id, player, &way.cost) || !extra_payable(cx, id, player, def) {
+                    if !can_pay_other(cx, id, player, &way.cost) || !extra_payable(cx, id, player, def) || !additional_payable {
                         continue;
                     }
                     let a = available.get_or_init(|| self::available(cx, player));
-                    if !way_covered(cx, a, player, id, def, &way.cost) {
+                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra))) {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
@@ -2320,17 +2453,29 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             // pay - but not by the permission an Adventure gives a card it exiled (CR 715.3d). At the speed of that face's
             // own type, and judged by that face alone (CR 715.3a, 720.3a).
             let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
-            if zone.is(ZoneKind::Hand) || permitted || from_graveyard {
+            if zone.is(ZoneKind::Hand) || permitted || from_graveyard || by_exile_cast {
                 for (way, _, inset) in def.inset_faces() {
                     let face_instant = speed.face(inset) && !grant.is_some_and(|g| g.sorcery_speed);
                     if face_instant != instants {
                         continue;
                     }
+                    // A permanent's permission to cast from exile is judged on the face (CR 715.3a, 720.3a).
+                    let face_additional = if by_exile_cast {
+                        match exile_cast_for(cx, casts, id, Some(cx.card_id(inset)), player) {
+                            Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(c.additional),
+                            _ => continue,
+                        }
+                    } else {
+                        None
+                    };
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
                     if {
                         let a = available.get_or_init(|| self::available(cx, player));
                         let mut least = least_cost(cx, a, player, id, inset, instead.unwrap_or(inset.cost), &[]);
                         least.generic = least.generic.saturating_add(more);
+                        if let Some(additional) = face_additional {
+                            least = add_cost(least, additional.mana);
+                        }
                         if any_type {
                             // Mana of any type pays every symbol of it (CR 609.4b).
                             least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
@@ -2525,6 +2670,14 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
             format!("Cast by paying {cost} instead").into()
         };
     }
+    // A card in exile cast by a permanent's permission (CR 601.3) says what the permission adds: "Cast by removing three counters
+    // from among creatures you control". The permanent it was exiled with, if that is one that gives such permission.
+    // Cast for an alternative cost or as another face the same way, the way says so too: "Evoke (cast by removing ...)".
+    if option.kind == ActionKind::CastSpell
+        && let Some(text) = exile_cast_text(cards, state, log, source)
+    {
+        return if option.index == 0 { text.into() } else { format!("{} ({})", describe_way(cards, state, log, option, source), lowercase_first(text)).into() };
+    }
     // A granted cast of a card that can be cast as more than one face (a Room's doors) names the face: "Unholy Annex: Once
     // during each of your turns, ...".
     if option.kind == ActionKind::CastSpell
@@ -2538,6 +2691,23 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
         }
     }
     describe_way(cards, state, log, option, source).into()
+}
+
+/// The text of the permission of the permanent a card in exile was exiled with, if that permanent gives one to cast cards in
+/// exile (CR 601.3) and nothing else lets the card be cast from there (a play permission of its own, an Adventure, a prepare
+/// copy). Read without asking whether it allows the cast: the option it describes was offered because it did.
+fn exile_cast_text(cards: &CardTable, state: &GameState, log: &[Record], card: ObjectId) -> Option<&'static str> {
+    let obj = state.obj(card);
+    if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure || obj.card_copy || state.permissions.iter().any(|p| p.card == card) {
+        return None;
+    }
+    let by = obj.exiled?.by;
+    exile_casts_of(cards, state, log).into_iter().find(|&(granter, _, _)| granter == by).map(|(_, _, cast)| cast.text)
+}
+
+fn lowercase_first(text: &str) -> String {
+    let mut chars = text.chars();
+    chars.next().map_or_else(String::new, |c| c.to_lowercase().chain(chars).collect())
 }
 
 fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption, source: ObjectId) -> &'static str {
@@ -2707,7 +2877,7 @@ fn cast(
     terms: CastTerms,
     resolving: bool,
 ) -> R<()> {
-    let CastTerms { instead, any_type, exile_after, flashback, life, more, less, copy: _, way: _ } = terms;
+    let CastTerms { instead, any_type, exile_after, flashback, life, more, less, copy, way: _ } = terms;
     // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own.
     let granted = granted_slot(way);
     let way = granted.map_or(way, |(_, face)| granted_face_way(face));
@@ -2736,6 +2906,9 @@ fn cast(
     };
     let def = inset.or(back).or(bestow).or(half).unwrap_or(whole);
     let face = cx.card_id(def);
+    // Cast from exile by a permanent's permission (CR 601.3), it owes what the permission adds (CR 118.8, 601.2f): found now, as
+    // the cast begins, so the permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling).
+    let exile_permit = if resolving || copy { None } else { exile_cast_permission(cx, card, inset.map(|_| face), player) };
     // Flashback (CR 702.34a) a permission or a permanent gave, or aftermath (CR 702.127a): exiled instead of put anywhere
     // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
     let flashback = flashback || def.aftermath || granted.is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.flashback);
@@ -2801,6 +2974,9 @@ fn cast(
     let specs: &[TargetSpec] = if way == WAY_OVERLOAD { &[] } else { def.spell_targets() };
     // CR 118.8: an additional cost is owed with every way of casting it; its mana joins the total.
     let mut extra = def.additional_cost.unwrap_or(Cost::NONE);
+    if let Some((_, permission)) = exile_permit {
+        extra = extra.and(permission.additional);
+    }
     if retraced {
         extra = extra.and(RETRACE);
     }
@@ -2820,8 +2996,9 @@ fn cast(
     // CR 601.2b: an additional cost that is one of several is chosen now, before X (as the C# engine asks it).
     if !def.additional_choice.is_empty() {
         let pick = choose_additional(cx, player, spell, face, def)?;
-        extra = pick;
-        cost.mana = add_cost(cost.mana, extra.mana);
+        // With what is owed already (a permission's additional cost, CR 118.8), not instead of it.
+        extra = extra.and(pick);
+        cost.mana = add_cost(cost.mana, pick.mana);
     }
 
     // CR 601.2b: an optional cost that is not mana (teamwork) is announced like a kicker: paid or not, before any target.
@@ -3064,6 +3241,8 @@ fn cast(
     let extra_beheld = choose_behold(cx, player, spell, &extra)?;
     let blighted = choose_blight(cx, player, spell, &cost)?;
     let extra_blighted = choose_blight(cx, player, spell, &extra)?;
+    let removed = choose_counters_among(cx, player, spell, &cost)?;
+    let extra_removed = choose_counters_among(cx, player, spell, &extra)?;
     let (extra_sacrifices, extra_exiles) = choose_variable(cx, player, spell, &extra, item.x)?;
     // An optional cost that sacrifices one or more: how many were is how many times it was paid (Plumb the Forbidden's
     // linked trigger reads it).
@@ -3098,6 +3277,12 @@ fn cast(
         o.cast_way = way;
         o.x = item.x;
     });
+    // Counters put on and taken off permanents are paid first (CR 601.2h: in any order), so a permanent the cost also
+    // sacrifices leaves with them as the payment left it.
+    pay_blight(cx, &cost, blighted);
+    pay_blight(cx, &extra, extra_blighted);
+    pay_counters_among(cx, &removed);
+    pay_counters_among(cx, &extra_removed);
     pay_permanents(cx, &cost, &chosen);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
@@ -3109,8 +3294,6 @@ fn cast(
     pay_permanents(cx, &extra, &extra_chosen);
     pay_behold(cx, player, &beheld);
     pay_behold(cx, player, &extra_beheld);
-    pay_blight(cx, &cost, blighted);
-    pay_blight(cx, &extra, extra_blighted);
     ops::sacrifice(cx, &extra_sacrifices);
     pay_discards(cx, &extra_discards);
     pay_life_and_counters(cx, player, spell, &extra);
@@ -3798,9 +3981,8 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // here, so nothing that happens to a target later changes what is paid.
     mana = apply_cost_changes(cx, player, Costed::Ability(source, ability), mana, &targets);
 
-    // Behold and blight are paid when a spell is cast only (CR 701.4a, 701.68a): an activated ability that had them would
-    // get the cost for free.
-    assert!(def.cost.behold.is_none() && def.cost.blight == 0, "an activated ability's behold or blight is not built");
+    // Behold is paid when a spell is cast only (CR 701.4a): an activated ability that had it would get the cost for free.
+    assert!(def.cost.behold.is_none(), "an activated ability's behold is not built");
     // A cost of tapped permanents is chosen once the mana is paid (CR 601.2g-h), which only a spell's does yet: no
     // activated ability has one.
     // `every_activated_ability_has_a_cost_activation_can_pay` (cantrip-engine) refuses such a card before any game.
@@ -3845,6 +4027,14 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // they are chosen now, from what is still there, so a Black Lotus sacrificed for the mana is no material. Too few left
     // is a cost that can't be paid, and the activation is taken back.
     let materials = choose_materials(cx, player, source, &def.cost)?;
+    // The creature a blight puts its counters on (CR 701.68a) and the counters removed from among permanents (CR 118.3) are
+    // chosen as they are paid, after the mana abilities (CR 601.2g-h by way of 602.2b), as a spell's additional cost's are:
+    // from what is there once the mana is paid. With no creature left to blight the cost can't be paid (CR 701.68b).
+    if def.cost.blight > 0 && blight_candidates(cx, player).is_empty() {
+        return Err(Stop::Cancel);
+    }
+    let blighted = choose_blight(cx, player, source, &def.cost)?;
+    let removed = choose_counters_among(cx, player, source, &def.cost)?;
     if life > 0 {
         ops::change_life(cx, player, -(life as i32));
     }
@@ -3855,6 +4045,9 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     if def.cost.tap {
         ops::tap(cx, source);
     }
+    // Counters put on and taken off permanents next, so a permanent the cost also sacrifices leaves with them.
+    pay_blight(cx, &def.cost, blighted);
+    pay_counters_among(cx, &removed);
     pay_permanents(cx, &def.cost, &chosen);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
@@ -4761,6 +4954,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
         loyalty,
         remove_counters,
         remove_any_counter,
+        remove_counters_among,
         exile_self,
         discard,
         pay_x_life,
@@ -4787,6 +4981,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
         && permanents.is_none()
         && loyalty.is_none()
         && remove_counters.is_none()
+        && remove_counters_among.is_none()
         && discard.is_none()
         && exile_from_graveyard == 0
         && exile_from_graveyard_of.is_none()

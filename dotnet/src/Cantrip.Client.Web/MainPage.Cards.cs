@@ -93,6 +93,10 @@ public sealed partial class MainPage
                 _eligible.UnionWith(divide.Candidates.Where(candidate => !candidate.IsPlayer).Select(candidate => candidate.Object.Value));
                 break;
 
+            case RemoveCountersPromptMessage remove:
+                _eligible.UnionWith(remove.Pools.Select(pool => pool.Object.Value));
+                break;
+
             case AssignCombatDamagePromptMessage assign when _shares.Count == 0:
                 // Seeded from the engine's own division, which is already legal, so confirming without touching it is
                 // a valid answer.
@@ -295,6 +299,16 @@ public sealed partial class MainPage
 
             DeclareAttackersPromptMessage or DeclareBlockersPromptMessage =>
                 new CardLook(Dimmed: card.Controller == client.Seat && card.CardTypes.Contains(CardTypeView.Creature)),
+
+            // A permanent whose counters a cost may take (CR 118.3): a click takes one more of them, and it says how many are taken.
+            RemoveCountersPromptMessage remove when remove.Pools.Any(pool => pool.Object == card.Handle) =>
+                new CardLook(
+                    Selected: remove.Pools.Any(pool => pool.Object == card.Handle && _selection.CounterRemovals.GetValueOrDefault((handle, pool.Counter)) > 0),
+                    Actionable: true,
+                    Note: CountersTakenNote(remove, card.Handle),
+                    Clicked: () => TakeCounterFrom(remove, card.Handle)),
+
+            RemoveCountersPromptMessage when card.Zone == ZoneKindView.Battlefield => new CardLook(Dimmed: true),
 
             // A divided slot's candidates wear their shares (CR 601.2d); a click on one adds to its share, as its + does.
             ChooseDividedTargetsPromptMessage divide when divide.Candidates.Any(candidate => !candidate.IsPlayer && candidate.Object == card.Handle) =>
@@ -898,6 +912,25 @@ public sealed partial class MainPage
             "|",
             (_shares.Where(pair => pair.Key.Creature == handle).Sum(pair => pair.Value) + _dividedShares.GetValueOrDefault(handle)).ToString(System.Globalization.CultureInfo.InvariantCulture),
             "|",
+            _selection.CounterRemovals.Where(pair => pair.Key.Object == handle).Sum(pair => pair.Value).ToString(System.Globalization.CultureInfo.InvariantCulture),
+            "|",
             _actions.For(card.Handle).Count.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
+    /// What a permanent says while a cost removes counters from among permanents: how many of each kind of its counters are taken,
+    /// "2 of 2 -1/-1 counters taken", or that a click takes one.
+    /// </summary>
+    private string CountersTakenNote(RemoveCountersPromptMessage prompt, ViewHandle permanent)
+    {
+        List<string> taken =
+        [
+            .. prompt.Pools
+                .Where(pool => pool.Object == permanent)
+                .Select(pool => (pool, n: _selection.CounterRemovals.GetValueOrDefault((pool.Object.Value, pool.Counter))))
+                .Where(chosen => chosen.n > 0)
+                .Select(chosen => $"{chosen.n} of {chosen.pool.Count} {chosen.pool.Counter} counter{(chosen.pool.Count == 1 ? string.Empty : "s")} taken"),
+        ];
+        return taken.Count > 0 ? string.Join("; ", taken) + "." : "Click to take one of its counters.";
     }
 }

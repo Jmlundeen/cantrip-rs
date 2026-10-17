@@ -895,6 +895,7 @@ public sealed class AnswerMessage : ClientMessage
 [Union(18, typeof(ChooseDividedTargetsPromptMessage))]
 [Union(19, typeof(ChooseStartingPlayerPromptMessage))]
 [Union(20, typeof(MulliganPromptMessage))]
+[Union(21, typeof(RemoveCountersPromptMessage))]
 public abstract class PromptPayload
 {
     /// <summary>
@@ -1508,6 +1509,66 @@ public sealed class MulliganPromptMessage : PromptPayload
 
     /// <summary>Keeping.</summary>
     public override AnswerPayload Default() => new MayChosenAnswer { Accept = false };
+}
+
+/// <summary>
+/// This client removes <see cref="Total"/> counters, of any kinds, from among permanents as part of a cost (CR 118.3, 122.1):
+/// "by removing three counters from among creatures you control" (Dawnhand Dissident). Each of <see cref="Pools"/> is the
+/// counters of one kind on one permanent, with how many there are; any of them may be taken, adding up to the total.
+/// Answered with a <see cref="CountersRemovedAnswer"/>.
+/// </summary>
+[MessagePackObject]
+public sealed class RemoveCountersPromptMessage : PromptPayload
+{
+    [Key(0)]
+    public int Player { get; set; }
+
+    /// <summary>The spell being cast or the ability being activated whose cost this is.</summary>
+    [Key(1)]
+    public ViewHandle Source { get; set; }
+
+    /// <summary>How many counters come off in all.</summary>
+    [Key(2)]
+    public int Total { get; set; }
+
+    [Key(3)]
+    public List<CounterPoolMessage> Pools { get; set; } = [];
+
+    /// <summary>As many as there are from each pool in turn, the first offered first, until the total is reached.</summary>
+    public override AnswerPayload Default()
+    {
+        int left = Math.Max(0, Total);
+        List<CounterPoolMessage> removals = [];
+        foreach (CounterPoolMessage pool in Pools)
+        {
+            int n = Math.Min(pool.Count, left);
+            if (n > 0)
+            {
+                removals.Add(new CounterPoolMessage { Object = pool.Object, Counter = pool.Counter, Count = n });
+                left -= n;
+            }
+        }
+
+        return new CountersRemovedAnswer { Removals = removals };
+    }
+}
+
+/// <summary>
+/// Counters of one kind on one permanent: in a <see cref="RemoveCountersPromptMessage"/> how many it has, in a
+/// <see cref="CountersRemovedAnswer"/> how many come off. <see cref="Counter"/> names the kind as <see cref="CounterView"/>
+/// does (<c>+1/+1</c>, <c>stun</c>).
+/// </summary>
+[MessagePackObject]
+public sealed class CounterPoolMessage
+{
+    [Key(0)]
+    public ViewHandle Object { get; set; }
+
+    [Key(1)]
+    public string Counter { get; set; } = string.Empty;
+
+    [Key(2)]
+    public int Count { get; set; }
 }
 
 /// <summary>
@@ -2494,7 +2555,16 @@ public sealed class DamageShareMessage
 [Union(14, typeof(PlayerChosenAnswer))]
 [Union(15, typeof(ColorsChosenAnswer))]
 [Union(16, typeof(TargetsDividedAnswer))]
+[Union(17, typeof(CountersRemovedAnswer))]
 public abstract class AnswerPayload;
+
+/// <summary>The counters taken for a <see cref="RemoveCountersPromptMessage"/>: how many of each kind from each permanent.</summary>
+[MessagePackObject]
+public sealed class CountersRemovedAnswer : AnswerPayload
+{
+    [Key(0)]
+    public List<CounterPoolMessage> Removals { get; set; } = [];
+}
 
 /// <summary>Gives up the spell or ability being announced, in answer to any prompt that <see cref="PromptMessage.MayCancel"/>.</summary>
 [MessagePackObject]

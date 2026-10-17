@@ -51,6 +51,7 @@ keeps it).
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 | [KI-36](#ki-36-an-ability-that-loses-its-sources-abilities-stops-applying-in-its-later-layers) | An ability that loses its source's abilities stops applying in its later layers | Low | Open |
 | [KI-37](#ki-37-a-sideboard-card-the-engine-does-not-have-is-left-out-of-the-game) | A sideboard card the engine does not have is left out of the game | Low | Open |
+| [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
 
 ## Issues
 
@@ -372,3 +373,16 @@ outside the game cannot choose it. Limited pools are the cube's ported cards, so
 card, or has the deck loader refuse the list.
 
 **Scenarios.** `cantrip-host`'s `a_sideboard_card_the_engine_does_not_have_is_left_out`.
+### KI-38: An activated ability whose cost removes counters from among permanents is unexercised
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-16, building Dawnhand Dissident's casts |
+
+**Notes.** `Cost::remove_counters_among` ("remove N counters from among creatures you control", CR 118.3) is chosen and paid by
+`actions::activate` as well as by `actions::cast`, but only a cast pays it in content (Dawnhand Dissident's permission). Tayam,
+Luminous Enigma's "{3}, Remove three counters from among creatures you control" is the printed activated ability it is built for;
+the activation path chooses the counters after the mana, as blight's, and removes them with the rest of the cost. When a card with
+it is added, its scenarios exercise this path.
+
+**Scenarios.** None yet: no card in content has the cost on an activated ability.

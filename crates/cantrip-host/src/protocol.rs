@@ -814,6 +814,7 @@ pub enum PromptPayload {
     ChoosePlayerPromptMessage(ChoosePlayerPrompt),
     ChooseColorsPromptMessage(ChooseColorsPrompt),
     ChooseDividedTargetsPromptMessage(ChooseDividedTargetsPrompt),
+    RemoveCountersPromptMessage(RemoveCountersPrompt),
     ChooseStartingPlayerPromptMessage(ChooseStartingPlayerPrompt),
     MulliganPromptMessage(MulliganPrompt),
 }
@@ -1132,6 +1133,43 @@ pub struct ChooseDividedTargetsPrompt {
     pub optional: bool,
 }
 
+/// Remove `Total` counters, of any kinds, from among permanents, as part of a cost (CR 118.3, 122.1): "remove three counters
+/// from among creatures you control". Each of `Pools` is the counters of one kind on one permanent, with how many there are;
+/// the answer takes some from any of them, adding up to `Total`. `Source` is the spell or ability whose cost it is.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct RemoveCountersPrompt {
+    pub player: i32,
+    pub source: ViewHandle,
+    pub total: i32,
+    pub pools: Vec<CounterPoolMessage>,
+}
+
+/// Counters of one kind on one permanent: `Counter` names the kind as `CounterView` does (`+1/+1`, `stun`).
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct CounterPoolMessage {
+    pub object: ViewHandle,
+    pub counter: String,
+    pub count: i32,
+}
+
+impl RemoveCountersPrompt {
+    /// As many as there are from each pool in turn, the first offered first, until the total is reached.
+    pub fn default_removals(&self) -> Vec<CounterPoolMessage> {
+        let mut left = self.total.max(0);
+        let mut out = Vec::new();
+        for p in &self.pools {
+            let n = p.count.min(left);
+            if n > 0 {
+                out.push(CounterPoolMessage { object: p.object, counter: p.counter.clone(), count: n });
+                left -= n;
+            }
+        }
+        out
+    }
+}
+
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ChooseStartingPlayerPrompt {
@@ -1149,7 +1187,7 @@ pub struct MulliganPrompt {
 
 // --- Answers ---
 
-/// What a player answers, one of 17 kinds, each the C# class of the same name.
+/// What a player answers, one of 18 kinds, each the C# class of the same name.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "$type")]
 pub enum AnswerPayload {
@@ -1170,6 +1208,7 @@ pub enum AnswerPayload {
     PlayerChosenAnswer(PlayerChosenAnswer),
     ColorsChosenAnswer(ColorsChosenAnswer),
     TargetsDividedAnswer(TargetsDividedAnswer),
+    CountersRemovedAnswer(CountersRemovedAnswer),
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1317,6 +1356,13 @@ pub struct TargetsDividedAnswer {
     pub shares: Vec<TargetShareMessage>,
 }
 
+/// The counters taken for a `RemoveCountersPromptMessage`: how many of each kind from each permanent.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct CountersRemovedAnswer {
+    pub removals: Vec<CounterPoolMessage>,
+}
+
 impl PromptPayload {
     /// The seat being asked.
     pub fn player(&self) -> i32 {
@@ -1340,6 +1386,7 @@ impl PromptPayload {
             PromptPayload::ChoosePlayerPromptMessage(p) => p.player,
             PromptPayload::ChooseColorsPromptMessage(p) => p.player,
             PromptPayload::ChooseDividedTargetsPromptMessage(p) => p.player,
+            PromptPayload::RemoveCountersPromptMessage(p) => p.player,
             PromptPayload::ChooseStartingPlayerPromptMessage(p) => p.player,
             PromptPayload::MulliganPromptMessage(p) => p.player,
         }
@@ -1367,6 +1414,7 @@ impl PromptPayload {
             PromptPayload::ChoosePlayerPromptMessage(_) => "ChoosePlayerPromptMessage",
             PromptPayload::ChooseColorsPromptMessage(_) => "ChooseColorsPromptMessage",
             PromptPayload::ChooseDividedTargetsPromptMessage(_) => "ChooseDividedTargetsPromptMessage",
+            PromptPayload::RemoveCountersPromptMessage(_) => "RemoveCountersPromptMessage",
             PromptPayload::ChooseStartingPlayerPromptMessage(_) => "ChooseStartingPlayerPromptMessage",
             PromptPayload::MulliganPromptMessage(_) => "MulliganPromptMessage",
         }
@@ -1483,6 +1531,7 @@ impl PromptPayload {
                     _ => Vec::new(),
                 },
             }),
+            PromptPayload::RemoveCountersPromptMessage(p) => AnswerPayload::CountersRemovedAnswer(CountersRemovedAnswer { removals: p.default_removals() }),
             PromptPayload::ChooseStartingPlayerPromptMessage(p) => AnswerPayload::PlayerChosenAnswer(PlayerChosenAnswer { player: p.player }),
             PromptPayload::MulliganPromptMessage(_) => AnswerPayload::MayChosenAnswer(MayChosenAnswer { accept: false }),
         }

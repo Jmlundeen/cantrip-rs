@@ -325,6 +325,11 @@ pub enum RequestKind {
     /// and cards in their graveyard, each one of what `quality` names ("artifact", "creature"). An exact number of
     /// materials has `minimum == maximum`; "one or more" has `maximum` of every card offered.
     Craft { source: ObjectId, cards: Vec<ObjectId>, minimum: u8, maximum: u8, quality: &'static str },
+    /// Remove `total` counters from among permanents (CR 118.3, 122.1): "remove three counters from among creatures you
+    /// control" (Dawnhand Dissident; Tayam, Luminous Enigma). Each of `pools` is the counters of one kind on one permanent,
+    /// with how many there are; any of them may be taken, of any kind and from any of the permanents, adding up to `total`.
+    /// Answered with `Answer::Counters`.
+    RemoveCounters { source: ObjectId, pools: Vec<CounterPool>, total: u8 },
     /// The targets of a slot that divides a total among them, and each one's share (CR 601.2d): "distribute two +1/+1
     /// counters among up to two target creatures". At most `max_targets` of `candidates` (any number when 0), each with a
     /// share of at least 1, adding up to `total`; none at all when the slot is `optional`.
@@ -381,6 +386,14 @@ pub enum RequestKind {
         damage: Option<DamageAbout>,
         turn: bool,
     },
+}
+
+/// The counters of one kind on one permanent that a `RequestKind::RemoveCounters` may take from, and how many it has.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct CounterPool {
+    pub object: ObjectId,
+    pub kind: CounterKind,
+    pub count: u16,
 }
 
 /// Damage a question about replacement effects is about (CR 616.1): its source, whom it would be dealt to and how much.
@@ -779,6 +792,8 @@ pub enum Answer {
     Divided(Vec<(Target, u16)>),
     /// Give up the spell or ability being announced (CR 733.1).
     Cancel,
+    /// The counters removed for a `RequestKind::RemoveCounters`: how many of each kind from each permanent.
+    Counters(Vec<(ObjectId, CounterKind, u16)>),
     /// The index of the option chosen, for a question of one-of-several (which replacement effect applies first).
     Index(u8),
 }

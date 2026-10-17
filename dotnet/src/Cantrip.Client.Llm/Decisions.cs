@@ -137,6 +137,7 @@ public sealed class Decisions
             AssignCombatDamagePromptMessage damage => Damage(client, damage),
             ChooseTargetPromptMessage target => Target(client, target),
             ChooseDividedTargetsPromptMessage divided => Divided(client, divided),
+            RemoveCountersPromptMessage remove => RemoveCounters(client, remove),
             ChooseModesPromptMessage modes => Modes(client, modes),
             ChooseCardsPromptMessage cards => Cards(client, cards),
             SearchLibraryPromptMessage search => Search(client, search),
@@ -1021,6 +1022,38 @@ public sealed class Decisions
         return new TargetsDividedAnswer
         {
             Shares = [.. chosen.Select((target, i) => new TargetShareMessage { Target = target, Amount = amounts[i] })],
+        };
+    }
+
+    /// <summary>
+    /// Removes counters from among this seat's permanents as a cost (CR 118.3): one question per counter, which kind from which
+    /// permanent, among those with some left, so a -1/-1 counter taken off is told apart from a +1/+1 counter lost.
+    /// </summary>
+    private AnswerPayload RemoveCounters(GameClient client, RemoveCountersPromptMessage prompt)
+    {
+        int[] taken = new int[prompt.Pools.Count];
+        for (int i = 0; i < prompt.Total; i++)
+        {
+            List<int> open = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] < prompt.Pools[p].Count)];
+            if (open.Count == 0)
+            {
+                return prompt.Default();
+            }
+
+            int pick = open.Count == 1 ? 0 : One(new Question
+            {
+                Heading = $"To pay {GameText.Named(client, prompt.Source)}'s cost you remove {prompt.Total} counters from among your permanents "
+                    + $"({i} removed so far). Which counter do you remove next?",
+                Choices = [.. open.Select(p =>
+                    $"A {prompt.Pools[p].Counter} counter from {GameText.Named(client, prompt.Pools[p].Object)} ({prompt.Pools[p].Count - taken[p]} left on it)")],
+            });
+            taken[open[pick]]++;
+        }
+
+        return new CountersRemovedAnswer
+        {
+            Removals = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] > 0).Select(p =>
+                new CounterPoolMessage { Object = prompt.Pools[p].Object, Counter = prompt.Pools[p].Counter, Count = taken[p] })],
         };
     }
 

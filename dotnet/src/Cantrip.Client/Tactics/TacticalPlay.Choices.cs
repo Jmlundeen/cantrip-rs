@@ -78,6 +78,72 @@ public sealed partial class TacticalPlay
     }
 
     /// <summary>
+    /// Removes counters from among this seat's permanents as a cost (CR 118.3), one at a time, each the one that costs least to
+    /// lose: a -1/-1 or stun counter first, whose loss helps; then a counter of another kind; a +1/+1 counter last, and one whose
+    /// loss would leave its creature dead only when nothing else is left.
+    /// </summary>
+    private AnswerPayload RemoveCounters(GameClient client, RemoveCountersPromptMessage prompt)
+    {
+        int[] taken = new int[prompt.Pools.Count];
+        for (int i = 0; i < prompt.Total; i++)
+        {
+            int best = -1;
+            double cheapest = double.MaxValue;
+            for (int p = 0; p < prompt.Pools.Count; p++)
+            {
+                if (taken[p] >= prompt.Pools[p].Count)
+                {
+                    continue;
+                }
+
+                double cost = CounterLoss(client, prompt, taken, p);
+                if (cost < cheapest)
+                {
+                    cheapest = cost;
+                    best = p;
+                }
+            }
+
+            if (best < 0)
+            {
+                return prompt.Default();
+            }
+
+            taken[best]++;
+        }
+
+        return new CountersRemovedAnswer
+        {
+            Removals = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] > 0).Select(p =>
+                new CounterPoolMessage { Object = prompt.Pools[p].Object, Counter = prompt.Pools[p].Counter, Count = taken[p] })],
+        };
+    }
+
+    /// <summary>What losing one more counter of pool <paramref name="p"/> costs, with those already <paramref name="taken"/>.</summary>
+    private double CounterLoss(GameClient client, RemoveCountersPromptMessage prompt, int[] taken, int p)
+    {
+        CounterPoolMessage pool = prompt.Pools[p];
+        if (pool.Counter is "-1/-1" or "stun")
+        {
+            return -1;
+        }
+
+        if (pool.Counter != "+1/+1")
+        {
+            return 2;
+        }
+
+        // A +1/+1 counter is a point of power and toughness; the last ones a creature's toughness stands on, the creature.
+        ObjectView? creature = client.Object(pool.Object);
+        // Its toughness as the counters already taken leave it: each +1/+1 one less, each -1/-1 one more.
+        int change = Enumerable.Range(0, prompt.Pools.Count)
+            .Where(q => prompt.Pools[q].Object == pool.Object)
+            .Sum(q => prompt.Pools[q].Counter switch { "+1/+1" => -taken[q], "-1/-1" => taken[q], _ => 0 });
+        bool dies = creature is { Toughness: { } toughness } && toughness + change - 1 <= creature.DamageMarked;
+        return dies ? 10 + _model.Worth(creature!) : 3;
+    }
+
+    /// <summary>
     /// Divides damage among targets (CR 601.2d): lethal to each creature worth killing, the ones worth most per point
     /// first, and whatever is left at the opponent, or failing that at the last creature chosen.
     /// </summary>

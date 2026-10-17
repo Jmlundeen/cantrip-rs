@@ -354,6 +354,25 @@ public sealed class ScenarioPlayer
                 await DistributeAsync(distributed, state);
                 return;
 
+            case CountersRemovedAnswer removed:
+            {
+                // Counters removed from among permanents as a cost (CR 118.3): the dock's button for each kind on each permanent
+                // takes one more, "Take a -1/-1 counter from Sylvan Caryatid (0 of 2)", clicked that many times; then the
+                // button that removes them.
+                foreach (CounterPoolMessage removal in removed.Removals)
+                {
+                    string name = state.Cards.FirstOrDefault(c => c.Handle == removal.Object.Value)?.Name
+                        ?? throw new NotDrivenException($"counters on card #{removal.Object.Value}, which is not in view", state);
+                    for (int i = 0; i < removal.Count; i++)
+                    {
+                        await ClickButtonStartingAsync($"Take a {removal.Counter} counter from {name} (");
+                    }
+                }
+
+                await ClickButtonStartingAsync("Remove ");
+                return;
+            }
+
             case ReplacementChosenAnswer replacement:
                 // Which of several replacement effects applies first (CR 616.1): the dock has a button for each, "Source: what
                 // it does", in the order the question offers them.

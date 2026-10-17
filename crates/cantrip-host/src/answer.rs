@@ -19,6 +19,7 @@
 //! | `PlayerChosenAnswer`                          | `Player`                                                     |
 //! | `ColorsChosenAnswer`                          | `Colors`                                                     |
 //! | `TargetsDividedAnswer`                        | `Divided`                                                    |
+//! | `CountersRemovedAnswer`                       | `Counters`                                                   |
 
 use cantrip_engine::*;
 
@@ -189,6 +190,18 @@ pub fn translate(
                 .map(|s| Ok((target(handles, game, &s.target)?, s.amount.clamp(0, 255) as u16)))
                 .collect::<Result<_, Untranslatable>>()?,
         ),
+        AnswerPayload::CountersRemovedAnswer(a) => Answer::Counters(
+            a.removals
+                .iter()
+                .map(|r| {
+                    let kind = CounterKind::ALL
+                        .into_iter()
+                        .find(|k| k.name() == r.counter)
+                        .ok_or_else(|| Untranslatable::Illegal(format!("no counter is called \"{}\"", r.counter)))?;
+                    Ok((object(handles, game, r.object)?, kind, r.count.clamp(0, i32::from(u16::MAX)) as u16))
+                })
+                .collect::<Result<_, Untranslatable>>()?,
+        ),
     })
 }
 
@@ -282,6 +295,12 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
         }),
         Answer::Divided(shares) => AnswerPayload::TargetsDividedAnswer(TargetsDividedAnswer {
             shares: shares.iter().map(|&(t, amount)| TargetShareMessage { target: wire_target(handles, t), amount: i32::from(amount) }).collect(),
+        }),
+        Answer::Counters(taken) => AnswerPayload::CountersRemovedAnswer(CountersRemovedAnswer {
+            removals: taken
+                .iter()
+                .map(|&(object, kind, n)| CounterPoolMessage { object: handles.handle(object), counter: kind.name().to_string(), count: i32::from(n) })
+                .collect(),
         }),
     }
 }
