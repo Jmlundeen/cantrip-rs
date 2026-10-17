@@ -1,0 +1,30 @@
+# Scry 1 may leave the card on top ("you may put that card on the bottom"): Bot1 keeps the Lightning Bolt, which it draws on turn
+# three. The land has no basic land types, but "{T}: Add {U} or {B}" taps for blue on turn three and for black on turn five (the
+# color is chosen as it is activated).
+
+[Bot1 Deck]
+Temple of Deceit
+Island x6
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Temple of Deceit.Play
+Bot1.Arrange(Lightning Bolt |)
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 7
+! Bot1.Battlefield.Temple of Deceit.Activate(Color: Red)
+! Bot1.Battlefield.Temple of Deceit.Activate(Color: Colorless)
+Bot1.Battlefield.Temple of Deceit.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Temple of Deceit.Activate(Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Battlefield.Temple of Deceit.Types = Land
+Bot1.Hand = Island; Island; Island; Island; Island; Island; Island; Lightning Bolt
+Bot1.Graveyard.Count = 0
