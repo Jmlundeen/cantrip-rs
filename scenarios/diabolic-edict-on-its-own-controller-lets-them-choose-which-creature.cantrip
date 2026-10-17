@@ -1,0 +1,35 @@
+# Diabolic Edict says "target player", not "target opponent": Bot1 targets itself. With a Llanowar Elves and an Ornithopter
+# (an artifact creature) it chooses which to sacrifice (CR 701.21a): the Ornithopter goes, the Elves stay. Bot2, which
+# controls no creature, is asked nothing.
+
+[Bot1 Deck]
+Forest
+Swamp
+Llanowar Elves
+Ornithopter
+Diabolic Edict
+Island x2
+Island x20
+
+[Bot2 Deck]
+Forest x7
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot1)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Diabolic Edict; Ornithopter
+Bot1.Battlefield = Forest; Swamp; Llanowar Elves
+Bot2.Battlefield.Count = 0

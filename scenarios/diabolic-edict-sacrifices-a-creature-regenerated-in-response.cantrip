@@ -1,0 +1,41 @@
+# Sacrifice is no destruction (CR 701.21a, 701.19): Bot2 answers the Edict by regenerating its only creature with Yavimaya
+# Hollow ({G}, {T}), and the shield does nothing, since the Elves are sacrificed and not destroyed. Compare Damn's destroy,
+# which a shield does stop.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Diabolic Edict
+Island x3
+Island x20
+
+[Bot2 Deck]
+Forest
+Yavimaya Hollow
+Llanowar Elves
+Forest x4
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Yavimaya Hollow.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot2)
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Yavimaya Hollow.Activate(Ability: Regenerate; Bot2.Battlefield.Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Yavimaya Hollow
+Bot1.Graveyard = Diabolic Edict

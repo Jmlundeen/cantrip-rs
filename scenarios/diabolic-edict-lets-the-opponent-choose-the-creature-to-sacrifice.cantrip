@@ -1,0 +1,41 @@
+# Diabolic Edict: "Target player sacrifices a creature of their choice." Bot2 controls Llanowar Elves and Guerrilla Gorilla and
+# is asked (CR 701.21a); it answers with the Gorilla, the second one offered, so the choice is Bot2's and not a default or
+# the caster's: the Gorilla is sacrificed and the Elves stay.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Diabolic Edict
+Island x4
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot2)
+Bot2.Choose(Guerrilla Gorilla)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Guerrilla Gorilla
+Bot2.Battlefield = Forest; Mox Emerald; Mox Emerald; Llanowar Elves
+Bot1.Graveyard = Diabolic Edict

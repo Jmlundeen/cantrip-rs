@@ -1,0 +1,35 @@
+# Diabolic Edict targets the player, not a creature, so the hexproof (CR 702.11) of Bot2's only creature, a Sylvan Caryatid,
+# does not matter: it is sacrificed (CR 701.21a). No Choose line: with a single creature there is nothing to choose.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Diabolic Edict
+Island x4
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Forest x4
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Sylvan Caryatid
+Bot2.Battlefield = Forest; Mox Emerald
+Bot1.Graveyard = Diabolic Edict

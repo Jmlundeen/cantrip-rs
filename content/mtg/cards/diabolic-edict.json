@@ -1,0 +1,6 @@
+{
+  "name": "Diabolic Edict",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "Target player sacrifices a creature of their choice."
+}

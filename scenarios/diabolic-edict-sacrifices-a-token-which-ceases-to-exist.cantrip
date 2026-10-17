@@ -1,0 +1,39 @@
+# Bot2's Lingering Souls makes two Spirit tokens; Diabolic Edict has Bot2 choose one to sacrifice (CR 701.21a). A token that
+# leaves the battlefield ceases to exist (CR 111.7), so it reaches no graveyard: Bot2's graveyard holds only Lingering Souls.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Diabolic Edict
+Island x4
+Island x20
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Mox Ruby
+Lingering Souls
+Plains x4
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot2)
+Bot2.Choose(Spirit)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Lingering Souls
+Bot2.Battlefield.Count = 4
+Bot1.Graveyard = Diabolic Edict

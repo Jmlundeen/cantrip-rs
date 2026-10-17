@@ -1,0 +1,41 @@
+# Bot1 attacks with Llanowar Elves and Bot2 blocks with its Llanowar Elves. After blockers are declared Bot1 casts Diabolic
+# Edict, and Bot2 sacrifices its only creature, the blocker. The attacker stays blocked (CR 509.1h, 506.4) although no
+# creature blocks it now, so it deals no damage (CR 510.1c): Bot2 stays at 20 life, and Bot1's Elves are unhurt.
+
+[Bot1 Deck]
+Forest
+Swamp
+Llanowar Elves
+Diabolic Edict
+Island x3
+Island x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot2.Block(Llanowar Elves > Llanowar Elves)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Graveyard = Diabolic Edict

@@ -1,0 +1,33 @@
+# Diabolic Edict: a player with no creature is still a legal target; the spell resolves and nothing is sacrificed
+# (CR 701.21a, 608.2). Bot2 controls a Forest and a Mox Emerald, neither a creature, and both stay.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Diabolic Edict
+Island x4
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Forest x5
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Diabolic Edict.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Mox Emerald
+Bot1.Graveyard = Diabolic Edict
