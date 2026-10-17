@@ -59,7 +59,8 @@ click.
 
 A card in exile or in a graveyard is drawn only while that zone is open, so the driver opens it as a person does - the
 Exile button over the piles, the graveyard pile - to click a card there or to read what its face says
-(`Client.Bot1.Exile.Lightning Bolt.Annotation`), and shuts it again after a read. A menu of a card's abilities is told
+(`Client.Bot1.Exile.Lightning Bolt.Annotation`), and shuts it again after a read. A face-down card the page may look at (CR
+406.3) has no name on its face, and is read by what it really is, as the script names it. A menu of a card's abilities is told
 apart by the ability's index, which the page publishes for each row under `?test`.
 
 Objects nobody could tell apart count as one (`Run::same_but_for_interchangeable`): a click on the top of a pile of

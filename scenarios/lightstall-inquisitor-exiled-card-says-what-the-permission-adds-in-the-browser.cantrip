@@ -19,7 +19,9 @@ Bot2.Hand.Plains.Play
 Bot2.Battlefield.Plains.Activate
 Bot2.Hand.Lightstall Inquisitor.Cast
 Bot2.Pass
-? Client.Bot1.Prompt.Title = Lightstall Inquisitor: exile a card from your hand
+Bot1.Pass
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Lightstall Inquisitor: choose a card to exile
 Bot1.Choose(Forest)
 [T3 Bot1.Main1]
 ? Client.Bot1.Exile.Lit = true

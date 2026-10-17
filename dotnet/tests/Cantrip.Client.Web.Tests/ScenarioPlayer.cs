@@ -942,7 +942,9 @@ public sealed class ScenarioPlayer
 
         await _page.Page.Mouse.ClickAsync(opener.Value.X, opener.Value.Y);
         TableState open = await _page.SettledAsync();
-        CardState? found = open.Cards.FirstOrDefault(c => c.Place == place && c.Visible && c.Name == (name == "(hidden)" ? string.Empty : name));
+        // A face-down card the page may look at (CR 406.3) is found by what it really is, as the script names it.
+        CardState? found = open.Cards.FirstOrDefault(c => c.Place == place && c.Visible
+            && (c.Name == (name == "(hidden)" ? string.Empty : name) || (c.Name.Length == 0 && c.FaceDownName == name)));
         string shown = found is null
             ? $"(no {name} in the open {zone}: {string.Join("; ", open.Cards.Where(c => c.Place == place).Select(c => c.Name))})"
             : Face(found, attribute);
