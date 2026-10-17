@@ -17,6 +17,18 @@ pub fn enter_as_copy(
     eligible: fn(&Chars) -> bool,
     exception: fn(&dyn Query, Copiable) -> Copiable,
 ) -> Result<(), Suspend> {
+    enter_as_copy_asking(g, entry, eligible, exception, &COPY_AS_ENTERS)
+}
+
+/// `enter_as_copy`, asked in the card's own words: Vesuva's "enter tapped as a copy", where what the copy does as it enters
+/// is part of the choice. Whether it enters as a copy is `entry.copy` afterwards.
+pub fn enter_as_copy_asking(
+    g: &mut dyn Game,
+    entry: &mut Entering,
+    eligible: fn(&Chars) -> bool,
+    exception: fn(&dyn Query, Copiable) -> Copiable,
+    question: &'static Question,
+) -> Result<(), Suspend> {
     let entering = entry.object;
     let candidates: Vec<ObjectId> = g
         .state()
@@ -29,7 +41,7 @@ pub fn enter_as_copy(
         return Ok(());
     }
     let controller = g.obj(entering).controller;
-    if g.ask(controller, RequestKind::May { source: entering, purpose: Purpose::Ask(&COPY_AS_ENTERS) })? != Answer::Yes {
+    if g.ask(controller, RequestKind::May { source: entering, purpose: Purpose::Ask(question) })? != Answer::Yes {
         return Ok(());
     }
     let chosen = if candidates.len() == 1 {
