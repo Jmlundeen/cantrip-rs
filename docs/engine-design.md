@@ -801,16 +801,27 @@ targets", Urgent Necropsy) is `CardDef::cost_of_targets`, asked once the targets
 however many times it is named (`move_together`), by the first of its moves (a later one to another zone is dropped): a
 permanent a spell targets in two slots is destroyed once.
 
-### Ways a permanent gives: from a graveyard or from a hand
+### Ways a permanent gives: zone permission and alternative costs
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
-Paragon, Underworld Breach's escape, mayhem) or the hand. Each is judged on the face being cast, offered beside the card's
-other casts with its own way number, and is the one alternative cost of that cast (CR 118.9a); additional costs and cost
-increases still apply to it (CR 118.9d). Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost
-that is or includes the mana cost has its {X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana
-cost may be cast that way (CR 118.6a). The host marks a cast for nothing `WithoutPayingManaCost`, with the cost it comes to
-as its `CostText`, and the tactical bot takes it over the card's ordinary cast. Not built: emblems that give one (Tamiyo,
-Field Researcher's): KI-44.
+Paragon, Underworld Breach's escape, mayhem) or the hand ("you may cast spells from your hand without paying their mana
+costs", Omniscience). Each is judged on the face being cast, offered beside the card's other casts with its own way number,
+and is the one alternative cost of that cast (CR 118.9a); additional costs and cost increases still apply to it (CR 118.9d).
+`any_zone` makes it a zone-neutral alternative cost: it uses another rule or permission's right to cast that face,
+but opens no zone itself (CR 601.3). A permission requiring its own alternative cost cannot be combined with it
+(CR 118.9a). This includes ordinary graveyard permission, Adventure exile, other players' cards in exile, and
+`LibraryTopSpells` permission, evaluated on the face cast. `instant_speed` changes only that way's timing
+(CR 601.3c); casting prohibitions and explicit timing restrictions still apply. Primal Prayers and Aluren use these rules.
+A resolving effect that permits paying the normal mana cost offers these zone-neutral alternatives after choosing the
+face, with `Label::GrantedWay`; a forced alternative cost excludes them. `CastWay` still lists faces only.
+Energy is a `Cost::energy` payment (CR 107.14): composing costs adds it, repeating costs multiplies it, affordability
+checks the player's counters, and payment is journaled so cancellation and tree navigation restore them.
+Primal Prayers and Amped Raptor use energy as a casting cost.
+Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost that is or includes the mana cost has its
+{X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana cost may be cast that way (CR 118.6a).
+The host marks such a cast `WithoutPayingManaCost`, with the cost it comes to as its `CostText`, and the tactical bot takes it
+over the card's ordinary cast. Not built: a fixed-zone way given to cards in a hand used by a cast an effect makes as it resolves
+(`cast_ways_during_resolution` offers the mana cost only), and emblems that give one (Tamiyo, Field Researcher's): KI-44.
 
 ### Alternative costs a permanent gives the spells a player casts
 
@@ -1500,7 +1511,7 @@ Known gaps:
   Spider-Sense from the graveyard under Yawgmoth's Will is a scenario, and sneak's instant-speed way likewise), unless its
   text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost), but a cast made while an effect resolves
   (`cast_ways_during_resolution`) is offered for the card's mana cost and faces only: an effect that lets a spell be cast
-  paying its costs ("cast it from exile this turn") as it resolves can't use web-slinging or any other alternative cost.
+  paying its costs ("cast it from exile this turn") as it resolves cannot yet use printed `WayDef` alternatives such as web-slinging. Zone-neutral `GrantedWay` alternatives are offered.
 - Costs to attack are mana only: one that asks for life (Sivitri, Dragon Master's +1), a Phyrexian symbol paid with life
   (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
   as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.

@@ -982,6 +982,17 @@ mod tests {
     }
 
     #[test]
+    fn energy_is_paid_in_additional_and_repeated_costs() {
+        let energy = Cost { energy: 1, ..Cost::NONE };
+        let total = TAP.and(energy).and(energy.times(3));
+        assert_eq!(total.energy, 4);
+        assert!(total.tap);
+        assert!(!total.is_tap_only(), "a mana ability with an energy cost is not a plain land tap");
+        assert_eq!(energy.times(0).energy, 0);
+        assert!(TAP.and(energy.times(0)).is_tap_only());
+    }
+
+    #[test]
     fn mana_abilities_list_what_they_add() {
         let AbilityDef::Activated(d) = mana_ability(TAP, add(Mana::G), "{T}: Add {G}.") else { panic!() };
         assert!(d.is_mana_ability() && d.mana.is_none() && d.adds.get(Mana::G) == 1 && d.cost.tap);

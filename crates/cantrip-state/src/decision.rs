@@ -819,6 +819,8 @@ pub enum Label {
     Counter(CounterKind),
     /// One of the faces a card may be cast as (CR 709.3, 715.3, 712.8a), named by the face's name.
     Face(CardId),
+    /// A permanent's granted alternative cost, indexed in its printed definition (CR 118.9).
+    GrantedWay(CardId, u8),
     /// One of a card's miracle abilities, to reveal it with (CR 702.94a, 607.5).
     Miracle(MiracleOf),
     /// A type of mana to add (CR 106.1b: white, blue, black, red, green or colorless): "one mana of any type that land

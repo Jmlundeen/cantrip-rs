@@ -102,6 +102,7 @@ pub fn label_text(label: &Label) -> &'static str {
             };
             modal.and_then(|m| m.modes.get(i as usize)).map_or("", |m| m.text)
         }
+        Label::GrantedWay(card, i) => cards().get(card).granted_ways.get(i as usize).map_or("", |w| w.text),
         Label::Extra(card, i) => cards().get(card).additional_choice.get(i as usize).map_or("", |c| c.text),
         Label::PayLife(Color::White) => "Pay 2 life for {W/P}",
         Label::PayLife(Color::Blue) => "Pay 2 life for {U/P}",

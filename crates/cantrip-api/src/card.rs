@@ -487,6 +487,8 @@ pub struct Cost {
     /// Pay this much life (CR 119.4): payable only with at least that much, and not at all while the payer can't lose life
     /// (CR 119.8).
     pub life: u8,
+    /// Pay energy counters (CR 107.14, 118.3): Primal Prayers, Amped Raptor.
+    pub energy: u8,
     /// Remove this many counters of this kind from the source (CR 602.1, 118.3).
     pub remove_counters: Option<(CounterKind, u8)>,
     /// Put this many counters of this kind on the source (CR 118.3, 602.2b): "{T}, Put a page counter on this artifact"
@@ -658,6 +660,7 @@ impl Cost {
             permanents,
             loyalty,
             life,
+            energy,
             remove_counters,
             put_counters,
             remove_any_counter,
@@ -688,6 +691,7 @@ impl Cost {
             && permanents.is_none()
             && loyalty.is_none()
             && life == 0
+            && energy == 0
             && remove_counters.is_none()
             && put_counters.is_none()
             && !remove_any_counter
@@ -728,6 +732,7 @@ impl Cost {
             c.mana = ManaCost::ZERO;
         }
         c.life = self.life.saturating_mul(n);
+        c.energy = self.energy.saturating_mul(n);
         c.exile_from_graveyard = self.exile_from_graveyard.saturating_mul(n);
         c.blight = self.blight.saturating_mul(n);
         c.remove_counters_among = self.remove_counters_among.map(|(k, f)| (k.saturating_mul(n), f)).filter(|_| n > 0);
@@ -786,6 +791,7 @@ impl Cost {
             c.put_counters = other.put_counters;
         }
         c.life += other.life;
+        c.energy = c.energy.saturating_add(other.energy);
         c.exile_from_graveyard += other.exile_from_graveyard;
         if c.exile_from_graveyard_of.is_none() {
             c.exile_from_graveyard_of = other.exile_from_graveyard_of;
@@ -847,6 +853,7 @@ impl Cost {
             permanents: None,
             loyalty: None,
             life: 0,
+            energy: 0,
             remove_counters: None,
             put_counters: None,
             remove_any_counter: false,
@@ -1383,6 +1390,11 @@ pub struct GrantedWay {
     /// hand (a way given to cards in a hand, as web-slinging would be). Another zone's rule or permission does not open it.
     /// An alternative cost for spells cast from wherever (Omniscience's, Dracogenesis's) is a `SpellAlternative` instead.
     pub from: ZoneKind,
+    /// An alternative cost usable from any zone another rule or permission already allows (CR 118.9, 601.3).
+    /// This grants no zone permission itself: Primal Prayers, Aluren.
+    pub any_zone: bool,
+    /// Only this way may be used whenever an instant could be cast (CR 601.3c): Primal Prayers, Aluren.
+    pub instant_speed: bool,
     /// The way also lets a land card in the graveyard be played (CR 305.1) rather than cast: `cost` is asked of the land
     /// card too, and any `Some` allows the play (the land has no cost). It uses the land drop, and the history marks the
     /// use as it marks a cast's, so "once during each of your turns" is shared between the play and the casts. Serra Paragon.
@@ -1399,7 +1411,7 @@ pub struct GrantedWay {
 
 impl GrantedWay {
     /// A way that casts only and grants nothing, for a card's file to start from.
-    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, lands: false, gains: None, flashback: false };
+    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, any_zone: false, instant_speed: false, lands: false, gains: None, flashback: false };
 }
 
 /// What a static ability lets a spell be cast for rather than its mana cost (CR 118.9, `SpellAlternative::cost`).
