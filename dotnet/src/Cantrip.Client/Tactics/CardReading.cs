@@ -474,6 +474,8 @@ public static partial class CardReading
             || plain.Contains("target creatures gain ", StringComparison.Ordinal)
             || plain.Contains("gets +", StringComparison.Ordinal) || plain.Contains("+1/+1 counter", StringComparison.Ordinal)
             || plain.Contains("untap target", StringComparison.Ordinal) || plain.Contains("attach", StringComparison.Ordinal)
+            // A flood counter makes the land an Island too (Eluge, Aquitect's Will): its controller's to use.
+            || plain.Contains("flood counter on target", StringComparison.Ordinal)
             || plain.StartsWith("equip", StringComparison.Ordinal) || plain.Contains(": equip", StringComparison.Ordinal)
             || plain.Contains("target attacking creature", StringComparison.Ordinal) && plain.Contains("counter", StringComparison.Ordinal))
         {
