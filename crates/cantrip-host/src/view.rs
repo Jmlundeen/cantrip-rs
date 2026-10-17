@@ -687,7 +687,12 @@ impl<'a> Projector<'a> {
                 EffectKind::Prevention { to: Target::Player(q), .. } if q == p => {
                     if p == self.viewer { "you" } else { "them" }
                 }
-                EffectKind::Prevention { to: Target::None, .. } if e.controller == p => "",
+                // One about an object it names more than as the damage's recipient is on that object (Maze of Ith's).
+                EffectKind::Prevention { to: Target::None, card, index, .. }
+                    if e.controller == p && self.game.cards.get(card).granted_preventions.get(index as usize).is_some_and(|d| d.of_it.is_none()) =>
+                {
+                    ""
+                }
                 _ => continue,
             };
             if let Some(text) = self.prevention_text(e, whom) {
@@ -790,7 +795,11 @@ impl<'a> Projector<'a> {
             Shield::All => format!("Prevent all {damage}"),
             Shield::Next(n) => format!("Prevent the next {n} {damage}"),
         };
-        let to = if whom.is_empty() { String::new() } else { format!(" to {whom}") };
+        let to = match card.granted_preventions.get(index as usize)?.of_it {
+            Some(of_it) if whom == "it" => format!(" {of_it}"),
+            _ if whom.is_empty() => String::new(),
+            _ => format!(" to {whom}"),
+        };
         Some(format!("{how} that would be dealt{to}{} ({}).", self.until_text(e.duration), card.name))
     }
 
@@ -1262,7 +1271,12 @@ impl<'a> Projector<'a> {
                         continue;
                     }
                     // A prevention shield on it (CR 615.7), or all damage to it prevented: no ability of its own says so.
-                    EffectKind::Prevention { to, .. } if to == Target::Object(id) => {
+                    // Or one about it that names more than the damage dealt to it (Maze of Ith's "to and dealt by").
+                    EffectKind::Prevention { to, card, index, .. }
+                        if to == Target::Object(id)
+                            || (to == Target::None
+                                && game.cards.get(card).granted_preventions.get(index as usize).is_some_and(|d| d.of_it.is_some())) =>
+                    {
                         if let Some(text) = self.prevention_text(e, "it") {
                             view.granted_abilities.push(AbilityTextView { text, spent: false });
                         }
