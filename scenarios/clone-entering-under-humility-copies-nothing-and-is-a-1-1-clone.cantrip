@@ -1,0 +1,66 @@
+# Clone's "You may have this creature enter as a copy of any creature on the battlefield" is a replacement effect of its own
+# (CR 614.1c, 707.2), and which replacement effects apply to a permanent entering is judged on "the permanent as it would
+# exist on the battlefield, taking into account ... continuous effects that already exist and would apply to the
+# permanent" (CR 614.12). With Humility out, Clone as it would exist there is a creature with no abilities, so it can't
+# copy: Bot1 is not asked (the refusal "! Bot1.Accept" holds across Clone's resolution, while the Overseer is there to be
+# copied), and Clone enters as itself, a Shapeshifter that Humility makes 1/1 - it does not die as its printed 0/0, and it
+# is no Inspiring Overseer, so no enters trigger of one could happen either: Bot1 stays at 21.
+# The control: Inspiring Overseer, cast on turn 1 before Humility, did gain Bot1 1 life and draw a card.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Inspiring Overseer
+Humility
+Plains
+Mox Sapphire
+Clone
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+[T2 Bot2.Main1]
+? Bot1.Life = 21
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Pass
+! Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Life = 21
+Bot1.Battlefield.Clone.Subtypes = Shapeshifter
+Bot1.Battlefield.Clone.Colors = Blue
+Bot1.Battlefield.Clone.Power = 1
+Bot1.Battlefield.Clone.Toughness = 1
+Bot1.Battlefield.Inspiring Overseer.Power = 1
+Bot1.Graveyard.Count = 0

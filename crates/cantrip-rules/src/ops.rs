@@ -600,11 +600,13 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     let card = cx.cards().face(cx.s().obj(entering.object).card, entering.transformed);
     // CR 305.7, 614.12: a land that would lose the abilities of its rules text on the battlefield to an effect that sets
     // its subtype ("nonbasic lands are Mountains") has none of its own entering replacements: it is judged as it would
-    // exist there (Blood Moon's ruling: it does not enter tapped, nor choose "as" it enters).
+    // exist there (Blood Moon's ruling: it does not enter tapped, nor choose "as" it enters). Nor has a permanent that
+    // would lose all its abilities there (Humility, Dress Down: `enters_without_abilities`).
     let object = entering.object;
     let lost = |cx: &Cx, card: CardId, copy: Option<&Copiable>| layers::loses_rules_text_entering(cx.cards(), cx.s(), &cx.g.log, object, card, copy);
     if let Some(enters) = cx.cards().get(card).enters
         && !lost(cx, card, entering.copy.as_ref())
+        && !enters_without_abilities(cx, entering)
     {
         enters(cx, entering)?;
     }
@@ -614,10 +616,42 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
         && copy.card != card
         && let Some(enters) = cx.cards().get(copy.card).enters
         && !lost(cx, copy.card, Some(&copy))
+        && !enters_without_abilities(cx, entering)
     {
         enters(cx, entering)?;
     }
     Ok(())
+}
+
+/// Whether the permanent about to enter would have lost all its abilities once it is on the battlefield (CR 613.1f), so that
+/// none of its own "enters with" and "as this enters" replacement effects applies (CR 614.12: which replacement effects apply
+/// is judged on "the permanent as it would exist on the battlefield, taking into account replacement effects that have
+/// already modified how it enters the battlefield, ... and continuous effects that already exist and would apply to the
+/// permanent", as Yixlid Jailer's example has it). A creature entering under Humility or Dress Down: a Walking Ballista
+/// enters with no counters, a Clone copies nothing. Worked out by putting it on the battlefield for the moment of the
+/// question - under the player it enters under, with the face it enters with and as the copy a replacement already made it
+/// - and taking that back, so every layer judges it as it would be there. Asked only while a "loses all abilities" static
+/// ability is on the battlefield; no resolved effect can name an object that is not there yet.
+fn enters_without_abilities(cx: &mut Cx, entering: &Entering) -> bool {
+    if !layers::loses_all_static_applies(cx.cards(), cx.s()) {
+        return false;
+    }
+    let id = entering.object;
+    let mark = cx.s().mark();
+    let from = cx.s().obj(id).zone;
+    cx.st().zone_remove(from, id);
+    cx.st().update_obj(id, |o| {
+        o.zone = Zone::BATTLEFIELD;
+        o.controller = entering.controller;
+        o.transformed = entering.transformed;
+        if entering.copy.is_some() {
+            o.copy = entering.copy;
+        }
+    });
+    cx.st().zone_push(Zone::BATTLEFIELD, id);
+    let lost = layers::lost_all_abilities(cx.cards(), cx.s(), &cx.g.log, id);
+    cx.st().revert(mark);
+    lost
 }
 
 /// Who may protect a battle `controller` controls (CR 310.9a, 310.12a), in turn order: for a Siege each opponent still in
@@ -2789,5 +2823,92 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
     let moves: Vec<Moving> = exiled.into_iter().map(|id| Moving::to(id, Zone::exile(cx.s().obj(id).owner))).collect();
     if !moves.is_empty() {
         move_together(cx, &moves, ZoneReason::Exile);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{Game, Setup};
+
+    fn creature(_: &dyn LayerQuery, _: ObjectId, _: ObjectId, c: &Chars) -> bool {
+        c.is(CardType::Creature)
+    }
+
+    fn two_counters(_: &mut dyn cantrip_api::Game, entering: &mut Entering) -> Result<(), Suspend> {
+        entering.counters[CounterKind::PlusOne as usize] += 2;
+        Ok(())
+    }
+
+    /// Humility's first half: "All creatures lose all abilities."
+    static HUMBLER: CardDef = CardDef {
+        name: "Humbler",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[loses_all_abilities(creature, "")],
+        ..CardDef::BLANK
+    };
+    /// "This creature enters with two +1/+1 counters on it."
+    static GROWN: CardDef = CardDef {
+        name: "Grown",
+        types: TypeSet::of(&[CardType::Creature]),
+        power: Some(0),
+        toughness: Some(0),
+        enters: Some(two_counters),
+        ..CardDef::BLANK
+    };
+    /// The same of an artifact, which "all creatures" does not reach.
+    static GROWN_RELIC: CardDef = CardDef { name: "Grown Relic", types: TypeSet::of(&[CardType::Artifact]), enters: Some(two_counters), ..CardDef::BLANK };
+
+    /// The counters each card in Bot1's hand would enter with, Humbler put onto the battlefield first if `humbled`; each card
+    /// is still in the hand afterwards.
+    fn entering_counters(humbled: bool) -> Vec<(&'static str, i16)> {
+        let cards: &'static CardTable = Box::leak(Box::new(CardTable::new([&HUMBLER, &GROWN, &GROWN_RELIC])));
+        let deck = vec![cards.id_of(&HUMBLER), cards.id_of(&GROWN), cards.id_of(&GROWN_RELIC)];
+        let mut game = Game::new(cards, &Setup { decks: vec![deck, Vec::new()], ..Setup::default() });
+        let hand = Zone::hand(PlayerId(0));
+        let held: Vec<ObjectId> = game.state.zone(hand).to_vec();
+        let humbler = held[0];
+        if humbled {
+            game.state.zone_remove(hand, humbler);
+            game.state.update_obj(humbler, |o| o.zone = Zone::BATTLEFIELD);
+            game.state.zone_push(Zone::BATTLEFIELD, humbler);
+            game.state.see_statics();
+        }
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None };
+        let mut out = Vec::new();
+        for &id in &held[1..] {
+            let mut entering = Entering {
+                object: id,
+                controller: PlayerId(0),
+                tapped: false,
+                counters: [0; CounterKind::COUNT],
+                copy: None,
+                prepared: false,
+                chosen_color: None,
+                chosen_subtype: None,
+                chosen_player: None,
+                chosen_card: None,
+                chosen_odd: None,
+                attach: None,
+                attach_player: None,
+                x: 0,
+                transformed: false,
+                protector: None,
+                instead: None,
+            };
+            assert!(prepare_entry(&mut cx, &mut entering).is_ok());
+            assert!(cx.s().obj(id).zone == hand && cx.s().zone(hand).contains(&id) && !cx.s().battlefield().contains(&id));
+            out.push((cx.cards().get(cx.s().obj(id).card).name, entering.counters[CounterKind::PlusOne as usize]));
+        }
+        out
+    }
+
+    /// CR 614.12: a creature entering while "all creatures lose all abilities" applies has, as it would exist on the
+    /// battlefield, no "enters with" ability, so it gets no counters; an artifact the ability does not reach gets its two, and
+    /// so does the creature with nothing on the battlefield. The question leaves both cards where they were.
+    #[test]
+    fn an_entering_permanent_that_would_lose_its_abilities_has_no_enters_replacement() {
+        assert_eq!(entering_counters(false), [("Grown", 2), ("Grown Relic", 2)]);
+        assert_eq!(entering_counters(true), [("Grown", 0), ("Grown Relic", 2)]);
     }
 }

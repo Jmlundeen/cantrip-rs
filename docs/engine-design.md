@@ -334,6 +334,12 @@ and entering-counter replacements and the last-known information of a permanent 
 game as it was before the event, then every object moves. So permanents entering together never see one another (a
 creature returned with Gev or Containment Priest is untouched by them; Giada counts only the Angels already there), and
 permanents leaving together all still see one another (Dauthi Voidwalker dying with an opponent's creature exiles it).
+A permanent's own "enters with" and "as this enters" abilities (`CardDef::enters`, its own and those of what it enters
+as a copy of) apply only if, as it would exist on the battlefield, it would still have its abilities (CR 614.12, Yixlid
+Jailer's example): under Humility or Dress Down a creature enters with none of them (a Walking Ballista with no counters,
+a Clone copying nothing). `prepare_entry` asks it by putting the object on the battlefield for the moment of the question,
+under the player it enters under and as the copy it enters as, and reverting that; only while a "loses all abilities"
+static ability is on the battlefield (`layers::loses_all_static_applies`).
 
 A static ability that makes triggered abilities trigger an additional time (CR 603.2d: Elesh Norn, Mother of Machines,
 Panharmonicon, Teysa Karlov, Harmonic Prodigy) is a `CardDef::additional_triggers` entry, the same shape asked of the same

@@ -1466,6 +1466,12 @@ pub fn loses_rules_text_entering(cards: &CardTable, state: &GameState, log: &[Re
     })
 }
 
+/// Whether a "loses all abilities" static ability (CR 613.1f) of a permanent that has not lost its own abilities to an
+/// effect is on the battlefield: the guard of every question about what such an ability would take.
+pub fn loses_all_static_applies(cards: &CardTable, state: &GameState) -> bool {
+    state.statics_seen && !static_sources(cards, state).strippers.is_empty()
+}
+
 /// What `lost_to_statics` found: the permanents that lost all their abilities to a static ability, and the sources whose
 /// such abilities apply.
 #[derive(Default)]
