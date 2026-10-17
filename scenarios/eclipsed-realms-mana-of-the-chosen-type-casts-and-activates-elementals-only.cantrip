@@ -1,0 +1,50 @@
+# Eclipsed Realms: "As this land enters, choose Elemental, Elf, Faerie, Giant, Goblin, Kithkin, Merfolk, or Treefolk"
+# (CR 614.12a) - Human is not among them (the refusal) - and "{T}: Add one mana of any color. Spend this mana only to cast
+# a spell of the chosen type or activate an ability of a source of the chosen type" (CR 106.6, 607.2a). Elemental chosen,
+# its {R} on turn 1, the only mana, can't cast Lightning Bolt. Turn 3 its {G} and the Forest's cast Bramble Familiar, an
+# Elemental spell; turn 5 they pay the Familiar's "{1}{G}, {T}, Discard a card: Return this creature to its owner's hand",
+# an ability of an Elemental source. Turn 7 "{T}: Add {C}" adds plain {C}.
+
+[Bot1 Deck]
+Eclipsed Realms
+Forest
+Bramble Familiar
+Lightning Bolt
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Eclipsed Realms.Play
+! Bot1.Modes(Human)
+Bot1.Modes(Elemental)
+? Bot1.Battlefield.Eclipsed Realms.ChosenSubtype = Elemental
+Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Red)
+? Bot1.Mana = {R} (ElementalSpellsOrAbilities)
+! Bot1.Hand.Lightning Bolt.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bramble Familiar.Cast(Spend: G ElementalSpellsOrAbilities, G)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T5 Bot1.Main1]
+Bot1.Battlefield.Eclipsed Realms.Activate(Ability: any color; Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Bramble Familiar.Activate(Ability: Return; Spend: G ElementalSpellsOrAbilities, G)
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T7 Bot1.Main1]
+Bot1.Battlefield.Eclipsed Realms.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Eclipsed Realms; Forest
+Bot1.Hand.Count = 7
+Bot1.Graveyard = Island
