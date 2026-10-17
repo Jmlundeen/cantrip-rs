@@ -68,6 +68,7 @@ keeps it).
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Unexercised |
 | [KI-52](#ki-52-which-lands-lost-their-rules-text-to-a-subtype-setting-effect-is-judged-on-layers-1-to-3) | Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3 | Low | Unexercised |
+| [KI-53](#ki-53-a-copy-holds-at-most-four-abilities-added-by-exceptions) | A copy holds at most four abilities added by exceptions | Low | Unexercised |
 
 ## Issues
 
@@ -600,7 +601,8 @@ ruling of a card the engine has; a copy entering under the effect does not copy 
 614.12), which is the case the rulings name. A fix, if a ruling says the copy effect goes entirely, starts the land's
 characteristics from its own card when `layers::land_text_lost` holds it.
 
-**Scenarios.** none: no card in content copies a land already on the battlefield.
+**Scenarios.** none yet. Vesuva and Thespian's Stage (added 2026-10-17) now make it reachable: a Vesuva or Stage copying a
+nonbasic land, then Magus of the Moon entering.
 
 ### KI-52: Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3
 
@@ -620,3 +622,16 @@ the copy it enters as, without the layer 1-3 effects of other objects: none in c
 enters. A fix applies the object's own layer-4 effects that change its card types before asking.
 
 **Scenarios.** none: no card in content reaches it.
+
+### KI-53: A copy holds at most four abilities added by exceptions
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-17, Thespian's Stage |
+
+**Notes.** `Copiable::extra_abilities` (`crates/cantrip-state/src/object.rs`) is a fixed array of four; adding a fifth
+"except it has [ability]" (CR 707.9b) is silently dropped. Each Thespian's Stage copying a Stage-copy adds one more instance of the
+Stage ability (CR 113.2c), so a chain of five Stages copying one another loses one. No other card in content adds more than one.
+A fix grows the array or refuses the copy loudly; instances beyond the second of the same ability change no play.
+
+**Scenarios.** none: no scenario builds the chain.
