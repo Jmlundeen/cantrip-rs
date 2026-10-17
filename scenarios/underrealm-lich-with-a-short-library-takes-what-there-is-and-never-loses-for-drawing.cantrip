@@ -1,0 +1,44 @@
+# Underrealm Lich: "Underrealm Lich's first ability applies even if you have fewer than three cards in your library. If you
+# have no cards in your library, you can't lose the game for trying to draw a card from an empty library" (its ruling;
+# CR 121.6a, 609.3). Bot1's library holds two cards as Ancestral Recall resolves: the first draw looks at those two, Bot1
+# takes the Forest and the other goes to its graveyard; the second and third draws look at nothing. Its turn 3 draw for the
+# turn is replaced too, and Bot1 is still in the game afterwards, having never drawn from its empty library.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Underrealm Lich
+Ancestral Recall
+Plains
+Forest
+Mountain
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Underrealm Lich.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Arrange(Forest | Mountain)
+[T3 Bot1.Main1]
+
+[Expect]
+Result = InProgress
+Bot1.LostTo = (absent)
+Bot1.Hand = Plains; Forest
+Bot1.Library.Count = 0
+Bot1.Graveyard = Ancestral Recall; Mountain; Black Lotus

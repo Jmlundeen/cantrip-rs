@@ -1,0 +1,51 @@
+# Underrealm Lich: "If you would draw a card, instead look at the top three cards of your library, then put one into your
+# hand and the rest into your graveyard" (CR 614.1a, 121.6). "Each draw is performed - and replaced by Underrealm Lich's
+# ability - one at a time" (its ruling): Ancestral Recall's three draws are three looks at the top three. Bot1 takes the
+# Forest, then the Mountain, then the Plains, and the six Islands looked at go to its graveyard.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Underrealm Lich
+Ancestral Recall
+Plains
+Forest
+Island
+Island
+Mountain
+Island
+Island
+Plains
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Underrealm Lich.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Arrange(Forest | Island; Island)
+Bot1.Arrange(Mountain | Island; Island)
+Bot1.Arrange(Plains | Island; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Forest; Mountain; Plains
+Bot1.Library.Count = 20
+Bot1.Graveyard = Ancestral Recall; Island; Island; Island; Island; Island; Island; Black Lotus

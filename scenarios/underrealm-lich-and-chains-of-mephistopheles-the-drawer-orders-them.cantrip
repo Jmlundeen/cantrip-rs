@@ -1,0 +1,60 @@
+# Underrealm Lich and Chains of Mephistopheles, both Bot1's, both replace its draws outside the first of its draw step, and
+# Bot1 orders them each time (CR 616.1). Its turn 3 draw for the turn is exempt from Chains and replaced by the Lich alone,
+# which finds Ancestral Recall among the top three. Of the spell's three draws Bot1 has the Lich apply first to the first:
+# a look at the top three, and the card it takes is put into its hand, not drawn (CR 121.5), so Chains has nothing to
+# replace. For the second it has Chains apply first: it discards that Island and so draws - and the Lich, which has not had
+# its opportunity, replaces that draw (CR 614.5). The third is the Lich's again. Bot1 ends with two Islands.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Chains of Mephistopheles
+Underrealm Lich
+Ancestral Recall
+Forest
+Forest
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Chains of Mephistopheles.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Underrealm Lich.Cast
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Ancestral Recall | Forest; Forest)
+[T3 Bot1.Main1]
+? Bot1.Hand = Ancestral Recall
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Underrealm Lich)
+Bot1.Arrange(Island | Island; Island)
+Bot1.Replace(Chains of Mephistopheles)
+Bot1.Choose(Island)
+Bot1.Arrange(Island | Island; Island)
+Bot1.Replace(Underrealm Lich)
+Bot1.Arrange(Island | Island; Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island
+Bot1.Library.Count = 11
+Bot1.Graveyard.Count = 11

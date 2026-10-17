@@ -1,0 +1,58 @@
+# Underrealm Lich: "Pay 4 life: This creature gains indestructible until end of turn. Tap it." The tap is the ability's
+# effect, not its cost, so "you can activate Underrealm Lich's last ability even if it's already tapped. It can't be tapped
+# again, but it still gains indestructible" (its ruling; CR 702.12b, 701.26a). As Bot2 casts Black Lotus, Bot1 activates it
+# twice, the second time with the Lich tapped by the first: 8 life paid. Bot2's Wrath of God then destroys every creature but
+# the indestructible Lich, which stays, tapped.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Underrealm Lich
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Wrath of God
+Swamp x4
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Underrealm Lich.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Black Lotus.Cast
+Bot1.Battlefield.Underrealm Lich.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Underrealm Lich.Tapped = true
+Bot1.Battlefield.Underrealm Lich.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 12
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Wrath of God.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Underrealm Lich.Keywords = Indestructible
+Bot1.Battlefield.Underrealm Lich.Tapped = true
+Bot1.Life = 12
+Bot2.Graveyard = Wrath of God; Black Lotus

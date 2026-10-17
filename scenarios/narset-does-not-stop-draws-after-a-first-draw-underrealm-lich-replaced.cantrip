@@ -1,0 +1,54 @@
+# Narset, Parter of Veils (Bot2's) and Underrealm Lich (Bot1's): "if an opponent's first draw is replaced (by Underrealm Lich's
+# ability, for example), that draw didn't happen and Narset won't stop the next draw (which may also be replaced by Underrealm
+# Lich's ability)" (Narset's ruling; CR 121.2b, 614.6). Bot1's turn 3 draw for the turn is replaced by the Lich, so Bot1 has
+# drawn no card this turn, and each of Ancestral Recall's three draws can still happen - and is replaced by the Lich too.
+# Bot1 takes four cards into its hand this turn; had the first been drawn, Narset would have left it no more.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Underrealm Lich
+Ancestral Recall
+Plains
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Underrealm Lich.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Narset, Parter of Veils.Cast
+[T3 Bot1.Upkeep]
+Bot1.Arrange(Island | Island; Island)
+[T3 Bot1.Main1]
+? Bot1.Hand = Ancestral Recall; Plains; Island
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Arrange(Island | Island; Island)
+Bot1.Arrange(Island | Island; Island)
+Bot1.Arrange(Island | Island; Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Island; Island; Island; Island
+Bot1.Library.Count = 8
+Bot1.Graveyard.Count = 10
