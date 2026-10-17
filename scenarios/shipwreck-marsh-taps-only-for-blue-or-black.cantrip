@@ -1,0 +1,25 @@
+# Shipwreck Marsh: "{T}: Add {U} or {B}" - red and green are not on offer (refusals), though the land is untapped with two
+# other lands (CR 614.1c); the positive control is the activation for {U} on the last line, which is offered and adds {U}.
+
+[Bot1 Deck]
+Island
+Island
+Shipwreck Marsh
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Shipwreck Marsh.Play
+! Bot1.Battlefield.Shipwreck Marsh.Activate(Color: Red)
+! Bot1.Battlefield.Shipwreck Marsh.Activate(Color: Green)
+Bot1.Battlefield.Shipwreck Marsh.Activate(Color: Blue)
+
+[Expect]
+Bot1.Battlefield.Shipwreck Marsh.Tapped = true
+Bot1.Mana = {U}
