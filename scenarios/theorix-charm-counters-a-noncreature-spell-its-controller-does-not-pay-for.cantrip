@@ -1,0 +1,38 @@
+# Theorix Charm's first mode: "Counter target noncreature spell unless its controller pays {2}." Bot2's Ornithopter, a
+# creature spell, is not a legal target (the refusal) and resolves. Bot2's Lightning Bolt is: with only the Mountain,
+# tapped for the Bolt, Bot2 cannot pay {2}, so the Bolt is countered and Bot1 takes no damage.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Theorix Charm
+Island x14
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+! Bot1.Hand.Theorix Charm.Cast(Stack.Ornithopter)
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Theorix Charm.Cast
+Bot1.Modes(Counter target noncreature spell)
+Bot1.Target(Stack.Lightning Bolt)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Theorix Charm
+Bot2.Battlefield = Mountain; Ornithopter

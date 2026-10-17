@@ -1,0 +1,30 @@
+# "Mill three cards, then draw a card" with exactly three cards in the library: all three are milled, and the draw from
+# the empty library makes Bot1 lose the next time state-based actions are checked (CR 704.5b, 121.4).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Theorix Charm
+Island
+Island
+Island
+Island
+Plains
+Swamp
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Theorix Charm.Cast
+Bot1.Modes(Mill three cards)
+
+[Expect]
+Result = Bot2 won
+Bot1.Graveyard = Theorix Charm; Forest; Swamp; Plains
+Bot1.Library.Count = 0

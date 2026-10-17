@@ -1,0 +1,40 @@
+# The positive control for the counter: Bot2 taps Mox Ruby and Mox Pearl for mana before casting Lightning Bolt with the
+# Mountain's, so two floating mana pay the {2} when Bot1's Theorix Charm asks: Lightning Bolt is not countered and Bot1
+# takes 3. Theorix Charm still goes to Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Theorix Charm
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Theorix Charm.Cast
+Bot1.Modes(Counter target noncreature spell)
+Bot1.Target(Stack.Lightning Bolt)
+Bot2.PayCost
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Theorix Charm

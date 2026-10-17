@@ -1,0 +1,46 @@
+# -2/-2 on Sheoldred, the Apocalypse (4/5) leaves her a 2/3 that survives, and the effect lasts only until end of turn
+# (CR 514.2): on Bot2's turn 4 she is 4/5 again. Bot1 lost 2 life to her trigger on the turn-3 draw.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Theorix Charm
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sheoldred, the Apocalypse
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sheoldred, the Apocalypse.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Theorix Charm.Cast
+Bot1.Modes(Target creature gets -2/-2)
+Bot1.Target(Sheoldred, the Apocalypse)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Sheoldred, the Apocalypse.Power = 2
+? Bot2.Battlefield.Sheoldred, the Apocalypse.Toughness = 3
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Sheoldred, the Apocalypse.Power = 4
+Bot2.Battlefield.Sheoldred, the Apocalypse.Toughness = 5
+Bot1.Graveyard = Theorix Charm

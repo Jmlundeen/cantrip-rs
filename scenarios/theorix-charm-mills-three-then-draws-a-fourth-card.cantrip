@@ -1,0 +1,34 @@
+# Theorix Charm's third mode: "Mill three cards, then draw a card." On turn 1 (no draw) the top four cards are Plains,
+# Swamp, Forest and Lightning Bolt: the first three are milled and the draw takes the next, Lightning Bolt. Moxen paid for it.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Theorix Charm
+Island
+Island
+Island
+Island
+Plains
+Swamp
+Forest
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Theorix Charm.Cast
+Bot1.Modes(Mill three cards)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Graveyard = Theorix Charm; Forest; Swamp; Plains
+Bot1.Hand = Island; Island; Island; Island; Lightning Bolt
+Bot1.Library.Count = 10

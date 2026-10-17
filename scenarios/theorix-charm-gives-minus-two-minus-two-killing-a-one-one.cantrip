@@ -1,0 +1,36 @@
+# Theorix Charm's second mode: "Target creature gets -2/-2 until end of turn." Llanowar Elves (1/1) becomes -1/-1 and
+# dies as a state-based action (CR 704.5f). Only a creature can be targeted: Bot2's Mox Ruby is refused.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Theorix Charm
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Theorix Charm.Cast
+Bot1.Modes(Target creature gets -2/-2)
+! Bot1.Target(Mox Ruby)
+Bot1.Target(Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest; Mox Ruby
+Bot1.Graveyard = Theorix Charm
