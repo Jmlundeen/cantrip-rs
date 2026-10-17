@@ -481,7 +481,8 @@ impl<'s> Run<'s> {
             // `! Bot1.Accept`, `! Bot1.Choose`, a bare `! Bot1.Target` or `! Bot2.Block`...: the player is not asked that kind of question
             // before their next priority (a bare Block: no block is possible, so the declaration is never asked for).
             if let Some(ScriptStep::Refused { action, line, text }) = self.current()
-                && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some()))
+                && ((action.verb.is_question() && !(matches!(action.verb, ScriptVerb::Choose | ScriptVerb::Colors | ScriptVerb::Name) && action.positional().next().is_some())
+                    && !(matches!(action.verb, ScriptVerb::Arrange) && !action.raw_arguments.trim().is_empty()))
                     || (matches!(action.verb, ScriptVerb::Target | ScriptVerb::Modes | ScriptVerb::Block)
                         && action.positional().next().is_none()
                         && action.named("Count").is_none()))
@@ -1606,6 +1607,14 @@ impl<'s> Run<'s> {
                     }
                 }
             }
+            // `! Bot1.Arrange(A; B | )`: the distribution is one the question refuses (too many to the hand, a card
+            // unplaced), judged by the rules' own check of the answer.
+            RequestKind::DistributeCards { cards, destinations, .. } if !action.raw_arguments.trim().is_empty() => {
+                let placements = self.arrangement(action, cards, destinations)?;
+                if check_answer(&self.game, request, &Answer::Placements { placements, shuffle: false }).is_ok() {
+                    return fail(format!("line {line} says {text} must not be an answer the question accepts, but it is"));
+                }
+            }
             _ => {}
         }
         Ok(())
@@ -1783,6 +1792,16 @@ impl<'s> Run<'s> {
             }
             return Ok(Answer::Placements { placements: vec![Vec::new(); destinations.len()], shuffle: true });
         }
+        let placements = self.arrangement(step, cards, destinations)?;
+        if let Some(problem) = distribution_problem(cards, destinations, &placements) {
+            return fail(format!("line {}: {problem}", step.line));
+        }
+        Ok(Answer::Placements { placements, shuffle: false })
+    }
+
+    /// The placements `Arrange(A; B | C)` names, as named: the cards must be among those looked at, but whether the
+    /// question accepts the distribution is not judged (a refusal, `! Bot1.Arrange(..)`, asks the rules that).
+    fn arrangement(&self, step: &ActionStep, cards: &[ObjectId], destinations: &[Destination]) -> R<Vec<Vec<ObjectId>>> {
         let groups: Vec<&str> = step.raw_arguments.split('|').collect();
         if groups.len() > destinations.len() {
             return fail(format!("line {}: {} groups for {} destinations", step.line, groups.len(), destinations.len()));
@@ -1797,10 +1816,7 @@ impl<'s> Run<'s> {
                 }
             }
         }
-        if let Some(problem) = distribution_problem(cards, destinations, &placements) {
-            return fail(format!("line {}: {problem}", step.line));
-        }
-        Ok(Answer::Placements { placements, shuffle: false })
+        Ok(placements)
     }
 
     /// `Triggers(A; B)`: each trigger named by its source's name or part of its text, in the order they go on the

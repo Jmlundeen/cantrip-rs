@@ -306,6 +306,10 @@ The same holds for the other questions, written bare: `! Bot1.Choose`, `! Bot1.D
 `! Bot1.Arrange`, `! Bot1.ChoosePlayer`, `! Bot1.Modes` and `! Bot1.Target` (without arguments) fail if that player is asked that kind
 of question before their next priority: a discard, a search result, a placement or a target that should not be asked for (an
 empty hand, a lone candidate, nothing to reveal). Pair each with a scenario that does ask it.
+
+`! Bot1.Arrange(A; B | )` with arguments is a distribution the question must refuse (two cards to a hand that takes one, a
+card left unplaced), judged by the rules' own check of the answer at the next placement question; place it before the
+`Arrange` that answers, beside which it is the positive control.
 `! Bot1.Discard` is the discard to hand size at cleanup (no maximum hand size): a refusal is checked until the player's next priority, so
 place it after the `Bot1.Pass` of the end step (`[T5 Bot1.End]`, `Bot1.Pass`) or the end step's own priority ends it first.
 
