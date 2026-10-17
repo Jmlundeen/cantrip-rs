@@ -1,0 +1,44 @@
+# Flamecache Gecko: only an opponent's life loss counts. Bot1 casts Dismember paying 2 life for each {B/P} (20 -> 16) at
+# Bot2's Llanowar Elves, then casts the Gecko: Bot2 has lost no life, so no mana is added and the pool ends empty.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Dismember
+Flamecache Gecko
+Island x2
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dismember.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Modes(1; 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Flamecache Gecko.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 16
+Bot2.Life = 20
+Bot1.Mana = 
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Flamecache Gecko

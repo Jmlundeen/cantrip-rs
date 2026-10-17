@@ -1,0 +1,43 @@
+# Flamecache Gecko: "if an opponent lost life this turn". Bot1 casts the Gecko; Bot2 answers by casting Dismember at its own
+# Llanowar Elves, paying 2 life for each {B/P} (20 -> 16), so when the Gecko enters an opponent has lost life and {B}{R} is
+# added. Bot1's own life is untouched. The second scenario (Bot1 pays the life itself) is the refusal.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Flamecache Gecko
+Island x4
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Dismember
+Island x3
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Flamecache Gecko.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Dismember.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Modes(1; 2)
+Bot2.Battlefield.Mox Emerald.Activate
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 20
+Bot1.Mana = {B}{R}
+Bot1.Battlefield = Mox Jet; Mox Ruby; Flamecache Gecko
