@@ -29,11 +29,12 @@ pub fn sorcery_timing(cx: &Cx, player: PlayerId) -> bool {
 pub fn priority_options(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
     let mut options = Vec::new();
     mana_ability_options(cx, player, &mut options);
-    // Split second (CR 702.61a): with such a spell on the stack, mana abilities are all anyone may do.
+    // Split second (CR 702.61a-b): with such a spell on the stack, mana abilities and special actions are all anyone may do
+    // (`activated_options` offers only the special actions then).
+    activated_options(cx, player, &std::cell::OnceCell::new(), false, &mut options);
     if split_second(cx) {
         return options;
     }
-    activated_options(cx, player, &std::cell::OnceCell::new(), false, &mut options);
     let available = std::cell::OnceCell::new();
     castable(cx, player, &available, true, &mut options);
     if sorcery_timing(cx, player) {
@@ -46,12 +47,13 @@ pub fn priority_options(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
 /// Whether a spell with split second is on the stack (CR 702.61a): read from the printed cards of what is on the stack,
 /// which is nothing at all for nearly every priority pass.
 fn split_second(cx: &Cx) -> bool {
-    cx.s().stack.iter().any(|i| {
-        i.kind == StackKind::Spell && {
-            let obj = cx.s().obj(i.object);
-            cx.card(obj.copy.map_or(obj.card, |c| c.card)).keywords.has(Keyword::SplitSecond)
-        }
-    })
+    cx.s().stack.iter().any(|i| i.kind == StackKind::Spell && has_split_second(cx, i.object))
+}
+
+/// Whether the spell `spell` has split second, by its printed card or the card it copies.
+fn has_split_second(cx: &Cx, spell: ObjectId) -> bool {
+    let obj = cx.s().obj(spell);
+    cx.card(obj.copy.map_or(obj.card, |c| c.card)).keywords.has(Keyword::SplitSecond)
 }
 
 fn activated(cx: &Cx, ability: AbilityRef) -> Option<&'static ActivatedDef> {
@@ -1827,8 +1829,8 @@ pub fn could_act_with_more_mana(cx: &Cx, player: PlayerId) -> bool {
     let unlimited = std::cell::OnceCell::new();
     let _ = unlimited.set(more);
     let mut options = Vec::new();
+    activated_options(cx, player, &unlimited, true, &mut options);
     if !split_second(cx) {
-        activated_options(cx, player, &unlimited, true, &mut options);
         castable(cx, player, &unlimited, true, &mut options);
         if sorcery_timing(cx, player) {
             castable(cx, player, &unlimited, false, &mut options);
@@ -1851,12 +1853,15 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
         .chain(cx.s().zone(Zone::graveyard(player)).iter().copied())
         .collect();
     let forbidders = static_rules::activation_forbidders(cx);
+    // Split second (CR 702.61a-b): no activated ability but a special action (turning a face-down creature face up, CR 116.2b).
+    let split = split_second(cx);
     for id in sources {
         let zone = cx.s().obj(id).zone.kind();
         let chars = cx.chars(id);
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
             if def.is_mana_ability()
+                || (split && !def.special_action)
                 || def.from != zone
                 || limit_reached(cx, id, &chars, index, def)
                 || static_rules::activation_barred(cx, &forbidders, id, def)
@@ -3701,6 +3706,13 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
+        return Vec::new();
+    }
+    // Split second (CR 702.61a): no spell is cast, by a resolving effect either, while a spell with it is on the stack under
+    // what resolves (Krosan Grip's ruling: "If the resolution of a triggered ability involves casting a spell, that spell can't
+    // be cast if a spell with split second is on the stack").
+    let below = &cx.s().stack[..cx.s().stack.len() - 1];
+    if below.iter().any(|i| i.kind == StackKind::Spell && has_split_second(cx, i.object)) {
         return Vec::new();
     }
     if cast_barred(cx, player).contains(obj.zone.kind()) {
