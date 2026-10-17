@@ -2039,22 +2039,27 @@ public sealed partial class TacticalPlay
         }
 
         // An X that a target's mana value must equal, where the targets are creature cards in this seat's graveyard
-        // (Likeness Looter's "target creature card in your graveyard with mana value X"): the costliest of them the mana
-        // reaches, worth the most to copy. The targets are chosen after X (CR 601.2b-c), so the largest X affordable would
-        // most often have nothing to target; with none in reach the ability is given up.
+        // (Likeness Looter's "target creature card in your graveyard with mana value X"): the one the mana reaches that is
+        // worth the most to become. Not a card with no toughness of its own (Walking Ballista's 0/0: the copy doesn't enter,
+        // gets no counters and dies, CR 704.5f), nor one worth no more than the source is now. The targets are chosen
+        // after X (CR 601.2b-c), so the largest X affordable would most often have nothing to target; with nothing worth
+        // it in reach the ability is given up.
         if (prompt.AnnouncesXOrKicks && prompt.HasX && prompt.Kicker.Length == 0 && client.Object(prompt.Spell) is { } source
             && CardReading.Plain(CardReading.Text(source)).Contains("creature card in your graveyard with mana value x", StringComparison.Ordinal))
         {
             int reach = AutoPlay.AnnouncedValue(prompt);
+            double now = _model.WorthOnceCast(source);
             ObjectView? best = client.Zone(ZoneKindView.Graveyard, client.Seat)
-                .Where(card => IsCreature(card) && card.ManaValue <= reach)
-                .MaxBy(card => card.ManaValue);
-            if (best is null && prompt.Options.Find(option => option.Kind == ActionKindView.CancelCasting) is { } none)
+                .Where(card => IsCreature(card) && card.ManaValue <= reach && (card.Toughness ?? 0) > 0 && _model.WorthOnceCast(card) > now)
+                .MaxBy(_model.WorthOnceCast);
+            if (best is null)
             {
-                return AutoPlay.Answer(none);
+                return prompt.Options.Find(option => option.Kind == ActionKindView.CancelCasting) is { } none
+                    ? AutoPlay.Answer(none)
+                    : AutoPlay.Announce(prompt, 0);
             }
 
-            return AutoPlay.Announce(prompt, best?.ManaValue ?? 0);
+            return AutoPlay.Announce(prompt, best.ManaValue);
         }
 
         // X is announced before anything is paid (CR 601.2b), at what the mana reaches: not counting the mana that
