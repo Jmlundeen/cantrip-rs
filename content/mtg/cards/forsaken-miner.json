@@ -1,0 +1,8 @@
+{
+  "name": "Forsaken Miner",
+  "manaCost": "{B}",
+  "type": "Creature — Skeleton Rogue",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "This creature can't block.\nWhenever you commit a crime, you may pay {B}. If you do, return this card from your graveyard to the battlefield. (Targeting opponents, anything they control, and/or cards in their graveyards is a crime.)"
+}

@@ -1,0 +1,53 @@
+# Forsaken Miner dies to Bot2's Lightning Bolt on turn 2. On turn 3 Bot1 casts its own Lightning Bolt at Bot2 (targeting an
+# opponent is a crime, CR 700.13). The Miner, in the graveyard, triggers; when the trigger resolves Bot1 pays {B} (a Swamp
+# that was already tapped for it) and the Miner returns to the battlefield (untapped, a new object) while the Bolt is
+# still on the stack, which then resolves for 3.
+
+[Bot1 Deck]
+Swamp
+Forsaken Miner
+Mox Ruby
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Forsaken Miner.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Forsaken Miner)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Forsaken Miner
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+? Bot1.Graveyard = Forsaken Miner
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+? Stack = Lightning Bolt
+? Bot1.Graveyard.Count = 0
+? Bot1.Battlefield.Forsaken Miner.Tapped = false
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forsaken Miner; Mox Ruby; Swamp; Swamp
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 17
+Bot1.Battlefield.Swamp#1.Tapped = true
+Bot1.Battlefield.Swamp#2.Tapped = false

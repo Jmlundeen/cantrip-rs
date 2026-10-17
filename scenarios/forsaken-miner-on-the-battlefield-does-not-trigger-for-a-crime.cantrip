@@ -1,0 +1,41 @@
+# The trigger functions only from the graveyard (CR 113.6k). With the Miner alive on the battlefield, Bot1's Lightning Bolt at
+# Bot2 is a crime but nothing triggers and nothing is asked: still one Miner, no mana spent on it (the positive control is
+# forsaken-miner-returns-from-the-graveyard-on-a-crime-when-b-is-paid).
+
+[Bot1 Deck]
+Swamp
+Forsaken Miner
+Mox Ruby
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Forsaken Miner.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+? Bot1.Crimes = Lightning Bolt
+! Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forsaken Miner; Mox Ruby; Swamp; Swamp
+Bot1.Graveyard = Lightning Bolt
+Bot2.Life = 17
+Bot1.Battlefield.Swamp#1.Tapped = false
+Bot1.Battlefield.Swamp#2.Tapped = false

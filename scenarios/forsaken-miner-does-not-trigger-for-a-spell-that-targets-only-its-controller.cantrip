@@ -1,0 +1,47 @@
+# Targeting yourself is no crime (CR 700.13): with the Miner in the graveyard, Bot1's Lightning Bolt aimed at its own face
+# does not trigger it, so no payment is asked (the positive control is the scenario where the Bolt targets Bot2).
+
+[Bot1 Deck]
+Swamp
+Forsaken Miner
+Mox Ruby
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Forsaken Miner.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Forsaken Miner)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Forsaken Miner
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 1
+? Bot1.Graveyard = Forsaken Miner
+! Bot1.Decline
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Swamp; Swamp
+Bot1.Graveyard = Lightning Bolt; Forsaken Miner
+Bot1.Life = 17
+Bot2.Life = 20
+Bot1.Crimes = (absent)

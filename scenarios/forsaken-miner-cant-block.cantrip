@@ -1,0 +1,36 @@
+# "This creature can't block." Bot2's Elvish Mystic attacks on turn 4. Bot1 may not block with Forsaken Miner (refused),
+# while its Ornithopter, in the same combat, can (the positive control): the Mystic is blocked and Bot1 takes no damage.
+
+[Bot1 Deck]
+Swamp
+Forsaken Miner
+Ornithopter
+Swamp x20
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Swamp x22
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Forsaken Miner.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1)
+! Bot1.Block(Forsaken Miner > Elvish Mystic)
+Bot1.Block(Ornithopter > Elvish Mystic)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Forsaken Miner; Ornithopter; Swamp

@@ -1,0 +1,50 @@
+# The payment is optional ("you may pay {B}"): the same position as forsaken-miner-returns-from-the-graveyard-on-a-crime-when-b-is-paid,
+# but Bot1 declines to pay when the trigger resolves. The Miner stays in the graveyard and the Bolt still resolves.
+
+[Bot1 Deck]
+Swamp
+Forsaken Miner
+Mox Ruby
+Lightning Bolt
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Forsaken Miner.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Forsaken Miner)
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Forsaken Miner
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+? Bot1.Graveyard = Forsaken Miner
+Bot1.Battlefield.Swamp.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Stack = Lightning Bolt
+? Bot1.Graveyard = Forsaken Miner
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Swamp; Swamp
+Bot1.Graveyard = Lightning Bolt; Forsaken Miner
+Bot2.Life = 17
+Bot1.Battlefield.Swamp#1.Tapped = true
+Bot1.Battlefield.Swamp#2.Tapped = false
