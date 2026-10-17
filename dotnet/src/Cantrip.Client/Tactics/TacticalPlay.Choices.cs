@@ -786,6 +786,18 @@ public sealed partial class TacticalPlay
             return new CardsChosenAnswer { Cards = [.. materials.Take(need)] };
         }
 
+        // A sacrifice whose power is what the spell deals (Fling, Kazuul's Fury: "the sacrificed creature's power"): the strongest
+        // creature it may give up, the one worth least among equals - a 0-power one would make the spell do nothing.
+        if (prompt.Purpose == CardChoicePurposeView.Sacrifice && prompt.Count == 1
+            && client.Object(prompt.Source) is { } flung
+            && CardReading.Plain(CardReading.Text(flung)).Contains("sacrificed creature's power", StringComparison.Ordinal))
+        {
+            List<ViewHandle> strongest = [.. prompt.Eligible
+                .OrderByDescending(card => client.Object(card)?.Power ?? 0)
+                .ThenBy(card => client.Object(card) is { } known ? Worth(client, known) : 0)];
+            return new CardsChosenAnswer { Cards = [.. strongest.Take(1)] };
+        }
+
         // Giving something up, or taking something: which end of the ranking is wanted. A card revealed to be kept or put into play
         // (Break Out) is taken, so the ordinary best-first ranking stands.
         bool losing = prompt.Purpose is CardChoicePurposeView.Discard or CardChoicePurposeView.Sacrifice or CardChoicePurposeView.Exile

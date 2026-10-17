@@ -924,10 +924,33 @@ impl<'a> Projector<'a> {
         }
         // Protection (CR 702.16) an effect or another permanent's static ability gave it (Mother of Runes, Akroma's Memorial):
         // no line of its own says so. One its own text prints (Progenitus, a leveled Hexdrinker, True-Name Nemesis) is that line.
-        if !view.oracle_text.to_lowercase().contains("protection from")
-            && let Some(text) = self.protection_text(c)
-        {
-            view.granted_abilities.push(AbilityTextView { text, spent: false });
+        if !view.oracle_text.to_lowercase().contains("protection from") {
+            if let Some(text) = self.protection_text(c) {
+                view.granted_abilities.push(AbilityTextView { text, spent: false });
+            }
+        } else {
+            // Its own text prints a protection: what resolved effects gave it besides (Mother of Runes on herself) is shown
+            // on its own line, read from the effects. (A static ability of another permanent giving more is not told apart.)
+            let mut given = *c;
+            given.protection = ColorSet::NONE;
+            given.protection_colorless = false;
+            given.protection_players = 0;
+            given.protection_types = TypeSet::NONE;
+            given.protection_colored_spells = false;
+            given.protection_everything = false;
+            for e in self.game.state.effects.iter().filter(|e| e.affected == id) {
+                match e.kind {
+                    EffectKind::Protection(colors) => given.protection = ColorSet(given.protection.0 | colors.0),
+                    EffectKind::ProtectionFromColorless => given.protection_colorless = true,
+                    EffectKind::ProtectionFromTypes(types) => given.protection_types = TypeSet(given.protection_types.0 | types.0),
+                    EffectKind::ProtectionFromEverything => given.protection_everything = true,
+                    EffectKind::ProtectionFromPlayer(p) => given.protection_players |= 1 << p.0,
+                    _ => {}
+                }
+            }
+            if let Some(text) = self.protection_text(&given) {
+                view.granted_abilities.push(AbilityTextView { text, spent: false });
+            }
         }
         let printed = |ability: AbilityRef| {
             (ability.card == c.card && usize::from(ability.index) < def.abilities.len())
@@ -987,7 +1010,14 @@ impl<'a> Projector<'a> {
         if c.protection_colored_spells {
             words.push("colored spells".to_string());
         }
-        words.extend(c.protection_types.iter().map(|t| format!("{}s", t.name().to_lowercase())));
+        // Plural, as cards print it: "from instants", "from sorceries".
+        words.extend(c.protection_types.iter().map(|t| {
+            let name = t.name().to_lowercase();
+            match name.strip_suffix('y') {
+                Some(stem) => format!("{stem}ies"),
+                None => format!("{name}s"),
+            }
+        }));
         for p in 0..8u8 {
             if c.protection_players & (1 << p) != 0 {
                 words.push(self.names.get(p as usize).cloned().unwrap_or_else(|| format!("player {}", p + 1)));

@@ -357,6 +357,20 @@ public sealed class TacticalPlayTests
     }
 
     [Fact]
+    public void Flings_its_strongest_creature_not_the_one_worth_least()
+    {
+        const string fling = "As an additional cost to cast this spell, sacrifice a creature.\nFling deals damage equal to the sacrificed creature's power to any target.";
+        GameClient client = Seated([Land(1), Land(2), Creature(3, "Ornithopter", 0, 2), Creature(4, "Bear", 2, 2), InHand(10, "Fling", CardTypeView.Instant, 2, fling)]);
+        var sacrifice = new ChooseCardsPromptMessage
+        {
+            Player = Me, Source = Handle(10), Purpose = CardChoicePurposeView.Sacrifice, Count = 1,
+            Cards = [Handle(3), Handle(4)], Eligible = [Handle(3), Handle(4)],
+        };
+
+        Assert.Equal([Handle(4)], Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, sacrifice)).Cards);
+    }
+
+    [Fact]
     public void Takes_an_extra_turn_but_not_one_that_loses_it_the_game()
     {
         GameClient client = Seated(

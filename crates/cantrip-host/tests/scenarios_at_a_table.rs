@@ -537,6 +537,14 @@ fn protection_a_permanent_was_given_is_shown_and_a_printed_one_is_not_repeated()
     });
     assert!(mother, "Bot2 is told the Blade Mother of Runes protected has protection from red");
 
+    // Mother of Runes on herself: her own text says "protection from", and the protection an effect gave her is still shown.
+    let mut herself = false;
+    play_looking("mother-of-runes-in-response-makes-a-lightning-bolt-fizzle", |_, views, _| {
+        herself |= granted_lines(&views[0], "Mother of Runes").is_some_and(|lines| lines.iter().any(|l| l == "Protection from red"));
+        false
+    });
+    assert!(herself, "Bot1 is told Mother of Runes gave herself protection from red");
+
     let mut progenitus_seen = false;
     play_looking("progenitus-cannot-be-targeted-blocked-enchanted-or-damaged", |_, views, _| {
         for view in views {
