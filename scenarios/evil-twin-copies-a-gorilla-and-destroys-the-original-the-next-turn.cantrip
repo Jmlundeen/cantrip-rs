@@ -1,0 +1,57 @@
+# Evil Twin enters as a copy of Bot2's Guerrilla Gorilla (CR 707.2, 614.1c) with the exception's "{U}{B}, {T}: Destroy target
+# creature with the same name as this creature" (CR 707.9b). It is the only creature out, so it is copied without asking which.
+# On turn 3 the ability can't be activated: its {T} is a creature's that came under Bot1's control this turn (CR 302.6). On
+# turn 5 it destroys Bot2's Guerrilla Gorilla; Bot2's Llanowar Elves, not named Guerrilla Gorilla, can't be its target (CR 115.1).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Evil Twin
+Island x11
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Llanowar Elves
+Forest x11
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Evil Twin.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+! Bot1.Battlefield.Guerrilla Gorilla.Activate(Ability: same name)
+[T4 Bot2.Main1]
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Guerrilla Gorilla.Activate(Bot2.Battlefield.Llanowar Elves; Ability: same name)
+Bot1.Battlefield.Guerrilla Gorilla.Activate(Bot2.Battlefield.Guerrilla Gorilla; Ability: same name)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Tapped = true
+Bot1.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Soldier
+Bot2.Battlefield = Forest; Mox Emerald; Llanowar Elves
+Bot2.Graveyard = Guerrilla Gorilla

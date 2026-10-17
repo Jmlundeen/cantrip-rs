@@ -1,0 +1,65 @@
+# The ability Evil Twin's exception adds is a copiable value (CR 707.9b; the ruling): Evil Twin is a copy of Bot2's Grizzly
+# Bears with "{U}{B}, {T}: Destroy target creature with the same name as this creature", and Phyrexian Metamorph entering as a
+# copy of that Twin is an artifact Guerrilla Gorilla with the ability as well. On turn 5 the Metamorph uses it on Bot2's Grizzly
+# Bears.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Evil Twin
+Phyrexian Metamorph
+Island
+Island x9
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Evil Twin.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Modes(1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Guerrilla Gorilla)
+? Bot1.Battlefield.Guerrilla Gorilla#2.Types = Creature; Artifact
+[T5 Bot1.Main1]
+Bot1.Battlefield.Guerrilla Gorilla#2.Activate(Bot2.Battlefield.Guerrilla Gorilla; Ability: same name)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Mox Pearl; Island; Guerrilla Gorilla; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla#2.Types = Creature; Artifact
+Bot1.Battlefield.Guerrilla Gorilla#2.Tapped = true
+Bot1.Battlefield.Guerrilla Gorilla#1.Tapped = false
+Bot2.Graveyard = Guerrilla Gorilla

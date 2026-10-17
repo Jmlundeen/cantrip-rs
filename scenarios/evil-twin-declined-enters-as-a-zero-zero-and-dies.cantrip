@@ -1,0 +1,41 @@
+# Evil Twin's copy is a "you may" (CR 614.1c, 707.2): Bot1 declines with Bot2's Guerrilla Gorilla out, and Evil Twin enters as
+# itself, a 0/0 Shapeshifter with no abilities, which the state-based actions put into the graveyard (CR 704.5f; the ruling:
+# "In that case, Evil Twin enters the battlefield as a 0/0 creature, and is probably put into the graveyard immediately").
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Evil Twin
+Island x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Evil Twin.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet
+Bot1.Graveyard = Evil Twin; Black Lotus
+Bot2.Battlefield = Forest; Mox Emerald; Guerrilla Gorilla
+Stack.Count = 0
