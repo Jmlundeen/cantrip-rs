@@ -1,0 +1,37 @@
+# The life total is read as Hidetsugu's Second Rite resolves (CR 608.2c), not as it is cast: Bot2 is at 12 when the Rite is
+# cast, Bot1 responds with Shock (12 -> 10), and the Rite then finds exactly 10 and deals 10 damage: Bot2 loses.
+
+[Life]
+Bot2: 12
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Hidetsugu's Second Rite
+Shock
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Hidetsugu's Second Rite.Cast(Bot2)
+Bot1.Hand.Shock.Cast(Bot2)
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost

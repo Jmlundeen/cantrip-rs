@@ -1,0 +1,33 @@
+# Hidetsugu's Second Rite: "If target player has exactly 10 life, deals 10 damage to that player." Bot2 starts at exactly 10
+# life, so the 10 damage takes it to 0 and it loses the game (CR 704.5a). Bot1 pays {3}{R} with four Mox Rubies.
+
+[Life]
+Bot2: 10
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Hidetsugu's Second Rite
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Hidetsugu's Second Rite.Cast(Bot2)
+
+[Expect]
+Result = Bot1 won
+Bot2.Status = Lost
+Bot1.Life = 20

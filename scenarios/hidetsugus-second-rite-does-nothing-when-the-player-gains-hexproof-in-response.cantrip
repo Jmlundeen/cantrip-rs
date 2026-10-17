@@ -1,0 +1,45 @@
+# Hidetsugu's Second Rite targets Bot2, who is at exactly 10 life. Bot2 responds with Dawn's Truce, gaining hexproof, so the
+# Rite's only target is illegal as it resolves (CR 608.2b) and the spell does not resolve: Bot2 stays at 10 and is alive.
+# (Bot2's Mox Pearls pay for Dawn's Truce, {1}{W}.)
+
+[Life]
+Bot2: 10
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Hidetsugu's Second Rite
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Dawn's Truce
+Island x20
+
+[Actions]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Hidetsugu's Second Rite.Cast(Bot2)
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Dawn's Truce.Cast
+[Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Stack.Count = 0
+Bot2.Life = 10
+Bot1.Graveyard = Hidetsugu's Second Rite
+Bot2.Graveyard = Dawn's Truce

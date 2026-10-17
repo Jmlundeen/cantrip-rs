@@ -1,0 +1,40 @@
+# Counterpart of the scenario above: Bot2 is at exactly 10 when the Rite is cast, but Bot1's own Shock in response takes it to
+# 8, and the Rite finds a life total that is not 10 as it resolves and does nothing. Bot2 survives at 8.
+
+[Life]
+Bot2: 10
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Hidetsugu's Second Rite
+Shock
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Hidetsugu's Second Rite.Cast(Bot2)
+Bot1.Hand.Shock.Cast(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Stack.Count = 0
+Bot2.Life = 8
+Bot1.Graveyard = Hidetsugu's Second Rite; Shock

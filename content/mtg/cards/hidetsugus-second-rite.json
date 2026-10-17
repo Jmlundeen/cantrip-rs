@@ -1,0 +1,6 @@
+{
+  "name": "Hidetsugu's Second Rite",
+  "manaCost": "{3}{R}",
+  "type": "Instant",
+  "oracleText": "If target player has exactly 10 life, Hidetsugu's Second Rite deals 10 damage to that player."
+}
