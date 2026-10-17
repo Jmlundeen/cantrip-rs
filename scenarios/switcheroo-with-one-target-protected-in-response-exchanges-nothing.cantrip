@@ -1,0 +1,59 @@
+# One target becoming illegal while staying on the battlefield stops the whole exchange too (CR 608.2b, 701.12a: if the
+# entire exchange can't be completed, no part of it occurs). Bot1 casts Switcheroo on its Ornithopter and Bot2's Llanowar
+# Elves; in response Bot2's Mother of Runes gives the Elves protection from blue, so the blue Switcheroo can no longer target
+# it (CR 702.16b). Switcheroo resolves with only the Ornithopter a legal target: both creatures stay where they were.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Ornithopter
+Switcheroo
+Island x13
+
+[Bot2 Deck]
+Plains
+Mox Emerald
+Mother of Runes
+Llanowar Elves
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Mother of Runes.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Switcheroo.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mother of Runes.Activate(Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Colors(Blue)
+? Bot2.Battlefield.Llanowar Elves.ProtectionFrom = Blue
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Island; Ornithopter
+Bot1.Graveyard = Switcheroo
+Bot2.Battlefield = Plains; Mox Emerald; Mother of Runes; Llanowar Elves

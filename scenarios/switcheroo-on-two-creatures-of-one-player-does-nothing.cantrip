@@ -1,0 +1,49 @@
+# "You don't have to control either target" and "if the same player controls both creatures when Switcheroo resolves,
+# nothing happens" (its rulings; CR 701.12b). Bot1 casts Switcheroo on two of Bot2's creatures, Llanowar Elves and
+# Ornithopter: both stay Bot2's, and neither came under a new controller, so the Elves (cast on Bot2's turn before) taps
+# for {G} on Bot2's next turn.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Switcheroo
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x17
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Switcheroo.Cast
+Bot1.Target(Bot2.Battlefield.Llanowar Elves; Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Llanowar Elves.Activate
+? Bot2.Mana = {G}
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Island
+Bot1.Graveyard = Switcheroo
+Bot2.Battlefield = Forest; Llanowar Elves; Ornithopter

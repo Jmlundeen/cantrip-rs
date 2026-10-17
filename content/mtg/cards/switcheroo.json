@@ -1,0 +1,6 @@
+{
+  "name": "Switcheroo",
+  "manaCost": "{4}{U}",
+  "type": "Sorcery",
+  "oracleText": "Exchange control of two target creatures."
+}

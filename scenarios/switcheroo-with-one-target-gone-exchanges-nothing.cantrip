@@ -1,0 +1,55 @@
+# "If one of the target creatures is an illegal target when Switcheroo resolves, the exchange won't happen" (its ruling;
+# CR 701.12a: if the entire exchange can't be completed, no part of it occurs; CR 608.2b). Bot1 casts Switcheroo on its
+# Ornithopter and Bot2's Llanowar Elves; in response Bot2 bolts the Ornithopter. Switcheroo resolves with one legal target
+# left, and Bot2 keeps the Elves.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Ornithopter
+Switcheroo
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Lightning Bolt
+Forest x16
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Switcheroo.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Island
+Bot1.Graveyard = Switcheroo; Ornithopter
+Bot2.Battlefield = Forest; Mox Ruby; Llanowar Elves
+Bot2.Graveyard = Lightning Bolt

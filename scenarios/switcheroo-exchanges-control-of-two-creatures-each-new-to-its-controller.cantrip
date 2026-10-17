@@ -1,0 +1,51 @@
+# Switcheroo: "Exchange control of two target creatures." When control of two permanents controlled by different players
+# is exchanged, each player gains control of the one the other controlled, at once (CR 701.12b, 613.1b), with no end.
+# Bot1's Ornithopter becomes Bot2's and Bot2's Llanowar Elves becomes Bot1's. Each came under its new controller this turn,
+# so Bot1 can't tap the Elves for mana (CR 302.6); on Bot1's next turn it can, and the exchange has not ended.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Island
+Ornithopter
+Switcheroo
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Switcheroo.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter; Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.SummoningSick = true
+! Bot1.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Island; Llanowar Elves
+Bot1.Graveyard = Switcheroo
+Bot2.Battlefield = Forest; Ornithopter
