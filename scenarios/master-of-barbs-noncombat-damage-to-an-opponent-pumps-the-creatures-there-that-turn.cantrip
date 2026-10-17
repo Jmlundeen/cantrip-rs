@@ -1,0 +1,48 @@
+# Master of Barbs: "Whenever one or more opponents are dealt noncombat damage, creatures you control get +1/+0 until end of
+# turn." Master (2/1 menace), an Ornithopter and then Lightning Bolt at Bot2 (17): the creatures there as the trigger resolves
+# are pumped (Master 3/1, Ornithopter 1/2), an Ornithopter cast afterwards is not (CR 611.2c; its power stays 0). On turn 3
+# the +1/+0 has ended with the turn (CR 514.2).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Master of Barbs
+Lightning Bolt
+Ornithopter
+Ornithopter
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Master of Barbs.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+? Bot1.Battlefield.Master of Barbs.Power = 3
+? Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#2.Power = 0
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Master of Barbs.Power = 2
+Bot1.Battlefield.Ornithopter#1.Power = 0

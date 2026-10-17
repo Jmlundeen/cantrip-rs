@@ -1,0 +1,11 @@
+{
+  "name": "Master of Barbs",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Lizard Bard",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Menace\nWhenever one or more opponents are dealt noncombat damage, creatures you control get +1/+0 until end of turn.",
+  "keywords": [
+    "Menace"
+  ]
+}

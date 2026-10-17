@@ -1,0 +1,59 @@
+# Master of Barbs asks for noncombat damage dealt to an opponent. Three things that are not: in turn 2 Bot2 bolts Bot1 (damage to
+# Master's own controller), in turn 3 Bot1 bolts Bot2's Ornithopter (noncombat damage to a creature, not a player), and then Master
+# of Barbs attacks Bot2 unblocked (combat damage to an opponent, 2). Master is a 2/1 throughout, until the turn is over
+# and Bot2 is at 18 from combat alone.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Master of Barbs
+Lightning Bolt
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Master of Barbs.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 17
+? Bot1.Battlefield.Master of Barbs.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Master of Barbs.Power = 2
+[Bot1.DeclareAttackers]
+Bot1.Attack(Master of Barbs > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield = Mountain
+Bot1.Battlefield.Master of Barbs.Power = 2

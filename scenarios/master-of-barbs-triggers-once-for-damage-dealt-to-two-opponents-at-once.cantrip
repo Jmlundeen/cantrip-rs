@@ -1,0 +1,49 @@
+# CR 603.2c: "one or more opponents are dealt noncombat damage" is one trigger for damage dealt at once. In a three-player game
+# Ingris Stingerquill's attack trigger has the attacker deal 1 damage to each opponent, both together, and Master of Barbs
+# triggers once: the Master is a 3/1 (not 4/1) and Ingris a 2/4. (Master and Ingris cast in turn 1, attack in turn 4.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Master of Barbs
+Ingris Stingerquill
+Mountain x20
+
+[Bot2 Deck]
+Forest x14
+
+[Bot3 Deck]
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Master of Barbs.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ingris Stingerquill.Cast
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+[T4 Bot1.DeclareAttackers]
+Bot1.Attack(Ingris Stingerquill > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+? Bot2.Life = 19
+? Bot3.Life = 19
+? Bot1.Battlefield.Master of Barbs.Power = 3
+? Bot1.Battlefield.Ingris Stingerquill.Power = 2
+
+[Expect]
+Bot1.Battlefield.Master of Barbs.Power = 3
+Bot1.Battlefield.Ingris Stingerquill.Power = 2
