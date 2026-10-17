@@ -564,7 +564,10 @@ the face (`actions::Speed`, as for a split half, a Room's door, a back face and 
 choice of new targets for it read too (CR 715.3c, 720.3c). As it resolves, an Adventure is exiled on its adventure (CR 715.3d)
 and an Omen is shuffled into its owner's library by its controller (CR 720.3d); a copy of an Omen still shuffles its owner's
 library and ceases to exist. Countered, or with every target gone, either goes to the graveyard. The host sends the face as
-`ObjectView::inset_spell`, printed beside the card. Not built: casting the face from the top of a library
+`ObjectView::inset_spell`, printed beside the card. A land card with an Adventure (Lindblum, Industrial Regency) is cast
+only as the Adventure, never as itself (CR 305.9), and exiled on its adventure it is played from exile as a land play (CR
+715.3d). A static ability about "each X card in your graveyard" (Iroh, Underworld Breach) judges the card, which has only
+its normal characteristics there (CR 715.4), and takes the cost from the face cast. Not built: casting the face from the top of a library
 (`PlayRule::LibraryTopSpells`, which offers only the card itself).
 
 ### Costs to attack

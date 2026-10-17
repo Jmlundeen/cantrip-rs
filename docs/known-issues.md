@@ -44,6 +44,7 @@ keeps it).
 | [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-or-fireglass-mentor) | An exile that a replacement sends elsewhere is not exercised by Hex Magic or Fireglass Mentor | Low | Unexercised |
 | [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
+| [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
 
 ## Issues
 
@@ -92,6 +93,7 @@ the line goes.
 | --- | --- | --- |
 | Retargeting a copy (`ops::retarget`): "up to" slots of a modal spell, each-opponent slots, spliced text (CR 702.47c) and kicked-spell targets | nothing | No modal spell in content has an "up to" mode target, no copyable spell has an each-opponent target, and no scenario copies a spliced or kicked spell. |
 | A granted cast of a back face (`GRANTED_FACE_BACK`, `faces_to_cast`) | nothing | No implemented double-faced card has a castable back face. |
+| A flash grant judged for an MDFC back face or a bestowed Aura through `actions::Speed::face`, beyond Sigarda's Aid's bestow | nothing | No implemented double-faced card has a castable noncreature back face; no flash grant names creatures. |
 | The transformed cast's `cast_only_if_met` check (`could_cast_transformed_during_resolution`) | nothing | Only Berserk has a "cast only" condition, and it has no back face. |
 | A "loses all abilities" effect older than an ability granted later (CR 613.1f, 613.7) | Rust test | No implemented card does both. |
 | Gift of an extra turn; a copied permanent spell keeping its gift; "whenever you give a gift" | Rust tests, `crates/cantrip-script/tests/gift.rs` | Perch Protection needs phasing; no implemented card copies a gift permanent or has the trigger. |
@@ -269,3 +271,19 @@ read `library::object_names` before moving the object (The End, Deadly Cover-Up)
 after the move needs the name kept in `LastKnown`.
 
 **Scenarios.** None yet.
+
+### KI-31: An Adventure is never cast from the top of a library
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-16, review of the land-with-an-Adventure change |
+
+**Notes.** A card may be cast as its Adventure wherever the card itself may be cast (CR 715.3), the top of a library
+included: Bolas's Citadel could cast Stomp or Mage Siege off the top for life, and Mystic Forge an Adventure that is an
+artifact or colorless spell. `actions::castable`'s two library-top passes (`PlayRule::LibraryTopSpells`, and
+`top_for_life`) offer only the card itself, never `inset_faces` (also noted in `docs/engine-design.md`, "Spells in an
+inset frame"). Traveling Chocobo's ruling (Lindblum on top: the land may be played, the Adventure not cast) holds today
+only because no face is offered; a fix judges each inset face with the filter, as `Speed::face` does for flash.
+
+**Scenarios.**
+- [`scenarios/traveling-chocobo-plays-lindblum-off-the-top-but-not-its-adventure.cantrip`](../scenarios/traveling-chocobo-plays-lindblum-off-the-top-but-not-its-adventure.cantrip) - the case that must stay refused; none yet for one that must be offered (Bolas's Citadel with Bonecrusher Giant on top).
