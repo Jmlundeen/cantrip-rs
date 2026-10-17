@@ -1864,6 +1864,10 @@ pub fn change_life(cx: &mut Cx, player: PlayerId, delta: i32) {
     }
     cx.st().update_player(player, |p| p.life = p.life.saturating_add(delta));
     cx.emit(Event::LifeChange { player, delta });
+    // CR 702.179d: an opponent losing life during the turn of a player with speed.
+    if delta < 0 {
+        crate::speed::life_lost(cx, player);
+    }
 }
 
 /// The moves left of a destruction once the permanents a regeneration shield saves have regenerated instead

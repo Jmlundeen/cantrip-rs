@@ -9,8 +9,8 @@ use cantrip_state::{PendingTrigger, Span};
 use crate::{Cx, R};
 
 /// Puts an ability of the rules' own on its way to the stack (CR 603.3), controlled by `controller` and about
-/// `subject`. Its source is a new object in no zone: it ceases to matter once the ability resolves.
-fn queue(cx: &mut Cx, card: CardId, index: u8, controller: PlayerId, subject: Target) {
+/// `subject`. Its source is a new object in no zone: it ceases to matter once the ability resolves. The source.
+pub(crate) fn queue(cx: &mut Cx, card: CardId, index: u8, controller: PlayerId, subject: Target) -> ObjectId {
     let source = cx.st().push_obj(Obj::new(card, controller, Zone::GONE));
     cx.st().trigger_push(PendingTrigger {
         source,
@@ -22,6 +22,7 @@ fn queue(cx: &mut Cx, card: CardId, index: u8, controller: PlayerId, subject: Ta
         count: None,
         since: None,
     });
+    source
 }
 
 fn in_game(cx: &Cx, player: PlayerId) -> bool {

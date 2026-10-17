@@ -13,6 +13,7 @@ mod ops;
 mod replace;
 mod resolve;
 mod settle;
+mod speed;
 mod static_rules;
 mod turn;
 mod validate;
@@ -1211,6 +1212,10 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn venture(&mut self, player: PlayerId) -> Result<(), Suspend> {
         designations::venture(self, player).map_err(|_| Suspend)
+    }
+
+    fn increase_speed(&mut self, player: PlayerId, amount: u8) {
+        speed::increase(self, player, amount);
     }
 
     fn damage_cant_be_prevented(&mut self) {

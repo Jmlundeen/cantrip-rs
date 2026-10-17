@@ -751,6 +751,9 @@ pub trait Game: Query {
     /// there are two. The room's ability triggers (CR 309.4c). The one who ventures out of the bottommost room
     /// completes the dungeon (CR 701.49c, 309.7) and enters it again.
     fn venture(&mut self, player: PlayerId) -> Result<(), Suspend>;
+    /// `player`'s speed increases by `amount` (CR 702.179): from none it becomes `amount` (CR 702.179c), and it goes no
+    /// higher than 4, the max speed (CR 702.179e; the Aetherdrift release notes: "can't increase it any higher").
+    fn increase_speed(&mut self, player: PlayerId, amount: u8);
     /// Whether the resolving effect's controller could cast `card` transformed now, from where it is (CR 608.2g,
     /// 712.11a): a double-faced card that is not modal, judged as its back face alone.
     fn could_cast_transformed_during_resolution(&self, card: ObjectId) -> bool;

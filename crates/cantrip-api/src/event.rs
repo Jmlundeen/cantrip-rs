@@ -148,6 +148,9 @@ pub enum Event {
     /// `player` surveilled `count` (CR 701.25a), recorded once the process is complete, even if some or all of it was
     /// impossible (CR 701.25d); `looked` as for `Scried`. Never for "surveil 0" (CR 701.25c).
     Surveilled { player: PlayerId, count: u16, looked: u16 },
+    /// `player`'s speed became `speed` (CR 702.179): set to 1 by the state-based action (CR 704.5aa), or increased
+    /// (CR 702.179c-d). Never for an increase that changed nothing.
+    SpeedChanged { player: PlayerId, speed: u8 },
 }
 
 impl Event {
@@ -176,6 +179,7 @@ impl Event {
             | Event::TurnEnded { player }
             | Event::Scried { player, .. }
             | Event::Surveilled { player, .. }
+            | Event::SpeedChanged { player, .. }
             | Event::CrimeCommitted { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::BecameTarget { controller, .. } | Event::EnteredFaceDown { controller, .. } => Some(controller),
@@ -218,7 +222,7 @@ impl Event {
             | Event::TurnedFaceUp { permanent, .. }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } => false,
         }
     }
 }
@@ -275,6 +279,7 @@ impl EventMask {
     pub const TURNED_FACE_UP: EventMask = EventMask(1 << 43);
     /// Damage was prevented (CR 615.13).
     pub const DAMAGE_PREVENTED: EventMask = EventMask(1 << 44);
+    pub const SPEED_CHANGED: EventMask = EventMask(1 << 45);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -343,6 +348,7 @@ impl EventMask {
             Event::Scried { .. } => EventMask::SCRIED,
             Event::Surveilled { .. } => EventMask::SURVEILLED,
             Event::DamagePrevented { .. } => EventMask::DAMAGE_PREVENTED,
+            Event::SpeedChanged { .. } => EventMask::SPEED_CHANGED,
             _ => EventMask(0),
         }
     }

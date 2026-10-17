@@ -131,6 +131,10 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     if crate::designations::keyword_designations(cx) {
         acted = true;
     }
+    // CR 704.5aa: a player with no speed who controls a permanent with start your engines! gets a speed of 1.
+    if crate::speed::engines_start(cx) {
+        acted = true;
+    }
 
     // CR 704.5f, g, h, i: creatures with no toughness or lethal damage, planeswalkers with no loyalty.
     let mut to_graveyard = Vec::new();

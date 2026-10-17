@@ -1667,6 +1667,9 @@ pub struct CardDef {
     /// Storied (CR 702.195a): while a permanent of this card is on the battlefield and its controller controls three or
     /// more permanents that are artifacts, Sagas and/or legendary, they have an enduring story for the rest of the game.
     pub storied: bool,
+    /// Start your engines! (CR 702.179a): a player who controls a permanent of this card and has no speed gets a speed
+    /// of 1, as a state-based action (CR 704.5aa).
+    pub start_your_engines: bool,
     /// A permanent of this card whose controller sacrifices it at the beginning of the cleanup step when this says so (CR 514.1, 603.7):
     /// Necromancy's \"if you cast it any time a sorcery couldn't have been cast\".
     pub sacrifice_at_cleanup: Option<fn(&dyn Query, ObjectId) -> bool>,
@@ -1821,6 +1824,7 @@ impl CardDef {
         cast_as_though_flash: false,
         ascend: false,
         storied: false,
+        start_your_engines: false,
         sacrifice_at_cleanup: None,
         shares_name: false,
         splice: None,
@@ -1941,6 +1945,9 @@ pub struct CardTable {
     /// Which cards give their controller a designation once the board allows it (ascend, CR 702.131b; storied, CR
     /// 702.195a): their sources are found on the board, and the board counted only for a player one of them works for.
     pub designators: Vec<bool>,
+    /// Which cards have start your engines! (CR 702.179a): their permanents are found on the board for a player with no
+    /// speed (CR 704.5aa).
+    pub engines: Vec<bool>,
     /// The rules' own abilities (`crate::intrinsic`): what a basic land type gives a land (CR 305.6).
     pub intrinsic: CardId,
     /// What a face-down permanent is (CR 708.2a): its copiable values.
@@ -2002,6 +2009,7 @@ impl CardTable {
         let activation_rules: Vec<bool> = cards.iter().map(|c| !c.activation_rules.is_empty()).collect();
         let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();
         let designators: Vec<bool> = cards.iter().map(|c| c.ascend || c.storied).collect();
+        let engines: Vec<bool> = cards.iter().map(|c| c.start_your_engines).collect();
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
@@ -2033,6 +2041,7 @@ impl CardTable {
             activation_rules,
             trigger_rules,
             designators,
+            engines,
             intrinsic,
             face_down,
             undercity,

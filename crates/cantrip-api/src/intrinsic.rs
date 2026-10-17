@@ -54,6 +54,23 @@ pub const UNLOCK_RIGHT: u8 = 13;
 /// the delayed one it sets up.
 pub const DECAYED: u8 = 14;
 pub const DECAYED_SACRIFICE: u8 = 15;
+/// The triggered ability a player with speed has (CR 702.179d).
+pub const SPEED_UP: u8 = 16;
+/// The highest speed, max speed (CR 702.179e): "once your speed reaches 4 ... [you] can't increase it any higher" (the
+/// Aetherdrift release notes).
+pub const MAX_SPEED: u8 = 4;
+
+/// "If your speed is less than 4" (CR 702.179d): the intervening "if" (CR 603.4), asked as it triggers and again as it
+/// resolves. "You" is the ability's controller, the player whose speed it is.
+fn speed_below_max(q: &dyn Query, asker: &Asker) -> bool {
+    q.state().player(asker.controller).speed.is_some_and(|s| s < MAX_SPEED)
+}
+
+/// "Your speed increases by 1" (CR 702.179d).
+fn speed_up(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.increase_speed(item.controller, 1);
+    Ok(())
+}
 
 /// "When this creature attacks" (CR 508.3a).
 fn this_attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -174,6 +191,11 @@ pub static INTRINSIC: CardDef = CardDef {
         unlock("Unlock the right door by paying its mana cost.", unlock_right, right_is_locked),
         triggered(when(EventMask::ATTACKS, this_attacks), decayed_attacks, "When this creature attacks, sacrifice it at end of combat."),
         inherent("Decayed: sacrifice this creature at end of combat.", decayed_sacrifice),
+        inherent(
+            "Whenever one or more opponents lose life during your turn, if your speed is less than 4, your speed increases by 1. This ability triggers only once each turn.",
+            speed_up,
+        )
+        .condition(speed_below_max),
     ],
     ..CardDef::BLANK
 };

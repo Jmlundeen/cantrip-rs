@@ -364,6 +364,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.CitysBlessing` and `BotN.EnduringStory` (`true`), once the player has the designation (CR 702.131c, 702.195b) and
   absent until then
 - `BotN.TurnsToSkip` (`3`), the turns an effect still makes the player skip (CR 500.11, 614.10), absent when none
+- `BotN.Speed` (`1` to `4`), once the player has a speed (CR 702.179) and absent while they have none (CR 702.179b)
 - `BotN.Dungeon` (`Undercity: Forge`) while in a dungeon, and `BotN.DungeonsCompleted` once one is completed (CR 309.7)
 - `BotN.Looked`, the cards the player has looked at, in the order they looked (a look at one card of a hand, Urza's Bauble),
   once they have looked at any and absent until then

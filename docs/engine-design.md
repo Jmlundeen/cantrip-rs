@@ -758,6 +758,24 @@ effect's duration), which the tactical bot reads where it guesses who can attack
 noise (2026-10-16, alternating with the build before: 6.61, 7.81, 7.52, 6.38 us before and 7.05, 6.52, 7.79, 6.29 us
 after).
 
+### Speed
+
+Speed (CR 702.179) is `Player::speed`, `None` until something sets it (CR 702.179b). Start your engines! is
+`CardDef::start_your_engines`, a static ability read by a state-based action (CR 704.5aa, `speed::engines_start`): a player
+with no speed who controls such a permanent that has not lost its abilities gets speed 1, so gaining control of one counts
+and losing it changes nothing (the rulings). The player's inherent triggered ability (CR 702.179d) has no source: it is the
+rules' own, `intrinsic::SPEED_UP`, queued from `ops::change_life` when an opponent of the active player loses life and the
+active player's speed is below 4, from an object in no zone as the monarch's are (`designations::queue`). "Only once each
+turn" is asked of the history: the turn's `Event::Triggered` records of that ability (only the active player's can trigger in
+a turn). "If your speed is less than 4" is its intervening "if" (CR 603.4). `Game::increase_speed` raises speed, never past 4
+(CR 702.179c, e; the release notes), and records `Event::SpeedChanged`. Effects read it with
+`cantrip_mechanics::start_your_engines::{speed, has_max_speed}` (0 for none, CR 702.179f); "Max speed — [ability]" is
+`max_speed::max_speed(text)`, a layer-6 static granting the card's `delayed[0]` while its controller has speed 4
+(CR 702.178a), so below that the permanent has no such ability at all. A max speed ability granting one that works from
+another zone (CR 702.178b) waits for a card. The host sends `PlayerSummaryView::speed` and the client draws "Speed N" or "Max
+speed" beside the life total. The benchmark is unchanged within the noise (2026-10-16, a very busy machine, alternating
+with the build before: 13.54, 22.13, 16.20, 18.59 us before and 12.16, 22.53, 14.30, 13.31 us after).
+
 ### Cases and the solved designation; suspect
 
 Solved (CR 719.3b) is a designation, `Marks::solved`: no ability and no copiable value, so a permanent that becomes a copy of

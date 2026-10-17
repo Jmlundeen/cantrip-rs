@@ -851,6 +851,9 @@ pub struct Player {
     pub room: u8,
     /// Dungeons this player has completed (CR 309.7).
     pub dungeons_completed: u8,
+    /// The player's speed (CR 702.179): none until a rule or effect sets it (CR 702.179b), 1 once they control a
+    /// permanent with start your engines! (CR 704.5aa), and up from there to 4. Nothing decreases it.
+    pub speed: Option<u8>,
 }
 
 /// Mana in a player's pool with a restriction on what it may be spent on (CR 106.6): one entry per player and

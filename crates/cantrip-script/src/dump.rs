@@ -259,6 +259,10 @@ impl StateDump {
             if player.enduring_story {
                 d.set(format!("{b}.EnduringStory"), true);
             }
+            // Speed (CR 702.179): absent while the player has none (CR 702.179b).
+            if let Some(speed) = player.speed {
+                d.set(format!("{b}.Speed"), speed);
+            }
             d.set(format!("{b}.Life"), player.life);
             d.set(format!("{b}.Poison"), player.poison);
             if player.lost {
