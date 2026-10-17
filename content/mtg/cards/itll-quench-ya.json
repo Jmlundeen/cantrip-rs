@@ -1,0 +1,6 @@
+{
+  "name": "It'll Quench Ya!",
+  "manaCost": "{1}{U}",
+  "type": "Instant — Lesson",
+  "oracleText": "Counter target spell unless its controller pays {2}."
+}

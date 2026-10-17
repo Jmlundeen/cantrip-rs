@@ -1,0 +1,41 @@
+# It'll Quench Ya! asks for {2} (CR 118.12): Bot2 casts Lightning Bolt with a Mountain and holds just Mox Jet, whose one mana it makes
+# while asked, so paying {2} is not offered (! Bot2.PayCost) and the Bolt is countered. The Bolt goes to Bot2's graveyard, Bot1 keeps 20 life; the control is the
+# scenario where two mana pay.
+
+[Bot1 Deck]
+Island
+Island
+It'll Quench Ya!
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mox Jet
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.It'll Quench Ya!.Cast(Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.PayCost
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = It'll Quench Ya!
+Bot2.Battlefield.Mox Jet.Tapped = true

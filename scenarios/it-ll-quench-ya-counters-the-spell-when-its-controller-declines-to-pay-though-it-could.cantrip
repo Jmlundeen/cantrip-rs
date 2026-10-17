@@ -1,0 +1,43 @@
+# "Unless its controller pays {2}" is the controller's choice (CR 118.12, 701.6): Bot2 holds Mox Jet and Mox Ruby, two mana, and
+# declines, so the Lightning Bolt is countered and Bot1 keeps its life. Both Moxen stay untapped.
+
+[Bot1 Deck]
+Island
+Island
+It'll Quench Ya!
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.It'll Quench Ya!.Cast(Lightning Bolt)
+Bot1.Pass
+Bot2.Decline
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = It'll Quench Ya!
+Bot2.Battlefield.Mox Jet.Tapped = false
+Bot2.Battlefield.Mox Ruby.Tapped = false

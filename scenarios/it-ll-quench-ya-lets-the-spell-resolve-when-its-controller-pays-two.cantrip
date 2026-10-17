@@ -1,0 +1,46 @@
+# It'll Quench Ya!: "Counter target spell unless its controller pays {2}" (CR 118.12). In turn 4 Bot2 casts Lightning Bolt with a
+# Mountain, keeping Mox Jet and Mox Ruby untapped, and pays {2} when asked by tapping both. The Bolt resolves and hits Bot1
+# for 3; the Quench is spent.
+
+[Bot1 Deck]
+Island
+Island
+It'll Quench Ya!
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Mox Jet
+Mox Ruby
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.It'll Quench Ya!.Cast(Lightning Bolt)
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.PayCost
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = It'll Quench Ya!
+Bot2.Battlefield.Mox Jet.Tapped = true
+Bot2.Battlefield.Mox Ruby.Tapped = true
