@@ -412,6 +412,11 @@ fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     for id in untapping {
         ops::untap(cx, id);
     }
+    // No player gets priority in the untap step (CR 502.4), so no state-based actions are checked before the upkeep begins:
+    // an effect "for as long as [it] remains tapped" ends the moment its source untaps (CR 611.2b), and the controller it
+    // gave back is the one the upkeep's "at the beginning of your upkeep" abilities see (CR 613.1b).
+    ops::end_lapsed_conditions(cx);
+    ops::settle_control(cx);
     // That untap step has now happened for everything its player exerted, whoever controls it now (CR 701.43a).
     for id in cx.s().battlefield().to_vec() {
         if cx.s().obj(id).marks.exerted_by == Some(active) {
