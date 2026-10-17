@@ -1,0 +1,45 @@
+# Hearth Elemental's reduction takes only generic mana (CR 118.7c): with five counted cards in the graveyard {5}{R} costs {R}, and a
+# larger X could not make it cost less. Stoke Genius discards four Shocks (instants), Bot1 draws a Shock and a Mox Ruby, casts that
+# Shock (five instants in the graveyard), and on turn 3 casts Hearth Elemental from exile with exactly one Mox Ruby tapped; its
+# pool is empty afterwards.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Hearth Elemental
+Shock
+Shock
+Shock
+Shock
+Shock
+Mox Ruby
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Hearth Elemental.Cast(Ability: Adventure)
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Exile.Hearth Elemental.Cast
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Hearth Elemental.Power = 4
+Bot1.Mana = 
+Bot2.Life = 18
+Exile.Count = 0
+Bot1.Graveyard.Count = 5

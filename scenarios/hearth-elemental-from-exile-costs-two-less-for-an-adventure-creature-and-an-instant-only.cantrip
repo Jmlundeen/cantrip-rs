@@ -1,0 +1,50 @@
+# Hearth Elemental: "This spell costs {X} less to cast, where X is the number of cards in your graveyard that are instant cards,
+# sorcery cards, and/or have an Adventure." Bot1 casts Stoke Genius (Hearth Elemental's Adventure, {1}{R}): "Discard your hand, then
+# draw two cards" puts Bonecrusher Giant (a creature card that has an Adventure), Shock (an instant), Ornithopter (an artifact
+# creature) and an Island in the graveyard, so X is 2 - the creature with an Adventure counts, the Ornithopter and the Island do not.
+# Hearth Elemental, now in exile, is cast from there for {6} less 2 = {3}{R}: Bot1 taps exactly four Moxen and nothing is left in
+# its mana pool (a third counted card would leave mana over, a lower X would leave the spell unpaid). Stoke Genius itself cost
+# {1}{R}, the graveyard being empty then.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Hearth Elemental
+Bonecrusher Giant
+Ornithopter
+Island
+Shock
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Hearth Elemental.Cast(Ability: Adventure)
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+? Bot1.Graveyard.Count = 4
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Exile.Hearth Elemental.Cast
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Hearth Elemental.Power = 4
+Bot1.Battlefield.Hearth Elemental.Toughness = 5
+Bot1.Mana = 
+Exile.Count = 0
+Bot1.Graveyard.Count = 4

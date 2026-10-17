@@ -1,0 +1,51 @@
+# "Cards in your graveyard": Bot2's Shock (an instant, in Bot2's graveyard after it is cast at Bot1) does not reduce Bot1's Hearth Elemental.
+# Bot1's own graveyard has one sorcery, Iroh's Demonstration, so X is 1 and the creature costs {4}{R}: five Mox Rubies are
+# tapped and nothing is left in the pool (if Bot2's graveyard counted, X would be 2 and mana would be left over).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Iroh's Demonstration
+Hearth Elemental
+Mox Ruby
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Shock
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Iroh's Demonstration.Cast
+Bot1.Modes(1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Hearth Elemental.Cast
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Hearth Elemental.Power = 4
+Bot1.Mana = 
+Bot2.Graveyard = Shock
+Bot1.Graveyard = Iroh's Demonstration
