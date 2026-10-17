@@ -4,12 +4,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("Exile", "exile eight cards from your graveyard?", "If you do, it becomes prepared", "Exile eight", "Don't exile");
 
-/// "This creature enters prepared" (CR 614.1d, 722.3a).
-fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.prepared = true;
-    Ok(())
-}
-
 /// "You may exile eight cards from your graveyard. If you do, this creature becomes prepared." A graveyard short of
 /// eight is never asked: the payment is impossible, so it was not made.
 fn exile_eight(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -32,7 +26,7 @@ pub static CARD: CardDef = CardDef {
         ward::<2>("Ward {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)"),
         triggered(triggers::THIS_ATTACKS, exile_eight, "Whenever this creature attacks, you may exile eight cards from your graveyard. If you do, this creature becomes prepared."),
     ],
-    enters: Some(enters_prepared),
+    enters: Some(cantrip_mechanics::prepare::enters_prepared),
     prepare: Some(&crate::ancestral_recall::CARD),
     ..oracle::EMERITUS_OF_IDEATION
 };

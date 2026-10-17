@@ -1,7 +1,8 @@
 # Pompous Battlemage enters prepared (CR 722.3a), so a copy of Improvised Act waits in exile. On turn 3 Bot1 casts that copy
-# (a sorcery, {R}): "You may discard a card. If you do, draw a card." - Bot1 discards the Lightning Bolt and draws the
-# Black Lotus beneath. Casting the copy unprepares the Battlemage and the copy leaves exile (nothing in the graveyard:
-# a copy ceases to exist, CR 707.10a). Prowess made it 2/2 until end of turn for casting a noncreature spell.
+# (a sorcery, {R}): "You may discard a card. If you do, draw a card." - Bot1 discards the Lightning Bolt and draws the next
+# card of the library, an Island (the Black Lotus is the turn-3 draw before). Casting the copy unprepares the Battlemage and
+# the copy leaves exile and ceases to exist (CR 707.10a), so only the Bolt is in the graveyard. Prowess made the Battlemage
+# 2/2 until end of turn for casting a noncreature spell.
 
 [Bot1 Deck]
 Mountain

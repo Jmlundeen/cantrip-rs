@@ -12,12 +12,6 @@ pub static REGROWTH: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// "This creature enters prepared" (CR 614.1d, 722.3a).
-fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.prepared = true;
-    Ok(())
-}
-
 /// "If you control eight or more lands" (CR 603.4): checked as it triggers and again as it resolves.
 fn eight_lands(q: &dyn Query, asker: &Asker) -> bool {
     cantrip_mechanics::lands_you_control(q, asker.controller) >= 8
@@ -31,7 +25,7 @@ fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(triggers::THIS_ATTACKS, become_prepared, "Whenever this creature attacks, if you control eight or more lands, this creature becomes prepared.")
         .condition(eight_lands)],
-    enters: Some(enters_prepared),
+    enters: Some(cantrip_mechanics::prepare::enters_prepared),
     prepare: Some(&REGROWTH),
     ..oracle::EMERITUS_OF_ABUNDANCE
 };

@@ -12,9 +12,7 @@ fn destroy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Exile up to one target card from a graveyard. Draw a card." The card is drawn whether or not a target was chosen; if
 /// the one chosen became illegal the spell does not resolve at all (CR 608.2b), the core's.
 fn exile_and_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !item.targets.is_empty() {
-        exile_target(g, item, 0);
-    }
+    exile_target(g, item, 0);
     g.draw(item.controller, 1);
     Ok(())
 }

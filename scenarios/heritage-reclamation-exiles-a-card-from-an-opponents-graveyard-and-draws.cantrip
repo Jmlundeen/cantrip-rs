@@ -1,7 +1,6 @@
 # Heritage Reclamation's third mode: "Exile up to one target card from a graveyard. Draw a card." Bot2's Lightning Bolt
 # (cast at Bot1 on turn 2) is in their graveyard; Bot1 exiles it from there - a card in any graveyard is a legal target -
-# and draws a card: 7 cards, less a Forest on turn 1, plus the turn-3 draw, less a Forest and the Reclamation, plus the
-# card it draws is 6.
+# and draws a card (hand 6). The Mox Ruby Bot2 controls is not a card in a graveyard: it is refused as a target.
 
 [Bot1 Deck]
 Forest
@@ -28,6 +27,7 @@ Bot1.Battlefield.Forest.Activate
 Bot1.Battlefield.Forest.Activate
 Bot1.Hand.Heritage Reclamation.Cast
 Bot1.Modes(Exile up to one target card)
+! Bot1.Target(Mox Ruby)
 Bot1.Target(Lightning Bolt)
 [Bot1.Main2]
 ? Stack.Count = 0

@@ -23,11 +23,6 @@ pub static ALL_ABOARD: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.prepared = true;
-    Ok(())
-}
-
-pub static CARD: CardDef = CardDef { enters: Some(enters_prepared), prepare: Some(&ALL_ABOARD), ..oracle::SKYCOACH_CONDUCTOR };
+pub static CARD: CardDef = CardDef { enters: Some(cantrip_mechanics::prepare::enters_prepared), prepare: Some(&ALL_ABOARD), ..oracle::SKYCOACH_CONDUCTOR };
 
 pub static EXTRA: &[&CardDef] = &[&ALL_ABOARD];

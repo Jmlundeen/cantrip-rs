@@ -13,14 +13,9 @@ pub static IMPROVISED_ACT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.prepared = true;
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[PROWESS],
-    enters: Some(enters_prepared),
+    enters: Some(cantrip_mechanics::prepare::enters_prepared),
     prepare: Some(&IMPROVISED_ACT),
     ..oracle::POMPOUS_BATTLEMAGE
 };
