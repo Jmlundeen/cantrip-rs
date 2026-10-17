@@ -1,0 +1,51 @@
+# Browser
+# Demon Wall in the web client: "As long as this creature has a counter on it, it can attack as though it didn't have
+# defender" (CR 702.3b, 609.4). With no counter, its face shows only its printed lines. Bot1 clicks its {5}{B} ability for two
+# +1/+1 counters, and its face then also says "Can attack as though it didn't have defender." while it keeps defender. The
+# attack picker offers it and Bot1 attacks with it alone, a 5/5: Bot2 goes from 20 to 15, and the Wall is tapped.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Sol Ring
+Black Lotus
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Client.Bot1.Battlefield.Demon Wall.Rules = Defender / Menace (This creature can't be blocked except by two or more creatures.) / As long as this creature has a counter on it, it can attack as though it didn't have defender. / {5}{B}: Put two +1/+1 counters on this creature.
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+? Client.Bot1.Battlefield.Demon Wall.Rules = Defender / Menace (This creature can't be blocked except by two or more creatures.) / As long as this creature has a counter on it, it can attack as though it didn't have defender. / {5}{B}: Put two +1/+1 counters on this creature. / Can attack as though it didn't have defender.
+? Client.Bot1.Battlefield.Demon Wall.Counters = 2 × +1/+1
+Bot1.Attack(Demon Wall > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Demon Wall.Tapped = true
+Bot1.Battlefield.Demon Wall.Keywords = Defender; Menace

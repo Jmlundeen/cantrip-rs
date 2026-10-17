@@ -1,0 +1,51 @@
+# Demon Wall: "As long as this creature has a counter on it" means a counter of any kind, and it is judged as attackers are
+# declared (CR 508.1a, 609.4). Bot1's Wall has been under its control since turn 1 and has no counter. On turn 3, in the
+# beginning of combat step, Bot1 casts Requiting Hex at Bot2's Ornithopter, blighting 1 onto the Wall (a -1/-1 counter on a
+# creature it controls). The Hex destroys the Ornithopter and Bot1 gains 2 life; the Wall, now a 2/2 with a -1/-1 counter,
+# attacks as though it didn't have defender and deals Bot2 2. Without a counter it could not have attacked (the refusal in
+# demon-wall-cant-attack-without-a-counter-and-attacks-keeping-defender-once-it-has-its-own).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Requiting Hex
+Swamp
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.BeginCombat]
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Requiting Hex.Cast
+Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Demon Wall)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Demon Wall.Counters.MinusOneMinusOne = 1
+Bot1.Pass
+Bot1.Attack(Demon Wall > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 22
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Demon Wall.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Demon Wall.Power = 2
+Bot1.Battlefield.Demon Wall.Tapped = true

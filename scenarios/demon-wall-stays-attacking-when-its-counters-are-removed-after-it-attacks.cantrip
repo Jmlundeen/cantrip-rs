@@ -1,0 +1,66 @@
+# Demon Wall: "As long as this creature has a counter on it, it can attack as though it didn't have defender" is a
+# permission checked as attackers are declared (CR 508.1a, 508.1c, 609.4), not a reason to leave combat afterwards. Bot1's
+# Wall gets two +1/+1 counters on turn 3 and attacks on turn 5 as a 5/5. In the declare attackers step, after the
+# declaration, Bot2 sacrifices Vampire Hexmage to remove all its counters: the Wall is a 3/3 with defender again, still an
+# attacking creature (CR 506.4: nothing removed it from combat), and deals Bot2 3 combat damage.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Sol Ring
+Black Lotus
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Swamp
+Vampire Hexmage
+Swamp x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Vampire Hexmage.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Demon Wall > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Demon Wall)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Blockers]
+? Combat.Attackers = Demon Wall > Bot2
+? Bot1.Battlefield.Demon Wall.Power = 3
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Vampire Hexmage
+Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Demon Wall.Keywords = Defender; Menace
+Bot1.Battlefield.Demon Wall.Tapped = true

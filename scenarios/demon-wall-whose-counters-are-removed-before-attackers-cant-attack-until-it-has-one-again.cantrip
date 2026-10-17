@@ -1,0 +1,81 @@
+# Demon Wall: "As long as this creature has a counter on it, it can attack as though it didn't have defender" (CR 609.4) is
+# judged as attackers are declared (CR 508.1a). Bot1's Wall gets two +1/+1 counters on turn 3. On turn 5, in the beginning of
+# combat step, Bot2 sacrifices Vampire Hexmage to remove them all: with no counter left, defender stops the Wall attacking
+# (the refusal, CR 702.3b) while the Ornithopter beside it attacks (the control). In the second main phase Bot1 pays {5}{B}
+# again, and on turn 7 the Wall attacks as a 5/5: Bot2 goes from 20 to 15.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Ornithopter
+Sol Ring
+Black Lotus
+Swamp
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Swamp
+Swamp
+Vampire Hexmage
+Swamp x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Vampire Hexmage.Cast
+[T5 Bot1.BeginCombat]
+Bot1.Pass
+Bot2.Battlefield.Vampire Hexmage.Activate(Bot1.Battlefield.Demon Wall)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Demon Wall.Power = 3
+! Bot1.Attack(Demon Wall > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Demon Wall.Tapped = false
+? Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+[T7 Bot1.Main1]
+Bot1.Attack(Demon Wall > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Graveyard = Vampire Hexmage
+Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Demon Wall.Tapped = true

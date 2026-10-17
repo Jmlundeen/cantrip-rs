@@ -1,0 +1,49 @@
+# Demon Wall attacking as though it didn't have defender (CR 609.4) is otherwise an ordinary attack: a creature with
+# vigilance doesn't tap to attack (CR 508.1f, 702.20b). On turn 3 Bot1 pays {5}{B} for the Wall's two +1/+1 counters and
+# casts Pym Particles on it ("Target creature gains vigilance until end of turn and can't be blocked this turn"). The Wall
+# attacks as a 5/5 and stays untapped; Bot2 goes from 20 to 15. It still has defender beside the keywords Pym Particles gave.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Sol Ring
+Black Lotus
+Pym Particles
+Island
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Pym Particles.Cast(Bot1.Battlefield.Demon Wall)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Demon Wall > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Demon Wall.Tapped = false
+Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Demon Wall.Keywords = CantBeBlocked; Defender; Menace; Vigilance

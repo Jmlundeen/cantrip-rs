@@ -1,0 +1,60 @@
+# Browser
+# Demon Wall attacks "as though it didn't have defender" (CR 609.4): for every other purpose it has defender. Bot1's Wall has
+# two +1/+1 counters, so it may already attack; Assault Formation's "{G}: Target creature with defender can attack this turn
+# as though it didn't have defender" may still target it, since it still has defender (a Wall that lost defender to attack
+# would be no legal target, CR 115.1). Both permissions apply together (CR 609.4a). The Wall attacks and assigns combat damage
+# equal to its toughness under Assault Formation (CR 510.1a), 5 as a 5/5: Bot2 goes from 20 to 15. In the browser, the Wall's
+# face says it can attack as though it didn't have defender this turn, the effect's duration.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Sol Ring
+Demon Wall
+Assault Formation
+Black Lotus
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Assault Formation.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Assault Formation.Activate(Bot1.Battlefield.Demon Wall; Ability: attack this turn)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Battlefield.Demon Wall.Rules = Defender / Menace (This creature can't be blocked except by two or more creatures.) / As long as this creature has a counter on it, it can attack as though it didn't have defender. / {5}{B}: Put two +1/+1 counters on this creature. / Can attack as though it didn't have defender this turn.
+Bot1.Attack(Demon Wall > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Demon Wall.Keywords = Defender; Menace
+Bot1.Battlefield.Demon Wall.Tapped = true

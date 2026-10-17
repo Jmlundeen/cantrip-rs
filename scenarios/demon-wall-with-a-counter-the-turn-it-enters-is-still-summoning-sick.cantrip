@@ -1,0 +1,52 @@
+# Demon Wall: "can attack as though it didn't have defender" lifts defender alone (CR 609.4); a creature must still have
+# been under its controller's control continuously since the turn began, or have haste (CR 302.6, 508.1a). On turn 3 Bot1
+# casts the Wall and pays {5}{B} for its two +1/+1 counters: it is summoning sick, so it can't attack (the refusal) while the
+# Ornithopter cast on turn 1 does (the control). On turn 5 the same Wall attacks as a 5/5: Bot2 goes from 20 to 15.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Ornithopter
+Sol Ring
+Demon Wall
+Black Lotus
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+? Bot1.Battlefield.Demon Wall.SummoningSick = true
+! Bot1.Attack(Demon Wall > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Demon Wall.Tapped = false
+? Bot1.Battlefield.Ornithopter.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Attack(Demon Wall > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Demon Wall.Tapped = true

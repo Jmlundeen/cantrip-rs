@@ -1,0 +1,59 @@
+# Demon Wall: "Defender" and "As long as this creature has a counter on it, it can attack as though it didn't have defender"
+# (CR 702.3b, 609.4), and "{5}{B}: Put two +1/+1 counters on this creature." Turn 3, the Wall has been under Bot1's control
+# since turn 1 and has no counter: defender stops it attacking (the refusal) while the Ornithopter beside it attacks (the
+# control; a 0/2, it deals nothing). In the second main phase Bot1 pays {5}{B} and the Wall gets two +1/+1 counters. Turn 5 it
+# attacks on its own as a 5/5 and becomes tapped (CR 508.1f: it has no vigilance), Bot2 going from 20 to 15. It still
+# has defender while it attacks: "as though" changes only whether it may attack (CR 609.4), so its keywords are Defender and
+# Menace.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Ornithopter
+Sol Ring
+Black Lotus
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+? Bot1.Battlefield.Demon Wall.SummoningSick = false
+! Bot1.Attack(Demon Wall > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Tapped = true
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+[T5 Bot1.Main1]
+Bot1.Attack(Demon Wall > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Demon Wall.Power = 5
+Bot1.Battlefield.Demon Wall.Tapped = true
+Bot1.Battlefield.Demon Wall.Keywords = Defender; Menace
+Bot1.Battlefield.Ornithopter.Tapped = false

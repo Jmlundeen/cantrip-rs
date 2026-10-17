@@ -1,0 +1,72 @@
+# Demon Wall: "As long as this creature has a counter on it, it can attack as though it didn't have defender" is about this
+# creature alone, for whoever controls it. Bot2's Wall gets two +1/+1 counters on turn 4 and attacks Bot1 as a 5/5 (Bot1 20
+# -> 15). Bot1's Sylvan Caryatid, a defender with a +1/+1 counter from Snakeskin Veil, gets nothing from Bot2's Wall: on
+# turn 5 it can't attack (the refusal) while Bot1's Ornithopter does (the control).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Ornithopter
+Snakeskin Veil
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Sol Ring
+Black Lotus
+Swamp
+Swamp
+Swamp x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Demon Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sylvan Caryatid.Counters.PlusOnePlusOne = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Demon Wall.Activate
+Bot2.Pass
+Bot1.Pass
+Bot2.Attack(Demon Wall > Bot1)
+[T5 Bot1.Main1]
+? Bot1.Life = 15
+! Bot1.Attack(Sylvan Caryatid > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 15
+Bot1.Battlefield.Sylvan Caryatid.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sylvan Caryatid.Tapped = false
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2

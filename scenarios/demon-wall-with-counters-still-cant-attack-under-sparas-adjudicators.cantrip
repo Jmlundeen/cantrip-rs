@@ -1,0 +1,78 @@
+# Demon Wall's "can attack as though it didn't have defender" (CR 609.4) answers defender only: an effect that says the
+# creature can't attack is a restriction of its own (CR 508.1c). Bot1's Wall gets two +1/+1 counters on turn 3. On turn 4
+# Bot2's Spara's Adjudicators enters and says the Wall "can't attack or block until your next turn": on turn 5 the Wall can't
+# attack (the refusal) though the Ornithopter does (the control). Bot2's turn 6 ends the effect, and on turn 7 the Wall
+# attacks as a 5/5; the Adjudicators alone can't block it (menace, CR 702.110b), so Bot2 goes from 20 to 15.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Demon Wall
+Ornithopter
+Sol Ring
+Black Lotus
+Swamp
+Swamp x12
+
+[Bot2 Deck]
+Forest
+Island
+Black Lotus
+Black Lotus
+Spara's Adjudicators
+Island
+Island
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Demon Wall.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Demon Wall.Activate
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot2.Battlefield.Black Lotus#1.Activate(Color: Blue)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Spara's Adjudicators.Cast
+Bot2.Pass
+Bot2.Target(Bot1.Battlefield.Demon Wall)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Attack(Demon Wall > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Demon Wall.Tapped = false
+? Bot1.Battlefield.Ornithopter.Tapped = true
+[T7 Bot1.Main1]
+Bot1.Attack(Demon Wall > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot2.Battlefield = Forest; Island; Spara's Adjudicators
+Bot1.Battlefield.Demon Wall.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Demon Wall.Tapped = true
