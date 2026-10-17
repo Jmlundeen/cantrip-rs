@@ -20,7 +20,7 @@ mod validate;
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Marks, Rng};
 
-pub use actions::{activation_costs, cast_costs, describe};
+pub use actions::{activation_costs, cast_costs, describe, granted_cast_cost};
 pub use validate::{check as check_answer, distribution_problem, name_problem};
 pub use layers::{chars, live, summoning_sick};
 

@@ -1056,6 +1056,21 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, candidat
     candidates.iter().map(|&t| apply_cost_changes(&cx, player, Costed::Spell(card), def.cost, &[t])).collect()
 }
 
+/// What a cast a permanent grants (CR 604, 118.9) costs `player` for `card`, by the option's way number: the way's own
+/// cost, read for the face it casts as the offer and the cast read it (CR 709.3a), before cost changes. For the menu row,
+/// since a way's text need not say it (Iroh's "the flashback cost is equal to that card's mana cost"). `None` for any other
+/// way, or one the permanent no longer gives.
+pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, card: ObjectId, way: u8) -> Option<Cost> {
+    let (k, face) = granted_slot(way)?;
+    let (granter, controller, rule) = *granted_ways_of(game.cards, &game.state).get(k)?;
+    let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    let view = AsFace { cx: &cx, spell: card, face: cx.card_id(face_def) };
+    let q: &dyn Query = if face == GRANTED_FACE_WHOLE { &cx } else { &view };
+    (rule.cost)(q, &Asker { source: granter, controller }, card, player)
+}
+
 /// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's.
 fn own_cost_changes(cx: &Cx, id: ObjectId) -> &'static [CostChange] {
     let obj = cx.s().obj(id);

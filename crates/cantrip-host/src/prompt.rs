@@ -198,6 +198,9 @@ fn cost_text_of(cost: &Cost, name: &str) -> String {
     if cost.discard_self {
         parts.push("Discard".to_string());
     }
+    if cost.exile_from_graveyard > 0 {
+        parts.push(format!("Exile {} other cards from your graveyard", cost.exile_from_graveyard));
+    }
     parts.join(", ")
 }
 
@@ -267,6 +270,19 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             }
             if let Some(face) = inset {
                 m.cost_text = face.cost.to_string();
+            }
+            // A cast a permanent grants (CR 604, 118.9) says what it costs, which the way's text need not: Iroh's flashback
+            // "equal to that card's mana cost", Underworld Breach's escape. A face it casts shows it as its cost; the card
+            // itself, beside the way's text, unless that text already names a cost ("Flashback {1}").
+            if granted_slot(o.index).is_some()
+                && let Some(cost) = granted_cast_cost(game, game.state.obj(src).owner, src, o.index)
+            {
+                let text = cost_text_of(&cost, def.name);
+                if granted_face.is_some() {
+                    m.cost_text = text;
+                } else if !text.is_empty() && !m.description.contains('{') {
+                    m.description = if m.description.is_empty() { text } else { format!("{} {text}", m.description) };
+                }
             }
             let cost = if let Some(face) = granted_face.or(inset) {
                 face.cost
