@@ -1,0 +1,44 @@
+# Clone can't copy a creature entering at the same time as it (the card's ruling, CR 614.1c, 707.2), so when the only
+# other creature is one entering with it there is nothing to copy and nothing is asked. Bot1's Clone dies as a 0/0 on
+# turn 1 with no creature to copy; Bot2 discards a Guerrilla Gorilla to hand size on turn 2. On turn 3 Exhume returns
+# Clone and the Gorilla together: Bot1 is not asked whether to copy ("! Bot1.Accept"), and the Clone, a 0/0 again, goes
+# back to the graveyard after Exhume (CR 704.5f). The Gorilla stays. The positive control is
+# clone-returned-by-exhume-cannot-copy-a-creature-entering-with-it, where an Ornithopter is already out and it is asked.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Clone
+Island
+Island
+Exhume
+Island x12
+
+[Bot2 Deck]
+Guerrilla Gorilla x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Clone; Black Lotus
+? Bot2.Graveyard = Guerrilla Gorilla
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Exhume.Cast
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet
+Bot1.Graveyard = Clone; Exhume; Black Lotus
+Bot2.Battlefield = Guerrilla Gorilla

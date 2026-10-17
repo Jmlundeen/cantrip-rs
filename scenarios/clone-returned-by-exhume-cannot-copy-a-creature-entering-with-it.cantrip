@@ -1,0 +1,52 @@
+# Clone can't copy a creature that enters the battlefield at the same time as it does (the card's ruling, CR 614.1c,
+# 707.2): what it may copy is what is already there as it enters. Bot1's Clone is cast on turn 1 and declined, dying as
+# a 0/0; Bot2 discards a Guerrilla Gorilla to hand size on turn 2. On turn 3 Exhume puts Clone and the Gorilla onto the
+# battlefield together: Clone is offered Bot1's two Ornithopters and not the Gorilla (refused beside the Ornithopter it
+# takes), and enters as an Ornithopter.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Clone
+Ornithopter
+Ornithopter
+Exhume
+Island x12
+
+[Bot2 Deck]
+Guerrilla Gorilla x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Decline
+[T3 Bot1.Main1]
+? Bot1.Graveyard = Clone; Black Lotus
+? Bot2.Graveyard = Guerrilla Gorilla
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Exhume.Cast
+Bot1.Accept
+! Bot1.Target(Guerrilla Gorilla)
+Bot1.Target(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Ornithopter; Ornithopter; Ornithopter
+Bot1.Graveyard = Exhume; Black Lotus
+Bot2.Battlefield = Guerrilla Gorilla
+Bot2.Graveyard.Count = 0
