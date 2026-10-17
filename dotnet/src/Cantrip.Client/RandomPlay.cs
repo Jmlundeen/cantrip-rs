@@ -704,7 +704,16 @@ public sealed class RandomPlay : IAutoPlayer
         // "Up to" a number takes any number down to the least the prompt allows: none, or craft's "one or more" (CR 702.167a).
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
         int least = Math.Min(prompt.Minimum, most);
-        return new CardsChosenAnswer { Cards = Some(prompt.Eligible, prompt.UpTo ? least + _random.Next(most - least + 1) : most) };
+        List<ViewHandle> drawn = Some(prompt.Eligible, prompt.UpTo ? least + _random.Next(most - least + 1) : most);
+
+        // A band (CR 702.22c) has at most one creature without banding: the first drawn stays.
+        if (prompt.Purpose == CardChoicePurposeView.Band)
+        {
+            List<ViewHandle> without = [.. drawn.Where(prompt.WithoutBanding.Contains).Skip(1)];
+            drawn.RemoveAll(without.Contains);
+        }
+
+        return new CardsChosenAnswer { Cards = drawn };
     }
 
     /// <summary>Drawn cards from a library search, including finding nothing where that is allowed (CR 701.19d).</summary>

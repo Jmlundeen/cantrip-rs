@@ -49,6 +49,11 @@ public static class AutoPlay
                 client.Answer(unless.Verb == "LookAgain" ? Answer(unless.Options.First(option => option.Kind == ActionKindView.DeclineCost)) : PayUnless(unless));
                 return true;
 
+            case ChooseCardsPromptMessage { Purpose: CardChoicePurposeView.Band }:
+                // Attackers banded together (CR 702.22c): none, so each is blocked on its own.
+                client.Answer(new CardsChosenAnswer());
+                return true;
+
             case ChooseCardsPromptMessage choose:
                 // The first eligible cards. Which card hurts most to lose is strategy this does not have.
                 client.Answer(new CardsChosenAnswer { Cards = [.. choose.Eligible.Take(choose.Count)] });
@@ -110,7 +115,8 @@ public static class AutoPlay
                 return true;
 
             case AssignCombatDamagePromptMessage assign:
-                // The engine's own division — lethal to each creature in turn, the rest through with trample — is
+                // The engine's own division — lethal to each creature in turn, the rest through with trample; for an
+                // opponent's creature banding gives this seat (CR 702.22j-k), all of it on the creature it hurts least — is
                 // always legal and as good as a bot needs.
                 client.Answer(assign.Default());
                 return true;

@@ -1247,6 +1247,13 @@ public sealed class ChooseCardsPromptMessage : PromptPayload
     public int PreventLeft { get; set; }
 
     /// <summary>
+    /// For <see cref="CardChoicePurposeView.Band"/>, the eligible creatures without banding, of which a band may have at most
+    /// one (CR 702.22c).
+    /// </summary>
+    [Key(19)]
+    public List<ViewHandle> WithoutBanding { get; set; } = [];
+
+    /// <summary>
     /// The first eligible cards, never anything outside <see cref="Eligible"/>. A choice that must add up to a power is
     /// offered "up to" every candidate, so taking them all meets it whenever anything can; one with a <see cref="Minimum"/>
     /// takes that many; one limited to a total mana value takes the first that fit together within it.
@@ -2633,6 +2640,13 @@ public sealed class DamageDivisionMessage
     /// <summary>The planeswalker the attacker is attacking, when the excess may go there instead (CR 702.19c).</summary>
     [Key(8)]
     public ViewHandle DefenderPermanent { get; set; }
+
+    /// <summary>
+    /// The creature is another player's (CR 702.22j-k): banding gives this player the division of its combat damage among
+    /// their own creatures it is blocked by or is blocking, as they choose - none of it to a player.
+    /// </summary>
+    [Key(9)]
+    public bool Banding { get; set; }
 }
 
 /// <summary>Where one creature's combat damage goes, one share per recipient.</summary>

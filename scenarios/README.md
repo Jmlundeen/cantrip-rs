@@ -377,7 +377,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `Monarch` (`Bot1`), once a player has become the monarch (CR 725) and absent until then; `Initiative` likewise (CR 726)
 - `DayNight` (`Day`, `Night`), once the game has a designation (CR 731.1) and absent while it is neither. The game's
   own, so it names no player.
-- `Stack`, `Exile`, `Combat.Attackers`, `Combat.Blocks`, each with `.Count`
+- `Stack`, `Exile`, `Combat.Attackers`, `Combat.Blocks`, each with `.Count`: an attacker as `Grizzly Bears > Bot2`, one in an
+  attacking band (CR 702.22c) as `Benalish Hero > Bot2 (band 1)`, bands numbered in the order announced; a block as
+  `Blocker > Attacker`, one for each member of a band a creature blocks (CR 702.22h)
 - `Delayed` (with `.Count`): the delayed triggered abilities still waiting (CR 603.7), each named for the object it came from:
   one used up or ended with its turn is gone from it
 - `Combat.AttackCost` (`{2}`), `.Remaining` and `.Attackers` (with `.Count`), while a declaration's cost to attack is being

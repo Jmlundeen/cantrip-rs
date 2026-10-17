@@ -2209,11 +2209,18 @@ public sealed partial class MainPage
     {
         string problem = DivisionProblem(client, prompt);
 
+        // Banding (CR 702.22j-k): the creature whose damage is divided is the opponent's, and it goes among this player's own
+        // creatures it is blocked by or is blocking.
+        bool theirs = prompt.Divisions.Count > 0 && prompt.Divisions.All(division => division.Banding);
         Prompt(
-            "Assign combat damage",
+            theirs ? "Banding: divide their creature's combat damage" : "Assign combat damage",
             problem.Length > 0
                 ? problem
-                : $"{prompt.Divisions.Count} creature{(prompt.Divisions.Count == 1 ? string.Empty : "s")} to divide  ·  each must add up to its power");
+                : theirs
+                    ? prompt.Divisions.Count == 1
+                        ? $"Your banding lets you divide {client.Object(prompt.Divisions[0].Source)?.Name ?? "their creature"}'s damage among your creatures it is fighting, as you choose"
+                        : $"Your banding lets you divide {prompt.Divisions.Count} of their creatures' damage among your creatures they are fighting, as you choose"
+                    : $"{prompt.Divisions.Count} creature{(prompt.Divisions.Count == 1 ? string.Empty : "s")} to divide  ·  each must add up to its power");
 
         AddButton(
             "Deal damage",
@@ -2241,7 +2248,7 @@ public sealed partial class MainPage
 
             _buttons.Children.Add(new SymbolText(13, assigned == division.Damage ? Theme.Fg : Theme.FgMuted, semibold: true)
             {
-                Text = $"{source}: {assigned} of {division.Damage}",
+                Text = division.Banding ? $"{source} (theirs, banding): {assigned} of {division.Damage}" : $"{source}: {assigned} of {division.Damage}",
             });
 
             foreach (ViewHandle blocker in division.Creatures)

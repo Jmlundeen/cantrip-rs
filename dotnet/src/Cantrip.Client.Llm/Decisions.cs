@@ -875,6 +875,22 @@ public sealed class Decisions
 
         foreach (DamageDivisionMessage division in prompt.Divisions)
         {
+            // Banding (CR 702.22j-k): an opponent's creature's damage, divided among this player's own creatures as they
+            // choose - all of it on the one it hurts least.
+            if (division.Banding && division.Creatures.Count > 0)
+            {
+                int spared = One(new Question
+                {
+                    Heading = $"Your banding lets you divide {GameText.Creature(client, division.Source)}'s {division.Damage} combat damage "
+                        + "among your creatures it is fighting. Which one takes all of it?",
+                    Note = "It is the opponent's creature: put its damage where it hurts you least - on a creature it does not kill, "
+                        + "or on the one you can best spare.",
+                    Choices = [.. division.Creatures.Select(creature => GameText.Named(client, creature))],
+                });
+                answer.Shares.Add(new DamageShareMessage { Source = division.Source, Creature = division.Creatures[spared], Amount = division.Damage });
+                continue;
+            }
+
             List<(string Text, List<DamageShareMessage> Shares)> ways = Divisions(client, division);
 
             if (ways.Count == 0)
@@ -1205,6 +1221,13 @@ public sealed class Decisions
 
         List<ViewHandle> chosen = [.. picks.Select(pick => prompt.Eligible[pick])];
 
+        // A band (CR 702.22c) has at most one creature without banding: the first picked stays.
+        if (prompt.Purpose == CardChoicePurposeView.Band)
+        {
+            List<ViewHandle> without = [.. chosen.Where(prompt.WithoutBanding.Contains).Skip(1)];
+            chosen.RemoveAll(without.Contains);
+        }
+
         // Craft's "one or more" (CR 702.167a): an answer short of the least it takes is made up with the first ones offered.
         chosen.AddRange(prompt.Eligible.Where(card => !chosen.Contains(card)).Take(Math.Max(prompt.Minimum - chosen.Count, 0)));
         return new CardsChosenAnswer { Cards = chosen };
@@ -1356,6 +1379,7 @@ public sealed class Decisions
             CardChoicePurposeView.PreventDamageFrom => $"{source}: its prevention shield has {prompt.PreventLeft} damage left to prevent, and these sources would deal damage to what it shields at the same time. Choose the source whose damage it prevents first; what is left of the shield goes to the others, and the damage it can't prevent is dealt. Prevent first the damage that would hurt most: from a source with deathtouch or lifelink if the shield can prevent all of it, else the most damage.",
             CardChoicePurposeView.Craft => $"{source}: craft - choose {(prompt.Minimum > 0 ? $"{prompt.Minimum} or more" : many)}{(kind.Length > 0 ? kind : " other permanent or card")}(s) from among the permanents you control and the cards in your graveyard to exile with {source} as the cost of its craft ability; then it returns transformed. The materials are exiled for good, so choose those you can best spare, cards in your graveyard before permanents.",
             CardChoicePurposeView.PutOnBottom => $"You kept a hand after mulliganing: choose {many} card(s) to put on the bottom of your library.",
+            CardChoicePurposeView.Band => $"{source} has banding and is attacking: choose the other attackers that attack in a band with it, or none. A band may hold any number with banding but at most one without ({string.Join(", ", prompt.WithoutBanding.Select(card => GameText.Named(client, card)))} have none). A band is blocked as one: a creature blocking any of it blocks all of it, and you, not the blocker's controller, divide that blocker's damage among the band - so a valuable creature banded with one with banding can have the blockers' damage put on the other. But one blocker then stops the whole band.",
             _ => $"{source}: choose {many}{kind} card(s).",
         };
     }

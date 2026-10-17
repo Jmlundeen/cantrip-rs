@@ -274,7 +274,7 @@ pub fn hexproof_from_text(qualities: HexproofFrom) -> String {
 }
 
 /// The keywords as a card's text words them, for the ones an effect gave an object or took from it.
-const KEYWORD_WORDS: [(Keyword, &str); 40] = [
+const KEYWORD_WORDS: [(Keyword, &str); 41] = [
     (Keyword::Flying, "Flying"),
     (Keyword::Haste, "Haste"),
     (Keyword::Vigilance, "Vigilance"),
@@ -315,6 +315,7 @@ const KEYWORD_WORDS: [(Keyword, &str); 40] = [
     (Keyword::Swampwalk, "Swampwalk"),
     (Keyword::Mountainwalk, "Mountainwalk"),
     (Keyword::Forestwalk, "Forestwalk"),
+    (Keyword::Banding, "Banding"),
 ];
 
 /// A rules line without its parenthesized reminder text, trimmed.
@@ -871,6 +872,7 @@ impl<'a> Projector<'a> {
                 target_player,
                 target_permanent,
                 was_blocked: a.blocked,
+                band: i32::from(a.band),
             });
         }
         for a in &s.attackers {
@@ -1178,6 +1180,7 @@ impl<'a> Projector<'a> {
             exerted: obj.marks.exerted_by.is_some(),
             saddled: game.is_saddled(id),
             goaded: effect(EffectKind::Goaded),
+            band: s.attackers.iter().find(|a| a.id == id).map_or(0, |a| i32::from(a.band)),
             harnessed: effect(EffectKind::Harnessed),
             choices,
             class_level: if on_battlefield { i32::from(obj.class_level) } else { 0 },

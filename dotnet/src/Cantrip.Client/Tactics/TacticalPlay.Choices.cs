@@ -748,6 +748,31 @@ public sealed partial class TacticalPlay
             return new CardsChosenAnswer { Cards = [first] };
         }
 
+        // Banding (CR 702.22c, 702.22k): the band's controller divides the damage of whatever blocks it among the band, so the
+        // creature with banding can take a blocker's damage for an attacker worth more. The one attacker without banding worth
+        // most, and worth more than the creature with banding, joins it; the other creatures with banding stay apart, each
+        // blocked on its own. With none worth protecting, no band: a band is blocked as one, so it only loses evasion.
+        if (prompt.Purpose == CardChoicePurposeView.Band)
+        {
+            double own = client.Object(prompt.Source) is { } leader ? _model.Worth(leader) : 0;
+            ObjectView? best = prompt.WithoutBanding
+                .Select(client.Object)
+                .OfType<ObjectView>()
+                .OrderByDescending(creature => _model.Worth(creature))
+                .FirstOrDefault();
+            if (best is not null && _model.Worth(best) > own)
+            {
+                if (Narrating)
+                {
+                    Note($"{best.Name} bands with {client.Object(prompt.Source)?.Name}, which can take its blockers' damage");
+                }
+
+                return new CardsChosenAnswer { Cards = [best.Handle] };
+            }
+
+            return new CardsChosenAnswer();
+        }
+
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
 
         // Station's creature (CR 702.184a): its power is the counters the permanent gets, so the one Station chose, or else

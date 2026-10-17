@@ -324,6 +324,13 @@ public enum CardChoicePurposeView
 
     /// <summary>The chosen permanents are tapped by an effect as it resolves (CR 701.26a), not to pay a cost: Thousand Moons Smithy's "you may tap five untapped artifacts and/or creatures you control".</summary>
     Tap = 31,
+
+    /// <summary>
+    /// The other attacking creatures that attack in a band with the source, a creature with banding (CR 702.22c, 508.1e): any
+    /// number with banding and at most one of <c>WithoutBanding</c>. None chosen forms no band. A band is blocked as one
+    /// (CR 702.22h).
+    /// </summary>
+    Band = 32,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

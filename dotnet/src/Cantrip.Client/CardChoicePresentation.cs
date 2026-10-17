@@ -24,7 +24,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             or CardChoicePurposeView.Untap or CardChoicePurposeView.Keep or CardChoicePurposeView.TapToPay
             or CardChoicePurposeView.Tap or CardChoicePurposeView.Destroy or CardChoicePurposeView.Attach or CardChoicePurposeView.Encode
             or CardChoicePurposeView.Blight or CardChoicePurposeView.TapToReduce or CardChoicePurposeView.PutCounters
-            or CardChoicePurposeView.PreventDamageFrom;
+            or CardChoicePurposeView.PreventDamageFrom or CardChoicePurposeView.Band;
+        // Banding (CR 702.22c): at most one creature without banding in a band.
+        int withoutBanding = picked.Count(h => prompt.WithoutBanding.Exists(w => w.Value == h));
         // A mulligan's bottoming is asked by the rules and has no source; an effect's (Valakut Awakening) names its own.
         string source = legend ? "The legend rule"
             : client.Object(context?.Source ?? prompt.Source)?.Name
@@ -109,6 +111,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             // A prevention shield two or more sources would deal damage to at once (CR 615.7): whose damage it prevents first.
             : prompt.Purpose == CardChoicePurposeView.PreventDamageFrom
                 ? $"{source}: choose the source whose damage the shield prevents first"
+            // Banding (CR 702.22c, 508.1e): the attackers that attack in a band with the source.
+            : prompt.Purpose == CardChoicePurposeView.Band
+                ? $"{source} has banding: choose attacking creatures to band with it, or none"
             : prompt.Count == 1 && !prompt.UpTo ? $"{source}: choose {article} {kind}{from} to {verb}{budget}"
             : anyNumber ? $"{source}: choose any number of {many}{from} to {verb}{budget}"
             : $"{source}: choose {(prompt.UpTo ? "up to " : "")}{prompt.Count} {many}{from} to {verb}{budget}";
@@ -116,6 +121,10 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             ? $"{picked.Count} chosen  ·  exiled with {source} to pay the craft cost; {source} returns transformed"
             : prompt.Purpose == CardChoicePurposeView.PreventDamageFrom
             ? $"It has {prompt.PreventLeft} damage left to prevent; what it can't prevent of the others' damage is dealt{where}"
+            : prompt.Purpose == CardChoicePurposeView.Band
+            ? withoutBanding > 1
+                ? $"A band may have only one creature without banding  ·  {withoutBanding} chosen{where}"
+                : $"{picked.Count} chosen  ·  any with banding, at most one without; the band is blocked as one, and you divide the damage of what blocks it{where}"
             : prompt.Purpose == CardChoicePurposeView.TapToReduce
             ? picked.Count == 0
                 ? $"None tapped: the full cost is paid{where}"
@@ -164,6 +173,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.Craft => picked.Count == 1 ? "Exile it" : $"Exile {picked.Count}",
             CardChoicePurposeView.Reveal => picked.Count == 0 ? "Reveal nothing" : "Reveal it",
             CardChoicePurposeView.PreventDamageFrom => "Prevent its damage first",
+            CardChoicePurposeView.Band => picked.Count == 0 ? "No band" : $"Band {picked.Count + 1} together",
             // "Discard nothing" only where declining is an answer; a mandatory discard still counts down to its number.
             _ => picked.Count == 0 && prompt.UpTo ? "Discard nothing"
                 : picked.Count == 1 ? "Discard it" : $"Discard {picked.Count}",
@@ -173,7 +183,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             && (prompt.UpTo ? picked.Count <= prompt.Count && picked.Count >= prompt.Minimum : picked.Count == prompt.Count)
             && power >= prompt.MinimumPower
             && manaValue >= prompt.MinimumManaValue
-            && (prompt.MaximumTotalManaValue is not { } limit || manaValue <= limit);
+            && (prompt.MaximumTotalManaValue is not { } limit || manaValue <= limit)
+            && (prompt.Purpose != CardChoicePurposeView.Band || withoutBanding <= 1);
         bool answersOnLastPick = table == ZoneKindView.Battlefield && !prompt.UpTo && prompt.MinimumPower == 0 && prompt.MinimumManaValue == 0
             && prompt.Count > 0 && !ordered;
         return new(title, detail, Origins(client, prompt.Cards, context) + $"  ·  {prompt.Cards.Count} card{(prompt.Cards.Count == 1 ? "" : "s")}",

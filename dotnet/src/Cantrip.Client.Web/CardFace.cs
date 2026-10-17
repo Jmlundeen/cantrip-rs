@@ -1270,6 +1270,12 @@ public static partial class CardFace
             parts.Add("GOADED");
         }
 
+        // An attacking band (CR 702.22c): blocked as one, so its members say which band they are in.
+        if (card.Band > 0)
+        {
+            parts.Add($"BAND {card.Band}");
+        }
+
         return parts;
     }
 

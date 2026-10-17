@@ -542,6 +542,8 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
         let log_mark = cx.g.log.len();
         let answer = cx.ask_core(active, kind.clone(), false)?;
         let Answer::Attack(attacks) = answer else { return Ok(()) };
+        // CR 508.1e: the bands among them, announced before they tap.
+        let bands = declare_bands(cx, active, &attacks)?;
         // CR 508.1f: the chosen creatures become tapped, which is no cost, before any cost is paid (CR 508.1g-j).
         for &(id, _) in &attacks {
             if !cx.chars(id).has(Keyword::Vigilance) {
@@ -570,11 +572,12 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 Err(stop) => return Err(stop),
             }
         }
-        break attacks;
+        break (attacks, bands);
     };
+    let (attacks, bands) = attacks;
     let mut attackers = Vec::new();
-    for (id, target) in attacks {
-        attackers.push(Attacker::new(id, target));
+    for ((id, target), band) in attacks.into_iter().zip(bands) {
+        attackers.push(Attacker { band, ..Attacker::new(id, target) });
     }
     let attacked = !attackers.is_empty();
     cx.st().update_turn(|t| t.attacked = attacked);
@@ -587,6 +590,50 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     }
     cx.emit_batch(&events, None);
     Ok(())
+}
+
+/// The attacking bands the active player announces (CR 508.1e, 702.22c), one band number for each of `attacks` (0 for none).
+/// Each attacker with banding not yet in a band is asked in turn for the other attackers that band with it: any of those
+/// attacking what it attacks (CR 702.22d) and in no band yet (each creature is in one band at most), any number with banding
+/// and at most one without (the core refuses more, `validate`). Choosing none forms no band with it. Nothing is asked where no
+/// attacker has banding, or one has no other attacker beside it.
+fn declare_bands(cx: &mut Cx, active: PlayerId, attacks: &[(ObjectId, Target)]) -> R<Vec<u8>> {
+    let mut band = vec![0u8; attacks.len()];
+    let mut next = 1;
+    for i in 0..attacks.len() {
+        let (source, target) = attacks[i];
+        if band[i] != 0 || !cx.chars(source).has(Keyword::Banding) {
+            continue;
+        }
+        let eligible: Vec<ObjectId> =
+            (0..attacks.len()).filter(|&j| j != i && band[j] == 0 && attacks[j].1 == target).map(|j| attacks[j].0).collect();
+        if eligible.is_empty() {
+            continue;
+        }
+        let count = eligible.len() as u8;
+        let ask = RequestKind::ChooseCards {
+            source,
+            purpose: Purpose::Band,
+            cards: eligible.clone(),
+            eligible,
+            count,
+            up_to: true,
+            kind: "attacking creature",
+            total: None,
+        };
+        let Answer::Cards(chosen) = cx.ask_core(active, ask, false)? else { continue };
+        if chosen.is_empty() {
+            continue;
+        }
+        band[i] = next;
+        for c in chosen {
+            if let Some(j) = attacks.iter().position(|a| a.0 == c) {
+                band[j] = next;
+            }
+        }
+        next += 1;
+    }
+    Ok(band)
 }
 
 /// Whether `blocker` may block `attacker` (CR 509.1b): a creature that can't block (decayed's too, CR 702.147a), one that
@@ -702,9 +749,15 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
             let mut list = Vec::new();
             let mut attackers = cx.s().attackers.clone();
             for (blocker, attacker) in blocks {
-                list.push(Block { blocker, attacker, first_strike: false });
-                if let Some(a) = attackers.iter_mut().find(|a| a.id == attacker) {
-                    a.blocked = true;
+                // CR 702.22h: a creature blocking a member of an attacking band blocks each other member of it too.
+                let band = attackers.iter().find(|a| a.id == attacker).map_or(0, |a| a.band);
+                let mut blocked = vec![attacker];
+                blocked.extend(attackers.iter().filter(|a| band != 0 && a.band == band && a.id != attacker).map(|a| a.id));
+                for attacker in blocked {
+                    list.push(Block { blocker, attacker, first_strike: false });
+                    if let Some(a) = attackers.iter_mut().find(|a| a.id == attacker) {
+                        a.blocked = true;
+                    }
                 }
             }
             cx.st().set_attackers(attackers);
@@ -835,8 +888,10 @@ fn most_requirements(cx: &Cx, allowed: &[(ObjectId, ObjectId)], pairs: Vec<(Obje
     BlockRequirements { pairs, most: most as u8, suggested }
 }
 
-/// Combat damage (CR 510): every attacker and blocker deals its damage at once. A blocked attacker with a choice divides
-/// its damage among its blockers as its controller chooses (CR 510.1c), otherwise all to its one blocker.
+/// Combat damage (CR 510): every attacker and blocker deals its damage at once. A creature with a choice in where its damage
+/// goes - an attacker blocked by two or more creatures, or a trampler with more than lethal for its blocker (CR 510.1c,
+/// 702.19b), a blocker blocking two or more creatures (CR 510.1d) - divides it as the player banding names chooses, else as
+/// its controller does (CR 702.22j-k); the active player announces first, then each defending player (CR 510.1).
 fn combat_damage(cx: &mut Cx) -> R<()> {
     // CR 510.4: with a first or double striker in combat as the step begins, there is a first-strike damage step before
     // the regular one.
@@ -860,29 +915,48 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
         cx.st().set_blocks(blocks);
     }
 
-    // CR 510.1c-d: an attacker blocked by more than one creature, or with trample and more than lethal, divides its
-    // damage as its controller chooses.
-    let mut divisions = Vec::new();
-    for attacker in cx.s().attackers.clone() {
-        if live(cx.s(), attacker.id) && attacker.blocked && deals_now(cx, attacker.id, attacker.first_strike, first_strike_step)
-            && let Some(d) = division(cx, &attacker)
-        {
-            divisions.push(d);
+    // The creatures dealing combat damage now: the attackers, and each blocker once however many creatures it blocks.
+    let attackers: Vec<Attacker> = cx
+        .s()
+        .attackers
+        .iter()
+        .copied()
+        .filter(|a| live(cx.s(), a.id) && deals_now(cx, a.id, a.first_strike, first_strike_step))
+        .collect();
+    let mut blockers: Vec<ObjectId> = Vec::new();
+    for b in &cx.s().blocks {
+        if !blockers.contains(&b.blocker) && live(cx.s(), b.blocker) && deals_now(cx, b.blocker, b.first_strike, first_strike_step) {
+            blockers.push(b.blocker);
+        }
+    }
+
+    // The divisions, each with the player who makes it.
+    let mut divisions: Vec<(PlayerId, DamageDivision)> = Vec::new();
+    for attacker in attackers.iter().filter(|a| a.blocked) {
+        if let Some(d) = attacker_division(cx, attacker) {
+            let by = if d.banding { cx.s().obj(d.creatures[0]).controller } else { cx.s().obj(attacker.id).controller };
+            divisions.push((by, d));
+        }
+    }
+    for &blocker in &blockers {
+        if let Some(d) = blocker_division(cx, blocker) {
+            let by = if d.banding { cx.s().obj(d.creatures[0]).controller } else { cx.s().obj(blocker).controller };
+            divisions.push((by, d));
         }
     }
     let mut chosen: Vec<(ObjectId, Option<ObjectId>, u16)> = Vec::new();
-    if !divisions.is_empty() {
-        let active = cx.s().turn.active;
-        if let Answer::Shares(shares) = cx.ask_core(active, RequestKind::AssignCombatDamage { divisions }, false)? {
-            chosen = shares;
+    let players: Vec<PlayerId> = cx.s().apnap().collect();
+    for player in players {
+        let mine: Vec<DamageDivision> = divisions.iter().filter(|(by, _)| *by == player).map(|(_, d)| d.clone()).collect();
+        if !mine.is_empty()
+            && let Answer::Shares(shares) = cx.ask_core(player, RequestKind::AssignCombatDamage { divisions: mine }, false)?
+        {
+            chosen.extend(shares);
         }
     }
 
     let mut assignments: Vec<(ObjectId, Target, u16)> = Vec::new();
-    for attacker in cx.s().attackers.clone() {
-        if !live(cx.s(), attacker.id) || !deals_now(cx, attacker.id, attacker.first_strike, first_strike_step) {
-            continue;
-        }
+    for attacker in &attackers {
         if chosen.iter().any(|s| s.0 == attacker.id) {
             for &(source, to, amount) in chosen.iter().filter(|s| s.0 == attacker.id) {
                 let target = match to {
@@ -894,38 +968,36 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
             continue;
         }
         let power = crate::static_rules::combat_damage_of(cx, attacker.id);
-        let blockers: Vec<ObjectId> = cx
-            .s()
-            .blocks
-            .iter()
-            .filter(|b| b.attacker == attacker.id && live(cx.s(), b.blocker))
-            .map(|b| b.blocker)
-            .collect();
         if !attacker.blocked {
             assignments.push((attacker.id, attacker.target, power));
             continue;
         }
-        if blockers.is_empty() {
+        match blockers_of(cx, attacker.id).as_slice() {
             // CR 510.1c: a blocked attacker whose blockers are all gone assigns no combat damage - unless it has trample,
-            // which then assigns all of it to the player or planeswalker it attacks (CR 702.19e).
-            if cx.chars(attacker.id).has(Keyword::Trample) {
-                assignments.push((attacker.id, attacker.target, power));
+            // which then assigns all of it to the player or planeswalker it attacks (CR 702.19d).
+            [] => {
+                if cx.chars(attacker.id).has(Keyword::Trample) {
+                    assignments.push((attacker.id, attacker.target, power));
+                }
+            }
+            // CR 510.1c: blocked by exactly one creature, all of it to that creature.
+            &[only] => assignments.push((attacker.id, Target::Object(only), power)),
+            // Two or more: divided above, unless it assigns no combat damage at all (CR 510.1a: 0 power).
+            _ => {}
+        }
+    }
+    for &blocker in &blockers {
+        if chosen.iter().any(|s| s.0 == blocker) {
+            for &(source, to, amount) in chosen.iter().filter(|s| s.0 == blocker) {
+                if let Some(creature) = to {
+                    assignments.push((source, Target::Object(creature), amount));
+                }
             }
             continue;
         }
-        let mut left = power;
-        for (i, &b) in blockers.iter().enumerate() {
-            let chars = cx.chars(b);
-            let lethal = (chars.toughness.unwrap_or(0) - cx.s().obj(b).damage as i16).max(0) as u16;
-            let share = if i + 1 == blockers.len() { left } else { left.min(lethal) };
-            assignments.push((attacker.id, Target::Object(b), share));
-            left -= share;
-        }
-    }
-    for block in cx.s().blocks.clone() {
-        if live(cx.s(), block.blocker) && live(cx.s(), block.attacker) && deals_now(cx, block.blocker, block.first_strike, first_strike_step) {
-            let power = crate::static_rules::combat_damage_of(cx, block.blocker);
-            assignments.push((block.blocker, Target::Object(block.attacker), power));
+        // CR 510.1d: blocking exactly one creature, all of it to that creature; blocking none still in combat, none.
+        if let &[only] = blocked_by(cx, blocker).as_slice() {
+            assignments.push((blocker, Target::Object(only), crate::static_rules::combat_damage_of(cx, blocker)));
         }
     }
     // CR 510.2: all of it is dealt at once, and announced at once (CR 603.2c). A prevention shield two or more sources would
@@ -943,47 +1015,109 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
     Ok(())
 }
 
-/// The damage division a blocked attacker has a choice in (the C# `AttackerDivision`): more than one blocker, or
-/// trample and more damage than is lethal to its one blocker.
-fn division(cx: &Cx, attacker: &Attacker) -> Option<DamageDivision> {
-    let power = crate::static_rules::combat_damage_of(cx, attacker.id);
-    let blockers: Vec<ObjectId> =
-        cx.s().blocks.iter().filter(|b| b.attacker == attacker.id && live(cx.s(), b.blocker)).map(|b| b.blocker).collect();
-    if power == 0 || blockers.is_empty() {
-        return None;
-    }
-    let trample = cx.chars(attacker.id).has(Keyword::Trample);
-    let deathtouch = cx.chars(attacker.id).has(Keyword::Deathtouch);
-    let lethal: Vec<u16> = blockers
+/// The creatures still blocking `attacker` (CR 509.1h, 506.4): its blockers that have not left combat.
+fn blockers_of(cx: &Cx, attacker: ObjectId) -> Vec<ObjectId> {
+    cx.s().blocks.iter().filter(|b| b.attacker == attacker && live(cx.s(), b.blocker)).map(|b| b.blocker).collect()
+}
+
+/// The creatures `blocker` is still blocking (CR 509.1g, 506.4): those of its blocks whose attacker has not left combat.
+fn blocked_by(cx: &Cx, blocker: ObjectId) -> Vec<ObjectId> {
+    cx.s().blocks.iter().filter(|b| b.blocker == blocker && live(cx.s(), b.attacker)).map(|b| b.attacker).collect()
+}
+
+/// Lethal damage for each of `creatures` from `source` (CR 702.19b, 120.4a): its toughness less the damage marked on it, or
+/// any 1 from a source with deathtouch (CR 702.2c).
+fn lethal_for(cx: &Cx, source: ObjectId, creatures: &[ObjectId]) -> Vec<u16> {
+    let deathtouch = cx.chars(source).has(Keyword::Deathtouch);
+    creatures
         .iter()
-        .map(|&b| {
+        .map(|&c| {
             if deathtouch {
                 return 1;
             }
-            let c = cx.chars(b);
-            (c.toughness.unwrap_or(0) - cx.s().obj(b).damage as i16).max(0) as u16
+            let chars = cx.chars(c);
+            (chars.toughness.unwrap_or(0) - cx.s().obj(c).damage as i16).max(0) as u16
         })
-        .collect();
-    if blockers.len() == 1 && (!trample || power <= lethal[0]) {
-        return None;
-    }
-    // The suggestion: lethal to each in order, the rest to the last blocker, or with trample to the defender.
+        .collect()
+}
+
+/// The suggestion for a division the creature's controller makes: lethal to each in turn, the rest to the last creature, or
+/// with `rest_to_defender` (trample) to the player or planeswalker attacked. The amounts, and what goes past the creatures.
+fn lethal_in_turn(power: u16, lethal: &[u16], rest_to_defender: bool) -> (Vec<u16>, u16) {
     let mut left = power;
     let mut suggested = Vec::new();
     for (i, &l) in lethal.iter().enumerate() {
-        let share = if i + 1 == lethal.len() && !trample { left } else { left.min(l) };
+        let share = if i + 1 == lethal.len() && !rest_to_defender { left } else { left.min(l) };
         suggested.push(share);
         left -= share;
     }
+    (suggested, left)
+}
+
+/// The suggestion for a division banding gives to the controller of the creatures it is divided among (CR 702.22j-k): all of
+/// it to one of them, one it would not kill if there is one (the toughest such), else the one worth least by its power and
+/// toughness. Each amount, index for index.
+fn spared(cx: &Cx, power: u16, creatures: &[ObjectId], lethal: &[u16]) -> Vec<u16> {
+    let worth = |c: ObjectId| {
+        let chars = cx.chars(c);
+        chars.power.unwrap_or(0) + chars.toughness.unwrap_or(0)
+    };
+    let survivor = (0..creatures.len()).filter(|&i| lethal[i] > power).max_by_key(|&i| lethal[i]);
+    let pick = survivor.unwrap_or_else(|| (0..creatures.len()).min_by_key(|&i| worth(creatures[i])).unwrap_or(0));
+    (0..creatures.len()).map(|i| if i == pick { power } else { 0 }).collect()
+}
+
+/// The damage division a blocked attacker has a choice in: more than one blocker (CR 510.1c), or trample and more damage than
+/// is lethal to its one blocker (CR 702.19b). Blocked by a creature with banding, the defending player divides it among its
+/// blockers as they choose - none of it to the player, trample or not (CR 702.22j) - and there is no choice with one blocker.
+fn attacker_division(cx: &Cx, attacker: &Attacker) -> Option<DamageDivision> {
+    let power = crate::static_rules::combat_damage_of(cx, attacker.id);
+    let blockers = blockers_of(cx, attacker.id);
+    if power == 0 || blockers.is_empty() {
+        return None;
+    }
+    let banding = blockers.iter().any(|&b| cx.chars(b).has(Keyword::Banding));
+    let trample = cx.chars(attacker.id).has(Keyword::Trample) && !banding;
+    let lethal = lethal_for(cx, attacker.id, &blockers);
+    if blockers.len() == 1 && (!trample || power <= lethal[0]) {
+        return None;
+    }
+    let (suggested, past) = if banding { (spared(cx, power, &blockers, &lethal), 0) } else { lethal_in_turn(power, &lethal, trample) };
     Some(DamageDivision {
         source: attacker.id,
+        banding,
         damage: power,
         creatures: blockers,
         lethal,
         may_assign_to_defender: trample,
         defender: if trample { attacker.target } else { Target::None },
         suggested,
-        suggested_to_defender: if trample { left } else { 0 },
+        suggested_to_defender: past,
+    })
+}
+
+/// The damage division a blocker blocking two or more creatures has (CR 510.1d): among them as its controller chooses, or,
+/// when one of them has banding, as the attacking player chooses (CR 702.22k). A blocker blocks two or more only by blocking
+/// a band (CR 702.22h).
+fn blocker_division(cx: &Cx, blocker: ObjectId) -> Option<DamageDivision> {
+    let power = crate::static_rules::combat_damage_of(cx, blocker);
+    let blocked = blocked_by(cx, blocker);
+    if power == 0 || blocked.len() < 2 {
+        return None;
+    }
+    let banding = blocked.iter().any(|&a| cx.chars(a).has(Keyword::Banding));
+    let lethal = lethal_for(cx, blocker, &blocked);
+    let suggested = if banding { spared(cx, power, &blocked, &lethal) } else { lethal_in_turn(power, &lethal, false).0 };
+    Some(DamageDivision {
+        source: blocker,
+        banding,
+        damage: power,
+        creatures: blocked,
+        lethal,
+        may_assign_to_defender: false,
+        defender: Target::None,
+        suggested,
+        suggested_to_defender: 0,
     })
 }
 

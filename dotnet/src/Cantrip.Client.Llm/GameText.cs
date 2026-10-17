@@ -505,6 +505,12 @@ public static class GameText
 
             text.Append("\n  ").Append(Creature(client, attacker.Attacker)).Append(" is attacking ").Append(at);
 
+            // An attacking band (CR 702.22c, 702.22h): blocked as one.
+            if (attacker.Band > 0)
+            {
+                text.Append(" in band ").Append(attacker.Band);
+            }
+
             text.Append(blockers.Count > 0
                 ? ", blocked by " + string.Join(", ", blockers.Select(blocker => Creature(client, blocker)))
                 : attacker.WasBlocked ? ", blocked" : ", unblocked");

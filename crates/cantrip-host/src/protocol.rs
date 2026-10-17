@@ -262,6 +262,9 @@ pub enum CardChoicePurposeView {
     PreventDamageFrom,
     /// Permanents an effect taps as it resolves (CR 701.26a), not to pay a cost (Thousand Moons Smithy).
     Tap,
+    /// The other attacking creatures that attack in a band with `Source`, a creature with banding (CR 702.22c, 508.1e): any
+    /// number with banding and at most one of `WithoutBanding`. None chosen forms no band.
+    Band,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -487,6 +490,8 @@ pub struct ObjectView {
     pub exerted: bool,
     pub saddled: bool,
     pub goaded: bool,
+    /// The attacking band it is in (CR 702.22c), numbered from 1; 0 for none.
+    pub band: i32,
     pub other_face: Option<Box<ObjectView>>,
     pub harnessed: bool,
     pub attached_to_player: i32,
@@ -602,6 +607,8 @@ pub struct AttackerView {
     pub target_player: i32,
     pub target_permanent: ViewHandle,
     pub was_blocked: bool,
+    /// The attacking band it is in (CR 702.22c), numbered from 1; 0 for none. Its band is blocked as one (CR 702.22h).
+    pub band: i32,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -803,6 +810,10 @@ pub struct DamageDivisionMessage {
     pub suggested: Vec<i32>,
     pub suggested_to_defender: i32,
     pub defender_permanent: ViewHandle,
+    /// The creature is not the asked player's (CR 702.22j-k): banding gives them the division of its damage among their own
+    /// creatures it is blocked by or is blocking.
+    #[serde(default)]
+    pub banding: bool,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -1010,6 +1021,8 @@ pub struct ChooseCardsPrompt {
     pub maximum_total_mana_value: Option<i32>,
     /// For `PreventDamageFrom`, how much damage the shield has left to prevent (CR 615.7).
     pub prevent_left: i32,
+    /// For `Band`, the eligible creatures without banding, of which a band may have at most one (CR 702.22c).
+    pub without_banding: Vec<ViewHandle>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

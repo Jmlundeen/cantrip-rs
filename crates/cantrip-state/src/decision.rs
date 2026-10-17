@@ -488,7 +488,11 @@ impl BlockRequirements {
 /// planeswalker it attacks), with what is lethal to each and the engine's own suggestion.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct DamageDivision {
+    /// The creature whose combat damage this is: an attacker among its blockers, or a blocker among the attackers it blocks.
     pub source: ObjectId,
+    /// The player asked is not its controller (CR 702.22j-k): banding gives the division of this creature's damage to the
+    /// controller of the creatures with banding it is blocked by or is blocking, who divides it among them as they choose.
+    pub banding: bool,
     pub damage: u16,
     pub creatures: Vec<ObjectId>,
     pub lethal: Vec<u16>,
@@ -666,6 +670,9 @@ pub enum ColorUse {
 /// Why a player is choosing.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Purpose {
+    /// The other attacking creatures that attack in a band with the request's source, a creature with banding (CR 702.22c,
+    /// 508.1e): any number with banding and at most one without, all attacking what it attacks. None chosen is no band.
+    Band,
     Discard,
     Sacrifice,
     /// A card chosen from a revealed hand (Duress).

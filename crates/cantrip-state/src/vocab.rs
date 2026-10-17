@@ -783,6 +783,10 @@ pub enum Keyword {
     Mountainwalk = 38,
     /// Forestwalk (CR 702.14), as Islandwalk.
     Forestwalk = 39,
+    /// Banding (CR 702.22): it may attack in a band with other attackers (CR 702.22c), and its controller divides the combat
+    /// damage of the creatures blocking it or blocked by it (CR 702.22j-k). A static ability that modifies the rules for
+    /// combat, which the core plays: Benalish Hero, Mesa Pegasus.
+    Banding = 40,
 }
 
 impl Keyword {

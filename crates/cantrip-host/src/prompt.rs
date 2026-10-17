@@ -436,6 +436,7 @@ fn remaining_hybrid(cost: &ManaCost) -> Vec<HybridSymbolView> {
 fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
     use CardChoicePurposeView as V;
     match purpose {
+        Purpose::Band => V::Band,
         Purpose::Discard => {
             if opening {
                 V::PutOnBottom
@@ -793,6 +794,14 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     Purpose::PreventDamageFrom(n) => i32::from(*n),
                     _ => 0,
                 },
+                // A band may have at most one creature without banding (CR 702.22c): which of the eligible ones those are.
+                without_banding: match purpose {
+                    Purpose::Band => handles_of(
+                        handles,
+                        &eligible.iter().copied().filter(|&c| !game.chars(c).has(Keyword::Banding)).collect::<Vec<_>>(),
+                    ),
+                    _ => Vec::new(),
+                },
                 ..Default::default()
             })
         }
@@ -1062,6 +1071,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     suggested: d.suggested.iter().map(|&l| i32::from(l)).collect(),
                     suggested_to_defender: i32::from(d.suggested_to_defender),
                     defender_permanent: d.defender.object().map_or(ViewHandle::NONE, |id| handles.handle(id)),
+                    banding: d.banding,
                 })
                 .collect(),
         }),

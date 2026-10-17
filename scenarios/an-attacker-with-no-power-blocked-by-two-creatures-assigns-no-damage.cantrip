@@ -1,0 +1,32 @@
+# CR 510.1a: a creature that would assign 0 or less damage assigns no combat damage at all, so an attacker with no power
+# blocked by two creatures has nothing to divide (CR 510.1c). Bot1's Ornithopter (0/2)
+# attacks; Bot2's Ornithopter and Birds of Paradise both block it. No damage is dealt by anyone - the blockers have no power
+# either - and nothing is left marked.
+
+[Bot1 Deck]
+Ornithopter
+Island x14
+
+[Bot2 Deck]
+Forest
+Ornithopter
+Birds of Paradise
+Island x14
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Block(Ornithopter > Ornithopter; Birds of Paradise > Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Battlefield.Birds of Paradise.Damage = 0
+Bot1.Battlefield.Ornithopter.Damage = 0

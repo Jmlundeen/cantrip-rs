@@ -92,6 +92,7 @@ fn keyword_name(k: u8) -> &'static str {
         37 => "Swampwalk",
         38 => "Mountainwalk",
         39 => "Forestwalk",
+        40 => "Banding",
         _ => "?",
     }
 }
@@ -230,7 +231,9 @@ impl StateDump {
                     Target::Object(id) => game.name(id).to_string(),
                     Target::None | Target::Ability(_) => "nothing".into(),
                 };
-                format!("{} > {}", game.name(a.id), at)
+                // An attacker in a band (CR 702.22c) says which: `Benalish Hero > Bot2 (band 1)`.
+                let band = if a.band == 0 { String::new() } else { format!(" (band {})", a.band) };
+                format!("{} > {}{band}", game.name(a.id), at)
             })
             .collect();
         d.list("Combat.Attackers", attackers, false);

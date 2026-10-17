@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 183;
+    public const int ProtocolVersion = 184;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -419,6 +419,10 @@ public sealed class ObjectView
     [Key(33)]
     public bool Goaded { get; set; }
 
+    /// <summary>The attacking band it is in (CR 702.22c), numbered from 1 in the order announced; 0 for none.</summary>
+    [Key(58)]
+    public int Band { get; set; }
+
     /// <summary>
     /// For a double-faced card, the face that is not up, exactly as it is printed (CR 712.2); null for a card with one
     /// face and for anything the viewer may not identify.
@@ -807,6 +811,10 @@ public sealed class AttackerView
 
     [Key(4)]
     public bool WasBlocked { get; set; }
+
+    /// <summary>The attacking band it is in (CR 702.22c), numbered from 1; 0 for none. A band is blocked as one (CR 702.22h).</summary>
+    [Key(5)]
+    public int Band { get; set; }
 }
 
 [MessagePackObject]

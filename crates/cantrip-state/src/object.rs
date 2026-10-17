@@ -1453,12 +1453,15 @@ pub struct Attacker {
     /// It had first strike or double strike as this combat's first-strike damage step began (CR 510.4): in the regular
     /// combat damage step it assigns combat damage only if it has double strike then.
     pub first_strike: bool,
+    /// The attacking band it is in (CR 702.22c), numbered from 1 in the order they were announced; 0 for none. It lasts the
+    /// rest of combat whatever happens to banding (CR 702.22e), and a member removed from combat leaves it (CR 702.22f).
+    pub band: u8,
 }
 
 impl Attacker {
-    /// An attacking creature, unblocked, not yet in any combat damage step.
+    /// An attacking creature, unblocked, in no band, not yet in any combat damage step.
     pub const fn new(id: ObjectId, target: Target) -> Attacker {
-        Attacker { id, target, blocked: false, first_strike: false }
+        Attacker { id, target, blocked: false, first_strike: false, band: 0 }
     }
 }
 
