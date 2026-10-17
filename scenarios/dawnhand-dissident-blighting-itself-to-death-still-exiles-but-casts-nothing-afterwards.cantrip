@@ -1,0 +1,50 @@
+# Dawnhand Dissident's "{T}, Blight 2: Exile target card from a graveyard" may put the counters on the Dissident itself, though it
+# dies of them (the ruling: the creature "doesn't have to have enough toughness to survive the process", CR 704.5f). The ability
+# is independent of its source once activated (CR 113.7a), so Bot1's Llanowar Elves are still exiled. But the permission to cast
+# them is a static ability of the Dissident, which no longer exists (CR 113.6, 611.3a): with three +1/+1 counters on a Walking
+# Ballista and {G} open, the Elves can't be cast from exile. The twin that casts them is
+# "...exiles-a-creature-and-casts-it-removing-counters-of-two-kinds".
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Black Lotus
+Black Lotus
+Dawnhand Dissident
+Llanowar Elves
+Walking Ballista
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Walking Ballista.Cast(X: 3)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Llanowar Elves; Ability: Exile target)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+Bot1.Battlefield.Forest.Activate
+! Bot1.Exile.Llanowar Elves.Cast
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Graveyard = Dawnhand Dissident; Black Lotus; Black Lotus
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 3

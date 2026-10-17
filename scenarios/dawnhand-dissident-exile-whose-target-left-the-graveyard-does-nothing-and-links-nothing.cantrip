@@ -1,0 +1,70 @@
+# Dawnhand Dissident's "{T}, Blight 2: Exile target card from a graveyard" with its target gone before it resolves does nothing (CR
+# 608.2b), though its cost was paid (CR 601.2h by way of 602.2b). Bot1 targets its Llanowar Elves in its graveyard, blighting its
+# Sylvan Caryatid twice; Bot2 responds with Glorious Decay, exiling the Elves itself. The Elves are in exile but were not exiled
+# with the Dissident (CR 607.2a), so with three counters among Bot1's creatures and {G} open they can't be cast from there.
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Black Lotus
+Dawnhand Dissident
+Llanowar Elves
+Walking Ballista
+Sylvan Caryatid
+Mox Emerald
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mox Emerald
+Mox Ruby
+Glorious Decay
+Island
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot1.Pass
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Llanowar Elves; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Glorious Decay.Cast
+Bot2.Modes(Exile target card from a graveyard)
+Bot2.Target(Bot1.Graveyard.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+? Exile = Llanowar Elves
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+Bot1.Battlefield.Forest.Activate
+! Bot1.Exile.Llanowar Elves.Cast
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield.Sylvan Caryatid.Counters.MinusOneMinusOne = 2
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Dawnhand Dissident.Tapped = true
+Bot2.Graveyard = Glorious Decay; Lightning Bolt

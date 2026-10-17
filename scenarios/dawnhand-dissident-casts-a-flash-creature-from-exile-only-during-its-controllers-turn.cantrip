@@ -1,0 +1,62 @@
+# Dawnhand Dissident: "During your turn, you may cast creature spells from among cards you own exiled with this creature ..." The
+# permission changes no timing (the rulings): a creature with flash may be cast from exile at instant speed (CR 702.8a), but only
+# during its controller's turn. Bot1 surveils its Cathar Commando into the graveyard on turn three (blighting the Dissident itself,
+# 0/1) and exiles it on turn five (blighting its Sylvan Caryatid twice, 0/1): three -1/-1 counters among its creatures. On Bot2's
+# turn six, with {W}{W} open and the counters there, the Commando can't be cast from exile; in Bot1's upkeep on turn seven it is,
+# with flash, removing the three counters (CR 118.8): the Dissident and the Caryatid are back to 1/2 and 0/3.
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Plains
+Mox Pearl
+Plains
+Cathar Commando
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Cathar Commando)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Cathar Commando; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Cathar Commando
+[T6 Bot2.Main1]
+Bot2.Pass
+! Bot1.Exile.Cathar Commando.Cast
+[T7 Bot1.Upkeep]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Cathar Commando.Cast
+Bot1.RemoveCounters(Dawnhand Dissident: 1; Sylvan Caryatid: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Cathar Commando.Power = 3
+Bot1.Battlefield.Dawnhand Dissident.Toughness = 2
+Bot1.Battlefield.Dawnhand Dissident.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Sylvan Caryatid.Toughness = 3
+Exile.Count = 0

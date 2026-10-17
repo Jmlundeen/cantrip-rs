@@ -1,0 +1,66 @@
+# Dawnhand Dissident's rulings: it "must be under your control in order for you to start casting a creature spell using its last
+# ability, but it doesn't need to stay under your control throughout that process", and the creature spell keeps its own timing ("only
+# during your main phase while the stack is empty"). Bot1 surveils its Walking Ballista into the graveyard and exiles it with the
+# Dissident, blighting its two Sylvan Caryatids (one counter, then two). In its upkeep on turn seven, with three counters among its
+# creatures and mana open, Bot1 can't cast the Ballista, which has no flash. In its main phase it casts it with X = 1 and pays the {2}
+# by sacrificing the Dissident itself to Ashnod's Altar (CR 601.2g); the three counters are still removed and the Ballista resolves.
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Ashnod's Altar
+Sylvan Caryatid
+Forest
+Walking Ballista
+Forest x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Ashnod's Altar.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Sylvan Caryatid.Activate(Color: Green)
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Sylvan Caryatid#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Walking Ballista)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Walking Ballista; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid#2)
+Bot1.Pass
+Bot2.Pass
+? Exile = Walking Ballista
+[T7 Bot1.Upkeep]
+! Bot1.Exile.Walking Ballista.Cast
+[T7 Bot1.Main1]
+Bot1.Exile.Walking Ballista.Cast(X: 1)
+Bot1.Battlefield.Ashnod's Altar.Activate(Sacrifice: Dawnhand Dissident)
+Bot1.RemoveCounters(Sylvan Caryatid#1: 1; Sylvan Caryatid#2: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Dawnhand Dissident
+Bot1.Battlefield.Sylvan Caryatid#1.Toughness = 3
+Bot1.Battlefield.Sylvan Caryatid#2.Toughness = 3
+Exile.Count = 0

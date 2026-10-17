@@ -1,0 +1,67 @@
+# "Remove three counters from among creatures you control" takes counters of any kinds (CR 118.3, 122.1), and from a creature with
+# several kinds the payer chooses which. Bot1's Sylvan Caryatid, blighted twice by Dawnhand Dissident's exile, then gets a flying, a
+# first strike and a lifelink counter from Abigale, Eloquent First-Year (losing its own abilities). Casting the exiled Llanowar Elves,
+# Bot1 removes the Caryatid's flying and first strike counters and the Dissident's -1/-1 counter: the Caryatid keeps its two -1/-1
+# counters and its lifelink counter, and with them lifelink (CR 122.1b); the Dissident is a 1/2 again.
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Abigale, Eloquent First-Year
+Plains
+Forest
+Llanowar Elves
+Forest x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Llanowar Elves; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Sylvan Caryatid.Counters.Flying = 1
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Exile.Llanowar Elves.Cast
+Bot1.RemoveCounters(Sylvan Caryatid: Flying 1; Sylvan Caryatid: FirstStrike 1; Dawnhand Dissident: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Sylvan Caryatid.Counters.MinusOneMinusOne = 2
+Bot1.Battlefield.Sylvan Caryatid.Counters.Lifelink = 1
+Bot1.Battlefield.Sylvan Caryatid.Counters.Flying = (absent)
+Bot1.Battlefield.Sylvan Caryatid.Counters.FirstStrike = (absent)
+Bot1.Battlefield.Sylvan Caryatid.Keywords = Lifelink
+Bot1.Battlefield.Dawnhand Dissident.Toughness = 2
+Exile.Count = 0

@@ -1,0 +1,66 @@
+# Dawnhand Dissident's permission is to cast the card, not a cost to cast it for: the card's own alternative cost may be paid (CR
+# 601.2b, 118.9), and the three counters are owed "in addition to paying their other costs" (CR 118.8, 601.2f) whatever it is
+# cast for. Solitude, exiled with the Dissident, is evoked from exile: Bot1 exiles Swords to Plowshares from its hand for the evoke
+# cost and removes three counters from among its creatures (the Dissident's one and its Sylvan Caryatid's two). Solitude enters,
+# exiles Bot2's Llanowar Elves (Bot2 gains 1 life) and is sacrificed to evoke (CR 702.74a).
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Swords to Plowshares
+Plains
+Plains
+Solitude
+Plains
+Forest x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Solitude)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Solitude; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Solitude
+Bot1.Exile.Solitude.Cast(Ability: Evoke)
+Bot1.Choose(Swords to Plowshares)
+Bot1.RemoveCounters(Dawnhand Dissident: 1; Sylvan Caryatid: 2)
+? Stack = Solitude
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Solitude
+Exile = Swords to Plowshares; Llanowar Elves
+Bot1.Battlefield.Dawnhand Dissident.Toughness = 2
+Bot1.Battlefield.Sylvan Caryatid.Toughness = 3
+Bot2.Battlefield = Forest
+Bot2.Life = 21
+Bot1.Hand = Plains; Plains

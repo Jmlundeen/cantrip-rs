@@ -1,0 +1,65 @@
+# Dawnhand Dissident: "During your turn, you may cast creature spells from among cards you own exiled with this creature ..." - the
+# permission is its controller's ("you", CR 109.5), and owning the card is not enough. Bot2 discards its Llanowar Elves to Vengeful
+# Possession (cast on its own Walking Ballista); Bot1's Dissident exiles them from Bot2's graveyard. On Bot2's own turn six, with
+# three +1/+1 counters on its Ballista and {G} open, Bot2 can't cast the Elves it owns: Bot1 controls the Dissident. The twin where
+# Bot2 controls the Dissident and casts them is "...lets-its-controller-cast-only-the-cards-they-own".
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Forest x15
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Mox Ruby
+Walking Ballista
+Vengeful Possession
+Llanowar Elves
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 3)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Vengeful Possession.Cast(Bot2.Battlefield.Walking Ballista)
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot2.Graveyard.Llanowar Elves; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+[T6 Bot2.Main1]
+! Bot2.Exile.Llanowar Elves.Cast
+
+[Expect]
+Exile = Llanowar Elves
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 3
+Bot2.Battlefield.Mox Emerald.Tapped = false

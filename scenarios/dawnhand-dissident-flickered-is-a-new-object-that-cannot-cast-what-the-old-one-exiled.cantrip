@@ -1,0 +1,62 @@
+# "Cards exiled with this creature" are those its own ability exiled (CR 607.2a), and a permanent that leaves and returns is a new
+# object (CR 400.7) that nothing was exiled with. Bot1's Dawnhand Dissident surveils Llanowar Elves into the graveyard on turn three
+# and exiles them on turn five (blighting its Sylvan Caryatid twice), then is flickered by Ephemerate: the Dissident that returns
+# (without its -1/-1 counter) did not exile the Elves. On turn seven it blights itself to surveil, so there are three counters among
+# Bot1's creatures, and with {G} open the Elves still can't be cast from exile. The twin that casts them is
+# "...exiles-a-creature-and-casts-it-removing-counters-of-two-kinds".
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Ephemerate
+Plains
+Forest
+Llanowar Elves
+Forest x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Llanowar Elves; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dawnhand Dissident.Toughness = 2
+[T7 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Forest |)
+Bot1.Battlefield.Forest.Activate
+! Bot1.Exile.Llanowar Elves.Cast
+
+[Expect]
+Exile = Ephemerate; Llanowar Elves
+Bot1.Battlefield.Dawnhand Dissident.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Sylvan Caryatid.Counters.MinusOneMinusOne = 2

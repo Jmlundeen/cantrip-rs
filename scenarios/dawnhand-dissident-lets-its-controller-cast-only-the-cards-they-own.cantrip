@@ -1,0 +1,88 @@
+# Dawnhand Dissident: "During your turn, you may cast creature spells from among cards you own exiled with this creature by removing
+# three counters from among creatures you control ..." - "you" is the Dissident's controller (CR 109.5), and the cards must be theirs
+# (CR 108.3). Bot1 bolts Bot2's Llanowar Elves and exiles them from Bot2's graveyard with the Dissident, blighting 2 onto its Sylvan
+# Caryatid: with three counters among its creatures and {G} open, Bot1 can't cast the Elves, which Bot2 owns. On its own turn Bot2
+# gains control of the Dissident with Vengeful Possession (untapped, with haste), blights the Dissident itself to surveil, and casts
+# its own Elves from exile by removing three counters from among the creatures it now controls: the Dissident's -1/-1 counter and
+# its Walking Ballista's two +1/+1 counters (CR 118.3). Bot1's counters are not touched.
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Black Lotus
+Sylvan Caryatid
+Walking Ballista
+Mountain
+Lightning Bolt
+Forest
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Emerald
+Llanowar Elves
+Walking Ballista
+Vengeful Possession
+Mountain
+Mox Ruby
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 2)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot2.Graveyard.Llanowar Elves; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+! Bot1.Exile.Llanowar Elves.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Vengeful Possession.Cast(Bot1.Battlefield.Dawnhand Dissident)
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose()
+Bot2.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot2.Choose(Dawnhand Dissident)
+Bot2.Pass
+Bot1.Pass
+Bot2.Arrange(Island |)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Exile.Llanowar Elves.Cast
+Bot2.RemoveCounters(Dawnhand Dissident: 1; Walking Ballista: 2)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Tapped = false
+Bot2.Graveyard = Walking Ballista; Vengeful Possession; Black Lotus
+Bot2.Battlefield.Dawnhand Dissident.Toughness = 2
+Bot1.Battlefield.Sylvan Caryatid.Counters.MinusOneMinusOne = 2
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Exile.Count = 0

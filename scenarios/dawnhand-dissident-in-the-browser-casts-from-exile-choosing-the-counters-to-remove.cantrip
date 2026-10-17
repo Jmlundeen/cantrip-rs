@@ -1,0 +1,62 @@
+# Browser
+# Dawnhand Dissident in the browser: its "{T}, Blight 2: Exile target card from a graveyard" is activated on Bot1's Llanowar Elves in its
+# graveyard, and the creature to blight is asked as blight is ("choose a creature you control to blight"). The Elves in exile say how
+# they may be cast ("Cast by removing three counters from among creatures you control"), and casting them asks which counters to remove
+# under a caption that says so: a button for each kind of counter on each creature, naming how many are taken of how many there are,
+# and a button that removes them once there are three. Bot1 takes both -1/-1 counters off its Sylvan Caryatid and the +1/+1 counter off
+# its Walking Ballista, which dies (CR 704.5f).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Black Lotus
+Dawnhand Dissident
+Llanowar Elves
+Walking Ballista
+Sylvan Caryatid
+Mox Emerald
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot1.Pass
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Llanowar Elves; Ability: Exile target)
+? Client.Bot1.Prompt.Title = Dawnhand Dissident: choose a creature you control to blight (it gets -1/-1 counters)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+Bot1.Battlefield.Forest.Activate
+Bot1.Exile.Llanowar Elves.Cast
+? Client.Bot1.Prompt.Title = Llanowar Elves: remove 3 counters
+? Client.Bot1.Prompt.Detail = Any kinds, from among the permanents shown  ·  0 of 3 chosen  ·  click a permanent to take one of its counters, or a button below
+Bot1.RemoveCounters(Sylvan Caryatid: 2; Walking Ballista: 1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Jet; Dawnhand Dissident; Sylvan Caryatid; Mox Emerald; Llanowar Elves
+Bot1.Battlefield.Sylvan Caryatid.Toughness = 3
+Bot1.Graveyard = Walking Ballista; Black Lotus
+Exile.Count = 0

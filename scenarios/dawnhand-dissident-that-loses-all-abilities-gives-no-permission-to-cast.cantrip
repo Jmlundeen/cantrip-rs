@@ -1,0 +1,59 @@
+# Dawnhand Dissident's permission to cast from exile is a static ability (CR 604.1): a Dissident that has lost all its abilities
+# (CR 613.1f) gives none. Bot1 exiles Llanowar Elves with the Dissident, then Abigale, Eloquent First-Year's entering ability makes
+# the Dissident lose all abilities and puts three keyword counters on it. With six counters among Bot1's creatures and {G} open, the
+# Elves can't be cast from exile. The twin, where Abigale's ability goes on the Sylvan Caryatid instead and the Elves are cast, is
+# "...removes-counters-of-any-kinds-naming-which-from-a-creature-with-several".
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Abigale, Eloquent First-Year
+Plains
+Forest
+Llanowar Elves
+Forest x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Llanowar Elves)
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Llanowar Elves; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Forest#2.Activate
+! Bot1.Exile.Llanowar Elves.Cast
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield.Dawnhand Dissident.Counters.Flying = 1
+Bot1.Battlefield.Dawnhand Dissident.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Sylvan Caryatid.Counters.MinusOneMinusOne = 2

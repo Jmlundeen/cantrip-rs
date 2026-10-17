@@ -1,0 +1,35 @@
+# Dawnhand Dissident: "{T}, Blight 1: Surveil 1." Blight 1 puts a -1/-1 counter on a creature its controller controls (CR
+# 701.68a), chosen as the cost is paid (CR 601.2h by way of 602.2b); the Dissident may be that creature, and as the only one Bot1
+# controls it must be. It becomes a 0/1 and survives. Surveil 1 (CR 701.25a) puts the top card of the library, a Lightning Bolt,
+# into the graveyard. The {T} leaves the Dissident tapped.
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest x5
+Forest
+Lightning Bolt
+Forest x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+? Bot1.Battlefield.Dawnhand Dissident.Toughness = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Lightning Bolt)
+
+[Expect]
+Bot1.Battlefield.Dawnhand Dissident.Counters.MinusOneMinusOne = 1
+Bot1.Battlefield.Dawnhand Dissident.Power = 0
+Bot1.Battlefield.Dawnhand Dissident.Toughness = 1
+Bot1.Battlefield.Dawnhand Dissident.Tapped = true
+Bot1.Graveyard = Lightning Bolt
+Bot1.Library.Count = 11

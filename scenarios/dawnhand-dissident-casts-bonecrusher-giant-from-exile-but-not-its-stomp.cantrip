@@ -1,0 +1,60 @@
+# Dawnhand Dissident lets its controller cast "creature spells" from among the cards exiled with it. An adventurer card is cast as
+# its Adventure or as itself, and only that face is the spell (CR 715.3a-b): Bonecrusher Giant exiled with the Dissident may be cast
+# as the Giant, a creature spell, but not as Stomp, an instant. Bot1 surveils the Giant into its graveyard on turn three (blighting
+# the Dissident, 0/1) and exiles it on turn five (blighting its Sylvan Caryatid twice, 0/1). With five mana open and three
+# counters there, Stomp is refused; the Giant is cast for {2}{R} and the three counters removed (CR 118.8).
+
+[Bot1 Deck]
+Mox Jet
+Dawnhand Dissident
+Forest
+Mox Emerald
+Sylvan Caryatid
+Mountain
+Mountain
+Mountain
+Bonecrusher Giant
+Mountain
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dawnhand Dissident.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Ability: Surveil)
+Bot1.Choose(Dawnhand Dissident)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Bonecrusher Giant)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dawnhand Dissident.Activate(Bot1.Graveyard.Bonecrusher Giant; Ability: Exile target)
+Bot1.Choose(Sylvan Caryatid)
+Bot1.Pass
+Bot2.Pass
+? Exile = Bonecrusher Giant
+! Bot1.Exile.Bonecrusher Giant.Cast(Bot2; Ability: Stomp)
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Exile.Bonecrusher Giant.Cast
+Bot1.RemoveCounters(Dawnhand Dissident: 1; Sylvan Caryatid: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Bonecrusher Giant.Power = 4
+Bot1.Battlefield.Dawnhand Dissident.Toughness = 2
+Bot1.Battlefield.Sylvan Caryatid.Toughness = 3
+Bot2.Life = 20
+Exile.Count = 0
