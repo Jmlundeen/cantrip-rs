@@ -1,0 +1,31 @@
+# Thrór's Map: "When Thrór's Map enters, search your library for a basic land card, reveal it, put it into your hand,
+# then shuffle." Bot1 casts it with two Moxen; the Savannah (a nonbasic land) is refused, the Forest is found (positive
+# control), revealed (CR 701.20) and put into the hand, not onto the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Thrór's Map
+Island x4
+Savannah
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thrór's Map.Cast
+! Bot1.Search(Savannah)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Revealed = Forest
+Bot1.Hand.Count = 5
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Thrór's Map
+Bot1.Library.Count = 11

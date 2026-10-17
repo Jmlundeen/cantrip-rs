@@ -1,0 +1,35 @@
+# Thror's Map is legendary. The second Map enters in turn 3 and the legend rule (CR 704.5j) has Bot1 keep one and put the
+# other into the graveyard; the enters ability of the one that entered triggered all the same (CR 603.6a) and fetches a
+# second Forest into the hand. Hand: 5 after turn 1, +1 draw, -1 Map cast, +1 Forest = 6.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Thrór's Map
+Thrór's Map
+Island x3
+Forest x4
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thrór's Map.Cast
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thrór's Map.Cast
+Bot1.Choose(Thrór's Map)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Thrór's Map
+Bot1.Graveyard = Thrór's Map
+Bot1.Hand.Count = 6

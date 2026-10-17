@@ -1,0 +1,6 @@
+{
+  "name": "Thrór's Map",
+  "manaCost": "{2}",
+  "type": "Legendary Artifact",
+  "oracleText": "When Thrór's Map enters, search your library for a basic land card, reveal it, put it into your hand, then shuffle.\n{2}, {T}: Draw a card, then discard a card."
+}

@@ -1,0 +1,39 @@
+# Thror's Map: "{2}, {T}: Draw a card, then discard a card." On turn 3 Bot1 pays {2} from its two Moxen and taps the Map
+# (it is an artifact, not a creature, so it is not summoning sick even though it could not have been tapped at once):
+# the hand is 5 after turn 1's Forest search, 6 after the turn-3 draw, 7 after the loot's draw, 6 after its discard (a
+# Plains chosen on purpose, which is in the graveyard). The Map is tapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Thrór's Map
+Plains
+Island x3
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thrór's Map.Cast
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 6
+Bot1.Battlefield.Thrór's Map.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Battlefield.Thrór's Map.Tapped = true
+Bot1.Pass
+Bot1.Choose(Plains)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Plains
+Bot1.Battlefield.Thrór's Map.Tapped = true
