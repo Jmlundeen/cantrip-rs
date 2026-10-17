@@ -1,0 +1,43 @@
+# Emptiness: the creature card returned has "mana value 3 or less". With {W}{W} spent but only an Elegy Acolyte (mana value 4)
+# and an Island in the graveyard, the first ability has no legal target and is removed from the stack (CR 603.3d): nothing is
+# asked, nothing returns, and the Acolyte stays in the graveyard. Positive control: the same game with a Llanowar Elves
+# there, emptiness-cast-with-white-white-returns-a-creature-card-of-mana-value-three-or-less.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Faithless Looting
+Emptiness
+Elegy Acolyte
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Elegy Acolyte; Island)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Emptiness.Cast
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Emerald; Mox Sapphire; Emptiness
+Bot1.Graveyard = Black Lotus; Faithless Looting; Island; Elegy Acolyte
+Bot1.Battlefield.Emptiness.Power = 3
+Bot1.Battlefield.Emptiness.Toughness = 5

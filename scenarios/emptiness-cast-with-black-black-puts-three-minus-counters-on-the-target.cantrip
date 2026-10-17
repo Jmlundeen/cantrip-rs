@@ -1,0 +1,44 @@
+# Emptiness (3/5): "When this creature enters, if {B}{B} was spent to cast it, put three -1/-1 counters on up to one target
+# creature." Bot1 pays {4}{W/B}{W/B} with Black Lotus's {B}{B}{B} and three Moxen (red, green, blue): the two hybrid symbols
+# are paid with black mana, so {B}{B} was spent; white was not, so the first ability (the reanimation) does not trigger
+# (nothing is asked for it). Bot2's Ornithopter (0/2) gets three -1/-1 counters and dies as a state-based action (CR 704.5f).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Emptiness
+Island x2
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Emptiness.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Sapphire; Emptiness
+Bot1.Battlefield.Emptiness.Power = 3
+Bot1.Battlefield.Emptiness.Toughness = 5
+Bot1.Battlefield.Emptiness.Counters.MinusOneMinusOne = (absent)
+Bot1.Graveyard = Black Lotus

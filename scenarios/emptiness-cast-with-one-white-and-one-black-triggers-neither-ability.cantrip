@@ -1,0 +1,49 @@
+# Emptiness: "if {W}{W} was spent" and "if {B}{B} was spent" each need two mana of that color. Paid with a Mox Pearl ({W}), a Mox
+# Jet ({B}), a Mox Emerald and Black Lotus's {R}{R}{R}, only one white and one black were spent (the hybrid symbols took one
+# each), so neither ability triggers: nobody is asked for a target (! Bot1.Target) although a Llanowar Elves is in the
+# graveyard and Bot2's Ornithopter is a legal creature to target. The Elves stay, the Ornithopter lives.
+
+[Bot1 Deck]
+Mox Ruby
+Faithless Looting
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Emerald
+Emptiness
+Llanowar Elves
+Island
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Emptiness.Cast
+! Bot1.Target
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Jet; Mox Emerald; Emptiness
+Bot1.Graveyard = Black Lotus; Faithless Looting; Island; Llanowar Elves
+Bot2.Battlefield = Ornithopter
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Emptiness.Toughness = 5

@@ -1,0 +1,37 @@
+# Emptiness evoked with a Mox Pearl ({W}) and a Mox Jet ({B}): one white and one black mana were spent, neither {W}{W} nor
+# {B}{B}, so only the evoke sacrifice trigger happens. The Llanowar Elves stay in the graveyard (compare
+# emptiness-evoked-with-white-white-still-returns-the-creature-before-its-sacrifice), nobody is asked for a target, and
+# Emptiness is sacrificed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Faithless Looting
+Emptiness
+Island x2
+Llanowar Elves
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Island)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emptiness.Cast(Ability: Evoke)
+! Bot1.Target
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Jet
+Bot1.Graveyard = Emptiness; Faithless Looting; Island; Llanowar Elves

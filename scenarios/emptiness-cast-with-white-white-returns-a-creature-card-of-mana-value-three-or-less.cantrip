@@ -1,0 +1,46 @@
+# Emptiness: "if {W}{W} was spent to cast it, return target creature card with mana value 3 or less from your graveyard to the
+# battlefield." Faithless Looting puts a Llanowar Elves (mana value 1) and an Island into the graveyard; Black Lotus's
+# {W}{W}{W} and the Mox Pearl pay the hybrid symbols with white, so {W}{W} was spent, and the Elves return to the
+# battlefield untapped (the only legal target, so it is chosen without a question). No black mana was spent, so the second
+# ability does not trigger. The control that the mana value is limited to 3 is
+# emptiness-white-white-with-only-a-mana-value-four-creature-in-the-graveyard-returns-nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Faithless Looting
+Emptiness
+Llanowar Elves
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Island)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Emptiness.Cast
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Emerald; Mox Sapphire; Emptiness; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Graveyard = Black Lotus; Faithless Looting; Island
+Bot1.Battlefield.Emptiness.Power = 3
+Bot1.Battlefield.Emptiness.Toughness = 5

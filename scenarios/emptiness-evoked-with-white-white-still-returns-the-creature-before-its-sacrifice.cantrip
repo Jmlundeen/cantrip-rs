@@ -1,0 +1,34 @@
+# Emptiness evoked ({W/B}{W/B}) with Black Lotus's {W}{W}{W}: "if {W}{W} was spent to cast it" counts what was spent on the evoke
+# cost too, so the reanimation triggers beside the evoke sacrifice trigger. Bot1 puts the reanimation first (a ruling lets the
+# creature's own ability resolve before the evoke trigger), so the Llanowar Elves, in the graveyard from Faithless Looting,
+# come back, and then Emptiness is sacrificed: it ends in the graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Faithless Looting
+Emptiness
+Island x3
+Llanowar Elves
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Island)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Emptiness.Cast(Ability: Evoke)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Llanowar Elves
+Bot1.Graveyard = Emptiness; Black Lotus; Faithless Looting; Island
