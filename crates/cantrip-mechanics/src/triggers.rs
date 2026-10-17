@@ -730,6 +730,20 @@ pub fn creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> 
     }
 }
 
+/// "Whenever a creature an opponent controls enters" (CR 603.6a): any creature, token or not, under the control of a player
+/// other than this ability's controller as it entered. The ability is about that player (`Fired::about`), for "deals 1 damage
+/// to that player". Authority of the Consuls and Gideon the Oathless print it.
+pub fn opponents_creature_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield) && q.controller(*new) != me.controller && q.chars(*new).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Player(q.controller(*new)))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever an artifact you control enters" (CR 603.6a): any artifact, this one included if it is one, under your control as
 /// it entered. Tezzeret, Cruel Captain and Chandra, Spark Hunter's emblem print it; Dowsing Device's "this artifact or another
 /// artifact you control enters" is the same event.
@@ -1003,6 +1017,7 @@ pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, 
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
+pub const OPPONENTS_CREATURE_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, opponents_creature_enters);
 pub const ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, artifact_you_control_enters);
 pub const CREATURE_DIES: Trigger = when(EventMask::ZONE_CHANGE, creature_dies);
 pub const CREATURE_YOU_CONTROL_DIES: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_dies);
