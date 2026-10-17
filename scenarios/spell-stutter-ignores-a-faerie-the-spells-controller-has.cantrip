@@ -1,0 +1,48 @@
+# "For each Faerie you control": the Stutter's controller's. Bot2 controls the Picklock Prankster (cast with Mox Sapphire
+# and Mox Jet) and still pays only {2} for its Bolt - Mox Pearl and Mox Emerald - so the Bolt resolves (20 - 3 = 17).
+# Beside the scenario where Bot1 has the Faerie (and Bot2 cannot pay {3}), this shows whose Faeries are counted.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Spell Stutter
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Picklock Prankster
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Picklock Prankster.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spell Stutter.Cast(Stack.Lightning Bolt)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot2.PayCost
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Spell Stutter
+Bot2.Battlefield.Picklock Prankster.Subtypes = Faerie; Rogue

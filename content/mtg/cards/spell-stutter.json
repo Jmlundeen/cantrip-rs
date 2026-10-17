@@ -1,0 +1,6 @@
+{
+  "name": "Spell Stutter",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target spell unless its controller pays {2} plus an additional {1} for each Faerie you control."
+}
