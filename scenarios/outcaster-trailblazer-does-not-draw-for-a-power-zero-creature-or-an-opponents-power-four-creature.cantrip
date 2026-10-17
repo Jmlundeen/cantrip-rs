@@ -1,0 +1,52 @@
+# Outcaster Trailblazer's draw is for "another creature you control with power 4 or greater". Bot1's Ornithopter (power 0) enters:
+# nothing drawn. Bot2 then casts its own Outcaster Trailblazer (power 4, but not Bot1's): Bot1 draws nothing, and the Trailblazer
+# on the battlefield is the same for both - Bot2's own enters trigger adds its mana. The control, where a power-four creature of
+# Bot1's does draw, is the scenario with two Trailblazers.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Outcaster Trailblazer
+Ornithopter
+Plains
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Outcaster Trailblazer
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Colors(Green)
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+? Bot1.Hand = Plains; Plains
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Outcaster Trailblazer.Cast
+Bot1.Pass
+Bot2.Colors(Red)
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Hand = Plains; Plains
+
+[Expect]
+Bot1.Hand = Plains; Plains
+Bot2.Battlefield.Outcaster Trailblazer.Power = 4

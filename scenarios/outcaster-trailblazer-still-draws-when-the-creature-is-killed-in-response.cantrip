@@ -1,0 +1,51 @@
+# Outcaster Trailblazer ruling: "Once Outcaster Trailblazer's second ability has triggered, lowering the power of the creature or
+# removing it from the battlefield won't stop you from drawing a card." Bot1's second Trailblazer enters on turn 3 and the first one's
+# draw trigger goes on the stack; Bot2 answers with Lightning Bolt on the new 4/2, which dies, and the draw still happens.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Outcaster Trailblazer
+Outcaster Trailblazer
+Plains
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Colors(Green)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Triggers(draw a card; add one mana)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Outcaster Trailblazer#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains
+Bot1.Graveyard = Outcaster Trailblazer
+Bot1.Battlefield.Outcaster Trailblazer.Power = 4
+Bot2.Graveyard = Lightning Bolt

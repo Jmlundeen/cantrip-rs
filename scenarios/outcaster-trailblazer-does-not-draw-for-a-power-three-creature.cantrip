@@ -1,0 +1,39 @@
+# Outcaster Trailblazer: "power 4 or greater" is a floor at four. Bot1's Trailblazer enters (its trigger adds {G}), then a Chance-Met Elves
+# (a 3/2: one short) is cast with that {G} and two Moxen: no card is drawn, so the hand stays empty. The control, where a creature
+# with power exactly four does draw, is the scenario with two Trailblazers.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Outcaster Trailblazer
+Chance-Met Elves
+Plains x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Colors(Green)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chance-Met Elves.Cast
+Bot2.Pass
+[Bot1.Main2]
+? Bot1.Battlefield.Chance-Met Elves.Power = 3
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 15

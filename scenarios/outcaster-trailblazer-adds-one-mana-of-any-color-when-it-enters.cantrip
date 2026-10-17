@@ -1,0 +1,33 @@
+# Outcaster Trailblazer: "When this creature enters, add one mana of any color." It isn't a mana ability (the ruling): it goes on the
+# stack as a triggered ability and the color is chosen as it resolves (CR 106.1b, 605.1b). Bot1 casts it with three Moxen and then
+# chooses blue: the pool holds {U}, which no land or Mox of Bot1's makes here.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Outcaster Trailblazer
+Plains x3
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Colors(Blue)
+? Bot1.Mana = {U}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Outcaster Trailblazer.Power = 4
+Bot1.Battlefield.Outcaster Trailblazer.Toughness = 2
+Stack.Count = 0

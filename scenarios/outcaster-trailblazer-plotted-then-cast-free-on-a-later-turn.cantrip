@@ -1,0 +1,37 @@
+# Outcaster Trailblazer, Plot {2}{G} (CR 702.170): Bot1 pays {2}{G} with three Moxen and exiles it from the hand (a special action, so
+# nothing on the stack: no enters trigger yet). It can't be cast the turn it was plotted (the refusal), but on turn 3 it is cast from exile
+# for no mana at sorcery speed (the Moxen stay untapped), its enters trigger adds a mana of the chosen color, and it is a 4/2 on the battlefield.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Outcaster Trailblazer
+Plains x3
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Activate(Ability: Plot)
+? Exile = Outcaster Trailblazer
+? Stack.Count = 0
+! Bot1.Exile.Outcaster Trailblazer.Cast
+[T3 Bot1.Main1]
+Bot1.Exile.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Colors(White)
+? Bot1.Mana = {W}
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Outcaster Trailblazer.Power = 4
+Exile.Count = 0
+Bot1.Battlefield.Mox Emerald.Tapped = false

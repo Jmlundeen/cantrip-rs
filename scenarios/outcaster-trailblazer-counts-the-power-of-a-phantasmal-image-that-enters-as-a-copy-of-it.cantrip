@@ -1,0 +1,42 @@
+# Outcaster Trailblazer ruling: "entering the battlefield as a copy of another creature" is considered when determining whether the ability
+# triggers. Phantasmal Image is a 0/0 card, but it enters as a copy of the Trailblazer, a 4/2, so the Trailblazer on the battlefield draws a
+# card for it. The Image's copy has the enters trigger too (it adds a mana). The one Plains drawn joins the Plains Bot1 held (two in hand, one card gone from the library).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Outcaster Trailblazer
+Phantasmal Image
+Plains
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Colors(Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Phantasmal Image.Cast
+Bot2.Pass
+Bot1.Accept
+Bot1.Triggers(draw a card; add one mana)
+Bot2.Pass
+Bot1.Colors(Red)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains; Plains
+Bot1.Library.Count = 13
+Bot1.Battlefield.Outcaster Trailblazer#2.Power = 4

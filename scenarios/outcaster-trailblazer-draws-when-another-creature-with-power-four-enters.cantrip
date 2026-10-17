@@ -1,0 +1,47 @@
+# Outcaster Trailblazer: "Whenever another creature you control with power 4 or greater enters, draw a card." Bot1 casts one
+# Trailblazer (three Moxen; its enters trigger adds {G}) and, with that {G} and two more Moxen, a second 4/2 Trailblazer: the first
+# draws a card for it, and the second does not draw for itself ("another"). Bot1's hand was empty, so it ends with the one drawn
+# Plains.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Sapphire
+Outcaster Trailblazer
+Outcaster Trailblazer
+Plains
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Colors(Green)
+? Bot1.Mana = {G}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Outcaster Trailblazer.Cast
+Bot2.Pass
+Bot1.Triggers(draw a card; add one mana)
+Bot2.Pass
+Bot1.Colors(Red)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Plains
+Bot1.Battlefield.Outcaster Trailblazer#1.Power = 4
+Bot1.Battlefield.Outcaster Trailblazer#2.Power = 4
+Bot1.Library.Count = 14
