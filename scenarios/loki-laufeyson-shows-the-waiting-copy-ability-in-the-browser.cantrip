@@ -2,7 +2,7 @@
 # As a person sees it: Loki's two abilities are told apart on its menu, each with its cost. Once "{1}, {T}: When you next
 # cast ..." has resolved, the delayed ability sits on no card, so the page says it beside Bot1's life total, named for Loki.
 # Bot1 casts Lightning Bolt at Bot2; the copy asks for its new targets, and Bot1 keeps Bot2. The ability is used up
-# (CR 603.7c): nothing waits any more, and Bot2 has taken 3 + 3.
+# (CR 603.7b): nothing waits any more, and Bot2 has taken 3 + 3.
 
 [Bot1 Deck]
 Mountain

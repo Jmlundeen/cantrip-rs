@@ -1,0 +1,53 @@
+# Loki Laufeyson: the copy is made even if the spell it triggered on has been countered by the time the ability resolves
+# (Doublecast's ruling, 2018-07-13; CR 707.10, 608.2h). Bot1 casts Lightning Bolt at Bot2 under Loki's waiting ability;
+# Bot2 counters the Bolt in response to the trigger, and the trigger still copies it from its last known information. The
+# copy deals the 3.
+
+[Bot1 Deck]
+Mountain
+Loki Laufeyson
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Counterspell
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loki Laufeyson.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Loki Laufeyson.Activate(Ability: When you next)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+? Delayed = Loki Laufeyson
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Lightning Bolt
+Bot1.Target(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Counterspell
+Delayed.Count = 0

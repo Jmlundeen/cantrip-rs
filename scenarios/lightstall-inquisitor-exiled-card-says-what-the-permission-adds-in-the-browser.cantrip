@@ -23,7 +23,7 @@ Bot2.Pass
 Bot1.Choose(Forest)
 [T3 Bot1.Main1]
 ? Client.Bot1.Exile.Lit = true
-? Client.Bot1.Exile.Forest.Annotation = Playable while it stays here, a spell costs {1} more, a land enters tapped
+? Client.Bot1.Exile.Forest.Annotation = Playable while it stays here, a land enters tapped
 Bot1.Exile.Forest.Play
 [T3 Bot1.Main2]
 

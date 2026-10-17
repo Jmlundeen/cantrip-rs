@@ -1,0 +1,49 @@
+# Loki Laufeyson (power 2): a spell's mana value on the stack includes the X chosen for it (CR 202.3e). Bot1 activates
+# Loki, then casts Meltdown with X = 2, mana value 3, more than Loki's power: no copy, and the ability goes on waiting. Then
+# Meltdown with X = 1, mana value 2: copied, X and all (CR 707.10), and the ability is used up. Bot2's Mox Ruby (mana value 0)
+# is destroyed either way.
+
+[Bot1 Deck]
+Mountain
+Loki Laufeyson
+Mountain
+Mox Ruby
+Black Lotus
+Meltdown
+Meltdown
+Mountain x10
+
+[Bot2 Deck]
+Mox Ruby
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Loki Laufeyson.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Loki Laufeyson.Activate(Ability: When you next)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Meltdown.Cast(X: 2)
+Bot1.Pass
+? Delayed = Loki Laufeyson
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Meltdown.Cast(X: 1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard = Mox Ruby
+Delayed.Count = 0

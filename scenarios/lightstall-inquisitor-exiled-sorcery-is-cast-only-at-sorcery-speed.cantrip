@@ -1,0 +1,38 @@
+# Lightstall Inquisitor: "playing the exiled card follows all normal timing restrictions" (ruling 2025-07-25; CR 307.1).
+# Bot2 exiles Pyroclasm; on Bot1's turn Bot2 is not offered it, and on its own turn, in its main phase with an empty stack,
+# it casts it from exile for {2}{R}, which kills the Inquisitor.
+
+[Bot1 Deck]
+Plains
+Lightstall Inquisitor
+Plains x15
+
+[Bot2 Deck]
+Pyroclasm
+Mountain
+Mox Ruby
+Mox Ruby
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Lightstall Inquisitor.Cast
+Bot2.Choose(Pyroclasm)
+! Bot2.Exile.Pyroclasm.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Exile.Pyroclasm.Cast
+? Bot2.Mana =
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Exile.Count = 0
+Bot1.Graveyard = Lightstall Inquisitor
+Bot2.Graveyard = Pyroclasm

@@ -1,4 +1,4 @@
-# Loki Laufeyson: "when you next cast ... this turn" (CR 603.7b-c). Bot1 activates Loki on turn 3 and casts nothing; the
+# Loki Laufeyson: "when you next cast ... this turn" (CR 603.7b). Bot1 activates Loki on turn 3 and casts nothing; the
 # delayed ability waits through that turn and is gone once it ends. On turn 5 Bot1's Lightning Bolt, mana value 1, is not
 # copied: Bot2 takes 3, not 6.
 

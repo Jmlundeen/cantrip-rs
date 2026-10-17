@@ -1,6 +1,6 @@
 # Loki Laufeyson: "{1}, {T}: When you next cast an instant or sorcery spell with mana value less than or equal to Loki's
 # power this turn, copy that spell. You may choose new targets for the copy." Bot1 activates Loki (power 2) and casts
-# Lightning Bolt at Bot2; the delayed ability (CR 603.7c) copies it, and Bot1 aims the copy at Bot2's Ornithopter
+# Lightning Bolt at Bot2; the delayed ability (CR 603.7b) copies it, and Bot1 aims the copy at Bot2's Ornithopter
 # (CR 707.10c). The copy resolves first. A second Bolt the same turn is not copied: "when you next" triggers once, and the
 # ability is gone once it has (`Delayed` is empty). Bot2 takes 3 + 3, and the Ornithopter dies.
 
