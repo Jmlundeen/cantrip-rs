@@ -1,0 +1,78 @@
+# Turn to Frog's ruling: a creature it affects that stops being a creature keeps its other types and is blue with no abilities,
+# but no Frog - a creature type is had only by a creature or a Kindred (CR 205.3d; "If it stops being a creature ... it will
+# be a legendary blue enchantment with no abilities"). On turn 4 Bot2 turns Bot1's Opalescence-animated Humility into a
+# Frog, then disenchants Opalescence: Humility is no creature now - a blue enchantment with no subtype - and it still has
+# no abilities until end of turn (a resolved effect on it, CR 611.2c), so Bot1's Inspiring Overseer is still its printed
+# 2/1 with flying.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Mox Jet
+Sol Ring
+Opalescence
+Inspiring Overseer
+Humility
+Island x12
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Turn to Frog
+Disenchant
+Plains
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Inspiring Overseer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Inspiring Overseer.Power = 1
+? Bot1.Battlefield.Inspiring Overseer.Keywords = (absent)
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Humility)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Humility.Subtypes = Frog
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Opalescence)
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Graveyard = Opalescence; Black Lotus
+Bot1.Battlefield.Humility.Types = Enchantment
+Bot1.Battlefield.Humility.Subtypes = (absent)
+Bot1.Battlefield.Humility.Colors = Blue
+Bot1.Battlefield.Inspiring Overseer.Power = 2
+Bot1.Battlefield.Inspiring Overseer.Keywords = Flying

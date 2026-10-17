@@ -728,7 +728,7 @@ impl Entry {
     /// Whether another effect could change what it applies to or what it does (CR 613.8a(b)), which is all the dependency
     /// system judges: a static ability's reach ("other creatures", "each land"), and the resolved effects that do
     /// something only to an object that has something - a text change, only where its word is (CR 612.1); "all creature
-    /// types", only to a creature or Kindred (CR 205.3d). Every other resolved effect names the objects it applies to
+    /// types" and a creature type set, only to a creature or Kindred (CR 205.3d). Every other resolved effect names the objects it applies to
     /// (CR 611.2c) and does the same to each whatever was done before it, so nothing changes what it applies to or does.
     /// A change to an effect's text or existence is not judged here: the only existence the layers can take away is a
     /// static ability's, to "loses all abilities", which `lost_to_statics` orders (CR 613.8a), and no text-changing effect
@@ -737,7 +737,7 @@ impl Entry {
         match self {
             Entry::Static(..) => true,
             Entry::Granted(_) | Entry::Continued(..) => false,
-            Entry::Effect(e) => matches!(e.kind, EffectKind::ChangeText { .. } | EffectKind::AddAllCreatureTypes),
+            Entry::Effect(e) => matches!(e.kind, EffectKind::ChangeText { .. } | EffectKind::AddAllCreatureTypes | EffectKind::SetCreatureType(_)),
         }
     }
 
@@ -751,7 +751,7 @@ impl Entry {
                     chars.subtypes.has(from) && !(from.is_creature_type() && chars.keywords.has(Keyword::Changeling))
                 }
                 EffectKind::ChangeText { from: Word::Color(from), .. } => chars.hexproof_from.colors().has(from),
-                EffectKind::AddAllCreatureTypes => chars.is(CardType::Creature) || chars.is(CardType::Kindred),
+                EffectKind::AddAllCreatureTypes | EffectKind::SetCreatureType(_) => chars.is(CardType::Creature) || chars.is(CardType::Kindred),
                 _ => true,
             },
         }
@@ -1143,9 +1143,12 @@ fn apply_effect(effect: &ContinuousEffect, layer: Layer, chars: &mut Chars) {
                 }
             }
             // CR 205.1a: a creature type that is set replaces every creature type, and no other subtype.
+            // CR 205.3d: the type set is had only by a creature or a Kindred (Turn to Frog's ruling: a God that stops being a
+            // creature is a blue enchantment, no Frog).
             (Layer::Type, EffectKind::SetCreatureType(s)) => {
                 let kept = chars.subtypes.iter().filter(|t| !t.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with);
-                chars.subtypes = kept.with(s);
+                let creature = chars.is(CardType::Creature) || chars.is(CardType::Kindred);
+                chars.subtypes = if creature { kept.with(s) } else { kept };
             }
             // CR 613.1d: set types replace every card type, and the subtypes with them.
             (Layer::Type, EffectKind::SetTypes(types)) => {
