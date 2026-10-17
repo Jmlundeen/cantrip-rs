@@ -403,6 +403,12 @@ impl Game {
         static_rules::cant_gain_life(self, self.cards, player)
     }
 
+    /// Whether `creature` may attack as though it didn't have defender right now (CR 702.3b, 609.4): an effect or a static
+    /// ability on the battlefield says so. Whether it has defender at all is asked of its characteristics.
+    pub fn may_attack_despite_defender(&self, creature: ObjectId) -> bool {
+        static_rules::may_attack_despite_defender(self, self.cards, creature)
+    }
+
     /// Whether `player` may look at the top card of their library any time (CR 401.2), as a permanent they control says.
     pub fn may_look_at_library_top(&self, player: PlayerId) -> bool {
         actions::may_look_at_library_top(self, self.cards, player)

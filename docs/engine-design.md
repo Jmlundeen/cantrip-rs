@@ -533,6 +533,24 @@ open to it costs nothing, and a requirement to attack a certain player (or a goa
 counts that player while attacking them is free. The board is searched for these only as attackers are declared. The
 benchmark measured 5.73 us per decision before and 5.76-5.85 us after (2026-10-16, the same noisy machine).
 
+### Attacking as though it didn't have defender
+
+A creature with defender can't attack (CR 702.3b). "Can attack as though it didn't have defender" is a permission about
+that one rule (CR 609.4): the creature keeps defender for every other purpose (a "target creature with defender" may still
+choose it), and nothing else that stops an attack is lifted - tapped, summoning sick (CR 508.1a), an effect saying it can't
+attack (CR 508.1c). `static_rules::may_attack_despite_defender` is the one place it is asked, by the declaration of
+attackers (`turn::declare_attackers`, last among the checks, so only of a creature that could otherwise attack) and by the
+host (`Game::may_attack_despite_defender`): a resolved effect about the creature (`EffectKind::CanAttackDespiteDefender`,
+Assault Formation's {G} ability), or a static ability of a permanent on the battlefield with its abilities
+(`CardDef::attacks_despite_defender`, an `AttackDespiteDefenderRule` asked of the creature: Demon Wall's "as long as this
+creature has a counter on it"; Rolling Stones' "Wall creatures", High Alert's and Ghalta's "creatures you control", Animate
+Wall's "enchanted Wall" and Skyclave Sentinel's "as long as it has a +1/+1 counter" are the same rule, none in content yet).
+It is judged as attackers are declared: a creature whose permission ends after it attacks stays attacking (CR 506.4). The
+host lists "Can attack as though it didn't have defender" with the creature's granted abilities while it applies (with the
+effect's duration), which the tactical bot reads where it guesses who can attack. The benchmark is unchanged within the
+noise (2026-10-16, alternating with the build before: 6.61, 7.81, 7.52, 6.38 us before and 7.05, 6.52, 7.79, 6.29 us
+after).
+
 ### Cases and the solved designation; suspect
 
 Solved (CR 719.3b) is a designation, `Marks::solved`: no ability and no copiable value, so a permanent that becomes a copy of

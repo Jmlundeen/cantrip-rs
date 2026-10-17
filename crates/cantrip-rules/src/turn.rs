@@ -425,10 +425,12 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
                 && chars.is(CardType::Creature)
                 && !chars.is(CardType::Battle)
                 && !obj.tapped
-                && (!chars.has(Keyword::Defender) || cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CanAttackDespiteDefender))
                 // CR 508.1c: an effect saying it can't attack.
                 && !cx.s().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::CantAttack)
                 && !summoning_sick(cx.cards(), cx.s(), id)
+                // CR 702.3b: defender, unless an effect or a static ability lets it attack as though it didn't have it
+                // (CR 609.4), which lifts no other restriction: asked last, of a creature that could otherwise attack.
+                && (!chars.has(Keyword::Defender) || crate::static_rules::may_attack_despite_defender(&*cx, cx.cards(), id))
         })
         .collect();
     if eligible.is_empty() {

@@ -91,6 +91,28 @@ pub fn cant_gain_life(q: &dyn Query, cards: &'static CardTable, player: PlayerId
     })
 }
 
+/// Whether `creature` may attack as though it didn't have defender (CR 702.3b, 609.4): a resolved effect says so this turn
+/// (`EffectKind::CanAttackDespiteDefender`, Assault Formation's {G} ability), or a static ability of a permanent on the
+/// battlefield does (`CardDef::attacks_despite_defender`: Demon Wall's "as long as this creature has a counter on it",
+/// which stops when the permanent leaves or loses its abilities, CR 611.3a, 613.1f). It is a permission about attacking
+/// alone: the creature keeps defender, which everything else still sees (CR 609.4), and nothing here lifts any other
+/// restriction on attacking (CR 508.1a, 508.1c). Asked only of a creature with defender, so the battlefield is searched
+/// then.
+pub fn may_attack_despite_defender(q: &dyn Query, cards: &'static CardTable, creature: ObjectId) -> bool {
+    let s = q.state();
+    if s.effects.iter().any(|e| e.affected == creature && e.kind == EffectKind::CanAttackDespiteDefender) {
+        return true;
+    }
+    s.battlefield().iter().any(|&id| {
+        let obj = s.obj(id);
+        let def = cards.get(cards.current(obj));
+        !def.attacks_despite_defender.is_empty() && !s.lost_all_abilities(id) && {
+            let asker = Asker { source: id, controller: obj.controller };
+            def.attacks_despite_defender.iter().any(|rule| rule(q, &asker, creature))
+        }
+    })
+}
+
 /// What each attack open to the active player's creatures costs to declare (CR 508.1d, 508.1h): for each of `eligible`
 /// and each of `targets`, every static ability of a permanent on the battlefield that makes that attack cost something
 /// (`CardDef::attack_costs`: Propaganda's "creatures can't attack you unless their controller pays {2} for each creature

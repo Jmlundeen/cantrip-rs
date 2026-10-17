@@ -1361,6 +1361,13 @@ pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// your opponents control" (Patient Zero, Uthgardt Fury) and "from creatures" (Case of the Market Melee) are the same kind.
 pub type DamageStaysRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability lets this creature attack as though it didn't have defender (CR 702.3b, 609.4): given the
+/// rule's own asker and the creature. Demon Wall's "as long as this creature has a counter on it, it can attack as
+/// though it didn't have defender"; Rolling Stones' "Wall creatures can attack as though they didn't have defender" and
+/// High Alert's "creatures you control" are the same kind. It changes only whether the creature may attack: the creature
+/// keeps defender for every other purpose (CR 609.4).
+pub type AttackDespiteDefenderRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether a static ability lets its controller spend mana as though it were mana of any color to activate the abilities
 /// of this permanent (CR 609.4b): given the rule's own asker and the permanent whose ability is activated.
 pub type SpendAnyColorRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
@@ -1616,6 +1623,9 @@ pub struct CardDef {
     pub block_rules: &'static [BlockRule],
     /// Its static abilities that make attacking cost something (CR 508.1d, 508.1h), while it is on the battlefield.
     pub attack_costs: &'static [AttackCostRule],
+    /// Its static abilities that let creatures attack as though they didn't have defender (CR 702.3b, 609.4), while it is
+    /// on the battlefield with its abilities. Asked only of a creature with defender as attackers are declared.
+    pub attacks_despite_defender: &'static [AttackDespiteDefenderRule],
     /// Its static abilities that change who can target what and whether ward triggers, while it is on the battlefield.
     pub targeting_rules: &'static [TargetingRule],
     /// Its static abilities that make some damage unpreventable (CR 615.12).
@@ -1737,6 +1747,7 @@ impl CardDef {
         cast_rules: &[],
         block_rules: &[],
         attack_costs: &[],
+        attacks_despite_defender: &[],
         targeting_rules: &[],
         unpreventable_damage: &[],
         cant_gain_life: &[],
