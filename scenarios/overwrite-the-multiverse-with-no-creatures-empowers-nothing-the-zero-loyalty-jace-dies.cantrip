@@ -1,0 +1,41 @@
+# Nothing to exile: X is 0. Empower Jace 0 still creates the Jace token if there is none (CR 701.71a) - with 0 loyalty, and a
+# planeswalker with 0 loyalty is put into its owner's graveyard (CR 704.5i), where a token ceases to exist (CR 111.7). Nothing
+# is left on the battlefield but the Moxes and Lotus' spent mana; no Jace stays.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Overwrite the Multiverse
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Overwrite the Multiverse.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl
+Bot1.Graveyard = Overwrite the Multiverse; Black Lotus

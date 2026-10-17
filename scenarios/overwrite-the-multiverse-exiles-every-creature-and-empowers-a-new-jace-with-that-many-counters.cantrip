@@ -1,0 +1,52 @@
+# Exile all creatures, yours and the opponent's: Bot1's Ornithopter and Bot2's Ornithopter and Llanowar Elves, three in all. X is 3,
+# so with no Jace token Bot1 gets a new blue Jace planeswalker token with 3 loyalty counters (CR 701.71a): not a nontoken Jace, and
+# not Bot2's. The three creatures are in exile, not the graveyard, and the Moxes and lands are untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ornithopter
+Overwrite the Multiverse
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Overwrite the Multiverse.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Ornithopter; Llanowar Elves
+Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Types = Planeswalker
+Bot1.Battlefield.Jace.Colors = Blue
+Bot2.Battlefield = Forest
+Bot1.Graveyard = Overwrite the Multiverse; Black Lotus
+Bot2.Graveyard.Count = 0

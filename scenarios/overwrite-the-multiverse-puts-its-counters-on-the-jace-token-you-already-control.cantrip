@@ -1,0 +1,55 @@
+# The ruling: with a Jace planeswalker token already in play, empower Jace puts the counters on that one and creates no second token
+# (CR 701.71a). Jace's Machinations on turn 1 makes the token with 8 loyalty counters; Overwrite the Multiverse on turn 3 exiles Bot2's
+# Ornithopter and Llanowar Elves, and Bot1's Ornithopter, so the same Jace has 8 + 3 = 11.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Jace's Machinations
+Overwrite the Multiverse
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Jace's Machinations.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Jace.Counters.Loyalty = 8
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Overwrite the Multiverse.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile.Count = 3
+Bot1.Battlefield.Jace.Counters.Loyalty = 11
+Bot1.Battlefield.Jace.Token = true

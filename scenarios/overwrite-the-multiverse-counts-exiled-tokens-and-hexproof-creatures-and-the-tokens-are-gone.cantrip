@@ -1,0 +1,53 @@
+# "Exile all creatures" targets nothing, so hexproof does not matter: Bot2's Sylvan Caryatid (hexproof) is exiled with Bot1's two
+# Spirit tokens. A token that is exiled is exiled (it ceases to exist afterwards, CR 111.7), so it counts: X is 3, and the new Jace token
+# has 3 loyalty counters. Only the Caryatid is left in exile as a card.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Lingering Souls
+Overwrite the Multiverse
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lingering Souls.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Spirit#2.Token = true
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Overwrite the Multiverse.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Sylvan Caryatid
+Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot1.Battlefield.Count = 4
+Bot2.Battlefield = Forest; Mox Emerald
