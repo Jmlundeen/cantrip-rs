@@ -408,6 +408,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   them - what `[BotN Sideboard]` and `[Basic Lands Outside]` gave them, less what has been brought into the game - and
   `BotN.Sideboard.<Name>.Colors` for each (CR 400.11c: nothing but its own characteristic-defining abilities changes them)
 - `BotN.Hand.<Name>.Power` and `.Toughness`, and the same for `BotN.Graveyard.<Name>`, for a creature card there (CR 604.3: a characteristic-defining ability such as Sandman's works in every zone); a name held twice there is `Name#1`, `Name#2` in zone order
+- `BotN.Hand.<Name>.Colors` and `BotN.Graveyard.<Name>.Colors` (computed, sorted, empty when colorless), for every card there: an effect that works in every zone may change them (Mycosynth Lattice)
 - `BotN.Battlefield.<Name>.Doors` and `.ManaValue` for a Room (CR 709.5): the names of its unlocked doors, left first
   (empty when both are locked), and the mana value they leave it. The Room is named by its unlocked doors (`Unholy Annex`,
   `Unholy Annex // Ritual Chamber`), and by nothing at all when neither is (`Bot1.Battlefield.#1`). A locked door is

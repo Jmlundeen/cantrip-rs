@@ -363,15 +363,14 @@ impl StateDump {
             d.list(&format!("{b}.Graveyard"), graveyard, true);
             // The power and toughness of a creature card in a hand or a graveyard (CR 604.3: a characteristic-defining ability works
             // in every zone), `Bot1.Graveyard.Sandman, Shifting Scoundrel.Power`; a name held twice is `Name#1`, `Name#2` in zone order.
-            // A card outside the game (CR 400.11c) has `.Colors` too: only its own characteristic-defining abilities change it.
+            // Every card there has `.Colors` (empty when colorless): an effect may change a card's colors in a hand or a graveyard
+            // (Mycosynth Lattice's "all cards that aren't on the battlefield ... are colorless"), and outside the game (CR
+            // 400.11c) only its own characteristic-defining abilities change it.
             for (zone, label) in [(Zone::hand(p), "Hand"), (Zone::graveyard(p), "Graveyard"), (Zone::sideboard(p), "Sideboard")] {
                 let ids = s.zone(zone).to_vec();
                 for &id in &ids {
                     let c = game.chars(id);
                     let outside = zone.is(ZoneKind::Sideboard);
-                    if !outside && !c.is(CardType::Creature) {
-                        continue;
-                    }
                     let name = game.name(id);
                     let same: Vec<ObjectId> = ids.iter().copied().filter(|&o| game.name(o) == name).collect();
                     let key = if same.len() == 1 {
@@ -379,10 +378,10 @@ impl StateDump {
                     } else {
                         format!("{b}.{label}.{name}#{}", same.iter().position(|&o| o == id).unwrap() + 1)
                     };
-                    if outside {
-                        let mut colors: Vec<String> = c.colors.iter().map(|c| c.name().to_string()).collect();
-                        colors.sort();
-                        d.list(&format!("{key}.Colors"), colors, true);
+                    let mut colors: Vec<String> = c.colors.iter().map(|c| c.name().to_string()).collect();
+                    colors.sort();
+                    d.list(&format!("{key}.Colors"), colors, true);
+                    if outside || !c.is(CardType::Creature) {
                         continue;
                     }
                     d.set(format!("{key}.Power"), c.power.unwrap_or(0));
