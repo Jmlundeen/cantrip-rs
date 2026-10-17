@@ -680,7 +680,7 @@ fn choose_counter_kind(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &C
 /// The permanents a variable sacrifice may take, or the other cards in the graveyard an exile may take (CR 601.2h).
 fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> Vec<ObjectId> {
     match variable {
-        VariableCost::SacrificeX(filter) | VariableCost::SacrificeOneOrMore(filter) => {
+        VariableCost::SacrificeX(filter) | VariableCost::SacrificeOneOrMore(filter) | VariableCost::SacrificeAnyNumber { filter, .. } => {
             let asker = Asker { source, controller: player };
             cx.permanents_of(player).into_iter().filter(|&id| filter(cx, &asker, id)).collect()
         }
@@ -704,7 +704,7 @@ fn types_among(cx: &Cx, cards: &[ObjectId]) -> usize {
 /// Whether a variable cost could be paid at all: X may be zero, "one or more" needs one, and the exile needs enough types.
 fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> bool {
     match variable {
-        VariableCost::SacrificeX(_) => true,
+        VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => true,
         VariableCost::SacrificeOneOrMore(_) => !variable_candidates(cx, source, player, variable).is_empty(),
         VariableCost::ExileFromGraveyardWithTypes(n) => {
             types_among(cx, &variable_candidates(cx, source, player, variable)) >= n.max(1) as usize
@@ -726,7 +726,7 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
     let Some(variable) = cost.variable else { return Ok((Vec::new(), Vec::new())) };
     let candidates = variable_candidates(cx, source, player, variable);
     match variable {
-        VariableCost::SacrificeX(_) => {
+        VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => {
             if x == 0 {
                 return Ok((Vec::new(), Vec::new()));
             }
@@ -1201,6 +1201,18 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
     candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
 }
 
+/// For a spell being cast whose additional cost sacrifices any number of permanents for a reduction each (CR 601.2b,
+/// `VariableCost::SacrificeAnyNumber`): the generic mana each takes off, and how many its caster could sacrifice, for the
+/// announcement's prompt. None for any other spell.
+pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: PlayerId) -> Option<(u8, usize)> {
+    let obj = game.state.obj(spell);
+    let def = game.cards.get(obj.copy.map_or(obj.card, |c| c.card));
+    let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0 };
+    Some((less_each, variable_candidates(&cx, spell, player, variable).len()))
+}
+
 /// What a cast a permanent grants (`index`, a granted way's number) costs `player` for `card` (`granted_cast_cost`), and its
 /// mana as the cost changes in play leave it before any target is announced (CR 601.2f): for the menu row of a cast without
 /// paying the mana cost, which says what it still costs ({1} more under Thalia).
@@ -1381,7 +1393,13 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
             cost = add_cost(cost, c);
         }
     }
-    finish(cx, available, player, card, def, cost, targets)
+    let mut cost = finish(cx, available, player, card, def, cost, targets);
+    // "Costs {1} less for each permanent sacrificed this way": as little as sacrificing every permanent that could be.
+    if let Some(VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) {
+        let candidates = def.additional_cost.and_then(|c| c.variable).map_or(0, |v| variable_candidates(cx, card, player, v).len());
+        cost.generic = cost.generic.saturating_sub((candidates as u32 * less_each as u32).min(255) as u8);
+    }
+    cost
 }
 
 /// `least_cost`'s Phyrexian symbols paid with life where the life total allows, and the cost changes applied.
@@ -3247,7 +3265,12 @@ fn cast(
         (None, None) if way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT) => def.cost.x,
         (None, None) => 0,
     };
-    let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_)));
+    let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. }));
+    // "This spell costs {1} less to cast for each permanent sacrificed this way": generic mana off for each one announced.
+    let less_each = match extra.variable {
+        Some(VariableCost::SacrificeAnyNumber { less_each, .. }) => less_each,
+        _ => 0,
+    };
     if x_symbols > 0 || def.kicker.is_some() || extra.pay_x_life || sacrifices_x {
         let base = cost.mana;
         // X paid in life is announced up to the life there is (CR 119.4), and X creatures sacrificed up to the creatures
@@ -3259,7 +3282,7 @@ fn cast(
         } else {
             1000
         };
-        let n = announce(cx, player, spell, base, def.kicker, x_symbols, cap)?;
+        let n = announce_x(cx, player, spell, base, def.kicker, x_symbols, cap, false, less_each)?;
         if let Some(k) = def.kicker {
             if k.cost.x > 0 {
                 // Kicker {X} (CR 702.33a, 107.3): X is the number announced, and kicked when it is not 0.
@@ -3423,6 +3446,11 @@ fn cast(
     if let Some(creature) = reducer {
         cost.mana.generic = cost.mana.generic.saturating_sub(reduction_of(cx, creature));
     }
+    // "This spell costs {1} less to cast for each permanent sacrificed this way" (CR 601.2f, 118.7a): a reduction by the
+    // number announced, after what raises the cost.
+    if less_each > 0 {
+        cost.mana.generic = cost.mana.generic.saturating_sub((item.x as u32 * less_each as u32).min(255) as u8);
+    }
 
     // Mana of any type may pay for it (CR 609.4b).
     if any_type {
@@ -3555,7 +3583,10 @@ fn cast(
     // CR 601.2i: it becomes cast.
     let as_cast = cx.chars(spell);
     let x = cx.s().stack.iter().rev().find(|i| i.object == spell).map_or(0, |i| i.x);
-    let value = (cx.card(as_cast.card).cost.mana_value() + x as u32).min(255) as u8;
+    // Its mana value on the stack counts X once for each {X} in its mana cost (CR 202.3e): none for an X a cost defined
+    // without one (Immoral Bargain's, a number of permanents sacrificed).
+    let printed = cx.card(as_cast.card).cost;
+    let value = (printed.mana_value() + printed.x as u32 * x as u32).min(255) as u8;
     // "As you cast this spell": the board once the costs are paid (CR 601.2i), asked of the face being cast.
     let fact = def.cast_fact.map_or(0, |f| f(cx, &Asker { source: spell, controller: player }));
     cx.record(Event::Cast(Cast {
@@ -4128,12 +4159,13 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 /// Announcing X or the number of times a spell is kicked (CR 601.2b), as the C# engine asks it: a pay-costs
 /// question that raises and lowers the value until confirmed.
 fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16) -> R<u16> {
-    announce_x(cx, player, spell, base, kicker, x_symbols, cap, false)
+    announce_x(cx, player, spell, base, kicker, x_symbols, cap, false, 0)
 }
 
-/// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`).
+/// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`), and how much generic mana
+/// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`).
 #[allow(clippy::too_many_arguments)]
-fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16, loyalty: bool) -> R<u16> {
+fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16, loyalty: bool, less_each: u8) -> R<u16> {
     let most: u16 = match kicker {
         Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
         _ => cap,
@@ -4144,7 +4176,7 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         match kicker {
             Some(k) => total = kicker_total(total, k, n),
             None if x_symbols > 0 => total.generic = total.generic.saturating_add((n as u32 * x_symbols as u32).min(255) as u8),
-            None => {}
+            None => total.generic = total.generic.saturating_sub((n as u32 * less_each as u32).min(255) as u8),
         }
         let mut options = Vec::new();
         if n < most {
@@ -4204,7 +4236,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // CR 606.4, 107.3, 601.2b by way of 602.2b: "−X" announces X, up to the loyalty counters there are to remove (CR 118.3).
     if def.cost.loyalty == Some(LOYALTY_MINUS_X) {
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
-        item.x = announce_x(cx, player, source, mana, None, 0, cap, true)?;
+        item.x = announce_x(cx, player, source, mana, None, 0, cap, true, 0)?;
     }
     let life = announce_life(cx, player, source, &mut mana)?;
     // CR 602.2a, 701.27f: put on the stack now, before its costs are paid.

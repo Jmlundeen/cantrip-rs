@@ -555,6 +555,14 @@ Grizzled Genius's "plotting cards from your hand costs {2} less" (CR 116.2k, 118
 `ActivatedDef::plot`. `special_action_cost` applies the changes to the printed cost, for the advice and the payment alike;
 the host's menu row says what it costs when that differs ("(costs {B}{G})").
 
+"As an additional cost to cast this spell, you may sacrifice any number of nonland permanents. This spell costs {1} less
+to cast for each permanent sacrificed this way" (Rottenmouth Viper) is `VariableCost::SacrificeAnyNumber`: how many is
+announced as the spell is cast (CR 601.2b), kept as its `x` though its mana cost has no {X}, so the total cost is determined
+knowing it (CR 601.2f) - `less_each` generic mana off each, after any increase (CR 118.7a) - and which ones are chosen once
+the mana is paid (CR 601.2g-h). The advice counts every permanent that could be sacrificed. The host's announcement says
+what the number is (`PayCostsPromptMessage::SacrificeReduces`). A spell's mana value in its `Cast` record counts X once
+for each {X} in its mana cost (CR 202.3e), and not at all for an X a cost defines without one.
+
 ### Ways a permanent gives: from a graveyard or from a hand
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra

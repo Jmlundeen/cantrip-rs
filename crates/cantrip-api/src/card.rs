@@ -510,6 +510,13 @@ pub enum VariableCost {
     /// Sacrifice one or more permanents you control that pass the filter (CR 701.21a): as an optional additional cost, the
     /// spell's `paid` is how many were. Plumb the Forbidden.
     SacrificeOneOrMore(ObjectFilter),
+    /// "As an additional cost to cast this spell, you may sacrifice any number of [permanents]. This spell costs {N} less to
+    /// cast for each permanent sacrificed this way" (Rottenmouth Viper): how many is announced as the spell is cast (CR
+    /// 601.2b), so the total cost is determined knowing it (CR 601.2f) - `less_each` generic mana off for each, a reduction
+    /// applied after any increase, never below {0} (CR 118.7a) - and which ones are chosen as the cost is paid, after the
+    /// mana abilities (CR 601.2g-h). The number is kept as the spell's `x`, though its mana cost has no {X}, so its mana
+    /// value is not changed (CR 202.3e).
+    SacrificeAnyNumber { filter: ObjectFilter, less_each: u8 },
     /// Exile any number of other cards from your graveyard with this many card types or more among them (CR 205.2a):
     /// Nethergoyf's escape.
     ExileFromGraveyardWithTypes(u8),
