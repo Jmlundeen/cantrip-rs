@@ -1,9 +1,9 @@
-# Progenitus's protection from everything (CR 702.16e, "DEBT", the ruling), each part beside its positive control:
+# Progenitus's protection from everything (CR 702.16j, "DEBT", the ruling), each part beside its positive control:
 # - it can't be targeted (702.16b): Bot2 can't bolt it, but bolts Bot1;
 # - it can't be blocked (702.16f): Dragon Sniper (reach) can't block it, but blocks Ornithopter, killing it with deathtouch,
 #   while Progenitus deals Bot2 10;
 # - it can't be enchanted (702.16c): Bot1 can't cast Rancor on it, but casts it on Bot2's Dragon Sniper ("enchant creature");
-# - damage to it is prevented (702.16d): Pyroclasm's 2 is prevented and recorded as prevented by Progenitus, while the Sniper
+# - damage to it is prevented (702.16e): Pyroclasm's 2 is prevented and recorded as prevented by Progenitus, while the Sniper
 #   dies, and Rancor returns to its owner's hand (its own trigger).
 # Natural Order puts Progenitus onto the battlefield on turn 1.
 
