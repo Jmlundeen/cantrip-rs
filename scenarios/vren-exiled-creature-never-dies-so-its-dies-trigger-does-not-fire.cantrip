@@ -1,0 +1,49 @@
+# "Abilities that trigger when a creature dies won't trigger": Bot2's Haywire Mite ("When this creature dies, you gain 2 life") is bolted with
+# Vren in play. It is exiled instead of dying (CR 700.4), so Bot2 gains no life and stays at 20, and the exile still counts for one Rat at the end step.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Vren, the Relentless
+Mox Ruby
+Lightning Bolt
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Jet
+Haywire Mite
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+? Exile = Haywire Mite
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Haywire Mite
+Bot2.Life = 20
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Rat.Power = 2

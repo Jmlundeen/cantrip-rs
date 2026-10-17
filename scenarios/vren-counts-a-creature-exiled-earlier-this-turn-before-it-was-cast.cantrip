@@ -1,0 +1,49 @@
+# "The number of creatures that were exiled under your opponents' control this turn" is a question of the past (ruling), not of what Vren
+# did: on turn 3 Bot1 first exiles Bot2's Llanowar Elves with Swords to Plowshares, and only then casts Vren (Sapphire, Jet and a Black Lotus). At the
+# end step the Rat is still made - X is 1 - and it is 2/2 beside Vren.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Mox Pearl
+Swords to Plowshares
+Vren, the Relentless
+Island
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Exile = Llanowar Elves
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Llanowar Elves
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Rat.Power = 2
+Bot1.Battlefield.Rat.Toughness = 2

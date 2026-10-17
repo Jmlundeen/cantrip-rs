@@ -1,0 +1,57 @@
+# Control, not ownership, decides (CR 614.1a, 108.4): "a creature an opponent controls". Bot1 casts Vren on turn 1, and on turn 3 gives its own
+# Ornithopter to Bot2 with Harmless Offering. Bot2 now controls it, so when Bot1 bolts it Vren exiles it instead of letting it die - it is not
+# put into Bot1's (its owner's) graveyard - and it was exiled under an opponent's control, so the end step makes one Rat, 2/2 beside Vren.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Ruby
+Vren, the Relentless
+Ornithopter
+Harmless Offering
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Vren, the Relentless.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Ornithopter
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+? Bot1.Graveyard.Count = 2
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot1.Graveyard = Lightning Bolt; Harmless Offering
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Rat.Power = 2
+Bot1.Battlefield.Rat.Toughness = 2

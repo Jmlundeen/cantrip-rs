@@ -1,6 +1,6 @@
 # Insatiable Avarice with both modes ({B} + {2} + {B}{B} = five mana: a Black Lotus and two Mox Jets): "No matter which modes you
 # choose, you always follow the instructions in the order they are written". Bot1 targets itself. The search comes first: the Lightning Bolt
-# buried third in the library is shuffled in and put on top; then Bot1 draws three cards - the Bolt first, then the two Swamps now on top
+# buried fourth in the library (a draw of three without the search would miss it) is shuffled in and put on top; then Bot1 draws three cards - the Bolt first, then the two Swamps now on top
 # of it - and loses 3 life. If the draw came first the Bolt would not be in hand.
 
 [Bot1 Deck]
@@ -11,8 +11,9 @@ Mox Jet
 Swamp x3
 Swamp
 Swamp
+Swamp
 Lightning Bolt
-Swamp x11
+Swamp x10
 
 [Bot2 Deck]
 Island x20
