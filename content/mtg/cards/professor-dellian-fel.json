@@ -1,0 +1,7 @@
+{
+  "name": "Professor Dellian Fel",
+  "manaCost": "{2}{B}{G}",
+  "type": "Legendary Planeswalker — Dellian",
+  "loyalty": 5,
+  "oracleText": "+2: You gain 3 life.\n0: You draw a card and lose 1 life.\n−3: Destroy target creature.\n−6: You get an emblem with \"Whenever you gain life, target opponent loses that much life.\""
+}

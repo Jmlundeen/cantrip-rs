@@ -1,0 +1,67 @@
+# Dellian's +2 on turn 1 (loyalty 7, Bot1 23) and -6 on turn 3 (loyalty 1) give Bot1 the emblem (CR 114.2). On turn 4 Bot2
+# gains 5 with its own Witherbloom Charm: the emblem is Bot1's, so nothing triggers ("whenever YOU gain life"): Bot1 stays at
+# 23. On turn 5 Bot1's +2 gains 3: the emblem's trigger targets Bot2, who loses that much, 3 (25 - 3 = 22), then Bot1's Charm
+# gains 5 and Bot2 loses that much, 5 (22 - 5 = 17). Bot1 ends 23 + 3 + 5 = 31.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Professor Dellian Fel
+Mox Jet
+Witherbloom Charm
+Swamp x15
+
+[Bot2 Deck]
+Mox Jet
+Mox Emerald
+Witherbloom Charm
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Professor Dellian Fel.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Professor Dellian Fel.Activate(Ability: gain 3)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Professor Dellian Fel.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Emblems.Count = 1
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Witherbloom Charm.Cast
+Bot2.Modes(You gain 5 life)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 25
+? Bot1.Life = 23
+[T5 Bot1.Main1]
+Bot1.Battlefield.Professor Dellian Fel.Activate(Ability: gain 3)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 22
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witherbloom Charm.Cast
+Bot1.Modes(You gain 5 life)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 31
+Bot2.Life = 17
+Bot1.Emblems.Count = 1
+Bot1.Battlefield.Professor Dellian Fel.Counters.Loyalty = 3

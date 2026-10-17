@@ -1,0 +1,26 @@
+# 0: "You draw a card and lose 1 life" (CR 121.1, 119.3): Bot1 draws one card and loses 1 (20 - 1 = 19); the loyalty
+# stays 5 (CR 606.4). Hand: 7 - 3 cast + 1 drawn = 5.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Professor Dellian Fel
+Swamp x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Professor Dellian Fel.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Professor Dellian Fel.Activate(Ability: draw a card)
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand.Count = 5
+Bot1.Battlefield.Professor Dellian Fel.Counters.Loyalty = 5

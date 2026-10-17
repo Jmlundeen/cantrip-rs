@@ -1,0 +1,38 @@
+# -3: "Destroy target creature" (CR 701.8): the loyalty cost is paid and Llanowar Elves is destroyed. Bot2's Mox Ruby
+# (not a creature) is refused as a target beside the Elves (the positive control) and stays; loyalty 5 - 3 = 2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Professor Dellian Fel
+Swamp x17
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Ruby
+Forest x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Professor Dellian Fel.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Professor Dellian Fel.Activate(Bot2.Battlefield.Mox Ruby; Ability: Destroy target)
+Bot1.Battlefield.Professor Dellian Fel.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Destroy target)
+
+[Expect]
+Bot2.Battlefield = Forest; Mox Ruby
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Professor Dellian Fel.Counters.Loyalty = 2

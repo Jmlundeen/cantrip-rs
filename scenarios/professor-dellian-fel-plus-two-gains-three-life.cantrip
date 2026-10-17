@@ -1,0 +1,26 @@
+# Professor Dellian Fel enters with 5 loyalty; +2 makes it 7 and Bot1 gains 3 life (CR 119.3, 606.4): 20 + 3 = 23. Cast with
+# Black Lotus ({B}{B}{B}) and Mox Emerald ({G}).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Professor Dellian Fel
+Swamp x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Professor Dellian Fel.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Professor Dellian Fel.Activate(Ability: gain 3)
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 20
+Bot1.Battlefield.Professor Dellian Fel.Counters.Loyalty = 7
