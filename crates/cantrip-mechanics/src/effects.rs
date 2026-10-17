@@ -70,6 +70,14 @@ pub fn counters_on_creatures_you_control(g: &mut dyn Game, player: PlayerId, kin
     creatures
 }
 
+/// "Put a +1/+1 counter on [this permanent]" (CR 122.1), the ability's source: none once it has left the battlefield, as a
+/// new object it is another (CR 400.7). Essence Channeler, Ajani Resolute's Ajani's Pridemate token and Leonardo, Cutting
+/// Edge print it after "whenever you gain life".
+pub fn plus_one_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_counters(item.object, CounterKind::PlusOne, 1);
+    Ok(())
+}
+
 fn creatures_on_the_battlefield(g: &dyn Game) -> Vec<ObjectId> {
     g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect()
 }

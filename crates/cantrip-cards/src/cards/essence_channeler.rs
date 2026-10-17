@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::effects::plus_one_counter_on_this;
 use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::targets;
 use cantrip_mechanics::triggers::{THIS_DIES, YOU_GAIN_LIFE};
@@ -14,13 +15,6 @@ fn you_lost_life_this_turn(view: &dyn LayerQuery, source: ObjectId, affected: Ob
 /// "... this creature has flying and vigilance" (CR 702.9, 702.20, layer 6).
 fn flying_and_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying).with(Keyword::Vigilance);
-}
-
-/// "Whenever you gain life, put a +1/+1 counter on this creature" (CR 122.1): none once it has left the battlefield
-/// (CR 400.7).
-fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 1);
-    Ok(())
 }
 
 /// "When this creature dies, put its counters on target creature you control": as many of each kind as it had as it died,
@@ -41,7 +35,7 @@ fn pass_counters(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(YOU_GAIN_LIFE, grow, "Whenever you gain life, put a +1/+1 counter on this creature."),
+        triggered(YOU_GAIN_LIFE, plus_one_counter_on_this,"Whenever you gain life, put a +1/+1 counter on this creature."),
         triggered(THIS_DIES, pass_counters, "When this creature dies, put its counters on target creature you control.")
             .targets(&[targets::CREATURE_YOU_CONTROL])
             .look_back(),

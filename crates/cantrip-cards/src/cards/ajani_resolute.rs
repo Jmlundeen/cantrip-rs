@@ -10,12 +10,6 @@ fn gain_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- The token ----------------------------------------------------------------------------------------------------
 
-/// "Whenever you gain life, put a +1/+1 counter on this token."
-fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_counters(item.object, CounterKind::PlusOne, 1);
-    Ok(())
-}
-
 /// The 2/2 white Cat Soldier creature token named Ajani's Pridemate (CR 111.4).
 pub static PRIDEMATE: CardDef = CardDef {
     name: "Ajani's Pridemate",
@@ -27,7 +21,7 @@ pub static PRIDEMATE: CardDef = CardDef {
     toughness: Some(2),
     abilities: &[triggered(
         YOU_GAIN_LIFE,
-        grow,
+        cantrip_mechanics::effects::plus_one_counter_on_this,
         "Whenever you gain life, put a +1/+1 counter on this token.",
     )],
     text: "Whenever you gain life, put a +1/+1 counter on this token.",
