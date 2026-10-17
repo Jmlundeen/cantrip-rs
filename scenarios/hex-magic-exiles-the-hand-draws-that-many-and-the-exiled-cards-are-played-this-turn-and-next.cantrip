@@ -1,0 +1,44 @@
+# Hex Magic: "Exile all the cards from your hand, then draw that many cards. Until the end of your next turn, you may play cards
+# exiled this way." After the three Moxen and Hex Magic, the hand of three (Lightning Bolt, Forest, Island) is exiled and three Plains
+# are drawn (hand = three Plains; "that many" = 3). The exiled cards may be played the rest of this turn - Bot1 plays the Forest from exile as its
+# land for the turn (CR 305.1) - and on its next turn: Bot1 casts the Lightning Bolt from exile for {R} at Bot2's face (20 - 3) and plays
+# the Island from exile as that turn's land.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Hex Magic
+Lightning Bolt
+Forest
+Island
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hex Magic.Cast
+Bot2.Pass
+? Exile = Lightning Bolt; Forest; Island
+? Bot1.Hand = Plains; Plains; Plains
+Bot1.Exile.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+Bot1.Exile.Island.Play
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Exile.Count = 0
+Bot1.Hand = Plains; Plains; Plains; Plains
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Forest; Island
+Bot1.Graveyard = Lightning Bolt; Hex Magic

@@ -1,0 +1,35 @@
+# Hex Magic with no other card in hand: after six Moxen and the spell itself (which is on the stack, not in the hand) the hand is empty,
+# so nothing is exiled and zero cards are drawn ("that many"): the library keeps all twenty of its cards and the exile stays empty.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Hex Magic
+Mox Amber
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Amber.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hex Magic.Cast
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 20
+Exile.Count = 0
+Bot1.Graveyard = Hex Magic

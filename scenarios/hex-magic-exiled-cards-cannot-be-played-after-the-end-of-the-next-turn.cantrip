@@ -1,0 +1,37 @@
+# Hex Magic: "Until the end of your next turn" (CR 514.2). The Lightning Bolt and the Forest exiled on turn 1 are still playable on turn 3
+# (Bot1 plays the Island from exile and casts nothing, as the positive control that the permission is there), but on turn 5, the turn
+# after the next one, the permission is gone: the Bolt cannot be cast with Mox Ruby's mana ready, and the Forest cannot be played with the
+# land drop open (a Plains from hand is played right after as the control).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Hex Magic
+Lightning Bolt
+Forest
+Island
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hex Magic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Exile.Island.Play
+[T5 Bot1.Main1]
+! Bot1.Exile.Forest.Play
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Plains.Play
+
+[Expect]
+Exile = Lightning Bolt; Forest
+Bot1.Battlefield = Mox Ruby; Mox Jet; Mox Pearl; Island; Plains
