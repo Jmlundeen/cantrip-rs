@@ -80,6 +80,9 @@ keeps it).
 | [KI-67](#ki-67-a-spell-cast-by-a-resolving-ability-under-split-second-is-unexercised) | A spell cast by a resolving ability under split second is unexercised | Low | Unexercised |
 | [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
 | [KI-69](#ki-69-a-bestowed-spell-has-the-mana-value-of-its-bestow-cost) | A bestowed spell has the mana value of its bestow cost | Low | Open |
+| [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
+| [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
+| [KI-72](#ki-72-a-face-down-permanent-may-be-unable-to-turn-face-up-under-humility) | A face-down permanent may be unable to turn face up under Humility | Low | Suspected |
 
 ## Issues
 
@@ -867,7 +870,7 @@ face and the bestow cost apart.
 
 **Scenarios.** none yet.
 
-### KI-68: A block requirement is counted on the declared block only, not through the blocked creature's band
+### KI-70: A block requirement is counted on the declared block only, not through the blocked creature's band
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
@@ -883,7 +886,7 @@ no card in content triggers on "blocks a creature" or "becomes blocked by a crea
 
 **Scenarios.** none yet: no card in content puts Lure on a creature with banding or bands with a Lured creature.
 
-### KI-69: The tactical bot's combat planning ignores bands
+### KI-71: The tactical bot's combat planning ignores bands
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
@@ -895,3 +898,19 @@ blocker's damage among the band (702.22k) or its attacker's damage among banding
 divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's sparing suggestion).
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
+
+### KI-72: A face-down permanent may be unable to turn face up under Humility
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | engine | 2026-10-17, card-faces batch |
+
+**Notes.** Turning a face-down permanent face up is a special action (CR 116.2b, 702.37e, 701.40a), allowed by the face-up card's
+morph cost or, for a manifested creature card, its mana cost; it is not an ability of the face-down permanent, so "loses all
+abilities" (Humility, Dress Down) should not stop it (Whisperwood Elemental's ruling: a manifested creature card can still be
+turned face up after losing its abilities). The engine offers it through `intrinsic::FACE_DOWN` / `intrinsic::can_turn_face_up`,
+which sit on the face-down values and may be taken by Humility's layer-6 effect. Separately, there is no verb to turn a
+permanent face down (CR 708.2a) and no "manifested" mark, so a creature an effect turned face down (Ixidron) would wrongly be
+offered turning face up for its mana cost (CR 701.40b, 702.37e). Neither is reachable by a card in content today.
+
+**Scenarios.** none yet: a face-down creature under Humility is the first to write.
