@@ -1,0 +1,52 @@
+# Faerie Fencing's Faerie is the one you controlled as you finished casting it (CR 601.2i: the spell becomes cast once its costs
+# are paid, 601.2g-h). The Dragon cycle's ruling says the same: "if you lose control of your only Dragon while casting the spell
+# (because, for example, you sacrificed it to activate a mana ability), you won't get the bonus." Bot1 controls Faerie Mastermind
+# as it begins to cast Fencing with X = 1 at Bot2's Concealing Curtains (0/4), and pays {B} by sacrificing the Mastermind to
+# Phyrexian Altar while paying. It controlled no Faerie as the spell became cast: the Curtains get -1/-1 alone, -1/3 (with the
+# bonus they would die).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Mox Ruby
+Phyrexian Altar
+Faerie Mastermind
+Faerie Fencing
+Island x13
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Phyrexian Altar.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faerie Fencing.Cast(Concealing Curtains; X: 1)
+Bot1.Battlefield.Phyrexian Altar.Activate(Sacrifice: Faerie Mastermind; Color: Black)
+? Stack.Count = 1
+? Bot1.Graveyard = Faerie Mastermind; Black Lotus
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faerie Fencing; Faerie Mastermind; Black Lotus
+Bot2.Battlefield.Concealing Curtains.Power = -1
+Bot2.Battlefield.Concealing Curtains.Toughness = 3

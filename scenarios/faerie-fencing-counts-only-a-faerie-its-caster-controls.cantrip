@@ -1,0 +1,48 @@
+# Faerie Fencing: "if you controlled a Faerie as you cast this spell" - you, its caster. Bot2 controls Faerie Mastermind and
+# Concealing Curtains (0/4); Bot1, with no Faerie of its own, casts Faerie Fencing with X = 1 at the Curtains. They get -1/-1
+# alone and stay, -1/3: the opponent's Faerie gives no additional -3/-3 (with it they would have 0 toughness and die).
+
+[Bot1 Deck]
+Island
+Mox Jet
+Mox Ruby
+Faerie Fencing
+Island x16
+
+[Bot2 Deck]
+Swamp
+Mox Sapphire
+Mox Jet
+Concealing Curtains
+Faerie Mastermind
+Swamp x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Faerie Mastermind.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faerie Fencing.Cast(Concealing Curtains; X: 1)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faerie Fencing
+Bot2.Battlefield.Faerie Mastermind.Subtypes = Faerie; Rogue
+Bot2.Battlefield.Concealing Curtains.Power = -1
+Bot2.Battlefield.Concealing Curtains.Toughness = 3

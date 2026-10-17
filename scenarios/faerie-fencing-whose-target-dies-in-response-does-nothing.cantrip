@@ -1,0 +1,51 @@
+# Faerie Fencing with its only target gone doesn't resolve (CR 608.2b): Bot1 controls Faerie Mastermind as it casts Fencing with
+# X = 0 at Bot2's Ornithopter (0/2) and, holding priority, Lightning Bolt at the same Ornithopter. The Bolt resolves first and
+# kills it; Fencing has no legal target, does nothing and goes to Bot1's graveyard. Its -3/-3 goes nowhere else: Bot2's other
+# creature, Concealing Curtains, stays 0/4.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Faerie Mastermind
+Faerie Fencing
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Swamp
+Ornithopter
+Concealing Curtains
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faerie Fencing.Cast(Ornithopter; X: 0)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faerie Fencing; Lightning Bolt
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Concealing Curtains.Power = 0
+Bot2.Battlefield.Concealing Curtains.Toughness = 4

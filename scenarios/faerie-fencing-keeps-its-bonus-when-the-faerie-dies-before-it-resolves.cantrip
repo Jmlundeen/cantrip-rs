@@ -1,0 +1,56 @@
+# Faerie Fencing: "Target creature gets -X/-X until end of turn. That creature gets an additional -3/-3 until end of turn if you
+# controlled a Faerie as you cast this spell." Its ruling: "If you controlled a Faerie as you finished casting Faerie Fencing, it
+# doesn't matter whether you still control one as the spell resolves." Bot1 controls Faerie Mastermind as it casts Faerie Fencing
+# with X = 1 at Bot2's Concealing Curtains (0/4) on Bot2's turn; Bot2 answers by killing the Mastermind with Lightning Bolt, so
+# Bot1 controls no Faerie as Fencing resolves (checked with Fencing still on the stack). The Curtains still get -1/-1 and -3/-3:
+# 0 toughness, into the graveyard (CR 601.2i, 704.5f). Read as it resolves it would be -1/3 and live.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Faerie Mastermind
+Faerie Fencing
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Ruby
+Concealing Curtains
+Lightning Bolt
+Swamp x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faerie Fencing.Cast(Concealing Curtains; X: 1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Faerie Mastermind)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Bot1.Graveyard = Faerie Mastermind
+? Bot2.Battlefield.Concealing Curtains.Toughness = 4
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Faerie Fencing; Faerie Mastermind
+Bot2.Graveyard = Concealing Curtains; Lightning Bolt

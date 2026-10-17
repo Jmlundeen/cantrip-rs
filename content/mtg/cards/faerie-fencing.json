@@ -1,0 +1,6 @@
+{
+  "name": "Faerie Fencing",
+  "manaCost": "{X}{B}",
+  "type": "Instant",
+  "oracleText": "Target creature gets -X/-X until end of turn. That creature gets an additional -3/-3 until end of turn if you controlled a Faerie as you cast this spell."
+}

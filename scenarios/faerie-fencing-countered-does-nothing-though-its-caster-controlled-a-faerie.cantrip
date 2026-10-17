@@ -1,0 +1,50 @@
+# Faerie Fencing countered (CR 701.6a, 608.2): Bot1 controls Faerie Mastermind as it casts Fencing with X = 1 at Bot2's Concealing
+# Curtains (0/4), and Bot2 counters it with Counterspell. Neither -1/-1 nor the additional -3/-3 happens: the Curtains stay 0/4,
+# and Fencing is in Bot1's graveyard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Faerie Mastermind
+Faerie Fencing
+Island x14
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Concealing Curtains
+Counterspell
+Swamp x16
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faerie Fencing.Cast(Concealing Curtains; X: 1)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Counterspell.Cast(Faerie Fencing)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faerie Fencing
+Bot1.Battlefield.Faerie Mastermind.Types = Creature
+Bot2.Graveyard = Counterspell; Black Lotus
+Bot2.Battlefield.Concealing Curtains.Power = 0
+Bot2.Battlefield.Concealing Curtains.Toughness = 4

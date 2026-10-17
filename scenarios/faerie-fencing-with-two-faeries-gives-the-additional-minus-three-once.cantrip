@@ -1,0 +1,56 @@
+# Faerie Fencing: "Target creature gets -X/-X until end of turn. That creature gets an additional -3/-3 until end of turn if you
+# controlled a Faerie as you cast this spell." The condition is one fact, not a count: with two Faerie Masterminds Bot1 casts
+# Fencing with X = 0 at Bot2's Rot-Curse Rakshasa (5/5), which gets -0/-0 and -3/-3, once: 2/2 until end of turn (-3/-3 for
+# each Faerie would kill it; without the bonus it would stay 5/5). At Bot1's next turn the effects have ended: 5/5 again.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Mox Jet
+Faerie Mastermind
+Faerie Mastermind
+Faerie Fencing
+Island x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Rot-Curse Rakshasa
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Rot-Curse Rakshasa.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faerie Fencing.Cast(Rot-Curse Rakshasa; X: 0)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Rot-Curse Rakshasa.Power = 2
+? Bot2.Battlefield.Rot-Curse Rakshasa.Toughness = 2
+[T3 Bot1.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faerie Fencing; Black Lotus
+Bot1.Battlefield.Faerie Mastermind#1.Types = Creature
+Bot1.Battlefield.Faerie Mastermind#2.Types = Creature
+Bot2.Battlefield.Rot-Curse Rakshasa.Power = 5
+Bot2.Battlefield.Rot-Curse Rakshasa.Toughness = 5

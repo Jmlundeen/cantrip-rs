@@ -1,0 +1,57 @@
+# A copy of a spell is not cast (CR 707.10), so a copy of Faerie Fencing never "controlled a Faerie as you cast this spell": the
+# ruling on the Dragon spells' same condition, "the copy wasn't cast, so whether you controlled a Dragon won't matter". The copy
+# does copy X (CR 707.10). Bot1 controls Faerie Mastermind as it casts Fencing with X = 0 at Bot2's Rot-Curse Rakshasa (5/5), then
+# flashes in Lutri, the Spellchaser, whose enters trigger copies Fencing with the same target. The copy resolves first: -0/-0 and
+# no bonus; then the original: -0/-0 and -3/-3. The Rakshasa is 2/2 (had the copy the bonus too, -6/-6 would kill it).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Black Lotus
+Faerie Mastermind
+Faerie Fencing
+Lutri, the Spellchaser
+Island x13
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Rot-Curse Rakshasa
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Faerie Mastermind.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Rot-Curse Rakshasa.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faerie Fencing.Cast(Rot-Curse Rakshasa; X: 0)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+Bot1.Target(Rot-Curse Rakshasa)
+Bot1.Pass
+? Stack.Count = 1
+? Bot2.Battlefield.Rot-Curse Rakshasa.Power = 5
+? Bot2.Battlefield.Rot-Curse Rakshasa.Toughness = 5
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faerie Fencing; Black Lotus
+Bot1.Battlefield.Lutri, the Spellchaser.Types = Creature
+Bot2.Battlefield.Rot-Curse Rakshasa.Power = 2
+Bot2.Battlefield.Rot-Curse Rakshasa.Toughness = 2

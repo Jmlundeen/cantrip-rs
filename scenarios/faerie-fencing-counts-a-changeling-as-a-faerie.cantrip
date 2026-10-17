@@ -1,0 +1,41 @@
+# Faerie Fencing's "if you controlled a Faerie as you cast this spell" counts a creature with changeling, which is every creature
+# type (CR 702.73a, 205.3m). Bot1's only creature is Woodland Changeling as it casts Fencing with X = 0 at Bot2's Concealing
+# Curtains (0/4): they get the additional -3/-3 and stay, -3/1 (without it they would be 0/4).
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Jet
+Woodland Changeling
+Faerie Fencing
+Island x15
+
+[Bot2 Deck]
+Swamp
+Concealing Curtains
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Faerie Fencing.Cast(Concealing Curtains; X: 0)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Faerie Fencing
+Bot1.Battlefield.Woodland Changeling.Types = Creature
+Bot2.Battlefield.Concealing Curtains.Power = -3
+Bot2.Battlefield.Concealing Curtains.Toughness = 1
