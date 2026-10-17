@@ -1,0 +1,60 @@
+# Alhammarret's Archive and Thought Reflection, both Bot1's, both replace each of its draws outside the first of its draw
+# step; Bot1 chooses which applies first (CR 616.1, both cards' rulings), and whichever it is, the other then replaces each of
+# the two cards it draws (CR 614.5): four cards a draw. Thought Reflection comes on turn 1 and doubles the turn 3 draw, which
+# brings Ancestral Recall; Archive comes on turn 3. In the turn 5 draw step the draw for the turn is the first card of the
+# step, so the Archive leaves it alone and Thought Reflection makes it two: the first of these is the step's first card and
+# is drawn, the Archive doubles the second - three cards. Ancestral Recall's three draws then are four cards each, with
+# the Archive put first, then Thought Reflection, then the Archive again: twelve. Bot1's hand ends at fourteen.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Jet
+Thought Reflection
+Alhammarret's Archive
+Island
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thought Reflection.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand = Alhammarret's Archive; Island; Ancestral Recall
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Alhammarret's Archive.Cast
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 4
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Replace(Alhammarret's Archive)
+Bot1.Replace(Thought Reflection)
+Bot1.Replace(Alhammarret's Archive)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 14
+Bot1.Library.Count = 5

@@ -1,0 +1,51 @@
+# Alhammarret's Archive: "If you would gain life, you gain twice that much life instead. If you would draw a card except the
+# first one you draw in each of your draw steps, draw two cards instead." (CR 614.1a, 121.6) Bot1 casts it on turn 1 and
+# then Healing Salve on itself: 3 life becomes 6. In its turn 3 draw step the draw for the turn is the first card it draws
+# in the step, so it is one card; Ancestral Recall afterwards is three draws, each replaced on its own by two (CR 121.2), six
+# cards. Bot1 ends with 26 life and the six cards; with the draw step doubled too it would hold seven, and with nothing
+# doubled three.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Pearl
+Alhammarret's Archive
+Healing Salve
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Alhammarret's Archive.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+[T1 Bot1.Main2]
+? Bot1.Life = 26
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 26
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 13
+Bot1.Graveyard = Ancestral Recall; Healing Salve; Black Lotus
