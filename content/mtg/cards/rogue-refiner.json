@@ -1,0 +1,8 @@
+{
+  "name": "Rogue Refiner",
+  "manaCost": "{1}{G}{U}",
+  "type": "Creature — Human Rogue",
+  "oracleText": "When this creature enters, draw a card and you get {E}{E}.",
+  "power": "3",
+  "toughness": "2"
+}
