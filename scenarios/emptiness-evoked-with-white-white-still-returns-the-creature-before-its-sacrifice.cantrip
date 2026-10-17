@@ -1,7 +1,6 @@
 # Emptiness evoked ({W/B}{W/B}) with Black Lotus's {W}{W}{W}: "if {W}{W} was spent to cast it" counts what was spent on the evoke
-# cost too, so the reanimation triggers beside the evoke sacrifice trigger. Bot1 puts the reanimation first (a ruling lets the
-# creature's own ability resolve before the evoke trigger), so the Llanowar Elves, in the graveyard from Faithless Looting,
-# come back, and then Emptiness is sacrificed: it ends in the graveyard.
+# cost too, so the reanimation triggers beside the evoke sacrifice trigger. The Llanowar Elves, in the graveyard from
+# Faithless Looting, come back, and Emptiness is sacrificed: it ends in the graveyard.
 
 [Bot1 Deck]
 Mox Ruby

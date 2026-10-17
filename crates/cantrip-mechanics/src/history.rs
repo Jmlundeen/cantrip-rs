@@ -33,8 +33,9 @@ pub fn permanent_left_battlefield_this_turn(q: &dyn Query, player: PlayerId) -> 
         .any(|r| matches!(r.event, Event::ZoneChange { old, .. } if q.obj(old).controller == player))
 }
 
-/// The void condition: "a nonland permanent left the battlefield this turn or a spell was warped this turn" (CR 702.185c).
-/// Any player's permanent counts, a token too, judged as it was as it left the battlefield (CR 608.2h). Elegy Acolyte and
+/// The void condition: "a nonland permanent left the battlefield this turn or a spell was warped this turn". Void is an
+/// ability word (CR 207.2c) with no rules of its own; only its second clause has a rule, CR 702.185c: a spell was warped when
+/// it was cast for its warp cost. Any player's permanent counts, a token too, judged as it was as it left the battlefield (CR 608.2h). Elegy Acolyte and
 /// every other card with a void ability print it.
 pub fn void(q: &dyn Query) -> bool {
     q.history()

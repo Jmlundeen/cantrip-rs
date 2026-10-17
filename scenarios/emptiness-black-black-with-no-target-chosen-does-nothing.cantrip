@@ -1,0 +1,42 @@
+# Emptiness's {B}{B} ability is "up to one target creature": Bot1 pays with Black Lotus's {B}{B}{B} and chooses no target
+# (Target() takes none), so nothing happens: Bot2's Ornithopter lives and Emptiness is still a 3/5 with no counters.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Black Lotus
+Emptiness
+Island x2
+Island x14
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Emptiness.Cast
+Bot1.Target()
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield = Mox Ruby; Mox Emerald; Mox Sapphire; Emptiness
+Bot1.Battlefield.Emptiness.Power = 3
+Bot1.Battlefield.Emptiness.Toughness = 5
+Bot1.Battlefield.Emptiness.Counters.MinusOneMinusOne = (absent)
+Bot1.Graveyard = Black Lotus

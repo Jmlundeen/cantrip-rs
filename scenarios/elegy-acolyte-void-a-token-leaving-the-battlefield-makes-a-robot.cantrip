@@ -1,0 +1,45 @@
+# Elegy Acolyte's Void: "a nonland permanent left the battlefield this turn" includes a token (a token is a permanent, and it
+# leaves the battlefield before ceasing to exist, CR 111.7, 400.7). Turn 3 Bot1 casts Biotech Specialist (its Lander token
+# arrives) and sacrifices the Lander for {2}: the token leaves, nothing else does (the Specialist stays), and at the beginning
+# of the end step the Robot is created. The control that nothing leaving means no Robot is the first Elegy Acolyte scenario.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Mox Ruby
+Elegy Acolyte
+Biotech Specialist
+Mox Emerald
+Mox Sapphire
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elegy Acolyte.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Biotech Specialist.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Lander Token.Activate
+Bot1.Search()
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Emerald; Mox Sapphire; Elegy Acolyte; Biotech Specialist; Robot
+Bot1.Battlefield.Robot.Token = true
+Bot2.Life = 18

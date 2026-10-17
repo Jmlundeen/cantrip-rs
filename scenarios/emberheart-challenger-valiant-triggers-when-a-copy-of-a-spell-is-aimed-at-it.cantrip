@@ -1,0 +1,56 @@
+# Emberheart Challenger's valiant: "If you create a copy of a spell on the stack and target a creature you control with a
+# valiant ability, that ability will trigger as long as the creature hasn't yet been the target of a spell or ability you
+# control this turn" (ruling 2024-07-26). Bot1 begins with Leyline of Resonance out; its Snakeskin Veil targets Llanowar Elves
+# (not the Challenger, so valiant has not triggered: the Stack check shows only the Veil, the Leyline's trigger and prowess), the Leyline
+# copies the Veil and Bot1 chooses the Challenger as the copy's new target (CR 707.10c): that is the Challenger becoming the
+# target of a spell Bot1 controls for the first time that turn, so valiant exiles the top card, a Mountain.
+
+[Bot1 Deck]
+Leyline of Resonance
+Mox Ruby
+Mox Jet
+Mox Emerald
+Emberheart Challenger
+Llanowar Elves
+Snakeskin Veil
+Forest
+Mountain
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Accept
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emberheart Challenger.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+Bot1.Triggers(copy that spell; Prowess)
+? Stack.Count = 3
+? Exile.Count = 0
+Bot1.Pass
+Bot1.Target(Emberheart Challenger)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mountain
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = Hexproof
+Bot1.Battlefield.Emberheart Challenger.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Emberheart Challenger.Keywords = Haste; Hexproof
+Bot1.Graveyard = Snakeskin Veil

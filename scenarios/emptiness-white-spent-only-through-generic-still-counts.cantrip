@@ -1,0 +1,49 @@
+# Emptiness's conditions look at the mana spent on its whole cost, not at the hybrid symbols alone. Here Bot1 chooses to pay
+# the two hybrid symbols with the black mana (Spend: B, B), so the white mana pays only generic - and {W}{W} was still
+# spent, so the reanimation still triggers beside the {B}{B} ability (ruling 2025-11-17). Paid with Dark Ritual's {B}{B}{B} and Black Lotus's {W}{W}{W}: {W}{W} and {B}{B} were both spent (CR 106.1b - mana
+# is spent by color whatever symbol it pays), so both enters abilities trigger. Turn 1 Faithless Looting puts a Llanowar Elves
+# in the graveyard; Bot2's Ornithopter (0/2) is on the battlefield by turn 3. The reanimation returns the Elves and the other
+# ability puts three -1/-1 counters on the Ornithopter, which dies.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Black Lotus
+Mox Ruby
+Faithless Looting
+Emptiness
+Island
+Llanowar Elves
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Llanowar Elves; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Emptiness.Cast(Spend: B, B)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Jet; Emptiness; Llanowar Elves
+Bot1.Graveyard = Black Lotus; Dark Ritual; Faithless Looting; Island

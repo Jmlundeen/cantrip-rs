@@ -1,0 +1,56 @@
+# Emberheart Challenger's valiant: "If a spell or ability you control has one or more of its targets changed to a creature
+# you control with a valiant ability, that ability will trigger if that creature hasn't yet been the target of a spell or
+# ability you control this turn" (ruling 2024-07-26). Bot1's Snakeskin Veil targets Llanowar Elves; Bot1 responds to it with
+# Bolt Bend ({3}{R}) and changes its target to the Challenger, the only other legal one so chosen without a question (CR 115.7a): valiant triggers (first time this turn) and exiles
+# the top card, a Mountain. The Veil then resolves on the Challenger: counter and hexproof, and the Elves get nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Emerald
+Emberheart Challenger
+Llanowar Elves
+Snakeskin Veil
+Bolt Bend
+Forest
+Mountain
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Emberheart Challenger.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Snakeskin Veil.Cast(Llanowar Elves)
+Bot1.Battlefield.Llanowar Elves.Activate
+? Exile.Count = 0
+Bot1.Hand.Bolt Bend.Cast(Stack.Snakeskin Veil)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Mountain
+Stack.Count = 0
+Bot1.Battlefield.Emberheart Challenger.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Emberheart Challenger.Keywords = Haste; Hexproof
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)
+Bot1.Graveyard = Snakeskin Veil; Bolt Bend
