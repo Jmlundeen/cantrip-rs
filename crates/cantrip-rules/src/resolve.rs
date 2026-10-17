@@ -461,9 +461,16 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                 // It has resolved (CR 608.2m: "the first time this ability has resolved this turn").
                 cx.record(Event::Resolved { source: item.object, ability: item.ability });
             }
-            // An ability that ended the turn has left the stack already, with everything else on it (CR 724.1b).
-            if cx.s().stack.get(at).is_some_and(|i| i.serial == item.serial) {
-                cx.st().stack_remove(at);
+            // It leaves the stack as it finishes resolving (CR 608.2n), found by its serial: what it did may have taken an
+            // item below it off the stack (Ertai Resurrected countering an ability), moving it down. An ability that ended
+            // the turn has left the stack already, with everything else on it (CR 724.1b).
+            let now = if cx.s().stack.get(at).is_some_and(|i| i.serial == item.serial) {
+                Some(at)
+            } else {
+                cx.s().stack.iter().rposition(|i| i.serial == item.serial)
+            };
+            if let Some(now) = now {
+                cx.st().stack_remove(now);
             }
         }
     }

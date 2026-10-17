@@ -447,6 +447,10 @@ pub trait Game: Query {
     /// Copies a spell on the stack (CR 707.10) for `copier`, not cast; with `new_targets` the copier may choose new
     /// targets (CR 707.10c). The copy, or nothing if the spell is not on the stack.
     fn copy_spell(&mut self, spell: ObjectId, copier: PlayerId, new_targets: bool) -> Result<Option<ObjectId>, Suspend>;
+    /// Copies the activated or triggered ability on the stack that `ability` names (`Target::Ability`) for `copier` (CR
+    /// 707.10), with the original's source; an activated one that has left the stack is copied as it last was there. With
+    /// `new_targets` the copier may choose new targets (CR 707.10c). The copy's serial, or nothing.
+    fn copy_ability(&mut self, ability: Target, copier: PlayerId, new_targets: bool) -> Result<Option<u32>, Suspend>;
     /// A reflexive triggered ability (CR 603.12): "when you do, ...", triggered as the effect that made it resolves and
     /// put on the stack, targets chosen, the next time a player would receive priority. `ability` is one of the
     /// source card's `delayed` abilities.

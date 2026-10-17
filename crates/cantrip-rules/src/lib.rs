@@ -820,6 +820,10 @@ impl cantrip_api::Game for Cx<'_> {
         ops::copy_spell(self, spell, copier, new_targets).map_err(|_| Suspend)
     }
 
+    fn copy_ability(&mut self, ability: Target, copier: PlayerId, new_targets: bool) -> Result<Option<u32>, Suspend> {
+        ops::copy_ability(self, ability, copier, new_targets).map_err(|_| Suspend)
+    }
+
     fn delayed_trigger_about(&mut self, when: DelayedWhen, source: ObjectId, controller: PlayerId, ability: AbilityRef, objects: &[ObjectId]) {
         let members = self.g.state.members_push(objects);
         let since = self.g.log.len() as u32;

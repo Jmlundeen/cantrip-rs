@@ -1204,6 +1204,44 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
     Ok(Some(copy))
 }
 
+/// Copies the activated or triggered ability on the stack that `ability` names (`Target::Ability`, its serial) for
+/// `copier` (CR 707.10): another instance of it, put onto the stack above everything, with the original's source (the
+/// Lithoform Engine ruling), targets, modes, X, what it triggered on and the objects its costs were paid with (CR 707.10:
+/// "the objects used to pay the costs of the original"). It was not activated or triggered (CR 707.10), so nothing that
+/// triggers on activations sees it, and no cost is paid for it. An activated ability that has left the stack, countered or
+/// resolved, is copied as it last was there (the Rings of Brighthearth ruling: the copy is made "even if that ability is
+/// countered"); what copies a triggered ability targets it, and copies nothing once it is gone. With `new_targets` the
+/// copier may choose new targets (CR 707.10c) as for a spell (`retarget`). Rings of Brighthearth, Kurkesh, Illusionist's
+/// Bracers, Battlemage's Bracers and Locus of Enlightenment copy activated abilities; Lithoform Engine, Return the Favor and
+/// Strionic Resonator target one. The copy's serial, or nothing if no such ability is to be found or `copier` has left the
+/// game.
+pub fn copy_ability(cx: &mut Cx, ability: Target, copier: PlayerId, new_targets: bool) -> R<Option<u32>> {
+    let Target::Ability(serial) = ability else { return Ok(None) };
+    let mut item = match cx.s().stack.iter().position(|i| i.kind != StackKind::Spell && i.serial == serial) {
+        Some(at) => cx.s().stack[at],
+        None => match cx.s().left_ability(serial) {
+            Some(&left) => left,
+            None => return Ok(None),
+        },
+    };
+    if cx.s().player(copier).lost {
+        return Ok(None);
+    }
+    item.controller = copier;
+    item.serial = 0;
+    // A copy is put onto the stack as it is created (CR 707.10).
+    item.since = cx.g.log.len() as u32;
+    cx.st().stack_push(item);
+    let top = cx.s().stack.len() - 1;
+    if new_targets {
+        item = retarget(cx, top, item.object, item.object, copier)?;
+    }
+    for &t in item.targets().iter().filter(|&&t| t != Target::None) {
+        cx.emit(Event::BecameTarget { target: t, by: item.object, controller: copier });
+    }
+    Ok(Some(cx.s().stack[top].serial))
+}
+
 /// "You may choose new targets" (CR 115.7d, 707.10c) for the item at `top` of the stack: each slot it was announced with
 /// is offered every legal choice it has now, the one it has among them; a slot with nothing else it could be is not
 /// asked, and an answer that is not legal leaves the old target. `object` is the spell whose slots they are and

@@ -33,8 +33,9 @@ pub struct GameState {
     pub triggers: Vec<PendingTrigger>,
     pub delayed: Vec<Delayed>,
     pub last_known: Vec<LastKnown>,
-    /// The stack items of spells that have left the stack (countered, resolved, exiled), as they last were on it: what a
-    /// rule reads of a spell that is no longer there (CR 608.2h, 707.10). Append-only.
+    /// The stack items of spells and activated abilities that have left the stack (countered, resolved, exiled), as they
+    /// last were on it: what a rule reads of one that is no longer there (CR 608.2h, 707.10; Rings of Brighthearth's copy of
+    /// an ability countered in response). Append-only.
     pub left_stack: Vec<StackItem>,
     /// What happened this turn (CR 603.2h, 608.2m, 601.2i), for the rules that ask about it.
     /// The objects of the batches "one or more" abilities triggered by (`Span` names a run of it). Append-only.
@@ -485,7 +486,7 @@ impl GameState {
             above.push(self.stack_pop().expect("above"));
         }
         let item = self.stack_pop().expect("the item");
-        if item.kind == StackKind::Spell {
+        if item.kind != StackKind::Triggered {
             self.left_stack.push(item);
             self.log(Undo::LeftStackPushed);
         }
@@ -591,7 +592,13 @@ impl GameState {
 
     /// The stack item a spell last had on the stack, if it has left it (CR 608.2h).
     pub fn left_stack(&self, spell: ObjectId) -> Option<&StackItem> {
-        self.left_stack.iter().rev().find(|i| i.object == spell)
+        self.left_stack.iter().rev().find(|i| i.kind == StackKind::Spell && i.object == spell)
+    }
+
+    /// The stack item an activated ability last had on the stack, named by its serial (`Target::Ability`), if it has left
+    /// it (CR 608.2h, 707.10).
+    pub fn left_ability(&self, serial: u32) -> Option<&StackItem> {
+        self.left_stack.iter().rev().find(|i| i.kind == StackKind::Activated && i.serial == serial)
     }
 
     /// The characteristics an object last had on the battlefield, if it left it.
