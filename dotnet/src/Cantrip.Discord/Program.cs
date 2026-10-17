@@ -30,6 +30,12 @@ using Cantrip.Server.Events;
 // wss://.../table/{port}/game, passed through to the table on this machine. The tables then listen only here, so the
 // tunnel to the web port is the only way in. Without it, players connect to each table's own port at --public-host.
 //
+// With drafts and the bot's own site, /queue is the draft queue page: every queue, every table forming and every draft
+// under way, open to anyone. /play is constructed play: the Standard gauntlet, 1v1 games each player brings one of the
+// decks under decks/standard to. Players sign in on either with Discord to take a seat, given the application's OAuth2
+// client id (--oauth-client-id, or CANTRIP_DISCORD_CLIENT_ID) and its secret, from the CANTRIP_DISCORD_SECRET environment
+// variable only; {site}/signin/discord is to be registered as its redirect.
+//
 // --bot-narration DIR (or CANTRIP_BOT_NARRATION) has every bot seat write down each decision it makes and what it
 // weighed - its picks and deck, then its games - a file a seat in DIR, so a draft or a game lost to a person can be read
 // afterwards. Off by default.
@@ -133,6 +139,28 @@ catch (Exception error) when (error is IOException or InvalidOperationException 
     return 1;
 }
 
+// The Standard gauntlet's decks: every list under decks/standard whose cards the engine has.
+List<DeckList> standard = [];
+if (Directory.Exists(Path.Combine(decks, "standard")))
+{
+    int unplayable = 0;
+    foreach (string path in Directory.GetFiles(Path.Combine(decks, "standard"), "*.txt").Order(StringComparer.Ordinal))
+    {
+        try
+        {
+            DeckList candidate = DeckList.Load(path);
+            candidate.Resolve([ContentCache.Get(content).Cards]);
+            standard.Add(candidate);
+        }
+        catch (Exception error) when (error is IOException or InvalidOperationException or FormatException)
+        {
+            unplayable++;
+        }
+    }
+
+    Console.WriteLine($"{standard.Count} Standard deck(s) for the gauntlet{(unplayable == 0 ? string.Empty : $"; {unplayable} with cards the engine lacks left out")}.");
+}
+
 // Drafts, when there is somewhere to keep them.
 DraftHost? drafts = null;
 DraftQueues? queues = null;
@@ -231,6 +259,7 @@ await using var matchmaker = new Matchmaker(new MatchmakerOptions
 {
     ContentRoot = content,
     Deck = deck,
+    Formats = standard.Count == 0 ? new Dictionary<string, IReadOnlyList<DeckList>>() : new Dictionary<string, IReadOnlyList<DeckList>> { ["standard"] = standard },
     Ports = ports,
     ListenAddress = listen,
     PublicHost = publicHost,
@@ -240,6 +269,10 @@ await using var matchmaker = new Matchmaker(new MatchmakerOptions
 
 // The client is static, so one serves every game; only when it is hosted elsewhere does the bot not serve it.
 Microsoft.AspNetCore.Builder.WebApplication? web = null;
+Uri? queuePage = null;
+
+// The Discord side, for the queue page to ask who a signed-in player is on the server; there once the bot is made.
+DiscordBot? discord = null;
 if (client is null)
 {
     string? root = StringArg(args, "--client-root") ?? Cantrip.Server.Host.WebClientFiles.Built(Path.GetDirectoryName(content)!);
@@ -256,27 +289,62 @@ if (client is null)
         Console.ResetColor();
     }
 
+    Uri siteAddress = publicUrl ?? new Uri($"http://{publicHost}:{webPort}/");
+
+    // Everything being played and everything played, at /status: the events kept in the data directory, the queues'
+    // tables still forming and the games hosted on their own. The queue page shows the drafts under way from it too.
+    // An event is being played only while the bot hosts it: one left live in the directory by a draft played locally,
+    // or by one stopped for good, is not.
+    var status = new EventStatusBoard(store, () => [.. queues?.StatusTables() ?? [], .. matchmaker.StatusTables()],
+        () => [.. drafts?.Drafts.Where(draft => draft.IsLive).Select(draft => draft.Id) ?? [], .. pods?.Hosting ?? []]);
+    var signIn = new SiteSignInOptions
+    {
+        Site = siteAddress,
+        ClientId = StringArg(args, "--oauth-client-id") ?? Environment.GetEnvironmentVariable("CANTRIP_DISCORD_CLIENT_ID"),
+        ClientSecret = Environment.GetEnvironmentVariable("CANTRIP_DISCORD_SECRET"),
+        Keys = store is null ? null : Path.Combine(store.Root, "site-keys"),
+        Player = account => discord?.WebPlayerAsync(account) ?? Task.FromResult(new DiscordPlayer(account.Id, account.Name)),
+    };
+    QueueSiteOptions? queueSite = null;
+    if (queues is not null && drafts is not null && store is not null)
+    {
+        queueSite = new QueueSiteOptions
+        {
+            Queues = queues,
+            Board = status,
+            Drafts = drafts,
+            Pods = pods,
+            Client = siteAddress,
+            Art = art,
+            SignIn = signIn,
+            ChannelName = channel => discord?.ChannelName(channel),
+        };
+        queuePage = new Uri(siteAddress, QueueSite.Route);
+    }
+
+    PlaySiteOptions? playSite = standard.Count == 0 ? null : new PlaySiteOptions { Games = matchmaker, Client = siteAddress, Art = art, SignIn = signIn };
+
     string artCache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
     web = await ClientSite.StartAsync(listen, webPort, root, new Cantrip.Art.ArtStore(new Cantrip.Art.ArtStoreOptions { ContentRoot = content, CacheDirectory = artCache }),
-        publicUrl is null ? null : tablePorts, portraits,
-        // Everything being played and everything played, at /status: the events kept in the data directory, the queues'
-        // tables still forming and the games hosted on their own.
-        // An event is being played only while the bot hosts it: one left live in the directory by a draft played locally,
-        // or by one stopped for good, is not.
-        new EventStatusBoard(store, () => [.. queues?.StatusTables() ?? [], .. matchmaker.StatusTables()],
-            () => [.. drafts?.Drafts.Where(draft => draft.IsLive).Select(draft => draft.Id) ?? [], .. pods?.Hosting ?? []]));
-    client = publicUrl ?? new Uri($"http://{publicHost}:{webPort}/");
+        publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite);
+    client = siteAddress;
     Console.WriteLine($"Serving the web client from {root}; the server's status at {new Uri(client, Cantrip.Server.Host.StatusSite.Route)}.");
+    if (queueSite is not null) Console.WriteLine($"The draft queue page at {queuePage}.");
+    if (playSite is not null) Console.WriteLine($"Constructed play at {new Uri(siteAddress, PlaySite.Route)}.");
+    Console.WriteLine(signIn.Enabled
+        ? $"Players sign in with Discord, which sends them back to {SiteSignIn.Callback(siteAddress)}: register it as the application's redirect."
+        : "Nobody can sign in to take a seat from the site: give --oauth-client-id and CANTRIP_DISCORD_SECRET.");
 }
 
 await using Microsoft.AspNetCore.Builder.WebApplication? site = web;
 await using var bot = new DiscordBot(
-    new DiscordBotOptions { Token = token, Guild = guild, Deck = deck.Name, Client = client, Art = art, Cube = cubeName, Portraits = portraits },
+    new DiscordBotOptions { Token = token, Guild = guild, Deck = deck.Name, Client = client, Art = art, Cube = cubeName, Portraits = portraits, QueuePage = queuePage },
     matchmaker,
     new HostPolicy(hostRoles),
     drafts,
     queues,
     pods);
+discord = bot;
 
 await bot.StartAsync();
 if (drafts is not null)

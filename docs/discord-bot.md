@@ -93,9 +93,55 @@ played, so five of them while a round of a pod of eight is on. Give the bot more
 the tunnel or firewall to match) to run more than one pod at a time; a game waiting for a port opens as soon as one is
 free.
 
+### The draft queue page
+
+`/queue` on the bot's site is the queues on the web, open to anyone (`QueueSite`, its page `queue.html`): a section for
+each kind of draft - booster, grid, Winston - with every queue and what it drafts, every table still taking players and
+who is at it, and every draft under way with where it has got to (the status page's own words: *Drafting pack 2 of 3*,
+*Building decks*, *Round 2 of 3*) and a link to it on the status page. Each queue's message in Discord has an
+**Every table** button that opens it.
+
+A player presses **Sign in with Discord** and is asked by Discord only to say who they are (OAuth2 with PKCE, the
+`identify` scope); the token is used once to learn their account and dropped, and the server keeps them signed in with
+a cookie of its own for thirty days. They sit down as a Join in Discord seats them: by their name on the server and with
+their avatar kept (or, not being on the server, their account's own), one seat at a time across Discord and the page.
+
+- **Join** on a table takes a seat at it, and the page goes straight to the table in the web client - the same tables
+  a queue channel's **Join** fills. A queue with no table taking players shows a card of its own, whose **Join** starts
+  its next table.
+- **New Draft** under a heading sets up a table with settings of the player's own: the cube (any in the cube lists),
+  the packs and their size and the rounds, the grids, or the cards and piles, the smallest deck, and bot seats. The
+  player takes its first seat. It belongs to no channel: a channel's **Join** never seats anyone there, only players who
+  pick it on the page. It forms, checks everyone is ready and becomes a draft exactly as a queue's table does, and
+  closes once everyone has left it.
+- **Open my table** gives a seated player a fresh link to their seat, and **Back to my draft** takes a player in a draft
+  back to it, as `/cantrip mydraft` does.
+
+The page needs the Discord application's OAuth2 client id (`--oauth-client-id`, or `CANTRIP_DISCORD_CLIENT_ID`) and its
+secret (`CANTRIP_DISCORD_SECRET`, from the environment only), and the redirect `{site}/signin/discord` registered
+on the application's **OAuth2** page; the bot prints the address to register as it starts. One sign-in serves this page
+and [constructed play](#constructed-play) (`SiteSignIn`: `/signin`, `/signin/discord`, `/signout`). Without them the page
+shows everything and nobody can sign in. Open it at the site's own address - `--public-url`, or `http://{public-host}:{web-port}` -
+since the sign-in comes back there. The keys the cookie is sealed with are kept in the data directory (`site-keys/`), so
+a restart leaves everyone signed in.
+
 Queues are kept in the data directory (`queues/{channel}.json`). Tables still forming are not: a restart empties them,
 and their players press **Join** again. `DraftQueues` is the Discord-free half, tested in `DraftQueuesTests` with real
 tables; the table itself is `QueueTable` ([events.md](events.md)).
+
+## Constructed play
+
+`/play` on the bot's site (`PlaySite`, its page `play.html`) is the same for 1v1 constructed games, open to anyone: a
+section for each format the bot hosts - for now the **Standard Gauntlet**, whose decks are every list under
+`decks/standard` with cards the engine has (the bot says how many as it starts, and how many it left out) - with every
+game waiting for an opponent and every game being played, by its players' names. Nobody is shown anyone's deck.
+
+A player signed in with Discord, exactly as on the queue page, presses **New Game** or **Join** and chooses their deck
+(the page remembers their last one in that browser; **Random deck** picks one), and the page goes straight to their
+seat. The game is a `/cantrip host` game in all but its decks - the same ports, one game per player across Discord and
+the page, dealt once both players have the table open, expiring if it never is - and the table shows each player the
+deck their opponent brought only as the game shows it. **Open my game** gives a seat back; **Cancel** calls off a game
+of one's own that nobody has joined.
 
 ## Drafts
 
@@ -156,7 +202,10 @@ static HTTPS host or a CDN - with `--art` for where its art is, and the bot then
    `https://discord.com/oauth2/authorize?client_id=APPLICATION_ID&scope=bot+applications.commands&permissions=3072`.
    3072 is View Channels plus Send Messages, which is all the bot uses: its replies to players are ephemeral, and it
    only edits and deletes its own messages.
-3. Turn on Developer Mode in Discord (User Settings, Advanced) so you can right-click to copy the server ID and the ID
+3. For the draft queue page: on the application's **OAuth2** page, copy the client id and reset and copy the client
+   secret (keep it as secret as the token), and add the redirect `https://your.site/signin/discord` - the bot
+   prints the one to add as it starts.
+4. Turn on Developer Mode in Discord (User Settings, Advanced) so you can right-click to copy the server ID and the ID
    of the role allowed to host.
 
 ## Running it
@@ -189,9 +238,11 @@ and `tools\test.cmd` with it, for as long as it ran.
 | `--draft-cards N` | `90` | How many cards a draft draws from the cube. |
 | `--draft-piles N` | `3` | How many piles a Winston draft lays out. |
 | `--min-deck N` | `40` | The fewest cards a main deck may have. |
-| `--draft-ports FIRST-LAST` | `7790-7799` | One draft table to a port, held from the first player joining to the game's end; shared by queues and `/cantrip draft`. |
+| `--draft-ports FIRST-LAST` | `7790-7799` | One draft table to a port, held from the first player joining to the game's end; shared by queues, the queue page's tables and `/cantrip draft`. |
+| `--oauth-client-id ID` | `CANTRIP_DISCORD_CLIENT_ID`, else none | The application's OAuth2 client id, for signing in on the draft queue and constructed play pages; with `CANTRIP_DISCORD_SECRET`. |
 
-The token is read from the environment only, so it never appears in a command line or a shell history.
+The token is read from the environment only, so it never appears in a command line or a shell history; so is the
+OAuth2 secret, `CANTRIP_DISCORD_SECRET`.
 
 `tools\discord-bot-release.cmd` puts a new build behind a running bot: it stops the bot and whatever `play-release-build.cmd` left
 running, publishes the client in Release, and starts the bot again in a window of its own, at the address of the quick
@@ -235,13 +286,19 @@ that has been silent for 100.
 
 `ClientSite` serves the web client and its art, and makes the link that opens a seat in it - and the server's status page
 at `/status`, every event, forming table and game being played and the history of those played ([events.md](events.md#the-status-page)).
+And the draft queue page at `/queue` (`QueueSite`): what `DraftQueues` has forming and the status board has under way,
+Discord sign-in, and seats handed out as links to the client. `DraftQueues` is tested with tables of a player's own in
+`DraftQueuesTests`, the pages over real HTTP in `SiteTests` - what they show, that a seat wants signing in, and the
+request that goes to Discord. `/play` is `PlaySite` over the `Matchmaker`, whose games of a format each seat choose a
+deck for (`MatchmakerTests`); both pages sign in through `SiteSignIn`.
 
 The seat itself is a `GameServer` ticket, described in [table-lifecycle.md](table-lifecycle.md#seat-tickets).
 
 ## Not yet
 
-- **Identity.** A ticket proves only that someone was shown it, and it was shown only to its Discord account. OAuth
-  login (stage 1 of the plan) will bind the seat to the account itself.
+- **Identity.** A ticket proves only that someone was shown it, and it was shown only to its Discord account - in an
+  ephemeral reply, or on the queue page to the account signed in there. The table itself does not ask who is sitting
+  down: binding the seat to the account (stage 1 of the plan) is still to come.
 - **HTTPS.** The bot serves plain HTTP. Beyond a LAN, put a TLS proxy in front of the web port and the table ports, and
   give the players `https://` and `wss://` addresses.
 - **Persistence.** Games hosted with `/cantrip host` live in the bot's memory: a restart ends them, and nothing is

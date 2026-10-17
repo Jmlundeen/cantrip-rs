@@ -102,6 +102,58 @@ public sealed class DraftQueuesTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task A_table_of_a_players_own_fills_only_from_the_page_and_its_draft_begins_like_a_queues()
+    {
+        (DraftQueues queues, DraftHost drafts) = Create();
+        await using (drafts)
+        await using (queues)
+        {
+            await queues.ConfigureAsync(Settings());
+            Assert.Contains("rw-aggro", queues.Cubes());
+            Assert.Contains("no cube", (await queues.CreateTableAsync(new QueueSettings { Cube = "nope", Cards = 18 }, Alice)).Refusal, StringComparison.Ordinal);
+
+            // A grid draft of her own, though the channel's queue drafts Winston: in no channel, and she has its first seat.
+            QueueSeating alice = await queues.CreateTableAsync(new QueueSettings { Channel = Channel, Cube = "rw-aggro", Format = "grid", Packs = 4, MinimumDeck = 10 }, Alice);
+            Assert.Equal(1, alice.Seat);
+            QueueBoardTable own = Assert.Single(queues.Board().Tables);
+            Assert.Equal((0UL, "grid", "rw-aggro", 2), (own.Channel, own.Settings.Format, own.Cube, own.Seats));
+            Assert.Equal(["Alice"], own.Players);
+            Assert.Equal(own.Id, queues.TableOf(Alice.Id));
+
+            // The channel's Join opens a table of its own rather than seat anyone at hers.
+            QueueSeating bob = await queues.JoinAsync(Channel, Bob);
+            Assert.NotEqual(alice.Address, bob.Address);
+            Assert.Equal(2, queues.Board().Tables.Count);
+
+            // One seat at a time, wherever it was taken.
+            Assert.NotNull((await queues.CreateTableAsync(new QueueSettings { Cube = "rw-aggro", Cards = 18 }, Alice)).Refusal);
+            Assert.NotNull((await queues.JoinTableAsync(own.Id, Bob)).Refusal);
+            Assert.Contains("on the draft queue page", (await queues.JoinAsync(Channel, Alice)).Refusal, StringComparison.Ordinal);
+
+            // Picked on the page: Carol sits down across from her, and then it is full.
+            QueueSeating carol = await queues.JoinTableAsync(own.Id, Carol);
+            Assert.Equal((alice.Address, 2), (carol.Address, carol.Seat));
+            Assert.Equal("That table is full.", (await queues.JoinTableAsync(own.Id, new DiscordPlayer(1004, "Dave"))).Refusal);
+
+            GameClient aliceClient = await Sit(alice.Address!, alice.Ticket!);
+            GameClient carolClient = await Sit(carol.Address!, carol.Ticket!);
+            await Until(() => aliceClient.Table?.ReadyLeftMs > 0, aliceClient, carolClient);
+            aliceClient.SetReady(true);
+            carolClient.SetReady(true);
+
+            // Begun at the same table and handed to the draft host as a draft from no queue; the page no longer lists it.
+            await Until(() => aliceClient.Draft is { Format: "grid" }, aliceClient, carolClient);
+            await Settle(() => drafts.Drafts.Count == 1 && queues.Board().Tables.Count == 1);
+            HostedDraft draft = Assert.Single(drafts.Drafts);
+            Assert.Equal((Alice, Carol, 0UL), (draft.Host, draft.Guest, draft.Queue));
+            Assert.Null(queues.TableOf(Alice.Id));
+            Assert.Contains("Back to my draft", (await queues.JoinTableAsync(queues.Board().Tables[0].Id, Alice)).Refusal, StringComparison.Ordinal);
+            aliceClient.Disconnect();
+            carolClient.Disconnect();
+        }
+    }
+
     private static QueueSettings Settings() => new() { Channel = Channel, Cube = "rw-aggro", Cards = 18, MinimumDeck = 20 };
 
     private static List<int> FreePorts(int count)

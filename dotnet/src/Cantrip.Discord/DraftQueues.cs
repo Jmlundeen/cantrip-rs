@@ -60,6 +60,21 @@ public sealed class QueueSettings
 /// <summary>What a queue's message shows: how full the table being filled is, and what else is going on.</summary>
 public sealed record QueueStatus(QueueSettings Settings, int Waiting, int Seats, int Checking, int Underway);
 
+/// <summary>
+/// Every queue and every table still forming, as the draft queue page shows them (<see cref="QueueSite"/>): what each
+/// queue drafts, and who has sat down where.
+/// </summary>
+public sealed record QueueBoard(IReadOnlyList<QueueBoardQueue> Queues, IReadOnlyList<QueueBoardTable> Tables);
+
+/// <summary>A channel's queue: what a table made for it drafts, and the cube's name as it is shown.</summary>
+public sealed record QueueBoardQueue(QueueSettings Settings, string Cube);
+
+/// <summary>
+/// A table still forming. <see cref="Channel"/> is its queue's, or zero for a table a player set up on the queue page with
+/// settings of their own, which only that page seats players at. <see cref="Seats"/> are the players' seats, less the bots'.
+/// </summary>
+public sealed record QueueBoardTable(string Id, ulong Channel, QueueSettings Settings, string Cube, IReadOnlyList<string> Players, int Seats, bool Checking, DateTimeOffset Created);
+
 /// <summary>What a player gets for joining a queue: the table's address and a ticket to their seat, or why not.</summary>
 public sealed record QueueSeating(Uri? Address, string? Ticket, int Seat, string? Refusal)
 {
@@ -122,6 +137,10 @@ public sealed class DraftQueuesOptions
 /// one player.
 /// </para>
 /// <para>
+/// A player may also set a table up with settings of their own, from the queue page (<see cref="CreateTableAsync"/>): it
+/// belongs to no channel, a channel's Join never seats anyone at it, and it is filled only by players who pick it there.
+/// </para>
+/// <para>
 /// The queues' settings are kept in the data directory. A table still forming is only in memory: a restart empties it,
 /// and its players join again.
 /// </para>
@@ -133,6 +152,9 @@ public sealed class DraftQueues : IAsyncDisposable
     private readonly DraftQueuesOptions _options;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private readonly Dictionary<ulong, Queue> _queues = [];
+
+    /// <summary>The tables players set up with settings of their own, in no channel's queue.</summary>
+    private readonly List<Forming> _own = [];
 
     /// <summary>
     /// Players whose table has begun its draft but not yet been handed to the draft host: not to be seated anywhere else
@@ -149,9 +171,18 @@ public sealed class DraftQueues : IAsyncDisposable
         public List<Forming> Tables { get; } = [];
     }
 
-    private sealed class Forming(QueueTable table, GameServer server, int port, Uri address, int seats)
+    private sealed class Forming(QueueTable table, GameServer server, int port, Uri address, QueueSettings settings, string cube)
     {
-        public int Seats { get; } = seats;
+        /// <summary>How the queue page names the table: never a ticket, and no use to anyone without a seat to take.</summary>
+        public string Id { get; } = Guid.NewGuid().ToString("N")[..12];
+
+        /// <summary>What the table drafts, as it was made: its queue's settings then, or a player's own.</summary>
+        public QueueSettings Settings { get; } = settings;
+
+        public string CubeName { get; } = cube;
+
+        /// <summary>The players' seats: the table's, less its bots'.</summary>
+        public int Seats => Settings.PlayerSeats;
 
         public QueueTable Table { get; } = table;
         public GameServer Server { get; } = server;
@@ -218,34 +249,7 @@ public sealed class DraftQueues : IAsyncDisposable
     public async Task<string?> ConfigureAsync(QueueSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        if (settings.Format is not (DraftFormats.Winston or DraftFormats.Booster or DraftFormats.Grid)) return $"There is no '{settings.Format}' draft. Winston, booster and grid are the ones there are.";
-        if (settings.Format == DraftFormats.Booster && _options.Pods is null) return "This bot is not set up to run booster drafts.";
-        if (settings.Piles is < 1 or > 8) return "A Winston draft has one to eight piles.";
-        if (settings.Format == DraftFormats.Booster && (settings.PacksDrafted is < 1 or > 6 || settings.PackSize is < 5 or > 20)) return "A booster draft opens one to six packs of five to twenty cards.";
-        if (settings.Format == DraftFormats.Grid && settings.PacksDrafted is < 1 or > 40) return "A grid draft lays out one to forty grids.";
-        if (settings.Rounds is < 1 or > 5) return "A booster draft plays one to five rounds.";
-        if (settings.MinimumDeck is < 1 or > 200) return "The smallest deck must be between 1 and 200 cards.";
-        if (settings.Bots < 0 || settings.Bots >= settings.Seats) return $"A table of {settings.Seats} has up to {settings.Seats - 1} bot{(settings.Seats == 2 ? string.Empty : "s")}: at least one seat is a player's.";
-
-        (string cube, IReadOnlyList<string> cards, IReadOnlyList<string> pickOrder) found;
-        try
-        {
-            found = Cube(settings);
-        }
-        catch (Exception error) when (error is IOException or ArgumentException or FormatException)
-        {
-            return error.Message;
-        }
-
-        int playable = DraftPod.Playable(ContentCache.Get(_options.ContentRoot), found.cards, settings.Format);
-        int wanted = settings.Format switch
-        {
-            DraftFormats.Booster => settings.Seats * settings.PacksDrafted * settings.PackSize,
-            DraftFormats.Grid => settings.PacksDrafted * GridDraft.PackSize,
-            _ => settings.Cards,
-        };
-        if (wanted < 0 || wanted > playable)
-            return $"The cube {found.cube} has {playable} cards that can be played; a draft cannot take {wanted}.";
+        if (Check(settings, out var found) is { } refusal) return refusal;
 
         await _gate.WaitAsync().ConfigureAwait(false);
         try
@@ -254,13 +258,13 @@ public sealed class DraftQueues : IAsyncDisposable
             {
                 settings.Message = settings.Message == 0 ? queue.Settings.Message : settings.Message;
                 queue.Settings = settings;
-                queue.CubeCards = found.cards;
-                queue.PickOrder = found.pickOrder;
-                queue.CubeName = found.cube;
+                queue.CubeCards = found.Cards;
+                queue.PickOrder = found.PickOrder;
+                queue.CubeName = found.Cube;
             }
             else
             {
-                _queues[settings.Channel] = new Queue(settings, found.cards, found.pickOrder, found.cube);
+                _queues[settings.Channel] = new Queue(settings, found.Cards, found.PickOrder, found.Cube);
             }
 
             settings.Updated = _options.TimeProvider.GetUtcNow();
@@ -271,6 +275,43 @@ public sealed class DraftQueues : IAsyncDisposable
             _gate.Release();
         }
 
+        return null;
+    }
+
+    /// <summary>Why a draft cannot be had with these settings, or null with the cube it draws from.</summary>
+    private string? Check(QueueSettings settings, out (string Cube, IReadOnlyList<string> Cards, IReadOnlyList<string> PickOrder) found)
+    {
+        found = default;
+        if (settings.Format is not (DraftFormats.Winston or DraftFormats.Booster or DraftFormats.Grid)) return $"There is no '{settings.Format}' draft. Winston, booster and grid are the ones there are.";
+        if (settings.Format == DraftFormats.Booster && _options.Pods is null) return "This bot is not set up to run booster drafts.";
+        if (settings.Piles is < 1 or > 8) return "A Winston draft has one to eight piles.";
+        if (settings.Format == DraftFormats.Booster && (settings.PacksDrafted is < 1 or > 6 || settings.PackSize is < 5 or > 20)) return "A booster draft opens one to six packs of five to twenty cards.";
+        if (settings.Format == DraftFormats.Grid && settings.PacksDrafted is < 1 or > 40) return "A grid draft lays out one to forty grids.";
+        if (settings.Rounds is < 1 or > 5) return "A booster draft plays one to five rounds.";
+        if (settings.MinimumDeck is < 1 or > 200) return "The smallest deck must be between 1 and 200 cards.";
+        if (settings.Bots < 0 || settings.Bots >= settings.Seats) return $"A table of {settings.Seats} has up to {settings.Seats - 1} bot{(settings.Seats == 2 ? string.Empty : "s")}: at least one seat is a player's.";
+
+        (string Cube, IReadOnlyList<string> Cards, IReadOnlyList<string> PickOrder) cube;
+        try
+        {
+            cube = Cube(settings);
+        }
+        catch (Exception error) when (error is IOException or ArgumentException or FormatException)
+        {
+            return error.Message;
+        }
+
+        int playable = DraftPod.Playable(ContentCache.Get(_options.ContentRoot), cube.Cards, settings.Format);
+        int wanted = settings.Format switch
+        {
+            DraftFormats.Booster => settings.Seats * settings.PacksDrafted * settings.PackSize,
+            DraftFormats.Grid => settings.PacksDrafted * GridDraft.PackSize,
+            _ => settings.Cards,
+        };
+        if (wanted < 0 || wanted > playable)
+            return $"The cube {cube.Cube} has {playable} cards that can be played; a draft cannot take {wanted}.";
+
+        found = cube;
         return null;
     }
 
@@ -339,16 +380,16 @@ public sealed class DraftQueues : IAsyncDisposable
         _gate.Wait();
         try
         {
-            return [.. _queues.Values.SelectMany(queue => queue.Tables.Where(forming => !forming.Gone && forming.Table.Forming).Select(forming => new StatusTable(
+            return [.. Tables().Where(forming => forming.Table.Forming).Select(forming => new StatusTable(
                 StatusTableKinds.Forming,
-                queue.Settings.Format,
-                queue.CubeName,
+                forming.Settings.Format,
+                forming.CubeName,
                 forming.Table.Checking ? "Checking" : "Forming",
                 [.. forming.Table.Players.Select(player => player.Name)],
                 forming.Seats,
-                queue.Settings.Bots,
+                forming.Settings.Bots,
                 forming.Table.Created,
-                forming.Table.Checking ? "Ready check" : $"{forming.Table.Taken} of {queue.Settings.PlayerSeats} seated")))
+                forming.Table.Checking ? "Ready check" : $"{forming.Table.Taken} of {forming.Seats} seated"))
                 .OrderBy(table => table.Created)];
         }
         finally
@@ -366,33 +407,68 @@ public sealed class DraftQueues : IAsyncDisposable
     }
 
     /// <summary>
-    /// Seats a player from a queue: a fresh ticket to the table they are already at, or the first free seat at the
-    /// queue's oldest table with one, or a new table.
+    /// Every queue, and every table still forming - a queue's, or one a player set up with settings of their own - oldest
+    /// first, as the queue page shows them.
     /// </summary>
-    public async Task<QueueSeating> JoinAsync(ulong channel, DiscordPlayer player)
+    public QueueBoard Board()
+    {
+        _gate.Wait();
+        try
+        {
+            return new QueueBoard(
+                [.. _queues.Values.OrderBy(queue => queue.Settings.Channel).Select(queue => new QueueBoardQueue(queue.Settings, queue.CubeName))],
+                [.. Tables().Where(forming => forming.Table.Forming).OrderBy(forming => forming.Table.Created).Select(forming => new QueueBoardTable(
+                    forming.Id,
+                    forming.Settings.Channel,
+                    forming.Settings,
+                    forming.CubeName,
+                    [.. forming.Table.Players.Select(player => player.Name)],
+                    forming.Seats,
+                    forming.Table.Checking,
+                    forming.Table.Created))]);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    /// <summary>The table still forming that a player has a seat at, by its <see cref="QueueBoardTable.Id"/>; null for none.</summary>
+    public string? TableOf(ulong player)
+    {
+        string id = DraftHost.PlayerId(new DiscordPlayer(player, string.Empty));
+        _gate.Wait();
+        try { return Tables().FirstOrDefault(forming => forming.Table.Seats(id))?.Id; }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>The cubes a queue or a table may draw from, by name: every list in the cube directories.</summary>
+    public IReadOnlyList<string> Cubes() => [.. _options.CubeDirectories
+        .Where(Directory.Exists)
+        .SelectMany(directory => Directory.EnumerateFiles(directory, "*.txt"))
+        .Select(Path.GetFileNameWithoutExtension)
+        .OfType<string>()
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .Order(StringComparer.OrdinalIgnoreCase)];
+
+    /// <summary>
+    /// Seats a player from a queue: a fresh ticket to the table they are already at, or the first free seat at the
+    /// queue's oldest table with one, or a new table. <paramref name="web"/> is a player on the queue page rather than in
+    /// Discord, which a refusal speaks to.
+    /// </summary>
+    public async Task<QueueSeating> JoinAsync(ulong channel, DiscordPlayer player, bool web = false)
     {
         ArgumentNullException.ThrowIfNull(player);
         string id = DraftHost.PlayerId(player);
-        QueueSeating seating;
         await _gate.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (!_queues.TryGetValue(channel, out Queue? queue)) return QueueSeating.Refused("This channel has no draft queue.");
+            if (!_queues.TryGetValue(channel, out Queue? queue)) return QueueSeating.Refused(web ? "That draft queue was closed." : "This channel has no draft queue.");
 
-            // Already at a table: a fresh ticket to it, in this queue; in another, where it is.
-            foreach ((ulong other, Queue elsewhere) in _queues)
-            {
-                foreach (Forming at in elsewhere.Tables.Where(forming => !forming.Gone && forming.Table.Seats(id)))
-                {
-                    if (other != channel)
-                        return QueueSeating.Refused($"You already have a seat at a table in <#{other}>. Press **Join** there for its link, or leave that table first.");
-                    if (at.Table.Reserve(id, player.Name) is { } again)
-                        return new QueueSeating(at.Address, again, at.Table.Players.First(seat => seat.PlayerId == id).Seat, null);
-                }
-            }
-
-            if (_starting.Contains(id) || _options.Drafts.InDraft(player.Id) || _options.Pods?.InDraft(player.Id) == true)
-                return QueueSeating.Refused("You're already in a draft. Use **/cantrip mydraft** for a link back to it.");
+            // Already at a table: a fresh ticket to it, in this queue; anywhere else, where it is.
+            if (Tables().FirstOrDefault(forming => forming.Table.Seats(id)) is { } at)
+                return at.Settings.Channel == channel && at.Table.Reserve(id, player.Name) is { } again ? Seating(at, id, again) : Elsewhere(at, web);
+            if (Busy(id, player, web) is { } busy) return busy;
 
             Forming? forming = queue.Tables
                 .Where(each => !each.Gone && each.Table.Forming && each.Table.Taken < each.Seats)
@@ -400,30 +476,113 @@ public sealed class DraftQueues : IAsyncDisposable
                 .FirstOrDefault();
             if (forming is null)
             {
-                (forming, string? refusal) = await OpenTable(queue).ConfigureAwait(false);
+                (forming, string? refusal) = await OpenTable(queue.Settings, (queue.CubeName, queue.CubeCards, queue.PickOrder)).ConfigureAwait(false);
                 if (forming is null) return QueueSeating.Refused(refusal!);
+                queue.Tables.Add(forming);
             }
 
-            string name = Matchmaker.SeatName(player.Name);
-            forming.Players[id] = player with { Name = name };
-            string ticket = forming.Table.Reserve(id, name) ?? throw new InvalidOperationException("A free seat was not free.");
-            seating = new QueueSeating(forming.Address, ticket, forming.Table.Players.First(seat => seat.PlayerId == id).Seat, null);
+            return Sit(forming, player);
         }
         finally
         {
             _gate.Release();
         }
-
-        return seating;
     }
 
-    /// <summary>Opens a new table for a queue on a free port. Called under the lock.</summary>
-    private async Task<(Forming? Forming, string? Refusal)> OpenTable(Queue queue)
+    /// <summary>
+    /// Seats a player at the table they picked on the queue page, by its <see cref="QueueBoardTable.Id"/>: a queue's or one
+    /// of a player's own, so long as it is still forming and has a seat free.
+    /// </summary>
+    public async Task<QueueSeating> JoinTableAsync(string table, DiscordPlayer player)
     {
-        QueueSettings settings = queue.Settings;
-        IReadOnlyList<string> cubeCards = queue.CubeCards;
-        IReadOnlyList<string> pickOrder = queue.PickOrder;
-        string cube = queue.CubeName;
+        ArgumentNullException.ThrowIfNull(player);
+        string id = DraftHost.PlayerId(player);
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (Tables().FirstOrDefault(forming => forming.Table.Seats(id)) is { } at)
+                return at.Id == table && at.Table.Reserve(id, player.Name) is { } again ? Seating(at, id, again) : Elsewhere(at, web: true);
+            if (Busy(id, player, web: true) is { } busy) return busy;
+
+            if (Tables().FirstOrDefault(forming => forming.Id == table && forming.Table.Forming) is not { } forming)
+                return QueueSeating.Refused("That table has gone: its draft began, or everyone left it.");
+            if (forming.Table.Checking || forming.Table.Taken >= forming.Seats)
+                return QueueSeating.Refused("That table is full.");
+            return Sit(forming, player);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    /// <summary>
+    /// Sets up a table with settings of the player's own, from the queue page, and seats them at it. It is in no channel's
+    /// queue: only players who pick it on the page sit down there, and it closes, as any forming table does, once
+    /// everyone has left it.
+    /// </summary>
+    public async Task<QueueSeating> CreateTableAsync(QueueSettings settings, DiscordPlayer player)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(player);
+        settings.Channel = 0;
+        settings.Message = 0;
+        if (Check(settings, out var found) is { } refusal) return QueueSeating.Refused(refusal);
+
+        string id = DraftHost.PlayerId(player);
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (Tables().FirstOrDefault(forming => forming.Table.Seats(id)) is { } at) return Elsewhere(at, web: true);
+            if (Busy(id, player, web: true) is { } busy) return busy;
+
+            settings.Updated = _options.TimeProvider.GetUtcNow();
+            (Forming? forming, string? failed) = await OpenTable(settings, found).ConfigureAwait(false);
+            if (forming is null) return QueueSeating.Refused(failed!);
+            _own.Add(forming);
+            return Sit(forming, player);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    /// <summary>Every table not yet gone: the queues', and the players' own. Called under the lock.</summary>
+    private IEnumerable<Forming> Tables() => _queues.Values.SelectMany(queue => queue.Tables).Concat(_own).Where(forming => !forming.Gone);
+
+    /// <summary>Why a player at no table cannot take a seat: they are in a draft. Called under the lock.</summary>
+    private QueueSeating? Busy(string id, DiscordPlayer player, bool web) =>
+        _starting.Contains(id) || _options.Drafts.InDraft(player.Id) || _options.Pods?.InDraft(player.Id) == true
+            ? QueueSeating.Refused(web ? "You're already in a draft. Press Back to my draft for your seat." : "You're already in a draft. Use **/cantrip mydraft** for a link back to it.")
+            : null;
+
+    /// <summary>A player with a seat at another table than the one they asked for, told where it is.</summary>
+    private static QueueSeating Elsewhere(Forming at, bool web) => QueueSeating.Refused(
+        web ? "You already have a seat at another table. Press Open my table for its link, or leave that table first."
+        : at.Settings.Channel == 0 ? "You already have a seat at a table on the draft queue page. Open it from there, or leave that table first."
+        : $"You already have a seat at a table in <#{at.Settings.Channel}>. Press **Join** there for its link, or leave that table first.");
+
+    /// <summary>Seats a player at a table with a seat free. Called under the lock.</summary>
+    private static QueueSeating Sit(Forming forming, DiscordPlayer player)
+    {
+        string id = DraftHost.PlayerId(player);
+        string name = Matchmaker.SeatName(player.Name);
+        forming.Players[id] = player with { Name = name };
+        string ticket = forming.Table.Reserve(id, name) ?? throw new InvalidOperationException("A free seat was not free.");
+        return Seating(forming, id, ticket);
+    }
+
+    private static QueueSeating Seating(Forming forming, string id, string ticket) =>
+        new(forming.Address, ticket, forming.Table.Players.First(seat => seat.PlayerId == id).Seat, null);
+
+    /// <summary>
+    /// Opens a new table on a free port, drafting <paramref name="settings"/> from <paramref name="found"/>; the caller puts
+    /// it in its queue, or with the players' own. Called under the lock.
+    /// </summary>
+    private async Task<(Forming? Forming, string? Refusal)> OpenTable(QueueSettings settings, (string Cube, IReadOnlyList<string> Cards, IReadOnlyList<string> PickOrder) found)
+    {
+        (string cube, IReadOnlyList<string> cubeCards, IReadOnlyList<string> pickOrder) = found;
         Forming? made = null;
         bool booster = settings.Format == DraftFormats.Booster;
         bool grid = settings.Format == DraftFormats.Grid;
@@ -487,7 +646,7 @@ public sealed class DraftQueues : IAsyncDisposable
             },
         });
 
-        HashSet<int> taken = [.. _queues.Values.SelectMany(each => each.Tables).Where(forming => !forming.Gone).Select(forming => forming.Port)];
+        HashSet<int> taken = [.. Tables().Select(forming => forming.Port)];
         List<string> failures = [];
         foreach (int port in _options.Ports.Where(port => !taken.Contains(port)))
         {
@@ -504,8 +663,7 @@ public sealed class DraftQueues : IAsyncDisposable
                     Portraits = _options.Portraits,
                     Art = _options.Art,
                 }).ConfigureAwait(false);
-                made = new Forming(table, server, port, _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game"), settings.PlayerSeats);
-                queue.Tables.Add(made);
+                made = new Forming(table, server, port, _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game"), settings, cube);
                 Forming watched = made;
                 table.Changed += changedTable => _ = Task.Run(() => TableChangedAsync(settings.Channel, watched));
 
@@ -544,6 +702,7 @@ public sealed class DraftQueues : IAsyncDisposable
             {
                 changed.Gone = true;
                 queue?.Tables.Remove(changed);
+                _own.Remove(changed);
                 if (formed is BoosterPod booster) podBegun = (booster, changed);
                 else if (formed is DraftPod draft && draft.Players.OrderBy(player => player.Seat).ToList() is [var first, var second])
                     begun = (draft, changed, Seated(changed, first.PlayerId, first.Name), Seated(changed, second.PlayerId, second.Name));
@@ -636,6 +795,7 @@ public sealed class DraftQueues : IAsyncDisposable
         {
             if (forming.Gone || !forming.Table.Forming) return;
             if (_queues.TryGetValue(channel, out Queue? queue)) queue.Tables.Remove(forming);
+            _own.Remove(forming);
             Console.Error.WriteLine($"A forming draft table on port {forming.Port} stopped: {forming.Server.FaultDetail}");
             await Close(forming).ConfigureAwait(false);
         }
@@ -659,6 +819,7 @@ public sealed class DraftQueues : IAsyncDisposable
         {
             if (forming.Gone || forming.Table.Taken > 0 || !forming.Table.Forming) return;
             if (_queues.TryGetValue(channel, out Queue? queue)) queue.Tables.Remove(forming);
+            _own.Remove(forming);
             await Close(forming).ConfigureAwait(false);
         }
         finally
@@ -691,7 +852,7 @@ public sealed class DraftQueues : IAsyncDisposable
 
     private async Task Raise(ulong channel)
     {
-        if (Changed is not { } changed) return;
+        if (channel == 0 || Changed is not { } changed) return;
         foreach (Func<ulong, Task> handler in changed.GetInvocationList().Cast<Func<ulong, Task>>())
             await handler(channel).ConfigureAwait(false);
     }
@@ -702,11 +863,12 @@ public sealed class DraftQueues : IAsyncDisposable
         try
         {
             // Players at tables still forming are told before the tables go, rather than seeing the connection drop.
-            List<Forming> forming = [.. _queues.Values.SelectMany(queue => queue.Tables).Where(each => !each.Gone)];
+            List<Forming> forming = [.. Tables()];
             foreach (Forming each in forming) each.Table.Close("The draft queues are restarting. Press Join again in a moment.");
             if (forming.Count > 0) await Task.Delay(TimeSpan.FromMilliseconds(500)).ConfigureAwait(false);
             foreach (Forming each in forming) await Close(each).ConfigureAwait(false);
             _queues.Clear();
+            _own.Clear();
         }
         finally
         {

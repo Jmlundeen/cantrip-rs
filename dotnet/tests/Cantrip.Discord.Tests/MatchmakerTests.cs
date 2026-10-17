@@ -121,6 +121,53 @@ public sealed class MatchmakerTests
     }
 
     [Fact]
+    public async Task A_constructed_games_players_each_sit_down_with_the_deck_they_chose_from_its_formats_list()
+    {
+        DeckList reanimator = DeckList.Load(DeckList.Find(Path.Combine(RepoRoot.Path, "decks"), "ub-reanimator"));
+        await using var matchmaker = new Matchmaker(new MatchmakerOptions
+        {
+            ContentRoot = RepoRoot.ContentRoot,
+            Deck = RwAggro.Value,
+            Formats = new Dictionary<string, IReadOnlyList<DeckList>> { ["standard"] = [RwAggro.Value, reanimator] },
+            Ports = FreePorts(2),
+        });
+
+        Assert.NotNull((await matchmaker.HostAsync(Alice, "modern", "rw-aggro")).Refusal);
+        Assert.NotNull((await matchmaker.HostAsync(Alice, "standard", "legend-rule-test")).Refusal);
+        Seating hosted = await matchmaker.HostAsync(Alice, "standard", "ub-reanimator");
+        HostedGame game = hosted.Game!;
+        Assert.Equal(("standard", GameStage.Open), (game.Format, game.Stage));
+        Assert.Same(game, matchmaker.GameOf(Alice.Id));
+
+        // A game hosted from Discord is no game of the format's.
+        Seating discord = await matchmaker.HostAsync(Carol);
+        Assert.Null(discord.Game!.Format);
+        Assert.Equal([game], matchmaker.Games("standard"));
+
+        // A seat wants a deck from the list; the host asking again gets their own seat back, deck or none.
+        Assert.NotNull((await matchmaker.JoinAsync(game.Id, Bob)).Refusal);
+        Assert.NotNull((await matchmaker.JoinAsync(game.Id, Bob, "nope")).Refusal);
+        Assert.Equal(GameStage.Open, game.Stage);
+        Assert.Equal(hosted.Ticket, (await matchmaker.JoinAsync(game.Id, Alice)).Ticket);
+        Seating joined = await matchmaker.JoinAsync(game.Id, Bob, "rw-aggro");
+        Assert.Equal((GameStage.Seated, 2), (game.Stage, joined.Seat));
+
+        GameClient alice = await Connect(game, hosted.Ticket!);
+        GameClient bob = await Connect(game, joined.Ticket!);
+        try
+        {
+            await Until(() => alice.View is not null && bob.View is not null, alice, bob);
+            Assert.Equal(new[] { ("Alice", "ub-reanimator"), ("Bob", "rw-aggro") },
+                alice.Table!.Players.Select(player => (player.Name, player.Deck)));
+        }
+        finally
+        {
+            alice.Disconnect();
+            bob.Disconnect();
+        }
+    }
+
+    [Fact]
     public async Task A_player_is_in_one_game_at_a_time_and_a_full_game_takes_nobody_else()
     {
         await using Matchmaker matchmaker = Create();

@@ -29,6 +29,9 @@ public sealed class DiscordBotOptions
     /// <summary>The cube drafts draft, by name, for the messages; null when the bot hosts no drafts.</summary>
     public string? Cube { get; init; }
 
+    /// <summary>The draft queue page (<see cref="QueueSite"/>), which every queue's message links to; null when the bot serves none.</summary>
+    public Uri? QueuePage { get; init; }
+
     /// <summary>
     /// Where each player's Discord picture is kept, taken afresh whenever they join a draft; null to keep none.
     /// </summary>
@@ -401,7 +404,9 @@ public sealed class DiscordBot : IAsyncDisposable
         try
         {
             string content = GameMessages.Queue(status, _queues.CubeName(channel));
-            MessageComponent join = new ComponentBuilder().WithButton("Join", QueueJoinPrefix + channel, ButtonStyle.Primary).Build();
+            var buttons = new ComponentBuilder().WithButton("Join", QueueJoinPrefix + channel, ButtonStyle.Primary);
+            if (_options.QueuePage is { } page) buttons.WithButton("Every table", style: ButtonStyle.Link, url: page.AbsoluteUri);
+            MessageComponent join = buttons.Build();
             if (await FindAsync($"{channel}:{status.Settings.Message}").ConfigureAwait(false) is { } message)
             {
                 await message.ModifyAsync(properties =>
@@ -647,6 +652,38 @@ public sealed class DiscordBot : IAsyncDisposable
             url: ClientSite.Link(options.Client, seating.Game!.Address, seating.Ticket!, options.Art).AbsoluteUri)
         .Build();
 
+    /// <summary>
+    /// The player an account signed in on the queue page sits down as: by their name on this server, with their picture
+    /// kept, as a Join here does - or, for someone not on the server, by their account's own name and avatar.
+    /// </summary>
+    public async Task<DiscordPlayer> WebPlayerAsync(WebAccount account)
+    {
+        ArgumentNullException.ThrowIfNull(account);
+        IGuildUser? member = null;
+        try
+        {
+            member = await _client.Rest.GetGuildUserAsync(_options.Guild, account.Id).ConfigureAwait(false);
+        }
+        catch (HttpException error)
+        {
+            Console.Error.WriteLine($"[discord] Could not look {account.Id} up on the server: {error.Message}");
+        }
+
+        if (member is not null)
+        {
+            KeepPortrait(member);
+            return Player(member);
+        }
+
+        KeepPortrait(account.Id, account.Avatar is { } avatar
+            ? CDN.GetUserAvatarUrl(account.Id, avatar, PortraitSize, ImageFormat.Png)
+            : CDN.GetDefaultUserAvatarUrl(account.Id));
+        return new DiscordPlayer(account.Id, account.Name);
+    }
+
+    /// <summary>A channel's name as the queue page shows it, <c>#booster</c>; null for one the bot cannot see.</summary>
+    public string? ChannelName(ulong channel) => _client.GetChannel(channel) is IGuildChannel { Name: { } name } ? "#" + name : null;
+
     private static DiscordPlayer Player(IUser user) =>
         new(user.Id, user is IGuildUser { DisplayName: { } shown } ? shown : user.GlobalName ?? user.Username);
 
@@ -660,11 +697,13 @@ public sealed class DiscordBot : IAsyncDisposable
     /// their portrait in place of the last. Started as they join, alongside it rather than ahead of it: a picture that
     /// cannot be had now leaves the one kept, and never holds up a seat.
     /// </summary>
-    private void KeepPortrait(IUser user)
+    private void KeepPortrait(IUser user) =>
+        KeepPortrait(user.Id, (user as IGuildUser)?.GetGuildAvatarUrl(ImageFormat.Png, PortraitSize) ?? user.GetDisplayAvatarUrl(ImageFormat.Png, PortraitSize));
+
+    private void KeepPortrait(ulong user, string url)
     {
         if (_options.Portraits is not { } portraits) return;
-        string url = (user as IGuildUser)?.GetGuildAvatarUrl(ImageFormat.Png, PortraitSize) ?? user.GetDisplayAvatarUrl(ImageFormat.Png, PortraitSize);
-        string player = DraftHost.PlayerId(Player(user));
+        string player = DraftHost.PlayerId(new DiscordPlayer(user, string.Empty));
         _ = Task.Run(async () =>
         {
             try

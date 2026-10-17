@@ -13,8 +13,14 @@ public sealed class MatchmakerOptions
 {
     public required string ContentRoot { get; init; }
 
-    /// <summary>The deck every seat plays. One deck for now, so there is nothing to choose.</summary>
+    /// <summary>The deck every seat of a game hosted from Discord plays, so there is nothing to choose.</summary>
     public required DeckList Deck { get; init; }
+
+    /// <summary>
+    /// The constructed formats games may be hosted in from the play page, by name ("standard"), each with the decks its
+    /// players choose from as they sit down. Empty for none.
+    /// </summary>
+    public IReadOnlyDictionary<string, IReadOnlyList<DeckList>> Formats { get; init; } = new Dictionary<string, IReadOnlyList<DeckList>>();
 
     /// <summary>The ports tables may listen on, one table to a port. How many games can run at once.</summary>
     public required IReadOnlyList<int> Ports { get; init; }
@@ -64,9 +70,10 @@ public sealed class HostedGame
 {
     private readonly Dictionary<ulong, string> _tickets = [];
 
-    internal HostedGame(string id, DiscordPlayer host, int port, Uri address, GameServer server, DateTimeOffset createdAt)
+    internal HostedGame(string id, DiscordPlayer host, int port, Uri address, GameServer server, DateTimeOffset createdAt, string? format = null)
     {
         Id = id;
+        Format = format;
         Host = host;
         Port = port;
         Address = address;
@@ -76,6 +83,9 @@ public sealed class HostedGame
 
     /// <summary>Short and opaque, for button IDs. Not a secret: knowing it seats nobody.</summary>
     public string Id { get; }
+
+    /// <summary>The constructed format it is played in, its players each choosing a deck; null for a game hosted from Discord.</summary>
+    public string? Format { get; }
 
     public DiscordPlayer Host { get; }
     public DiscordPlayer? Guest { get; internal set; }
@@ -168,9 +178,41 @@ public sealed class Matchmaker : IAsyncDisposable
         }
     }
 
-    public async Task<Seating> HostAsync(DiscordPlayer host)
+    /// <summary>The constructed formats games may be hosted in, and each one's decks.</summary>
+    public IReadOnlyDictionary<string, IReadOnlyList<DeckList>> Formats => _options.Formats;
+
+    /// <summary>Every game of a constructed format not yet over, oldest first, as the play page lists them.</summary>
+    public IReadOnlyList<HostedGame> Games(string format)
+    {
+        _gate.Wait();
+        try { return [.. _games.Values.Where(game => game.Format == format && game.Stage != GameStage.Ended).OrderBy(game => game.CreatedAt)]; }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>The game a player has a seat in that is not yet over, if any.</summary>
+    public HostedGame? GameOf(ulong player)
+    {
+        _gate.Wait();
+        try { return Active(player); }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>
+    /// Hosts a game with its first seat the host's: from Discord, both seats playing <see cref="MatchmakerOptions.Deck"/>;
+    /// in a constructed <paramref name="format"/>, the host playing <paramref name="deck"/>, one of the format's, and the
+    /// player who joins choosing their own.
+    /// </summary>
+    public async Task<Seating> HostAsync(DiscordPlayer host, string? format = null, string? deck = null)
     {
         ArgumentNullException.ThrowIfNull(host);
+        IReadOnlyList<DeckList> decks = [_options.Deck];
+        if (format is not null)
+        {
+            if (!_options.Formats.TryGetValue(format, out IReadOnlyList<DeckList>? formatDecks)) return Seating.Refused($"There are no {format} games here.");
+            if (formatDecks.FirstOrDefault(each => each.Name == deck) is null) return Seating.Refused("Choose a deck from the list.");
+            decks = formatDecks;
+        }
+
         await _gate.WaitAsync().ConfigureAwait(false);
         HostedGame game;
         string ticket;
@@ -193,7 +235,7 @@ public sealed class Matchmaker : IAsyncDisposable
                         Players = 2,
                         Seed = BitConverter.ToUInt64(RandomNumberGenerator.GetBytes(8)),
                         ContentRoot = _options.ContentRoot,
-                        Decks = [_options.Deck],
+                        Decks = decks,
                         RequireTickets = true,
                         ListenAddress = _options.ListenAddress,
                         TimeProvider = _options.TimeProvider,
@@ -220,8 +262,8 @@ public sealed class Matchmaker : IAsyncDisposable
             do id = Convert.ToHexString(RandomNumberGenerator.GetBytes(4)).ToLowerInvariant();
             while (_games.ContainsKey(id));
             var address = _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game");
-            game = new HostedGame(id, host with { Name = SeatName(host.Name) }, port, address, server, _options.TimeProvider.GetUtcNow());
-            ticket = server.Reserve(1, game.Host.Name, _options.Deck.Name);
+            game = new HostedGame(id, host with { Name = SeatName(host.Name) }, port, address, server, _options.TimeProvider.GetUtcNow(), format);
+            ticket = server.Reserve(1, game.Host.Name, format is null ? _options.Deck.Name : deck!);
             game.Seat(host.Id, ticket);
             _games.Add(id, game);
             Watch(game);
@@ -236,9 +278,10 @@ public sealed class Matchmaker : IAsyncDisposable
 
     /// <summary>
     /// Seats a player in the free seat. A player already seated at this game gets their own ticket again, which is how
-    /// someone who lost it — or whose client died — gets back in.
+    /// someone who lost it — or whose client died — gets back in. A constructed game's player sits down with
+    /// <paramref name="deck"/>, one of its format's.
     /// </summary>
-    public async Task<Seating> JoinAsync(string gameId, DiscordPlayer player)
+    public async Task<Seating> JoinAsync(string gameId, DiscordPlayer player, string? deck = null)
     {
         ArgumentNullException.ThrowIfNull(player);
         Seating seating;
@@ -253,9 +296,11 @@ public sealed class Matchmaker : IAsyncDisposable
                 return Seating.Refused("That game already has both its players.", game);
             if (Active(player.Id) is { } current)
                 return Seating.Refused("You are already in another game. Finish or cancel it first.", current);
+            if (game.Format is { } format && !_options.Formats[format].Any(each => each.Name == deck))
+                return Seating.Refused("Choose a deck from the list.", game);
 
             game.Guest = player with { Name = SeatName(player.Name) };
-            string ticket = game.Server.Reserve(2, game.Guest.Name, _options.Deck.Name);
+            string ticket = game.Server.Reserve(2, game.Guest.Name, game.Format is null ? _options.Deck.Name : deck!);
             game.Seat(player.Id, ticket);
             game.Stage = GameStage.Seated;
             seating = new Seating(game, ticket, 2, null);

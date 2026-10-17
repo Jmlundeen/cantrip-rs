@@ -92,7 +92,7 @@ is pushed from there. Card art never goes in: `content/*/images/` is gitignored 
     events (`Events/`): drafts, deck building and the data directory events and players are kept in (`--data` /
     `CANTRIP_DATA`). `docs/events.md`.
   - `dotnet/src/Cantrip.Discord` — the Discord bot: a Discord-free `Matchmaker` under a thin Discord.Net adapter,
-    serving the web client its tickets open. `docs/discord-bot.md`.
+    serving the web client its tickets open, and the draft queue and constructed play pages (`/queue`, `/play`, Discord sign-in). `docs/discord-bot.md`.
   - `dotnet/src/Cantrip.Client.Web` — the client: Uno on WebAssembly, in the browser, drawn with Skia.
     `docs/web-client.md`. What it draws from is in `dotnet/src/Cantrip.Client` and
     `dotnet/src/Cantrip.Client.Presentation`; its tests are Playwright, in `dotnet/tests/Cantrip.Client.Web.Tests`.

@@ -35,15 +35,19 @@ internal static class ClientSite
     /// disposed; and, given <paramref name="tables"/>, every one of those table ports at <c>/table/{port}/game</c>
     /// (<see cref="TableProxy"/>), so that one public address reaches everything; and, given <paramref name="portraits"/>,
     /// players' pictures at <c>/portraits/{player}.png</c>, where the tables tell the client they are; and, given
-    /// <paramref name="status"/>, the server's status page at <c>/status</c> (<see cref="StatusSite"/>).
+    /// <paramref name="status"/>, the server's status page at <c>/status</c> (<see cref="StatusSite"/>); and, given
+    /// <paramref name="queues"/>, the draft queue page at <c>/queue</c> (<see cref="QueueSite"/>); and, given
+    /// <paramref name="play"/>, the constructed play page at <c>/play</c> (<see cref="PlaySite"/>) - each signing players in
+    /// with <paramref name="signIn"/> (<see cref="SiteSignIn"/>).
     /// </summary>
     public static async Task<WebApplication> StartAsync(string listen, int port, string root, ArtStore art, IReadOnlySet<int>? tables = null, PortraitStore? portraits = null,
-        EventStatusBoard? status = null)
+        EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls($"http://{listen}:{port}");
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
         builder.Services.AddRouting();
+        if (signIn is not null) builder.Services.AddSiteSignIn(signIn);
         WebApplication app = builder.Build();
 
         // A ping every 30 seconds: a tunnel or proxy in front (Cloudflare closes a WebSocket silent for 100 seconds) would
@@ -51,6 +55,7 @@ internal static class ClientSite
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(30) });
         app.UseWebClient(root);
         app.UseRouting();
+        if (signIn is not null) app.UseSiteSignIn(signIn);
         app.MapCardArt(art);
         if (portraits is not null)
         {
@@ -66,6 +71,21 @@ internal static class ClientSite
         if (status is not null)
         {
             app.MapEventStatus(status);
+        }
+
+        if (signIn is not null)
+        {
+            app.MapSiteSignIn(signIn);
+        }
+
+        if (queues is not null)
+        {
+            app.MapDraftQueues(queues);
+        }
+
+        if (play is not null)
+        {
+            app.MapConstructedPlay(play);
         }
 
         if (tables is not null)

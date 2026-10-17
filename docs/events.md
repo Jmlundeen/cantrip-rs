@@ -262,7 +262,8 @@ the ticket given. The forming part is only in memory; the event, once made, is k
   makes an event and hosts it; `--event ID` hosts one already made. `--grid [--packs 18]` in place of `--winston`
   makes a grid draft (`tools\draft-grid-vs-bot.cmd`). It prints each player's ticket, or writes them to
   `--tickets FILE` as JSON. `Cantrip.Bot --ticket T` drafts, builds and plays a seat.
-- The Discord bot, given a data directory: a queue channel's **Join**, or `/cantrip draft` ([discord-bot.md](discord-bot.md)).
+- The Discord bot, given a data directory: a queue channel's **Join**, a table joined or set up on its `/queue` page, or
+  `/cantrip draft` ([discord-bot.md](discord-bot.md)).
 
 ## The status page
 
