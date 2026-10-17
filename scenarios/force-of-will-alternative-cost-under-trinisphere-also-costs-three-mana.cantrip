@@ -1,0 +1,59 @@
+# Force of Will's alternative cost (1 life and a blue card exiled from hand, CR 118.9) has no mana in it; Trinisphere makes
+# the total cost of a spell that would cost less than three mana cost three (CR 601.2f, 118.9d), so Bot1 pays {3} as well as
+# the life and the card. Bot1 casts its four Moxen before Trinisphere. On turn 6 Bot2 casts Duress (three Swamps, Trinisphere
+# taxing it too) and Bot1, in response, floats four blue from its Moxen and casts Force of Will for its alternative cost: one
+# blue is left, Bot1 is on 19 and Brainstorm is exiled.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Trinisphere
+Force of Will
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp
+Swamp
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Trinisphere.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Swamp#3.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+? Stack = Duress
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Battlefield.Mox Sapphire#4.Activate
+? Bot1.Mana = {U}{U}{U}{U}
+Bot1.Hand.Force of Will.Cast(Duress; Ability: exile a blue card)
+Bot1.Choose(Brainstorm)
+? Stack = Force of Will; Duress
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Bot1.Mana = {U}
+Bot1.Life = 19
+Exile = Brainstorm
+Bot1.Graveyard = Force of Will; Black Lotus
+Bot2.Graveyard = Duress

@@ -1,0 +1,56 @@
+# Browser
+# What the client shows of a total cost the cost changes in play make (CR 601.2f): under Bot1's Trinisphere, Force of Will's
+# card menu offers its mana cost, {3}{U}{U}, which Trinisphere leaves as it is, and its alternative cost, whose row says it
+# costs {3} now - three mana besides the life and the blue card, which its text does not say. Bot1 casts it that way in
+# response to Bot2's Duress, from four blue floated: one is left.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Black Lotus
+Trinisphere
+Force of Will
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp
+Swamp
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Trinisphere.Cast
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Swamp.Play
+[T6 Bot2.Main1]
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Battlefield.Swamp#3.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Battlefield.Mox Sapphire#4.Activate
+Bot1.Hand.Force of Will.Cast(Duress; Ability: exile a blue card)
+? Client.Bot1.Menu = Cast Force of Will; Cast Force of Will — Pay 1 life, exile a blue card from your hand (costs {3})
+Bot1.Choose(Brainstorm)
+? Bot1.Mana = {U}
+
+[Expect]
+Turn = 6
+Stack.Count = 0
+Bot1.Mana = {U}
+Bot1.Life = 19
+Exile = Brainstorm
+Bot2.Graveyard = Duress

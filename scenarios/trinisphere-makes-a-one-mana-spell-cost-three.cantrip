@@ -1,0 +1,41 @@
+# Trinisphere: "each spell that would cost less than three mana to cast costs three mana to cast" (CR 601.2f), the extra
+# mana generic. Bot1 casts its two Moxen first (they would cost three after), then Trinisphere with Black Lotus's three red.
+# On turn 3 it floats four red and casts Lightning Bolt, which would cost {R}: it costs {2}{R}, so one red is left, not three.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Black Lotus
+Trinisphere
+Mountain
+Mountain
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Trinisphere.Cast
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+? Bot1.Mana = {R}{R}{R}{R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana = {R}
+Bot1.Battlefield.Trinisphere.Tapped = false
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot2.Life = 17

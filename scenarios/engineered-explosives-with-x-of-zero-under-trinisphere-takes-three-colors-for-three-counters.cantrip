@@ -1,0 +1,45 @@
+# Trinisphere makes Engineered Explosives with X = 0, a total of {0}, cost three mana (CR 601.2f) of any type. Bot1 pays it
+# with white, blue and black, and sunburst counts the colors spent to cast it (CR 702.44a): it enters with three charge
+# counters, though X was 0. Trinisphere was cast first with Black Lotus's red, its Moxen before it. Trinisphere makes no
+# ability cost more: on turn 3 the Explosives' "{2}, Sacrifice" is paid with two mana, and destroys each nonland permanent
+# of mana value 3 - Trinisphere - and none of the Moxen.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Black Lotus
+Trinisphere
+Engineered Explosives
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Trinisphere.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {W}{U}{B}
+Bot1.Hand.Engineered Explosives.Cast(X: 0)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Engineered Explosives.Counters.Charge = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+? Bot1.Mana = {W}{U}
+Bot1.Battlefield.Engineered Explosives.Activate
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana =
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet
+Bot1.Graveyard = Trinisphere; Engineered Explosives; Black Lotus
