@@ -34,6 +34,17 @@ pub fn your_creature_tokens(q: &dyn LayerQuery, source: ObjectId, affected: Obje
     q.state().obj(affected).token && your_creatures(q, source, affected, so_far)
 }
 
+/// "[Creature / Instant and sorcery / No qualifier] spells you control" (CR 113.6, 601.2i, layer 6) as the `StaticDef::affects` of a
+/// static ability declared `.everywhere()`: a spell on the stack (an ability on the stack has no card types) controlled by the
+/// source's controller that has one of the card types in `TYPES`, a bitset of `CardType as u16` positions (`TypeSet.0`), judged on
+/// what the earlier layers made it; `TYPES` of 0 is every spell. Frenzied Baloth (creature spells), Hexing Squelcher (spells) and
+/// Sphinx of the Final Word (instant and sorcery spells) print it before "can't be countered".
+pub fn your_spells_of_types<const TYPES: u16>(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    let o = q.state().obj(affected);
+    let of_a_type = if TYPES == 0 { so_far.types != TypeSet::NONE } else { so_far.types.0 & TYPES != 0 };
+    o.zone.kind() == ZoneKind::Stack && of_a_type && o.controller == q.state().obj(source).controller
+}
+
 /// A static ability that affects only the object that has it (CR 604.1: "this creature", "this land", "this token") as its
 /// `StaticDef::affects`. Anje's Ravager, Emrakul, the Aeons Torn, Multiversal Passage, Roaming Throne, Territorial Kavu and
 /// the Construct token use it.
