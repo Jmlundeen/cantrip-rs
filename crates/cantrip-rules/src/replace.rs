@@ -289,12 +289,13 @@ fn hint_of(cx: &Cx, c: &Candidate) -> &'static str {
     }
 }
 
-/// Whether the effect prevents all the damage it applies to and uses nothing up: a static ability's prevention,
-/// protection's, or a resolved effect that prevents all of it. Which of several such effects applies first changes nothing
+/// Whether the effect prevents all the damage it applies to and uses nothing up: a static ability's prevention of all of
+/// it, protection's, or a resolved effect that prevents all of it. Which of several such effects applies first changes nothing
 /// but which one is recorded as having prevented it, so the affected player is not asked to order only these (CR 616.1).
 fn prevents_all(cx: &Cx, c: &Candidate) -> bool {
     match c.origin {
-        Origin::Protection | Origin::Prevention => true,
+        Origin::Protection => true,
+        Origin::Prevention => cx.cards().get(card_of(cx, c.source)).preventions[c.index as usize].amount.is_none(),
         Origin::GrantedPrevention(timestamp) => cx
             .s()
             .effects
@@ -375,9 +376,19 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 }
             }
             // CR 702.16e, 615.1: the damage is prevented, all of it.
-            Origin::Protection | Origin::Prevention => {
+            Origin::Protection => {
                 if let Proposal::Damage(d) = proposal {
                     prevent(cx, d, d.amount, source);
+                }
+            }
+            // CR 615.1: a static ability's prevention, of all the damage or of as much as it says, of the damage as it now is
+            // (CR 616.1f).
+            Origin::Prevention => {
+                let asker = Asker { source, controller: controller_of(cx, source, proposal) };
+                if let Proposal::Damage(d) = proposal {
+                    let def = &cx.cards().get(card_of(cx, source)).preventions[index as usize];
+                    let amount = def.amount.map_or(d.amount, |how_much| how_much(&*cx, &asker, d).min(d.amount));
+                    prevent(cx, d, amount, source);
                 }
             }
             Origin::GrantedPrevention(timestamp) => {
