@@ -1,0 +1,48 @@
+# Last Chance's delayed ability waits for "that turn's end step" (CR 603.7) alone. Bot1 casts Last Chance on turn 1 and, in the
+# extra turn 2's first main phase, ends the turn with Sundial of the Infinite: the end step is skipped (CR 724.1e), so the
+# ability never triggers, and once turn 2 is over it never can - it is gone, and Bot1 is still in the game at its own end
+# step of turn 4 (Final Fortune's ruling: "If you end up skipping the extra turn's end step you do not lose").
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Last Chance
+Sol Ring
+Sundial of the Infinite
+Mountain x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Sundial of the Infinite.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Last Chance.Cast
+Bot1.Pass
+Bot2.Pass
+? Delayed = Last Chance
+[T2 Bot1.Main1]
+? ActivePlayer = Bot1
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Sundial of the Infinite.Activate
+[T3 Bot2.Upkeep]
+? Delayed.Count = 0
+[T4 Bot1.End]
+Bot1.Pass
+[T5 Bot2.Upkeep]
+
+[Expect]
+Turn = 5
+Result = InProgress
+Bot1.Battlefield.Sundial of the Infinite.Tapped = false
+Delayed.Count = 0
