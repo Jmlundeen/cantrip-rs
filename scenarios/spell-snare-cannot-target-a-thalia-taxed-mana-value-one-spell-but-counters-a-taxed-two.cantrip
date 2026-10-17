@@ -1,0 +1,47 @@
+# A cost increase changes what a spell costs, never its mana value (CR 202.3; Thalia's ruling). Under Bot1's Thalia,
+# Guardian of Thraben, Bot1's Lightning Bolt costs {1}{R} but is mana value 1, so Bot2's Spell Snare ("counter target spell
+# with mana value 2") may not target it; Bot1's Mind Stone costs {3} and is mana value 2, and Spell Snare - itself {1}{U}
+# under Thalia - counters it.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Thalia, Guardian of Thraben
+Lightning Bolt
+Mind Stone
+Black Lotus
+Mountain x10
+
+[Bot2 Deck]
+Island
+Island
+Spell Snare
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+! Bot2.Hand.Spell Snare.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mind Stone.Cast
+Bot2.Battlefield.Island#1.Activate
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Spell Snare.Cast(Stack.Mind Stone)
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Mind Stone; Black Lotus; Lightning Bolt
+Bot2.Graveyard = Spell Snare
