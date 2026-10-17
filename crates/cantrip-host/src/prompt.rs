@@ -298,6 +298,13 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                 def.ways.get(o.index as usize - 1).map_or(def.cost, |w| w.cost.mana)
             };
             m.has_x = cost.x > 0;
+            // Paid in life rather than its mana cost (CR 118.9, 119.4: Inside Information, Bolas's Citadel): the life is the
+            // cost the row shows and the seats weigh, and no mana cost, which is not paid; an X in it is 0 (CR 107.3).
+            if let Some(life) = life_for_cast(game, game.cards, game.state.obj(src).controller, src, o.index) {
+                m.life_cost = i32::from(life);
+                m.cost_text = format!("Pay {life} life");
+                m.has_x = false;
+            }
             // A cost that depends on the target it is cast with (CR 601.2c, 601.2f): the row says what the cast costs with
             // each candidate, where that is not its mana cost.
             if o.index == 0 && o.targets_required == 1 && !o.target_candidates.is_empty() {
