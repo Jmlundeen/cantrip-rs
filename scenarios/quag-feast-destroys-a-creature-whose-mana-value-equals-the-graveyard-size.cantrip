@@ -1,0 +1,34 @@
+# Quag Feast: "less than or equal to": a Guerrilla Gorilla (mana value 2) against a graveyard of exactly the two milled cards
+# is destroyed (the equal case; the spell on the stack is not counted). The target question refuses Bot2's land.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Quag Feast
+Swamp x17
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Guerrilla Gorilla
+Forest x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Quag Feast.Cast(Bot2.Battlefield.Forest)
+Bot1.Hand.Quag Feast.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Guerrilla Gorilla
+Bot1.Graveyard.Count = 3

@@ -1,0 +1,6 @@
+{
+  "name": "Quag Feast",
+  "manaCost": "{1}{B}",
+  "type": "Sorcery",
+  "oracleText": "Choose target creature, planeswalker, or Vehicle. Mill two cards, then destroy the chosen permanent if its mana value is less than or equal to the number of cards in your graveyard."
+}

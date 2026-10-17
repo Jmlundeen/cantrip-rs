@@ -1,0 +1,35 @@
+# Quag Feast: "creature, planeswalker, or Vehicle". Bot2's Smuggler's Copter is a Vehicle (an artifact, and a creature only when
+# crewed): it is a legal target while it is no creature, and it is destroyed (mana value 2, two cards milled). The refusals: Bot2's
+# Sol Ring (an artifact that is not a Vehicle) cannot be chosen.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Quag Feast
+Swamp x17
+
+[Bot2 Deck]
+Island
+Sol Ring
+Smuggler's Copter
+Island x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Smuggler's Copter.Cast
+Bot2.Battlefield.Sol Ring.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Quag Feast.Cast(Bot2.Battlefield.Sol Ring)
+Bot1.Hand.Quag Feast.Cast(Bot2.Battlefield.Smuggler's Copter)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Smuggler's Copter
+Bot2.Battlefield = Island; Sol Ring

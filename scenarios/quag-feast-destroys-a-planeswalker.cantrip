@@ -1,0 +1,33 @@
+# Quag Feast: "creature, PLANESWALKER, or Vehicle". Bot2's Ajani Resolute (a planeswalker of mana value 2) is destroyed after two
+# cards are milled.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Quag Feast
+Swamp x17
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ajani Resolute
+Plains x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ajani Resolute.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Quag Feast.Cast(Bot2.Battlefield.Ajani Resolute)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Ajani Resolute
+Bot1.Graveyard.Count = 3
