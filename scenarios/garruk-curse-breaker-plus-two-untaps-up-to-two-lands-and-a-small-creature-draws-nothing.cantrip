@@ -1,0 +1,52 @@
+# Garruk, Curse Breaker's +2 is "untap up to two target lands": on turn 1 it untaps one tapped Forest (one target is allowed), which
+# then pays for an Elvish Mystic; the Mystic enters with power 1, so the "power 4 or greater" draw trigger does not fire
+# (the control that it does is garruk-curse-breaker-minus-three-makes-a-trampling-beast-and-draws-for-it). On turn 3 both
+# Forests, tapped for mana, are untapped by a second +2 with two targets. Loyalty 5 + 2 + 2 = 9; hand 7 - 5 plays = 2, +1 draw
+# on turn 3, -1 for the second Forest.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Elvish Mystic
+Garruk, Curse Breaker
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Garruk, Curse Breaker.Cast
+Bot1.Pass
+? Bot1.Battlefield.Forest.Tapped = true
+Bot1.Battlefield.Garruk, Curse Breaker.Activate(Ability: +2: Untap)
+Bot1.Target(Forest)
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Garruk, Curse Breaker.Activate(Ability: +2: Untap)
+Bot1.Target(Forest#1; Forest#2)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Battlefield.Garruk, Curse Breaker.Counters.Loyalty = 9
+Bot1.Battlefield.Forest#1.Tapped = false
+Bot1.Battlefield.Forest#2.Tapped = false
+Bot1.Battlefield.Elvish Mystic.Power = 1

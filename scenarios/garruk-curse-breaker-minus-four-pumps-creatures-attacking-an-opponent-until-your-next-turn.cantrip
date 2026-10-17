@@ -1,0 +1,68 @@
+# Garruk, Curse Breaker's -4: "Until your next turn, whenever one or more creatures attack one of your opponents, those
+# creatures get +2/+2 and gain trample until end of turn." Bot1 casts Garruk, an Elvish Mystic and an Ornithopter (0/2 flier) on turn 1. On turn 3 it uses
+# the -4 and attacks Bot2 with both: one batched trigger (Stack.Count = 1); the Mystic is a 3/3 and the Ornithopter a 2/4, so Bot2 takes 5 (15).
+# On turn 4 Bot2's own Mystic attacks Bot1, who is not Garruk's controller's opponent: no bonus, Bot1 takes 1 (19). On turn 5
+# Garruk's controller's next turn has begun, so the ability is gone and the Mystic deals only 1 and the Ornithopter nothing (Bot2 at 14).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Garruk, Curse Breaker
+Elvish Mystic
+Ornithopter
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Elvish Mystic
+Forest x22
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Garruk, Curse Breaker.Cast
+Bot1.Pass
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Garruk, Curse Breaker.Activate(Ability: Until your next turn)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Elvish Mystic > Bot2; Ornithopter > Bot2)
+? Stack.Count = 1
+[T3 Bot1.Main2]
+? Bot2.Life = 15
+? Bot1.Battlefield.Garruk, Curse Breaker.Counters.Loyalty = 1
+[T4 Bot2.Main1]
+Bot2.Attack(Elvish Mystic > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 19
+[T5 Bot1.Main1]
+Bot1.Attack(Elvish Mystic > Bot2; Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 19
+Bot1.Battlefield.Garruk, Curse Breaker.Counters.Loyalty = 1

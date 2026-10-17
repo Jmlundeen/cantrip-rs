@@ -1,0 +1,63 @@
+# The -4 is about creatures that "attack one of your opponents" - a player, not a planeswalker. On turn 3 (-4 used) Bot1's
+# Elvish Mystic attacks Bot2 and becomes a 3/3 trampler (Bot2 at 17, the positive control), while its Ornithopter attacks Bot2's
+# Liliana of the Veil and stays 0/2: she takes nothing and keeps 3 loyalty (it would be 1 with +2/+2). Exactly one creature is
+# in the batch, so Stack.Count is 1.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Garruk, Curse Breaker
+Elvish Mystic
+Ornithopter
+Forest x20
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Garruk, Curse Breaker.Cast
+Bot1.Pass
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Garruk, Curse Breaker.Activate(Ability: Until your next turn)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Elvish Mystic > Bot2; Ornithopter > Bot2.Battlefield.Liliana of the Veil)
+? Stack.Count = 1
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 3

@@ -1,0 +1,40 @@
+# Garruk, Curse Breaker (cast on turn 1 with Black Lotus and two Moxen, 5 loyalty): the -3 creates a 4/4 green Beast token with
+# trample, and the Beast has power 4 as it enters, so Garruk's "whenever a creature you control with power 4 or greater enters"
+# draws a card. Hand: 7 - Lotus, Emerald, Jet, Garruk = 3, +1 for the draw. Loyalty 5 - 3 = 2.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Garruk, Curse Breaker
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Garruk, Curse Breaker.Cast
+Bot1.Pass
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Garruk, Curse Breaker.Activate(Ability: Create a 4/4 green Beast)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Garruk, Curse Breaker.Counters.Loyalty = 2
+Bot1.Battlefield.Beast.Power = 4
+Bot1.Battlefield.Beast.Toughness = 4
+Bot1.Battlefield.Beast.Keywords = Trample
+Bot1.Battlefield.Beast.Colors = Green
