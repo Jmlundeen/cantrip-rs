@@ -1,0 +1,49 @@
+# Lunar Convocation: Bot1 gains 3 (Lightning Helix, which deals 3 to Bot2) and pays 2 life for "{1}{B}, Pay 2 life: Draw a card"
+# (CR 119.4: paying life is losing it), so at its end step both abilities trigger: Bot2 loses 1 more (20 - 3 - 1 = 16) and Bot1 gets
+# a 1/1 black Bat with flying. Bot1: 20 + 3 - 2 = 21; it drew the Island. 8 permanents: six Moxen, the Convocation, the Bat.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Ruby
+Lunar Convocation
+Lightning Helix
+Island x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lunar Convocation.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Pass
+Bot1.Battlefield.Lunar Convocation.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot2.Life = 16
+Bot1.Battlefield.Count = 8
+Bot1.Battlefield.Bat.Power = 1
+Bot1.Battlefield.Bat.Keywords = Flying
+Bot1.Battlefield.Bat.Colors = Black
+Bot1.Hand.Count = 1

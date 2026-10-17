@@ -1,0 +1,39 @@
+# "At the beginning of YOUR end step": Bot1 gains 3 with Lightning Helix on Bot2's turn 2 (during Bot2's end step), when the
+# Convocation's abilities could trigger only if they were "each end step" abilities: Bot2's end step does not trigger them (it is
+# not Bot1's), and by Bot1's own end step on turn 3 the new turn has begun, so "this turn" no longer holds a gain (CR 603.4).
+# Bot2 is on 17 (the Helix), Bot1 on 23, and no Bat exists: 5 permanents.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lunar Convocation
+Lightning Helix
+Island
+Island x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Lunar Convocation.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.End]
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield.Count = 5

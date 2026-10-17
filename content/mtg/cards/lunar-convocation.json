@@ -1,0 +1,6 @@
+{
+  "name": "Lunar Convocation",
+  "manaCost": "{W}{B}",
+  "type": "Enchantment",
+  "oracleText": "At the beginning of your end step, if you gained life this turn, each opponent loses 1 life.\nAt the beginning of your end step, if you gained and lost life this turn, create a 1/1 black Bat creature token with flying.\n{1}{B}, Pay 2 life: Draw a card."
+}
