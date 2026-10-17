@@ -1,0 +1,39 @@
+# Theorist's Proxy has flash (CR 702.8a) and "When this creature enters, empower Jace 3" (CR 701.71a): Bot1 casts it during Bot2's
+# main phase (a creature spell without flash could not be), the trigger resolves, and with no Jace planeswalker token under Bot1's
+# control a blue Jace token is created and gets three loyalty counters. The token's "-3: Draw a card" is then available (Bot1
+# activates it at once; the Jace dies with 0 loyalty, CR 704.5i) and draws Bot1 a card. The Proxy is a 0/3.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Theorist's Proxy
+Island x4
+Lightning Bolt
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Theorist's Proxy.Cast
+Bot2.Pass
+? Bot1.Battlefield.Theorist's Proxy.Power = 0
+? Bot1.Battlefield.Theorist's Proxy.Toughness = 3
+? Stack = Theorist's Proxy
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 3
+? Bot1.Battlefield.Jace.Token = true
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace.Activate(Ability: Draw)
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Sapphire; Theorist's Proxy
+Bot1.Hand.Count = 6
+Bot1.Graveyard.Count = 0

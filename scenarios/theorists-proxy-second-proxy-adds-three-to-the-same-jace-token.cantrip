@@ -1,0 +1,35 @@
+# Empower Jace with a Jace planeswalker token already under your control: "If you control a Jace planeswalker token, you can't
+# choose to create a new one" - the counters go on it (CR 701.71a). Bot1 casts Theorist's Proxy twice in one turn: the first
+# makes the Jace token with 3 loyalty, the second puts three more on that same token (6), and only one Jace token exists.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Theorist's Proxy
+Theorist's Proxy
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Theorist's Proxy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot1.Hand.Theorist's Proxy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Jace; Mox Sapphire; Theorist's Proxy; Theorist's Proxy
+Bot1.Battlefield.Jace.Counters.Loyalty = 6

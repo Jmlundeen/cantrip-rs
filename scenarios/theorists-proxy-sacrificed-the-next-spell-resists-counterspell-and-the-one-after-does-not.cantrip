@@ -1,0 +1,77 @@
+# "{U}, Sacrifice this creature: The next spell you cast this turn can't be countered." Bot1 casts Theorist's Proxy on turn 3
+# (its enters trigger empowers a Jace token), then pays {U} and sacrifices it (the sacrifice is a cost, so the Proxy is in the
+# graveyard while the ability is on the stack). Bot1 then casts two Lightning Bolts at Bot2, who answers each with Counterspell. The first
+# Bolt is marked as it is cast (CR 601.2, 611.2c): the Counterspell resolves and does nothing (CR 701.5a) and the Bolt deals 3. The
+# effect is used up by that spell, so the second Bolt is countered. The Proxy being gone does not undo the effect, and the Jace token
+# it made stays.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Theorist's Proxy
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Counterspell
+Counterspell
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Theorist's Proxy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Theorist's Proxy.Activate(Ability: next spell)
+? Stack = Theorist's Proxy
+? Bot1.Graveyard = Theorist's Proxy
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+? Stack = Counterspell; Lightning Bolt
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Theorist's Proxy
+Bot2.Graveyard = Counterspell; Counterspell
+Bot1.Battlefield.Jace.Counters.Loyalty = 3

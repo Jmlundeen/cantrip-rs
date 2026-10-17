@@ -1,0 +1,41 @@
+# "Empower Jace won't let you put loyalty counters on nontoken Jace planeswalkers" - only a Jace planeswalker token counts, so
+# with Jace, the Mind Sculptor (3 loyalty as it enters) on the battlefield, Theorist's Proxy creates its own Jace token with 3
+# counters and leaves the Mind Sculptor at 3 (CR 701.71a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Jace, the Mind Sculptor
+Theorist's Proxy
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Hand.Theorist's Proxy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 3
+Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Count = 6
