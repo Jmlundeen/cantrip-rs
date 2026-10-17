@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{library::exile_top_face_down_may_look_and_play, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// Creatures target player controls can't block this turn (CR 509.1b): a rule about the player until the turn ends, so it
@@ -16,12 +16,7 @@ fn cant_block(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// Exile the top card of your library face down. You may look at and play that card this turn.
 fn exile_top_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    let Some(&top) = g.state().zone(Zone::library(player)).first() else { return Ok(()) };
-    let exiled = g.exile_face_down(&[top], None)[0];
-    g.look_at(player, &[exiled]);
-    if g.obj(exiled).zone.is(ZoneKind::Exile) {
-        g.allow_play(exiled, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST });
-    }
+    exile_top_face_down_may_look_and_play(g, player, 1, player, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST });
     Ok(())
 }
 

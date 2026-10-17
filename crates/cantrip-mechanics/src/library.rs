@@ -347,6 +347,21 @@ pub fn exile_top_may_play(g: &mut dyn Game, from: PlayerId, count: usize, who: P
     exiled
 }
 
+/// "Exile the top `count` cards of `from`'s library face down. `who` may look at and play [it / those cards]" under `grant`
+/// (CR 406.3, 601.3, 305.1): the cards leave together face down, `who` looks at each that really reached exile (a
+/// replacement may send it elsewhere), and may play it under the grant. The cards still in exile. Headliner Scarlett (one,
+/// this turn) and Outrageous Robbery (X, for as long as they remain exiled) print it.
+pub fn exile_top_face_down_may_look_and_play(g: &mut dyn Game, from: PlayerId, count: usize, who: PlayerId, grant: PlayGrant) -> Vec<ObjectId> {
+    let top = top_of_library(g, from, count);
+    let exiled: Vec<ObjectId> =
+        g.exile_face_down(&top, None).into_iter().filter(|&card| g.obj(card).zone.is(ZoneKind::Exile)).collect();
+    g.look_at(who, &exiled);
+    for &card in &exiled {
+        g.allow_play(card, who, grant);
+    }
+    exiled
+}
+
 /// "Exile the top `count` cards of your library. Until the end of your next turn, you may play [it / those cards]"
 /// (`exile_top_may_play`): the grant is to play, not only cast, a land among them under the ordinary land-play rules, until the
 /// cleanup step of `player`'s next turn (CR 514.2). The cards still in exile. Cori Mountain Monastery (one), Clockwork
