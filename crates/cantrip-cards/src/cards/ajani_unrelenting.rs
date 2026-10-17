@@ -2,22 +2,11 @@ use cantrip_api::*;
 use cantrip_mechanics::{creatures_you_control, effects, haste_until_end_of_turn, tokens, triggers};
 use cantrip_oracle as oracle;
 
-/// The 2/2 colorless Wizard Soldier creature token named Cadet (CR 111.4).
-pub static CADET: CardDef = CardDef {
-    name: "Cadet",
-    has_cost: false,
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Wizard, Subtype::Soldier]),
-    power: Some(2),
-    toughness: Some(2),
-    ..CardDef::BLANK
-};
-
 /// "Whenever you activate a loyalty ability, create a 2/2 colorless Wizard Soldier creature token named Cadet." Any
 /// permanent's loyalty ability, by this one's controller (CR 606.2, 603.2). The activation triggers it (CR 602.2), so the
 /// trigger goes on the stack above the ability and the Cadet is on the battlefield before that ability resolves (the ruling).
 fn make_cadet(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &CADET, 1)?;
+    tokens::create(g, item.controller, &tokens::CADET, 1)?;
     Ok(())
 }
 
@@ -53,7 +42,7 @@ fn minus_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-pub static EXTRA: &[&CardDef] = &[&CADET];
+pub static EXTRA: &[&CardDef] = &[&tokens::CADET];
 
 pub static CARD: CardDef = CardDef {
     abilities: &[

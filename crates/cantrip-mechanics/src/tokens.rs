@@ -535,6 +535,18 @@ pub static RABBIT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 2/2 colorless Wizard Soldier creature token named Cadet (CR 111.4). Ajani Unrelenting, Stingerquill Charm and
+/// Ingris Stingerquill make it.
+pub static CADET: CardDef = CardDef {
+    name: "Cadet",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Wizard, Subtype::Soldier]),
+    power: Some(2),
+    toughness: Some(2),
+    ..CardDef::BLANK
+};
+
 /// A 1/1 black Bat creature token with flying. Sanguine Evangelist and Aclazotz, Deepest Betrayal make it.
 pub static BAT: CardDef = CardDef {
     name: "Bat",
