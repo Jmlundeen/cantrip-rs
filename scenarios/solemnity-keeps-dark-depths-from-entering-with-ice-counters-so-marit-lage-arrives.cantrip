@@ -1,0 +1,37 @@
+# Solemnity's "Counters can't be put on ... lands" stops the counters a land would enter with (CR 122.6, 101.2, the ruling): Dark
+# Depths, played with Solemnity on the battlefield, enters with none of its ten ice counters. "When Dark Depths has no ice counters
+# on it" is a state trigger (CR 603.8): it triggers at once, Dark Depths is sacrificed, and Bot1 creates Marit Lage, a legendary
+# 20/20 black Avatar token with flying and indestructible.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Solemnity
+Dark Depths
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Dark Depths.Play
+? Stack = Dark Depths
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Marit Lage; Mox Pearl; Plains; Sol Ring; Solemnity
+Bot1.Battlefield.Marit Lage.Power = 20
+Bot1.Battlefield.Marit Lage.Keywords = Flying; Indestructible
+Bot1.Graveyard = Dark Depths

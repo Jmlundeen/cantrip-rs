@@ -1,0 +1,53 @@
+# Solemnity's ruling: "If ... an additional cost of a spell requires putting counters on an artifact, creature, enchantment, or land,
+# that cost can't be paid" (CR 118.3, 101.2). Requiting Hex's "you may blight 1" puts a -1/-1 counter on a creature its caster
+# controls (CR 701.68a); with Solemnity out Bot1's Ornithopter can't take one, so the choice to blight is not offered and the Hex is
+# cast plain: the Elves dies and no life is gained. The positive control is
+# requiting-hex-blighting-your-own-creature-puts-the-counter-on-it-and-gains-two-life, the same choice taken with an Ornithopter.
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Mox Jet
+Ornithopter
+Solemnity
+Requiting Hex
+Island x10
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Island x13
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Requiting Hex.Cast
+! Bot1.Modes(Blight 1)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Ornithopter.Counters.MinusOneMinusOne = (absent)

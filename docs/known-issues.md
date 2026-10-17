@@ -72,6 +72,7 @@ keeps it).
 | [KI-54](#ki-54-a-loop-a-player-could-stop-has-no-shortcut-and-a-seat-that-never-stops-it-goes-round-forever) | A loop a player could stop has no shortcut, and a seat that never stops it goes round forever | Medium | Open |
 | [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
+| [KI-60](#ki-60-infects--1-1-counters-are-counters-an-effect-puts) | Infect's -1/-1 counters are counters an effect puts | Low | Suspected |
 
 ## Issues
 
@@ -705,7 +706,10 @@ things. A fix asks the choice by instance (each labelled with its slot's text). 
 permanent entering with counters (CR 122.6) with the player it enters under, but its characteristics are read from the object
 in the zone it comes from, not as the permanent it will be (CR 614.12): a card entering as a copy of a creature, or a
 noncreature card entering as a creature, is judged by its own characteristics. Moonshadow and a persisting Kitchen Finks,
-creature cards entering as themselves, are judged rightly.
+creature cards entering as themselves, are judged rightly. Solemnity's ban (artifacts, creatures, enchantments, lands) is asked
+the same way, and so are the replacements of +1/+1 counters keyed to the permanent's types
+(`cantrip_mechanics::replacements::plus_one_counters_applies`: Hardened Scales, Corpsejack Menace, Ozolith, Michelangelo) for a
+permanent entering with counters: a Walking Ballista, a Saga, Dark Depths and a planeswalker entering as themselves are right.
 
 **Scenarios.** none yet.
 
@@ -754,3 +758,16 @@ night. `ops::prepare_entry` asks `day_night::enters_transformed` from the printe
 question, with a scenario of a daybound creature cast at night under Humility.
 
 **Scenarios.** none yet.
+
+### KI-60: Infect's -1/-1 counters are counters an effect puts
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | engine | 2026-10-17, Doubling Season |
+
+**Notes.** Doubling Season doubles counters "an effect" puts (`CounterPlacement::effect`), and not those a cost or a turn-based
+action puts (CR 118.3, 714.3c). The -1/-1 counters damage from a source with infect puts on a creature (CR 120.3d, 702.90c) are
+put as an effect's (`ops::add_counters`), combat damage's included, though combat damage is dealt by a turn-based action
+(CR 510.2). No ruling says which they are; a wither source would ask the same (none is in content).
+
+**Scenarios.** none yet: an infect creature dealing combat damage to a creature whose controller has a Doubling Season.

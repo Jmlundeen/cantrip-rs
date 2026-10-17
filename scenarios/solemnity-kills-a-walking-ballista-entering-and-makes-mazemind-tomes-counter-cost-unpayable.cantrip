@@ -1,0 +1,49 @@
+# Solemnity: "Counters can't be put on artifacts, creatures, enchantments, or lands" (CR 122.6, 101.2). Before it arrives,
+# Mazemind Tome's "{T}, Put a page counter on this artifact: Scry 1" is paid and the Tome has one page counter (the positive
+# control). With Solemnity out, that cost can't be paid (CR 118.3, the ruling), so neither of the Tome's abilities is offered,
+# and the counter already on it stays (the ruling). Walking Ballista cast for X = 1 enters with no counter (the ruling: counters
+# as it enters) and dies as a 0/0 (CR 704.5f).
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Mazemind Tome
+Solemnity
+Walking Ballista
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Mazemind Tome.Cast
+Bot1.Pass
+Bot1.Battlefield.Mazemind Tome.Activate(Ability: Scry 1)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Mazemind Tome.Counters.Page = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+! Bot1.Battlefield.Mazemind Tome.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Mazemind Tome.Counters.Page = 1
+Bot1.Graveyard = Walking Ballista

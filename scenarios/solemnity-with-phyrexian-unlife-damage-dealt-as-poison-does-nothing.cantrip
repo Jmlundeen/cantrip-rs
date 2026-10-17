@@ -1,0 +1,59 @@
+# Solemnity's "Players can't get counters" (CR 122.1, 101.2) and Phyrexian Unlife (CR 702.90b): Bot1, Bolted from 1 life to -2,
+# has no more than 0 life, so the next damage is dealt as though its source had infect - as poison counters, which no player can
+# get under Solemnity. The second Bolt does nothing at all to Bot1: no life lost and no poison, and Bot1 is still in the game.
+
+[Life]
+Bot1: 1
+
+[Bot1 Deck]
+Plains
+Sol Ring
+Mox Pearl
+Solemnity
+Phyrexian Unlife
+Plains
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solemnity.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Phyrexian Unlife.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = -2
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.End]
+
+[Expect]
+Result = InProgress
+Bot1.Life = -2
+Bot1.Poison = 0
