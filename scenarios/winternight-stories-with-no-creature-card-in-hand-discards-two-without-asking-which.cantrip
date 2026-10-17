@@ -1,0 +1,36 @@
+# Winternight Stories: with no creature card in the hand after the draw (Mountain, Island, Island, Plains, Plains) the choice between a
+# creature card and two cards isn't offered (the refusal of the mode question): Bot1 discards two cards of its choice. An Island and a
+# Plains go; the control is the scenario with a creature card in hand.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Winternight Stories
+Plains
+Plains
+Mountain
+Mountain
+Island
+Island
+Plains x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Winternight Stories.Cast
+! Bot1.Modes
+Bot1.Choose(Mountain; Plains)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Winternight Stories; Plains; Mountain
+Bot1.Hand = Plains; Mountain; Island; Island
+Bot1.Library.Count = 10

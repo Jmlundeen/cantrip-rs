@@ -1,0 +1,57 @@
+# Winternight Stories, harmonize {4}{U}: cast from the graveyard, tapping Llanowar Elves (power 1) reduces the cost by {1} to {3}{U}
+# (paid with four of five Moxen, the Ruby left untapped: the tap really lowered the cost), and the spell is exiled as it
+# resolves instead of returning to the graveyard (CR 702.180a). Turn 1: cast for {2}{U} with the Elves already out; no creature
+# card in the hand after the draw, so two cards (the Islands) go. Turn 3: harmonize; the draw brings an Ornithopter, a creature
+# card, and the one-card discard takes it.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Winternight Stories
+Llanowar Elves
+Island
+Island
+Plains
+Plains
+Ornithopter
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Winternight Stories.Cast
+Bot1.Choose(Island; Island)
+? Bot1.Graveyard = Winternight Stories; Island; Island
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Winternight Stories.Cast(Ability: Harmonize)
+Bot1.Choose(Llanowar Elves)
+Bot1.Modes(Discard a creature card)
+Bot1.Choose(Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+
+[Expect]
+Exile = Winternight Stories
+Bot1.Graveyard = Ornithopter; Island; Island
+Bot1.Hand = Plains; Plains; Plains; Plains

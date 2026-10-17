@@ -140,7 +140,7 @@ pub fn each_discards_a_card(g: &mut dyn Game, players: &[PlayerId], source: Obje
 /// "Discard two cards unless you discard [a quality of card]" (CR 608.2d, 701.9): the cards `player` chooses, not yet
 /// discarded. With a card of the quality in hand they choose between discarding one such card and discarding two cards
 /// of any kind (the card's `labels` 0 and 1 name the two answers, in that order); a card of the quality may be one of the
-/// two. With none in hand nothing is offered but the two cards. Steamcore Scholar and Bandit's Talent print it.
+/// two. With none in hand nothing is offered but the two cards. Steamcore Scholar, Winternight Stories and Bandit's Talent print it.
 pub fn choose_discard_two_unless_discarding(
     g: &mut dyn Game,
     player: PlayerId,
