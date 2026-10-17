@@ -1,0 +1,45 @@
+# Browser
+# Mobilize does not say what its Warriors attack (CR 702.181a), so as each enters attacking its controller chooses a player,
+# planeswalker or battle for it (CR 508.4), not necessarily what the creature with mobilize attacks. Voice of Victory attacks
+# Bot2 on turn 3 while Bot2 has Liliana of the Veil (loyalty 3); Bot1 sends one Warrior at Liliana and the other at Bot2.
+# Voice (1 power) and a Warrior take Bot2 to 18, the other Warrior takes Liliana to 2. In the browser the question is a
+# choice, not a target, and says what it is for; the page then stands each Warrior in its own combat group.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Voice of Victory
+Plains x12
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Voice of Victory.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Voice of Victory > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Choice for Voice of Victory
+? Client.Bot1.Prompt.Detail = Choose what it attacks as it enters tapped and attacking: a player, a planeswalker or a battle.  ·  2 possible choices
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Target(Bot2)
+? Combat.Attackers = Voice of Victory > Bot2; Warrior > Liliana of the Veil; Warrior > Bot2
+? Client.Bot1.Combat = Attacking Bot2: Voice of Victory, Warrior; Attacking Liliana of the Veil: Warrior
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 2

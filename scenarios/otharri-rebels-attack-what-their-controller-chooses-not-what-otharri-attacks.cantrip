@@ -1,0 +1,53 @@
+# Otharri's Rebels enter "tapped and attacking" with nothing named for them to attack, so their controller chooses for each
+# one (CR 508.4), not necessarily what Otharri attacks. Otharri (haste, 3/3 flying lifelink) attacks Bot2 on turn 9 while Bot2
+# has Liliana of the Veil (loyalty 3); his one Rebel (one experience counter) is sent at Liliana instead. Otharri takes Bot2
+# to 17 and Bot1 to 23; the Rebel's 2 takes Liliana to 1.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Plains
+Plains
+Otharri, Suns' Glory
+Mountain x14
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Otharri, Suns' Glory.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Otharri, Suns' Glory > Bot2)
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+? Combat.Attackers = Otharri, Suns' Glory > Bot2; Rebel > Liliana of the Veil
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 23
+Bot1.Experience = 1
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1

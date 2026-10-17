@@ -46,9 +46,9 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
         0 => None,
         1 => Some(candidates[0]),
         _ => {
-            let ask = RequestKind::ChooseTarget { label: "", slot_player: None,
+            let ask = RequestKind::ChooseTarget { label: "Choose what it attacks as it enters tapped and attacking: a player, a planeswalker or a battle.", slot_player: None,
                 source,
-                purpose: Purpose::Targets,
+                purpose: Purpose::EnterAttacking,
                 candidates: candidates.to_vec(),
                 optional: false,
                 least: 1,
@@ -66,7 +66,7 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
 /// `count` of `token`, each tapped and attacking what its controller chooses for it (CR 508.4): `choose_attack_target` once per
 /// token, asked only when there is a choice and before any token is made, and the ones that attack the same thing created
 /// together (CR 101.4). Nothing is made when there is nothing to attack. Hero of Bladehold and Dalkovan Encampment print it
-/// with two.
+/// with two, Otharri, Suns' Glory with one for each experience counter.
 pub fn create_attacking_of_your_choice(g: &mut dyn Game, you: PlayerId, source: ObjectId, token: CardId, count: usize) -> Result<Vec<ObjectId>, Suspend> {
     let mut chosen: Vec<Target> = Vec::new();
     for _ in 0..count {
