@@ -1,0 +1,56 @@
+# Slagstorm's 3 damage to each creature is one simultaneous event (CR 120.2) and Tomik's replacement applies to each recipient
+# alone: Bot2's Fanatic of Rhonas (1/4) takes 3 + 1 = 4 and dies, though 3 would not kill it, while Bot1's own Fanatic of Rhonas
+# (1/4) takes plain 3 and survives with 3 damage marked (4 would kill it). Bot1's Tomik (1/2) dies to the 3 damage (lethal either
+# way). Tomik was on the battlefield when the damage was dealt, so he counts.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tomik, Izzet Sparkmage
+Mox Emerald
+Mox Jet
+Fanatic of Rhonas
+Slagstorm
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Fanatic of Rhonas
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Tomik, Izzet Sparkmage.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fanatic of Rhonas.Cast
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Slagstorm.Cast
+Bot1.Modes(1)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Fanatic of Rhonas
+Bot1.Graveyard = Tomik, Izzet Sparkmage; Slagstorm
+Bot1.Battlefield.Fanatic of Rhonas.Damage = 3
+Bot2.Life = 20
+Bot1.Life = 20

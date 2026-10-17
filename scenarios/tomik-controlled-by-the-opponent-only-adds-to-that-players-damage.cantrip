@@ -1,0 +1,47 @@
+# "A source you control": Tomik raises only the damage of its own controller's sources, and only damage to that player's
+# opponents. Bot2 controls Tomik. Bot1's Shock at Bot2 deals its 2 unchanged (the damage is to Tomik's controller: 20 -> 18), and
+# Bot1's Shock at itself deals 2 (an opponent of Tomik's controller is hit, but by a source Tomik's controller doesn't control: 20 -> 18).
+# Bot2's own Shock at Bot1 deals 3 (20 -> 15 with the above: 18 - 3 = 15).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Shock
+Shock
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Tomik, Izzet Sparkmage
+Shock
+Island x20
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Tomik, Izzet Sparkmage.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot1.Hand.Shock.Cast(Bot1)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 18
+Bot1.Life = 15

@@ -1,0 +1,72 @@
+# Tomik's "plus 1" and Mjölnir's "double" both replace the same damage (CR 616.1): Gau, Feral Youth (legendary red-green, so worthy of
+# Mjölnir, which is equipped to him) deals damage equal to his power (2: he has not attacked, so no Rage) to each opponent when Faithless
+# Looting flashes back (a card leaves the graveyard), and the player being dealt the damage, Bot2, chooses which applies first. Bot2
+# chooses Mjölnir: 2 doubled is 4, plus 1 is 5 (20 -> 15). Counterpart: tomik-then-mjolnir-the-damaged-opponent-chooses-to-add-first-for-six.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Mox Jet
+Gau, Feral Youth
+Faithless Looting
+Mjölnir, Hammer of Thor
+Island
+Island
+Mountain
+Tomik, Izzet Sparkmage
+Island x12
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Gau, Feral Youth.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mjölnir, Hammer of Thor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mjölnir, Hammer of Thor.Activate(Bot1.Battlefield.Gau, Feral Youth; Ability: Equip)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tomik, Izzet Sparkmage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Faithless Looting.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot2.Replace(double all damage)
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 15

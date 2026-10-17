@@ -1,0 +1,46 @@
+# Tomik only adds to noncombat damage dealt to an opponent or their permanents. Bot1's Tomik attacks on turn 3 and deals exactly
+# 1 combat damage (Bot2: 20 -> 19, not 18). After combat Bot1 shocks itself (2 damage to its own controller, not 3: 20 -> 18) and
+# its own Fanatic of Rhonas (1/4), which has exactly 2 damage marked (not 3).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Emerald
+Mox Jet
+Tomik, Izzet Sparkmage
+Fanatic of Rhonas
+Shock
+Shock
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Tomik, Izzet Sparkmage.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fanatic of Rhonas.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Tomik, Izzet Sparkmage > Bot2)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Shock.Cast(Bot1)
+Bot1.Pass
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Fanatic of Rhonas)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Life = 18
+Bot1.Battlefield.Fanatic of Rhonas.Damage = 2
