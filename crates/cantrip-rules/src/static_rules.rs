@@ -74,6 +74,18 @@ pub fn cast_barred(cx: &Cx, player: PlayerId) -> ZoneKinds {
     barred
 }
 
+/// The permanents on the battlefield with a static ability that forbids casting spells with certain qualities
+/// (`CardDef::spell_rules`, CR 101.2, 601.3), with their controllers: empty, so unallocated, in nearly every game.
+pub fn spell_forbidders(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
+    sources(cx, |d| !d.spell_rules.is_empty()).collect()
+}
+
+/// Whether one of `forbidders` (`spell_forbidders`) forbids `player` to cast `spell`, read through `q`: the card seen as the
+/// face it would be cast as (CR 601.3e), or the spell on the stack once its proposal is complete (CR 601.6).
+pub fn spell_forbidden(q: &dyn Query, forbidders: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, spell: ObjectId) -> bool {
+    forbidders.iter().any(|&(id, controller, def)| def.spell_rules.iter().any(|rule| !rule(q, &Asker { source: id, controller }, player, spell)))
+}
+
 /// Whether a static ability makes the damage `source` is about to deal unpreventable (CR 615.12). Asked only when
 /// protection would prevent it, which is rare, so the battlefield is searched then.
 pub fn damage_cant_be_prevented(cx: &Cx, source: ObjectId, combat: bool) -> bool {

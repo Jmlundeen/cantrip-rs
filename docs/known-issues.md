@@ -78,6 +78,8 @@ keeps it).
 | [KI-65](#ki-65-a-prepared-permanent-that-phases-out-loses-its-preparation-copy-for-good) | A prepared permanent that phases out loses its preparation copy for good | Low | Unexercised |
 | [KI-66](#ki-66-phasing-in-a-multiplayer-game-after-a-player-leaves-is-unbuilt) | Phasing in a multiplayer game after a player leaves is unbuilt | Low | Unexercised |
 | [KI-67](#ki-67-a-spell-cast-by-a-resolving-ability-under-split-second-is-unexercised) | A spell cast by a resolving ability under split second is unexercised | Low | Unexercised |
+| [KI-68](#ki-68-the-advice-applies-a-total-costs-least-before-a-casts-own-reductions-and-a-permissions-additions) | The advice applies a total cost's least before a cast's own reductions and a permission's additions | Low | Open |
+| [KI-69](#ki-69-a-bestowed-spell-has-the-mana-value-of-its-bestow-cost) | A bestowed spell has the mana value of its bestow cost | Low | Open |
 
 ## Issues
 
@@ -159,6 +161,7 @@ the line goes.
 | Ba Sing Se entering at the same time as basic lands: those lands are not counted for "enters tapped unless you control a basic land" (ruling 2025-10-02; `lands::enters_tapped_unless_you_control_basic_land` reads the battlefield as it is) | Abandoned Air Temple-style scenarios with a basic land already in play | No implemented effect puts a land and a basic land onto the battlefield together (several permanents put onto the battlefield by one effect still enter one at a time, `engine-design.md`). |
 | Demonic Pact under another controller: the modes it chose before count whoever chose them (ruling 2015-06-22; `history::mode_not_chosen_before` is keyed on the Pact object, not the player) | Two Pacts choosing independently (`demonic-pact-two-pacts-each-have-all-four-modes-to-choose`) | No scenario steals a Demonic Pact between upkeeps. |
 | Demonic Pact with only modes that need a target left and no legal target for them (ruling 2015-06-22: the ability is removed from the stack with no effect, CR 603.3c, 700.2) | Gollum, Riddle Master with every mode spent (`gollum-spends-all-three-modes-and-then-riddles-no-more`: the same removal, for lack of modes) | Its targeted modes take any target and target opponent, which are always legal while an opponent is in the game, so no position lacks a target. |
+| A spell no longer allowed once its proposal is complete (CR 601.6: `actions::cast` asks `CardDef::spell_rules` again of the spell on the stack, its X announced, and takes the cast back): a fused split spell's combined mana value, or a back face cast transformed, whose mana value is its front face's (CR 202.3b) where the card it is judged as before the cast reads the back face alone | the check before the cast (every Gaddock Teeg scenario) | No implemented spell's qualities that a rule judges change between the offer and the proposal: Gaddock Teeg's {X} clause already forbids every noncreature spell with {X}, no implemented card has fuse, and the one implemented Siege's back face (Lightshield Array) is mana value 2. |
 
 **Scenarios.** None, by definition.
 
@@ -829,5 +832,37 @@ with phased-out permanents.
 a spell with split second is on the stack" (CR 702.61a). `actions::cast_ways_during_resolution` offers no way to cast while a
 spell with split second is on the stack under what resolves, but no scenario has a triggered ability that casts (cascade,
 discover) resolve above a split-second spell.
+
+### KI-68: The advice applies a total cost's least before a cast's own reductions and a permission's additions
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-17, review of Trinisphere |
+
+**Notes.** CR 601.2f applies what directly affects the total cost (Trinisphere's "costs three mana", `CostDelta::at_least`)
+last. `actions::cast` does (`apply_cost_changes_before_least`, then harmonize, a sacrifice for each and emerge, then
+`at_least`). The advice that decides whether a cast is offered does not: `least_cost`/`finish` apply it inside
+`change_total`, before Rottenmouth Viper's sacrifice-for-each reduction and before `way_covered`'s emerge and harmonize
+reductions, so under Trinisphere such a cast may be offered for less than it costs and given back at the payment (Wild
+Ride's harmonize with a 4-power creature is advised at {R}, costs {2}{R}); and `castable_ways` adds a permission's `more`
+and additional mana after it, so a cast it could pay may be withheld (a Bolt costing {2} more by a permission is advised at
+{4}{R}, costs {2}{R}). A fix gives the advice the cast's order: `change_parts`, the cast's own reductions and the
+permission's additions, then the least.
+
+**Scenarios.** none yet (Trinisphere with Wild Ride, Winternight Stories, Crabomination, Rottenmouth Viper or a permission
+with a tax would show it).
+
+### KI-69: A bestowed spell has the mana value of its bestow cost
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-17, review of Chalice of the Void and Gaddock Teeg |
+
+**Notes.** `bestow::bestowed` makes the bestowed face with the bestow cost as its `cost` where the two differ (Detective's
+Phoenix: `{R}`), and the spell's mana value on the stack is read from that face, so a bestowed Detective's Phoenix is mana
+value 1 rather than 3. Bestow is an alternative cost (CR 702.103a, 118.9c): the mana value is the card's mana cost's.
+Chalice of the Void with one counter would counter it (and with three would not), and a `CardDef::spell_rules` ban judges it
+by the bestow cost too (no implemented bestow card's mana value reaches Gaddock Teeg's 4). A fix keeps the mana cost on the
+face and the bestow cost apart.
 
 **Scenarios.** none yet.

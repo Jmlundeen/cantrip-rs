@@ -1479,6 +1479,15 @@ pub fn miracles(q: &dyn Query, card: ObjectId) -> Vec<Miracle> {
 /// than their hands" (Drannith Magistrate) reads it.
 pub type CastRule = fn(&dyn Query, &Asker, PlayerId, ZoneKind) -> bool;
 
+/// A static ability that forbids casting spells with certain qualities (CR 101.2, 601.3): whether `player` may cast `spell`,
+/// false forbidding it. "Noncreature spells with mana value 4 or greater can't be cast" (Gaddock Teeg), "noncreature
+/// spells with {X} in their mana costs can't be cast" (Gaddock Teeg). It reads the spell's characteristics through the
+/// query: a card that is to be cast is seen as the face it would be cast as (CR 601.3e, 709.3a, 715.3a, 712.8a), with X
+/// as 0 (CR 202.3e), and asked again of the spell on the stack once its proposal is complete (CR 601.6), with X as
+/// announced; a cast no longer allowed then is illegal and taken back (CR 733). Judged before the proposal with X as 0, a
+/// quality that announcing X could lift (CR 601.3a) would be refused too early: no card forbids by such a quality.
+pub type SpellRule = fn(&dyn Query, &Asker, PlayerId, ObjectId) -> bool;
+
 /// A static ability that limits who may block whom (CR 509.1b): asked, while the object that has it is on the battlefield,
 /// of every possible block - the blocker and the attacker, either of which may be the object itself, or neither; false
 /// forbids the block. "This creature can't block or be blocked by non-Spirit creatures" (Wan Shi Tong's Spirits),
@@ -1985,6 +1994,9 @@ pub struct CardDef {
     pub dungeon: &'static [&'static [u8]],
     /// Its static abilities that forbid casting spells (CR 101.2).
     pub cast_rules: &'static [CastRule],
+    /// Its static abilities that forbid casting spells with certain qualities (CR 101.2, 601.3), while it is on the battlefield
+    /// with its abilities.
+    pub spell_rules: &'static [SpellRule],
     /// Its static abilities that limit blocking (CR 509.1b), while it is on the battlefield.
     pub block_rules: &'static [BlockRule],
     /// Its static abilities that keep creatures from attacking (CR 508.1c), while it is on the battlefield.
@@ -2169,6 +2181,7 @@ impl CardDef {
         splice: None,
         dungeon: &[],
         cast_rules: &[],
+        spell_rules: &[],
         block_rules: &[],
         attack_rules: &[],
         attack_costs: &[],

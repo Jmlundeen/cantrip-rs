@@ -696,6 +696,24 @@ whole of the life the total cost asks - an additional "pay X life", Phyrexian sy
 (CR 119.4, 118.3): a cast or activation that cannot is taken back (CR 733). The advice counts it too: a single-target cast
 announced with its action is not offered at a target whose tax its caster could not pay (`added_life_payable`).
 
+A cost change may set the least the total comes to (`CostDelta::at_least`: Trinisphere's "each spell that would cost less
+than three mana to cast costs three mana to cast"). It is one of the "effects that directly affect the total cost" CR 601.2f
+applies once the total is otherwise determined: after the mana cost or alternative cost, every increase and every reduction
+(the cast's own too - harmonize's tapped power, a sacrifice for each, emerge's sacrificed mana value), generic mana making up
+the difference, before the total is locked in and paid. A spell cast without paying its mana cost (Omniscience) or for an
+alternative cost of no mana (Force of Will's) comes to three like any other. A cast takes it apart from the rest
+(`apply_cost_changes_before_least`) and applies it last, after its own reductions; the advice applies it with the rest
+(`change_total`), before those reductions and a permission's additions (known issue KI-68). The host's row for a cast says what the total comes to whenever the changes in play make it other than the
+cost it is cast for (`cast_total`: "(costs {3})", for a card cast from a hand), as it does for a cost that depends on
+the target.
+
+A static ability that forbids casting spells with certain qualities ("noncreature spells with mana value 4 or greater can't
+be cast", Gaddock Teeg) is `CardDef::spell_rules` (`SpellRule`, CR 101.2, 601.3). Each cast the rules would offer is judged on
+the face it casts (CR 601.3e, 709.3a: one half of a split card, an Adventure, a back face), with X as 0, and left out if a
+permanent with such a rule forbids it (`castable`, the casts an effect makes as it resolves too); and once a cast's proposal is
+complete (CR 601.2a-d) the spell on the stack is judged again, its X announced, and a cast no longer allowed is taken back
+(CR 601.6). The battlefield is searched for these only when something could be cast.
+
 A special action with a cost (CR 116.2: plotting, suspending, foretelling, turning a face-down permanent up, unlocking a
 door) is costed as `Costed::SpecialAction`: it is no activated ability (CR 116.1), so what changes the cost of activating
 abilities (Forensic Gadgeteer, Anointed Peacekeeper) leaves it alone, and only a change that names it applies - Doc Aurlock,

@@ -2412,7 +2412,50 @@ fn own_speed(def: &CardDef, flash: TypeSet) -> bool {
     def.is(CardType::Instant) || def.keywords.has(Keyword::Flash) || def.types.0 & flash.0 != 0
 }
 
+/// The casts `player` may begin now (CR 601.3): `castable_ways`, less those a static ability forbids for the qualities of the
+/// spell each would cast (CR 101.2, 601.3e: judged as the face it casts).
 fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
+    let start = options.len();
+    castable_ways(cx, player, available, instants, options);
+    if options.len() == start {
+        return;
+    }
+    let forbidders = static_rules::spell_forbidders(cx);
+    if forbidders.is_empty() {
+        return;
+    }
+    let offered = options.split_off(start);
+    options.extend(offered.into_iter().filter(|o| o.source.is_none_or(|card| !face_forbidden(cx, &forbidders, player, card, o.index))));
+}
+
+/// Whether a static ability forbids `player` to cast `card` by the way `way` (CR 101.2, 601.3), judged on the face that way
+/// casts (CR 601.3e, 709.3a, 715.3a, 712.8a).
+fn face_forbidden(cx: &Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, card: ObjectId, way: u8) -> bool {
+    let whole = cx.card(cx.s().obj(card).card);
+    let face = cast_face(whole, way);
+    if std::ptr::eq(face, whole) {
+        static_rules::spell_forbidden(cx, forbidders, player, card)
+    } else {
+        static_rules::spell_forbidden(&AsFace { cx, spell: card, face: cx.card_id(face) }, forbidders, player, card)
+    }
+}
+
+/// The face of the card `whole` a cast by the way `way` casts (CR 709.3, 715.3, 720.3, 712.8a, 702.103b): an inset face (an
+/// Adventure, an Omen), a back face, a bestowed Aura, one half of a split card, or the card itself. A way a permanent grants
+/// names its face.
+fn cast_face(whole: &'static CardDef, way: u8) -> &'static CardDef {
+    let way = granted_slot(way).map_or(way, |(_, face)| granted_face_way(face));
+    let back = if way == WAY_BACK_FACE || way == WAY_TRANSFORMED { whole.back } else { None };
+    let bestow = if way == WAY_BESTOW { whole.bestow } else { None };
+    let half = match (way, whole.split) {
+        (WAY_SPLIT_LEFT, Some((left, _))) => Some(left),
+        (WAY_SPLIT_RIGHT, Some((_, right))) => Some(right),
+        _ => None,
+    };
+    whole.inset_face(way).or(back).or(bestow).or(half).unwrap_or(whole)
+}
+
+fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
     let barred = cast_barred(cx, player);
     if ZoneKinds::CAST_FROM.iter().all(|&from| barred.contains(from)) {
         return;
@@ -3240,7 +3283,7 @@ fn cast(
         (WAY_SPLIT_RIGHT, Some((_, right))) => Some(right),
         _ => None,
     };
-    let def = inset.or(back).or(bestow).or(half).unwrap_or(whole);
+    let def = cast_face(whole, way);
     let face = cx.card_id(def);
     // Cast from exile by a permanent's permission (CR 601.3), it owes what the permission adds (CR 118.8, 601.2f): found now, as
     // the cast begins, so the permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling).
@@ -3530,6 +3573,13 @@ fn cast(
         }
     }
 
+    // CR 601.6: the proposal (CR 601.2a-d) is complete; a spell with qualities a static ability forbids now (its X announced,
+    // CR 202.3e) may not be cast, and the cast is taken back.
+    let forbidders = static_rules::spell_forbidders(cx);
+    if !forbidders.is_empty() && static_rules::spell_forbidden(&*cx, &forbidders, player, spell) {
+        return Err(Stop::Cancel);
+    }
+
     // CR 601.2f: the total cost, with what increases or reduces it, once the targets are announced (CR 601.2c): a change may
     // read them ("costs {2} less if it targets ..."). It is locked in here, so nothing that happens to a target later changes
     // what is paid. A change may add life as an additional cost (CR 118.8: "cost an additional 3 life to cast"), part of the
@@ -3757,8 +3807,18 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     }
     let def = cx.card(obj.card);
     let asker = Asker { source: card, controller: player };
+    let forbidders = static_rules::spell_forbidders(cx);
+    let forbidden = |face: &'static CardDef| {
+        !forbidders.is_empty()
+            && if std::ptr::eq(face, def) {
+                static_rules::spell_forbidden(cx, &forbidders, player, card)
+            } else {
+                static_rules::spell_forbidden(&AsFace { cx, spell: card, face: cx.card_id(face) }, &forbidders, player, card)
+            }
+    };
     let castable = |face: &'static CardDef| {
         cast_only_if_met(cx, face, &asker)
+            && !forbidden(face)
             && match face.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
                 None => slots_satisfiable(cx, &asker, face.spell_targets()),
@@ -3878,6 +3938,10 @@ pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool
     }
     let asker = Asker { source: card, controller: player };
     if !cast_only_if_met(cx, back, &asker) {
+        return false;
+    }
+    let forbidders = static_rules::spell_forbidders(cx);
+    if !forbidders.is_empty() && face_forbidden(cx, &forbidders, player, card, WAY_TRANSFORMED) {
         return false;
     }
     if let Some(modal) = back.modal {
