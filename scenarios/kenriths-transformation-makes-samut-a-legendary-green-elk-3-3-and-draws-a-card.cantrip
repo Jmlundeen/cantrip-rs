@@ -1,0 +1,65 @@
+# Kenrith's Transformation: "When this Aura enters, draw a card. Enchanted creature loses all abilities and is a green Elk
+# creature with base power and toughness 3/3." Bot1 enchants Bot2's Samut, Hazoret's Champion (a red 2/2 Human Warrior
+# Cleric with "Creatures you control have haste") and draws the Ornithopter on top of its library. Samut is a green Elk
+# creature 3/3, no longer a Human, Warrior or Cleric and no longer red, but still legendary - a supertype is no card type
+# (the ruling: "the creature keeps any supertypes"). Its haste-giving ability is gone: the Llanowar Elves Bot2 casts on turn 4
+# are summoning sick (CR 302.6), where the Elves cast on turn 2 attacked at once.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Kenrith's Transformation
+Island
+Island
+Island
+Island
+Island
+Ornithopter
+Island x11
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Emerald
+Samut, Hazoret's Champion
+Llanowar Elves
+Llanowar Elves
+Mountain
+Mountain x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Samut, Hazoret's Champion.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Attack(Llanowar Elves > Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Kenrith's Transformation.Cast(Samut, Hazoret's Champion)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+! Bot2.Attack(Llanowar Elves#2 > Bot1)
+Bot2.Attack(Llanowar Elves#1 > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Hand = Island; Island; Island; Island; Island; Ornithopter
+Bot1.Battlefield.Kenrith's Transformation.AttachedTo = Samut, Hazoret's Champion
+Bot2.Battlefield.Samut, Hazoret's Champion.Supertypes = Legendary
+Bot2.Battlefield.Samut, Hazoret's Champion.Types = Creature
+Bot2.Battlefield.Samut, Hazoret's Champion.Subtypes = Elk
+Bot2.Battlefield.Samut, Hazoret's Champion.Colors = Green
+Bot2.Battlefield.Samut, Hazoret's Champion.Power = 3
+Bot2.Battlefield.Samut, Hazoret's Champion.Toughness = 3
+Bot2.Battlefield.Samut, Hazoret's Champion.Keywords = (absent)
+Bot2.Battlefield.Llanowar Elves#2.SummoningSick = true

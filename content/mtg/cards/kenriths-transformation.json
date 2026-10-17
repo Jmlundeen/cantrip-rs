@@ -1,0 +1,6 @@
+{
+  "name": "Kenrith's Transformation",
+  "manaCost": "{1}{G}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nWhen this Aura enters, draw a card.\nEnchanted creature loses all abilities and is a green Elk creature with base power and toughness 3/3. (It loses all other card types and creature types.)"
+}
