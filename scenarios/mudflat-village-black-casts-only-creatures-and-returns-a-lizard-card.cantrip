@@ -1,0 +1,64 @@
+# Mudflat Village. "{T}: Add {B}. Spend this mana only to cast a creature spell" (CR 106.6): on turn 1 that {B}, the only
+# mana, can't cast Dark Ritual (the refusal) but casts Callous Inspector. Bot2's Lightning Bolts kill the Inspector (a
+# Human) on turn 2 and Blazing Rootwalla (a Lizard) on turn 4. Turn 5: "{1}{B}, {T}, Sacrifice this land: Return target Bat,
+# Lizard, Rat, or Squirrel card from your graveyard to your hand" can't target the Inspector's card but returns the
+# Rootwalla's, paid with the Swamp and the Mountain; the Village is in the graveyard.
+
+[Bot1 Deck]
+Mudflat Village
+Callous Inspector
+Dark Ritual
+Mountain
+Blazing Rootwalla
+Swamp
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mudflat Village.Play
+Bot1.Battlefield.Mudflat Village.Activate(Ability: creature spell)
+? Bot1.Mana = {B} (CreatureSpells)
+! Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Callous Inspector.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Callous Inspector)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Blazing Rootwalla.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Blazing Rootwalla)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Battlefield.Mudflat Village.Activate(Ability: Return; Bot1.Graveyard.Callous Inspector)
+Bot1.Battlefield.Mudflat Village.Activate(Ability: Return; Bot1.Graveyard.Blazing Rootwalla)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot1.Life = 19
+Bot1.Hand = Blazing Rootwalla; Dark Ritual; Island; Island; Island
+Bot1.Graveyard = Mudflat Village; Callous Inspector
+Bot1.Battlefield = Clue Token; Mountain; Swamp
+Bot1.Mana =
