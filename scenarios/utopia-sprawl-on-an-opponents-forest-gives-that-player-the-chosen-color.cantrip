@@ -1,0 +1,45 @@
+# Utopia Sprawl: "Enchant Forest" (CR 702.5a, 303.4a) makes a Mountain no legal target, while a Forest of either player's is
+# (the positive control). Bot1 casts it on Bot2's Forest and chooses blue as it enters (CR 614.12a). "Whenever enchanted
+# Forest is tapped for mana, its controller adds an additional one mana of the chosen color": a triggered mana ability (CR
+# 605.1b, 106.12a) that resolves at once, and "its controller" is the Forest's, so when Bot2 taps the Forest, Bot2 has {G}{U}
+# and Bot1, the Aura's controller, nothing. Bot1's own Forest, not enchanted, taps for {G} alone.
+
+[Bot1 Deck]
+Forest
+Mountain
+Utopia Sprawl
+Plains
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Forest
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+! Bot1.Hand.Utopia Sprawl.Cast(Mountain)
+Bot1.Hand.Utopia Sprawl.Cast(Bot2.Battlefield.Forest)
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Blue)
+? Bot2.Battlefield.Forest.Subtypes = Forest
+[T4 Bot2.Main1]
+Bot2.Battlefield.Forest.Activate
+? Bot2.Mana = {U}{G}
+? Bot1.Mana =
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Utopia Sprawl.AttachedTo = Forest
+Bot1.Battlefield.Utopia Sprawl.ChosenColor = Blue
+Bot2.Mana = {U}{G}
+Bot1.Mana =

@@ -1,0 +1,65 @@
+# Three Utopia Sprawls ("Enchant Forest"), on a basic Forest, on Taiga (a nonbasic Land - Mountain Forest) and on Dryad
+# Arbor (a nonbasic Land Creature - Forest Dryad), each choosing red. Before Blood Moon all three are legal, and the one on
+# the Forest adds an additional {R} when the Forest is tapped for mana (the positive control of the trigger). Blood Moon
+# makes Taiga and Dryad Arbor Mountains and nothing else (CR 305.7), so they are no longer Forests: the Auras on them are
+# attached to illegal objects and are put into the graveyard (CR 303.4c, 704.5m). The basic Forest is not a nonbasic land
+# and stays a Forest, so its Sprawl stays.
+
+[Bot1 Deck]
+Forest
+Taiga
+Dryad Arbor
+Utopia Sprawl
+Utopia Sprawl
+Utopia Sprawl
+Mox Ruby
+Blood Moon
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Utopia Sprawl.Cast(Forest)
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+? Bot1.Battlefield.Utopia Sprawl.AttachedTo = Forest
+[T3 Bot1.Main1]
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Utopia Sprawl.Cast(Taiga)
+Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+[T5 Bot1.Main1]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Utopia Sprawl.Cast(Dryad Arbor)
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {R}
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+? Bot1.Mana = {R}
+[T7 Bot1.Main1]
+? Bot1.Battlefield = Forest; Taiga; Dryad Arbor; Utopia Sprawl; Utopia Sprawl; Utopia Sprawl; Mox Ruby
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Taiga.Activate(Ability: Add {R})
+Bot1.Battlefield.Dryad Arbor.Activate(Ability: Add {G})
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot1.Graveyard = Utopia Sprawl; Utopia Sprawl
+Bot1.Battlefield = Forest; Taiga; Dryad Arbor; Utopia Sprawl; Mox Ruby; Blood Moon
+Bot1.Battlefield.Utopia Sprawl.AttachedTo = Forest
+Bot1.Battlefield.Taiga.Subtypes = Mountain
+Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Mountain
+Bot1.Battlefield.Forest.Subtypes = Forest
