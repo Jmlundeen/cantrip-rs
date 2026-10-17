@@ -1,0 +1,43 @@
+# Spirit of the Labyrinth: "If you draw a card, and then Spirit of the Labyrinth enters the battlefield, you won't be able
+# to draw more cards that turn" (its ruling): the cards drawn this turn are counted from the turn's history, those drawn
+# before it arrived included (CR 121.2b). Bot1 draws three with Ancestral Recall, then casts Spirit of the Labyrinth: Opt's
+# draw is the turn's fourth card and can't happen, though its scry does.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Spirit of the Labyrinth
+Ancestral Recall
+Opt
+Mox Ruby
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Hand = Spirit of the Labyrinth; Opt; Island; Island; Island
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Island | )
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Island
+Bot1.Library.Count = 17
+Bot1.Graveyard = Opt; Ancestral Recall

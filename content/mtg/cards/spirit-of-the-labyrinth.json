@@ -1,0 +1,8 @@
+{
+  "name": "Spirit of the Labyrinth",
+  "manaCost": "{1}{W}",
+  "type": "Enchantment Creature — Spirit",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Each player can't draw more than one card each turn."
+}

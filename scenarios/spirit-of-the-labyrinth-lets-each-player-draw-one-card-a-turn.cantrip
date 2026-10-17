@@ -1,0 +1,46 @@
+# Spirit of the Labyrinth: "Each player can't draw more than one card each turn." It applies to each card draw (CR 121.2b):
+# "if you haven't drawn any cards in a turn, and a spell or ability would cause you to draw multiple cards, you'll just draw
+# one card" (its ruling), and its controller is one of the players. Bot1 casts it on turn 1, then Ancestral Recall on
+# itself: one card of the three. On turn 2 Bot2 draws its card for the turn, and its own Ancestral Recall draws it nothing.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Sapphire
+Spirit of the Labyrinth
+Ancestral Recall
+Forest
+Plains
+Island x20
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T2 Bot2.Main1]
+? Bot1.Hand = Forest; Plains; Island
+? Bot2.Hand.Count = 8
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Library.Count = 19
+Bot2.Hand.Count = 6
+Bot2.Library.Count = 19

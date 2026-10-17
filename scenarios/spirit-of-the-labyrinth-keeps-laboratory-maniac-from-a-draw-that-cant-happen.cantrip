@@ -1,0 +1,43 @@
+# Spirit of the Labyrinth and Laboratory Maniac, both Bot1's: "if a replacement effect would try to replace a card that you
+# can't draw, that effect can't apply" (Spirit's ruling; CR 614.17c). Bot1's library holds one card as Ancestral Recall
+# resolves: the first draw takes it; the second would be from the empty library, but it is the turn's second card, which
+# Bot1 can't draw - so Laboratory Maniac does not replace it and Bot1 does not win, and having drawn nothing from the empty
+# library, Bot1 does not lose either (CR 121.4, 704.5b). Nor does the third draw.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Spirit of the Labyrinth
+Laboratory Maniac
+Ancestral Recall
+Forest
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Laboratory Maniac.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T1 Bot1.Main2]
+
+[Expect]
+Result = InProgress
+Bot1.LostTo = (absent)
+Bot1.Hand = Forest
+Bot1.Library.Count = 0
