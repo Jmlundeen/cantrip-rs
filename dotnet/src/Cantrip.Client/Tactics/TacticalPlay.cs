@@ -100,6 +100,12 @@ public sealed partial class TacticalPlay : IAutoPlayer
     /// <summary>Whether this seat's last answer to a payment made mana for it, so the next question is the same payment.</summary>
     private bool _unlessContinuing;
 
+    /// <summary>Whether that last answer was a mana ability activated, the only answer that can fail to bring paying nearer.</summary>
+    private bool _unlessMadeMana;
+
+    /// <summary>The X this seat decided to pay, for a "you may pay {X}" whose X it chooses (CR 107.3f).</summary>
+    private int _xWanted;
+
     /// <summary>The colors of whatever this seat last protected something from, for the color it is then asked to name.</summary>
     private List<ColorView> _threat = [];
 

@@ -225,6 +225,12 @@ public static class AutoPlay
     /// </summary>
     private static List<TargetMessage> ChooseTarget(GameClient client, ChooseTargetPromptMessage prompt)
     {
+        // "With total mana value X or less" (CR 601.2c): the first that fit together.
+        if (prompt.MaximumTotalManaValue is { } most)
+        {
+            return Cantrip.Core.Decisions.TotalManaValue.FirstFitting(prompt.Candidates, prompt.ManaValues, prompt.Count, most);
+        }
+
         // A slot that takes several — "Untap X target lands" — wants exactly that many, and whether aiming at an
         // opponent's is good or bad depends on the card, so it simply fills the slot from what is offered.
         if (prompt.Count > 1)

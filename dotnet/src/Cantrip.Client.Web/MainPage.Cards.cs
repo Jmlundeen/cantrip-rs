@@ -204,7 +204,8 @@ public sealed partial class MainPage
         // Aiming comes first: while something is being aimed, nothing else on the board is a control.
         if (AimCandidates(client) is not null)
         {
-            bool aimable = _targetableObjects.TryGetValue(handle, out TargetMessage? target);
+            // "With total mana value X or less": a candidate that would take the chosen targets over it is no choice now.
+            bool aimable = _targetableObjects.TryGetValue(handle, out TargetMessage? target) && FitsTotal(client, target!);
 
             return new CardLook(
                 Selected: aimable && IsPickedTarget(target!),
@@ -560,7 +561,8 @@ public sealed partial class MainPage
                 _pickedTargets.Clear();
             }
 
-            if (_pickedTargets.Count < count)
+            // A target that would take the total mana value over the slot's limit is not added (CR 601.2c).
+            if (_pickedTargets.Count < count && FitsTotal(client, target))
             {
                 _pickedTargets.Add(target);
             }
@@ -581,6 +583,16 @@ public sealed partial class MainPage
             ? AnswerFor(announced, _pickedTargets.Count > 0 ? _pickedTargets[0] : null)
             : new TargetsChosenAnswer { Targets = [.. _pickedTargets] });
     }
+
+    /// <summary>
+    /// Whether <paramref name="target"/> may be chosen beside the targets already picked: a slot "with total mana value X or
+    /// less" (Fire Lord Sozin's) takes no target that would go over it, one already picked always (picking it again puts it back).
+    /// </summary>
+    private bool FitsTotal(GameClient client, TargetMessage target) =>
+        _targeting is not null
+        || client.Prompt?.Prompt is not ChooseTargetPromptMessage { MaximumTotalManaValue: not null } asked
+        || IsPickedTarget(target)
+        || asked.Fits(_pickedTargets, target);
 
     private static bool Same(TargetMessage one, TargetMessage other) =>
         one.Player == other.Player && one.Object == other.Object;

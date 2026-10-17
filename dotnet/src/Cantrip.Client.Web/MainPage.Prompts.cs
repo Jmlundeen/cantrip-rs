@@ -606,6 +606,12 @@ public sealed partial class MainPage
         // What this slot is for, where the card says (Jeskai Revelation's two slots, The Theorist's one for each opponent).
         string slot = SlotLabel(client, prompt);
 
+        // "With total mana value X or less" (CR 601.2c): the running total of what is picked, against the limit.
+        if (prompt.MaximumTotalManaValue is { } most)
+        {
+            slot = $"{slot}total mana value {prompt.TotalManaValueOf(_pickedTargets)}, at most {most}  ·  ";
+        }
+
         Prompt(
             prompt.AnyNumber ? $"Any number of {nouns} for {source}"
                 : prompt.Count == 1 && prompt.Optional ? $"Up to one {noun} for {source}"
@@ -1493,7 +1499,10 @@ public sealed partial class MainPage
             ? "That card has left where it was, so paying gets nothing"
             : prompt.Words(prompt.Detail, subject);
 
-        Prompt(title, string.Join("  ·  ", new[] { detail, standing }.Where(part => part.Length > 0)));
+        // "You may pay {X}" (CR 107.3f): X is chosen here, as it is paid, and the payment is of the X shown.
+        string chosen = prompt.ChoosingX ? $"X = {prompt.X}, so {prompt.Total}  ·  − and + change X" : "";
+
+        Prompt(title, string.Join("  ·  ", new[] { detail, chosen, standing }.Where(part => part.Length > 0)));
 
         if (_actions.Pay is { } pay)
         {
@@ -1503,6 +1512,26 @@ public sealed partial class MainPage
         if (_actions.Decline is { } decline)
         {
             AddButton(prompt.No.Length > 0 ? prompt.Words(prompt.No, subject) : "Don't pay", () => Send(client, AnswerFor(decline)), primary: _actions.Pay is null);
+        }
+
+        if (prompt.ChoosingX)
+        {
+            _buttons.Children.Add(Stepper(
+                8,
+                XStep("−", "Lower X by one", _actions.DecreaseX),
+                new SymbolText(13, Theme.Fg, semibold: true) { Text = $"X = {prompt.X}" },
+                XStep("+", "Raise X by one", _actions.IncreaseX)));
+        }
+
+        DockButton XStep(string text, string tooltip, ActionOptionMessage? option)
+        {
+            var button = new DockButton(text, primary: false, enabled: option is not null) { Tooltip = tooltip };
+            if (option is not null)
+            {
+                button.Clicked += () => { Send(client, AnswerFor(option)); RedrawNow(); };
+            }
+
+            return button;
         }
     }
 

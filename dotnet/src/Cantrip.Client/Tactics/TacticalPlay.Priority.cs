@@ -2178,8 +2178,9 @@ public sealed partial class TacticalPlay
         // is activated, cannot be paid for, and leaves the same question with the same amount owed: asked that way
         // twice, the cost is one this seat cannot pay, and it says no. The payment goes on only while this seat is making mana
         // for it: any other question from the same source is a new payment (Zoraline's attack after her entering).
+        // Only making mana can stall: raising X changes nothing owed while the pool covers it.
         bool continuing = _unlessContinuing && prompt.Source == _unless;
-        if (continuing && prompt.Remaining == _unlessOwed)
+        if (continuing && _unlessMadeMana && prompt.Remaining == _unlessOwed)
         {
             if (++_unlessStalls >= 2)
             {
@@ -2197,12 +2198,57 @@ public sealed partial class TacticalPlay
         if (!continuing)
         {
             _unless = prompt.Source;
-            _paying = WorthPaying(client, prompt);
+            _paying = prompt.ChoosingX ? DecideX(client, prompt) : WorthPaying(client, prompt);
         }
 
         TakeActionAnswer answer = Paying(client, prompt);
-        _unlessContinuing = answer.Kind == ActionKindView.ActivateAbility;
+        _unlessContinuing = answer.Kind is ActionKindView.ActivateAbility or ActionKindView.IncreaseX or ActionKindView.DecreaseX;
+        _unlessMadeMana = answer.Kind == ActionKindView.ActivateAbility;
         return answer;
+    }
+
+    /// <summary>
+    /// "You may pay {X}" with X this seat's to choose (CR 107.3f), read by what paying does: whether to pay at all, and the X it
+    /// raises to (<see cref="_xWanted"/>), no more than the mana it can make. Fire Lord Sozin's ("PutCreaturesFromGraveyard")
+    /// puts creature cards with total mana value X or less from the graveyard of the player it hit onto the battlefield, so the
+    /// X worth paying is the most those cards in an opponent's graveyard add up to; with none there, nothing is worth paying.
+    /// </summary>
+    private bool DecideX(GameClient client, UnlessPaysPromptMessage prompt)
+    {
+        _xWanted = 0;
+        if (prompt.Verb != "PutCreaturesFromGraveyard" || client.View is not { } view)
+        {
+            return false;
+        }
+
+        List<ObjectView> creatures = [.. view.Players
+            .Where(player => player.Seat != client.Seat)
+            .SelectMany(player => client.Zone(ZoneKindView.Graveyard, player.Seat))
+            .Where(card => card.CardTypes.Contains(CardTypeView.Creature))];
+        if (creatures.Count == 0)
+        {
+            return false;
+        }
+
+        // The mana it could make: what is in the pool, and one for each source it may tap while asked. X is the most a set of
+        // those cards adds up to within that (a subset sum), so no mana is paid for a card it could not then take.
+        int pool = Summary(view, client.Seat)?.Mana.Sum() ?? 0;
+        int sources = prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility).Select(option => option.Source).Distinct().Count();
+        int afford = Math.Min(pool + sources, 1000);
+        bool[] reachable = new bool[afford + 1];
+        reachable[0] = true;
+        foreach (int value in creatures.Select(card => card.ManaValue).Where(value => value > 0))
+        {
+            for (int total = afford; total >= value; total--)
+            {
+                reachable[total] |= reachable[total - value];
+            }
+        }
+
+        _xWanted = Enumerable.Range(0, afford + 1).Last(total => reachable[total]);
+
+        // Paying {0} still takes the cards worth nothing; with none of those and nothing affordable, it is not worth asking.
+        return _xWanted > 0 || creatures.Any(card => card.ManaValue == 0);
     }
 
     /// <summary>The answer to a payment once it is decided: decline, or make the mana and pay.</summary>
@@ -2211,6 +2257,16 @@ public sealed partial class TacticalPlay
         if (!_paying)
         {
             return AutoPlay.Answer(prompt.Options.First(option => option.Kind == ActionKindView.DeclineCost));
+        }
+
+        // X raised or lowered to the X decided on before anything is paid (CR 107.3f).
+        if (prompt.ChoosingX)
+        {
+            ActionKindView step = prompt.X < _xWanted ? ActionKindView.IncreaseX : prompt.X > _xWanted ? ActionKindView.DecreaseX : ActionKindView.PayCost;
+            if (step != ActionKindView.PayCost && prompt.Options.Find(option => option.Kind == step) is { } change)
+            {
+                return AutoPlay.Answer(change);
+            }
         }
 
         // Not with the last of its life, as for a spell of its own: the spell kept is no use to a seat that is dead.

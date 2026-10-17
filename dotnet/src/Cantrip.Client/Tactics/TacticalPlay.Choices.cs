@@ -17,6 +17,13 @@ public sealed partial class TacticalPlay
             return new TargetsChosenAnswer();
         }
 
+        // "Any number of target creature cards with total mana value X or less" (Fire Lord Sozin's): the most the cards can
+        // be worth together within the limit.
+        if (prompt.MaximumTotalManaValue is { } most)
+        {
+            return new TargetsChosenAnswer { Targets = WithinTotal(client, prompt, most) };
+        }
+
         EffectRead effect = Reading(client, prompt.Text, prompt.Source, prompt.Ability);
 
         // A bite deals damage equal to the power of the creature chosen for its first slot, to what its second slot chooses:
@@ -43,6 +50,41 @@ public sealed partial class TacticalPlay
         }
 
         return new TargetsChosenAnswer { Targets = targets };
+    }
+
+    /// <summary>
+    /// The targets of a slot limited to a total mana value (CR 601.2c), at most <see cref="ChooseTargetPromptMessage.Count"/>
+    /// of them: those whose mana values fill as much of <paramref name="most"/> as can be filled, the larger cards first among
+    /// equals, and every card of mana value 0 besides, which costs nothing of it. A bounded knapsack over the limit, which is
+    /// the X just paid and so small. Fire Lord Sozin's puts the cards onto the battlefield under this seat's control, so more
+    /// is better; only that slot has a total today.
+    /// </summary>
+    private static List<TargetMessage> WithinTotal(GameClient client, ChooseTargetPromptMessage prompt, int most)
+    {
+        int limit = Math.Max(0, Math.Min(most, 1000));
+        int Value(int i) => prompt.ManaValues.ElementAtOrDefault(i);
+        List<int> positive = [.. Enumerable.Range(0, prompt.Candidates.Count)
+            .Where(i => Value(i) > 0)
+            .OrderByDescending(Value)
+            .ThenByDescending(i => client.Object(prompt.Candidates[i].Object)?.Power ?? 0)];
+
+        // best[t]: the first set found whose values add up to exactly t (0/1 knapsack, the larger cards tried first).
+        List<int>?[] best = new List<int>?[limit + 1];
+        best[0] = [];
+        foreach (int i in positive)
+        {
+            for (int total = limit; total >= Value(i); total--)
+            {
+                if (best[total] is null && best[total - Value(i)] is { } before)
+                {
+                    best[total] = [.. before, i];
+                }
+            }
+        }
+
+        List<int> chosen = [.. Enumerable.Range(0, limit + 1).Reverse().Select(t => best[t]).First(set => set is not null)!,
+            .. Enumerable.Range(0, prompt.Candidates.Count).Where(i => Value(i) == 0)];
+        return [.. chosen.Take(prompt.Count).Select(i => prompt.Candidates[i])];
     }
 
     /// <summary>

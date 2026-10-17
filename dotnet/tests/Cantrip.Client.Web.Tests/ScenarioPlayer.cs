@@ -653,6 +653,41 @@ public sealed class ScenarioPlayer
         return null;
     }
 
+    /// <summary>
+    /// Scrolls each open graveyard column - with the wheel, over a card of it in view - down and then up until the card is in
+    /// view, as a person scrolls a long graveyard to the card they want. Null when no column brings it into view.
+    /// </summary>
+    private async Task<CardState?> ScrollGraveyardsToAsync(int handle)
+    {
+        TableState state = await _page.SettledAsync();
+        List<string> places = [.. state.Cards.Where(c => c.Visible && c.Place.EndsWith("graveyard", StringComparison.Ordinal)).Select(c => c.Place).Distinct()];
+        foreach (string place in places)
+        {
+            foreach (float delta in new[] { 120f, -120f })
+            {
+                for (int turn = 0; turn < 20; turn++)
+                {
+                    TableState now = await _page.SettledAsync();
+                    if (now.Cards.Where(c => c.Visible && c.Handle == handle).MaxBy(c => c.W) is { } found)
+                    {
+                        return found;
+                    }
+
+                    CardState? over = now.Cards.FirstOrDefault(c => c.Visible && c.Place == place);
+                    if (over is null)
+                    {
+                        break;
+                    }
+
+                    await _page.Page.Mouse.MoveAsync(over.X, over.Y);
+                    await _page.Page.Mouse.WheelAsync(0, delta);
+                }
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Shuts a zone this driver opened to click a card in it, if it is still open: a player's table is not left so.</summary>
     private async Task CloseZoneAsync(int seat, bool graveyard)
     {
@@ -686,6 +721,16 @@ public sealed class ScenarioPlayer
         if (card is { Place: "" or "graveyard" or "opponent-graveyard", Row: "" } && !state.GraveyardsOpen)
         {
             card = null;
+        }
+
+        // An open graveyard holding more cards than its column shows scrolls: the card is looked for there as a person scrolls to it.
+        if (card is null && state.GraveyardsOpen)
+        {
+            card = await ScrollGraveyardsToAsync(handle);
+            if (card is not null)
+            {
+                state = await _page.SettledAsync();
+            }
         }
 
         (int Seat, bool Graveyard)? opened = null;

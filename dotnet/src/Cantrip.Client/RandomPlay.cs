@@ -400,6 +400,12 @@ public sealed class RandomPlay : IAutoPlayer
             _paying = Coin();
         }
 
+        // "You may pay {X}" with X its own to choose (CR 107.3f): now and then raised by one before paying, so X is drawn too.
+        if (_paying && prompt.ChoosingX && Coin() && prompt.Options.Find(option => option.Kind == ActionKindView.IncreaseX) is { } raise)
+        {
+            return AutoPlay.Answer(raise);
+        }
+
         return _paying
             ? AutoPlay.PayUnless(prompt)
             : AutoPlay.Answer(prompt.Options.First(option => option.Kind == ActionKindView.DeclineCost));
@@ -533,7 +539,16 @@ public sealed class RandomPlay : IAutoPlayer
         int fewest = prompt.Optional ? 0 : prompt.Minimum > 0 ? prompt.Minimum : prompt.Count;
         int number = Math.Min(prompt.Candidates.Count, fewest + _random.Next(prompt.Count - fewest + 1));
 
-        return new TargetsChosenAnswer { Targets = Some(prompt.Candidates, Math.Max(number, 1)) };
+        List<TargetMessage> drawn = Some(prompt.Candidates, Math.Max(number, 1));
+
+        // "With total mana value X or less" (CR 601.2c): the draw cut back to those that fit together, in the order drawn.
+        if (prompt.MaximumTotalManaValue is { } most)
+        {
+            List<int> values = [.. drawn.Select(target => prompt.ManaValues.ElementAtOrDefault(prompt.Candidates.IndexOf(target)))];
+            drawn = Cantrip.Core.Decisions.TotalManaValue.FirstFitting(drawn, values, drawn.Count, most);
+        }
+
+        return new TargetsChosenAnswer { Targets = drawn };
     }
 
     /// <summary>

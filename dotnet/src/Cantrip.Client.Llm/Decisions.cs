@@ -98,6 +98,9 @@ public sealed class Decisions
     /// <summary>Whether the last answer to a payment made mana for it, so the next question is the same payment.</summary>
     private bool _unlessContinuing;
 
+    /// <summary>The X chosen for a "you may pay {X}" whose X is this seat's to choose (CR 107.3f).</summary>
+    private int _xWanted;
+
     public Decisions(IChooser chooser)
     {
         ArgumentNullException.ThrowIfNull(chooser);
@@ -553,14 +556,36 @@ public sealed class Decisions
             string question = prompt.Question.Length > 0 ? prompt.Words(prompt.Question, subject) : $"pay {prompt.CostText()}?";
             string detail = prompt.Words(prompt.Detail, subject);
             string no = prompt.No.Length > 0 ? $" Declining: {prompt.Words(prompt.No, subject)}." : string.Empty;
-            _paying = Yes($"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
-                + $"It costs {prompt.CostText()}; you have {client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Life} life. Pay it?");
+            if (prompt.ChoosingX)
+            {
+                // "You may pay {X}" with X yours to choose (CR 107.3f): how much X, up to the mana there is to make, or nothing.
+                int pool = client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Mana.Sum() ?? 0;
+                int most = pool + prompt.Options.Where(option => option.Kind == ActionKindView.ActivateAbility).Select(option => option.Source).Distinct().Count();
+                int picked = One(new Question
+                {
+                    Heading = $"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
+                        + $"X is yours to choose; you can make about {most} mana. How much X do you pay?",
+                    Choices = ["Don't pay.", .. Enumerable.Range(0, most + 1).Select(x => $"Pay X = {x}.")],
+                });
+                _paying = picked > 0;
+                _xWanted = Math.Max(0, picked - 1);
+            }
+            else
+            {
+                _paying = Yes($"{source}: {question}{(detail.Length > 0 ? $" ({detail}.)" : string.Empty)}{no} "
+                    + $"It costs {prompt.CostText()}; you have {client.View?.Players.FirstOrDefault(player => player.Seat == client.Seat)?.Life} life. Pay it?");
+            }
         }
 
-        TakeActionAnswer answer = _paying
+        // The X decided on, raised or lowered to before anything is paid.
+        ActionKindView step = !_paying || !prompt.ChoosingX ? ActionKindView.PayCost
+            : prompt.X < _xWanted ? ActionKindView.IncreaseX : prompt.X > _xWanted ? ActionKindView.DecreaseX : ActionKindView.PayCost;
+        TakeActionAnswer answer = prompt.Options.Find(option => option.Kind == step && step != ActionKindView.PayCost) is { } change
+            ? AutoPlay.Answer(change)
+            : _paying
             ? AutoPlay.PayUnless(prompt)
             : AutoPlay.Answer(prompt.Options.First(option => option.Kind == ActionKindView.DeclineCost));
-        _unlessContinuing = answer.Kind == ActionKindView.ActivateAbility;
+        _unlessContinuing = answer.Kind is ActionKindView.ActivateAbility or ActionKindView.IncreaseX or ActionKindView.DecreaseX;
         return answer;
     }
 
@@ -960,15 +985,27 @@ public sealed class Decisions
 
         string what = prompt.Targeted ? "targets" : "chooses";
 
-        return new TargetsChosenAnswer
+        // "With total mana value X or less" (CR 601.2c): each candidate's mana value said, and what is chosen kept to those
+        // that fit together, in the order chosen.
+        string total = prompt.MaximumTotalManaValue is { } limit
+            ? $" Their mana values together may be at most {limit}: "
+                + string.Join(", ", prompt.Candidates.Select((target, i) => $"{GameText.Aimed(client, target)} {prompt.ManaValues.ElementAtOrDefault(i)}")) + "."
+            : string.Empty;
+
+        List<TargetMessage> chosen = Aim(
+            client,
+            prompt.Candidates,
+            prompt.Count,
+            least: prompt.Optional ? 0 : prompt.Minimum > 0 ? prompt.Minimum : prompt.Count,
+            what: $"{GameText.Named(client, prompt.Ability)} {what}" + (prompt.Text.Length > 0 ? $": {Slot(client, prompt)}." : ".") + total);
+
+        if (prompt.MaximumTotalManaValue is { } most)
         {
-            Targets = Aim(
-                client,
-                prompt.Candidates,
-                prompt.Count,
-                least: prompt.Optional ? 0 : prompt.Minimum > 0 ? prompt.Minimum : prompt.Count,
-                what: $"{GameText.Named(client, prompt.Ability)} {what}" + (prompt.Text.Length > 0 ? $": {Slot(client, prompt)}." : ".")),
-        };
+            List<int> values = [.. chosen.Select(target => prompt.ManaValues.ElementAtOrDefault(prompt.Candidates.IndexOf(target)))];
+            chosen = Cantrip.Core.Decisions.TotalManaValue.FirstFitting(chosen, values, chosen.Count, most);
+        }
+
+        return new TargetsChosenAnswer { Targets = chosen };
     }
 
     /// <summary>

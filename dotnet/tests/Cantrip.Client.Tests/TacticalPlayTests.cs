@@ -930,6 +930,149 @@ public sealed class TacticalPlayTests
         Assert.Equal([0], answer.Modes);
     }
 
+    private static ObjectView InTheirGraveyard(int handle, string name, int manaValue) => new()
+    {
+        Handle = Handle(handle),
+        Zone = ZoneKindView.Graveyard,
+        ZoneOwner = Them,
+        Kind = ObjectKindView.Card,
+        Owner = Them,
+        Controller = Them,
+        Name = name,
+        CardTypes = [CardTypeView.Creature],
+        ManaValue = manaValue,
+        Power = manaValue,
+        Toughness = manaValue,
+    };
+
+    [Fact]
+    public void Fills_a_total_mana_value_of_targets_with_the_most_it_can_and_every_card_worth_nothing()
+    {
+        // Fire Lord Sozin's "any number of target creature cards with total mana value X or less", X = 3: the Ogre (2) and an
+        // Elf (1) fill the 3, and the Thopter (0) costs nothing of it.
+        GameClient client = Seated([
+            InTheirGraveyard(21, "Elf", 1), InTheirGraveyard(22, "Ogre", 2), InTheirGraveyard(23, "Elf", 1), InTheirGraveyard(24, "Thopter", 0)]);
+
+        TargetsChosenAnswer answer = Assert.IsType<TargetsChosenAnswer>(Bot().Decide(client, new ChooseTargetPromptMessage
+        {
+            Player = Me,
+            Candidates = [.. new[] { 21, 22, 23, 24 }.Select(h => new TargetMessage { Object = Handle(h) })],
+            ManaValues = [1, 2, 1, 0],
+            MaximumTotalManaValue = 3,
+            Optional = true,
+            AnyNumber = true,
+            Count = 4,
+        }));
+
+        List<int> chosen = [.. answer.Targets.Select(t => t.Object.Value)];
+        Assert.Equal(3, chosen.Sum(h => h switch { 22 => 2, 24 => 0, _ => 1 }));
+        Assert.Contains(22, chosen);
+        Assert.Contains(24, chosen);
+    }
+
+    [Fact]
+    public void Raises_x_to_what_the_creature_cards_in_an_opponents_graveyard_are_worth_up_to_the_mana_it_can_make()
+    {
+        // "You may pay {X}" with X its own to choose: an Ogre (2) and an Elf (1) in the opponent's graveyard are worth 3, but with
+        // an empty pool and one land to tap it can make only 1 - so it raises X to 1, then pays.
+        GameClient client = Seated([Land(1), InTheirGraveyard(21, "Elf", 1), InTheirGraveyard(22, "Ogre", 2)]);
+        TacticalPlay bot = Bot();
+
+        UnlessPaysPromptMessage Asked(int x) => new()
+        {
+            Player = Me,
+            Source = Handle(30),
+            Subject = Handle(30),
+            Verb = "PutCreaturesFromGraveyard",
+            ChoosingX = true,
+            X = x,
+            Total = $"{{{x}}}",
+            Remaining = $"{{{x}}}",
+            RemainingGeneric = x,
+            Options =
+            [
+                new() { Kind = ActionKindView.ActivateAbility, Source = Handle(1), Produces = [ManaTypeView.Red] },
+                new() { Kind = ActionKindView.IncreaseX },
+                new() { Kind = ActionKindView.DecreaseX },
+                new() { Kind = ActionKindView.DeclineCost },
+            ],
+        };
+
+        Assert.Equal(ActionKindView.IncreaseX, Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked(0))).Kind);
+        TakeActionAnswer making = Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked(1)));
+        Assert.Equal((ActionKindView.ActivateAbility, Handle(1)), (making.Kind, making.Source));
+    }
+
+    [Fact]
+    public void Raises_x_past_what_the_pool_already_covers_and_pays_it_from_the_pool()
+    {
+        // Firebending's {R}{R}{R} floating: raising X changes nothing still owed, which is no stall. An Ogre (2) and an Elf (1)
+        // are worth 3, so X goes to 3 and is paid; a Giant (6) it could never afford is left out of the sum.
+        GameClient client = Seated([InTheirGraveyard(21, "Elf", 1), InTheirGraveyard(22, "Ogre", 2), InTheirGraveyard(23, "Giant", 6)]);
+        client.View!.Players.First(player => player.Seat == Me).Mana[(int)ManaTypeView.Red] = 3;
+        TacticalPlay bot = Bot();
+
+        UnlessPaysPromptMessage Asked(int x) => new()
+        {
+            Player = Me,
+            Source = Handle(30),
+            Subject = Handle(30),
+            Verb = "PutCreaturesFromGraveyard",
+            ChoosingX = true,
+            X = x,
+            Total = $"{{{x}}}",
+            Remaining = "{0}",
+            Options =
+            [
+                new() { Kind = ActionKindView.PayCost },
+                new() { Kind = ActionKindView.IncreaseX },
+                new() { Kind = ActionKindView.DecreaseX },
+                new() { Kind = ActionKindView.DeclineCost },
+            ],
+        };
+
+        List<ActionKindView> answers = [.. Enumerable.Range(0, 4).Select(x => Assert.IsType<TakeActionAnswer>(bot.Decide(client, Asked(x))).Kind)];
+        Assert.Equal([ActionKindView.IncreaseX, ActionKindView.IncreaseX, ActionKindView.IncreaseX, ActionKindView.PayCost], answers);
+    }
+
+    [Fact]
+    public void Pays_no_x_for_a_creature_card_it_cannot_afford()
+    {
+        GameClient client = Seated([Land(1), InTheirGraveyard(23, "Giant", 6)]);
+        TakeActionAnswer answer = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, new UnlessPaysPromptMessage
+        {
+            Player = Me,
+            Source = Handle(30),
+            Verb = "PutCreaturesFromGraveyard",
+            ChoosingX = true,
+            Total = "{0}",
+            Options =
+            [
+                new() { Kind = ActionKindView.ActivateAbility, Source = Handle(1), Produces = [ManaTypeView.Red] },
+                new() { Kind = ActionKindView.PayCost }, new() { Kind = ActionKindView.IncreaseX }, new() { Kind = ActionKindView.DeclineCost },
+            ],
+        }));
+
+        Assert.Equal(ActionKindView.DeclineCost, answer.Kind);
+    }
+
+    [Fact]
+    public void Pays_no_x_with_no_creature_card_in_an_opponents_graveyard()
+    {
+        GameClient client = Seated([Land(1)]);
+        TakeActionAnswer answer = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, new UnlessPaysPromptMessage
+        {
+            Player = Me,
+            Source = Handle(30),
+            Verb = "PutCreaturesFromGraveyard",
+            ChoosingX = true,
+            Total = "{0}",
+            Options = [new() { Kind = ActionKindView.PayCost }, new() { Kind = ActionKindView.IncreaseX }, new() { Kind = ActionKindView.DeclineCost }],
+        }));
+
+        Assert.Equal(ActionKindView.DeclineCost, answer.Kind);
+    }
+
     [Fact]
     public void The_same_board_gets_the_same_answer_every_time()
     {
