@@ -100,6 +100,30 @@ pub fn may_cause_discard_or_sacrifice(q: &dyn Query, causer: PlayerId, player: P
     true
 }
 
+/// An object's mana cost (CR 202.1) as its characteristics `c` give it (`Query::mana_cost`): the card's or the one it
+/// copies, none for a copy that has none (CR 707.9b) or a face-down permanent (CR 708.2a), and a Room's unlocked doors on
+/// the battlefield (CR 709.5).
+pub fn mana_cost_of(card: &dyn Fn(CardId) -> &'static CardDef, obj: &Obj, c: &Chars) -> ManaCost {
+    if c.no_cost {
+        return ManaCost::ZERO;
+    }
+    let def = card(c.card);
+    // A Room on the battlefield has the mana cost of its unlocked doors alone (CR 709.5); anywhere else the card's.
+    if def.is_room() && obj.zone.is(ZoneKind::Battlefield) { def.room_cost(obj.marks.doors) } else { def.cost }
+}
+
+/// An object's mana value (CR 202.3) as its characteristics `c` give it (`Query::mana_value`, `LayerQuery::mana_value`).
+pub fn mana_value_of(card: &dyn Fn(CardId) -> &'static CardDef, state: &GameState, id: ObjectId, c: &Chars) -> u32 {
+    let obj = state.obj(id);
+    let front = card(obj.card);
+    let cost = match front.back {
+        Some(back) if obj.transformed && obj.copy.is_none() && !back.has_cost && !front.back_land && !c.no_cost => front.cost,
+        _ => mana_cost_of(card, obj, c),
+    };
+    let x = if obj.zone.is(ZoneKind::Stack) { obj.x } else { state.left_stack(id).map_or(0, |item| item.x) };
+    cost.mana_value() + cost.x as u32 * x as u32
+}
+
 /// Reading the game.
 pub trait Query {
     fn state(&self) -> &GameState;
@@ -190,13 +214,7 @@ pub trait Query {
     /// that has none (CR 707.9b) or a face-down permanent (CR 708.2a), and a Room's unlocked doors on the battlefield
     /// (CR 709.5). Its {X} symbols are counted in `x`, not valued.
     fn mana_cost(&self, id: ObjectId) -> ManaCost {
-        let c = self.chars(id);
-        if c.no_cost {
-            return ManaCost::ZERO;
-        }
-        let def = self.card(c.card);
-        // A Room on the battlefield has the mana cost of its unlocked doors alone (CR 709.5); anywhere else the card's.
-        if def.is_room() && self.obj(id).zone.is(ZoneKind::Battlefield) { def.room_cost(self.obj(id).marks.doors) } else { def.cost }
+        mana_cost_of(&|card| self.card(card), self.obj(id), &self.chars(id))
     }
 
     /// An object's mana value (CR 202.3): its mana cost's, or 0 for a copy that has none (CR 707.9b). Each {X} in it
@@ -206,18 +224,7 @@ pub trait Query {
     /// The back face of a nonmodal double-faced object, up, has no mana cost but the mana value of its front face's
     /// (CR 202.3b, 712.8c, 712.8e: a transformed permanent, a spell cast transformed); a copy of that face has 0.
     fn mana_value(&self, id: ObjectId) -> u32 {
-        let obj = self.obj(id);
-        let front = self.card(obj.card);
-        let cost = match front.back {
-            Some(back) if obj.transformed && obj.copy.is_none() && !back.has_cost && !front.back_land && !self.chars(id).no_cost => front.cost,
-            _ => self.mana_cost(id),
-        };
-        let x = if self.obj(id).zone.is(ZoneKind::Stack) {
-            self.obj(id).x
-        } else {
-            self.state().left_stack(id).map_or(0, |item| item.x)
-        };
-        cost.mana_value() + cost.x as u32 * x as u32
+        mana_value_of(&|card| self.card(card), self.state(), id, &self.chars(id))
     }
 
     /// An object's copiable values (CR 707.2): what a copy of it copies, the exceptions of its own copy effect

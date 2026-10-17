@@ -715,6 +715,13 @@ pub const fn static_ability(layer: Layer, affects: StaticAffects, apply: StaticA
     StaticDef { text, layer, affects, apply, ..StaticDef::BLANK }
 }
 
+/// A static ability (CR 604) whose effect on each object `affects` accepts reads that object (`StaticDef::apply_each`):
+/// "each other non-Aura enchantment ... has base power and base toughness each equal to its mana value" (Opalescence;
+/// March of the Machines, Titania's Song).
+pub const fn static_ability_for_each(layer: Layer, affects: StaticAffects, apply: crate::StaticApplyEach, text: &'static str) -> StaticDef {
+    StaticDef { text, layer, affects, apply_each: Some(apply), ..StaticDef::BLANK }
+}
+
 /// A static ability by which every object `affects` accepts loses all abilities (CR 613.1f, layer 6): "enchanted
 /// creature loses all abilities" (Eaten by Piranhas, Darksteel Mutation, Kenrith's Transformation, Frogify), "all
 /// creatures lose all abilities" (Humility). Its effect takes away every ability the object has at its timestamp, its

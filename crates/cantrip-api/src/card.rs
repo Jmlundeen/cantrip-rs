@@ -150,6 +150,12 @@ pub trait LayerQuery {
     /// Tarmogoyf among them counting as it is in exile (their rulings). Only for an object that is not the one being
     /// computed and whose own abilities do not read it back.
     fn chars_with_defined_pt(&self, id: ObjectId) -> Chars;
+    /// An object's mana value (CR 202.3) from `so_far`, its characteristics as the layers have them now: its mana cost is
+    /// settled with its copiable values (CR 613.2c), so this is what `Query::mana_value` gives, without asking for the
+    /// characteristics still being worked out. What "its mana value" reads in a static ability's effect (Opalescence).
+    fn mana_value(&self, id: ObjectId, so_far: &Chars) -> u32 {
+        crate::mana_value_of(&|card| self.cards().get(card), self.state(), id, so_far)
+    }
     /// The words an object's text has now (CR 612): what a static ability names, read through its source's words.
     fn words(&self, id: ObjectId) -> Words {
         crate::words(self.state(), id)
@@ -162,6 +168,10 @@ pub type StaticAffects = fn(&dyn LayerQuery, ObjectId, ObjectId, &Chars) -> bool
 /// A static ability's effect on one affected object's characteristics.
 pub type StaticApply = fn(&dyn LayerQuery, ObjectId, &mut Chars);
 
+/// A static ability's effect on one affected object's characteristics that reads that object (`StaticDef::apply_each`):
+/// the view, the source, the affected object, and its characteristics so far.
+pub type StaticApplyEach = fn(&dyn LayerQuery, ObjectId, ObjectId, &mut Chars);
+
 /// A static ability (CR 604) that generates a continuous effect on characteristics (CR 611.3, 613): "lands are
 /// Swamps", "all cards are blue", "other Elves get +1/+1". It applies while its source is on the battlefield, to
 /// every object `affects` accepts: permanents, or objects anywhere with `everywhere` (CR 611.3a). A
@@ -172,6 +182,10 @@ pub struct StaticDef {
     pub layer: Layer,
     pub affects: StaticAffects,
     pub apply: StaticApply,
+    /// In place of `apply`, an effect that differs from object to object by what each is ("has base power and base
+    /// toughness each equal to its mana value": Opalescence, March of the Machines): it is told the affected object
+    /// (`static_ability_for_each`).
+    pub apply_each: Option<StaticApplyEach>,
     pub everywhere: bool,
     pub own: bool,
     /// The zone its source functions from (CR 113.6b): the battlefield, the graveyard for Anger's kind, or exile for
@@ -207,6 +221,7 @@ impl StaticDef {
             layer: Layer::Ability,
             affects: affects_nothing,
             apply: apply_nothing,
+            apply_each: None,
             everywhere: false,
             own: false,
             from: ZoneKind::Battlefield,

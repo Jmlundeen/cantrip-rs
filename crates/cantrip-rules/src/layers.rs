@@ -566,7 +566,7 @@ impl Noted {
         match *entry {
             Entry::Static(source, st) if self.on => {
                 if (st.affects)(view, source, id, chars) {
-                    (st.apply)(view, source, chars);
+                    apply_static(st, view, source, id, chars);
                     self.parts.push((source, st));
                 }
             }
@@ -582,6 +582,14 @@ impl Noted {
         {
             self.parts.push((source, st));
         }
+    }
+}
+
+/// A static ability of `source` applied to `id`: its effect, or its effect on that object (`StaticDef::apply_each`).
+fn apply_static(st: &StaticDef, view: &View, source: ObjectId, id: ObjectId, chars: &mut Chars) {
+    match st.apply_each {
+        Some(apply) => apply(view, source, id, chars),
+        None => (st.apply)(view, source, chars),
     }
 }
 
@@ -716,7 +724,7 @@ impl Entry {
         match *self {
             Entry::Effect(e) => apply_effect(&e, view.stop, chars),
             Entry::Granted(st) => (st.apply)(view, id, chars),
-            Entry::Static(source, st) | Entry::Continued(source, st) => (st.apply)(view, source, chars),
+            Entry::Static(source, st) | Entry::Continued(source, st) => apply_static(st, view, source, id, chars),
         }
     }
 
@@ -724,10 +732,10 @@ impl Entry {
         match *self {
             Entry::Effect(e) => apply_effect(&e, view.stop, chars),
             Entry::Granted(st) => (st.apply)(view, id, chars),
-            Entry::Continued(source, st) => (st.apply)(view, source, chars),
+            Entry::Continued(source, st) => apply_static(st, view, source, id, chars),
             Entry::Static(source, st) => {
                 if (st.affects)(view, source, id, chars) {
-                    (st.apply)(view, source, chars);
+                    apply_static(st, view, source, id, chars);
                 }
             }
         }
