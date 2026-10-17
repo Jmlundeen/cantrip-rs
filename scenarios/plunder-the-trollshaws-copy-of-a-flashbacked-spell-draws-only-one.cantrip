@@ -1,6 +1,3 @@
-# Known bug: ops::copy_spell builds the copy from the original, so a copy of a spell cast from a graveyard inherits `cast_from`; a copy
-# is never cast (CR 707.10), so "if this spell was cast from a graveyard" is false for it and it draws one card, not two
-# (docs/known-issues.md; the same fault makes Sevinne's Reclamation's copy offer to copy itself again).
 # Plunder the Trollshaws is cast on turn 1 (draws one) and again from the graveyard with flashback on turn 3 (Black Lotus' blue
 # and a Mox Sapphire pay {3}{U}); with it on the stack Bot1 flashes in Lutri, the Spellchaser ({1}{R}{U}: Mox Ruby, Mox Sapphire,
 # Mox Jet), whose enters trigger copies it. The copy resolves first and draws ONE; the original draws two. Cards drawn in all:

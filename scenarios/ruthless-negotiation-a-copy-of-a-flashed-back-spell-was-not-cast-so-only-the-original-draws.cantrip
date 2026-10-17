@@ -1,4 +1,3 @@
-# Known bug: a copy of a spell made by Lutri is given the original spell's cast_from (copy_spell in cantrip-rules ops.rs spreads ..original), so the copy of a flashed-back Ruthless Negotiation draws too; a copy is never cast (CR 707.10).
 # "If this spell was cast from a graveyard, draw a card": a copy of a spell is not cast (CR 707.10), so the copy of a
 # flashed-back Negotiation, made by Lutri flashed in with it on the stack, exiles a card but does not draw; only the original
 # draws. Hand-cast on turn 1 (Bot2 exiles Forest), flashed back on turn 3 (the copy, resolving first, makes Bot2 exile

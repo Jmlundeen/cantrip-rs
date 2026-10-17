@@ -46,7 +46,6 @@ keeps it).
 | [KI-28](#ki-28-noncombat-damage-plus-n-reads-the-controller-of-a-damage-source-that-is-not-on-the-battlefield-or-the-stack) | Noncombat damage "plus N" reads the controller of a damage source that is not on the battlefield or the stack | Low | Suspected |
 | [KI-30](#ki-30-a-permanents-name-is-not-part-of-its-last-known-information) | A permanent's name is not part of its last-known information | Low | Open |
 | [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
-| [KI-32](#ki-32-a-copy-of-a-spell-keeps-the-zone-the-original-was-cast-from) | A copy of a spell keeps the zone the original was cast from | Medium | Open |
 | [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 
@@ -293,22 +292,6 @@ only because no face is offered; a fix judges each inset face with the filter, a
 
 **Scenarios.**
 - [`scenarios/traveling-chocobo-plays-lindblum-off-the-top-but-not-its-adventure.cantrip`](../scenarios/traveling-chocobo-plays-lindblum-off-the-top-but-not-its-adventure.cantrip) - the case that must stay refused; none yet for one that must be offered (Bolas's Citadel with Bonecrusher Giant on top).
-### KI-32: A copy of a spell keeps the zone the original was cast from
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-16, Ruthless Negotiation |
-
-**Notes.** `copy_spell` in `crates/cantrip-rules/src/ops.rs` builds the copy's object with `..original`, so `Obj::cast_from`
-(and any other cast-only field) is the original's. A copy of a spell is not cast (CR 707.10), so "if this spell was cast from a
-graveyard" (Ruthless Negotiation, Sevinne's Reclamation) and rebound's "if this spell was cast from your hand" (`resolve.rs`) must
-be false for it. Today the copy of a flashed-back Ruthless Negotiation draws a card too; the copy Sevinne's Reclamation makes
-asks to copy itself again (its scenarios decline by default, so they do not show it). A fix sets `cast_from: None` (and clears
-the other cast-only fields) in the copy, beside `spent`.
-
-**Scenarios.**
-- [`scenarios/ruthless-negotiation-a-copy-of-a-flashed-back-spell-was-not-cast-so-only-the-original-draws.cantrip`](../scenarios/ruthless-negotiation-a-copy-of-a-flashed-back-spell-was-not-cast-so-only-the-original-draws.cantrip) - Lutri copies a flashed-back Negotiation; only the original may draw (marked `# Known bug`).
-- [`scenarios/plunder-the-trollshaws-copy-of-a-flashbacked-spell-draws-only-one.cantrip`](../scenarios/plunder-the-trollshaws-copy-of-a-flashbacked-spell-draws-only-one.cantrip) - Lutri copies a flashed-back Plunder the Trollshaws; the copy draws one, the original two (marked `# Known bug`).
 
 ### KI-33: Chain Lightning's payer copies without being asked whether to
 
