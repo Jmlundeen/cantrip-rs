@@ -793,6 +793,18 @@ pub fn you_commit_a_crime(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fi
 /// "Whenever you commit a crime" as a trigger condition: `triggered(YOU_COMMIT_A_CRIME, ..)`.
 pub const YOU_COMMIT_A_CRIME: Trigger = when_asked(EventMask::CRIME, you_commit_a_crime);
 
+/// "Whenever you discard a card" (CR 701.9a): each card of a discard is its own event, so the ability triggers once for
+/// each card discarded, and the card, in the graveyard, is what it is about. With `.once_per_batch()` it is "whenever you
+/// discard one or more cards" (CR 603.2c). Ivora, Currency Converter, Marauding Mako, Inti and Cool but Rude print it.
+pub fn you_discard(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Discarded { player, card } if *player == me.controller => Fired::about(Target::Object(*card)),
+        _ => None,
+    }
+}
+
+pub const YOU_DISCARD: Trigger = when_asked(EventMask::DISCARDED, you_discard);
+
 /// "Whenever you flip a coin" (CR 705.1): any flip its controller makes, won or lost.
 pub fn you_flip_a_coin(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {

@@ -4,14 +4,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("Exile", "exile the discarded card from your graveyard?", "", "Exile it", "Leave it");
 
-/// "Whenever you discard a card": the card, in the graveyard, is what the ability is about.
-fn you_discard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Discarded { player, card } if *player == q.controller(source) => Fired::about(Target::Object(*card)),
-        _ => None,
-    }
-}
-
 /// "You may exile that card from your graveyard": exiled with this artifact (CR 607.2a), where its other ability
 /// finds it. A card that has left the graveyard since is not the card any more (CR 400.7).
 fn exile_discarded(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -59,7 +51,7 @@ fn cash_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::DISCARDED, you_discard), exile_discarded, "Whenever you discard a card, you may exile that card from your graveyard."),
+        triggered(cantrip_mechanics::triggers::YOU_DISCARD, exile_discarded, "Whenever you discard a card, you may exile that card from your graveyard."),
         ability(cost("{2}, {T}"), cantrip_mechanics::effects::loot, "{2}, {T}: Draw a card, then discard a card."),
         ability(TAP, cash_in, "{T}: Put a card exiled with this artifact into its owner's graveyard. If it's a land card, create a Treasure token. If it's a nonland card, create a 2/2 black Rogue creature token."),
     ],

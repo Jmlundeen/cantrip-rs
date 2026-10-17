@@ -25,14 +25,6 @@ fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Whenever you discard one or more cards" (CR 603.2c): once for the cards discarded together.
-fn you_discard(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Discarded { player, card } if *player == q.controller(source) => Fired::about(Target::Object(*card)),
-        _ => None,
-    }
-}
-
 /// "Exile the top card of your library. You may play that card until your next end step": a permission to play, not
 /// only to cast, so a land may be played as the turn's land drop (CR 305.1). Taking it is not a draw.
 fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -44,7 +36,7 @@ fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(cantrip_mechanics::triggers::YOU_ATTACK, discard_for_counter, "Whenever you attack, you may discard a card. When you do, put a +1/+1 counter on target attacking creature. It gains trample until end of turn."),
-        triggered(when(EventMask::DISCARDED, you_discard), exile_and_play, "Whenever you discard one or more cards, exile the top card of your library. You may play that card until your next end step.")
+        triggered(cantrip_mechanics::triggers::YOU_DISCARD, exile_and_play, "Whenever you discard one or more cards, exile the top card of your library. You may play that card until your next end step.")
             .once_per_batch(),
     ],
     delayed: &[delayed_trigger(empower, "When you do, put a +1/+1 counter on target attacking creature. It gains trample until end of turn.")
