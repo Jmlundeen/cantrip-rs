@@ -188,12 +188,20 @@ question over writing each card as explicit stages, which the spike measured, an
   subtype) replaced by another. The layers change the type line; card code reads every word of its rules text through
   `Query::words` (`Words`, the changes in timestamp order), so the card does what its changed text says. A token's
   colors and creature types are those of the text that made it (`Copiable::words`, 612.4), a permanent spell's effects
-  go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`).
+  go on to the permanent (400.7a), and an object that has left keeps the words it last had (`LastKnown::words`). An
+  effect that sets a name (612.8, "named Everflame, Heroes' Legacy") is `EffectKind::SetName`, in layer 3: the object
+  has that name alone (`Chars::name_set`), for the legend rule and every "same name" or chosen-name question
+  (`library::object_names`).
+- **Type-changing effects (613.1d, layer 4)** in timestamp order: `AddTypes`, `SetTypes`, `AddSubtype`,
+  `SetCreatureType`, `AddAllCreatureTypes` ("with all creature types", only to a creature or Kindred, 205.3d) and
+  `LoseAllCreatureTypes`. Changeling's every creature type is a characteristic-defining ability applied first (613.3).
 - **Static abilities granted by effects (613.1f, 613.7a)** are `granted_static` entries (`AbilityDef::Static`) of a card's
   `delayed` list, given with `EffectKind::AddAbility`. Once layer 6 has settled an object's abilities, those it still has
   (so "loses all abilities" later in timestamp order takes them) apply to it alone, with it as their source, in their own
   layer (7a onward, refused at table construction for an earlier one) at the timestamp of the granting effect, merged in
-  timestamp order with the effects and other statics of that layer.
+  timestamp order with the effects and other statics of that layer. One that affects other objects
+  (`granted_static_ability`, The Irencrag's "Equipped creature gets +3/+3") makes the permanent a static source
+  (`StaticSources::granted`) while it still has the ability, applied among the other sources' abilities at its timestamp.
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.

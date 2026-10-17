@@ -96,6 +96,7 @@ the line goes.
 | Path | Covered instead by | Why no scenario |
 | --- | --- | --- |
 | Retargeting a copy (`ops::retarget`): "up to" slots of a modal spell, each-opponent slots, spliced text (CR 702.47c) and kicked-spell targets | nothing | No modal spell in content has an "up to" mode target, no copyable spell has an each-opponent target, and no scenario copies a spliced or kicked spell. |
+| A granted static ability that affects other objects taken by a later "loses all abilities" (`layers::granted_to_others`: the `LoseAllAbilities` clear and the `has.abilities` filter) | The Irencrag's own "loses all other abilities" before its grants | No implemented card makes a noncreature artifact lose all abilities while it stays an Equipment (Oko's +1 makes Everflame an Elk creature, which unattaches it). |
 | A granted cast of a back face (`GRANTED_FACE_BACK`, `faces_to_cast`) | nothing | No implemented double-faced card has a castable back face. |
 | A flash grant judged for an MDFC back face or a bestowed Aura through `actions::Speed::face`, beyond Sigarda's Aid's bestow | nothing | No implemented double-faced card has a castable noncreature back face; no flash grant names creatures. |
 | The transformed cast's `cast_only_if_met` check (`could_cast_transformed_during_resolution`) | nothing | Only Berserk has a "cast only" condition, and it has no back face. |
@@ -272,6 +273,8 @@ abilities and words but no name, so "the same name as that permanent" asked afte
 use last-known information: a card, copy effect, face-down or transformed state is gone with the old object (CR 400.7). Cards
 read `library::object_names` before moving the object (The End, Deadly Cover-Up), which is right for them; a card that must ask
 after the move needs the name kept in `LastKnown`.
+The same holds for a name an effect set (`EffectKind::SetName`, CR 612.8): The Irencrag that left as Everflame, Heroes'
+Legacy reads as The Irencrag afterwards.
 
 **Scenarios.** None yet.
 

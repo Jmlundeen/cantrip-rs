@@ -1,0 +1,43 @@
+# The Nameless Inversion ruling: "If a creature loses all creature types but then gains a new creature type later in the
+# turn, it will be that new creature type." Bot1's Concealing Curtains, a 0/4 Wall, loses all creature types to the
+# Inversion, then Scale Up makes it a green Wurm with base power and toughness 6/4. Layer 4 applies in timestamp order
+# (CR 613.7), so the later Wurm stays: it is a Wurm, 9/1 with the Inversion's +3/-3 on top of the new base (CR 613.4b-c).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Emerald
+Concealing Curtains
+Nameless Inversion
+Scale Up
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Nameless Inversion.Cast(Bot1.Battlefield.Concealing Curtains)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Concealing Curtains.Subtypes = (absent)
+Bot1.Hand.Scale Up.Cast(Bot1.Battlefield.Concealing Curtains)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Bot1.Battlefield.Concealing Curtains.Subtypes = Wurm
+Bot1.Battlefield.Concealing Curtains.Power = 9
+Bot1.Battlefield.Concealing Curtains.Toughness = 1

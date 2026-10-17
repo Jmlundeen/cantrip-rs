@@ -547,7 +547,7 @@ fn statics(
     // The static abilities effects gave permanents that affect other objects, in their timestamp order (CR 613.7a), each
     // applied among the sources' own at its timestamp.
     let mut given: Vec<(u32, ObjectId, &'static StaticDef)> =
-        others.iter().flat_map(|&holder| granted_to_others(cards, state, log, holder, layer)).collect();
+        if on_battlefield { others.iter().flat_map(|&holder| granted_to_others(cards, state, log, holder, layer)).collect() } else { Vec::new() };
     given.sort_by_key(|&(timestamp, _, _)| timestamp);
     let mut given = given.into_iter().peekable();
     let mut give = |upto: u32, chars: &mut Chars, until: &mut dyn FnMut(u32, &mut Chars)| {
