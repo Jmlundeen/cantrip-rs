@@ -1,0 +1,52 @@
+# Dress Down's ruling: "If an effect causes Dress Down to become a creature, it will lose its own abilities along with all
+# other creatures. This includes the triggered ability that causes it to be sacrificed at the beginning of the end step."
+# With Opalescence out, Dress Down enters on turn 3 as a 2/2 enchantment creature (its mana value), and its "Creatures lose
+# all abilities" takes its own abilities as well as every other creature's, while its effect goes on applying (CR 613.6):
+# its enters trigger is not there to trigger (CR 603.6a), so Bot1 draws nothing, and it is not sacrificed at the end step -
+# on turn 5 it is still on the battlefield. Bot1's Llanowar Elves taps for {G} before it (turn 3, the positive control) and
+# has no mana ability under it: the refusal on turn 5, untapped and long past summoning sickness, holds.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Opalescence
+Llanowar Elves
+Dress Down
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 1
+? Bot1.Battlefield.Dress Down.Types = Enchantment; Creature
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Llanowar Elves.Activate
+
+[Expect]
+Turn = 5
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Dress Down.Types = Enchantment; Creature
+Bot1.Battlefield.Dress Down.Power = 2
+Bot1.Battlefield.Dress Down.Toughness = 2
+Bot1.Battlefield.Opalescence.Types = Enchantment

@@ -1,0 +1,34 @@
+# Dress Down's "At the beginning of the end step, sacrifice this enchantment" triggers only as an end step begins (CR 603.2,
+# 513.1). Cast with flash during Bot2's end step on turn 2, once that step has begun, it missed that beginning: it is still
+# on the battlefield through Bot1's turn 3 - its Ornithopter without flying in turn 3's main phase - and is sacrificed only
+# when turn 3's end step begins. On turn 4 the Ornithopter has flying again.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Dress Down
+Island x16
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.End]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield = Island; Mox Sapphire; Ornithopter; Dress Down
+? Bot1.Battlefield.Ornithopter.Keywords = (absent)
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Dress Down
+Bot1.Battlefield.Ornithopter.Keywords = Flying

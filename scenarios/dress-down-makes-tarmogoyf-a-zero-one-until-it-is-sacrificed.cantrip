@@ -1,0 +1,54 @@
+# Tarmogoyf's power and toughness come from a characteristic-defining ability (CR 604.3), a static ability Dress Down's
+# "Creatures lose all abilities" takes away in layer 6 (CR 613.1f), so layer 7a has nothing to apply: its printed */1+* is
+# read with each star as 0 (CR 208.2a), a 0/1. With Lightning Bolt in a graveyard it was a 1/2 (turn 1). On turn 3 Dress
+# Down makes it 0/1, though Bot2 has discarded an Island to its hand size (turn 2): at the beginning of that end step Dress
+# Down is sacrificed, and on turn 4, with an instant, an enchantment and a land among the graveyards' cards, Tarmogoyf is a
+# 3/4 again.
+
+[Bot1 Deck]
+Island
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Tarmogoyf
+Lightning Bolt
+Dress Down
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tarmogoyf.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Tarmogoyf.Power = 1
+? Bot1.Battlefield.Tarmogoyf.Toughness = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Tarmogoyf.Power = 0
+? Bot1.Battlefield.Tarmogoyf.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot1.Graveyard = Dress Down; Lightning Bolt
+Bot2.Graveyard = Island
+Bot1.Battlefield.Tarmogoyf.Power = 3
+Bot1.Battlefield.Tarmogoyf.Toughness = 4

@@ -1,0 +1,63 @@
+# A dies trigger "looks back in time" (CR 603.10a): it triggers on the creature as it last existed on the battlefield, and a
+# Doomed Traveler that dies while Dress Down is out had no abilities then (CR 613.1f), so its "When this creature dies,
+# create a 1/1 white Spirit creature token with flying" does not trigger: Bot2's Lightning Bolt on turn 2, while Dress Down
+# (cast with flash that turn) is out, kills it and no Spirit is made. Dress Down is sacrificed at that end step; on turn 4
+# Bot2 bolts Bot1's second Doomed Traveler, which has its ability, and that one makes a Spirit (the positive control).
+
+[Bot1 Deck]
+Plains
+Island
+Mox Pearl
+Mox Sapphire
+Doomed Traveler
+Doomed Traveler
+Dress Down
+Island x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Doomed Traveler)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+? Bot1.Graveyard = Doomed Traveler
+? Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Dress Down
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doomed Traveler.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Doomed Traveler)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Graveyard = Doomed Traveler; Dress Down; Doomed Traveler
+Bot1.Battlefield = Plains; Island; Mox Pearl; Mox Sapphire; Spirit
+Bot1.Battlefield.Spirit.Token = true

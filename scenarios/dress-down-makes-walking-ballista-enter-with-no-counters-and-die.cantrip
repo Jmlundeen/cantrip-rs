@@ -1,0 +1,40 @@
+# Walking Ballista's "This creature enters with X +1/+1 counters on it" is its own replacement effect (CR 614.1c), and which
+# replacement effects apply to a permanent entering is judged on it "as it would exist on the battlefield, taking into
+# account ... continuous effects that already exist and would apply to the permanent" (CR 614.12). With Dress Down out, a
+# Ballista there would be a creature with no abilities: cast for X = 2 it enters with no counters, a 0/0 - Dress Down sets
+# no base power and toughness - and the state-based actions put it into the graveyard (CR 704.5f).
+# walking-ballista-cast-for-x-two-enters-with-two-counters-and-pings-with-them is the control.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Mox Jet
+Dress Down
+Walking Ballista
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Dress Down
+Bot1.Graveyard = Walking Ballista; Black Lotus

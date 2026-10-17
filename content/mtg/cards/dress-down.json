@@ -1,0 +1,9 @@
+{
+  "name": "Dress Down",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment",
+  "oracleText": "Flash\nWhen this enchantment enters, draw a card.\nCreatures lose all abilities.\nAt the beginning of the end step, sacrifice this enchantment.",
+  "keywords": [
+    "Flash"
+  ]
+}

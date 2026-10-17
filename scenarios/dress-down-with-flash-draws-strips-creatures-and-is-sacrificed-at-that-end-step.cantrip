@@ -1,0 +1,53 @@
+# Dress Down: "Flash. When this enchantment enters, draw a card. Creatures lose all abilities. At the beginning of the end
+# step, sacrifice this enchantment." Bot1 casts it on Bot2's turn 2 (flash, CR 702.8a), and draws a card (CR 603.6a), the Lightning Bolt. Bot2's
+# Misshapen Fiend, a creature, loses flying (CR 613.1f) - so does Bot1's Ornithopter. At the beginning of that turn's end
+# step - any player's end step, "the end step" (CR 513.1) - it is sacrificed, and on turn 3 both have flying again.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Ornithopter
+Dress Down
+Island
+Island
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Misshapen Fiend
+Swamp x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Misshapen Fiend.Cast
+Bot2.Pass
+? Bot1.Hand.Count = 4
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dress Down.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Hand = Island; Island; Island; Lightning Bolt
+? Bot2.Battlefield.Misshapen Fiend.Keywords = (absent)
+? Bot1.Battlefield.Ornithopter.Keywords = (absent)
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Dress Down
+Bot1.Battlefield = Island; Mox Sapphire; Ornithopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Misshapen Fiend.Keywords = Flying
