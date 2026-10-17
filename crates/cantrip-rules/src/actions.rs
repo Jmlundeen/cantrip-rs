@@ -1824,16 +1824,13 @@ fn loyalty_available(cx: &Cx, id: ObjectId) -> bool {
 
 /// The permission `player` holds to play `card` from where it is, if any (CR 601.3, 305.1).
 pub fn permission_for(cx: &Cx, card: ObjectId, player: PlayerId) -> Option<PlayPermission> {
-    let s = cx.s();
-    s.permissions
-        .iter()
-        .find(|p| {
-            p.card == card
-                && p.player == player
-                && !(p.grant.later_turns && p.turn == s.turn.number)
-                && p.grant.when.is_none_or(|when| play_condition_holds(cx, player, when))
-        })
-        .copied()
+    cx.s().permissions.iter().find(|p| p.card == card && p.player == player && permission_stands(cx, p, player)).copied()
+}
+
+/// Whether a permission lets `player` play its card now, as far as its own terms say (CR 601.3, 305.1): not on the turn it
+/// was given if it is for a later turn (CR 702.185a), and only while its condition holds (CR 611.2).
+fn permission_stands(cx: &Cx, p: &PlayPermission, player: PlayerId) -> bool {
+    !(p.grant.later_turns && p.turn == cx.s().turn.number) && p.grant.when.is_none_or(|when| play_condition_holds(cx, player, when))
 }
 
 /// Whether the condition on a permission to play holds now (CR 611.2): asked of the history of this turn, which no later
@@ -1844,6 +1841,9 @@ fn play_condition_holds(cx: &Cx, player: PlayerId, when: PlayCondition) -> bool 
             matches!(r.event, Event::Attacks { attacker, .. }
                 if cx.s().obj(attacker).controller == player && cx.chars(attacker).has_subtype(kind))
         }),
+        PlayCondition::ControlsSubtype(kind) => {
+            cx.s().battlefield().iter().any(|&id| cx.s().obj(id).controller == player && cx.chars(id).has_subtype(kind))
+        }
     }
 }
 
@@ -1993,7 +1993,11 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     }
     // A land a card lets this player play from where it is (CR 305.1): "you may play that card".
     for p in &cx.s().permissions {
-        if p.player == player && p.grant.lands && played_by_permission_from(cx, p.card, player, from_graveyard, from_top) {
+        if p.player == player
+            && p.grant.lands
+            && permission_stands(cx, p, player)
+            && played_by_permission_from(cx, p.card, player, from_graveyard, from_top)
+        {
             offer(p.card, options);
         }
     }
@@ -2018,7 +2022,7 @@ pub fn land_play_permission(cx: &Cx, card: ObjectId, player: PlayerId) -> Option
     if !played_by_permission_from(cx, card, player, graveyard, top_lands) {
         return None;
     }
-    let mut by = cx.s().permissions.iter().filter(|p| p.card == card && p.player == player && p.grant.lands);
+    let mut by = cx.s().permissions.iter().filter(|p| p.card == card && p.player == player && p.grant.lands && permission_stands(cx, p, player));
     let first = by.clone().next().copied();
     by.find(|p| !p.grant.enters_tapped).copied().or(first)
 }

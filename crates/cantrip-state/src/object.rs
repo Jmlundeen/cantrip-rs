@@ -742,6 +742,10 @@ pub struct PlayGrant {
 pub enum PlayCondition {
     /// A creature of this type was declared as an attacker by the permitted player this turn (CR 508.1): Robber of the Rich.
     AttackedWithThisTurn(Subtype),
+    /// The permitted player controls a permanent of this subtype now (CR 205.3, 110.2): Flameshape's "you may play them if you
+    /// control a Wizard". Asked as the card would be played (CR 601.3, 305.1); losing the permanent once a spell is cast does
+    /// not undo it (ruling 2026-06-29).
+    ControlsSubtype(Subtype),
 }
 
 impl PlayGrant {

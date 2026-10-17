@@ -901,9 +901,11 @@ impl<'a> Projector<'a> {
         };
         let mut text = format!("{prefix}{} {window}", if grant.lands { "Playable" } else { "Castable" });
         // A condition the permission stands under is said, so one not met reads as the conditional it is.
-        if let Some(PlayCondition::AttackedWithThisTurn(subtype)) = grant.when {
-            let who = if mine { "you" } else { "they" };
-            text.push_str(&format!(", if {who} attacked with a {}", subtype.name()));
+        let who = if mine { "you" } else { "they" };
+        match grant.when {
+            Some(PlayCondition::AttackedWithThisTurn(subtype)) => text.push_str(&format!(", if {who} attacked with a {}", subtype.name())),
+            Some(PlayCondition::ControlsSubtype(subtype)) => text.push_str(&format!(", if {who} control a {}", subtype.name())),
+            None => {}
         }
         if grant.sorcery_speed {
             text.push_str(", as a sorcery");

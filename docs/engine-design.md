@@ -462,6 +462,9 @@ played this way enters tapped", `PlayGrant::enters_tapped`). That is a replaceme
 616.1): Archon of Emeria's "nonbasic lands your opponents control enter tapped" is a second, and once either has applied the
 other has nothing left to change (CR 616.1f). Which permission a land play is made by is `actions::land_play_permission`: none
 from the hand, or from a graveyard or a library's top a rule lets lands be played from, the same test the offer makes.
+A permission may stand under a condition (`PlayCondition`, CR 611.2): "during any turn you attacked with a Rogue" (Robber of the
+Rich), "if you control a Wizard" (`ControlsSubtype`, Flameshape), asked whenever the card would be played - a land play by the
+permission as much as a cast - and so are its other terms (`actions::permission_stands`: a warp card's later turn).
 
 The cleanup step removes all marked damage (CR 514.2) except from a permanent a static ability keeps it on:
 `CardDef::damage_stays` (`DamageStaysRule`, asked of each damaged permanent by the permanents on the battlefield with their
