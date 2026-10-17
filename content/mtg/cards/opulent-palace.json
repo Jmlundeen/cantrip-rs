@@ -1,0 +1,5 @@
+{
+  "name": "Opulent Palace",
+  "type": "Land",
+  "oracleText": "This land enters tapped.\n{T}: Add {B}, {G}, or {U}."
+}

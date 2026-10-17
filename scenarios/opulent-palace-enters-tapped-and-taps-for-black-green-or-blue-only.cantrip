@@ -1,0 +1,31 @@
+# Opulent Palace enters tapped (CR 614.1c), so on turn 1 it has no mana. On turn 3 black, green and blue are each offered
+# (blue taken, then the pool is emptied by a phase change and black, green taken on later turns), while white, red and
+# colorless are refused beside those positive controls: "{T}: Add {B}, {G}, or {U}" adds exactly one of the three.
+
+[Bot1 Deck]
+Opulent Palace
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Opulent Palace.Play
+? Bot1.Battlefield.Opulent Palace.Tapped = true
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Opulent Palace.Activate(Color: White)
+! Bot1.Battlefield.Opulent Palace.Activate(Color: Red)
+! Bot1.Battlefield.Opulent Palace.Activate(Color: Colorless)
+Bot1.Battlefield.Opulent Palace.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Opulent Palace.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T7 Bot1.Main1]
+Bot1.Battlefield.Opulent Palace.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Turn = 7
+Bot1.Mana = {G}
+Bot1.Battlefield = Opulent Palace
