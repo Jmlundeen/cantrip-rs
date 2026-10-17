@@ -951,6 +951,18 @@ A control effect that ends this way gives the permanent back (CR 613.1b). Eluge,
 Xolatoyac, the Smiling Flood and Quicksilver Fountain print the same words. The paths no printed card can show (a counter
 put back without a new effect; an effect begun without a counter) are `crates/cantrip-script/tests/counter_duration.rs`.
 
+### Permissions to play under a condition
+
+A standing permission to play a card (`PlayPermission`, CR 601.3, 305.1) may hold only while a condition does
+(`PlayGrant::when`, CR 611.2), worked out each time the permission is asked (`actions::permission_for`), so it is
+offered, or not, as the game is then: `PlayCondition::AttackedWithThisTurn(subtype)` ("during any turn you attacked with
+a Rogue", Robber of the Rich) asks this turn's history; `PlayCondition::ControlsSubtype(subtype)` ("you may play them if
+you control a Wizard", Gandalf, Goblins' Bane's Flameshape; Possibility Technician's Kavu) asks whether the holder controls
+a permanent with that subtype now, its characteristics through the layers (a changeling counts). Losing the last one stops
+the permission until another arrives; a spell already cast stays cast. The card in exile keeps the permission all along -
+only a zone change ends it (CR 400.7). The host says the condition beside the permission ("Playable while it stays here,
+if you control a Wizard").
+
 ### Restricted mana
 
 Mana a restriction limits (CR 106.6) is kept in the pool apart from ordinary mana, one `ManaPool` per restriction present
