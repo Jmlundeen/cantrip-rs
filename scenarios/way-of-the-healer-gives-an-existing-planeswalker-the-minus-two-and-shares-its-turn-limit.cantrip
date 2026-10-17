@@ -1,0 +1,60 @@
+# Narset, Parter of Veils (five loyalty) is in play when Way of the Healer arrives on turn 3, and now has the granted "[-2]: Create
+# ... Cadet. Surveil 1": activating it makes her loyalty 3 and a Cadet. Her own -2 is then refused for the turn, one loyalty ability per
+# planeswalker (CR 606.3), while the Jace token Way empowers (5) may use a loyalty ability of its own that turn: its -3 draws a card.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Narset, Parter of Veils
+Mox Pearl
+Mox Ruby
+Way of the Healer
+Plains
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate(Ability: {U})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Narset, Parter of Veils.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Way of the Healer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Cadet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Plains)
+? Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3
+! Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Look)
+! Bot1.Battlefield.Narset, Parter of Veils.Activate(Ability: Cadet)
+Bot1.Battlefield.Jace.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Narset, Parter of Veils.Counters.Loyalty = 3
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Cadet.Token = true
+Bot1.Hand.Count = 2

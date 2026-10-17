@@ -1,0 +1,60 @@
+# The granted "[-2]" costs two loyalty (CR 606.4, 119.4): the Jace token Way empowers to 5 makes a Cadet on turn 1 (loyalty 3) and on
+# turn 3 (loyalty 1), and on turn 5, with one loyalty, the Cadet ability is refused although it is the same turn-structure as before
+# (the positive control: its own -1 "Surveil 1" is allowed, putting it to 0 loyalty, where it dies as a state-based action, CR 704.5i).
+# Two Cadets remain. Library tops are chosen so each turn's draw and surveil are known: Swamp (surveilled away on turn 1), Forest
+# (turn 3's draw), Mountain (surveilled away turn 3), Plains (turn 5's draw), Island (surveilled away turn 5).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Way of the Healer
+Plains
+Plains
+Swamp
+Forest
+Mountain
+Plains
+Island
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Way of the Healer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace.Activate(Ability: Cadet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Swamp)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace.Activate(Ability: Cadet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Mountain)
+? Bot1.Battlefield.Jace.Counters.Loyalty = 1
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Jace.Activate(Ability: Cadet)
+Bot1.Battlefield.Jace.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Jet; Mox Emerald; Way of the Healer; Cadet; Cadet
+Bot1.Graveyard = Island; Mountain; Swamp

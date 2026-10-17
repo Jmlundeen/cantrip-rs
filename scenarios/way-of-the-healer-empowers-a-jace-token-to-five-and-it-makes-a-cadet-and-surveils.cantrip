@@ -1,0 +1,49 @@
+# Way of the Healer (turn 1, off four Moxen): "When it enters, empower Jace 5": no Jace token is controlled, so a blue Jace planeswalker
+# token with 0 loyalty is created and gets five loyalty counters. "Planeswalkers you control have '[-2]: Create a 2/2 colorless Wizard
+# Soldier creature token named Cadet. Surveil 1.'" gives the token that ability beside its own two: activating it costs 2 loyalty (5 to
+# 3), makes the Cadet (a colorless 2/2 token, Soldier and Wizard) and then surveils 1: the top card, Swamp, is put into the graveyard.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Emerald
+Way of the Healer
+Plains
+Plains
+Swamp
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Way of the Healer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Jace.Counters.Loyalty = 5
+Bot1.Battlefield.Jace.Activate(Ability: Cadet)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Swamp)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Mox Jet; Mox Emerald; Way of the Healer; Jace; Cadet
+Bot1.Battlefield.Jace.Counters.Loyalty = 3
+Bot1.Battlefield.Cadet.Token = true
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Toughness = 2
+Bot1.Battlefield.Cadet.Subtypes = Soldier; Wizard
+Bot1.Battlefield.Cadet.Colors = (absent)
+Bot1.Graveyard = Swamp
