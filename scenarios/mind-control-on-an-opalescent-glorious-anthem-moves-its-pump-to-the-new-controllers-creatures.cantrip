@@ -1,0 +1,77 @@
+# Layers 2, 4 and 7c together (CR 613.1b, 613.1d, 613.4c). Opalescence makes Bot2's Glorious Anthem a 3/3 creature (layer 4,
+# base power and toughness its mana value in 7b), so Bot1's Mind Control can enchant it. "Creatures you control get +1/+1"
+# means the Anthem's controller (CR 109.5), which layer 2 settles first: before Mind Control, Bot2's Llanowar Elves is 2/2
+# and the Anthem pumps itself to 4/4; once Bot1 controls it, Bot1's Ornithopter is 1/3, the Anthem still 4/4 (now Bot1's
+# creature), and the Elves back to 1/1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Plains
+Opalescence
+Ornithopter
+Island
+Mind Control
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Plains
+Glorious Anthem
+Llanowar Elves
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Glorious Anthem.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Glorious Anthem.Power = 4
+? Bot2.Battlefield.Llanowar Elves.Power = 2
+? Bot1.Battlefield.Ornithopter.Power = 0
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mind Control.Cast(Bot2.Battlefield.Glorious Anthem)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet; Plains; Island; Opalescence; Ornithopter; Mind Control; Glorious Anthem
+Bot1.Battlefield.Glorious Anthem.Power = 4
+Bot1.Battlefield.Glorious Anthem.Toughness = 4
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot2.Battlefield = Mox Pearl; Mox Emerald; Mox Jet; Plains; Llanowar Elves
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Llanowar Elves.Toughness = 1
