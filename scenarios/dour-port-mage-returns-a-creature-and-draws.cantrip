@@ -1,0 +1,30 @@
+# Dour Port-Mage returns another creature to its owner's hand; its leave event triggers one draw (CR 603.2, 603.10, 701.10).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Ornithopter
+Dour Port-Mage
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Dour Port-Mage.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T5 Bot1.Main2]
+Bot1.Battlefield.Dour Port-Mage.Activate(Bot1.Battlefield.Ornithopter; Ability: Return another target creature)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Sol Ring; Dour Port-Mage
+Bot1.Hand.Count = 8
