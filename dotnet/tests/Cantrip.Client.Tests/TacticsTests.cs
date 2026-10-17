@@ -42,6 +42,21 @@ public sealed class CardReadingTests
     }
 
     [Fact]
+    public void A_defender_attacks_only_while_the_server_says_it_can_attack_as_though_it_didnt_have_defender()
+    {
+        // CR 702.3b, 609.4: Demon Wall's own line says when; the server adds the granted line only while it applies, and the
+        // Wall keeps defender either way.
+        const string text = "Defender\nMenace\nAs long as this creature has a counter on it, it can attack as though it didn't have defender.";
+        ObjectView wall = Creature(1, "Demon Wall", 3, 3, text: text);
+        Assert.False(CardReading.DefenderAllowsAttack(wall));
+
+        wall.GrantedAbilities.Add(new AbilityTextView { Text = "Can attack as though it didn't have defender." });
+        Assert.True(CardReading.DefenderAllowsAttack(wall));
+        Assert.Equal(Keywords.Defender | Keywords.Menace, CardReading.KeywordsOf(wall) & (Keywords.Defender | Keywords.Menace));
+        Assert.True(CardReading.DefenderAllowsAttack(Creature(2, "Bear", 2, 2)));
+    }
+
+    [Fact]
     public void A_keyword_counter_whose_keyword_was_taken_away_gives_nothing()
     {
         // Put on before "loses all abilities" (CR 613.7c): the counter is there, the keyword is not, and the server grants none.

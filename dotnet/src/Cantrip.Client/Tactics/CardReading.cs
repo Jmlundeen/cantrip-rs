@@ -286,6 +286,18 @@ public static partial class CardReading
         return found & ~lost;
     }
 
+    /// <summary>
+    /// Whether defender leaves a creature free to attack (CR 702.3b): it has no defender, or the server lists with its
+    /// granted abilities that it can attack as though it didn't have defender right now (CR 609.4: Demon Wall with a
+    /// counter on it, a creature Assault Formation picked). Anything else that stops an attack is asked separately.
+    /// </summary>
+    public static bool DefenderAllowsAttack(ObjectView creature)
+    {
+        ArgumentNullException.ThrowIfNull(creature);
+        return (KeywordsOf(creature) & Keywords.Defender) == 0
+            || creature.GrantedAbilities.Any(granted => Plain(granted.Text).Contains("can attack as though it didn't have defender", StringComparison.Ordinal));
+    }
+
     /// <summary>The keywords on one line, when keywords are all the line is: "First strike, lifelink".</summary>
     private static Keywords Line(string line)
     {

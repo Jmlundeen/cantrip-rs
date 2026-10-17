@@ -145,8 +145,8 @@ public sealed partial class TacticalPlay
             // The crew stay tapped through the opponent's turn (CR 502.3 untaps them only in this seat's own), so the
             // attack back meets a board without them: what more of it gets through is part of the price.
             int life = LifeOf(view, client.Seat);
-            List<Unit> coming = [.. theirs.Where(creature => (creature.Power ?? 0) > 0).Select(creature => Unit.From(creature, _model))
-                .Where(creature => !creature.Has(Keywords.Defender))];
+            List<Unit> coming = [.. theirs.Where(creature => (creature.Power ?? 0) > 0 && CardReading.DefenderAllowsAttack(creature))
+                .Select(creature => Unit.From(creature, _model))];
             List<Unit> home = [.. able.Select(creature => Unit.From(creature, _model))];
             List<Unit> left = [.. home.Where(creature => !crew.Contains(creature.Handle))];
             int openWithout = Exposure(coming, home);
@@ -207,8 +207,8 @@ public sealed partial class TacticalPlay
 
             // The creature stays tapped through the opponent's turn: what more of their attack gets through is the price.
             int life = LifeOf(view, client.Seat);
-            List<Unit> coming = [.. Creatures(client, rival).Where(creature => (creature.Power ?? 0) > 0).Select(creature => Unit.From(creature, _model))
-                .Where(creature => !creature.Has(Keywords.Defender))];
+            List<Unit> coming = [.. Creatures(client, rival).Where(creature => (creature.Power ?? 0) > 0 && CardReading.DefenderAllowsAttack(creature))
+                .Select(creature => Unit.From(creature, _model))];
             List<Unit> home = [.. able.Select(creature => Unit.From(creature, _model))];
             List<Unit> left = [.. home.Where(creature => creature.Handle != tapped.Handle)];
             if (Exposure(coming, left) > Exposure(coming, home))
@@ -225,7 +225,7 @@ public sealed partial class TacticalPlay
 
     private static bool CouldAttack(ObjectView creature) =>
         !creature.Tapped && (!creature.SummoningSick || (CardReading.KeywordsOf(creature) & Keywords.Haste) != 0)
-        && (CardReading.KeywordsOf(creature) & Keywords.Defender) == 0;
+        && CardReading.DefenderAllowsAttack(creature);
 
     /// <summary>
     /// The creatures to tap for a crew cost: the set that adds up to the power asked for and gives up least — the

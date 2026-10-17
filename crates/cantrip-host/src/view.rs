@@ -948,6 +948,17 @@ impl<'a> Projector<'a> {
                 };
                 view.granted_abilities.push(AbilityTextView { text: format!("{what}{}.", self.until_text(e.duration)), spent: false });
             }
+            // A creature with defender that may attack as though it didn't have it right now (CR 702.3b, 609.4): by a resolved
+            // effect, with how long it lasts (Assault Formation), or while a static ability's condition holds (Demon Wall with a
+            // counter on it). It still has defender, so its face says both.
+            if c.has(Keyword::Defender) && c.is(CardType::Creature) {
+                const TEXT: &str = "Can attack as though it didn't have defender";
+                if let Some(e) = s.effects.iter().find(|e| e.affected == id && e.kind == EffectKind::CanAttackDespiteDefender) {
+                    view.granted_abilities.push(AbilityTextView { text: format!("{TEXT}{}.", self.until_text(e.duration)), spent: false });
+                } else if game.may_attack_despite_defender(id) {
+                    view.granted_abilities.push(AbilityTextView { text: format!("{TEXT}."), spent: false });
+                }
+            }
         }
 
         if obj.face_down {
