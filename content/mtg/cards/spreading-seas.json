@@ -1,0 +1,6 @@
+{
+  "name": "Spreading Seas",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant land\nWhen this Aura enters, draw a card.\nEnchanted land is an Island."
+}

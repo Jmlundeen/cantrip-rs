@@ -1,0 +1,61 @@
+# Spreading Seas ("Enchanted land is an Island") and Blood Moon ("Nonbasic lands are Mountains") both set a land's subtype
+# in layer 4 (CR 305.7). Neither depends on the other: neither changes whether a land is enchanted by the Seas or nonbasic,
+# and each takes only the abilities of the land's own rules text, not the other's (CR 613.8a). So they apply in timestamp
+# order and the later one's type is the one the land has (CR 613.7). Taiga is enchanted before the Moon arrives: the Seas
+# make it an Island (it taps for {U} to pay for the Moon), then the Moon makes it a Mountain - it taps for {R} and not {U}.
+# Mutavault is enchanted by a second Seas after the Moon: it is an Island, tapping for {U} and not {R}.
+
+[Bot1 Deck]
+Taiga
+Mutavault
+Mox Ruby
+Mox Sapphire
+Spreading Seas
+Spreading Seas
+Blood Moon
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Taiga.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Spreading Seas.Cast(Taiga)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Taiga.Activate(Ability: Add {G})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Taiga.Subtypes = Island
+[T3 Bot1.Main1]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Taiga.Activate(Ability: Add {U})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Taiga.Subtypes = Mountain
+? Bot1.Battlefield.Mutavault.Subtypes = Mountain
+[T5 Bot1.Main1]
+Bot1.Hand.Spreading Seas.Cast(Mutavault)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Island
+! Bot1.Battlefield.Taiga.Activate(Ability: Add {U})
+Bot1.Battlefield.Taiga.Activate(Ability: Add {R})
+! Bot1.Battlefield.Mutavault.Activate(Ability: Add {R})
+Bot1.Battlefield.Mutavault.Activate(Ability: Add {U})
+? Bot1.Mana = {U}{R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Taiga.Subtypes = Mountain
+Bot1.Battlefield.Mutavault.Subtypes = Island
+Bot1.Battlefield.Spreading Seas#1.AttachedTo = Taiga
+Bot1.Battlefield.Spreading Seas#2.AttachedTo = Mutavault

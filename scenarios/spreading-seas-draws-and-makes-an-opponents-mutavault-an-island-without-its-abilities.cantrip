@@ -1,0 +1,56 @@
+# Spreading Seas on Bot2's Mutavault. "When this Aura enters, draw a card" (CR 603.6a): Bot1's hand goes from 5 (after the
+# cast) to 6. "Enchanted land is an Island" sets the land's subtype (CR 305.7, layer 4): Mutavault loses its rules text's
+# abilities - "{T}: Add {C}" and the animation - and has "{T}: Add {U}" (CR 305.6). Bot2 can tap it for {U} only. Before the
+# Aura, Bot2 animates it (the positive control of the abilities being there).
+
+[Bot1 Deck]
+Island
+Island
+Spreading Seas
+Plains
+Plains
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Mutavault
+Mox Ruby
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mutavault.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Mutavault.Types = Land; Creature
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Spreading Seas.Cast(Mutavault)
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+? Bot1.Hand.Count = 5
+Bot1.Pass
+Bot2.Pass
+? Stack = Spreading Seas
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 6
+? Bot2.Battlefield.Mutavault.Subtypes = Island
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Mutavault.Activate(Ability: Add {C})
+! Bot2.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot2.Battlefield.Mutavault.Activate(Ability: Add {U})
+? Bot2.Mana = {U}
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Spreading Seas.AttachedTo = Mutavault
+Bot2.Battlefield.Mutavault.Subtypes = Island
+Bot2.Battlefield.Mutavault.Types = Land
+Bot1.Hand.Count = 6
