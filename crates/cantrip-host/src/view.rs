@@ -708,16 +708,16 @@ impl<'a> Projector<'a> {
             };
             summary.pending_effects.push(format!("{text}{}.", self.until_text(e.duration)));
         }
-        // "Players can't gain life" (CR 119.7): from a permanent's static ability while it is on the battlefield, or a resolved
-        // effect about the player (Screaming Nemesis's "for the rest of the game"), as it applies now.
-        // "Can't lose life" (CR 119.8) likewise, from a static ability; both at once are a life total that can't change
-        // (Platinum Emperion).
         // "You have shroud" (CR 702.18a) and hexproof (CR 702.11c) from a static ability of a permanent, as it applies now.
         for (keyword, word) in [(Keyword::Shroud, "shroud"), (Keyword::Hexproof, "hexproof")] {
             if game.player_has(p, keyword) {
                 summary.pending_effects.push(format!("{} have {word}.", if p == self.viewer { "You" } else { "They" }));
             }
         }
+        // "Players can't gain life" (CR 119.7): from a permanent's static ability while it is on the battlefield, or a resolved
+        // effect about the player (Screaming Nemesis's "for the rest of the game"), as it applies now.
+        // "Can't lose life" (CR 119.8) likewise, from a static ability; both at once are a life total that can't change
+        // (Platinum Emperion).
         let you = p == self.viewer;
         match (game.cant_gain_life(p), game.cant_lose_life(p)) {
             (true, true) => summary.pending_effects.push(format!("{} life total can't change.", if you { "Your" } else { "Their" })),

@@ -378,7 +378,7 @@ shapes have an example:
 - **Gift** (CR 702.174) is `CardDef.gift`, one of `cantrip_mechanics::gift`'s constants (a card, a Food, a tapped Fish, a
   Treasure, an Octopus, an extra turn); the promise and the opponent are asked before the targets, the spell's effect reads
   `item.gift.is_some()` and a target filter `gift::promised(q, asker.source)`. An instant or sorcery gives it as it
-  resolves (the core); a permanent lists `gift::trigger(text)`. Tokens a gift makes are listed in the card's `EXTRA`. **Player hexproof** is `EffectKind::PlayerHexproof`. **Hexproof from [quality]** (CR 702.11d) printed on a card is
+  resolves (the core); a permanent lists `gift::trigger(text)`. Tokens a gift makes are listed in the card's `EXTRA`. **Player hexproof** a resolved effect gives is `EffectKind::PlayerHexproof`; a permanent's static "You have shroud" (or hexproof) is `CardDef::player_keywords` (`cantrip_mechanics::statics::YOU_HAVE_SHROUD`), which targeting and the host read. **Hexproof from [quality]** (CR 702.11d) printed on a card is
   `CardDef.hexproof_from` (`HexproofFrom::color(Color::Black)`, `HexproofFrom::MONOCOLORED`, card types with
   `HexproofFrom::card_type`; a color in it is a word of the text, CR 612.2); given by a static ability it is
   `cantrip_mechanics::hexproof_from::gives::<Q>` (a resolved effect that gives it, Mondo Gecko's, is not built). The core judges it
