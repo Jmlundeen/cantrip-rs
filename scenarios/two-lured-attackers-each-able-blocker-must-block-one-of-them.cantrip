@@ -1,0 +1,60 @@
+# Two attackers each wearing Lure (CR 509.1c): each creature able to block has two requirements, one for each, and can
+# obey only one, since it blocks one creature (CR 509.1a). The most a declaration can obey is one per blocker, so each of
+# Bot2's two creatures must block one of the Lured attackers - either one: here both block the same Llanowar Elves. Bot2's
+# Elves alone blocking is refused (the Ornithopter would be free to obey one more), and so is no block at all. The other
+# Lured creature, Bot1's Guerrilla Gorilla, is unblocked and deals 2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Guerrilla Gorilla
+Black Lotus
+Lure
+Lure
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lure.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lure.Cast(Guerrilla Gorilla)
+Bot1.Attack(Llanowar Elves > Bot2; Guerrilla Gorilla > Bot2)
+! Bot2.Block(Count: 0)
+! Bot2.Block(Llanowar Elves > Llanowar Elves)
+Bot2.Block(Llanowar Elves > Llanowar Elves; Ornithopter > Llanowar Elves)
+Bot1.AssignDamage(Llanowar Elves > Llanowar Elves: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield.Lure.AttachedTo = Guerrilla Gorilla
+Bot1.Graveyard = Lure; Llanowar Elves; Black Lotus

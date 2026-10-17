@@ -1,0 +1,41 @@
+# Lure on a creature with menace when the defending player has only one creature able to block it (CR 509.1c): blocking
+# with it alone breaks menace's restriction (CR 702.110b), so no legal declaration obeys the requirement, and declaring no
+# blocks is legal. Bot1's Callous Inspector (1/1 menace) wears Lure and attacks; Bot2's lone Llanowar Elves may not block
+# it, and the Inspector deals its 1 to Bot2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Callous Inspector
+Black Lotus
+Lure
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Callous Inspector.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lure.Cast(Callous Inspector)
+Bot1.Attack(Callous Inspector > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Battlefield.Callous Inspector.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Damage = 0

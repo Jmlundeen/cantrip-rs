@@ -1,0 +1,56 @@
+# Propaganda's cost is paid as attackers are declared (CR 508.1h-j), before any block, and has nothing to do with Lure's
+# requirement on the blockers (CR 509.1c). Bot2's Propaganda; Bot1's Llanowar Elves wears Lure and attacks, Bot1 paying {2}.
+# Bot2's Ornithopter is able to block it, so it must: no block is refused, and the Ornithopter blocks.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Llanowar Elves
+Black Lotus
+Lure
+Island x14
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Propaganda
+Ornithopter
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Propaganda.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lure.Cast(Llanowar Elves)
+Bot1.Attack(Llanowar Elves > Bot2)
+? Combat.AttackCost = {2}
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot2.Block(Count: 0)
+Bot2.Block(Ornithopter > Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot2.Battlefield.Ornithopter.Damage = 1
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Forest.Tapped = false

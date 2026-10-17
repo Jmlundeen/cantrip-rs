@@ -1,0 +1,6 @@
+{
+  "name": "Lure",
+  "manaCost": "{1}{G}{G}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nAll creatures able to block enchanted creature do so."
+}

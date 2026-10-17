@@ -1,0 +1,60 @@
+# Lure: "All creatures able to block enchanted creature do so." (CR 509.1c) Bot1's Llanowar Elves wears Lure and attacks
+# with Guerrilla Gorilla. Bot2 has Llanowar Elves, Ornithopter and Forsaken Miner ("can't block"). Both creatures able to
+# block the Lured Elves must block it: declaring no blocks is refused, and so is the Ornithopter blocking the Gorilla instead
+# (one requirement obeyed where two can be). Forsaken Miner can't block at all (CR 509.1b), so it is under no requirement -
+# Lure gives no creature the ability to block (the ruling) - and the declaration without it is legal. The Gorilla is
+# unblocked: Bot2 ends at 18, and Bot1's Elves deals its 1 to Bot2's Elves and dies to it.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Guerrilla Gorilla
+Black Lotus
+Lure
+Island x14
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Llanowar Elves
+Ornithopter
+Forsaken Miner
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Forsaken Miner.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Lure.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Attack(Llanowar Elves > Bot2; Guerrilla Gorilla > Bot2)
+! Bot2.Block(Count: 0)
+! Bot2.Block(Llanowar Elves > Llanowar Elves; Ornithopter > Guerrilla Gorilla)
+! Bot2.Block(Forsaken Miner > Llanowar Elves)
+Bot2.Block(Llanowar Elves > Llanowar Elves; Ornithopter > Llanowar Elves)
+Bot1.AssignDamage(Llanowar Elves > Llanowar Elves: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Graveyard = Lure; Llanowar Elves; Black Lotus
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forsaken Miner; Mox Emerald; Ornithopter; Swamp
