@@ -837,7 +837,7 @@ impl<'a> Merge<'a> {
 /// object it applies to, which this object's question cannot see; so an effect that would change what the first applies to
 /// only once what it waits for has applied ("lands are creatures", waiting for the effect that makes this a land, before
 /// "creatures are artifacts") counts as changing it, as it does for the lands already on the battlefield. A dependency
-/// through another object alone is not seen (known issue KI-37).
+/// through another object alone is not seen (known issue KI-39).
 fn by_dependency(view: &View, id: ObjectId, mut pending: Vec<Entry>, chars: &mut Chars) {
     while !pending.is_empty() {
         let i = ready(view, id, &pending, chars);
