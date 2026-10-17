@@ -1,0 +1,45 @@
+# "Existing damage prevention shields won't be reduced by damage that can't be prevented" (CR 615.12). Bot1 puts Healing
+# Salve's shield of 3 on itself; Bot2's Questing Beast (haste) attacks, and its combat damage can't be prevented: Bot1
+# takes all 4, and the shield is left whole. After combat Bot2's Lightning Bolt at Bot1 is prevented in full by it. Bot1
+# ends at 16; had the Beast's damage used the shield up, the Bolt would leave Bot1 at 13.
+
+[Bot1 Deck]
+Mox Pearl
+Healing Salve
+Island x25
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Ruby
+Questing Beast
+Lightning Bolt
+Island x22
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Questing Beast.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1)
+[T2 Bot2.DeclareAttackers]
+Bot2.Attack(Questing Beast > Bot1)
+[T2 Bot2.Main2]
+? Bot1.Life = 16
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.End]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Graveyard = Lightning Bolt; Black Lotus
+Prevented = 3 Lightning Bolt > Bot1 by Healing Salve

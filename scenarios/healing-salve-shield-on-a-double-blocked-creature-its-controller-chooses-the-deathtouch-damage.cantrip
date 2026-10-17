@@ -1,0 +1,65 @@
+# Healing Salve's shield of 3 is on Bot1's attacking Guerrilla Gorilla, which Bot2 blocks with Preacher of the Schism (2,
+# deathtouch) and its own Guerrilla Gorilla (2): 4 damage from two sources at once. "If damage would be dealt to the
+# shielded permanent or player by two or more applicable sources at the same time, the player or the controller of the
+# permanent chooses which damage the shield prevents" (CR 615.7): Bot1 has it prevent the Preacher's 2 first, then 1 of
+# the Gorilla's. The Preacher deals no damage, so its deathtouch does nothing (CR 702.2b), and Bot1's Gorilla lives with 1
+# damage. The other choice is healing-salve-shield-on-a-double-blocked-creature-its-controller-chooses-the-other-damage.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Guerrilla Gorilla
+Healing Salve
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Preacher of the Schism
+Guerrilla Gorilla
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Preacher of the Schism.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Guerrilla Gorilla > Bot2)
+Bot2.Block(Preacher of the Schism > Guerrilla Gorilla; Bot2.Battlefield.Guerrilla Gorilla > Bot1.Battlefield.Guerrilla Gorilla)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1.Battlefield.Guerrilla Gorilla)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Preacher of the Schism)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 1
+Bot1.Graveyard = Healing Salve
+Prevented = 2 Preacher of the Schism > Guerrilla Gorilla by Healing Salve; 1 Guerrilla Gorilla > Guerrilla Gorilla by Healing Salve

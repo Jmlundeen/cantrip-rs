@@ -1,0 +1,51 @@
+# Healing Salve's second mode: "Prevent the next 3 damage that would be dealt to any target this turn" - a shield (CR
+# 615.7) on Bot1. Bot2's Shock (2) is prevented in full and reduces the shield to 1; its Lightning Bolt (3) has 1
+# prevented and 2 dealt, and the shield is used up: a second Shock is dealt in full. Bot1 ends at 20 - 2 - 2 = 16. Each
+# prevention is recorded with the amount it prevented. The shield is shown beside Bot1's life total while it lasts.
+
+[Bot1 Deck]
+Mox Pearl
+Healing Salve
+Island x25
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Shock
+Lightning Bolt
+Shock
+Island x21
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 20
+? Prevented = 2 Shock > Bot1 by Healing Salve
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 18
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Shock.Cast(Bot1)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 16
+Bot2.Graveyard = Shock; Black Lotus; Lightning Bolt; Shock
+Prevented = 2 Shock > Bot1 by Healing Salve; 1 Lightning Bolt > Bot1 by Healing Salve

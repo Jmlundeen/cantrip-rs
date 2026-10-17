@@ -1,0 +1,69 @@
+# Browser
+# Healing Salve, played by Bot1's page: its shield of 3 on Bot1's attacking Guerrilla Gorilla is shown on the creature's
+# face (nothing printed on it says so), and when Bot2's Preacher of the Schism and Guerrilla Gorilla would deal their 4
+# damage to it at once, the page asks whose damage the shield prevents first and how much it has left (CR 615.7). Bot1
+# clicks the Preacher: its 2 is prevented, then 1 of the Gorilla's, and Bot1's Gorilla lives with 1 damage. The same game
+# headless is healing-salve-shield-on-a-double-blocked-creature-its-controller-chooses-the-deathtouch-damage.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Guerrilla Gorilla
+Healing Salve
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Preacher of the Schism
+Guerrilla Gorilla
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Preacher of the Schism.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Guerrilla Gorilla > Bot2)
+Bot2.Block(Preacher of the Schism > Guerrilla Gorilla; Bot2.Battlefield.Guerrilla Gorilla > Bot1.Battlefield.Guerrilla Gorilla)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1.Battlefield.Guerrilla Gorilla)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Battlefield.Guerrilla Gorilla.Rules = Reach / Sacrifice this creature: Destroy target noncreature artifact or noncreature enchantment. Activate only as a sorcery. / Prevent the next 3 damage that would be dealt to it this turn (Healing Salve).
+Bot1.Pass
+Bot2.Pass
+Bot1.AssignDamage(Guerrilla Gorilla > Preacher of the Schism: 2)
+? Client.Bot1.Prompt.Title = Healing Salve: choose the source whose damage the shield prevents first
+? Client.Bot1.Prompt.Detail = It has 3 damage left to prevent; what it can't prevent of the others' damage is dealt  ·  click them on the battlefield
+Bot1.Choose(Preacher of the Schism)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 1
+Bot1.Graveyard = Healing Salve
+Prevented = 2 Preacher of the Schism > Guerrilla Gorilla by Healing Salve; 1 Guerrilla Gorilla > Guerrilla Gorilla by Healing Salve

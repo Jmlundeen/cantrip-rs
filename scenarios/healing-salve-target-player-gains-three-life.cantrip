@@ -1,0 +1,25 @@
+# Healing Salve's first mode: "Target player gains 3 life" (CR 119.3). Bot1 chooses it and targets Bot2, who gains the
+# 3, not Healing Salve's controller.
+
+[Bot1 Deck]
+Mox Pearl
+Healing Salve
+Island x25
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 23
+Bot1.Graveyard = Healing Salve
+Prevented = (absent)
