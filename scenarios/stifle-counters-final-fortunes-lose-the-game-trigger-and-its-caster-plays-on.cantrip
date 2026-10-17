@@ -1,0 +1,43 @@
+# Stifle can target a delayed triggered ability once it has triggered (the ruling). Bot1 casts Final Fortune on turn 1; at the
+# beginning of the extra turn 2's end step "you lose the game" triggers, and Bot1 counters it with Stifle (CR 701.6). The ability
+# triggers only once (CR 603.7c) and that turn is over, so Bot1 is still in the game at the end of its turn 4 and after.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Final Fortune
+Stifle
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Final Fortune.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot1.End]
+? Stack = Final Fortune
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stifle.Cast(Stack.Final Fortune)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T4 Bot1.End]
+Bot1.Pass
+[T5 Bot2.Upkeep]
+
+[Expect]
+Turn = 5
+Result = InProgress
+Bot1.Status = (absent)
+Delayed.Count = 0
+Bot1.Graveyard = Stifle; Final Fortune
