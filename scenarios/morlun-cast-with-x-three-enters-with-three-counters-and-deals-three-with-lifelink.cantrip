@@ -1,0 +1,38 @@
+# Morlun, Devourer of Spiders cast for X = 3 ({3}{B}{B}, with a Black Lotus and two Moxen): "Morlun enters with X +1/+1 counters on him" - three, so he is a 5/4 - and "When Morlun enters, he deals X damage
+# to target opponent": 3 to Bot2 (20 -> 17), and his lifelink gains Bot1 3 (20 -> 23). The one opponent is the only legal target, so it is chosen without being asked.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Black Lotus
+Morlun, Devourer of Spiders
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Morlun, Devourer of Spiders.Cast(X: 3)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield.Morlun, Devourer of Spiders.Power = 5
+Bot1.Battlefield.Morlun, Devourer of Spiders.Toughness = 4
+Bot1.Battlefield.Morlun, Devourer of Spiders.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Morlun, Devourer of Spiders.Keywords = Lifelink

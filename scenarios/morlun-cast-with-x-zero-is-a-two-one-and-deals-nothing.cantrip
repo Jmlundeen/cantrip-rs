@@ -1,0 +1,27 @@
+# X = 0: Morlun ({B}{B}) enters with no counters, a 2/1, and "he deals X damage to target opponent" deals 0 - Bot2 stays at 20 and his lifelink gains Bot1 nothing.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Morlun, Devourer of Spiders
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Morlun, Devourer of Spiders.Cast(X: 0)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Battlefield.Morlun, Devourer of Spiders.Power = 2
+Bot1.Battlefield.Morlun, Devourer of Spiders.Toughness = 1

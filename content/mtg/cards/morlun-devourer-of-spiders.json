@@ -1,0 +1,11 @@
+{
+  "name": "Morlun, Devourer of Spiders",
+  "manaCost": "{X}{B}{B}",
+  "type": "Legendary Creature — Vampire Villain",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Lifelink\nMorlun enters with X +1/+1 counters on him.\nWhen Morlun enters, he deals X damage to target opponent.",
+  "keywords": [
+    "Lifelink"
+  ]
+}
