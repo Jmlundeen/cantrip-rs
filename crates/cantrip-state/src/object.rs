@@ -669,6 +669,22 @@ pub enum Duration {
     /// exile any other way is a new object (CR 400.7) that can never be cast as this one, so the effect then lasts as long
     /// as its affected object does. Emrakul, the Exigent Doom and Streets of New Capenna's Glamorous Outlaw cycle.
     UntilCastFromExile(ObjectId),
+    /// "For as long as it has a [kind] counter on it" (CR 611.2b): it ends the moment the affected object has no counter
+    /// of that kind, and does not begin if it has none then; a counter put on later does not bring it back. Eluge, the
+    /// Shoreless Sea, Aquitect's Will, Quicksilver Fountain and Xolatoyac, the Smiling Flood ("it's an Island ... for as
+    /// long as it has a flood counter on it"), Aven Mimeomancer, Mathas, Fiend Seeker.
+    WhileCounter(CounterKind),
+}
+
+impl Duration {
+    /// Whether an effect of this duration on `affected` still lasts as far as the object itself goes (CR 611.2b): false
+    /// once the condition a "for as long as" duration names about it is no longer true.
+    pub fn holds_for(self, affected: &Obj) -> bool {
+        match self {
+            Duration::WhileCounter(kind) => affected.counters(kind) > 0,
+            _ => true,
+        }
+    }
 }
 
 /// When a permission to play a card ends (CR 611.2).

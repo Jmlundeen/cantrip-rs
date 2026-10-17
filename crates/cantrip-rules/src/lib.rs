@@ -1116,6 +1116,10 @@ impl cantrip_api::Game for Cx<'_> {
         {
             return;
         }
+        // "For as long as it has a [kind] counter on it" whose condition is already false does nothing (CR 611.2b).
+        if !duration.holds_for(self.g.state.obj(affected)) {
+            return;
+        }
         let controller = self.g.state.obj(source).controller;
         let timestamp = self.g.state.timestamp();
         self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected, kind, duration });

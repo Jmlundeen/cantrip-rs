@@ -642,6 +642,7 @@ fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: 
             let c = &mut o.counters[kind as usize];
             *c = (*c - n as i16).max(0);
         });
+        ops::end_lapsed_durations(cx, source);
     }
     // Counters a cost puts on its source are put by the player paying it (CR 118.3): what replaces counters being put applies.
     if let Some((kind, n)) = cost.put_counters {
@@ -4082,6 +4083,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     pay_life_and_counters(cx, player, source, &def.cost);
     if let Some(kind) = counter {
         cx.st().update_obj(source, |o| o.counters[kind as usize] = (o.counters[kind as usize] - 1).max(0));
+        ops::end_lapsed_durations(cx, source);
     }
     pay_exert_and_tappers(cx, source, &def.cost, &tappers);
     note_activation(cx, source, index as usize, def);
@@ -4103,6 +4105,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
             let n = &mut o.counters[CounterKind::Loyalty as usize];
             *n = (*n + change).max(0);
         });
+        ops::end_lapsed_durations(cx, source);
     }
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, &[source]);

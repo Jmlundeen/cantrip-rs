@@ -1850,6 +1850,7 @@ pub fn deal_damage_with(
                     let loyalty = &mut o.counters[CounterKind::Loyalty as usize];
                     *loyalty = (*loyalty - amount as i16).max(0);
                 });
+                end_lapsed_durations(cx, id);
             }
             lifelink(cx, source, &source_chars, amount, batch);
             Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })
@@ -2121,6 +2122,16 @@ pub fn bring_into_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
     brought
 }
 
+/// Ends the effects on `id` whose "for as long as" duration is no longer true of it (CR 611.2b), the moment it stops
+/// being true: called wherever a counter is taken off an object, or a permanent untaps, so a condition made true again
+/// later never brings such an effect back.
+pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
+    let obj = *cx.s().obj(id);
+    if cx.s().effects.iter().any(|e| e.affected == id && !e.duration.holds_for(&obj)) {
+        cx.st().effects_retain(|e| e.affected != id || e.duration.holds_for(&obj));
+    }
+}
+
 /// Puts counters on an object, or takes them off with a negative amount. Putting them is an event replacement effects
 /// can change (CR 122.6, 614.1a): "that many plus one" instead.
 pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
@@ -2141,6 +2152,9 @@ pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
             }
         }
     });
+    if counts.iter().any(|&n| n < 0) {
+        end_lapsed_durations(cx, id);
+    }
     // The layers look for hone counters from now on (CR 122.1j).
     if counts[CounterKind::Hone as usize] > 0 {
         cx.st().see_statics();
@@ -2316,6 +2330,7 @@ pub fn untap(cx: &mut Cx, id: ObjectId) {
     }
     if cx.s().obj(id).counters(CounterKind::Stun) > 0 {
         cx.st().update_obj(id, |o| o.counters[CounterKind::Stun as usize] -= 1);
+        end_lapsed_durations(cx, id);
         return;
     }
     cx.st().update_obj(id, |o| o.tapped = false);
