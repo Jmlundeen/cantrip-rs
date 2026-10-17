@@ -605,6 +605,11 @@ public static class GameText
             parts.Add("suspected");
         }
 
+        if (card.PhasedOut)
+        {
+            parts.Add("phased out: treated as though it doesn't exist until it phases in");
+        }
+
         if (card.ClassLevel > 0)
         {
             parts.Add($"level {card.ClassLevel}");

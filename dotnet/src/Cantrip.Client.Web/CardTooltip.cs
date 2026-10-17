@@ -255,6 +255,11 @@ public sealed class CardTooltip : Canvas
             lines.Add("Suspected (CR 701.60): menace, and can't block.");
         }
 
+        if (card.PhasedOut)
+        {
+            lines.Add("Phased out (CR 702.26): treated as though it doesn't exist - it can't be targeted, attack or block, and its abilities do nothing - until it phases in.");
+        }
+
         if (card.ClassLevel > 0)
         {
             lines.Add($"Level {card.ClassLevel} (CR 716).");

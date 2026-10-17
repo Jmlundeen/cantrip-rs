@@ -102,4 +102,26 @@ public sealed class TacticalCounterTests
         Assert.IsType<PassAnswer>(waiting.Decide(Board(bear, 4), broke));
         Assert.Contains("Counterspell in hand against Bear: not enough mana", poor.ToString(), StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void Phases_its_board_out_with_Teferis_Protection_against_a_sweeper_and_for_nothing_else()
+    {
+        const string protection = "Until your next turn, your life total can't change and you gain protection from everything. "
+            + "All permanents you control phase out.\nExile Teferi's Protection.";
+        ObjectView wrath = OnStack(20, "Wrath of God", 4, 0, 0, "Destroy all creatures. They can't be regenerated.");
+        wrath.CardTypes = [CardTypeView.Sorcery];
+        wrath.Power = null;
+        wrath.Toughness = null;
+        var cast = new PriorityPromptMessage { Player = Me, Options = [new() { Kind = ActionKindView.CastSpell, Source = Handle(10), Affordable = true }] };
+        ObjectView Protection() => InHand(10, "Teferi's Protection", CardTypeView.Instant, 3, protection, color: ColorView.White);
+
+        GameClient swept = Seated([Land(1), Land(2), Land(3), Creature(4, "Mine", 3, 3), wrath, Protection()], active: Them);
+        Assert.Equal(Handle(10), Assert.IsType<TakeActionAnswer>(With(0).Decide(swept, cast)).Source);
+
+        // Against a Wrath that would take more of theirs, and with nothing on the stack, it is kept.
+        GameClient theirs = Seated([Land(1), Land(2), Land(3), Creature(4, "Theirs", 3, 3, Them), wrath, Protection()], active: Them);
+        Assert.IsType<PassAnswer>(With(0).Decide(theirs, cast));
+        GameClient idle = Seated([Land(1), Land(2), Land(3), Creature(4, "Mine", 3, 3), Protection()]);
+        Assert.IsType<PassAnswer>(With(0).Decide(idle, cast));
+    }
 }

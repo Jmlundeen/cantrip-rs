@@ -357,6 +357,20 @@ public sealed class TacticalPlayTests
     }
 
     [Fact]
+    public void Takes_an_extra_turn_but_not_one_that_loses_it_the_game()
+    {
+        GameClient client = Seated(
+        [
+            Land(1), Land(2),
+            InHand(10, "Final Fortune", CardTypeView.Instant, 2, "Take an extra turn after this one. At the beginning of that turn's end step, you lose the game."),
+            InHand(11, "Time Walk", CardTypeView.Sorcery, 2, "Take an extra turn after this one.", color: ColorView.Blue),
+        ]);
+
+        Assert.IsType<PassAnswer>(Bot().Decide(client, Priority(Cast(10))));
+        Assert.Equal(Handle(11), Assert.IsType<TakeActionAnswer>(Bot().Decide(client, Priority(Cast(10), Cast(11)))).Source);
+    }
+
+    [Fact]
     public void Casts_a_sweeper_when_it_is_the_opponent_who_has_the_board()
     {
         GameClient client = Seated(

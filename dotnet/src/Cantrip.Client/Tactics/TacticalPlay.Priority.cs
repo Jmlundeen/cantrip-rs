@@ -1214,6 +1214,28 @@ public sealed partial class TacticalPlay
         _model.Weight("creature") + (_model.Weight("creature.power") * Math.Max(power, 0))
         + (_model.Weight("creature.toughness") * Math.Max(toughness, 0)) + _model.Weight("creature.token");
 
+    /// <summary>
+    /// For a sweeper's text ("destroy all creatures"), what it would take of the opponents' less what it would take of this
+    /// seat's; null for any other text. A phased-out permanent is treated as though it does not exist (CR 702.26b), so it is
+    /// swept by nothing.
+    /// </summary>
+    private double? Swept(GameClient client, PlayerView view, string text)
+    {
+        string plain = CardReading.Plain(text);
+        if (!(plain.Contains("destroy all creatures", StringComparison.Ordinal) || plain.Contains("destroy each creature", StringComparison.Ordinal)
+            || plain.Contains("exile all creatures", StringComparison.Ordinal) || plain.Contains("all creatures get -", StringComparison.Ordinal)
+            || plain.Contains("destroy all artifacts and creatures", StringComparison.Ordinal)))
+        {
+            return null;
+        }
+
+        bool artifacts = plain.Contains("artifacts and creatures", StringComparison.Ordinal);
+        return view.Objects
+            .Where(card => card.Zone == ZoneKindView.Battlefield && !card.PhasedOut
+                && (IsCreature(card) || (artifacts && card.CardTypes.Contains(CardTypeView.Artifact))))
+            .Sum(card => (Mine(client, card) ? -1 : 1) * _model.Worth(card));
+    }
+
     /// <summary>What a spell that aims at nothing is worth, as far as its text can be read.</summary>
     private double Untargeted(GameClient client, PlayerView view, string text)
     {
@@ -1221,8 +1243,8 @@ public sealed partial class TacticalPlay
         double worth = 0;
         bool read = false;
 
-        // Mana for nothing is a card for nothing.
-        if (CardReading.Ritual(text))
+        // Mana for nothing is a card for nothing; a spell that loses this seat the game later is cast by no plan it has.
+        if (CardReading.Ritual(text) || CardReading.LosesTheGame(text))
         {
             return 0;
         }
@@ -1267,16 +1289,10 @@ public sealed partial class TacticalPlay
             read = true;
         }
 
-        if (plain.Contains("destroy all creatures", StringComparison.Ordinal) || plain.Contains("destroy each creature", StringComparison.Ordinal)
-            || plain.Contains("exile all creatures", StringComparison.Ordinal) || plain.Contains("all creatures get -", StringComparison.Ordinal)
-            || plain.Contains("destroy all artifacts and creatures", StringComparison.Ordinal))
+        if (Swept(client, view, text) is { } swept)
         {
             // A sweeper is worth what it sweeps of theirs less what it sweeps of its own, and is otherwise held.
-            bool artifacts = plain.Contains("artifacts and creatures", StringComparison.Ordinal);
-            worth += view.Objects
-                .Where(card => card.Zone == ZoneKindView.Battlefield
-                    && (IsCreature(card) || (artifacts && card.CardTypes.Contains(CardTypeView.Artifact))))
-                .Sum(card => (Mine(client, card) ? -1 : 1) * _model.Worth(card));
+            worth += swept;
             read = true;
         }
         else if (CardReading.Effect(text) is { Kind: EffectKind.Damage, Amount: > 0 } damage && plain.Contains("each opponent", StringComparison.Ordinal))
@@ -1777,6 +1793,25 @@ public sealed partial class TacticalPlay
             // A counterspell paid for with another card (Force of Will) is two cards for one, and is kept for a spell
             // worth that.
             bool pitched = option.Kind == ActionKindView.CastSpell && option.AbilityIndex > 0 && !option.WithoutPayingManaCost && CardReading.ManaValue(option.Description) == 0;
+
+            // "All permanents you control phase out" (Teferi's Protection, CR 702.26b): cast against an opponent's sweeper that
+            // would take more of this seat's than of theirs, which then finds none of this seat's permanents. Never cast for
+            // anything else: phasing out its own board for nothing is no plan.
+            if (option.Kind == ActionKindView.CastSpell && CardReading.PhasesOutYourPermanents(text))
+            {
+                if (top.Controller != client.Seat && Swept(client, view, CardReading.Text(top)) is < 0)
+                {
+                    if (Narrating)
+                    {
+                        Note($"{card.Name} against {top.Name}: it would sweep more of this seat's than of theirs");
+                    }
+
+                    _answered.Add(answer);
+                    return Take(view, new Candidate(option, 1, 0, [], Kick: false, Permanent: false, Hostile: false));
+                }
+
+                continue;
+            }
 
             if (effect.Kind == EffectKind.Counter)
             {

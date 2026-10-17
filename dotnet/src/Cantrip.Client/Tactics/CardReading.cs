@@ -668,6 +668,16 @@ public static partial class CardReading
     public static bool ExtraTurn(string text) => Plain(text).Contains("extra turn", StringComparison.Ordinal);
 
     /// <summary>
+    /// Whether a piece of text has its controller lose the game later (Final Fortune's "at the beginning of that turn's end
+    /// step, you lose the game", Glorious End's "your next end step"): a seat with no plan to win before then never casts it.
+    /// </summary>
+    public static bool LosesTheGame(string text) => Plain(text).Contains("you lose the game", StringComparison.Ordinal);
+
+    /// <summary>Whether a piece of text phases out all its controller's permanents (Teferi's Protection, CR 702.26b).</summary>
+    public static bool PhasesOutYourPermanents(string text) =>
+        Plain(text).Contains("all permanents you control phase out", StringComparison.Ordinal);
+
+    /// <summary>
     /// Whether a piece of text does the same thing to everyone: "each player", "all creatures", "all permanents".
     /// Whether that is good depends on the board, so one this seat cannot weigh is one it does not cast.
     /// </summary>

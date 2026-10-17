@@ -68,6 +68,7 @@ internal static class Faces
             .Append(card.Monstrous ? 'M' : 'm')
             .Append(card.Solved ? 'V' : 'v')
             .Append(card.Suspected ? 'Q' : 'q')
+            .Append(card.PhasedOut ? 'P' : 'p')
             .Append(card.ClassLevel)
             .Append(card.Harnessed ? 'H' : 'h')
             .Append(card.Exerted ? 'E' : 'e')
@@ -150,7 +151,7 @@ internal static class Faces
         && card.SpentLines.Count == 0
         && card.ChosenModes.Count == 0
         && card.ClassLevel == 0
-        && !card.Monstrous && !card.Solved && !card.Suspected && !card.Harnessed && !card.Saddled && !card.Exerted && !card.Goaded
+        && !card.Monstrous && !card.Solved && !card.Suspected && !card.PhasedOut && !card.Harnessed && !card.Saddled && !card.Exerted && !card.Goaded
         && (!Printed.TryGetValue(card.Name, out string? printed) || printed == cardLook);
 
     /// <summary>A face's look as drawn: the card's own, faded or not, with any line over its art.</summary>

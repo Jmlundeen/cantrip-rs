@@ -1240,6 +1240,11 @@ public static partial class CardFace
             parts.Add("SUSPECTED");
         }
 
+        if (card.PhasedOut)
+        {
+            parts.Add("PHASED OUT");
+        }
+
         if (card.ClassLevel > 0)
         {
             parts.Add($"LEVEL {card.ClassLevel}");

@@ -215,6 +215,7 @@ public static class BoardRows
             .Append(card.Monstrous ? 'M' : 'm')
             .Append(card.Solved ? 'V' : 'v')
             .Append(card.Suspected ? 'Q' : 'q')
+            .Append(card.PhasedOut ? 'P' : 'p')
             .Append(card.ClassLevel)
             .Append(card.Harnessed ? 'H' : 'h')
             .Append(card.Exerted ? 'E' : 'e')

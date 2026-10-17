@@ -175,7 +175,8 @@ public sealed partial class MainPage
             top,
             tapped,
             look.Actionable,
-            look.Dimmed,
+            // A phased-out permanent is drawn faded: the game treats it as though it does not exist (CR 702.26b).
+            look.Dimmed || card.PhasedOut,
             look.Selected,
             Clickable: look.Clicked is not null,
             look.Annotation,
