@@ -1236,9 +1236,8 @@ pub fn copy_ability(cx: &mut Cx, ability: Target, copier: PlayerId, new_targets:
     if new_targets {
         item = retarget(cx, top, item.object, item.object, copier)?;
     }
-    for &t in item.targets().iter().filter(|&&t| t != Target::None) {
-        cx.emit(Event::BecameTarget { target: t, by: item.object, controller: copier });
-    }
+    // Each object or player it targets becomes a target once, however many of its slots name it (CR 115.2).
+    became_targets(cx, item.targets().iter().copied(), item.object, copier);
     Ok(Some(cx.s().stack[top].serial))
 }
 
