@@ -1,0 +1,11 @@
+{
+  "name": "Youthful Valkyrie",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Angel",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Flying\nWhenever another Angel you control enters, put a +1/+1 counter on this creature.",
+  "keywords": [
+    "Flying"
+  ]
+}

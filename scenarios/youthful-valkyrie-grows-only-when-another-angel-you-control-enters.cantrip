@@ -1,0 +1,54 @@
+# Youthful Valkyrie: "Whenever another Angel you control enters, put a +1/+1 counter on this creature." Bot1 casts a Valkyrie,
+# an Ornithopter (not an Angel: no counter) and a second Valkyrie (another Angel: the first one gets a counter; the second does
+# not, since it is not "another" to itself). Bot2 then casts its own Valkyrie, an Angel Bot1 does not control: no counter either.
+# The first Valkyrie ends with exactly one counter (2/4).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Youthful Valkyrie
+Youthful Valkyrie
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Youthful Valkyrie
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Youthful Valkyrie.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Youthful Valkyrie.Cast
+Bot1.Pass
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Youthful Valkyrie.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Youthful Valkyrie#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Youthful Valkyrie#1.Power = 2
+Bot1.Battlefield.Youthful Valkyrie#1.Toughness = 4
+Bot1.Battlefield.Youthful Valkyrie#2.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Youthful Valkyrie#2.Power = 1
+Bot2.Battlefield.Youthful Valkyrie.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Youthful Valkyrie.Power = 1
