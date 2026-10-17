@@ -1,0 +1,61 @@
+# Defense Grid: "Each spell costs {3} more to cast except during its controller's turn" (CR 601.2f), whoever controls the
+# Grid. On turn 2 Bot2's Lightning Bolt, on its own turn, costs {R}: its Mountain's red pays it. On turn 3 Bot1's own Bolt
+# costs {R} on Bot1's turn (one of two red floated is left), and Bot2's second Bolt, cast in response on Bot1's turn, costs
+# {3}{R}: all four of Bot2's Moxen's red are spent.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Defense Grid
+Lightning Bolt
+Mox Ruby
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Defense Grid.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+? Bot2.Mana = {R}
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Bot2.Mana =
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+? Bot1.Mana = {R}{R}
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana = {R}
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Battlefield.Mox Ruby#3.Activate
+Bot2.Battlefield.Mox Ruby#4.Activate
+? Bot2.Mana = {R}{R}{R}{R}
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Mana = {R}
+Bot2.Mana =
+Bot1.Life = 14
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

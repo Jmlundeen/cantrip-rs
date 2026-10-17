@@ -1,0 +1,6 @@
+{
+  "name": "Defense Grid",
+  "manaCost": "{2}",
+  "type": "Artifact",
+  "oracleText": "Each spell costs {3} more to cast except during its controller's turn."
+}
