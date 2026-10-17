@@ -1,0 +1,58 @@
+# "Damage equal to that creature's power" is read as Terror of the Peaks' ability resolves, or, once the creature has left the
+# battlefield, as it last existed there (CR 608.2h). On turn 5 Bot1's Embereth Shieldbreaker (2/1) enters and the ability
+# goes on the stack aimed at Bot2. In response Bot1 casts Full Bore on it (+3/+2, a 5/3), and Bot2 answers with Lightning
+# Bolt, which kills it. The ability then deals 5 damage to Bot2: neither the power when it triggered (2) nor nothing.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Mountain
+Embereth Shieldbreaker
+Full Bore
+Mountain
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Full Bore.Cast(Embereth Shieldbreaker)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Embereth Shieldbreaker.Power = 5
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Embereth Shieldbreaker)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Bot2.Life = 20
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 5
+Bot2.Life = 15
+Bot1.Graveyard = Embereth Shieldbreaker; Full Bore; Show and Tell; Black Lotus

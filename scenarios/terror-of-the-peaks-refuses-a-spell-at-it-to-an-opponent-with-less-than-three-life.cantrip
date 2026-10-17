@@ -1,0 +1,36 @@
+# A player can pay life only if their life total is at least the payment (CR 119.4, 118.3). Bot2 is at 2 life, and Terror of
+# the Peaks makes a spell Bot2 casts at it cost an additional 3 life (CR 601.2f): Bot2's Lightning Bolt is not offered at
+# Terror, though it is still cast at Bot1, for {R} and no life.
+
+[Life]
+Bot2: 2
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Terror of the Peaks)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Turn = 2
+Bot1.Life = 17
+Bot2.Life = 2
+Bot1.Battlefield.Terror of the Peaks.Damage = 0

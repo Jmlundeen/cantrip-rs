@@ -1,0 +1,51 @@
+# Once triggered, Terror of the Peaks' ability is independent of it (CR 113.7a): exiled before the ability resolves, Terror
+# still deals the damage, as it last existed (CR 608.2h). On turn 3 Bot1's Embereth Shieldbreaker enters and the ability is
+# aimed at Bot2. In response Bot2 casts Swords to Plowshares at Terror, which costs {W} and 3 life (CR 601.2f): Terror is
+# exiled and Bot1 gains 5 life, its power. The ability then deals 2 damage to Bot2: 20 - 3 - 2 = 15.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Mountain
+Embereth Shieldbreaker
+Island x10
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Terror of the Peaks)
+? Bot2.Life = 17
+Bot2.Pass
+Bot1.Pass
+? Exile = Terror of the Peaks
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 25
+Bot2.Life = 15
+Exile = Terror of the Peaks
+Bot1.Battlefield = Island; Mountain; Embereth Shieldbreaker

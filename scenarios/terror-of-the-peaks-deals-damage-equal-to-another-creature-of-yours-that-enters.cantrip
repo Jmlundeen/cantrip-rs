@@ -1,0 +1,55 @@
+# Terror of the Peaks: "Whenever another creature you control enters, this creature deals damage equal to that creature's
+# power to any target" (CR 603.6a, 120.3). Terror itself entering (put onto the battlefield by Show and Tell) does not
+# trigger it: Bot1 is asked for no target. Bot2's Ornithopter entering on turn 2 is not Bot1's: no target either. On turn 3
+# Bot1's Ornithopter triggers it, aimed at Bot2, and deals no damage, its power being 0 (CR 120.8); Bot1's Embereth
+# Shieldbreaker triggers it and Terror deals 2 damage to Bot2.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Mountain
+Ornithopter
+Embereth Shieldbreaker
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+! Bot1.Target
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot1.Target
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2)
+
+[Expect]
+Turn = 3
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Battlefield = Island; Mountain; Terror of the Peaks; Ornithopter; Embereth Shieldbreaker
+Bot2.Battlefield = Ornithopter

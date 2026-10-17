@@ -1,0 +1,52 @@
+# Terror of the Peaks: "Spells your opponents cast that target this creature cost an additional 3 life to cast" (CR 118.8,
+# 601.2f). Bot1's Show and Tell puts it onto the battlefield on turn 1. On turn 2 Bot2's Lightning Bolt at it costs {R} and
+# 3 life, paid as it is cast: Bot2 is at 17 with the Bolt still on the stack, and Terror (4 toughness) survives. Bot1's own
+# Full Bore at Terror on turn 3 costs Bot1 no life, and Bot2's Lightning Bolt at Bot1 on turn 4 costs Bot2 none.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Mountain
+Full Bore
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Terror of the Peaks)
+? Stack = Lightning Bolt
+? Bot2.Life = 17
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Terror of the Peaks.Damage = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Full Bore.Cast(Terror of the Peaks)
+? Bot1.Life = 20
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+
+[Expect]
+Turn = 4
+Bot1.Life = 17
+Bot2.Life = 17
+Bot1.Battlefield = Island; Mountain; Terror of the Peaks
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

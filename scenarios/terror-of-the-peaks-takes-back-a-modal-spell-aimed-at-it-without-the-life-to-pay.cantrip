@@ -1,0 +1,54 @@
+# A modal spell's targets are chosen as it is cast, after its modes (CR 601.2b-c), and Terror of the Peaks' additional 3 life
+# is part of the total cost determined after them (CR 601.2f). Bot2, at 2 life, casts Kolaghan's Command choosing "target
+# player discards a card" (Bot1) and "2 damage to any target" (Terror): the total asks 3 life Bot2 does not have (CR 119.4),
+# so the cast is illegal and taken back (CR 601.2h, 733): the Command is in Bot2's hand again, nothing was paid and Bot1 has
+# discarded nothing. Bot2 casts it again with the 2 damage at Bot1, which costs no life, and it resolves.
+
+[Life]
+Bot2: 2
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Kolaghan's Command
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Kolaghan's Command.Cast
+Bot2.Modes(2; 4)
+Bot2.Target(Bot1)
+Bot2.Target(Bot1.Battlefield.Terror of the Peaks)
+? Stack.Count = 0
+? Bot2.Hand.Count = 6
+? Bot2.Mana = {B}{B}{B}{R}
+Bot2.Hand.Kolaghan's Command.Cast
+Bot2.Modes(2; 4)
+Bot2.Target(Bot1)
+Bot2.Target(Bot1)
+
+[Expect]
+Turn = 2
+Bot1.Life = 18
+Bot2.Life = 2
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Island; Show and Tell; Black Lotus
+Bot1.Battlefield.Terror of the Peaks.Damage = 0
+Bot2.Graveyard = Kolaghan's Command; Black Lotus

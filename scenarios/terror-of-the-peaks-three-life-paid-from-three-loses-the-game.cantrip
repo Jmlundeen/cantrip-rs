@@ -1,0 +1,35 @@
+# A player with exactly 3 life can pay Terror of the Peaks' additional 3 life (CR 119.4: the life total is at least the
+# payment). Bot2 at 3 casts Lightning Bolt at Terror, pays {R} and 3 life, and is at 0: the state-based action makes Bot2
+# lose the game before anyone has priority (CR 704.5a), so the Bolt never resolves.
+
+[Life]
+Bot2: 3
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Terror of the Peaks)
+
+[Expect]
+Result = Bot1 won
+Bot2.Life = 0
+Bot2.Status = Lost
+Bot1.Battlefield.Terror of the Peaks.Damage = 0

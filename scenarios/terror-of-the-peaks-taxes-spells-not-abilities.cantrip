@@ -1,0 +1,38 @@
+# Terror of the Peaks taxes spells that target it, not abilities (CR 118.8, 601.2f, 602.2b). Bot2's Goblin Bombardment
+# ("Sacrifice a creature: 1 damage to any target") is activated at Terror, sacrificing Ornithopter: it costs Bot2 no life,
+# and Terror is dealt 1 damage.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Goblin Bombardment
+Ornithopter
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Goblin Bombardment.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Goblin Bombardment.Activate(Bot1.Battlefield.Terror of the Peaks; Sacrifice: Ornithopter)
+
+[Expect]
+Turn = 2
+Bot2.Life = 20
+Bot1.Battlefield.Terror of the Peaks.Damage = 1
+Bot2.Graveyard = Ornithopter; Black Lotus

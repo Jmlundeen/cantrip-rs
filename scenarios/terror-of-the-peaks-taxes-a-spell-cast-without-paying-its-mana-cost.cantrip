@@ -1,0 +1,33 @@
+# An additional cost is paid with an alternative cost too (CR 118.9d, 601.2f). Bot1's Show and Tell puts Terror of the
+# Peaks onto the battlefield, and Bot2 puts Omniscience. On turn 2 Bot2, with no land, casts Lightning Bolt at Terror without
+# paying its mana cost: no mana, but Terror's additional 3 life still, so Bot2 is at 17.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Island x10
+
+[Bot2 Deck]
+Omniscience
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose(Omniscience)
+[T2 Bot2.Main1]
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Terror of the Peaks; Ability: Without paying)
+? Bot2.Life = 17
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 2
+Bot2.Life = 17
+Bot1.Battlefield.Terror of the Peaks.Damage = 3
+Bot2.Battlefield = Omniscience

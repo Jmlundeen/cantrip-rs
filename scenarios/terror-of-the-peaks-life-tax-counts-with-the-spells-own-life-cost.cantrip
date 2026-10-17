@@ -1,0 +1,47 @@
+# The total cost is paid whole or not at all (CR 601.2h), so the life it asks is counted together: Fire Covenant's "as an
+# additional cost, pay X life" and Terror of the Peaks' additional 3 life for a spell an opponent casts at it (CR 118.8,
+# 601.2f, 119.4). Bot2, at 9 life, announces X = 7 and divides the 7 damage onto Terror: 7 + 3 is more than 9, so the cast
+# is taken back with nothing paid. Announced again with X = 4, all at Terror, it costs 4 + 3 = 7 life: Bot2 is at 2 and
+# Terror (4 toughness) dies.
+
+[Life]
+Bot2: 9
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Terror of the Peaks
+Island x10
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Fire Covenant
+Lightning Bolt x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Terror of the Peaks)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Fire Covenant.Cast(X: 7)
+Bot2.Divide(Bot1.Battlefield.Terror of the Peaks: 7)
+? Stack.Count = 0
+? Bot2.Life = 9
+? Bot2.Mana = {B}{B}{B}{R}
+Bot2.Hand.Fire Covenant.Cast(X: 4)
+Bot2.Divide(Bot1.Battlefield.Terror of the Peaks: 4)
+
+[Expect]
+Turn = 2
+Bot2.Life = 2
+Bot1.Graveyard = Terror of the Peaks; Show and Tell; Black Lotus
+Bot2.Graveyard = Fire Covenant; Black Lotus
