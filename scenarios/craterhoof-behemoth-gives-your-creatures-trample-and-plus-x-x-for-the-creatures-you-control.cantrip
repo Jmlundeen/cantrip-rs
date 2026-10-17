@@ -1,0 +1,54 @@
+# Craterhoof Behemoth: "When this creature enters, creatures you control gain trample and get +X/+X until end of turn, where X
+# is the number of creatures you control." Turn 1 Bot1 casts five Moxen, a Black Lotus and an Ornithopter; Bot2 casts its own
+# Ornithopter on turn 2. On turn 3 Bot1 draws Craterhoof Behemoth and pays {5}{G}{G}{G} with the five Moxen and the Lotus.
+# X is 2 (Craterhoof Behemoth and the Ornithopter; Bot2's creature does not count): the Behemoth is a 7/7 with haste and
+# trample, the Ornithopter a 2/4 flier with trample, and both attack at once. Bot2's Ornithopter is not affected, stays
+# a 0/2 flier, and does not block: Bot2 takes 7 + 2 = 9.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Craterhoof Behemoth
+Forest x10
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Craterhoof Behemoth.Cast
+Bot1.Attack(Craterhoof Behemoth; Ornithopter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 11
+Bot1.Battlefield.Craterhoof Behemoth.Power = 7
+Bot1.Battlefield.Craterhoof Behemoth.Toughness = 7
+Bot1.Battlefield.Craterhoof Behemoth.Keywords = Haste; Trample
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Ornithopter.Keywords = Flying

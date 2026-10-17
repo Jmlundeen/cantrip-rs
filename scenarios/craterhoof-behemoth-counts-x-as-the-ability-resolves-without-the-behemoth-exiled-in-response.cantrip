@@ -1,0 +1,50 @@
+# Craterhoof Behemoth, ruling 2025-04-04: "The value of X is calculated only once, as Craterhoof Behemoth's last ability
+# resolves." Turn 3 Bot1 casts it (five Moxen and a Black Lotus) with an Ornithopter already in play. With the enters trigger
+# on the stack Bot2 exiles the Behemoth with Swords to Plowshares (Bot1 gains 5 life, its power then). The ability still
+# resolves, but Bot1 controls one creature, the Ornithopter: X is 1, so it is a 1/3 with trample, not the 2/4 it would be
+# were the Behemoth counted.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Ornithopter
+Craterhoof Behemoth
+Forest x10
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Craterhoof Behemoth.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Craterhoof Behemoth)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 25
+Exile = Craterhoof Behemoth
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample

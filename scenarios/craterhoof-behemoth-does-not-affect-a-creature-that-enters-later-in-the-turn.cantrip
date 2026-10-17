@@ -1,0 +1,50 @@
+# Craterhoof Behemoth, ruling 2025-04-04: its ability "affects only creatures you control at the time it resolves. Creatures you
+# begin to control later in the turn won't gain trample and get +X/+X." Turn 1 Bot1 plays a Forest and casts five Moxen and a
+# Black Lotus; turn 3 it draws Llanowar Elves and holds it; turn 5 it draws and casts the Behemoth (Moxen and Lotus), alone: X is 1,
+# so it is a 6/6 with haste and trample and hits Bot2 for 6. Afterwards it casts Llanowar Elves with the Forest: a plain
+# 1/1, with neither trample nor a bonus.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Forest
+Llanowar Elves
+Craterhoof Behemoth
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Craterhoof Behemoth.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Attack(Craterhoof Behemoth > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Craterhoof Behemoth.Power = 6
+Bot1.Battlefield.Craterhoof Behemoth.Toughness = 6
+Bot1.Battlefield.Craterhoof Behemoth.Keywords = Haste; Trample
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)

@@ -1,0 +1,11 @@
+{
+  "name": "Craterhoof Behemoth",
+  "manaCost": "{5}{G}{G}{G}",
+  "type": "Creature — Beast",
+  "power": 5,
+  "toughness": 5,
+  "keywords": [
+    "Haste"
+  ],
+  "oracleText": "Haste\nWhen this creature enters, creatures you control gain trample and get +X/+X until end of turn, where X is the number of creatures you control."
+}
