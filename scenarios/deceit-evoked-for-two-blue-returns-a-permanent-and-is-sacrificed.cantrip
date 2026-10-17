@@ -1,0 +1,42 @@
+# Evoke {U/B}{U/B} paid with two Mox Sapphires spends two blue (the evoke cost counts, CR 601.2h): the {U}{U} ability and the evoke
+# sacrifice trigger both trigger. Bot1 lets the sacrifice resolve first (the first named goes on the stack first): Deceit is in the graveyard
+# while the return is still on the stack, and the return still resolves, Llanowar Elves going back to Bot2's hand (the intervening "if"
+# asks only what was spent, CR 603.4, and the ability does not need Deceit to still exist, CR 113.7a).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Deceit
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Hand.Deceit.Cast(Ability: Evoke)
+Bot1.Triggers(return; sacrifice)
+Bot1.Target(Llanowar Elves)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Deceit
+? Bot2.Hand.Count = 6
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Deceit
+Bot1.Battlefield = Mox Sapphire; Mox Sapphire
+Bot2.Battlefield = Forest
+Bot2.Hand.Count = 7

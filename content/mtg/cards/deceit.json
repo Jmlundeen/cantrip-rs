@@ -1,0 +1,8 @@
+{
+  "name": "Deceit",
+  "manaCost": "{4}{U/B}{U/B}",
+  "type": "Creature — Elemental Incarnation",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "When this creature enters, if {U}{U} was spent to cast it, return up to one other target nonland permanent to its owner's hand.\nWhen this creature enters, if {B}{B} was spent to cast it, target opponent reveals their hand. You choose a nonland card from it. That player discards that card.\nEvoke {U/B}{U/B}"
+}

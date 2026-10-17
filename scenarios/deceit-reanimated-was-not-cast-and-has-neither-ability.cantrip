@@ -1,0 +1,43 @@
+# Deceit put onto the battlefield by Reanimate was not cast, so nothing was spent to cast it and neither enters ability triggers
+# (CR 603.4, 400.7): Bot2's Llanowar Elves stays on the battlefield, nothing is asked, and Bot2's hand is untouched. Reanimate's {B} paid for
+# Reanimate. Bot1 loses 6 life (Deceit's mana value).
+
+[Bot1 Deck]
+Swamp
+Swamp
+Entomb
+Reanimate
+Swamp x4
+Deceit
+Swamp x11
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Deceit)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Deceit)
+Bot1.Pass
+! Bot1.Target
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Deceit.Power = 5
+Bot1.Life = 14
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 0

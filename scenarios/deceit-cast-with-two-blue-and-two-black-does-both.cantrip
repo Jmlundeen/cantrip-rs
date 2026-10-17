@@ -1,0 +1,51 @@
+# Two blue and two black spent (Mox Sapphire x2, Mox Jet x2, Mox Ruby, Mox Emerald): both enters abilities happen, in the order Bot1
+# names. Llanowar Elves returns to Bot2's hand, so the revealed hand holds two nonland cards (Elves and Lightning Bolt) and Bot1
+# chooses the Bolt: the discard sees the hand after the return when the return resolves first.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Emerald
+Deceit
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Lightning Bolt
+Forest x4
+Forest x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Deceit.Cast
+Bot1.Triggers(return; reveals)
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand = Llanowar Elves; Forest; Forest; Forest; Forest; Forest

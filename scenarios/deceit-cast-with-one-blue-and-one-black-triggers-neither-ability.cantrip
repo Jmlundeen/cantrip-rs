@@ -1,0 +1,50 @@
+# "{U}{U}" and "{B}{B}" need two of the same color: Deceit paid with Mox Sapphire, Mox Jet, Mox Ruby x2, Mox Emerald and Mox Pearl
+# spent one blue and one black, so neither enters ability happens (CR 603.4) and nothing is asked. Bot2's Llanowar Elves stays and
+# its hand is untouched. The positive controls are the two scenarios that spend two blue or two black.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Deceit
+Island x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Lightning Bolt
+Forest x4
+Forest x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deceit.Cast
+Bot1.Pass
+! Bot1.Target
+! Bot1.Choose
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Deceit.Power = 5
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 0

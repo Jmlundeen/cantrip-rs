@@ -1,0 +1,38 @@
+# Evoke paid with Mox Sapphire and Mox Jet spends one blue and one black, so neither enters ability triggers (CR 603.4); only the
+# evoke sacrifice does and Deceit goes to the graveyard. Bot2's Llanowar Elves and hand are untouched (the control: the two-blue evoke scenario).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Deceit
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x5
+Forest x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Deceit.Cast(Ability: Evoke)
+? Stack.Count = 1
+! Bot1.Target
+! Bot1.Choose
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Deceit
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Hand.Count = 6
+Bot2.Graveyard.Count = 0
