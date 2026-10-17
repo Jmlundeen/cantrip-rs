@@ -1,0 +1,47 @@
+# Giant Growth: "Target creature gets +3/+3 until end of turn." On turn 2 Bot2 casts Lightning Bolt at Bot1's Llanowar
+# Elves; Bot1 answers with Giant Growth, which resolves first (CR 608.1): the Elves is a 4/4, and the Bolt's 3 damage does
+# not kill it (CR 704.5g). The +3/+3 lasts until the cleanup step (CR 514.2), when the damage is removed too: on turn 3 the
+# Elves is a 1/1 with no damage.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Giant Growth
+Mox Emerald
+Forest x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 4
+? Bot1.Battlefield.Llanowar Elves.Toughness = 4
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Llanowar Elves.Damage = 3
+? Bot1.Battlefield.Llanowar Elves.Toughness = 4
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Graveyard = Giant Growth
+Bot2.Graveyard = Lightning Bolt
