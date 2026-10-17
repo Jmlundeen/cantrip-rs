@@ -539,3 +539,15 @@ pub fn exile_all_creatures(g: &mut dyn Game) -> usize {
     let creatures: Vec<ObjectId> = g.state().battlefield().iter().copied().filter(|&id| g.chars(id).is(CardType::Creature)).collect();
     g.exile_all(&creatures).len()
 }
+
+/// "Gain control of target creature until end of turn. Untap that creature. It gains haste until end of turn." (CR 613.1b,
+/// 611.2a, 702.10): the resolving spell's first target, if it is still legal (CR 608.2b), which it returns. Act of Treason
+/// and Vengeful Possession print it (Threaten, Traitorous Blood with trample too); one the caster already controls is
+/// untapped and given haste all the same (Act of Treason's ruling).
+pub fn gain_control_untap_haste(g: &mut dyn Game, item: &StackItem) -> Option<ObjectId> {
+    let creature = crate::targets::object(g, item, 0)?;
+    g.gain_control(item.object, creature, item.controller, Duration::EndOfTurn);
+    g.untap(creature);
+    crate::haste_until_end_of_turn(g, item.object, creature);
+    Some(creature)
+}
