@@ -1,0 +1,34 @@
+# Rapid Rescue: "Mill two cards. You may put a permanent card from among the milled cards into your hand. You gain 2
+# life." The two milled cards are Llanowar Elves and Lightning Bolt; Bolt is not a permanent card, so it cannot be taken
+# (the refusal), and Bot1 takes the creature. The other stays in the graveyard, with Rapid Rescue itself.
+
+[Bot1 Deck]
+Forest
+Rapid Rescue
+Forest
+Forest
+Forest
+Forest
+Forest
+Llanowar Elves
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Rapid Rescue.Cast
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Llanowar Elves)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Llanowar Elves
+Bot1.Graveyard = Rapid Rescue; Lightning Bolt
+Bot1.Library.Count = 10
+Bot2.Life = 20

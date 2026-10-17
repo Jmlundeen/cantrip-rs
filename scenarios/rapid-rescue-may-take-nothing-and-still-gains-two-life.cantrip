@@ -1,0 +1,30 @@
+# Rapid Rescue: "You may put a permanent card ... into your hand" - Bot1 takes neither Llanowar Elves nor Island, so both
+# milled cards stay in the graveyard; the life is gained regardless.
+
+[Bot1 Deck]
+Forest
+Rapid Rescue
+Forest
+Forest
+Forest
+Forest
+Forest
+Llanowar Elves
+Island
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Rapid Rescue.Cast
+Bot1.Choose()
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Rapid Rescue; Island; Llanowar Elves

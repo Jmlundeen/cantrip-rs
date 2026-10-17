@@ -1,0 +1,32 @@
+# Rapid Rescue: lands and artifacts are permanent cards too (CR 110.4), and "a permanent card" is one: of the milled Island
+# and Sol Ring, Bot1 asks for the Island (the second is refused, only one may be put into hand). Sol Ring stays in the
+# graveyard; life 22.
+
+[Bot1 Deck]
+Forest
+Rapid Rescue
+Forest
+Forest
+Forest
+Forest
+Forest
+Island
+Sol Ring
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Rapid Rescue.Cast
+! Bot1.Choose(Island; Sol Ring)
+Bot1.Choose(Island)
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Island
+Bot1.Graveyard = Rapid Rescue; Sol Ring

@@ -1,0 +1,6 @@
+{
+  "name": "Rapid Rescue",
+  "manaCost": "{G}",
+  "type": "Instant",
+  "oracleText": "Mill two cards. You may put a permanent card from among the milled cards into your hand. You gain 2 life. (To mill two cards, put the top two cards of your library into your graveyard.)"
+}

@@ -1,0 +1,31 @@
+# Rapid Rescue: with two Lightning Bolts milled there is no permanent card to take, so nothing is asked (an instant is
+# not a permanent card); both stay in the graveyard and the 2 life is still gained.
+
+[Bot1 Deck]
+Forest
+Rapid Rescue
+Forest
+Forest
+Forest
+Forest
+Forest
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Rapid Rescue.Cast
+! Bot1.Choose
+[Bot1.Main2]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Rapid Rescue; Lightning Bolt; Lightning Bolt
+Bot1.Library.Count = 10
