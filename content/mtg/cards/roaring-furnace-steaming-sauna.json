@@ -1,0 +1,18 @@
+{
+  "name": "Roaring Furnace // Steaming Sauna",
+  "oracleText": "",
+  "halves": [
+    {
+      "name": "Roaring Furnace",
+      "manaCost": "{1}{R}",
+      "type": "Enchantment — Room",
+      "oracleText": "When you unlock this door, this Room deals damage equal to the number of cards in your hand to target creature an opponent controls.\n(You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)"
+    },
+    {
+      "name": "Steaming Sauna",
+      "manaCost": "{3}{U}{U}",
+      "type": "Enchantment — Room",
+      "oracleText": "You have no maximum hand size.\nAt the beginning of your end step, draw a card.\n(You may cast either half. That door unlocks on the battlefield. As a sorcery, you may pay the mana cost of a locked door to unlock it.)"
+    }
+  ]
+}

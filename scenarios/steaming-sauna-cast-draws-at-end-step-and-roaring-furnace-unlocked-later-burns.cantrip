@@ -1,0 +1,47 @@
+# Roaring Furnace // Steaming Sauna cast as its right door, Steaming Sauna, in turn 1: "At the beginning of your end step,
+# draw a card" gives Bot1 a third card at its end step. In turn 3 Bot1 unlocks Roaring Furnace for {1}{R}, a special
+# action (CR 709.5e), and "when you unlock this door" triggers (CR 709.5h): the Room deals damage equal to the four cards
+# in Bot1's hand to Bot2's Llanowar Elves, which die.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Sapphire
+Roaring Furnace // Steaming Sauna
+Mountain
+Island
+Island
+Island x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Roaring Furnace // Steaming Sauna.Cast(Ability: Steaming Sauna)
+? Bot1.Hand.Count = 2
+[T2 Bot2.Upkeep]
+? Bot1.Hand.Count = 3
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Steaming Sauna.Doors = Steaming Sauna
+Bot1.Battlefield.Steaming Sauna.Activate(Ability: left door)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack = Roaring Furnace // Steaming Sauna
+? Bot1.Hand.Count = 4
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Roaring Furnace // Steaming Sauna.Doors = Roaring Furnace; Steaming Sauna
+Bot2.Graveyard = Llanowar Elves

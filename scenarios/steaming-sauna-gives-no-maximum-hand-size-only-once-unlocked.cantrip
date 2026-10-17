@@ -1,0 +1,55 @@
+# Steaming Sauna: "You have no maximum hand size. At the beginning of your end step, draw a card." A locked door has no
+# rules text (CR 709.5): Bot1 casts Roaring Furnace // Steaming Sauna as Roaring Furnace in turn 1 (its trigger, with no
+# creature of Bot2's to target, is removed), Bot2's Ancestral Recall gives Bot1 three cards, and at the cleanup of turn 3
+# Bot1, holding eight with only Roaring Furnace unlocked, discards to seven (CR 402.2, 514.1), and draws nothing at its end
+# step. In turn 5 Bot1 unlocks Steaming Sauna for {3}{U}{U} (CR 709.5e) and casts Ancestral Recall: the Sauna's end-step
+# trigger draws a ninth card, and the cleanup asks no discard - the play rule is the unlocked door's.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Roaring Furnace // Steaming Sauna
+Black Lotus
+Ancestral Recall
+Island
+Island
+Island x15
+
+[Bot2 Deck]
+Island
+Ancestral Recall
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Roaring Furnace // Steaming Sauna.Cast(Ability: Roaring Furnace)
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot1)
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 8
+[T3 Bot1.End]
+Bot1.Pass
+? Bot1.Hand.Count = 8
+Bot1.Discard(Island)
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Roaring Furnace.Activate(Ability: right door)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot1.Battlefield.Roaring Furnace // Steaming Sauna.Doors = Roaring Furnace; Steaming Sauna
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T5 Bot1.End]
+Bot1.Pass
+! Bot1.Discard
+[T6 Bot2.Upkeep]
+
+[Expect]
+Bot1.Hand.Count = 9
+Bot1.Graveyard = Ancestral Recall; Black Lotus; Island
