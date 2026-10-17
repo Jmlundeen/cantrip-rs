@@ -333,6 +333,14 @@ pub fn exile_top_play_until_end_of_next_turn(g: &mut dyn Game, player: PlayerId,
     exile_top_may_play(g, player, count, player, grant)
 }
 
+/// "Exile the top `count` cards of your library. You may play [it / those cards] this turn" (`exile_top_may_play`): the grant
+/// is to play, not only cast, a land among them under the ordinary land-play rules, until the cleanup step (CR 514.2). The
+/// cards still in exile. Laelia, the Blade Reforged and Emberheart Challenger (one card each) print it.
+pub fn exile_top_play_this_turn(g: &mut dyn Game, player: PlayerId, count: usize) -> Vec<ObjectId> {
+    let grant = PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST };
+    exile_top_may_play(g, player, count, player, grant)
+}
+
 /// "[One] of `items` chosen at random" (CR 701.9c, 705): one is drawn from the game's own generator, so the same game picks
 /// the same one; no draw is made when there is no choice. None from an empty list. Crabomination picks a card at random
 /// from a graveyard and a hand, Chaos Defiler one of the creatures chosen, Ursine Monstrosity an opponent and Tersa

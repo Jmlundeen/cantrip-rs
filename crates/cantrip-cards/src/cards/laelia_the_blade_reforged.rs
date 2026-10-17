@@ -1,11 +1,10 @@
 use cantrip_api::*;
-use cantrip_mechanics::library::exile_top_may_play;
+use cantrip_mechanics::library::exile_top_play_this_turn;
 use cantrip_oracle as oracle;
 
 /// Exile the top card of your library. You may play that card this turn (CR 305.1, 601.3): a land too.
 fn exile_top(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let grant = PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST };
-    exile_top_may_play(g, item.controller, 1, item.controller, grant);
+    exile_top_play_this_turn(g, item.controller, 1);
     Ok(())
 }
 

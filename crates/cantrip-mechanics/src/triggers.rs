@@ -28,6 +28,25 @@ pub fn this_enters_if_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Op
     }
 }
 
+/// Valiant: "Whenever this creature becomes the target of a spell or ability you control for the first time each turn"
+/// (CR 115.10, 603.2): the creature became the target of something its controller controls, and no earlier event this turn
+/// made it the target of something they control - the history is as it was just before this event, so it holds the earlier
+/// ones only. A copy of a spell, and a spell or ability whose target was changed to it, make it a target too. Emberheart
+/// Challenger and Heartfire Hero print it.
+pub fn valiant(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let Event::BecameTarget { target: Target::Object(t), controller, .. } = event else { return None };
+    if *t != me.source || *controller != me.controller {
+        return None;
+    }
+    let before = q.history().this_turn().iter().any(|r| {
+        matches!(r.event, Event::BecameTarget { target: Target::Object(o), controller: c, .. } if o == me.source && c == me.controller)
+    });
+    if before { None } else { Fired::PLAIN }
+}
+
+/// Valiant as a trigger condition: `triggered(VALIANT, ..)`.
+pub const VALIANT: Trigger = when_asked(EventMask::BECAME_TARGET, valiant);
+
 /// An intervening "if it's on the battlefield" (CR 603.4), checked as the ability triggers and again as it resolves: the
 /// permanent is still the object that triggered (CR 400.7) and has not left. Animate Dead and Necromancy print it.
 pub fn this_is_on_the_battlefield(q: &dyn Query, asker: &Asker) -> bool {
