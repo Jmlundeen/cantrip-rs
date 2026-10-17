@@ -1,0 +1,67 @@
+# Opalescence makes Glorious Anthem a creature with base power and toughness 3/3, its mana value (layer 4 and 7b), and the
+# Anthem's "Creatures you control get +1/+1" now reaches itself (CR 613.4c, layer 7c): a 4/4 on turn 3, its Llanowar Elves
+# 2/2. Humility enters on turn 5, after Opalescence: layer 4, Opalescence makes Humility and the Anthem creatures; layer 6,
+# Humility takes all their abilities, the Anthem's among them; layer 7b, in timestamp order, Opalescence makes them 4/4 and
+# 3/3 and then Humility makes them 1/1 (CR 613.6, 613.7; the Humility-Opalescence ruling). The Anthem pumps nothing any
+# more: it is 1/1, not 2/2, and the Elves 1/1. Opalescence is no creature (it is not "other" to itself).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Pearl
+Sol Ring
+Mox Emerald
+Opalescence
+Glorious Anthem
+Llanowar Elves
+Humility
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Glorious Anthem.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Glorious Anthem.Types = Enchantment; Creature
+? Bot1.Battlefield.Glorious Anthem.Power = 4
+? Bot1.Battlefield.Glorious Anthem.Toughness = 4
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Glorious Anthem.Types = Enchantment; Creature
+Bot1.Battlefield.Glorious Anthem.Power = 1
+Bot1.Battlefield.Glorious Anthem.Toughness = 1
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Power = 1
+Bot1.Battlefield.Humility.Toughness = 1
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Opalescence.Types = Enchantment

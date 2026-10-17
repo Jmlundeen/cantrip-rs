@@ -1,0 +1,6 @@
+{
+  "name": "Glorious Anthem",
+  "manaCost": "{1}{W}{W}",
+  "type": "Enchantment",
+  "oracleText": "Creatures you control get +1/+1."
+}

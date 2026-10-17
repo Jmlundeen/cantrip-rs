@@ -1,0 +1,41 @@
+# Glorious Anthem: "Creatures you control get +1/+1." A static ability (CR 604.1, 613.4c) that reaches every creature its
+# controller controls, one that enters later too (CR 611.3a): Bot1's Llanowar Elves, cast after it on turn 1, is a 2/2,
+# and Bot2's Llanowar Elves, which Bot1 does not control, stays a 1/1. The Anthem itself is no creature.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Mox Emerald
+Glorious Anthem
+Llanowar Elves
+Island x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Glorious Anthem.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Battlefield.Glorious Anthem.Types = Enchantment
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Llanowar Elves.Toughness = 1
