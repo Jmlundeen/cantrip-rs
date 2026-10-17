@@ -424,6 +424,12 @@ impl Game {
         static_rules::cant_gain_life(self, self.cards, player)
     }
 
+    /// Whether a static ability on the battlefield gives `player` the keyword ability `keyword` right now (CR 702.18a: "You
+    /// have shroud").
+    pub fn player_has(&self, player: PlayerId, keyword: Keyword) -> bool {
+        layers::player_has(self.cards, &self.state, &self.log, player, keyword)
+    }
+
     /// Whether `player` can't lose life right now (CR 119.8): a static ability on the battlefield says so.
     pub fn cant_lose_life(&self, player: PlayerId) -> bool {
         static_rules::cant_lose_life(self, self.cards, player)

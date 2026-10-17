@@ -1537,6 +1537,16 @@ pub struct TargetingRule {
     pub applies: fn(&dyn LayerQuery, ObjectId, ObjectId) -> bool,
 }
 
+/// A static ability that gives players a keyword ability (CR 702.18a "This permanent or player can't be the target of
+/// spells or abilities", 702.11c), while its source is on the battlefield with its abilities: `applies` is asked of the
+/// source and a player. Shroud and hexproof are the keywords a player can have; "You have shroud" (True Believer, Ivory
+/// Mask) and "You have hexproof" (Leyline of Sanctity) print it. `cantrip_mechanics::statics` has the shared ones.
+#[derive(Clone, Copy)]
+pub struct PlayerKeywordRule {
+    pub keyword: Keyword,
+    pub applies: fn(&dyn LayerQuery, ObjectId, PlayerId) -> bool,
+}
+
 /// A triggered ability that an event would trigger, as a [`TriggerRule`] or an [`AdditionalTrigger`] is asked about it: its
 /// source (a permanent, or a card in another zone whose ability functions there), the player who would control it, and its
 /// definition.
@@ -2008,6 +2018,9 @@ pub struct CardDef {
     pub attacks_despite_defender: &'static [AttackDespiteDefenderRule],
     /// Its static abilities that change who can target what and whether ward triggers, while it is on the battlefield.
     pub targeting_rules: &'static [TargetingRule],
+    /// Its static abilities that give players keyword abilities ("You have shroud", CR 702.18a), while it is on the
+    /// battlefield with its abilities.
+    pub player_keywords: &'static [PlayerKeywordRule],
     /// Its static abilities that make some damage unpreventable (CR 615.12).
     pub unpreventable_damage: &'static [UnpreventableRule],
     /// Its static abilities that stop players from gaining life (CR 119.7), while it is on the battlefield: the gain, the
@@ -2187,6 +2200,7 @@ impl CardDef {
         attack_costs: &[],
         attacks_despite_defender: &[],
         targeting_rules: &[],
+        player_keywords: &[],
         unpreventable_damage: &[],
         cant_gain_life: &[],
         cant_lose_life: &[],
@@ -2294,6 +2308,8 @@ pub struct CardTable {
     pub attack_rules: Vec<bool>,
     /// Per card: it has a targeting rule. Read to find the few battlefield sources of one, never to ask the table.
     pub targeting_rules: Vec<bool>,
+    /// Per card: it gives players keyword abilities (`CardDef::player_keywords`). Read to find the few battlefield sources of one.
+    pub player_keywords: Vec<bool>,
     /// Which cards have a triggered mana ability: looked for among the permanents only when a permanent is tapped for mana.
     pub mana_triggers: Vec<bool>,
     /// Which cards have cost changes (CR 601.2f): the board is looked at for their sources, never for the card table's
@@ -2398,6 +2414,7 @@ impl CardTable {
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
+        let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty()).collect();
         let mana_triggers: Vec<bool> =
             cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))).collect();
         let intrinsic = CardId(
@@ -2425,6 +2442,7 @@ impl CardTable {
             block_rules,
             attack_rules,
             targeting_rules,
+            player_keywords,
             mana_triggers,
             cost_changes,
             activation_rules,

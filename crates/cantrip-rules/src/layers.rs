@@ -1354,11 +1354,14 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
         Target::Ability(serial) => state.stack.iter().any(|i| i.serial == serial && i.kind != StackKind::Spell),
         // A player with hexproof (CR 702.11c) can't be targeted by their opponents' spells and abilities.
         // A player with protection from everything (CR 702.16j) can't be targeted by anything, their own included.
+        // A player with shroud (CR 702.18a) can't be targeted by anything, their own included.
         Target::Player(p) => {
             !state.player(p).lost
                 && !(p != asker.controller
-                    && state.effects.iter().any(|e| e.kind == EffectKind::PlayerHexproof && e.controller == p))
+                    && (state.effects.iter().any(|e| e.kind == EffectKind::PlayerHexproof && e.controller == p)
+                        || player_has(cards, state, log, p, Keyword::Hexproof)))
                 && !state.effects.iter().any(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == p)
+                && !player_has(cards, state, log, p, Keyword::Shroud)
         }
         Target::Object(id) => {
             if !live(state, id) {
@@ -1581,6 +1584,20 @@ pub fn targeting_rule(cards: &CardTable, state: &GameState, log: &[Record], kind
         cards.targeting_rules[card.0 as usize]
             && !lost_all_abilities(cards, state, log, source)
             && cards.get(card).targeting_rules.iter().any(|r| r.kind == kind && (r.applies)(&view, source, subject))
+    })
+}
+
+/// Whether a static ability of a permanent on the battlefield with its abilities gives `player` the keyword ability `keyword`
+/// (`CardDef::player_keywords`: True Believer's "You have shroud", CR 702.18a). A board with no such permanent costs a
+/// table lookup per permanent.
+pub fn player_has(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, keyword: Keyword) -> bool {
+    let view = View { cards, state, log, stop: Layer::Ability };
+    state.battlefield().iter().any(|&source| {
+        let card = cards.current(state.obj(source));
+        // A permanent that has lost all its abilities has no static abilities (CR 613.1f).
+        cards.player_keywords[card.0 as usize]
+            && cards.get(card).player_keywords.iter().any(|r| r.keyword == keyword && (r.applies)(&view, source, player))
+            && !lost_all_abilities(cards, state, log, source)
     })
 }
 
@@ -2006,5 +2023,60 @@ mod tests {
         let elf = effect(7, EffectKind::ChangeText { from: Word::Subtype(Subtype::Elf), to: Word::Subtype(Subtype::Goblin) });
         apply_effect(&elf, Layer::Text, &mut chars);
         assert_eq!(chars.keywords, Keywords::of(&[Keyword::Islandwalk, Keyword::Flying]));
+    }
+}
+
+#[cfg(test)]
+mod player_keyword_tests {
+    use super::*;
+
+    fn controller_is(q: &dyn LayerQuery, source: ObjectId, player: PlayerId) -> bool {
+        q.state().obj(source).controller == player
+    }
+
+    static VEIL: CardDef = CardDef {
+        name: "Player Shroud Test Veil",
+        player_keywords: &[PlayerKeywordRule { keyword: Keyword::Shroud, applies: controller_is }],
+        ..CardDef::BLANK
+    };
+    static WARD: CardDef = CardDef {
+        name: "Player Hexproof Test Ward",
+        player_keywords: &[PlayerKeywordRule { keyword: Keyword::Hexproof, applies: controller_is }],
+        ..CardDef::BLANK
+    };
+    static SPARK: CardDef = CardDef { name: "Player Keyword Test Spark", ..CardDef::BLANK };
+
+    fn put(cards: &CardTable, state: &mut GameState, name: &str, controller: u8, zone: Zone) -> ObjectId {
+        let id = state.push_obj(Obj::new(cards.find(name).unwrap(), PlayerId(controller), zone));
+        state.zone_push(zone, id);
+        id
+    }
+
+    /// CR 702.18a: a player with shroud can't be the target of any spell or ability, their own included; CR 702.11c: a
+    /// player with hexproof can't be the target of their opponents' only. Both last only while the permanent whose static
+    /// ability gives them is on the battlefield (CR 611.3a), and the other player is untouched.
+    #[test]
+    fn a_static_ability_gives_its_controller_shroud_or_hexproof_while_it_is_on_the_battlefield() {
+        let cards = CardTable::new([&VEIL, &WARD, &SPARK]);
+        let mut state = GameState::new(2, 0);
+        let veil = put(&cards, &mut state, "Player Shroud Test Veil", 0, Zone::BATTLEFIELD);
+        let ward = put(&cards, &mut state, "Player Hexproof Test Ward", 1, Zone::BATTLEFIELD);
+        let mine = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 0, Zone::hand(PlayerId(0))), controller: PlayerId(0) };
+        let theirs = Asker { source: put(&cards, &mut state, "Player Keyword Test Spark", 1, Zone::hand(PlayerId(1))), controller: PlayerId(1) };
+        state.see_statics();
+        assert!(player_has(&cards, &state, &[], PlayerId(0), Keyword::Shroud));
+        assert!(!player_has(&cards, &state, &[], PlayerId(1), Keyword::Shroud));
+        assert!(!player_has(&cards, &state, &[], PlayerId(0), Keyword::Hexproof));
+        // Shroud: nobody targets player 0, player 0 included.
+        assert!(!can_target(&cards, &state, &[], &mine, Target::Player(PlayerId(0))));
+        assert!(!can_target(&cards, &state, &[], &theirs, Target::Player(PlayerId(0))));
+        // Hexproof: player 1 targets themselves, player 0 can't target them.
+        assert!(can_target(&cards, &state, &[], &theirs, Target::Player(PlayerId(1))));
+        assert!(!can_target(&cards, &state, &[], &mine, Target::Player(PlayerId(1))));
+        // Gone from the battlefield, the abilities are gone.
+        state.zone_remove(Zone::BATTLEFIELD, veil);
+        state.zone_remove(Zone::BATTLEFIELD, ward);
+        assert!(can_target(&cards, &state, &[], &theirs, Target::Player(PlayerId(0))));
+        assert!(can_target(&cards, &state, &[], &mine, Target::Player(PlayerId(1))));
     }
 }
