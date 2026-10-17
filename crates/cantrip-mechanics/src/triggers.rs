@@ -125,10 +125,13 @@ pub fn you_draw_a_card(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired
 
 /// "Whenever you gain life" (CR 119.3, 603.2): one trigger for each time the source's controller gains life, and none
 /// when none is gained (a gain of 0, or life that can't be gained, CR 119.7). Ajani Resolute (and its Pridemate token) and
-/// Amalia Benavides Aguirre print it.
+/// Amalia Benavides Aguirre print it, and Professor Dellian Fel's emblem and Sanguine Bond read the amount ("that
+/// much"): the trigger's `data[0]` is the life gained.
 pub fn you_gain_life(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
-        Event::LifeChange { player, delta } if *delta > 0 && *player == me.controller => Fired::PLAIN,
+        Event::LifeChange { player, delta } if *delta > 0 && *player == me.controller => {
+            Some(Fired { subject: Target::None, data: [*delta as u32, 0] })
+        }
         _ => None,
     }
 }
