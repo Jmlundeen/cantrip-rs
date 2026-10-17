@@ -1144,11 +1144,20 @@ public sealed partial class MainPage
             "AddMana" when prompt.Count == 1 => "One mana of that color is added",
             "AddMana" => $"One mana of each is added  ·  {_pickedColors.Count} of {prompt.Count} chosen",
             "GainProtection" when prompt.Count == 1 => "That creature gains protection from it until end of turn",
+            // A text change (CR 612.1): the word replaced, then the word replacing it.
+            "ReplaceWord" => "Every instance of it in the target's text is replaced",
+            "ReplacingWord" => "It replaces every instance of the first in the target's text",
             _ when prompt.Count == 1 => "Chosen, not targeted",
             _ => $"{_pickedColors.Count} of {prompt.Count} chosen",
         };
+        string title = prompt.Verb switch
+        {
+            "ReplaceWord" => $"{source}: choose the color word to replace",
+            "ReplacingWord" => $"{source}: choose the color word that replaces it",
+            _ => $"{source}: choose {many}",
+        };
 
-        Prompt($"{source}: choose {many}", doing);
+        Prompt(title, doing);
 
         foreach (ColorView color in prompt.Choices)
         {

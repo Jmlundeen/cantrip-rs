@@ -3,7 +3,7 @@ use cantrip_oracle as oracle;
 
 /// "As Three Tree City enters, choose a creature type" (CR 614.1c, 614.12a), kept on the permanent.
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    let ask = RequestKind::ChooseSubtype { source: entering.object, choices: Subtype::CREATURE_TYPES.to_vec() };
+    let ask = RequestKind::ChooseSubtype { source: entering.object, choices: Subtype::CREATURE_TYPES.to_vec(), purpose: WordUse::Chosen };
     if let Answer::Subtype(chosen) = g.ask(entering.controller, ask)? {
         entering.chosen_subtype = Some(chosen);
     }

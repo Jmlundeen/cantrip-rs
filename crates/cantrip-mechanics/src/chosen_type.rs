@@ -12,7 +12,7 @@ pub fn choose_creature_type(g: &mut dyn Game, entering: &mut Entering) -> Result
 /// "As this enters, choose [one of these types]" (CR 614.12a): `choose_creature_type` among `choices` only, in the order
 /// given (Eclipsed Realms' eight, read through its words).
 pub fn choose_type_among(g: &mut dyn Game, entering: &mut Entering, choices: Vec<Subtype>) -> Result<Option<Subtype>, Suspend> {
-    let ask = RequestKind::ChooseSubtype { source: entering.object, choices };
+    let ask = RequestKind::ChooseSubtype { source: entering.object, choices, purpose: WordUse::Chosen };
     let Answer::Subtype(chosen) = g.ask(entering.controller, ask)? else { return Ok(None) };
     entering.chosen_subtype = Some(chosen);
     Ok(Some(chosen))

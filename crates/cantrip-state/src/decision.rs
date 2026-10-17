@@ -318,7 +318,7 @@ pub enum RequestKind {
     ChooseName { source: ObjectId, looked_at: Vec<ObjectId>, suggestion: Option<CardId>, kind: NameKind },
     /// One subtype of `choices`, in order ("choose a creature type", CR 205.3m: the C# engine asks it as a modes
     /// question over every creature type, more than a mode index holds).
-    ChooseSubtype { source: ObjectId, choices: Vec<Subtype> },
+    ChooseSubtype { source: ObjectId, choices: Vec<Subtype>, purpose: WordUse },
     /// "You may".
     May { source: ObjectId, purpose: Purpose },
     /// A player chosen without targeting (CR 608.2d, 614.12a): True-Name Nemesis's "as this enters, choose a player",
@@ -617,6 +617,17 @@ impl Question {
     }
 }
 
+/// What a choice of a subtype is for, as far as the chooser needs to know to choose well.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum WordUse {
+    /// The type an effect names from now on ("as this enters, choose a creature type", CR 205.3m).
+    Chosen,
+    /// The word a text-changing effect replaces in its target's text (CR 612.1): "one creature type ...".
+    Replaced,
+    /// The word that replaces it ("... with another", CR 612.1).
+    Replacing,
+}
+
 /// What a choice of colors is for (CR 105.1), as far as the chooser needs to know to choose well.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum ColorUse {
@@ -624,6 +635,10 @@ pub enum ColorUse {
     Any,
     /// The color of mana to add (CR 106.1b): a color the chooser's hand asks for.
     AddMana,
+    /// The color word a text-changing effect replaces in its target's text (CR 612.1).
+    ReplacedWord,
+    /// The color word that replaces it (CR 612.1).
+    ReplacingWord,
     /// A color that helps the chooser: the one most of their own creatures and spells are, for "creatures you control of the
     /// chosen color get +1/+0" or "mana of the chosen color".
     Benefit,

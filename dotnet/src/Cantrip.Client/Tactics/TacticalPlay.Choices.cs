@@ -404,6 +404,17 @@ public sealed partial class TacticalPlay
             return new ModesChosenAnswer { Modes = [0] };
         }
 
+        // A text change's words (CR 612): which kind of word, which word to replace and which replaces it.
+        if (TextChangeKind(client, prompt) is int kind)
+        {
+            return new ModesChosenAnswer { Modes = [kind] };
+        }
+
+        if (TextChangeSubtype(client, view, prompt) is int word)
+        {
+            return new ModesChosenAnswer { Modes = [word] };
+        }
+
         // "As this enters, choose a creature type" (Roaming Throne, Chronicle of Victory, Door of Destinies): every such card
         // rewards the type this seat has most of, so the type most common among its creatures on the battlefield and the
         // creature cards in its hand; with none of any offered type, the prompt's own first.
@@ -1049,6 +1060,9 @@ public sealed partial class TacticalPlay
             "EndTurn" => client.Zone(ZoneKindView.Stack, 0) is { Count: > 1 } stack
                 && stack.Take(stack.Count - 1).All(item => !Mine(client, item)),
 
+            // "You may choose not to untap this creature" (Old Man of the Sea): kept tapped while it holds what it took.
+            "UntapInUntapStep" => UntapsInUntapStep(client, prompt),
+
             // Everything else a card says its controller "may" do is something a card's controller wants done: a
             // search, a draw, a free spell, an untap.
             _ => true,
@@ -1129,6 +1143,11 @@ public sealed partial class TacticalPlay
         if (prompt.Choices.Count == 0)
         {
             return prompt.Default();
+        }
+
+        if (TextChangeColor(client, view, prompt) is ColorView word)
+        {
+            return new ColorsChosenAnswer { Colors = [word] };
         }
 
         IEnumerable<ColorView> theirs = view.Objects

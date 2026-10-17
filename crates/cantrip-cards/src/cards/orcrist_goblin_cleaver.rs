@@ -21,7 +21,7 @@ fn equipped_deals_combat_damage_to_a_player(q: &dyn Query, source: ObjectId, eve
 /// as the ability resolves (CR 608.2d), the creatures counted after, and the Treasures created together (CR 101.4).
 fn treasures_for_type(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let ask = RequestKind::ChooseSubtype { source: item.object, choices: Subtype::CREATURE_TYPES.to_vec() };
+    let ask = RequestKind::ChooseSubtype { source: item.object, choices: Subtype::CREATURE_TYPES.to_vec(), purpose: WordUse::Chosen };
     let Answer::Subtype(chosen) = g.ask(you, ask)? else { return Ok(()) };
     let count = g
         .permanents_of(you)

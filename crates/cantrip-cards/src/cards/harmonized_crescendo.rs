@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let choices = Subtype::CREATURE_TYPES.to_vec();
-    let Answer::Subtype(chosen) = g.ask(you, RequestKind::ChooseSubtype { source: item.object, choices })? else {
+    let Answer::Subtype(chosen) = g.ask(you, RequestKind::ChooseSubtype { source: item.object, choices, purpose: WordUse::Chosen })? else {
         return Ok(());
     };
     let count = g

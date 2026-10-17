@@ -901,14 +901,19 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     .collect(),
             })
         }
-        RequestKind::ChooseSubtype { source, choices } => PromptPayload::ChooseModesPromptMessage(ChooseModesPrompt {
+        RequestKind::ChooseSubtype { source, choices, purpose } => PromptPayload::ChooseModesPromptMessage(ChooseModesPrompt {
             player,
             source: source_handle(game, handles, *source),
             modes: choices.iter().map(|s| s.name().to_string()).collect(),
             eligible: (0..choices.len() as i32).collect(),
             count: 1,
             at_most: 1,
-            heading: "Choose a creature type".into(),
+            heading: subtype_heading(choices, *purpose),
+            detail: match purpose {
+                WordUse::Chosen => String::new(),
+                WordUse::Replaced => "Every instance of it in the target's text is replaced".into(),
+                WordUse::Replacing => "It replaces every instance of the first in the target's text".into(),
+            },
             ..Default::default()
         }),
         RequestKind::ChooseColors { source, choices, count, purpose } => PromptPayload::ChooseColorsPromptMessage(ChooseColorsPrompt {
@@ -921,6 +926,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 ColorUse::Any => String::new(),
                 ColorUse::AddMana => "AddMana".into(),
                 ColorUse::Benefit => "Benefit".into(),
+                ColorUse::ReplacedWord => "ReplaceWord".into(),
+                ColorUse::ReplacingWord => "ReplacingWord".into(),
             },
         }),
         RequestKind::ChooseName { source, looked_at, suggestion, kind } => {
@@ -1338,5 +1345,17 @@ mod tests {
         assert_eq!((cast.verb.as_str(), cast.question.as_str()), ("CastForMiracleCost", "Cast {source} for its miracle {2}?"));
         assert!(cast.detail.starts_with("You pay its miracle {2} instead of its mana cost"), "{}", cast.detail);
         assert!(!cast.no_default);
+    }
+}
+
+/// What a choice of a subtype says it is for: "Choose a creature type" for one an effect names from now on (the heading the
+/// bots read it by), and for a word of a text change (CR 612.1) which word it is - the one replaced, or the one replacing it -
+/// and its kind, a creature type or a basic land type.
+fn subtype_heading(choices: &[Subtype], purpose: WordUse) -> String {
+    let kind = if choices.first().is_some_and(|s| s.is_creature_type()) { "creature type" } else { "basic land type" };
+    match purpose {
+        WordUse::Chosen => "Choose a creature type".into(),
+        WordUse::Replaced => format!("Choose the {kind} to replace"),
+        WordUse::Replacing => format!("Choose the {kind} that replaces it"),
     }
 }
