@@ -1,0 +1,49 @@
+# No creature card among the top eight that could be chosen (Sol Ring, Mox Sapphire, Craterclaw Colossus and five Islands): the
+# Colossus is a creature card, but worth 7 by itself it could never be put onto the battlefield within a total of 6, so it is not
+# offered. Bot1 has looked at the eight but is asked nothing (the bare refusal), and all eight go to the bottom below Black Lotus,
+# the ninth card, which Bot1 draws on turn 3.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Michelangelo's Technique
+Island
+Sol Ring
+Mox Sapphire
+Craterclaw Colossus
+Island x5
+Black Lotus
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Michelangelo's Technique.Cast
+Bot1.Pass
+! Bot1.Choose
+Bot1.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Looked = Sol Ring; Mox Sapphire; Craterclaw Colossus; Island; Island; Island; Island; Island
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby
+Bot1.Graveyard = Michelangelo's Technique
+Bot1.Hand = Island; Black Lotus
+Bot1.Library.Count = 8

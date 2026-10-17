@@ -1,0 +1,50 @@
+# The two creature cards enter the battlefield at the same time (CR 110.2a), so each one's "whenever another creature you
+# control enters" sees the other (CR 603.6a). Bot1 names Woodland Changeling first and Aunt May second: had they entered one at a
+# time in that order, Aunt May would not have been there to see the Changeling. Aunt May triggers for it: Bot1 gains 1 life, and
+# the Changeling (a 2/2), every creature type and so a Spider, gets a +1/+1 counter (1 + 2 = 3, within the 6).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Michelangelo's Technique
+Island
+Woodland Changeling
+Island
+Aunt May
+Island x5
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Michelangelo's Technique.Cast
+Bot1.Pass
+Bot1.Choose(Woodland Changeling; Aunt May)
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby; Woodland Changeling; Aunt May
+Bot1.Battlefield.Woodland Changeling.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Woodland Changeling.Power = 3
+Bot1.Life = 21
+Bot1.Graveyard = Michelangelo's Technique

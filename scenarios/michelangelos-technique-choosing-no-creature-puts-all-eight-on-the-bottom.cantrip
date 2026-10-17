@@ -1,0 +1,46 @@
+# "Up to two": Bot1 chooses no card from the eight it looks at (eight Elvish Mystics, which may be chosen). All eight go to the
+# bottom of the library (CR 401.4), below the cards not looked at: Mox Sapphire, Sol Ring and Black Lotus, the ninth to eleventh
+# cards, are now on top. The eight at the bottom are alike, so their random order cannot show.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Michelangelo's Technique
+Island
+Elvish Mystic x8
+Mox Sapphire
+Sol Ring
+Black Lotus
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Michelangelo's Technique.Cast
+Bot1.Pass
+Bot1.Choose()
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby
+Bot1.Graveyard = Michelangelo's Technique
+Bot1.Library = Mox Sapphire; Sol Ring; Black Lotus; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic; Elvish Mystic

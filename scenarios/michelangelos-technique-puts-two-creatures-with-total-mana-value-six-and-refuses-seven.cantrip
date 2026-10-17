@@ -1,0 +1,61 @@
+# Michelangelo's Technique (turn 1, cast for {4}{G}) looks at the top eight cards: Argothian Elder (mana value 4), Woodland
+# Changeling (2), Hired Blade (3), Craterclaw Colossus (7), Elvish Mystic (1), Sol Ring (not a creature), Twinmaw Stormbrood (6)
+# and an Island. "Up to two creature cards with total mana value 6 or less" (CR 202.3): the Colossus is refused alone (7), Sol Ring
+# and the Island are not creature cards, the Elder and the Hired Blade together are refused (4 + 3 = 7), three creatures are
+# refused even at a total of 6 (2 + 3 + 1), and the Elder and the Changeling together, exactly 6, are put onto the battlefield. The
+# other six go to the bottom, so the twelve Islands not looked at are left on top.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Michelangelo's Technique
+Island
+Argothian Elder
+Woodland Changeling
+Hired Blade
+Craterclaw Colossus
+Elvish Mystic
+Sol Ring
+Twinmaw Stormbrood
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Michelangelo's Technique.Cast
+Bot1.Pass
+! Bot1.Choose(Craterclaw Colossus)
+! Bot1.Choose(Sol Ring)
+! Bot1.Choose(Library.Island)
+! Bot1.Choose(Argothian Elder; Hired Blade)
+! Bot1.Choose(Woodland Changeling; Hired Blade; Elvish Mystic)
+Bot1.Choose(Argothian Elder; Woodland Changeling)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Argothian Elder; Woodland Changeling; Hired Blade; Craterclaw Colossus; Elvish Mystic; Sol Ring; Twinmaw Stormbrood; Island
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby; Argothian Elder; Woodland Changeling
+Bot1.Graveyard = Michelangelo's Technique
+Bot1.Hand = Island
+Bot1.Library.Count = 18
+Bot1.Life = 20

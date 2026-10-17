@@ -1,0 +1,53 @@
+# Sneak {3}{G} (CR 702.190a): Bot1 attacks with Ornithopter on turn 3 and, once Bot2 has not blocked, casts Michelangelo's
+# Technique in the declare blockers step for {3}{G} (two Forests, Mox Emerald, Mox Pearl), returning the unblocked Ornithopter to
+# its hand. A sorcery cast this way resolves as usual: Argothian Elder and Woodland Changeling are put onto the battlefield, but
+# not attacking (only a permanent spell whose sneak cost was paid enters attacking, CR 702.190b), so Bot2 takes no combat damage
+# at all and the two are untapped.
+
+[Bot1 Deck]
+Forest
+Forest
+Mox Emerald
+Mox Pearl
+Ornithopter
+Michelangelo's Technique
+Island
+Island
+Argothian Elder
+Woodland Changeling
+Island x6
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Hand.Michelangelo's Technique.Cast(Ability: Sneak)
+Bot1.Choose(Ornithopter)
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot1.Choose(Argothian Elder; Woodland Changeling)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Pearl; Argothian Elder; Woodland Changeling
+Bot1.Battlefield.Argothian Elder.Tapped = false
+Bot1.Battlefield.Woodland Changeling.Tapped = false
+Bot1.Hand = Ornithopter; Island; Island
+Bot1.Graveyard = Michelangelo's Technique

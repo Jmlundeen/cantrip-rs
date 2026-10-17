@@ -1,0 +1,54 @@
+# Browser
+# Michelangelo's Technique at a table, Bot1 a page: the choice of the cards it looked at says "up to 2 creature cards with total
+# mana value 6 or less" and keeps a running total of what is chosen, against the 6 (CR 202.3); Bot1 clicks Argothian Elder (4)
+# and Woodland Changeling (2) in the tray, exactly 6, and confirms them onto the battlefield. Hired Blade (3) is eligible too, but
+# with the Elder would make 7, which the page does not let it add and the engine refuses.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Michelangelo's Technique
+Island
+Argothian Elder
+Hired Blade
+Woodland Changeling
+Sol Ring
+Island x4
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Michelangelo's Technique.Cast
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Michelangelo's Technique: choose up to 2 creature cards with total mana value 6 or less to put onto the battlefield
+? Client.Bot1.Prompt.Detail = 0 of 2 chosen  ·  total mana value 0 of 6 or less
+! Bot1.Choose(Argothian Elder; Hired Blade)
+Bot1.Choose(Argothian Elder; Woodland Changeling)
+? Client.Bot1.Confirm = Put onto the battlefield
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby; Argothian Elder; Woodland Changeling
+Bot1.Graveyard = Michelangelo's Technique
+Bot1.Library.Count = 18
+Client.Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby; Argothian Elder; Woodland Changeling

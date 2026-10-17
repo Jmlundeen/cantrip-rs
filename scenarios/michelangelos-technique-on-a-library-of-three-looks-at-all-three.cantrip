@@ -1,0 +1,43 @@
+# A library of only three cards when Michelangelo's Technique resolves: Bot1 looks at the three there are (CR 609.3) and puts
+# Hired Blade (3) and Elvish Mystic (1) onto the battlefield; Sol Ring, the third, goes to the bottom and is all that is left.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Michelangelo's Technique
+Island
+Hired Blade
+Sol Ring
+Elvish Mystic
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Michelangelo's Technique.Cast
+Bot1.Pass
+Bot1.Choose(Hired Blade; Elvish Mystic)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Looked = Hired Blade; Sol Ring; Elvish Mystic
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby; Hired Blade; Elvish Mystic
+Bot1.Library = Sol Ring

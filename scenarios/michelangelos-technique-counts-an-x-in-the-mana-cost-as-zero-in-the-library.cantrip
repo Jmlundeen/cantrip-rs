@@ -1,0 +1,50 @@
+# "Total mana value 6 or less" is read in the library, where an {X} in a mana cost is 0 (CR 202.3e, the 2026-01-27 ruling):
+# Walking Ballista ({X}{X}) counts 0, so it goes onto the battlefield beside Twinmaw Stormbrood (6), a total of 6, where the
+# Stormbrood with Elvish Mystic (6 + 1 = 7) is refused. The Ballista enters with no counters and dies as a 0/0 (CR 704.5f); the
+# Stormbrood's enters ability gains 5 life.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Jet
+Mox Ruby
+Michelangelo's Technique
+Island
+Twinmaw Stormbrood
+Elvish Mystic
+Walking Ballista
+Island x5
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Michelangelo's Technique.Cast
+Bot1.Pass
+! Bot1.Choose(Twinmaw Stormbrood; Elvish Mystic)
+Bot1.Choose(Twinmaw Stormbrood; Walking Ballista)
+Bot1.Pass
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Pearl; Mox Jet; Mox Ruby; Twinmaw Stormbrood
+Bot1.Graveyard = Walking Ballista; Michelangelo's Technique
+Bot1.Life = 25
+Bot1.Library.Count = 18
