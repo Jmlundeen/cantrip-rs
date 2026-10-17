@@ -1,0 +1,51 @@
+# Darksteel Citadel, an Artifact Land with indestructible and "{T}: Add {C}". It is played as a land (CR 305.1, a land card
+# is never cast) and taps for {C}. Being an artifact, Disenchant may target it; being indestructible, "destroy" does
+# nothing to it (CR 702.12b), so it stays and only the Disenchant goes to the graveyard. A Mox Pearl, an artifact that is not
+# indestructible, is destroyed by the second Disenchant (the positive control of the destroying).
+
+[Bot1 Deck]
+Darksteel Citadel
+Mox Pearl
+Plains
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Disenchant
+Disenchant
+Plains
+Plains
+Plains
+Plains
+Plains x15
+
+[Actions]
+Bot1.Hand.Darksteel Citadel.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Darksteel Citadel.Activate
+? Bot1.Mana = {C}
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Disenchant.Cast(Darksteel Citadel)
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield = Darksteel Citadel; Mox Pearl
+? Bot2.Graveyard = Disenchant
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Disenchant.Cast(Mox Pearl)
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+
+[Expect]
+Turn = 6
+Bot1.Battlefield.Darksteel Citadel.Types = Artifact; Land
+Bot1.Battlefield.Darksteel Citadel.Keywords = Indestructible
+Bot1.Graveyard = Mox Pearl
+Bot2.Graveyard = Disenchant; Disenchant

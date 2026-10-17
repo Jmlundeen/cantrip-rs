@@ -1,0 +1,8 @@
+{
+  "name": "Darksteel Citadel",
+  "type": "Artifact Land",
+  "oracleText": "Indestructible\n{T}: Add {C}.",
+  "keywords": [
+    "Indestructible"
+  ]
+}
