@@ -1,0 +1,75 @@
+# Vesuva enters as a copy of Bot2's Dark Depths (with ten ice counters: the copied "enters with" applies, CR 614.12, 707.9a),
+# and Bot1 removes one with the copied "{3}: Remove an ice counter" (the positive control). Then Blood Moon. CR 305.7: a
+# land whose subtype an effect sets "loses all abilities generated from its rules text, its old land types, and any copiable
+# effects affecting that land" - the three sources of the abilities it loses. The copy effect itself, a layer-1 effect
+# (CR 613.2a), is untouched: the name, supertypes and card type it gave stay (Blood Moon's ruling: it changes no name or
+# supertype). So Vesuva is a legendary snow Land - Mountain named Dark Depths, with its nine ice counters, that taps for {R},
+# has no "{3}: Remove an ice counter" and no state trigger. Bot2's Dark Depths likewise.
+# The legend rule (CR 704.5j) still sees the name: on turn 7 Bot1 plays its own Dark Depths, which under the Moon enters with
+# no ice counters (its "enters with" is lost, Blood Moon's ruling, CR 614.12) and does not trigger though it has none; Bot1
+# keeps it and Vesuva goes to the graveyard. No Marit Lage is ever made.
+# This settles known issue KI-51: "any copiable effects" is the third source of the abilities a land loses, not a loss of
+# the copy effect.
+
+[Bot1 Deck]
+Mountain
+Vesuva
+Mox Ruby
+Mox Jet
+Mox Pearl
+Blood Moon
+Dark Depths
+Plains x15
+
+[Bot2 Deck]
+Island
+Dark Depths
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Dark Depths.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Vesuva.Play
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Dark Depths)
+? Bot1.Battlefield.Dark Depths.Counters.Ice = 10
+Bot1.Battlefield.Dark Depths.Activate(Ability: Remove)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dark Depths.Counters.Ice = 9
+[T5 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dark Depths.Subtypes = Mountain
+? Bot1.Battlefield.Dark Depths.Supertypes = Legendary; Snow
+! Bot1.Battlefield.Dark Depths.Activate(Ability: Remove)
+Bot1.Battlefield.Dark Depths.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T7 Bot1.Main1]
+Bot1.Hand.Dark Depths.Play
+Bot1.Choose(Dark Depths#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 7
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Blood Moon; Dark Depths
+Bot1.Battlefield.Dark Depths.Counters.Ice = (absent)
+Bot1.Battlefield.Dark Depths.Subtypes = Mountain
+Bot1.Graveyard = Vesuva
+Bot2.Battlefield.Dark Depths.Counters.Ice = 10
+Bot2.Battlefield.Dark Depths.Subtypes = Mountain
+Bot2.Battlefield.Dark Depths.Supertypes = Legendary; Snow
+Stack.Count = 0

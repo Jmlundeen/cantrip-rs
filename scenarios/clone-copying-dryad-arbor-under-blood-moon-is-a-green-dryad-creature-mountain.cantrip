@@ -1,0 +1,63 @@
+# Clone enters as a copy of Bot2's Dryad Arbor while Blood Moon is out. Clone's "you may have this creature enter as a
+# copy" is its own replacement effect, judged as Clone would exist on the battlefield (CR 614.12): Clone is a creature card,
+# no land, so Blood Moon takes nothing from it and the copy is made. Once on the battlefield it is a Dryad Arbor in every
+# copiable value (CR 707.2: a nonbasic Land Creature - Forest Dryad, green by the copied color indicator, 1/1), so Blood
+# Moon applies to it in layer 4 (CR 305.7): it is a Land Creature - Dryad Mountain, still green and 1/1, still named Dryad
+# Arbor. "Loses ... any copiable effects affecting that land" takes the abilities the copy gave, not the copy effect (as in
+# vesuva-copying-dark-depths-under-blood-moon-...): it does not turn back into a Clone. It came under Bot1's control this
+# turn, so it is summoning sick and can't tap for mana; on turn 5 it taps for {R}, not {G}.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Blood Moon
+Clone
+Island x15
+
+[Bot2 Deck]
+Dryad Arbor
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Dryad Arbor.Play
+? Bot2.Battlefield.Dryad Arbor.Subtypes = Dryad; Mountain
+[T3 Bot1.Main1]
+Bot1.Hand.Clone.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+? Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Mountain
+? Bot1.Battlefield.Dryad Arbor.SummoningSick = true
+! Bot1.Battlefield.Dryad Arbor.Activate
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Dryad Arbor.Activate(Ability: Add {G})
+Bot1.Battlefield.Dryad Arbor.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Mountain
+Bot1.Battlefield.Dryad Arbor.Colors = Green
+Bot1.Battlefield.Dryad Arbor.Power = 1
+Bot1.Battlefield.Dryad Arbor.Toughness = 1

@@ -1,0 +1,58 @@
+# Inkmoth Nexus animated ("becomes a 1/1 Phyrexian Blinkmoth artifact creature with flying and infect until end of turn.
+# It's still a land."), then Blood Moon. The animation is a resolved ability's effect, not an ability of the land (CR 305.7:
+# "this doesn't remove any abilities that were granted to the land by other effects", nor any card type), so under the Moon
+# it is still a 1/1 Artifact Land Creature with flying and infect; its creature types stay and its land type is now
+# Mountain (the Moon sets land types only). It attacks and gives Bot2 a poison counter. Its own "{T}: Add {C}" and its
+# animation ability are gone: on turn 5, the animation over (CR 514.2), it is a plain Land - Mountain that cannot become a
+# creature again and taps for {R}.
+
+[Bot1 Deck]
+Inkmoth Nexus
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mountain
+Blood Moon
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Inkmoth Nexus.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Inkmoth Nexus.Types = Land; Artifact; Creature
+? Bot1.Battlefield.Inkmoth Nexus.Subtypes = Blinkmoth; Mountain; Phyrexian
+? Bot1.Battlefield.Inkmoth Nexus.Keywords = Flying; Infect
+? Bot1.Battlefield.Inkmoth Nexus.Power = 1
+! Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: Add {C})
+! Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Attack(Inkmoth Nexus > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Poison = 1
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: {1})
+Bot1.Battlefield.Inkmoth Nexus.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot2.Poison = 1
+Bot2.Life = 20
+Bot1.Battlefield.Inkmoth Nexus.Types = Land
+Bot1.Battlefield.Inkmoth Nexus.Subtypes = Mountain
+Bot1.Battlefield.Inkmoth Nexus.Keywords = (absent)

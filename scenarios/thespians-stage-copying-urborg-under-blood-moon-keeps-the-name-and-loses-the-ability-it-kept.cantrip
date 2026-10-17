@@ -1,0 +1,60 @@
+# Thespian's Stage becomes a copy of Bot2's Urborg, Tomb of Yawgmoth "except it has this ability" (CR 707.9b): it is a
+# legendary Urborg that makes every land a Swamp - Bot2's Island is an Island Swamp (the positive control) - and keeps the
+# Stage's copy ability. Then Blood Moon: CR 305.7 takes from a land whose subtype is set "all abilities generated from its
+# rules text, its old land types, and any copiable effects affecting that land". The ability the copy effect's exception
+# gave is one generated from a copiable effect, so it is gone too; what else the copy effect made of the Stage - its name,
+# its legendary supertype - is no ability and stays (layer 1, CR 613.2a; Blood Moon's ruling). Both Urborgs are Mountains
+# with no ability but "{T}: Add {R}" (CR 305.6), and Urborg's ability depends on Blood Moon's and is gone (CR 613.8a), so
+# the Island is only an Island.
+
+[Bot1 Deck]
+Thespian's Stage
+Mox Ruby
+Mox Jet
+Sol Ring
+Blood Moon
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Urborg, Tomb of Yawgmoth
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Thespian's Stage.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Jet.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Urborg, Tomb of Yawgmoth.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Thespian's Stage.Activate(Bot2.Battlefield.Urborg, Tomb of Yawgmoth; Ability: becomes)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Supertypes = Legendary
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Bot2.Battlefield.Island.Subtypes = Island; Swamp
+[T5 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+! Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: becomes)
+! Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Add {B})
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield = Urborg, Tomb of Yawgmoth; Mox Ruby; Mox Jet; Sol Ring; Blood Moon
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Supertypes = Legendary
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+Bot2.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+Bot2.Battlefield.Island.Subtypes = Island

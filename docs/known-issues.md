@@ -66,7 +66,7 @@ keeps it).
 | [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
-| [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Unexercised |
+| [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-52](#ki-52-which-lands-lost-their-rules-text-to-a-subtype-setting-effect-is-judged-on-layers-1-to-3) | Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3 | Low | Unexercised |
 | [KI-53](#ki-53-a-copy-holds-at-most-four-abilities-added-by-exceptions) | A copy holds at most four abilities added by exceptions | Low | Unexercised |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-has-no-shortcut-and-a-seat-that-never-stops-it-goes-round-forever) | A loop a player could stop has no shortcut, and a seat that never stops it goes round forever | Medium | Open |
@@ -592,20 +592,24 @@ creature type before it animates (an effect that gives every permanent a creatur
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, Magus of the Moon |
+| Low | Exercised; the reading is the CR's grammar, no ruling | engine | 2026-10-17, Magus of the Moon |
 
 **Notes.** CR 305.7: a land whose subtype an effect sets "loses all abilities generated from its rules text, its old land types,
-and any copiable effects affecting that land". `Chars::set_land_subtypes` takes, in layer 4, every ability the land has by then:
-its card's and those a copy effect gave it (the copied card's abilities and keywords, a copy's "except it has ..."), which is the
-part of a copy effect that is abilities. What else a copy effect made of it - the name, mana cost, colors, card types and power and
-toughness of what it copies (CR 707.2) - stays, as layer 1 applied it. Whether "loses any copiable effects" takes those too (a
-land copying an animated Mutavault, or Vesuva copying a land on the battlefield before Blood Moon arrives) is not settled by any
-ruling of a card the engine has; a copy entering under the effect does not copy at all (the "as enters" choice is lost, CR
-614.12), which is the case the rulings name. A fix, if a ruling says the copy effect goes entirely, starts the land's
-characteristics from its own card when `layers::land_text_lost` holds it.
+and any copiable effects affecting that land". The engine reads the sentence as naming the three sources of the abilities the land
+loses - its rules text, its old land types (their mana abilities, CR 305.6) and any copiable effects (a copied card's abilities
+and keywords, a copy's "except it has ...") - so `Chars::set_land_subtypes` takes, in layer 4, every ability the land has by
+then, and what else a copy effect made of it (the name, supertypes, card types, colors, power and toughness of what it copies,
+CR 707.2) stays, as layer 1 applied it. The sentence's first clause already says the land "no longer has its old land type", so
+"loses ... its old land types" read as a list of things lost would repeat it; read as sources of abilities it does not. The
+other reading - the copy effect itself is lost - has the land stop being what made it a land at all in the case of a Clone
+copying a Dryad Arbor, and no ruling of Blood Moon, Magus of the Moon, Vesuva or Thespian's Stage says so; the judges' articles
+consulted (Blood Moon, Progenitor of Dependency; a 2013 Judge Forum thread on Thespian's Stage under Blood Moon, which predates
+the "copiable effects" wording and kept the Stage's ability) settle nothing either way. A ruling that the copy effect goes
+entirely would start the land's characteristics from its own card when `layers::land_text_lost` holds it.
 
-**Scenarios.** none yet. Vesuva and Thespian's Stage (added 2026-10-17) now make it reachable: a Vesuva or Stage copying a
-nonbasic land, then Magus of the Moon entering.
+**Scenarios.** vesuva-copying-dark-depths-under-blood-moon-is-a-legendary-mountain-named-dark-depths-with-no-abilities,
+thespians-stage-copying-urborg-under-blood-moon-keeps-the-name-and-loses-the-ability-it-kept,
+clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: they assert this reading and pass.
 
 ### KI-52: Which lands lost their rules text to a subtype-setting effect is judged on layers 1 to 3
 
