@@ -1,0 +1,80 @@
+# Blood Sun ("All lands lose all abilities except mana abilities", layer 6) with Urborg, Tomb of Yawgmoth ("Each land is a
+# Swamp in addition to its other land types", layer 4) and two Footfall Craters ("Enchanted land has '{T}: Target creature
+# gains trample and haste until end of turn.'", layer 6).
+# - Urborg's ability applies in layer 4, before Blood Sun's effect takes it in layer 6 (CR 613.1, 613.6; the ruling: "that
+#   ability will apply before Blood Sun removes that land's abilities"): every land is still a Swamp, so Bot2's Island taps
+#   for {B} on turn 4 and Mutavault, entering after the Sun, is a Swamp too.
+# - Each Crater's grant is a layer-6 effect with the Crater's timestamp (CR 613.7). The one on Urborg came before the Sun,
+#   so the Sun takes the ability it gave (Urborg used it on turn 2, the positive control, and cannot on turn 5); the one put
+#   on Mutavault after the Sun gives an ability the land keeps (the ruling: "If a land gains an ability after Blood Sun has
+#   entered the battlefield, it keeps that ability"), and Mutavault gives Ornithopter trample and haste with it.
+# - Mutavault keeps "{T}: Add {C}" and its Swamp's "{T}: Add {B}", and has no "{1}: ... becomes a 2/2".
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Mox Ruby
+Mox Jet
+Mox Pearl
+Footfall Crater
+Footfall Crater
+Blood Sun
+Mutavault
+Plains
+Plains x15
+
+[Bot2 Deck]
+Ornithopter
+Island
+Island x30
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Footfall Crater.Cast(Urborg, Tomb of Yawgmoth)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ornithopter; Ability: Target creature)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Haste; Trample
+[T3 Bot1.Main1]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Blood Sun.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Subtypes = Swamp
+[T4 Bot2.Main1]
+Bot2.Battlefield.Island.Activate(Ability: Add {B})
+? Bot2.Mana = {B}
+[T5 Bot1.Main1]
+Bot1.Hand.Footfall Crater.Cast(Mutavault)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Target creature)
+! Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot1.Battlefield.Mutavault.Activate(Ornithopter; Ability: Target creature)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Keywords = Flying; Haste; Trample
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Add {B})
+? Bot1.Mana = {B}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Swamp
+Bot1.Battlefield.Mutavault.Subtypes = Swamp
+Bot2.Battlefield.Island.Subtypes = Island; Swamp
+Bot1.Battlefield.Footfall Crater#2.AttachedTo = Mutavault

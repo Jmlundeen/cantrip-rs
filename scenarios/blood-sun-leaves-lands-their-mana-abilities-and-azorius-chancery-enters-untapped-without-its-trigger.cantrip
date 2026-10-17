@@ -1,0 +1,73 @@
+# Blood Sun: "When this enchantment enters, draw a card. All lands lose all abilities except mana abilities."
+# - The draw (CR 603.6a): Bot1's hand is 4 once Blood Sun is cast and 5 once its trigger resolves.
+# - Mutavault keeps "{T}: Add {C}", a mana ability (CR 605.1a), and loses "{1}: ... becomes a 2/2", which costs mana but
+#   adds none (the ruling: a mana ability produces mana). Bot1 animates it on turn 1, before the Sun (the positive control),
+#   and cannot on turn 3, after it; it still taps for {C}.
+# - Bot2's Azorius Chancery is the positive control on turn 2: it enters tapped and its trigger returns it. Under the Sun,
+#   on turn 4, its "enters tapped" and its "when this land enters" are lost before they can apply (the rulings; CR 614.12:
+#   a permanent entering is judged as it would exist on the battlefield): it enters untapped, nothing triggers, and it keeps
+#   "{T}: Add {W}{U}" and taps for it. It is still a Land with no land type: Blood Sun changes no type.
+
+[Bot1 Deck]
+Mutavault
+Mox Ruby
+Mox Jet
+Blood Sun
+Plains
+Plains
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Azorius Chancery
+Island x30
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+[T2 Bot2.Main1]
+Bot2.Hand.Azorius Chancery.Play
+? Bot2.Battlefield.Azorius Chancery.Tapped = true
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Azorius Chancery)
+? Bot2.Battlefield.Count = 0
+[T2 Bot2.Cleanup]
+Bot2.Discard(Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Blood Sun.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mutavault.Activate
+? Bot1.Hand.Count = 4
+Bot1.Pass
+Bot2.Pass
+? Stack = Blood Sun
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 5
+! Bot1.Battlefield.Mutavault.Activate(Ability: becomes a 2/2)
+[T4 Bot2.Main1]
+Bot2.Hand.Azorius Chancery.Play
+? Bot2.Battlefield.Azorius Chancery.Tapped = false
+? Stack.Count = 0
+Bot2.Battlefield.Azorius Chancery.Activate
+? Bot2.Mana = {W}{U}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mutavault.Activate
+? Bot1.Mana = {C}
+
+[Expect]
+Turn = 5
+Bot2.Battlefield = Azorius Chancery
+Bot2.Battlefield.Azorius Chancery.Types = Land
+Bot2.Battlefield.Azorius Chancery.Subtypes = (absent)
+Bot1.Battlefield.Mutavault.Types = Land

@@ -1,0 +1,6 @@
+{
+  "name": "Blood Sun",
+  "manaCost": "{2}{R}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, draw a card.\nAll lands lose all abilities except mana abilities."
+}
