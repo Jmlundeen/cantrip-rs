@@ -28,8 +28,7 @@ fn empower(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Exile the top card of your library. You may play that card until your next end step": a permission to play, not
 /// only to cast, so a land may be played as the turn's land drop (CR 305.1). Taking it is not a draw.
 fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let grant = PlayGrant { lands: true, expiry: Expiry::UntilYourNextEndStep, ..PlayGrant::CAST };
-    cantrip_mechanics::library::exile_top_may_play(g, item.controller, 1, item.controller, grant);
+    cantrip_mechanics::library::exile_top_play_until_your_next_end_step(g, item.controller, 1);
     Ok(())
 }
 

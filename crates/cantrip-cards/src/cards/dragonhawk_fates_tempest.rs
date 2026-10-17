@@ -12,8 +12,7 @@ use cantrip_oracle as oracle;
 fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let x = ferocious::count(g, you);
-    let grant = PlayGrant { lands: true, expiry: Expiry::UntilYourNextEndStep, ..PlayGrant::CAST };
-    let exiled = library::exile_top_may_play(g, you, x, you, grant);
+    let exiled = library::exile_top_play_until_your_next_end_step(g, you, x);
     delayed::at_your_next_end_step_about(g, item, 0, &exiled);
     Ok(())
 }
