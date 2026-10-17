@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, statics::base_pt, targets};
+use cantrip_mechanics::{attach::attached_object, station::base_pt, targets};
 use cantrip_oracle as oracle;
 
 // "Enchanted creature is a Treefolk with base power and toughness 0/4 and loses all abilities.": one static ability, an
@@ -18,7 +18,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[
         static_ability(Layer::Type, attached_object, treefolk, "Enchanted creature is a Treefolk."),
         static_ability(Layer::PtSet, attached_object, base_pt::<0, 4>, "Enchanted creature has base power and toughness 0/4."),
-        attached_loses_all_abilities("Enchanted creature loses all abilities."),
+        loses_all_abilities(attached_object, "Enchanted creature loses all abilities."),
     ],
     ..oracle::LIGNIFY
 };

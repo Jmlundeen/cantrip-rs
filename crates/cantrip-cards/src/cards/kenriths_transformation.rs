@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, effects, statics::base_pt, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{attach::attached_object, effects, station::base_pt, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 // "Enchanted creature loses all abilities and is a green Elk creature with base power and toughness 3/3. (It loses all
@@ -25,7 +25,7 @@ pub static CARD: CardDef = CardDef {
     statics: &[
         static_ability(Layer::Type, attached_object, elk_creature, "Enchanted creature is an Elk creature."),
         static_ability(Layer::Color, attached_object, green, "Enchanted creature is green."),
-        attached_loses_all_abilities("Enchanted creature loses all abilities."),
+        loses_all_abilities(attached_object, "Enchanted creature loses all abilities."),
         static_ability(Layer::PtSet, attached_object, base_pt::<3, 3>, "Enchanted creature has base power and toughness 3/3."),
     ],
     ..oracle::KENRITHS_TRANSFORMATION
