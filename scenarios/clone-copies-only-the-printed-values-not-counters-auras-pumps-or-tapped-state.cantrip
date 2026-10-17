@@ -1,0 +1,78 @@
+# Clone copies exactly what is printed on the original (CR 707.2, the card's ruling): not whether it is tapped, not its
+# counters, not the Auras attached to it, not effects that changed its power, toughness or abilities. On turn 2 Bot2's
+# Guerrilla Gorilla (2/2 reach) gets Rancor (+2/+0 and trample) and a +1/+1 counter from Snakeskin Veil; on turn 4 it
+# attacks and stays tapped. On turn 5 Bot1 casts Clone, and in response Bot2's Battlefield Improvisation gives the
+# Gorilla +2/+2: as Clone enters, the Gorilla is a tapped 7/5 with reach and trample and a counter. Clone is an untapped
+# 2/2 Gorilla with reach alone and no counter. Bot1 took the 5 of the attack.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Clone
+Island x17
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Pearl
+Guerrilla Gorilla
+Rancor
+Snakeskin Veil
+Battlefield Improvisation
+Forest x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Rancor.Cast(Guerrilla Gorilla)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Snakeskin Veil.Cast(Guerrilla Gorilla)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Attack(Guerrilla Gorilla > Bot1)
+[T4 Bot2.Main2]
+? Bot1.Life = 15
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Clone.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Battlefield Improvisation.Cast(Bot2.Battlefield.Guerrilla Gorilla)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Guerrilla Gorilla.Power = 7
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 15
+Bot1.Battlefield = Island; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla.Power = 2
+Bot1.Battlefield.Guerrilla Gorilla.Toughness = 2
+Bot1.Battlefield.Guerrilla Gorilla.Keywords = Reach
+Bot1.Battlefield.Guerrilla Gorilla.Tapped = false
+Bot1.Battlefield.Guerrilla Gorilla.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Guerrilla Gorilla.Subtypes = Ape; Hero; Soldier
+Bot2.Battlefield.Guerrilla Gorilla.Power = 7
+Bot2.Battlefield.Guerrilla Gorilla.Toughness = 5
+Bot2.Battlefield.Guerrilla Gorilla.Keywords = Reach; Trample
+Bot2.Battlefield.Guerrilla Gorilla.Tapped = true
+Bot2.Battlefield.Guerrilla Gorilla.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Rancor.AttachedTo = Guerrilla Gorilla

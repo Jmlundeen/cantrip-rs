@@ -1,0 +1,55 @@
+# A creature that is itself copying something has as its copiable values what it copied together with its copy
+# effect's exceptions (CR 707.9b, Clone's ruling). On turn 5 Bot1's Phyrexian Metamorph enters as a copy of Bot2's
+# Guerrilla Gorilla, "except it's an artifact in addition to its other types"; then Bot1's Clone copies the Metamorph:
+# the Clone is a Guerrilla Gorilla that is an artifact too (Clone has no exception of its own), while Bot2's Gorilla,
+# the printed card, is a creature only. Had Clone copied the Gorilla it would not be an artifact.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Sapphire
+Phyrexian Metamorph
+Clone
+Island x14
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Phyrexian Metamorph.Cast
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Guerrilla Gorilla)
+? Bot1.Battlefield.Guerrilla Gorilla.Types = Creature; Artifact
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Guerrilla Gorilla)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot1.Life = 20
+Bot1.Battlefield = Island; Mox Sapphire; Guerrilla Gorilla; Guerrilla Gorilla
+Bot1.Battlefield.Guerrilla Gorilla#2.Types = Creature; Artifact
+Bot1.Battlefield.Guerrilla Gorilla#2.Subtypes = Ape; Hero; Soldier
+Bot1.Battlefield.Guerrilla Gorilla#2.Keywords = Reach
+Bot2.Battlefield.Guerrilla Gorilla.Types = Creature

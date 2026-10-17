@@ -1,0 +1,36 @@
+# Clone copying a legendary creature is legendary with the same name (CR 707.2, 205.4), so with both under Bot1's control
+# the legend rule (CR 704.5j) has Bot1 choose one and put the other into its owner's graveyard, not destroyed. On turn 1
+# Bot1 casts Ragavan, Nimble Pilferer with a Mountain and Clone with Black Lotus and Mox Sapphire, copying it, and keeps
+# the Clone (the second Ragavan): the Ragavan card goes to the graveyard and the one left is the Clone.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Sapphire
+Ragavan, Nimble Pilferer
+Clone
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Choose(Ragavan, Nimble Pilferer#2)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mountain; Mox Sapphire; Ragavan, Nimble Pilferer
+Bot1.Battlefield.Ragavan, Nimble Pilferer.Supertypes = Legendary
+Bot1.Graveyard = Ragavan, Nimble Pilferer; Black Lotus

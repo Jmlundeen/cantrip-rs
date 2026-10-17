@@ -1,0 +1,56 @@
+# A characteristic-defining ability is part of the copiable values (CR 707.2, 604.3), so a Clone of Tarmogoyf has
+# Tarmogoyf's power and toughness ability and goes on counting, not the numbers the Goyf showed as it was copied. On
+# turn 1 Bot1 casts Tarmogoyf (Forest, Mox Emerald) and Clone (Black Lotus, Mox Sapphire) copying it; the graveyards
+# then hold Black Lotus, an artifact: both are 1/2. Bot2, playing no land, discards an Island to hand size in turn 2's
+# cleanup (CR 514.1), so on turn 3 there is a land too and both are 2/3; then Ancestral Recall adds an instant, and both
+# are 3/4. A Clone that had copied fixed values would still be 1/2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Mox Sapphire
+Tarmogoyf
+Clone
+Ancestral Recall
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Tarmogoyf.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+? Bot1.Battlefield.Tarmogoyf#2.Power = 1
+? Bot1.Battlefield.Tarmogoyf#2.Toughness = 2
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Tarmogoyf#2.Power = 2
+? Bot1.Battlefield.Tarmogoyf#2.Toughness = 3
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Forest; Island; Mox Emerald; Mox Sapphire; Tarmogoyf; Tarmogoyf
+Bot1.Graveyard = Ancestral Recall; Black Lotus
+Bot2.Graveyard = Island
+Bot1.Battlefield.Tarmogoyf#1.Power = 3
+Bot1.Battlefield.Tarmogoyf#1.Toughness = 4
+Bot1.Battlefield.Tarmogoyf#2.Power = 3
+Bot1.Battlefield.Tarmogoyf#2.Toughness = 4
+Bot1.Battlefield.Tarmogoyf#2.Subtypes = Lhurgoyf
+Bot1.Battlefield.Tarmogoyf#2.Colors = Green

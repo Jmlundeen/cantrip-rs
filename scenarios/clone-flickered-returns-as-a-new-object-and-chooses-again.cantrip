@@ -1,0 +1,58 @@
+# A Clone that leaves the battlefield and returns is a new object (CR 400.7), and the copy effect applies again as it
+# enters, with a new choice (CR 614.1c, 707.2). On turn 3 Bot1's Clone copies Bot1's Ornithopter (Bot2's Sylvan
+# Caryatid is the other candidate); then Ephemerate exiles the Clone and returns it, and this time it copies the
+# Caryatid. In the end Bot1 has its Ornithopter and a Caryatid, and no second Ornithopter; Ephemerate is exiled by
+# rebound.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Ornithopter
+Clone
+Ephemerate
+Plains
+Island x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Forest x17
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+? Bot1.Battlefield = Island; Plains; Mox Sapphire; Ornithopter; Ornithopter
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ephemerate.Cast(Bot1.Battlefield.Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Sylvan Caryatid)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Plains; Mox Sapphire; Ornithopter; Sylvan Caryatid
+Bot1.Battlefield.Sylvan Caryatid.Types = Creature
+Bot1.Battlefield.Sylvan Caryatid.Keywords = Defender; Hexproof
+Exile = Ephemerate
+Bot2.Battlefield = Forest; Mox Emerald; Sylvan Caryatid

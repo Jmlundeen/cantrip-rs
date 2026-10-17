@@ -1,0 +1,39 @@
+# Clone's copy is chosen as it enters, not targeted (CR 608.2d, 115.1; the card's ruling), so hexproof does not stop it
+# and an opponent's creature is as available as one's own: Bot2's Sylvan Caryatid (defender, hexproof) is the lone
+# creature and Bot1's Clone enters as a Caryatid of its own, green, a Creature - Plant 0/3. Bot2's original is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Clone
+Island x17
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Sylvan Caryatid
+Forest x17
+
+[Actions]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Sapphire; Sylvan Caryatid
+Bot1.Battlefield.Sylvan Caryatid.Keywords = Defender; Hexproof
+Bot1.Battlefield.Sylvan Caryatid.Types = Creature
+Bot1.Battlefield.Sylvan Caryatid.Colors = Green
+Bot1.Battlefield.Sylvan Caryatid.Toughness = 3
+Bot2.Battlefield = Forest; Mox Emerald; Sylvan Caryatid

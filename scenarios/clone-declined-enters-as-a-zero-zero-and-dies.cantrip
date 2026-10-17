@@ -1,0 +1,28 @@
+# "You may": Bot1 declines with an Ornithopter there to copy, so Clone enters as itself, a 0/0 Shapeshifter, and is put
+# into its owner's graveyard as a state-based action (CR 704.5f, the card's ruling). The Ornithopter it could have copied
+# stays alone.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Sapphire
+Clone
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Sapphire; Ornithopter
+Bot1.Graveyard = Clone; Black Lotus

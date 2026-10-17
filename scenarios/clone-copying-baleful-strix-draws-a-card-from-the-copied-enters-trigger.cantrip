@@ -1,0 +1,48 @@
+# A Clone that enters as a copy has the copied creature's abilities as it enters, so its "when this creature enters"
+# triggers for it (CR 707.2, 603.6a, the card's ruling). On turn 1 Bot1 casts Baleful Strix with two Moxes and draws the
+# Plains; then Clone for Black Lotus and the Island, copying the Strix: the Clone is an artifact Bird with flying and
+# deathtouch and draws the next card, the Forest. Without the copied trigger the Forest would still be on top.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Clone
+Swamp
+Plains
+Forest
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Baleful Strix.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Clone; Swamp; Plains
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Swamp; Plains; Forest
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Baleful Strix; Baleful Strix
+Bot1.Battlefield.Baleful Strix#2.Types = Artifact; Creature
+Bot1.Battlefield.Baleful Strix#2.Subtypes = Bird
+Bot1.Battlefield.Baleful Strix#2.Keywords = Deathtouch; Flying
+Bot1.Battlefield.Baleful Strix#2.Colors = Black; Blue

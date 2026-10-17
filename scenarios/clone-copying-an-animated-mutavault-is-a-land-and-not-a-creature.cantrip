@@ -1,0 +1,42 @@
+# Which creature Clone may copy is judged as it is now, but what it takes is only the copiable values (CR 707.2): an
+# animated Mutavault is a creature and may be chosen, yet its animation is an effect, not a copiable value, so the Clone
+# is a Mutavault that is a land and nothing else (the card's ruling on copying an animated manland). On turn 1 Bot1 taps
+# Mutavault for {C} and spends it on Mutavault's own animation, then casts Clone with Black Lotus and Mox Sapphire,
+# copying the 2/2 Mutavault, the lone creature. The Clone is a land with no creature type, not a creature (so not a 0/0
+# that dies), and was not played as a land; the original is still a 2/2 Land Creature until end of turn.
+
+[Bot1 Deck]
+Mutavault
+Black Lotus
+Mox Sapphire
+Clone
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mutavault.Play
+Bot1.Battlefield.Mutavault.Activate(Ability: {T})
+Bot1.Battlefield.Mutavault.Activate(Ability: {1})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mutavault.Types = Land; Creature
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.LandsPlayed = 1
+Bot1.Battlefield = Mutavault; Mutavault; Mox Sapphire
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Mutavault#1.Types = Land; Creature
+Bot1.Battlefield.Mutavault#1.Subtypes = (every creature type)
+Bot1.Battlefield.Mutavault#2.Types = Land
+Bot1.Battlefield.Mutavault#2.Subtypes = (absent)
+Bot1.Battlefield.Mutavault#2.Colors = (absent)

@@ -1,0 +1,36 @@
+# Clone: "You may have this creature enter as a copy of any creature on the battlefield." (CR 614.1c, 707.2) On turn 1
+# Bot1 casts Ornithopter, then Clone for Black Lotus's {U}{U}{U} and Mox Sapphire's {U}, and accepts. The Ornithopter is
+# the lone creature, so it is copied without asking which (the Mox, an artifact, is no candidate). Clone is then an
+# Ornithopter in every copiable value: the name, a colorless 0/2 Artifact Creature - Thopter with flying (its own blue,
+# Shapeshifter and 0/0 are gone), so it does not die as a 0/0.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Mox Sapphire
+Clone
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Sapphire; Ornithopter; Ornithopter
+Bot1.Graveyard = Black Lotus
+Bot1.Battlefield.Ornithopter#2.Types = Artifact; Creature
+Bot1.Battlefield.Ornithopter#2.Subtypes = Thopter
+Bot1.Battlefield.Ornithopter#2.Colors = (absent)
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot1.Battlefield.Ornithopter#2.Toughness = 2
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying

@@ -1,0 +1,39 @@
+# A copy's mana cost is copied with X as 0 (CR 107.3m, 707.2; the card's ruling), and counters are not copied. Bot1's
+# Walking Ballista is cast for X = 2 and enters with two +1/+1 counters. Clone copies it: it is a Walking Ballista whose
+# "enters with X +1/+1 counters" sees no X spent on it, so it enters with none, a 0/0 that is put into the graveyard
+# (CR 704.5f). The original keeps its two counters.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Sapphire
+Walking Ballista
+Clone
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Island; Mox Sapphire; Walking Ballista
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard = Clone; Black Lotus; Black Lotus

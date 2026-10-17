@@ -1,0 +1,29 @@
+# With no creature on the battlefield there is nothing Clone may copy, so it is not asked whether to (CR 707.2,
+# 614.1c): the refusal "! Bot1.Accept" holds across its resolution. Mox Sapphire, an artifact but not a creature, is no
+# candidate (Phyrexian Metamorph could copy it; Clone cannot). Clone enters as the printed 0/0 and dies (CR 704.5f).
+# The positive control is clone-enters-as-a-copy-of-an-ornithopter, where the same cast with a creature out asks.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Clone
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Pass
+! Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire
+Bot1.Graveyard = Clone; Black Lotus
