@@ -366,6 +366,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `DayNight` (`Day`, `Night`), once the game has a designation (CR 731.1) and absent while it is neither. The game's
   own, so it names no player.
 - `Stack`, `Exile`, `Combat.Attackers`, `Combat.Blocks`, each with `.Count`
+- `Delayed` (with `.Count`): the delayed triggered abilities still waiting (CR 603.7), each named for the object it came from:
+  one used up or ended with its turn is gone from it
 - `Combat.AttackCost` (`{2}`), `.Remaining` and `.Attackers` (with `.Count`), while a declaration's cost to attack is being
   paid (CR 508.1h-j: "creatures can't attack you unless their controller pays ..."): the total, what the pool has not yet
   covered, and the attackers it is for; absent at any other time. A `? Combat.AttackCost = {2}` right after an `Attack`

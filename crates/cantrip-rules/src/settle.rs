@@ -900,8 +900,9 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
                         t,
                         Again::new(),
                     ));
-                    // "Until" is used up by the event that ends the wait (CR 603.7b).
-                    if d.when == DelayedWhen::UntilEvent
+                    // "Until" is used up by the event that ends the wait (CR 603.7b), and "when you next" by the event it
+                    // triggers on (CR 603.7c).
+                    if matches!(d.when, DelayedWhen::UntilEvent | DelayedWhen::NextThisTurn)
                         && let Some(at) = cx.s().delayed.iter().position(|x| *x == d)
                     {
                         cx.st().delayed_remove(at);
@@ -1044,7 +1045,7 @@ pub fn step_began(cx: &mut Cx, step: Step) {
         let (due, used_up) = match d.when {
             DelayedWhen::Step { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), true),
             DelayedWhen::EachStep { step: s, on_turn_of } => (s == step && on_turn_of.is_none_or(|p| p == active), false),
-            DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) => (false, false),
+            DelayedWhen::ThisTurn | DelayedWhen::UntilEvent | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::NextThisTurn => (false, false),
         };
         if due {
             if used_up {

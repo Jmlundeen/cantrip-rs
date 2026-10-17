@@ -28,6 +28,17 @@ pub fn this_turn(g: &mut dyn Game, item: &StackItem, source: ObjectId) {
     g.delayed_trigger(DelayedWhen::ThisTurn, source, item.controller, AbilityRef::delayed(this, 0), Target::None);
 }
 
+/// Sets up the card's delayed ability number `ability` to trigger "when you next [event] this turn" (CR 603.7b-c): once, the
+/// first time its `listens`/`matches` accept an event this turn, controlled by the resolving ability's controller; it ends
+/// with the turn if it never does. `source` is the object its `matches` is asked of, as for `this_turn`. Each call is a
+/// separate ability, so two activations both trigger on the same next event. The ability is the card as the source has it
+/// now, or the card it copies. Loki Laufeyson uses it; Doublecast, Teach by Example and Galvanic Iteration print it.
+pub fn next_this_turn(g: &mut dyn Game, item: &StackItem, ability: u8, source: ObjectId) {
+    let o = *g.obj(item.object);
+    let card = o.copy.map(|c| c.card).unwrap_or(o.card);
+    g.delayed_trigger(DelayedWhen::NextThisTurn, source, item.controller, AbilityRef::delayed(card, ability), Target::None);
+}
+
 /// `at_next_end_step_about` for "at the beginning of your next end step" (CR 603.7): the first end step of the ability's
 /// controller's turn that has not begun yet, which is this turn's when the ability resolves before it. Dragonhawk, Fate's
 /// Tempest uses it for the cards it exiled.

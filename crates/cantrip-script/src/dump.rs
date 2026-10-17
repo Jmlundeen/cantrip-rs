@@ -140,6 +140,10 @@ impl StateDump {
         let stack: Vec<String> = s.stack.iter().rev().map(|item| game.name(item.object).to_string()).collect();
         d.list("Stack", stack, true);
 
+        // The delayed triggered abilities waiting for their moment (CR 603.7), each named for the object it came from.
+        let delayed: Vec<String> = s.delayed.iter().map(|d| game.name(d.source).to_string()).collect();
+        d.list("Delayed", delayed, false);
+
         let mut exiled: Vec<ObjectId> = s.seats().flat_map(|p| s.zone(Zone::exile(p)).to_vec()).collect();
         exiled.sort();
         // A card exiled face down has no name in exile (CR 406.3): `Exile` lists it as "(face down)", and `Exile.FaceDown`, the

@@ -603,13 +603,14 @@ impl<'a> Projector<'a> {
             let until = if e.duration == Duration::EndOfTurn { " this turn" } else { "" };
             summary.pending_effects.push(format!("The \"legend rule\" doesn't apply to permanents {whose} control{until}."));
         }
-        // "Whenever [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b): a delayed triggered ability that
-        // waits for its event, on no object, so the page says it beside its controller's life total, in the ability's own words
+        // "Whenever [event] this turn" / "when you next [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b-c):
+        // a delayed triggered ability that waits for its event, on no object, so the page says it beside its controller's life total, in the ability's own words
         // and named for the object it came from (the words may say "that creature"). The other seat is told whose it is. So is
         // one that triggers at each such step for the rest of the game (paradigm, CR 702.192a): the card it came from may be
         // anywhere, or nowhere it can be seen.
         for d in s.delayed.iter().filter(|d| {
-            d.controller == p && matches!(d.when, DelayedWhen::ThisTurn | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::EachStep { .. })
+            d.controller == p
+                && matches!(d.when, DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn | DelayedWhen::UntilNextTurnOf(_) | DelayedWhen::EachStep { .. })
         }) {
             let text = game.cards.ability(d.ability).text();
             let from = game.cards.get(game.chars(d.source).card).name;

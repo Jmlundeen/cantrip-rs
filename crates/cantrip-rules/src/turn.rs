@@ -866,9 +866,9 @@ fn cleanup(cx: &mut Cx) -> R<()> {
             });
         }
     }
-    // "This turn" delayed abilities end with it (CR 603.7b).
+    // "This turn" delayed abilities end with it (CR 603.7b), and so does a "when you next ... this turn" that never triggered.
     for at in (0..cx.s().delayed.len()).rev() {
-        if cx.s().delayed[at].when == DelayedWhen::ThisTurn {
+        if matches!(cx.s().delayed[at].when, DelayedWhen::ThisTurn | DelayedWhen::NextThisTurn) {
             cx.st().delayed_remove(at);
         }
     }
