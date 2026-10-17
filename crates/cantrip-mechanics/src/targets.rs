@@ -309,7 +309,7 @@ fn enchantment_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Enchantment))
 }
 
-/// "Target enchantment" (CR 115.1). Requisition Raid, Heritage Reclamation and Pawpatch Formation print it.
+/// "Target enchantment" (CR 115.1). Requisition Raid, Heritage Reclamation, Pawpatch Formation and Insidious Fungus print it.
 pub const ENCHANTMENT: TargetSpec = target(enchantment_filter);
 /// "Target artifact or creature you control" (CR 115.1, 205.2a). Concerted Care, Oko, Thief of Crowns (the permanent it exchanges),
 /// Ozolith, the Shattered Spire and Three Steps Ahead print it.
