@@ -1,0 +1,44 @@
+# Roiling Canopy: "if you control at least five other Forests" counts the Forests other than the one that entered, so the entering Forest is not part of the
+# count and its leaving changes nothing (CR 603.4). Overgrown Tomb enters as the sixth Forest with five basic Forests; in response Bot2 sacrifices Wasteland to destroy
+# the Tomb, and when the ability resolves five other Forests are still there: the Elves become 4/4.
+
+[Bot1 Deck]
+Roiling Canopy
+Llanowar Elves
+Forest
+Forest
+Forest
+Forest
+Forest
+Overgrown Tomb
+Island x13
+
+[Bot2 Deck]
+Wasteland
+Island x19
+
+[Actions]
+Bot1.Hand.Roiling Canopy.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Overgrown Tomb.Play
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Bot1.Battlefield.Overgrown Tomb)
+[T13 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Llanowar Elves.Power = 4
+Bot1.Graveyard = Overgrown Tomb
+Stack.Count = 0
