@@ -1,0 +1,57 @@
+# Browser
+# Healing Salve, played by Bot1's page: its shield of 3 on Bot1 is shown beside Bot1's life total (no permanent says so),
+# and when Bot2's Preacher of the Schism and Guerrilla Gorilla, both unblocked, would deal their 4 combat damage to Bot1 at
+# once, the page asks whose damage the shield prevents first and how much it has left (CR 615.7). Bot1 clicks the
+# Gorilla: its 2 is prevented, then 1 of the Preacher's, and 1 is dealt - the order recorded, the Gorilla's first though
+# the Preacher attacked first. (The Preacher's attack triggers make Bot2 a Vampire token, draw a card and lose 1 life.)
+
+[Bot1 Deck]
+Mox Pearl
+Healing Salve
+Island x25
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Black Lotus
+Preacher of the Schism
+Guerrilla Gorilla
+Island
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Preacher of the Schism.Cast
+Bot2.Pass
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Preacher of the Schism > Bot1; Guerrilla Gorilla > Bot1)
+[T4 Bot2.DeclareBlockers]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Prevent the next 3 damage)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Facts = Prevent the next 3 damage that would be dealt to you this turn (Healing Salve)
+Bot2.Pass
+Bot1.Pass
+? Client.Bot1.Prompt.Title = Healing Salve: choose the source whose damage the shield prevents first
+? Client.Bot1.Prompt.Detail = It has 3 damage left to prevent; what it can't prevent of the others' damage is dealt  ·  click them on the battlefield
+Bot1.Choose(Guerrilla Gorilla)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Graveyard = Healing Salve
+Prevented = 2 Guerrilla Gorilla > Bot1 by Healing Salve; 1 Preacher of the Schism > Bot1 by Healing Salve
