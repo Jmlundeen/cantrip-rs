@@ -83,15 +83,55 @@ pub struct GameState {
     pub land_text_lost: std::cell::RefCell<LostToStatics>,
 }
 
-/// What the rules watch to find a loop of mandatory actions (CR 104.4b, 732.4). `forced` counts the priorities given, with
-/// something on the stack, since a player last had a real choice (a question with more than one legal answer); once it is
-/// high enough, each such priority's position is fingerprinted into `seen`, and a position seen again with no real choice
-/// made in between is a loop no player can stop: the game is a draw. Any real choice clears both. Empty in nearly every
-/// position.
+/// What the rules watch to find a loop (CR 104.4b, 732): `cantrip_rules::loops` is what they do with it. Empty, but for the
+/// step it is in, in nearly every position.
+///
+/// A run of mandatory actions: `forced` counts the priorities given, with something on the stack, since a player last had a
+/// real choice (a question with more than one legal answer); once it is high enough, each such priority's position is
+/// fingerprinted into `seen`, and a position seen again with no real choice made and the history not asked in between is a
+/// loop no player can stop: the game is a draw. Any real choice clears them, and a question asked of the history clears
+/// `seen`. `far` is what the players' life totals, poison and libraries were halfway to the longest such run the rules let
+/// go on.
+///
+/// A step with a great deal in it: from `step_log` (the history's length as the step `step` began) on, each question's
+/// position is kept in `keys` with the answers given to it, and `round` follows a position at priority that comes round
+/// again: `involved` is the players who chose to act since it last did, `designated` those who must now choose otherwise
+/// (CR 732.3). `asking` is the request waiting and its key, `priority_key` the key of the priority about to be asked, and
+/// `acted` the players who chose to act at the priority being played out with its answer, not yet among `involved`.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LoopWatch {
-    pub forced: u16,
+    pub forced: u32,
     pub seen: Vec<u64>,
+    pub far: Vec<i32>,
+    pub step: u32,
+    pub step_log: u32,
+    pub keys: Vec<LoopKey>,
+    pub round: Option<LoopRound>,
+    pub involved: u8,
+    pub designated: u8,
+    pub asking: Option<(u32, u64)>,
+    pub priority_key: Option<u64>,
+    pub acted: u8,
+}
+
+/// A question asked in a position (its shape, by `cantrip_rules::loops`): how many times, and the answers given to it there.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
+pub struct LoopKey {
+    pub key: u64,
+    pub asked: u16,
+    pub given: Vec<u64>,
+}
+
+/// A position at priority that has come round again: how many times since the players last acted differently (`rounds`),
+/// how many of those in a row nobody chose to act (`passes`), the priorities since it last came round (`since`), and the
+/// amounts of things as it last did.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
+pub struct LoopRound {
+    pub key: u64,
+    pub rounds: u16,
+    pub passes: u16,
+    pub since: u16,
+    pub amounts: Vec<(u32, i32)>,
 }
 
 /// The layers' list of the permanents a "loses all abilities" static ability took everything from, made for one epoch

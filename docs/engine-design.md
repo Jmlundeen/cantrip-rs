@@ -576,14 +576,28 @@ who can't win (`CardDef::win_rules`) or who has an opponent who can't lose. A co
 (104.3a). Every loss records `Event::GameLost` with its `LossReason`, and a draw `Event::GameDrawn` with its `DrawReason`,
 which the host tells each seat (`PlayerLostEvent`, `GameEndedEvent.DrawReason`).
 
-A loop of mandatory actions is a draw (CR 104.4b, 732.4), found by `loops.rs`. A question with more than one legal answer is
-a real choice and clears the watch (`GameState::loop_watch`, journalled like any other write); a priority with nothing to do
-but pass - and tap a mana ability whose whole cost is {T}, which only fills a pool, since every spell or ability that mana
-could pay for is offered at priority whether or not it can be paid yet - is none. After `WATCH_AFTER` such priorities in a
-row with something on the stack, each priority's position is fingerprinted up to the identity of objects (objects numbered
-by where they are, references to objects that left followed to what they became, timestamps by their order; the history and
-last-known information left out), and a position seen again is the loop going round: the game is a draw. A normal game pays
-a comparison per priority. A loop a player could stop is left to the players (CR 732.2-732.3, `docs/known-issues.md`).
+Loops are `loops.rs`'s (CR 104.4b, 732), watched in `GameState::loop_watch`, journalled like any other write. A loop of
+mandatory actions is a draw (CR 104.4b, 732.4). A question with more than one legal answer is a real choice and clears the
+watch of mandatory actions; a priority with nothing to do but pass - and tap a mana ability whose whole cost is {T}, when
+nothing more mana could buy is castable - is none. After `WATCH_AFTER` such priorities in a row with something on the
+stack, each priority's position is fingerprinted up to the identity of objects (objects numbered by where they are,
+references to objects that left followed to what they became, timestamps by their order), every amount in it (life,
+poison, counters, damage, mana, libraries), and a position seen again is the loop going round: the game is a draw. The
+event history is not in the fingerprint; every read of it is counted instead (`cantrip_api::history::note_read`, made by
+`History::new`), and a read clears the positions seen, so a loop that "the third time this turn" or "only once each turn"
+could end is never found by its positions (`loops::settled_read` asks a question whose answer the rest of the turn can't
+change without counting it). A loop that never comes back to a position, or only with the history read between, is
+followed by the shape of its positions (the fingerprint less its amounts) once a step has `BUSY_STEP` events in it: a
+priority whose shape comes round `ROUNDS` times with no player choosing to act and every amount gone only the way no rule
+ends anything by (life gained, counters added) is an endless loop of mandatory actions, a draw; one whose amounts go down is
+left to run out. In such a step every question is kept with its shape and the answers given there; a loop its players keep
+going by choice goes round `ROUNDS_TO_CHOOSE` times (the engine's count, as no shortcut is proposed) and then the player
+chosen as CR 732.3 chooses must choose otherwise for the rest of the step - the answers
+they gave that question there are taken out of it (a target, card, player or mode chosen, a priority action, a "may" taken;
+never a pass or a decline). A loop whose players only pass or decline can't be stopped by making them act (CR 732.5) and is a
+draw after `ROUNDS`. `FORCED_LIMIT` and `STEP_LIMIT` end what is left: a run of mandatory actions that long with no life,
+poison or library moving towards its end is a draw, and in a step that long players may only pass and decline. A normal game
+pays a comparison per priority and a count per read of the history.
 
 ### Casting: when a cost's choices are made
 

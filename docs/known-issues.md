@@ -67,7 +67,7 @@ keeps it).
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-53](#ki-53-a-copy-holds-at-most-four-abilities-added-by-exceptions) | A copy holds at most four abilities added by exceptions | Low | Unexercised |
-| [KI-54](#ki-54-a-loop-a-player-could-stop-has-no-shortcut-and-a-seat-that-never-stops-it-goes-round-forever) | A loop a player could stop has no shortcut, and a seat that never stops it goes round forever | Medium | Open |
+| [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
 | [KI-55](#ki-55-spellskite-cant-choose-between-two-instances-of-target-that-hold-the-same-object) | Spellskite can't choose between two instances of "target" that hold the same object | Low | Unexercised |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
 | [KI-60](#ki-60-infects--1-1-counters-are-counters-an-effect-puts) | Infect's -1/-1 counters are counters an effect puts | Low | Suspected |
@@ -608,29 +608,56 @@ A fix grows the array or refuses the copy loudly; instances beyond the second of
 
 **Scenarios.** none: no scenario builds the chain.
 
-### KI-54: A loop a player could stop has no shortcut, and a seat that never stops it goes round forever
+### KI-54: A loop a player could stop is shortcut after a fixed number of rounds, not one the players name
 
 | Severity | Status | Area | Found |
 | --- | --- | --- | --- |
-| Medium | Open | engine / client | 2026-10-17, CR 104.4b loop detection |
+| Low | Open | engine / client | 2026-10-17, CR 104.4b loop detection; narrowed by the loop hardening |
 
-**Notes.** `loops.rs` makes a loop of mandatory actions a draw (CR 104.4b, 732.4). A loop in which some player has a real
-choice - an instant to cast, a second creature card for Animate Dead to enchant (the Worldgorger Dragon loop with another
-creature card in a graveyard) - is not a draw, rightly (CR 104.4b's last sentence), but nothing implements the shortcut that
-ends it (CR 732.2-732.3: the players name a number of iterations, and then the player who must makes a different choice):
-each iteration is played out, and a seat that keeps making the same choice (a bot passing with a breaking instant in hand)
-goes round until it chooses otherwise. Two smaller simplifications in what counts as no choice: a mana ability whose whole
-cost is {T} is treated as no choice, when nothing more mana could pay for is castable, even when its effect does more than
-add mana (a painland's damage); and the fingerprint leaves out the event history, so a forced loop whose rounds differ only
-in what the history would answer later (a "once each turn" or "the Nth time this turn" trigger that would end it on a later
-round) is wrongly found a draw - a false draw, not only a missed one. No card in content makes such a loop yet. A fix for the
-first is a shortcut proposal (CR 732.2a) the client can offer and the bots can answer; for the last, the fingerprint takes in
-the history of the turn as the rules that read it would see it.
+**Notes.** `loops.rs` makes every loop end (its module comment is the design): a loop of mandatory actions is a draw at
+once when a position comes round with nothing asking the history in between, and otherwise after `ROUNDS` rounds of its
+shape with no amount heading for an end; a loop its players keep going by choice goes round `ROUNDS_TO_CHOOSE` times and
+then the player CR 732.3 names must choose otherwise; one whose players only pass or decline is a draw after `ROUNDS`
+(CR 732.5, 732.4). What is still not the rules' procedure:
+- No shortcut is proposed (CR 732.2a-c): no player names a number of iterations, and none can shorten one. The engine takes
+  `ROUNDS_TO_CHOOSE` as the number every player chose; a human who wants more rounds (mana past 32 rounds of an infinite
+  mana loop) can't have them, and one who wants fewer stops by choosing otherwise, as the rules allow. A fix is a shortcut
+  proposal the client offers (a number of iterations) and the bots answer.
+- The player made to choose otherwise is chosen as CR 732.3 chooses, but the engine applies it to every loop of choices
+  going nowhere - also one whose amounts rise each round (mana floated), where no position is "reached multiple times" - and
+  for the rest of the step. What is made to differ is every answer they gave to the same question in the same shape (a
+  target, card, player or mode chosen alone, a priority action - any activation of that ability, whatever its targets - or a
+  "may" taken): more than "a different game choice", though never anything but choosing less or another of the same.
+- A pass or a decline is never refused: a loop whose only choice is a "may" declined each time round (Fecundity's draw) is a
+  draw after `ROUNDS`. CR 732.5 would let the player be held to that action, a loop object's; the engine's policy is not to,
+  as taking it seldom stops the loop and may only harm them.
+- A choice of several targets or cards at once, an order of triggers, a number, and a "may" asked in a staged ability
+  (`Game::ask_then`) can't be refused, so a loop going round through them is treated as one of passes: a draw after
+  `ROUNDS`. Where the other order or choice would have ended the loop, that is a draw the rules don't make (CR 104.4b's last
+  sentence): the price of ending the loop at all.
+- A loop whose rounds read the history (a card's "this turn" question each time round) is found only by its shape, after
+  `BUSY_STEP` events and `ROUNDS` rounds, not at its second round: the right result, later. `ROUNDS` (256) is taken to be past
+  any number a card counts the history or an amount to.
+- A loop that never comes back to a shape - its zones growing, a token or an effect more each time round - is ended only by
+  `FORCED_LIMIT` (a run of mandatory actions: a draw if no life total, poison, library, the stack or the board moved towards
+  an end in its second half), or in a step of choices by `STEP_LIMIT` (players may then only pass and decline, and every
+  answer counts as passing) and at last by twice `STEP_LIMIT` events in the step, a draw by the engine's judgement and no
+  rule's - each slower as the zones grow. An amount going down from far away (a million life lost one at a time) is played
+  out to its end.
+- Cost: in a step being watched every question clones and journals the watch (its kept questions and answers), so a loop
+  that runs to `ROUNDS` costs seconds, and a minute or more under `CANTRIP_VERIFY` (the growth and Fecundity draw
+  scenarios). A fix keeps the questions in smaller journal entries.
+- A mana ability whose whole cost is {T} is treated as no choice when nothing more mana could pay for is castable, even when
+  its effect does more than add mana (a painland's damage).
 
 **Scenarios.**
 - [`scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip`](../scenarios/oblivion-ring-loop-a-player-can-break-with-an-instant-is-not-a-draw.cantrip)
   and [`scenarios/worldgorger-dragon-loop-ends-when-animate-dead-chooses-another-creature-card.cantrip`](../scenarios/worldgorger-dragon-loop-ends-when-animate-dead-chooses-another-creature-card.cantrip):
-  loops with a choice, played round by hand until the script breaks them (not marked: they show the rules-correct "no draw").
+  loops with a choice, played round by hand until the script breaks them.
+- [`scenarios/oblivion-ring-loop-a-player-never-breaks-with-the-instant-they-hold-is-a-draw.cantrip`](../scenarios/oblivion-ring-loop-a-player-never-breaks-with-the-instant-they-hold-is-a-draw.cantrip),
+  [`scenarios/worldgorger-dragon-loop-whose-player-keeps-choosing-the-dragon-must-choose-the-other-creature-card.cantrip`](../scenarios/worldgorger-dragon-loop-whose-player-keeps-choosing-the-dragon-must-choose-the-other-creature-card.cantrip)
+  and [`scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip`](../scenarios/worldgorger-dragon-loop-whose-player-always-declines-fecundity-is-a-draw.cantrip):
+  the fixed count at work (not marked: they show rules-correct outcomes).
 
 ### KI-55: Spellskite can't choose between two instances of "target" that hold the same object
 

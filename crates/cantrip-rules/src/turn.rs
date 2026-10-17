@@ -1007,10 +1007,11 @@ pub fn priority(cx: &mut Cx) -> R<Flow> {
         cx.st().update_turn(|t| t.priority = player);
     }
     let options = actions::priority_options(cx, player);
-    // CR 104.4b: the game has come round a loop of mandatory actions, and is a draw.
-    if crate::loops::at_priority(cx, player, &options) {
+    // CR 104.4b: the game has come round a loop of mandatory actions, and is a draw; and a player who must make a different
+    // choice round a loop is not offered what they did here before (CR 732.3).
+    let Some(options) = crate::loops::at_priority(cx, player, options) else {
         return Ok(Flow::Done);
-    }
+    };
     match cx.ask_core(player, RequestKind::Priority { options }, false)? {
         Answer::Act(action) => {
             let mut frame = Frame::new(FrameKind::Act { player });
