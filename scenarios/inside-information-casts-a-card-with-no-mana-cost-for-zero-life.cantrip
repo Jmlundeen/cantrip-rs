@@ -1,0 +1,32 @@
+# Inside Information exiles Lotus Bloom, a card with no mana cost. Life equal to its mana value is an alternative cost, which
+# a card with no mana cost may be cast for (CR 118.6a, 118.9): Bot1 casts it for 0 life, and it is on the battlefield with its
+# life unchanged.
+
+[Bot1 Deck]
+Mox Jet
+Black Lotus
+Inside Information
+Plains x14
+
+[Bot2 Deck]
+Island x7
+Lotus Bloom
+Island x9
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Inside Information.Cast(Bot2; X: 1)
+Bot1.Pass
+Bot1.Exile.Lotus Bloom.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Lotus Bloom; Mox Jet
+Bot1.Life = 20
+Exile.Count = 0

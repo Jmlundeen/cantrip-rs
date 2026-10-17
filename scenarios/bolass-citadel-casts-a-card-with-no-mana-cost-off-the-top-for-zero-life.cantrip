@@ -1,0 +1,35 @@
+# Bolas's Citadel: "you may pay life equal to its mana value rather than pay its mana cost" is an alternative cost, which a
+# card with no mana cost may be cast for (CR 118.6a, 118.9). Lotus Bloom, on top of Bot1's library under the Citadel, is cast
+# for 0 life.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Sol Ring
+Bolas's Citadel
+Swamp
+Swamp
+Lotus Bloom
+Swamp x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Library.Lotus Bloom.Cast
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Life = 20
+Bot1.Battlefield = Swamp; Mox Jet; Sol Ring; Bolas's Citadel; Lotus Bloom

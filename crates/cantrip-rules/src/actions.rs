@@ -2304,7 +2304,9 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
             if instant == instants && !land {
                 if def.split.is_none()
                     && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted_whole || from_graveyard || retrace)
-                    && (def.has_cost || (instead.is_some() && !life_grant))
+                    // A card with no mana cost is cast only for an alternative cost (CR 118.6a): one the permission names, life
+                    // equal to its mana value (0) included.
+                    && (def.has_cost || instead.is_some())
                     && (!life_grant || can_pay_other(cx, id, player, &life_for_mana_value(def)))
                     && additional_payable
                     && def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
@@ -2567,7 +2569,8 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
     {
         let def = cx.card(cx.s().obj(id).card);
         let instant = Speed { cx, flash, granters: &flash_granters, player, card: id }.whole(def);
-        if !def.is(CardType::Land) && def.has_cost && instant == instants && can_pay_other(cx, id, player, &life_for_mana_value(def)) {
+        // Life is an alternative cost, so a card with no mana cost may be cast this way too, for 0 life (CR 118.6a).
+        if !def.is(CardType::Land) && instant == instants && can_pay_other(cx, id, player, &life_for_mana_value(def)) {
             let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
             if offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option) {
                 options.push(option);
