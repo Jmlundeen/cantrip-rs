@@ -1,0 +1,9 @@
+{
+  "name": "Chomping Changeling",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Shapeshifter",
+  "oracleText": "Changeling\nWhen this creature enters, destroy up to one target artifact or enchantment.",
+  "keywords": ["Changeling"],
+  "power": "1",
+  "toughness": "2"
+}
