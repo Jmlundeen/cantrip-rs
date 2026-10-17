@@ -1,0 +1,30 @@
+# Plunder the Trollshaws cast from the hand draws exactly one card (Oracle: "Draw a card"; the two-card replacement
+# applies only to a spell cast from a graveyard). The next two cards of the library are Forests, so the hand shows
+# how many were drawn, and the card goes to the graveyard (no flashback was used).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Plunder the Trollshaws
+Island x4
+Forest
+Forest
+Island x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Plunder the Trollshaws.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Island; Island; Island; Island
+Bot1.Library.Count = 14
+Bot1.Graveyard = Plunder the Trollshaws
+Exile =

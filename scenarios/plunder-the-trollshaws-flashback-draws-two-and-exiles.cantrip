@@ -1,0 +1,47 @@
+# Plunder the Trollshaws hard cast (draws one: a Forest), then cast from the graveyard with flashback {3}{U} (CR 702.34a):
+# the spell was cast from a graveyard, so it draws two cards instead (the next two Forests), and it is exiled afterwards.
+# Six mana in one turn: an Island and five Mox Sapphires; 2 for the hard cast, 4 for the flashback.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Plunder the Trollshaws
+Forest
+Island x2
+Forest
+Forest
+Island x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Plunder the Trollshaws.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Forest
+? Bot1.Graveyard = Plunder the Trollshaws
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Battlefield.Mox Sapphire#4.Activate
+Bot1.Battlefield.Mox Sapphire#5.Activate
+Bot1.Graveyard.Plunder the Trollshaws.Cast(Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Hand = Forest; Island; Island
+Bot1.Graveyard =
+Exile = Plunder the Trollshaws
