@@ -223,7 +223,7 @@ would go over unclickable.
   themselves (613.8b), and the order is worked out again after each (613.8c). Judged on the object being worked out, an
   effect that would change what another applies to once its own prerequisites have applied counts too (a chain:
   "creatures are artifacts" after "lands are creatures" after the effect that makes it a land); a dependency through
-  another object alone is not seen (known issue KI-39). Of 613.8a(b)'s four criteria, "what it applies to" and "what it
+  another object alone is not seen (known issue KI-41). Of 613.8a(b)'s four criteria, "what it applies to" and "what it
   does" are judged here; "existence" is a static ability's taken away by "loses all abilities", ordered by
   `lost_to_statics`; no text change the engine has rewrites another effect's text. The words of rules text follow the
   same order (`Words::word`: the earliest change of the word as it is now, again and again). Characteristic-defining
