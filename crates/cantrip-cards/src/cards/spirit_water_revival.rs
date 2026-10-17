@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::library;
 use cantrip_oracle as oracle;
 
 /// "Draw two cards. If this spell's additional cost was paid, instead shuffle your graveyard into your library, draw seven
@@ -10,12 +11,7 @@ use cantrip_oracle as oracle;
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     if item.kicked > 0 {
-        let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(you)).to_vec();
-        if graveyard.is_empty() {
-            g.shuffle(you);
-        } else {
-            g.put_into_library(&graveyard, LibraryPlace::ShuffledIn);
-        }
+        library::shuffle_graveyard_into_library(g, you);
         g.draw(you, 7);
         g.add_effect(item.object, item.object, EffectKind::NoMaximumHandSize, Duration::Indefinite);
     } else {

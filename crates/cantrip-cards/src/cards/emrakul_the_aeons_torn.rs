@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::library;
 use cantrip_mechanics::statics::itself;
 use cantrip_mechanics::triggers::{annihilator, CAST_THIS_SPELL};
 use cantrip_oracle as oracle;
@@ -20,9 +21,7 @@ fn put_into_graveyard(_: &dyn Query, source: ObjectId, event: &Event) -> Option<
 /// "Its owner shuffles their graveyard into their library."
 fn shuffle_graveyard_in(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let owner = g.obj(item.object).owner;
-    let graveyard = g.state().zone(Zone::graveyard(owner)).to_vec();
-    g.put_into_library(&graveyard, LibraryPlace::Top);
-    g.shuffle(owner);
+    library::shuffle_graveyard_into_library(g, owner);
     Ok(())
 }
 

@@ -554,3 +554,12 @@ pub fn instant_or_sorcery_card(q: &dyn Query, card: ObjectId) -> bool {
     let chars = q.chars(card);
     chars.is(CardType::Instant) || chars.is(CardType::Sorcery)
 }
+
+/// "[Player] shuffles their graveyard into their library" (CR 701.24c): every card in the graveyard goes into the library
+/// at once and the library is shuffled, which it is even when no card arrives. Emrakul, the Aeons Torn, Spirit Water
+/// Revival and Quest for Ancient Secrets print it.
+pub fn shuffle_graveyard_into_library(g: &mut dyn Game, player: PlayerId) {
+    let graveyard: Vec<ObjectId> = g.state().zone(Zone::graveyard(player)).to_vec();
+    g.put_into_library(&graveyard, LibraryPlace::Top);
+    g.shuffle(player);
+}
