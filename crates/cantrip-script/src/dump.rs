@@ -301,6 +301,26 @@ impl StateDump {
             let mut graveyard = names(s.zone(Zone::graveyard(p)));
             graveyard.reverse();
             d.list(&format!("{b}.Graveyard"), graveyard, true);
+            // The power and toughness of a creature card in a hand or a graveyard (CR 604.3: a characteristic-defining ability works
+            // in every zone), `Bot1.Graveyard.Sandman, Shifting Scoundrel.Power`; a name held twice is `Name#1`, `Name#2` in zone order.
+            for (zone, label) in [(Zone::hand(p), "Hand"), (Zone::graveyard(p), "Graveyard")] {
+                let ids = s.zone(zone).to_vec();
+                for &id in &ids {
+                    let c = game.chars(id);
+                    if !c.is(CardType::Creature) {
+                        continue;
+                    }
+                    let name = game.name(id);
+                    let same: Vec<ObjectId> = ids.iter().copied().filter(|&o| game.name(o) == name).collect();
+                    let key = if same.len() == 1 {
+                        format!("{b}.{label}.{name}")
+                    } else {
+                        format!("{b}.{label}.{name}#{}", same.iter().position(|&o| o == id).unwrap() + 1)
+                    };
+                    d.set(format!("{key}.Power"), c.power.unwrap_or(0));
+                    d.set(format!("{key}.Toughness"), c.toughness.unwrap_or(0));
+                }
+            }
 
             // CR 114: the emblems a player owns, from the one shared command zone.
             let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).map(|&id| game.name(id).to_string()).collect();

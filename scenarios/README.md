@@ -360,6 +360,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Looked`, the cards the player has looked at, in the order they looked (a look at one card of a hand, Urza's Bauble),
   once they have looked at any and absent until then
 - `BotN.Hand`, `.Library`, `.Graveyard`, `.Battlefield`, `.Emblems` (CR 114, from the command zone), each with `.Count`
+- `BotN.Hand.<Name>.Power` and `.Toughness`, and the same for `BotN.Graveyard.<Name>`, for a creature card there (CR 604.3: a characteristic-defining ability such as Sandman's works in every zone); a name held twice there is `Name#1`, `Name#2` in zone order
 - `BotN.Battlefield.<Name>.Doors` and `.ManaValue` for a Room (CR 709.5): the names of its unlocked doors, left first
   (empty when both are locked), and the mana value they leave it. The Room is named by its unlocked doors (`Unholy Annex`,
   `Unholy Annex // Ritual Chamber`), and by nothing at all when neither is (`Bot1.Battlefield.#1`). A locked door is
