@@ -1,0 +1,66 @@
+# Dependency (CR 613.8a): Conspiracy's "Creatures you control are the chosen type" and Opalescence's "Each other non-Aura
+# enchantment is a creature" are both layer-4 effects, and applying Opalescence's changes what Conspiracy's applies to, so
+# Conspiracy's depends on it and waits for it - though Conspiracy (turn 1) is older than Opalescence (turn 5), and in
+# timestamp order Conspiracy's would have found no creature among the enchantments. So Glorious Anthem and Conspiracy
+# itself, enchantment creatures, are Merfolk (the chosen type). In layer 7b each is its mana value, Conspiracy 5/5 and the
+# Anthem 3/3, and in 7c the Anthem's "Creatures you control get +1/+1" makes them 6/6 and 4/4. Opalescence is no creature,
+# so no Merfolk.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Pearl
+Sol Ring
+Conspiracy
+Glorious Anthem
+Plains
+Opalescence
+Island x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Conspiracy.Cast
+Bot1.Pass
+Bot1.Modes(Merfolk)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Glorious Anthem.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Glorious Anthem.Subtypes = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Glorious Anthem.Types = Enchantment; Creature
+Bot1.Battlefield.Glorious Anthem.Subtypes = Merfolk
+Bot1.Battlefield.Glorious Anthem.Power = 4
+Bot1.Battlefield.Glorious Anthem.Toughness = 4
+Bot1.Battlefield.Conspiracy.Types = Enchantment; Creature
+Bot1.Battlefield.Conspiracy.Subtypes = Merfolk
+Bot1.Battlefield.Conspiracy.Power = 6
+Bot1.Battlefield.Conspiracy.Toughness = 6
+Bot1.Battlefield.Opalescence.Types = Enchantment
+Bot1.Battlefield.Opalescence.Subtypes = (absent)
