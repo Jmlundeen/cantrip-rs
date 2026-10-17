@@ -1,0 +1,54 @@
+# Rust Harvester's ability has been activated (the Bauble is exiled as the cost) when Bot2 answers with Lightning Bolt on the 1/1
+# Harvester, which dies. The ability still resolves (its target, Bot2, is legal): no counter goes on a creature that left the
+# battlefield (CR 400.7), and "it deals damage equal to its power" uses its last known power, 1, not 2 (CR 608.2h): Bot2 goes to 19.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mishra's Bauble
+Rust Harvester
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rust Harvester.Cast
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot1)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Rust Harvester.Activate(Bot2)
+Bot1.Choose(Mishra's Bauble)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Rust Harvester)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 19
+Bot1.Graveyard = Rust Harvester
+Bot1.Battlefield.Count = 3
+Exile = Mishra's Bauble
+Bot2.Graveyard = Lightning Bolt

@@ -1,0 +1,57 @@
+# Rust Harvester targets Bot2's Ornithopter; in response Bot2 Bolts its own Ornithopter, so the ability's only target is illegal and
+# it doesn't resolve at all (CR 608.2b): the +1/+1 counter is not put on the Harvester, which stays 1/1 (the counter is part of the
+# resolution, not the cost). The Bauble was exiled as the cost, and the Harvester is tapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mishra's Bauble
+Rust Harvester
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Ornithopter
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Rust Harvester.Cast
+Bot1.Hand.Mishra's Bauble.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mishra's Bauble.Activate(Bot1)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Rust Harvester.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Choose(Mishra's Bauble)
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Battlefield.Rust Harvester.Power = 1
+Bot1.Battlefield.Rust Harvester.Toughness = 1
+Bot1.Battlefield.Rust Harvester.Tapped = true
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Exile = Mishra's Bauble
