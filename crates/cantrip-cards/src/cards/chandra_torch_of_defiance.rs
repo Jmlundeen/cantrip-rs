@@ -40,13 +40,6 @@ fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 // --- The emblem ---------------------------------------------------------------------------------------------------
 
-fn you_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { player, .. } if *player == q.controller(source) => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 fn five_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     damage_target(g, item, 0, 5);
     Ok(())
@@ -55,7 +48,7 @@ fn five_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Chandra, Torch of Defiance emblem",
     has_cost: false,
-    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast), five_damage, "Whenever you cast a spell, this emblem deals 5 damage to any target.")
+    abilities: &[triggered(cantrip_mechanics::triggers::YOU_CAST_A_SPELL, five_damage, "Whenever you cast a spell, this emblem deals 5 damage to any target.")
         .targets(&[targets::ANY])],
     text: "Whenever you cast a spell, this emblem deals 5 damage to any target.",
     ..CardDef::BLANK

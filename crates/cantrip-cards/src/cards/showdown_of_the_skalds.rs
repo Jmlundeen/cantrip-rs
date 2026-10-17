@@ -17,14 +17,6 @@ fn rally(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Whenever you cast a spell": a spell, not an activated ability, cast by this ability's controller.
-fn you_cast_a_spell(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { player, .. } if *player == me.controller => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 fn counter_on_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(creature) = targets::object(g, item, 0) {
         g.add_counters(creature, CounterKind::PlusOne, 1);
@@ -38,7 +30,7 @@ pub static CARD: CardDef = CardDef {
         chapter(2, rally, "II \u{2014} Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control."),
         chapter(3, rally, "III \u{2014} Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control."),
     ],
-    delayed: &[triggered(when_asked(EventMask::SPELL_CAST, you_cast_a_spell), counter_on_creature, "Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control.")
+    delayed: &[triggered(cantrip_mechanics::triggers::YOU_CAST_A_SPELL, counter_on_creature, "Whenever you cast a spell this turn, put a +1/+1 counter on target creature you control.")
         .targets(&[targets::CREATURE_YOU_CONTROL])],
     ..oracle::SHOWDOWN_OF_THE_SKALDS
 };

@@ -516,6 +516,15 @@ pub const fn ward_sacrifice<const N: u8>(text: &'static str) -> AbilityDef {
         .ward()
 }
 
+/// "Whenever you cast a spell" (CR 601.2i, 603.2): Paradox Engine, Showdown of the Skalds' chapter III, the emblems of Chandra, Torch of Defiance, Chandra, Chill
+/// of Compliance and Jace, Vryn's Prodigy print it.
+pub fn you_cast_a_spell(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { player, .. } if *player == me.controller => Fired::PLAIN,
+        _ => None,
+    }
+}
+
 /// "Whenever you cast a noncreature spell" (CR 603.2): prowess, Displacer Kitten and Dragon's Rage Channeler print it.
 pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
@@ -628,6 +637,12 @@ pub fn each_opponents_upkeep(q: &dyn Query, me: &Asker, event: &Event) -> Option
         Event::StepBegan { step: Step::Upkeep } if q.state().turn.active != me.controller => Fired::PLAIN,
         _ => None,
     }
+}
+
+/// "At the beginning of your first main phase" or, as older cards say it, "your precombat main phase" (CR 505.1a: only the
+/// first main phase of a turn is the precombat one). Coalition Relic and both faces of Ashling, Rekindled print it.
+pub fn your_first_main_phase(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    your_step(q, me, event, Step::PrecombatMain)
 }
 
 /// "At the beginning of combat on your turn" (CR 507.1). Luminarch Aspirant and Ouroboroid print it.
@@ -918,12 +933,14 @@ pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, 
 pub const ENCHANTED_PLAYER_ATTACKED: Trigger = when(EventMask::ATTACKS, enchanted_player_attacked);
 pub const YOU_ATTACK: Trigger = when_asked(EventMask::ATTACKERS_DECLARED, you_attack);
 pub const INSTANT_OR_SORCERY_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_instant_or_sorcery);
+pub const YOU_CAST_A_SPELL: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell);
 pub const NONCREATURE_SPELL_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, noncreature_spell_you_cast);
 pub const YOU_CAST_A_SPELL_FROM_EXILE: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_a_spell_from_exile);
 pub const THIS_DIES: Trigger = when(EventMask::ZONE_CHANGE, this_dies);
 pub const THIS_LEAVES: Trigger = when(EventMask::ZONE_CHANGE, this_leaves);
 pub const YOUR_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_upkeep);
 pub const YOUR_DRAW_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_draw_step);
+pub const YOUR_FIRST_MAIN_PHASE: Trigger = when_asked(EventMask::STEP_BEGAN, your_first_main_phase);
 pub const EACH_OPPONENTS_UPKEEP: Trigger = when_asked(EventMask::STEP_BEGAN, each_opponents_upkeep);
 pub const BEGINNING_OF_YOUR_COMBAT: Trigger = when_asked(EventMask::STEP_BEGAN, beginning_of_your_combat);
 pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_step);

@@ -26,14 +26,6 @@ fn plus_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Whenever you cast a spell" (CR 603.2): the emblem's owner casts it.
-fn you_cast_a_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::SpellCast { player, .. } if *player == q.controller(source) => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 fn mill_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.target_legal(item, 0)
         && let Some(player) = item.targets[0].player()
@@ -46,7 +38,7 @@ fn mill_five(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Jace, Telepath Unbound emblem",
     has_cost: false,
-    abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast_a_spell), mill_five, "Whenever you cast a spell, target opponent mills five cards.")
+    abilities: &[triggered(cantrip_mechanics::triggers::YOU_CAST_A_SPELL, mill_five, "Whenever you cast a spell, target opponent mills five cards.")
         .targets(&[targets::OPPONENT])],
     text: "Whenever you cast a spell, target opponent mills five cards.",
     ..CardDef::BLANK
