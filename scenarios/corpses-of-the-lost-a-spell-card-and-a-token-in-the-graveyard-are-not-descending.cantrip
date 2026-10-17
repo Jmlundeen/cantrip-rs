@@ -1,0 +1,41 @@
+# Corpses of the Lost: "if you descended this turn" needs a PERMANENT CARD put into your graveyard (CR 700.11). Turn 1
+# Bot1 casts it, then Lightning Bolt at its own Skeleton Pirate (a 3/2): the token dies (a token is not a card, so it does not
+# count, CR 111.7) and the Bolt, an instant, goes to the graveyard (not a permanent card). Bot1 has not descended, so the
+# trigger is never put on the stack and nothing asks for a payment (the refusal); the scenario where a discarded
+# Ornithopter does make it ask is the positive control. Life stays at 20 and the enchantment stays.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Corpses of the Lost
+Lightning Bolt
+Ornithopter
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corpses of the Lost.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Skeleton Pirate)
+[T1 Bot1.End]
+Bot1.Pass
+! Bot1.Accept
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Corpses of the Lost.Types = Enchantment
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Ornithopter

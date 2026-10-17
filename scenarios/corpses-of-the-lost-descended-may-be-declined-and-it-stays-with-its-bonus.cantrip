@@ -1,0 +1,41 @@
+# Corpses of the Lost: the payment is a "may". Same position as the scenario where Bot1 pays (descended through Faithless
+# Looting), but Bot1 declines at the end step: no life is paid (20), the enchantment stays on the battlefield, and the
+# Skeleton Pirate token keeps +1/+0 and haste (a 3/2).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Corpses of the Lost
+Faithless Looting
+Ornithopter
+Mountain
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corpses of the Lost.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Plains)
+[T1 Bot1.End]
+Bot1.Decline
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Plains
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Skeleton Pirate.Power = 3
+Bot1.Battlefield.Skeleton Pirate.Keywords = Haste

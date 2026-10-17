@@ -1,0 +1,51 @@
+# Corpses of the Lost: "Skeletons you control get +1/+0 and have haste" is about any Skeleton, token or card, and only
+# the ones Bot1 controls. Turn 1 Bot1 casts Corpses of the Lost (Swamp, Mox Jet, Mox Ruby) and Emperor of Bones (Mox Pearl,
+# Mox Emerald): its Emperor is a 3/2 with haste and attacks at once. On turn 2 Bot2 casts its own Emperor of Bones (Mox Jet, Mox
+# Ruby): a Skeleton Bot1 does not control, so it stays a 2/2 and is summoning sick (no haste).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Corpses of the Lost
+Emperor of Bones
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Emperor of Bones
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corpses of the Lost.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Emperor of Bones.Cast
+Bot1.Attack(Emperor of Bones > Bot2)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Emperor of Bones.Cast
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Emperor of Bones.SummoningSick = true
+? Bot1.Battlefield.Emperor of Bones.SummoningSick = false
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Emperor of Bones.Power = 3
+Bot1.Battlefield.Emperor of Bones.Keywords = Haste
+Bot2.Battlefield.Emperor of Bones.Power = 2
+Bot2.Battlefield.Emperor of Bones.Keywords = (absent)

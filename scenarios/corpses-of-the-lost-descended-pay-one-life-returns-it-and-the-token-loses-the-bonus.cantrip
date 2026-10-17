@@ -1,0 +1,44 @@
+# Corpses of the Lost: "At the beginning of your end step, if you descended this turn, you may pay 1 life. If you do, return
+# this enchantment to its owner's hand." Turn 1 Bot1 casts it (Mox Jet, Mox Ruby, Mox Pearl), then Faithless Looting (a
+# Mountain) draws two Plains and discards an Ornithopter and a Plains: permanent cards put into Bot1's graveyard, so Bot1
+# descended (CR 700.11). At the end step Bot1 pays 1 life (19) and the enchantment returns to hand. The Skeleton Pirate
+# token stays, but with Corpses of the Lost gone it is a plain 2/2 with no haste.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Corpses of the Lost
+Faithless Looting
+Ornithopter
+Mountain
+Plains
+Plains
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corpses of the Lost.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Plains)
+[T1 Bot1.End]
+Bot1.Accept
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand = Corpses of the Lost; Plains
+Bot1.Graveyard = Faithless Looting; Plains; Ornithopter
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Skeleton Pirate.Power = 2
+Bot1.Battlefield.Skeleton Pirate.Keywords = (absent)

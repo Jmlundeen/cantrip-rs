@@ -1,0 +1,42 @@
+# Corpses of the Lost: "if YOU descended this turn" counts permanent cards put into Bot1's own graveyard only (CR 700.11).
+# Turn 1 Bot1 casts it and then Hymn to Tourach on Bot2, whose hand is all Ornithopters: two permanent cards go to
+# Bot2's graveyard, not Bot1's (Hymn itself is a sorcery). Bot1 has not descended, so nothing asks it to pay at the end
+# step (the refusal; the Faithless Looting scenario is its positive control).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Corpses of the Lost
+Hymn to Tourach
+Island x12
+
+[Bot2 Deck]
+Ornithopter x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corpses of the Lost.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Hymn to Tourach.Cast(Bot2)
+[T1 Bot1.End]
+Bot1.Pass
+! Bot1.Accept
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard.Count = 2
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Hymn to Tourach
+Bot1.Battlefield.Corpses of the Lost.Types = Enchantment

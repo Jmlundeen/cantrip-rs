@@ -1,0 +1,53 @@
+# Corpses of the Lost, ruling 2023-11-10: "You decide to pay 1 life as the last ability is resolving. If you decide to pay 1
+# life and Corpses of the Lost is still on the battlefield, it will immediately return to its owner's hand." Turn 1 Bot1
+# casts it; turn 3 Faithless Looting discards an Ornithopter (Bot1 descended) and at the end step the trigger is put on the
+# stack. Bot2 answers with Petty Theft (Brazen Borrower's Adventure) and returns Corpses of the Lost to Bot1's hand. The
+# trigger still resolves (it only needs the descent): Bot1 pays 1 life (19), and the enchantment, no longer on the
+# battlefield, is not returned a second time or moved from the hand it is already in: Bot1 holds it once.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Corpses of the Lost
+Faithless Looting
+Ornithopter
+Mountain
+Plains x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Brazen Borrower
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corpses of the Lost.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Plains)
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Brazen Borrower.Cast(Bot1.Battlefield.Corpses of the Lost; Ability: Adventure)
+Bot1.Accept
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand = Corpses of the Lost; Plains; Plains
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Count = 5
+Exile = Brazen Borrower

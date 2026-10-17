@@ -1,0 +1,40 @@
+# Corpses of the Lost: "When this enchantment enters, create a 2/2 black Skeleton Pirate creature token" and "Skeletons you
+# control get +1/+0 and have haste." Turn 1 Bot1 casts an Ornithopter (free) and Corpses of the Lost (Mox Jet, Mox Ruby, Mox
+# Pearl). The token is a 3/2 with haste and attacks at once; the Ornithopter, not a Skeleton, is still a 0/2 flier with no
+# haste and can't attack (the refusal, with the Skeleton Pirate attacking as its positive control). Bot2 loses 3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Corpses of the Lost
+Ornithopter
+Island x2
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Corpses of the Lost.Cast
+! Bot1.Attack(Ornithopter > Bot2)
+Bot1.Attack(Skeleton Pirate > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Skeleton Pirate.Power = 3
+Bot1.Battlefield.Skeleton Pirate.Toughness = 2
+Bot1.Battlefield.Skeleton Pirate.Keywords = Haste
+Bot1.Battlefield.Skeleton Pirate.Subtypes = Pirate; Skeleton
+Bot1.Battlefield.Skeleton Pirate.Colors = Black
+Bot1.Battlefield.Skeleton Pirate.Token = true
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Keywords = Flying
