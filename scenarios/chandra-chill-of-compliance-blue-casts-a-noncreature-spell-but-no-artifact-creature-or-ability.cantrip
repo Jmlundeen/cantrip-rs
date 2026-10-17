@@ -1,0 +1,67 @@
+# Chandra, Chill of Compliance's second +1: "Add {U}. Spend this mana only to cast a noncreature spell" (CR 106.6), a
+# loyalty ability that resolves from the stack (CR 605.1a). Turn 1, with only that {U} and every other source tapped:
+# Aerial Doombot can't be cast - an artifact creature spell is a creature spell, however it is also an artifact - and
+# Aether Spellbomb's "{1}, Sacrifice this artifact: Draw a card" can't be activated - an ability, no spell. Turn 3: the
+# next {U} casts Ancestral Recall, and the Island's and Mox Sapphire's unrestricted {U} pay for Aerial Doombot and the
+# Spellbomb's ability.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Chandra, Chill of Compliance
+Aerial Doombot
+Aether Spellbomb
+Ancestral Recall
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Aether Spellbomb.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {U} (NoncreatureSpells)
+! Bot1.Hand.Aerial Doombot.Cast
+! Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Aether Spellbomb.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Mox Ruby; Chandra, Chill of Compliance; Aerial Doombot
+Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 5
+Bot1.Graveyard = Aether Spellbomb; Ancestral Recall
+Bot1.Hand.Count = 4
+Bot1.Mana =

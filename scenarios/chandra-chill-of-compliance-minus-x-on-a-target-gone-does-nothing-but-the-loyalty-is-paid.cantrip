@@ -1,0 +1,39 @@
+# Chandra, Chill of Compliance's "-X: Tap target artifact or creature. Put X stun counters on it." aimed at Bot1's own
+# Lotus Petal, which is then sacrificed for mana while the ability waits on the stack: its only target is gone, so it does
+# nothing as it would resolve (CR 608.2b), but the X loyalty counters were removed as its cost (CR 606.4, 118.3).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Lotus Petal
+Chandra, Chill of Compliance
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Bot1.Battlefield.Lotus Petal; Ability: Tap target; X: 2)
+Bot1.Battlefield.Lotus Petal.Activate(Color: Blue)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Battlefield = Island; Mox Sapphire; Mox Jet; Chandra, Chill of Compliance
+Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 1
+Bot1.Graveyard = Lotus Petal

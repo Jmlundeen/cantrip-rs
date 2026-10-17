@@ -1,0 +1,79 @@
+# Chandra, Chill of Compliance's first +1: "Surveil 1. If you put a noncreature, nonland card into your graveyard this way,
+# put that card into your hand." Turn 1: Lightning Bolt is put into the graveyard and returns to the hand. Turn 3: an Island
+# put there stays (a land). Turn 5: Aerial Doombot put there stays (an artifact creature is a creature). Turn 7: Mox Pearl,
+# an artifact that is no creature, returns. Turn 9: Brainstorm is left on top: nothing goes to the graveyard, so nothing
+# returns, and Brainstorm is the next card drawn. Each +1 raises Chandra's loyalty by one (CR 606.4).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Chandra, Chill of Compliance
+Island
+Island
+Island
+Lightning Bolt
+Island
+Island
+Island
+Aerial Doombot
+Island
+Mox Pearl
+Island
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Lightning Bolt)
+? Bot1.Hand = Island; Island; Island; Lightning Bolt
+? Bot1.Graveyard =
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Island)
+? Bot1.Graveyard = Island
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Aerial Doombot)
+? Bot1.Graveyard = Aerial Doombot; Island
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Mox Pearl)
+? Bot1.Graveyard = Aerial Doombot; Island
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Brainstorm | )
+? Bot1.Library.Count = 11
+[T11 Bot1.Main1]
+
+[Expect]
+Turn = 11
+Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 8
+Bot1.Graveyard = Aerial Doombot; Island
+Bot1.Hand = Island; Island; Island; Lightning Bolt; Mox Pearl; Brainstorm

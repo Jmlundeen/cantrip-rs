@@ -1,0 +1,49 @@
+# Browser
+# What the page shows of Chandra, Chill of Compliance: her +1's {U} sits in the pool captioned "noncreature spells"
+# (CR 106.6) and casts Ancestral Recall; on turn 3 her -X asks for X as a loyalty cost - X loyalty counters come off her
+# (CR 606.4, 107.3), no mana - and X of 2 taps Bot2's Ornithopter with two stun counters, leaving her at 2.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Chandra, Chill of Compliance
+Ancestral Recall
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana = 1 Blue (noncreature spells)
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Mana =
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap target; X: 2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 2
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Counters.Stun = 2

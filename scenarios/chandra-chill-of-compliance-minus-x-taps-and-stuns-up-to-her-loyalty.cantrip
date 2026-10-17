@@ -1,0 +1,61 @@
+# Chandra, Chill of Compliance's "-X: Tap target artifact or creature. Put X stun counters on it." X is announced as the
+# ability is activated and its cost removes that many loyalty counters (CR 606.4, 107.3, 601.2b by way of 602.2b), so it
+# can't be more than the loyalty there is (CR 118.3). Turn 3, at 4 loyalty: X of 0 taps Bot2's Ornithopter and puts no
+# counter on it, and it untaps as usual on turn 4. Turn 5, at 4 loyalty again (the turn 3 activation removed none): X can't
+# be 5; X of 4 taps it with four stun counters and leaves Chandra with no loyalty, so she is put into the graveyard
+# (CR 704.5i). Turn 6: a stun counter comes off instead of the Ornithopter untapping (CR 122.1d).
+# The `! ...(X: 5)` refusal sits right after the X: 4 activation on purpose: an X refusal is judged at that activation's
+# own announcement, raising X one step at a time from 0 while Chandra still has 4 loyalty (scenarios/README.md,
+# Refusals), and it fails if X reaches 5 (checked: with the cap one higher it goes red). Placed before the activation it
+# would be an ordinary refusal of the whole ability, which is offered.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Chandra, Chill of Compliance
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Surveil)
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island | )
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap target; X: 0)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Tapped = true
+? Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 4
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Ornithopter.Tapped = false
+[T5 Bot1.Main1]
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap target; X: 4)
+! Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap target; X: 5)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Counters.Stun = 4
+[T6 Bot2.Main1]
+
+[Expect]
+Turn = 6
+Bot1.Graveyard = Chandra, Chill of Compliance
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Counters.Stun = 3

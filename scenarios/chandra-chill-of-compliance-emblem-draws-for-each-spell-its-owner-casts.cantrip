@@ -1,0 +1,65 @@
+# Chandra, Chill of Compliance's "-6: You get an emblem with 'Whenever you cast a spell, draw a card.'" Three +1s take
+# her from 3 to 6 loyalty; on turn 7 the -6 leaves her at 0, so she is put into the graveyard (CR 704.5i), and the emblem
+# stays in Bot1's command zone (CR 114.4). Bot1's Ancestral Recall then triggers it, the draw resolving first; Bot2's
+# Ornithopter, cast by an opponent, does not.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Chandra, Chill of Compliance
+Ancestral Recall
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Chandra, Chill of Compliance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: Add {U})
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+? Bot1.Battlefield.Chandra, Chill of Compliance.Counters.Loyalty = 6
+Bot1.Battlefield.Chandra, Chill of Compliance.Activate(Ability: You get an emblem)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Emblems = Chandra, Chill of Compliance emblem
+? Bot1.Graveyard = Chandra, Chill of Compliance
+? Bot1.Hand.Count = 3
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 6
+[T8 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 8
+Stack.Count = 0
+Bot1.Emblems = Chandra, Chill of Compliance emblem
+Bot1.Hand.Count = 6
+Bot2.Battlefield = Ornithopter
