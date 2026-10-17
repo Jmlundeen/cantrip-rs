@@ -1,0 +1,59 @@
+# Necrotic Ooze: "As long as this creature is on the battlefield, it has all activated abilities of all creature cards in
+# all graveyards." On turn 2 Bot2 casts Walking Ballista for X = 0, and it dies as a 0/0 (CR 704.5f): a creature card in
+# Bot2's graveyard. Bot1's Ooze has both its activated abilities, as its own (CR 613.1f; the ruling: an ability that names
+# its card names the Ooze): on turn 3 "{4}: Put a +1/+1 counter on this creature" puts the counter on the Ooze (a 5/4), and
+# "Remove a +1/+1 counter from this creature: It deals 1 damage to any target" takes it off again to deal Bot2 1: the Ooze
+# is its printed 4/3 and Bot2 is at 19. Before the Ballista died (turn 1) the Ooze had no ability to offer (the refusal).
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Necrotic Ooze
+Island x13
+
+[Bot2 Deck]
+Walking Ballista
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Necrotic Ooze.Cast
+Bot1.Pass
+! Bot1.Battlefield.Necrotic Ooze.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Walking Ballista.Cast(X: 0)
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Walking Ballista
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Necrotic Ooze.Activate(Ability: {4})
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Necrotic Ooze.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Necrotic Ooze.Power = 5
+Bot1.Battlefield.Necrotic Ooze.Activate(Bot2; Ability: Remove)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 19
+Bot1.Battlefield.Necrotic Ooze.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Necrotic Ooze.Power = 4
+Bot1.Battlefield.Necrotic Ooze.Toughness = 3

@@ -1,0 +1,48 @@
+# Humility takes Necrotic Ooze's "it has all activated abilities of all creature cards in all graveyards" in layer 6 (CR
+# 613.1f), and with it every ability that ability would give: the Ooze's grant depends on Humility's effect, which applies
+# first (CR 613.8a), though the Ooze came first. Walking Ballista is in Bot1's graveyard (cast for X = 0 on turn 1), and on
+# turn 5, with four mana open, the Ooze offers neither of its abilities (the refusal) - the positive control is
+# necrotic-ooze-has-the-activated-abilities-of-a-creature-card-in-an-opponents-graveyard, where the same {4} is activated.
+# The Ooze is a 1/1.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Pearl
+Walking Ballista
+Necrotic Ooze
+Humility
+Plains
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Necrotic Ooze.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Necrotic Ooze.Activate
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Black Lotus; Walking Ballista
+Bot1.Battlefield.Necrotic Ooze.Power = 1
+Bot1.Battlefield.Necrotic Ooze.Toughness = 1

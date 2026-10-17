@@ -1,0 +1,70 @@
+# Necrotic Ooze has the activated abilities of the creature cards in graveyards only. Opalescence makes "each other non-Aura
+# enchantment" a creature - a permanent, never a card in a graveyard (CR 611.3a, 613.1d: a static ability of a permanent
+# affects permanents unless it says otherwise) - so Assault Formation, which Bot2 discards to its hand size on turn 2, is
+# an enchantment card in a graveyard and gives the Ooze nothing: with {2}{G} open on turn 5 the Ooze offers neither of its
+# abilities (the refusals). Walking Ballista, a creature card in Bot1's graveyard since turn 1, does give its abilities:
+# "{4}: Put a +1/+1 counter on this creature" is activated (the positive control), and the Ooze, a creature Opalescence
+# does not touch, is a 5/4.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Emerald
+Walking Ballista
+Necrotic Ooze
+Opalescence
+Island x12
+
+[Bot2 Deck]
+Island
+Island
+Island
+Island
+Island
+Island
+Island
+Assault Formation
+Island x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Walking Ballista.Cast(X: 0)
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Necrotic Ooze.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot2.Graveyard = Assault Formation
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+! Bot1.Battlefield.Necrotic Ooze.Activate(Ability: +0/+1)
+! Bot1.Battlefield.Necrotic Ooze.Activate(Ability: defender)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Necrotic Ooze.Activate(Ability: {4})
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Necrotic Ooze.Types = Creature
+Bot1.Battlefield.Necrotic Ooze.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Necrotic Ooze.Power = 5
+Bot1.Battlefield.Necrotic Ooze.Toughness = 4
+Bot1.Battlefield.Opalescence.Types = Enchantment

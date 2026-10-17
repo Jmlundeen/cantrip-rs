@@ -1,0 +1,8 @@
+{
+  "name": "Necrotic Ooze",
+  "manaCost": "{2}{B}{B}",
+  "type": "Creature — Ooze",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "As long as this creature is on the battlefield, it has all activated abilities of all creature cards in all graveyards."
+}
