@@ -1,0 +1,33 @@
+# Shared Roots: "Search your library for a basic land card, put it onto the battlefield tapped, then shuffle." Bot1's library
+# holds a Temple Garden (a nonbasic land, refused beside the basic Forest, the positive control) and a Forest. The Forest
+# arrives tapped (a Swamp or Island would too) and the spell goes to the graveyard. Bot1's hand lost the spell and the two
+# Mox Emeralds that paid for it and gained no card (a search puts the land onto the battlefield, not into the hand).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Shared Roots
+Island
+Island
+Island
+Island
+Temple Garden
+Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Shared Roots.Cast
+! Bot1.Search(Temple Garden)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Graveyard = Shared Roots
+Bot1.Hand.Count = 4

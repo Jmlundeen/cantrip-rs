@@ -1,0 +1,30 @@
+# The search may fail (CR 701.23b): Bot1's library has no basic land at all, only a Temple Garden (nonbasic, refused) and
+# Ornithopters. Shared Roots resolves, nothing enters the battlefield (the battlefield stays the two Moxen), and the spell is
+# still put into the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Shared Roots
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Temple Garden
+Ornithopter x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Shared Roots.Cast
+! Bot1.Search(Temple Garden)
+
+[Expect]
+Bot1.Graveyard = Shared Roots
+Bot1.Battlefield.Count = 2
+Bot1.Hand.Count = 4

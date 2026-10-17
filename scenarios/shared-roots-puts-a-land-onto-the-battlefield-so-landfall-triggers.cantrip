@@ -1,0 +1,43 @@
+# A land put onto the battlefield by a spell enters under Bot1's control, so landfall triggers (CR 207.2c: "for any reason"),
+# although it is tapped and although no land was played: Bot1's Sazh's Chocobo (0/1) gets a +1/+1 counter and is 1/2. Bot2's
+# Chocobo, in play beside it, gets nothing (Bot2's lands did not enter).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Sazh's Chocobo
+Shared Roots
+Island
+Island
+Forest
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Sazh's Chocobo
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Sazh's Chocobo.Cast
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Shared Roots.Cast
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Sazh's Chocobo.Cast
+
+[Expect]
+Bot1.Battlefield.Sazh's Chocobo.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Sazh's Chocobo.Power = 1
+Bot1.Battlefield.Sazh's Chocobo.Toughness = 2
+Bot1.Battlefield.Forest.Tapped = true
+Bot2.Battlefield.Sazh's Chocobo.Power = 0
