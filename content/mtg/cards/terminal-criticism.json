@@ -1,0 +1,6 @@
+{
+  "name": "Terminal Criticism",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "Destroy target creature or planeswalker that's blue or red. You gain 1 life."
+}

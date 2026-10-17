@@ -1,0 +1,49 @@
+# Terminal Criticism: "Destroy target creature or planeswalker that's blue or red. You gain 1 life." Bot2 controls a blue
+# Picklock Prankster and a black Hired Blade. The black creature is refused as a target (the colour limit), the blue one is
+# destroyed and Bot1 gains 1 life (20 -> 21).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Terminal Criticism
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Emerald
+Picklock Prankster
+Hired Blade
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Picklock Prankster.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Hired Blade)
+Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Picklock Prankster)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Graveyard = Picklock Prankster
+Bot2.Battlefield.Hired Blade.Colors = Black
+Bot1.Graveyard = Terminal Criticism

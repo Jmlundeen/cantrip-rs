@@ -1,0 +1,58 @@
+# "That's blue or red": a red creature (Masked Meower) qualifies, and so does a multicoloured one that is blue and black
+# (Baleful Strix, CR 105.4: it is blue, whatever else it is). Bot1 casts two Terminal Criticisms, one on each; each destroys
+# its target and gains a life (20 -> 22). A green creature (Edge Rover) is the refusal.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Swamp
+Swamp
+Terminal Criticism
+Terminal Criticism
+Island x14
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Masked Meower
+Baleful Strix
+Edge Rover
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Masked Meower.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Baleful Strix.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Edge Rover.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Edge Rover)
+Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Masked Meower)
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Baleful Strix)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot2.Graveyard = Baleful Strix; Masked Meower
+Bot2.Battlefield.Edge Rover.Colors = Green
+Bot1.Graveyard = Terminal Criticism; Terminal Criticism

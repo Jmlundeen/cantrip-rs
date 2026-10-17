@@ -1,0 +1,41 @@
+# Terminal Criticism has one target. Bot2 kills its own Picklock Prankster with a Lightning Bolt in response, so the target is
+# illegal on resolution and the spell does nothing (CR 608.2b): Bot1 does not gain the life (stays at 20), though
+# the spell was cast.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Terminal Criticism
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Pearl
+Picklock Prankster
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Picklock Prankster.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Picklock Prankster)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Picklock Prankster)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Picklock Prankster; Lightning Bolt
+Bot1.Graveyard = Terminal Criticism

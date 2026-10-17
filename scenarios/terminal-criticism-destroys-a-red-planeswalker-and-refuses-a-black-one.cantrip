@@ -1,0 +1,54 @@
+# "Creature or planeswalker": Chandra, Torch of Defiance (a red planeswalker, Bot2's) is destroyed by Terminal Criticism
+# and Bot1 gains 1 life. Bot1's own Liliana of the Veil is a black planeswalker and is refused as a target (positive control:
+# the same spell on Chandra). Nobody uses a loyalty ability.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Mox Pearl
+Liliana of the Veil
+Terminal Criticism
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Chandra, Torch of Defiance
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Chandra, Torch of Defiance.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+! Bot1.Hand.Terminal Criticism.Cast(Bot1.Battlefield.Liliana of the Veil)
+Bot1.Hand.Terminal Criticism.Cast(Bot2.Battlefield.Chandra, Torch of Defiance)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot2.Graveyard = Chandra, Torch of Defiance
+Bot1.Battlefield.Liliana of the Veil.Types = Planeswalker
+Bot1.Graveyard = Terminal Criticism
