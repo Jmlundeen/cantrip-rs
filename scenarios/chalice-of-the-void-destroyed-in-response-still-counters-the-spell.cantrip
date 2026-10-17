@@ -1,0 +1,46 @@
+# Once Chalice of the Void's ability has triggered, it counters the spell even if Chalice leaves the battlefield (its
+# ruling; CR 113.7a: the ability exists apart from its source). Bot2 casts Lightning Bolt (mana value 1) at Bot1 under
+# Bot1's one-counter Chalice; with the trigger on the stack Bot2 destroys Chalice with Abrade (mana value 2, not countered).
+# The trigger still counters the Bolt: Bot1 stays on 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Chalice of the Void
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Abrade
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Chalice of the Void.Cast(X: 1)
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack = Chalice of the Void; Lightning Bolt
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Abrade.Cast
+Bot2.Modes(Destroy target artifact)
+Bot2.Target(Bot1.Battlefield.Chalice of the Void)
+? Stack = Abrade; Chalice of the Void; Lightning Bolt
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Graveyard = Chalice of the Void
+Bot2.Graveyard = Lightning Bolt; Abrade

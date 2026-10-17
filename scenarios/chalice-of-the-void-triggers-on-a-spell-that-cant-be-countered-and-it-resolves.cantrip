@@ -1,0 +1,35 @@
+# "Counter that spell" does nothing to a spell that can't be countered (CR 101.2, 701.6a). Bot1's Chalice of the Void has
+# two counters; Bot2's Abrupt Decay (mana value 2, "this spell can't be countered") triggers it - the ability goes on the
+# stack - but stays, and destroys the Chalice itself (mana value 0 on the battlefield, CR 202.3e).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chalice of the Void
+Mountain x10
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Abrupt Decay
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Chalice of the Void.Cast(X: 2)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Abrupt Decay.Cast(Bot1.Battlefield.Chalice of the Void)
+? Stack = Chalice of the Void; Abrupt Decay
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Graveyard = Chalice of the Void; Black Lotus
+Bot2.Graveyard = Abrupt Decay

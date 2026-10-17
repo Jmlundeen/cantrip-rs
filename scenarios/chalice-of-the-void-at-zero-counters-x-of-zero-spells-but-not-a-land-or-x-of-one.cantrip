@@ -1,0 +1,37 @@
+# Chalice of the Void cast with X = 0 costs nothing and enters with no charge counters, so it counters each spell with mana
+# value 0 (its ruling): a Mox, and Engineered Explosives with X = 0, whose X is 0 on the stack (CR 202.3e). A land is played,
+# never cast (CR 305.1), so the Mountain is not countered; and Engineered Explosives with X = 1, mana value 1 on the stack, is
+# not countered, entering with a charge counter for the red spent (sunburst, CR 702.44a).
+
+[Bot1 Deck]
+Chalice of the Void
+Mox Ruby
+Engineered Explosives
+Engineered Explosives
+Mountain
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Chalice of the Void.Cast(X: 0)
+[T1 Bot1.Main2]
+Bot1.Hand.Mox Ruby.Cast
+? Stack = Chalice of the Void; Mox Ruby
+Bot1.Pass
+Bot1.Hand.Engineered Explosives.Cast(X: 0)
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Engineered Explosives.Cast(X: 1)
+[T2 Bot2.Main1]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield = Chalice of the Void; Mountain; Engineered Explosives
+Bot1.Battlefield.Engineered Explosives.Counters.Charge = 1
+Bot1.Graveyard = Engineered Explosives; Mox Ruby

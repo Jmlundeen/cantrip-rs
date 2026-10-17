@@ -1,0 +1,46 @@
+# On the stack a split card is only the half being cast, and has that half's mana value (CR 709.3b, 202.3d); in every other
+# zone it has the combined mana cost (CR 709.4b), here 8. Bot1's Chalice of the Void with two counters (X = 2, four mana)
+# counters Bot2's Cease, mana value 2: Bot2 neither gains 2 life (it stays on the 17 Bot1's Bolt left it) nor draws,
+# and the Bolt stays in Bot1's graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Chalice of the Void
+Lightning Bolt
+Mountain x10
+
+[Bot2 Deck]
+Swamp
+Mox Emerald
+Cease // Desist
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chalice of the Void.Cast(X: 2)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Chalice of the Void.Counters.Charge = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot2.Target(Bot1.Graveyard.Lightning Bolt)
+Bot2.Target()
+Bot2.Target(Bot2)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Life = 17
+Bot2.Hand.Count = 5
+Bot2.Graveyard = Cease // Desist
+Bot1.Graveyard = Black Lotus; Lightning Bolt

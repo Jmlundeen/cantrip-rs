@@ -1,0 +1,55 @@
+# Chalice of the Void, X = 1: {X}{X} is two mana (its ruling), and it enters with one charge counter (CR 614.1c). "Whenever
+# a player casts a spell with mana value equal to the number of charge counters on this artifact, counter that spell": its
+# controller's own Lightning Bolt (mana value 1) is countered - the trigger goes on the stack above it - and so is Bot2's on
+# turn 2, but Bot2's Mind Stone (mana value 2) is not.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Chalice of the Void
+Lightning Bolt
+Mountain
+Mountain x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Lightning Bolt
+Mind Stone
+Mountain x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Chalice of the Void.Cast(X: 1)
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Chalice of the Void.Counters.Charge = 1
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack = Chalice of the Void; Lightning Bolt
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack = Chalice of the Void; Lightning Bolt
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Mind Stone.Cast
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Life = 20
+Bot2.Life = 20
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield = Mountain; Mox Ruby; Mox Jet; Mind Stone
+Bot1.Battlefield.Chalice of the Void.Counters.Charge = 1
