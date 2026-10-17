@@ -1,14 +1,14 @@
 ---
 name: import-cards
-description: Implement every card of a list that the engine doesn't have yet. The list can come from any source - a CubeCobra cube (kept in docs/cube-lists and synced), a decklist (a file, an MTGO or Arena export, a deck in decks/), a set by code or name, a Scryfall search, a local text file, or names pasted in. Its missing cards go to parallel card agents (the add-cards skill), and the run ends with a plain, copyable list of the card faces and tokens that still need art. Takes the source and an agent count, and asks for either one that is missing. Use when asked to import, sync, update or refresh a cube, to add the cards of a deck, a set or a list, or to make a list of cards playable.
+description: Implement every card of a list that the engine doesn't have yet. The list can come from any source - a CubeCobra cube (kept in docs/cube-lists and synced), a decklist (a file, an MTGO or Arena export, a deck in decks/), a set by code or name, a Scryfall search, a local text file, or names pasted in. Its missing cards go to parallel card agents (the add-cards skill). Takes the source and an agent count, and asks for either one that is missing. Use when asked to import, sync, update or refresh a cube, to add the cards of a deck, a set or a list, or to make a list of cards playable.
 ---
 
 # Importing a list of cards
 
-One list per run, in four steps: **resolve** the source to card names, **keep** the list when it is a cube, **implement**
-every name on it that no card file defines, and **report** what still needs art. Every step covers that list and nothing
-else. This skill doesn't implement cards itself. Step 3 runs the `add-cards` skill, which runs its agents. This skill
-only adds what comes before and after it.
+One list per run, in three steps: **resolve** the source to card names, **keep** the list when it is a cube, and
+**implement** every name on it that no card file defines. Every step covers that list and nothing else. This skill
+doesn't implement cards itself. Step 3 runs the `add-cards` skill, which runs its agents. This skill only adds what
+comes before it and the report after it.
 
 ## Arguments
 
@@ -110,7 +110,7 @@ In the steps below, the list is `--file <scratchpad>/<name>.txt`.
 
 `python tools/maintenance/missing-cards.py <the list>` prints the names on the list that no card file defines, and
 `--count` gives the total. Show the user the list. For a cube it includes cards that were missing before this sync, and
-those are part of this run too. Cards on other lists are not part of it. If none are missing, skip to step 4.
+those are part of this run too. Cards on other lists are not part of it. If none are missing, skip to the report.
 
 ## 3. Implement them
 
@@ -119,29 +119,8 @@ coordinator: dispatch, gaps, landing, review and its *Finishing* report. A card 
 the final report with the gap. The names go to the agents in the order `missing-cards.py` prints them. Never sort them
 by difficulty.
 
-## 4. Report the art
+## Report
 
-Once every agent has finished and the cards have landed:
-
-```
-python tools/maintenance/missing-art.py <the list>
-python tools/maintenance/missing-art.py --tokens <the list>
-```
-
-The first prints, one per line, every face of a card on the list that has a card file and no art under
-`content/*/images/`. That means the front face, and also a back face, adventure, prepare face or split half under its
-own name on its own line. It covers the whole list, not only this run's cards, because what matters is everything the
-list still needs. `--tokens` does the same for the tokens those cards make.
-
-End the final report with the art, after everything `add-cards` reports:
-
-- One line saying how many card faces and how many tokens need art.
-- **The card faces**, in a fenced code block with no language tag: the exact output of the first command, one name per
-  line and nothing else. No bullets, no numbering, no face labels, no commentary inside the block. The user copies
-  the names straight from it, so a missing name, an extra word or reordered output defeats the point. If the output
-  is empty, write `No card faces need art.` instead of an empty block.
-- **The tokens**, in a second block of the same kind, under its own one-line heading.
-
-Report the source before the art. For a cube, give its list, its added and removed names (or the count, for a new
-list), and the commit that carried them. For anything else, give the source, how many names it had, and how many were
-missing.
+Once every agent has finished and the cards have landed, end with what `add-cards` reports, preceded by the source. For
+a cube, give its list, its added and removed names (or the count, for a new list), and the commit that carried them. For
+anything else, give the source, how many names it had, and how many were missing.
