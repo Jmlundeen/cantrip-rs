@@ -1,0 +1,6 @@
+{
+  "name": "Essence Scatter",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target creature spell."
+}

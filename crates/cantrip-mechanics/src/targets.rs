@@ -259,6 +259,15 @@ fn card_in_a_graveyard_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if { let o = q.obj(id); o.zone.is(ZoneKind::Graveyard) && o.became.is_none() })
 }
 
+fn creature_spell_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    spell_filter(q, asker, t) && matches!(t, Target::Object(id) if q.chars(id).is(CardType::Creature))
+}
+
+/// "Target creature spell" (CR 115.1, 111.1): a spell on the stack with the card type creature, whatever else it is (an
+/// artifact creature, an enchantment creature). Essence Scatter prints it; Stern Scolding's "creature spell with power or
+/// toughness 2 or less" starts from it.
+pub const CREATURE_SPELL: TargetSpec = target(creature_spell_filter);
+
 fn noncreature_spell_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     spell_filter(q, asker, t) && matches!(t, Target::Object(id) if !q.chars(id).is(CardType::Creature))
 }

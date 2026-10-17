@@ -1,0 +1,37 @@
+# "A creature spell is any spell with the card type creature, even if it has other types" (ruling): Bot2 first casts Mox Jet,
+# an artifact that is not a creature, and Essence Scatter is not offered against it (the refusal; the Mox resolves and
+# Bot1 passes). Then Bot2 casts Ornithopter, an artifact creature, and Bot1 counters it.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Essence Scatter
+Essence Scatter
+Island x3
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Ornithopter
+Swamp x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+? Stack = Mox Jet
+! Bot1.Hand.Essence Scatter.Cast
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+? Stack = Ornithopter
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Essence Scatter.Cast(Ornithopter)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Graveyard = Essence Scatter
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield = Mox Jet
