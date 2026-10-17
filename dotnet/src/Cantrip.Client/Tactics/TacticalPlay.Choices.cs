@@ -292,6 +292,13 @@ public sealed partial class TacticalPlay
         return best;
     }
 
+    /// <summary>The life a "Lose N life" choice costs, or 0 for any other.</summary>
+    private static int LifeLost(string mode)
+    {
+        System.Text.RegularExpressions.Match life = System.Text.RegularExpressions.Regex.Match(mode, @"^Lose (\d+) life$");
+        return life.Success ? int.Parse(life.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture) : 0;
+    }
+
     private static int MostCommonCreatureType(GameClient client, ChooseModesPromptMessage prompt)
     {
         List<ObjectView> mine = [.. Creatures(client, client.Seat), .. client.MyHand().Where(IsCreature)];
@@ -357,6 +364,26 @@ public sealed partial class TacticalPlay
             int discard = prompt.Modes.FindIndex(mode => mode == "Discard a card");
             bool spare = discard >= 0 && prompt.Eligible.Contains(discard) && client.MyHand().Count >= 5;
             return new ModesChosenAnswer { Modes = [spare ? discard : neither] };
+        }
+
+        // "Each opponent loses 4 life unless that player sacrifices a nonland permanent of their choice or discards a card"
+        // (Rottenmouth Viper), asked of this seat once for each time: the life while losing it costs less than a card does
+        // (never the last of it), otherwise a card from the hand, otherwise the least of its permanents (which the choice of
+        // permanent after it picks).
+        if (!prompt.AdditionalCost && prompt.Heading.Length == 0 && prompt.Count == 1
+            && prompt.Modes.FindIndex(mode => LifeLost(mode) > 0) is int lose and >= 0
+            && prompt.Modes.Exists(mode => mode.StartsWith("Sacrifice a", StringComparison.Ordinal) || mode == "Discard a card"))
+        {
+            int mine = LifeOf(view, client.Seat);
+            int loss = LifeLost(prompt.Modes[lose]);
+            double hurts = _model.Life(mine) - _model.Life(mine - loss);
+            int discard = prompt.Modes.FindIndex(mode => mode == "Discard a card");
+            int sacrifice = prompt.Modes.FindIndex(mode => mode.StartsWith("Sacrifice a", StringComparison.Ordinal));
+            int chosen = mine - loss > 0 && hurts < _model.Card ? lose
+                : discard >= 0 && prompt.Eligible.Contains(discard) ? discard
+                : sacrifice >= 0 && prompt.Eligible.Contains(sacrifice) ? sacrifice
+                : lose;
+            return new ModesChosenAnswer { Modes = [chosen] };
         }
 
         // Discarding one card instead of two (Steamcore Scholar): the cheaper discard, whenever it is offered.

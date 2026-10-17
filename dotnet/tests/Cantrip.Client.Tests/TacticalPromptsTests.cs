@@ -167,6 +167,43 @@ public sealed class TacticalPromptsTests
         Assert.Single(answer.Modes);
     }
 
+    // --- Rottenmouth Viper: "each opponent loses 4 life unless that player sacrifices a nonland permanent ... or discards" -
+
+    private static ChooseModesPromptMessage Punished() => new()
+    {
+        Player = Me,
+        Modes = ["Sacrifice a nonland permanent", "Discard a card", "Lose 4 life"],
+        Eligible = [0, 1, 2],
+        Count = 1,
+    };
+
+    [Fact]
+    public void Pays_the_punishment_in_life_while_life_is_comfortable()
+    {
+        GameClient client = Seated([InHand(1, "Island", CardTypeView.Land, 0, ""), Creature(2, "Giant", 4, 3, Me)], myLife: 20);
+
+        Assert.Equal([2], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Punished())).Modes);
+    }
+
+    [Fact]
+    public void Discards_rather_than_lose_the_last_of_its_life()
+    {
+        GameClient client = Seated([InHand(1, "Island", CardTypeView.Land, 0, ""), Creature(2, "Giant", 4, 3, Me)], myLife: 4);
+
+        Assert.Equal([1], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, Punished())).Modes);
+    }
+
+    [Fact]
+    public void Sacrifices_when_it_cannot_afford_the_life_and_has_no_card_to_discard()
+    {
+        GameClient client = Seated([Creature(2, "Giant", 4, 3, Me)], myLife: 3);
+        ChooseModesPromptMessage prompt = Punished();
+        prompt.Modes = ["Sacrifice a nonland permanent", "Lose 4 life"];
+        prompt.Eligible = [0, 1];
+
+        Assert.Equal([0], Assert.IsType<ModesChosenAnswer>(Bot().Decide(client, prompt)).Modes);
+    }
+
     // --- Chandra, Spark Hunter's +2: "You may sacrifice an artifact or discard a card. If you do, draw a card." ---------
 
     private static ChooseModesPromptMessage SacrificeOrDiscard() => new()
