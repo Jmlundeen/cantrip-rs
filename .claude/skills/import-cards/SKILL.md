@@ -1,6 +1,6 @@
 ---
 name: import-cards
-description: Implement every card of a list that the engine doesn't have yet. The list can come from any source - a CubeCobra cube (kept in docs/cube-lists and synced), a decklist (a file, an MTGO or Arena export, a deck in decks/), a set by code or name, a Scryfall search, a local text file, or names pasted in. Its missing cards go to parallel card agents (the add-cards skill). Takes the source and an agent count, and asks for either one that is missing. Use when asked to import, sync, update or refresh a cube, to add the cards of a deck, a set or a list, or to make a list of cards playable.
+description: Implement every card of a list that the engine doesn't have yet. The list can come from any source - a CubeCobra cube (kept in docs/cube-lists and synced), a decklist (a file, an MTGO or Arena export, a deck in decks/ - main deck and sideboard), a set by code or name, a Scryfall search, a local text file, or names pasted in. Its missing cards go to parallel card agents (the add-cards skill). Takes the source and an agent count, and asks for either one that is missing. Use when asked to import, sync, update or refresh a cube, to add the cards of a deck, a set or a list, or to make a list of cards playable.
 ---
 
 # Importing a list of cards
@@ -93,9 +93,12 @@ python tools/maintenance/card-list.py "set:Modern Horizons 3" --out <scratchpad>
 python tools/maintenance/card-list.py "query:o:earthbend" --out <scratchpad>/<name>.txt
 ```
 
-- A decklist may use `4 Name`, `4x Name`, `Name (SET) 123` or `SB: Name` lines, and section headers. The sideboard,
-  commander and companion are included, but a maybeboard is not. Use `--main-only` when the user asks for the
-  mainboard alone.
+- A decklist may use `4 Name`, `4x Name`, `Name (SET) 123` or `SB: Name` lines, and section headers.
+- **The sideboard is part of the deck.** A deck is complete only when every card in its main deck *and* its sideboard
+  has a card file, so the sideboard is always imported, whatever form it takes: a `Sideboard` header, `SB:` lines, or
+  the cards after the blank line of an MTGO or Arena export. The commander and companion are included too; a
+  maybeboard is not. Never pass `--main-only` for an import, and never report a deck done, or skip its sideboard cards
+  as optional, while a sideboard card is missing.
 - A set is every card Scryfall lists in it: basics, promos and reprints included, tokens and art cards left out.
   Cards that already have card files are left out at step 2 anyway.
 - Write the list to the scratchpad. It belongs to this run, not to the repository. A decklist goes into `decks/` only
