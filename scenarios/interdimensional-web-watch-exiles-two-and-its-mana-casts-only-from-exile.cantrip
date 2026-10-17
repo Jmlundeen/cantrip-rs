@@ -2,7 +2,8 @@
 # next turn, you may play those cards." and "{T}: Add two mana in any combination of colors. Spend this mana only to cast
 # spells from exile" (CR 106.6, 601.2a). Turn 1 (Black Lotus and the Mountain pay for it) it exiles Lightning Bolt and a
 # Mountain from the top; tapped for {R}{R} its mana can't cast the Lightning Bolt in the hand (every land tapped) - the
-# refusal - but casts the exiled one at Bot2. Turn 3, Bot1's next turn, the exiled Mountain is played from exile (a land
+# refusal - but casts the exiled one at Bot2; the {R} left can't pay Sensei's Divining Top's "{1}: Look at the top three
+# cards" either, an ability and no spell (the Top was cast with Mox Ruby's {R}, the Mox tapped). Turn 3, Bot1's next turn, the exiled Mountain is played from exile (a land
 # play, CR 305.1), and the Watch's two mana are of two colors this time, {W}{G} (CR 106.1b).
 
 [Bot1 Deck]
@@ -10,8 +11,8 @@ Mountain
 Black Lotus
 Interdimensional Web Watch
 Lightning Bolt
-Island
-Island
+Mox Ruby
+Sensei's Divining Top
 Island
 Lightning Bolt
 Mountain
@@ -22,6 +23,11 @@ Island x20
 
 [Actions]
 Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sensei's Divining Top.Cast
+Bot1.Pass
+Bot2.Pass
 Bot1.Battlefield.Mountain.Activate
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
@@ -39,6 +45,7 @@ Bot1.Exile.Lightning Bolt.Cast(Bot2)
 Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana = {R} (SpellsFromExile)
+! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look)
 [T3 Bot1.Main1]
 Bot1.Exile.Mountain.Play
 Bot1.Battlefield.Interdimensional Web Watch.Activate
@@ -49,5 +56,5 @@ Bot1.Colors(White; Green)
 Turn = 3
 Bot2.Life = 17
 Exile.Count = 0
-Bot1.Battlefield = Interdimensional Web Watch; Mountain; Mountain
+Bot1.Battlefield = Interdimensional Web Watch; Mountain; Mountain; Mox Ruby; Sensei's Divining Top
 Bot1.Graveyard = Lightning Bolt; Black Lotus

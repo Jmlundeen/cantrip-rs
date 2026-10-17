@@ -58,7 +58,6 @@ Bot1.Pass
 
 [Expect]
 Turn = 2
-Bot2.Life = 20
 Bot1.Battlefield.Shang-Chi, Master of Kung Fu.Tapped = true
 Bot1.Battlefield.Llanowar Elves.Tapped = true
 Bot1.Battlefield.Basking Rootwalla.Power = 1

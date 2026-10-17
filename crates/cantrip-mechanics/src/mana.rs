@@ -140,8 +140,12 @@ pub fn land_tapped_for_mana(q: &dyn Query, event: &Event) -> Option<(ObjectId, P
 
 /// The trigger of "that player adds one mana of any type that land produced": about the land, with the player who tapped
 /// it (`data[0]`) and the types of mana it produced (`data[1]`, a bit for each `Mana` it produced), which the ability
-/// resolving reads (`add_one_mana_of_any_type_that_land_produced`).
+/// resolving reads (`add_one_mana_of_any_type_that_land_produced`). None when it produced nothing, which triggers nothing
+/// (CR 106.12a).
 pub fn that_land_produced(land: ObjectId, player: PlayerId, produced: ManaPool) -> Option<Fired> {
+    if produced.is_empty() {
+        return None;
+    }
     let types = Mana::ALL.iter().filter(|&&m| produced.get(m) > 0).fold(0u32, |types, &m| types | 1 << m as u32);
     Some(Fired { subject: Target::Object(land), data: [player.0 as u32, types] })
 }
@@ -157,7 +161,6 @@ pub fn add_one_mana_of_any_type_that_land_produced(g: &mut dyn Game, item: &Stac
     let player = PlayerId(item.data[0] as u8);
     let types: Vec<Mana> = Mana::ALL.into_iter().filter(|&m| item.data[1] & 1 << m as u32 != 0).collect();
     let mana = match types.as_slice() {
-        [] => return Ok(()),
         [one] => *one,
         _ => {
             let source = item.object;

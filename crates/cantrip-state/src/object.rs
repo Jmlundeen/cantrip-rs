@@ -894,9 +894,10 @@ pub enum ManaRestriction {
     /// cast from exile, its ruling: not only the cards its own ability exiled).
     SpellsFrom(ZoneKind),
     /// "This mana can't be spent to cast spells from your [zone]" (CR 106.6, 601.2a): everything but casting a spell from
-    /// a zone of this kind - an ability, or a spell cast from anywhere else. A player casts only from their own hand (no
-    /// card lets one cast from another's), so "your hand" is the hand. From your hand: Heartwood Crafter (its prepare
-    /// spell's copy is cast from exile, CR 722.3).
+    /// a zone of this kind - an ability, or a spell cast from anywhere else. Only the kind of zone is read: "your hand" is
+    /// the hand, as no card in the engine lets a player cast from another player's hand (Sen Triplets would, and would need
+    /// the hand's owner compared with the payer). From your hand: Heartwood Crafter (its prepare spell's copy is cast from
+    /// exile, CR 722.3).
     NotSpellsFrom(ZoneKind),
 }
 

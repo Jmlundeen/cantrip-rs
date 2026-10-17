@@ -1,0 +1,44 @@
+# An ability that triggers whenever a permanent "is tapped for mana" triggers when such a mana ability resolves and
+# produces mana (CR 106.12a). Yavimaya, Cradle of Growth makes Gaea's Cradle a Forest, so Nissa, Who Shakes the World's
+# "Whenever you tap a Forest for mana, add an additional {G}" would see it tapped; but with no creature on Bot1's side the
+# Cradle's "{T}: Add {G} for each creature you control" produces nothing, and Nissa adds nothing: the pool stays empty
+# (the Cradle, a Forest, could have tapped for {G} with the Forest's own ability instead, CR 305.6).
+# The basic Forest tapped beside it, the control, makes {G}{G}. Nissa comes on turn 1 (the Forest and two Black Lotuses).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Black Lotus
+Nissa, Who Shakes the World
+Yavimaya, Cradle of Growth
+Gaea's Cradle
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Nissa, Who Shakes the World.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Yavimaya, Cradle of Growth.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Gaea's Cradle.Play
+? Bot1.Battlefield.Gaea's Cradle.Subtypes = Forest
+Bot1.Battlefield.Gaea's Cradle.Activate(Ability: for each creature)
+? Bot1.Mana =
+Bot1.Battlefield.Forest.Activate
+? Bot1.Mana = {G}{G}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Gaea's Cradle.Tapped = true
+Bot1.Mana = {G}{G}

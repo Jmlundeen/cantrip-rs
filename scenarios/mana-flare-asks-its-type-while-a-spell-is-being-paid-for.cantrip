@@ -1,0 +1,43 @@
+# Mana Flare's question - which type of the {W}{U} Azorius Chancery produced to add (CR 106.12a, 605.4a) - asked while a
+# spell is being paid for (CR 601.2g: mana abilities are activated during the payment). Turn 5 Bot1 casts Brainstorm with
+# an empty pool and taps the Chancery from the payment; the Flare asks, Bot1 chooses {U}, a {U} pays for Brainstorm and
+# {W}{U} are left in the pool. Brainstorm resolves: three cards drawn, two Islands put back.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mana Flare
+Azorius Chancery
+Brainstorm
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mana Flare.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Azorius Chancery.Play
+Bot1.Choose(Mountain)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Brainstorm.Cast(Spend: U)
+Bot1.Battlefield.Azorius Chancery.Activate
+Bot1.Modes({U})
+Bot1.Pass
+? Bot1.Mana = {W}{U}
+Bot2.Pass
+Bot1.Choose(Island; Island)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Brainstorm; Black Lotus
+Bot1.Mana = {W}{U}
+Bot1.Battlefield.Azorius Chancery.Tapped = true

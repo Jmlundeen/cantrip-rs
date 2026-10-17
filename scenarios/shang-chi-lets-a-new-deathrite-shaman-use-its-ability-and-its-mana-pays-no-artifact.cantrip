@@ -1,0 +1,54 @@
+# Shang-Chi, Master of Kung Fu on a {T} ability that is no mana ability (CR 302.6, 602.2b) and its mana's limit to
+# "abilities of creature sources" (CR 106.6). Turn 1 Bot1 casts Shang-Chi, Deathrite Shaman and Sensei's Divining Top
+# (the Forest and Black Lotus), and Mox Ruby's {R} casts Lightning Bolt at Bot2. Shang-Chi taps for {B}{B}: that mana,
+# the only mana there is, can't pay the Top's "{1}: Look at the top three cards" (an artifact source) - the refusal - but
+# pays the Deathrite's "{B}, {T}: Exile target instant or sorcery card from a graveyard. Each opponent loses 2 life", its
+# {T} paid though the Deathrite arrived this turn. Bot2 is at 15 and the Bolt in exile; one {B} is left.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Shang-Chi, Master of Kung Fu
+Deathrite Shaman
+Sensei's Divining Top
+Mox Ruby
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Shang-Chi, Master of Kung Fu.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Deathrite Shaman.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Sensei's Divining Top.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Battlefield.Shang-Chi, Master of Kung Fu.Activate(Color: Black)
+? Bot1.Mana = {B}{B} (CreatureAbilities)
+! Bot1.Battlefield.Sensei's Divining Top.Activate(Ability: Look)
+Bot1.Battlefield.Deathrite Shaman.Activate(Ability: instant or sorcery; Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {B} (CreatureAbilities)
+
+[Expect]
+Turn = 1
+Bot2.Life = 15
+Exile = Lightning Bolt
+Bot1.Battlefield.Deathrite Shaman.Tapped = true
+Bot1.Battlefield.Deathrite Shaman.SummoningSick = true

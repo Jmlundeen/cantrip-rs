@@ -48,6 +48,7 @@ keeps it).
 | [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
 | [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
+| [KI-29](#ki-29-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 
 ## Issues
 
@@ -321,3 +322,17 @@ skip this turn". The choice is still right; only the name is missing. A fix carr
 **Scenarios.**
 - [`scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip`](../scenarios/ral-zarek-guest-lecturer-skipped-turn-and-time-vault-in-the-browser.cantrip) -
   the named case, the page having seen Ral; the unnamed one needs a reconnect, which no scenario does.
+### KI-29: The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-16, review of Shang-Chi, Master of Kung Fu |
+
+**Notes.** Under Shang-Chi, Master of Kung Fu ("You may activate abilities of creatures you control as though those creatures
+had haste", CR 302.6; `CardDef::activate_as_though_haste`) the engine offers the {T} mana abilities of creatures that came
+this turn, Shang-Chi's own among them, but the tactical bot's mana planning
+(`dotnet/src/Cantrip.Client/Tactics/TacticalPlay.Priority.cs`, the source counts that skip `SummoningSick` creatures) leaves
+them out, so it plans with less mana than it has. The view has no word for the permission; a fix counts a sick creature as
+a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
+
+**Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
