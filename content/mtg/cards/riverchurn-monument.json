@@ -1,0 +1,6 @@
+{
+  "name": "Riverchurn Monument",
+  "manaCost": "{1}{U}",
+  "type": "Artifact",
+  "oracleText": "{1}, {T}: Any number of target players each mill two cards. (Each of them puts the top two cards of their library into their graveyard.)\nExhaust — {2}{U}{U}, {T}: Any number of target players each mill cards equal to the number of cards in their graveyard. (Activate each exhaust ability only once.)"
+}

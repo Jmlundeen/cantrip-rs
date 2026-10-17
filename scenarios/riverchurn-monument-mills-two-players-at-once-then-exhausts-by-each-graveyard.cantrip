@@ -1,0 +1,96 @@
+# Riverchurn Monument: "{1}, {T}: Any number of target players each mill two cards" and "Exhaust - {2}{U}{U}, {T}: Any
+# number of target players each mill cards equal to the number of cards in their graveyard. (Activate each exhaust
+# ability only once.)" On turn 3 Bot1 targets both players: each mills their top two, the second card above the first
+# (CR 701.17). On turn 4 Bot2 bolts Bot1, so Bot2's graveyard holds three cards to Bot1's two. On turn 5 the exhaust
+# targets both: Bot1 mills two and Bot2 three, each by their own graveyard as it resolves. On turn 7 the exhaust is
+# not offered again, with its mana there, while the first ability still is (the positive control), at Bot2 alone.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Riverchurn Monument
+Island
+Island
+Island
+Swamp
+Forest
+Plains
+Swamp
+Forest
+Plains
+Swamp
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Mountain
+Mountain
+Mountain
+Mountain
+Swamp
+Forest
+Plains
+Swamp
+Forest
+Plains
+Island
+Swamp
+Ornithopter
+Ornithopter
+Mountain x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Riverchurn Monument.Cast
+Bot1.Pass
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Riverchurn Monument.Activate(Ability: {1}, {T})
+Bot1.Target(Bot1; Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Plains; Forest
+? Bot2.Graveyard = Plains; Forest
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Riverchurn Monument.Activate(Ability: Exhaust)
+Bot1.Target(Bot1; Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Plains; Forest; Plains; Forest
+? Bot2.Graveyard = Island; Plains; Forest; Lightning Bolt; Plains; Forest
+[T7 Bot1.Main1]
+! Bot1.Battlefield.Riverchurn Monument.Activate(Ability: Exhaust)
+Bot1.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Riverchurn Monument.Activate(Ability: {1}, {T})
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot1.Graveyard = Plains; Forest; Plains; Forest
+Bot2.Graveyard = Ornithopter; Ornithopter; Island; Plains; Forest; Lightning Bolt; Plains; Forest
+Bot1.Battlefield.Riverchurn Monument.Tapped = true

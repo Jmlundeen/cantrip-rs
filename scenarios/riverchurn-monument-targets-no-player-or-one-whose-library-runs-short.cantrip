@@ -1,0 +1,60 @@
+# Riverchurn Monument: "{1}, {T}: Any number of target players each mill two cards." Any number is none too (CR 115.1d,
+# 601.2c): on turn 1 Bot1 activates it with the {C} left over from casting it and chooses no player - the Monument is
+# tapped and nobody mills. On turn 3 Bot1 targets Bot2 alone, whose library holds one card: the same player can't be
+# chosen twice for one "target" (CR 115.3), so Bot2 named twice is refused, and Bot2 mills the one card there is
+# (CR 701.17b: as many as possible) without losing - milling is not drawing (CR 704.5b). Bot1 mills nothing.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Mox Sapphire
+Riverchurn Monument
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain x7
+Swamp
+Plains
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Riverchurn Monument.Cast
+Bot1.Pass
+? Bot1.Mana = {C}
+Bot1.Battlefield.Riverchurn Monument.Activate(Ability: {1}, {T})
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Riverchurn Monument.Tapped = true
+? Bot1.Graveyard.Count = 0
+? Bot2.Graveyard.Count = 0
+? Bot1.Library.Count = 10
+? Bot2.Library.Count = 2
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Riverchurn Monument.Activate(Ability: {1}, {T})
+! Bot1.Target(Bot2; Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Result = InProgress
+Bot2.Status = (absent)
+Bot2.Graveyard = Plains
+Bot2.Library.Count = 0
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 9
+Bot1.Battlefield.Riverchurn Monument.Tapped = true
