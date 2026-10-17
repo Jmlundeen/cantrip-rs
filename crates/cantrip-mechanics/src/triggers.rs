@@ -955,7 +955,34 @@ pub fn opponent_activates_ability_of_artifact_creature_or_land(q: &dyn Query, me
     if permanent && opponent && !def.is_mana_ability() { Fired::about(Target::Player(player)) } else { None }
 }
 
+/// The ability an activation put on the stack (CR 602.2a), as a `Target::Ability` naming it there, for "copy that ability"
+/// (`Game::copy_ability`): the topmost activated ability of that source and ability, which, as triggers are collected the
+/// moment the activation is complete (CR 602.2i, 603.2), is the one just activated. Rings of Brighthearth, Kurkesh,
+/// Illusionist's Bracers, Battlemage's Bracers and Locus of Enlightenment copy it.
+pub fn activated_ability_on_stack(q: &dyn Query, event: &Event) -> Option<Target> {
+    let Event::AbilityActivated { source, ability, .. } = *event else { return None };
+    q.state()
+        .stack
+        .iter()
+        .rev()
+        .find(|i| i.kind == StackKind::Activated && i.object == source && i.ability == ability)
+        .map(|i| Target::Ability(i.serial))
+}
+
+/// "Whenever you activate an ability that isn't a mana ability" (CR 602.2, 605.1a, 603.2): any ability this ability's
+/// controller activates that uses the stack, wherever its source is, about that ability on the stack (to copy it,
+/// `activated_ability_on_stack`). Locus of Enlightenment prints it, and Rings of Brighthearth as "if it isn't a mana ability".
+pub fn you_activate_a_nonmana_ability(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    let (_, player, def) = activation(q, event)?;
+    if player != me.controller || def.is_mana_ability() {
+        return None;
+    }
+    Fired::about(activated_ability_on_stack(q, event)?)
+}
+
 // --- The triggers, each with the events it listens to: `triggered(THIS_ENTERS, effect, text)` ---------------------
+
+pub const YOU_ACTIVATE_A_NONMANA_ABILITY: Trigger = when_asked(EventMask::ABILITY_ACTIVATED, you_activate_a_nonmana_ability);
 
 pub const THIS_ENTERS: Trigger = when(EventMask::ZONE_CHANGE, this_enters);
 pub const THIS_ENTERS_IF_CAST: Trigger = when(EventMask::ZONE_CHANGE, this_enters_if_cast);

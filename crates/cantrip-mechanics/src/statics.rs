@@ -267,6 +267,24 @@ pub fn chosen_name_activations_barred(q: &dyn Query, asker: &Asker, source: Obje
     def.is_mana_ability() || !q.obj(asker.source).marks.chosen_card.is_some_and(|name| crate::library::object_has_name(q, source, name))
 }
 
+/// "Has all activated abilities of [these cards]" (CR 602.1, 613.1f), a layer-6 apply: each activated ability each of
+/// `cards` prints, in order, the affected object's own as written, so it is the ability's source and "this [card]" means it
+/// (CR 113.7, the Locus of Enlightenment ruling). A special action is no ability (CR 116.2). The same ability twice is two
+/// abilities (CR 602.5c). Agatha's Soul Cauldron (the creature cards exiled with it) and Locus of Enlightenment (the exiled
+/// cards used to craft it) grant them.
+pub fn grant_activated_abilities_of(view: &dyn LayerQuery, cards: &[CardId], chars: &mut Chars) {
+    for &card in cards {
+        for (index, ability) in view.cards().get(card).abilities.iter().enumerate() {
+            if !matches!(ability, AbilityDef::Activated(a) if !a.special_action) {
+                continue;
+            }
+            if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+                chars.abilities[slot] = Some(AbilityRef { card, index: index as u8 });
+            }
+        }
+    }
+}
+
 /// "Has [an ability]" (CR 113.6, 613.1f) for the card's delayed ability number 0: a static ability that gives the objects it
 /// affects the ability the card lists first in `delayed` (the card as the source has it now, or the card it copies).
 /// Astrologian's Planisphere, Decaying Soil, Deconstruction Hammer, Footfall Crater, Hexing Squelcher, Kaldra Compleat,
