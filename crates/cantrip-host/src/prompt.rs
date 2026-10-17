@@ -822,13 +822,17 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             heading: "Choose a creature type".into(),
             ..Default::default()
         }),
-        RequestKind::ChooseColors { source, choices, count } => PromptPayload::ChooseColorsPromptMessage(ChooseColorsPrompt {
+        RequestKind::ChooseColors { source, choices, count, purpose } => PromptPayload::ChooseColorsPromptMessage(ChooseColorsPrompt {
             player,
             source: source_handle(game, handles, *source),
             choices: colors_view(*choices),
             count: i32::from(*count),
             may_repeat: i32::from(*count) > choices.iter().count() as i32,
-            verb: String::new(),
+            verb: match purpose {
+                ColorUse::Any => String::new(),
+                ColorUse::AddMana => "AddMana".into(),
+                ColorUse::Benefit => "Benefit".into(),
+            },
         }),
         RequestKind::ChooseName { source, looked_at, suggestion, kind } => {
             let mut names: Vec<String> = game

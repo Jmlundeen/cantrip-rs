@@ -397,6 +397,13 @@ public static partial class CardReading
             return new EffectRead(EffectKind.Steal);
         }
 
+        // "Target opponent gains control of target permanent you control" gives one of its own permanents away: not a spell that
+        // helps or hurts a target, so it is left unread and the seat does not cast it.
+        if (plain.Contains("gains control of target", StringComparison.Ordinal))
+        {
+            return default;
+        }
+
         if (plain.Contains("target", StringComparison.Ordinal) && plain.Contains("loses all abilities", StringComparison.Ordinal)
             && BaseSizeClause().Match(plain) is { Success: true } reshaped)
         {

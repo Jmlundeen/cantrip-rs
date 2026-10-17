@@ -31,7 +31,7 @@ pub fn controls_land_type(q: &dyn Query, controller: PlayerId, land_type: Subtyp
 /// permanent (CR 607.2d). Sunken Citadel and Valgavoth's Lair print it.
 pub fn enters_tapped_choosing_a_color(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     entering.tapped = true;
-    entering.chosen_color = Some(crate::choose_color(g, entering.controller, entering.object)?);
+    entering.chosen_color = Some(crate::choose_color_for(g, entering.controller, entering.object, ColorUse::Benefit)?);
     Ok(())
 }
 

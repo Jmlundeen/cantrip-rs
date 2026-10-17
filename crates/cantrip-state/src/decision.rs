@@ -283,7 +283,8 @@ pub enum RequestKind {
     /// marks choices that are costs (Phyrexian mana paid with life, CR 107.4f) rather than modes; `repeat` lets one
     /// mode be chosen more than once (CR 700.2d).
     ChooseModes { source: ObjectId, modes: Vec<Label>, eligible: Vec<u8>, count: u8, at_most: u8, affordable: Vec<u8>, additional_cost: bool, repeat: bool },
-    ChooseColors { source: ObjectId, choices: ColorSet, count: u8 },
+    /// `purpose` says what the colors are for, which a player or a bot choosing them reads (`ColorUse`).
+    ChooseColors { source: ObjectId, choices: ColorSet, count: u8, purpose: ColorUse },
     /// A card name (CR 201.3, 614.12a): any card the game knows. `looked_at` are the cards the player has just been
     /// shown, and `suggestion` the name an unscripted player takes (the costliest nonland card among them).
     /// `kind` is what the name must be the name of (CR 201.4a): any card, a nonland card or a land card.
@@ -528,6 +529,18 @@ impl Question {
     pub const fn no_default(self) -> Self {
         Question { yes_is_default: false, ..self }
     }
+}
+
+/// What a choice of colors is for (CR 105.1), as far as the chooser needs to know to choose well.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum ColorUse {
+    /// Nothing is said of it: the effect's own use (a color to protect from, a color everything becomes).
+    Any,
+    /// The color of mana to add (CR 106.1b): a color the chooser's hand asks for.
+    AddMana,
+    /// A color that helps the chooser: the one most of their own creatures and spells are, for "creatures you control of the
+    /// chosen color get +1/+0" or "mana of the chosen color".
+    Benefit,
 }
 
 /// Why a player is choosing.

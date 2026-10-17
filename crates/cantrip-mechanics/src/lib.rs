@@ -459,8 +459,14 @@ pub fn counters_divided(g: &mut dyn Game, item: &StackItem, kind: CounterKind) {
 
 /// A one-color choice (CR 105.1), asked of `player`.
 pub fn choose_color(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<Color, Suspend> {
+    choose_color_for(g, player, source, ColorUse::Any)
+}
+
+/// A one-color choice (CR 105.1) with what it is for said (`ColorUse`): "a color that benefits you" (Heraldic Banner, Sunken
+/// Citadel) or the color of mana to add (Deathrite Shaman, Ashling Rekindled, Boommobile).
+pub fn choose_color_for(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: ColorUse) -> Result<Color, Suspend> {
     // The core holds the answer to the question: exactly one of the five colors (`validate`).
-    let Answer::Colors(colors) = g.ask(player, RequestKind::ChooseColors { source, choices: ColorSet(0b11111), count: 1 })? else {
+    let Answer::Colors(colors) = g.ask(player, RequestKind::ChooseColors { source, choices: ColorSet(0b11111), count: 1, purpose })? else {
         unreachable!("the core answers a color choice with colors")
     };
     Ok(colors[0])
@@ -471,7 +477,7 @@ pub fn choose_color(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Res
 /// Coalition Relic, Wizard's Rockets, Desolation of Smaug and Sarkhan, Fireblood ask it.
 pub fn choose_colors(g: &mut dyn Game, player: PlayerId, source: ObjectId, choices: ColorSet, count: u8) -> Result<Vec<Color>, Suspend> {
     // The core holds the answer to the question: `count` colors, each among `choices` (`validate`).
-    let Answer::Colors(colors) = g.ask(player, RequestKind::ChooseColors { source, choices, count })? else {
+    let Answer::Colors(colors) = g.ask(player, RequestKind::ChooseColors { source, choices, count, purpose: ColorUse::AddMana })? else {
         unreachable!("the core answers a color choice with colors")
     };
     Ok(colors)

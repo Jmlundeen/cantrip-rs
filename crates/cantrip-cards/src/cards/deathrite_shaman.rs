@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_oracle as oracle;
-use cantrip_mechanics::{choose_color, exile_target, targets::card_in_graveyard};
+use cantrip_mechanics::{choose_color_for, exile_target, targets::card_in_graveyard};
 
 fn land_card(q: &dyn Query, _: &Asker, t: Target) -> bool {
     card_in_graveyard(q, t, &[CardType::Land])
@@ -18,7 +18,7 @@ fn creature_card(q: &dyn Query, _: &Asker, t: Target) -> bool {
 /// the mana added only as it resolves, and not at all if its target is gone.
 fn exile_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if exile_target(g, item, 0) {
-        let color = choose_color(g, item.controller, item.object)?;
+        let color = choose_color_for(g, item.controller, item.object, ColorUse::AddMana)?;
         g.add_mana(item.controller, color.mana(), 1);
     }
     Ok(())

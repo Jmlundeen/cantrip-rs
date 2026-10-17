@@ -801,8 +801,9 @@ public sealed partial class TacticalPlay
     }
 
     /// <summary>
-    /// A color: for protection, that of whatever is being protected from; for mana, one its hand asks for; and
-    /// otherwise the one its opponents have most of.
+    /// A color: for protection, that of whatever is being protected from; for mana, one its hand asks for; for a color that
+    /// benefits it ("creatures you control of the chosen color get +1/+0"), the one most of its own creatures and spells in
+    /// hand are; and otherwise the one its opponents have most of.
     /// </summary>
     private AnswerPayload Colors(GameClient client, PlayerView view, ChooseColorsPromptMessage prompt)
     {
@@ -815,9 +816,17 @@ public sealed partial class TacticalPlay
             .Where(card => card.Zone is ZoneKindView.Battlefield or ZoneKindView.Stack && !Mine(client, card))
             .SelectMany(card => card.Colors);
 
-        IEnumerable<ColorView> source = prompt.Verb == "AddMana"
-            ? client.MyHand().Where(card => !IsLand(card)).SelectMany(card => card.Colors)
-            : _threat.Count > 0 ? _threat : theirs;
+        IEnumerable<ColorView> hand = client.MyHand().Where(card => !IsLand(card)).SelectMany(card => card.Colors);
+        IEnumerable<ColorView> ours = view.Objects
+            .Where(card => card.Zone == ZoneKindView.Battlefield && Mine(client, card) && IsCreature(card))
+            .SelectMany(card => card.Colors);
+
+        IEnumerable<ColorView> source = prompt.Verb switch
+        {
+            "AddMana" => hand,
+            "Benefit" => ours.Concat(hand),
+            _ => _threat.Count > 0 ? _threat : theirs,
+        };
 
         List<ColorView> ranked = [.. source
             .Where(prompt.Choices.Contains)

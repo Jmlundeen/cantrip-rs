@@ -1,12 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose_color, crew::crew, damage_target, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{choose_color_for, crew::crew, damage_target, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 /// "When this Vehicle enters, add four mana of any one color. Spend this mana only to activate abilities." A triggered
 /// ability that adds mana is no mana ability (CR 605.1b): it resolves from the stack, the color chosen then (CR 106.5,
 /// 106.6). The four may go to one ability or to several (its ruling).
 fn four_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let color = choose_color(g, item.controller, item.object)?;
+    let color = choose_color_for(g, item.controller, item.object, ColorUse::AddMana)?;
     g.add_restricted_mana(item.controller, color.mana(), 4, ManaRestriction::ABILITIES);
     Ok(())
 }

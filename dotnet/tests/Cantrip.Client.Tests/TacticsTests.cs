@@ -162,6 +162,13 @@ public sealed class CardReadingTests
     }
 
     [Fact]
+    public void A_donation_of_its_own_permanent_is_left_unread_not_taken_for_help_or_a_steal()
+    {
+        Assert.Equal(default, CardReading.Effect("Target opponent gains control of target permanent you control."));
+        Assert.Equal(EffectKind.Steal, CardReading.Effect("Gain control of target creature until end of turn.").Kind);
+    }
+
+    [Fact]
     public void A_modal_card_is_read_one_mode_at_a_time()
     {
         IReadOnlyList<string> modes = CardReading.Modes("Choose one —\n• Abrade deals 3 damage to target creature.\n• Destroy target artifact.");

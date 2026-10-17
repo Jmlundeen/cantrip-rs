@@ -29,7 +29,7 @@ pub fn color_word_or_basic_land_type(g: &mut dyn Game, player: PlayerId, source:
 
 /// One color of `choices`.
 fn one_color(g: &mut dyn Game, player: PlayerId, source: ObjectId, choices: ColorSet) -> Result<Color, Suspend> {
-    let ask = RequestKind::ChooseColors { source, choices, count: 1 };
+    let ask = RequestKind::ChooseColors { source, choices, count: 1, purpose: ColorUse::Any };
     let Answer::Colors(colors) = g.ask(player, ask)? else { unreachable!("the core answers a color choice with colors") };
     Ok(colors[0])
 }

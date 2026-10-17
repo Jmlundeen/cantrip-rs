@@ -54,7 +54,7 @@ fn pay_red(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// The mana pays only for casting a spell whose mana value is 4 or greater on the stack, X counted (CR 106.6, 202.3e;
 /// its ruling), and empties from the pool at the end of the step or phase like any mana (CR 106.4).
 fn add_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let color = cantrip_mechanics::choose_color(g, item.controller, item.object)?;
+    let color = cantrip_mechanics::choose_color_for(g, item.controller, item.object, ColorUse::AddMana)?;
     g.add_restricted_mana(item.controller, color.mana(), 2, ManaRestriction::mana_value_at_least(4));
     Ok(())
 }

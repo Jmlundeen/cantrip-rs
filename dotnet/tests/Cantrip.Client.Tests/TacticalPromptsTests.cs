@@ -38,6 +38,49 @@ public sealed class TacticalPromptsTests
         AdditionalCost = true,
     };
 
+    // --- A color that benefits the seat --------------------------------------------------------------------------------
+
+    private static ObjectView Colored(ObjectView card, ColorView color)
+    {
+        card.Colors = [color];
+        return card;
+    }
+
+    private static ChooseColorsPromptMessage ColorChoice(string verb) => new()
+    {
+        Player = Me,
+        Choices = [ColorView.White, ColorView.Blue, ColorView.Black, ColorView.Red, ColorView.Green],
+        Count = 1,
+        Verb = verb,
+    };
+
+    [Fact]
+    public void Chooses_the_color_most_of_its_own_creatures_and_spells_are_for_a_color_that_benefits_it()
+    {
+        GameClient client = Seated([
+            Colored(Creature(3, "Hill Giant", 3, 3), ColorView.Red),
+            Colored(Creature(4, "Goblin", 1, 1), ColorView.Red),
+            Colored(Creature(5, "Serra Angel", 4, 4, Them), ColorView.White),
+            Colored(Creature(6, "Elite Vanguard", 2, 1, Them), ColorView.White),
+            Colored(Creature(7, "Knight", 2, 2, Them), ColorView.White),
+            InHand(8, "Island Hopper", CardTypeView.Creature, 2, power: 1, toughness: 1, color: ColorView.Blue),
+        ]);
+
+        Assert.Equal([ColorView.Red], Assert.IsType<ColorsChosenAnswer>(Bot().Decide(client, ColorChoice("Benefit"))).Colors);
+    }
+
+    [Fact]
+    public void Chooses_the_color_its_opponents_have_most_of_when_the_choice_says_nothing_of_what_it_is_for()
+    {
+        GameClient client = Seated([
+            Colored(Creature(3, "Hill Giant", 3, 3), ColorView.Red),
+            Colored(Creature(5, "Serra Angel", 4, 4, Them), ColorView.White),
+            Colored(Creature(6, "Elite Vanguard", 2, 1, Them), ColorView.White),
+        ]);
+
+        Assert.Equal([ColorView.White], Assert.IsType<ColorsChosenAnswer>(Bot().Decide(client, ColorChoice(string.Empty))).Colors);
+    }
+
     // --- Collect evidence -------------------------------------------------------------------------------------------
 
     [Fact]

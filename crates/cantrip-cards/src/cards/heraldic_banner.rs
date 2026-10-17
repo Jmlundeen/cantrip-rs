@@ -1,12 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::choose_color;
+use cantrip_mechanics::choose_color_for;
 use cantrip_mechanics::lands::chosen_color;
 use cantrip_mechanics::statics::{plus_pt, your_creatures};
 use cantrip_oracle as oracle;
 
 /// "As this artifact enters, choose a color" (CR 614.12a), kept on the permanent (CR 607.2d).
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    entering.chosen_color = Some(choose_color(g, entering.controller, entering.object)?);
+    entering.chosen_color = Some(choose_color_for(g, entering.controller, entering.object, ColorUse::Benefit)?);
     Ok(())
 }
 
