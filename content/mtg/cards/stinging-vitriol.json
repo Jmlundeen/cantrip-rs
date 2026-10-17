@@ -1,0 +1,6 @@
+{
+  "name": "Stinging Vitriol",
+  "manaCost": "{B}{R}",
+  "type": "Sorcery",
+  "oracleText": "Stinging Vitriol deals 2 damage to target opponent. That player reveals their hand. You choose a nonland card from it. They discard that card."
+}

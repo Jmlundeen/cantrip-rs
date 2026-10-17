@@ -1,0 +1,31 @@
+# Stinging Vitriol: 2 damage to the target opponent, who reveals their hand; Bot1 chooses a nonland card and Bot2
+# discards it. Bot2's hand is Lightning Bolt, Counterspell and Islands: the Island is refused (a refusal beside the
+# Bolt as the positive control), the Bolt is discarded, and the Counterspell stays in hand.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Stinging Vitriol
+Mountain x20
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stinging Vitriol.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 6
+Bot1.Graveyard = Stinging Vitriol
+Bot1.Life = 20

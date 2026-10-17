@@ -1,0 +1,26 @@
+# Stinging Vitriol against a hand of only lands: the 2 damage is dealt and the hand is revealed, but with no nonland card
+# there is nothing to choose, so Bot1 is asked nothing and Bot2 discards nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Stinging Vitriol
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stinging Vitriol.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose
+
+[Expect]
+Bot2.Life = 18
+Bot2.Hand.Count = 7
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Stinging Vitriol

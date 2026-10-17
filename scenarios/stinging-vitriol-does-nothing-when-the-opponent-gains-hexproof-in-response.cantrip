@@ -1,0 +1,42 @@
+# CR 608.2b: Stinging Vitriol's only target is Bot2. Bot2 answers with Dawn's Truce (it gains hexproof), so the target is
+# illegal as the spell tries to resolve and it does nothing at all: no damage (Bot2 stays at 20), no reveal, no choice for
+# Bot1, and the Lightning Bolt stays in Bot2's hand. Vitriol goes to Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Stinging Vitriol
+Mountain x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Dawn's Truce
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stinging Vitriol.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+! Bot1.Choose
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Dawn's Truce
+Bot2.Hand = Island; Island; Island; Island; Lightning Bolt
+Bot1.Graveyard = Stinging Vitriol
+Stack.Count = 0
