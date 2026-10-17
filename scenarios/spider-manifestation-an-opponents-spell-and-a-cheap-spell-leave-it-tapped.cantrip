@@ -1,0 +1,47 @@
+# Spider Manifestation: "Whenever you cast". Tapped for mana on turn 3 (paying for Elvish Mystic's {G}, a spell with mana value 1), it stays tapped; on
+# Bot2's turn Bot2 casts Auriok Salvagers (mana value 4), which is not Bot1's spell, and it still stays tapped.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Spider Manifestation
+Elvish Mystic
+Island x16
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Auriok Salvagers
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Spider Manifestation.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Spider Manifestation.Activate(Color: Green)
+Bot1.Pass
+? Bot1.Battlefield.Spider Manifestation.Tapped = true
+[T4 Bot2.Main1]
+Bot2.Hand.Auriok Salvagers.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Spider Manifestation.Tapped = true
+Bot2.Battlefield.Auriok Salvagers.Power = 2

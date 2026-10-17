@@ -1,0 +1,32 @@
+# "{T}: Add {R} or {G}": on turn 3 red and green are offered (green taken) while white, blue, black and colorless are refused beside them as the positive control.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Spider Manifestation
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Spider Manifestation.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Spider Manifestation.Activate(Color: White)
+! Bot1.Battlefield.Spider Manifestation.Activate(Color: Blue)
+! Bot1.Battlefield.Spider Manifestation.Activate(Color: Black)
+! Bot1.Battlefield.Spider Manifestation.Activate(Color: Colorless)
+Bot1.Battlefield.Spider Manifestation.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Spider Manifestation.Activate(Color: Red)
+
+[Expect]
+Bot1.Mana = {R}

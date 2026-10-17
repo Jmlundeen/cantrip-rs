@@ -1,0 +1,44 @@
+# Spider Manifestation: a spell's mana value on the stack includes the X chosen for it (CR 202.3e). Mind Twist ({X}{B}) cast with X = 3 has mana value 4 and untaps
+# the creature that helped pay for it; the second turn's Mind Twist with X = 2 has mana value 3 and does not.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Spider Manifestation
+Mind Twist
+Mind Twist
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Spider Manifestation.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Spider Manifestation.Activate(Color: Green)
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 3)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spider Manifestation.Tapped = false
+Bot1.Battlefield.Spider Manifestation.Activate(Color: Green)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Spider Manifestation.Activate(Color: Green)
+Bot1.Hand.Mind Twist.Cast(Bot2; X: 2)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Spider Manifestation.Tapped = true

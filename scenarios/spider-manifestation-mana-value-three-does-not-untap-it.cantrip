@@ -1,0 +1,34 @@
+# Spider Manifestation: "mana value 4 or greater" - Master of Death ({1}{U}{B}) has mana value 3, so tapping the creature for {G} to help pay for it leaves it
+# tapped (the boundary under the first scenario, where mana value 4 untaps it). Its surveil is left as the defaults have it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Spider Manifestation
+Auriok Salvagers
+Master of Death
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Spider Manifestation.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Spider Manifestation.Activate(Color: Green)
+Bot1.Hand.Master of Death.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Spider Manifestation.Tapped = true
