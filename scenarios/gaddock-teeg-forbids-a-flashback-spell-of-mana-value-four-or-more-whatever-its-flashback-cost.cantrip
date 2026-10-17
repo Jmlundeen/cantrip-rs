@@ -1,0 +1,54 @@
+# Mana value is the mana cost's alone, whatever is paid instead (CR 202.3; Gaddock Teeg's ruling): Echo of Eons, mana
+# value 6, may not be cast for its flashback cost of {2}{U} under Gaddock Teeg (CR 702.34a), though Bot1 has five mana to
+# pay it. Lingering Souls, mana value 3, may be: Bot1 casts it from its hand and then from its graveyard for its flashback
+# cost, {1}{B}. Bot2's Duress put Echo of Eons into Bot1's graveyard on turn 2.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Gaddock Teeg
+Lingering Souls
+Echo of Eons
+Mox Sapphire
+Mox Jet
+Island
+Island x10
+
+[Bot2 Deck]
+Swamp
+Duress
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gaddock Teeg.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Echo of Eons)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+! Bot1.Graveyard.Echo of Eons.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lingering Souls.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Graveyard.Lingering Souls.Cast(Ability: Flashback)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard = Echo of Eons
+Exile = Lingering Souls
+Bot1.Battlefield.Count = 10

@@ -1,0 +1,50 @@
+# Gaddock Teeg: "Noncreature spells with mana value 4 or greater can't be cast" (CR 101.2, 601.3), for every player. On
+# turn 2 Bot2 has six mana floating and Door of Destinies (an artifact of mana value 4) in hand: it may not be cast.
+# Lodestone Golem, an artifact creature of mana value 4, may: Bot2 casts it. Mind Stone, a noncreature spell of mana value
+# 2, is cast too.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Gaddock Teeg
+Island x10
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Black Lotus
+Door of Destinies
+Lodestone Golem
+Mind Stone
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gaddock Teeg.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+? Bot2.Mana = {U}{U}{U}{U}{B}{R}
+! Bot2.Hand.Door of Destinies.Cast
+Bot2.Hand.Lodestone Golem.Cast
+Bot2.Pass
+Bot2.Hand.Mind Stone.Cast
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Mana =
+Bot2.Hand = Door of Destinies; Island
+Bot2.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Lodestone Golem; Mind Stone
+Bot1.Battlefield = Mox Emerald; Mox Pearl; Gaddock Teeg

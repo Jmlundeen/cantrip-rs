@@ -1,0 +1,49 @@
+# Only the chosen half of a split card is evaluated to see if it can be cast (CR 709.3a, 601.3e; Gaddock Teeg's ruling).
+# Cease // Desist has a combined mana value of 8 (CR 709.4b), but Cease is mana value 2 and Desist 6. On turn 3, with seven
+# mana floating (Desist's {4}{G/W}{G/W} could be paid) under Bot1's own Gaddock Teeg, Desist may not be cast; Cease is, and
+# Bot1 gains 2 life and draws a card.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Gaddock Teeg
+Black Lotus
+Cease // Desist
+Mox Ruby
+Mox Jet
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gaddock Teeg.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {W}{B}{R}{G}{G}{G}{G}
+! Bot1.Hand.Cease // Desist.Cast(Ability: Desist)
+Bot1.Hand.Cease // Desist.Cast(Ability: Cease)
+Bot1.Target()
+Bot1.Target(Bot1)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 22
+Bot1.Hand = Island; Island
+Bot1.Graveyard = Cease // Desist; Black Lotus

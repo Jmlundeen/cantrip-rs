@@ -1,0 +1,40 @@
+# Casting a spell without paying its mana cost does not change its mana value (CR 118.9c, 202.3; Gaddock Teeg's ruling).
+# Bot1's Show and Tell puts Omniscience onto the battlefield and Bot2 puts Gaddock Teeg beside it. Echo of Eons (mana value
+# 6) may not be cast from Bot1's hand without paying its mana cost; Lodestone Golem (a creature, mana value 4) and Lightning
+# Bolt (mana value 1) are cast that way - the Bolt for {1}, the Golem's tax on nonartifact spells, which the Island pays.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Omniscience
+Echo of Eons
+Lodestone Golem
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Gaddock Teeg
+Island x15
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Omniscience)
+Bot2.Choose(Gaddock Teeg)
+! Bot1.Hand.Echo of Eons.Cast
+Bot1.Hand.Lodestone Golem.Cast(Ability: Without paying)
+Bot1.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2; Ability: Without paying)
+Bot1.Battlefield.Island.Activate
+
+[Expect]
+Turn = 1
+Stack.Count = 0
+Bot1.Hand = Echo of Eons
+Bot1.Battlefield = Island; Omniscience; Lodestone Golem
+Bot1.Battlefield.Island.Tapped = true
+Bot2.Battlefield = Gaddock Teeg
+Bot2.Life = 17
