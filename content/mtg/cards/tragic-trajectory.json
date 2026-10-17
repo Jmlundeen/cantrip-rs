@@ -1,0 +1,6 @@
+{
+  "name": "Tragic Trajectory",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Target creature gets -2/-2 until end of turn.\nVoid — That creature gets -10/-10 until end of turn instead if a nonland permanent left the battlefield this turn or a spell was warped this turn."
+}

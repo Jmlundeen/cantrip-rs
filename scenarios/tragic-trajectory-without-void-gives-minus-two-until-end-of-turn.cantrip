@@ -1,0 +1,46 @@
+# No nonland permanent has left the battlefield and no spell has been warped on turn 3 (Bot2's Black Lotus was sacrificed
+# on turn 2, a different turn), so the Trajectory gives -2/-2: Bot2's Quantum Riddler (4/6) is a 2/4 for the rest of the turn
+# and a 4/6 again on turn 4 (the effect lasts until end of turn, CR 514.2).
+
+[Bot1 Deck]
+Swamp
+Tragic Trajectory
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Quantum Riddler
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Quantum Riddler.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Tragic Trajectory.Cast(Quantum Riddler)
+Bot1.Battlefield.Swamp.Activate
+[T3 Bot1.Main2]
+? Bot2.Battlefield.Quantum Riddler.Power = 2
+? Bot2.Battlefield.Quantum Riddler.Toughness = 4
+[T4 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Quantum Riddler.Power = 4
+Bot2.Battlefield.Quantum Riddler.Toughness = 6
+Bot1.Graveyard = Tragic Trajectory

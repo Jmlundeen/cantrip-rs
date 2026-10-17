@@ -1,0 +1,46 @@
+# Void's second clause (CR 702.185c): a spell was warped this turn. Bot1 warps Pinnacle Emissary (paid with the Mox Ruby)
+# before casting the Trajectory with its Swamp; the Emissary is still on the battlefield (it is exiled at the next end step) and
+# nothing else has left, so only the warp makes void true, and the Riddler gets -10/-10 and dies.
+
+[Bot1 Deck]
+Swamp
+Mox Ruby
+Pinnacle Emissary
+Tragic Trajectory
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Quantum Riddler
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Quantum Riddler.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Pinnacle Emissary.Cast(Ability: Warp)
+Bot1.Pass
+Bot1.Hand.Tragic Trajectory.Cast(Quantum Riddler)
+Bot1.Battlefield.Swamp.Activate
+
+[Expect]
+Bot2.Graveyard = Quantum Riddler; Black Lotus
+Bot1.Battlefield.Pinnacle Emissary.Power = 3
+Bot1.Graveyard = Tragic Trajectory

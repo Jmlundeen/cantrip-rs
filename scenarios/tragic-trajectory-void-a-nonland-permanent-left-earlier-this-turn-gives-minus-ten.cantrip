@@ -1,0 +1,42 @@
+# Void: a nonland permanent (Lotus Petal, sacrificed for its mana) left the battlefield this turn before the Trajectory was
+# cast, so the Quantum Riddler gets -10/-10 instead of -2/-2 and dies (CR 704.5f).
+
+[Bot1 Deck]
+Swamp
+Tragic Trajectory
+Lotus Petal
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Quantum Riddler
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Quantum Riddler.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Hand.Tragic Trajectory.Cast(Quantum Riddler)
+
+[Expect]
+Bot2.Graveyard = Quantum Riddler; Black Lotus
+Bot2.Battlefield.Count = 2
+Bot1.Graveyard = Tragic Trajectory; Lotus Petal

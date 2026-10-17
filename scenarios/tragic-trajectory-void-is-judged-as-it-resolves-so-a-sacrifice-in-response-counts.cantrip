@@ -1,0 +1,47 @@
+# The void condition is read as the Trajectory resolves: it was cast (paid with the Swamp) with nothing having left the battlefield
+# this turn, and then Lotus Petal is sacrificed in response, so by resolution a nonland permanent has left and the Riddler
+# gets -10/-10 and dies. (Compare tragic-trajectory-without-void-gives-minus-two-until-end-of-turn, where nothing leaves.)
+
+[Bot1 Deck]
+Swamp
+Tragic Trajectory
+Lotus Petal
+Swamp
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Quantum Riddler
+Swamp
+Swamp
+Swamp
+10 Swamp
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Quantum Riddler.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Hand.Tragic Trajectory.Cast(Quantum Riddler)
+Bot1.Battlefield.Swamp.Activate
+? Stack.Count = 1
+? Bot2.Battlefield.Quantum Riddler.Power = 4
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Quantum Riddler; Black Lotus
+Bot2.Battlefield.Count = 2
+Bot1.Graveyard = Tragic Trajectory; Lotus Petal
