@@ -553,6 +553,7 @@ impl<'a> Projector<'a> {
             has_initiative: player.initiative,
             has_citys_blessing: player.citys_blessing,
             has_enduring_story: player.enduring_story,
+            speed: player.speed.map(i32::from),
             energy: i32::from(player.energy),
             dungeons_completed: i32::from(player.dungeons_completed),
             ..Default::default()

@@ -448,6 +448,16 @@ public static class GameText
             text.Append(", has an enduring story");
         }
 
+        // Speed (CR 702.179): max speed abilities work only at 4 (CR 702.178a).
+        if (player.Speed is int speed)
+        {
+            text.Append(CultureInfo.InvariantCulture, $", speed {speed} of 4");
+            if (speed >= 4)
+            {
+                text.Append(" (max speed)");
+            }
+        }
+
         if (player.Dungeon.Length > 0)
         {
             text.Append(CultureInfo.InvariantCulture, $", in {player.Dungeon} at {player.DungeonRoom}");

@@ -379,6 +379,7 @@ public sealed partial class TacticalPlay : IAutoPlayer
             hash.Add(player.HandCount);
             hash.Add(player.LibraryCount);
             hash.Add(player.Energy);
+            hash.Add(player.Speed);
         }
 
         foreach (ZoneView zone in view.Zones)

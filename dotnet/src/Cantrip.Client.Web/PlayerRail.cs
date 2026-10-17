@@ -405,6 +405,17 @@ public sealed class PlayerRail : Border
             Add("Enduring story", Theme.Accent, tooltip: "Has an enduring story for the rest of the game. Cards with storied and others check for it.");
         }
 
+        // Speed (CR 702.179): shown once the player has any, since max speed abilities work only at 4 (CR 702.178a).
+        if (player.Speed is int speed)
+        {
+            Add(
+                speed >= 4 ? "Max speed" : $"Speed {speed}",
+                Theme.Accent,
+                tooltip: speed >= 4
+                    ? "Speed 4, the most there is. Their max speed abilities work."
+                    : $"Speed {speed} of 4. It goes up by 1 once on each of their turns when an opponent loses life. Max speed abilities work at 4.");
+        }
+
         // Effects waiting on the player that sit on no object (CR 611.2c): "the next spell you cast can't be countered".
         foreach (string pending in player.PendingEffects)
         {

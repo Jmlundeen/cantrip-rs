@@ -176,6 +176,14 @@ public sealed class PlayerSummaryView
     [Key(20)]
     public bool HasEnduringStory { get; set; }
 
+    /// <summary>
+    /// This player's speed (CR 702.179), 1 to 4, which start your engines! gives and which rises once on each of their
+    /// turns an opponent loses life; null while they have no speed (CR 702.179b). Public. At 4 they have max speed, which
+    /// max speed abilities ask for (CR 702.178a).
+    /// </summary>
+    [Key(21)]
+    public int? Speed { get; set; }
+
     public override string ToString() => $"seat {Seat} '{Name}' {Life} life";
 }
 

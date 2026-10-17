@@ -53,6 +53,8 @@ public sealed class TacticalModel
         ["land.1-4"] = 0.22,
         ["land.5+"] = 0.06,
         ["active"] = 0.10,
+        // A point of speed (CR 702.179): a step toward the max speed abilities that work only at 4.
+        ["speed"] = 0.05,
 
         ["creature"] = 0.10,
         ["creature.power"] = 0.15,
@@ -300,6 +302,8 @@ public sealed class TacticalModel
             double side = player.Seat == view.Viewer ? 1 : -1;
             Bands(player.Life, (name, amount) => Add(name, side * amount));
             Add("hand", side * player.HandCount);
+            // Speed (CR 702.179), toward the max speed its abilities ask for (CR 702.178a).
+            Add("speed", side * (player.Speed ?? 0));
         }
 
         Add("active", view.ActivePlayer == view.Viewer ? 1 : -1);

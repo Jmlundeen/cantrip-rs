@@ -408,6 +408,8 @@ pub struct PlayerSummaryView {
     pub pending_effects: Vec<String>,
     /// An enduring story (CR 702.195b): public, as the city's blessing is.
     pub has_enduring_story: bool,
+    /// The player's speed (CR 702.179), 1 to 4; none while they have no speed (CR 702.179b). Public.
+    pub speed: Option<i32>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
