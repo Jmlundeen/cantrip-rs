@@ -1,0 +1,53 @@
+# Browser
+# North Wind Avatar in the browser: "you may put a card you own from outside the game into your hand" (CR 400.11b). Bot1's rail
+# has a Sideboard button into the cards it owns outside the game, and Bot2's rail has none, since only a sideboard's owner may
+# look at it (CR 400.11a). The trigger's choice says the cards come from outside the game - Bot1's sideboard - and that taking
+# none is an answer; Bot1 clicks Lightning Bolt in the tray, which goes to its hand, and the log says where it came from.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+North Wind Avatar
+Island x16
+
+[Bot1 Sideboard]
+Lightning Bolt
+Counterspell
+
+[Bot2 Deck]
+Island x20
+
+[Bot2 Sideboard]
+Shock
+
+[Actions]
+? Client.Bot1.Sideboard.Caption = Sideboard  2
+? Client.Bot1.Sideboard.Tooltip = Your sideboard: the cards you own outside the game. Only you can see them
+? Client.Bot1.OpponentSideboard.Caption =
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.North Wind Avatar.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = North Wind Avatar: choose up to 1 card you own from outside the game to put into your hand
+? Client.Bot1.Prompt.Detail = 0 of 1 chosen  ·  from your sideboard, which only you can see
+? Client.Bot1.Button.Take nothing = shown
+Bot1.Choose(Lightning Bolt)
+? Client.Bot1.Confirm = Put into your hand
+? Client.Bot1.Hand = Island; Island; Island; Lightning Bolt
+? Client.Bot1.Sideboard.Caption = Sideboard  1
+? Client.Bot1.Log.Has = You put [Lightning Bolt] into your hand from outside the game.
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Sideboard = Counterspell
+Bot2.Sideboard = Shock
+Bot1.Hand = Island; Island; Island; Lightning Bolt
+Bot1.Battlefield.North Wind Avatar.Types = Creature

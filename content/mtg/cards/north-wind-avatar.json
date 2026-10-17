@@ -1,0 +1,11 @@
+{
+  "name": "North Wind Avatar",
+  "manaCost": "{2}{U}{U}{R}",
+  "type": "Creature — Dragon Spirit Avatar",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying\nWhen this creature enters, if you cast it, you may put a card you own from outside the game into your hand.",
+  "keywords": [
+    "Flying"
+  ]
+}

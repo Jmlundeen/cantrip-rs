@@ -1,0 +1,58 @@
+# In a Limited game a sideboard holds any number of basic lands (Magic Tournament Rules; North Wind Avatar's ruling: "In Limited
+# events, your sideboard also includes an arbitrary number of basic lands"). Bot1's sideboard is its Opt and the event's basics,
+# here Island and Mountain. The first Avatar brings in a Mountain, and another Mountain is still outside the game; the second Avatar
+# brings in a Mountain again. Bot1 ends with two Mountains in hand and its sideboard as it began: Opt, Island and Mountain.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+North Wind Avatar
+Mountain
+Island
+North Wind Avatar
+Island x10
+
+[Bot1 Sideboard]
+Opt
+
+[Basic Lands Outside]
+Island
+Mountain
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+? Bot1.Sideboard = Opt; Island; Mountain
+? Bot2.Sideboard = Island; Mountain
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.North Wind Avatar.Cast
+Bot1.Pass
+Bot1.Choose(Mountain)
+? Bot1.Sideboard = Opt; Island; Mountain
+? Bot1.Hand = Island; Mountain
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.North Wind Avatar.Cast
+Bot1.Pass
+Bot1.Choose(Mountain)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Sideboard = Opt; Island; Mountain
+Bot1.Hand = Mountain; Mountain
+Bot2.Sideboard = Island; Mountain

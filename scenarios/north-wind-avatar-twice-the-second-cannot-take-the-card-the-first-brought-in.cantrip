@@ -1,0 +1,53 @@
+# Two North Wind Avatars. The first, cast on turn 1, brings Lightning Bolt into Bot1's hand; that card is in the game now and stays
+# there until it ends (CR 400.11b), so when the second Avatar is cast on turn 3 its trigger offers only what is still outside the
+# game: Counterspell, not the Bolt in hand. Bot1 takes Counterspell, and the sideboard is empty.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+North Wind Avatar
+Mountain
+Island
+North Wind Avatar
+Island x10
+
+[Bot1 Sideboard]
+Lightning Bolt
+Counterspell
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.North Wind Avatar.Cast
+Bot1.Pass
+Bot1.Choose(Lightning Bolt)
+? Bot1.Sideboard = Counterspell
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.North Wind Avatar.Cast
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Counterspell)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.North Wind Avatar#1.Types = Creature
+Bot1.Battlefield.North Wind Avatar#2.Types = Creature
+Bot1.Sideboard.Count = 0
+Bot1.Hand = Counterspell; Lightning Bolt

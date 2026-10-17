@@ -1,0 +1,53 @@
+# North Wind Avatar's trigger does not need the Avatar to stay (CR 113.7a): with the trigger on the stack Bot2 returns the Avatar
+# to Bot1's hand with Bounce Off, and the trigger still resolves - "if you cast it" was true as it triggered and stays true, since
+# the spell was cast (CR 603.4). Bot1 takes Counterspell from its sideboard. Its hand ends with the Avatar and Counterspell.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Sapphire
+North Wind Avatar
+Island
+Island
+Island x10
+
+[Bot1 Sideboard]
+Lightning Bolt
+Counterspell
+
+[Bot2 Deck]
+Island
+Bounce Off
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.North Wind Avatar.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Bounce Off.Cast(Bot1.Battlefield.North Wind Avatar)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Hand.North Wind Avatar.Power = 5
+Bot1.Choose(Counterspell)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Hand = Island; Island; North Wind Avatar; Counterspell
+Bot1.Sideboard = Lightning Bolt
+Bot2.Graveyard = Bounce Off

@@ -1,0 +1,54 @@
+# North Wind Avatar: "When this creature enters, if you cast it, you may put a card you own from outside the game into your hand"
+# (CR 400.11b). Bot1 casts it off Black Lotus and two Moxen; its trigger offers the cards in Bot1's sideboard - Lightning Bolt and
+# Counterspell - and not Bot2's Shock (a card *you* own, CR 108.3b). Bot1 takes the Bolt, which is a card of the game from then on
+# (CR 400.11b): Bot1 casts it at Bot2 with the Mountain. Counterspell stays outside the game, and Bot2's sideboard is untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+North Wind Avatar
+Mountain
+Island
+Island
+Island x10
+
+[Bot1 Sideboard]
+Lightning Bolt
+Counterspell
+
+[Bot2 Deck]
+Island x20
+
+[Bot2 Sideboard]
+Shock
+
+[Actions]
+? Bot1.Sideboard = Lightning Bolt; Counterspell
+? Bot1.Hand.Count = 7
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.North Wind Avatar.Cast
+Bot1.Pass
+? Stack.Count = 1
+! Bot1.Choose(Shock)
+Bot1.Choose(Lightning Bolt)
+? Bot1.Sideboard = Counterspell
+? Bot2.Sideboard = Shock
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.North Wind Avatar.Types = Creature
+Bot1.Sideboard = Counterspell
+Bot2.Sideboard = Shock
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Hand = Island; Island
+Bot2.Life = 17
