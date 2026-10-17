@@ -1,0 +1,6 @@
+{
+  "name": "Moat",
+  "manaCost": "{2}{W}{W}",
+  "type": "Enchantment",
+  "oracleText": "Creatures without flying can't attack."
+}

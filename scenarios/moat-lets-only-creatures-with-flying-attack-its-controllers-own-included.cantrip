@@ -1,0 +1,62 @@
+# Moat: "Creatures without flying can't attack." (CR 508.1c) - every creature, its controller's own too. Bot2 casts Moat on
+# turn 2. On turn 3 Bot1's Llanowar Elves is refused as an attacker while Bot1's Misshapen Fiend (flying) attacks - the
+# positive control - and deals 1. On turn 4 Bot2's own Llanowar Elves is refused too, and Bot2's Misshapen Fiend attacks
+# and deals 1.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Misshapen Fiend
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Swamp
+Black Lotus
+Mox Jet
+Mox Emerald
+Moat
+Misshapen Fiend
+Llanowar Elves
+Mox Pearl
+Island x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Misshapen Fiend.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Misshapen Fiend.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Moat.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Attack(Misshapen Fiend > Bot2)
+[T4 Bot2.Main1]
+! Bot2.Attack(Llanowar Elves > Bot1)
+Bot2.Attack(Misshapen Fiend > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Turn = 4
+Bot1.Life = 19
+Bot2.Life = 19
+Bot1.Battlefield.Llanowar Elves.Tapped = false
+Bot2.Battlefield.Llanowar Elves.Tapped = false
+Bot2.Battlefield.Misshapen Fiend.Tapped = true
