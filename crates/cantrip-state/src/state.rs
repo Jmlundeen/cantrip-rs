@@ -169,6 +169,9 @@ pub struct StaticSources {
     /// Those of `list` with a static ability that sets the land subtypes of what it affects (`StaticDef::sets_land_subtypes`,
     /// CR 305.7), whatever abilities they have lost in layer 6 (CR 613.6), in timestamp order.
     pub setters: Vec<(ObjectId, ZoneKind)>,
+    /// Those of `list` on the battlefield with a control-changing static ability (CR 613.1b, layer 2), whatever abilities
+    /// they have lost in layer 6 (CR 613.1), in timestamp order.
+    pub controllers: Vec<ObjectId>,
     /// The permanents with hone counters on them (CR 122.1j), in battlefield order: what each gives the creature it is
     /// attached to is no ability of it, so it is found apart from `list`, whatever abilities the permanent has lost.
     pub honed: Vec<ObjectId>,
@@ -357,7 +360,7 @@ impl GameState {
             unsettled: true,
             journal: Journal::default(),
             epoch: 0,
-            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), honed: Vec::new(), granted: Vec::new(), continuing: false }),
+            static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), controllers: Vec::new(), honed: Vec::new(), granted: Vec::new(), continuing: false }),
             lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
             land_text_lost: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
         }

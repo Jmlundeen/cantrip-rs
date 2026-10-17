@@ -682,6 +682,11 @@ pub enum Duration {
     /// begin if it is untapped then. Braided Net; Rust Tick, Amber Prison and the other "doesn't untap ... for as long as"
     /// cards word theirs about their own source instead.
     WhileTapped,
+    /// "For as long as [condition]" (CR 611.2b), the condition the card's own: the `index`th of its `lasting` list, asked of
+    /// the effect whenever the state-based actions are checked. It ends the first time the condition is false, and does
+    /// nothing if it is false as the effect would begin; it never comes back. Old Man of the Sea's "for as long as this
+    /// creature remains tapped and that creature's power remains less than or equal to this creature's power".
+    AsLongAs(CardId, u8),
 }
 
 impl Duration {

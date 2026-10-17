@@ -282,6 +282,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         made.list.clear();
         made.strippers.clear();
         made.setters.clear();
+        made.controllers.clear();
         made.honed.clear();
         // A permanent that has lost all its abilities to an effect keeps the effects its static abilities had applied in
         // layers 1 to 5 by the time layer 6 took them (CR 613.6, Humility with Magus of the Moon); from layer 6 on it has
@@ -321,9 +322,13 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         }
         // CR 613.7: static abilities apply in the timestamp order of the objects that have them.
         made.list.sort_by_key(|&(source, _, _)| state.obj(source).timestamp);
-        let (mut strippers, mut setters) = (Vec::new(), Vec::new());
+        let (mut strippers, mut setters, mut controllers) = (Vec::new(), Vec::new(), Vec::new());
         for &(source, from, lost) in &made.list {
             let statics = cards.get(cards.current(state.obj(source))).statics;
+            // CR 613.1b: a control-changing ability applies in layer 2, before layer 6 could take it.
+            if from == ZoneKind::Battlefield && state.obj(source).zone.is(ZoneKind::Battlefield) && statics.iter().any(|s| s.layer == Layer::Control) {
+                controllers.push(source);
+            }
             if !lost && statics.iter().any(|s| s.loses_all && s.from == from) {
                 strippers.push((source, from));
             }
@@ -335,6 +340,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         made.strippers = strippers;
         made.continuing = made.list.iter().any(|&(source, _, _)| cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.continues));
         made.setters = setters;
+        made.controllers = controllers;
         made.granted.clear();
         for e in &state.effects {
             if let EffectKind::AddAbility(ability) = e.kind
@@ -1040,6 +1046,36 @@ fn ready(view: &View, id: ObjectId, pending: &[Entry], chars: &Chars) -> usize {
     }
     // A loop has a member that waits on nothing outside it, so one is always ready.
     (0..n).find(|&a| (0..n).all(|b| !direct[a][b] || through[b][a])).unwrap_or(0)
+}
+
+/// The permanents with a control-changing static ability (CR 613.1b), in timestamp order.
+pub fn static_control_sources(cards: &CardTable, state: &GameState) -> Vec<ObjectId> {
+    static_sources(cards, state).controllers.clone()
+}
+
+/// The control-changing static abilities that apply to `id` (CR 613.1b, layer 2), as (timestamp, the player who gains
+/// control): each source's controller, at its source's timestamp (CR 613.7; an Aura's is when it became attached, 613.7e),
+/// judged on what layer 1 made `id`. Empty, and free, while no such ability is on the battlefield.
+pub fn static_control(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> Vec<(u32, PlayerId)> {
+    if !state.statics_seen {
+        return Vec::new();
+    }
+    let sources = static_control_sources(cards, state);
+    if sources.is_empty() {
+        return Vec::new();
+    }
+    let view = View { cards, state, log, stop: Layer::Control };
+    let so_far = chars_before(cards, state, log, id, Layer::Control);
+    let mut found = Vec::new();
+    for source in sources {
+        let sobj = state.obj(source);
+        for st in cards.get(cards.current(sobj)).statics.iter().filter(|s| s.layer == Layer::Control) {
+            if source != id && (st.affects)(&view, source, id, &so_far) {
+                found.push((sobj.timestamp, sobj.controller));
+            }
+        }
+    }
+    found
 }
 
 /// The layer a resolved effect of this kind applies in (CR 613.1), as `apply_effect` applies it; none for an effect that
@@ -1890,5 +1926,52 @@ mod tests {
             let woods = chars(&cards, &state, &[], ids[2]);
             assert!(!woods.is(CardType::Creature) && !woods.has_subtype(Subtype::Saproling), "{names:?}");
         }
+    }
+
+    // --- Control-changing static abilities (CR 613.1b, layer 2).
+
+    fn attached(view: &dyn LayerQuery, source: ObjectId, id: ObjectId, _: &Chars) -> bool {
+        view.state().obj(source).attached_to == Some(id)
+    }
+
+    /// "You control enchanted creature" (Mind Control's shape).
+    static CONTROLLER: CardDef = CardDef {
+        name: "Controller",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        statics: &[control_changing(attached, "You control enchanted creature.")],
+        ..CardDef::BLANK
+    };
+    static BEAR: CardDef = CardDef { name: "Bear", types: TypeSet::of(&[CardType::Creature]), ..CardDef::BLANK };
+
+    /// CR 613.1b, 613.7e: each control-changing ability that applies to the permanent gives its source's controller control,
+    /// at its source's timestamp; one attached elsewhere gives nothing, and none applies to its own source.
+    #[test]
+    fn a_control_changing_static_ability_gives_its_controller_what_it_affects() {
+        let cards = CardTable::new([&CONTROLLER, &BEAR]);
+        let (mut state, ids) = battlefield(&cards, &["Bear", "Bear", "Controller", "Controller"]);
+        state.update_obj(ids[2], |o| {
+            o.attached_to = Some(ids[0]);
+            o.controller = PlayerId(1);
+        });
+        state.update_obj(ids[3], |o| o.attached_to = Some(ids[0]));
+        state.see_statics();
+        assert_eq!(static_control(&cards, &state, &[], ids[0]), [(3, PlayerId(1)), (4, PlayerId(0))]);
+        assert!(static_control(&cards, &state, &[], ids[1]).is_empty());
+        assert!(static_control(&cards, &state, &[], ids[2]).is_empty());
+    }
+
+    /// CR 613.1: layer 2 applies before layer 6 could take the ability away, so a source that has lost all its abilities to
+    /// an effect still gives control.
+    #[test]
+    fn a_control_changing_ability_applies_though_its_source_lost_its_abilities() {
+        let cards = CardTable::new([&CONTROLLER, &BEAR]);
+        let (mut state, ids) = battlefield(&cards, &["Bear", "Controller"]);
+        state.update_obj(ids[1], |o| {
+            o.attached_to = Some(ids[0]);
+            o.controller = PlayerId(1);
+        });
+        state.effect_push(ContinuousEffect { affected: ids[1], ..effect(9, EffectKind::LoseAllAbilities) });
+        state.see_statics();
+        assert_eq!(static_control(&cards, &state, &[], ids[0]), [(2, PlayerId(1))]);
     }
 }

@@ -67,6 +67,11 @@ pub fn state_based_actions_alone(cx: &mut Cx) -> R<bool> {
 fn state_based_actions(cx: &mut Cx) -> R<bool> {
     let mut acted = false;
     let mut leavers = Vec::new();
+    // CR 611.2b: an effect "for as long as" a condition ends once it is false; then, CR 613.1b: who controls each permanent
+    // is what the control-changing effects that apply now say, before anything that asks it (the legend rule, an Aura's
+    // legality, "you control").
+    ops::end_lapsed_conditions(cx);
+    ops::settle_control(cx);
 
     // CR 704.5a, 704.5b, 704.5c: a player at 0 life, who attempted to draw from an empty library since the last check, or
     // with ten or more poison counters loses - unless a static ability says they don't lose that way (CR 104.3: Platinum
@@ -417,6 +422,9 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         let alive: Vec<bool> = state.effects.iter().map(applies).collect();
         // By index: `effects_retain` visits the effects from the end, so a counter over them would mismatch.
         cx.st().effects_keep(&alive);
+        // A control-changing effect that ended with them gives its permanent back now (CR 613.1b), and the state-based
+        // actions are checked again with the new controllers.
+        acted |= ops::settle_control(cx);
     }
     Ok(acted)
 }

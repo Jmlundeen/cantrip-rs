@@ -1146,6 +1146,18 @@ impl<'a> Projector<'a> {
                     EffectKind::CantAttack => "Can't attack",
                     EffectKind::CantBlock => "Can't block",
                     EffectKind::CantActivateAbilities => "Its activated abilities can't be activated",
+                    // A resolved control-changing effect (CR 613.1b): who has it and for how long, named for where it came
+                    // from, as nothing else on the permanent says so. A permanent given for good says nothing.
+                    EffectKind::Control(p) if e.duration != Duration::Indefinite => {
+                        let who = if p == self.viewer { "You control".to_string() } else { format!("{} controls", self.names.get(p.index()).cloned().unwrap_or_default()) };
+                        let from = game.cards.get(game.chars(e.source).card).name;
+                        let until = match e.duration {
+                            Duration::AsLongAs(card, index) => game.cards.get(card).lasting.get(index as usize).map_or(String::new(), |l| format!(" for as long as {}", l.text.replace("{source}", from))),
+                            other => self.until_text(other),
+                        };
+                        view.granted_abilities.push(AbilityTextView { text: format!("{who} it{until} ({from})."), spent: false });
+                        continue;
+                    }
                     // A prevention shield on it (CR 615.7), or all damage to it prevented: no ability of its own says so.
                     EffectKind::Prevention { to, .. } if to == Target::Object(id) => {
                         if let Some(text) = self.prevention_text(e, "it") {

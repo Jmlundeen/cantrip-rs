@@ -1202,6 +1202,12 @@ impl cantrip_api::Game for Cx<'_> {
         }
         let controller = self.g.state.obj(source).controller;
         let timestamp = self.g.state.timestamp();
+        // "For as long as [condition]" whose condition is false as it would begin does nothing (CR 611.2b).
+        if let Duration::AsLongAs(..) = duration
+            && !ops::lasting_holds(self, &ContinuousEffect { source, controller, timestamp, affected, kind, duration })
+        {
+            return;
+        }
         self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected, kind, duration });
         // A static ability given to a permanent that affects other objects makes it a source of static abilities.
         if let EffectKind::AddAbility(ability) = kind

@@ -287,7 +287,7 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
                     cx.st().delayed_remove(at);
                 }
             }
-            untap_step(cx, active);
+            untap_step(cx, active)?;
             return Ok(Flow::Done);
         }
         Step::Draw => {
@@ -388,7 +388,11 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
 /// CR 502.3: the active player's permanents untap, all at once. Except an exerted one, for the untap step it sits out
 /// (CR 701.43a), and one that doesn't untap during its controller's untap step (CR 502.3); and one with a stun counter
 /// has a counter removed from it instead (CR 122.1d).
-fn untap_step(cx: &mut Cx, active: PlayerId) {
+fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
+    // CR 502.3: the active player determines which permanents will untap, then they untap together. A permanent whose
+    // card says "you may choose not to untap this ... during your untap step" is the active player's to keep tapped:
+    // asked of each, in battlefield order, before any untaps.
+    let mut untapping = Vec::new();
     for id in cx.s().battlefield().to_vec() {
         let obj = cx.s().obj(id);
         if obj.controller != active || !obj.tapped {
@@ -397,6 +401,15 @@ fn untap_step(cx: &mut Cx, active: PlayerId) {
         if obj.marks.exerted_by == Some(active) || cx.chars(id).has(Keyword::DoesNotUntap) {
             continue;
         }
+        if cx.card(cx.cards().current(obj)).may_not_untap && !cx.lost_all_abilities(id) {
+            let ask = RequestKind::May { source: id, purpose: Purpose::Ask(&UNTAP_IT) };
+            if cx.ask_core(active, ask, false)? != Answer::Yes {
+                continue;
+            }
+        }
+        untapping.push(id);
+    }
+    for id in untapping {
         ops::untap(cx, id);
     }
     // That untap step has now happened for everything its player exerted, whoever controls it now (CR 701.43a).
@@ -405,7 +418,12 @@ fn untap_step(cx: &mut Cx, active: PlayerId) {
             cx.st().update_obj(id, |o| o.marks.exerted_by = None);
         }
     }
+    Ok(())
 }
+
+/// "You may choose not to untap this ... during your untap step" (CR 502.3), asked of the active player for each such
+/// permanent of theirs that is tapped.
+const UNTAP_IT: Question = Question::new("UntapInUntapStep", "untap it during this untap step?", "You may choose to leave it tapped", "Untap it", "Leave it tapped");
 
 /// The battles the active player may attack (CR 310.9b, 508.1b): those whose protector is one of the defending
 /// players. A Siege its attacker controls is one of them (CR 310.12a); one the attacker protects never is.

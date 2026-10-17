@@ -2356,7 +2356,12 @@ pub fn bring_into_hand(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
 pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
     let obj = *cx.s().obj(id);
     if cx.s().effects.iter().any(|e| e.affected == id && !e.duration.holds_for(&obj)) {
+        let control = cx.s().effects.iter().any(|e| e.affected == id && !e.duration.holds_for(&obj) && matches!(e.kind, EffectKind::Control(_)));
         cx.st().effects_retain(|e| e.affected != id || e.duration.holds_for(&obj));
+        // A control-changing effect that ended gives the permanent back as it ends (CR 613.1b).
+        if control {
+            refresh_control(cx, id);
+        }
     }
 }
 
@@ -2717,14 +2722,16 @@ fn attackable(cx: &Cx, attacking: PlayerId, defender: Target) -> bool {
     }
 }
 
-/// Settles who controls a permanent from the control-changing effects that apply to it (CR 613.1b, layer 2): the one
-/// with the latest timestamp, else whoever controlled it before any of them did. Control that is new is new for
-/// summoning sickness (CR 302.6) and takes the permanent out of combat (CR 506.4).
-pub fn refresh_control(cx: &mut Cx, id: ObjectId) {
+/// Settles who controls a permanent from the control-changing effects that apply to it (CR 613.1b, layer 2): resolved
+/// ones and static abilities ("you control enchanted creature") alike, the one with the latest timestamp (CR 613.7),
+/// else whoever controlled it before any of them did. Control that is new is new for summoning sickness (CR 302.6) and
+/// takes the permanent out of combat (CR 506.4). Whether its controller changed.
+pub fn refresh_control(cx: &mut Cx, id: ObjectId) -> bool {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        return;
+        return false;
     }
     let obj = *cx.s().obj(id);
+    let statics = layers::static_control(cx.cards(), cx.s(), &cx.g.log, id);
     let latest = cx
         .s()
         .effects
@@ -2734,13 +2741,14 @@ pub fn refresh_control(cx: &mut Cx, id: ObjectId) {
             EffectKind::Control(p) => Some((e.timestamp, p)),
             _ => None,
         })
+        .chain(statics)
         .max_by_key(|&(timestamp, _)| timestamp)
         .map(|(_, p)| p);
     let base = obj.marks.control_base.unwrap_or(obj.controller);
     let controller = latest.unwrap_or(base);
     let control_base = latest.map(|_| base);
     if controller == obj.controller && control_base == obj.marks.control_base {
-        return;
+        return false;
     }
     let turn = cx.s().turn.number;
     cx.st().update_obj(id, |o| {
@@ -2760,6 +2768,59 @@ pub fn refresh_control(cx: &mut Cx, id: ObjectId) {
             cx.st().set_blocks(blocks);
         }
     }
+    controller != obj.controller
+}
+
+/// Whether the condition of an effect's "for as long as" duration (`Duration::AsLongAs`, CR 611.2b) is still true: the
+/// card's own condition, asked of the effect. Any other duration holds as far as this goes.
+pub fn lasting_holds(cx: &Cx, e: &cantrip_state::ContinuousEffect) -> bool {
+    match e.duration {
+        Duration::AsLongAs(card, index) => cx.card(card).lasting.get(index as usize).is_none_or(|l| (l.holds)(cx, e)),
+        _ => true,
+    }
+}
+
+/// Ends each effect whose "for as long as [condition]" duration (`Duration::AsLongAs`) is no longer true (CR 611.2b), as
+/// the state-based actions are checked: it is over for good, though the condition become true again. A control-changing
+/// effect that ends gives its permanent back with the next `settle_control`. Whether any ended.
+pub fn end_lapsed_conditions(cx: &mut Cx) -> bool {
+    if !cx.s().effects.iter().any(|e| matches!(e.duration, Duration::AsLongAs(..))) {
+        return false;
+    }
+    let keep: Vec<bool> = cx.s().effects.iter().map(|e| lasting_holds(cx, e)).collect();
+    if keep.iter().all(|&k| k) {
+        return false;
+    }
+    cx.st().effects_keep(&keep);
+    true
+}
+
+/// Settles the controller of every permanent (CR 613.1b, layer 2) as the control-changing effects that apply now say: a
+/// static ability's reach changes as Auras move and their sources come and go, and a resolved effect may have ended
+/// ("for as long as ...", CR 611.2b). One permanent's controller can decide another's (an Aura's controller is whom it
+/// gives control to), so it is worked out again while anything changes. Whether any controller changed. Free while
+/// no control-changing effect applies and no permanent's control was ever changed.
+pub fn settle_control(cx: &mut Cx) -> bool {
+    let s = cx.s();
+    let any = s.effects.iter().any(|e| matches!(e.kind, EffectKind::Control(_)))
+        || s.battlefield().iter().any(|&id| s.obj(id).marks.control_base.is_some())
+        || (s.statics_seen && !layers::static_control_sources(cx.cards(), s).is_empty());
+    if !any {
+        return false;
+    }
+    let mut changed = false;
+    // Each pass settles at least one permanent for good unless two decide each other; the battlefield bounds the chain.
+    for _ in 0..=cx.s().battlefield().len() {
+        let mut again = false;
+        for id in cx.s().battlefield().to_vec() {
+            again |= refresh_control(cx, id);
+        }
+        changed |= again;
+        if !again {
+            break;
+        }
+    }
+    changed
 }
 
 /// A permanent becomes a copy of something until end of turn (CR 707.2, 611.2b): its copiable values are `values` (exceptions

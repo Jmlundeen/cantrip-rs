@@ -111,6 +111,11 @@ pub enum LibraryPlace {
 /// are the object's copiable values; control (2) is the object's controller itself.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Layer {
+    /// Layer 2: control-changing effects (CR 613.1b). A static ability of this layer (`control_changing`) gives its
+    /// source's controller control of what it affects; it changes no characteristic, so the layers that work out
+    /// characteristics pass it by, and the core settles each permanent's controller from it and the resolved
+    /// control-changing effects in timestamp order (CR 613.7).
+    Control,
     /// Layer 3: text-changing effects (CR 612), on the type line here; card code reads its rules text's words through
     /// `Query::words`.
     Text,
@@ -1580,6 +1585,17 @@ pub struct TurnBeginRule {
     pub hint: &'static str,
 }
 
+/// The condition of a "for as long as" duration a card's spell or ability gives its effect (CR 611.2b), as
+/// `Duration::AsLongAs`: Old Man of the Sea's "for as long as this creature remains tapped and that creature's power remains
+/// less than or equal to this creature's power".
+#[derive(Clone, Copy)]
+pub struct Lasting {
+    /// The condition after "for as long as", for the client: `{source}` is where the name of the effect's source goes.
+    pub text: &'static str,
+    /// Whether the condition is still true of the effect (its source and the object it affects), judged on the game now.
+    pub holds: fn(&dyn Query, &ContinuousEffect) -> bool,
+}
+
 /// A static ability that says whether a spell or ability may cause a player to discard cards or sacrifice permanents
 /// (CR 101.2): true allows it. `causer` is the controller of the spell or ability, `player` who would discard or
 /// sacrifice. "Spells and abilities your opponents control can't cause you to discard cards or sacrifice permanents."
@@ -2025,6 +2041,12 @@ pub struct CardDef {
     pub cause_rules: &'static [CauseRule],
     /// Its replacements of its controller's turn beginning (CR 614.10).
     pub turn_begin: &'static [TurnBeginRule],
+    /// The conditions of the "for as long as" durations its spells and abilities give their effects (CR 611.2b), which a
+    /// `Duration::AsLongAs` names by index.
+    pub lasting: &'static [Lasting],
+    /// "You may choose not to untap this [permanent] during your untap step" (CR 502.3): its controller is asked, as their
+    /// untap step untaps their permanents, whether it untaps. Old Man of the Sea, Rubinia Soulsinger, Seasinger print it.
+    pub may_not_untap: bool,
     /// Its static abilities that allow sorcery-speed abilities at instant speed (CR 606.3).
     pub instant_activation: &'static [InstantActivationRule],
     /// Its static abilities that let spells be cast as though they had flash (CR 307.5): "You may cast Aura and Equipment spells
@@ -2154,6 +2176,8 @@ impl CardDef {
         activate_as_though_haste: &[],
         cause_rules: &[],
         turn_begin: &[],
+        lasting: &[],
+        may_not_untap: false,
         instant_activation: &[],
         flash_rules: &[],
         activation_rules: &[],
@@ -2314,6 +2338,11 @@ impl CardTable {
                     "{}: a static ability that continues an effect follows its earlier part, in a later layer (CR 613.6)",
                     card.name
                 );
+            }
+            // A control-changing ability (CR 613.1b) gives control of permanents: the core asks it of each one on the
+            // battlefield.
+            for s in card.statics.iter().filter(|s| s.layer == Layer::Control) {
+                assert!(!s.everywhere && !s.own && !s.continues, "{}: a control-changing static ability affects other permanents", card.name);
             }
             // And what one that sets land subtypes took (`layers::land_text_lost`): it affects lands on the battlefield.
             for s in card.statics.iter().filter(|s| s.sets_land_subtypes) {
