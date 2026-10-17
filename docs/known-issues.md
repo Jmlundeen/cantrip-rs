@@ -638,6 +638,7 @@ Stage ability (CR 113.2c), so a chain of five Stages copying one another loses o
 A fix grows the array or refuses the copy loudly; instances beyond the second of the same ability change no play.
 
 **Scenarios.** none: no scenario builds the chain.
+
 ### KI-54: A loop a player could stop has no shortcut, and a seat that never stops it goes round forever
 
 | Severity | Status | Area | Found |
