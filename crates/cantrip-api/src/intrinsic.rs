@@ -182,7 +182,7 @@ pub static INTRINSIC: CardDef = CardDef {
 /// its controller has priority, by paying its mana cost. A special action (CR 116.2): no stack. The cost is the card's
 /// own, which the rules read off the permanent (`actions::special_action`), not off this ability.
 fn turn_face_up(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.turn_face_up(item.object);
+    g.turn_face_up(item.object, item.controller);
     Ok(())
 }
 

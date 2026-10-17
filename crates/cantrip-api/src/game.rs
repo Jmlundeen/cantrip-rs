@@ -586,8 +586,9 @@ pub trait Game: Query {
     /// Puts an object onto the battlefield face down (CR 708.3): a 2/2 creature with no name, types or abilities
     /// (CR 708.2a), its controller able to turn it face up for its mana cost if it is a creature card (CR 701.40b).
     fn put_onto_battlefield_face_down(&mut self, object: ObjectId, controller: PlayerId) -> Result<ObjectId, Suspend>;
-    /// Turns a face-down permanent face up (CR 701.40b, 708.2). Nothing if it is not one.
-    fn turn_face_up(&mut self, permanent: ObjectId);
+    /// `player` turns a face-down permanent face up (CR 701.40b, 708.2, 708.8): the player taking the special action, or
+    /// the controller of the effect that turns it up. Recorded as `Event::TurnedFaceUp`. Nothing if it is not one.
+    fn turn_face_up(&mut self, permanent: ObjectId, player: PlayerId);
     /// `player` unlocks a door of a Room (CR 709.5f): the permanent is given that half's unlocked designation, which
     /// triggers "when you unlock this door" (CR 709.5h). `door` is `DOOR_LEFT` or `DOOR_RIGHT`. Nothing if the permanent is
     /// not a Room on the battlefield or the door is already unlocked.

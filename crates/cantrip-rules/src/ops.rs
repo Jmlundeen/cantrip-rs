@@ -302,6 +302,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             }
         }
         events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason });
+        // CR 708.3: it entered face down, which the history keeps, as turning it face up later ends that (CR 708.8).
+        if entering && cx.s().obj(new_id).face_down {
+            events.push(Event::EnteredFaceDown { permanent: new_id, controller: cx.s().obj(new_id).controller });
+        }
         // CR 709.5h: a door unlocked as the Room enters is unlocked all the same ("when you unlock this door" triggers).
         if entering && cx.s().obj(new_id).marks.doors != 0 {
             events.push(Event::DoorUnlocked { permanent: new_id, door: cx.s().obj(new_id).marks.doors, player: cx.s().obj(new_id).controller });
@@ -450,9 +454,18 @@ pub fn put_onto_battlefield_face_down(cx: &mut Cx, id: ObjectId, controller: Pla
     Ok(put_onto_battlefield(cx, &[(id, controller, false)], ZoneReason::Other)?[0])
 }
 
-/// Turns a face-down permanent face up (CR 701.40b, 708.2): it is the card it is, the same object (CR 708.8).
-pub fn turn_face_up(cx: &mut Cx, id: ObjectId) {
+/// `player` turns a face-down permanent face up (CR 701.40b, 708.2): it is the card it is, the same object (CR 708.8).
+/// `player` is the one who took the special action, or the controller of the effect that turns it up.
+pub fn turn_face_up(cx: &mut Cx, id: ObjectId, player: PlayerId) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || !cx.s().obj(id).face_down {
+        return;
+    }
+    // CR 701.40g, 701.58g: a manifested or cloaked instant or sorcery card that would turn face up is revealed by its
+    // controller and left face down, and nothing that triggers on turning face up does.
+    let card = cx.cards().get(cx.s().obj(id).card);
+    if card.types.has(CardType::Instant) || card.types.has(CardType::Sorcery) {
+        let controller = cx.s().obj(id).controller;
+        cx.emit(Event::Revealed { player: controller, card: id });
         return;
     }
     cx.st().update_obj(id, |o| {
@@ -460,6 +473,7 @@ pub fn turn_face_up(cx: &mut Cx, id: ObjectId) {
         o.copy = None;
     });
     note_statics(cx, id);
+    cx.emit(Event::TurnedFaceUp { permanent: id, player });
 }
 
 /// The door whose half was cast, by the way it was cast (CR 709.3, 709.5d): none for anything but a split card's halves.

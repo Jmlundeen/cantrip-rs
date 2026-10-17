@@ -139,7 +139,10 @@ also the last-known-information record for one-off mechanics. A question about t
 "the first card drawn in its controller's draw step") is a query over it: written in the card's file when one card
 asks it, moved to `cantrip_mechanics::history` when a second printed card asks it in the same words. The core only
 records events; no per-turn counter answers a history question, the layers' included: a static ability's condition reads
-the history through `LayerQuery::history` (below).
+the history through `LayerQuery::history` (below). A state that changes in place is recorded as it changes, so the
+history can answer for it afterwards: a permanent entering face down is `EnteredFaceDown` (with its controller then) and
+turning one face up is `TurnedFaceUp` (with the player who did it, CR 708.8), as the face-down status itself is gone
+once it is turned up.
 
 - **Causes are recorded.** Each event names what produced it, which serves explanations, debugging and the AI's
   features.

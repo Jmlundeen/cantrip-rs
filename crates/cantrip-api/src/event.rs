@@ -55,6 +55,15 @@ pub enum Event {
     Solved { permanent: ObjectId },
     /// A permanent became suspected (CR 701.60a): it was not suspected before (CR 701.60d).
     Suspected { permanent: ObjectId },
+    /// A permanent entered the battlefield face down (CR 708.3: turned face down before it entered; manifest, CR 701.40a,
+    /// and manifest dread, CR 701.62a), under `controller`'s control. Recorded with its `ZoneChange`, so "a permanent
+    /// entered the battlefield face down under your control this turn" is asked of the history after it has been turned
+    /// face up (which ends its face-down status, CR 708.8) or has left, or its control has changed.
+    EnteredFaceDown { permanent: ObjectId, controller: PlayerId },
+    /// A face-down permanent was turned face up (CR 708.7, 708.8) by `player`: the player who took the special action
+    /// (CR 116.2b, 701.40b, 701.58b), or the controller of the spell or ability whose effect turned it up. The same
+    /// object, now with its normal characteristics.
+    TurnedFaceUp { permanent: ObjectId, player: PlayerId },
     StepBegan { step: Step },
     /// `amount` counters of `kind` were put on a permanent (CR 122.6), as many as the replacement effects left (CR 614.1a),
     /// or it entered with them. `total` is how many of that kind it has once they are on it, so "when the fourth plan
@@ -137,6 +146,7 @@ impl Event {
             | Event::GaveGift { player, .. }
             | Event::Copied { player, .. }
             | Event::DoorUnlocked { player, .. }
+            | Event::TurnedFaceUp { player, .. }
             | Event::CoinFlipped { player, .. }
             | Event::DieRolled { player, .. }
             | Event::Done { player, .. }
@@ -145,7 +155,7 @@ impl Event {
             | Event::Surveilled { player, .. }
             | Event::CrimeCommitted { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
-            Event::BecameTarget { controller, .. } => Some(controller),
+            Event::BecameTarget { controller, .. } | Event::EnteredFaceDown { controller, .. } => Some(controller),
             Event::Damage { target: Target::Player(p), .. } => Some(p),
             _ => None,
         }
@@ -180,6 +190,8 @@ impl Event {
             | Event::Monstrous { permanent }
             | Event::Solved { permanent }
             | Event::Suspected { permanent }
+            | Event::EnteredFaceDown { permanent, .. }
+            | Event::TurnedFaceUp { permanent, .. }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } => false,
@@ -235,6 +247,8 @@ impl EventMask {
     pub const SURVEILLED: EventMask = EventMask(1 << 39);
     pub const SOLVED: EventMask = EventMask(1 << 40);
     pub const SUSPECTED: EventMask = EventMask(1 << 41);
+    pub const ENTERED_FACE_DOWN: EventMask = EventMask(1 << 42);
+    pub const TURNED_FACE_UP: EventMask = EventMask(1 << 43);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -275,6 +289,8 @@ impl EventMask {
             Event::Monstrous { .. } => EventMask::MONSTROUS,
             Event::Solved { .. } => EventMask::SOLVED,
             Event::Suspected { .. } => EventMask::SUSPECTED,
+            Event::EnteredFaceDown { .. } => EventMask::ENTERED_FACE_DOWN,
+            Event::TurnedFaceUp { .. } => EventMask::TURNED_FACE_UP,
             Event::CountersPut { .. } => EventMask::COUNTERS,
             Event::Transformed { .. } => EventMask::TRANSFORMED,
             Event::Unattached { .. } => EventMask::UNATTACHED,

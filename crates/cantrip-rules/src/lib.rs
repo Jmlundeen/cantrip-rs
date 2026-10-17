@@ -727,8 +727,8 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_face_down(self, object, controller).map_err(|_| Suspend)
     }
 
-    fn turn_face_up(&mut self, permanent: ObjectId) {
-        ops::turn_face_up(self, permanent);
+    fn turn_face_up(&mut self, permanent: ObjectId, player: PlayerId) {
+        ops::turn_face_up(self, permanent, player);
     }
 
     fn unlock_door(&mut self, permanent: ObjectId, door: u8, player: PlayerId) {
