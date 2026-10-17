@@ -1,0 +1,49 @@
+# A finality counter replaces only a move from the battlefield to a graveyard (CR 122.1h; the ruling: "Finality counters
+# don't stop permanents from going to zones other than the graveyard"). Bot2's Boomerang Basics returns Summon: Esper
+# Maduin, with its finality counter, to its owner's hand: it goes there, as the card Esper Origins (front face, CR 712.8a),
+# and nothing is exiled. Bot2 did not control it, so Bot2 draws nothing.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Esper Origins
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island
+Boomerang Basics
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange( | Island; Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Arrange(Lightning Bolt; Island | )
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Boomerang Basics.Cast(Bot1.Battlefield.Summon: Esper Maduin)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand = Island; Island; Esper Origins
+Exile.Count = 0
+Bot1.Battlefield = Forest; Sol Ring; Mox Emerald
+Bot2.Hand.Count = 6

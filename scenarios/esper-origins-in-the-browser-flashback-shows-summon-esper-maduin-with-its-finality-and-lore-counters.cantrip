@@ -1,0 +1,47 @@
+# Browser
+# Esper Origins played at a table: cast from the hand, surveiled, then cast from the graveyard with flashback {3}{G} from the
+# card's menu. The flashback cast exiles the spell and puts the card onto the battlefield transformed with a finality counter
+# (CR 712.14a, 122.6): Bot1's page draws Summon: Esper Maduin with both counters it entered
+# with as pills on its art - the finality counter and the Saga's lore counter (CR 714.3a) - and chapter I's reveal puts
+# Llanowar Elves into the hand.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Esper Origins
+Mox Ruby
+Island
+Island
+Lightning Bolt
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt | Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Pass
+Bot1.Arrange(Llanowar Elves | Lightning Bolt)
+Bot1.Pass
+[T1 Bot1.Main2]
+? Client.Bot1.Battlefield.Summon: Esper Maduin.Counters = 1 × finality; 1 × lore
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+Bot1.Hand = Mox Ruby; Island; Llanowar Elves
