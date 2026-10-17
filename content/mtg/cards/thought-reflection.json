@@ -1,0 +1,6 @@
+{
+  "name": "Thought Reflection",
+  "manaCost": "{4}{U}{U}{U}",
+  "type": "Enchantment",
+  "oracleText": "If you would draw a card, draw two cards instead."
+}

@@ -1,0 +1,55 @@
+# Thought Reflection (Bot1's) under Narset, Parter of Veils (Bot2's): "each opponent can't draw more than one card each turn"
+# applies to each card draw (CR 121.2b), and a draw that can't happen is replaced by nothing (CR 614.17c; Narset's ruling).
+# Bot1's turn 3 draw for the turn is its first card of the turn, so it can be drawn and Thought Reflection replaces it with
+# two; the first of those is drawn, and the second would be the turn's second card, so it isn't drawn. Ancestral Recall's
+# three draws then can't happen at all, so Thought Reflection does not replace them either: Bot1 draws one card this turn,
+# where without Narset it would draw eight.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Jet
+Thought Reflection
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Narset, Parter of Veils
+Swamp x5
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thought Reflection.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Narset, Parter of Veils.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 2
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 0
+Bot1.Library.Count = 19
+Bot1.Graveyard = Ancestral Recall; Black Lotus

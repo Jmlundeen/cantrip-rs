@@ -1,0 +1,46 @@
+# Thought Reflection: "If you would draw a card, draw two cards instead" (CR 121.6, 614.1a). Bot1 casts it on turn 1. In its
+# turn 3 draw step the draw for the turn is replaced by two (the effect has no exception for the draw step), and Ancestral
+# Recall's three draws are each replaced on their own (CR 121.2, the card's ruling: "Draw three" draws six), so Bot1 draws
+# eight cards in all: its hand is the Ancestral Recall left from turn 1, the two of the draw step less the Island played,
+# and six more; the library loses eight of its twenty Islands. Without the effect it would hold three and keep sixteen.
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Jet
+Thought Reflection
+Ancestral Recall
+Island x20
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thought Reflection.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Ancestral Recall.Cast(Bot1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 7
+Bot1.Library.Count = 12
+Bot1.Graveyard = Ancestral Recall; Black Lotus

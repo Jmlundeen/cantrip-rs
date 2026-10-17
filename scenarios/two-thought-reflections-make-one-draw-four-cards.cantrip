@@ -1,0 +1,59 @@
+# Two Thought Reflections: "the effects of multiple Thought Reflections are cumulative" (its ruling; CR 614.5, 616.1). Each
+# replacement effect gets one opportunity at an event and at the events that replace it: the first Thought Reflection
+# Bot1 applies to its turn 5 draw makes it two draws, and the other replaces each of those with two more, while neither
+# applies a second time - so the one draw is four cards, no more (an effect applying to its own draws again would never
+# stop) and no fewer. The first is cast on turn 1, the second on turn 3, whose draw step the first alone made two cards
+# (an Island and Mox Emerald, which helps pay for the second).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Jet
+Thought Reflection
+Thought Reflection
+Island
+Mox Emerald
+Island x18
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Thought Reflection.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand.Count = 3
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Thought Reflection.Cast
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 0
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Sol Ring; Mox Sapphire; Mox Jet; Mox Emerald; Thought Reflection; Thought Reflection
+Bot1.Hand.Count = 4
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Library.Count = 14
