@@ -1,0 +1,48 @@
+# CR 702.22c: a band is one or more attacking creatures with banding and up to one without - however many have banding. Bot1
+# attacks with Benalish Hero and Mesa Pegasus (banding), Guerrilla Gorilla and Llanowar Elves (not). Asked for the Hero's band,
+# Bot1 can't take both creatures without banding - refused - but takes the Pegasus and the Gorilla: two with banding and one
+# without. The Pegasus is in a band now, so nothing more is asked, and the Elves attack alone. Nothing blocks; all four deal
+# their damage: 1 + 1 + 2 + 1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Mesa Pegasus
+Llanowar Elves
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mesa Pegasus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Benalish Hero > Bot2; Mesa Pegasus > Bot2; Guerrilla Gorilla > Bot2; Llanowar Elves > Bot2)
+! Bot1.Choose(Guerrilla Gorilla; Llanowar Elves)
+Bot1.Choose(Mesa Pegasus; Guerrilla Gorilla)
+! Bot1.Choose
+[T5 Bot1.Blockers]
+? Combat.Attackers = Benalish Hero > Bot2 (band 1); Mesa Pegasus > Bot2 (band 1); Guerrilla Gorilla > Bot2 (band 1); Llanowar Elves > Bot2
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 15

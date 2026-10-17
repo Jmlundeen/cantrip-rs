@@ -1,0 +1,48 @@
+# Banding on the defending side (CR 702.22j): an attacking creature blocked by a creature with banding has its combat damage
+# divided by the defending player, as they choose among the creatures blocking it - past lethal, and none of it to the
+# player whatever trample would have done (CR 702.19b is the attacking player's procedure, which this replaces). Bot2's
+# Ulvenwald Oddity (4/4 trample, haste) attacks; Bot1 blocks it with Benalish Hero and Guerrilla Gorilla. Bot1 puts all 4 on
+# the Hero: it dies, the Gorilla is dealt nothing, and Bot1 takes nothing. Bot2 alone would have assigned 1 to the Hero, 2 to
+# the Gorilla and 1 to Bot1. The Oddity is dealt 3 and lives.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Attack(Ulvenwald Oddity > Bot1)
+Bot1.Block(Benalish Hero > Ulvenwald Oddity; Guerrilla Gorilla > Ulvenwald Oddity)
+[T2 Bot2.Blockers]
+Bot1.AssignDamage(Ulvenwald Oddity > Benalish Hero: 4)
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Life = 20
+Bot1.Graveyard = Benalish Hero
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 3

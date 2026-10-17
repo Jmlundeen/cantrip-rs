@@ -1,0 +1,43 @@
+# Banding against deathtouch (CR 702.22k, 702.2b): Bot2's Dragon Sniper (1/1 deathtouch) blocks Bot1's band of Benalish Hero
+# and Guerrilla Gorilla, and so blocks both (CR 702.22h). Its 1 would be lethal to either (CR 702.2c), but the attacking
+# player divides it: Bot1 puts it on the Hero, which dies, and the Gorilla, dealt nothing, lives. The band's 3 kill the Sniper.
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Forest
+Dragon Sniper
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Dragon Sniper.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Benalish Hero > Bot2; Guerrilla Gorilla > Bot2)
+Bot1.Choose(Guerrilla Gorilla)
+Bot2.Block(Dragon Sniper > Guerrilla Gorilla)
+Bot1.AssignDamage(Dragon Sniper > Benalish Hero: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Graveyard = Benalish Hero
+Bot1.Battlefield.Guerrilla Gorilla.Damage = 0
+Bot2.Graveyard = Dragon Sniper

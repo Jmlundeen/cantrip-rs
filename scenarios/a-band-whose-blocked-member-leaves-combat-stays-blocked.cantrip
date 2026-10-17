@@ -1,0 +1,53 @@
+# A blocked creature stays blocked when what made it so changes (CR 509.1h), and a member removed from combat leaves its band
+# (CR 702.22f). Bot1's Benalish Hero and Guerrilla Gorilla attack as a band; Bot2's Ulvenwald Oddity blocks the Hero, so it
+# blocks the Gorilla too (CR 702.22h). In the declare blockers step Bot2 Bolts the Hero. The Gorilla is still blocked by the
+# Oddity, deals its 2 to it and nothing to Bot2, and the Oddity, now blocking only the Gorilla, deals all 4 to it (CR 510.1d:
+# no division is left to make, and the Gorilla has no banding to give one to Bot1).
+
+[Bot1 Deck]
+Plains
+Mox Emerald
+Mox Ruby
+Benalish Hero
+Guerrilla Gorilla
+Island x14
+
+[Bot2 Deck]
+Forest
+Black Lotus
+Ulvenwald Oddity
+Mox Ruby
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Guerrilla Gorilla.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Ulvenwald Oddity.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Benalish Hero > Bot2; Guerrilla Gorilla > Bot2)
+Bot1.Choose(Guerrilla Gorilla)
+Bot2.Block(Ulvenwald Oddity > Benalish Hero)
+[T3 Bot1.Blockers]
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Benalish Hero)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot2.Life = 20
+Bot1.Graveyard = Guerrilla Gorilla; Benalish Hero
+Bot2.Battlefield.Ulvenwald Oddity.Damage = 2
