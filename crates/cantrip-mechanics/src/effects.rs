@@ -259,6 +259,15 @@ pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     Ok(())
 }
 
+/// "The next spell you cast this turn can't be countered" (CR 611.2c, 601.2, 701.5a): an effect about the ability's
+/// controller, which marks the next spell that player casts this turn as it is cast, before anyone has priority, and ends
+/// with the turn if they cast none. Each activation is its own effect, so two before the next spell both apply to it.
+/// Mistrise Village and Theorist's Proxy print it.
+pub fn next_spell_cant_be_countered(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_player_effect(item.controller, item.object, EffectKind::NextSpellCantBeCountered, Duration::EndOfTurn);
+    Ok(())
+}
+
 /// "Destroy target [thing]" (CR 701.8): the ability's first target.
 pub fn destroy_first_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     crate::destroy_target(g, item, 0);
