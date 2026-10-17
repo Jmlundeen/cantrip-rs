@@ -1,0 +1,63 @@
+# The ruling of Opalescence and Humility (2009-10-01), Warleader's Call in Worship's place: Humility (turn 3) entered
+# before Opalescence (turn 5). Layer 4: Humility and Warleader's Call become creatures (Opalescence). Layer 6: they lose
+# their abilities (Humility; Warleader's Call's +1/+1 is gone). Layer 7b, in timestamp order (CR 613.7): Humility makes
+# both 1/1, then Opalescence makes Humility 4/4 and Warleader's Call 3/3 (their mana values). Both 1/1 would be the other
+# order; Humility 5/5 and Warleader's Call 4/4 would be the anthem still applying.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Warleader's Call
+Humility
+Opalescence
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Warleader's Call.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Humility.Types = Enchantment
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Power = 4
+Bot1.Battlefield.Humility.Toughness = 4
+Bot1.Battlefield.Warleader's Call.Types = Enchantment; Creature
+Bot1.Battlefield.Warleader's Call.Power = 3
+Bot1.Battlefield.Warleader's Call.Toughness = 3
+Bot1.Battlefield.Opalescence.Types = Enchantment

@@ -1,0 +1,65 @@
+# The ruling of Opalescence and Humility (2009-10-01), Warleader's Call in Worship's place: Opalescence (turn 3) entered
+# before Humility (turn 5). Layer 4: Humility and Warleader's Call become creatures that are still enchantments
+# (Opalescence). Layer 6: they lose their abilities (Humility) - Warleader's Call's "Creatures you control get +1/+1"
+# among them. Layer 7b, in timestamp order (CR 613.7): Opalescence makes Humility 4/4 and Warleader's Call 3/3 (their
+# mana values), then Humility makes both 1/1 - its own effect goes on applying though it took its own ability (CR 613.6).
+# Both end 1/1: 2/2 if Warleader's Call's +1/+1 had stayed, 4/4 and 3/3 if Opalescence's 7b part came last.
+# Opalescence itself is no creature. Before Humility, Warleader's Call is a 4/4: base 3/3 and its own +1/+1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Warleader's Call
+Opalescence
+Humility
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Warleader's Call.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Warleader's Call.Power = 4
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Power = 1
+Bot1.Battlefield.Humility.Toughness = 1
+Bot1.Battlefield.Warleader's Call.Types = Enchantment; Creature
+Bot1.Battlefield.Warleader's Call.Power = 1
+Bot1.Battlefield.Warleader's Call.Toughness = 1
+Bot1.Battlefield.Opalescence.Types = Enchantment

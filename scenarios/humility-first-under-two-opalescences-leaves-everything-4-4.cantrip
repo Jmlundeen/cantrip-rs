@@ -1,0 +1,64 @@
+# The ruling of Opalescence and Humility (2006-02-01): "If Humility has the earliest timestamp, then everything is 4/4."
+# Humility (turn 1), then two Opalescences (turns 3 and 5): each Opalescence animates Humility and the other Opalescence
+# (layer 4), Humility takes all three's abilities (layer 6), and in layer 7b its 1/1 applies first; each Opalescence's
+# part goes on applying, its effect having begun in layer 4 (CR 613.6), and sets the other two to 4/4 after it.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Humility
+Opalescence
+Opalescence
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Humility.Power = 4
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Opalescence#1.Types = Enchantment; Creature
+Bot1.Battlefield.Opalescence#1.Power = 4
+Bot1.Battlefield.Opalescence#1.Toughness = 4
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Power = 4
+Bot1.Battlefield.Humility.Toughness = 4
+Bot1.Battlefield.Opalescence#2.Power = 4
+Bot1.Battlefield.Opalescence#2.Toughness = 4

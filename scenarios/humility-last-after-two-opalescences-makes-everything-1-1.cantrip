@@ -1,0 +1,64 @@
+# The ruling of Opalescence and Humility (2006-02-01): "With a Humility and two Opalescences on the battlefield, if
+# Humility has the latest timestamp, then all creatures are 1/1 with no abilities." Two Opalescences (turns 1 and 3),
+# then Humility (turn 5): each Opalescence animates the other (on turn 3 both are 4/4) and Humility; in layer 7b both
+# Opalescences' parts apply first and Humility's 1/1 last.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Opalescence
+Opalescence
+Humility
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Opalescence#1.Power = 4
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Opalescence#1.Types = Enchantment; Creature
+Bot1.Battlefield.Opalescence#1.Power = 1
+Bot1.Battlefield.Opalescence#1.Toughness = 1
+Bot1.Battlefield.Opalescence#2.Power = 1
+Bot1.Battlefield.Opalescence#2.Toughness = 1
+Bot1.Battlefield.Humility.Types = Enchantment; Creature
+Bot1.Battlefield.Humility.Power = 1
+Bot1.Battlefield.Humility.Toughness = 1

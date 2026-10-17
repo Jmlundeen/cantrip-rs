@@ -1,0 +1,68 @@
+# Opalescence: "Each other non-Aura enchantment is a creature in addition to its other types and has base power and
+# base toughness each equal to its mana value." Bot1's Warleader's Call (mana value 3, cast on turn 1) becomes an
+# Enchantment Creature with base 3/3 (layers 4 and 7b, CR 613.1d, 613.4b); its own "Creatures you control get +1/+1"
+# now pumps it too, and Luminarch Aspirant's beginning-of-combat +1/+1 counter goes on it, both on top of the base
+# (layer 7c): a 5/5, which attacks (it has been under Bot1's control since turn 1, CR 302.6) and deals 5. Rancor is an
+# Aura and stays a noncreature enchantment ("non-Aura") still enchanting Aspirant; Opalescence does not animate itself
+# ("other"). Bot2 took 1 from Warleader's Call when Aspirant entered on turn 1: 20 - 1 - 5 = 14.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Sol Ring
+Warleader's Call
+Luminarch Aspirant
+Rancor
+Opalescence
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Warleader's Call.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Luminarch Aspirant.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Luminarch Aspirant)
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.BeginCombat]
+Bot1.Target(Warleader's Call)
+Bot1.Attack(Warleader's Call > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot2.Life = 14
+Bot1.Battlefield.Warleader's Call.Types = Enchantment; Creature
+Bot1.Battlefield.Warleader's Call.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Warleader's Call.Power = 5
+Bot1.Battlefield.Warleader's Call.Toughness = 5
+Bot1.Battlefield.Opalescence.Types = Enchantment
+Bot1.Battlefield.Rancor.Types = Enchantment
+Bot1.Battlefield.Rancor.AttachedTo = Luminarch Aspirant

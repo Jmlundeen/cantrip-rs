@@ -1,0 +1,66 @@
+# The ruling of Opalescence and Humility (2006-02-01): "If the timestamp order is Opalescence, Humility, Opalescence, the
+# second Opalescence is 1/1, and the Humility and first Opalescence are 4/4." Each Opalescence animates the other two
+# (layer 4), and Humility takes every creature's abilities in layer 6 - the Opalescences' among them. Their effects began
+# in layer 4, so their 7b parts go on applying to what they made creatures (CR 613.6). Layer 7b in timestamp order: the
+# first Opalescence makes Humility and the second 4/4; Humility makes all three 1/1; the second Opalescence makes the
+# first and Humility 4/4. On turn 3, before the second, Humility is 1/1 (Opalescence, then Humility).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Opalescence
+Humility
+Opalescence
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Humility.Power = 1
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Opalescence#1.Types = Enchantment; Creature
+Bot1.Battlefield.Opalescence#1.Power = 4
+Bot1.Battlefield.Opalescence#1.Toughness = 4
+Bot1.Battlefield.Humility.Power = 4
+Bot1.Battlefield.Humility.Toughness = 4
+Bot1.Battlefield.Opalescence#2.Types = Enchantment; Creature
+Bot1.Battlefield.Opalescence#2.Power = 1
+Bot1.Battlefield.Opalescence#2.Toughness = 1

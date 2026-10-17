@@ -1,0 +1,46 @@
+# Opalescence on an enchantment that is a creature already: Fear of Missing Out is a printed 2/3 Enchantment Creature
+# of mana value 2. "Each other non-Aura enchantment ... has base power and base toughness each equal to its mana value"
+# applies to it too, and its layer-7b value replaces the printed one (CR 613.4b; the printed values are the copiable
+# values of layer 1): a 2/2, where it would stay 2/3 if Opalescence left creatures alone. Its enters trigger (discard a
+# card, then draw) has no bearing on its size.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Opalescence
+Fear of Missing Out
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fear of Missing Out.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Fear of Missing Out.Types = Enchantment; Creature
+Bot1.Battlefield.Fear of Missing Out.Power = 2
+Bot1.Battlefield.Fear of Missing Out.Toughness = 2

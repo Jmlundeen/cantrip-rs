@@ -1,0 +1,61 @@
+# Opalescence's ruling: "A noncreature permanent that turns into a creature can attack ... only if its controller has
+# continuously controlled that permanent since the beginning of their most recent turn" (CR 302.6). On turn 3 Bot1 casts
+# Opalescence and then Quest for Ancient Secrets: Warleader's Call, under Bot1's control since turn 1, attacks as a 4/4
+# (base 3/3, its own +1/+1), while Quest, which came this turn, is a summoning-sick 2/2 (base 1/1 for mana value 1, +1/+1)
+# and is refused as an attacker. Quest enters as a creature, so Warleader's Call's "Whenever a creature you control
+# enters" triggers (CR 603.6a): Bot2 takes 1 from it and 4 in combat, 20 - 1 - 4 = 15.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Warleader's Call
+Quest for Ancient Secrets
+Opalescence
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Warleader's Call.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Quest for Ancient Secrets.Cast
+Bot1.Pass
+! Bot1.Attack(Quest for Ancient Secrets > Bot2)
+Bot1.Attack(Warleader's Call > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Life = 15
+Bot1.Battlefield.Warleader's Call.Types = Enchantment; Creature
+Bot1.Battlefield.Warleader's Call.SummoningSick = False
+Bot1.Battlefield.Warleader's Call.Tapped = True
+Bot1.Battlefield.Quest for Ancient Secrets.Types = Enchantment; Creature
+Bot1.Battlefield.Quest for Ancient Secrets.SummoningSick = True
+Bot1.Battlefield.Quest for Ancient Secrets.Power = 2
+Bot1.Battlefield.Quest for Ancient Secrets.Toughness = 2
