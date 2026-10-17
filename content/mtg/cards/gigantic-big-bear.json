@@ -1,0 +1,13 @@
+{
+  "name": "Gigantic Big Bear",
+  "manaCost": "{5}{G}{G}",
+  "type": "Creature — Bear",
+  "power": 10,
+  "toughness": 7,
+  "oracleText": "This spell can't be countered.\nHexproof, haste",
+  "keywords": [
+    "CantBeCountered",
+    "Hexproof",
+    "Haste"
+  ]
+}

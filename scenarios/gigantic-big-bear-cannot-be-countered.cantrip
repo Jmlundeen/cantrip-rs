@@ -1,0 +1,41 @@
+# "This spell can't be countered." Turn 3: Bot1 casts Gigantic Big Bear with two Black Lotuses and two Forests (eight mana for seven). Bot2, holding a Black
+# Lotus from turn 2, answers with Counterspell; it resolves and does nothing, the Bear resolves and is on the battlefield, and Counterspell is in Bot2's graveyard.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Black Lotus
+Gigantic Big Bear
+Forest
+Forest x16
+
+[Bot2 Deck]
+Black Lotus
+Counterspell
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantic Big Bear.Cast
+? Stack = Gigantic Big Bear
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Counterspell.Cast(Gigantic Big Bear)
+? Stack = Counterspell; Gigantic Big Bear
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Forest; Gigantic Big Bear
+Bot2.Graveyard = Counterspell; Black Lotus

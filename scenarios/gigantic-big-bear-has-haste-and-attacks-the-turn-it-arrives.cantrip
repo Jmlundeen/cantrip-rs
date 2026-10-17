@@ -1,0 +1,31 @@
+# "Haste": turn 1 Bot1 casts Gigantic Big Bear ({5}{G}{G}) with two Black Lotuses and a Forest, and attacks with it at once, dealing 10 to Bot2.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Black Lotus
+Gigantic Big Bear
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gigantic Big Bear.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Gigantic Big Bear > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 10
+Bot1.Battlefield.Gigantic Big Bear.Power = 10
+Bot1.Battlefield.Gigantic Big Bear.Toughness = 7
+Bot1.Battlefield.Gigantic Big Bear.Keywords = CantBeCountered; Haste; Hexproof
+Bot1.Battlefield.Gigantic Big Bear.Tapped = true
