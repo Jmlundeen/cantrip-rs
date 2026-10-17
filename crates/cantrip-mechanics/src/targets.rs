@@ -66,7 +66,8 @@ fn spell_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
 pub const ANY: TargetSpec = target(any_target_filter);
 pub const CREATURE: TargetSpec = target(creature_filter);
 /// "Another target creature", "other target creature" (CR 115.1, 109.5): a creature on the battlefield other than the source
-/// of the spell or ability. Arwen, Mortal Queen, Restless Vinestalk and Wolverine, Fierce Fighter print it; a slot of up to one
+/// of the spell or ability. Arwen, Mortal Queen, Restless Vinestalk, Wolverine, Fierce Fighter, Solitude, Abigale, Eloquent First-Year, Lyna, Veil of Vengeance
+/// and Super-Adaptoid print it; a slot of up to one
 /// is `up_to_one(other_creature_filter)`.
 pub fn other_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && t != Target::Object(asker.source)
