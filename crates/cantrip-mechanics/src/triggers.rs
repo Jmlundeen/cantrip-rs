@@ -128,6 +128,16 @@ pub fn you_draw_a_card(_: &dyn Query, me: &Asker, event: &Event) -> Option<Fired
     }
 }
 
+/// "Whenever an opponent draws a card" (CR 120.3, 603.2): once for each card an opponent of the source's controller draws
+/// (a draw a replacement effect replaced was not made, CR 614.6), that player the trigger's subject. Sheoldred, the
+/// Apocalypse and Consecrated Sphinx print it.
+pub fn an_opponent_draws_a_card(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Drew { player, .. } if q.state().opponents(me.controller).any(|o| o == *player) => Fired::about(Target::Player(*player)),
+        _ => None,
+    }
+}
+
 /// "Whenever you gain life" (CR 119.3, 603.2): one trigger for each time the source's controller gains life, and none
 /// when none is gained (a gain of 0, or life that can't be gained, CR 119.7). Ajani Resolute (and its Pridemate token) and
 /// Amalia Benavides Aguirre print it, and Professor Dellian Fel's emblem and Sanguine Bond read the amount ("that
@@ -858,6 +868,19 @@ pub fn deals_combat_damage_to_player(_: &dyn Query, source: ObjectId, event: &Ev
     }
 }
 
+/// "Whenever this creature deals combat damage to a creature" (CR 510.2, 603.2): once for each creature it damages, judged
+/// as the damage is dealt, with "that creature" the trigger's subject. Stinkweed Imp prints it, and Kaldra Compleat grants it.
+pub fn deals_combat_damage_to_a_creature(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: from, target: Target::Object(id), amount, combat: true, .. }
+            if *from == source && *amount > 0 && q.chars(*id).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Object(*id))
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control deals combat damage to a player" (CR 510.2, 603.2): one trigger for each creature and
 /// player, with "that player" fixed as the trigger's subject. Vraska, Golgari Queen's emblem and Enduring Curiosity print it.
 pub fn creature_you_control_deals_combat_damage_to_player(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -1026,11 +1049,13 @@ pub const YOU_SCRY: Trigger = when_asked(EventMask::SCRIED, you_scry);
 pub const YOU_SURVEIL: Trigger = when_asked(EventMask::SURVEILLED, you_surveil);
 pub const YOU_SCRY_OR_SURVEIL: Trigger = when_asked(EventMask(EventMask::SCRIED.0 | EventMask::SURVEILLED.0), you_scry_or_surveil);
 pub const YOU_DRAW_A_CARD: Trigger = when_asked(EventMask::DREW, you_draw_a_card);
+pub const AN_OPPONENT_DRAWS_A_CARD: Trigger = when_asked(EventMask::DREW, an_opponent_draws_a_card);
 pub const YOU_GAIN_LIFE: Trigger = when_asked(EventMask::LIFE_CHANGE, you_gain_life);
 pub const CAST_THIS_SPELL: Trigger = when(EventMask::SPELL_CAST, cast_this_spell);
 pub const MAGECRAFT: Trigger = when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::COPIED.0), you_cast_or_copy_instant_or_sorcery);
 pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 | EventMask::BLOCKS.0), this_attacks_or_blocks);
 pub const THIS_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, this_dealt_damage);
+pub const DEALS_COMBAT_DAMAGE_TO_A_CREATURE: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_a_creature);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
 pub const THIS_ENTERS_OR_ATTACKS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), this_enters_or_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);

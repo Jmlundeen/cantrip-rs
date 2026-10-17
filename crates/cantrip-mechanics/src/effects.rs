@@ -342,6 +342,18 @@ pub fn ask_may(g: &mut dyn Game, player: PlayerId, source: ObjectId, purpose: Pu
     Ok(g.ask(player, RequestKind::May { source, purpose })? == Answer::Yes)
 }
 
+/// "You may draw `n` cards" (CR 121.3, 121.2b): not offered when `player` can't draw that many ("can't draw more than one
+/// card each turn" forbids a choice of two even before any card is drawn, Narset, Parter of Veils' ruling); asked with
+/// `question`, and the cards drawn on a yes. Whether they chose to draw. Leovold, Emissary of Trest, Consecrated Sphinx and
+/// Sylvan Library print it.
+pub fn may_draw(g: &mut dyn Game, player: PlayerId, source: ObjectId, n: u32, question: &'static Question) -> Result<bool, Suspend> {
+    if cant_draw(g, player, n) || !ask_may(g, player, source, Purpose::Ask(question))? {
+        return Ok(false);
+    }
+    g.draw(player, n);
+    Ok(true)
+}
+
 const MAY_MILL: Question = Question::new("Mill", "mill a card?", "The top card of your library goes into your graveyard", "Mill", "Don't mill");
 
 /// "You may mill a card" (CR 701.17a): asked of the ability's controller, then the mill. Mole Man's Moloid tokens and
@@ -505,6 +517,19 @@ pub fn gain_haste(g: &mut dyn Game, source: ObjectId, object: ObjectId) {
 /// Monstrosity and Boros Charm print it.
 pub fn gain_indestructible_until_end_of_turn(g: &mut dyn Game, source: ObjectId, target: ObjectId) {
     g.add_effect(source, target, EffectKind::AddKeywords(Keywords::of(&[Keyword::Indestructible])), Duration::EndOfTurn);
+}
+
+/// "This creature gains indestructible until end of turn. Tap it." (CR 702.12b, 611.2a, 701.26a): if the ability's source is
+/// still on the battlefield as the permanent it was (CR 400.7), it gains the keyword for the rest of the turn, then it is
+/// tapped. The tap is the ability's own instruction, not its cost, so the ability can be activated while it is tapped
+/// already (Underrealm Lich's ruling). Iron-Shield Elf and Underrealm Lich print it.
+pub fn this_gains_indestructible_then_tap(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let creature = item.object;
+    if crate::targets::permanent(g, creature) {
+        gain_indestructible_until_end_of_turn(g, creature, creature);
+        g.tap(creature);
+    }
+    Ok(())
 }
 
 /// "`target` gains hexproof and indestructible until end of turn" (CR 702.11b, 702.12b, 611.2a): both keywords from one

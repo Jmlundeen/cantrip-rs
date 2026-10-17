@@ -40,6 +40,7 @@ pub mod craft;
 pub mod crew;
 pub mod devoid;
 pub mod double;
+pub mod dredge;
 pub mod earthbend;
 pub mod empower;
 pub mod enduring;

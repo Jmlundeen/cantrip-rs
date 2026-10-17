@@ -1,21 +1,9 @@
 use cantrip_api::*;
+use cantrip_mechanics::statics::opponents_cant_draw_more_than_one_card_each_turn;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-const ASK: Question = Question::new("Draw", "draw a card?", "", "Draw", "Don't draw");
-
-/// "Each opponent can't draw more than one card each turn." A draw instruction is cut down to the one card the player
-/// has not drawn yet this turn (CR 101.2, 121.2): nothing at all once they have drawn.
-fn limits(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
-    matches!(proposal, Proposal::DrawInstruction(d) if d.player != asker.controller)
-}
-
-fn limit(q: &dyn Query, _: &Asker, proposal: &mut Proposal) {
-    if let Proposal::DrawInstruction(d) = proposal {
-        let allowed = 1u32.saturating_sub(cantrip_mechanics::history::drawn_this_turn(q, d.player) as u32);
-        d.count = d.count.min(allowed);
-    }
-}
+static ASK: Question = Question::new("Draw", "draw a card?", "", "Draw", "Don't draw");
 
 /// "Whenever you or a permanent you control becomes the target of a spell or ability an opponent controls": a
 /// permanent is one on the battlefield. Each thing named is its own event, so each triggers it (CR 603.2).
@@ -34,23 +22,17 @@ fn targeted(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     }
 }
 
-/// "You may draw a card." Not offered when an opponent's Leovold has already used up this turn's draw (CR 121.3).
+/// "You may draw a card." Not offered when the player can't draw a card (CR 121.3): an opponent's Leovold once this turn's
+/// draw is used up.
 fn may_draw(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    let leovold = g.chars(item.object).card;
-    let barred = cantrip_mechanics::history::drawn_this_turn(g, you) >= 1
-        && g.state().battlefield().iter().any(|&id| g.controller(id) != you && g.chars(id).card == leovold);
-    if barred {
-        return Ok(());
-    }
-    if cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
-        g.draw(you, 1);
-    }
+    cantrip_mechanics::effects::may_draw(g, item.controller, item.object, 1, &ASK)?;
     Ok(())
 }
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::BECAME_TARGET, targeted), may_draw, "Whenever you or a permanent you control becomes the target of a spell or ability an opponent controls, you may draw a card.")],
-    replacements: &[replacement(ReplacementKind::DrawInstruction, limits, limit, "can't draw more than one card each turn")],
+    // "Each opponent can't draw more than one card each turn" (CR 121.2b): each draw past the first is not made, and no
+    // replacement effect replaces it (CR 614.17c).
+    cant_draw: &[opponents_cant_draw_more_than_one_card_each_turn],
     ..oracle::LEOVOLD_EMISSARY_OF_TREST
 };

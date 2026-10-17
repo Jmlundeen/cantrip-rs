@@ -249,6 +249,20 @@ fn you(q: &dyn LayerQuery, source: ObjectId, player: PlayerId) -> bool {
     q.state().obj(source).controller == player
 }
 
+/// Whether `n` more cards would be more than one card `player` has drawn this turn (CR 121.2b): the limit of "can't draw
+/// more than one card each turn", counted from the history, so the cards drawn before the permanent arrived count
+/// (Narset, Parter of Veils' ruling) and a draw a replacement effect replaced does not (CR 614.6). Spirit of the Labyrinth,
+/// Narset, Parter of Veils and Leovold, Emissary of Trest print the limit.
+pub fn more_than_one_card_drawn_this_turn(q: &dyn Query, player: PlayerId, n: u32) -> bool {
+    crate::history::drawn_this_turn(q, player) as u32 + n > 1
+}
+
+/// "Each opponent can't draw more than one card each turn" (CR 121.2b) as a `CardDef::cant_draw` entry: every player but
+/// its controller. Narset, Parter of Veils and Leovold, Emissary of Trest print it.
+pub fn opponents_cant_draw_more_than_one_card_each_turn(q: &dyn Query, asker: &Asker, player: PlayerId, n: u32) -> bool {
+    player != asker.controller && more_than_one_card_drawn_this_turn(q, player, n)
+}
+
 /// "Damage can't be prevented" (CR 615.12) as a `CardDef::unpreventable_damage` entry: all damage, from any source, combat
 /// or not, while the permanent is on the battlefield. Sunspine Lynx, Leyline of Punishment and Everlasting Torment print it.
 pub fn damage_cant_be_prevented(_: &dyn Query, _: &Asker, _: ObjectId, _: bool) -> bool {

@@ -1,0 +1,42 @@
+# Hullbreacher (Bot1's) replaces each of an opponent's draws on its own (CR 121.6, 614.1a), like any effect that replaces "a
+# card" drawn, so it is ordered with the drawing player's own replacement effects by that player (CR 616.1). Bot2 draws its
+# last card in its turn 2 draw step (exempt from Hullbreacher), then casts Laboratory Maniac and Ancestral Recall. The first
+# draw would be from its empty library, and both effects apply: Bot2 has Laboratory Maniac apply first and wins the game
+# instead of drawing (CR 104.2b); Bot1 gets no Treasure.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Hullbreacher
+Plains x4
+Plains x20
+
+[Bot2 Deck]
+Island
+Black Lotus
+Laboratory Maniac
+Ancestral Recall
+Swamp x3
+Swamp
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Hullbreacher.Cast
+[T2 Bot2.Main1]
+? Bot2.Library.Count = 0
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Laboratory Maniac.Cast
+Bot2.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ancestral Recall.Cast(Bot2)
+Bot2.Replace(Laboratory Maniac)
+
+[Expect]
+Result = Bot2 won
+Bot1.Battlefield = Island; Hullbreacher

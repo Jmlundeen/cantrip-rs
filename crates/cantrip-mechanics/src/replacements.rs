@@ -193,11 +193,28 @@ fn you_would_draw_from_nothing(q: &dyn Query, asker: &Asker, proposal: &Proposal
     matches!(proposal, Proposal::Draw(d) if d.player == asker.controller && q.state().zone(Zone::library(d.player)).is_empty())
 }
 
-/// The draw does not happen (CR 614.6).
-fn not_drawn(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
+/// "... instead": the card is not drawn (CR 614.6), what the effect does in its place being its `then`. The `apply` of every
+/// replacement effect that replaces one draw (CR 121.6): Laboratory Maniac's, Notion Thief's, Thought Reflection's, dredge's.
+pub fn instead_of_drawing(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
     if let Proposal::Draw(d) = proposal {
         d.replaced = true;
     }
+}
+
+/// "If you would draw a card" (CR 121.6, 614.1a): one draw of the effect's controller, judged as it is about to be made
+/// (CR 121.2), so each draw of an instruction to draw several is replaced on its own; an empty library is no matter
+/// (CR 121.6a). Thought Reflection, Underrealm Lich and Abundance print it.
+pub fn you_would_draw_a_card(_: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::Draw(d) if d.player == asker.controller)
+}
+
+/// "If an opponent would draw a card except the first one they draw in each of their draw steps" (CR 121.6, 614.1a): one
+/// draw, judged as it is about to be made (CR 121.2), by an opponent of the effect's controller, unless it would be the first
+/// card that player draws in their own draw step (a draw replaced before it was not drawn, CR 614.6). Hullbreacher and
+/// Notion Thief print it.
+pub fn opponent_would_draw_except_first_in_draw_step(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+    matches!(proposal, Proposal::Draw(d)
+        if q.state().opponents(asker.controller).any(|o| o == d.player) && !crate::history::first_draw_in_own_draw_step(q, d.player))
 }
 
 /// "You win the game instead": unless a player can't win or an opponent can't lose (Platinum Angel), when it does nothing
@@ -209,7 +226,7 @@ fn win_instead(g: &mut dyn Game, asker: &Asker, _: &Proposal, _: &Proposal) {
 /// "If you would draw a card while your library has no cards in it, you win the game instead" (CR 614.1a, 121.6). Each draw
 /// of an instruction to draw several is asked about on its own. Laboratory Maniac and Jace, Wielder of Mysteries print it.
 pub const WIN_INSTEAD_OF_DRAWING_FROM_AN_EMPTY_LIBRARY: ReplacementDef =
-    replacement(ReplacementKind::Draw, you_would_draw_from_nothing, not_drawn, "wins the game instead of drawing from an empty library")
+    replacement(ReplacementKind::Draw, you_would_draw_from_nothing, instead_of_drawing, "wins the game instead of drawing from an empty library")
         .then(win_instead);
 
 /// "If you would gain life, you gain twice that much life instead." Each applies once to each gain, so two make four

@@ -83,6 +83,8 @@ keeps it).
 | [KI-70](#ki-70-a-block-requirement-is-counted-on-the-declared-block-only-not-through-the-blocked-creatures-band) | A block requirement is counted on the declared block only, not through the blocked creature's band | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-72](#ki-72-a-face-down-permanent-may-be-unable-to-turn-face-up-under-humility) | A face-down permanent may be unable to turn face up under Humility | Low | Suspected |
+| [KI-73](#ki-73-older-you-may-draw-cards-offer-a-draw-a-cant-draw-rule-forbids) | Older "you may draw" cards offer a draw a can't-draw rule forbids | Low | Open |
+| [KI-74](#ki-74-a-question-a-replacement-asks-mid-run-is-not-watched-for-loops) | A question a replacement asks mid-run is not watched for loops | Low | Suspected |
 
 ## Issues
 
@@ -867,6 +869,33 @@ value 1 rather than 3. Bestow is an alternative cost (CR 702.103a, 118.9c): the 
 Chalice of the Void with one counter would counter it (and with three would not), and a `CardDef::spell_rules` ban judges it
 by the bestow cost too (no implemented bestow card's mana value reaches Gaddock Teeg's 4). A fix keeps the mana cost on the
 face and the bestow cost apart.
+
+### KI-73: Older "you may draw" cards offer a draw a can't-draw rule forbids
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | cards | 2026-10-17, the draw-replacement batch's review |
+
+**Notes.** "If an effect says that a player can't draw cards and another effect offers that player the choice to draw a card,
+that player can't choose to do so" (CR 121.3), and under "can't draw more than one card each turn" a choice to draw two or
+more can't be taken at all (CR 121.2b, Narset, Parter of Veils' ruling). `cantrip_mechanics::effects::may_draw` does this
+(Leovold, Consecrated Sphinx, Sylvan Library), but Fecundity, Jeskai Ascendancy, Oblivious Bookworm, Smuggler's Copter and
+Terrasymbiosis still ask their "you may draw" by hand: under Spirit of the Labyrinth or Narset they ask, and the draw then does
+not happen (the core refuses it), where the rules say they should not ask. The fix moves them onto `may_draw`.
+
+**Scenarios.** none yet.
+
+### KI-74: A question a replacement asks mid-run is not watched for loops
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | engine | 2026-10-17, the draw-replacement batch's review |
+
+**Notes.** A run that goes on past a question it could not stop at (a replacement effect's order, a dredge or Abundance "may",
+Chains of Mephistopheles' discard) is wound back to where the question was asked (`Cx::asked_at`). The mark is taken before
+`loops::waiting` registers the question with the loop watch, so the revert undoes the registration, and such a question is
+not watched for a loop of choices (CR 732). The old revert to the run's start did the same. A loop through repeated draw
+replacements is the only way to meet it.
 
 **Scenarios.** none yet.
 
