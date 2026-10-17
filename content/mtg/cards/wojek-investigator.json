@@ -1,0 +1,12 @@
+{
+  "name": "Wojek Investigator",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Angel Detective",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Flying, vigilance\nAt the beginning of your upkeep, investigate once for each opponent who has more cards in hand than you. (To investigate, create a Clue token. It's an artifact with \"{2}, Sacrifice this token: Draw a card.\")",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}
