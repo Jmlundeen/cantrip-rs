@@ -20,13 +20,6 @@ fn sacrifice_to_draw_and_mill(g: &mut dyn Game, item: &StackItem) -> Result<(), 
     Ok(())
 }
 
-/// "{2}{B}: Return this card from your graveyard to your hand." Nothing if it has left the graveyard by then: the verb
-/// returns no object that is no longer the one it was (CR 400.7).
-fn return_to_hand(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.return_to_hand(&[item.object]);
-    Ok(())
-}
-
 /// The keywords the Bonemass has while an exiled card used to craft it has them.
 const SHARED: [Keyword; 12] = [
     Keyword::Flying,
@@ -76,7 +69,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, sacrifice_to_draw_and_mill, "When this artifact enters, you may sacrifice a nontoken creature. If you do, draw X cards, then mill X cards, where X is that creature's power."),
         craft::ability(mana("{2}{B}{B}"), &craft::ONE_OR_MORE_CREATURES, "Craft with one or more creatures {2}{B}{B}"),
-        ability(cost("{2}{B}"), return_to_hand, "{2}{B}: Return this card from your graveyard to your hand.").from(ZoneKind::Graveyard),
+        ability(cost("{2}{B}"), cantrip_mechanics::effects::return_this_to_hand,"{2}{B}: Return this card from your graveyard to your hand.").from(ZoneKind::Graveyard),
     ],
     back: Some(&BACK),
     ..oracle::ALTAR_OF_THE_WRETCHED
