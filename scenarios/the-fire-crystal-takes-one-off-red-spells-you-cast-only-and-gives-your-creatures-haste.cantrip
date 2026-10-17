@@ -1,0 +1,65 @@
+# The Fire Crystal (CR 601.2f, 118.7c): "Red spells you cast cost {1} less to cast" and "Creatures you control have haste". Turn 1:
+# Mountain, Mox Ruby, Mox Jet and Mox Pearl pay for the Crystal ({2}{R}{R}). Turn 3: Bot1 casts Immolation Shaman ({1}{R}, red) for {R} alone
+# - its Mountain - and, with haste, attacks with it the turn it is cast: Bot2 goes to 19. The colorless Mind Stone ({2}) is not reduced
+# (the pool is empty after Mox Jet and Mox Pearl pay it: an unreduced {2} left nothing over). Turn 4: Bot2 casts its own red Embereth Shieldbreaker
+# ({1}{R}) with two Mountains tapped first: the Crystal is Bot1's, so it costs the full {1}{R} - nothing is left in Bot2's pool.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+The Fire Crystal
+Mind Stone
+Immolation Shaman
+Mountain
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mountain
+Embereth Shieldbreaker
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Fire Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Hand.Immolation Shaman.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mind Stone.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot1.Attack(Immolation Shaman > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Embereth Shieldbreaker.Cast
+? Bot2.Mana =
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Immolation Shaman.SummoningSick = false
+Bot2.Battlefield.Embereth Shieldbreaker.SummoningSick = true

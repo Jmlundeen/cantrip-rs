@@ -1,0 +1,55 @@
+# "Sacrifice it at the beginning of the next end step" (CR 603.7): the Crystal is activated in Bot1's own end step of turn 3, after that
+# step began, so "the next end step" is turn 4's (Bot2's). The token Ornithopter is still there through Bot2's turn 4 up to its end step (the
+# check at Bot2's second main phase) and gone after (turn 5), when Bot1's graveyard is still empty.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+The Fire Crystal
+Ornithopter
+Mox Sapphire
+Mountain
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Fire Crystal.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.End]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.The Fire Crystal.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Ornithopter#2.Token = true
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; The Fire Crystal; Ornithopter

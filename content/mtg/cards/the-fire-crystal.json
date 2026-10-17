@@ -1,0 +1,6 @@
+{
+  "name": "The Fire Crystal",
+  "manaCost": "{2}{R}{R}",
+  "type": "Legendary Artifact",
+  "oracleText": "Red spells you cast cost {1} less to cast.\nCreatures you control have haste.\n{4}{R}{R}, {T}: Create a token that's a copy of target creature you control. Sacrifice it at the beginning of the next end step."
+}

@@ -1,0 +1,64 @@
+# The Fire Crystal: "{4}{R}{R}, {T}: Create a token that's a copy of target creature you control. Sacrifice it at the beginning of the next end
+# step" (CR 707.2, 111.1, 603.7). Turn 1: Crystal paid with Mountain and three Moxen, plus a free Ornithopter. Turn 3: six mana from
+# the second Mountain and all the Moxen (Ruby for {R}{R} with a Mountain) copies the Ornithopter: a token Ornithopter with flying
+# appears (two Ornithopters), and in the end step it is sacrificed: a token that leaves the battlefield ceases to exist, so Bot1's
+# graveyard stays empty. The target must be a creature Bot1 controls: Bot2's Ornithopter is refused (beside the positive control).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+The Fire Crystal
+Ornithopter
+Mox Sapphire
+Mountain
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.The Fire Crystal.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Battlefield.The Fire Crystal.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.The Fire Crystal.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Ornithopter#2.Token = true
+? Bot1.Battlefield.Ornithopter#2.Keywords = Flying; Haste
+? Bot1.Battlefield.Ornithopter#1.Token = (absent)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield = Mountain; Mountain; Mox Ruby; Mox Jet; Mox Pearl; Mox Sapphire; The Fire Crystal; Ornithopter
+Bot1.Battlefield.Ornithopter.Token = (absent)
