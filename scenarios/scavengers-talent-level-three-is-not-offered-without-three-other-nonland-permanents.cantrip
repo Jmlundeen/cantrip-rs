@@ -1,0 +1,43 @@
+# Level 3 needs "three other nonland permanents" to sacrifice: Bot1 reaches it with Swamps only (lands are not
+# sacrificed to it), so at the beginning of its end step in turn 5 the "you may" is never asked (`! Bot1.Accept`) and
+# nothing is sacrificed. The sibling scenario, with Moxen to sacrifice, is asked.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Scavenger's Talent
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+! Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Scavenger's Talent
+Bot1.Graveyard.Count = 0

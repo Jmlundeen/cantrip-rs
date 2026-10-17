@@ -1,0 +1,73 @@
+# Scavenger's Talent, level 1: "Whenever one or more creatures you control die, create a Food token. This ability triggers
+# only once each turn." Bot1's Talent and two Healer's Hawks are out after turn 1. In turn 2 Bot2 kills one Hawk with a
+# Lightning Bolt and the other with a Shock, two separate deaths in one turn: only one Food is made (CR 603.2). Then Bot1
+# casts a third Hawk in turn 3 and Bot2 kills it in turn 4, a new turn, which makes a second Food (it is "each turn", not
+# once in the game).
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Pearl
+Scavenger's Talent
+Healer's Hawk
+Healer's Hawk
+Healer's Hawk
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Shock
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Healer's Hawk#1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Shock.Cast(Bot1.Battlefield.Healer's Hawk)
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.End]
+? Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Pearl; Scavenger's Talent; Food Token
+? Bot1.Graveyard = Healer's Hawk; Healer's Hawk
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Healer's Hawk)
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Pearl; Mox Pearl; Scavenger's Talent; Food Token; Food Token
+Bot1.Graveyard.Count = 3

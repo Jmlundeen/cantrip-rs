@@ -1,0 +1,68 @@
+# Scavenger's Talent level 3: "At the beginning of your end step, you may sacrifice three other nonland permanents. If you
+# do, return a creature card from your graveyard to the battlefield with a finality counter on it." Bot1 reaches level 3 in
+# turn 5 (Level 2 in turn 3). At the end step it sacrifices its Healer's Hawk and two Moxen; the creature card may be one of
+# the sacrificed permanents (the ruling), and the Hawk comes back with a finality counter on it, as a new object. The level-2
+# ability triggers for each of the three sacrifices (three mills of two, all aimed at Bot2: 6 cards), and the level-1 ability
+# for the Hawk's death makes a Food. Bot2 plays a land each turn so nothing is discarded.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Scavenger's Talent
+Healer's Hawk
+Island x10
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healer's Hawk.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+Bot1.Accept
+Bot1.Choose(Healer's Hawk; Mox Pearl; Mox Ruby)
+Bot1.Choose(Healer's Hawk)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Sapphire; Scavenger's Talent; Healer's Hawk; Food Token
+Bot1.Battlefield.Healer's Hawk.Counters.Finality = 1
+Bot1.Graveyard.Count = 2
+Bot2.Graveyard.Count = 6

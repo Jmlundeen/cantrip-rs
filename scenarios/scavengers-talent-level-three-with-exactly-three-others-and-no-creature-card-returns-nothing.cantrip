@@ -1,0 +1,61 @@
+# Level 3 with exactly three other nonland permanents (three Moxen): they are all sacrificed without a choice, and with no
+# creature card in the graveyard there is nothing to return ("return a creature card": none to return, CR 608.2c). The
+# three sacrifices trigger level 2 three times, each milling two cards from Bot2 (6). The Swamps (lands) are not among the
+# permanents that can be sacrificed. Bot2 plays a land each turn so nothing is discarded.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Swamp
+Scavenger's Talent
+Mox Pearl
+Mox Ruby
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.End]
+! Bot1.Choose
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Swamp; Swamp; Swamp; Scavenger's Talent
+Bot1.Graveyard.Count = 3
+Bot2.Graveyard.Count = 6

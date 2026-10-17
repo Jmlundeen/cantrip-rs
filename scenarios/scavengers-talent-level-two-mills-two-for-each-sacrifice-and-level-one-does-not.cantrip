@@ -1,0 +1,61 @@
+# Scavenger's Talent level 2: "Whenever you sacrifice a permanent, target player mills two cards." Turn 1 (level 1): Bot1
+# sacrifices Masked Meower to its own ability (a cost) - no mill (Bot2's graveyard stays empty); the Meower dies, so the
+# level-1 ability makes a Food. Turn 3: Bot1 pays {1}{B} for Level 2 (sorcery speed, CR 716.2b), sacrifices the second
+# Meower, targets Bot2, and Bot2 mills two cards (2 in its graveyard, 4 left in a library of 7 less its turn-2 draw). The Meower's death in turn 3 makes a second Food (a
+# new turn). The level is a designation, not a counter (CR 716.3).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Ruby
+Scavenger's Talent
+Masked Meower
+Masked Meower
+Island
+Island x10
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Masked Meower.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard.Count = 0
+? Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Ruby; Scavenger's Talent; Masked Meower; Food Token
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Scavenger's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Masked Meower.Activate
+Bot1.Choose(Island)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard.Count = 2
+Bot2.Library.Count = 4
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Ruby; Scavenger's Talent; Food Token; Food Token

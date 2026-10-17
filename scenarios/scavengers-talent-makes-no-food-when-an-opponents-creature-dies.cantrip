@@ -1,0 +1,39 @@
+# "Creatures you control": Bot2's Healer's Hawk dies to Bot1's Stab and Bot1's Talent makes no Food (the positive control
+# is the sibling scenario where Bot1's own creature dies).
+
+[Bot1 Deck]
+Mox Jet
+Scavenger's Talent
+Stab
+Island x10
+
+[Bot2 Deck]
+Mox Pearl
+Healer's Hawk
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Scavenger's Talent.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healer's Hawk.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stab.Cast(Bot2.Battlefield.Healer's Hawk)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Healer's Hawk
