@@ -1,0 +1,37 @@
+# Dredger's Insight: an artifact card taken from among the milled cards into hand gains 1 life as well - "artifact
+# and/or creature cards leave your graveyard". Milled: Island, Sol Ring, Lightning Bolt, Llanowar Elves; Bot1 takes the
+# Sol Ring (an artifact that is not a creature), leaving the creature behind.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Dredger's Insight
+Forest
+Island
+Sol Ring
+Lightning Bolt
+Llanowar Elves
+Forest x10
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+Bot1.Choose(Sol Ring)
+[Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Sol Ring
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Island

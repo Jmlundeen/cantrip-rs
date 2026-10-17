@@ -1,0 +1,39 @@
+# Dredger's Insight: a land card may be taken from among the milled cards (artifact, creature, or land), but a land is
+# neither an artifact nor a creature, so leaving the graveyard it gains no life. Milled: Lightning Bolt, Island, Lightning
+# Bolt, Lightning Bolt; the only card that can be taken is the Island. (The positive controls, where the card taken is a
+# creature or an artifact, are the other Dredger's Insight scenarios.)
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Dredger's Insight
+Forest
+Lightning Bolt
+Island
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Island)
+[Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Island
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Lightning Bolt

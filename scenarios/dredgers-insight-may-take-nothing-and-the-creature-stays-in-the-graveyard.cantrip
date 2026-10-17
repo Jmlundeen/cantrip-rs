@@ -1,0 +1,37 @@
+# Dredger's Insight: "You may put an artifact, creature, or land card from among the milled cards into your hand" - Bot1
+# takes none of the Llanowar Elves, Sol Ring and Island that are eligible, so all four milled cards stay in the graveyard
+# and no card left it: no life.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Dredger's Insight
+Forest
+Llanowar Elves
+Sol Ring
+Island
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+Bot1.Choose()
+[Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest
+Bot1.Graveyard = Lightning Bolt; Island; Sol Ring; Llanowar Elves

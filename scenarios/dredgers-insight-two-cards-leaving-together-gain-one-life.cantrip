@@ -1,0 +1,61 @@
+# Dredger's Insight: "Whenever ONE OR MORE artifact and/or creature cards leave your graveyard, you gain 1 life" (CR 603.2c).
+# On Bot2's turn 4 two lightning Bolts kill Bot1's Llanowar Elves (a creature) and Ornithopter (an artifact creature); in
+# Bot2's second main phase Bot1 casts Second Sunrise (three white-and-green Moxen), which returns both to the battlefield
+# at once. Two cards left the graveyard together: the ability triggers once and Bot1 gains 1 life, not 2.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Dredger's Insight
+Second Sunrise
+Mox Pearl
+Mox Pearl
+Mox Emerald
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Hand.Dredger's Insight.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T4 Bot2.Main2]
+? Bot1.Graveyard.Count = 6
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Second Sunrise.Cast
+[Bot2.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield = Forest; Mox Pearl; Mox Pearl; Ornithopter; Llanowar Elves; Mox Emerald; Dredger's Insight
+Bot1.Graveyard = Second Sunrise; Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot2.Life = 20

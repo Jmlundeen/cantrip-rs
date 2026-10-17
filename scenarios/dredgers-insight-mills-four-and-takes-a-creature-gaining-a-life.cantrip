@@ -1,0 +1,43 @@
+# Dredger's Insight: "When this enchantment enters, mill four cards. You may put an artifact, creature, or land card from
+# among the milled cards into your hand." The four milled are Llanowar Elves, Lightning Bolt, Island and Sol Ring (Forest,
+# the eighth card, is Bot1's turn-3 draw). Lightning Bolt is not an artifact, creature or land card, so it cannot be
+# taken; Bot1 takes the creature, which leaves the graveyard - and "whenever one or more artifact and/or creature cards
+# leave your graveyard" gains 1 life (the enchantment is on the battlefield by then).
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Dredger's Insight
+Forest
+Llanowar Elves
+Lightning Bolt
+Island
+Sol Ring
+Forest x10
+
+[Bot2 Deck]
+Island x22
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Llanowar Elves)
+[Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Llanowar Elves
+Bot1.Graveyard = Sol Ring; Island; Lightning Bolt
+Bot1.Battlefield = Forest; Forest; Dredger's Insight
+Bot1.Library.Count = 10
+Bot2.Life = 20

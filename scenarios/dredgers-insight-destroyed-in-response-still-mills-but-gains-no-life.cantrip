@@ -1,0 +1,49 @@
+# Dredger's Insight: the enters trigger is independent of the enchantment staying (CR 113.7a, 603.6a). Bot1 casts it; with the
+# trigger on the stack Bot2 destroys it with Disenchant. The trigger still resolves: four cards are milled (Llanowar Elves,
+# Lightning Bolt, Island, Sol Ring) and Bot1 takes the Elves into hand. But the enchantment is gone, so its first ability
+# is not there to see the creature card leave the graveyard: Bot1 gains no life.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Forest
+Forest
+Forest
+Dredger's Insight
+Forest
+Llanowar Elves
+Lightning Bolt
+Island
+Sol Ring
+Forest x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Disenchant
+Plains x4
+Plains x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Dredger's Insight)
+Bot1.Choose(Llanowar Elves)
+[Bot1.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 20
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Llanowar Elves
+Bot1.Graveyard = Sol Ring; Island; Lightning Bolt; Dredger's Insight
+Bot1.Battlefield = Forest; Forest

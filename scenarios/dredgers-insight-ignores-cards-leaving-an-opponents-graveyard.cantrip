@@ -1,0 +1,59 @@
+# Dredger's Insight: "leave YOUR graveyard". On turn 4 Bot2 bolts its own Llanowar Elves, and in Bot2's second main phase
+# Bot1 casts Second Sunrise, which returns the Elves to the battlefield from Bot2's graveyard (Bot1 has no creature or
+# artifact card that went to its graveyard from the battlefield). A creature card left a graveyard, but not Bot1's: Bot1
+# gains no life. (The positive control, cards leaving Bot1's own graveyard, is the "two cards leaving together" scenario.)
+
+[Bot1 Deck]
+Forest
+Forest
+Dredger's Insight
+Second Sunrise
+Mox Pearl
+Mox Pearl
+Mox Emerald
+Forest
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Forest x10
+
+[Bot2 Deck]
+Forest
+Mountain
+Llanowar Elves
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Dredger's Insight.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+[T4 Bot2.Main2]
+? Bot2.Graveyard.Count = 2
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Second Sunrise.Cast
+[Bot2.End]
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 20
+Bot2.Battlefield = Forest; Mountain; Llanowar Elves
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Second Sunrise; Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt
