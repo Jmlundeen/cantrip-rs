@@ -1,0 +1,36 @@
+# Prismari Charm, third mode: "Return target nonland permanent to its owner's hand." Bot2's Ornithopter returns to Bot2's
+# hand (its owner's; Bot1 does not get it). Bot2's Island is not a legal target (nonland): the refusal comes beside the
+# positive control, the Ornithopter named on the next line. Choosing two modes is refused (choose one).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Prismari Charm
+Island x14
+
+[Bot2 Deck]
+Island
+Ornithopter
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Prismari Charm.Cast
+! Bot1.Modes(1; 3)
+Bot1.Modes(Return target nonland permanent)
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Hand = Ornithopter; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
+Bot2.Battlefield = Island
+Bot1.Hand = Island; Island; Island; Island; Island

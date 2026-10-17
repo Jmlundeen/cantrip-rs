@@ -1,0 +1,39 @@
+# Prismari Charm, second mode, two targets. In response Bot2 kills its own Birds of Paradise with Lightning Bolt, so that
+# target is illegal on resolution; the spell is not countered because one target is still legal (CR 608.2b): Bot2 takes
+# the 1 damage (20 - 1), and the Bolt's 3 went to the Birds.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Prismari Charm
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Birds of Paradise
+Lightning Bolt
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Prismari Charm.Cast
+Bot1.Modes(deals 1 damage)
+Bot1.Target(Bot2.Battlefield.Birds of Paradise; Bot2)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Birds of Paradise)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot2.Graveyard = Birds of Paradise; Lightning Bolt
+Bot1.Graveyard = Prismari Charm

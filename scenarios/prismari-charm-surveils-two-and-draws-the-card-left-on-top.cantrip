@@ -1,0 +1,33 @@
+# Prismari Charm, first mode: "Surveil 2, then draw a card." (CR 701.25a). Bot1 looks at the top two cards, Lightning Bolt
+# and Counterspell, puts Lightning Bolt into the graveyard and keeps Counterspell on top, so the draw that follows the surveil
+# takes Counterspell and not Mana Leak (the third card), which proves the surveil is finished before the draw.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Prismari Charm
+Island x4
+Lightning Bolt
+Counterspell
+Mana Leak
+Island x10
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Prismari Charm.Cast
+Bot1.Modes(Surveil 2)
+Bot2.Pass
+Bot1.Arrange(Counterspell | Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Prismari Charm; Lightning Bolt
+Bot1.Hand = Island; Island; Island; Island; Counterspell
+Bot1.Library.Count = 11
+Bot1.Library = Mana Leak; Island; Island; Island; Island; Island; Island; Island; Island; Island; Island
