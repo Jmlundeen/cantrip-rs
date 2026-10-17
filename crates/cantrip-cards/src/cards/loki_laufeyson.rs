@@ -2,27 +2,18 @@ use cantrip_api::*;
 use cantrip_mechanics::{delayed, power_up, targets, triggers};
 use cantrip_oracle as oracle;
 
-/// "Loki's power": the power Loki has now, or the power it last had on the battlefield once it has left (CR 608.2h,
-/// 113.7a); it may be zero or less.
-fn lokis_power(q: &dyn Query, loki: ObjectId) -> i16 {
-    if targets::permanent(q, loki) {
-        q.chars(loki).power.unwrap_or(0)
-    } else {
-        q.state().last_known(loki).and_then(|k| k.power).unwrap_or(0)
-    }
-}
-
 /// "When you next cast an instant or sorcery spell with mana value less than or equal to Loki's power this turn": a spell
 /// cast, not copied (CR 707.10a), by the ability's controller (CR 603.7d), whose mana value as it stands on the stack, X
-/// included (CR 202.3e), is no more than Loki's power at the moment it is cast. The spell is the trigger's subject.
+/// included (CR 202.3e), is no more than Loki's power at the moment it is cast, as it last was once Loki has left (CR
+/// 608.2h). The spell is the trigger's subject.
 fn next_instant_or_sorcery_within_lokis_power(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     let fired = triggers::you_cast_instant_or_sorcery(q, me, event)?;
     let spell = fired.subject.object()?;
-    (i64::from(q.mana_value(spell)) <= i64::from(lokis_power(q, me.source))).then_some(fired)
+    (i64::from(q.mana_value(spell)) <= i64::from(targets::power_or_last_known(q, me.source))).then_some(fired)
 }
 
 /// "{1}, {T}: When you next cast ... this turn, copy that spell": the ability sets up a delayed triggered ability that
-/// triggers once, on the next such spell this turn, and ends with the turn if none is cast (CR 603.7b-c). Each activation
+/// triggers once, on the next such spell this turn, and ends with the turn if none is cast (CR 603.7b). Each activation
 /// sets up its own, so two would both copy the same next spell.
 fn watch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     delayed::next_this_turn(g, item, 0, item.object);

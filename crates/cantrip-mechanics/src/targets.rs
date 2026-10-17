@@ -206,6 +206,17 @@ pub fn permanent(q: &dyn Query, id: ObjectId) -> bool {
     on_battlefield(q, id)
 }
 
+/// "[This permanent]'s power" read by an ability of it: the power it has now, or the power it last had on the battlefield
+/// once it has left (CR 608.2h, 113.7a); zero for one with none. Ouroboroid's "where X is Ouroboroid's power" and Loki
+/// Laufeyson's "less than or equal to Loki's power" read it.
+pub fn power_or_last_known(q: &dyn Query, id: ObjectId) -> i16 {
+    if permanent(q, id) {
+        q.chars(id).power.unwrap_or(0)
+    } else {
+        q.state().last_known(id).and_then(|k| k.power).unwrap_or(0)
+    }
+}
+
 fn artifact_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
     matches!(t, Target::Object(id) if on_battlefield(q, id) && q.chars(id).is(CardType::Artifact))
 }

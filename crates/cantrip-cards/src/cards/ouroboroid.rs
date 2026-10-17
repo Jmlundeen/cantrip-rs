@@ -6,12 +6,7 @@ use cantrip_oracle as oracle;
 /// ability resolves, from last known information if the Ouroboroid has gone (CR 608.2h); a power of zero or less puts
 /// nothing anywhere.
 fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let source = item.object;
-    let power = if targets::permanent(g, source) {
-        g.chars(source).power.unwrap_or(0)
-    } else {
-        g.state().last_known(source).and_then(|k| k.power).unwrap_or(0)
-    };
+    let power = targets::power_or_last_known(g, item.object);
     if power <= 0 {
         return Ok(());
     }
