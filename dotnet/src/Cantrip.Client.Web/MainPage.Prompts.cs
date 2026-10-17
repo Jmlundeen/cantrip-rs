@@ -1169,20 +1169,44 @@ public sealed partial class MainPage
         return containing.Count == 1 ? containing[0] : null;
     }
 
-    /// <summary>Which of several replacement effects applies first (CR 616.1).</summary>
+    /// <summary>
+    /// Which of several replacement effects applies first (CR 616.1). The caption says what the event is where the table
+    /// words it ("3 damage from Lightning Bolt to you": damage, whom it would now be dealt to), and the detail what happens
+    /// next: every other effect that still applies to the changed event then applies too, each once (CR 614.5, 616.1f), so
+    /// that with two redirections the one chosen first passes the damage on to the other. Sources that share a name are told
+    /// apart by what can be seen of them: the damage marked on each, and whether it is tapped.
+    /// </summary>
     private void FillChooseReplacement(GameClient client, ChooseReplacementPromptMessage prompt)
     {
-        // The object the event is about, or for an event about none, what the event is ("You would gain 3 life").
-        string subject = client.Object(prompt.Subject)?.Name ?? (prompt.Event.Length > 0 ? prompt.Event : "it");
+        // What the event is where the table words it ("You would gain 3 life", "3 damage from Lightning Bolt to you"), else
+        // the object it is about.
+        string subject = prompt.Event.Length > 0 ? prompt.Event : client.Object(prompt.Subject)?.Name ?? "it";
 
         Prompt(
             $"{subject}: which applies first?",
-            $"{prompt.Sources.Count} effects want to change this  ·  the rest follow");
+            $"{prompt.Sources.Count} effects want to change this  ·  then each other one that still applies does, once");
 
+        List<string> names = [.. prompt.Sources.Select(source => client.Object(source)?.Name ?? "An effect")];
         for (int i = 0; i < prompt.Sources.Count; i++)
         {
             int index = i;
-            string source = client.Object(prompt.Sources[i])?.Name ?? "An effect";
+            string source = names[i];
+            if (names.Count(name => name == source) > 1 && client.Object(prompt.Sources[i]) is { } shared)
+            {
+                List<string> seen = [];
+                if (shared.DamageMarked > 0)
+                {
+                    seen.Add($"{shared.DamageMarked} damage marked");
+                }
+
+                if (shared.Tapped)
+                {
+                    seen.Add("tapped");
+                }
+
+                source = seen.Count > 0 ? $"{source} ({string.Join(", ", seen)})" : source;
+            }
+
             string hint = i < prompt.Hints.Count ? prompt.Hints[i] : string.Empty;
 
             AddButton(

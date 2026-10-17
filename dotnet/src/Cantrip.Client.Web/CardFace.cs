@@ -1423,14 +1423,20 @@ public static partial class CardFace
     /// <summary>How tall the loyalty shield's ink stands to its width.</summary>
     private const float LoyaltyStartAspect = 0.6f;
 
+    /// <summary>
+    /// The damage marked on a permanent as its face draws it beside the power and toughness, "-3", or nothing: until the
+    /// cleanup step removes it, or for as long as it stays (CR 514.2, "damage isn't removed from this creature").
+    /// </summary>
+    public static string MarkedDamage(ObjectView card) => card.DamageMarked <= 0 || Body(card) is null ? string.Empty : $"-{card.DamageMarked}";
+
     private static void DrawMarkedDamage(SKCanvas canvas, ObjectView card, Layout layout)
     {
-        if (card.DamageMarked <= 0 || Body(card) is null)
+        string damage = MarkedDamage(card);
+        if (damage.Length == 0)
         {
             return;
         }
 
-        string damage = $"-{card.DamageMarked}";
         int size = Math.Max(layout.BodyFontSize, (int)MathF.Round(layout.BodyFontSize * 1.18f));
         using var font = new SKFont(CardAssets.Title, size);
         float width = font.MeasureText(damage);
