@@ -1,0 +1,37 @@
+# Ill-Timed Explosion with a one-card library and nothing else in hand: the first draw gives Bot1 an Island, the second fails (CR 121.4).
+# "Discard two cards" is impossible with one card in hand, and a player can't choose an impossible option (CR 608.2d), so the
+# question is not asked (`! Bot1.Accept`; the control is the scenario with two cards, where it is asked). Bot1 then loses to the failed
+# draw the next time state-based actions are checked.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Pearl
+Ill-Timed Explosion
+Ornithopter
+Ornithopter
+Island
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ill-Timed Explosion.Cast
+! Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Result = Bot2 won
+Bot1.Status = Lost
