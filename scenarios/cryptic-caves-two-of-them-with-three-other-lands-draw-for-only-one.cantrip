@@ -1,0 +1,48 @@
+# Cryptic Caves, ruling 2019-07-12: "If you control two Cryptic Caves and exactly three other lands, you can activate the last
+# ability of only one of the Cryptic Caves. As soon as the cost for that ability is paid, you will no longer control enough
+# lands to activate the ability of the second Cryptic Caves." Bot1 (with an Icetill Explorer for a second land play each
+# turn) controls on turn 5 a Forest, two Islands and two Cryptic Caves, and an untapped Mox Pearl and Mox Jet. The first Caves is
+# activated (it counts itself among the five) and draws a card; the second one is then refused (four lands, with its {1} and
+# itself untapped) and nothing more is drawn: one card in hand.
+
+[Bot1 Deck]
+Icetill Explorer
+Forest
+Cryptic Caves
+Cryptic Caves
+Mox Emerald
+Mox Pearl
+Mox Jet
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Icetill Explorer.Cast
+Bot1.Hand.Cryptic Caves.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Cryptic Caves.Play
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Cryptic Caves.Activate(Ability: Draw)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 1
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Battlefield.Cryptic Caves.Activate(Ability: Draw)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Count = 8

@@ -186,7 +186,7 @@ pub const fn pay_life_for_either(a: Color, b: Color, text: &'static str) -> Abil
 }
 
 /// A horizon land's other ability: "{1}, {T}, Sacrifice this land: Draw a card." (`text` is its full text, with the land's
-/// name). Horizon Canopy and Fiery Islet print it.
+/// name). Horizon Canopy, Fiery Islet and Cryptic Caves (with its own restriction) print it.
 pub const fn sacrifice_to_draw(text: &'static str) -> AbilityDef {
     ability(cost("{1}, {T}").and(SACRIFICE_THIS), |g, item| effects::draw(g, item, 1), text)
 }

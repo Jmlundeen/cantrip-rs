@@ -1,0 +1,24 @@
+# Cryptic Caves: "{T}: Add {C}." Bot1 plays it and taps it for one colorless mana (the pool shows {C}); with a Mox Pearl's
+# {W} that pays the {2} of kicking the Everflowing Chalice once, and the Caves stays tapped afterwards.
+
+[Bot1 Deck]
+Cryptic Caves
+Mox Pearl
+Everflowing Chalice
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Cryptic Caves.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Cryptic Caves.Activate
+? Bot1.Mana = {C}
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Everflowing Chalice.Cast(Kicked: 1)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Cryptic Caves.Tapped = true
+Bot1.Battlefield.Everflowing Chalice.Types = Artifact
