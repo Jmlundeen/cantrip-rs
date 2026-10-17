@@ -41,6 +41,24 @@ pub fn itself(_: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Char
     source == affected
 }
 
+/// "Delirium - This creature gets/has ... as long as there are four or more card types among cards in your graveyard"
+/// (CR 207.2c, 604.1, 611.3a) as a static ability's `StaticDef::affects`: only the source itself, and only while four or more
+/// card types are among the cards in its controller's graveyard, each judged as the layers make it (the types are asked
+/// again whenever characteristics are computed). Dragon's Rage Channeler and Wildfire Wickerfolk use it.
+pub fn itself_with_delirium(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+    if source != affected {
+        return false;
+    }
+    let state = q.state();
+    let mut seen = TypeSet::NONE;
+    for &card in state.zone(Zone::graveyard(state.obj(source).controller)) {
+        for t in q.chars(card).types.iter() {
+            seen = seen.with(t);
+        }
+    }
+    seen.iter().count() >= 4
+}
+
 /// "... has haste" (CR 702.10, layer 6) as a static ability's `StaticDef::apply`. Anger, Samut, Lavaspur Boots, Skateboard
 /// and dash's haste print it.
 pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
