@@ -1,0 +1,43 @@
+# CR 510.4: the regular combat damage step is for the attackers and blockers "that had neither first strike nor double
+# strike as the first combat damage step began", whatever they have now. Bot1 attacks with Thalia, Guardian of Thraben
+# (first strike) and Llanowar Elves (1/1). After Thalia's first-strike damage (Bot2 to 18), Bot1 casts Violent Urge on the
+# Elves ({1} more for Thalia): +1/+0 and first strike. The Elves had no first strike as the first step began, so they deal
+# their 2 in the regular step (Bot2 to 16); Thalia, which had first strike and has no double strike, deals no more.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Mox Emerald
+Llanowar Elves
+Mox Ruby
+Violent Urge
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Thalia, Guardian of Thraben > Bot2; Llanowar Elves > Bot2)
+[T3 Bot1.Damage]
+? Bot2.Life = 18
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Violent Urge.Cast(Llanowar Elves)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Llanowar Elves.Keywords = FirstStrike
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Graveyard = Violent Urge

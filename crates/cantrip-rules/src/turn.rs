@@ -574,7 +574,7 @@ fn declare_attackers(cx: &mut Cx) -> R<()> {
     };
     let mut attackers = Vec::new();
     for (id, target) in attacks {
-        attackers.push(Attacker { id, target, blocked: false });
+        attackers.push(Attacker::new(id, target));
     }
     let attacked = !attackers.is_empty();
     cx.st().update_turn(|t| t.attacked = attacked);
@@ -699,7 +699,7 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
             let mut list = Vec::new();
             let mut attackers = cx.s().attackers.clone();
             for (blocker, attacker) in blocks {
-                list.push(Block { blocker, attacker });
+                list.push(Block { blocker, attacker, first_strike: false });
                 if let Some(a) = attackers.iter_mut().find(|a| a.id == attacker) {
                     a.blocked = true;
                 }
@@ -727,35 +727,51 @@ fn declare_blockers(cx: &mut Cx) -> R<()> {
     Ok(())
 }
 
-/// Combat damage (CR 510): every attacker and blocker deals its damage at once. A blocked attacker divides its
-/// damage among its blockers in order, lethal to each before the next (CR 510.1c's default).
-/// Whether a creature deals combat damage in this damage step: in a first-strike step only creatures with first
-/// strike or double strike; in the regular step those without first strike, and those with double strike again.
-fn deals_now(cx: &Cx, id: ObjectId, first_strike_step: bool) -> bool {
+/// Whether a creature has first strike or double strike now (CR 702.7b, 702.4b).
+fn strikes_first(cx: &Cx, id: ObjectId) -> bool {
     let c = cx.chars(id);
-    let first = c.has(Keyword::FirstStrike) || c.has(Keyword::DoubleStrike);
-    if first_strike_step { first } else { !c.has(Keyword::FirstStrike) || c.has(Keyword::DoubleStrike) }
+    c.has(Keyword::FirstStrike) || c.has(Keyword::DoubleStrike)
 }
 
+/// Whether a creature assigns combat damage in this combat damage step (CR 510.4): in a first-strike step only those with
+/// first strike or double strike; in the regular step after one, those that had neither as the first-strike step began
+/// (`had_first_strike`, recorded then), and those that have double strike now - so a creature that loses first strike
+/// after dealing first-strike damage deals no more, and one that gains it only after that step began deals its damage now.
+/// With no first-strike step, every creature does.
+fn deals_now(cx: &Cx, id: ObjectId, had_first_strike: bool, first_strike_step: bool) -> bool {
+    if first_strike_step { strikes_first(cx, id) } else { !had_first_strike || cx.chars(id).has(Keyword::DoubleStrike) }
+}
+
+/// Combat damage (CR 510): every attacker and blocker deals its damage at once. A blocked attacker with a choice divides
+/// its damage among its blockers as its controller chooses (CR 510.1c), otherwise all to its one blocker.
 fn combat_damage(cx: &mut Cx) -> R<()> {
-    // CR 510.4: with a first or double striker in combat, there is a first-strike damage step before the regular one.
+    // CR 510.4: with a first or double striker in combat as the step begins, there is a first-strike damage step before
+    // the regular one.
     let in_combat: Vec<ObjectId> =
         cx.s().attackers.iter().map(|a| a.id).chain(cx.s().blocks.iter().map(|b| b.blocker)).collect();
     let round = cx.s().turn.damage_round;
-    let first_strike_step = round == 0
-        && in_combat.iter().any(|&id| {
-            live(cx.s(), id) && {
-                let c = cx.chars(id);
-                c.has(Keyword::FirstStrike) || c.has(Keyword::DoubleStrike)
-            }
-        });
+    let first_strike_step = round == 0 && in_combat.iter().any(|&id| live(cx.s(), id) && strikes_first(cx, id));
     cx.st().update_turn(|t| t.damage_round = if first_strike_step { 1 } else { 2 });
+    // CR 510.4: which attackers and blockers had first strike or double strike as the first-strike step began, which the
+    // regular step after it asks.
+    if first_strike_step {
+        let mut attackers = cx.s().attackers.clone();
+        for a in &mut attackers {
+            a.first_strike = live(cx.s(), a.id) && strikes_first(cx, a.id);
+        }
+        let mut blocks = cx.s().blocks.clone();
+        for b in &mut blocks {
+            b.first_strike = live(cx.s(), b.blocker) && strikes_first(cx, b.blocker);
+        }
+        cx.st().set_attackers(attackers);
+        cx.st().set_blocks(blocks);
+    }
 
     // CR 510.1c-d: an attacker blocked by more than one creature, or with trample and more than lethal, divides its
     // damage as its controller chooses.
     let mut divisions = Vec::new();
     for attacker in cx.s().attackers.clone() {
-        if live(cx.s(), attacker.id) && attacker.blocked && deals_now(cx, attacker.id, first_strike_step)
+        if live(cx.s(), attacker.id) && attacker.blocked && deals_now(cx, attacker.id, attacker.first_strike, first_strike_step)
             && let Some(d) = division(cx, &attacker)
         {
             divisions.push(d);
@@ -771,7 +787,7 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
 
     let mut assignments: Vec<(ObjectId, Target, u16)> = Vec::new();
     for attacker in cx.s().attackers.clone() {
-        if !live(cx.s(), attacker.id) || !deals_now(cx, attacker.id, first_strike_step) {
+        if !live(cx.s(), attacker.id) || !deals_now(cx, attacker.id, attacker.first_strike, first_strike_step) {
             continue;
         }
         if chosen.iter().any(|s| s.0 == attacker.id) {
@@ -814,7 +830,7 @@ fn combat_damage(cx: &mut Cx) -> R<()> {
         }
     }
     for block in cx.s().blocks.clone() {
-        if live(cx.s(), block.blocker) && live(cx.s(), block.attacker) && deals_now(cx, block.blocker, first_strike_step) {
+        if live(cx.s(), block.blocker) && live(cx.s(), block.attacker) && deals_now(cx, block.blocker, block.first_strike, first_strike_step) {
             let power = crate::static_rules::combat_damage_of(cx, block.blocker);
             assignments.push((block.blocker, Target::Object(block.attacker), power));
         }

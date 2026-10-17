@@ -2711,7 +2711,7 @@ pub fn enter_attacking(cx: &mut Cx, entered: &[ObjectId], defender: Target) {
         }
         let chars = cx.chars(id);
         if chars.is(CardType::Creature) && !chars.is(CardType::Battle) {
-            attackers.push(Attacker { id, target: defender, blocked: false });
+            attackers.push(Attacker::new(id, defender));
         }
     }
     if attackers.len() != cx.s().attackers.len() {

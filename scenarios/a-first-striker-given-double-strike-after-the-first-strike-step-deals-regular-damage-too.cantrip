@@ -1,0 +1,41 @@
+# CR 510.4: the regular combat damage step is also for "the remaining attackers and blockers that currently have double
+# strike". Bot1's Thalia, Guardian of Thraben (2/1, first strike) attacks unblocked and deals 2 in the first-strike step.
+# Bot1 then gives it double strike with Boros Charm ({1} more for Thalia's own tax): it had first strike as the first step
+# began, but has double strike now, so it deals 2 again in the regular step. Bot2 ends at 16.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Mox Ruby
+Mox Jet
+Boros Charm
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Thalia, Guardian of Thraben > Bot2)
+[T3 Bot1.Damage]
+? Bot2.Life = 18
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Boros Charm.Cast
+Bot1.Modes(Target creature gains double strike)
+Bot1.Target(Thalia, Guardian of Thraben)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Thalia, Guardian of Thraben.Keywords = DoubleStrike; FirstStrike
+Bot1.Graveyard = Boros Charm

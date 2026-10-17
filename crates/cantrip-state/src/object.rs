@@ -1450,6 +1450,16 @@ pub struct Attacker {
     pub id: ObjectId,
     pub target: Target,
     pub blocked: bool,
+    /// It had first strike or double strike as this combat's first-strike damage step began (CR 510.4): in the regular
+    /// combat damage step it assigns combat damage only if it has double strike then.
+    pub first_strike: bool,
+}
+
+impl Attacker {
+    /// An attacking creature, unblocked, not yet in any combat damage step.
+    pub const fn new(id: ObjectId, target: Target) -> Attacker {
+        Attacker { id, target, blocked: false, first_strike: false }
+    }
 }
 
 /// A blocking creature and the attacker it blocks (CR 509.1).
@@ -1457,6 +1467,8 @@ pub struct Attacker {
 pub struct Block {
     pub blocker: ObjectId,
     pub attacker: ObjectId,
+    /// The blocker had first strike or double strike as this combat's first-strike damage step began (CR 510.4).
+    pub first_strike: bool,
 }
 
 /// How the game ended, if it has (CR 104).
