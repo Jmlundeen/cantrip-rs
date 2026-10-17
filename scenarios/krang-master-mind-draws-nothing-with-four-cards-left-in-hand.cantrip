@@ -1,6 +1,7 @@
-# "If you have fewer than four cards in hand" is an intervening "if" (CR 603.4): the same setup as the scenario that draws 1, cast
-# a turn later (turn 7), leaves Bot1 four cards in hand after Krang is cast (Island, Plains, Plains, Plains), so the trigger does not
-# trigger at all and nothing is drawn: the hand is exactly those four and the library has not moved.
+# "If you have fewer than four cards in hand" is an intervening "if" (CR 603.4), checked as the ability would trigger: the same setup
+# as the scenario that draws 1, cast in turn 7, leaves Bot1 four cards in hand after Krang is cast (Island, Plains, Plains, Lightning
+# Bolt), so the ability does not trigger at all: the stack is empty once Krang has resolved (? Stack.Count = 0). Casting the Lightning
+# Bolt afterwards (hand 3) draws nothing either: had it triggered and only been checked on resolution, it would have drawn 1.
 
 [Bot1 Deck]
 Island
@@ -12,7 +13,7 @@ Krang, Master Mind
 Island
 Plains
 Plains
-Plains
+Lightning Bolt
 Island x20
 
 [Bot2 Deck]
@@ -31,13 +32,19 @@ Bot1.Pass
 [T7 Bot1.Main1]
 Bot1.Battlefield.Island.Activate
 Bot1.Battlefield.Mox Sapphire.Activate
-Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Krang, Master Mind.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Stack.Count = 0
+? Bot1.Hand = Island; Plains; Plains; Lightning Bolt
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
 Bot1.Pass
 [T7 Bot1.Main2]
 
 [Expect]
-Bot1.Hand = Island; Plains; Plains; Plains
+Bot1.Hand = Island; Plains; Plains
 Bot1.Library.Count = 20
+Bot2.Life = 17
 Bot1.Battlefield.Krang, Master Mind.Power = 5
