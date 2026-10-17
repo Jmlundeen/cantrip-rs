@@ -42,8 +42,7 @@ Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Swamp#2.Activate
 Bot1.Search(Guerrilla Gorilla)
-Bot1.Choose(Guerrilla Gorilla)
-Bot1.Choose(Guerrilla Gorilla)
+Bot1.Choose(Guerrilla Gorilla; Guerrilla Gorilla)
 Bot1.Target(Hardened Academic)
 [Bot1.Main2]
 

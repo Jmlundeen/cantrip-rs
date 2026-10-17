@@ -1,7 +1,6 @@
 # Lively Dirge, mode 2: "up to two creature cards with total mana value 4 or less". Bot1's graveyard holds Proft, Sinister
-# Mastermind (mana value 3) and a Guerrilla Gorilla (2), put there by two Entomb. Bot1 chooses Proft first: the total left
-# is 1, so the Gorilla (2) can no longer be chosen (the refusal below: no further choice is asked) and stays in the
-# graveyard, while Proft returns. The positive control, a pair whose total is exactly 4 (two Gorillas), is in
+# Mastermind (mana value 3) and a Guerrilla Gorilla (2), put there by two Entomb. The two together make 5, so the question
+# refuses that pair (CR 202.3); Bot1 chooses Proft alone, who returns, and the Gorilla stays in the graveyard. The positive control, a pair whose total is exactly 4 (two Gorillas), is in
 # lively-dirge-both-modes-search-first-then-return-the-searched-creature-with-another.
 
 [Bot1 Deck]
@@ -37,8 +36,8 @@ Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Swamp#2.Activate
 Bot1.Hand.Lively Dirge.Cast
 Bot1.Modes(2)
+! Bot1.Choose(Proft, Sinister Mastermind; Guerrilla Gorilla)
 Bot1.Choose(Proft, Sinister Mastermind)
-! Bot1.Choose
 [Bot1.Main2]
 
 [Expect]

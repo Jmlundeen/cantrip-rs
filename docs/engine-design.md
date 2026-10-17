@@ -186,8 +186,8 @@ nothing else. A limit on what the cards chosen together add up to is part of the
 total mana value 6 or less" (CR 202.3) is a `ChooseCards` with `total: Some(TotalAtMost { values, most })`, each eligible
 card's mana value read as the question is asked (`choose::cards_within_total`), and the client shows the running total and
 refuses a card that would go over by the same numbers. Michelangelo's Technique asks it, through
-`library::look_at_top_onto_battlefield` (which Aang, at the Crossroads and United Battlefront use without a total); Lively
-Dirge and Ao, the Dawn Sky print the same choice.
+`library::look_at_top_onto_battlefield` (which Aang, at the Crossroads and United Battlefront use without a total), and Lively
+Dirge asks it from the graveyard ("up to two creature cards with total mana value 4 or less"); Ao, the Dawn Sky prints it too.
 
 ### Characteristics
 
