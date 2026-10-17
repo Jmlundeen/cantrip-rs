@@ -1,7 +1,7 @@
 """Fetch card art from mtgpics.com: the original, non-promo printing's art-only picture, at the best resolution.
 
-    python tools/mtgpics-art/fetch_art.py <out-dir> [--install] < names.txt      names one a line (missing-art.py's output)
-    python tools/mtgpics-art/fetch_art.py <out-dir> --name "Eternal Witness"
+    python tools/maintenance/mtgpics-art/fetch_art.py <out-dir> [--install] < names.txt      names one a line (missing-art.py's output)
+    python tools/maintenance/mtgpics-art/fetch_art.py <out-dir> --name "Eternal Witness"
 
 Writes <out-dir>/<slug>.jpg (the client's CardArt.Slug: lower case, hyphens, no apostrophes) and prints one line a card:
 `OK`, `OK PROMO-ONLY` (mtgpics holds no regular printing's art), `NOART` or `ERR`. With --install <out-dir> is

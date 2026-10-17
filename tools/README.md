@@ -66,6 +66,7 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 | `pick-order.py` | ranks the cubes' cards into their `*.picks.json` pick orders |
 | `art-credits.py` | fills `content/<dataset>/artists.json` with the original printing's artist for each picture not yet credited |
 | `mtgpics-art/fetch_art.py` | downloads the original, non-promo art-only picture of each card name read from stdin from mtgpics.com, under its slug file name (the `fetch-card-art` skill) |
+| `scryfall-art/fetch_art.py` | the fallback for what mtgpics lacks: downloads the earliest regular printing's Scryfall `art_crop` of each card name read from stdin, under its slug file name; never replaces a file (the `fetch-card-art` skill) |
 
 ## The rest
 

@@ -1,7 +1,7 @@
 """Fallback card art from Scryfall, for faces mtgpics has no art-only picture of (recent sets, some name searches).
 
-    python tools/scryfall-art/fetch_art.py <out-dir> < names.txt        names one a line (missing-art.py's output)
-    python tools/scryfall-art/fetch_art.py <out-dir> --name "Torch the Tower"
+    python tools/maintenance/scryfall-art/fetch_art.py <out-dir> < names.txt        names one a line (missing-art.py's output)
+    python tools/maintenance/scryfall-art/fetch_art.py <out-dir> --name "Torch the Tower"
 
 Writes <out-dir>/<slug>.jpg (the client's CardArt.Slug) from the printing's `art_crop` image - the art alone - and prints one
 line a card: `OK`, `OK PROMO-ONLY`, `NOART` or `ERR`. A file that already exists is never replaced.

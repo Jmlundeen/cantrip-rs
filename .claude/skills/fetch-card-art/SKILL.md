@@ -19,17 +19,17 @@ Art is a file per face in `content/<dataset>/images/<slug>.jpg` (`CardArt.Slug`:
 3. **Check for misnamed files first.** `ls content/mtg/images | grep -v '^[a-z0-9-]*\.[a-z]*$'` - art the user dropped
    in under a display name (`Appa, Steadfast Guardian.jpg`) is already art: rename it to its slug instead of fetching.
 4. **Fetch into a staging folder** (a scratch directory, not the images folder):
-   `python tools/mtgpics-art/fetch_art.py <stage> < names.txt`. About 2 s a card, so run it in the background.
+   `python tools/maintenance/mtgpics-art/fetch_art.py <stage> < names.txt`. About 2 s a card, so run it in the background.
    Needs Pillow. One line a card: `OK`, `OK PROMO-ONLY`, `NOART`, `ERR`.
 5. **Check, then install.** List staged sizes; look at anything odd by reading the image. Install with
-   `python tools/mtgpics-art/fetch_art.py content/mtg/images --install` (the same names), or copy the staged files; a
+   `python tools/maintenance/mtgpics-art/fetch_art.py content/mtg/images --install` (the same names), or copy the staged files; a
    file already there is replaced only by a larger picture. Re-run `missing-art.py` - what it still lists is the report.
 6. **Report** what was not found and why, plus the cards that came back small or promo-only. Don't commit.
 
 ## Scryfall fallback (user-approved 2026-10-16)
 
 mtgpics has no art-only picture for most recent sets (Torch the Tower, the Marvel and Hobbit cards). `NOART` faces go to
-`python tools/scryfall-art/fetch_art.py <stage> < noart.txt`: the earliest regular printing's `art_crop`, ~600x450 -
+`python tools/maintenance/scryfall-art/fetch_art.py <stage> < noart.txt`: the earliest regular printing's `art_crop`, ~600x450 -
 low resolution, but better than none. Run mtgpics first; Scryfall only for what it lacks. It never replaces a file.
 
 `missing-art.py` only checks the cube lists. A card added outside them is missed, so audit every file under
