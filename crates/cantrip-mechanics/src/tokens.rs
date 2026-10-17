@@ -584,3 +584,10 @@ pub static SPIRIT: CardDef = CardDef {
     text: "This token can't block or be blocked by non-Spirit creatures.",
     ..CardDef::BLANK
 };
+
+/// "Create a Treasure token" as an effect (CR 111.10a): one Treasure under the controller of the resolving spell or ability. Bejeweled
+/// Warg, Fable of the Mirror-Breaker's Reflection, Fountainport, Magda, Brazen Outlaw, Monument to Endurance, Sanar, Unfinished
+/// Genius and Smaug the Magnificent print it.
+pub fn create_a_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    create_treasure(g, item.controller)
+}

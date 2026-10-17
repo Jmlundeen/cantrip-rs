@@ -18,15 +18,10 @@ fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Mode 1: a Treasure token.
-fn treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create_treasure(g, item.controller)
-}
-
 static MODAL: ModalDef = modes(&[
     mode(counter, "Put a +1/+1 counter on target Wolf you control.")
         .targets(&[target(wolf_you_control)]),
-    mode(treasure, "Create a Treasure token."),
+    mode(tokens::create_a_treasure, "Create a Treasure token."),
 ]);
 
 pub static CARD: CardDef = CardDef {

@@ -22,10 +22,6 @@ fn dwarf_becomes_tapped(q: &dyn Query, source: ObjectId, event: &Event) -> Optio
     }
 }
 
-fn treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create_treasure(g, item.controller)
-}
-
 /// "Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."
 fn tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
@@ -39,7 +35,7 @@ fn tutor(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::TAPPED, dwarf_becomes_tapped), treasure, "Whenever a Dwarf you control becomes tapped, create a Treasure token."),
+        triggered(when(EventMask::TAPPED, dwarf_becomes_tapped), tokens::create_a_treasure, "Whenever a Dwarf you control becomes tapped, create a Treasure token."),
         ability(sacrifice(5, cantrip_mechanics::targets::filters::treasure), tutor, "Sacrifice five Treasures: Search your library for an artifact or Dragon card, put that card onto the battlefield, then shuffle."),
     ],
     statics: &[static_ability(Layer::PtModify, other_dwarves_you_control, cantrip_mechanics::statics::plus_pt::<1, 0>, "Other Dwarves you control get +1/+0.")],

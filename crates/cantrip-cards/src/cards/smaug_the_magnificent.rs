@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::tokens::{create_treasure, treasures_controlled, TREASURE};
+use cantrip_mechanics::tokens::{create_a_treasure, treasures_controlled, TREASURE};
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
@@ -15,15 +15,11 @@ fn treasure_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn make_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    create_treasure(g, item.controller)
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(triggers::THIS_ATTACKS, treasure_damage, "Whenever Smaug attacks, he deals damage equal to the number of Treasures you control to any target.")
             .targets(&[targets::ANY]),
-        triggered(triggers::YOUR_UPKEEP, make_treasure, "At the beginning of your upkeep, create a Treasure token."),
+        triggered(triggers::YOUR_UPKEEP, create_a_treasure, "At the beginning of your upkeep, create a Treasure token."),
     ],
     ..oracle::SMAUG_THE_MAGNIFICENT
 };

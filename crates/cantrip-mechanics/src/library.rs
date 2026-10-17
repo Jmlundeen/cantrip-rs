@@ -484,3 +484,10 @@ pub fn exile_until_nonland(
     }
     (exiled, None)
 }
+
+/// "An instant or sorcery card" as a search finds it (CR 205.2a, 701.23): the card's types as they are in the library. Mystical
+/// Tutor and Wild Idea (Sanar, Unfinished Genius's prepare spell) search for it.
+pub fn instant_or_sorcery_card(q: &dyn Query, card: ObjectId) -> bool {
+    let chars = q.chars(card);
+    chars.is(CardType::Instant) || chars.is(CardType::Sorcery)
+}

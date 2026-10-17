@@ -12,11 +12,6 @@ fn mode_not_chosen_this_turn(q: &dyn Query, asker: &Asker, mode: u8) -> bool {
     })
 }
 
-/// "Create a Treasure token."
-fn treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create_treasure(g, item.controller)
-}
-
 /// "Each opponent loses 3 life."
 fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.each_opponent_loses_life(item.controller, 3);
@@ -25,7 +20,7 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 static MODAL: ModalDef = modes(&[
     mode(|g, item| effects::draw(g, item, 1), "Draw a card."),
-    mode(treasure, "Create a Treasure token."),
+    mode(tokens::create_a_treasure, "Create a Treasure token."),
     mode(drain, "Each opponent loses 3 life."),
 ])
 .allowed(mode_not_chosen_this_turn);

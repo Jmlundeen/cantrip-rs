@@ -15,17 +15,12 @@ fn create_fish(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Create a Treasure token."
-fn create_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create_treasure(g, item.controller)
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
         ability(cost("{2}, {T}").and(sacrifice(1, targets::token_you_control)), draw_a_card, "{2}, {T}, Sacrifice a token: Draw a card."),
         ability(cost("{3}, {T}").and(life(1)), create_fish, "{3}, {T}, Pay 1 life: Create a 1/1 blue Fish creature token."),
-        ability(cost("{4}, {T}"), create_treasure, "{4}, {T}: Create a Treasure token."),
+        ability(cost("{4}, {T}"), tokens::create_a_treasure, "{4}, {T}: Create a Treasure token."),
     ],
     ..oracle::FOUNTAINPORT
 };

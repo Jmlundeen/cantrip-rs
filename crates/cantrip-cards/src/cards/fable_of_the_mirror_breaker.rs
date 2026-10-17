@@ -1,13 +1,9 @@
 use cantrip_api::*;
 use cantrip_mechanics::choose;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::tokens::{TREASURE, create_treasure};
+use cantrip_mechanics::tokens::{TREASURE, create_a_treasure};
 use cantrip_mechanics::exile_and_return_transformed;
 use cantrip_oracle as oracle;
-
-fn make_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    create_treasure(g, item.controller)
-}
 
 /// The 2/2 red Goblin Shaman token chapter I makes.
 pub static GOBLIN_SHAMAN: CardDef = CardDef {
@@ -18,7 +14,7 @@ pub static GOBLIN_SHAMAN: CardDef = CardDef {
     subtypes: SubtypeSet::of(&[Subtype::Goblin, Subtype::Shaman]),
     power: Some(2),
     toughness: Some(2),
-    abilities: &[triggered(cantrip_mechanics::triggers::THIS_ATTACKS, make_treasure, "Whenever this token attacks, create a Treasure token.")],
+    abilities: &[triggered(cantrip_mechanics::triggers::THIS_ATTACKS, create_a_treasure, "Whenever this token attacks, create a Treasure token.")],
     text: "Whenever this token attacks, create a Treasure token.",
     ..CardDef::BLANK
 };
