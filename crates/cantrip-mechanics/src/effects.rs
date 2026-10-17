@@ -210,6 +210,14 @@ pub fn put_loyalty_counter_on_this(g: &mut dyn Game, item: &StackItem) -> Result
     Ok(())
 }
 
+/// "Add one mana of any color" (CR 106.1b, 605.1b): the color is chosen by the ability's controller as it resolves; an ability
+/// that adds mana and is not a mana ability goes on the stack. Lotus Cobra, The Legend of Roku and Outcaster Trailblazer print it.
+pub fn add_one_mana_of_any_color(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let color = crate::choose_color(g, item.controller, item.object)?;
+    g.add_mana(item.controller, color.mana(), 1);
+    Ok(())
+}
+
 /// "Sacrifice this [permanent]" (CR 701.21): the ability's source. City of Traitors and Carnage, Crimson Chaos print it.
 pub fn sacrifice_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.sacrifice(&[item.object]);

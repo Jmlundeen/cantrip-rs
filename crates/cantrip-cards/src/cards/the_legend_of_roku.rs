@@ -12,13 +12,6 @@ fn chapter_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// II: "Add one mana of any color." The color is chosen as the chapter resolves.
-fn chapter_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let color = cantrip_mechanics::choose_color(g, item.controller, item.object)?;
-    g.add_mana(item.controller, color.mana(), 1);
-    Ok(())
-}
-
 /// III: "Exile this Saga, then return it to the battlefield transformed under your control": the ability's
 /// controller's, who need not own it.
 fn chapter_three(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -60,7 +53,7 @@ pub static BACK: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         chapter(1, chapter_one, "I \u{2014} Exile the top three cards of your library. Until the end of your next turn, you may play those cards."),
-        chapter(2, chapter_two, "II \u{2014} Add one mana of any color."),
+        chapter(2, cantrip_mechanics::effects::add_one_mana_of_any_color, "II \u{2014} Add one mana of any color."),
         chapter(3, chapter_three, "III \u{2014} Exile this Saga, then return it to the battlefield transformed under your control."),
     ],
     back: Some(&BACK),
