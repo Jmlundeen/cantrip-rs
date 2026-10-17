@@ -1247,6 +1247,46 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
     Some((less_each, variable_candidates(&cx, spell, player, variable).len()))
 }
 
+/// What casting `card` by the cast option `index` costs `player` before any target is announced, with the cost changes in
+/// play applied (CR 601.2f): its mana cost, an alternative cost of its own (a way, overload), or a face's mana cost (an
+/// Adventure, an Omen, a half, a back face, a bestowed Aura), with the mana of its additional cost (CR 118.8), what increases
+/// and reduces the total (Thalia, Helm of Awakening) and what sets its least (Trinisphere); and the life the changes add.
+/// For the menu row, so a cast says what it will cost before it is paid. `None` when nothing could change it (no cost
+/// changer on the battlefield, none of the card's own), which is nearly always; for a way a permanent grants
+/// (`granted_cast_total` says that); for a card cast from anywhere but a hand, where a permission may say what to pay
+/// instead or in addition; and for a cost with {X}, whose total waits on the X announced. The cost it starts from is
+/// returned with the total, so the row says something only where the changes make a difference.
+pub fn cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8) -> Option<(ManaCost, ManaCost, u32)> {
+    if !game.state.obj(card).zone.is(ZoneKind::Hand) {
+        return None;
+    }
+    let whole = game.cards.get(game.state.obj(card).card);
+    let changers = game.state.battlefield().iter().any(|&id| {
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
+    });
+    if granted_slot(index).is_some() {
+        return None;
+    }
+    let face = cast_face(whole, index);
+    if !(changers || !face.own_cost_changes.is_empty()) {
+        return None;
+    }
+    let base = match index {
+        WAY_OVERLOAD => whole.overload?,
+        n if n > 0 && (n as usize) <= whole.ways.len() => whole.ways[n as usize - 1].cost.mana,
+        _ => face.cost,
+    };
+    let base = add_cost(base, face.additional_cost.map_or(ManaCost::ZERO, |extra| extra.mana));
+    if base.x > 0 {
+        return None;
+    }
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None };
+    let face_id = (!std::ptr::eq(face, whole)).then(|| cx.card_id(face));
+    let (total, life) = change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face_id, &[]);
+    Some((base, total, life))
+}
+
 /// What a cast a permanent grants (`index`, a granted way's number) costs `player` for `card` (`granted_cast_cost`), and its
 /// mana as the cost changes in play leave it before any target is announced (CR 601.2f): for the menu row of a cast without
 /// paying the mana cost, which says what it still costs ({1} more under Thalia).

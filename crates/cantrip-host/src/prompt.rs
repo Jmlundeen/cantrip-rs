@@ -319,12 +319,24 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             }
             // A cost that depends on the target it is cast with (CR 601.2c, 601.2f): the row says what the cast costs with
             // each candidate, where that is not what it costs otherwise - mana, and life a change adds (CR 118.8).
+            let mut by_target = false;
             if (o.index == 0 || granted.is_some()) && o.targets_required == 1 && !o.target_candidates.is_empty() {
                 let costs = cast_costs(game, player, src, o.index, &o.target_candidates);
                 if costs.iter().any(|&(c, life)| c != cost || life > 0) {
                     let each = costs_by_target(game, &o.target_candidates, &costs);
                     m.description = if m.description.is_empty() { format!("costs {each}") } else { format!("{} (costs {each})", m.description) };
+                    by_target = true;
                 }
+            }
+            // A total the cost changes in play make other than the cost it is cast for (CR 601.2f: Thalia's tax, Helm of
+            // Awakening's discount, Trinisphere's three): the row says it, so the cast says what it costs before it is paid.
+            if !by_target
+                && m.life_cost == 0
+                && let Some((base, total, life)) = cast_total(game, player, src, o.index)
+                && (total != base || life > 0)
+            {
+                let total = if life > 0 { format!("{total} and {life} life") } else { total.to_string() };
+                m.description = if m.description.is_empty() { format!("costs {total}") } else { format!("{} (costs {total})", m.description) };
             }
             m.target_candidates = candidates;
         }
