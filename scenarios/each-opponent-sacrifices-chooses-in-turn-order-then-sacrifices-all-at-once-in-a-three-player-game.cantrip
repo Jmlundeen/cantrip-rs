@@ -1,7 +1,7 @@
 # "Each opponent sacrifices a creature of their choice" with two opponents (CR 101.4, 701.21a): each opponent chooses in
 # turn order, and then all the chosen creatures are sacrificed at once. Bot1's Tithing Blade enters on turn 4: Bot2, with
-# Llanowar Elves and an Ornithopter, chooses the Ornithopter; Bot3's lone Llanowar Elves is taken without asking. Both
-# die in one event, so Bot1's Chainsaw ("Whenever one or more creatures die, put a rev counter on this Equipment") gets
+# Llanowar Elves and an Ornithopter, is asked first and chooses the Ornithopter; then Bot3, with the same two, chooses its
+# Llanowar Elves (the lines are answered in that order, so the order is proven). Both die in one event, so Bot1's Chainsaw ("Whenever one or more creatures die, put a rev counter on this Equipment") gets
 # one rev counter, not one for each sacrifice (CR 603.2c, 700.4).
 
 [Bot1 Deck]
@@ -23,7 +23,8 @@ Forest x10
 [Bot3 Deck]
 Forest
 Llanowar Elves
-Forest x5
+Ornithopter
+Forest x4
 Forest x10
 
 [Actions]
@@ -43,6 +44,8 @@ Bot2.Hand.Ornithopter.Cast
 Bot3.Hand.Forest.Play
 Bot3.Battlefield.Forest.Activate
 Bot3.Hand.Llanowar Elves.Cast
+Bot3.Pass
+Bot3.Hand.Ornithopter.Cast
 [T4 Bot1.Main1]
 Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Swamp.Activate
@@ -51,6 +54,7 @@ Bot1.Hand.Tithing Blade.Cast
 Bot1.Pass
 Bot1.Pass
 Bot2.Choose(Ornithopter)
+Bot3.Choose(Llanowar Elves)
 [T4 Bot1.Main2]
 
 [Expect]
@@ -58,4 +62,5 @@ Stack.Count = 0
 Bot2.Graveyard = Ornithopter
 Bot2.Battlefield.Llanowar Elves.Types = Creature
 Bot3.Graveyard = Llanowar Elves
+Bot3.Battlefield.Ornithopter.Types = Artifact; Creature
 Bot1.Battlefield.Chainsaw.Counters.Rev = 1
