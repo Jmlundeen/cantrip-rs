@@ -1,0 +1,52 @@
+# "Pay 3 life: M.O.D.O.K. connives. Activate only during your turn." (CR 701.50a, 602.5b) On turn 3 Bot1 casts M.O.D.O.K. and activates twice: each pays 3
+# life as a cost (20 -> 14), draws a card, then discards a card. The first discards the Lightning Bolt, a nonland card, so M.O.D.O.K. gets a
+# +1/+1 counter (3/3); the second discards an Island, a land, so there is no counter. On Bot2's turn 4 the ability is refused
+# (the positive control is the activations on turn 3).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+M.O.D.O.K.
+Lightning Bolt
+Island
+Island
+Swamp
+Swamp
+Swamp
+Island x10
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.M.O.D.O.K..Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.M.O.D.O.K..Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+? Bot1.Life = 17
+? Bot1.Battlefield.M.O.D.O.K..Power = 3
+Bot1.Battlefield.M.O.D.O.K..Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot1.Life = 14
+[T4 Bot2.Main1]
+! Bot1.Battlefield.M.O.D.O.K..Activate
+
+[Expect]
+Bot1.Life = 14
+Bot1.Battlefield.M.O.D.O.K..Power = 3
+Bot1.Battlefield.M.O.D.O.K..Toughness = 3
+Bot1.Graveyard = Island; Lightning Bolt; Black Lotus
+Bot1.Hand.Count = 4

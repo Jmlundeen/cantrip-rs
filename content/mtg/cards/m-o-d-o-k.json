@@ -1,0 +1,12 @@
+{
+  "name": "M.O.D.O.K.",
+  "manaCost": "{3}{B}{B}",
+  "type": "Legendary Artifact Creature — Villain",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flying, lifelink\nMental Organism — Pay 3 life: M.O.D.O.K. connives. Activate only during your turn. (Draw a card, then discard a card. If you discarded a nonland card, put a +1/+1 counter on this creature.)\nDesigned Only for Killing — Creatures your opponents control get -1/-1.",
+  "keywords": [
+    "Flying",
+    "Lifelink"
+  ]
+}

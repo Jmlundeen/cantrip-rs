@@ -1,0 +1,63 @@
+# "Creatures your opponents control get -1/-1" (CR 613.4c): Bot2 controls a Llanowar Elves (1/1) and an Ornithopter (0/2); Bot1 has its own
+# Ornithopter. When M.O.D.O.K. enters on turn 3 the Elves becomes 0/0 and is put into the graveyard (CR 704.5f), Bot2's Ornithopter is -1/1, and
+# Bot1's own Ornithopter is untouched at 0/2, as is M.O.D.O.K. itself (2/2). Then Bot1 kills its own M.O.D.O.K. with a Lightning Bolt: the effect ends
+# with it and Bot2's Ornithopter is a 0/2 again.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+M.O.D.O.K.
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x4
+Forest x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+? Bot2.Battlefield.Ornithopter.Power = 0
+? Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.M.O.D.O.K..Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Llanowar Elves
+? Bot2.Battlefield.Ornithopter.Power = -1
+? Bot2.Battlefield.Ornithopter.Toughness = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+? Bot1.Battlefield.Ornithopter.Toughness = 2
+? Bot1.Battlefield.M.O.D.O.K..Power = 2
+? Bot1.Battlefield.M.O.D.O.K..Toughness = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(M.O.D.O.K.)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = M.O.D.O.K.; Lightning Bolt; Black Lotus
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2

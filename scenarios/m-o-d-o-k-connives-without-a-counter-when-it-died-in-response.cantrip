@@ -1,0 +1,50 @@
+# Connive (CR 701.50a, 608.2h): the life is paid as a cost, so it is gone for good. Bot2 answers the activation with a Lightning Bolt that kills
+# M.O.D.O.K. (a 2/2; Bot1's creatures are not shrunk by it). The ability still resolves: Bot1 draws a card and discards the Lightning Bolt, but
+# there is no creature on the battlefield to put a +1/+1 counter on, so the discard of a nonland card changes nothing.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Jet
+M.O.D.O.K.
+Lightning Bolt
+Island
+Island
+Swamp
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.M.O.D.O.K..Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.M.O.D.O.K..Activate
+? Bot1.Life = 17
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(M.O.D.O.K.)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Graveyard = Lightning Bolt; M.O.D.O.K.; Black Lotus
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Lightning Bolt
