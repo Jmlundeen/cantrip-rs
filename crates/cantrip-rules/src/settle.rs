@@ -17,6 +17,10 @@ fn bestowed(cx: &Cx, id: ObjectId) -> bool {
 
 pub fn settle(cx: &mut Cx) -> R<Flow> {
     loop {
+        // CR 603.8: a state trigger triggers as soon as its state is true, so the board a resolution leaves is asked before
+        // the state-based actions change it (CR 704.3): Thespian's Stage that became a Dark Depths with no ice counters has
+        // triggered even if the legend rule then puts it into the graveyard.
+        state_triggers(cx);
         if state_based_actions(cx)? {
             continue;
         }
@@ -26,7 +30,6 @@ pub fn settle(cx: &mut Cx) -> R<Flow> {
         if ops::return_exiled(cx)? {
             continue;
         }
-        state_triggers(cx);
         if !cx.s().triggers.is_empty() {
             put_triggers_on_stack(cx)?;
             continue;

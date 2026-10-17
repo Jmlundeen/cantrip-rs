@@ -351,7 +351,9 @@ intervening "if" is asked with the same controller as it triggers.
 A state trigger (CR 603.8: Mazemind Tome's "when there are four or more page counters on this artifact", Dandân's "when
 you control no Islands") listens for no event: `state_triggered` gives it a `TriggeredDef::state` condition, asked of each
 permanent and emblem after every event (in `collect_batch`'s `consider`, on the characteristics already found there) and
-again each time a player would receive priority (`settle::state_triggers`, for a state that changed with no event). It
+again each time a player would receive priority (`settle::state_triggers`, for a state that changed with no event), before
+each check of the state-based actions, so a state a resolution left and a state-based action ends has still triggered (CR
+704.3: Thespian's Stage that became a Dark Depths with no ice counters and lost the legend rule). It
 triggers while the condition holds unless it has already triggered and not left the stack - found this batch, pending, or
 on the stack (`state_trigger_waiting`) - so it triggers again once it has resolved or been countered, if the state still
 holds; an object that changed zones is a new one with a new ability (CR 400.7).
