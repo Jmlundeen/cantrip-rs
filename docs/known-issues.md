@@ -47,6 +47,7 @@ keeps it).
 | [KI-30](#ki-30-a-permanents-name-is-not-part-of-its-last-known-information) | A permanent's name is not part of its last-known information | Low | Open |
 | [KI-31](#ki-31-an-adventure-is-never-cast-from-the-top-of-a-library) | An Adventure is never cast from the top of a library | Medium | Open |
 | [KI-32](#ki-32-a-copy-of-a-spell-keeps-the-zone-the-original-was-cast-from) | A copy of a spell keeps the zone the original was cast from | Medium | Open |
+| [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 
 ## Issues
 
@@ -304,3 +305,16 @@ the other cast-only fields) in the copy, beside `spent`.
 
 **Scenarios.**
 - [`scenarios/ruthless-negotiation-a-copy-of-a-flashed-back-spell-was-not-cast-so-only-the-original-draws.cantrip`](../scenarios/ruthless-negotiation-a-copy-of-a-flashed-back-spell-was-not-cast-so-only-the-original-draws.cantrip) - Lutri copies a flashed-back Negotiation; only the original may draw (marked `# Known bug`).
+
+### KI-33: Chain Lightning's payer copies without being asked whether to
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | card | 2026-10-16, review of the payment prompt (`Game::may_pay`) |
+
+**Notes.** Chain Lightning: "that player or that permanent's controller may pay {R}{R}. If the player does, they may copy this
+spell and may choose a new target for that copy." Paying is one choice and copying a second (CR 118.12, 707.10c), but
+`chain_lightning.rs` copies as soon as the payment is made. Only a player who pays {R}{R} and then would rather not copy is
+affected. A fix asks a "may copy" (`effects::ask_may`) after a paid `may_pay`, and a scenario pays and declines the copy.
+
+**Scenarios.** None yet.
