@@ -602,6 +602,37 @@ public sealed class TacticalPermanentsTests
     }
 
     [Fact]
+    public void Puts_the_creatures_worth_most_together_within_a_total_mana_value()
+    {
+        // Michelangelo's Technique: up to two creature cards with total mana value 6 or less, over a 4/4 (4), a 3/3 (3) and a
+        // 2/2 (2). The 4/4 and the 3/3 would be worth most but make 7, which the engine refuses: the 4/4 and the 2/2 make 6.
+        ObjectView[] looked = [Creature(3, "Giant", 4, 4), Creature(4, "Ogre", 3, 3), Creature(5, "Bear", 2, 2)];
+        foreach (ObjectView card in looked)
+        {
+            card.Zone = ZoneKindView.Library;
+            card.ZoneOwner = Me;
+        }
+
+        GameClient client = Seated(looked);
+        var prompt = new ChooseCardsPromptMessage
+        {
+            Player = Me,
+            Owner = Me,
+            Purpose = CardChoicePurposeView.PutOntoBattlefield,
+            Cards = [Handle(3), Handle(4), Handle(5)],
+            Eligible = [Handle(3), Handle(4), Handle(5)],
+            Count = 2,
+            UpTo = true,
+            Kind = "creature",
+            ManaValues = [4, 3, 2],
+            MaximumTotalManaValue = 6,
+        };
+
+        CardsChosenAnswer chosen = Assert.IsType<CardsChosenAnswer>(Bot().Decide(client, prompt));
+        Assert.Equal([Handle(3), Handle(5)], chosen.Cards.Order());
+    }
+
+    [Fact]
     public void Crafts_with_the_fewest_materials_a_graveyard_card_before_a_permanent()
     {
         // Craft (CR 702.167a): the materials are exiled for good, so a card already in the graveyard goes before a creature

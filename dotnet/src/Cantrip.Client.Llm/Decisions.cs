@@ -1084,6 +1084,11 @@ public sealed class Decisions
             return new CardsChosenAnswer { Cards = ToManaValue(client, prompt, what) };
         }
 
+        if (prompt.MaximumTotalManaValue is { } most)
+        {
+            return new CardsChosenAnswer { Cards = WithinManaValue(client, prompt, what, most) };
+        }
+
         int count = Math.Min(prompt.Count, prompt.Eligible.Count);
 
         IReadOnlyList<int> picks = Many(new Question
@@ -1154,6 +1159,49 @@ public sealed class Decisions
 
         return total >= prompt.MinimumManaValue ? taken : [.. ((CardsChosenAnswer)prompt.Default()).Cards];
     }
+
+    /// <summary>
+    /// A choice "with total mana value N or less" (CR 202.3), as Michelangelo's Technique's "up to two creature cards with total
+    /// mana value 6 or less": one card at a time, each offered with its mana value, only those that still fit what is left of
+    /// the limit, and stopping is a choice of its own.
+    /// </summary>
+    private List<ViewHandle> WithinManaValue(GameClient client, ChooseCardsPromptMessage prompt, string what, int most)
+    {
+        List<ViewHandle> taken = [];
+        int total = 0;
+
+        while (taken.Count < prompt.Count)
+        {
+            List<int> fitting = [.. Enumerable.Range(0, prompt.Eligible.Count)
+                .Where(index => !taken.Contains(prompt.Eligible[index]) && total + ManaValueAt(prompt, index) <= most)];
+            if (fitting.Count == 0)
+            {
+                break;
+            }
+
+            int pick = One(new Question
+            {
+                Heading = what,
+                Note = string.Create(
+                    CultureInfo.InvariantCulture,
+                    $"The cards chosen together may have a total mana value of at most {most}; {total} is taken so far, by {taken.Count} of at most {prompt.Count} card(s). Only cards that still fit are listed."),
+                Choices = [.. fitting.Select(index => string.Create(CultureInfo.InvariantCulture, $"{GameText.Named(client, prompt.Eligible[index])} (mana value {ManaValueAt(prompt, index)})")),
+                    "Take no more cards"],
+            });
+
+            if (pick >= fitting.Count)
+            {
+                break;
+            }
+
+            taken.Add(prompt.Eligible[fitting[pick]]);
+            total += ManaValueAt(prompt, fitting[pick]);
+        }
+
+        return taken;
+    }
+
+    private static int ManaValueAt(ChooseCardsPromptMessage prompt, int index) => index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0;
 
     /// <summary>What a choice of cards is for, in the words the card would use.</summary>
     private static string Purpose(GameClient client, ChooseCardsPromptMessage prompt)

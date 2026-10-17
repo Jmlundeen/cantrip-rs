@@ -627,6 +627,28 @@ public sealed class RandomPlay : IAutoPlayer
                 : prompt.Default();
         }
 
+        if (prompt.MaximumTotalManaValue is { } limit)
+        {
+            // "With total mana value N or less" (CR 202.3): a shuffled order, each card taken while it still fits, up to a drawn
+            // number of them.
+            List<int> order = Shuffled(prompt.Eligible.Count);
+            int wanted = _random.Next(Math.Min(prompt.Count, prompt.Eligible.Count) + 1);
+            List<ViewHandle> taken = [];
+            int left = limit;
+
+            foreach (int index in order)
+            {
+                int value = index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0;
+                if (taken.Count < wanted && value <= left)
+                {
+                    taken.Add(prompt.Eligible[index]);
+                    left -= value;
+                }
+            }
+
+            return new CardsChosenAnswer { Cards = taken };
+        }
+
         // "Up to" a number takes any number down to the least the prompt allows: none, or craft's "one or more" (CR 702.167a).
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
         int least = Math.Min(prompt.Minimum, most);

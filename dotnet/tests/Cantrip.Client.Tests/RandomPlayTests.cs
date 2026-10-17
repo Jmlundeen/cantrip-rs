@@ -456,6 +456,36 @@ public sealed class RandomPlayTests
     }
 
     [Fact]
+    public void Stays_within_a_total_mana_value_a_choice_limits_while_still_drawing_which_cards()
+    {
+        // "Up to two creature cards with total mana value 6 or less" (CR 202.3): never over it, never more than two.
+        var prompt = new ChooseCardsPromptMessage
+        {
+            Player = Me,
+            Eligible = [Handle(1), Handle(2), Handle(3), Handle(4)],
+            Count = 2,
+            UpTo = true,
+            ManaValues = [4, 3, 2, 6],
+            MaximumTotalManaValue = 6,
+        };
+
+        var bot = new RandomPlay(seed: 31);
+        var sets = new HashSet<string>();
+
+        for (int i = 0; i < Draws; i++)
+        {
+            var chosen = Assert.IsType<CardsChosenAnswer>(bot.Decide(prompt));
+            int total = chosen.Cards.Sum(card => prompt.ManaValues[prompt.Eligible.IndexOf(card)]);
+
+            Assert.True(total <= 6, $"chose {total} mana value against a most of 6");
+            Assert.True(chosen.Cards.Count <= 2, $"chose {chosen.Cards.Count} cards of up to 2");
+            sets.Add(string.Join(",", chosen.Cards.Select(card => card.Value).OrderBy(value => value)));
+        }
+
+        Assert.True(sets.Count > 1, "always chose the same cards");
+    }
+
+    [Fact]
     public void Orders_triggers_every_way_round()
     {
         // CR 603.3b: any order is legal and the order decides which resolves first, so this is a real difference

@@ -331,6 +331,7 @@ public static class PromptFixtures
         "choose-collect-evidence",
         "choose-put-onto-battlefield",
         "choose-put-onto-battlefield-revealed",
+        "choose-put-onto-battlefield-within-total",
         "choose-put-into-hand",
         "choose-put-into-their-hand",
         "choose-cast",
@@ -2215,6 +2216,25 @@ public static class PromptFixtures
                 view.Zones.First(zone => zone.Kind == ZoneKindView.Graveyard && zone.Owner == Viewer).Contents.Clear();
                 ChooseCardsPromptMessage choose = Choose(CardChoicePurposeView.PutOntoBattlefield, Viewer, revealed, count: 1, upTo: false);
                 choose.Eligible = [revealed[2]];
+                return choose;
+            }
+
+            case "choose-put-onto-battlefield-within-total":
+            {
+                // Michelangelo's Technique: the top of the library looked at, up to two creature cards among them with total mana
+                // value 6 or less put onto the battlefield (CR 202.3).
+                List<ViewHandle> looked = Graveyard(view, 4);
+                foreach (ViewHandle card in looked)
+                {
+                    Object(view, card.Value).Zone = ZoneKindView.Library;
+                }
+
+                view.Zones.First(zone => zone.Kind == ZoneKindView.Graveyard && zone.Owner == Viewer).Contents.Clear();
+                ChooseCardsPromptMessage choose = Choose(CardChoicePurposeView.PutOntoBattlefield, Viewer, looked, count: 2, upTo: true);
+                choose.Kind = "creature";
+                choose.Eligible = [looked[0], looked[1], looked[2]];
+                choose.ManaValues = [4, 2, 3];
+                choose.MaximumTotalManaValue = 6;
                 return choose;
             }
 

@@ -241,8 +241,9 @@ public sealed partial class MainPage
                 new CardLook(
                     Selected: _picked.Contains(handle),
                     Dimmed: !_eligible.Contains(handle),
-                    Actionable: _eligible.Contains(handle) && !_picked.Contains(handle) && _selection.CanPick(choose.Count),
-                    Clicked: _eligible.Contains(handle) && (_picked.Contains(handle) || _selection.CanPick(choose.Count))
+                    Actionable: _eligible.Contains(handle) && !_picked.Contains(handle) && _selection.CanPick(choose.Count)
+                        && CardChoicePresentation.Fits(choose, _picked, handle),
+                    Clicked: _eligible.Contains(handle) && (_picked.Contains(handle) || _selection.CanPick(choose.Count) && CardChoicePresentation.Fits(choose, _picked, handle))
                         ? () => PickOnBoard(client, choose, handle)
                         : null,
                     Annotation: PutBackAnnotation(choose, handle)),
@@ -315,6 +316,11 @@ public sealed partial class MainPage
             && _picked.IndexOf(handle) is >= 0 and var at
             ? prompt.Purpose == CardChoicePurposeView.Splice ? $"Effect {at + 1}"
                 : at == prompt.Count - 1 ? "On top" : $"{at + 1}"
+            // A choice "with total mana value N or less" (CR 202.3): what each card it may take counts, as the engine read it
+            // (an {X} in a library is 0, CR 202.3e).
+            : prompt.MaximumTotalManaValue is not null && prompt.Eligible.FindIndex(card => card.Value == handle) is >= 0 and var index
+                && index < prompt.ManaValues.Count
+                ? $"Mana value {prompt.ManaValues[index]}"
             : null;
 
     /// <summary>

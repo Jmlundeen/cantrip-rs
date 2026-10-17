@@ -1542,8 +1542,11 @@ public sealed partial class MainPage
                     AddChoice(shown, new CardLook(
                         Selected: _picked.Contains(handle),
                         Dimmed: !canPick,
-                        Actionable: canPick && !_picked.Contains(handle) && _selection.CanPick(prompt.Count),
-                        Clicked: canPick && (_picked.Contains(handle) || _selection.CanPick(prompt.Count)) ? () => Pick(handle, prompt.Count) : null,
+                        // A card that would take a choice "with total mana value N or less" over it is refused (CR 202.3).
+                        Actionable: canPick && !_picked.Contains(handle) && _selection.CanPick(prompt.Count) && CardChoicePresentation.Fits(prompt, _picked, handle),
+                        Clicked: canPick && (_picked.Contains(handle) || _selection.CanPick(prompt.Count) && CardChoicePresentation.Fits(prompt, _picked, handle))
+                            ? () => Pick(handle, prompt.Count)
+                            : null,
                         Annotation: PutBackAnnotation(prompt, handle)));
                 }
             }

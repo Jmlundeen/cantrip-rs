@@ -433,6 +433,61 @@ public sealed partial class TacticalPlay
         return new CardsChosenAnswer { Cards = [chosen] };
     }
 
+    /// <summary>
+    /// The eligible cards worth most together whose mana values add up to <paramref name="budget"/> or less and that are no
+    /// more than the prompt's count: each worth what it would be once in play. Every set is weighed when there are few
+    /// enough cards (a look at the top eight is 256); beyond that, the most valuable that still fit, one at a time. A card
+    /// worth nothing is left out.
+    /// </summary>
+    private List<ViewHandle> WorthMostWithin(GameClient client, ChooseCardsPromptMessage prompt, int budget)
+    {
+        int n = prompt.Eligible.Count;
+        double[] worth = [.. prompt.Eligible.Select(card => client.Object(card) is { } known ? Math.Max(0, _model.WorthOnceCast(known)) : 0)];
+        int[] value = [.. Enumerable.Range(0, n).Select(index => index < prompt.ManaValues.Count ? prompt.ManaValues[index] : 0)];
+        int most = Math.Min(prompt.Count, n);
+
+        if (n > 16)
+        {
+            List<ViewHandle> taken = [];
+            int left = budget;
+            foreach (int index in Enumerable.Range(0, n).OrderByDescending(index => worth[index]))
+            {
+                if (taken.Count < most && worth[index] > 0 && value[index] <= left)
+                {
+                    taken.Add(prompt.Eligible[index]);
+                    left -= value[index];
+                }
+            }
+
+            return taken;
+        }
+
+        int best = 0;
+        double bestWorth = 0;
+        for (int set = 1; set < 1 << n; set++)
+        {
+            int count = 0, total = 0;
+            double sum = 0;
+            for (int index = 0; index < n; index++)
+            {
+                if ((set & 1 << index) != 0)
+                {
+                    count++;
+                    total += value[index];
+                    sum += worth[index];
+                }
+            }
+
+            if (count <= most && total <= budget && sum > bestWorth)
+            {
+                best = set;
+                bestWorth = sum;
+            }
+        }
+
+        return [.. Enumerable.Range(0, n).Where(index => (best & 1 << index) != 0).Select(index => prompt.Eligible[index])];
+    }
+
     private AnswerPayload Cards(GameClient client, PlayerView view, ChooseCardsPromptMessage prompt)
     {
         // A choice that has to add up to a power (saddle, crew): the creatures that reach it and give up least, where
@@ -462,6 +517,14 @@ public sealed partial class TacticalPlay
             }
 
             return total >= prompt.MinimumManaValue ? new CardsChosenAnswer { Cards = taken } : prompt.Default();
+        }
+
+        // "Up to two creature cards with total mana value 6 or less" (CR 202.3): cards taken, onto the battlefield or into a hand,
+        // so the set worth most together among those that fit the limit and the count - never a set over it, which the engine
+        // refuses. A big creature alone can beat two small ones, so the sets are weighed whole rather than best-first.
+        if (prompt.MaximumTotalManaValue is { } budget)
+        {
+            return new CardsChosenAnswer { Cards = WorthMostWithin(client, prompt, budget) };
         }
 
         // Otherwise that, an order or a vote: the prompt's own answer.

@@ -54,6 +54,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         bool said = prompt.Purpose is CardChoicePurposeView.Behold or CardChoicePurposeView.Blight;
         string kind = prompt.Kind.Length > 0 ? (said || permanents || table == ZoneKindView.Battlefield ? prompt.Kind : prompt.Kind + " card") : one;
         string many = prompt.Count == 1 ? kind : kind.EndsWith('y') ? kind[..^1] + "ies" : kind + "s";
+        // "Up to two creature cards with total mana value 6 or less" (CR 202.3): the cards chosen together, not each one.
+        if (prompt.MaximumTotalManaValue is { } within) many += $" with total mana value {within} or less";
         string article = "aeiou".Contains(kind[0], StringComparison.OrdinalIgnoreCase) ? "an" : "a";
         // "Any number of": every one of several that may be chosen, as the rules text says when it does not name a count.
         bool anyNumber = prompt.UpTo && prompt.Count >= 255;
@@ -111,6 +113,8 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             ? $"{picked.Count} chosen  ·  total power {power} of {prompt.MinimumPower}{where}"
             : prompt.MinimumManaValue > 0
                 ? $"{picked.Count} chosen  ·  total mana value {manaValue} of {prompt.MinimumManaValue}{where}"
+            : prompt.MaximumTotalManaValue is { } most
+                ? $"{picked.Count} of {prompt.Count} chosen  ·  total mana value {manaValue} of {most} or less{where}"
             : ordered && prompt.Count > 1
                 ? prompt.Purpose == CardChoicePurposeView.Splice
                     ? $"{picked.Count} of {prompt.Count} chosen  ·  their text follows the spell in the order chosen{where}"
@@ -156,11 +160,27 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             && picked.All(handle => prompt.Eligible.Any(eligible => eligible.Value == handle))
             && (prompt.UpTo ? picked.Count <= prompt.Count && picked.Count >= prompt.Minimum : picked.Count == prompt.Count)
             && power >= prompt.MinimumPower
-            && manaValue >= prompt.MinimumManaValue;
+            && manaValue >= prompt.MinimumManaValue
+            && (prompt.MaximumTotalManaValue is not { } limit || manaValue <= limit);
         bool answersOnLastPick = table == ZoneKindView.Battlefield && !prompt.UpTo && prompt.MinimumPower == 0 && prompt.MinimumManaValue == 0
             && prompt.Count > 0 && !ordered;
         return new(title, detail, Origins(client, prompt.Cards, context) + $"  ·  {prompt.Cards.Count} card{(prompt.Cards.Count == 1 ? "" : "s")}",
             confirm, valid, table, answersOnLastPick);
+    }
+
+    /// <summary>
+    /// Whether clicking <paramref name="handle"/> keeps a choice "with total mana value N or less" (CR 202.3) within it: a card
+    /// that would take the picked cards over the limit is refused, as the engine would refuse the answer. A picked card can
+    /// always be clicked (to put it back), and any card can when the choice has no such limit. With one to choose, a click
+    /// trades, so the card is judged alone.
+    /// </summary>
+    public static bool Fits(ChooseCardsPromptMessage prompt, IReadOnlyList<int> picked, int handle)
+    {
+        ArgumentNullException.ThrowIfNull(prompt);
+        ArgumentNullException.ThrowIfNull(picked);
+        if (prompt.MaximumTotalManaValue is null || picked.Contains(handle)) return true;
+        IEnumerable<int> after = prompt.Count == 1 ? [handle] : picked.Append(handle);
+        return Cantrip.Core.Decisions.TotalManaValue.Within(prompt.Eligible, prompt.ManaValues, after.Select(h => new ViewHandle(h)), prompt.MaximumTotalManaValue);
     }
 
     public static ZoneKindView? ChoiceTable(GameClient client, ChooseCardsPromptMessage prompt)

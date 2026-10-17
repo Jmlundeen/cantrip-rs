@@ -193,6 +193,41 @@ public sealed class PromptPresentationTests
         Assert.True(enough.CanSubmit);
     }
 
+    [Fact]
+    public void A_choice_within_a_total_mana_value_shows_the_running_total_and_refuses_a_card_that_would_go_over()
+    {
+        // Michelangelo's Technique: up to two creature cards with total mana value 6 or less, over mana values 4, 2 and 3.
+        GameClient client = Client("choose-put-onto-battlefield-within-total");
+        ChooseCardsPromptMessage prompt = Assert.IsType<ChooseCardsPromptMessage>(client.Prompt!.Prompt);
+        int[] cards = [.. prompt.Eligible.Select(handle => handle.Value)];
+
+        CardChoicePresentation none = CardChoicePresentation.Describe(client, prompt, []);
+        Assert.Contains("choose up to 2 creature cards with total mana value 6 or less to put onto the battlefield", none.Title);
+        Assert.Contains("0 of 2 chosen  ·  total mana value 0 of 6 or less", none.Detail);
+        Assert.True(none.CanSubmit);
+        Assert.Equal("Put nothing", none.Confirm);
+
+        // The 4 picked: the 2 still fits (6), the 3 would make 7 and is refused; the 4 itself can be put back.
+        CardChoicePresentation four = CardChoicePresentation.Describe(client, prompt, [cards[0]]);
+        Assert.Contains("1 of 2 chosen  ·  total mana value 4 of 6 or less", four.Detail);
+        Assert.True(CardChoicePresentation.Fits(prompt, [cards[0]], cards[1]));
+        Assert.False(CardChoicePresentation.Fits(prompt, [cards[0]], cards[2]));
+        Assert.True(CardChoicePresentation.Fits(prompt, [cards[0]], cards[0]));
+
+        CardChoicePresentation six = CardChoicePresentation.Describe(client, prompt, [cards[0], cards[1]]);
+        Assert.Contains("total mana value 6 of 6 or less", six.Detail);
+        Assert.True(six.CanSubmit);
+
+        // An answer over the limit, however it was reached, cannot be sent.
+        CardChoicePresentation over = CardChoicePresentation.Describe(client, prompt, [cards[0], cards[2]]);
+        Assert.Contains("total mana value 7 of 6 or less", over.Detail);
+        Assert.False(over.CanSubmit);
+
+        // The prompt's own answer for a player who answers without reading: the first cards that fit together.
+        CardsChosenAnswer fallback = Assert.IsType<CardsChosenAnswer>(prompt.Default());
+        Assert.Equal([prompt.Eligible[0], prompt.Eligible[1]], fallback.Cards);
+    }
+
     [Theory]
     [InlineData("choose-return-to-hand", true)]
     [InlineData("choose-return-effect", false)]
