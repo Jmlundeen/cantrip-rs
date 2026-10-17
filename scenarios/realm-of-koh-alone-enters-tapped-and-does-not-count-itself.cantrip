@@ -1,0 +1,31 @@
+# Realm of Koh as Bot1's only land enters tapped: the land entering is not a basic land, and a second Realm of Koh does
+# not make the next one untapped either (it is not basic, CR 205.4a). The Swamp on turn 5 is the basic land that makes
+# the third Realm of Koh enter untapped on turn 7 (positive control: the ability then taps it for {B}).
+
+[Bot1 Deck]
+Realm of Koh
+Realm of Koh
+Swamp
+Realm of Koh
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Realm of Koh.Play
+? Bot1.Battlefield.Realm of Koh.Tapped = true
+[T3 Bot1.Main1]
+Bot1.Hand.Realm of Koh.Play
+? Bot1.Battlefield.Realm of Koh#2.Tapped = true
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Realm of Koh.Play
+? Bot1.Battlefield.Realm of Koh#3.Tapped = false
+Bot1.Battlefield.Realm of Koh#3.Activate(Ability: Add)
+
+[Expect]
+Bot1.Mana = {B}
+Bot1.Battlefield.Realm of Koh#3.Tapped = true
+Bot1.Battlefield.Count = 4

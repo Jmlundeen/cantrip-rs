@@ -1,0 +1,29 @@
+# Realm of Koh: "This land enters tapped unless you control a basic land." Bot1's only other land is a Tundra (the Plains
+# and Island types, but not basic, CR 205.4a) and Bot2's Swamp is not Bot1's to count, so Bot1's Realm enters tapped on
+# turn 3. Bot2's own Realm on turn 4, beside its own Swamp, enters untapped (the positive control), and taps for {B}.
+
+[Bot1 Deck]
+Tundra
+Realm of Koh
+Island x20
+
+[Bot2 Deck]
+Swamp
+Realm of Koh
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Realm of Koh.Play
+! Bot1.Battlefield.Realm of Koh.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Realm of Koh.Play
+Bot2.Battlefield.Realm of Koh.Activate(Ability: Add)
+
+[Expect]
+Bot1.Battlefield.Realm of Koh.Tapped = true
+Bot2.Battlefield.Realm of Koh.Tapped = true
+Bot2.Mana = {B}
