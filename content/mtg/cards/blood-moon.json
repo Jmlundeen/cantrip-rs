@@ -1,0 +1,6 @@
+{
+  "name": "Blood Moon",
+  "manaCost": "{2}{R}",
+  "type": "Enchantment",
+  "oracleText": "Nonbasic lands are Mountains."
+}

@@ -1,0 +1,46 @@
+# Blood Moon on Dryad Arbor, a nonbasic Land Creature - Forest Dryad with a green color indicator. CR 305.7: setting its
+# subtype to Mountain replaces its land type (Forest) and no other subtype, and adds or removes no card type, so in layer 4
+# it is a Land Creature - Dryad Mountain; layer 5 is untouched, so it stays green by its color indicator (the rulings: "it
+# continues to be a green Dryad creature"); its power and toughness stay 1/1. It has "{T}: Add {R}" (CR 305.6) and no
+# longer "{T}: Add {G}". Before the Moon it taps for {G} (the positive control).
+
+[Bot1 Deck]
+Dryad Arbor
+Mox Ruby
+Mountain
+Mountain
+Blood Moon
+Plains
+Plains
+Plains x15
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Dryad Arbor.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Dryad Arbor.Activate
+? Bot1.Mana = {G}
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Dryad Arbor.Activate(Ability: Add {G})
+Bot1.Battlefield.Dryad Arbor.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dryad Arbor.Types = Land; Creature
+Bot1.Battlefield.Dryad Arbor.Subtypes = Dryad; Mountain
+Bot1.Battlefield.Dryad Arbor.Colors = Green
+Bot1.Battlefield.Dryad Arbor.Power = 1
+Bot1.Battlefield.Dryad Arbor.Toughness = 1
+Bot1.Battlefield.Blood Moon.Types = Enchantment

@@ -1,0 +1,66 @@
+# Blood Moon ("Nonbasic lands are Mountains") on Darksteel Citadel, an artifact land with indestructible and "{T}: Add {C}".
+# CR 305.7: setting a land's subtype takes every ability of its rules text - a keyword ability among them (CR 702.12) - and
+# changes no card type, so in layer 4 Citadel becomes an Artifact Land - Mountain with no abilities but "{T}: Add {R}"
+# (CR 305.6). Before the Moon, Bot2's Disenchant on Citadel destroys nothing (CR 702.12b: the positive control); under it,
+# the second Disenchant destroys it. It taps for {R} and not {C} under the Moon; it is still an artifact, which is why
+# Disenchant may target it at all.
+
+[Bot1 Deck]
+Darksteel Citadel
+Mox Ruby
+Mountain
+Mountain
+Blood Moon
+Plains x15
+
+[Bot2 Deck]
+Disenchant
+Disenchant
+Plains
+Plains
+Plains
+Plains
+Plains x15
+
+[Actions]
+Bot1.Hand.Darksteel Citadel.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Darksteel Citadel.Activate
+? Bot1.Mana = {C}
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Disenchant.Cast(Darksteel Citadel)
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+[T4 Bot2.Main2]
+? Bot1.Battlefield.Darksteel Citadel.Keywords = Indestructible
+? Bot2.Graveyard = Disenchant
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Darksteel Citadel.Subtypes = Mountain
+? Bot1.Battlefield.Darksteel Citadel.Keywords = (absent)
+? Bot1.Battlefield.Darksteel Citadel.Types = Artifact; Land
+! Bot1.Battlefield.Darksteel Citadel.Activate(Ability: Add {C})
+Bot1.Battlefield.Darksteel Citadel.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T6 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Disenchant.Cast(Darksteel Citadel)
+Bot2.Battlefield.Plains#1.Activate
+Bot2.Battlefield.Plains#2.Activate
+
+[Expect]
+Turn = 6
+Bot1.Graveyard = Darksteel Citadel
+Bot2.Graveyard = Disenchant; Disenchant
+Bot1.Battlefield = Mox Ruby; Mountain; Mountain; Blood Moon

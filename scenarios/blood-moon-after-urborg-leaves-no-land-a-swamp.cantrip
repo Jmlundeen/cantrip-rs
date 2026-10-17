@@ -1,0 +1,49 @@
+# Blood Moon, an enchantment, enters after Urborg, Tomb of Yawgmoth ("Each land is a Swamp in addition to its other land types").
+# Both apply in layer 4, Urborg's with the earlier timestamp, but Urborg's depends on Blood Moon's: applying Blood Moon's takes away
+# Urborg's ability (CR 305.7), changing its existence, so Blood Moon's applies first and Urborg's no longer exists (CR 613.8a-b).
+# Before the Moon, Bot2's basic Plains is a Plains Swamp (the positive control). After it, the Plains is only a Plains and
+# taps for {W}, not {B}; Urborg is a Mountain only, taps for {R} and not {B}, and stays a legendary land named Urborg (the
+# ruling: Blood Moon changes no name or supertype).
+
+[Bot1 Deck]
+Urborg, Tomb of Yawgmoth
+Mox Ruby
+Mox Jet
+Mox Pearl
+Blood Moon
+Plains x15
+
+[Bot2 Deck]
+Plains
+Plains x19
+
+[Actions]
+Bot1.Hand.Urborg, Tomb of Yawgmoth.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+? Bot2.Battlefield.Plains.Subtypes = Plains; Swamp
+[T3 Bot1.Main1]
+Bot1.Hand.Blood Moon.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Plains.Subtypes = Plains
+! Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Add {B})
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Activate(Ability: Add {R})
+? Bot1.Mana = {R}
+[T4 Bot2.Main1]
+! Bot2.Battlefield.Plains.Activate(Ability: Add {B})
+Bot2.Battlefield.Plains.Activate(Ability: Add {W})
+? Bot2.Mana = {W}
+
+[Expect]
+Turn = 4
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Subtypes = Mountain
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Supertypes = Legendary
+Bot1.Battlefield.Urborg, Tomb of Yawgmoth.Types = Land
+Bot2.Battlefield.Plains.Subtypes = Plains
