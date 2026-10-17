@@ -49,6 +49,7 @@ keeps it).
 | [KI-33](#ki-33-chain-lightnings-payer-copies-without-being-asked-whether-to) | Chain Lightning's payer copies without being asked whether to | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
+| [KI-36](#ki-36-an-ability-that-loses-its-sources-abilities-stops-applying-in-its-later-layers) | An ability that loses its source's abilities stops applying in its later layers | Low | Open |
 
 ## Issues
 
@@ -337,6 +338,7 @@ them out, so it plans with less mana than it has. The view has no word for the p
 a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
 
 **Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
+
 ### KI-36: An ability that loses its source's abilities stops applying in its later layers
 
 | Severity | Status | Area | Found |
