@@ -1,0 +1,45 @@
+# Iroh's Demonstration, second mode: "4 damage to target creature." Bot1 aims it at Bot2's Baloth Prime (10/10): exactly 4 damage
+# is marked on that creature, and Bot2's other creature (Ornithopter) takes none, since the first mode's blanket damage is not chosen.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Iroh's Demonstration
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Baloth Prime
+Ornithopter
+Island x20
+
+[Actions]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Baloth Prime.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Iroh's Demonstration.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot2.Battlefield.Baloth Prime)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield.Baloth Prime.Damage = 4
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Iroh's Demonstration

@@ -1,0 +1,6 @@
+{
+  "name": "Iroh's Demonstration",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery — Lesson",
+  "oracleText": "Choose one —\n• Iroh's Demonstration deals 1 damage to each creature your opponents control.\n• Iroh's Demonstration deals 4 damage to target creature."
+}
