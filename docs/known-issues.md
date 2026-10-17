@@ -18,6 +18,7 @@ keeps it).
 ## Entry template
 
 ```
+
 ### KI-<n>: <one-line description of what is wrong>
 
 | Severity | Status | Area | Found |
@@ -53,6 +54,9 @@ keeps it).
 | [KI-37](#ki-37-a-sideboard-card-the-engine-does-not-have-is-left-out-of-the-game) | A sideboard card the engine does not have is left out of the game | Low | Open |
 | [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
+| [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
+| [KI-23](#ki-23-a-creature-fighting-itself-cr-70114c-is-implemented-but-no-scenario-can-reach-it) | A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it | Low | Unexercised |
+| [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 
 ## Issues
 
@@ -310,6 +314,7 @@ spell and may choose a new target for that copy." Paying is one choice and copyi
 affected. A fix asks a "may copy" (`effects::ask_may`) after a paid `may_pay`, and a scenario pays and declines the copy.
 
 **Scenarios.** None yet.
+
 ### KI-34: A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt
 
 | Severity | Status | Area | Found |
@@ -374,6 +379,7 @@ outside the game cannot choose it. Limited pools are the cube's ported cards, so
 card, or has the deck loader refuse the list.
 
 **Scenarios.** `cantrip-host`'s `a_sideboard_card_the_engine_does_not_have_is_left_out`.
+
 ### KI-38: An activated ability whose cost removes counters from among permanents is unexercised
 
 | Severity | Status | Area | Found |
@@ -387,6 +393,7 @@ the activation path chooses the counters after the mana, as blight's, and remove
 it is added, its scenarios exercise this path.
 
 **Scenarios.** None yet: no card in content has the cost on an activated ability.
+
 ### KI-39: A state that is true only in the middle of a resolution, with no event, misses its state trigger
 
 | Severity | Status | Area | Found |
@@ -402,3 +409,19 @@ counters, which are events. A fix asks the conditions after every change to the 
 an event.
 
 **Scenarios.** None can be written with the cards in content.
+
+### KI-40: A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-16, review of Royal Treatment and Eluge, the Shoreless Sea |
+
+**Notes.** `create_tokens_onto` in `crates/cantrip-rules/src/ops.rs` does not create an Aura token "attached to" a
+permanent it could not legally enchant (CR 303.4i), and attaches an Equipment token only to what it could equip (CR
+301.5e); `add_effect` in `crates/cantrip-rules/src/lib.rs` refuses a `Duration::WhileCounter`/`WhileTapped` effect whose
+condition is already false (CR 611.2b). No card in content gives protection from enchantments or keeps a counter from
+being put on a land, and none creates an Equipment token attached to something, so those arms run in no scenario. The day
+such a card exists each needs a scenario (Royal Treatment on a creature with protection from enchantments; Eluge's flood
+counter on a land that can't have counters put on it), and this entry is deleted.
+
+**Scenarios.** None yet.
