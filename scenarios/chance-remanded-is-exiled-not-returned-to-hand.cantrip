@@ -1,0 +1,47 @@
+# Aftermath (CR 702.127a): "If this spell was cast from a graveyard, exile it instead of putting it anywhere else any time
+# it would leave the stack." Bot1 casts Leave in turn 3, then Chance from its graveyard; Bot2's Remand, which would
+# return it to its owner's hand, sends Leave // Chance to exile instead (CR 614.1), and Remand draws Bot2 a card. Chance
+# did nothing: no discard, no draw.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Leave // Chance
+Black Lotus
+Mox Ruby
+Island
+Island
+Mountain x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Remand
+Island x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Leave // Chance.Cast(Ability: Leave)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Graveyard.Leave // Chance.Cast(Ability: Chance)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Remand.Cast(Chance)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Leave // Chance
+Bot1.Hand = Mountain; Island; Island
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Remand

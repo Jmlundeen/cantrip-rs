@@ -1119,11 +1119,16 @@ pub struct GrantedWay {
     /// "If you do, it gains [ability]": the index in the granting card's `delayed` abilities of the ability the permanent
     /// resulting from the play or the cast has from then on (CR 400.7a, 113.6). Serra Paragon's exile-and-gain-2-life.
     pub gains: Option<u8>,
+    /// The way is flashback the permanent gives the card ("each instant and sorcery card in your graveyard has flashback",
+    /// CR 702.34a): a spell cast this way is exiled instead of put anywhere else any time it would leave the stack, whether
+    /// it resolves, is countered or is returned to a hand, and whether or not the permanent is still there. Iroh, Grand
+    /// Lotus; Lier, Disciple of the Drowned and Kess's kin that give flashback as a static ability would use it.
+    pub flashback: bool,
 }
 
 impl GrantedWay {
     /// A way that casts only and grants nothing, for a card's file to start from.
-    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, lands: false, gains: None };
+    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, lands: false, gains: None, flashback: false };
 }
 
 /// A static ability of a permanent that gives cards in a hand miracle (CR 702.94a): "each instant and sorcery card in your

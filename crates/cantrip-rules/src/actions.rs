@@ -2564,8 +2564,9 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             } else {
                 (instead, 0)
             };
-            let exile_after = permitted.is_some_and(|p| p.grant.exile_after);
-            cast(cx, player, source, action.index, &action.targets, CastTerms { instead, any_type, life, more, less: 0, exile_after, copy: false, way: None }, false)?
+            // A flashback a permission gives (Snapcaster Mage, CR 702.34a).
+            let flashback = permitted.is_some_and(|p| p.grant.exile_after);
+            cast(cx, player, source, action.index, &action.targets, CastTerms { instead, any_type, life, more, less: 0, exile_after: false, flashback, copy: false, way: None }, false)?
         }
         ActionKind::ActivateAbility if action.index >= PLAYER_MANA_ABILITY => {
             activate_mana(cx, player, source, action.index, action.color, false, &[])?;
@@ -2613,6 +2614,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         gift: None,
         shares: [0; cantrip_state::MAX_TARGETS],
         exile_after: false,
+        flashback: false,
         since: 0,
     };
     item.targets[..targets.len()].copy_from_slice(targets);
@@ -2643,7 +2645,7 @@ fn cast(
     terms: CastTerms,
     resolving: bool,
 ) -> R<()> {
-    let CastTerms { instead, any_type, exile_after, life, more, less, copy: _, way: _ } = terms;
+    let CastTerms { instead, any_type, exile_after, flashback, life, more, less, copy: _, way: _ } = terms;
     // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own.
     let granted = granted_slot(way);
     let way = granted.map_or(way, |(_, face)| granted_face_way(face));
@@ -2672,8 +2674,9 @@ fn cast(
     };
     let def = inset.or(back).or(bestow).or(half).unwrap_or(whole);
     let face = cx.card_id(def);
-    // Aftermath (CR 702.127a): exiled instead of put anywhere else as it leaves the stack.
-    let exile_after = exile_after || def.aftermath;
+    // Flashback (CR 702.34a) a permission or a permanent gave, or aftermath (CR 702.127a): exiled instead of put anywhere
+    // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
+    let flashback = flashback || def.aftermath || granted.is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s())[k].2.flashback);
     let mut cost = match (way, instead) {
         (_, Some(instead)) => Cost::mana(instead),
         _ if granted.is_some() => {
@@ -2731,6 +2734,7 @@ fn cast(
     let mut item = stack_item(StackKind::Spell, spell, AbilityRef { card: face, index: u8::MAX }, player, targets);
     item.way = way;
     item.exile_after = exile_after;
+    item.flashback = flashback;
     // Overload (CR 702.96a): "each" for "target", so nothing is targeted.
     let specs: &[TargetSpec] = if way == WAY_OVERLOAD { &[] } else { def.spell_targets() };
     // CR 118.8: an additional cost is owed with every way of casting it; its mana joins the total.

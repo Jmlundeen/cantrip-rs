@@ -51,6 +51,7 @@ pub static CARD: CardDef = CardDef {
         cost: from_graveyard,
         lands: true,
         gains: Some(0),
+        ..GrantedWay::CAST
     }],
     delayed: &[triggered(when(EventMask::ZONE_CHANGE, put_into_graveyard), exile_and_gain, "When this permanent is put into a graveyard from the battlefield, exile it and you gain 2 life.")
         .look_back()],

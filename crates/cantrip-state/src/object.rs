@@ -410,6 +410,10 @@ pub struct StackItem {
     /// For an instant or sorcery spell: if it would be put into a graveyard as it leaves the stack, it is exiled
     /// instead (Bilbo's "cast this way").
     pub exile_after: bool,
+    /// For a spell cast with flashback that is not printed in its ways (CR 702.34a): one a permission gave (Snapcaster Mage)
+    /// or a permanent's static ability (Iroh, Grand Lotus), or an aftermath half cast from a graveyard (CR 702.127a). It is
+    /// exiled instead of put anywhere else any time it would leave the stack.
+    pub flashback: bool,
     /// The serial of the first event in the history after it was put on the stack (the history's head then), or, for a
     /// delayed triggered ability, after that ability was created (`Delayed::since`): what an instruction to transform its
     /// source asks the history about (CR 701.27f).

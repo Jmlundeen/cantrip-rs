@@ -1,0 +1,49 @@
+# Flashback (CR 702.34a): "If the flashback cost was paid, exile this card instead of putting it anywhere else any time it
+# would leave the stack" - for a flashback a card was given as much as for a printed one (Snapcaster Mage's ruling: "it
+# will always be exiled afterward, whether it resolves, is countered, or leaves the stack in some other way"). Snapcaster
+# Mage gives Lightning Bolt flashback, Bot1 casts it again from the graveyard, and Bot2's Remand, which would return it to
+# its owner's hand, sends it to exile instead (CR 614.1). The first Bolt hit Bot2; the second did nothing.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Lightning Bolt
+Snapcaster Mage
+Forest
+Forest x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Remand
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Snapcaster Mage.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Graveyard.Lightning Bolt.Cast(Bot2)
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Remand.Cast(Lightning Bolt)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Exile = Lightning Bolt
+Bot1.Graveyard = Black Lotus
+Bot1.Hand.Count = 2
