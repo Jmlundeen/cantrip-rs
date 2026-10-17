@@ -66,5 +66,5 @@ pub fn discard_chosen_from_revealed_hand_of_kind(
 /// reveal and the choice are asked even when no nonland card is there to take, as Duress is. Grief, Humiliate and
 /// Down, Down to Goblin-town print it.
 pub fn discard_chosen_nonland_from_revealed_hand(g: &mut dyn Game, item: &StackItem, player: PlayerId) -> Result<Vec<ObjectId>, Suspend> {
-    discard_chosen_from_revealed_hand_of_kind(g, item, player, Purpose::Discard, "nonland", |q, c| !q.chars(c).is(CardType::Land))
+    discard_chosen_from_revealed_hand_of_kind(g, item, player, Purpose::TakeFromHand, "nonland", |q, c| !q.chars(c).is(CardType::Land))
 }

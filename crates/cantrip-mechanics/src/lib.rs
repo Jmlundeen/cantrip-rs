@@ -89,6 +89,7 @@ pub mod tiered;
 pub mod sneak;
 pub mod solved;
 pub mod spectacle;
+pub mod spent;
 pub mod suspend;
 pub mod typecycling;
 pub mod unearth;
