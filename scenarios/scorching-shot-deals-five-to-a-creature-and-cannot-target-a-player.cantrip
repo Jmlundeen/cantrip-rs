@@ -1,0 +1,36 @@
+# Scorching Shot: "deals 5 damage to target creature." Bot1 kills Bot2's Fanatic of Rhonas (1/4) with it. The refusal
+# shows a player is not a legal target (only creatures are), and the Shot is offered at the Fanatic (positive control).
+# Five damage is more than the Fanatic's toughness 4; Bot2's life is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Scorching Shot
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Fanatic of Rhonas
+Island x20
+
+[Actions]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+! Bot1.Hand.Scorching Shot.Cast(Bot2)
+Bot1.Hand.Scorching Shot.Cast(Bot2.Battlefield.Fanatic of Rhonas)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Fanatic of Rhonas
+Bot2.Life = 20
+Bot1.Graveyard = Scorching Shot

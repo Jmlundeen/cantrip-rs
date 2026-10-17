@@ -1,0 +1,6 @@
+{
+  "name": "Scorching Shot",
+  "manaCost": "{R}{R}",
+  "type": "Sorcery",
+  "oracleText": "Scorching Shot deals 5 damage to target creature."
+}
