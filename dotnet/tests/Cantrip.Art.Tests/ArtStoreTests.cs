@@ -133,6 +133,26 @@ public sealed class ArtStoreTests : IDisposable
         Assert.True(File.Exists(Path.Combine(_root, "cache", ArtStore.CreditsFile)));
     }
 
+    [Fact]
+    public async Task A_cache_folder_alone_answers_for_the_renditions_it_holds()
+    {
+        ArtRendition built = (await _store.GetAsync("lightning-bolt", 256, CancellationToken.None))!;
+        string copied = Path.Combine(_root, "copied");
+        Directory.CreateDirectory(Path.Combine(copied, "256"));
+        foreach (string file in Directory.GetFiles(Path.Combine(_root, "cache", "256")))
+        {
+            File.Copy(file, Path.Combine(copied, "256", Path.GetFileName(file)));
+        }
+
+        var bare = new ArtStore(new ArtStoreOptions { ContentRoot = Path.Combine(_root, "no-content"), CacheDirectory = copied });
+
+        ArtRendition? kept = await bare.GetAsync("lightning-bolt", 256, CancellationToken.None);
+        Assert.NotNull(kept);
+        Assert.Equal(built.ETag, kept.ETag);
+        Assert.Null(await bare.GetAsync("lightning-bolt", 512, CancellationToken.None));
+        Assert.Null(await bare.GetAsync("no-such-card", 256, CancellationToken.None));
+    }
+
     private void WritePicture(string name, int width, int height)
     {
         using var bitmap = new SKBitmap(width, height);
