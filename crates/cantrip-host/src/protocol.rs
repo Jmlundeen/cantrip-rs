@@ -668,6 +668,9 @@ pub struct ActionOptionMessage {
     /// For an activation, which of the source's abilities. For a cast, 0 for the mana cost and n for
     /// the card's nth alternative cost (CR 118.9).
     pub ability_index: i32,
+    /// Opaque casting plan identity scoped to the current question; echo it with the selection.
+    #[serde(default)]
+    pub cast_plan_id: i32,
     pub targets_required: i32,
     pub target_candidates: Vec<TargetMessage>,
     /// For a mana ability: the mana it would add.
@@ -716,6 +719,7 @@ impl ActionOptionMessage {
             kind,
             source,
             ability_index: 0,
+            cast_plan_id: 0,
             targets_required: 0,
             target_candidates: Vec::new(),
             produces: Vec::new(),
@@ -1311,6 +1315,9 @@ pub struct TakeActionAnswer {
     pub kind: ActionKindView,
     pub source: ViewHandle,
     pub ability_index: i32,
+    /// Opaque casting plan identity scoped to the current question; echo it with the selection.
+    #[serde(default)]
+    pub cast_plan_id: i32,
     pub targets: Vec<TargetMessage>,
     pub color: Option<ColorView>,
     pub colors: Vec<ColorView>,
@@ -1331,6 +1338,7 @@ impl TakeActionAnswer {
             kind,
             source,
             ability_index: 0,
+            cast_plan_id: 0,
             targets: Vec::new(),
             color: None,
             colors: Vec::new(),
@@ -1348,6 +1356,7 @@ impl TakeActionAnswer {
     pub fn take(option: &ActionOptionMessage) -> Self {
         let mut answer = Self::new(option.kind, option.source);
         answer.ability_index = option.ability_index;
+        answer.cast_plan_id = option.cast_plan_id;
         answer.tap = option.tap;
         answer.filter = option.filter;
         answer.effect = option.effect;

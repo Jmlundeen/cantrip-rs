@@ -1,0 +1,38 @@
+# CR 608.2g, 118.9: an instruction to cast during resolution permits a printed alternative cost.
+# Chandra exiles Endurance with no green mana available; evoke exiles Llanowar Elves, so the creature is cast and sacrificed.
+# Source: https://magic.wizards.com/en/news/feature/kaladesh-release-notes-2016-09-16
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Llanowar Elves
+Island
+Island
+Endurance
+Island x20
+
+[Bot2 Deck]
+Lightning Bolt x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Accept
+Bot1.Modes(Evoke)
+Bot1.Choose(Llanowar Elves)
+Bot1.Pass
+Bot1.Target(Count: 0)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby; Chandra, Torch of Defiance
+Bot1.Graveyard = Endurance; Black Lotus
+Exile = Llanowar Elves
+Bot2.Life = 20

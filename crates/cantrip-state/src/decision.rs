@@ -137,6 +137,65 @@ pub const PAY_CONVOKE: u8 = 2;
 /// Waterbend (CR 701.67a): an untapped artifact or creature tapped pays {1}.
 pub const PAY_WATERBEND: u8 = 3;
 
+/// The permission route under which a cast is offered. Kept on the option that represents it so the
+/// rules engine can execute the same route the player chose, even when several permissions overlap.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum CastPermission {
+    Hand,
+    PrintedGraveyard,
+    GraveyardPlayRule,
+    Aftermath,
+    BestowGraveyard,
+    AdventureExile,
+    /// A prepared card in exile, keyed to the object that allowed its ordinary cast.
+    PreparedCopy {
+        source: ObjectId,
+    },
+    /// A printed alternative cost whose own text permits casting from this exact zone.
+    PrintedWay {
+        way: u32,
+    },
+    Retrace,
+    PlayPermission {
+        index: u32,
+    },
+    /// A permission granted by one specific printed ability for cards in a named zone.
+    GrantedWay {
+        source: ObjectId,
+        rule: u32,
+    },
+    ExileCast {
+        source: ObjectId,
+        rule: u32,
+    },
+    LibraryTop {
+        source: ObjectId,
+        rule: u32,
+    },
+    Resolution,
+}
+
+/// Which cost alternative this cast plan selects. Object references and card-table positions identify
+/// the exact granting ability; they are not re-searched as a first matching grant during execution.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum CastCostChoice {
+    Printed,
+    PrintedWay { way: u32 },
+    Overload,
+    GrantedWay { source: ObjectId, rule: u32 },
+    LifeForManaValue,
+    EffectSpecified,
+}
+
+/// A selector for one concrete route and cost through which a spell may be cast.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct CastPlan {
+    /// Existing cast-way/index meaning, retained for legacy labels and face selection.
+    pub way: u8,
+    pub permission: CastPermission,
+    pub cost: CastCostChoice,
+}
+
 /// One thing a player could do: an option of a priority, payment or "unless" question, as a prototype the answer
 /// fills in (targets, a color).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -146,6 +205,8 @@ pub struct ActionOption {
     /// For a cast, which way (0 its mana cost, n its nth alternative cost); for an activation, which ability of the
     /// source's computed ability list.
     pub index: u8,
+    /// The exact permission and cost route for a cast.
+    pub cast_plan: Option<CastPlan>,
     /// Targets the action is announced with, and who may be chosen for them (CR 601.2c): the candidates of every
     /// target slot together.
     pub targets_required: u8,
@@ -172,6 +233,7 @@ impl ActionOption {
             kind,
             source: None,
             index: 0,
+            cast_plan: None,
             targets_required: 0,
             targets_optional: false,
             target_candidates: Vec::new(),
@@ -194,6 +256,8 @@ pub struct Action {
     pub kind: ActionKind,
     pub source: Option<ObjectId>,
     pub index: u8,
+    /// The exact permission and cost route selected for a cast.
+    pub cast_plan: Option<CastPlan>,
     pub targets: Vec<Target>,
     pub color: Option<Color>,
     pub mana: Option<Mana>,
@@ -206,6 +270,7 @@ impl Action {
             kind: option.kind,
             source: option.source,
             index: option.index,
+            cast_plan: option.cast_plan,
             targets: Vec::new(),
             color: None,
             mana: option.mana,
@@ -821,6 +886,8 @@ pub enum Label {
     Face(CardId),
     /// A permanent's granted alternative cost, indexed in its printed definition (CR 118.9).
     GrantedWay(CardId, u8),
+    /// A printed alternative cost, indexed in the card's printed `ways` (CR 118.9).
+    PrintedWay(CardId, u32),
     /// One of a card's miracle abilities, to reveal it with (CR 702.94a, 607.5).
     Miracle(MiracleOf),
     /// A type of mana to add (CR 106.1b: white, blue, black, red, green or colorless): "one mana of any type that land

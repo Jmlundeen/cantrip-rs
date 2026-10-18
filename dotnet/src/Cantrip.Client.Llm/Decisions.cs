@@ -248,6 +248,7 @@ public sealed class Decisions
             Kind = option.Kind,
             Source = option.Source,
             AbilityIndex = option.AbilityIndex,
+            CastPlanId = option.CastPlanId,
             Tap = option.Tap,
             Targets = Aim(
                 client,

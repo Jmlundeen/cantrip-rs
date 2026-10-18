@@ -2096,6 +2096,9 @@ public sealed class ActionOptionMessage
     /// </summary>
     [Key(31)]
     public bool TappedAfterMana { get; set; }
+    /// <summary>Opaque casting-plan identity in this question; echo it when choosing this option.</summary>
+    [Key(32)]
+    public int CastPlanId { get; set; }
 }
 
 /// <summary>
@@ -2885,6 +2888,10 @@ public sealed class TakeActionAnswer : AnswerPayload
 
     [Key(2)]
     public int AbilityIndex { get; set; }
+
+    /// <summary>The offered casting plan; zero retains legacy selection when the route is unambiguous.</summary>
+    [Key(15)]
+    public int CastPlanId { get; set; }
 
     /// <summary>Targets chosen as the spell is announced (CR 601.2c).</summary>
     [Key(3)]

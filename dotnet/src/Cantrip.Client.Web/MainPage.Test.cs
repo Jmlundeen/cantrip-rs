@@ -569,7 +569,8 @@ public sealed partial class MainPage
                 json.WriteStartObject();
                 json.WriteString("kind", kind);
                 json.WriteString("label", label);
-                json.WriteNumber("ability", kind == "item" && child is Border { Tag: int ability } ? ability : -1);
+                json.WriteNumber("ability", kind == "item" && child is Border { Tag: CardMenu.RowIdentity identity } ? identity.Ability : -1);
+                json.WriteNumber("castPlanId", kind == "item" && child is Border { Tag: CardMenu.RowIdentity plan } ? plan.CastPlanId : 0);
                 WriteBox(json, target.TransformToVisual(Root).TransformBounds(new Rect(0, 0, target.ActualWidth, target.ActualHeight)));
                 json.WriteEndObject();
 

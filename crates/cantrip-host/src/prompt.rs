@@ -270,6 +270,103 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     let def = game.cards.get(game.state.obj(src).card);
     match o.kind {
         ActionKind::CastSpell => {
+            if let Some(plan) = o.cast_plan {
+                let player = game
+                    .pending()
+                    .map_or(game.state.turn.priority, |r| r.player);
+                if let Some(face) = cast_plan_face(game, src, plan)
+                    && let Some(base) = cast_plan_cost(game, player, src, plan)
+                {
+                    // The engine's description names the permission that supplies the route for scripts and logs; the
+                    // row says only what the player chooses between, as it did before routes were distinguished.
+                    m.description = m
+                        .description
+                        .rsplit_once(" — Permission: ")
+                        .map_or_else(|| m.description.clone(), |(text, _)| text.to_owned());
+                    if let Some(face) = def.inset_face(plan.way) {
+                        m.spell_name = face.name.to_string();
+                    } else if let Some(face) = granted_slot(o.index).and_then(|(_, face)| match face {
+                        GRANTED_FACE_LEFT => def.split.map(|h| h.0),
+                        GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
+                        GRANTED_FACE_ADVENTURE => def.adventure,
+                        GRANTED_FACE_OMEN => def.omen,
+                        GRANTED_FACE_BACK => def.back,
+                        _ => None,
+                    }) {
+                        m.spell_name = face.name.to_string();
+                    }
+                    m.has_x = base.mana.x > 0;
+                    m.life_cost = i32::from(base.life);
+                    let life_paid = matches!(plan.cost, CastCostChoice::LifeForManaValue);
+                    m.cost_text = if life_paid {
+                        format!("for {} life", base.life)
+                    } else {
+                        cost_text_of(&base, face.name)
+                    };
+                    // Paying life is the alternative cost, not "without paying": the row names the life instead, even 0.
+                    m.without_paying_mana_cost = !life_paid
+                        && base.mana == ManaCost::ZERO
+                        && (face.cost != ManaCost::ZERO || !face.has_cost);
+                    // A granted cast says what it costs beside the way's text (Iroh's flashback, "equal to that card's
+                    // mana cost"), unless that text already names a cost; a face it names shows the cost on its own row.
+                    if granted_slot(o.index).is_some()
+                        && m.spell_name.is_empty()
+                        && !life_paid
+                        && !m.cost_text.is_empty()
+                        && !m.description.contains('{')
+                    {
+                        m.description = if m.description.is_empty() {
+                            m.cost_text.clone()
+                        } else {
+                            format!("{} {}", m.description, m.cost_text)
+                        };
+                    }
+                    if let Some((_, total, life)) = cast_plan_total(game, player, src, plan) {
+                        let mut shown = base;
+                        shown.mana = total;
+                        shown.life = life.min(u32::from(u8::MAX)) as u8;
+                        m.life_cost = life.min(i32::MAX as u32) as i32;
+                        m.cost_text = if life_paid {
+                            format!("for {life} life")
+                        } else {
+                            let text = cost_text_of(&shown, face.name);
+                            if text.is_empty() {
+                                total.to_string()
+                            } else {
+                                text
+                            }
+                        };
+                        if total != base.mana || life != u32::from(base.life) {
+                            let total_text = if life > 0 {
+                                format!("{total} and {life} life")
+                            } else {
+                                total.to_string()
+                            };
+                            m.description = if m.description.is_empty() {
+                                format!("costs {total_text}")
+                            } else {
+                                format!("{} (costs {total_text})", m.description)
+                            };
+                        }
+                    }
+                    if o.targets_required == 1 && !o.target_candidates.is_empty() {
+                        let costs = cast_plan_costs(game, player, src, plan, &o.target_candidates);
+                        if costs
+                            .iter()
+                            .any(|&(mana, life)| mana != base.mana || life != u32::from(base.life))
+                        {
+                            let each = costs_by_target(game, &o.target_candidates, &costs);
+                            m.description = if m.description.is_empty() {
+                                format!("costs {each}")
+                            } else {
+                                format!("{} (costs {each})", m.description)
+                            };
+                        }
+                    }
+                }
+                m.target_candidates = candidates;
+                return m;
+            }
             // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell: its name, and its own mana cost.
             let inset = def.inset_face(o.index);
             // A cast a permanent grants names the face it casts (a Room's door, an Adventure): its name and its cost.
@@ -437,7 +534,15 @@ fn costs_by_target(game: &Game, candidates: &[Target], costs: &[(ManaCost, u32)]
 }
 
 fn options_messages(game: &Game, handles: &mut HandleSpace, options: &[ActionOption]) -> Vec<ActionOptionMessage> {
-    options.iter().map(|o| option_message(game, handles, o)).collect()
+    options.iter().enumerate()
+        .map(|(i, o)| {
+            let mut message = option_message(game, handles, o);
+            if o.cast_plan.is_some() {
+                message.cast_plan_id =
+                    i32::try_from(i + 1).expect("a question's options fit the wire index");
+            }
+            message
+        }).collect()
 }
 
 fn remaining_colored(cost: &ManaCost) -> Vec<ColorView> {

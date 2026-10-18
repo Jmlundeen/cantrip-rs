@@ -43,6 +43,13 @@ prompt and the seat's view. Seats are numbered from one. A game is resumed the w
 the same seed and decks, `Start`, and the recorded answers sent again in order, so the host is deterministic for a seed
 and nothing in it is a snapshot.
 
+Casting options include `CastPlanId`, an opaque positive identity within the current question's options. A
+`TakeActionAnswer` echoes it with the option's kind, source and ability index. It selects the exact zone permission
+and cost route whose terms the server displayed. The identity carries no engine object IDs and has no meaning in a
+later question; the enclosing request ID still identifies the question. Zero retains the older answer form only when
+its kind/source/index identifies one unambiguous route. Unknown IDs and IDs belonging to another option are rejected.
+The C# MessagePack protocol is version 185; existing keys keep their numbers and these fields are appended.
+
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed
 counters, added mana or cost life (a land, Black Lotus, Lotus Petal, Pentad Prism, a Treasure), that seat's next priority

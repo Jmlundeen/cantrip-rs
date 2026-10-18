@@ -14,7 +14,7 @@ fn distinct<T: PartialEq>(items: &[T]) -> bool {
 }
 
 fn fits(option: &ActionOption, action: &Action) -> bool {
-    if option.kind != action.kind || option.source != action.source || option.index != action.index {
+    if option.kind != action.kind || option.source != action.source || option.index != action.index || option.cast_plan != action.cast_plan {
         return false;
     }
     // Restricted mana is a kind of its own (CR 106.6): spending it is answered with its restriction.

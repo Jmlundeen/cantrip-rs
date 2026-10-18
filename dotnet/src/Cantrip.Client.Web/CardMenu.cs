@@ -10,6 +10,7 @@ namespace Cantrip.Client.Web;
 /// </summary>
 public sealed class CardMenu
 {
+    public sealed record RowIdentity(int Ability, int CastPlanId);
     private readonly Popup _popup = new() { IsLightDismissEnabled = true };
     private readonly StackPanel _rows = new() { Orientation = Orientation.Vertical };
 
@@ -30,7 +31,7 @@ public sealed class CardMenu
 
     /// <summary>Opens at a point in <paramref name="over"/>'s coordinates, with one row per choice.</summary>
     /// <param name="fontSize">The rows' type size: 13 for a card's menu, 12 for a drop-down's list.</param>
-    public void Open(UIElement over, Point at, IReadOnlyList<(string Text, Action OnChosen)> choices, double fontSize = 13, IReadOnlyList<int>? abilities = null)
+    public void Open(UIElement over, Point at, IReadOnlyList<(string Text, Action OnChosen)> choices, double fontSize = 13, IReadOnlyList<int>? abilities = null, IReadOnlyList<int>? castPlans = null)
     {
         ArgumentNullException.ThrowIfNull(choices);
 
@@ -46,7 +47,8 @@ public sealed class CardMenu
                 Background = Theme.Brush(Color.FromArgb(0, 0, 0, 0)),
                 Child = new SymbolText(fontSize, Theme.Fg) { Text = text },
                 // Which ability of the card the row is, for a page driven by a test to tell rows that read alike.
-                Tag = abilities is not null && index < abilities.Count ? abilities[index] : -1,
+                Tag = new RowIdentity(abilities is not null && index < abilities.Count ? abilities[index] : -1,
+                    castPlans is not null && index < castPlans.Count ? castPlans[index] : 0),
             };
 
             row.PointerEntered += (_, _) => row.Background = Theme.Brush(Theme.ControlHover);

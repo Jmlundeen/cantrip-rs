@@ -1,0 +1,51 @@
+# Mystic Forge permits artifact and colorless spells from the top for their mana costs; Bolas's Citadel independently
+# permits any spell from the top for life equal to its mana value. Cryptic Trilobite is a colorless, nonartifact X spell:
+# choose X=1 and cast it under Forge's permission for {2}, not Citadel's life payment. Forge entered first here.
+# Rules: CR 601.3, 601.2b and 118.9; X is chosen while proposing the spell and determines its mana value on the stack.
+# Sources: https://magic.wizards.com/en/rules ; https://magic.wizards.com/en/news/feature/core-set-2020-release-notes-2019-06-25 ; https://media.wizards.com/2025/downloads/FIN_Release_Notes_3O87RLY5EO/EN_FIN_Release_Notes_2025_1_15.pdf
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Black Lotus
+Black Lotus
+Mox Jet
+Mystic Forge
+Bolas's Citadel
+Swamp
+Cryptic Trilobite
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mystic Forge.Cast
+Bot1.Pass
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Library.Cryptic Trilobite.Cast(X: 1; Ability: Mystic Forge)
+
+[Expect]
+Turn = 3
+Bot1.Life = 20
+Bot1.Battlefield.Cryptic Trilobite.Power = 1
+Bot1.Battlefield.Cryptic Trilobite.Toughness = 1
+Stack.Count = 0

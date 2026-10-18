@@ -97,6 +97,7 @@ pub fn translate(
                 color: a.color.map(color_of),
                 mana: a.mana.map(mana_of),
                 restriction: restriction_of(a.filter, a.effect, &a.spend_subtypes, a.spend_mana_value),
+                cast_plan: None,
             };
             if let Some(s) = a.sacrifice {
                 action.targets.push(Target::Object(object(handles, game, s)?));
@@ -119,6 +120,45 @@ pub fn translate(
             {
                 action.source = o.source;
                 action.index = o.index;
+            }
+            if let RequestKind::Priority { options } | RequestKind::PayCosts { options, .. } =
+                &request.kind
+            {
+                if a.cast_plan_id != 0 {
+                    let selected = a
+                        .cast_plan_id
+                        .checked_sub(1)
+                        .and_then(|i| usize::try_from(i).ok())
+                        .and_then(|i| options.get(i))
+                        .filter(|o| {
+                            o.kind == action.kind
+                                && o.source == action.source
+                                && o.index == action.index
+                                && o.cast_plan.is_some()
+                        })
+                        .ok_or_else(|| {
+                            Untranslatable::Illegal(
+                                "that casting plan is not offered in this question".into(),
+                            )
+                        })?;
+                    action.cast_plan = selected.cast_plan;
+                } else if kind == ActionKind::CastSpell {
+                    let mut matching = options.iter().filter(|o| {
+                        o.kind == kind && o.source == action.source && o.index == action.index
+                    });
+                    if let Some(first) = matching.next() {
+                        if matching.any(|o| o.cast_plan != first.cast_plan) {
+                            return Err(Untranslatable::Illegal(
+                                "choose which casting permission to use".into(),
+                            ));
+                        }
+                        action.cast_plan = first.cast_plan;
+                    }
+                }
+            } else if a.cast_plan_id != 0 {
+                return Err(Untranslatable::Illegal(
+                    "this question offers no casting plans".into(),
+                ));
             }
             Answer::Act(action)
         }
@@ -225,6 +265,19 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
             let source = action.source.map_or(ViewHandle::NONE, |s| handles.handle(s));
             let mut a = TakeActionAnswer::new(crate::prompt::action_kind_view(action.kind), source);
             a.ability_index = i32::from(action.index);
+            if action.cast_plan.is_some()
+                && let RequestKind::Priority { options } | RequestKind::PayCosts { options, .. } =
+                    &request.kind
+                && let Some(i) = options.iter().position(|o| {
+                    o.kind == action.kind
+                        && o.source == action.source
+                        && o.index == action.index
+                        && o.cast_plan == action.cast_plan
+                })
+            {
+                a.cast_plan_id =
+                    i32::try_from(i + 1).expect("a question's options fit the wire index");
+            }
             a.color = action.color.map(color_view);
             a.mana = action.mana.map(mana_view);
             if let Some(restriction) = action.restriction {
@@ -302,5 +355,121 @@ pub fn payload_of(answer: &Answer, request: &Request, handles: &mut HandleSpace,
                 .map(|&(object, kind, n)| CounterPoolMessage { object: handles.handle(object), counter: kind.name().to_string(), count: i32::from(n) })
                 .collect(),
         }),
+    }
+}
+
+#[cfg(test)]
+mod cast_plan_tests {
+    use super::*;
+
+    fn fixture() -> (Game, Request, HandleSpace, ViewHandle) {
+        let island = cantrip_engine::card("Island").unwrap();
+        let game = Game::new(
+            cantrip_engine::cards(),
+            &Setup {
+                decks: vec![vec![island; 20]; 2],
+                sideboards: Vec::new(),
+                basic_lands_outside: Vec::new(),
+                seed: 1,
+                shuffle: false,
+                opening_chooser: None,
+            },
+        );
+        let source = ObjectId(0);
+        let mut handles = HandleSpace::new();
+        let handle = handles.handle(source);
+        let mut first = ActionOption::on(ActionKind::CastSpell, source, 0);
+        first.cast_plan = Some(CastPlan {
+            way: 0,
+            permission: CastPermission::Hand,
+            cost: CastCostChoice::Printed,
+        });
+        let mut second = first.clone();
+        second.cast_plan = Some(CastPlan {
+            way: 0,
+            permission: CastPermission::Resolution,
+            cost: CastCostChoice::EffectSpecified,
+        });
+        let request = Request {
+            id: 1,
+            player: PlayerId(0),
+            may_cancel: false,
+            kind: RequestKind::Priority {
+                options: vec![first, second],
+            },
+        };
+        (game, request, handles, handle)
+    }
+
+    #[test]
+    fn the_selected_plan_round_trips_even_when_legacy_action_fields_are_identical() {
+        let (game, request, mut handles, source) = fixture();
+        let mut selected = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+        selected.cast_plan_id = 2;
+        let answer = translate(
+            &AnswerPayload::TakeActionAnswer(selected),
+            &request,
+            &handles,
+            &game,
+        )
+        .unwrap_or_else(|_| panic!("an offered plan must translate"));
+        let RequestKind::Priority { options } = &request.kind else {
+            unreachable!()
+        };
+        let Answer::Act(action) = &answer else {
+            panic!("an action")
+        };
+        assert_eq!(action.cast_plan, options[1].cast_plan);
+        let AnswerPayload::TakeActionAnswer(round_trip) =
+            payload_of(&answer, &request, &mut handles, &game)
+        else {
+            panic!("a wire action")
+        };
+        assert_eq!(round_trip.cast_plan_id, 2);
+    }
+
+    #[test]
+    fn ambiguous_legacy_answers_do_not_silently_choose_the_first_permission() {
+        let (game, request, handles, source) = fixture();
+        let selected = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+        assert!(matches!(
+            translate(
+                &AnswerPayload::TakeActionAnswer(selected),
+                &request,
+                &handles,
+                &game
+            ),
+            Err(Untranslatable::Illegal(_))
+        ));
+    }
+
+    #[test]
+    fn invalid_plan_ids_and_ids_for_different_actions_are_rejected_without_panicking() {
+        let (game, request, handles, source) = fixture();
+        for id in [i32::MIN, -1, 3, i32::MAX] {
+            let mut selected = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+            selected.cast_plan_id = id;
+            assert!(matches!(
+                translate(
+                    &AnswerPayload::TakeActionAnswer(selected),
+                    &request,
+                    &handles,
+                    &game
+                ),
+                Err(Untranslatable::Illegal(_))
+            ));
+        }
+        let mut selected = TakeActionAnswer::new(ActionKindView::CastSpell, source);
+        selected.cast_plan_id = 1;
+        selected.ability_index = 1;
+        assert!(matches!(
+            translate(
+                &AnswerPayload::TakeActionAnswer(selected),
+                &request,
+                &handles,
+                &game
+            ),
+            Err(Untranslatable::Illegal(_))
+        ));
     }
 }

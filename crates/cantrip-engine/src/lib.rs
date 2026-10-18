@@ -6,7 +6,7 @@ use std::sync::OnceLock;
 pub mod undo;
 
 pub use cantrip_api::*;
-pub use cantrip_rules::{Game, Rejected, Setup, activation_costs, alternative_cast_total, cast_costs, cast_total, exile_cast_texts, granted_cast_cost, life_for_cast, chars, check_answer, describe, distribution_problem, live, name_problem, summoning_sick, granted_cast_total, special_action_costs, sacrifices_for_reduction};
+pub use cantrip_rules::{Game, Rejected, Setup, activation_costs, alternative_cast_total, cast_costs, cast_plan_cost, cast_plan_costs, cast_plan_face, cast_plan_total, cast_total, exile_cast_texts, granted_cast_cost, life_for_cast, chars, check_answer, describe, distribution_problem, live, name_problem, summoning_sick, granted_cast_total, special_action_costs, sacrifices_for_reduction};
 
 /// The simplest legal distribution of looked-at cards (the C# `CardDistribution.Greedy`): each destination's
 /// minimum first, in order, then each takes what it accepts up to its maximum, cards in the order looked at.
@@ -28,7 +28,7 @@ pub fn greedy_distribution(cards: &[ObjectId], destinations: &[Destination]) -> 
     }
     placements
 }
-pub use cantrip_state::{Frame, FrameKind, Mark};
+pub use cantrip_state::{CastCostChoice, CastPermission, CastPlan, Frame, FrameKind, Mark};
 
 /// Every card, sorted by name.
 pub fn cards() -> &'static CardTable {
@@ -103,6 +103,7 @@ pub fn label_text(label: &Label) -> &'static str {
             modal.and_then(|m| m.modes.get(i as usize)).map_or("", |m| m.text)
         }
         Label::GrantedWay(card, i) => cards().get(card).granted_ways.get(i as usize).map_or("", |w| w.text),
+        Label::PrintedWay(card, i) => cards().get(card).ways.get(i as usize).map_or("", |w| w.text),
         Label::Extra(card, i) => cards().get(card).additional_choice.get(i as usize).map_or("", |c| c.text),
         Label::PayLife(Color::White) => "Pay 2 life for {W/P}",
         Label::PayLife(Color::Blue) => "Pay 2 life for {U/P}",

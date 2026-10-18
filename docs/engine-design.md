@@ -803,6 +803,21 @@ permanent a spell targets in two slots is destroyed once.
 
 ### Ways a permanent gives: zone permission and alternative costs
 
+Casting offers carry a `CastPlan`: the chosen face/way, the permission that supplies access to its zone, and the
+selected normal or alternative cost (CR 601.2a-b, 601.3, 118.9). Standing permissions, permissions supplied by a
+permanent, library-top rules and resolution instructions are separate routes. Overlapping routes are enumerated;
+the first matching permission never stands for all of them. Mystic Forge and Bolas's Citadel therefore offer their
+own mana-paid and life-paid routes. A plan retains its permission's conditions, additional costs, timing terms and
+linked consequences; it cannot borrow a benefit from another permission while avoiding that permission's costs.
+A face the permission casts (a split half, an Adventure, a back face, a bestowed Aura) keeps its own mana cost and takes
+the permission's alternative payment as well: life equal to that face's mana value, or the way's cost, never the other
+half's or the whole card's.
+The engine resolves the selected route before payment changes the position, then carries those terms through the
+casting procedure. Source-specific usage limits and granted abilities remain attached to that source.
+The same selected plan prices the offered option, supplies its description, and executes the cast. The legacy `index`
+is a face/ability hint, not a permission identity. The host offers an opaque `CastPlanId` scoped to the current question;
+clients echo it and never interpret the permission selectors. A missing ID is accepted only where selection is unambiguous.
+
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
 Paragon, Underworld Breach's escape, mayhem) or the hand ("you may cast spells from your hand without paying their mana
 costs", Omniscience). Each is judged on the face being cast, offered beside the card's other casts with its own way number,
@@ -812,16 +827,16 @@ but opens no zone itself (CR 601.3). A permission requiring its own alternative 
 (CR 118.9a). This includes ordinary graveyard permission, Adventure exile, other players' cards in exile, and
 `LibraryTopSpells` permission, evaluated on the face cast. `instant_speed` changes only that way's timing
 (CR 601.3c); casting prohibitions and explicit timing restrictions still apply. Primal Prayers and Aluren use these rules.
-A resolving effect that permits paying the normal mana cost offers these zone-neutral alternatives after choosing the
-face, with `Label::GrantedWay`; a forced alternative cost excludes them. `CastWay` still lists faces only.
+A resolving effect that permits paying the normal mana cost offers printed alternatives, matching fixed-zone grants,
+and zone-neutral alternatives after choosing the face, with `Label::PrintedWay` and `Label::GrantedWay`. A forced alternative
+cost excludes other alternatives (CR 118.9a). `CastWay` still lists faces only; the selected plan retains the cost and its consequences.
 Energy is a `Cost::energy` payment (CR 107.14): composing costs adds it, repeating costs multiplies it, affordability
 checks the player's counters, and payment is journaled so cancellation and tree navigation restore them.
 Primal Prayers and Amped Raptor use energy as a casting cost.
 Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost that is or includes the mana cost has its
 {X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana cost may be cast that way (CR 118.6a).
 The host marks such a cast `WithoutPayingManaCost`, with the cost it comes to as its `CostText`, and the tactical bot takes it
-over the card's ordinary cast. Not built: a fixed-zone way given to cards in a hand used by a cast an effect makes as it resolves
-(`cast_ways_during_resolution` offers the mana cost only), and emblems that give one (Tamiyo, Field Researcher's): KI-44.
+over the card's ordinary cast. Emblems that give such a way (Tamiyo, Field Researcher's) are not built: KI-44.
 
 ### Alternative costs a permanent gives the spells a player casts
 
@@ -1509,9 +1524,8 @@ Known gaps:
 - `web_slinging::way` is a way from the hand (`ZoneKind::Hand`), like every printed alternative cost. Cast from
   elsewhere at priority by a permission or the card's own say-so, a hand way is offered too (`castable`'s `elsewhere`;
   Spider-Sense from the graveyard under Yawgmoth's Will is a scenario, and sneak's instant-speed way likewise), unless its
-  text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost), but a cast made while an effect resolves
-  (`cast_ways_during_resolution`) is offered for the card's mana cost and faces only: an effect that lets a spell be cast
-  paying its costs ("cast it from exile this turn") as it resolves cannot yet use printed `WayDef` alternatives such as web-slinging. Zone-neutral `GrantedWay` alternatives are offered.
+  text names the hand (`WayDef::only_from`: warp, CR 702.185a, so a warped card is cast from exile for its mana cost), and a cast made while an effect resolves offers compatible printed `WayDef` and granted alternatives as well.
+  An effect that imposes its own alternative cost excludes those other alternatives (CR 118.9a).
 - Costs to attack are mana only: one that asks for life (Sivitri, Dragon Master's +1), a Phyrexian symbol paid with life
   (Norn's Annex), tapping or sacrificing, and optional costs to attack (CR 508.1g: exert, enlist, which the engine has
   as other things) are not built, nor anything that changes a cost to attack. No card in content needs them.

@@ -392,7 +392,7 @@ public sealed partial class MainPage
                     () => { Take(client, option, color, combination, sacrifice); RedrawNow(); }));
         }
 
-        _menu.Open(Root, _pointer, items, abilities: [.. entries.Select(entry => entry[0].Option.AbilityIndex)]);
+        _menu.Open(Root, _pointer, items, abilities: [.. entries.Select(entry => entry[0].Option.AbilityIndex)], castPlans: [.. entries.Select(entry => entry[0].Option.CastPlanId)]);
     }
 
     /// <summary>Whether auto-mana answers a card's menu: on by default or not, and Shift held turns it the other way.</summary>
@@ -486,7 +486,7 @@ public sealed partial class MainPage
                 () => { Take(client, option, color, combination, sacrifice); RedrawNow(); }));
         }
 
-        _menu.Open(Root, _pointer, items, abilities: [.. rows.Select(row => row.Option.AbilityIndex)]);
+        _menu.Open(Root, _pointer, items, abilities: [.. rows.Select(row => row.Option.AbilityIndex)], castPlans: [.. rows.Select(row => row.Option.CastPlanId)]);
     }
 
     private static string CostChoiceLabel(GameClient client, List<ManaRow> entry)
@@ -611,6 +611,7 @@ public sealed partial class MainPage
         Kind = option.Kind,
         Source = option.Source,
         AbilityIndex = option.AbilityIndex,
+        CastPlanId = option.CastPlanId,
         Tap = option.Tap,
         Targets = target is null ? [] : [target],
         Mana = option.Kind is ActionKindView.AssignMana or ActionKindView.PayLifeForSymbol ? option.Produces[0] : null,
@@ -631,7 +632,7 @@ public sealed partial class MainPage
         if (client.Prompt.Prompt is PriorityPromptMessage priority)
         {
             _tappedAfterMana = answer is TakeActionAnswer taken && priority.Options.Exists(option => AutoPlay.ReturnsTappedAfterMana(option)
-                && option.Source == taken.Source && option.AbilityIndex == taken.AbilityIndex && option.Kind == taken.Kind);
+                && option.Source == taken.Source && option.AbilityIndex == taken.AbilityIndex && option.CastPlanId == taken.CastPlanId && option.Kind == taken.Kind);
         }
 
         client.Answer(answer);

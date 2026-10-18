@@ -906,6 +906,8 @@ pub struct PlayPermission {
     pub card: ObjectId,
     pub player: PlayerId,
     pub grant: PlayGrant,
+    /// The spell or ability source that created this permission.
+    pub source: Option<ObjectId>,
     /// The turn it was granted on, for `Expiry::EndOfYourNextTurn`.
     pub turn: u32,
 }

@@ -6,7 +6,7 @@
 //! first one offered.
 
 use cantrip_api::*;
-use cantrip_state::Span;
+use cantrip_state::{CastCostChoice, CastPermission, CastPlan, Span};
 
 use crate::layers::{self, live, summoning_sick};
 use crate::{Cx, Flow, R, Stop, counters, ops, static_rules};
@@ -47,13 +47,18 @@ pub fn priority_options(cx: &Cx, player: PlayerId) -> Vec<ActionOption> {
 /// Whether a spell with split second is on the stack (CR 702.61a): read from the printed cards of what is on the stack,
 /// which is nothing at all for nearly every priority pass.
 fn split_second(cx: &Cx) -> bool {
-    cx.s().stack.iter().any(|i| i.kind == StackKind::Spell && has_split_second(cx, i.object))
+    cx.s()
+        .stack
+        .iter()
+        .any(|i| i.kind == StackKind::Spell && has_split_second(cx, i.object))
 }
 
 /// Whether the spell `spell` has split second, by its printed card or the card it copies.
 fn has_split_second(cx: &Cx, spell: ObjectId) -> bool {
     let obj = cx.s().obj(spell);
-    cx.card(obj.copy.map_or(obj.card, |c| c.card)).keywords.has(Keyword::SplitSecond)
+    cx.card(obj.copy.map_or(obj.card, |c| c.card))
+        .keywords
+        .has(Keyword::SplitSecond)
 }
 
 fn activated(cx: &Cx, ability: AbilityRef) -> Option<&'static ActivatedDef> {
@@ -71,7 +76,8 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     // ability may be activated as though it had (CR 302.6).
     if cost.tap
         && (obj.tapped
-            || summoning_sick(cx.cards(), cx.s(), &cx.g.log, source) && !static_rules::activates_as_though_haste(cx, controller, source))
+            || summoning_sick(cx.cards(), cx.s(), &cx.g.log, source)
+                && !static_rules::activates_as_though_haste(cx, controller, source))
     {
         return false;
     }
@@ -84,11 +90,17 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     }
     // CR 101.2, 118.3: a cost that puts counters on a permanent that can't have them put on it can't be paid (Solemnity's
     // ruling): a loyalty ability's plus, or "put a counter on this" as a cost.
-    let banned = |kind| obj.zone.is(ZoneKind::Battlefield) && static_rules::counters_banned(cx, cx.cards(), source, obj.controller, kind);
+    let banned = |kind| {
+        obj.zone.is(ZoneKind::Battlefield)
+            && static_rules::counters_banned(cx, cx.cards(), source, obj.controller, kind)
+    };
     if cost.loyalty.is_some_and(|l| l > 0) && banned(CounterKind::Loyalty) {
         return false;
     }
-    if cost.put_counters.is_some_and(|(kind, n)| n > 0 && banned(kind)) {
+    if cost
+        .put_counters
+        .is_some_and(|(kind, n)| n > 0 && banned(kind))
+    {
         return false;
     }
     if cx.s().player(controller).energy < cost.energy || !can_pay_life(cx, controller, cost.life) {
@@ -102,7 +114,11 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     {
         return false;
     }
-    if cost.unattach_self && !obj.attached_to.is_some_and(|h| cx.s().obj(h).zone.is(ZoneKind::Battlefield) && cx.s().obj(h).became.is_none()) {
+    if cost.unattach_self
+        && !obj.attached_to.is_some_and(|h| {
+            cx.s().obj(h).zone.is(ZoneKind::Battlefield) && cx.s().obj(h).became.is_none()
+        })
+    {
         return false;
     }
     if let Some((kind, n)) = cost.remove_counters
@@ -115,31 +131,53 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     }
     if let Some((n, filter)) = cost.discard {
         let asker = Asker { source, controller };
-        let hand = cx.s().zone(Zone::hand(controller)).iter().filter(|&&c| c != source && filter(cx, &asker, c)).count();
+        let hand = cx
+            .s()
+            .zone(Zone::hand(controller))
+            .iter()
+            .filter(|&&c| c != source && filter(cx, &asker, c))
+            .count();
         if hand < n as usize {
             return false;
         }
     }
     if let Some((n, filter)) = cost.exile_from_hand {
         let asker = Asker { source, controller };
-        let hand = cx.s().zone(Zone::hand(controller)).iter().filter(|&&c| c != source && filter(cx, &asker, c)).count();
+        let hand = cx
+            .s()
+            .zone(Zone::hand(controller))
+            .iter()
+            .filter(|&&c| c != source && filter(cx, &asker, c))
+            .count();
         if hand < n as usize {
             return false;
         }
     }
-    if cost.exile_from_graveyard > 0 && graveyard_exiles(cx, controller, source, cost).len() < cost.exile_from_graveyard as usize {
+    if cost.exile_from_graveyard > 0
+        && graveyard_exiles(cx, controller, source, cost).len() < cost.exile_from_graveyard as usize
+    {
         return false;
     }
     // Collect evidence N (CR 701.59a): payable only if the graveyard's cards, the source apart, add up to N.
     if cost.collect_evidence > 0 {
-        let total: u32 = cx.s().zone(Zone::graveyard(controller)).iter().filter(|&&c| c != source).map(|&c| cx.mana_value(c)).sum();
+        let total: u32 = cx
+            .s()
+            .zone(Zone::graveyard(controller))
+            .iter()
+            .filter(|&&c| c != source)
+            .map(|&c| cx.mana_value(c))
+            .sum();
         if total < cost.collect_evidence as u32 {
             return false;
         }
     }
     if let Some(p) = cost.permanents {
         let asker = Asker { source, controller };
-        let mut candidates = cx.permanents_of(controller).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).count();
+        let mut candidates = cx
+            .permanents_of(controller)
+            .into_iter()
+            .filter(|&id| pays_permanents(cx, cost, &p, &asker, id))
+            .count();
         // Tapped permanents are judged once the mana abilities have been activated (CR 601.2g-h): an untapped one that
         // passes the filter and one of its controller's mana abilities could tap will do.
         if p.tapped && candidates < p.count as usize {
@@ -147,7 +185,9 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
             candidates += cx
                 .permanents_of(controller)
                 .into_iter()
-                .filter(|&id| !cx.s().obj(id).tapped && (p.filter)(cx, &asker, id) && tappable.contains(&id))
+                .filter(|&id| {
+                    !cx.s().obj(id).tapped && (p.filter)(cx, &asker, id) && tappable.contains(&id)
+                })
                 .count();
         }
         if candidates < p.count as usize {
@@ -174,7 +214,9 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     }
     if let Some(m) = cost.materials {
         let candidates = material_candidates(cx, source, controller, m);
-        if candidates.len() < m.count as usize || !parts_can_be_matched(cx, source, controller, m, &candidates) {
+        if candidates.len() < m.count as usize
+            || !parts_can_be_matched(cx, source, controller, m, &candidates)
+        {
             return false;
         }
     }
@@ -184,13 +226,34 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
 /// Whether materials named one by one can each be a separate object of the candidates (the Throne of the Grim Captain
 /// ruling): a matching of every part to a distinct candidate passing its filter, found by trying each in turn. True for
 /// materials of one kind.
-fn parts_can_be_matched(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Materials, candidates: &[ObjectId]) -> bool {
-    m.parts.is_empty() || assign_parts(cx, &Asker { source, controller }, m.parts, candidates, &mut Vec::new())
+fn parts_can_be_matched(
+    cx: &Cx,
+    source: ObjectId,
+    controller: PlayerId,
+    m: &Materials,
+    candidates: &[ObjectId],
+) -> bool {
+    m.parts.is_empty()
+        || assign_parts(
+            cx,
+            &Asker { source, controller },
+            m.parts,
+            candidates,
+            &mut Vec::new(),
+        )
 }
 
 /// Whether `parts` can each take a distinct candidate passing its filter, none of `used` among them.
-fn assign_parts(cx: &Cx, asker: &Asker, parts: &[MaterialPart], candidates: &[ObjectId], used: &mut Vec<ObjectId>) -> bool {
-    let Some((part, rest)) = parts.split_first() else { return true };
+fn assign_parts(
+    cx: &Cx,
+    asker: &Asker,
+    parts: &[MaterialPart],
+    candidates: &[ObjectId],
+    used: &mut Vec<ObjectId>,
+) -> bool {
+    let Some((part, rest)) = parts.split_first() else {
+        return true;
+    };
     for &c in candidates {
         if !used.contains(&c) && (part.filter)(cx, asker, c) {
             used.push(c);
@@ -206,12 +269,23 @@ fn assign_parts(cx: &Cx, asker: &Asker, parts: &[MaterialPart], candidates: &[Ob
 
 /// What craft may exile as its materials (CR 702.167a): the permanents the payer controls, then the cards in their
 /// graveyard, that pass the materials' filter, the source apart (it is exiled as itself, not as a material).
-fn material_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Materials) -> Vec<ObjectId> {
+fn material_candidates(
+    cx: &Cx,
+    source: ObjectId,
+    controller: PlayerId,
+    m: &Materials,
+) -> Vec<ObjectId> {
     let asker = Asker { source, controller };
     let mut out = cx.permanents_of(controller);
     // Cards in the graveyard: a token put there (a Treasure sacrificed for the mana) is no card, and ceases to exist there
     // (CR 111.7, 704.5d).
-    out.extend(cx.s().zone(Zone::graveyard(controller)).iter().copied().filter(|&id| !cx.s().obj(id).token));
+    out.extend(
+        cx.s()
+            .zone(Zone::graveyard(controller))
+            .iter()
+            .copied()
+            .filter(|&id| !cx.s().obj(id).token),
+    );
     out.retain(|&id| id != source && (m.filter)(cx, &asker, id));
     out
 }
@@ -219,8 +293,15 @@ fn material_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, m: &Mate
 /// Chooses craft's materials (CR 702.167a, 601.2h), always asked, even when the choice is forced: exactly `count` of
 /// them, or `count` or more. Too few left to choose among (one gone since the ability was offered) is a cost that can't
 /// be paid, and the activation is taken back.
-fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
-    let Some(m) = cost.materials else { return Ok(Vec::new()) };
+fn choose_materials(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Vec<ObjectId>> {
+    let Some(m) = cost.materials else {
+        return Ok(Vec::new());
+    };
     // The source is exiled with them: one a mana ability moved while paying can't be (CR 601.2h).
     if !live(cx.s(), source) {
         return Err(Stop::Cancel);
@@ -233,7 +314,10 @@ fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost
     // one a separate object, so no choice offered is one that can't be finished. With none (one gone since the ability was
     // offered) the cost can't be paid, and the activation is taken back (CR 602.2b, 601.2h).
     if !m.parts.is_empty() {
-        let asker = Asker { source, controller: player };
+        let asker = Asker {
+            source,
+            controller: player,
+        };
         let mut chosen: Vec<ObjectId> = Vec::new();
         for (i, part) in m.parts.iter().enumerate() {
             let left: Vec<ObjectId> = cards
@@ -241,7 +325,8 @@ fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost
                 .copied()
                 .filter(|&c| {
                     !chosen.contains(&c) && (part.filter)(cx, &asker, c) && {
-                        let mut used: Vec<ObjectId> = chosen.iter().copied().chain(std::iter::once(c)).collect();
+                        let mut used: Vec<ObjectId> =
+                            chosen.iter().copied().chain(std::iter::once(c)).collect();
                         assign_parts(cx, &asker, &m.parts[i + 1..], &cards, &mut used)
                     }
                 })
@@ -249,7 +334,13 @@ fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost
             if left.is_empty() {
                 return Err(Stop::Cancel);
             }
-            let ask = RequestKind::Craft { source, cards: left, minimum: 1, maximum: 1, quality: part.quality };
+            let ask = RequestKind::Craft {
+                source,
+                cards: left,
+                minimum: 1,
+                maximum: 1,
+                quality: part.quality,
+            };
             match cx.ask_core(player, ask, true)? {
                 Answer::Cards(one) => chosen.extend(one),
                 _ => return Err(Stop::Cancel),
@@ -257,8 +348,18 @@ fn choose_materials(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost
         }
         return Ok(chosen);
     }
-    let maximum = if m.or_more { cards.len().min(255) as u8 } else { m.count };
-    let ask = RequestKind::Craft { source, cards, minimum: m.count, maximum, quality: m.quality };
+    let maximum = if m.or_more {
+        cards.len().min(255) as u8
+    } else {
+        m.count
+    };
+    let ask = RequestKind::Craft {
+        source,
+        cards,
+        minimum: m.count,
+        maximum,
+        quality: m.quality,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -280,8 +381,15 @@ fn pay_materials(cx: &mut Cx, source: ObjectId, chosen: &[ObjectId]) {
 
 /// What a cost that beholds may choose among (CR 701.4a): the permanents its payer controls and the cards in their hand,
 /// the source apart, that pass the filter.
-fn behold_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> Vec<ObjectId> {
-    let Some((_, filter, _)) = cost.behold else { return Vec::new() };
+fn behold_candidates(
+    cx: &Cx,
+    source: ObjectId,
+    controller: PlayerId,
+    cost: &Cost,
+) -> Vec<ObjectId> {
+    let Some((_, filter, _)) = cost.behold else {
+        return Vec::new();
+    };
     let asker = Asker { source, controller };
     let mut out = cx.permanents_of(controller);
     out.extend(cx.s().zone(Zone::hand(controller)).iter().copied());
@@ -291,9 +399,20 @@ fn behold_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cos
 
 /// Chooses what a cost beholds (CR 701.4a, 601.2h), always asked, even when the choice is forced.
 fn choose_behold(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
-    let Some((n, _, _)) = cost.behold else { return Ok(Vec::new()) };
+    let Some((n, _, _)) = cost.behold else {
+        return Ok(Vec::new());
+    };
     let eligible = behold_candidates(cx, source, player, cost);
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Behold, cards: eligible.clone(), eligible, count: n, up_to: false, kind: "", total: None };
+    let ask = RequestKind::ChooseCards {
+        source,
+        purpose: Purpose::Behold,
+        cards: eligible.clone(),
+        eligible,
+        count: n,
+        up_to: false,
+        kind: "",
+        total: None,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -302,7 +421,11 @@ fn choose_behold(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
 
 /// Pays the behold part of a cost (CR 701.4a): each card chosen from the hand is revealed; a permanent is only chosen.
 fn pay_behold(cx: &mut Cx, player: PlayerId, chosen: &[ObjectId]) {
-    let revealed: Vec<ObjectId> = chosen.iter().copied().filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Hand)).collect();
+    let revealed: Vec<ObjectId> = chosen
+        .iter()
+        .copied()
+        .filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Hand))
+        .collect();
     if !revealed.is_empty() {
         Game::reveal(cx, player, &revealed);
     }
@@ -314,18 +437,39 @@ fn blight_candidates(cx: &Cx, controller: PlayerId) -> Vec<ObjectId> {
     cx.permanents_of(controller)
         .into_iter()
         .filter(|&id| {
-            cx.chars(id).is(CardType::Creature) && !static_rules::counters_banned(cx, cx.cards(), id, controller, CounterKind::MinusOne)
+            cx.chars(id).is(CardType::Creature)
+                && !static_rules::counters_banned(
+                    cx,
+                    cx.cards(),
+                    id,
+                    controller,
+                    CounterKind::MinusOne,
+                )
         })
         .collect()
 }
 
 /// Chooses the creature a cost blights (CR 701.68a, 601.2h), always asked, even when the choice is forced.
-fn choose_blight(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Option<ObjectId>> {
+fn choose_blight(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Option<ObjectId>> {
     if cost.blight == 0 {
         return Ok(None);
     }
     let eligible = blight_candidates(cx, player);
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Blight, cards: eligible.clone(), eligible, count: 1, up_to: false, kind: "", total: None };
+    let ask = RequestKind::ChooseCards {
+        source,
+        purpose: Purpose::Blight,
+        cards: eligible.clone(),
+        eligible,
+        count: 1,
+        up_to: false,
+        kind: "",
+        total: None,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => cards.first().copied().map(Some).ok_or(Stop::Cancel),
         _ => Err(Stop::Cancel),
@@ -342,7 +486,12 @@ fn pay_blight(cx: &mut Cx, player: PlayerId, cost: &Cost, chosen: Option<ObjectI
 
 /// What a cost that removes counters from among permanents may take them from (CR 118.3, 122.1): each kind of counter on
 /// each permanent the payer controls that passes the filter, with how many there are, in battlefield order.
-fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, filter: ObjectFilter) -> Vec<CounterPool> {
+fn counter_pools(
+    cx: &Cx,
+    source: ObjectId,
+    controller: PlayerId,
+    filter: ObjectFilter,
+) -> Vec<CounterPool> {
     let asker = Asker { source, controller };
     let mut pools = Vec::new();
     for id in cx.permanents_of(controller) {
@@ -353,7 +502,11 @@ fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, filter: Object
         for kind in CounterKind::ALL {
             let count = obj.counters(kind);
             if count > 0 {
-                pools.push(CounterPool { object: id, kind, count: count as u16 });
+                pools.push(CounterPool {
+                    object: id,
+                    kind,
+                    count: count as u16,
+                });
             }
         }
     }
@@ -362,14 +515,26 @@ fn counter_pools(cx: &Cx, source: ObjectId, controller: PlayerId, filter: Object
 
 /// Whether there are counters enough among the permanents a cost removes them from (CR 118.3).
 fn counters_among_payable(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -> bool {
-    cost.remove_counters_among
-        .is_none_or(|(n, filter)| counter_pools(cx, source, controller, filter).iter().map(|p| p.count as u32).sum::<u32>() >= n as u32)
+    cost.remove_counters_among.is_none_or(|(n, filter)| {
+        counter_pools(cx, source, controller, filter)
+            .iter()
+            .map(|p| p.count as u32)
+            .sum::<u32>()
+            >= n as u32
+    })
 }
 
 /// Chooses the counters a cost removes from among permanents (CR 601.2h), always asked, even when the choice is forced. Too
 /// few left (some gone since the action was offered) is a cost that can't be paid, and the spell or ability is taken back.
-fn choose_counters_among(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<(ObjectId, CounterKind, u16)>> {
-    let Some((total, filter)) = cost.remove_counters_among else { return Ok(Vec::new()) };
+fn choose_counters_among(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Vec<(ObjectId, CounterKind, u16)>> {
+    let Some((total, filter)) = cost.remove_counters_among else {
+        return Ok(Vec::new());
+    };
     let pools = counter_pools(cx, source, player, filter);
     if pools.iter().map(|p| p.count as u32).sum::<u32>() < total as u32 {
         return Err(Stop::Cancel);
@@ -389,7 +554,12 @@ fn pay_counters_among(cx: &mut Cx, taken: &[(ObjectId, CounterKind, u16)]) {
 
 /// The creatures that could be tapped for crew or saddle (CR 702.122a, 702.171a): the controller's other untapped
 /// creatures, summoning sick or not, each with what it counts as towards the total power (CR 702.122b).
-fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatures) -> (Vec<ObjectId>, Vec<u8>) {
+fn tap_candidates(
+    cx: &Cx,
+    source: ObjectId,
+    controller: PlayerId,
+    t: &TapCreatures,
+) -> (Vec<ObjectId>, Vec<u8>) {
     let mut cards = Vec::new();
     let mut powers = Vec::new();
     for id in cx.permanents_of(controller) {
@@ -409,10 +579,23 @@ fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatu
 }
 
 /// Chooses the creatures a crew or saddle cost taps (CR 601.2h), always asked, even when the choice is forced.
-fn choose_tappers(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
-    let Some(t) = cost.tap_creatures else { return Ok(Vec::new()) };
+fn choose_tappers(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Vec<ObjectId>> {
+    let Some(t) = cost.tap_creatures else {
+        return Ok(Vec::new());
+    };
     let (cards, powers) = tap_candidates(cx, source, player, &t);
-    let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToPay, cards, powers, minimum: t.power };
+    let ask = RequestKind::TapForPower {
+        source,
+        purpose: Purpose::TapToPay,
+        cards,
+        powers,
+        minimum: t.power,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -463,15 +646,23 @@ fn limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize, def: &Activ
 /// no limit (printed, or given by something else) is the one activated first: identical abilities are interchangeable,
 /// so the limit binds only once every instance it has is a limited one.
 fn granted_limit_reached(cx: &Cx, id: ObjectId, chars: &Chars, index: usize) -> bool {
-    let Some(limited) = cx.card(chars.card).granted_once_each_turn else { return false };
-    let Some(ability) = chars.abilities().nth(index) else { return false };
+    let Some(limited) = cx.card(chars.card).granted_once_each_turn else {
+        return false;
+    };
+    let Some(ability) = chars.abilities().nth(index) else {
+        return false;
+    };
     let limited = limited(cx, id, ability);
     if limited == 0 || chars.abilities().filter(|&a| a == ability).count() > limited {
         return false;
     }
     let used = cx
         .history()
-        .select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id).this_turn())
+        .select(
+            EventQuery::kind(EventMask::ABILITY_ACTIVATED)
+                .object(id)
+                .this_turn(),
+        )
         .filter(|r| matches!(r.event, Event::AbilityActivated { ability: a, .. } if a == ability))
         .count();
     used >= limited
@@ -493,16 +684,45 @@ fn note_activation(cx: &mut Cx, id: ObjectId, index: usize, def: &ActivatedDef) 
 }
 
 /// Chooses the cards a cost discards (CR 601.2h), always asked, even when the choice is forced.
-fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
+fn choose_discards(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Vec<ObjectId>> {
     // "Discard your hand" (CR 701.9) chooses nothing: every card in it, the source (on the stack by now) not among them.
     if cost.discard_hand {
-        return Ok(cx.s().zone(Zone::hand(player)).iter().copied().filter(|&c| c != source).collect());
+        return Ok(cx
+            .s()
+            .zone(Zone::hand(player))
+            .iter()
+            .copied()
+            .filter(|&c| c != source)
+            .collect());
     }
-    let Some((n, filter)) = cost.discard else { return Ok(Vec::new()) };
-    let asker = Asker { source, controller: player };
+    let Some((n, filter)) = cost.discard else {
+        return Ok(Vec::new());
+    };
+    let asker = Asker {
+        source,
+        controller: player,
+    };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::Discard, cards: hand, eligible, count: n, up_to: false, kind: "", total: None };
+    let eligible: Vec<ObjectId> = hand
+        .iter()
+        .copied()
+        .filter(|&c| c != source && filter(cx, &asker, c))
+        .collect();
+    let ask = RequestKind::ChooseCards {
+        source,
+        purpose: Purpose::Discard,
+        cards: hand,
+        eligible,
+        count: n,
+        up_to: false,
+        kind: "",
+        total: None,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -511,12 +731,35 @@ fn choose_discards(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost)
 
 /// Chooses the cards a cost exiles from the hand (CR 601.2h, 118.9), always asked, even when the choice is forced: the
 /// hand is shown, and the cards that pass the filter are the ones that may be chosen.
-fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
-    let Some((n, filter)) = cost.exile_from_hand else { return Ok(Vec::new()) };
-    let asker = Asker { source, controller: player };
+fn choose_hand_exiles(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Vec<ObjectId>> {
+    let Some((n, filter)) = cost.exile_from_hand else {
+        return Ok(Vec::new());
+    };
+    let asker = Asker {
+        source,
+        controller: player,
+    };
     let hand: Vec<ObjectId> = cx.s().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| c != source && filter(cx, &asker, c)).collect();
-    let ask = RequestKind::ChooseCards { source, purpose: Purpose::ExileToPay, cards: hand, eligible, count: n, up_to: false, kind: "", total: None };
+    let eligible: Vec<ObjectId> = hand
+        .iter()
+        .copied()
+        .filter(|&c| c != source && filter(cx, &asker, c))
+        .collect();
+    let ask = RequestKind::ChooseCards {
+        source,
+        purpose: Purpose::ExileToPay,
+        cards: hand,
+        eligible,
+        count: n,
+        up_to: false,
+        kind: "",
+        total: None,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -525,13 +768,32 @@ fn choose_hand_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Co
 
 /// Collect evidence N (CR 701.59a): the cards, with total mana value N or more, that a cost exiles from the graveyard;
 /// always asked.
-fn choose_evidence(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
+fn choose_evidence(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Vec<ObjectId>> {
     if cost.collect_evidence == 0 {
         return Ok(Vec::new());
     }
-    let cards: Vec<ObjectId> = cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect();
-    let values: Vec<u8> = cards.iter().map(|&c| cx.mana_value(c).min(255) as u8).collect();
-    let ask = RequestKind::CollectEvidence { source, cards, values, minimum: cost.collect_evidence };
+    let cards: Vec<ObjectId> = cx
+        .s()
+        .zone(Zone::graveyard(player))
+        .iter()
+        .copied()
+        .filter(|&c| c != source)
+        .collect();
+    let values: Vec<u8> = cards
+        .iter()
+        .map(|&c| cx.mana_value(c).min(255) as u8)
+        .collect();
+    let ask = RequestKind::CollectEvidence {
+        source,
+        cards,
+        values,
+        minimum: cost.collect_evidence,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -540,12 +802,20 @@ fn choose_evidence(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost)
 
 /// The cards of `player`'s graveyard a cost may exile: any but the source, or those of the quality it names (CR 601.2h).
 fn graveyard_exiles(cx: &Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> Vec<ObjectId> {
-    let asker = Asker { source, controller: player };
+    let asker = Asker {
+        source,
+        controller: player,
+    };
     cx.s()
         .zone(Zone::graveyard(player))
         .iter()
         .copied()
-        .filter(|&c| c != source && cost.exile_from_graveyard_of.is_none_or(|f| f(cx, &asker, c)))
+        .filter(|&c| {
+            c != source
+                && cost
+                    .exile_from_graveyard_of
+                    .is_none_or(|f| f(cx, &asker, c))
+        })
         .collect()
 }
 
@@ -558,10 +828,19 @@ fn choose_exiles(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -
     let ask = RequestKind::ChooseCards {
         source,
         purpose: Purpose::ExileToPay,
-        cards: cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect(),
+        cards: cx
+            .s()
+            .zone(Zone::graveyard(player))
+            .iter()
+            .copied()
+            .filter(|&c| c != source)
+            .collect(),
         eligible,
         count: cost.exile_from_graveyard,
-        up_to: false, kind: "", total: None };
+        up_to: false,
+        kind: "",
+        total: None,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -573,7 +852,10 @@ fn pay_exiles(cx: &mut Cx, chosen: &[ObjectId]) {
     if chosen.is_empty() {
         return;
     }
-    let moves: Vec<ops::Moving> = chosen.iter().map(|&id| ops::Moving::to(id, Zone::exile(cx.s().obj(id).owner))).collect();
+    let moves: Vec<ops::Moving> = chosen
+        .iter()
+        .map(|&id| ops::Moving::to(id, Zone::exile(cx.s().obj(id).owner)))
+        .collect();
     ops::move_together(cx, &moves, ZoneReason::Exile);
 }
 
@@ -582,7 +864,9 @@ fn pay_exiles(cx: &mut Cx, chosen: &[ObjectId]) {
 /// ("{T}, Tap an untapped creature you control"), the source is not one of them: it is tapped by the {T} part of the same
 /// cost, and one permanent can't be tapped to pay both (CR 118.3, 602.2b).
 fn pays_permanents(cx: &Cx, cost: &Cost, p: &PermanentCost, asker: &Asker, id: ObjectId) -> bool {
-    !(cost.tap && cost.tap_permanents && id == asker.source) && (!p.tapped || cx.s().obj(id).tapped) && (p.filter)(cx, asker, id)
+    !(cost.tap && cost.tap_permanents && id == asker.source)
+        && (!p.tapped || cx.s().obj(id).tapped)
+        && (p.filter)(cx, asker, id)
 }
 
 /// The untapped permanents `player`'s mana abilities could tap as they are activated now (CR 601.2g, 605.3a): each one
@@ -597,7 +881,14 @@ fn tappable_for_mana(cx: &Cx, player: PlayerId) -> Vec<ObjectId> {
         if o.index >= PLAYER_MANA_ABILITY {
             continue;
         }
-        let Some(def) = cx.chars(source).abilities().nth(o.index as usize).and_then(|a| activated(cx, a)) else { continue };
+        let Some(def) = cx
+            .chars(source)
+            .abilities()
+            .nth(o.index as usize)
+            .and_then(|a| activated(cx, a))
+        else {
+            continue;
+        };
         if def.cost.tap && !cx.s().obj(source).tapped {
             out.push(source);
         }
@@ -616,10 +907,24 @@ fn permanents_after_mana(cost: &Cost) -> bool {
 
 /// Chooses the permanents a cost names (CR 601.2h), always asked, even when the choice is forced. Too few to choose
 /// among (tapped ones, judged once the mana is paid) is a cost that can't be paid: the announcement is taken back.
-fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Vec<ObjectId>> {
-    let Some(p) = cost.permanents else { return Ok(Vec::new()) };
-    let asker = Asker { source, controller: player };
-    let eligible: Vec<ObjectId> = cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).collect();
+fn choose_permanents(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Vec<ObjectId>> {
+    let Some(p) = cost.permanents else {
+        return Ok(Vec::new());
+    };
+    let asker = Asker {
+        source,
+        controller: player,
+    };
+    let eligible: Vec<ObjectId> = cx
+        .permanents_of(player)
+        .into_iter()
+        .filter(|&id| pays_permanents(cx, cost, &p, &asker, id))
+        .collect();
     if p.tapped && eligible.len() < p.count as usize {
         return Err(Stop::Cancel);
     }
@@ -639,7 +944,16 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
         (false, PermanentAction::Exile) => "permanent",
         (false, _) => "",
     };
-    let ask = RequestKind::ChooseCards { source, purpose, cards: eligible.clone(), eligible, count: p.count, up_to: false, kind, total: None };
+    let ask = RequestKind::ChooseCards {
+        source,
+        purpose,
+        cards: eligible.clone(),
+        eligible,
+        count: p.count,
+        up_to: false,
+        kind,
+        total: None,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -657,7 +971,10 @@ fn pay_discards(cx: &mut Cx, chosen: &[ObjectId]) {
 /// Pays the life and counters parts of a cost.
 fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) {
     if cost.energy > 0 {
-        assert!(cx.s().player(player).energy >= cost.energy, "an energy cost must be payable");
+        assert!(
+            cx.s().player(player).energy >= cost.energy,
+            "an energy cost must be payable"
+        );
         ops::change_energy(cx, player, -i32::from(cost.energy));
     }
     if cost.life > 0 {
@@ -675,7 +992,12 @@ fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: 
 
 /// The kind of counter a cost that removes a counter of any kind takes from the source (CR 118.3): the only kind it has,
 /// or the payer's choice among several, made as the cost is chosen.
-fn choose_counter_kind(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Option<CounterKind>> {
+fn choose_counter_kind(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Option<CounterKind>> {
     if !cost.remove_any_counter {
         return Ok(None);
     }
@@ -701,15 +1023,32 @@ fn choose_counter_kind(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &C
 }
 
 /// The permanents a variable sacrifice may take, or the other cards in the graveyard an exile may take (CR 601.2h).
-fn variable_candidates(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> Vec<ObjectId> {
+fn variable_candidates(
+    cx: &Cx,
+    source: ObjectId,
+    player: PlayerId,
+    variable: VariableCost,
+) -> Vec<ObjectId> {
     match variable {
-        VariableCost::SacrificeX(filter) | VariableCost::SacrificeOneOrMore(filter) | VariableCost::SacrificeAnyNumber { filter, .. } => {
-            let asker = Asker { source, controller: player };
-            cx.permanents_of(player).into_iter().filter(|&id| filter(cx, &asker, id)).collect()
+        VariableCost::SacrificeX(filter)
+        | VariableCost::SacrificeOneOrMore(filter)
+        | VariableCost::SacrificeAnyNumber { filter, .. } => {
+            let asker = Asker {
+                source,
+                controller: player,
+            };
+            cx.permanents_of(player)
+                .into_iter()
+                .filter(|&id| filter(cx, &asker, id))
+                .collect()
         }
-        VariableCost::ExileFromGraveyardWithTypes(_) => {
-            cx.s().zone(Zone::graveyard(player)).iter().copied().filter(|&c| c != source).collect()
-        }
+        VariableCost::ExileFromGraveyardWithTypes(_) => cx
+            .s()
+            .zone(Zone::graveyard(player))
+            .iter()
+            .copied()
+            .filter(|&c| c != source)
+            .collect(),
     }
 }
 
@@ -728,15 +1067,34 @@ fn types_among(cx: &Cx, cards: &[ObjectId]) -> usize {
 fn variable_payable(cx: &Cx, source: ObjectId, player: PlayerId, variable: VariableCost) -> bool {
     match variable {
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => true,
-        VariableCost::SacrificeOneOrMore(_) => !variable_candidates(cx, source, player, variable).is_empty(),
+        VariableCost::SacrificeOneOrMore(_) => {
+            !variable_candidates(cx, source, player, variable).is_empty()
+        }
         VariableCost::ExileFromGraveyardWithTypes(n) => {
             types_among(cx, &variable_candidates(cx, source, player, variable)) >= n.max(1) as usize
         }
     }
 }
 
-fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, cards: Vec<ObjectId>, count: usize, up_to: bool) -> R<Vec<ObjectId>> {
-    let ask = RequestKind::ChooseCards { source, purpose, cards: cards.clone(), eligible: cards, count: count.min(255) as u8, up_to, kind: "", total: None };
+fn ask_cards(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Purpose,
+    cards: Vec<ObjectId>,
+    count: usize,
+    up_to: bool,
+) -> R<Vec<ObjectId>> {
+    let ask = RequestKind::ChooseCards {
+        source,
+        purpose,
+        cards: cards.clone(),
+        eligible: cards,
+        count: count.min(255) as u8,
+        up_to,
+        kind: "",
+        total: None,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards),
         _ => Err(Stop::Cancel),
@@ -745,8 +1103,16 @@ fn ask_cards(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Purpose, 
 
 /// What a variable cost takes, chosen as the cost is chosen (CR 601.2h): the permanents to sacrifice, or the cards to
 /// exile. `x` is the X announced for `SacrificeX`.
-fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost, x: u16) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
-    let Some(variable) = cost.variable else { return Ok((Vec::new(), Vec::new())) };
+fn choose_variable(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+    x: u16,
+) -> R<(Vec<ObjectId>, Vec<ObjectId>)> {
+    let Some(variable) = cost.variable else {
+        return Ok((Vec::new(), Vec::new()));
+    };
     let candidates = variable_candidates(cx, source, player, variable);
     match variable {
         VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. } => {
@@ -757,7 +1123,18 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
             if candidates.len() < x as usize {
                 return Err(Stop::Cancel);
             }
-            Ok((ask_cards(cx, player, source, Purpose::SacrificeCost, candidates, x as usize, false)?, Vec::new()))
+            Ok((
+                ask_cards(
+                    cx,
+                    player,
+                    source,
+                    Purpose::SacrificeCost,
+                    candidates,
+                    x as usize,
+                    false,
+                )?,
+                Vec::new(),
+            ))
         }
         VariableCost::SacrificeOneOrMore(_) => {
             if candidates.is_empty() {
@@ -765,7 +1142,17 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
             }
             // As the C# engine asked it: one mandatory permanent (unless it is the only one), then up to all the rest.
             let first = if candidates.len() > 1 {
-                match ask_cards(cx, player, source, Purpose::SacrificeCost, candidates.clone(), 1, false)?.first() {
+                match ask_cards(
+                    cx,
+                    player,
+                    source,
+                    Purpose::SacrificeCost,
+                    candidates.clone(),
+                    1,
+                    false,
+                )?
+                .first()
+                {
                     Some(&f) => f,
                     None => return Err(Stop::Cancel),
                 }
@@ -776,7 +1163,15 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
             let rest: Vec<ObjectId> = candidates.into_iter().filter(|&c| c != first).collect();
             if !rest.is_empty() {
                 let n = rest.len();
-                let more = ask_cards(cx, player, source, Purpose::SacrificeCost, rest.clone(), n, true)?;
+                let more = ask_cards(
+                    cx,
+                    player,
+                    source,
+                    Purpose::SacrificeCost,
+                    rest.clone(),
+                    n,
+                    true,
+                )?;
                 chosen.extend(rest.into_iter().filter(|c| more.contains(c)));
             }
             Ok((chosen, Vec::new()))
@@ -786,7 +1181,15 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
                 return Err(Stop::Cancel);
             }
             let count = candidates.len();
-            let chosen = ask_cards(cx, player, source, Purpose::ExileToPay, candidates, count, true)?;
+            let chosen = ask_cards(
+                cx,
+                player,
+                source,
+                Purpose::ExileToPay,
+                candidates,
+                count,
+                true,
+            )?;
             // A choice covering too few card types does not pay: the announcement is rewound.
             if types_among(cx, &chosen) < n.max(1) as usize {
                 return Err(Stop::Cancel);
@@ -837,7 +1240,9 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
         }
         let chars = cx.chars(id);
         for (index, ability) in chars.abilities().enumerate() {
-            let Some(def) = activated(cx, ability) else { continue };
+            let Some(def) = activated(cx, ability) else {
+                continue;
+            };
             if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
                 || limit_reached(cx, id, &chars, index, def)
@@ -848,7 +1253,13 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
             }
             // "Activate only if ..." (CR 602.5b), as Fanatic of Rhonas's ferocious mana.
             if let Some(condition) = def.condition
-                && !condition(cx, &Asker { source: id, controller: player })
+                && !condition(
+                    cx,
+                    &Asker {
+                        source: id,
+                        controller: player,
+                    },
+                )
             {
                 continue;
             }
@@ -860,14 +1271,23 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 if static_rules::spend_any_color_for(cx, player, id, true) {
                     cost = cost.paid_with_any_color();
                 }
-                if !a.covers_for(&cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }) {
+                if !a.covers_for(
+                    &cost,
+                    &ManaPayment::Ability {
+                        source: chars.types,
+                        subtypes: chars.subtypes,
+                    },
+                ) {
                     continue;
                 }
             }
             let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
             option.restriction = def.restricted.map(|r| restriction_from(cx, id, r));
             if let Some(p) = def.cost.permanents {
-                let asker = Asker { source: id, controller: player };
+                let asker = Asker {
+                    source: id,
+                    controller: player,
+                };
                 option.target_candidates = cx
                     .permanents_of(player)
                     .into_iter()
@@ -893,7 +1313,13 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 }
             } else if def.any_color {
                 option.color_choices = match def.colors_from {
-                    Some(from) => from(cx, &Asker { source: id, controller: player }),
+                    Some(from) => from(
+                        cx,
+                        &Asker {
+                            source: id,
+                            controller: player,
+                        },
+                    ),
                     None if def.colors.is_empty() => ColorSet(0b11111),
                     None => def.colors,
                 };
@@ -904,19 +1330,33 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
     }
     // Mana abilities the player has of their own, from a resolved spell or ability (CR 605.1a, 611.2a): offered whenever they
     // could activate a mana ability. Numbered in the order of the effects that gave them.
-    for (n, effect) in cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player).enumerate() {
-        let EffectKind::PlayerManaAbility(ability) = effect.kind else { continue };
+    for (n, effect) in cx
+        .s()
+        .effects
+        .iter()
+        .filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player)
+        .enumerate()
+    {
+        let EffectKind::PlayerManaAbility(ability) = effect.kind else {
+            continue;
+        };
         if let Some(def) = activated(cx, ability)
             && can_pay_other(cx, effect.source, player, &def.cost)
         {
-            options.push(ActionOption::on(ActionKind::ActivateAbility, effect.source, PLAYER_MANA_ABILITY + n as u8));
+            options.push(ActionOption::on(
+                ActionKind::ActivateAbility,
+                effect.source,
+                PLAYER_MANA_ABILITY + n as u8,
+            ));
         }
     }
     // Mana abilities that function from the hand (CR 113.6, 605): Elvish Spirit Guide's exile-this-card.
     for &id in cx.s().zone(Zone::hand(player)) {
         let def = cx.card(cx.s().obj(id).card);
         for (index, ability) in def.abilities.iter().enumerate() {
-            let AbilityDef::Activated(a) = ability else { continue };
+            let AbilityDef::Activated(a) = ability else {
+                continue;
+            };
             if !a.is_mana_ability()
                 || a.from != ZoneKind::Hand
                 || !can_pay_other(cx, id, player, &a.cost)
@@ -925,7 +1365,13 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 continue;
             }
             if let Some(condition) = a.condition
-                && !condition(cx, &Asker { source: id, controller: player })
+                && !condition(
+                    cx,
+                    &Asker {
+                        source: id,
+                        controller: player,
+                    },
+                )
             {
                 continue;
             }
@@ -961,9 +1407,23 @@ pub fn target_candidates_given(
     candidates(cx, asker, spec, earlier, subject, slot_player, false)
 }
 
-fn candidates(cx: &Cx, asker: &Asker, spec: &TargetSpec, earlier: &[Target], subject: Target, slot_player: Option<PlayerId>, gift: bool) -> Vec<Target> {
+fn candidates(
+    cx: &Cx,
+    asker: &Asker,
+    spec: &TargetSpec,
+    earlier: &[Target],
+    subject: Target,
+    slot_player: Option<PlayerId>,
+    gift: bool,
+) -> Vec<Target> {
     let s = cx.s();
-    let cx = &crate::resolve::Given { q: cx, earlier, subject, slot_player, gift };
+    let cx = &crate::resolve::Given {
+        q: cx,
+        earlier,
+        subject,
+        slot_player,
+        gift,
+    };
     let mut out = Vec::new();
     for p in s.seats() {
         let t = Target::Player(p);
@@ -1010,7 +1470,9 @@ fn targets_with_activation(def: &ActivatedDef) -> bool {
 /// Whether every required slot has at least its minimum number of legal targets (CR 601.2c): fewer is no legal announcement, so the
 /// spell or ability is not offered.
 pub(crate) fn slots_satisfiable(cx: &Cx, asker: &Asker, specs: &[TargetSpec]) -> bool {
-    specs.iter().all(|spec| !spec.required() || target_candidates(cx, asker, spec).len() >= spec.min as usize)
+    specs.iter().all(|spec| {
+        !spec.required() || target_candidates(cx, asker, spec).len() >= spec.min as usize
+    })
 }
 
 /// Fills in an option's targets; false when a required slot has no candidate, so the option is not offered.
@@ -1048,7 +1510,12 @@ pub(crate) fn eligible_modes(cx: &Cx, asker: &Asker, modal: &ModalDef) -> Vec<u8
 /// Whether enough modes could be chosen for the spell or ability to be announced at all (CR 700.2a).
 fn modes_possible(cx: &Cx, asker: &Asker, modal: &ModalDef) -> bool {
     // A mode that may be chosen more than once is enough for any number (CR 700.2d).
-    eligible_modes(cx, asker, modal).len() >= if modal.repeat { 1 } else { modal.min.max(1) as usize }
+    eligible_modes(cx, asker, modal).len()
+        >= if modal.repeat {
+            1
+        } else {
+            modal.min.max(1) as usize
+        }
 }
 
 /// Whether a spell's targets are announced with the action: one slot of one target, on a spell that is not modal and
@@ -1075,7 +1542,13 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
         let met = |if_promised: bool| {
             specs.iter().all(|spec| {
                 !spec.required()
-                    || (if if_promised { target_candidates_if_promised(cx, asker, spec) } else { target_candidates(cx, asker, spec) }).len() >= spec.min as usize
+                    || (if if_promised {
+                        target_candidates_if_promised(cx, asker, spec)
+                    } else {
+                        target_candidates(cx, asker, spec)
+                    })
+                    .len()
+                        >= spec.min as usize
             })
         };
         return def.kicker.is_some() || met(false) || (def.gift.is_some() && met(true));
@@ -1083,7 +1556,15 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
     // "If this spell was kicked, instead choose ..." (CR 702.33a, 601.2c): the targets wait for the kicker, and it may be
     // cast if it could be announced either unkicked or, with a kicker to pay, kicked.
     if def.kicker.is_some() && specs.iter().any(|spec| spec.if_kicked.is_some()) {
-        return slots_satisfiable(cx, asker, specs) || slots_satisfiable(cx, asker, &specs.iter().map(|spec| spec.when_kicked(1)).collect::<Vec<_>>());
+        return slots_satisfiable(cx, asker, specs)
+            || slots_satisfiable(
+                cx,
+                asker,
+                &specs
+                    .iter()
+                    .map(|spec| spec.when_kicked(1))
+                    .collect::<Vec<_>>(),
+            );
     }
     with_targets(cx, asker, specs, option)
 }
@@ -1112,36 +1593,99 @@ fn added_life_payable(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, 
     if a.changers.is_empty() && def.own_cost_changes.is_empty() && !lasting_changes(cx) {
         return true;
     }
-    let (_, added) = change_total(cx, &a.changers, player, Costed::Spell(card), ManaCost::ZERO, face_of(cx, card, def), targets);
-    added == 0 || payable_life(cx, player) >= added as i32 + def.additional_cost.map_or(0, |c| c.life as i32)
+    let (_, added) = change_total(
+        cx,
+        &a.changers,
+        player,
+        Costed::Spell(card),
+        ManaCost::ZERO,
+        face_of(cx, card, def),
+        targets,
+    );
+    added == 0
+        || payable_life(cx, player)
+            >= added as i32 + def.additional_cost.map_or(0, |c| c.life as i32)
 }
 
 /// The face `def` is of the card `card`, where it is one of its faces rather than the card itself (an Adventure, an Omen, a
 /// back face, a bestowed Aura, a half): what the cost changes judge it as (CR 715.4, 720.3a, 709.3, 712.8a).
 fn face_of(cx: &Cx, card: ObjectId, def: &CardDef) -> Option<CardId> {
     let whole = cx.card(cx.s().obj(card).card);
-    let faces = [whole.adventure, whole.omen, whole.back, whole.bestow, whole.split.map(|s| s.0), whole.split.map(|s| s.1)];
-    faces.into_iter().flatten().find(|&f| std::ptr::eq(f, def)).map(|f| cx.card_id(f))
+    let faces = [
+        whole.adventure,
+        whole.omen,
+        whole.back,
+        whole.bestow,
+        whole.split.map(|s| s.0),
+        whole.split.map(|s| s.1),
+    ];
+    faces
+        .into_iter()
+        .flatten()
+        .find(|&f| std::ptr::eq(f, def))
+        .map(|f| cx.card_id(f))
 }
 
 /// A cost with the static abilities that change it applied (CR 601.2f, 118.7): increases first, then reductions, a
 /// reduction taking nothing below zero generic mana (CR 118.7c). `targets` are those announced for the spell or ability
 /// (CR 601.2c), which the total cost is determined after.
-pub fn apply_cost_changes(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> ManaCost {
-    change_with(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
+pub fn apply_cost_changes(
+    cx: &Cx,
+    player: PlayerId,
+    costed: Costed,
+    cost: ManaCost,
+    targets: &[Target],
+) -> ManaCost {
+    change_with(
+        cx,
+        &cost_change_sources(cx),
+        player,
+        costed,
+        cost,
+        None,
+        targets,
+    )
 }
 
 /// `apply_cost_changes`, and the life the changes add to the total cost as additional costs (CR 118.8, 601.2f: "cost an
 /// additional 3 life to cast").
-pub fn apply_cost_changes_total(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> (ManaCost, u32) {
-    change_total(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
+pub fn apply_cost_changes_total(
+    cx: &Cx,
+    player: PlayerId,
+    costed: Costed,
+    cost: ManaCost,
+    targets: &[Target],
+) -> (ManaCost, u32) {
+    change_total(
+        cx,
+        &cost_change_sources(cx),
+        player,
+        costed,
+        cost,
+        None,
+        targets,
+    )
 }
 
 /// `apply_cost_changes_total` with the least the total may come to (`CostDelta::at_least`) not yet applied but returned, for
 /// a cast whose own reductions (harmonize, emerge, a sacrifice for each) are still to come: that least is applied once they
 /// are (CR 601.2f).
-fn apply_cost_changes_before_least(cx: &Cx, player: PlayerId, costed: Costed, cost: ManaCost, targets: &[Target]) -> (ManaCost, u32, u8) {
-    change_parts(cx, &cost_change_sources(cx), player, costed, cost, None, targets)
+fn apply_cost_changes_before_least(
+    cx: &Cx,
+    player: PlayerId,
+    costed: Costed,
+    cost: ManaCost,
+    targets: &[Target],
+) -> (ManaCost, u32, u8) {
+    change_parts(
+        cx,
+        &cost_change_sources(cx),
+        player,
+        costed,
+        cost,
+        None,
+        targets,
+    )
 }
 
 /// The total cost brought up to the least mana an effect says it costs (CR 601.2f, `CostDelta::at_least`): generic mana
@@ -1163,7 +1707,8 @@ fn cost_change_sources(cx: &Cx) -> Vec<ObjectId> {
         .copied()
         .filter(|&id| {
             let obj = cx.s().obj(id);
-            cx.cards().cost_changes[cx.cards().current(obj).0 as usize] && !cx.lost_all_abilities(id)
+            cx.cards().cost_changes[cx.cards().current(obj).0 as usize]
+                && !cx.lost_all_abilities(id)
         })
         .collect()
 }
@@ -1201,7 +1746,11 @@ impl Query for AsFace<'_> {
     }
 
     fn chars(&self, id: ObjectId) -> Chars {
-        if id == self.spell { layers::chars_as_face(self.cx.cards(), self.cx.s(), &self.cx.g.log, id, self.face) } else { self.cx.chars(id) }
+        if id == self.spell {
+            layers::chars_as_face(self.cx.cards(), self.cx.s(), &self.cx.g.log, id, self.face)
+        } else {
+            self.cx.chars(id)
+        }
     }
 
     fn card_id(&self, def: &'static CardDef) -> CardId {
@@ -1226,15 +1775,31 @@ impl Query for AsFace<'_> {
 /// 602.2b): for the menu row of an action whose cost depends on the target it would be announced with. Empty when
 /// nothing could change that cost (no cost changer on the battlefield, none of the ability's or card's own), which is
 /// nearly always, or when it is no activated ability with a mana cost.
-pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8, candidates: &[Target]) -> Vec<(ManaCost, u32)> {
-    let Some(ability) = game.chars(source).abilities().nth(index as usize) else { return Vec::new() };
-    let AbilityDef::Activated(def) = game.cards.ability(ability) else { return Vec::new() };
+pub fn activation_costs(
+    game: &crate::Game,
+    player: PlayerId,
+    source: ObjectId,
+    index: u8,
+    candidates: &[Target],
+) -> Vec<(ManaCost, u32)> {
+    let Some(ability) = game.chars(source).abilities().nth(index as usize) else {
+        return Vec::new();
+    };
+    let AbilityDef::Activated(def) = game.cards.ability(ability) else {
+        return Vec::new();
+    };
     let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize]
+            && !game.lost_all_abilities(id)
     });
     let obj = game.state.obj(source);
-    let own = !game.cards.get(obj.copy.map_or(obj.card, |c| c.card)).own_cost_changes.is_empty();
-    if def.special_action || def.cost.mana.x > 0 || !(changers || own || def.cost_change.is_some()) {
+    let own = !game
+        .cards
+        .get(obj.copy.map_or(obj.card, |c| c.card))
+        .own_cost_changes
+        .is_empty();
+    if def.special_action || def.cost.mana.x > 0 || !(changers || own || def.cost_change.is_some())
+    {
         return Vec::new();
     }
     // The rules read the game through a frame's view; a copy of the position (no tree) is enough to ask it.
@@ -1275,10 +1840,151 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
     candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
 }
 
+/// The cost changes to the exact offered plan for each possible single target. Unlike `cast_costs`, this does not look up
+/// a permission or granted way by the legacy index, so two routes for the same card can be priced independently.
+pub fn cast_plan_costs(
+    game: &crate::Game,
+    player: PlayerId,
+    card: ObjectId,
+    plan: CastPlan,
+    candidates: &[Target],
+) -> Vec<(ManaCost, u32)> {
+    let changers = game.state.battlefield().iter().any(|&id| {
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize]
+            && !game.lost_all_abilities(id)
+    });
+    let def = game.cards.get(game.state.obj(card).card);
+    if !(changers || !def.own_cost_changes.is_empty()) {
+        return Vec::new();
+    }
+    let Some(base) = cast_plan_cost(game, player, card, plan) else {
+        return Vec::new();
+    };
+    if base.mana.x > 0 {
+        return Vec::new();
+    }
+    let mut copy = crate::Game {
+        state: game.state.clone(),
+        log: game.log.clone(),
+        tree: crate::tree::Tree::new(),
+        at: crate::tree::NodeId::ROOT,
+        cards: game.cards,
+        verify: false,
+    };
+    let cx = Cx {
+        g: &mut copy,
+        frame: usize::MAX,
+        cursor: 0,
+        mana_source: None,
+        entering: None,
+    };
+    let face = cast_face(cx.card(cx.s().obj(card).card), plan.way);
+    let face_id = (!std::ptr::eq(face, cx.card(cx.s().obj(card).card))).then(|| cx.card_id(face));
+    let any_type = plan_any_type(&cx, player, card, plan);
+    candidates
+        .iter()
+        .map(|&target| {
+            let (mut mana, life) = change_total(
+                &cx,
+                &cost_change_sources(&cx),
+                player,
+                Costed::Spell(card),
+                base.mana,
+                face_id,
+                &[target],
+            );
+            if any_type {
+                mana = ManaCost {
+                    generic: mana.mana_value().min(255) as u8,
+                    ..ManaCost::ZERO
+                };
+            }
+            (mana, base.life as u32 + life)
+        })
+        .collect()
+}
+
+/// The face a concrete cast plan puts on the stack.
+pub fn cast_plan_face(
+    game: &crate::Game,
+    card: ObjectId,
+    plan: CastPlan,
+) -> Option<&'static CardDef> {
+    let whole = game.cards.get(game.state.obj(card).card);
+    Some(cast_face(whole, plan.way))
+}
+
+/// The selected plan's base cost, total mana and added life after target-independent cost changes. X is announced during
+/// casting, so a plan whose cost still contains X has no single total yet.
+pub fn cast_plan_total(
+    game: &crate::Game,
+    player: PlayerId,
+    card: ObjectId,
+    plan: CastPlan,
+) -> Option<(Cost, ManaCost, u32)> {
+    let base = cast_plan_cost(game, player, card, plan)?;
+    if base.mana.x > 0 {
+        return None;
+    }
+    let whole = game.cards.get(game.state.obj(card).card);
+    let any_type = match plan.permission {
+        CastPermission::PlayPermission { index } => game
+            .state
+            .permissions
+            .get(index as usize)
+            .is_some_and(|p| p.card == card && p.player == player && p.grant.any_type),
+        _ => false,
+    };
+    let changer = game.state.battlefield().iter().any(|&id| {
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize]
+            && !game.lost_all_abilities(id)
+    });
+    if !changer && whole.own_cost_changes.is_empty() && !any_type {
+        return Some((base, base.mana, u32::from(base.life)));
+    }
+    let mut copy = crate::Game {
+        state: game.state.clone(),
+        log: game.log.clone(),
+        tree: crate::tree::Tree::new(),
+        at: crate::tree::NodeId::ROOT,
+        cards: game.cards,
+        verify: false,
+    };
+    let cx = Cx {
+        g: &mut copy,
+        frame: usize::MAX,
+        cursor: 0,
+        mana_source: None,
+        entering: None,
+    };
+    let face = cast_face(cx.card(cx.s().obj(card).card), plan.way);
+    let face_id = (!std::ptr::eq(face, cx.card(cx.s().obj(card).card))).then(|| cx.card_id(face));
+    let (mut total, added_life) = change_total(
+        &cx,
+        &cost_change_sources(&cx),
+        player,
+        Costed::Spell(card),
+        base.mana,
+        face_id,
+        &[],
+    );
+    if plan_any_type(&cx, player, card, plan) {
+        total = ManaCost {
+            generic: total.mana_value().min(255) as u8,
+            ..ManaCost::ZERO
+        };
+    }
+    Some((base, total, u32::from(base.life) + added_life))
+}
+
 /// For a spell being cast whose additional cost sacrifices any number of permanents for a reduction each (CR 601.2b,
 /// `VariableCost::SacrificeAnyNumber`): the generic mana each takes off, and how many its caster could sacrifice, for the
 /// announcement's prompt. None for any other spell.
-pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: PlayerId) -> Option<(u8, usize)> {
+pub fn sacrifices_for_reduction(
+    game: &crate::Game,
+    spell: ObjectId,
+    player: PlayerId,
+) -> Option<(u8, usize)> {
     let obj = game.state.obj(spell);
     let def = game.cards.get(obj.copy.map_or(obj.card, |c| c.card));
     let Some(variable @ VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) else { return None };
@@ -1296,7 +2002,12 @@ pub fn sacrifices_for_reduction(game: &crate::Game, spell: ObjectId, player: Pla
 /// (`granted_cast_total` says that); for a card cast from anywhere but a hand, where a permission may say what to pay
 /// instead or in addition; and for a cost with {X}, whose total waits on the X announced. The cost it starts from is
 /// returned with the total, so the row says something only where the changes make a difference.
-pub fn cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8) -> Option<(ManaCost, ManaCost, u32)> {
+pub fn cast_total(
+    game: &crate::Game,
+    player: PlayerId,
+    card: ObjectId,
+    index: u8,
+) -> Option<(ManaCost, ManaCost, u32)> {
     if !game.state.obj(card).zone.is(ZoneKind::Hand) {
         return None;
     }
@@ -1313,14 +2024,26 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
         n if n > 0 && (n as usize) <= whole.ways.len() => whole.ways[n as usize - 1].cost.mana,
         _ => face.cost,
     };
-    let base = add_cost(base, face.additional_cost.map_or(ManaCost::ZERO, |extra| extra.mana));
+    let base = add_cost(
+        base,
+        face.additional_cost
+            .map_or(ManaCost::ZERO, |extra| extra.mana),
+    );
     if base.x > 0 {
         return None;
     }
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
     let face_id = (!std::ptr::eq(face, whole)).then(|| cx.card_id(face));
-    let (total, life) = change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face_id, &[]);
+    let (total, life) = change_total(
+        &cx,
+        &cost_change_sources(&cx),
+        player,
+        Costed::Spell(card),
+        base,
+        face_id,
+        &[],
+    );
     Some((base, total, life))
 }
 
@@ -1335,7 +2058,15 @@ pub fn granted_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, 
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
     let face_id = (face != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def));
-    let mana = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face_id, &[]);
+    let mana = change_with(
+        &cx,
+        &cost_change_sources(&cx),
+        player,
+        Costed::Spell(card),
+        cost.mana,
+        face_id,
+        &[],
+    );
     Some((cost, mana))
 }
 
@@ -1376,7 +2107,8 @@ pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, card: ObjectId, w
 /// The cost changes the object `id` carries itself (CR 601.2f): its card's, or a copy's.
 fn own_cost_changes(cx: &Cx, id: ObjectId) -> &'static [CostChange] {
     let obj = cx.s().obj(id);
-    cx.card(obj.copy.map_or(obj.card, |c| c.card)).own_cost_changes
+    cx.card(obj.copy.map_or(obj.card, |c| c.card))
+        .own_cost_changes
 }
 
 fn change_with(
@@ -1528,7 +2260,15 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
 /// not offered (CR 601.2, 118.3): X at 0, no kicker, the cheapest modes it must choose, Phyrexian symbols paid with
 /// life where the life total allows. `targets` are the candidate it would be announced with, where its target is announced
 /// with the cast, or none (CR 601.2c, 601.2f).
-fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, base: ManaCost, targets: &[Target]) -> ManaCost {
+fn least_cost(
+    cx: &Cx,
+    available: &Available,
+    player: PlayerId,
+    card: ObjectId,
+    def: &CardDef,
+    base: ManaCost,
+    targets: &[Target],
+) -> ManaCost {
     let mut cost = base;
     if let Some(extra) = def.additional_cost {
         cost = add_cost(cost, extra.mana);
@@ -1550,7 +2290,12 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
         // One mode to choose: the cheapest the player could pay for - Three Steps Ahead's {3} when its {1}{U} would need
         // a second blue.
         if modal.min <= 1
-            && let Some(i) = costs.iter().position(|&c| available.covers_for(&finish(cx, available, player, card, def, add_cost(cost, c), targets), &spell_kind(cx, available, card, def)))
+            && let Some(i) = costs.iter().position(|&c| {
+                available.covers_for(
+                    &finish(cx, available, player, card, def, add_cost(cost, c), targets),
+                    &spell_kind(cx, available, card, def),
+                )
+            })
         {
             costs.swap(0, i);
         }
@@ -1560,16 +2305,35 @@ fn least_cost(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, 
     }
     let mut cost = finish(cx, available, player, card, def, cost, targets);
     // "Costs {1} less for each permanent sacrificed this way": as little as sacrificing every permanent that could be.
-    if let Some(VariableCost::SacrificeAnyNumber { less_each, .. }) = def.additional_cost.and_then(|c| c.variable) {
-        let candidates = def.additional_cost.and_then(|c| c.variable).map_or(0, |v| variable_candidates(cx, card, player, v).len());
-        cost.generic = cost.generic.saturating_sub((candidates as u32 * less_each as u32).min(255) as u8);
+    if let Some(VariableCost::SacrificeAnyNumber { less_each, .. }) =
+        def.additional_cost.and_then(|c| c.variable)
+    {
+        let candidates = def
+            .additional_cost
+            .and_then(|c| c.variable)
+            .map_or(0, |v| variable_candidates(cx, card, player, v).len());
+        cost.generic = cost
+            .generic
+            .saturating_sub((candidates as u32 * less_each as u32).min(255) as u8);
     }
     cost
 }
 
 /// `least_cost`'s Phyrexian symbols paid with life where the life total allows, and the cost changes applied.
-fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def: &CardDef, mut cost: ManaCost, targets: &[Target]) -> ManaCost {
-    let mut life = if cost.phyrexian.iter().any(|&n| n > 0) { payable_life(cx, player) } else { 0 };
+fn finish(
+    cx: &Cx,
+    available: &Available,
+    player: PlayerId,
+    card: ObjectId,
+    def: &CardDef,
+    mut cost: ManaCost,
+    targets: &[Target],
+) -> ManaCost {
+    let mut life = if cost.phyrexian.iter().any(|&n| n > 0) {
+        payable_life(cx, player)
+    } else {
+        0
+    };
     for (i, n) in cost.phyrexian.into_iter().enumerate() {
         for _ in 0..n {
             if life > 2 {
@@ -1582,7 +2346,15 @@ fn finish(cx: &Cx, available: &Available, player: PlayerId, card: ObjectId, def:
     cost.phyrexian = [0; 5];
     // A face cast from the hand (an Adventure, an Omen, a half, a back face) is judged as that face (CR 715.4, 720.3a,
     // 709.3, 712.8a).
-    change_with(cx, &available.changers, player, Costed::Spell(card), cost, face_of(cx, card, def), targets)
+    change_with(
+        cx,
+        &available.changers,
+        player,
+        Costed::Spell(card),
+        cost,
+        face_of(cx, card, def),
+        targets,
+    )
 }
 
 /// Whether `player` could pay `cost` from the mana pool and what the mana abilities they could activate add (advice,
@@ -1599,7 +2371,13 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
     if cx.s().obj(source).zone.is(ZoneKind::Stack) {
         a.covers_for(cost, &spell_payment(cx, source, a.names_subtypes()))
     } else {
-        a.covers_for(cost, &ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes })
+        a.covers_for(
+            cost,
+            &ManaPayment::Ability {
+                source: chars.types,
+                subtypes: chars.subtypes,
+            },
+        )
     }
 }
 
@@ -1627,7 +2405,12 @@ pub struct Available {
 }
 
 /// Adds restricted mana to the entry of its restriction in `Available::restricted`.
-fn add_available(list: &mut Vec<(ManaRestriction, [u8; 6], u32)>, restriction: ManaRestriction, fixed: [u8; 6], flex: u32) {
+fn add_available(
+    list: &mut Vec<(ManaRestriction, [u8; 6], u32)>,
+    restriction: ManaRestriction,
+    fixed: [u8; 6],
+    flex: u32,
+) {
     let at = match list.iter().position(|(r, ..)| *r == restriction) {
         Some(at) => at,
         None => {
@@ -1664,8 +2447,14 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     let mut consume: u32 = 0;
     // Mana abilities of the player's own (CR 605.1a): paid with life, as often as the life total allows (CR 119.4), and never
     // while the player can't lose life (CR 119.8).
-    for effect in cx.s().effects.iter().filter(|e| matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player) {
-        let EffectKind::PlayerManaAbility(ability) = effect.kind else { continue };
+    for effect in
+        cx.s().effects.iter().filter(|e| {
+            matches!(e.kind, EffectKind::PlayerManaAbility(_)) && e.controller == player
+        })
+    {
+        let EffectKind::PlayerManaAbility(ability) = effect.kind else {
+            continue;
+        };
         if let Some(def) = activated(cx, ability)
             && def.cost.life > 0
         {
@@ -1694,7 +2483,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         // The mana types the abilities that are not restricted could add between them.
         let mut types = 0u8;
         for (index, ability) in chars.abilities().enumerate() {
-            let Some(def) = activated(cx, ability) else { continue };
+            let Some(def) = activated(cx, ability) else {
+                continue;
+            };
             if !def.is_mana_ability()
                 || def.from != ZoneKind::Battlefield
                 || limit_reached(cx, id, &chars, index, def)
@@ -1705,7 +2496,13 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
             // "Activate only if ..." (CR 602.5b): a Verge's second color is not there without its land type.
             if let Some(condition) = def.condition
-                && !condition(cx, &Asker { source: id, controller: player })
+                && !condition(
+                    cx,
+                    &Asker {
+                        source: id,
+                        controller: player,
+                    },
+                )
             {
                 continue;
             }
@@ -1744,7 +2541,12 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 flex[any_types(cx, id, player, def) as usize] += def.adds_any as u32;
             }
             (1, Some(def)) if let Some(kind) = def.restricted => {
-                add_available(&mut restricted, restriction_from(cx, id, kind), def.adds.0, def.adds_any as u32);
+                add_available(
+                    &mut restricted,
+                    restriction_from(cx, id, kind),
+                    def.adds.0,
+                    def.adds_any as u32,
+                );
             }
             (1, Some(def)) => {
                 for m in 0..6 {
@@ -1790,21 +2592,43 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
 fn spell_kind(cx: &Cx, a: &Available, card: ObjectId, def: &CardDef) -> ManaPayment {
     let whole = cx.card(cx.s().obj(card).card);
     let back = !def.has_cost && whole.back.is_some_and(|b| std::ptr::eq(b, def));
-    let mana_value = if back { whole.cost.mana_value() } else { def.cost.mana_value() };
+    let mana_value = if back {
+        whole.cost.mana_value()
+    } else {
+        def.cost.mana_value()
+    };
     let (types, legendary, x) = (def.types, def.supertypes.legendary, def.cost.x > 0);
     // Cast from where the card is (CR 601.2a).
     let from = cx.s().obj(card).zone.kind();
     if !a.names_subtypes() {
-        return ManaPayment::Spell { types, subtypes: SubtypeSet::NONE, legendary, mana_value, x, from };
+        return ManaPayment::Spell {
+            types,
+            subtypes: SubtypeSet::NONE,
+            legendary,
+            mana_value,
+            x,
+            from,
+        };
     }
     let mut subtypes = def.subtypes;
     if std::ptr::eq(def, cx.card(cx.s().obj(card).card)) {
         subtypes = subtypes.union(cx.chars(card).subtypes);
     }
-    if def.keywords.has(Keyword::Changeling) && (def.types.has(CardType::Creature) || def.types.has(CardType::Kindred)) {
-        subtypes = Subtype::CREATURE_TYPES.into_iter().fold(subtypes, SubtypeSet::with);
+    if def.keywords.has(Keyword::Changeling)
+        && (def.types.has(CardType::Creature) || def.types.has(CardType::Kindred))
+    {
+        subtypes = Subtype::CREATURE_TYPES
+            .into_iter()
+            .fold(subtypes, SubtypeSet::with);
     }
-    ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from }
+    ManaPayment::Spell {
+        types,
+        subtypes,
+        legendary,
+        mana_value,
+        x,
+        from,
+    }
 }
 
 impl Available {
@@ -1839,8 +2663,25 @@ impl Available {
         // A spell whose X is still to be announced (CR 601.2b) has the larger mana value the larger X is (CR 202.3e):
         // mana for spells of a mana value or greater may pay for it at an X that brings it there (Ashling, Rimebound's
         // mana and a {X}{R} spell), each X costing its {X} symbols more.
-        let ManaPayment::Spell { types, subtypes, legendary, mana_value, x, from } = *payment else { return false };
-        let Some(most) = self.restricted.iter().filter_map(|(r, ..)| r.least_mana_value()).max() else { return false };
+        let ManaPayment::Spell {
+            types,
+            subtypes,
+            legendary,
+            mana_value,
+            x,
+            from,
+        } = *payment
+        else {
+            return false;
+        };
+        let Some(most) = self
+            .restricted
+            .iter()
+            .filter_map(|(r, ..)| r.least_mana_value())
+            .max()
+        else {
+            return false;
+        };
         if cost.x == 0 || mana_value >= most as u32 {
             return false;
         }
@@ -1848,7 +2689,17 @@ impl Available {
         (1..=(most as u32 - mana_value).div_ceil(per)).any(|n| {
             let mut more = *cost;
             more.generic = (more.generic as u32 + n * per).min(255) as u8;
-            self.covers_as(&more, &ManaPayment::Spell { types, subtypes, legendary, mana_value: mana_value + n * per, x, from })
+            self.covers_as(
+                &more,
+                &ManaPayment::Spell {
+                    types,
+                    subtypes,
+                    legendary,
+                    mana_value: mana_value + n * per,
+                    x,
+                    from,
+                },
+            )
         })
     }
 
@@ -1884,7 +2735,8 @@ impl Available {
         if self.unknown {
             return u16::MAX;
         }
-        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>();
+        let total =
+            self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>();
         total.saturating_sub(self.consume).min(u16::MAX as u32) as u16
     }
 
@@ -1926,7 +2778,8 @@ impl Available {
         if flex_needed > 0 && !flex_pays(&unpaid, &self.flex) {
             return false;
         }
-        let spare: u32 = (left.iter().map(|&n| n as u32).sum::<u32>() + (flex - flex_needed)).saturating_sub(self.consume);
+        let spare: u32 = (left.iter().map(|&n| n as u32).sum::<u32>() + (flex - flex_needed))
+            .saturating_sub(self.consume);
         spare >= cost.generic as u32
     }
 }
@@ -1941,8 +2794,19 @@ fn flex_pays(unpaid: &[u32; 64], flex: &[u32; 64]) -> bool {
     let needs: Vec<usize> = (1..64).filter(|&m| unpaid[m] > 0).collect();
     let sources: Vec<usize> = (1..64).filter(|&m| flex[m] > 0).collect();
     for set in 1..64usize {
-        let need: u32 = needs.iter().filter(|&&m| m & !set == 0).map(|&m| unpaid[m]).sum();
-        if need > 0 && need > sources.iter().filter(|&&m| m & set != 0).map(|&m| flex[m]).sum::<u32>() {
+        let need: u32 = needs
+            .iter()
+            .filter(|&&m| m & !set == 0)
+            .map(|&m| unpaid[m])
+            .sum();
+        if need > 0
+            && need
+                > sources
+                    .iter()
+                    .filter(|&&m| m & set != 0)
+                    .map(|&m| flex[m])
+                    .sum::<u32>()
+        {
             return false;
         }
     }
@@ -1966,7 +2830,16 @@ fn yield_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u
 /// The colors a mana ability's "mana of any color" may be: those it names, or all five.
 fn any_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 {
     match def.colors_from {
-        Some(from) => from(cx, &Asker { source: id, controller: player }).0,
+        Some(from) => {
+            from(
+                cx,
+                &Asker {
+                    source: id,
+                    controller: player,
+                },
+            )
+            .0
+        }
         None if def.colors.is_empty() => ANY_COLOR,
         None => def.colors.0,
     }
@@ -2007,7 +2880,13 @@ pub fn could_act_with_more_mana(cx: &Cx, player: PlayerId) -> bool {
 
 /// The activated abilities `player` may activate now, judged with the mana `available` could pay (`unlimited`: as though
 /// any cost could be paid, `could_act_with_more_mana`).
-fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, unlimited: bool, options: &mut Vec<ActionOption>) {
+fn activated_options(
+    cx: &Cx,
+    player: PlayerId,
+    available: &std::cell::OnceCell<Available>,
+    unlimited: bool,
+    options: &mut Vec<ActionOption>,
+) {
     // Abilities of permanents, then abilities that function from the hand (cycling) and the graveyard (unearth).
     let sources: Vec<ObjectId> = cx
         .s()
@@ -2025,7 +2904,9 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
         let zone = cx.s().obj(id).zone.kind();
         let chars = cx.chars(id);
         for (index, ability) in chars.abilities().enumerate() {
-            let Some(def) = activated(cx, ability) else { continue };
+            let Some(def) = activated(cx, ability) else {
+                continue;
+            };
             if def.is_mana_ability()
                 || (split && !def.special_action)
                 || def.from != zone
@@ -2041,7 +2922,9 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 // "Could begin to cast this card by putting it onto the stack from your hand" (CR 702.62a): from the zone
                 // the ability works from, which is the zone the card would be cast from.
                 Timing::AsCast
-                    if !(chars.is(CardType::Instant) || chars.has(Keyword::Flash) || sorcery_timing(cx, player))
+                    if !(chars.is(CardType::Instant)
+                        || chars.has(Keyword::Flash)
+                        || sorcery_timing(cx, player))
                         || cast_barred(cx, player).contains(zone) =>
                 {
                     continue;
@@ -2061,7 +2944,10 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             if def.cost.loyalty.is_some() && !loyalty_available(cx, id) {
                 continue;
             }
-            let asker = Asker { source: id, controller: player };
+            let asker = Asker {
+                source: id,
+                controller: player,
+            };
             if let Some(condition) = def.condition
                 && !condition(cx, &asker)
             {
@@ -2072,19 +2958,48 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             }
             // An activation whose mana cost the player cannot meet is not offered, as a spell they cannot afford is not
             // (CR 602.2b): a seat handed it would cancel at the payment and be handed it again, forever.
-            let owed = if def.special_action { special_action_cost(cx, player, id, ability, def) } else { def.cost.mana };
-            let judged = owed.x == 0 && owed.mana_value() > 0 && !def.tap_creatures_for_mana && !def.waterbend;
+            let owed = if def.special_action {
+                special_action_cost(cx, player, id, ability, def)
+            } else {
+                def.cost.mana
+            };
+            let judged = owed.x == 0
+                && owed.mana_value() > 0
+                && !def.tap_creatures_for_mana
+                && !def.waterbend;
             // The source's own mana abilities cannot pay for an ability that taps it (CR 602.2b, 605.3b).
-            let own = (judged && !unlimited && def.cost.tap && has_mana_source(cx, id, player)).then(|| available_without(cx, player, Some(id)));
-            let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
+            let own = (judged && !unlimited && def.cost.tap && has_mana_source(cx, id, player))
+                .then(|| available_without(cx, player, Some(id)));
+            let a = judged.then(|| {
+                own.as_ref()
+                    .unwrap_or_else(|| available.get_or_init(|| self::available(cx, player)))
+            });
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
-            let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };
+            let payment = if def.special_action {
+                ManaPayment::Other
+            } else {
+                ManaPayment::Ability {
+                    source: chars.types,
+                    subtypes: chars.subtypes,
+                }
+            };
             let covered = |a: &Available, targets: &[Target]| {
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
                 // touch it; what changes its own cost is already in `owed` (`special_action_cost`), which `special_action`
                 // pays.
-                let mut cost =
-                    if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
+                let mut cost = if def.special_action {
+                    owed
+                } else {
+                    change_with(
+                        cx,
+                        &a.changers,
+                        player,
+                        Costed::Ability(id, ability),
+                        owed,
+                        None,
+                        targets,
+                    )
+                };
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
                 if static_rules::spend_any_color_for(cx, player, id, !def.special_action) {
                     cost = cost.paid_with_any_color();
@@ -2100,7 +3015,9 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 targets_with_activation(def)
                     && !def.special_action
                     && def.modal.is_none()
-                    && (!a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty())
+                    && (!a.changers.is_empty()
+                        || def.cost_change.is_some()
+                        || !own_cost_changes(cx, id).is_empty())
             });
             if let Some(a) = a
                 && !each_target
@@ -2120,8 +3037,15 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             }
             // A static ability that lets the player pay another cost instead (CR 118.9) leaves every target on offer.
             if let Some(a) = a.filter(|_| each_target) {
-                let kept: Vec<Target> = option.target_candidates.iter().copied().filter(|&t| covered(a, &[t])).collect();
-                if kept.len() != option.target_candidates.len() && static_rules::activation_alternative(cx, player, id, def).is_none() {
+                let kept: Vec<Target> = option
+                    .target_candidates
+                    .iter()
+                    .copied()
+                    .filter(|&t| covered(a, &[t]))
+                    .collect();
+                if kept.len() != option.target_candidates.len()
+                    && static_rules::activation_alternative(cx, player, id, def).is_none()
+                {
                     if kept.is_empty() && !(option.targets_optional && covered(a, &[])) {
                         continue;
                     }
@@ -2144,11 +3068,16 @@ fn loyalty_available(cx: &Cx, id: ObjectId) -> bool {
         return true;
     }
     let (mut allowed, mut used) = (1usize, 0usize);
-    for r in cx.history().select(EventQuery::kind(EventMask::ABILITY_ACTIVATED).object(id).this_turn()) {
+    for r in cx.history().select(
+        EventQuery::kind(EventMask::ABILITY_ACTIVATED)
+            .object(id)
+            .this_turn(),
+    ) {
         if let Event::AbilityActivated { ability, .. } = r.event {
             if ability.index == EXTRA_LOYALTY_ALLOWED {
                 allowed += 1;
-            } else if matches!(cx.cards().ability(ability), AbilityDef::Activated(d) if d.cost.loyalty.is_some()) {
+            } else if matches!(cx.cards().ability(ability), AbilityDef::Activated(d) if d.cost.loyalty.is_some())
+            {
                 used += 1;
             }
         }
@@ -2158,7 +3087,447 @@ fn loyalty_available(cx: &Cx, id: ObjectId) -> bool {
 
 /// The permission `player` holds to play `card` from where it is, if any (CR 601.3, 305.1).
 pub fn permission_for(cx: &Cx, card: ObjectId, player: PlayerId) -> Option<PlayPermission> {
-    cx.s().permissions.iter().find(|p| p.card == card && p.player == player && permission_stands(cx, p, player)).copied()
+    cx.s()
+        .permissions
+        .iter()
+        .find(|p| p.card == card && p.player == player && permission_stands(cx, p, player))
+        .copied()
+}
+
+/// The standing permission selected by a cast plan. Its position is captured when the option is offered and carried
+/// through the action, so overlapping permissions cannot silently change which terms govern the cast.
+fn permission_at(cx: &Cx, card: ObjectId, player: PlayerId, index: u32) -> Option<PlayPermission> {
+    let permission = *cx.s().permissions.get(index as usize)?;
+    (permission.card == card
+        && permission.player == player
+        && permission_stands(cx, &permission, player))
+    .then_some(permission)
+}
+
+/// Resolve the selected plan's printed or granted cost while the offered position is still intact. This is also used by
+/// the host's cost display, so the row and the action begin from the same specific alternative.
+fn selected_plan_cost(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> Option<Cost> {
+    let whole = cx.card(cx.s().obj(card).card);
+    let face = cast_face(whole, plan.way);
+    let mut cost = match plan.cost {
+        CastCostChoice::Printed => Cost::mana(face.cost),
+        CastCostChoice::PrintedWay { way } => whole.ways.get(way as usize)?.cost,
+        CastCostChoice::Overload => Cost::mana(whole.overload?),
+        CastCostChoice::LifeForManaValue => life_for_mana_value(face),
+        CastCostChoice::EffectSpecified => return None,
+        CastCostChoice::GrantedWay { source, rule } => {
+            let (_, controller, granted) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
+                .into_iter()
+                .find(|(candidate, _, way)| {
+                    *candidate == source
+                        && cx
+                            .cards()
+                            .get(cx.chars(source).card)
+                            .granted_ways
+                            .iter()
+                            .position(|w| std::ptr::eq(w, *way))
+                            == Some(rule as usize)
+                })?;
+            let view = AsFace {
+                cx,
+                spell: card,
+                face: cx.card_id(face),
+            };
+            let q: &dyn Query = if plan.way == 0 { cx } else { &view };
+            let c = (granted.cost)(q, &Asker { source, controller }, card, player)?;
+            c
+        }
+    };
+    let object = cx.s().obj(card);
+    match plan.permission {
+        CastPermission::Hand => {
+            if object.zone != Zone::hand(player) {
+                return None;
+            }
+        }
+        CastPermission::PrintedGraveyard => {
+            if object.zone != Zone::graveyard(player)
+                || object.owner != player
+                || !(whole.keywords.has(Keyword::CastFromYourGraveyard)
+                    || face.keywords.has(Keyword::CastFromYourGraveyard))
+            {
+                return None;
+            }
+        }
+        CastPermission::GraveyardPlayRule => {
+            if object.zone != Zone::graveyard(player)
+                || object.owner != player
+                || !graveyard_play(cx, player)
+            {
+                return None;
+            }
+        }
+        CastPermission::Aftermath => {
+            if object.zone != Zone::graveyard(player)
+                || object.owner != player
+                || plan.way != WAY_SPLIT_RIGHT
+                || !face.aftermath
+            {
+                return None;
+            }
+        }
+        CastPermission::BestowGraveyard => {
+            if object.zone != Zone::graveyard(player)
+                || object.owner != player
+                || !whole.bestow_from_graveyard
+                || plan.way != WAY_BESTOW
+            {
+                return None;
+            }
+        }
+        CastPermission::AdventureExile => {
+            if object.zone != Zone::exile(player)
+                || object.owner != player
+                || !object.on_adventure
+                || plan.way != 0
+            {
+                return None;
+            }
+        }
+        CastPermission::PreparedCopy { source } => {
+            let prepared = cx.s().obj(source);
+            if !object.zone.is(ZoneKind::Exile)
+                || object.prepared_from != Some(source)
+                || !live(cx.s(), source)
+                || !prepared.prepared
+                || prepared.controller != player
+                || !object.card_copy
+            {
+                return None;
+            }
+        }
+        CastPermission::PrintedWay { way } => {
+            let printed = whole.ways.get(way as usize)?;
+            let view = AsFace {
+                cx,
+                spell: card,
+                face: cx.card_id(face),
+            };
+            let q: &dyn Query = if plan.way == 0 { cx } else { &view };
+            if !matches!(plan.cost, CastCostChoice::PrintedWay { way: selected } if selected == way)
+                || object.owner != player
+                || object.zone.player != player
+                || object.zone.kind() != printed.from
+                || !printed.condition.is_none_or(|condition| {
+                    condition(
+                        q,
+                        &Asker {
+                            source: card,
+                            controller: player,
+                        },
+                    )
+                })
+            {
+                return None;
+            }
+        }
+        CastPermission::Retrace => {
+            if object.zone != Zone::graveyard(player)
+                || object.owner != player
+                || !cx.chars(card).has(Keyword::Retrace)
+                || graveyard_play(cx, player)
+                || whole.keywords.has(Keyword::CastFromYourGraveyard)
+                || !matches!(plan.cost, CastCostChoice::Printed)
+            {
+                return None;
+            }
+        }
+        CastPermission::Resolution => {
+            if matches!(object.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack)
+                || !cx
+                    .s()
+                    .stack
+                    .last()
+                    .is_some_and(|item| item.controller == player)
+                || !cast_ways_during_resolution(cx, card)
+                    .iter()
+                    .any(|way| way.way == plan.way)
+            {
+                return None;
+            }
+        }
+        CastPermission::PlayPermission { index } => {
+            let permission = permission_at(cx, card, player, index)?;
+            let grant = permission.grant;
+            if grant.life_for_mana_value {
+                if !matches!(plan.cost, CastCostChoice::LifeForManaValue) {
+                    return None;
+                }
+            } else if let Some(instead) = grant.instead {
+                if !matches!(plan.cost, CastCostChoice::Printed) {
+                    return None;
+                }
+                cost = Cost::mana(instead);
+            } else if matches!(plan.cost, CastCostChoice::LifeForManaValue) {
+                return None;
+            }
+            cost.mana.generic = cost.mana.generic.saturating_add(grant.more);
+        }
+        CastPermission::GrantedWay { source, rule } => {
+            if !matches!(plan.cost, CastCostChoice::GrantedWay { source: s, rule: r } if s == source && r == rule)
+            {
+                return None;
+            }
+            let active = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
+                .into_iter()
+                .any(|(s, _, way)| s == source && granted_way_rule(cx, s, way) == Some(rule));
+            if !active
+                || object.zone.player != player
+                || object.zone.kind()
+                    != cx
+                        .cards()
+                        .get(cx.chars(source).card)
+                        .granted_ways
+                        .get(rule as usize)?
+                        .from
+            {
+                return None;
+            }
+        }
+        CastPermission::ExileCast { source, rule } => {
+            if !object.zone.is(ZoneKind::Exile) || object.on_adventure || object.card_copy {
+                return None;
+            }
+            let cast = cx
+                .cards()
+                .get(cx.chars(source).card)
+                .exile_casts
+                .get(rule as usize)?;
+            if !exile_casts_of(cx.cards(), cx.s(), &cx.g.log)
+                .iter()
+                .any(|(s, _, active)| {
+                    *s == source
+                        && exile_cast_rule(cx, *s, active) == Some(rule)
+                        && std::ptr::eq(*active, cast)
+                })
+            {
+                return None;
+            }
+            let view = AsFace {
+                cx,
+                spell: card,
+                face: cx.card_id(face),
+            };
+            let q: &dyn Query = if plan.way == 0 { cx } else { &view };
+            if !(cast.allows)(
+                q,
+                &Asker {
+                    source,
+                    controller: cx.s().obj(source).controller,
+                },
+                card,
+                player,
+            ) {
+                return None;
+            }
+        }
+        CastPermission::LibraryTop { source, rule } => {
+            if cx.s().zone(Zone::library(player)).first().copied() != Some(card) {
+                return None;
+            }
+            let view = AsFace {
+                cx,
+                spell: card,
+                face: cx.card_id(face),
+            };
+            let q: &dyn Query = if plan.way == 0 { cx } else { &view };
+            let life = library_cast_rule_at(q, cx.cards(), player, card, source, rule)?;
+            if life != matches!(plan.cost, CastCostChoice::LifeForManaValue) {
+                return None;
+            }
+        }
+    }
+    Some(cost)
+}
+
+fn selected_plan_extra(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> Option<Cost> {
+    let face = cast_face(cx.card(cx.s().obj(card).card), plan.way);
+    let mut extra = face.additional_cost.unwrap_or(Cost::NONE);
+    if let CastPermission::ExileCast { source, rule } = plan.permission {
+        let cast = cx
+            .cards()
+            .get(cx.chars(source).card)
+            .exile_casts
+            .get(rule as usize)?;
+        if !exile_casts_of(cx.cards(), cx.s(), &cx.g.log)
+            .iter()
+            .any(|(s, _, active)| {
+                *s == source
+                    && exile_cast_rule(cx, *s, active) == Some(rule)
+                    && std::ptr::eq(*active, cast)
+            })
+        {
+            return None;
+        }
+        let view = AsFace {
+            cx,
+            spell: card,
+            face: cx.card_id(face),
+        };
+        let q: &dyn Query = if plan.way == 0 { cx } else { &view };
+        if !(cast.allows)(
+            q,
+            &Asker {
+                source,
+                controller: cx.s().obj(source).controller,
+            },
+            card,
+            player,
+        ) {
+            return None;
+        }
+        extra = extra.and(cast.additional);
+    }
+    if matches!(plan.permission, CastPermission::Retrace) {
+        extra = extra.and(RETRACE);
+    }
+    Some(extra)
+}
+
+fn plan_any_type(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> bool {
+    match plan.permission {
+        CastPermission::PlayPermission { index } => {
+            permission_at(cx, card, player, index).is_some_and(|p| p.grant.any_type)
+        }
+        _ => false,
+    }
+}
+
+/// The selected cast plan's cost before cost changes. Used by adapters that need to explain or price the exact offered route.
+pub fn cast_plan_cost(
+    game: &crate::Game,
+    player: PlayerId,
+    card: ObjectId,
+    plan: CastPlan,
+) -> Option<Cost> {
+    if let Some(cost) = cast_plan_hand_cost(game, player, card, plan) {
+        return Some(cost);
+    }
+    let mut copy = crate::Game {
+        state: game.state.clone(),
+        log: game.log.clone(),
+        tree: crate::tree::Tree::new(),
+        at: crate::tree::NodeId::ROOT,
+        cards: game.cards,
+        verify: false,
+    };
+    let cx = Cx {
+        g: &mut copy,
+        frame: usize::MAX,
+        cursor: 0,
+        mana_source: None,
+        entering: None,
+    };
+    Some(
+        selected_plan_cost(&cx, player, card, plan)?
+            .and(selected_plan_extra(&cx, player, card, plan)?),
+    )
+}
+
+fn cast_plan_hand_cost(
+    game: &crate::Game,
+    player: PlayerId,
+    card: ObjectId,
+    plan: CastPlan,
+) -> Option<Cost> {
+    if plan.permission != CastPermission::Hand || game.state.obj(card).zone != Zone::hand(player) {
+        return None;
+    }
+    let whole = game.cards.get(game.state.obj(card).card);
+    let face = cast_face(whole, plan.way);
+    let mut cost = match plan.cost {
+        CastCostChoice::Printed => Cost::mana(face.cost),
+        CastCostChoice::PrintedWay { way } => whole.ways.get(way as usize)?.cost,
+        CastCostChoice::Overload => Cost::mana(whole.overload?),
+        _ => return None,
+    };
+    cost = cost.and(face.additional_cost.unwrap_or(Cost::NONE));
+    Some(cost)
+}
+
+#[derive(Clone, Copy)]
+struct ResolvedCastPlan {
+    plan: CastPlan,
+    cost: Cost,
+    terms: CastTerms,
+    granted: Option<(ObjectId, &'static GrantedWay)>,
+    exile: Option<(ObjectId, &'static ExileCast)>,
+    retraced: bool,
+}
+
+/// Resolve a selector before casting mutates the game. The chosen costs and linked permissions then travel together through
+/// the payment procedure, even if paying it removes the object that supplied them.
+fn resolve_cast_plan(
+    cx: &Cx,
+    player: PlayerId,
+    card: ObjectId,
+    plan: CastPlan,
+) -> Option<ResolvedCastPlan> {
+    let cost = selected_plan_cost(cx, player, card, plan)?;
+    let mut terms = CastTerms {
+        way: Some(plan.way),
+        ..CastTerms::default()
+    };
+    let mut granted = None;
+    let mut exile = None;
+    let retraced = matches!(plan.permission, CastPermission::Retrace);
+    match plan.permission {
+        CastPermission::PlayPermission { index } => {
+            let permission = permission_at(cx, card, player, index)?;
+            terms.instead = permission.grant.instead;
+            terms.any_type = permission.grant.any_type;
+            terms.flashback = permission.grant.exile_after;
+            if permission.grant.life_for_mana_value {
+                terms.instead = Some(ManaCost::ZERO);
+            }
+        }
+        CastPermission::ExileCast { source, rule } => {
+            let (_, _, grant) = exile_casts_of(cx.cards(), cx.s(), &cx.g.log)
+                .into_iter()
+                .find(|(candidate, _, grant)| {
+                    *candidate == source && exile_cast_rule(cx, source, grant) == Some(rule)
+                })?;
+            exile = Some((source, grant));
+        }
+        CastPermission::LibraryTop { .. }
+            if matches!(plan.cost, CastCostChoice::LifeForManaValue) =>
+        {
+            terms.instead = Some(ManaCost::ZERO);
+        }
+        CastPermission::GrantedWay { source, rule } => {
+            let (_, _, grant) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
+                .into_iter()
+                .find(|(candidate, _, grant)| {
+                    *candidate == source && granted_way_rule(cx, source, grant) == Some(rule)
+                })?;
+            terms.flashback = grant.flashback;
+            granted = Some((source, grant));
+        }
+        _ => {}
+    }
+    if let CastCostChoice::GrantedWay { source, rule } = plan.cost
+        && let Some((_, _, grant)) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
+            .into_iter()
+            .find(|(candidate, _, grant)| {
+                *candidate == source && granted_way_rule(cx, source, grant) == Some(rule)
+            })
+    {
+        terms.flashback |= grant.flashback;
+        granted = Some((source, grant));
+    }
+    Some(ResolvedCastPlan {
+        plan,
+        cost,
+        terms,
+        granted,
+        exile,
+        retraced,
+    })
 }
 
 /// Whether a permission lets `player` play its card now, as far as its own terms say (CR 601.3, 305.1): not on the turn it
@@ -2178,15 +3547,16 @@ fn play_condition_holds(cx: &Cx, player: PlayerId, when: PlayCondition) -> bool 
             matches!(r.event, Event::Attacks { attacker, .. }
                 if cx.s().obj(attacker).controller == player && cx.chars(attacker).has_subtype(kind))
         }),
-        PlayCondition::ControlsSubtype(kind) => {
-            cx.s().battlefield().iter().any(|&id| cx.s().obj(id).controller == player && cx.chars(id).has_subtype(kind))
-        }
+        PlayCondition::ControlsSubtype(kind) => cx.s().battlefield().iter().any(|&id| cx.s().obj(id).controller == player && cx.chars(id).has_subtype(kind)),
     }
 }
 
 /// Whether an effect lets `player` play lands and cast spells from their graveyard now (`EffectKind::PlayFromGraveyard`).
 fn graveyard_play(cx: &Cx, player: PlayerId) -> bool {
-    cx.s().effects.iter().any(|e| e.kind == EffectKind::PlayFromGraveyard && e.controller == player)
+    cx.s()
+        .effects
+        .iter()
+        .any(|e| e.kind == EffectKind::PlayFromGraveyard && e.controller == player)
 }
 
 /// The play rules that apply to `player` now (`CardDef::play_rules`), each with the permanent whose rule it is: those of the
@@ -2194,8 +3564,19 @@ fn graveyard_play(cx: &Cx, player: PlayerId) -> bool {
 /// 613.1f). A rule under "as long as" (`PlayRule::While`) applies only while its condition holds for its permanent: a
 /// Case's "Solved - [static ability]" (CR 702.169b). A Room's are those of its unlocked doors: a locked door has no rules
 /// text (CR 709.5).
-pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, command: bool, mut f: impl FnMut(ObjectId, &'static PlayRule)) {
-    fn walk(q: &dyn Query, asker: &Asker, rules: &'static [PlayRule], f: &mut impl FnMut(ObjectId, &'static PlayRule)) {
+pub fn each_play_rule(
+    q: &dyn Query,
+    cards: &CardTable,
+    player: PlayerId,
+    command: bool,
+    mut f: impl FnMut(ObjectId, &'static PlayRule),
+) {
+    fn walk(
+        q: &dyn Query,
+        asker: &Asker,
+        rules: &'static [PlayRule],
+        f: &mut impl FnMut(ObjectId, &'static PlayRule),
+    ) {
         for rule in rules {
             match rule {
                 PlayRule::While(condition, inner) => {
@@ -2215,11 +3596,17 @@ pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, comman
     for &id in s.battlefield().iter().chain(emblems) {
         let obj = s.obj(id);
         let card = cards.current(obj);
-        if obj.controller != player || !cards.play_rules[card.0 as usize] || q.lost_all_abilities(id) {
+        if obj.controller != player
+            || !cards.play_rules[card.0 as usize]
+            || q.lost_all_abilities(id)
+        {
             continue;
         }
         let def = cards.get(card);
-        let asker = Asker { source: id, controller: player };
+        let asker = Asker {
+            source: id,
+            controller: player,
+        };
         if def.is_room() {
             for door in def.unlocked_doors(obj.marks.doors) {
                 walk(q, &asker, door.play_rules, &mut f);
@@ -2228,6 +3615,98 @@ pub fn each_play_rule(q: &dyn Query, cards: &CardTable, player: PlayerId, comman
             walk(q, &asker, def.play_rules, &mut f);
         }
     }
+}
+
+/// The `n`th active top-of-library cast rule belonging to `source`, counting LibraryTop and LibraryTopSpells rules after
+/// `While` and Room-door expansion. The selector is stable for a decision and can be resolved before payment begins.
+fn library_cast_rule_at(
+    q: &dyn Query,
+    cards: &CardTable,
+    player: PlayerId,
+    card: ObjectId,
+    source: ObjectId,
+    n: u32,
+) -> Option<bool> {
+    let mut ordinal = 0u32;
+    let mut selected = None;
+    each_play_rule(q, cards, player, false, |candidate, rule| {
+        if candidate != source {
+            return;
+        }
+        match rule {
+            PlayRule::LibraryTop => {
+                if ordinal == n {
+                    selected = Some(true);
+                }
+                ordinal += 1;
+            }
+            PlayRule::LibraryTopSpells(allows) => {
+                if ordinal == n {
+                    if allows(
+                        q,
+                        &Asker {
+                            source,
+                            controller: player,
+                        },
+                        card,
+                    ) {
+                        selected = Some(false);
+                    }
+                }
+                ordinal += 1;
+            }
+            _ => {}
+        }
+    });
+    selected
+}
+
+fn library_cast_routes(
+    q: &dyn Query,
+    cards: &CardTable,
+    player: PlayerId,
+    card: ObjectId,
+) -> Vec<(CastPermission, bool)> {
+    let mut ordinals: Vec<(ObjectId, u32)> = Vec::new();
+    let mut routes = Vec::new();
+    each_play_rule(q, cards, player, false, |source, rule| {
+        let (life, allowed) = match rule {
+            PlayRule::LibraryTop => (true, true),
+            PlayRule::LibraryTopSpells(allows) => (
+                false,
+                allows(
+                    q,
+                    &Asker {
+                        source,
+                        controller: player,
+                    },
+                    card,
+                ),
+            ),
+            _ => return,
+        };
+        let ordinal = if let Some((_, next)) = ordinals
+            .iter_mut()
+            .find(|(candidate, _)| *candidate == source)
+        {
+            let ordinal = *next;
+            *next += 1;
+            ordinal
+        } else {
+            ordinals.push((source, 1));
+            0
+        };
+        if allowed {
+            routes.push((
+                CastPermission::LibraryTop {
+                    source,
+                    rule: ordinal,
+                },
+                life,
+            ));
+        }
+    });
+    routes
 }
 
 /// What `player`'s permanents let them do about land plays (CR 305.2) and the top of their library (CR 305.1, 601.3).
@@ -2247,7 +3726,10 @@ struct LandRules {
 
 fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
     // "Until end of turn, you may play lands and cast spells from your graveyard" (CR 305.1, 601.3): Yawgmoth's Will.
-    let mut rules = LandRules { graveyard: graveyard_play(cx, player), ..LandRules::default() };
+    let mut rules = LandRules {
+        graveyard: graveyard_play(cx, player),
+        ..LandRules::default()
+    };
     each_play_rule(cx, cx.cards(), player, false, |_, rule| match rule {
         PlayRule::ExtraLandPlays(n) => rules.extra += *n as u32,
         PlayRule::AnyNumberOfLandPlays => rules.unlimited = true,
@@ -2257,7 +3739,10 @@ fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
             rules.top_lands = true;
         }
         PlayRule::LibraryTopLands => rules.top_lands = true,
-        PlayRule::LibraryTopSpells(_) | PlayRule::NoMaximumHandSize | PlayRule::LookAtLibraryTop | PlayRule::While(..) => {}
+        PlayRule::LibraryTopSpells(_)
+        | PlayRule::NoMaximumHandSize
+        | PlayRule::LookAtLibraryTop
+        | PlayRule::While(..) => {}
     });
     rules
 }
@@ -2265,11 +3750,18 @@ fn land_rules(cx: &Cx, player: PlayerId) -> LandRules {
 /// Whether a permanent `player` controls, an emblem they have (CR 114.4), or an effect a resolved spell made for the rest
 /// of the game says they have no maximum hand size (CR 402.2).
 pub fn no_maximum_hand_size(cx: &Cx, player: PlayerId) -> bool {
-    if cx.s().effects.iter().any(|e| e.kind == EffectKind::NoMaximumHandSize && e.controller == player) {
+    if cx
+        .s()
+        .effects
+        .iter()
+        .any(|e| e.kind == EffectKind::NoMaximumHandSize && e.controller == player)
+    {
         return true;
     }
     let mut none = false;
-    each_play_rule(cx, cx.cards(), player, true, |_, rule| none |= matches!(rule, PlayRule::NoMaximumHandSize));
+    each_play_rule(cx, cx.cards(), player, true, |_, rule| {
+        none |= matches!(rule, PlayRule::NoMaximumHandSize)
+    });
     none
 }
 
@@ -2277,12 +3769,20 @@ pub fn no_maximum_hand_size(cx: &Cx, player: PlayerId) -> bool {
 /// Citadel, Mystic Forge, Case of the Locked Hothouse once solved).
 pub fn may_look_at_library_top(q: &dyn Query, cards: &CardTable, player: PlayerId) -> bool {
     let mut may = false;
-    each_play_rule(q, cards, player, false, |_, rule| may |= matches!(rule, PlayRule::LookAtLibraryTop));
+    each_play_rule(q, cards, player, false, |_, rule| {
+        may |= matches!(rule, PlayRule::LookAtLibraryTop)
+    });
     may
 }
 
 fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
-    let LandRules { extra, unlimited, graveyard: from_graveyard, top_lands: from_top, .. } = land_rules(cx, player);
+    let LandRules {
+        extra,
+        unlimited,
+        graveyard: from_graveyard,
+        top_lands: from_top,
+        ..
+    } = land_rules(cx, player);
     if !unlimited && cx.s().player(player).lands_played as u32 >= 1 + extra {
         return;
     }
@@ -2327,9 +3827,26 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
             continue;
         }
         let ways = granted.get_or_insert_with(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log));
-        for (k, &(granter, controller, way)) in ways.iter().enumerate().take(WAY_GRANTED_SLOTS as usize) {
-            if way.lands && (way.cost)(cx, &Asker { source: granter, controller }, id, player).is_some() {
-                options.push(ActionOption::on(ActionKind::PlayLand, id, granted_way(k, GRANTED_FACE_WHOLE)));
+        for (k, &(granter, controller, way)) in
+            ways.iter().enumerate().take(WAY_GRANTED_SLOTS as usize)
+        {
+            if way.lands
+                && (way.cost)(
+                    cx,
+                    &Asker {
+                        source: granter,
+                        controller,
+                    },
+                    id,
+                    player,
+                )
+                .is_some()
+            {
+                options.push(ActionOption::on(
+                    ActionKind::PlayLand,
+                    id,
+                    granted_way(k, GRANTED_FACE_WHOLE),
+                ));
             }
         }
     }
@@ -2348,7 +3865,13 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
 /// Whether a land play of `card` by `player` from where it is now would be by a permission (CR 305.1): not from the hand,
 /// and not from a graveyard or the top of a library that a rule lets the player play lands from (`LandRules`), which is the
 /// way it is played from there.
-fn played_by_permission_from(cx: &Cx, card: ObjectId, player: PlayerId, from_graveyard: bool, from_top: bool) -> bool {
+fn played_by_permission_from(
+    cx: &Cx,
+    card: ObjectId,
+    player: PlayerId,
+    from_graveyard: bool,
+    from_top: bool,
+) -> bool {
     let zone = cx.s().obj(card).zone;
     !zone.is(ZoneKind::Hand)
         && !(from_graveyard && zone == Zone::graveyard(player))
@@ -2360,11 +3883,17 @@ fn played_by_permission_from(cx: &Cx, card: ObjectId, player: PlayerId, from_gra
 /// played, it is played by one that lets it enter untapped if there is one, as one permission is taken when several would
 /// let a card be cast (`permission_for`): the land play offered is one, and entering tapped is all a permission can add to it.
 pub fn land_play_permission(cx: &Cx, card: ObjectId, player: PlayerId) -> Option<PlayPermission> {
-    let LandRules { graveyard, top_lands, .. } = land_rules(cx, player);
+    let LandRules {
+        graveyard,
+        top_lands,
+        ..
+    } = land_rules(cx, player);
     if !played_by_permission_from(cx, card, player, graveyard, top_lands) {
         return None;
     }
-    let mut by = cx.s().permissions.iter().filter(|p| p.card == card && p.player == player && p.grant.lands && permission_stands(cx, p, player));
+    let mut by = cx.s().permissions.iter().filter(|p| {
+        p.card == card && p.player == player && p.grant.lands && permission_stands(cx, p, player)
+    });
     let first = by.clone().next().copied();
     by.find(|p| !p.grant.enters_tapped).copied().or(first)
 }
@@ -2384,7 +3913,11 @@ fn cast_limit(cx: &Cx) -> Option<u8> {
             let obj = cx.s().obj(id);
             // A permanent that has lost all its abilities limits nothing (CR 613.1f).
             let limit = cx.card(obj.copy.map_or(obj.card, |c| c.card)).cast_limit;
-            if limit > 0 && cx.lost_all_abilities(id) { 0 } else { limit }
+            if limit > 0 && cx.lost_all_abilities(id) {
+                0
+            } else {
+                limit
+            }
         })
         .filter(|&n| n > 0)
         .min()
@@ -2429,7 +3962,11 @@ fn cast_only_if_met(cx: &Cx, face: &'static CardDef, asker: &Asker) -> bool {
 
 /// The ways the permanents on the battlefield give cards in graveyards to be cast (CR 604, 118.9): each with the permanent
 /// and its controller, in the order a way number counts them. Nothing is allocated while no permanent has one.
-fn granted_ways_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<(ObjectId, PlayerId, &'static GrantedWay)> {
+fn granted_ways_of(
+    cards: &CardTable,
+    s: &GameState,
+    log: &[Record],
+) -> Vec<(ObjectId, PlayerId, &'static GrantedWay)> {
     let mut ways = Vec::new();
     for &id in s.battlefield() {
         let obj = s.obj(id);
@@ -2446,7 +3983,11 @@ fn granted_ways_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<(Obj
 
 /// The permissions the permanents on the battlefield give to cast cards in exile (CR 601.3, 604.1), each with the permanent
 /// and its controller. Nothing is allocated while no permanent has one; a permanent that has lost its abilities gives none.
-fn exile_casts_of(cards: &CardTable, s: &GameState, log: &[Record]) -> Vec<(ObjectId, PlayerId, &'static ExileCast)> {
+fn exile_casts_of(
+    cards: &CardTable,
+    s: &GameState,
+    log: &[Record],
+) -> Vec<(ObjectId, PlayerId, &'static ExileCast)> {
     let mut casts = Vec::new();
     for &id in s.battlefield() {
         let obj = s.obj(id);
@@ -2472,7 +4013,17 @@ pub fn exile_cast_texts(game: &crate::Game, card: ObjectId) -> Vec<(PlayerId, &'
     let _face_up = layers::judged_face_up(s, card);
     exile_casts_of(cards, s, log)
         .into_iter()
-        .filter(|&(granter, controller, cast)| (cast.allows)(q, &Asker { source: granter, controller }, card, controller))
+        .filter(|&(granter, controller, cast)| {
+            (cast.allows)(
+                q,
+                &Asker {
+                    source: granter,
+                    controller,
+                },
+                card,
+                controller,
+            )
+        })
         .map(|(_, controller, cast)| (controller, cast.text))
         .collect()
 }
@@ -2486,18 +4037,58 @@ fn exile_cast_for(
     face: Option<CardId>,
     player: PlayerId,
 ) -> Option<(ObjectId, &'static ExileCast)> {
-    let view = face.map(|face| AsFace { cx, spell: card, face });
+    let view = face.map(|face| AsFace {
+        cx,
+        spell: card,
+        face,
+    });
     let q: &dyn Query = match &view {
         Some(view) => view,
         None => cx,
     };
-    casts.iter().find(|&&(granter, controller, c)| (c.allows)(q, &Asker { source: granter, controller }, card, player)).map(|&(granter, _, c)| (granter, c))
+    casts
+        .iter()
+        .find(|&&(granter, controller, c)| {
+            (c.allows)(
+                q,
+                &Asker {
+                    source: granter,
+                    controller,
+                },
+                card,
+                player,
+            )
+        })
+        .map(|&(granter, _, c)| (granter, c))
+}
+
+fn exile_cast_for_exact(
+    cx: &Cx,
+    card: ObjectId,
+    face: Option<CardId>,
+    player: PlayerId,
+    selected: (ObjectId, &'static ExileCast),
+) -> Option<(ObjectId, &'static ExileCast)> {
+    let (source, cast) = selected;
+    let controller = cx.s().obj(source).controller;
+    let view = face.map(|face| AsFace {
+        cx,
+        spell: card,
+        face,
+    });
+    let q: &dyn Query = view.as_ref().map_or(cx, |view| view);
+    (cast.allows)(q, &Asker { source, controller }, card, player).then_some(selected)
 }
 
 /// The permission a permanent gives `player` to cast `card`, a card in exile, as the face `face` (the card itself for
 /// none), if nothing else lets them cast it from there (CR 601.3): a permission of its own, a prepare spell's copy or a card
 /// on an Adventure. What the cast owes on top of its cost (CR 118.8) is the permission's.
-fn exile_cast_permission(cx: &Cx, card: ObjectId, face: Option<CardId>, player: PlayerId) -> Option<(ObjectId, &'static ExileCast)> {
+fn exile_cast_permission(
+    cx: &Cx,
+    card: ObjectId,
+    face: Option<CardId>,
+    player: PlayerId,
+) -> Option<(ObjectId, &'static ExileCast)> {
     let obj = cx.s().obj(card);
     if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure == Some(player) || obj.card_copy || permission_for(cx, card, player).is_some() {
         return None;
@@ -2511,8 +4102,13 @@ fn exile_cast_permission(cx: &Cx, card: ObjectId, face: Option<CardId>, player: 
 
 /// Whether the additional costs a card has (CR 118.8) could be paid, whatever way it is cast.
 fn extra_payable(cx: &Cx, id: ObjectId, player: PlayerId, def: &CardDef) -> bool {
-    def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
-        && (def.additional_choice.is_empty() || def.additional_choice.iter().any(|c| can_pay_other(cx, id, player, &c.cost)))
+    def.additional_cost
+        .is_none_or(|extra| can_pay_other(cx, id, player, &extra))
+        && (def.additional_choice.is_empty()
+            || def
+                .additional_choice
+                .iter()
+                .any(|c| can_pay_other(cx, id, player, &c.cost)))
 }
 
 /// Whether a card, or the face of it that would be cast, may be cast whenever its caster could cast an instant (CR 307.5,
@@ -2535,14 +4131,19 @@ impl Speed<'_> {
     fn whole(&self, def: &'static CardDef) -> bool {
         def.cast_as_though_flash
             || own_speed(def, self.flash)
-            || (!self.granters.is_empty() && static_rules::grants_flash(self.cx, self.granters, self.player, self.card))
+            || (!self.granters.is_empty()
+                && static_rules::grants_flash(self.cx, self.granters, self.player, self.card))
     }
 
     /// The card cast as `face`: a split card's half or a Room's door, an Adventure or an Omen, a back face, a bestowed Aura.
     fn face(&self, face: &'static CardDef) -> bool {
         own_speed(face, self.flash)
             || (!self.granters.is_empty() && {
-                let view = AsFace { cx: self.cx, spell: self.card, face: self.cx.card_id(face) };
+                let view = AsFace {
+                    cx: self.cx,
+                    spell: self.card,
+                    face: self.cx.card_id(face),
+                };
                 static_rules::grants_flash(&view, self.granters, self.player, self.card)
             })
     }
@@ -2555,7 +4156,13 @@ fn own_speed(def: &CardDef, flash: TypeSet) -> bool {
 
 /// The casts `player` may begin now (CR 601.3): `castable_ways`, less those a static ability forbids for the qualities of the
 /// spell each would cast (CR 101.2, 601.3e: judged as the face it casts).
-fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
+fn castable(
+    cx: &Cx,
+    player: PlayerId,
+    available: &std::cell::OnceCell<Available>,
+    instants: bool,
+    options: &mut Vec<ActionOption>,
+) {
     let start = options.len();
     castable_ways(cx, player, available, instants, options);
     if options.len() == start {
@@ -2569,20 +4176,41 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
     options.extend(offered.into_iter().filter(|o| {
         o.source.is_none_or(|card| {
             let _face_up = layers::judged_face_up(cx.s(), card);
-            !face_forbidden(cx, &forbidders, player, card, o.index)
+            !face_forbidden(
+                cx,
+                &forbidders,
+                player,
+                card,
+                o.cast_plan.map_or(o.index, |plan| plan.way),
+            )
         })
     }));
 }
 
 /// Whether a static ability forbids `player` to cast `card` by the way `way` (CR 101.2, 601.3), judged on the face that way
 /// casts (CR 601.3e, 709.3a, 715.3a, 712.8a).
-fn face_forbidden(cx: &Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef)], player: PlayerId, card: ObjectId, way: u8) -> bool {
+fn face_forbidden(
+    cx: &Cx,
+    forbidders: &[(ObjectId, PlayerId, &'static CardDef)],
+    player: PlayerId,
+    card: ObjectId,
+    way: u8,
+) -> bool {
     let whole = cx.card(cx.s().obj(card).card);
     let face = cast_face(whole, way);
     if std::ptr::eq(face, whole) {
         static_rules::spell_forbidden(cx, forbidders, player, card)
     } else {
-        static_rules::spell_forbidden(&AsFace { cx, spell: card, face: cx.card_id(face) }, forbidders, player, card)
+        static_rules::spell_forbidden(
+            &AsFace {
+                cx,
+                spell: card,
+                face: cx.card_id(face),
+            },
+            forbidders,
+            player,
+            card,
+        )
     }
 }
 
@@ -2598,7 +4226,12 @@ fn cast_face(whole: &'static CardDef, way: u8) -> &'static CardDef {
         (WAY_SPLIT_RIGHT, Some((_, right))) => Some(right),
         _ => None,
     };
-    whole.inset_face(way).or(back).or(bestow).or(half).unwrap_or(whole)
+    whole
+        .inset_face(way)
+        .or(back)
+        .or(bestow)
+        .or(half)
+        .unwrap_or(whole)
 }
 
 /// Any query, as a spell judged before it is cast reads the game (`AsFace`): the card has the characteristics of `face`.
@@ -2686,9 +4319,36 @@ fn asked_player(state: &GameState) -> PlayerId {
     state.agenda.iter().rev().find_map(|f| f.pending.as_ref().map(|r| r.player)).unwrap_or(state.turn.priority)
 }
 
-fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
+fn granted_way_rule(cx: &Cx, source: ObjectId, way: &'static GrantedWay) -> Option<u32> {
+    cx.cards()
+        .get(cx.chars(source).card)
+        .granted_ways
+        .iter()
+        .position(|candidate| std::ptr::eq(candidate, way))
+        .map(|i| i as u32)
+}
+
+fn exile_cast_rule(cx: &Cx, source: ObjectId, cast: &'static ExileCast) -> Option<u32> {
+    cx.cards()
+        .get(cx.chars(source).card)
+        .exile_casts
+        .iter()
+        .position(|candidate| std::ptr::eq(candidate, cast))
+        .map(|i| i as u32)
+}
+
+fn castable_ways(
+    cx: &Cx,
+    player: PlayerId,
+    available: &std::cell::OnceCell<Available>,
+    instants: bool,
+    options: &mut Vec<ActionOption>,
+) {
     let barred = cast_barred(cx, player);
-    if ZoneKinds::CAST_FROM.iter().all(|&from| barred.contains(from)) {
+    if ZoneKinds::CAST_FROM
+        .iter()
+        .all(|&from| barred.contains(from))
+    {
         return;
     }
     // Types of spell the player may cast as though they had flash (CR 307.5).
@@ -2717,338 +4377,699 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                 && obj.card_copy
                 && obj.prepared_from.is_some_and(|from| {
                     let f = cx.s().obj(from);
-                    live(cx.s(), from) && f.zone.is(ZoneKind::Battlefield) && f.prepared && f.controller == player
+                    live(cx.s(), from)
+                        && f.zone.is(ZoneKind::Battlefield)
+                        && f.prepared
+                        && f.controller == player
                 });
             let adventured = zone.is(ZoneKind::Exile) && obj.on_adventure == Some(player);
-            // Or by a permission to cast it from where it is (CR 601.3), from any zone it was granted for.
-            let permitted = !zone.is(ZoneKind::Hand) && permission_for(cx, id, player).is_some();
-            // Or by a static ability of a permanent that lets cards in exile be cast (CR 601.3, 604.1), judged on the card
-            // as itself here and on its Adventure or Omen below: one that is not otherwise castable from there.
             let def = cx.card(obj.card);
-            let by_exile_cast = zone.is(ZoneKind::Exile) && !prepared_copy && !adventured && !permitted;
-            let casts: &[(ObjectId, PlayerId, &'static ExileCast)] =
-                if by_exile_cast { exile_casts.get_or_init(|| exile_casts_of(cx.cards(), cx.s(), &cx.g.log)) } else { &[] };
-            let exile_cast = if casts.is_empty() { None } else { exile_cast_for(cx, casts, id, None, player) };
-            if by_exile_cast
-                && exile_cast.is_none()
-                && (casts.is_empty() || def.inset_faces().all(|(_, _, inset)| exile_cast_for(cx, casts, id, Some(cx.card_id(inset)), player).is_none()))
-            {
-                continue;
-            }
-            // The additional cost the permission adds to every way it casts the card by (CR 118.8, 601.2f), and whether it
-            // could be paid.
-            let additional = exile_cast.map(|(_, c)| c.additional);
-            let additional_payable = additional.is_none_or(|a| can_pay_other(cx, id, player, &a));
-            // Whether the permission that casts the card itself from here lets mana of any type pay for it (CR 609.4b).
-            let whole_any_type = exile_cast.is_some_and(|(_, c)| c.any_type);
-            let permitted = permitted || exile_cast.is_some();
-            // A land card is played, never cast (CR 305.1, 305.9), but one with an Adventure may be cast as that (CR 715.3:
-            // Lindblum, Industrial Regency's Mage Siege), and only as that.
-            let land = def.is(CardType::Land);
-            if land && def.inset_faces().next().is_none() {
-                continue;
-            }
-            let asker = Asker { source: id, controller: player };
-            if !cast_only_if_met(cx, def, &asker) {
-                continue;
-            }
-            // What a permission to cast it from here says to pay instead of its mana cost (CR 118.9).
-            let grant = if permitted { permission_for(cx, id, player).map(|p| p.grant) } else { None };
-            // Or life equal to its mana value (CR 118.9, 119.4): nothing in mana, and the life payable.
-            let life_grant = grant.is_some_and(|g| g.life_for_mana_value);
-            let instead = if life_grant { Some(ManaCost::ZERO) } else { grant.and_then(|g| g.instead) };
-            let any_type = grant.is_some_and(|g| g.any_type);
-            let more = grant.map_or(0, |g| g.more);
-            // A permission to cast it only as its Adventure (CR 715.3) casts neither the card itself nor another face of it.
-            let permitted_whole = permitted && !grant.is_some_and(|g| g.adventure_only);
-            // A cost paid "rather than" the mana cost is itself an alternative cost: no other may be used with it (CR 118.9a).
-            // Flashback a permission gives (Snapcaster Mage's) is one too, though its cost is the card's mana cost: the card
-            // may be cast from the graveyard only "by paying [cost] rather than paying its mana cost" (CR 702.34a), so not for
-            // an alternative cost of its own (Force of Will's; Snapcaster Mage's ruling).
-            let alternatives = permitted_whole && !life_grant && !grant.is_some_and(|g| g.exile_after);
-            let speed = Speed { cx, flash, granters: &flash_granters, player, card: id };
-            let instant = speed.whole(def) && !grant.is_some_and(|g| g.sorcery_speed);
-            // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard";
-            // or by a rule that lets its owner cast spells from their graveyard (Yawgmoth's Will).
-            let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
-            // Or by retrace (CR 702.81a), printed or granted: for its ordinary cost and a land card discarded. Asked only on
-            // the pass that may cast it, at its own speed or by an instant-speed way.
-            let retrace = zone.is(ZoneKind::Graveyard)
-                && own
-                && !from_graveyard
-                && cx.chars(id).has(Keyword::Retrace)
-                && can_pay_other(cx, id, player, &RETRACE);
-            let elsewhere = alternatives || from_graveyard || retrace || adventured;
-            // Whether a way of casting it from the hand is open to it here (CR 118.9, 601.3): one that names no zone is an
-            // alternative cost that may be paid whatever zone a rule or permission has the spell cast from, as Yawgmoth's
-            // Will does for Force of Will's, Daze's or web-slinging's; one whose text names the hand is not (warp, CR
-            // 702.185a). `elsewhere` is a rule or permission that has it cast from this other zone.
-            let from_elsewhere = |way: &WayDef, elsewhere: bool| way.from == ZoneKind::Hand && !way.only_from && !zone.is(ZoneKind::Hand) && elsewhere;
-            // The alternative costs static abilities give the spells the player casts (CR 118.9, 601.2b), each offered beside a
-            // cast of a face for its mana cost, from here, by whatever lets it be cast from here: as that way number, for that
-            // mana instead. None where the cast is already for an alternative cost (CR 118.9a): a permission's "without paying",
-            // "rather than", life for its mana value, or flashback.
-            let alternatives_open = !grant.is_some_and(|g| g.instead.is_some() || g.life_for_mana_value || g.exile_after);
-            let alternatives_of = |face: &'static CardDef, plain: u8| -> Vec<(u8, ManaCost)> {
-                if !alternatives_open {
-                    return Vec::new();
-                }
-                alternatives_for(cx, cx.cards(), given_alternatives.get_or_init(|| static_rules::spell_alternatives(cx)), player, id, face, plain)
-                    .into_iter()
-                    .map(|(index, (_, _, alternative))| (index, alternative.cost.mana()))
+            // Or by a permission to cast it from where it is (CR 601.3), from any zone it was granted for.
+            let standing: Vec<_> = if zone.is(ZoneKind::Hand) {
+                Vec::new()
+            } else {
+                cx.s()
+                    .permissions
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, p)| {
+                        p.card == id && p.player == player && permission_stands(cx, p, player)
+                    })
                     .collect()
             };
-            if instant == instants && !land {
-                if def.split.is_none()
+            let selected_exiles: Vec<(ObjectId, &'static ExileCast)> =
+                if zone.is(ZoneKind::Exile) && !prepared_copy && !adventured {
+                    let all =
+                        exile_casts.get_or_init(|| exile_casts_of(cx.cards(), cx.s(), &cx.g.log));
+                    all.iter()
+                        .filter_map(|&(source, _, cast)| {
+                            (exile_cast_for_exact(cx, id, None, player, (source, cast)).is_some()
+                                || def.inset_faces().any(|(_, _, face)| {
+                                    exile_cast_for_exact(
+                                        cx,
+                                        id,
+                                        Some(cx.card_id(face)),
+                                        player,
+                                        (source, cast),
+                                    )
+                                    .is_some()
+                                }))
+                            .then_some((source, cast))
+                        })
+                        .collect()
+                } else {
+                    Vec::new()
+                };
+            let mut permission_choices: Vec<(
+                Option<(usize, &PlayPermission)>,
+                Option<(ObjectId, &'static ExileCast)>,
+            )> = standing
+                .into_iter()
+                .map(|permission| (Some(permission), None))
+                .collect();
+            permission_choices.extend(selected_exiles.into_iter().map(|cast| (None, Some(cast))));
+            let intrinsic_route = adventured
+                || prepared_copy
+                || (zone.is(ZoneKind::Graveyard)
+                    && own
+                    && (faces_to_cast(def)
+                        .iter()
+                        .any(|(_, face)| face.keywords.has(Keyword::CastFromYourGraveyard))
+                        || graveyard_play(cx, player)
+                        || (cx.chars(id).has(Keyword::Retrace)
+                            && !faces_to_cast(def)
+                                .iter()
+                                .any(|(_, face)| face.keywords.has(Keyword::CastFromYourGraveyard))
+                            && !graveyard_play(cx, player))));
+            if intrinsic_route {
+                permission_choices.push((None, None));
+            }
+            if permission_choices.is_empty() {
+                permission_choices.push((None, None));
+            }
+            for (selected_permission, selected_exile) in permission_choices {
+                let permitted = selected_permission.is_some();
+                // Or by a static ability of a permanent that lets cards in exile be cast (CR 601.3, 604.1), judged on the card
+                // as itself here and on its Adventure or Omen below: one that is not otherwise castable from there.
+                let by_exile_cast =
+                    zone.is(ZoneKind::Exile) && !prepared_copy && !adventured && !permitted;
+                let casts: &[(ObjectId, PlayerId, &'static ExileCast)] = if by_exile_cast {
+                    exile_casts.get_or_init(|| exile_casts_of(cx.cards(), cx.s(), &cx.g.log))
+                } else {
+                    &[]
+                };
+                let exile_for = |face| {
+                    selected_exile.map_or_else(
+                        || exile_cast_for(cx, casts, id, face, player),
+                        |selected| exile_cast_for_exact(cx, id, face, player, selected),
+                    )
+                };
+                let exile_cast = exile_for(None);
+                if by_exile_cast
+                    && exile_cast.is_none()
+                    && (casts.is_empty()
+                        || def
+                            .inset_faces()
+                            .all(|(_, _, inset)| exile_for(Some(cx.card_id(inset))).is_none()))
+                {
+                    continue;
+                }
+                // The additional cost the permission adds to every way it casts the card by (CR 118.8, 601.2f), and whether it
+                // could be paid.
+                let additional = exile_cast.map(|(_, c)| c.additional);
+                let additional_payable =
+                    additional.is_none_or(|a| can_pay_other(cx, id, player, &a));
+                let whole_any_type = exile_cast.is_some_and(|(_, c)| c.any_type);
+                let permitted = permitted || exile_cast.is_some();
+                // A land card is played, never cast (CR 305.1, 305.9), but one with an Adventure may be cast as that (CR 715.3:
+                // Lindblum, Industrial Regency's Mage Siege), and only as that.
+                let land = def.is(CardType::Land);
+                if land && def.inset_faces().next().is_none() {
+                    continue;
+                }
+                let asker = Asker {
+                    source: id,
+                    controller: player,
+                };
+                if !cast_only_if_met(cx, def, &asker) {
+                    continue;
+                }
+                // What a permission to cast it from here says to pay instead of its mana cost (CR 118.9).
+                let grant = selected_permission.map(|(_, p)| p.grant);
+                // Or life equal to its mana value (CR 118.9, 119.4): nothing in mana, and the life payable.
+                let life_grant = grant.is_some_and(|g| g.life_for_mana_value);
+                let instead = if life_grant {
+                    Some(ManaCost::ZERO)
+                } else {
+                    grant.and_then(|g| g.instead)
+                };
+                let any_type = grant.is_some_and(|g| g.any_type);
+                let more = grant.map_or(0, |g| g.more);
+                // A permission to cast it only as its Adventure (CR 715.3) casts neither the card itself nor another face of it.
+                let permitted_whole = permitted && !grant.is_some_and(|g| g.adventure_only);
+                // A cost paid "rather than" the mana cost is itself an alternative cost: no other may be used with it (CR 118.9a).
+                // Flashback a permission gives (Snapcaster Mage's) is one too, though its cost is the card's mana cost: the card
+                // may be cast from the graveyard only "by paying [cost] rather than paying its mana cost" (CR 702.34a), so not for
+                // an alternative cost of its own (Force of Will's; Snapcaster Mage's ruling).
+                // A selected permission that names an alternative payment (including one equal to the printed cost)
+                // is itself the alternative cost. Other standing permissions are evaluated in separate loop passes.
+                let alternatives = permitted_whole
+                    && !life_grant
+                    && !grant.is_some_and(|g| g.instead.is_some() || g.exile_after);
+                let speed = Speed {
+                    cx,
+                    flash,
+                    granters: &flash_granters,
+                    player,
+                    card: id,
+                };
+                let instant = speed.whole(def) && !grant.is_some_and(|g| g.sorcery_speed);
+                // Or by the card's own say-so, for its ordinary cost (CR 113.6b): "You may cast this card from your graveyard";
+                // or by a rule that lets its owner cast spells from their graveyard (Yawgmoth's Will).
+                let from_graveyard = zone.is(ZoneKind::Graveyard)
+                    && own
+                    && (def.keywords.has(Keyword::CastFromYourGraveyard)
+                        || graveyard_play(cx, player));
+                // Or by retrace (CR 702.81a), printed or granted: for its ordinary cost and a land card discarded. Asked only on
+                // the pass that may cast it, at its own speed or by an instant-speed way.
+                let retrace = zone.is(ZoneKind::Graveyard)
+                    && own
+                    && !from_graveyard
+                    && cx.chars(id).has(Keyword::Retrace)
+                    && can_pay_other(cx, id, player, &RETRACE);
+                let permission_route = if zone.is(ZoneKind::Hand) {
+                    CastPermission::Hand
+                } else if let Some((index, _)) = selected_permission {
+                    CastPermission::PlayPermission {
+                        index: index as u32,
+                    }
+                } else if adventured {
+                    CastPermission::AdventureExile
+                } else if prepared_copy {
+                    CastPermission::PreparedCopy {
+                        source: obj.prepared_from.expect("prepared copy has its source"),
+                    }
+                } else if zone.is(ZoneKind::Graveyard)
+                    && def.keywords.has(Keyword::CastFromYourGraveyard)
+                {
+                    CastPermission::PrintedGraveyard
+                } else if zone.is(ZoneKind::Graveyard) && graveyard_play(cx, player) {
+                    CastPermission::GraveyardPlayRule
+                } else if retrace {
+                    CastPermission::Retrace
+                } else if let Some((source, cast)) = exile_cast {
+                    CastPermission::ExileCast {
+                        source,
+                        rule: exile_cast_rule(cx, source, cast).unwrap_or(0),
+                    }
+                } else {
+                    CastPermission::Hand
+                };
+                let elsewhere = alternatives || from_graveyard || retrace || adventured;
+                // Whether a way of casting it from the hand is open to it here (CR 118.9, 601.3): one that names no zone is an
+                // alternative cost that may be paid whatever zone a rule or permission has the spell cast from, as Yawgmoth's
+                // Will does for Force of Will's, Daze's or web-slinging's; one whose text names the hand is not (warp, CR
+                // 702.185a). `elsewhere` is a rule or permission that has it cast from this other zone.
+                let from_elsewhere = |way: &WayDef, elsewhere: bool| {
+                    way.from == ZoneKind::Hand
+                        && !way.only_from
+                        && !zone.is(ZoneKind::Hand)
+                        && elsewhere
+                };
+                if instant == instants && !land {
+                    if def.split.is_none()
                     && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted_whole || from_graveyard || retrace)
                     && (!life_grant || can_pay_other(cx, id, player, &life_for_mana_value(def)))
                     && additional_payable
                     && def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
                     && (def.additional_choice.is_empty()
                         || def.additional_choice.iter().any(|c| can_pay_other(cx, id, player, &c.cost)))
-                {
-                    // A card with no mana cost is cast only for an alternative cost (CR 118.6a): one the permission names, life
-                    // equal to its mana value (0) included, or one a static ability gives.
-                    let plain = (def.has_cost || instead.is_some()).then_some((0, instead.unwrap_or(def.cost)));
-                    for (index, base) in plain.into_iter().chain(alternatives_of(def, 0)) {
+                    {
                         let a = available.get_or_init(|| self::available(cx, player));
                         let covered = |targets: &[Target]| {
-                            let mut least = least_cost(cx, a, player, id, def, base, targets);
+                            let mut least = least_cost(
+                                cx,
+                                a,
+                                player,
+                                id,
+                                def,
+                                instead.unwrap_or(def.cost),
+                                targets,
+                            );
                             least.generic = least.generic.saturating_add(more);
                             if let Some(additional) = additional {
                                 least = add_cost(least, additional.mana);
                             }
-                            // Mana of any type pays every symbol of it (CR 609.4b), by the permission of its own or the
-                            // permanent's that casts it from exile.
-                            covers_total(cx, a, player, id, def, least, 0, any_type || whole_any_type) && added_life_payable(cx, a, player, id, def, targets)
+                            if any_type {
+                                // Mana of any type pays every symbol of it (CR 609.4b).
+                                least = ManaCost {
+                                    generic: least.mana_value().min(255) as u8,
+                                    ..ManaCost::ZERO
+                                };
+                            }
+                            covers_total(cx, a, player, id, def, least, 0)
+                                && added_life_payable(cx, a, player, id, def, targets)
                         };
-                        let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
+                        option.cast_plan = Some(CastPlan {
+                            way: 0,
+                            permission: permission_route,
+                            cost: if life_grant {
+                                CastCostChoice::LifeForManaValue
+                            } else {
+                                CastCostChoice::Printed
+                            },
+                        });
                         if offer_costed(cx, a, &asker, def, &mut option, covered) {
                             options.push(option);
                         }
                     }
-                }
-                for (n, way) in def.ways.iter().enumerate() {
-                    // Sneak and the like are offered below, at instant speed whatever the card is (CR 702.190a).
-                    if way.instant_speed {
-                        continue;
+                    for (n, way) in def.ways.iter().enumerate() {
+                        // Sneak and the like are offered below, at instant speed whatever the card is (CR 702.190a).
+                        if way.instant_speed {
+                            continue;
+                        }
+                        if (way.from != zone.kind() && !from_elsewhere(way, elsewhere)) || !own {
+                            continue;
+                        }
+                        if let Some(condition) = way.condition
+                            && !condition(cx, &asker)
+                        {
+                            continue;
+                        }
+                        // An additional cost is owed with every way of casting it (CR 118.8, 601.2f).
+                        if !can_pay_other(cx, id, player, &way.cost)
+                            || !extra_payable(cx, id, player, def)
+                            || !additional_payable
+                        {
+                            continue;
+                        }
+                        let a = available.get_or_init(|| self::available(cx, player));
+                        if !way_covered(
+                            cx,
+                            a,
+                            player,
+                            id,
+                            def,
+                            &additional.map_or(way.cost, |extra| way.cost.and(extra)),
+                        ) {
+                            continue;
+                        }
+                        let way_route = if zone.is(ZoneKind::Hand) {
+                            CastPermission::Hand
+                        } else if own && zone.player == player && way.from == zone.kind() {
+                            CastPermission::PrintedWay { way: n as u32 }
+                        } else {
+                            permission_route
+                        };
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
+                        option.cast_plan = Some(CastPlan {
+                            way: (n + 1) as u8,
+                            permission: way_route,
+                            cost: CastCostChoice::PrintedWay { way: n as u32 },
+                        });
+                        if offer_spell(cx, &asker, def, &mut option) {
+                            options.push(option);
+                        }
                     }
-                    // From its own zone of the caster's (the hand, their graveyard), or from wherever a permission lets the card
-                    // be cast, whoever owns it: a permission to cast leaves the card's alternative costs open (CR 601.2b, 118.9).
-                    if !(own && way.from == zone.kind()) && !from_elsewhere(way, elsewhere) {
-                        continue;
-                    }
-                    if let Some(condition) = way.condition
-                        && !condition(cx, &asker)
+                    // Overload (CR 702.96a): from the hand, for its overload cost. It has no targets, so it is offered
+                    // whether or not there is anything to target.
+                    if let Some(overload) = def.overload
+                        && own
+                        && zone.is(ZoneKind::Hand)
                     {
-                        continue;
-                    }
-                    // An additional cost is owed with every way of casting it (CR 118.8, 601.2f).
-                    if !can_pay_other(cx, id, player, &way.cost) || !extra_payable(cx, id, player, def) || !additional_payable {
-                        continue;
-                    }
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra)), any_type || whole_any_type) {
-                        continue;
-                    }
-                    let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
-                    if offer_spell(cx, &asker, def, &mut option) {
-                        options.push(option);
-                    }
-                }
-                // Overload (CR 702.96a): from the hand, for its overload cost. It has no targets, so it is offered
-                // whether or not there is anything to target.
-                if let Some(overload) = def.overload
-                    && own
-                    && zone.is(ZoneKind::Hand)
-                {
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    let cost = least_cost(cx, a, player, id, def, overload, &[]);
-                    if covers_total(cx, a, player, id, def, cost, 0, false) {
-                        options.push(ActionOption::on(ActionKind::CastSpell, id, WAY_OVERLOAD));
-                    }
-                }
-            }
-            // An alternative cost that may be used whenever an instant could be cast, whatever the card is (sneak, CR 702.190a).
-            // From another zone by a permission (sneak names no zone), unless the permission says when (CR 601.3).
-            if instants && !land {
-                for (n, way) in def.ways.iter().enumerate() {
-                    if !way.instant_speed {
-                        continue;
-                    }
-                    if !(own && way.from == zone.kind()) && !from_elsewhere(way, elsewhere && !grant.is_some_and(|g| g.sorcery_speed)) {
-                        continue;
-                    }
-                    if let Some(condition) = way.condition
-                        && !condition(cx, &asker)
-                    {
-                        continue;
-                    }
-                    if !can_pay_other(cx, id, player, &way.cost) || !extra_payable(cx, id, player, def) || !additional_payable {
-                        continue;
-                    }
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra)), any_type || whole_any_type) {
-                        continue;
-                    }
-                    let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
-                    if offer_spell(cx, &asker, def, &mut option) {
-                        options.push(option);
-                    }
-                }
-            }
-            // CR 118.9 and 601.3c: a granted alternative cost can supply timing, but a zone-neutral one
-            // never supplies permission to cast from a zone. Evaluate both on the face being cast.
-            let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log));
-            if !ways.is_empty() {
-                for (face_way, face_def) in faces_to_cast(def).into_iter().filter(|&(f, _)| !(land && f == GRANTED_FACE_WHOLE)) {
-                    let normal_permission = grant.is_none_or(|g| g.instead.is_none() && !g.life_for_mana_value && !g.exile_after
-                        && (!g.adventure_only || face_way == GRANTED_FACE_ADVENTURE));
-                    let face_exile = if by_exile_cast {
-                        exile_cast_for(cx, casts, id, (face_way != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def)), player)
-                    } else { None };
-                    let allowed = zone.is(ZoneKind::Hand) || from_graveyard || retrace
-                        || (adventured && face_way == GRANTED_FACE_WHOLE)
-                        || (permitted && normal_permission && (!by_exile_cast || face_exile.is_some()));
-                    let mut extra = face_exile.map_or(Cost::NONE, |(_, c)| c.additional);
-                    if retrace && !from_graveyard && !(permitted && normal_permission) {
-                        extra = extra.and(RETRACE);
-                    }
-                    let face_instant = if face_way == GRANTED_FACE_WHOLE { instant } else { speed.face(face_def) };
-                    offer_granted_casts(cx, player, available, instants, options, ways, id, face_way, face_def,
-                        face_instant, allowed, grant.is_some_and(|g| g.sorcery_speed), extra,
-                        if normal_permission { more } else { 0 }, normal_permission && any_type);
-                }
-            }
-            // What a face cast by the permission costs (CR 118.9, 601.2f): what it names instead, or life equal to the face's
-            // mana value, and what it adds; the face's own mana cost from the hand.
-            // `alternative` is the mana an alternative cost a static ability gives says to pay instead (CR 118.9).
-            let face_covered = |face: &CardDef, by_permission: Option<Option<&'static ExileCast>>, alternative: Option<ManaCost>| {
-                let a = available.get_or_init(|| self::available(cx, player));
-                let Some(by_exile_cast) = by_permission else {
-                    return a.covers_for(&least_cost(cx, a, player, id, face, alternative.unwrap_or(face.cost), &[]), &spell_kind(cx, a, id, face));
-                };
-                if life_grant && !can_pay_other(cx, id, player, &life_for_mana_value(face)) {
-                    return false;
-                }
-                let mut least = least_cost(cx, a, player, id, face, alternative.or(instead).unwrap_or(face.cost), &[]);
-                least.generic = least.generic.saturating_add(more);
-                if let Some(c) = by_exile_cast {
-                    least = add_cost(least, c.additional.mana);
-                }
-                if any_type || by_exile_cast.is_some_and(|c| c.any_type) {
-                    least = least.paid_with_any_type();
-                }
-                a.covers_for(&least, &spell_kind(cx, a, id, face))
-            };
-            // Whether a permission casts this face from here, and what it adds (CR 118.8): a permission of the card's own for
-            // the card, or a permanent's to cast cards from exile, judged on the face (CR 709.3a, 712.8a), whose additional
-            // cost has to be payable.
-            let face_permission = |face: &'static CardDef| -> Option<Option<&'static ExileCast>> {
-                if zone.is(ZoneKind::Hand) {
-                    None
-                } else if by_exile_cast {
-                    match exile_cast_for(cx, casts, id, Some(cx.card_id(face)), player) {
-                        Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(Some(c)),
-                        _ => None,
-                    }
-                } else if permitted_whole {
-                    Some(None)
-                } else {
-                    None
-                }
-            };
-            let face_speed = |face: &'static CardDef| speed.face(face) && !grant.is_some_and(|g| g.sorcery_speed);
-            // A split card's halves (CR 709.3): each cast for its own cost at its own speed, from the hand, or for an
-            // aftermath half (CR 702.127a) from the graveyard only; or, but for an aftermath half, from wherever a permission
-            // lets the card be cast (CR 601.3, 709.3).
-            if let Some((left, right)) = def.split {
-                for (way, half) in [(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)] {
-                    let from = if half.aftermath { ZoneKind::Graveyard } else { ZoneKind::Hand };
-                    let by_permission = if half.aftermath { None } else { face_permission(half) };
-                    if (!(zone.is(from) && own) && by_permission.is_none()) || face_speed(half) != instants {
-                        continue;
-                    }
-                    let alternatives = alternatives_of(half, way).into_iter().map(|(index, mana)| (index, Some(mana)));
-                    for (index, alternative) in std::iter::once((way, None)).chain(alternatives) {
-                        let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
-                        if face_covered(half, by_permission, alternative) && offer_spell(cx, &asker, half, &mut option) {
+                        let a = available.get_or_init(|| self::available(cx, player));
+                        let cost = least_cost(cx, a, player, id, def, overload, &[]);
+                        if covers_total(cx, a, player, id, def, cost, 0) {
+                            let mut option =
+                                ActionOption::on(ActionKind::CastSpell, id, WAY_OVERLOAD);
+                            option.cast_plan = Some(CastPlan {
+                                way: WAY_OVERLOAD,
+                                permission: CastPermission::Hand,
+                                cost: CastCostChoice::Overload,
+                            });
                             options.push(option);
                         }
                     }
                 }
-            }
-            // A modal double-faced card's back face, from the hand or wherever a permission lets the card be cast (CR 712.11b,
-            // 601.3), at the speed of the back face's own type (CR 712.2, 712.8a): the back face of a transforming card has no
-            // mana cost and is not cast.
-            if let Some(back) = def.back
-                && back.has_cost
-                && face_speed(back) == instants
-                && let back_by_permission = face_permission(back)
-                && (zone.is(ZoneKind::Hand) || back_by_permission.is_some())
-            {
-                let alternatives = alternatives_of(back, WAY_BACK_FACE).into_iter().map(|(index, mana)| (index, Some(mana)));
-                for (index, alternative) in std::iter::once((WAY_BACK_FACE, None)).chain(alternatives) {
-                    let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
-                    if face_covered(back, back_by_permission, alternative) && offer_spell(cx, &asker, back, &mut option) {
+                // An alternative cost that may be used whenever an instant could be cast, whatever the card is (sneak, CR 702.190a).
+                // From another zone by a permission (sneak names no zone), unless the permission says when (CR 601.3).
+                if instants && !land {
+                    for (n, way) in def.ways.iter().enumerate() {
+                        if !way.instant_speed || !own {
+                            continue;
+                        }
+                        if way.from != zone.kind()
+                            && !from_elsewhere(
+                                way,
+                                elsewhere && !grant.is_some_and(|g| g.sorcery_speed),
+                            )
+                        {
+                            continue;
+                        }
+                        if let Some(condition) = way.condition
+                            && !condition(cx, &asker)
+                        {
+                            continue;
+                        }
+                        if !can_pay_other(cx, id, player, &way.cost)
+                            || !extra_payable(cx, id, player, def)
+                            || !additional_payable
+                        {
+                            continue;
+                        }
+                        let a = available.get_or_init(|| self::available(cx, player));
+                        if !way_covered(
+                            cx,
+                            a,
+                            player,
+                            id,
+                            def,
+                            &additional.map_or(way.cost, |extra| way.cost.and(extra)),
+                        ) {
+                            continue;
+                        }
+                        let way_route = if zone.is(ZoneKind::Hand) {
+                            CastPermission::Hand
+                        } else if own && zone.player == player && way.from == zone.kind() {
+                            CastPermission::PrintedWay { way: n as u32 }
+                        } else {
+                            permission_route
+                        };
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
+                        option.cast_plan = Some(CastPlan {
+                            way: (n + 1) as u8,
+                            permission: way_route,
+                            cost: CastCostChoice::PrintedWay { way: n as u32 },
+                        });
+                        if offer_spell(cx, &asker, def, &mut option) {
+                            options.push(option);
+                        }
+                    }
+                }
+                // CR 118.9 and 601.3c: a granted alternative cost can supply timing, but a zone-neutral one
+                // never supplies permission to cast from a zone. Evaluate both on the face being cast.
+                let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log));
+                if !ways.is_empty() {
+                    for (face_way, face_def) in faces_to_cast(def)
+                        .into_iter()
+                        .filter(|&(f, _)| !(land && f == GRANTED_FACE_WHOLE))
+                    {
+                        let normal_permission = grant.is_none_or(|g| {
+                            g.instead.is_none()
+                                && !g.life_for_mana_value
+                                && !g.exile_after
+                                && (!g.adventure_only || face_way == GRANTED_FACE_ADVENTURE)
+                        });
+                        let face_exile = if by_exile_cast {
+                            exile_for(
+                                (face_way != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def)),
+                            )
+                        } else {
+                            None
+                        };
+                        let allowed = zone.is(ZoneKind::Hand)
+                            || from_graveyard
+                            || retrace
+                            || (adventured && face_way == GRANTED_FACE_WHOLE)
+                            || (permitted
+                                && normal_permission
+                                && (!by_exile_cast || face_exile.is_some()));
+                        let mut extra = face_exile.map_or(Cost::NONE, |(_, c)| c.additional);
+                        if retrace && !from_graveyard && !(permitted && normal_permission) {
+                            extra = extra.and(RETRACE);
+                        }
+                        let face_instant = if face_way == GRANTED_FACE_WHOLE {
+                            instant
+                        } else {
+                            speed.face(face_def)
+                        };
+                        offer_granted_casts(
+                            cx,
+                            player,
+                            available,
+                            instants,
+                            options,
+                            ways,
+                            id,
+                            face_way,
+                            face_def,
+                            face_instant,
+                            allowed,
+                            grant.is_some_and(|g| g.sorcery_speed),
+                            extra,
+                            if normal_permission { more } else { 0 },
+                            normal_permission && any_type,
+                            permission_route,
+                        );
+                    }
+                }
+                // What a face cast by the permission costs (CR 118.9, 601.2f): what it names instead, or life equal to the face's
+                // mana value, and what it adds; the face's own mana cost from the hand.
+                let face_covered = |face: &CardDef, by_permission: Option<Option<Cost>>| {
+                    let a = available.get_or_init(|| self::available(cx, player));
+                    let Some(additional) = by_permission else {
+                        return a.covers_for(
+                            &least_cost(cx, a, player, id, face, face.cost, &[]),
+                            &spell_kind(cx, a, id, face),
+                        );
+                    };
+                    if life_grant && !can_pay_other(cx, id, player, &life_for_mana_value(face)) {
+                        return false;
+                    }
+                    let mut least =
+                        least_cost(cx, a, player, id, face, instead.unwrap_or(face.cost), &[]);
+                    least.generic = least.generic.saturating_add(more);
+                    if let Some(additional) = additional {
+                        least = add_cost(least, additional.mana);
+                    }
+                    if any_type {
+                        least = ManaCost {
+                            generic: least.mana_value().min(255) as u8,
+                            ..ManaCost::ZERO
+                        };
+                    }
+                    a.covers_for(&least, &spell_kind(cx, a, id, face))
+                };
+                // Whether a permission casts this face from here, and what it adds (CR 118.8): a permission of the card's own for
+                // the card, or a permanent's to cast cards from exile, judged on the face (CR 709.3a, 712.8a), whose additional
+                // cost has to be payable.
+                let face_permission = |face: &'static CardDef| -> Option<Option<Cost>> {
+                    if zone.is(ZoneKind::Hand) {
+                        None
+                    } else if by_exile_cast {
+                        match exile_for(Some(cx.card_id(face))) {
+                            Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => {
+                                Some(Some(c.additional))
+                            }
+                            _ => None,
+                        }
+                    } else if permitted_whole
+                        || from_graveyard
+                        || (zone.is(ZoneKind::Graveyard)
+                            && own
+                            && (face.keywords.has(Keyword::CastFromYourGraveyard)
+                                || graveyard_play(cx, player)))
+                        || retrace
+                        || (adventured && std::ptr::eq(face, def))
+                        || (prepared_copy && std::ptr::eq(face, def))
+                    {
+                        Some(None)
+                    } else {
+                        None
+                    }
+                };
+                let face_permission_route = |face: &'static CardDef| -> Option<CastPermission> {
+                    if zone.is(ZoneKind::Hand) {
+                        Some(CastPermission::Hand)
+                    } else if let Some((index, _)) = selected_permission {
+                        Some(CastPermission::PlayPermission {
+                            index: index as u32,
+                        })
+                    } else if adventured && std::ptr::eq(face, def) {
+                        Some(CastPermission::AdventureExile)
+                    } else if prepared_copy && std::ptr::eq(face, def) {
+                        Some(CastPermission::PreparedCopy {
+                            source: obj.prepared_from.expect("prepared copy has its source"),
+                        })
+                    } else if zone.is(ZoneKind::Graveyard) && face.aftermath {
+                        Some(CastPermission::Aftermath)
+                    } else if zone.is(ZoneKind::Graveyard)
+                        && own
+                        && (face.keywords.has(Keyword::CastFromYourGraveyard)
+                            || def.keywords.has(Keyword::CastFromYourGraveyard))
+                    {
+                        Some(CastPermission::PrintedGraveyard)
+                    } else if zone.is(ZoneKind::Graveyard) && graveyard_play(cx, player) {
+                        Some(CastPermission::GraveyardPlayRule)
+                    } else if retrace {
+                        Some(CastPermission::Retrace)
+                    } else if by_exile_cast {
+                        exile_for(Some(cx.card_id(face))).and_then(|(source, cast)| {
+                            Some(CastPermission::ExileCast {
+                                source,
+                                rule: exile_cast_rule(cx, source, cast)?,
+                            })
+                        })
+                    } else {
+                        None
+                    }
+                };
+                let face_speed = |face: &'static CardDef| {
+                    speed.face(face) && !grant.is_some_and(|g| g.sorcery_speed)
+                };
+                // A face cast by this permission is paid for as the permission says: life equal to the face's mana value
+                // (Inside Information), rather than the mana cost the plan otherwise carries (CR 118.9, 119.4).
+                let face_cost = |route: CastPermission| {
+                    if life_grant && matches!(route, CastPermission::PlayPermission { .. }) {
+                        CastCostChoice::LifeForManaValue
+                    } else {
+                        CastCostChoice::Printed
+                    }
+                };
+                // A split card's halves (CR 709.3): each cast for its own cost at its own speed, from the hand, or for an
+                // aftermath half (CR 702.127a) from the graveyard only; or, but for an aftermath half, from wherever a permission
+                // lets the card be cast (CR 601.3, 709.3).
+                if let Some((left, right)) = def.split {
+                    for (way, half) in [(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)] {
+                        let from = if half.aftermath {
+                            ZoneKind::Graveyard
+                        } else {
+                            ZoneKind::Hand
+                        };
+                        let by_permission = if half.aftermath {
+                            None
+                        } else {
+                            face_permission(half)
+                        };
+                        if (!(zone.is(from) && own) && by_permission.is_none())
+                            || face_speed(half) != instants
+                        {
+                            continue;
+                        }
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
+                        let route = face_permission_route(half).unwrap_or(permission_route);
+                        option.cast_plan = Some(CastPlan {
+                            way,
+                            permission: route,
+                            cost: face_cost(route),
+                        });
+                        if face_covered(half, by_permission)
+                            && offer_spell(cx, &asker, half, &mut option)
+                        {
+                            options.push(option);
+                        }
+                    }
+                }
+                // A modal double-faced card's back face, from the hand or wherever a permission lets the card be cast (CR 712.11b,
+                // 601.3), at the speed of the back face's own type (CR 712.2, 712.8a): the back face of a transforming card has no
+                // mana cost and is not cast.
+                if let Some(back) = def.back
+                    && back.has_cost
+                    && face_speed(back) == instants
+                    && let back_by_permission = face_permission(back)
+                    && (zone.is(ZoneKind::Hand) || back_by_permission.is_some())
+                {
+                    let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
+                    let route = face_permission_route(back).unwrap_or(permission_route);
+                    option.cast_plan = Some(CastPlan {
+                        way: WAY_BACK_FACE,
+                        permission: route,
+                        cost: face_cost(route),
+                    });
+                    if face_covered(back, back_by_permission)
+                        && offer_spell(cx, &asker, back, &mut option)
+                    {
                         options.push(option);
                     }
                 }
-            }
-            // Bestow (CR 702.103a): from the hand, as the Aura it becomes, which needs a creature to enchant (CR 601.2c).
-            if (zone.is(ZoneKind::Hand) || (zone.is(ZoneKind::Graveyard) && own && def.bestow_from_graveyard))
-                && let Some(bestow) = def.bestow
-                && speed.face(bestow) == instants
-                && bestow.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
-            {
-                let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BESTOW);
-                if {
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    a.covers_for(&least_cost(cx, a, player, id, bestow, bestow.cost, &[]), &spell_kind(cx, a, id, bestow))
-                } && offer_spell(cx, &asker, bestow, &mut option)
+                // Bestow (CR 702.103a): from the hand, as the Aura it becomes, which needs a creature to enchant (CR 601.2c).
+                if (zone.is(ZoneKind::Hand)
+                    || (zone.is(ZoneKind::Graveyard) && own && def.bestow_from_graveyard))
+                    && let Some(bestow) = def.bestow
+                    && speed.face(bestow) == instants
+                    && bestow
+                        .additional_cost
+                        .is_none_or(|extra| can_pay_other(cx, id, player, &extra))
                 {
-                    options.push(option);
+                    let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BESTOW);
+                    option.cast_plan = Some(CastPlan {
+                        way: WAY_BESTOW,
+                        permission: if zone.is(ZoneKind::Hand) {
+                            CastPermission::Hand
+                        } else {
+                            CastPermission::BestowGraveyard
+                        },
+                        cost: CastCostChoice::Printed,
+                    });
+                    if {
+                        let a = available.get_or_init(|| self::available(cx, player));
+                        a.covers_for(
+                            &least_cost(cx, a, player, id, bestow, bestow.cost, &[]),
+                            &spell_kind(cx, a, id, bestow),
+                        )
+                    } && offer_spell(cx, &asker, bestow, &mut option)
+                    {
+                        options.push(option);
+                    }
                 }
-            }
-            // Its Adventure or its Omen (CR 715.3, 720.3): wherever the card itself may be cast - from the hand, or from
-            // elsewhere by a permission or by the card's or an effect's say-so (CR 601.3), for what that permission says to
-            // pay - but not by the permission an Adventure gives a card it exiled (CR 715.3d). At the speed of that face's
-            // own type, and judged by that face alone (CR 715.3a, 720.3a).
-            let from_graveyard = zone.is(ZoneKind::Graveyard) && own && (def.keywords.has(Keyword::CastFromYourGraveyard) || graveyard_play(cx, player));
-            if zone.is(ZoneKind::Hand) || permitted || from_graveyard || by_exile_cast {
-                for (way, _, inset) in def.inset_faces() {
-                    if permitted && !zone.is(ZoneKind::Hand) && !from_graveyard && grant.is_some_and(|g| g.adventure_only) && way != WAY_ADVENTURE {
-                        continue;
-                    }
-                    if life_grant && !from_graveyard && !can_pay_other(cx, id, player, &life_for_mana_value(inset)) {
-                        continue;
-                    }
-                    let face_instant = speed.face(inset) && !grant.is_some_and(|g| g.sorcery_speed);
-                    if face_instant != instants {
-                        continue;
-                    }
-                    // A permanent's permission to cast from exile is judged on the face (CR 715.3a, 720.3a).
-                    let face_exile_cast = if by_exile_cast {
-                        match exile_cast_for(cx, casts, id, Some(cx.card_id(inset)), player) {
-                            Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(c),
-                            _ => continue,
+                // Its Adventure or its Omen (CR 715.3, 720.3): wherever the card itself may be cast - from the hand, or from
+                // elsewhere by a permission or by the card's or an effect's say-so (CR 601.3), for what that permission says to
+                // pay - but not by the permission an Adventure gives a card it exiled (CR 715.3d). At the speed of that face's
+                // own type, and judged by that face alone (CR 715.3a, 720.3a).
+                let from_graveyard = zone.is(ZoneKind::Graveyard)
+                    && own
+                    && (def.keywords.has(Keyword::CastFromYourGraveyard)
+                        || graveyard_play(cx, player));
+                if zone.is(ZoneKind::Hand) || permitted || from_graveyard || by_exile_cast {
+                    for (way, _, inset) in def.inset_faces() {
+                        if permitted
+                            && !zone.is(ZoneKind::Hand)
+                            && !from_graveyard
+                            && grant.is_some_and(|g| g.adventure_only)
+                            && way != WAY_ADVENTURE
+                        {
+                            continue;
                         }
-                    } else {
-                        None
-                    };
-                    let alternatives = alternatives_of(inset, way).into_iter().map(|(index, mana)| (index, Some(mana)));
-                    for (index, alternative) in std::iter::once((way, None)).chain(alternatives) {
-                        let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+                        if life_grant
+                            && !from_graveyard
+                            && !can_pay_other(cx, id, player, &life_for_mana_value(inset))
+                        {
+                            continue;
+                        }
+                        let face_instant =
+                            speed.face(inset) && !grant.is_some_and(|g| g.sorcery_speed);
+                        if face_instant != instants {
+                            continue;
+                        }
+                        // A permanent's permission to cast from exile is judged on the face (CR 715.3a, 720.3a).
+                        let face_additional = if by_exile_cast {
+                            match exile_for(Some(cx.card_id(inset))) {
+                                Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => {
+                                    Some(c.additional)
+                                }
+                                _ => continue,
+                            }
+                        } else {
+                            None
+                        };
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
+                        let face_route = if by_exile_cast {
+                            exile_for(Some(cx.card_id(inset))).and_then(|(source, cast)| {
+                                Some(CastPermission::ExileCast {
+                                    source,
+                                    rule: exile_cast_rule(cx, source, cast)?,
+                                })
+                            })
+                        } else {
+                            face_permission_route(inset)
+                        };
+                        option.cast_plan = Some(CastPlan {
+                            way,
+                            permission: face_route.unwrap_or(permission_route),
+                            cost: face_cost(face_route.unwrap_or(permission_route)),
+                        });
                         if {
                             let a = available.get_or_init(|| self::available(cx, player));
-                            let mut least = least_cost(cx, a, player, id, inset, alternative.or(instead).unwrap_or(inset.cost), &[]);
+                            let mut least = least_cost(
+                                cx,
+                                a,
+                                player,
+                                id,
+                                inset,
+                                instead.unwrap_or(inset.cost),
+                                &[],
+                            );
                             least.generic = least.generic.saturating_add(more);
-                            if let Some(c) = face_exile_cast {
-                                least = add_cost(least, c.additional.mana);
+                            if let Some(additional) = face_additional {
+                                least = add_cost(least, additional.mana);
                             }
-                            if any_type || face_exile_cast.is_some_and(|c| c.any_type) {
+                            if any_type {
                                 // Mana of any type pays every symbol of it (CR 609.4b).
-                                least = least.paid_with_any_type();
+                                least = ManaCost {
+                                    generic: least.mana_value().min(255) as u8,
+                                    ..ManaCost::ZERO
+                                };
                             }
                             a.covers_for(&least, &spell_kind(cx, a, id, inset))
                         } && offer_spell(cx, &asker, inset, &mut option)
@@ -3066,40 +5087,88 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
         && let Some(&id) = cx.s().zone(Zone::library(player)).first()
     {
         let def = cx.card(cx.s().obj(id).card);
-        let mut allowed = false;
-        each_play_rule(cx, cx.cards(), player, false, |source, rule| {
-            allowed |= matches!(rule, PlayRule::LibraryTopSpells(f) if f(cx, &Asker { source, controller: player }, id))
-        });
-        let speed = Speed { cx, flash, granters: &flash_granters, player, card: id };
+        let whole_routes: Vec<_> = library_cast_routes(cx, cx.cards(), player, id);
+        let spell_routes: Vec<_> = whole_routes
+            .iter()
+            .filter(|(_, life)| !life)
+            .map(|(route, _)| *route)
+            .collect();
+        let speed = Speed {
+            cx,
+            flash,
+            granters: &flash_granters,
+            player,
+            card: id,
+        };
         let instant = speed.whole(def);
         let ways = granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log));
         if !ways.is_empty() {
-            for (face_way, face_def) in faces_to_cast(def).into_iter().filter(|&(_, f)| !f.is(CardType::Land)) {
+            for (face_way, face_def) in faces_to_cast(def)
+                .into_iter()
+                .filter(|&(_, f)| !f.is(CardType::Land))
+            {
                 let face_id = cx.card_id(face_def);
-                let view = AsFace { cx, spell: id, face: face_id };
-                let q: &dyn Query = if face_way == GRANTED_FACE_WHOLE { cx } else { &view };
-                let mut face_allowed = false;
-                each_play_rule(q, cx.cards(), player, false, |source, rule| {
-                    face_allowed |= matches!(rule, PlayRule::LibraryTopSpells(f) if f(q, &Asker { source, controller: player }, id));
-                });
-                offer_granted_casts(cx, player, available, instants, options, ways, id, face_way, face_def,
-                    speed.face(face_def), face_allowed, false, Cost::NONE, 0, false);
+                let view = AsFace {
+                    cx,
+                    spell: id,
+                    face: face_id,
+                };
+                let q: &dyn Query = if face_way == GRANTED_FACE_WHOLE {
+                    cx
+                } else {
+                    &view
+                };
+                for (permission, _) in library_cast_routes(q, cx.cards(), player, id)
+                    .into_iter()
+                    .filter(|(_, life)| !life)
+                {
+                    offer_granted_casts(
+                        cx,
+                        player,
+                        available,
+                        instants,
+                        options,
+                        ways,
+                        id,
+                        face_way,
+                        face_def,
+                        speed.face(face_def),
+                        true,
+                        false,
+                        Cost::NONE,
+                        0,
+                        false,
+                        permission,
+                    );
+                }
             }
         }
-        // Where a permanent lets them pay life instead, that cast below is the one offered.
-        // And for an alternative cost a static ability gives (CR 118.9), which a card with no mana cost may be cast for
-        // (CR 118.6a).
-        if allowed && !land_rules(cx, player).top_for_life && !def.is(CardType::Land) && instant == instants {
-            let plain = def.has_cost.then_some((0, def.cost));
-            let alternatives = alternatives_for(cx, cx.cards(), given_alternatives.get_or_init(|| static_rules::spell_alternatives(cx)), player, id, def, 0)
-                .into_iter()
-                .map(|(index, (_, _, alternative))| (index, alternative.cost.mana()));
-            for (index, base) in plain.into_iter().chain(alternatives) {
-                let a = available.get_or_init(|| self::available(cx, player));
-                let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
-                if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, base, &[]), 0, false)
-                    && offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option)
-                {
+        if !def.is(CardType::Land) && def.has_cost && instant == instants {
+            let a = available.get_or_init(|| self::available(cx, player));
+            for permission in &spell_routes {
+                let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
+                option.cast_plan = Some(CastPlan {
+                    way: 0,
+                    permission: *permission,
+                    cost: CastCostChoice::Printed,
+                });
+                if covers_total(
+                    cx,
+                    a,
+                    player,
+                    id,
+                    def,
+                    least_cost(cx, a, player, id, def, def.cost, &[]),
+                    0,
+                ) && offer_spell(
+                    cx,
+                    &Asker {
+                        source: id,
+                        controller: player,
+                    },
+                    def,
+                    &mut option,
+                ) {
                     options.push(option);
                 }
             }
@@ -3107,16 +5176,43 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
     }
     // The top card of the library, for a player a permanent lets cast from there for life (CR 601.3, 118.9).
     if !barred.contains(ZoneKind::Library)
-        && land_rules(cx, player).top_for_life
         && let Some(&id) = cx.s().zone(Zone::library(player)).first()
     {
         let def = cx.card(cx.s().obj(id).card);
-        let instant = Speed { cx, flash, granters: &flash_granters, player, card: id }.whole(def);
+        let instant = Speed {
+            cx,
+            flash,
+            granters: &flash_granters,
+            player,
+            card: id,
+        }
+        .whole(def);
         // Life is an alternative cost, so a card with no mana cost may be cast this way too, for 0 life (CR 118.6a).
-        if !def.is(CardType::Land) && instant == instants && can_pay_other(cx, id, player, &life_for_mana_value(def)) {
-            let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
-            if offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option) {
-                options.push(option);
+        if !def.is(CardType::Land)
+            && instant == instants
+            && can_pay_other(cx, id, player, &life_for_mana_value(def))
+        {
+            for (permission, _) in library_cast_routes(cx, cx.cards(), player, id)
+                .into_iter()
+                .filter(|(_, life)| *life)
+            {
+                let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
+                option.cast_plan = Some(CastPlan {
+                    way: 0,
+                    permission,
+                    cost: CastCostChoice::LifeForManaValue,
+                });
+                if offer_spell(
+                    cx,
+                    &Asker {
+                        source: id,
+                        controller: player,
+                    },
+                    def,
+                    &mut option,
+                ) {
+                    options.push(option);
+                }
             }
         }
     }
@@ -3126,45 +5222,134 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
 /// timing. The caller supplies zone permission for the chosen face, and its additional costs (CR 118.8).
 #[allow(clippy::too_many_arguments)]
 fn offer_granted_casts(
-    cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool,
-    options: &mut Vec<ActionOption>, ways: &[(ObjectId, PlayerId, &'static GrantedWay)],
-    id: ObjectId, face_way: u8, face_def: &'static CardDef, face_instant: bool,
-    allowed: bool, sorcery_only: bool, additional: Cost, more: u8, any_type: bool,
+    cx: &Cx,
+    player: PlayerId,
+    available: &std::cell::OnceCell<Available>,
+    instants: bool,
+    options: &mut Vec<ActionOption>,
+    ways: &[(ObjectId, PlayerId, &'static GrantedWay)],
+    id: ObjectId,
+    face_way: u8,
+    face_def: &'static CardDef,
+    face_instant: bool,
+    allowed: bool,
+    sorcery_only: bool,
+    additional: Cost,
+    more: u8,
+    any_type: bool,
+    permission: CastPermission,
 ) {
     let zone = cx.s().obj(id).zone;
     if face_def.aftermath && !zone.is(ZoneKind::Graveyard) {
         return;
     }
-    let view = AsFace { cx, spell: id, face: cx.card_id(face_def) };
-    let q: &dyn Query = if face_way == GRANTED_FACE_WHOLE { cx } else { &view };
-    for (k, &(granter, controller, way)) in ways.iter().enumerate().take(WAY_GRANTED_SLOTS as usize) {
-        if if way.any_zone { !allowed } else { zone.player != player || way.from != zone.kind() } {
+    let view = AsFace {
+        cx,
+        spell: id,
+        face: cx.card_id(face_def),
+    };
+    let q: &dyn Query = if face_way == GRANTED_FACE_WHOLE {
+        cx
+    } else {
+        &view
+    };
+    for (k, &(granter, controller, way)) in ways.iter().enumerate() {
+        if if way.any_zone {
+            !allowed
+        } else {
+            zone.player != player || way.from != zone.kind()
+        } {
             continue;
         }
         let instant = (face_instant || way.instant_speed) && !(way.any_zone && sorcery_only);
-        if instant != instants || !cast_only_if_met(cx, face_def, &Asker { source: id, controller: player }) {
+        if instant != instants
+            || !cast_only_if_met(
+                cx,
+                face_def,
+                &Asker {
+                    source: id,
+                    controller: player,
+                },
+            )
+        {
             continue;
         }
-        let Some(mut cost) = (way.cost)(q, &Asker { source: granter, controller }, id, player) else { continue };
+        let Some(mut cost) = (way.cost)(
+            q,
+            &Asker {
+                source: granter,
+                controller,
+            },
+            id,
+            player,
+        ) else {
+            continue;
+        };
         if way.any_zone {
             cost = cost.and(additional);
             cost.mana.generic = cost.mana.generic.saturating_add(more);
         }
-        if u16::from(cx.s().player(player).energy) < u16::from(cost.energy) + u16::from(face_def.additional_cost.map_or(0, |c| c.energy))
-            || !can_pay_other(cx, id, player, &cost) || !extra_payable(cx, id, player, face_def) {
+        if u16::from(cx.s().player(player).energy)
+            < u16::from(cost.energy) + u16::from(face_def.additional_cost.map_or(0, |c| c.energy))
+            || !can_pay_other(cx, id, player, &cost)
+            || !extra_payable(cx, id, player, face_def)
+        {
             continue;
         }
         let a = available.get_or_init(|| self::available(cx, player));
         let covered = |targets: &[Target]| {
             let mut least = least_cost(cx, a, player, id, face_def, cost.mana, targets);
             if way.any_zone && any_type {
-                least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                least = ManaCost {
+                    generic: least.mana_value().min(255) as u8,
+                    ..ManaCost::ZERO
+                };
             }
-            covers_total(cx, a, player, id, face_def, least, cost.exile_from_graveyard)
-                && added_life_payable(cx, a, player, id, face_def, targets)
+            covers_total(
+                cx,
+                a,
+                player,
+                id,
+                face_def,
+                least,
+                cost.exile_from_graveyard,
+            ) && added_life_payable(cx, a, player, id, face_def, targets)
         };
-        let mut option = ActionOption::on(ActionKind::CastSpell, id, granted_way(k, face_way));
-        if offer_costed(cx, a, &Asker { source: id, controller: player }, face_def, &mut option, covered) {
+        let Some(rule) = granted_way_rule(cx, granter, way) else {
+            continue;
+        };
+        let index = if k < WAY_GRANTED_SLOTS as usize {
+            granted_way(k, face_way)
+        } else {
+            face_way
+        };
+        let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+        option.cast_plan = Some(CastPlan {
+            way: granted_face_way(face_way),
+            permission: if way.any_zone {
+                permission
+            } else {
+                CastPermission::GrantedWay {
+                    source: granter,
+                    rule,
+                }
+            },
+            cost: CastCostChoice::GrantedWay {
+                source: granter,
+                rule,
+            },
+        });
+        if offer_costed(
+            cx,
+            a,
+            &Asker {
+                source: id,
+                controller: player,
+            },
+            face_def,
+            &mut option,
+            covered,
+        ) {
             options.push(option);
         }
     }
@@ -3173,18 +5358,29 @@ fn offer_granted_casts(
 /// The life a cast of `card` by `player` by this way pays instead of its mana cost (CR 118.9, 119.4), for the menu row and the
 /// seats that weigh it: a permission's life equal to the face's mana value (Inside Information), or Bolas's Citadel's for the
 /// top of the library. None for a cast paid in mana.
-pub fn life_for_cast(q: &dyn Query, cards: &CardTable, player: PlayerId, card: ObjectId, way: u8) -> Option<u8> {
+pub fn life_for_cast(
+    q: &dyn Query,
+    cards: &CardTable,
+    player: PlayerId,
+    card: ObjectId,
+    way: u8,
+) -> Option<u8> {
     let state = q.state();
     let obj = state.obj(card);
     let def = cards.get(obj.card);
     if !obj.zone.is(ZoneKind::Hand)
-        && state.permissions.iter().any(|p| p.card == card && p.player == player && p.grant.life_for_mana_value)
+        && state
+            .permissions
+            .iter()
+            .any(|p| p.card == card && p.player == player && p.grant.life_for_mana_value)
     {
         return Some(life_for_mana_value(face_cast(def, way)).life);
     }
     let mut top = false;
     if way == 0 && state.zone(Zone::library(player)).first() == Some(&card) {
-        each_play_rule(q, cards, player, false, |_, rule| top |= matches!(rule, PlayRule::LibraryTop));
+        each_play_rule(q, cards, player, false, |_, rule| {
+            top |= matches!(rule, PlayRule::LibraryTop)
+        });
     }
     top.then(|| life_for_mana_value(def).life)
 }
@@ -3204,17 +5400,29 @@ fn face_cast(def: &'static CardDef, way: u8) -> &'static CardDef {
 /// "Pay life equal to its mana value rather than pay its mana cost" (CR 118.9, 119.4): the life, as a cost, for a card or the
 /// face of it cast, its X counted as 0 (CR 107.3). Bolas's Citadel's rule and Inside Information's permission pay it.
 fn life_for_mana_value(def: &CardDef) -> Cost {
-    Cost { life: def.cost.mana_value().min(255) as u8, ..Cost::NONE }
+    Cost {
+        life: def.cost.mana_value().min(255) as u8,
+        ..Cost::NONE
+    }
 }
 
 /// The most an emerge cost could come down by right now (CR 702.119a): the mana values of the richest permanents it could
 /// sacrifice. What it comes down by is not known until the player has chosen, so this is only what makes the cast worth
 /// offering.
 fn emerge_reduction(cx: &Cx, player: PlayerId, card: ObjectId, cost: &Cost) -> u8 {
-    let Some(p) = cost.permanents.filter(|_| cost.emerge) else { return 0 };
-    let asker = Asker { source: card, controller: player };
-    let mut values: Vec<u32> =
-        cx.permanents_of(player).into_iter().filter(|&id| pays_permanents(cx, cost, &p, &asker, id)).map(|id| cx.mana_value(id)).collect();
+    let Some(p) = cost.permanents.filter(|_| cost.emerge) else {
+        return 0;
+    };
+    let asker = Asker {
+        source: card,
+        controller: player,
+    };
+    let mut values: Vec<u32> = cx
+        .permanents_of(player)
+        .into_iter()
+        .filter(|&id| pays_permanents(cx, cost, &p, &asker, id))
+        .map(|id| cx.mana_value(id))
+        .collect();
     values.sort_unstable_by(|a, b| b.cmp(a));
     values.iter().take(p.count as usize).sum::<u32>().min(255) as u8
 }
@@ -3222,7 +5430,10 @@ fn emerge_reduction(cx: &Cx, player: PlayerId, card: ObjectId, cost: &Cost) -> u
 /// The creatures a cost that taps one to reduce its mana may tap (CR 702.180a): the controller's untapped creatures. A
 /// creature with summoning sickness may be tapped, since this is not its own {T} ability (CR 302.6, 107.5).
 fn reducer_candidates(cx: &Cx, controller: PlayerId) -> Vec<ObjectId> {
-    cx.permanents_of(controller).into_iter().filter(|&id| !cx.s().obj(id).tapped && cx.chars(id).is(CardType::Creature)).collect()
+    cx.permanents_of(controller)
+        .into_iter()
+        .filter(|&id| !cx.s().obj(id).tapped && cx.chars(id).is(CardType::Creature))
+        .collect()
 }
 
 /// What tapping `creature` takes off the generic mana of the total cost (CR 702.180a): its power, none if that is below 0.
@@ -3257,7 +5468,12 @@ fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &C
 ///
 /// That total is read here, before X and kicker are announced (CR 601.2b), so a future harmonize card with X or a kicker must
 /// recompute it once they are, or the caption's min(power, generic) understates what comes off.
-fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) -> R<Option<ObjectId>> {
+fn choose_reducer(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    cost: &Cost,
+) -> R<Option<ObjectId>> {
     if !cost.tap_to_reduce {
         return Ok(None);
     }
@@ -3267,8 +5483,17 @@ fn choose_reducer(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) 
     }
     // Before any target is chosen (CR 601.2b), so a change that reads the targets is not in it.
     let generic = apply_cost_changes(cx, player, Costed::Spell(source), cost.mana, &[]).generic;
-    let powers = eligible.iter().map(|&c| reduction_of(cx, c).min(generic)).collect();
-    let ask = RequestKind::TapForPower { source, purpose: Purpose::TapToReduce, cards: eligible, powers, minimum: 0 };
+    let powers = eligible
+        .iter()
+        .map(|&c| reduction_of(cx, c).min(generic))
+        .collect();
+    let ask = RequestKind::TapForPower {
+        source,
+        purpose: Purpose::TapToReduce,
+        cards: eligible,
+        powers,
+        minimum: 0,
+    };
     match cx.ask_core(player, ask, true)? {
         Answer::Cards(cards) => Ok(cards.first().copied()),
         _ => Err(Stop::Cancel),
@@ -3280,7 +5505,10 @@ fn is_land(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
 }
 
 /// The additional cost of retrace (CR 702.81a): discard a land card.
-const RETRACE: Cost = Cost { discard: Some((1, is_land)), ..Cost::NONE };
+const RETRACE: Cost = Cost {
+    discard: Some((1, is_land)),
+    ..Cost::NONE
+};
 
 /// Whether a permanent has a mana ability that could be activated now: one more way to spend its tap, which a creature
 /// or artifact tapped to pay for convoke or improvise cannot also be used for.
@@ -3377,15 +5605,210 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
 /// The text an option is matched by and a menu row shows: an alternative cost's, a granted way's or an ability's. A cast a
 /// standing permission lets a card have (CR 601.3) says what the permission changes: "Flashback {2}{R}" for a flashback granted
 /// (Snapcaster Mage), "Cast without paying its mana cost", "Cast by paying {1}{U} instead".
-pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption) -> std::borrow::Cow<'static, str> {
-    let Some(source) = option.source else { return "".into() };
-    // A card exiled face down is described as the spell it would be (CR 406.3a).
+pub fn describe(
+    cards: &CardTable,
+    state: &GameState,
+    log: &[Record],
+    option: &ActionOption,
+) -> std::borrow::Cow<'static, str> {
+    let Some(plan) = option.cast_plan else {
+        return describe_legacy(cards, state, log, option);
+    };
+    let Some(source) = option.source else {
+        return "".into();
+    };
+    let _face_up = layers::judged_face_up(state, source);
+    let def = cards.get(cards.current(state.obj(source)));
+    let face = face_cast(def, plan.way);
+    let prefix_face = |text: String| {
+        // A granted cast of a card that can be cast as more than one face names the face, the whole card included
+        // ("Elusive Otter: Once during each of your turns, ..."), as the option's granted slot always has.
+        let named = if !std::ptr::eq(face, def) {
+            Some(face.name)
+        } else if granted_slot(option.index).is_some_and(|(_, slot)| slot == GRANTED_FACE_WHOLE)
+            && (def.inset_faces().next().is_some() || def.back.is_some_and(|b| b.has_cost))
+        {
+            Some(def.name)
+        } else {
+            None
+        };
+        match named {
+            Some(name) if text != name && !text.starts_with(&format!("{name}:")) => {
+                format!("{name}: {text}")
+            }
+            _ => text,
+        }
+    };
+    if let CastCostChoice::PrintedWay { way } = plan.cost {
+        let text = cards
+            .get(cards.current(state.obj(source)))
+            .ways
+            .get(way as usize)
+            .map_or("", |cost| cost.text)
+            .to_owned();
+        let (permission, detail) = match plan.permission {
+            CastPermission::PlayPermission { index } => (
+                state.permissions.get(index as usize).and_then(|permission| permission.source)
+                    .map(|id| cards.get(cards.current(state.obj(id))).name),
+                None,
+            ),
+            CastPermission::ExileCast { source: grantor, rule } => {
+                let current = cards.current(state.obj(grantor));
+                (
+                    Some(cards.get(current).name),
+                    Some(cards.get(current).exile_casts.get(rule as usize).map_or("", |permission| permission.text)),
+                )
+            }
+            CastPermission::LibraryTop { source: grantor, .. } =>
+                (Some(cards.get(cards.current(state.obj(grantor))).name), None),
+            _ => (None, None),
+        };
+        let text = prefix_face(text);
+        return match (permission, detail) {
+            (Some(name), Some(detail)) if detail.is_empty() => format!("{text} — Permission: {name}").into(),
+            (Some(name), Some(detail)) => format!("{text} — Permission: {name} ({detail})").into(),
+            (Some(name), None) => format!("{text} — Permission: {name}").into(),
+            _ => text.into(),
+        };
+    }
+    if let CastCostChoice::GrantedWay {
+        source: grantor,
+        rule,
+    } = plan.cost
+    {
+        let grantor_card = cards.current(state.obj(grantor));
+        let text = cards
+            .get(grantor_card)
+            .granted_ways
+            .get(rule as usize)
+            .map_or("", |way| way.text);
+        let grantor_name = cards.get(grantor_card).name;
+        let permission_source = match plan.permission {
+            CastPermission::PlayPermission { index } => state
+                .permissions
+                .get(index as usize)
+                .and_then(|permission| permission.source)
+                .map(|id| cards.get(cards.current(state.obj(id))).name),
+            CastPermission::LibraryTop { source, .. } => {
+                Some(cards.get(cards.current(state.obj(source))).name)
+            }
+            _ => None,
+        };
+        let text = prefix_face(text.to_owned());
+        return match permission_source.filter(|name| *name != grantor_name) {
+            Some(permission) => {
+                format!("{text} — Permission: {permission}; granted by {grantor_name}").into()
+            }
+            None => format!("{text} — Permission: {grantor_name}").into(),
+        };
+    }
+    let (text, provenance) = match plan.permission {
+        CastPermission::PlayPermission { index } => {
+            let Some(permission) = state
+                .permissions
+                .get(index as usize)
+                .filter(|p| p.card == source)
+            else {
+                return "".into();
+            };
+            let grant = permission.grant;
+            let text = if grant.life_for_mana_value {
+                format!(
+                    "Cast by paying {} life instead",
+                    life_for_mana_value(face).life
+                )
+            } else if grant.exile_after {
+                format!("Flashback {}", grant.instead.unwrap_or(face.cost))
+            } else if let Some(cost) = grant.instead {
+                if cost == ManaCost::ZERO {
+                    "Cast without paying its mana cost".to_owned()
+                } else {
+                    format!("Cast by paying {cost} instead")
+                }
+            } else {
+                describe_way(cards, state, log, option, source).to_owned()
+            };
+            let provenance = permission.source.map_or_else(
+                || format!("permission {}", index + 1),
+                |id| cards.get(state.obj(id).card).name.to_owned(),
+            );
+            (text, Some(provenance))
+        }
+        CastPermission::GrantedWay {
+            source: grantor,
+            rule,
+        } => {
+            let current = cards.current(state.obj(grantor));
+            (
+            cards
+                .get(current)
+                .granted_ways
+                .get(rule as usize)
+                .map_or("", |way| way.text)
+                .to_owned(),
+            Some(cards.get(current).name.to_owned()),
+        )},
+        CastPermission::ExileCast {
+            source: grantor,
+            rule,
+        } => {
+            let current = cards.current(state.obj(grantor));
+            (
+            cards
+                .get(current)
+                .exile_casts
+                .get(rule as usize)
+                .map_or("", |permission| permission.text)
+                .to_owned(),
+            Some(cards.get(current).name.to_owned()),
+        )},
+        CastPermission::LibraryTop {
+            source: grantor, ..
+        } => {
+            let current = cards.current(state.obj(grantor));
+            (
+                describe_way(cards, state, log, option, source).to_owned(),
+                Some(cards.get(current).name.to_owned()),
+            )
+        },
+        _ => (
+            describe_way(cards, state, log, option, source).to_owned(),
+            None,
+        ),
+    };
+    let text = prefix_face(text);
+    if let Some(name) = provenance {
+        if text.is_empty() {
+            format!("Permission: {name}").into()
+        } else {
+            format!("{} — Permission: {name}", text).into()
+        }
+    } else {
+        text.into()
+    }
+}
+
+fn describe_legacy(
+    cards: &CardTable,
+    state: &GameState,
+    log: &[Record],
+    option: &ActionOption,
+) -> std::borrow::Cow<'static, str> {
+    let Some(source) = option.source else {
+        return "".into();
+    };
     let _face_up = (option.kind == ActionKind::CastSpell).then(|| layers::judged_face_up(state, source));
     // "Pay life equal to its mana value rather than pay its mana cost" (CR 118.9): the life, for the face cast.
     if option.kind == ActionKind::CastSpell
-        && matches!(option.index, 0 | WAY_ADVENTURE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE)
+        && matches!(
+            option.index,
+            0 | WAY_ADVENTURE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE
+        )
         && state.obj(source).zone != Zone::hand(state.obj(source).owner)
-        && state.permissions.iter().any(|p| p.card == source && p.grant.life_for_mana_value)
+        && state
+            .permissions
+            .iter()
+            .any(|p| p.card == source && p.grant.life_for_mana_value)
     {
         let def = cards.get(state.obj(source).card);
         let face = face_cast(def, option.index);
@@ -3397,10 +5820,16 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
     }
     if option.kind == ActionKind::CastSpell
         && option.index == 0
-        && let Some(grant) = state.permissions.iter().find(|p| p.card == source && (p.grant.instead.is_some() || p.grant.exile_after)).map(|p| p.grant)
+        && let Some(grant) = state
+            .permissions
+            .iter()
+            .find(|p| p.card == source && (p.grant.instead.is_some() || p.grant.exile_after))
+            .map(|p| p.grant)
     {
         // A flashback granted costs the card's own mana cost unless the grant names another.
-        let cost = grant.instead.unwrap_or_else(|| cards.get(state.obj(source).card).cost);
+        let cost = grant
+            .instead
+            .unwrap_or_else(|| cards.get(state.obj(source).card).cost);
         return if grant.exile_after {
             format!("Flashback {cost}").into()
         } else if cost == ManaCost::ZERO {
@@ -3415,7 +5844,16 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
     if option.kind == ActionKind::CastSpell
         && let Some(text) = exile_cast_text(cards, state, log, source)
     {
-        return if option.index == 0 { text.into() } else { format!("{} ({})", describe_way(cards, state, log, option, source), lowercase_first(text)).into() };
+        return if option.index == 0 {
+            text.into()
+        } else {
+            format!(
+                "{} ({})",
+                describe_way(cards, state, log, option, source),
+                lowercase_first(text)
+            )
+            .into()
+        };
     }
     // A granted cast of a card that can be cast as more than one face (a Room's doors) names the face: "Unholy Annex: Once
     // during each of your turns, ...".
@@ -3424,9 +5862,16 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
     {
         let def = cards.get(state.obj(source).card);
         if let Some((_, face_def)) = faces_to_cast(def).into_iter().find(|&(f, _)| f == face)
-            && (face != GRANTED_FACE_WHOLE || def.inset_faces().next().is_some() || def.back.is_some_and(|b| b.has_cost))
+            && (face != GRANTED_FACE_WHOLE
+                || def.inset_faces().next().is_some()
+                || def.back.is_some_and(|b| b.has_cost))
         {
-            return format!("{}: {}", face_def.name, describe_way(cards, state, log, option, source)).into();
+            return format!(
+                "{}: {}",
+                face_def.name,
+                describe_way(cards, state, log, option, source)
+            )
+            .into();
         }
     }
     // A cast for an alternative cost a static ability gives (CR 118.9) says it, after the face it casts where that is not the
@@ -3444,30 +5889,63 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
 /// The text of the permission of the permanent a card in exile was exiled with, if that permanent gives one to cast cards in
 /// exile (CR 601.3) and nothing else lets the card be cast from there (a play permission of its own, an Adventure, a prepare
 /// copy). Read without asking whether it allows the cast: the option it describes was offered because it did.
-fn exile_cast_text(cards: &CardTable, state: &GameState, log: &[Record], card: ObjectId) -> Option<&'static str> {
+fn exile_cast_text(
+    cards: &CardTable,
+    state: &GameState,
+    log: &[Record],
+    card: ObjectId,
+) -> Option<&'static str> {
     let obj = state.obj(card);
     if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure.is_some() || obj.card_copy || state.permissions.iter().any(|p| p.card == card) {
         return None;
     }
     let by = obj.exiled?.by;
-    exile_casts_of(cards, state, log).into_iter().find(|&(granter, _, _)| granter == by).map(|(_, _, cast)| cast.text)
+    exile_casts_of(cards, state, log)
+        .into_iter()
+        .find(|&(granter, _, _)| granter == by)
+        .map(|(_, _, cast)| cast.text)
 }
 
 fn lowercase_first(text: &str) -> String {
     let mut chars = text.chars();
-    chars.next().map_or_else(String::new, |c| c.to_lowercase().chain(chars).collect())
+    chars
+        .next()
+        .map_or_else(String::new, |c| c.to_lowercase().chain(chars).collect())
 }
 
-fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption, source: ObjectId) -> &'static str {
+fn describe_way(
+    cards: &CardTable,
+    state: &GameState,
+    log: &[Record],
+    option: &ActionOption,
+    source: ObjectId,
+) -> &'static str {
     match option.kind {
-        ActionKind::CastSpell if matches!(option.index, WAY_ADVENTURE | WAY_OMEN) => {
-            cards.get(state.obj(source).card).inset_face(option.index).map_or("", |a| a.name)
-        }
-        _ if option.index == WAY_BACK_FACE => cards.get(state.obj(source).card).back.map_or("", |b| b.name),
+        ActionKind::CastSpell if matches!(option.index, WAY_ADVENTURE | WAY_OMEN) => cards
+            .get(state.obj(source).card)
+            .inset_face(option.index)
+            .map_or("", |a| a.name),
+        _ if option.index == WAY_BACK_FACE => cards
+            .get(state.obj(source).card)
+            .back
+            .map_or("", |b| b.name),
         ActionKind::CastSpell if option.index == WAY_BESTOW => "Bestow",
         ActionKind::CastSpell | ActionKind::PlayLand if granted_slot(option.index).is_some() => {
             let (k, _) = granted_slot(option.index).expect("a granted way");
-            granted_ways_of(cards, state, log).get(k).map_or("", |&(_, _, way)| way.text)
+            granted_ways_of(cards, state, log)
+                .get(k)
+                .map_or("", |&(_, _, way)| way.text)
+        }
+        ActionKind::CastSpell if option.index == WAY_SPLIT_LEFT => cards
+            .get(state.obj(source).card)
+            .split
+            .map_or("", |h| h.0.name),
+        ActionKind::CastSpell if option.index == WAY_SPLIT_RIGHT => cards
+            .get(state.obj(source).card)
+            .split
+            .map_or("", |h| h.1.name),
+        ActionKind::CastSpell if option.index > 0 && option.index < WAY_GRANTED => {
+            cards.get(state.obj(source).card).ways[option.index as usize - 1].text
         }
         ActionKind::CastSpell if alternative_slot(option.index).is_some() => {
             let q = crate::resolve::Reader { cards, state, events: log };
@@ -3488,7 +5966,11 @@ fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &A
             }),
         ActionKind::ActivateAbility => {
             let chars = layers::chars(cards, state, log, source);
-            chars.abilities().nth(option.index as usize).map(|a| cards.ability(a).text()).unwrap_or("")
+            chars
+                .abilities()
+                .nth(option.index as usize)
+                .map(|a| cards.ability(a).text())
+                .unwrap_or("")
         }
         _ => "",
     }
@@ -3498,7 +5980,14 @@ fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &A
 
 /// The `Act` frame: the action chosen with priority is its first answer.
 pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
-    let Answer::Act(action) = cx.ask_core(player, RequestKind::Priority { options: Vec::new() }, false)? else {
+    let Answer::Act(action) = cx.ask_core(
+        player,
+        RequestKind::Priority {
+            options: Vec::new(),
+        },
+        false,
+    )?
+    else {
         unreachable!("an Act frame starts with its action");
     };
     let source = action.source.expect("an action names its source");
@@ -3516,32 +6005,89 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
                 (granter, way)
             });
             if let Some((granter, _)) = granted {
-                let ability = AbilityRef { card: cx.s().obj(granter).card, index: GRANTED_WAY_USED };
-                cx.record(Event::AbilityActivated { source: granter, ability, player });
+                let ability = AbilityRef {
+                    card: cx.s().obj(granter).card,
+                    index: GRANTED_WAY_USED,
+                };
+                cx.record(Event::AbilityActivated {
+                    source: granter,
+                    ability,
+                    player,
+                });
             }
             if action.index == WAY_BACK_FACE {
                 // A modal double-faced card played as its back face enters as that face (CR 712.14a).
-                ops::put_onto_battlefield_as(cx, source, player, false, true, ZoneReason::PlayLand, &[])?;
+                ops::put_onto_battlefield_as(
+                    cx,
+                    source,
+                    player,
+                    false,
+                    true,
+                    ZoneReason::PlayLand,
+                    &[],
+                )?;
             } else {
-                let moved = ops::put_onto_battlefield(cx, &[(source, player, false)], ZoneReason::PlayLand)?;
+                let moved = ops::put_onto_battlefield(
+                    cx,
+                    &[(source, player, false)],
+                    ZoneReason::PlayLand,
+                )?;
                 if let Some((granter, way)) = granted
                     && let Some(n) = way.gains
                     && let Some(&land) = moved.first()
                 {
                     let ability = AbilityRef::delayed(cx.s().obj(granter).card, n);
-                    Game::add_effect(cx, land, land, EffectKind::AddAbility(ability), Duration::Indefinite);
+                    Game::add_effect(
+                        cx,
+                        land,
+                        land,
+                        EffectKind::AddAbility(ability),
+                        Duration::Indefinite,
+                    );
                 }
             }
         }
         ActionKind::CastSpell => {
             // Cast from where a permission allows (CR 601.3), for the cost it names instead of the mana cost: the card, or its
             // Adventure or Omen, which is casting the card too (CR 715.3, 720.3).
-            // An alternative cost a static ability gives (CR 118.9) is paid on a cast the permission makes all the same.
+            if let Some(plan) = action.cast_plan {
+                let Some(resolved) = resolve_cast_plan(cx, player, source, plan) else {
+                    return Err(Stop::Cancel);
+                };
+                cast(
+                    cx,
+                    player,
+                    source,
+                    plan.way,
+                    &action.targets,
+                    resolved.terms,
+                    false,
+                    Some(resolved),
+                )?;
+                cx.st().update_turn(|t| {
+                    t.priority = player;
+                    t.passes = 0;
+                });
+                return Ok(Flow::Done);
+            }
             let permitted = match alternative_slot(action.index).map_or(action.index, |_| face_way(action.index)) {
-                n if granted_slot(n).is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.any_zone) => permission_for(cx, source, player).filter(|p| p.grant.instead.is_none() && !p.grant.life_for_mana_value && !p.grant.exile_after),
+                n if granted_slot(n).is_some_and(|(k, _)| {
+                    granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.any_zone
+                }) =>
+                {
+                    permission_for(cx, source, player).filter(|p| {
+                        p.grant.instead.is_none()
+                            && !p.grant.life_for_mana_value
+                            && !p.grant.exile_after
+                    })
+                }
                 0 => permission_for(cx, source, player).filter(|p| !p.grant.adventure_only),
-                WAY_ADVENTURE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player),
-                WAY_OMEN | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => {
+                WAY_ADVENTURE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => {
+                    permission_for(cx, source, player)
+                }
+                WAY_OMEN | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE
+                    if !cx.s().obj(source).zone.is(ZoneKind::Hand) =>
+                {
                     permission_for(cx, source, player).filter(|p| !p.grant.adventure_only)
                 }
                 _ => None,
@@ -3553,24 +6099,61 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             // cast (CR 715.3a), or from the top of a library by a permanent's rule (Bolas's Citadel).
             let def = cx.card(cx.s().obj(source).card);
             let (instead, life) = if permitted.is_some_and(|p| p.grant.life_for_mana_value) {
-                (Some(ManaCost::ZERO), life_for_mana_value(face_cast(def, action.index)).life)
-            } else if action.index == 0 && cx.s().obj(source).zone.is(ZoneKind::Library) && land_rules(cx, player).top_for_life {
+                (
+                    Some(ManaCost::ZERO),
+                    life_for_mana_value(face_cast(def, action.index)).life,
+                )
+            } else if action.index == 0
+                && cx.s().obj(source).zone.is(ZoneKind::Library)
+                && land_rules(cx, player).top_for_life
+            {
                 (Some(ManaCost::ZERO), life_for_mana_value(def).life)
             } else {
                 (instead, 0)
             };
             // A flashback a permission gives (Snapcaster Mage, CR 702.34a).
             let flashback = permitted.is_some_and(|p| p.grant.exile_after);
-            cast(cx, player, source, action.index, &action.targets, CastTerms { instead, any_type, life, more, less: 0, exile_after: false, flashback, copy: false, way: None }, false)?
+            cast(
+                cx,
+                player,
+                source,
+                action.index,
+                &action.targets,
+                CastTerms {
+                    instead,
+                    any_type,
+                    life,
+                    more,
+                    less: 0,
+                    exile_after: false,
+                    flashback,
+                    copy: false,
+                    way: None,
+                },
+                false,
+                None,
+            )?
         }
         ActionKind::ActivateAbility if action.index >= PLAYER_MANA_ABILITY => {
             activate_mana(cx, player, source, action.index, action.color, false, &[])?;
         }
         ActionKind::ActivateAbility => {
-            let ability = cx.chars(source).abilities().nth(action.index as usize).expect("ability");
+            let ability = cx
+                .chars(source)
+                .abilities()
+                .nth(action.index as usize)
+                .expect("ability");
             let def = activated(cx, ability).expect("an activated ability");
             if def.is_mana_ability() {
-                activate_mana(cx, player, source, action.index, action.color, action.mana == Some(Mana::C), &action.targets)?;
+                activate_mana(
+                    cx,
+                    player,
+                    source,
+                    action.index,
+                    action.color,
+                    action.mana == Some(Mana::C),
+                    &action.targets,
+                )?;
             } else if def.special_action {
                 special_action(cx, player, source, ability)?;
             } else {
@@ -3587,7 +6170,13 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
     Ok(Flow::Done)
 }
 
-pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef, controller: PlayerId, targets: &[Target]) -> StackItem {
+pub(crate) fn stack_item(
+    kind: StackKind,
+    object: ObjectId,
+    ability: AbilityRef,
+    controller: PlayerId,
+    targets: &[Target],
+) -> StackItem {
     let mut item = StackItem {
         kind,
         object,
@@ -3620,11 +6209,14 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
 /// "The next spell you cast this turn can't be countered" (CR 611.2c, 601.2, 701.5a): each such effect of `player` marks
 /// this spell as it is cast, before anyone has priority, and is used up; two before one spell both apply to it.
 fn apply_next_spell_effects(cx: &mut Cx, player: PlayerId, spell: ObjectId) {
-    let ours = |e: &cantrip_state::ContinuousEffect| e.kind == EffectKind::NextSpellCantBeCountered && e.controller == player;
+    let ours = |e: &cantrip_state::ContinuousEffect| {
+        e.kind == EffectKind::NextSpellCantBeCountered && e.controller == player
+    };
     if !cx.s().effects.iter().any(ours) {
         return;
     }
-    cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true);
+    cx.st()
+        .update_obj(spell, |o| o.marks.cant_be_countered = true);
     let keep: Vec<bool> = cx.s().effects.iter().map(|e| !ours(e)).collect();
     cx.st().effects_keep(&keep);
 }
@@ -3640,21 +6232,41 @@ fn cast(
     targets: &[Target],
     terms: CastTerms,
     resolving: bool,
+    planned: Option<ResolvedCastPlan>,
 ) -> R<()> {
-    let CastTerms { instead, any_type, exile_after, flashback, life, more, less, copy, way: _ } = terms;
-    // CR 406.3a: a card exiled face down is turned face up just before it is announced.
+    let terms = planned.map_or(terms, |plan| plan.terms);
+    let CastTerms {
+        instead,
+        any_type,
+        exile_after,
+        flashback,
+        life,
+        more,
+        less,
+        copy,
+        way: _,
+    } = terms;
     ops::turn_up_to_play(cx, card);
-    // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own. So does an
-    // alternative cost a static ability gives the spells its caster casts (CR 118.9, 601.2b), read now, as the cast begins,
-    // so the cast keeps it if the permanent leaves while it is paid for.
-    let granted = granted_slot(way);
-    let alternative = alternative_at(&*cx, cx.cards(), player, card, way).map(|(_, _, a)| a.cost.mana());
-    // A way number for an alternative cost that nothing gives now is no legal proposal: never its face's mana cost instead,
-    // which a face without one would have cast for {0} (CR 118.6a).
-    if alternative_slot(way).is_some() && alternative.is_none() {
-        return Err(Stop::Cancel);
-    }
-    let way = face_way(way);
+    let alternative = if planned.is_none() { alternative_at(&*cx, cx.cards(), player, card, way).map(|(_, _, a)| a.cost.mana()) } else { None };
+    if planned.is_none() && alternative_slot(way).is_some() && alternative.is_none() { return Err(Stop::Cancel); }
+    // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own.
+    let legacy_granted = if planned.is_none() {
+        granted_slot(way)
+    } else {
+        None
+    };
+    let selected_granted = planned.and_then(|plan| plan.granted.map(|(source, way)| (source, way)));
+    let granted = legacy_granted;
+    let way = planned.map_or_else(
+        || face_way(way),
+        |plan| plan.plan.way,
+    );
+    // `way` selects the face used during casting. Keep the printed alternative-cost index separately
+    // on the spell object so shared mechanics such as evoke can see which printed way was paid.
+    let cast_way = planned.map_or(way, |plan| match plan.plan.cost {
+        CastCostChoice::PrintedWay { way } => way.saturating_add(1).min(u8::MAX as u32) as u8,
+        _ => plan.plan.way,
+    });
     let printed = cx.s().obj(card).card;
     let whole = cx.card(printed);
     // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell and nothing else on the stack (CR 715.3b,
@@ -3662,21 +6274,36 @@ fn cast(
     let inset = whole.inset_face(way);
     // Retrace (CR 702.81a): cast from the graveyard for its ordinary cost by a card's say-so that is not its own, a land
     // card discarded in addition to paying its other costs.
-    let retraced = way == 0
-        && granted.is_none_or(|(k, _)| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.any_zone)
-        && instead.is_none()
-        && cx.s().obj(card).zone.is(ZoneKind::Graveyard)
-        && !whole.keywords.has(Keyword::CastFromYourGraveyard)
-        && !graveyard_play(cx, player)
-        && permission_for(cx, card, player).is_none_or(|p| p.grant.instead.is_some() || p.grant.life_for_mana_value || p.grant.exile_after)
-        && cx.chars(card).has(Keyword::Retrace);
-    // The alternative cost is paid rather than the mana cost (CR 118.9), its X 0 (CR 107.3b), and every additional cost with
-    // it (CR 118.9d): retrace's discard is one, so it is read above.
+    let retraced = planned.map_or_else(
+        || {
+            way == 0
+                && granted.is_none_or(|(k, _)| {
+                    granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.any_zone
+                })
+                && instead.is_none()
+                && cx.s().obj(card).zone.is(ZoneKind::Graveyard)
+                && !whole.keywords.has(Keyword::CastFromYourGraveyard)
+                && !graveyard_play(cx, player)
+                && permission_for(cx, card, player).is_none_or(|p| {
+                    p.grant.instead.is_some() || p.grant.life_for_mana_value || p.grant.exile_after
+                })
+                && cx.chars(card).has(Keyword::Retrace)
+        },
+        |plan| plan.retraced,
+    );
     let instead = instead.or(alternative);
     // Cast as its back face (CR 712.8a), a modal double-faced card is that face and nothing else on the stack.
-    let back = if way == WAY_BACK_FACE || way == WAY_TRANSFORMED { whole.back } else { None };
+    let back = if way == WAY_BACK_FACE || way == WAY_TRANSFORMED {
+        whole.back
+    } else {
+        None
+    };
     // Cast bestowed (CR 702.103b), it is an Aura spell and nothing else on the stack.
-    let bestow = if way == WAY_BESTOW { whole.bestow } else { None };
+    let bestow = if way == WAY_BESTOW {
+        whole.bestow
+    } else {
+        None
+    };
     // Cast as one half of a split card (CR 709.3), it is that half and nothing else on the stack.
     let half = match (way, whole.split) {
         (WAY_SPLIT_LEFT, Some((left, _))) => Some(left),
@@ -3687,31 +6314,58 @@ fn cast(
     let face = cx.card_id(def);
     // Cast from exile by a permanent's permission (CR 601.3), it owes what the permission adds (CR 118.8, 601.2f): found now, as
     // the cast begins, so the permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling).
-    let exile_permit = if resolving || copy { None } else { exile_cast_permission(cx, card, inset.or(half).or(back).map(|_| face), player) };
-    // "Mana of any type can be spent to cast that spell" (CR 609.4b), by that permission: read as the cast begins too.
+    let exile_permit = if resolving || copy {
+        None
+    } else if let Some(plan) = planned {
+        plan.exile
+    } else {
+        exile_cast_permission(cx, card, inset.or(half).or(back).map(|_| face), player)
+    };
     let any_type = any_type || exile_permit.is_some_and(|(_, c)| c.any_type);
     // Flashback (CR 702.34a) a permission or a permanent gave, or aftermath (CR 702.127a): exiled instead of put anywhere
     // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
-    let flashback = flashback || def.aftermath || granted.is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.flashback);
-    let mut cost = match (way, instead) {
-        (_, Some(instead)) => Cost::mana(instead),
-        _ if granted.is_some() => {
-            let (k, _) = granted.expect("a granted way");
-            let (granter, controller, rule) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k];
-            let asker = Asker { source: granter, controller };
-            // Judged on the face being cast, as the offer was.
-            let view = AsFace { cx: &*cx, spell: card, face };
-            let q: &dyn Query = if way == 0 { &*cx } else { &view };
-            (rule.cost)(q, &asker, card, player).unwrap_or(Cost::mana(def.cost))
+    let flashback = flashback
+        || def.aftermath
+        || granted.is_some_and(|(k, _)| {
+            granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k]
+                .2
+                .flashback
+        })
+        || selected_granted.is_some_and(|(_, way)| way.flashback);
+    let mut cost = if let Some(plan) = planned {
+        plan.cost
+    } else {
+        match (way, instead) {
+            (_, Some(instead)) => Cost::mana(instead),
+            _ if granted.is_some() => {
+                let (k, _) = granted.expect("a granted way");
+                let (granter, controller, rule) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k];
+                let asker = Asker {
+                    source: granter,
+                    controller,
+                };
+                // Judged on the face being cast, as the offer was.
+                let view = AsFace {
+                    cx: &*cx,
+                    spell: card,
+                    face,
+                };
+                let q: &dyn Query = if way == 0 { &*cx } else { &view };
+                (rule.cost)(q, &asker, card, player).unwrap_or(Cost::mana(def.cost))
+            }
+            (0, _) => Cost::mana(def.cost),
+            (
+                WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_BESTOW | WAY_SPLIT_LEFT
+                | WAY_SPLIT_RIGHT,
+                _,
+            ) => Cost::mana(def.cost),
+            (WAY_OVERLOAD, _) => Cost::mana(whole.overload.unwrap_or(def.cost)),
+            _ => whole.ways[way as usize - 1].cost,
         }
-        (0, _) => Cost::mana(def.cost),
-        (WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_BESTOW | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT, _) => Cost::mana(def.cost),
-        (WAY_OVERLOAD, _) => Cost::mana(whole.overload.unwrap_or(def.cost)),
-        _ => whole.ways[way as usize - 1].cost,
     };
     // The {X} a granted way's cost has: the card's, where the cost is or includes its mana cost; none where it is cast
     // without paying its mana cost (CR 107.3b).
-    let granted_x = granted.map(|_| cost.mana.x);
+    let granted_x = (granted.is_some() || selected_granted.is_some()).then_some(cost.mana.x);
     cost.life = cost.life.saturating_add(life);
     cost.mana.generic = cost.mana.generic.saturating_add(more);
 
@@ -3723,7 +6377,12 @@ fn cast(
     let from = cx.s().obj(card).zone.kind();
     let cast_from = from;
     // CR 307.1: whether a sorcery could have been cast now, read before the spell goes on the stack.
-    let untimely = !(cx.s().turn.active == player && matches!(cx.s().turn.step(), Step::PrecombatMain | Step::PostcombatMain) && cx.s().stack.is_empty());
+    let untimely = !(cx.s().turn.active == player
+        && matches!(
+            cx.s().turn.step(),
+            Step::PrecombatMain | Step::PostcombatMain
+        )
+        && cx.s().stack.is_empty());
     let spell = ops::move_to_for(cx, card, Zone::STACK, ZoneReason::Cast);
     cx.st().update_obj(spell, |o| {
         o.cast_from = Some(from);
@@ -3731,10 +6390,31 @@ fn cast(
     });
     // A way a permanent gave is noted in the history against it, for a permission "once during each of your turns"
     // (CR 601.3): an activation of `GRANTED_WAY_USED`, past any ability a card prints.
-    if let Some((k, _)) = granted {
+    if let Some((granter, rule)) = selected_granted {
+        let ability = AbilityRef {
+            card: cx.s().obj(granter).card,
+            index: GRANTED_WAY_USED,
+        };
+        cx.record(Event::AbilityActivated {
+            source: granter,
+            ability,
+            player,
+        });
+        if let Some(n) = rule.gains {
+            let ability = AbilityRef::delayed(cx.s().obj(granter).card, n);
+            cx.st().update_obj(spell, |o| o.marks.gains = Some(ability));
+        }
+    } else if let Some((k, _)) = granted {
         let (granter, _, _) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k];
-        let ability = AbilityRef { card: cx.s().obj(granter).card, index: GRANTED_WAY_USED };
-        cx.record(Event::AbilityActivated { source: granter, ability, player });
+        let ability = AbilityRef {
+            card: cx.s().obj(granter).card,
+            index: GRANTED_WAY_USED,
+        };
+        cx.record(Event::AbilityActivated {
+            source: granter,
+            ability,
+            player,
+        });
         // "If you do, it gains ...": the spell carries it to the permanent it becomes.
         if let Some(n) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.gains {
             let ability = AbilityRef::delayed(cx.s().obj(granter).card, n);
@@ -3746,16 +6426,28 @@ fn cast(
         cx.st().permissions_retain(|p| p.card != card);
     }
     if inset.is_some() || back.is_some() || bestow.is_some() || half.is_some() {
-        cx.st().update_obj(spell, |o| {
-            o.copy = Some(Copiable::of(face))
-        });
+        cx.st()
+            .update_obj(spell, |o| o.copy = Some(Copiable::of(face)));
     }
-    let mut item = stack_item(StackKind::Spell, spell, AbilityRef { card: face, index: u8::MAX }, player, targets);
+    let mut item = stack_item(
+        StackKind::Spell,
+        spell,
+        AbilityRef {
+            card: face,
+            index: u8::MAX,
+        },
+        player,
+        targets,
+    );
     item.way = way;
     item.exile_after = exile_after;
     item.flashback = flashback;
     // Overload (CR 702.96a): "each" for "target", so nothing is targeted.
-    let specs: &[TargetSpec] = if way == WAY_OVERLOAD { &[] } else { def.spell_targets() };
+    let specs: &[TargetSpec] = if way == WAY_OVERLOAD {
+        &[]
+    } else {
+        def.spell_targets()
+    };
     // CR 118.8: an additional cost is owed with every way of casting it; its mana joins the total.
     let mut extra = def.additional_cost.unwrap_or(Cost::NONE);
     if let Some((_, permission)) = exile_permit {
@@ -3774,7 +6466,16 @@ fn cast(
     if let Some(modal) = def.modal
         && !modes_after_costs
     {
-        mask = cast_modes(cx, player, spell, &mut item, modal, (modal.min, modal.max), &mut cost, &mut extra)?;
+        mask = cast_modes(
+            cx,
+            player,
+            spell,
+            &mut item,
+            modal,
+            (modal.min, modal.max),
+            &mut cost,
+            &mut extra,
+        )?;
     }
 
     // CR 601.2b: an additional cost that is one of several is chosen now, before X (as the C# engine asks it).
@@ -3810,10 +6511,21 @@ fn cast(
     let x_symbols = match (instead, granted_x) {
         (Some(instead), _) => instead.x,
         (None, Some(x)) => x,
-        (None, None) if way == 0 || matches!(way, WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT) => def.cost.x,
+        (None, None)
+            if way == 0
+                || matches!(
+                    way,
+                    WAY_ADVENTURE | WAY_OMEN | WAY_BACK_FACE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT
+                ) =>
+        {
+            def.cost.x
+        }
         (None, None) => 0,
     };
-    let sacrifices_x = matches!(extra.variable, Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. }));
+    let sacrifices_x = matches!(
+        extra.variable,
+        Some(VariableCost::SacrificeX(_) | VariableCost::SacrificeAnyNumber { .. })
+    );
     // "This spell costs {1} less to cast for each permanent sacrificed this way": generic mana off for each one announced.
     let less_each = match extra.variable {
         Some(VariableCost::SacrificeAnyNumber { less_each, .. }) => less_each,
@@ -3830,7 +6542,9 @@ fn cast(
         } else {
             1000
         };
-        let n = announce_x(cx, player, spell, base, def.kicker, x_symbols, cap, false, less_each)?;
+        let n = announce_x(
+            cx, player, spell, base, def.kicker, x_symbols, cap, false, less_each,
+        )?;
         if let Some(k) = def.kicker {
             if k.cost.x > 0 {
                 // Kicker {X} (CR 702.33a, 107.3): X is the number announced, and kicked when it is not 0.
@@ -3849,7 +6563,10 @@ fn cast(
         } else {
             // What a cost paid instead was reduced by that its own generic mana could not take, off X's (CR 118.7a).
             let xs = (n as u32 * x_symbols as u32).min(255);
-            cost.mana.generic = cost.mana.generic.saturating_add((xs - xs.min(less as u32)) as u8);
+            cost.mana.generic = cost
+                .mana
+                .generic
+                .saturating_add((xs - xs.min(less as u32)) as u8);
             item.x = n;
             cx.st().update_obj(spell, |o| o.x = n);
         }
@@ -3859,8 +6576,14 @@ fn cast(
     if let Some(modal) = def.modal
         && let Some(paid_range) = modal.when_paid
     {
-        let range = if item.paid > 0 || item.kicked > 0 { paid_range } else { (modal.min, modal.max) };
-        mask = cast_modes(cx, player, spell, &mut item, modal, range, &mut cost, &mut extra)?;
+        let range = if item.paid > 0 || item.kicked > 0 {
+            paid_range
+        } else {
+            (modal.min, modal.max)
+        };
+        mask = cast_modes(
+            cx, player, spell, &mut item, modal, range, &mut cost, &mut extra,
+        )?;
     }
     // CR 702.47a-b: as an Arcane spell is cast, cards with splice onto Arcane may be revealed from the hand and their
     // cost paid; their spell abilities are added to this spell's, after its own, in the order chosen.
@@ -3879,7 +6602,10 @@ fn cast(
                 cards: hand,
                 eligible: eligible.clone(),
                 count,
-                up_to: true, kind: "", total: None };
+                up_to: true,
+                kind: "",
+                total: None,
+            };
             let spliced = match cx.ask_core(player, ask, true)? {
                 Answer::Cards(cards) => cards,
                 _ => return Err(Stop::Cancel),
@@ -3889,7 +6615,10 @@ fn cast(
             }
             for (n, c) in spliced.into_iter().take(2).enumerate() {
                 let splice_card = cx.s().obj(c).card;
-                cost.mana = add_cost(cost.mana, cx.card(splice_card).splice.expect("a splice card"));
+                cost.mana = add_cost(
+                    cost.mana,
+                    cx.card(splice_card).splice.expect("a splice card"),
+                );
                 item.data[n] = splice_card.0 as u32 + 1;
             }
         }
@@ -3903,13 +6632,28 @@ fn cast(
     // the targets (CR 702.174m): what may be targeted can depend on it. The opponent is the only one without asking.
     if let Some(gift) = def.gift
         && cx.s().opponents(player).any(|p| !cx.s().player(p).lost)
-        && matches!(cx.ask_core(player, RequestKind::May { source: spell, purpose: Purpose::PromiseGift(gift.kind) }, true)?, Answer::Yes)
+        && matches!(
+            cx.ask_core(
+                player,
+                RequestKind::May {
+                    source: spell,
+                    purpose: Purpose::PromiseGift(gift.kind)
+                },
+                true
+            )?,
+            Answer::Yes
+        )
     {
         let opponents: Vec<PlayerId> = cx.s().opponents(player).collect();
         let to = if opponents.len() == 1 {
             opponents[0]
         } else {
-            let ask = RequestKind::ChoosePlayer { source: spell, candidates: opponents, verb: "Gift", amount: 0 };
+            let ask = RequestKind::ChoosePlayer {
+                source: spell,
+                candidates: opponents,
+                verb: "Gift",
+                amount: 0,
+            };
             match cx.ask_core(player, ask, true)? {
                 Answer::Player(p) => p,
                 _ => return Err(Stop::Cancel),
@@ -3923,11 +6667,22 @@ fn cast(
 
     // CR 601.2c: targets slot by slot, where they were not announced with the action; a slot counted by X or by the
     // times it was kicked is judged by what was announced.
-    let counted = if item.x > 0 { item.x } else { item.kicked as u16 };
+    let counted = if item.x > 0 {
+        item.x
+    } else {
+        item.kicked as u16
+    };
     let mut targets: Vec<Target> = targets.to_vec();
     let mut of: Vec<u8> = Vec::new();
     if let Some(modal) = def.modal {
-        (targets, of) = choose_slots(cx, player, spell, &mode_specs(modal, mask), counted, item.kicked)?;
+        (targets, of) = choose_slots(
+            cx,
+            player,
+            spell,
+            &mode_specs(modal, mask),
+            counted,
+            item.kicked,
+        )?;
         set_item_targets(cx, &targets, &of);
     } else if let Some(divide) = def.divide
         && let Some(spec) = specs.first()
@@ -3962,9 +6717,13 @@ fn cast(
         // target recording its slot, so the spell's own slots need hold no set number of targets.
         let mut next = specs.len() as u8;
         for &spliced in item.data.iter().filter(|&&d| d != 0) {
-            let specs = cx.card(CardId(spliced as u16 - 1)).spell.map_or(&[][..], |s| s.targets);
+            let specs = cx
+                .card(CardId(spliced as u16 - 1))
+                .spell
+                .map_or(&[][..], |s| s.targets);
             if !specs.is_empty() {
-                let (chosen, chosen_of) = choose_slots(cx, player, spell, specs, counted, item.kicked)?;
+                let (chosen, chosen_of) =
+                    choose_slots(cx, player, spell, specs, counted, item.kicked)?;
                 of.extend(chosen_of.iter().map(|&s| next + s));
                 all.extend(chosen);
             }
@@ -3992,7 +6751,14 @@ fn cast(
     // permanents this spell targets") joins the total now that they are announced; one its caster can't pay is no legal
     // announcement (CR 601.2h), and the cast is taken back.
     if let Some(of_targets) = def.cost_of_targets {
-        let added = of_targets(cx, &Asker { source: spell, controller: player }, &targets);
+        let added = of_targets(
+            cx,
+            &Asker {
+                source: spell,
+                controller: player,
+            },
+            &targets,
+        );
         if !can_pay_other(cx, spell, player, &added) {
             return Err(Stop::Cancel);
         }
@@ -4000,7 +6766,8 @@ fn cast(
         cost.mana = add_cost(cost.mana, added.mana);
     }
     let (added_life, least);
-    (cost.mana, added_life, least) = apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets);
+    (cost.mana, added_life, least) =
+        apply_cost_changes_before_least(cx, player, Costed::Spell(spell), cost.mana, &targets);
     if added_life > 0 {
         cost.life = (cost.life as u32 + added_life).min(255) as u8;
         let owed = cost.life as i32 + extra.life as i32 + life as i32 + x_life as i32;
@@ -4016,14 +6783,21 @@ fn cast(
     // "This spell costs {1} less to cast for each permanent sacrificed this way" (CR 601.2f, 118.7a): a reduction by the
     // number announced, after what raises the cost.
     if less_each > 0 {
-        cost.mana.generic = cost.mana.generic.saturating_sub((item.x as u32 * less_each as u32).min(255) as u8);
+        cost.mana.generic = cost
+            .mana
+            .generic
+            .saturating_sub((item.x as u32 * less_each as u32).min(255) as u8);
     }
 
     // CR 601.2f-h: permanents the cost names are chosen, the mana paid, then the rest of the cost; an additional
     // cost's choices come once the mana is paid (CR 601.2h), as the C# engine asks them, and so do tapped permanents
     // (web-slinging's), which a mana ability activated while paying may have tapped (CR 601.2g).
     let late = permanents_after_mana(&cost);
-    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, spell, &cost)? };
+    let mut chosen = if late {
+        Vec::new()
+    } else {
+        choose_permanents(cx, player, spell, &cost)?
+    };
     let discards = choose_discards(cx, player, spell, &cost)?;
     let mut exiles = choose_exiles(cx, player, spell, &cost)?;
     let (way_sacrifices, way_exiles) = choose_variable(cx, player, spell, &cost, item.x)?;
@@ -4039,7 +6813,10 @@ fn cast(
     // it may come to (Trinisphere), after every increase and reduction, before the total is locked in and paid.
     cost.mana = at_least(cost.mana, least);
     // CR 701.67b: the tapping pays only the generic mana of the waterbend cost, whatever else the total has.
-    let waterbend = def.kicker.filter(|k| k.waterbend).map_or(0, |k| k.cost.generic.saturating_mul(item.kicked));
+    let waterbend = def
+        .kicker
+        .filter(|k| k.waterbend)
+        .map_or(0, |k| k.cost.generic.saturating_mul(item.kicked));
     // CR 702.180b, 601.2h: the creature is tapped as the total cost is paid. It is tapped before the mana is, since a cost
     // may be paid in any order, so it cannot also be tapped for mana: the tap it was chosen for is its own.
     if let Some(creature) = reducer {
@@ -4069,7 +6846,8 @@ fn cast(
         cx.st().update_obj(spell, |o| o.marks.gains_haste = true);
     }
     if restrictions & MANA_MAKES_UNCOUNTERABLE != 0 {
-        cx.st().update_obj(spell, |o| o.marks.cant_be_countered = true);
+        cx.st()
+            .update_obj(spell, |o| o.marks.cant_be_countered = true);
     }
     apply_next_spell_effects(cx, player, spell);
     if late {
@@ -4099,12 +6877,19 @@ fn cast(
     // Sneak (CR 702.190b): the permanent the spell becomes attacks what the creature its cost returns to hand is attacking
     // as the cost is paid, kept on the spell for its resolution. An instant or sorcery becomes no permanent, and keeps none.
     if granted.is_none()
+        && selected_granted.is_none()
         && instead.is_none()
         && way >= 1
-        && whole.ways.get(way as usize - 1).is_some_and(|w| w.enters_attacking)
+        && whole
+            .ways
+            .get(way as usize - 1)
+            .is_some_and(|w| w.enters_attacking)
         && !cx.chars(spell).is(CardType::Instant)
         && !cx.chars(spell).is(CardType::Sorcery)
-        && let Some(attack) = chosen.first().and_then(|&c| cx.s().attackers.iter().find(|a| a.id == c)).copied()
+        && let Some(attack) = chosen
+            .first()
+            .and_then(|&c| cx.s().attackers.iter().find(|a| a.id == c))
+            .copied()
     {
         let at = cx.s().stack.len() - 1;
         let mut with = cx.s().stack[at];
@@ -4113,7 +6898,7 @@ fn cast(
     }
     cx.st().update_obj(spell, |o| {
         o.spent = spent;
-        o.cast_way = way;
+        o.cast_way = cast_way;
         o.x = item.x;
     });
     // Counters put on and taken off permanents are paid first (CR 601.2h: in any order), so a permanent the cost also
@@ -4149,7 +6934,10 @@ fn cast(
         if rider_way == way {
             let since = cx.g.log.len() as u32;
             cx.st().delayed_push(cantrip_state::Delayed {
-                when: DelayedWhen::Step { step: Step::End, on_turn_of: None },
+                when: DelayedWhen::Step {
+                    step: Step::End,
+                    on_turn_of: None,
+                },
                 source: spell,
                 controller: player,
                 ability: AbilityRef::delayed(face, delayed),
@@ -4162,13 +6950,27 @@ fn cast(
 
     // CR 601.2i: it becomes cast.
     let as_cast = cx.chars(spell);
-    let x = cx.s().stack.iter().rev().find(|i| i.object == spell).map_or(0, |i| i.x);
+    let x = cx
+        .s()
+        .stack
+        .iter()
+        .rev()
+        .find(|i| i.object == spell)
+        .map_or(0, |i| i.x);
     // Its mana value on the stack counts X once for each {X} in its mana cost (CR 202.3e): none for an X a cost defined
     // without one (Immoral Bargain's, a number of permanents sacrificed).
     let printed = cx.card(as_cast.card).cost;
     let value = (printed.mana_value() + printed.x as u32 * x as u32).min(255) as u8;
     // "As you cast this spell": the board once the costs are paid (CR 601.2i), asked of the face being cast.
-    let fact = def.cast_fact.map_or(0, |f| f(cx, &Asker { source: spell, controller: player }));
+    let fact = def.cast_fact.map_or(0, |f| {
+        f(
+            cx,
+            &Asker {
+                source: spell,
+                controller: player,
+            },
+        )
+    });
     cx.record(Event::Cast(Cast {
         spell,
         player,
@@ -4181,8 +6983,15 @@ fn cast(
     }));
     // "Until this card is cast from exile" (CR 611.2a, 400.7) ends now, as the card that was in exile becomes cast: the
     // effects about it were there while its costs were paid.
-    if cast_from == ZoneKind::Exile && cx.s().effects.iter().any(|e| e.duration == Duration::UntilCastFromExile(card)) {
-        cx.st().effects_retain(|e| e.duration != Duration::UntilCastFromExile(card));
+    if cast_from == ZoneKind::Exile
+        && cx
+            .s()
+            .effects
+            .iter()
+            .any(|e| e.duration == Duration::UntilCastFromExile(card))
+    {
+        cx.st()
+            .effects_retain(|e| e.duration != Duration::UntilCastFromExile(card));
     }
     let nth = cx.history().casts_by(player).count().min(255) as u8;
     cx.emit(Event::SpellCast { spell, player, nth });
@@ -4197,6 +7006,87 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
     !cast_ways_during_resolution(cx, card).is_empty()
 }
 
+fn resolve_resolution_cast_plan(
+    cx: &Cx,
+    player: PlayerId,
+    card: ObjectId,
+    way: u8,
+    mut terms: CastTerms,
+    selected_granted: Option<(ObjectId, &'static GrantedWay)>,
+    selected_printed_way: Option<u32>,
+) -> Option<ResolvedCastPlan> {
+    let face = cast_face(cx.card(cx.s().obj(card).card), way);
+    let object = cx.s().obj(card);
+    let view = AsFace {
+        cx,
+        spell: card,
+        face: cx.card_id(face),
+    };
+    let q: &dyn Query = if way == 0 { cx } else { &view };
+    let (cost, route, cost_choice) = if let Some((source, granted)) = selected_granted {
+        if (!granted.any_zone
+            && (object.zone.kind() != granted.from || object.zone.player != player))
+            || granted_way_rule(cx, source, granted).is_none()
+        {
+            return None;
+        }
+        let controller = cx.s().obj(source).controller;
+        let cost = (granted.cost)(q, &Asker { source, controller }, card, player)?;
+        let rule = granted_way_rule(cx, source, granted)?;
+        (
+            cost,
+            CastPermission::GrantedWay { source, rule },
+            CastCostChoice::GrantedWay { source, rule },
+        )
+    } else if let Some(index) = selected_printed_way {
+        let way_cost = cx.card(object.card).ways.get(index as usize)?;
+        if way_cost.only_from && way_cost.from != object.zone.kind() {
+            return None;
+        }
+        if !way_cost.condition.is_none_or(|condition| {
+            condition(
+                q,
+                &Asker {
+                    source: card,
+                    controller: player,
+                },
+            )
+        }) {
+            return None;
+        }
+        (
+            way_cost.cost,
+            CastPermission::Resolution,
+            CastCostChoice::PrintedWay { way: index },
+        )
+    } else if let Some(instead) = terms.instead {
+        (
+            Cost::mana(instead),
+            CastPermission::Resolution,
+            CastCostChoice::EffectSpecified,
+        )
+    } else {
+        (
+            Cost::mana(face.cost),
+            CastPermission::Resolution,
+            CastCostChoice::Printed,
+        )
+    };
+    terms.way = Some(way);
+    Some(ResolvedCastPlan {
+        plan: CastPlan {
+            way,
+            permission: route,
+            cost: cost_choice,
+        },
+        cost,
+        terms,
+        granted: selected_granted,
+        exile: None,
+        retraced: false,
+    })
+}
+
 /// Each way the resolving effect's controller could cast `card` now (CR 608.2g), each face judged alone (CR 709.3a, 715.3a,
 /// 712.8a): the card itself unless it is a land or a split card (whose halves are what is cast, CR 709.3), a split card's two
 /// halves (an aftermath half only from a graveyard, CR 702.127a), an Adventurer's Adventure, an omen card's Omen (CR 720.3a),
@@ -4204,7 +7094,9 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// back face. A fused cast (CR 702.102a: a fuse split card cast from a hand, both halves at once, its mana value the sum of
 /// theirs) is a way too, from a hand only; it is not built yet (docs/known-issues.md).
 pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
-    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
+    let Some(player) = cx.s().stack.last().map(|i| i.controller) else {
+        return Vec::new();
+    };
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
         return Vec::new();
@@ -4213,7 +7105,10 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     // what resolves (Krosan Grip's ruling: "If the resolution of a triggered ability involves casting a spell, that spell can't
     // be cast if a spell with split second is on the stack").
     let below = &cx.s().stack[..cx.s().stack.len() - 1];
-    if below.iter().any(|i| i.kind == StackKind::Spell && has_split_second(cx, i.object)) {
+    if below
+        .iter()
+        .any(|i| i.kind == StackKind::Spell && has_split_second(cx, i.object))
+    {
         return Vec::new();
     }
     if cast_barred(cx, player).contains(obj.zone.kind()) {
@@ -4222,14 +7117,26 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     // A card exiled face down is judged as the spell it would be (CR 406.3a-b).
     let _face_up = layers::judged_face_up(cx.s(), card);
     let def = cx.card(obj.card);
-    let asker = Asker { source: card, controller: player };
+    let asker = Asker {
+        source: card,
+        controller: player,
+    };
     let forbidders = static_rules::spell_forbidders(cx);
     let forbidden = |face: &'static CardDef| {
         !forbidders.is_empty()
             && if std::ptr::eq(face, def) {
                 static_rules::spell_forbidden(cx, &forbidders, player, card)
             } else {
-                static_rules::spell_forbidden(&AsFace { cx, spell: card, face: cx.card_id(face) }, &forbidders, player, card)
+                static_rules::spell_forbidden(
+                    &AsFace {
+                        cx,
+                        spell: card,
+                        face: cx.card_id(face),
+                    },
+                    &forbidders,
+                    player,
+                    card,
+                )
             }
     };
     let castable = |face: &'static CardDef| {
@@ -4244,24 +7151,40 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     if let Some((left, right)) = def.split {
         for (way, half) in [(WAY_SPLIT_LEFT, left), (WAY_SPLIT_RIGHT, right)] {
             if (!half.aftermath || obj.zone.is(ZoneKind::Graveyard)) && castable(half) {
-                ways.push(CastWay { way, face: cx.card_id(half), mana_value: half.cost.mana_value() });
+                ways.push(CastWay {
+                    way,
+                    face: cx.card_id(half),
+                    mana_value: half.cost.mana_value(),
+                });
             }
         }
         return ways;
     }
     if !def.is(CardType::Land) && castable(def) {
-        ways.push(CastWay { way: 0, face: obj.card, mana_value: cx.mana_value(card) });
+        ways.push(CastWay {
+            way: 0,
+            face: obj.card,
+            mana_value: cx.mana_value(card),
+        });
     }
     for (way, _, inset) in def.inset_faces() {
         if castable(inset) {
-            ways.push(CastWay { way, face: cx.card_id(inset), mana_value: inset.cost.mana_value() });
+            ways.push(CastWay {
+                way,
+                face: cx.card_id(inset),
+                mana_value: inset.cost.mana_value(),
+            });
         }
     }
     if let Some(back) = def.back
         && back.has_cost
         && castable(back)
     {
-        ways.push(CastWay { way: WAY_BACK_FACE, face: cx.card_id(back), mana_value: back.cost.mana_value() });
+        ways.push(CastWay {
+            way: WAY_BACK_FACE,
+            face: cx.card_id(back),
+            mana_value: back.cost.mana_value(),
+        });
     }
     ways
 }
@@ -4270,15 +7193,22 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
 /// on the battlefield or the stack, it is their own turn (CR 305.3) and they have a land play left (CR 305.2). The phase,
 /// the stack and priority are not asked: the effect itself is the permission to play it now.
 pub fn could_play_land_during_resolution(cx: &Cx, card: ObjectId) -> bool {
-    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return false };
+    let Some(player) = cx.s().stack.last().map(|i| i.controller) else {
+        return false;
+    };
     let obj = cx.s().obj(card);
-    if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) || cx.s().turn.active != player {
+    if !live(cx.s(), card)
+        || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack)
+        || cx.s().turn.active != player
+    {
         return false;
     }
     if !cx.card(obj.card).is(CardType::Land) || cx.s().player(player).lost {
         return false;
     }
-    let LandRules { extra, unlimited, .. } = land_rules(cx, player);
+    let LandRules {
+        extra, unlimited, ..
+    } = land_rules(cx, player);
     unlimited || (cx.s().player(player).lands_played as u32) < 1 + extra
 }
 
@@ -4318,30 +7248,98 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
                 repeat: false,
             };
             match cx.ask_core(player, ask, false)? {
-                Answer::Modes(chosen) => ways[chosen.first().copied().unwrap_or(0) as usize % ways.len()].way,
+                Answer::Modes(chosen) => {
+                    ways[chosen.first().copied().unwrap_or(0) as usize % ways.len()].way
+                }
                 _ => ways[0].way,
             }
         }
     };
+    let mut selected_granted: Option<(ObjectId, &'static GrantedWay)> = None;
+    let mut selected_printed_way: Option<u32> = None;
     // CR 118.9a: only one alternative cost. An effect asking for the normal mana cost still lets the
     // caster choose a zone-neutral alternative cost (Primal Prayers, Aluren); a forced alternative does not.
     if terms.instead.is_none() && terms.life == 0 && !terms.flashback {
         let face_def = cast_face(cx.card(cx.s().obj(card).card), way);
-        let face_kind = faces_to_cast(cx.card(cx.s().obj(card).card)).into_iter()
-            .find(|&(_, f)| std::ptr::eq(f, face_def)).map(|(f, _)| f);
+        let face_kind = faces_to_cast(cx.card(cx.s().obj(card).card))
+            .into_iter()
+            .find(|&(_, f)| std::ptr::eq(f, face_def))
+            .map(|(f, _)| f);
         if let Some(face_kind) = face_kind {
-            let view = AsFace { cx: &*cx, spell: card, face: cx.card_id(face_def) };
+            let view = AsFace {
+                cx: &*cx,
+                spell: card,
+                face: cx.card_id(face_def),
+            };
             let q: &dyn Query = if way == 0 { &*cx } else { &view };
-            let mut choices = Vec::new();
+            let asker = Asker {
+                source: card,
+                controller: player,
+            };
+            let mut choices: Vec<(
+                u8,
+                Label,
+                Option<(ObjectId, &'static GrantedWay)>,
+                Option<u32>,
+            )> = Vec::new();
             if face_def.has_cost {
-                choices.push((way, Label::Face(cx.card_id(face_def))));
+                choices.push((way, Label::Face(cx.card_id(face_def)), None, None));
             }
-            for (k, (granter, controller, rule)) in granted_ways_of(cx.cards(), cx.s(), &cx.g.log).into_iter().enumerate().take(WAY_GRANTED_SLOTS as usize) {
-                if rule.any_zone && (rule.cost)(q, &Asker { source: granter, controller }, card, player)
-                    .is_some_and(|cost| can_pay_other(cx, card, player, &cost)) {
+            if face_kind == 0 {
+                for (index, printed) in cx.card(cx.s().obj(card).card).ways.iter().enumerate() {
+                    if printed.only_from && printed.from != cx.s().obj(card).zone.kind() {
+                        continue;
+                    }
+                    let view = AsFace {
+                        cx: &*cx,
+                        spell: card,
+                        face: cx.card_id(face_def),
+                    };
+                    let q: &dyn Query = if way == 0 { &*cx } else { &view };
+                    if !(printed
+                        .condition
+                        .is_none_or(|condition| condition(q, &asker)))
+                    {
+                        continue;
+                    }
+                    if can_pay_other(cx, card, player, &printed.cost) {
+                        choices.push((
+                            way,
+                            Label::PrintedWay(cx.s().obj(card).card, index as u32),
+                            None,
+                            Some(index as u32),
+                        ));
+                    }
+                }
+            }
+            for (granter, controller, rule) in granted_ways_of(cx.cards(), cx.s(), &cx.g.log) {
+                let object = cx.s().obj(card);
+                let in_granted_zone = rule.any_zone
+                    || (rule.from == object.zone.kind() && object.zone.player == player);
+                if in_granted_zone
+                    && (rule.cost)(
+                        q,
+                        &Asker {
+                            source: granter,
+                            controller,
+                        },
+                        card,
+                        player,
+                    )
+                    .is_some_and(|cost| can_pay_other(cx, card, player, &cost))
+                {
                     let printed = cx.card(cx.chars(granter).card);
-                    if let Some(index) = printed.granted_ways.iter().position(|w| std::ptr::eq(w, rule)) {
-                        choices.push((granted_way(k, face_kind), Label::GrantedWay(cx.chars(granter).card, index as u8)));
+                    if let Some(index) = printed
+                        .granted_ways
+                        .iter()
+                        .position(|w| std::ptr::eq(w, rule))
+                    {
+                        choices.push((
+                            granted_face_way(face_kind),
+                            Label::GrantedWay(cx.chars(granter).card, index as u8),
+                            Some((granter, rule)),
+                            None,
+                        ));
                     }
                 }
             }
@@ -4350,23 +7348,53 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
             }
             // Preserve the ordinary face-only prompt when there is no alternative to choose.
             if choices.len() > 1 {
+                if choices.len() > u8::MAX as usize {
+                    return Err(Stop::Cancel);
+                }
                 let ask = RequestKind::ChooseModes {
-                    source: card, modes: choices.iter().map(|&(_, label)| label).collect(),
-                    eligible: (0..choices.len() as u8).collect(), count: 1, at_most: 0,
-                    affordable: Vec::new(), additional_cost: false, repeat: false,
+                    source: card,
+                    modes: choices.iter().map(|&(_, label, _, _)| label).collect(),
+                    eligible: (0..choices.len() as u8).collect(),
+                    count: 1,
+                    at_most: 0,
+                    affordable: Vec::new(),
+                    additional_cost: false,
+                    repeat: false,
                 };
-                let Answer::Modes(chosen) = cx.ask_core(player, ask, false)? else { unreachable!("a cost choice") };
-                way = choices[chosen[0] as usize].0;
+                let Answer::Modes(chosen) = cx.ask_core(player, ask, false)? else {
+                    unreachable!("a cost choice")
+                };
+                let choice = choices[chosen[0] as usize];
+                way = choice.3.map_or(choice.0, |index| index.saturating_add(1).min(u8::MAX as u32) as u8);
+                selected_granted = choice.2;
+                selected_printed_way = choice.3;
             } else {
-                way = choices[0].0;
+                way = choices[0].3.map_or(choices[0].0, |index| index.saturating_add(1).min(u8::MAX as u32) as u8);
+                selected_granted = choices[0].2;
+                selected_printed_way = choices[0].3;
             }
         }
     }
     let mark = cx.s().mark();
     let log_mark = cx.g.log.len();
     // CR 707.12: it is a copy of the card that is cast, and the card stays where it is. A cast given up reverts the copy too.
-    let card = if terms.copy { ops::copy_card(cx, card, player) } else { card };
-    match cast(cx, player, card, way, &[], terms, true) {
+    let card = if terms.copy {
+        ops::copy_card(cx, card, player)
+    } else {
+        card
+    };
+    let Some(planned) = resolve_resolution_cast_plan(
+        cx,
+        player,
+        card,
+        way,
+        terms,
+        selected_granted,
+        selected_printed_way,
+    ) else {
+        return Ok(false);
+    };
+    match cast(cx, player, card, way, &[], terms, true, Some(planned)) {
         Ok(()) => Ok(true),
         Err(Stop::Cancel) => {
             cx.st().revert(mark);
@@ -4380,7 +7408,9 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
 /// Whether the resolving effect's controller could cast `card` transformed now (CR 608.2g, 712.11a): a double-faced
 /// card that is not modal (CR 712.11c-d: its back face has no mana cost of its own), judged as that back face alone.
 pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool {
-    let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return false };
+    let Some(player) = cx.s().stack.last().map(|i| i.controller) else {
+        return false;
+    };
     let obj = cx.s().obj(card);
     if !live(cx.s(), card) || matches!(obj.zone.kind(), ZoneKind::Battlefield | ZoneKind::Stack) {
         return false;
@@ -4388,7 +7418,9 @@ pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool
     if cast_barred(cx, player).contains(obj.zone.kind()) {
         return false;
     }
-    let Some(back) = cx.card(obj.card).back else { return false };
+    let Some(back) = cx.card(obj.card).back else {
+        return false;
+    };
     if back.has_cost {
         return false;
     }
@@ -4416,7 +7448,19 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
     let player = cx.s().stack.last().expect("a resolving item").controller;
     let mark = cx.s().mark();
     let log_mark = cx.g.log.len();
-    match cast(cx, player, card, WAY_TRANSFORMED, &[], CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() }, true) {
+    match cast(
+        cx,
+        player,
+        card,
+        WAY_TRANSFORMED,
+        &[],
+        CastTerms {
+            instead: Some(ManaCost::ZERO),
+            ..CastTerms::default()
+        },
+        true,
+        None,
+    ) {
         Ok(()) => Ok(true),
         Err(Stop::Cancel) => {
             cx.st().revert(mark);
@@ -4431,13 +7475,24 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
 /// count: the candidates less any worth more than the limit by itself, which no legal choice could include, and the limit
 /// with each remaining candidate's mana value, index for index, for the question (the core refuses an answer over it).
 /// A slot without one keeps its candidates and asks nothing of them.
-pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u16, candidates: Vec<Target>) -> (Vec<Target>, Option<TotalAtMost>) {
-    let Some(most) = spec.total_limit(counted) else { return (candidates, None) };
+pub(crate) fn within_total(
+    cx: &Cx,
+    spec: &TargetSpec,
+    counted: u16,
+    candidates: Vec<Target>,
+) -> (Vec<Target>, Option<TotalAtMost>) {
+    let Some(most) = spec.total_limit(counted) else {
+        return (candidates, None);
+    };
     let value = |t: Target| match t {
         Target::Object(id) => cx.mana_value(id).min(u32::from(u16::MAX)) as u16,
         _ => 0,
     };
-    let (kept, values): (Vec<Target>, Vec<u16>) = candidates.into_iter().map(|t| (t, value(t))).filter(|&(_, v)| v <= most).unzip();
+    let (kept, values): (Vec<Target>, Vec<u16>) = candidates
+        .into_iter()
+        .map(|t| (t, value(t)))
+        .filter(|&(_, v)| v <= most)
+        .unzip();
     (kept, Some(TotalAtMost { values, most }))
 }
 
@@ -4445,8 +7500,18 @@ pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u16, candidates:
 /// chosen for two slots). A slot that chose nothing ("up to") keeps its place with `Target::None` among the slots, so
 /// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose. Each target comes
 /// with the index of the spec it was chosen for (`StackItem::spec_of`), so a slot of several targets may stand anywhere.
-fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u16, kicked: u8) -> R<(Vec<Target>, Vec<u8>)> {
-    let asker = Asker { source, controller: player };
+fn choose_slots(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    specs: &[TargetSpec],
+    counted: u16,
+    kicked: u8,
+) -> R<(Vec<Target>, Vec<u8>)> {
+    let asker = Asker {
+        source,
+        controller: player,
+    };
     let slots = crate::resolve::expand_specs(cx.s(), player, specs);
     let mut targets = Vec::new();
     let mut of = Vec::new();
@@ -4455,8 +7520,14 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
         let spec = &spec.when_kicked(kicked);
         let before = targets.len();
         'slot: {
-            let candidates =
-                target_candidates_given(cx, &asker, spec, if slots.len() > 1 { &targets } else { &[] }, Target::None, *slot_player);
+            let candidates = target_candidates_given(
+                cx,
+                &asker,
+                spec,
+                if slots.len() > 1 { &targets } else { &[] },
+                Target::None,
+                *slot_player,
+            );
             let (candidates, total) = within_total(cx, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
             // Fewer legal targets than the slot's minimum is not a legal announcement (CR 601.2c, 602.2b): given up whole.
@@ -4475,7 +7546,9 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
             // A stack item holds at most MAX_TARGETS targets: a count past what is left of them is cut to it (known-issues KI-3).
             let room = cantrip_state::MAX_TARGETS.saturating_sub(targets.len());
             let count = (most as usize).min(candidates.len()).min(room) as u8;
-            let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
+            let ask = RequestKind::ChooseTarget {
+                label: spec.label,
+                slot_player: *slot_player,
                 source,
                 purpose: Purpose::Targets,
                 candidates,
@@ -4516,17 +7589,41 @@ pub(crate) enum Divided {
 /// Asks for the targets of a slot that divides a total among them, and each target's share (CR 601.2d), in one
 /// question, as the C# engine does: a total of nothing is not asked; with no candidate an optional slot takes no
 /// target. `may_cancel` is for a spell or ability still being announced.
-pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec: &TargetSpec, total: u16, may_cancel: bool) -> R<Divided> {
+pub(crate) fn ask_divided(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    spec: &TargetSpec,
+    total: u16,
+    may_cancel: bool,
+) -> R<Divided> {
     if total == 0 {
         return Ok(Divided::Skipped);
     }
-    let asker = Asker { source, controller: player };
+    let asker = Asker {
+        source,
+        controller: player,
+    };
     let candidates = target_candidates(cx, &asker, spec);
     if candidates.is_empty() {
-        return Ok(if spec.min == 0 { Divided::Skipped } else { Divided::Impossible });
+        return Ok(if spec.min == 0 {
+            Divided::Skipped
+        } else {
+            Divided::Impossible
+        });
     }
-    let max_targets = if spec.max == TargetSpec::COUNTED { 0 } else { spec.max };
-    let ask = RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional: spec.min == 0 };
+    let max_targets = if spec.max == TargetSpec::COUNTED {
+        0
+    } else {
+        spec.max
+    };
+    let ask = RequestKind::ChooseDividedTargets {
+        source,
+        candidates,
+        total,
+        max_targets,
+        optional: spec.min == 0,
+    };
     match cx.ask_core(player, ask, may_cancel)? {
         Answer::Divided(shares) if shares.is_empty() => Ok(Divided::Skipped),
         Answer::Divided(shares) => Ok(Divided::Chosen(
@@ -4626,13 +7723,35 @@ fn cast_modes(
 /// Asks for a modal spell's or ability's modes (CR 601.2b, 602.2b, 700.2), as the C# engine's `ChooseModesPrompt`:
 /// `range` (at least, at most) of the eligible modes, with the ones whose own cost could be paid beside `base` as advice.
 /// Returns the chosen modes as a bit for each.
-fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, modal: &ModalDef, range: (u8, u8), base: ManaCost) -> R<u8> {
+fn choose_modes(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    ability: AbilityRef,
+    modal: &ModalDef,
+    range: (u8, u8),
+    base: ManaCost,
+) -> R<u8> {
     let (least, max) = range;
-    let asker = Asker { source, controller: player };
+    let asker = Asker {
+        source,
+        controller: player,
+    };
     let eligible = eligible_modes(cx, &asker, modal);
     let costed = modal.modes.iter().any(|m| m.cost.mana_value() > 0);
     let affordable: Vec<u8> = if costed {
-        eligible.iter().copied().filter(|&i| can_afford(cx, player, source, &add_cost(base, modal.modes[i as usize].cost))).collect()
+        eligible
+            .iter()
+            .copied()
+            .filter(|&i| {
+                can_afford(
+                    cx,
+                    player,
+                    source,
+                    &add_cost(base, modal.modes[i as usize].cost),
+                )
+            })
+            .collect()
     } else {
         Vec::new()
     };
@@ -4645,7 +7764,8 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
     if modal.escalate.is_some() {
         let payable = |cx: &Cx, n: u8| {
             let first_n = (1u16 << n).wrapping_sub(1) as u8;
-            can_afford(cx, player, source, &modal_cost(modal, first_n, base)) && can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
+            can_afford(cx, player, source, &modal_cost(modal, first_n, base))
+                && can_pay_other(cx, source, player, &escalate_cost(modal, first_n))
         };
         while most > least.max(1) && !payable(cx, most) {
             most -= 1;
@@ -4653,7 +7773,9 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
     }
     let ask = RequestKind::ChooseModes {
         source,
-        modes: (0..modal.modes.len() as u8).map(|i| Label::Mode(ability, i)).collect(),
+        modes: (0..modal.modes.len() as u8)
+            .map(|i| Label::Mode(ability, i))
+            .collect(),
         eligible,
         count: least,
         at_most: if most > least { most } else { 0 },
@@ -4663,8 +7785,14 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
     };
     match cx.ask_core(player, ask, true)? {
         Answer::Modes(chosen) => {
-            let modes = chosen.iter().fold(0u8, |mask, &i| modal.with(mask, i as usize));
-            cx.record(Event::ModesChosen { source, ability, modes });
+            let modes = chosen
+                .iter()
+                .fold(0u8, |mask, &i| modal.with(mask, i as usize));
+            cx.record(Event::ModesChosen {
+                source,
+                ability,
+                modes,
+            });
             Ok(modes)
         }
         _ => Err(Stop::Cancel),
@@ -4795,7 +7923,9 @@ fn kicker_total(base: ManaCost, k: Kicker, n: u16) -> ManaCost {
     if k.cost.x > 0 {
         if n > 0 {
             total = add_cost(total, ManaCost { x: 0, ..k.cost });
-            total.generic = total.generic.saturating_add((n as u32 * k.cost.x as u32).min(255) as u8);
+            total.generic = total
+                .generic
+                .saturating_add((n as u32 * k.cost.x as u32).min(255) as u8);
         }
         return total;
     }
@@ -4807,17 +7937,31 @@ fn kicker_total(base: ManaCost, k: Kicker, n: u16) -> ManaCost {
 
 /// Announces whether an optional cost that is not mana is paid (CR 601.2b), as the C# engine asks it: a choice between
 /// casting without it and paying it, the second on offer only when it could be paid. Whether it was chosen.
-fn announce_optional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardId, def: &'static CardDef, optional: &OptionalCost) -> R<bool> {
+fn announce_optional(
+    cx: &mut Cx,
+    player: PlayerId,
+    spell: ObjectId,
+    face: CardId,
+    def: &'static CardDef,
+    optional: &OptionalCost,
+) -> R<bool> {
     // A spell that must choose more modes when it is paid ("choose both instead") can be cast that way only when that
     // many modes could be chosen (CR 700.2a, 601.2b): paying is not on offer otherwise.
-    let asker = Asker { source: spell, controller: player };
+    let asker = Asker {
+        source: spell,
+        controller: player,
+    };
     let modes_allow = def.modal.is_none_or(|modal| {
-        modal.when_paid.is_none_or(|(least, _)| eligible_modes(cx, &asker, modal).len() >= least.max(1) as usize)
+        modal.when_paid.is_none_or(|(least, _)| {
+            eligible_modes(cx, &asker, modal).len() >= least.max(1) as usize
+        })
     });
     let payable = modes_allow && can_pay_other(cx, spell, player, &optional.cost);
     let ask = RequestKind::ChooseModes {
         source: spell,
-        modes: (0..def.labels.len().min(2) as u8).map(|i| Label::Card(face, i)).collect(),
+        modes: (0..def.labels.len().min(2) as u8)
+            .map(|i| Label::Card(face, i))
+            .collect(),
         eligible: if payable { vec![0, 1] } else { vec![0] },
         count: 1,
         at_most: 0,
@@ -4833,16 +7977,26 @@ fn announce_optional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 
 /// Chooses which additional cost is paid (CR 601.2b): only the ones that can be paid are offered, and a lone one is
 /// taken without asking, as the C# engine does.
-fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardId, def: &'static CardDef) -> R<Cost> {
+fn choose_additional(
+    cx: &mut Cx,
+    player: PlayerId,
+    spell: ObjectId,
+    face: CardId,
+    def: &'static CardDef,
+) -> R<Cost> {
     let payable: Vec<u8> = (0..def.additional_choice.len() as u8)
         .filter(|&i| can_pay_other(cx, spell, player, &def.additional_choice[i as usize].cost))
         .collect();
-    let Some(&first) = payable.first() else { return Err(Stop::Cancel) };
+    let Some(&first) = payable.first() else {
+        return Err(Stop::Cancel);
+    };
     let mut picked = first;
     if payable.len() > 1 {
         let ask = RequestKind::ChooseModes {
             source: spell,
-            modes: (0..def.additional_choice.len() as u8).map(|i| Label::Extra(face, i)).collect(),
+            modes: (0..def.additional_choice.len() as u8)
+                .map(|i| Label::Extra(face, i))
+                .collect(),
             eligible: payable,
             count: 1,
             at_most: 0,
@@ -4860,16 +8014,36 @@ fn choose_additional(cx: &mut Cx, player: PlayerId, spell: ObjectId, face: CardI
 
 /// Announcing X or the number of times a spell is kicked (CR 601.2b), as the C# engine asks it: a pay-costs
 /// question that raises and lowers the value until confirmed.
-fn announce(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16) -> R<u16> {
+fn announce(
+    cx: &mut Cx,
+    player: PlayerId,
+    spell: ObjectId,
+    base: ManaCost,
+    kicker: Option<Kicker>,
+    x_symbols: u8,
+    cap: u16,
+) -> R<u16> {
     announce_x(cx, player, spell, base, kicker, x_symbols, cap, false, 0)
 }
 
 /// `announce`, saying whether the X is a "−X" loyalty cost's (`RequestKind::PayCosts::loyalty`), and how much generic mana
 /// each one announced takes off the total shown (`VariableCost::SacrificeAnyNumber`'s `less_each`).
 #[allow(clippy::too_many_arguments)]
-fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, kicker: Option<Kicker>, x_symbols: u8, cap: u16, loyalty: bool, less_each: u8) -> R<u16> {
+fn announce_x(
+    cx: &mut Cx,
+    player: PlayerId,
+    spell: ObjectId,
+    base: ManaCost,
+    kicker: Option<Kicker>,
+    x_symbols: u8,
+    cap: u16,
+    loyalty: bool,
+    less_each: u8,
+) -> R<u16> {
     let most: u16 = match kicker {
-        Some(Kicker { multi: false, cost, .. }) if cost.x == 0 => 1,
+        Some(Kicker {
+            multi: false, cost, ..
+        }) if cost.x == 0 => 1,
         _ => cap,
     };
     let mut n: u16 = 0;
@@ -4877,8 +8051,16 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         let mut total = base;
         match kicker {
             Some(k) => total = kicker_total(total, k, n),
-            None if x_symbols > 0 => total.generic = total.generic.saturating_add((n as u32 * x_symbols as u32).min(255) as u8),
-            None => total.generic = total.generic.saturating_sub((n as u32 * less_each as u32).min(255) as u8),
+            None if x_symbols > 0 => {
+                total.generic = total
+                    .generic
+                    .saturating_add((n as u32 * x_symbols as u32).min(255) as u8)
+            }
+            None => {
+                total.generic = total
+                    .generic
+                    .saturating_sub((n as u32 * less_each as u32).min(255) as u8)
+            }
         }
         let mut options = Vec::new();
         if n < most {
@@ -4889,7 +8071,17 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
         }
         options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         options.push(ActionOption::simple(ActionKind::CancelCasting));
-        let ask = RequestKind::PayCosts { source: spell, total, remaining: total, options, announcing: true, x: n, loyalty, attackers: Vec::new(), life: 0 };
+        let ask = RequestKind::PayCosts {
+            source: spell,
+            total,
+            remaining: total,
+            options,
+            announcing: true,
+            x: n,
+            loyalty,
+            attackers: Vec::new(),
+            life: 0,
+        };
         match cx.ask_core(player, ask, true)? {
             Answer::Act(a) => match a.kind {
                 ActionKind::IncreaseX => n += 1,
@@ -4903,14 +8095,32 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
 }
 
 /// Activating a non-mana ability (CR 602.2): on the stack, then its costs.
-fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, index: u8, targets: &[Target]) -> R<()> {
+fn activate(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    ability: AbilityRef,
+    index: u8,
+    targets: &[Target],
+) -> R<()> {
     let def = activated(cx, ability).expect("activated");
     let mut item = stack_item(StackKind::Activated, source, ability, player, targets);
     let mut mana = def.cost.mana;
     // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost.
-    if let Some((granter, alternative)) = static_rules::activation_alternative(cx, player, source, def)
+    if let Some((granter, alternative)) =
+        static_rules::activation_alternative(cx, player, source, def)
         && alternative != mana
-        && matches!(cx.ask_core(player, RequestKind::May { source: granter, purpose: Purpose::Ask(&ALTERNATIVE_ACTIVATION_COST) }, true)?, Answer::Yes)
+        && matches!(
+            cx.ask_core(
+                player,
+                RequestKind::May {
+                    source: granter,
+                    purpose: Purpose::Ask(&ALTERNATIVE_ACTIVATION_COST)
+                },
+                true
+            )?,
+            Answer::Yes
+        )
     {
         mana = alternative;
     }
@@ -4918,12 +8128,23 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // CR 602.2b, 601.2b: a modal ability's modes first, then X, then the Phyrexian symbols paid with life.
     let mut mask = 0u8;
     if let Some(modal) = def.modal {
-        mask = choose_modes(cx, player, source, ability, modal, (modal.min, modal.max), mana)?;
+        mask = choose_modes(
+            cx,
+            player,
+            source,
+            ability,
+            modal,
+            (modal.min, modal.max),
+            mana,
+        )?;
         item.modes = mask;
     }
     if mana.x > 0 {
         // "X target lands" cannot be announced past the legal targets there are (CR 601.2c, 602.2b).
-        let asker = Asker { source, controller: player };
+        let asker = Asker {
+            source,
+            controller: player,
+        };
         let cap = def
             .targets
             .iter()
@@ -4963,7 +8184,8 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // here, so nothing that happens to a target later changes what is paid. Life a change adds (CR 118.8) is payable only
     // with that much life, the rest of the cost's included (CR 119.4, 118.3), or the activation is taken back.
     let added_life;
-    (mana, added_life) = apply_cost_changes_total(cx, player, Costed::Ability(source, ability), mana, &targets);
+    (mana, added_life) =
+        apply_cost_changes_total(cx, player, Costed::Ability(source, ability), mana, &targets);
     let life = life as u32 + added_life;
     if added_life > 0 && payable_life(cx, player) < life as i32 + def.cost.life as i32 {
         return Err(Stop::Cancel);
@@ -5046,17 +8268,29 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     note_activation(cx, source, index as usize, def);
     // Craft exiles its source with its materials, last of all (`pay_materials`).
     if def.cost.exile_self && def.cost.materials.is_none() {
-        ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
+        ops::move_to_for(
+            cx,
+            source,
+            Zone::exile(cx.s().obj(source).owner),
+            ZoneReason::Exile,
+        );
     }
     if def.cost.discard_self {
         ops::discard(cx, source);
         if def.from == ZoneKind::Hand {
-            cx.emit(Event::Cycled { card: source, player });
+            cx.emit(Event::Cycled {
+                card: source,
+                player,
+            });
         }
     }
     if let Some(loyalty) = def.cost.loyalty {
         let turn = cx.s().turn.number;
-        let change = if loyalty == LOYALTY_MINUS_X { -(item.x as i16) } else { loyalty as i16 };
+        let change = if loyalty == LOYALTY_MINUS_X {
+            -(item.x as i16)
+        } else {
+            loyalty as i16
+        };
         cx.st().update_obj(source, |o| o.loyalty_turn = turn);
         if change > 0 {
             // CR 606.4, 118.3: loyalty counters put on as the cost, by the player activating it - what replaces counters being
@@ -5071,13 +8305,25 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         ops::sacrifice(cx, &[source]);
     }
     if def.cost.return_self {
-        ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);
+        ops::move_to_for(
+            cx,
+            source,
+            Zone::hand(cx.s().obj(source).owner),
+            ZoneReason::Other,
+        );
     }
     if def.cost.materials.is_some() {
-        assert!(def.cost.exile_self, "craft exiles its source with its materials (CR 702.167a)");
+        assert!(
+            def.cost.exile_self,
+            "craft exiles its source with its materials (CR 702.167a)"
+        );
         pay_materials(cx, source, &materials);
     }
-    cx.emit(Event::AbilityActivated { source, ability, player });
+    cx.emit(Event::AbilityActivated {
+        source,
+        ability,
+        player,
+    });
     ops::became_targets(cx, targets.iter().copied(), source, player);
     ops::commit_crime(cx, player, source, &targets);
     Ok(())
@@ -5090,12 +8336,31 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
 /// it face up, a Room door's to unlock it, the printed cost otherwise - with the static abilities that change the cost of
 /// that special action applied (`Costed::SpecialAction`: "plotting cards from your hand costs {2} less", CR 116.2k, 118.7),
 /// increases first, then reductions, none below {0}.
-fn special_action_cost(cx: &Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, def: &ActivatedDef) -> ManaCost {
+fn special_action_cost(
+    cx: &Cx,
+    player: PlayerId,
+    source: ObjectId,
+    ability: AbilityRef,
+    def: &ActivatedDef,
+) -> ManaCost {
     let printed = special_action_printed_cost(cx, source, ability, def);
-    change_with(cx, &cost_change_sources(cx), player, Costed::SpecialAction(source, ability), printed, None, &[])
+    change_with(
+        cx,
+        &cost_change_sources(cx),
+        player,
+        Costed::SpecialAction(source, ability),
+        printed,
+        None,
+        &[],
+    )
 }
 
-fn special_action_printed_cost(cx: &Cx, source: ObjectId, ability: AbilityRef, def: &ActivatedDef) -> ManaCost {
+fn special_action_printed_cost(
+    cx: &Cx,
+    source: ObjectId,
+    ability: AbilityRef,
+    def: &ActivatedDef,
+) -> ManaCost {
     let card = cx.s().obj(source).card;
     if cx.cards().turns_face_up(ability) {
         return ManaCost { x: 0, ..cx.card(card).cost };
@@ -5118,14 +8383,22 @@ fn special_action_printed_cost(cx: &Cx, source: ObjectId, ability: AbilityRef, d
 /// What the special action `index` of `source` (numbered as its options are) costs `player` now, where a cost change makes
 /// it differ from its printed cost (CR 116.2, 118.7): for the menu row, which says so ("costs {B}"). None otherwise, or for
 /// anything that is not a special action.
-pub fn special_action_costs(game: &crate::Game, player: PlayerId, source: ObjectId, index: u8) -> Option<ManaCost> {
+pub fn special_action_costs(
+    game: &crate::Game,
+    player: PlayerId,
+    source: ObjectId,
+    index: u8,
+) -> Option<ManaCost> {
     let ability = game.chars(source).abilities().nth(index as usize)?;
-    let AbilityDef::Activated(def) = game.cards.ability(ability) else { return None };
+    let AbilityDef::Activated(def) = game.cards.ability(ability) else {
+        return None;
+    };
     if !def.special_action {
         return None;
     }
     let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
+        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize]
+            && !game.lost_all_abilities(id)
     });
     if !changers {
         return None;
@@ -5164,7 +8437,11 @@ pub fn activate_mana(
     if index >= PLAYER_MANA_ABILITY {
         return activate_player_mana(cx, player, source, index - PLAYER_MANA_ABILITY);
     }
-    let ability = cx.chars(source).abilities().nth(index as usize).expect("ability");
+    let ability = cx
+        .chars(source)
+        .abilities()
+        .nth(index as usize)
+        .expect("ability");
     let def = activated(cx, ability).expect("activated");
     // What restricts its mana, read from the source as it is activated, before a cost may take it away (CR 106.6).
     let restricted = def.restricted.map(|r| restriction_from(cx, source, r));
@@ -5174,7 +8451,9 @@ pub fn activate_mana(
     // "Any type the sacrificed permanent could produce" (CR 106.7): read before it is gone, and the type named must be one.
     let mut adds_nothing = false;
     if def.colors_from_sacrifice {
-        let (colors, can_colorless) = chosen.first().map_or((ColorSet::NONE, false), |&land| producible_types(cx, land));
+        let (colors, can_colorless) = chosen
+            .first()
+            .map_or((ColorSet::NONE, false), |&land| producible_types(cx, land));
         adds_nothing = colors.is_empty() && !can_colorless;
         let fits = match (color, colorless) {
             (Some(c), false) => colors.has(c),
@@ -5190,7 +8469,9 @@ pub fn activate_mana(
     let mut mana = def.cost.mana;
     if mana.x > 0 {
         let n = announce(cx, player, source, mana, None, mana.x, 1000)?;
-        mana.generic = mana.generic.saturating_add((n as u32 * mana.x as u32).min(255) as u8);
+        mana.generic = mana
+            .generic
+            .saturating_add((n as u32 * mana.x as u32).min(255) as u8);
         mana.x = 0;
         cx.st().update_obj(source, |o| o.x = n);
     }
@@ -5199,17 +8480,35 @@ pub fn activate_mana(
     // that trigger on activations name loyalty abilities or abilities that aren't mana abilities; one that triggers on a
     // mana ability's activation too ("an ability of a creature": Elrond, Moon-Reader) needs it emitted, its trigger
     // waiting for the next time a player would receive priority (CR 603.3).
-    cx.record(Event::AbilityActivated { source, ability, player });
+    cx.record(Event::AbilityActivated {
+        source,
+        ability,
+        player,
+    });
     // {T} is paid on the permanent before any other part of the cost moves it (CR 605.3a, 601.2h, 118.3): see `activate`.
     if def.cost.tap {
         ops::tap(cx, source);
     }
     if def.cost.exile_self {
-        ops::move_to_for(cx, source, Zone::exile(cx.s().obj(source).owner), ZoneReason::Exile);
+        ops::move_to_for(
+            cx,
+            source,
+            Zone::exile(cx.s().obj(source).owner),
+            ZoneReason::Exile,
+        );
     }
     // A mana ability's own mana cost (Chromatic Star's {1}) is paid like any other (CR 605.3a, 601.2g).
     if mana != ManaCost::ZERO {
-        pay_mana_with(cx, player, source, mana, &Helpers { purpose: Paying::Activating, ..Helpers::NONE })?;
+        pay_mana_with(
+            cx,
+            player,
+            source,
+            mana,
+            &Helpers {
+                purpose: Paying::Activating,
+                ..Helpers::NONE
+            },
+        )?;
     }
     pay_exert_and_tappers(cx, source, &def.cost, &[]);
     if def.cost.discard_hand {
@@ -5221,10 +8520,17 @@ pub fn activate_mana(
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, &[source]);
     }
-    let asker = Asker { source, controller: player };
+    let asker = Asker {
+        source,
+        controller: player,
+    };
     // What the ability itself produces (CR 106.12a), told from the pool before and after it: whatever replaced or added to
     // its mana, and of whatever restriction, but not what the triggered mana abilities it triggers add.
-    let before = if def.cost.tap { mana_held(cx, player) } else { ManaPool::default() };
+    let before = if def.cost.tap {
+        mana_held(cx, player)
+    } else {
+        ManaPool::default()
+    };
     if !adds_nothing {
         // The mana is produced by the ability's source (CR 106.3), whatever has become of it paying the cost.
         let outer = cx.mana_source.replace(source);
@@ -5233,7 +8539,16 @@ pub fn activate_mana(
             Some(effect) => cx.acting_as(player, |cx| effect(cx, &asker, color)),
             None => {
                 let def = ActivatedDef { restricted, ..*def };
-                add_listed(cx, player, &def, if colorless { Some(Mana::C) } else { color.map(Color::mana) });
+                add_listed(
+                    cx,
+                    player,
+                    &def,
+                    if colorless {
+                        Some(Mana::C)
+                    } else {
+                        color.map(Color::mana)
+                    },
+                );
                 Ok(())
             }
         };
@@ -5242,7 +8557,9 @@ pub fn activate_mana(
     }
     if def.cost.tap {
         let after = mana_held(cx, player);
-        let produced = ManaPool(std::array::from_fn(|m| after.0[m].saturating_sub(before.0[m])));
+        let produced = ManaPool(std::array::from_fn(|m| {
+            after.0[m].saturating_sub(before.0[m])
+        }));
         tapped_for_mana(cx, player, source, produced)?;
     }
     Ok(())
@@ -5294,7 +8611,9 @@ fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
     let controller = cx.s().obj(land).controller;
     let (mut colors, mut colorless) = (ColorSet::NONE, false);
     for ability in cx.chars(land).abilities() {
-        let Some(def) = activated(cx, ability) else { continue };
+        let Some(def) = activated(cx, ability) else {
+            continue;
+        };
         if !def.is_mana_ability() || def.from != ZoneKind::Battlefield {
             continue;
         }
@@ -5306,7 +8625,13 @@ fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
         }
         if def.any_color {
             let named = match def.colors_from {
-                Some(from) => from(cx, &Asker { source: land, controller }),
+                Some(from) => from(
+                    cx,
+                    &Asker {
+                        source: land,
+                        controller,
+                    },
+                ),
                 None if def.colors.is_empty() => ColorSet(0b11111),
                 None => def.colors,
             };
@@ -5322,7 +8647,11 @@ fn producible_types(cx: &Cx, land: ObjectId) -> (ColorSet, bool) {
 /// whose cards have one. One that asks (a type of the mana that land produced) suspends the activation, to be run again
 /// with the answer.
 fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: ManaPool) -> R<()> {
-    let event = Event::TappedForMana { permanent: source, player, produced };
+    let event = Event::TappedForMana {
+        permanent: source,
+        player,
+        produced,
+    };
     cx.record(event);
     if produced.is_empty() {
         return Ok(());
@@ -5341,14 +8670,28 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
     for id in holders {
         let controller = cx.s().obj(id).controller;
         for ability in cx.chars(id).abilities().collect::<Vec<_>>() {
-            let AbilityDef::Triggered(t) = cx.cards().ability(ability) else { continue };
+            let AbilityDef::Triggered(t) = cx.cards().ability(ability) else {
+                continue;
+            };
             if !t.mana_ability {
                 continue;
             }
-            if let Some(fired) = t.fires(&*cx, &Asker { source: id, controller }, &event) {
+            if let Some(fired) = t.fires(
+                &*cx,
+                &Asker {
+                    source: id,
+                    controller,
+                },
+                &event,
+            ) {
                 // Static abilities that stop it triggering or make it trigger again apply to it as to any triggered ability
                 // (CR 603.2, 603.2d): each triggering resolves at once.
-                let triggering = Triggering { source: id, controller, def: t, permanent: true };
+                let triggering = Triggering {
+                    source: id,
+                    controller,
+                    def: t,
+                    permanent: true,
+                };
                 if statics.stop(cx, &event, &triggering) {
                     continue;
                 }
@@ -5381,7 +8724,11 @@ fn tapped_for_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, produced: Ma
 fn spend(owed: &mut ManaCost, mana: Mana) {
     if owed.symbols[mana as usize] > 0 {
         owed.symbols[mana as usize] -= 1;
-    } else if let Some(slot) = owed.hybrid.iter().position(|h| matches!(h, Some((a, b)) if *a == mana || *b == mana)) {
+    } else if let Some(slot) = owed
+        .hybrid
+        .iter()
+        .position(|h| matches!(h, Some((a, b)) if *a == mana || *b == mana))
+    {
         owed.hybrid[slot] = None;
     } else if owed.generic > 0 {
         owed.generic -= 1;
@@ -5430,7 +8777,11 @@ impl AnyMana {
 fn pays(owed: &ManaCost, mana: Mana) -> bool {
     owed.generic > 0
         || owed.symbols[mana as usize] > 0
-        || owed.hybrid.iter().flatten().any(|(a, b)| *a == mana || *b == mana)
+        || owed
+            .hybrid
+            .iter()
+            .flatten()
+            .any(|(a, b)| *a == mana || *b == mana)
 }
 
 /// How the pool would pay `owed`: none (it cannot), exactly one way, or more than one.
@@ -5517,9 +8868,19 @@ fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
 /// The pool units that would pay something owed, as `AssignMana` options, in the C# engine's order: colorless first,
 /// then colors the cost does not name, then the colors it names. Ordinary mana a rule tells apart by its source (`told`,
 /// each source with its mana, CR 106.3) is offered as that source's, after the ordinary mana of its kind no rule tells apart.
-fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], told: &[(ObjectId, ManaPool)], owed: &ManaCost) -> Vec<ActionOption> {
+fn assign_options(
+    pool: &ManaPool,
+    restricted: &[(ManaRestriction, ManaPool)],
+    told: &[(ObjectId, ManaPool)],
+    owed: &ManaCost,
+) -> Vec<ActionOption> {
     let named = |mana: Mana| {
-        owed.symbols[mana as usize] > 0 || owed.hybrid.iter().flatten().any(|(a, b)| *a == mana || *b == mana)
+        owed.symbols[mana as usize] > 0
+            || owed
+                .hybrid
+                .iter()
+                .flatten()
+                .any(|(a, b)| *a == mana || *b == mana)
     };
     let order = [Mana::C, Mana::W, Mana::U, Mana::B, Mana::R, Mana::G];
     let mut out = Vec::new();
@@ -5536,7 +8897,13 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], t
     }
     for pass in 0..3 {
         for mana in order {
-            let kind = if mana == Mana::C { 0 } else if named(mana) { 2 } else { 1 };
+            let kind = if mana == Mana::C {
+                0
+            } else if named(mana) {
+                2
+            } else {
+                1
+            };
             if kind != pass || pool.get(mana) == 0 || !pays(owed, mana) {
                 continue;
             }
@@ -5561,13 +8928,14 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], t
 
 /// The ordinary mana in `player`'s pool that each of the `told` sources produced (CR 106.3).
 fn told_pools(cx: &Cx, player: PlayerId, told: &[ObjectId]) -> Vec<(ObjectId, ManaPool)> {
-    let mut out: Vec<(ObjectId, ManaPool)> = told.iter().map(|&s| (s, ManaPool::default())).collect();
+    let mut out: Vec<(ObjectId, ManaPool)> =
+        told.iter().map(|&s| (s, ManaPool::default())).collect();
     for e in cx.s().mana_from_of(player) {
         if e.restriction.is_none()
             && let Some(at) = told.iter().position(|&s| s == e.source)
         {
             for m in 0..6 {
-                out[at].1 .0[m] += e.pool.0[m];
+                out[at].1.0[m] += e.pool.0[m];
             }
         }
     }
@@ -5576,7 +8944,13 @@ fn told_pools(cx: &Cx, player: PlayerId, told: &[ObjectId]) -> Vec<(ObjectId, Ma
 
 /// Records what a payment for `on` spent, one `Event::ManaSpent` for each source it took mana from, in the order it first
 /// took from each (CR 106.3, 601.2h).
-fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: &[(ObjectId, Mana, u8)]) {
+fn record_spent(
+    cx: &mut Cx,
+    player: PlayerId,
+    on: ObjectId,
+    cast: bool,
+    taken: &[(ObjectId, Mana, u8)],
+) {
     let mut by: Vec<(ObjectId, ManaPool)> = Vec::new();
     for &(source, mana, n) in taken {
         let at = match by.iter().position(|(s, _)| *s == source) {
@@ -5586,10 +8960,16 @@ fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: 
                 by.len() - 1
             }
         };
-        by[at].1 .0[mana as usize] += n;
+        by[at].1.0[mana as usize] += n;
     }
     for (source, mana) in by {
-        cx.record(Event::ManaSpent { player, source, on, cast, mana });
+        cx.record(Event::ManaSpent {
+            player,
+            source,
+            on,
+            cast,
+            mana,
+        });
     }
 }
 
@@ -5602,11 +8982,20 @@ fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> 
     match purpose {
         Paying::Casting if cx.s().obj(source).zone.is(ZoneKind::Stack) => {
             // The subtypes, only where some of the player's mana is limited by them.
-            spell_payment(cx, source, cx.s().restricted_of(player).any(|(r, _)| r.names_subtypes()))
+            spell_payment(
+                cx,
+                source,
+                cx.s()
+                    .restricted_of(player)
+                    .any(|(r, _)| r.names_subtypes()),
+            )
         }
         Paying::Activating => {
             let chars = cx.chars(source);
-            ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes }
+            ManaPayment::Ability {
+                source: chars.types,
+                subtypes: chars.subtypes,
+            }
         }
         _ => ManaPayment::Other,
     }
@@ -5618,7 +9007,11 @@ fn payment_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> 
 /// subtypes only `with_subtypes`, where some mana at hand is limited by them.
 fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
     let chars = cx.chars(spell);
-    let subtypes = if with_subtypes { chars.subtypes } else { SubtypeSet::NONE };
+    let subtypes = if with_subtypes {
+        chars.subtypes
+    } else {
+        SubtypeSet::NONE
+    };
     ManaPayment::Spell {
         types: chars.types,
         subtypes,
@@ -5632,8 +9025,14 @@ fn spell_payment(cx: &Cx, spell: ObjectId, with_subtypes: bool) -> ManaPayment {
 /// The restriction a mana ability of `source` puts on the mana it adds (CR 106.6): a subtype its text names is read
 /// through the source's words (CR 612: Artificial Evolution makes Maelstrom of the Spirit Dragon's mana for Elf spells),
 /// and "the chosen type" is the creature type chosen for it as it entered (CR 607.2a, 614.12a), or none if none was.
-pub fn restriction_from(cx: &Cx, source: ObjectId, restriction: ManaRestriction) -> ManaRestriction {
-    let ManaRestriction::Subtypes(mut s) = restriction else { return restriction };
+pub fn restriction_from(
+    cx: &Cx,
+    source: ObjectId,
+    restriction: ManaRestriction,
+) -> ManaRestriction {
+    let ManaRestriction::Subtypes(mut s) = restriction else {
+        return restriction;
+    };
     if s.chosen {
         s.subtypes = [cx.s().obj(source).chosen_subtype, None];
         s.chosen = false;
@@ -5645,12 +9044,20 @@ pub fn restriction_from(cx: &Cx, source: ObjectId, restriction: ManaRestriction)
 }
 
 /// The restricted mana `player` has that may pay for `source`, with its restriction.
-fn restricted_for(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Vec<(ManaRestriction, ManaPool)> {
+fn restricted_for(
+    cx: &Cx,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Paying,
+) -> Vec<(ManaRestriction, ManaPool)> {
     if !cx.s().has_restricted_mana(player) {
         return Vec::new();
     }
     let payment = payment_for(cx, player, source, purpose);
-    cx.s().restricted_of(player).filter(|(restriction, _)| restriction.may_pay(&payment)).collect()
+    cx.s()
+        .restricted_of(player)
+        .filter(|(restriction, _)| restriction.may_pay(&payment))
+        .collect()
 }
 
 /// The pool a cost for `source` may be paid from: unrestricted mana and the restricted mana that may pay for it.
@@ -5666,20 +9073,41 @@ fn spendable(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Ma
 
 /// Takes `spent` out of the pool, restricted mana first (it is what the C# engine prefers spending), each unit's source
 /// pushed onto `taken`. What the mana taken does to what it pays for (`ManaRestriction::effects`).
-fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, spent: &[u8; 6], taken: &mut Vec<(ObjectId, Mana, u8)>) -> u8 {
+fn take_mana(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Paying,
+    spent: &[u8; 6],
+    taken: &mut Vec<(ObjectId, Mana, u8)>,
+) -> u8 {
     let restricted = restricted_for(cx, player, source, purpose);
     let mut used = 0u8;
     for mana in Mana::ALL {
         let mut need = spent[mana as usize];
         for (restriction, _) in &restricted {
-            let take = cx.st().spend_mana(player, Some(*restriction), mana, need, cantrip_state::ManaPick::Any, taken);
+            let take = cx.st().spend_mana(
+                player,
+                Some(*restriction),
+                mana,
+                need,
+                cantrip_state::ManaPick::Any,
+                taken,
+            );
             if take > 0 {
                 used |= restriction.effects();
             }
             need -= take;
         }
         if need > 0 {
-            cx.st().spend_mana(player, None, mana, need, cantrip_state::ManaPick::Any, taken);
+            cx.st().spend_mana(
+                player,
+                None,
+                mana,
+                need,
+                cantrip_state::ManaPick::Any,
+                taken,
+            );
         }
     }
     used
@@ -5687,7 +9115,12 @@ fn take_mana(cx: &mut Cx, player: PlayerId, source: ObjectId, purpose: Paying, s
 
 /// The mana abilities `player` may activate while paying for `source` (CR 601.2g, 605.3a), each whose mana is restricted
 /// so that none of it may pay this cost marked as paying nothing (CR 106.6).
-fn mana_options_while_paying(cx: &Cx, player: PlayerId, source: ObjectId, purpose: Paying) -> Vec<ActionOption> {
+fn mana_options_while_paying(
+    cx: &Cx,
+    player: PlayerId,
+    source: ObjectId,
+    purpose: Paying,
+) -> Vec<ActionOption> {
     let mut options = Vec::new();
     mana_ability_options(cx, player, &mut options);
     if options.iter().any(|o| o.restriction.is_some()) {
@@ -5766,9 +9199,17 @@ fn convoke_pips(cost: &ManaCost) -> Vec<[Option<Mana>; 2]> {
 /// Which creature (by index) pays each pip when as many pips as possible are paid by creatures of their colors.
 fn convoke_match(pips: &[[Option<Mana>; 2]], creatures: &[ColorSet]) -> Vec<Option<usize>> {
     fn accepts(pip: &[Option<Mana>; 2], colors: ColorSet) -> bool {
-        pip.iter().flatten().any(|m| m.color().is_some_and(|c| colors.has(c)))
+        pip.iter()
+            .flatten()
+            .any(|m| m.color().is_some_and(|c| colors.has(c)))
     }
-    fn assign(p: usize, pips: &[[Option<Mana>; 2]], creatures: &[ColorSet], paid_by: &mut [Option<usize>], seen: &mut [bool]) -> bool {
+    fn assign(
+        p: usize,
+        pips: &[[Option<Mana>; 2]],
+        creatures: &[ColorSet],
+        paid_by: &mut [Option<usize>],
+        seen: &mut [bool],
+    ) -> bool {
         for c in 0..creatures.len() {
             if seen[c] || !accepts(&pips[p], creatures[c]) {
                 continue;
@@ -5800,7 +9241,9 @@ fn convoked(cost: &ManaCost, creatures: &[ColorSet]) -> ManaCost {
     let paid_by = convoke_match(&pips, creatures);
     let matched = paid_by.iter().flatten().count();
     let mut left = *cost;
-    left.generic = left.generic.saturating_sub((creatures.len() - matched) as u8);
+    left.generic = left
+        .generic
+        .saturating_sub((creatures.len() - matched) as u8);
     // The pips come in the cost's order, colored symbols first and hybrid symbols after.
     let mut at = 0;
     for mana in Mana::ALL {
@@ -5853,13 +9296,17 @@ fn pay_candidates(
             }
         }
     }
-    if helpers.with.improvise || helpers.with.convoke || helpers.waterbend > 0 || helpers.creatures {
+    if helpers.with.improvise || helpers.with.convoke || helpers.waterbend > 0 || helpers.creatures
+    {
         for id in cx.permanents_of(player) {
             if cx.s().obj(id).tapped || out.iter().any(|o| o.source == Some(id)) {
                 continue;
             }
             let chars = cx.chars(id);
-            if helpers.waterbend > bent && due.generic > 0 && (chars.is(CardType::Artifact) || chars.is(CardType::Creature)) {
+            if helpers.waterbend > bent
+                && due.generic > 0
+                && (chars.is(CardType::Artifact) || chars.is(CardType::Creature))
+            {
                 out.push(ActionOption::on(ActionKind::TapToPay, id, PAY_WATERBEND));
             } else if helpers.creatures && due.generic > 0 && chars.is(CardType::Creature) {
                 out.push(ActionOption::on(ActionKind::TapToPay, id, PAY_WATERBEND));
@@ -5881,7 +9328,13 @@ fn pay_candidates(
 /// it, otherwise by asking, with the player's mana abilities, the pool's mana and whatever else may pay (convoke's
 /// creatures, delve's cards, improvise's artifacts) offered, until nothing is owed. Once one of those has paid, no
 /// mana ability is offered any more: the cost is being paid, which comes after every mana ability (CR 601.2g-h).
-pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost, helpers: &Helpers) -> R<ManaPool> {
+pub(crate) fn pay_mana_with(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    total: ManaCost,
+    helpers: &Helpers,
+) -> R<ManaPool> {
     Ok(pay_mana_used(cx, player, source, total, helpers)?.0)
 }
 
@@ -5931,7 +9384,11 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
             if helpers.any() { pay_candidates(cx, player, source, helpers, &cost, &left, &convoking, &delved, bent) } else { Vec::new() };
         let mut decided = ways(&pool, &due);
         // Ordinary mana a rule tells apart by its source (CR 106.3), by the source that produced it.
-        let told = if helpers.no_mana { Vec::new() } else { static_rules::mana_told_apart(cx, cx.cards(), player) };
+        let told = if helpers.no_mana {
+            Vec::new()
+        } else {
+            static_rules::mana_told_apart(cx, cx.cards(), player)
+        };
         let told_mana = told_pools(cx, player, &told);
         // Ordinary mana and restricted mana of a kind are different units (CR 106.6): spending only some of that kind
         // is the player's choice, even when the pool pays the cost one way. So is spending only some of the mana of a kind
@@ -5942,7 +9399,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
             let plain = cx.s().player(player).pool;
             let split = Mana::ALL.iter().any(|&m| {
                 let apart: u8 = told_mana.iter().map(|(_, p)| p.get(m)).sum();
-                let groups = told_mana.iter().filter(|(_, p)| p.get(m) > 0).count() + usize::from(plain.get(m) > apart);
+                let groups = told_mana.iter().filter(|(_, p)| p.get(m) > 0).count()
+                    + usize::from(plain.get(m) > apart);
                 groups > 1 && spent[m as usize] > 0 && spent[m as usize] < pool.get(m)
             });
             if split {
@@ -5963,7 +9421,11 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
                 decided = Ways::Many;
             }
         }
-        let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, taken: &mut Vec<(ObjectId, Mana, u8)>, spent: [u8; 6]| {
+        let spend_pool = |cx: &mut Cx,
+                          paid: &mut ManaPool,
+                          used: &mut u8,
+                          taken: &mut Vec<(ObjectId, Mana, u8)>,
+                          spent: [u8; 6]| {
             *used |= take_mana(cx, player, source, helpers.purpose, &spent, taken);
             for mana in Mana::ALL {
                 paid.0[mana as usize] += spent[mana as usize];
@@ -5976,13 +9438,22 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
             break;
         }
         let paying = !convoking.is_empty() || generic_paid > 0;
-        let mut options = if paying { Vec::new() } else { mana_options_while_paying(cx, player, source, helpers.purpose) };
+        let mut options = if paying {
+            Vec::new()
+        } else {
+            mana_options_while_paying(cx, player, source, helpers.purpose)
+        };
         if matches!(decided, Ways::One(_)) {
             // The pool's one way of paying, which the player may take or pay some other way instead.
             options.push(ActionOption::simple(ActionKind::ConfirmCasting));
         } else if !helpers.no_mana {
             let restricted = restricted_for(cx, player, source, helpers.purpose);
-            options.extend(assign_options(&cx.s().player(player).pool, &restricted, &told_mana, &due));
+            options.extend(assign_options(
+                &cx.s().player(player).pool,
+                &restricted,
+                &told_mana,
+                &due,
+            ));
         }
         options.extend(candidates);
         options.push(ActionOption::simple(ActionKind::CancelCasting));
@@ -5993,13 +9464,31 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         } else {
             total
         };
-        let ask = RequestKind::PayCosts { source, total: shown, remaining: due, options, announcing: false, x: 0, loyalty: false, attackers: helpers.attackers.to_vec(), life: helpers.life };
+        let ask = RequestKind::PayCosts {
+            source,
+            total: shown,
+            remaining: due,
+            options,
+            announcing: false,
+            x: 0,
+            loyalty: false,
+            attackers: helpers.attackers.to_vec(),
+            life: helpers.life,
+        };
         let answer = cx.ask_core(player, ask, true)?;
         match answer {
             Answer::Act(action) => match action.kind {
                 ActionKind::ActivateAbility => {
                     let from = action.source.expect("source");
-                    activate_mana(cx, player, from, action.index, action.color, action.mana == Some(Mana::C), &action.targets)?;
+                    activate_mana(
+                        cx,
+                        player,
+                        from,
+                        action.index,
+                        action.color,
+                        action.mana == Some(Mana::C),
+                        &action.targets,
+                    )?;
                 }
                 ActionKind::AssignMana => {
                     let mana = action.mana.expect("mana");
@@ -6008,7 +9497,14 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
                         // to the options, which offer no other.
                         Some(r) => {
                             used |= r.effects();
-                            cx.st().spend_mana(player, Some(r), mana, 1, cantrip_state::ManaPick::Any, &mut taken);
+                            cx.st().spend_mana(
+                                player,
+                                Some(r),
+                                mana,
+                                1,
+                                cantrip_state::ManaPick::Any,
+                                &mut taken,
+                            );
                         }
                         // Mana of the source the option names, or of none a rule tells apart (CR 106.3).
                         None => {
@@ -6023,7 +9519,9 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
                     any.spend(&mut owed, mana);
                 }
                 ActionKind::ConfirmCasting => {
-                    let Ways::One(spent) = decided else { return Err(Stop::Cancel) };
+                    let Ways::One(spent) = decided else {
+                        return Err(Stop::Cancel);
+                    };
                     spend_pool(cx, &mut paid, &mut used, &mut taken, spent);
                     break;
                 }
@@ -6051,7 +9549,8 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         }
     }
     if !taken.is_empty() {
-        let cast = helpers.purpose == Paying::Casting && cx.s().obj(source).zone.is(ZoneKind::Stack);
+        let cast =
+            helpers.purpose == Paying::Casting && cx.s().obj(source).zone.is(ZoneKind::Stack);
         record_spent(cx, player, source, cast, &taken);
     }
     if !delved.is_empty() {
@@ -6071,7 +9570,9 @@ pub fn can_pay_life(cx: &Cx, player: PlayerId, life: u8) -> bool {
 /// that involves having that player pay life can't be paid") or their life total can't change (Teferi's Protection's ruling:
 /// "You can't pay a cost that includes the payment of any amount of life other than 0 life").
 pub fn payable_life(cx: &Cx, player: PlayerId) -> i32 {
-    if static_rules::cant_lose_life(cx, cx.cards(), player) || ops::life_total_cant_change(cx.s(), player) {
+    if static_rules::cant_lose_life(cx, cx.cards(), player)
+        || ops::life_total_cant_change(cx.s(), player)
+    {
         0
     } else {
         cx.s().player(player).life
@@ -6085,8 +9586,18 @@ pub fn payable_life(cx: &Cx, player: PlayerId) -> i32 {
 /// is paid (CR 119.4): a player without that much life is not asked at all, and one whose mana ability takes it below
 /// that (Mana Confluence's life, a painland's damage) can no longer pay, and is offered only declining. Whether it was
 /// paid.
-pub fn may_pay(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<bool> {
-    assert!(only_mana_and_life(cost), "a cost paid during resolution is mana and life; its other parts are not built");
+pub fn may_pay(
+    cx: &mut Cx,
+    payer: PlayerId,
+    source: ObjectId,
+    subject: ObjectId,
+    cost: &Cost,
+    question: &'static Question,
+) -> R<bool> {
+    assert!(
+        only_mana_and_life(cost),
+        "a cost paid during resolution is mana and life; its other parts are not built"
+    );
     Ok(pay_during_resolution(cx, payer, source, subject, cost, question, None)?.is_some())
 }
 
@@ -6099,10 +9610,23 @@ const MOST_X_PAID: u16 = 1000;
 /// (CR 605.3a), and pays {X} once the pool covers it, or declines. Any X may be chosen, 0 included (paying {0} is still
 /// paying, CR 118.5). The X paid, or `None` when the payer declined: "when you do" (CR 603.12) asks whether it was paid, and
 /// "X" afterwards is the X paid. `cost` is the cost with its {X} (and any other mana or life beside it).
-pub fn may_pay_x(cx: &mut Cx, payer: PlayerId, source: ObjectId, subject: ObjectId, cost: &Cost, question: &'static Question) -> R<Option<u16>> {
+pub fn may_pay_x(
+    cx: &mut Cx,
+    payer: PlayerId,
+    source: ObjectId,
+    subject: ObjectId,
+    cost: &Cost,
+    question: &'static Question,
+) -> R<Option<u16>> {
     assert!(cost.mana.x > 0, "may_pay_x pays a cost with an {{X}} in it");
-    let without_x = Cost { mana: ManaCost { x: 0, ..cost.mana }, ..*cost };
-    assert!(only_mana_and_life(&without_x), "a cost paid during resolution is mana and life; its other parts are not built");
+    let without_x = Cost {
+        mana: ManaCost { x: 0, ..cost.mana },
+        ..*cost
+    };
+    assert!(
+        only_mana_and_life(&without_x),
+        "a cost paid during resolution is mana and life; its other parts are not built"
+    );
     pay_during_resolution(cx, payer, source, subject, cost, question, Some(0))
 }
 
@@ -6136,7 +9660,11 @@ fn pay_during_resolution(
         let total = match x {
             Some(n) => {
                 let generic = u32::from(cost.mana.generic) + u32::from(n) * u32::from(cost.mana.x);
-                ManaCost { generic: generic.min(255) as u8, x: 0, ..cost.mana }
+                ManaCost {
+                    generic: generic.min(255) as u8,
+                    x: 0,
+                    ..cost.mana
+                }
             }
             None => cost.mana,
         };
@@ -6163,13 +9691,33 @@ fn pay_during_resolution(
             }
         }
         options.push(ActionOption::simple(ActionKind::DeclineCost));
-        let ask = RequestKind::UnlessPays { source, subject, total, remaining, life, life_payable, question, options, x };
+        let ask = RequestKind::UnlessPays {
+            source,
+            subject,
+            total,
+            remaining,
+            life,
+            life_payable,
+            question,
+            options,
+            x,
+        };
         let answer = cx.ask_core(payer, ask, false)?;
-        let Answer::Act(action) = answer else { return Ok(None) };
+        let Answer::Act(action) = answer else {
+            return Ok(None);
+        };
         match action.kind {
             ActionKind::ActivateAbility => {
                 let from = action.source.expect("source");
-                activate_mana(cx, payer, from, action.index, action.color, action.mana == Some(Mana::C), &action.targets)?;
+                activate_mana(
+                    cx,
+                    payer,
+                    from,
+                    action.index,
+                    action.color,
+                    action.mana == Some(Mana::C),
+                    &action.targets,
+                )?;
             }
             ActionKind::IncreaseX => x = x.map(|n| n + 1),
             ActionKind::DecreaseX => x = x.map(|n| n.saturating_sub(1)),
@@ -6225,7 +9773,14 @@ fn only_mana_and_life(cost: &Cost) -> bool {
     } = *cost;
     mana.x == 0
         && energy == 0
-        && !(tap || sacrifice_self || discard_self || remove_any_counter || exile_self || pay_x_life || exert || emerge)
+        && !(tap
+            || sacrifice_self
+            || discard_self
+            || remove_any_counter
+            || exile_self
+            || pay_x_life
+            || exert
+            || emerge)
         && !(tap_permanents || unattach_self || return_self || discard_hand || tap_to_reduce)
         && permanents.is_none()
         && loyalty.is_none()

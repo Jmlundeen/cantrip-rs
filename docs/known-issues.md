@@ -511,7 +511,8 @@ spell-backed modal double-faced card is added.
 so an emblem that gives one - Tamiyo, Field Researcher's "You may cast spells from your hand without paying their mana costs"
 (CR 114.4) - could not be built.
 
-**Scenarios.** none yet.
+**Scenarios.** `chandra-casts-an-exiled-creature-for-its-evoke-alternative` covers printed alternatives during resolution;
+`primal-prayers-cast-during-chandra-resolution` covers a zone-neutral grant. Neither requires an emblem.
 
 ### KI-45: The number a cost sacrifices is kept as the spell's X
 

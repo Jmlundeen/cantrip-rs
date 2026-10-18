@@ -704,6 +704,10 @@ public sealed class ScenarioPlayer
         {
             rows = [.. rows.Where(r => r.Ability == action.AbilityIndex)];
         }
+        if (action.CastPlanId != 0)
+        {
+            rows = [.. rows.Where(r => r.CastPlanId == action.CastPlanId)];
+        }
 
         ControlState? row = action.Color is { } color
             ? rows.FirstOrDefault(r => r.Label.Contains($"{{{Symbol(color)}}}", StringComparison.Ordinal))

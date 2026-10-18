@@ -34,7 +34,7 @@ mod validate;
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Rng};
 
-pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction};
+pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_plan_cost, cast_plan_costs, cast_plan_face, cast_plan_total, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction};
 pub use validate::{check as check_answer, distribution_problem, name_problem};
 pub use layers::{chars, live, summoning_sick};
 
@@ -1363,11 +1363,17 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant) {
         let turn = self.g.state.turn.number;
-        let permission = PlayPermission { card, player, grant, turn };
-        // A "for as long as you control" duration that is already over as it would begin does nothing (CR 611.2b).
-        if self.g.state.permission_lasts(&permission) {
-            self.g.state.permission_push(permission);
-        }
+        // Resolve effects use their stack item; special actions run directly in an Act frame.
+        // An unrelated item can remain on the stack while that action grants permission.
+        let source = self.mana_source.or_else(|| match self.g.state.agenda.get(self.frame) {
+            Some(frame) if matches!(frame.kind, FrameKind::Act { .. }) => frame.answers.first().and_then(|answer| {
+                if let Answer::Act(action) = answer { action.source } else { None }
+            }),
+            Some(frame) if frame.kind == FrameKind::Resolve => self.g.state.stack.last().map(|item| item.object),
+            _ => None,
+        });
+        let permission = PlayPermission { card, player, grant, source, turn };
+        if self.g.state.permission_lasts(&permission) { self.g.state.permission_push(permission); }
     }
 
     fn could_cast_transformed_during_resolution(&self, card: ObjectId) -> bool {

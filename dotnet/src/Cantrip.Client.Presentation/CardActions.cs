@@ -498,7 +498,7 @@ public sealed class CardActions
     {
         ArgumentNullException.ThrowIfNull(one);
         ArgumentNullException.ThrowIfNull(other);
-        return one.Kind == other.Kind && one.Source == other.Source && one.AbilityIndex == other.AbilityIndex;
+        return one.Kind == other.Kind && one.Source == other.Source && one.AbilityIndex == other.AbilityIndex && one.CastPlanId == other.CastPlanId;
     }
 
     /// <summary>
