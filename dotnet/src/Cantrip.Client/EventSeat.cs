@@ -13,9 +13,11 @@ public sealed class EventSeat : IDisposable
     private readonly string _name;
     private readonly Func<IAutoPlayer?> _player;
     private AutoSeat _seat;
+    private readonly Func<Uri, Uri> _reach;
 
-    private EventSeat(string name, Func<IAutoPlayer?> player, GameClient client, Uri address)
+    private EventSeat(string name, Func<IAutoPlayer?> player, GameClient client, Uri address, Func<Uri, Uri> reach)
     {
+        _reach = reach;
         _name = name;
         _player = player;
         _seat = new AutoSeat(client, player());
@@ -24,12 +26,14 @@ public sealed class EventSeat : IDisposable
 
     /// <summary>Sits down at an event's table with a ticket for it.</summary>
     /// <param name="player">Makes how the seat decides, afresh for every table; null plays the one deterministic way.</param>
-    public static async Task<EventSeat> JoinAsync(Uri address, string ticket, string name, Func<IAutoPlayer?>? player = null, CancellationToken cancellation = default)
+    /// <param name="reach">Where to connect for an address the server gives, at this table and each it moves the seat to; null connects to the address as given.</param>
+    public static async Task<EventSeat> JoinAsync(Uri address, string ticket, string name, Func<IAutoPlayer?>? player = null, CancellationToken cancellation = default, Func<Uri, Uri>? reach = null)
     {
         ArgumentNullException.ThrowIfNull(address);
-        var client = new GameClient(await WebSocketTransport.ConnectAsync(address, cancellation).ConfigureAwait(false));
+        reach ??= given => given;
+        var client = new GameClient(await WebSocketTransport.ConnectAsync(reach(address), cancellation).ConfigureAwait(false));
         client.Join(name, 0, ticket);
-        return new EventSeat(name, player ?? (() => null), client, address);
+        return new EventSeat(name, player ?? (() => null), client, address, reach);
     }
 
     /// <summary>The client at the table the seat is at now: a new one at every table.</summary>
@@ -61,7 +65,7 @@ public sealed class EventSeat : IDisposable
         {
             Client.Disconnect();
             Uri next = new(moved.Server);
-            var client = new GameClient(await WebSocketTransport.ConnectAsync(next, cancellation).ConfigureAwait(false));
+            var client = new GameClient(await WebSocketTransport.ConnectAsync(_reach(next), cancellation).ConfigureAwait(false));
             client.Join(_name, 0, moved.Ticket);
             _seat = new AutoSeat(client, _player());
             Address = next;

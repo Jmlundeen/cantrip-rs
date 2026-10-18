@@ -60,14 +60,25 @@ internal static class BotSeats
     private static readonly TimeSpan DraftThink = TimeSpan.FromMilliseconds(1200);
 
     /// <summary>
+    /// Where a bot connects for a table's public address. Behind the table proxy (<see cref="TableProxy"/>) that address
+    /// is the sign-in's to guard, and a bot has no Discord account to sign in with, so it goes to the table itself, on
+    /// this machine, as the proxy does. Any other address is returned as it is.
+    /// </summary>
+    public static Uri Direct(Uri address, string listen) =>
+        TableAccess.PortOf(address) is { } port
+            ? new Uri($"ws://{(listen is "0.0.0.0" or "*" or "+" ? "127.0.0.1" : listen)}:{port}/game")
+            : address;
+
+    /// <summary>
     /// Plays a seat of a Winston or grid draft at its one table: the draft, the deck and the game, until the game is over,
     /// the table goes or <paramref name="cancellation"/> calls it off.
     /// </summary>
-    public static async Task PlayDraftAsync(Uri address, string ticket, string name, CancellationToken cancellation)
+    /// <param name="listen">The address the tables listen on (<see cref="Direct"/>).</param>
+    public static async Task PlayDraftAsync(Uri address, string listen, string ticket, string name, CancellationToken cancellation)
     {
         try
         {
-            var client = new GameClient(await WebSocketTransport.ConnectAsync(address, cancellation).ConfigureAwait(false));
+            var client = new GameClient(await WebSocketTransport.ConnectAsync(Direct(address, listen), cancellation).ConfigureAwait(false));
             client.Join(name, 0, ticket);
             using StreamWriter? narration = Narration(name);
             var seat = new AutoSeat(client, new TacticalPlay { Narrator = narration }) { DraftThink = DraftThink };
@@ -103,13 +114,14 @@ internal static class BotSeats
     /// Plays a seat of a booster pod across every table it is sent to - the pod's, then each of its games' - until the
     /// final standings, the table goes or <paramref name="cancellation"/> calls it off.
     /// </summary>
-    public static async Task PlayPodAsync(Uri address, string ticket, string name, CancellationToken cancellation)
+    /// <param name="listen">The address the tables listen on (<see cref="Direct"/>).</param>
+    public static async Task PlayPodAsync(Uri address, string listen, string ticket, string name, CancellationToken cancellation)
     {
         try
         {
             // One file for the seat across every table it is sent to, each game's decisions in turn.
             using StreamWriter? narration = Narration(name);
-            using EventSeat seat = await EventSeat.JoinAsync(address, ticket, name, () => new TacticalPlay { Narrator = narration }, cancellation).ConfigureAwait(false);
+            using EventSeat seat = await EventSeat.JoinAsync(address, ticket, name, () => new TacticalPlay { Narrator = narration }, cancellation, given => Direct(given, listen)).ConfigureAwait(false);
             while (!cancellation.IsCancellationRequested && !seat.Finished)
             {
                 if (!await seat.StepAsync(cancellation).ConfigureAwait(false)) await Task.Delay(15, cancellation).ConfigureAwait(false);

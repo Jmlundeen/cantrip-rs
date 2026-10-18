@@ -484,7 +484,7 @@ public sealed class DraftHost : IAsyncDisposable
     /// Sits a bot down in each of the draft's seats a queue kept for one, at the table it has just been given. Called
     /// under the lock.
     /// </summary>
-    private static void PlayBots(HostedDraft draft)
+    private void PlayBots(HostedDraft draft)
     {
         if (draft.Pod is not { } pod || draft.Address is not { } address || draft.Bots is not null || !draft.IsLive) return;
         List<(string PlayerId, string Name, int Seat)> bots = [.. pod.Players.Where(player => BotSeats.IsBot(player.PlayerId))];
@@ -494,7 +494,7 @@ public sealed class DraftHost : IAsyncDisposable
         foreach ((string id, string name, int _) in bots)
         {
             string ticket = pod.IssueTicket(id);
-            _ = Task.Run(() => BotSeats.PlayDraftAsync(address, ticket, name, cancellation), CancellationToken.None);
+            _ = Task.Run(() => BotSeats.PlayDraftAsync(address, _options.ListenAddress, ticket, name, cancellation), CancellationToken.None);
         }
     }
 
