@@ -1,4 +1,4 @@
-//! "For as long as it has a [kind] counter on it" (CR 611.2b, `Duration::WhileHasCounter`): the paths no printed card in the
+//! "For as long as it has a [kind] counter on it" (CR 611.2b, `Duration::WhileCounter`): the paths no printed card in the
 //! engine reaches, played on a table of test-only cards. Eluge, the Shoreless Sea's scenarios prove the effect lasts while the
 //! counter does and ends with it; but every flood counter a printed card puts comes with an effect of its own (Eluge, Aquitect's
 //! Will, Quicksilver Fountain, Xolatoyac), so no scenario can tell an ended effect that came back from a new one. These are:
@@ -24,7 +24,7 @@ fn the_land(item: &StackItem) -> ObjectId {
 }
 
 fn island_while_flooded(g: &mut dyn Rules, item: &StackItem) {
-    g.add_effect(item.object, the_land(item), EffectKind::AddSubtype(Subtype::Island), Duration::WhileHasCounter(CounterKind::Flood));
+    g.add_effect(item.object, the_land(item), EffectKind::AddSubtype(Subtype::Island), Duration::WhileCounter(CounterKind::Flood));
 }
 
 /// Put a flood counter on target land. It's an Island in addition to its other types for as long as it has a flood counter on it.
@@ -80,7 +80,7 @@ fn deal(hand: &[&str]) -> Game {
     deck.extend(hand.iter().map(|n| table().find(n).unwrap_or_else(|| panic!("no card {n}"))));
     deck.extend(std::iter::repeat(filler).take(30 - deck.len()));
     let other = vec![filler; 30];
-    let mut game = Game::new(table(), &Setup { decks: vec![deck, other], seed: 1, shuffle: false, opening_chooser: None });
+    let mut game = Game::new(table(), &Setup { decks: vec![deck, other], seed: 1, shuffle: false, opening_chooser: None, sideboards: Vec::new(), basic_lands_outside: Vec::new() });
     game.verify = true;
     game.run();
     game
@@ -158,7 +158,7 @@ fn a_counter_put_back_after_the_last_came_off_does_not_restart_the_effect() {
     .collect();
     assert_eq!(seen, expected);
     // The ended effect is gone from the game, not dormant: only the second Probe Flood's remains.
-    let lasting = game.state.effects.iter().filter(|e| e.duration == Duration::WhileHasCounter(CounterKind::Flood)).count();
+    let lasting = game.state.effects.iter().filter(|e| e.duration == Duration::WhileCounter(CounterKind::Flood)).count();
     assert_eq!(lasting, 1);
 }
 
@@ -170,5 +170,5 @@ fn the_effect_never_begins_on_an_object_without_the_counter() {
     let mut seen = Vec::new();
     play(&mut game, &["Probe Bare", "Probe Refill"], |g, name| seen.push((name.to_string(), the_filler(g))));
     assert_eq!(seen, vec![("Probe Bare".to_string(), (false, 0)), ("Probe Refill".to_string(), (false, 1))]);
-    assert!(game.state.effects.iter().all(|e| e.duration != Duration::WhileHasCounter(CounterKind::Flood)));
+    assert!(game.state.effects.iter().all(|e| e.duration != Duration::WhileCounter(CounterKind::Flood)));
 }

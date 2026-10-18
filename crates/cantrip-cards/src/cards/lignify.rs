@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, station::base_pt, targets};
+use cantrip_mechanics::{attach::attached_object, statics::base_pt, targets};
 use cantrip_oracle as oracle;
 
 // "Enchanted creature is a Treefolk with base power and toughness 0/4 and loses all abilities.": one static ability, an

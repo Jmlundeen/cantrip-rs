@@ -419,7 +419,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         (live(state, e.affected) || e.kind.outlives_affected())
             && (e.duration != Duration::WhileSourceOnBattlefield
                 || (live(state, e.source) && state.obj(e.source).zone.is(ZoneKind::Battlefield)))
-            && e.duration.counters_hold(state.obj(e.affected))
+            && e.duration.holds_for(state.obj(e.affected))
     };
     if state.effects.iter().any(|e| !applies(e)) {
         let alive: Vec<bool> = state.effects.iter().map(applies).collect();

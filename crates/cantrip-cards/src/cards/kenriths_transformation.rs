@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, effects, station::base_pt, targets, triggers::THIS_ENTERS};
+use cantrip_mechanics::{attach::attached_object, effects, statics::base_pt, targets, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
 // "Enchanted creature loses all abilities and is a green Elk creature with base power and toughness 3/3. (It loses all

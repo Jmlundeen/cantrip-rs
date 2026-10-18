@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{attach::attached_object, station::base_pt, targets};
+use cantrip_mechanics::{attach::attached_object, statics::base_pt, targets};
 use cantrip_oracle as oracle;
 
 // "Enchanted creature loses all abilities and has base power and toughness 1/1": one static ability, an effect in layer 6
