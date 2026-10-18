@@ -113,26 +113,35 @@ public sealed class LobbyPanel : Grid
         TablePlayerView? me = table.Players.FirstOrDefault(player => player.Seat == client.Seat);
         bool locked = me?.Ready == true;
 
-        var name = new TextBox { Text = me?.Name ?? "", PlaceholderText = "Your name", IsReadOnly = locked, FontSize = 13 };
-        column.Children.Add(name);
-
-        var deck = new ComboBox { IsEnabled = !locked, HorizontalAlignment = HorizontalAlignment.Stretch, FontSize = 13 };
-        foreach (string available in table.Decks)
+        // A ticketed seat (a Discord player's) has its name and deck from the table already: the name is theirs from
+        // Discord, so there is nothing here to type, only the deck it plays to show.
+        if (me?.Fixed == true)
         {
-            deck.Items.Add(available);
+            column.Children.Add(Text($"Playing {me.Deck} as {me.Name}", 13, Theme.FgMuted));
         }
-
-        deck.SelectedIndex = table.Decks.IndexOf(me?.Deck ?? "");
-        column.Children.Add(deck);
-
-        DockButton save = Button(column, "Apply name and deck", disabled: locked || table.Decks.Count == 0);
-        save.Clicked += () =>
+        else
         {
-            if (deck.SelectedIndex >= 0)
+            var name = new TextBox { Text = me?.Name ?? "", PlaceholderText = "Your name", IsReadOnly = locked, FontSize = 13 };
+            column.Children.Add(name);
+
+            var deck = new ComboBox { IsEnabled = !locked, HorizontalAlignment = HorizontalAlignment.Stretch, FontSize = 13 };
+            foreach (string available in table.Decks)
             {
-                client.ConfigurePlayer(name.Text, table.Decks[deck.SelectedIndex]);
+                deck.Items.Add(available);
             }
-        };
+
+            deck.SelectedIndex = table.Decks.IndexOf(me?.Deck ?? "");
+            column.Children.Add(deck);
+
+            DockButton save = Button(column, "Apply name and deck", disabled: locked || table.Decks.Count == 0);
+            save.Clicked += () =>
+            {
+                if (deck.SelectedIndex >= 0)
+                {
+                    client.ConfigurePlayer(name.Text, table.Decks[deck.SelectedIndex]);
+                }
+            };
+        }
 
         if (client.Seat == table.HostSeat)
         {

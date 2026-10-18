@@ -1064,7 +1064,7 @@ public sealed class GameServer : IAsyncDisposable
             SelectedSets = [.. _sets], Detail = _detail,
             Players = [.. _members.Values.OrderBy(member => member.Seat).Select(member => new TablePlayerView
             {
-                Seat = member.Seat, Name = member.Name, Deck = member.Deck, Ready = member.Ready, Connected = member.Connection is not null,
+                Seat = member.Seat, Name = member.Name, Deck = member.Deck, Ready = member.Ready, Connected = member.Connection is not null, Fixed = member.Reserved,
             })],
             EventId = _options.Event?.EventId ?? string.Empty,
             EventName = _options.Event?.Name ?? string.Empty,
