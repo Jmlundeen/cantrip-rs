@@ -41,7 +41,7 @@ internal static class ClientSite
     /// with <paramref name="signIn"/> (<see cref="SiteSignIn"/>).
     /// </summary>
     public static async Task<WebApplication> StartAsync(string listen, int port, string root, ArtStore art, IReadOnlySet<int>? tables = null, PortraitStore? portraits = null,
-        EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null)
+        EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null, TableAccess? access = null)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls($"http://{listen}:{port}");
@@ -88,10 +88,15 @@ internal static class ClientSite
             app.MapConstructedPlay(play);
         }
 
+        if (access is not null)
+        {
+            TableAccess.MapEnter(app);
+        }
+
         if (tables is not null)
         {
             // The tables listen where the bot told them to; reached here from this machine.
-            app.MapTables(listen is "0.0.0.0" or "*" or "+" ? "127.0.0.1" : listen, tables);
+            app.MapTables(listen is "0.0.0.0" or "*" or "+" ? "127.0.0.1" : listen, tables, access);
         }
 
         await app.StartAsync().ConfigureAwait(false);

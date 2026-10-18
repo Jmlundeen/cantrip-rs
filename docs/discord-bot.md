@@ -271,6 +271,18 @@ that has been silent for 100.
    and add a public hostname - say `cantrip` on your domain - with service type HTTP and URL `localhost:7779`. Start
    the bot with `--public-url https://cantrip.yourdomain`.
 
+### Every table wants a Discord sign-in
+
+With sign-in set up (`--oauth-client-id` and `CANTRIP_DISCORD_SECRET`) and a `--public-url`, no table opens on a ticket
+alone. **Open in Cantrip** (and the queue and play pages' seats) lead to `/enter`, which signs the player in with
+Discord if the browser is not, then goes on to the client with the same query and ticket. The ticket stays after the `#`
+the whole way, so it is in no request: the page keeps it in the tab for the trip to Discord and back. The table proxy
+then lets a WebSocket through only from a browser signed in as an account the table has a seat for (`TableAccess`): no
+sign-in is refused with 401, a signed-in account with no seat there with 403. The table still checks the ticket itself,
+so both are needed. A seat is kept for its account twelve hours.
+
+Without sign-in or without `--public-url` (tables on their own ports) a ticket opens a seat as it always has.
+
 ## How it is built
 
 `dotnet/src/Cantrip.Discord` is the bot (`cantrip-discord`). It is two parts:

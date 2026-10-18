@@ -26,6 +26,9 @@ public sealed class DiscordBotOptions
     /// <summary>Where card art is, for the client's <c>?art=</c>; null leaves the client to its default.</summary>
     public Uri? Art { get; init; }
 
+    /// <summary>Who may open which table, when the tables are behind sign-in (<see cref="TableAccess"/>); null for none, and links open the client directly.</summary>
+    internal TableAccess? Access { get; init; }
+
     /// <summary>The cube drafts draft, by name, for the messages; null when the bot hosts no drafts.</summary>
     public string? Cube { get; init; }
 
@@ -211,7 +214,7 @@ public sealed class DiscordBot : IAsyncDisposable
             if (_pods is not null && await _pods.ReturnAsync(Player(command.User)).ConfigureAwait(false) is { Refusal: null } pod)
             {
                 MessageComponent link = new ComponentBuilder()
-                    .WithButton("Open in Cantrip", style: ButtonStyle.Link, url: ClientSite.Link(_options.Client, pod.Address!, pod.Ticket!, _options.Art).AbsoluteUri)
+                    .WithButton("Open in Cantrip", style: ButtonStyle.Link, url: TableAccess.Link(_options.Access, _options.Client, pod.Address!, pod.Ticket!, _options.Art, command.User.Id).AbsoluteUri)
                     .Build();
                 await command.FollowupAsync(GameMessages.PodTicket(pod), ephemeral: true, components: link).ConfigureAwait(false);
                 return;
@@ -219,7 +222,7 @@ public sealed class DiscordBot : IAsyncDisposable
 
             DraftSeating back = await _drafts.ReturnAsync(Player(command.User)).ConfigureAwait(false);
             if (back.Refusal is not null) await command.FollowupAsync(back.Refusal, ephemeral: true).ConfigureAwait(false);
-            else await command.FollowupAsync(GameMessages.DraftTicket(back), ephemeral: true, components: OpenDraft(_options, back)).ConfigureAwait(false);
+            else await command.FollowupAsync(GameMessages.DraftTicket(back), ephemeral: true, components: OpenDraft(_options, back, command.User.Id)).ConfigureAwait(false);
             return;
         }
 
@@ -271,7 +274,7 @@ public sealed class DiscordBot : IAsyncDisposable
             return;
         }
 
-        await command.FollowupAsync(GameMessages.Ticket(seating), ephemeral: true, components: Open(_options, seating)).ConfigureAwait(false);
+        await command.FollowupAsync(GameMessages.Ticket(seating), ephemeral: true, components: Open(_options, seating, command.User.Id)).ConfigureAwait(false);
     }
 
     /// <summary>Opens a draft and posts its message, which the second player joins from.</summary>
@@ -455,7 +458,7 @@ public sealed class DiscordBot : IAsyncDisposable
             {
                 MessageComponent open = new ComponentBuilder()
                     .WithButton("Open in Cantrip", style: ButtonStyle.Link,
-                        url: ClientSite.Link(_options.Client, seating.Address!, seating.Ticket!, _options.Art).AbsoluteUri)
+                        url: TableAccess.Link(_options.Access, _options.Client, seating.Address!, seating.Ticket!, _options.Art, button.User.Id).AbsoluteUri)
                     .Build();
                 await button.FollowupAsync(GameMessages.QueueTicket(seating), ephemeral: true, components: open).ConfigureAwait(false);
             }
@@ -468,7 +471,7 @@ public sealed class DiscordBot : IAsyncDisposable
             if (seating.Refusal is not null)
                 await button.FollowupAsync(seating.Refusal, ephemeral: true).ConfigureAwait(false);
             else
-                await button.FollowupAsync(GameMessages.DraftTicket(seating), ephemeral: true, components: OpenDraft(_options, seating)).ConfigureAwait(false);
+                await button.FollowupAsync(GameMessages.DraftTicket(seating), ephemeral: true, components: OpenDraft(_options, seating, button.User.Id)).ConfigureAwait(false);
         }
         else if (_drafts is not null && id.StartsWith(DraftCancelPrefix, StringComparison.Ordinal))
         {
@@ -484,7 +487,7 @@ public sealed class DiscordBot : IAsyncDisposable
             if (seating.Refusal is not null)
                 await button.FollowupAsync(seating.Refusal, ephemeral: true).ConfigureAwait(false);
             else
-                await button.FollowupAsync(GameMessages.Ticket(seating), ephemeral: true, components: Open(_options, seating)).ConfigureAwait(false);
+                await button.FollowupAsync(GameMessages.Ticket(seating), ephemeral: true, components: Open(_options, seating, button.User.Id)).ConfigureAwait(false);
         }
         else if (id.StartsWith(CancelPrefix, StringComparison.Ordinal))
         {
@@ -624,9 +627,9 @@ public sealed class DiscordBot : IAsyncDisposable
             .WithButton("Cancel", DraftCancelPrefix + draft.Id, ButtonStyle.Danger)
             .Build();
 
-    private static MessageComponent OpenDraft(DiscordBotOptions options, DraftSeating seating) => new ComponentBuilder()
+    private static MessageComponent OpenDraft(DiscordBotOptions options, DraftSeating seating, ulong player) => new ComponentBuilder()
         .WithButton("Open in Cantrip", style: ButtonStyle.Link,
-            url: ClientSite.Link(options.Client, seating.Draft!.Address!, seating.Ticket!, options.Art).AbsoluteUri)
+            url: TableAccess.Link(options.Access, options.Client, seating.Draft!.Address!, seating.Ticket!, options.Art, player).AbsoluteUri)
         .Build();
 
     /// <summary>
@@ -647,9 +650,9 @@ public sealed class DiscordBot : IAsyncDisposable
     };
 
     /// <summary>The link button on a ticket reply, which opens the web client in the player's seat at the table.</summary>
-    private static MessageComponent Open(DiscordBotOptions options, Seating seating) => new ComponentBuilder()
+    private static MessageComponent Open(DiscordBotOptions options, Seating seating, ulong player) => new ComponentBuilder()
         .WithButton("Open in Cantrip", style: ButtonStyle.Link,
-            url: ClientSite.Link(options.Client, seating.Game!.Address, seating.Ticket!, options.Art).AbsoluteUri)
+            url: TableAccess.Link(options.Access, options.Client, seating.Game!.Address, seating.Ticket!, options.Art, player).AbsoluteUri)
         .Build();
 
     /// <summary>

@@ -57,7 +57,7 @@ public static class SiteSignIn
     private const string AvatarClaim = "urn:discord:avatar";
 
     /// <summary>The pages a sign-in may come back to.</summary>
-    private static readonly HashSet<string> Pages = new(StringComparer.Ordinal) { QueueSite.Route, PlaySite.Route };
+    private static readonly HashSet<string> Pages = new(StringComparer.Ordinal) { QueueSite.Route, PlaySite.Route, TableAccess.EnterRoute };
 
     /// <summary>Where Discord sends a player back to once they have signed in; registered as a redirect of the application.</summary>
     public static Uri Callback(Uri site) => new(site, "signin/discord");
@@ -202,9 +202,9 @@ public static class SiteSignIn
     /// <summary>A seat as a page takes it: the link that opens it in the web client, or why there is none.</summary>
     public sealed record SeatAnswer(string? Link, string? Refusal)
     {
-        public static SeatAnswer For(Uri client, Uri? art, Uri? address, string? ticket, string? refusal) =>
+        public static SeatAnswer For(Uri client, Uri? art, TableAccess? access, ulong player, Uri? address, string? ticket, string? refusal) =>
             refusal is null && address is not null && ticket is not null
-                ? new SeatAnswer(ClientSite.Link(client, address, ticket, art).AbsoluteUri, null)
+                ? new SeatAnswer(TableAccess.Link(access, client, address, ticket, art, player).AbsoluteUri, null)
                 : new SeatAnswer(null, refusal ?? "No seat could be had.");
     }
 

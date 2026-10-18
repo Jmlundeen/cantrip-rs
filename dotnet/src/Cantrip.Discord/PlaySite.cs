@@ -19,6 +19,9 @@ public sealed class PlaySiteOptions
 
     /// <summary>Who is signed in, and the player they sit down as.</summary>
     public required SiteSignInOptions SignIn { get; init; }
+
+    /// <summary>Who may open which table, when the tables are behind sign-in (<see cref="TableAccess"/>); null for none.</summary>
+    internal TableAccess? Access { get; init; }
 }
 
 /// <summary>
@@ -88,9 +91,9 @@ public static class PlaySite
         app.MapPost($"/{Route}/api/host", async (HttpContext context, HostRequest host) =>
         {
             if (Account(context) is not { } account) return Results.Unauthorized();
-            if (host.Format is not { Length: > 0 } format) return Fresh(context, Seat(options, null, "Choose a format."));
+            if (host.Format is not { Length: > 0 } format) return Fresh(context, Seat(options, account.Id, null, "Choose a format."));
             DiscordPlayer player = await PlayerOf(options.SignIn, account).ConfigureAwait(false);
-            return Fresh(context, Seat(options, await options.Games.HostAsync(player, format, host.Deck).ConfigureAwait(false)));
+            return Fresh(context, Seat(options, account.Id, await options.Games.HostAsync(player, format, host.Deck).ConfigureAwait(false)));
         });
 
         app.MapPost($"/{Route}/api/join", async (HttpContext context, JoinRequest join) =>
@@ -99,9 +102,9 @@ public static class PlaySite
 
             // Only the games of a format: a game hosted from Discord is joined there.
             if (options.Games.Find(join.Game ?? string.Empty) is not { Format: not null })
-                return Fresh(context, Seat(options, null, "That game has ended."));
+                return Fresh(context, Seat(options, account.Id, null, "That game has ended."));
             DiscordPlayer player = await PlayerOf(options.SignIn, account).ConfigureAwait(false);
-            return Fresh(context, Seat(options, await options.Games.JoinAsync(join.Game!, player, join.Deck).ConfigureAwait(false)));
+            return Fresh(context, Seat(options, account.Id, await options.Games.JoinAsync(join.Game!, player, join.Deck).ConfigureAwait(false)));
         });
 
         app.MapPost($"/{Route}/api/cancel", async (HttpContext context, CancelRequest cancel) =>
@@ -121,11 +124,11 @@ public static class PlaySite
 
     public sealed record CancelRequest(string? Game);
 
-    private static SeatAnswer Seat(PlaySiteOptions options, Seating seating) =>
-        SeatAnswer.For(options.Client, options.Art, seating.Game?.Address, seating.Ticket, seating.Refusal);
+    private static SeatAnswer Seat(PlaySiteOptions options, ulong player, Seating seating) =>
+        SeatAnswer.For(options.Client, options.Art, options.Access, player, seating.Game?.Address, seating.Ticket, seating.Refusal);
 
-    private static SeatAnswer Seat(PlaySiteOptions options, Seating? seating, string refusal) =>
-        SeatAnswer.For(options.Client, options.Art, null, null, seating?.Refusal ?? refusal);
+    private static SeatAnswer Seat(PlaySiteOptions options, ulong player, Seating? seating, string refusal) =>
+        SeatAnswer.For(options.Client, options.Art, options.Access, player, null, null, seating?.Refusal ?? refusal);
 
     /// <summary>
     /// A deck as the list names it: its file's first comment up to a colon (<c># Mono-Red Aggro: a Standard meta deck</c>),
