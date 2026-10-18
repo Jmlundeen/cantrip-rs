@@ -24,7 +24,7 @@ set "ROOT=%~dp0.."
 set "COMMAND=duel"
 if /i "%~1"=="watch" set "COMMAND="
 
-dotnet build "%ROOT%\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" -v q --nologo || exit /b 2
-dotnet run --project "%ROOT%\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" --no-build -v q -- %COMMAND% %*
+dotnet build "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" -v q --nologo || exit /b 2
+dotnet run --project "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" --no-build -v q -- %COMMAND% %*
 
 endlocal & exit /b %ERRORLEVEL%

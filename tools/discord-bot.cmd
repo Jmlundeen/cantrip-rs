@@ -32,7 +32,7 @@ set "GUILD=--guild 1161743985849663528"
 echo.%* | findstr /c:"--guild" >nul && set "GUILD="
 
 set "RUN=%ROOT%\.cantrip-run\discord"
-dotnet build "%ROOT%\src\Cantrip.Discord\Cantrip.Discord.csproj" -v q --nologo -o "%RUN%" || exit /b 1
+dotnet build "%ROOT%\dotnet\src\Cantrip.Discord\Cantrip.Discord.csproj" -v q --nologo -o "%RUN%" || exit /b 1
 
 "%RUN%\cantrip-discord.exe" %GUILD% %*
 endlocal
