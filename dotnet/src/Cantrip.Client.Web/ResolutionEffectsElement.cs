@@ -107,7 +107,7 @@ public sealed class ResolutionEffectsElement : SKCanvasElement
     /// Whether the table should go on being drawn as it was, so the effects' arrows reach what they point at before the
     /// table moves on - before a creature they killed leaves it.
     /// </summary>
-    public bool Holding => _enabled && DateTime.UtcNow < _holdUntil;
+    public bool HoldingTable => _enabled && DateTime.UtcNow < _holdUntil;
 
     private readonly List<Playing> _playing = [];
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(8) };

@@ -1337,7 +1337,7 @@ public sealed partial class MainPage : Page
         }
 
         // Not while a card is being carried: the row it was picked up from would be rebuilt under the pointer.
-        if (_needsRedraw && !AwaitingPrompt(client) && _carried is null && !_resolutions.Holding)
+        if (_needsRedraw && !AwaitingPrompt(client) && _carried is null && !_resolutions.HoldingTable)
         {
             _needsRedraw = false;
             Redraw(client);
