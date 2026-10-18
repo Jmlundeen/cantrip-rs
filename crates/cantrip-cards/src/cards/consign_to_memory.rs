@@ -11,18 +11,18 @@ fn target_trigger_or_colorless_spell(q: &dyn Query, _: &Asker, target: Target) -
     }
 }
 
+fn counter_triggered_ability(g: &mut dyn Game, serial: u32) {
+    let at = g.state().stack.iter().position(|i| i.serial == serial)
+        .expect("a legal triggered ability target remains on the stack");
+    let source = g.state().stack[at].object;
+    g.counter_item(source, at);
+}
+
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.target_legal(item, 0) { return Ok(()) }
-    match item.targets[0] {
-        Target::Object(id) => g.counter(id),
-        Target::Ability(serial) => {
-            if let Some(at) = g.state().stack.iter().position(|i| i.serial == serial) {
-                let source = g.state().stack[at].object;
-                g.counter_item(source, at);
-            }
-        }
-        _ => {}
-    }
+    let target = item.targets[0];
+    if let Target::Object(id) = target { g.counter(id); }
+    else if let Target::Ability(serial) = target { counter_triggered_ability(g, serial); }
     Ok(())
 }
 

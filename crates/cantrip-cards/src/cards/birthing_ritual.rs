@@ -22,12 +22,12 @@ fn ritual(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         && cantrip_api::may_cause_discard_or_sacrifice(g, you, you, true)
         && effects::ask_may(g, you, item.object, Purpose::Ask(&SACRIFICE))?
     {
-        if let Some(creature) = choose::card(g, you, item.object, Purpose::Sacrifice, creatures)? {
-            let mana_value = g.mana_value(creature);
-            let sacrificed = g.sacrifice(&[creature]);
-            if !sacrificed.is_empty() {
-                maximum = Some(1 + mana_value);
-            }
+        let creature = choose::card(g, you, item.object, Purpose::Sacrifice, creatures)?
+            .expect("a permitted mandatory sacrifice has a creature to choose");
+        let mana_value = g.mana_value(creature);
+        let sacrificed = g.sacrifice(&[creature]);
+        if !sacrificed.is_empty() {
+            maximum = Some(1 + mana_value);
         }
     }
     if let Some(maximum) = maximum {
