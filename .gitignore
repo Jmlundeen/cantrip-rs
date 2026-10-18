@@ -60,3 +60,6 @@ docs/cube-lists/card-ratings.json
 
 # Python bytecode
 __pycache__/
+
+# Where `tools\publish-server.cmd` publishes to (the server address and key path). Local to this machine.
+tools/deploy.local.json

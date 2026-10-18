@@ -1,0 +1,18 @@
+[Unit]
+Description=Cantrip Discord bot and table host
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=opc
+WorkingDirectory=/home/opc/cantrip/src
+EnvironmentFile=/etc/cantrip/bot.env
+ExecStart=/usr/bin/dotnet /home/opc/cantrip/src/.cantrip-run/discord/cantrip-discord.dll --guild 1161743985849663528 --listen 127.0.0.1 --web-port 7779 --client-root /home/opc/cantrip/client/wwwroot
+# The bot stops on Ctrl+C (SIGINT) and not on SIGTERM, which it would sit out for the default 90 seconds.
+KillSignal=SIGINT
+TimeoutStopSec=15
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

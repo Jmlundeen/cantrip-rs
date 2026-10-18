@@ -49,6 +49,8 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 |---|---|
 | `discord-bot.cmd` | runs the Discord bot (`docs/discord-bot.md`) |
 | `discord-bot-release.cmd` | stops the bot, builds the Release web client, and starts it again |
+| `publish-server.cmd` | publishes to the server: builds the bot and the web client here, builds the engine host there, publishes the art, and restarts the bot once (`-Fast`, `-SkipClient`, `-SkipArt`); the server is in `tools\deploy.local.json` |
+| `publish-art.cmd` | publishes card art alone, with the server up: brings the pre-sized art cache up to date here and sends what differs (`-DryRun`, `-SkipBuild`) |
 
 ## `maintenance/` - generated files and audits
 
@@ -71,6 +73,7 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 ## The rest
 
 - `scripts/` - the PowerShell behind the launchers above; run the `.cmd`, not these.
+- `deploy/` - the server's systemd units, kept for reference; the Discord token and OAuth secret live only on the server, in `/etc/cantrip/bot.env`. `dotnet\tools\Cantrip.ArtWarm` builds the pre-sized art cache `publish-art.cmd` sends.
 - `dotnet\tools\Cantrip.Bot` - plays one seat of a real server without a window; every bot seat above is one of these.
 - `dotnet\tools\Cantrip.Playtest`, `Cantrip.LlmGames` - the runners behind the `bots-*.cmd` launchers. `Cantrip.BotLab` - behind
   `bot-duel.cmd`, `bot-train.cmd` and `bot-draft.cmd`.
