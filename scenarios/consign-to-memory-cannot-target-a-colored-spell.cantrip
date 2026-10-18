@@ -1,0 +1,29 @@
+# Consign to Memory cannot target a colored spell, even while that spell is on the stack.
+
+[Bot1 Deck]
+Island
+Island
+Consign to Memory
+Island x12
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Actions]
+Bot1.Hand.Island.Play
+[T1 Bot1.Main2]
+Bot2.Hand.Mountain.Play
+[T2 Bot2.Main2]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Hand.Consign to Memory.Cast(Stack.Lightning Bolt)
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard =
