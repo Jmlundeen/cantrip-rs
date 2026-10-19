@@ -1,0 +1,76 @@
+# Rescue Skiff: "10+ | Flying (5/6)" (CR 721.2b): at ten or more charge counters it is a creature in
+# addition to its other types and has flying, with base power and toughness 5/6. It is cast on turn 1 off Pearl, Jet, Ruby and Lotus
+# with nothing legal to return (the Lotus in the graveyard is neither creature nor enchantment), an artifact with no
+# power or toughness (CR 721.2c). Two Sunset Saboteurs (4 power) are cast on turn 3 and station it: 4 + 4 = 8 is not
+# enough, and it is still no creature. On turn 5 a third station makes twelve: a 5/6 flying artifact creature that
+# attacks, having been under Bot1's control since turn 1.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Black Lotus
+Rescue Skiff
+Sunset Saboteur
+Sunset Saboteur
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Rescue Skiff.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Sunset Saboteur.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Rescue Skiff.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur#1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Rescue Skiff.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur#2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rescue Skiff.Counters.Charge = 8
+? Bot1.Battlefield.Rescue Skiff.Types = Artifact
+? Bot1.Battlefield.Rescue Skiff.Keywords = (absent)
+? Bot1.Battlefield.Rescue Skiff.Power = (absent)
+? Bot1.Battlefield.Rescue Skiff.Toughness = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Rescue Skiff.Activate(Ability: Station)
+Bot1.Choose(Sunset Saboteur#1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Rescue Skiff.Counters.Charge = 12
+? Bot1.Battlefield.Rescue Skiff.Types = Artifact; Creature
+? Bot1.Battlefield.Rescue Skiff.Power = 5
+? Bot1.Battlefield.Rescue Skiff.Toughness = 6
+? Bot1.Battlefield.Rescue Skiff.Keywords = Flying
+Bot1.Attack(Rescue Skiff > Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Rescue Skiff.Types = Artifact; Creature
+Bot1.Battlefield.Rescue Skiff.Keywords = Flying

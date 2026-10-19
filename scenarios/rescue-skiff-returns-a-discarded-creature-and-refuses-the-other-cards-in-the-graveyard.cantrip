@@ -1,0 +1,47 @@
+# Rescue Skiff: "When this Spacecraft enters, return target creature or enchantment card from your graveyard to the
+# battlefield." Faithless Looting draws Ornithopter and Rest in Peace and discards both, so the graveyard holds Black Lotus
+# and Faithless Looting (artifact, sorcery: not legal targets, the refusals) beside the creature card and the enchantment
+# card. Bot1 targets the Ornithopter, which returns untapped (CR 400.3); the Rest in Peace stays in the graveyard.
+# The mana: Ruby pays Looting; Lotus's {W}{W}{W}, Pearl, Jet and Sapphire pay {5}{W}.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Black Lotus
+Faithless Looting
+Rescue Skiff
+Ornithopter
+Rest in Peace
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Ornithopter; Rest in Peace)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Rescue Skiff.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Graveyard.Black Lotus)
+! Bot1.Target(Bot1.Graveyard.Faithless Looting)
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Jet; Mox Sapphire; Rescue Skiff; Ornithopter
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Rescue Skiff.Types = Artifact
+Bot1.Graveyard = Black Lotus; Faithless Looting; Rest in Peace
