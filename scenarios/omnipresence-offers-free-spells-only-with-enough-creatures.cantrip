@@ -1,0 +1,34 @@
+# A free alternative cost follows the current creature count; normal cost remains available (CR 118.9).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Omnipresence
+Ornithopter
+Ornithopter
+Belladonna Took
+Black Lotus
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Omnipresence.Cast
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Hand.Belladonna Took.Cast(Ability: Without)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Belladonna Took.Cast(Ability: Without)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Belladonna Took.Power = 2
+Bot1.Battlefield.Belladonna Took.Toughness = 2
+Bot1.Battlefield = Omnipresence; Ornithopter; Ornithopter; Belladonna Took
