@@ -1,0 +1,28 @@
+# With no artifact left (the two Lotuses that paid for it are spent), chapter I draws nothing and Bot2 draws nothing (there is no card to
+# draw, so "if you do" is false: Bot2's library is untouched by it), and on turn 5 chapter III deals
+# X = 0 damage (no artifact has a mana value): Bot2 stays at 20, and the Saga is sacrificed after III.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Armor Wars
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Armor Wars.Cast
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot2.Life = 20
+Bot2.Library.Count = 11
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Armor Wars; Black Lotus; Black Lotus
+Stack.Count = 0

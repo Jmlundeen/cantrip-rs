@@ -1,0 +1,45 @@
+# Armor Wars on turn 1 with three artifacts left (Mox Ruby, Mox Sapphire, Sol Ring; the Lotus is spent): chapter I, accepted, draws
+# three cards and gives Bot2 one. On turn 3 chapter II makes artifact spells cost {1} less: Basalt Monolith ({3}) is cast with Ruby
+# and Sol Ring (3 mana, one left over for Skydiver), while Thieving Skydiver, not an artifact, is cast for its full {1}{U}. On turn 5 chapter III deals
+# X to Bot2, X the greatest mana value among Bot1's artifacts: Monolith's 3 (not Sol Ring's 1), and the Saga is sacrificed after III.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Sol Ring
+Armor Wars
+Basalt Monolith
+Thieving Skydiver
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Armor Wars.Cast
+Bot1.Accept
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Basalt Monolith.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Thieving Skydiver.Cast
+[T5 Bot1.Main1]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Battlefield = Mox Ruby; Mox Sapphire; Sol Ring; Basalt Monolith; Thieving Skydiver
+Bot1.Graveyard = Armor Wars; Black Lotus
+Bot1.Hand.Count = 5
+Bot2.Library.Count = 10
+Stack.Count = 0

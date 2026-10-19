@@ -1,0 +1,48 @@
+# Chapter II's reduction is a lasting effect (CR 611.2c): Bot2 destroys Armor Wars with Disenchant while the chapter II trigger is
+# on the stack, but the ability still resolves (it is independent of its source, CR 113.7a) and Basalt Monolith ({3}) is cast for {2}
+# with just the two Moxen, though the Saga is gone.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Black Lotus
+Sol Ring
+Armor Wars
+Basalt Monolith
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Armor Wars.Cast
+Bot1.Decline
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Armor Wars)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Basalt Monolith.Cast
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Ruby; Mox Sapphire; Sol Ring; Basalt Monolith
+Bot1.Graveyard = Armor Wars; Black Lotus
+Bot2.Graveyard = Disenchant
+Stack.Count = 0
