@@ -1362,7 +1362,7 @@ pub type TargetedCost = fn(&dyn Query, &Asker, &[Target]) -> Cost;
 /// The cost a card in a graveyard or a hand may be cast for by a static ability's say-so (CR 113.6, 118.9), or none when it
 /// may not be: asked of the granting permanent (`Asker`), the card (as the face being cast) and the player casting it.
 /// Underworld Breach's escape is the card's mana cost and exiling three other cards; mayhem is its mana cost for a card
-/// discarded this turn; Omniscience's is nothing (`Cost::NONE`, "without paying its mana cost").
+/// discarded this turn; a way for nothing would be `Cost::NONE`, "without paying its mana cost".
 ///
 /// Whether X is announced follows from the cost (CR 107.3a-b): a cost that includes the card's mana cost has its {X}, and
 /// one that is neither the mana cost nor includes X ("without paying its mana cost") leaves 0 the only legal choice for X.
@@ -1379,8 +1379,8 @@ pub struct GrantedWay {
     pub text: &'static str,
     pub cost: GrantedCost,
     /// The zone of the caster's own the way casts cards from (CR 601.3): their graveyard (Lurrus, escape, mayhem) or their
-    /// hand ("you may cast spells from your hand without paying their mana costs", Omniscience). Another zone's rule or
-    /// permission does not open it.
+    /// hand (a way given to cards in a hand, as web-slinging would be). Another zone's rule or permission does not open it.
+    /// An alternative cost for spells cast from wherever (Omniscience's, Dracogenesis's) is a `SpellAlternative` instead.
     pub from: ZoneKind,
     /// The way also lets a land card in the graveyard be played (CR 305.1) rather than cast: `cost` is asked of the land
     /// card too, and any `Some` allows the play (the land has no cost). It uses the land drop, and the history marks the
@@ -1399,6 +1399,54 @@ pub struct GrantedWay {
 impl GrantedWay {
     /// A way that casts only and grants nothing, for a card's file to start from.
     pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, lands: false, gains: None, flashback: false };
+}
+
+/// What a static ability lets a spell be cast for rather than its mana cost (CR 118.9, `SpellAlternative::cost`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum InsteadOfManaCost {
+    /// "Without paying its mana cost" (Dracogenesis, Omniscience): no mana, and X is 0 (CR 107.3b).
+    WithoutPaying,
+    /// "You may pay [cost] rather than pay the mana cost" (Jodah, Archmage Eternal's and Fist of Suns' {W}{U}{B}{R}{G},
+    /// Rooftop Storm's {0}): that mana, and X is 0, as it is not the mana cost (CR 107.3b).
+    Mana(ManaCost),
+}
+
+impl InsteadOfManaCost {
+    /// The mana paid rather than the mana cost.
+    pub const fn mana(self) -> ManaCost {
+        match self {
+            InsteadOfManaCost::WithoutPaying => ManaCost::ZERO,
+            InsteadOfManaCost::Mana(mana) => mana,
+        }
+    }
+}
+
+/// A static ability of a permanent that gives an alternative cost to spells a player casts (CR 118.9, 601.2b, 604.1):
+/// "you may cast Dragon spells without paying their mana costs" (Dracogenesis), "you may pay {W}{U}{B}{R}{G} rather than pay
+/// the mana cost for spells that you cast" (Jodah, Archmage Eternal; Fist of Suns), "you may pay {0} rather than pay the mana
+/// cost for Zombie creature spells you cast" (Rooftop Storm), "you may cast spells from your hand without paying their mana
+/// costs" (Omniscience, `applies` asking for the hand).
+///
+/// It is a way of paying and no permission (CR 601.3): it stands beside every cast the player may already make of the face
+/// it judges - from a hand, a graveyard (Yawgmoth's Will, the card's own say-so, aftermath), exile (an Adventure, a
+/// permanent's permission, a "you may cast it" effect), a library's top (a permanent's rule) or as an effect resolves "you
+/// may cast that card" (CR 608.2g) - and offers it for this cost instead of the mana cost, at the same time. It is the one
+/// alternative cost of that cast (CR 118.9a), so it is not offered where the cast already is for one: flashback, a
+/// permission's own "without paying" or "rather than", life for its mana value, a card's own alternative cost (evoke,
+/// bestow, overload), a way a permanent grants. Additional costs (kicker, a permission's "in addition", CR 118.9d) and what
+/// raises or lowers the total (CR 601.2f) apply to it as to the mana cost; X is 0 (CR 107.3b). A card with no mana cost may
+/// be cast for it (CR 118.6a). It functions while the permanent is on the battlefield with its abilities.
+#[derive(Clone, Copy)]
+pub struct SpellAlternative {
+    /// What the cast is called on the menu (and what a scenario's `Ability:` names it by): "Without paying its mana cost".
+    pub text: &'static str,
+    /// Whether `player` may cast `spell` for it (CR 118.9): asked of the permanent (`Asker`, its controller "you"), with the
+    /// spell as the face that would be cast (a Room's door, an Adventure, a back face through a view of that face alone,
+    /// CR 709.3a, 715.3a, 712.8a), in the zone it is cast from, before it moves (CR 601.2a). "Spells you cast" asks
+    /// `player == asker.controller`; "Dragon spells", the face's subtypes.
+    pub applies: fn(&dyn Query, &Asker, ObjectId, PlayerId) -> bool,
+    /// What is paid rather than the mana cost.
+    pub cost: InsteadOfManaCost,
 }
 
 /// A static ability of a permanent that lets a player cast cards in exile (CR 601.3, 604.1): "you may cast spells from among
@@ -2091,6 +2139,9 @@ pub struct CardDef {
     pub ability_alternatives: &'static [AbilityAlternative],
     /// Ways it gives cards in graveyards to be cast, while it is on the battlefield (CR 604, 118.9).
     pub granted_ways: &'static [GrantedWay],
+    /// Alternative costs it gives the spells a player casts, from wherever they are cast, while it is on the battlefield
+    /// with its abilities (CR 118.9, 601.2b): Dracogenesis's "you may cast Dragon spells without paying their mana costs".
+    pub spell_alternatives: &'static [SpellAlternative],
     /// Its static abilities that let a player cast cards in exile (CR 601.3, 604.1), while it is on the battlefield with its
     /// abilities: "you may cast spells from among cards exiled with this".
     pub exile_casts: &'static [ExileCast],
@@ -2331,6 +2382,7 @@ impl CardDef {
         ability_discounts: &[],
         ability_alternatives: &[],
         granted_ways: &[],
+        spell_alternatives: &[],
         exile_casts: &[],
         granted_miracles: &[],
         opening_hand: None,

@@ -700,7 +700,8 @@ pub struct ActionOptionMessage {
     /// For a mana ability offered while a cost is paid: its mana is restricted so that none of it may pay this cost
     /// (CR 106.6).
     pub pays_nothing: bool,
-    /// For a cast: a way a permanent gives that casts the spell without paying its mana cost (CR 118.9, Omniscience).
+    /// For a cast: a way or an alternative cost a permanent gives that casts the spell without paying its mana cost (CR 118.9,
+    /// Omniscience, Dracogenesis).
     /// `cost_text` is what it comes to with the cost changes in play, before any target ({0}, or {1} under Thalia).
     pub without_paying_mana_cost: bool,
     /// For a cast or an activation: its cost returns tapped permanents, chosen once the mana is paid (CR 601.2g-h, 602.2b:

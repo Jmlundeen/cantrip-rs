@@ -270,7 +270,8 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell: its name, and its own mana cost.
             let inset = def.inset_face(o.index);
             // A cast a permanent grants names the face it casts (a Room's door, an Adventure): its name and its cost.
-            let granted_face = granted_slot(o.index).and_then(|(_, face)| match face {
+            // So does a cast for an alternative cost a static ability gives (CR 118.9: Dracogenesis), of a face it casts.
+            let granted_face = granted_slot(o.index).or(alternative_slot(o.index)).and_then(|(_, face)| match face {
                 GRANTED_FACE_LEFT => def.split.map(|h| h.0),
                 GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
                 GRANTED_FACE_ADVENTURE => def.adventure,
@@ -298,10 +299,19 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                 }
             }
             let player = game.state.obj(src).controller;
-            // A way that casts without paying the mana cost (CR 118.9, Omniscience), whose X is 0 (CR 107.3b), is marked so,
+            // A way that casts without paying the mana cost (CR 118.9), whose X is 0 (CR 107.3b), is marked so,
             // and its row says what it comes to with the cost changes in play before any target ({0}, or {1} under Thalia).
             let granted = granted_slot(o.index).and_then(|_| granted_cast_total(game, player, src, o.index));
-            let cost = if let Some((way, total)) = granted {
+            // An alternative cost a static ability gives (CR 118.9): "without paying its mana cost" (Omniscience, Dracogenesis) is
+            // marked so; one in mana ({W}{U}{B}{R}{G} rather than the mana cost) is its cost. Either says what it comes to.
+            let alternative = alternative_cast_total(game, player, src, o.index);
+            let cost = if let Some((mana, total)) = alternative {
+                // Rooftop Storm's {0} is nothing paid as well; a face whose own cost is {0} is cast the same either way.
+                let face = granted_face.unwrap_or(def);
+                m.without_paying_mana_cost = mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
+                m.cost_text = total.to_string();
+                mana
+            } else if let Some((way, total)) = granted {
                 let face = granted_face.unwrap_or(def);
                 m.without_paying_mana_cost = way.mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
                 if m.without_paying_mana_cost {
@@ -334,7 +344,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             // A cost that depends on the target it is cast with (CR 601.2c, 601.2f): the row says what the cast costs with
             // each candidate, where that is not what it costs otherwise - mana, and life a change adds (CR 118.8).
             let mut by_target = false;
-            if (o.index == 0 || granted.is_some()) && o.targets_required == 1 && !o.target_candidates.is_empty() {
+            if (o.index == 0 || granted.is_some() || alternative.is_some()) && o.targets_required == 1 && !o.target_candidates.is_empty() {
                 let costs = cast_costs(game, player, src, o.index, &o.target_candidates);
                 if costs.iter().any(|&(c, life)| c != cost || life > 0) {
                     let each = costs_by_target(game, &o.target_candidates, &costs);
@@ -932,6 +942,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which miracle to reveal it with".into()
                 } else if matches!(modes.first(), Some(Label::ManaType(..))) {
                     "Choose which type of mana to add".into()
+                } else if matches!(modes.first(), Some(Label::ManaCost)) {
+                    "Choose how to pay for it".into()
                 } else if let Some(heading) = options_heading(game, modes) {
                     heading
                 } else {

@@ -820,6 +820,11 @@ pub enum Label {
     /// A type of mana to add (CR 106.1b: white, blue, black, red, green or colorless): "one mana of any type that land
     /// produced".
     ManaType(Mana),
+    /// Paying a spell's mana cost, as it is cast (CR 601.2b), beside the alternative costs it could be cast for instead.
+    ManaCost,
+    /// The `u8`th alternative cost a permanent of this card gives the spells a player casts (CR 118.9:
+    /// `CardDef::spell_alternatives`), to pay rather than the mana cost.
+    AlternativeCost(CardId, u8),
 }
 
 /// One miracle ability of a card (CR 702.94a), named without the object, which a question asked as the card is drawn may not

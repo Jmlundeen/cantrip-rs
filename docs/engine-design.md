@@ -789,14 +789,37 @@ permanent a spell targets in two slots is destroyed once.
 ### Ways a permanent gives: from a graveyard or from a hand
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
-Paragon, Underworld Breach's escape, mayhem) or the hand ("you may cast spells from your hand without paying their mana
-costs", Omniscience). Each is judged on the face being cast, offered beside the card's other casts with its own way number,
-and is the one alternative cost of that cast (CR 118.9a); additional costs and cost increases still apply to it (CR 118.9d).
-Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost that is or includes the mana cost has its
-{X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana cost may be cast that way (CR 118.6a).
-The host marks such a cast `WithoutPayingManaCost`, with the cost it comes to as its `CostText`, and the tactical bot takes it
-over the card's ordinary cast. Not built: a way given to cards in a hand used by a cast an effect makes as it resolves
-(`cast_ways_during_resolution` offers the mana cost only), and emblems that give one (Tamiyo, Field Researcher's): KI-44.
+Paragon, Underworld Breach's escape, mayhem) or the hand. Each is judged on the face being cast, offered beside the card's
+other casts with its own way number, and is the one alternative cost of that cast (CR 118.9a); additional costs and cost
+increases still apply to it (CR 118.9d). Whether X is announced follows from the cost the way names (CR 107.3a-b): a cost
+that is or includes the mana cost has its {X}; `Cost::NONE`, "without paying its mana cost", leaves X 0. A card with no mana
+cost may be cast that way (CR 118.6a). The host marks a cast for nothing `WithoutPayingManaCost`, with the cost it comes to
+as its `CostText`, and the tactical bot takes it over the card's ordinary cast. Not built: emblems that give one (Tamiyo,
+Field Researcher's): KI-44.
+
+### Alternative costs a permanent gives the spells a player casts
+
+"You may cast Dragon spells without paying their mana costs" (Dracogenesis), "you may pay {W}{U}{B}{R}{G} rather than pay the
+mana cost for spells that you cast" (Jodah, Archmage Eternal; Fist of Suns), "you may pay {0} rather than pay the mana cost for
+Zombie creature spells you cast" (Rooftop Storm) and "you may cast spells from your hand without paying their mana costs"
+(Omniscience) are `CardDef::spell_alternatives` (`SpellAlternative`: `applies(q, asker, spell, player)` and `cost`, an
+`InsteadOfManaCost`, CR 118.9, 601.2b). Such an ability is a way of paying, not a permission (CR 601.3): it stands beside
+every cast the player may already make of a face for that face's mana cost - from a hand, a graveyard (Yawgmoth's Will, the
+card's own say-so, aftermath, retrace), exile (an Adventure, `ExileCast`, a `PlayPermission`), a library's top
+(`PlayRule::LibraryTopSpells`) - as a way number of its own (`WAY_ALTERNATIVE + k * 6 + face`, `alternative_way`), so the
+client sees it as its own cast with its cost (`alternative_cast_total`) and the cast goes on as that face's own
+(`face_way`), with that mana as `instead`. Each face is judged alone (CR 709.3a, 715.3a, 712.8a), in the zone it is cast
+from. It is offered whether or not the mana cost could be paid, and for a card with no mana cost (CR 118.6a). It is the one
+alternative cost of the cast (CR 118.9a), so it is not offered beside a cast that already is for one: a permission's
+"without paying" or "rather than" (`PlayGrant::instead`), flashback a permission gives, life for its mana value, Bolas's
+Citadel's top of the library, a card's own ways (evoke, bestow, overload) or a `GrantedWay`. Additional costs (kicker, a
+permission's `more`, an `ExileCast`'s, retrace's discard) are still paid (CR 118.9d), what changes the total applies to it
+(CR 601.2f: Thalia, Trinisphere, Terror of the Peaks), and X is 0 (CR 107.3b). A cast an effect makes as it resolves paying
+its costs (`cast_during_resolution` with no `instead`, CR 608.2g: Chandra, Torch of Defiance's "you may cast that card")
+announces the cost as it is cast (CR 601.2b): its caster chooses between `Label::ManaCost` and each `Label::AlternativeCost`
+that applies. The battlefield is searched for these once per offer, and only once something could be cast.
+Not built: one beside a `GrantedWay` that is itself a permission for the mana cost (Lurrus's, Serra Paragon's), which the way
+number cannot carry both of (KI-79).
 
 ### Hexproof from a quality
 

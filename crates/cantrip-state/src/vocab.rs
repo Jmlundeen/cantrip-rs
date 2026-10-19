@@ -85,6 +85,53 @@ pub fn granted_face_way(face: u8) -> u8 {
     }
 }
 
+/// How a spell is cast for an alternative cost a static ability of a permanent on the battlefield gives the spells a player
+/// casts (CR 118.9, 601.2b: `CardDef::spell_alternatives`), as a way number: `WAY_ALTERNATIVE + k * WAY_GRANTED_STRIDE +
+/// face` for the kth such cost the battlefield gives, in the order the permanents and their rules are listed, and the face
+/// of the card it is cast as (`GRANTED_FACE_*`). It is a way of paying, not a permission: it stands beside a cast the
+/// player may already make for the face's mana cost, from wherever that cast is made, and goes on as that cast
+/// (`face_way`) with this cost paid rather than the mana cost. The band lies above the granted ways' and below the
+/// split halves'.
+pub const WAY_ALTERNATIVE: u8 = WAY_GRANTED + WAY_GRANTED_SLOTS * WAY_GRANTED_STRIDE;
+/// How many such costs a battlefield may give at once.
+pub const WAY_ALTERNATIVE_SLOTS: u8 = 4;
+
+/// The way number of the kth alternative cost the battlefield gives, cast as `face`.
+pub fn alternative_way(k: usize, face: u8) -> u8 {
+    WAY_ALTERNATIVE + k as u8 * WAY_GRANTED_STRIDE + face
+}
+
+/// The alternative cost (its index among those the battlefield gives) and the face a way number names, or `None` for a
+/// way that is not one.
+pub fn alternative_slot(way: u8) -> Option<(usize, u8)> {
+    let n = way.checked_sub(WAY_ALTERNATIVE)?;
+    (n < WAY_ALTERNATIVE_SLOTS * WAY_GRANTED_STRIDE).then(|| ((n / WAY_GRANTED_STRIDE) as usize, n % WAY_GRANTED_STRIDE))
+}
+
+/// The face (`GRANTED_FACE_*`) a cast for the face's own mana cost names by its way number (0, a split half, the
+/// Adventure, the back face, the Omen), or `None` for a way that is not one: an alternative cost of the card's own,
+/// bestow, overload, a granted way.
+pub fn face_of_way(way: u8) -> Option<u8> {
+    match way {
+        0 => Some(GRANTED_FACE_WHOLE),
+        WAY_SPLIT_LEFT => Some(GRANTED_FACE_LEFT),
+        WAY_SPLIT_RIGHT => Some(GRANTED_FACE_RIGHT),
+        WAY_ADVENTURE => Some(GRANTED_FACE_ADVENTURE),
+        WAY_BACK_FACE => Some(GRANTED_FACE_BACK),
+        WAY_OMEN => Some(GRANTED_FACE_OMEN),
+        _ => None,
+    }
+}
+
+/// The way a cast goes on as once a granted way or an alternative cost the battlefield gives is decoded: that face's own
+/// (`granted_face_way`); any other way is itself.
+pub fn face_way(way: u8) -> u8 {
+    match granted_slot(way).or(alternative_slot(way)) {
+        Some((_, face)) => granted_face_way(face),
+        None => way,
+    }
+}
+
 /// How a card with overload is cast overloaded (CR 702.96a), as a way number: for its overload cost, with "each" where it
 /// says "target", so with no targets at all.
 pub const WAY_OVERLOAD: u8 = 250;

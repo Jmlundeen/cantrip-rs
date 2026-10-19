@@ -1250,17 +1250,24 @@ pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
     if !(spell_cost_changers(game) || !def.own_cost_changes.is_empty()) {
         return Vec::new();
     }
-    let base = match (index, granted_slot(index)) {
-        (0, _) => def.cost,
-        (_, Some(_)) => match granted_cast_cost(game, player, card, index) {
+    let alternative = alternative_slot(index)
+        .and_then(|(k, _)| static_rules::spell_alternatives_in(game.cards, &game.state, &game.log).get(k).map(|&(_, _, a)| a.cost.mana()));
+    let base = match (index, granted_slot(index), alternative) {
+        (0, _, _) => def.cost,
+        (_, Some(_), _) => match granted_cast_cost(game, player, card, index) {
             Some(cost) => cost.mana,
             None => return Vec::new(),
         },
+        (_, _, Some(mana)) => mana,
         _ => return Vec::new(),
     };
     let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
     let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
-    let face = granted_slot(index).and_then(|(_, face)| faces_to_cast(def).into_iter().find(|&(f, _)| f == face)).filter(|&(f, _)| f != GRANTED_FACE_WHOLE).map(|(_, d)| cx.card_id(d));
+    let face = granted_slot(index)
+        .or(alternative_slot(index))
+        .and_then(|(_, face)| faces_to_cast(def).into_iter().find(|&(f, _)| f == face))
+        .filter(|&(f, _)| f != GRANTED_FACE_WHOLE)
+        .map(|(_, d)| cx.card_id(d));
     candidates.iter().map(|&t| change_total(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), base, face, &[t])).collect()
 }
 
@@ -1290,7 +1297,7 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
         return None;
     }
     let whole = game.cards.get(game.state.obj(card).card);
-    if granted_slot(index).is_some() {
+    if granted_slot(index).is_some() || alternative_slot(index).is_some() {
         return None;
     }
     let face = cast_face(whole, index);
@@ -1325,6 +1332,23 @@ pub fn granted_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, 
     let face_id = (face != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def));
     let mana = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), cost.mana, face_id, &[]);
     Some((cost, mana))
+}
+
+/// What a cast for an alternative cost a static ability gives (`index`, an alternative way's number; CR 118.9, 601.2b) pays
+/// rather than the mana cost of the face it casts, and the mana as the cost changes in play leave it before any target is
+/// announced (CR 601.2f): for the menu row, which says what the cast still costs ({1} more under Thalia). `None` for any
+/// other way, or one the permanent no longer gives.
+pub fn alternative_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8) -> Option<(ManaCost, ManaCost)> {
+    let (k, face) = alternative_slot(index)?;
+    let (_, _, alternative) = *static_rules::spell_alternatives_in(game.cards, &game.state, &game.log).get(k)?;
+    let whole = game.cards.get(game.state.obj(card).card);
+    let face_def = cast_face(whole, index);
+    let mana = alternative.cost.mana();
+    let mut copy = crate::Game { state: game.state.clone(), log: game.log.clone(), tree: crate::tree::Tree::new(), at: crate::tree::NodeId::ROOT, cards: game.cards, verify: false };
+    let cx = Cx { g: &mut copy, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+    let face_id = (face != GRANTED_FACE_WHOLE).then(|| cx.card_id(face_def));
+    let total = change_with(&cx, &cost_change_sources(&cx), player, Costed::Spell(card), mana, face_id, &[]);
+    Some((mana, total))
 }
 
 /// What a cast a permanent grants (CR 604, 118.9) costs `player` for `card`, by the option's way number: the way's own
@@ -2551,7 +2575,7 @@ fn face_forbidden(cx: &Cx, forbidders: &[(ObjectId, PlayerId, &'static CardDef)]
 /// Adventure, an Omen), a back face, a bestowed Aura, one half of a split card, or the card itself. A way a permanent grants
 /// names its face.
 fn cast_face(whole: &'static CardDef, way: u8) -> &'static CardDef {
-    let way = granted_slot(way).map_or(way, |(_, face)| granted_face_way(face));
+    let way = face_way(way);
     let back = if way == WAY_BACK_FACE || way == WAY_TRANSFORMED { whole.back } else { None };
     let bestow = if way == WAY_BESTOW { whole.bestow } else { None };
     let half = match (way, whole.split) {
@@ -2560,6 +2584,36 @@ fn cast_face(whole: &'static CardDef, way: u8) -> &'static CardDef {
         _ => None,
     };
     whole.inset_face(way).or(back).or(bestow).or(half).unwrap_or(whole)
+}
+
+/// The alternative costs among `all` (`static_rules::spell_alternatives`) that `player` may pay rather than the mana cost
+/// of `card` cast as `face` (CR 118.9, 601.2b), the face its way for its mana cost, `plain`, casts: each as its way number
+/// and the mana paid instead. Judged on that face (CR 709.3a, 715.3a, 712.8a), in the zone the card is in. Nothing for a
+/// way that is not a cast for a face's mana cost.
+fn alternatives_for(
+    cx: &Cx,
+    all: &[(ObjectId, PlayerId, &'static SpellAlternative)],
+    player: PlayerId,
+    card: ObjectId,
+    face: &'static CardDef,
+    plain: u8,
+) -> Vec<(u8, ManaCost)> {
+    let Some(code) = face_of_way(plain).filter(|_| !all.is_empty()) else { return Vec::new() };
+    let view = AsFace { cx, spell: card, face: cx.card_id(face) };
+    let q: &dyn Query = if code == GRANTED_FACE_WHOLE { cx } else { &view };
+    all.iter()
+        .take(WAY_ALTERNATIVE_SLOTS as usize)
+        .enumerate()
+        .filter(|&(_, &(source, controller, alternative))| (alternative.applies)(q, &Asker { source, controller }, card, player))
+        .map(|(k, &(_, _, alternative))| (alternative_way(k, code), alternative.cost.mana()))
+        .collect()
+}
+
+/// The alternative cost a static ability gives (CR 118.9) that a cast by the way number `way` pays, with the permanent
+/// that gives it and its controller: `None` for any other way, or one the permanent no longer gives.
+fn alternative_of(cx: &Cx, way: u8) -> Option<(ObjectId, PlayerId, &'static SpellAlternative)> {
+    let (k, _) = alternative_slot(way)?;
+    static_rules::spell_alternatives(cx).get(k).copied()
 }
 
 fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available>, instants: bool, options: &mut Vec<ActionOption>) {
@@ -2579,6 +2633,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
         .filter(|zone| !barred.contains(zone.kind()));
     let granted: std::cell::OnceCell<Vec<(ObjectId, PlayerId, &'static GrantedWay)>> = std::cell::OnceCell::new();
     let exile_casts: std::cell::OnceCell<Vec<(ObjectId, PlayerId, &'static ExileCast)>> = std::cell::OnceCell::new();
+    let given_alternatives: std::cell::OnceCell<Vec<(ObjectId, PlayerId, &'static SpellAlternative)>> = std::cell::OnceCell::new();
     for zone in zones {
         let own = zone.player == player;
         for &id in cx.s().zone(zone) {
@@ -2658,32 +2713,45 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             // Will does for Force of Will's, Daze's or web-slinging's; one whose text names the hand is not (warp, CR
             // 702.185a). `elsewhere` is a rule or permission that has it cast from this other zone.
             let from_elsewhere = |way: &WayDef, elsewhere: bool| way.from == ZoneKind::Hand && !way.only_from && !zone.is(ZoneKind::Hand) && elsewhere;
+            // The alternative costs static abilities give the spells the player casts (CR 118.9, 601.2b), each offered beside a
+            // cast of a face for its mana cost, from here, by whatever lets it be cast from here: as that way number, for that
+            // mana instead. None where the cast is already for an alternative cost (CR 118.9a): a permission's "without paying",
+            // "rather than", life for its mana value, or flashback.
+            let alternatives_open = !grant.is_some_and(|g| g.instead.is_some() || g.life_for_mana_value || g.exile_after);
+            let alternatives_of = |face: &'static CardDef, plain: u8| -> Vec<(u8, ManaCost)> {
+                if !alternatives_open {
+                    return Vec::new();
+                }
+                alternatives_for(cx, given_alternatives.get_or_init(|| static_rules::spell_alternatives(cx)), player, id, face, plain)
+            };
             if instant == instants && !land {
                 if def.split.is_none()
                     && (zone.is(ZoneKind::Hand) || prepared_copy || adventured || permitted_whole || from_graveyard || retrace)
-                    // A card with no mana cost is cast only for an alternative cost (CR 118.6a): one the permission names, life
-                    // equal to its mana value (0) included.
-                    && (def.has_cost || instead.is_some())
                     && (!life_grant || can_pay_other(cx, id, player, &life_for_mana_value(def)))
                     && additional_payable
                     && def.additional_cost.is_none_or(|extra| can_pay_other(cx, id, player, &extra))
                     && (def.additional_choice.is_empty()
                         || def.additional_choice.iter().any(|c| can_pay_other(cx, id, player, &c.cost)))
                 {
-                    let a = available.get_or_init(|| self::available(cx, player));
-                    let covered = |targets: &[Target]| {
-                        let mut least = least_cost(cx, a, player, id, def, instead.unwrap_or(def.cost), targets);
-                        least.generic = least.generic.saturating_add(more);
-                        if let Some(additional) = additional {
-                            least = add_cost(least, additional.mana);
+                    // A card with no mana cost is cast only for an alternative cost (CR 118.6a): one the permission names, life
+                    // equal to its mana value (0) included, or one a static ability gives.
+                    let plain = (def.has_cost || instead.is_some()).then_some((0, instead.unwrap_or(def.cost)));
+                    for (index, base) in plain.into_iter().chain(alternatives_of(def, 0)) {
+                        let a = available.get_or_init(|| self::available(cx, player));
+                        let covered = |targets: &[Target]| {
+                            let mut least = least_cost(cx, a, player, id, def, base, targets);
+                            least.generic = least.generic.saturating_add(more);
+                            if let Some(additional) = additional {
+                                least = add_cost(least, additional.mana);
+                            }
+                            // Mana of any type pays every symbol of it (CR 609.4b), by the permission of its own or the
+                            // permanent's that casts it from exile.
+                            covers_total(cx, a, player, id, def, least, 0, any_type || whole_any_type) && added_life_payable(cx, a, player, id, def, targets)
+                        };
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+                        if offer_costed(cx, a, &asker, def, &mut option, covered) {
+                            options.push(option);
                         }
-                        // Mana of any type pays every symbol of it (CR 609.4b), by the permission of its own or the
-                        // permanent's that casts it from exile.
-                        covers_total(cx, a, player, id, def, least, 0, any_type || whole_any_type) && added_life_payable(cx, a, player, id, def, targets)
-                    };
-                    let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
-                    if offer_costed(cx, a, &asker, def, &mut option, covered) {
-                        options.push(option);
                     }
                 }
                 for (n, way) in def.ways.iter().enumerate() {
@@ -2793,15 +2861,16 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             }
             // What a face cast by the permission costs (CR 118.9, 601.2f): what it names instead, or life equal to the face's
             // mana value, and what it adds; the face's own mana cost from the hand.
-            let face_covered = |face: &CardDef, by_permission: Option<Option<&'static ExileCast>>| {
+            // `alternative` is the mana an alternative cost a static ability gives says to pay instead (CR 118.9).
+            let face_covered = |face: &CardDef, by_permission: Option<Option<&'static ExileCast>>, alternative: Option<ManaCost>| {
                 let a = available.get_or_init(|| self::available(cx, player));
                 let Some(by_exile_cast) = by_permission else {
-                    return a.covers_for(&least_cost(cx, a, player, id, face, face.cost, &[]), &spell_kind(cx, a, id, face));
+                    return a.covers_for(&least_cost(cx, a, player, id, face, alternative.unwrap_or(face.cost), &[]), &spell_kind(cx, a, id, face));
                 };
                 if life_grant && !can_pay_other(cx, id, player, &life_for_mana_value(face)) {
                     return false;
                 }
-                let mut least = least_cost(cx, a, player, id, face, instead.unwrap_or(face.cost), &[]);
+                let mut least = least_cost(cx, a, player, id, face, alternative.or(instead).unwrap_or(face.cost), &[]);
                 least.generic = least.generic.saturating_add(more);
                 if let Some(c) = by_exile_cast {
                     least = add_cost(least, c.additional.mana);
@@ -2839,9 +2908,12 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                     if (!(zone.is(from) && own) && by_permission.is_none()) || face_speed(half) != instants {
                         continue;
                     }
-                    let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
-                    if face_covered(half, by_permission) && offer_spell(cx, &asker, half, &mut option) {
-                        options.push(option);
+                    let alternatives = alternatives_of(half, way).into_iter().map(|(index, mana)| (index, Some(mana)));
+                    for (index, alternative) in std::iter::once((way, None)).chain(alternatives) {
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+                        if face_covered(half, by_permission, alternative) && offer_spell(cx, &asker, half, &mut option) {
+                            options.push(option);
+                        }
                     }
                 }
             }
@@ -2854,9 +2926,12 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                 && let back_by_permission = face_permission(back)
                 && (zone.is(ZoneKind::Hand) || back_by_permission.is_some())
             {
-                let mut option = ActionOption::on(ActionKind::CastSpell, id, WAY_BACK_FACE);
-                if face_covered(back, back_by_permission) && offer_spell(cx, &asker, back, &mut option) {
-                    options.push(option);
+                let alternatives = alternatives_of(back, WAY_BACK_FACE).into_iter().map(|(index, mana)| (index, Some(mana)));
+                for (index, alternative) in std::iter::once((WAY_BACK_FACE, None)).chain(alternatives) {
+                    let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+                    if face_covered(back, back_by_permission, alternative) && offer_spell(cx, &asker, back, &mut option) {
+                        options.push(option);
+                    }
                 }
             }
             // Bestow (CR 702.103a): from the hand, as the Aura it becomes, which needs a creature to enchant (CR 601.2c).
@@ -2900,22 +2975,25 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                     } else {
                         None
                     };
-                    let mut option = ActionOption::on(ActionKind::CastSpell, id, way);
-                    if {
-                        let a = available.get_or_init(|| self::available(cx, player));
-                        let mut least = least_cost(cx, a, player, id, inset, instead.unwrap_or(inset.cost), &[]);
-                        least.generic = least.generic.saturating_add(more);
-                        if let Some(c) = face_exile_cast {
-                            least = add_cost(least, c.additional.mana);
+                    let alternatives = alternatives_of(inset, way).into_iter().map(|(index, mana)| (index, Some(mana)));
+                    for (index, alternative) in std::iter::once((way, None)).chain(alternatives) {
+                        let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+                        if {
+                            let a = available.get_or_init(|| self::available(cx, player));
+                            let mut least = least_cost(cx, a, player, id, inset, alternative.or(instead).unwrap_or(inset.cost), &[]);
+                            least.generic = least.generic.saturating_add(more);
+                            if let Some(c) = face_exile_cast {
+                                least = add_cost(least, c.additional.mana);
+                            }
+                            if any_type || face_exile_cast.is_some_and(|c| c.any_type) {
+                                // Mana of any type pays every symbol of it (CR 609.4b).
+                                least = least.paid_with_any_type();
+                            }
+                            a.covers_for(&least, &spell_kind(cx, a, id, inset))
+                        } && offer_spell(cx, &asker, inset, &mut option)
+                        {
+                            options.push(option);
                         }
-                        if any_type || face_exile_cast.is_some_and(|c| c.any_type) {
-                            // Mana of any type pays every symbol of it (CR 609.4b).
-                            least = least.paid_with_any_type();
-                        }
-                        a.covers_for(&least, &spell_kind(cx, a, id, inset))
-                    } && offer_spell(cx, &asker, inset, &mut option)
-                    {
-                        options.push(option);
                     }
                 }
             }
@@ -2933,13 +3011,19 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
         });
         let instant = Speed { cx, flash, granters: &flash_granters, player, card: id }.whole(def);
         // Where a permanent lets them pay life instead, that cast below is the one offered.
-        if allowed && !land_rules(cx, player).top_for_life && !def.is(CardType::Land) && def.has_cost && instant == instants {
-            let a = available.get_or_init(|| self::available(cx, player));
-            let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
-            if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, def.cost, &[]), 0, false)
-                && offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option)
-            {
-                options.push(option);
+        // And for an alternative cost a static ability gives (CR 118.9), which a card with no mana cost may be cast for
+        // (CR 118.6a).
+        if allowed && !land_rules(cx, player).top_for_life && !def.is(CardType::Land) && instant == instants {
+            let plain = def.has_cost.then_some((0, def.cost));
+            let alternatives = alternatives_for(cx, given_alternatives.get_or_init(|| static_rules::spell_alternatives(cx)), player, id, def, 0);
+            for (index, base) in plain.into_iter().chain(alternatives) {
+                let a = available.get_or_init(|| self::available(cx, player));
+                let mut option = ActionOption::on(ActionKind::CastSpell, id, index);
+                if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, base, &[]), 0, false)
+                    && offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option)
+                {
+                    options.push(option);
+                }
             }
         }
     }
@@ -3217,6 +3301,15 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
             return format!("{}: {}", face_def.name, describe_way(cards, state, log, option, source)).into();
         }
     }
+    // A cast for an alternative cost a static ability gives (CR 118.9) says it, after the face it casts where that is not the
+    // card itself: "Without paying its mana cost", "Stomp: Without paying its mana cost".
+    if option.kind == ActionKind::CastSpell
+        && let Some((_, face)) = alternative_slot(option.index)
+        && face != GRANTED_FACE_WHOLE
+    {
+        let face_def = cast_face(cards.get(state.obj(source).card), option.index);
+        return format!("{}: {}", face_def.name, describe_way(cards, state, log, option, source)).into();
+    }
     describe_way(cards, state, log, option, source).into()
 }
 
@@ -3247,6 +3340,10 @@ fn describe_way(cards: &CardTable, state: &GameState, log: &[Record], option: &A
         ActionKind::CastSpell | ActionKind::PlayLand if granted_slot(option.index).is_some() => {
             let (k, _) = granted_slot(option.index).expect("a granted way");
             granted_ways_of(cards, state, log).get(k).map_or("", |&(_, _, way)| way.text)
+        }
+        ActionKind::CastSpell if alternative_slot(option.index).is_some() => {
+            let (k, _) = alternative_slot(option.index).expect("an alternative cost");
+            static_rules::spell_alternatives_in(cards, state, log).get(k).map_or("", |&(_, _, alternative)| alternative.text)
         }
         ActionKind::CastSpell if option.index == WAY_SPLIT_LEFT => cards.get(state.obj(source).card).split.map_or("", |h| h.0.name),
         ActionKind::CastSpell if option.index == WAY_SPLIT_RIGHT => cards.get(state.obj(source).card).split.map_or("", |h| h.1.name),
@@ -3309,7 +3406,8 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
         ActionKind::CastSpell => {
             // Cast from where a permission allows (CR 601.3), for the cost it names instead of the mana cost: the card, or its
             // Adventure or Omen, which is casting the card too (CR 715.3, 720.3).
-            let permitted = match action.index {
+            // An alternative cost a static ability gives (CR 118.9) is paid on a cast the permission makes all the same.
+            let permitted = match alternative_slot(action.index).map_or(action.index, |_| face_way(action.index)) {
                 0 => permission_for(cx, source, player).filter(|p| !p.grant.adventure_only),
                 WAY_ADVENTURE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => permission_for(cx, source, player),
                 WAY_OMEN | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => {
@@ -3413,9 +3511,12 @@ fn cast(
     resolving: bool,
 ) -> R<()> {
     let CastTerms { instead, any_type, exile_after, flashback, life, more, less, copy, way: _ } = terms;
-    // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own.
+    // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own. So does an
+    // alternative cost a static ability gives the spells its caster casts (CR 118.9, 601.2b), read now, as the cast begins,
+    // so the cast keeps it if the permanent leaves while it is paid for.
     let granted = granted_slot(way);
-    let way = granted.map_or(way, |(_, face)| granted_face_way(face));
+    let alternative = alternative_of(cx, way).map(|(_, _, a)| a.cost.mana());
+    let way = face_way(way);
     let printed = cx.s().obj(card).card;
     let whole = cx.card(printed);
     // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell and nothing else on the stack (CR 715.3b,
@@ -3429,6 +3530,9 @@ fn cast(
         && cx.s().obj(card).zone.is(ZoneKind::Graveyard)
         && !whole.keywords.has(Keyword::CastFromYourGraveyard)
         && cx.chars(card).has(Keyword::Retrace);
+    // The alternative cost is paid rather than the mana cost (CR 118.9), its X 0 (CR 107.3b), and every additional cost with
+    // it (CR 118.9d): retrace's discard is one, so it is read above.
+    let instead = instead.or(alternative);
     // Cast as its back face (CR 712.8a), a modal double-faced card is that face and nothing else on the stack.
     let back = if way == WAY_BACK_FACE || way == WAY_TRANSFORMED { whole.back } else { None };
     // Cast bestowed (CR 702.103b), it is an Aura spell and nothing else on the stack.
@@ -3560,7 +3664,7 @@ fn cast(
     // cost, X included;
     // an alternative cost is not that cost, so X is 0 (CR 107.3b).
     // A way a permanent grants (Lurrus, Underworld Breach's escape, mayhem) casts the face for its mana cost, or a cost that
-    // includes it, so X is announced (CR 107.3a); one that casts it without paying its mana cost (Omniscience) leaves X 0
+    // includes it, so X is announced (CR 107.3a); one that casts it without paying its mana cost leaves X 0
     // (CR 107.3b). Cast without paying its mana cost (`instead`, CR 118.9), X is 0 (CR 107.3b).
     // A cost paid instead that includes {X} (a miracle cost that is the card's mana cost reduced) announces it (CR 107.3a).
     let x_symbols = match (instead, granted_x) {
@@ -4072,6 +4176,43 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
                 _ => ways[0].way,
             }
         }
+    };
+    // CR 601.2b, 118.9: an alternative cost a static ability gives the spell is announced as it is cast, where the effect has it
+    // cast paying its costs: neither "without paying its mana cost" nor for another cost, nor with flashback (CR 118.9a).
+    let way = if terms.instead.is_none() && terms.life == 0 && !terms.flashback {
+        let whole = cx.card(cx.s().obj(card).card);
+        let all = static_rules::spell_alternatives(cx);
+        let alternatives = alternatives_for(cx, &all, player, card, cast_face(whole, way), way);
+        if alternatives.is_empty() {
+            way
+        } else {
+            let label = |index: u8| {
+                let (granter, _, alternative) = all[alternative_slot(index).expect("an alternative way").0];
+                let of = cx.cards().current(cx.s().obj(granter));
+                let n = cx.card(of).spell_alternatives.iter().position(|a| std::ptr::eq(a, alternative)).unwrap_or(0);
+                Label::AlternativeCost(of, n as u8)
+            };
+            let modes: Vec<Label> = std::iter::once(Label::ManaCost).chain(alternatives.iter().map(|&(index, _)| label(index))).collect();
+            let ask = RequestKind::ChooseModes {
+                source: card,
+                eligible: (0..modes.len() as u8).collect(),
+                modes,
+                count: 1,
+                at_most: 0,
+                affordable: Vec::new(),
+                additional_cost: false,
+                repeat: false,
+            };
+            match cx.ask_core(player, ask, false)? {
+                Answer::Modes(chosen) => match chosen.first() {
+                    Some(&n) if n > 0 && (n as usize) <= alternatives.len() => alternatives[n as usize - 1].0,
+                    _ => way,
+                },
+                _ => way,
+            }
+        }
+    } else {
+        way
     };
     let mark = cx.s().mark();
     let log_mark = cx.g.log.len();
@@ -5965,6 +6106,227 @@ fn is_live(cx: &Cx, id: ObjectId) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Game;
+
+    const ME: PlayerId = PlayerId(0);
+    const THEM: PlayerId = PlayerId(1);
+
+    /// "You may cast Dragon spells without paying their mana costs" (Dracogenesis): spells "you" cast, judged on the face.
+    fn dragon_spells_you_cast(q: &dyn Query, asker: &Asker, spell: ObjectId, player: PlayerId) -> bool {
+        player == asker.controller && q.chars(spell).has_subtype(Subtype::Dragon)
+    }
+    /// "You may pay {W}{U}{B}{R}{G} rather than pay the mana cost for spells that you cast" (Jodah, Archmage Eternal).
+    fn spells_you_cast(_: &dyn Query, asker: &Asker, _: ObjectId, player: PlayerId) -> bool {
+        player == asker.controller
+    }
+    fn any_card(_: &dyn Query, _: &Asker, _: ObjectId, _: PlayerId) -> bool {
+        true
+    }
+    fn any_spell(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
+        true
+    }
+
+    static GENESIS: CardDef = CardDef {
+        name: "Alternative Test Genesis",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        spell_alternatives: &[SpellAlternative { text: "Without paying its mana cost", applies: dragon_spells_you_cast, cost: InsteadOfManaCost::WithoutPaying }],
+        ..CardDef::BLANK
+    };
+    static ARCHMAGE: CardDef = CardDef {
+        name: "Alternative Test Archmage",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        spell_alternatives: &[SpellAlternative { text: "Pay {W}{U}{B}{R}{G} rather than pay its mana cost", applies: spells_you_cast, cost: InsteadOfManaCost::Mana(mana("{W}{U}{B}{R}{G}")) }],
+        ..CardDef::BLANK
+    };
+    /// "You may cast spells from among cards in exile" (a permanent's permission, CR 601.3).
+    static EXILER: CardDef = CardDef {
+        name: "Alternative Test Exiler",
+        types: TypeSet::of(&[CardType::Enchantment]),
+        exile_casts: &[ExileCast { text: "Cast from exile", allows: any_card, additional: Cost::NONE, any_type: false }],
+        ..CardDef::BLANK
+    };
+    /// "You may cast spells from the top of your library" (CR 601.3).
+    static FORGE: CardDef = CardDef {
+        name: "Alternative Test Forge",
+        types: TypeSet::of(&[CardType::Artifact]),
+        play_rules: &[PlayRule::LibraryTopSpells(any_spell)],
+        ..CardDef::BLANK
+    };
+    static DRAGON: CardDef = CardDef {
+        name: "Alternative Test Dragon",
+        types: TypeSet::of(&[CardType::Creature]),
+        subtypes: SubtypeSet::of(&[Subtype::Dragon]),
+        cost: mana("{6}{R}{R}"),
+        has_cost: true,
+        power: Some(5),
+        toughness: Some(5),
+        ..CardDef::BLANK
+    };
+    static BEAR: CardDef = CardDef {
+        name: "Alternative Test Bear",
+        types: TypeSet::of(&[CardType::Creature]),
+        cost: mana("{1}{G}"),
+        has_cost: true,
+        power: Some(2),
+        toughness: Some(2),
+        ..CardDef::BLANK
+    };
+
+    /// A game in the first player's precombat main phase, the stack empty, with each of `cards` in the zone beside it and
+    /// owned by the player beside it, nothing else anywhere and no mana: what each is, in order.
+    fn table(cards: &[(&'static CardDef, Zone, PlayerId)]) -> (Game, Vec<ObjectId>) {
+        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&GENESIS, &ARCHMAGE, &EXILER, &FORGE, &DRAGON, &BEAR])));
+        let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
+        game.state.update_turn(|t| {
+            t.number = 2;
+            t.active = ME;
+            t.priority = ME;
+            t.set_step(Step::PrecombatMain);
+        });
+        let ids = cards
+            .iter()
+            .map(|&(def, zone, owner)| {
+                let id = game.state.push_obj(Obj::new(table.id_of(def), owner, zone));
+                game.state.zone_push(zone, id);
+                id
+            })
+            .collect();
+        (game, ids)
+    }
+
+    fn cx(game: &mut Game) -> Cx<'_> {
+        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None }
+    }
+
+    /// The way numbers `player` is offered to cast `card` by now.
+    fn casts(game: &mut Game, player: PlayerId, card: ObjectId) -> Vec<u8> {
+        let cx = cx(game);
+        priority_options(&cx, player).into_iter().filter(|o| o.kind == ActionKind::CastSpell && o.source == Some(card)).map(|o| o.index).collect()
+    }
+
+    const FREE: u8 = WAY_ALTERNATIVE + GRANTED_FACE_WHOLE;
+
+    /// CR 118.9, 601.2b: a Dragon in hand that no mana could pay for is offered without paying its mana cost, and only that;
+    /// a spell that is no Dragon is offered nothing (and its mana cost can't be paid either).
+    #[test]
+    fn an_alternative_cost_is_offered_for_a_spell_whose_mana_cost_cannot_be_paid() {
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::hand(ME), ME), (&BEAR, Zone::hand(ME), ME)]);
+        assert_eq!(casts(&mut game, ME, ids[1]), vec![FREE]);
+        assert!(casts(&mut game, ME, ids[2]).is_empty());
+        let cx = cx(&mut game);
+        let option = ActionOption::on(ActionKind::CastSpell, ids[1], FREE);
+        assert_eq!(describe(cx.cards(), cx.s(), &cx.g.log, &option), "Without paying its mana cost");
+    }
+
+    /// CR 118.9: "spells you cast" is its controller's alone; the opponent's Dragon is offered nothing by it.
+    #[test]
+    fn an_alternative_cost_is_its_controllers_alone() {
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, THEM), (&DRAGON, Zone::hand(ME), ME)]);
+        assert!(casts(&mut game, ME, ids[1]).is_empty());
+    }
+
+    /// CR 601.3, 118.9: it gives no permission. A Dragon in a graveyard nothing lets be cast is offered nothing; one a
+    /// permission lets be cast from there ("you may cast it") is offered for the alternative cost, beside nothing else, the
+    /// mana cost being unpayable.
+    #[test]
+    fn an_alternative_cost_grants_no_permission_and_stands_beside_one() {
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::graveyard(ME), ME)]);
+        assert!(casts(&mut game, ME, ids[1]).is_empty());
+        game.state.permission_push(PlayPermission { card: ids[1], player: ME, grant: PlayGrant::CAST, turn: 2 });
+        assert_eq!(casts(&mut game, ME, ids[1]), vec![FREE]);
+    }
+
+    /// CR 118.9a: a cast already for an alternative cost - a permission's "without paying its mana cost", flashback, life
+    /// for its mana value - is not offered for another.
+    #[test]
+    fn an_alternative_cost_is_not_combined_with_another() {
+        for grant in [
+            PlayGrant { instead: Some(ManaCost::ZERO), ..PlayGrant::CAST },
+            PlayGrant { exile_after: true, ..PlayGrant::CAST },
+            PlayGrant { life_for_mana_value: true, ..PlayGrant::CAST },
+        ] {
+            let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::graveyard(ME), ME)]);
+            game.state.permission_push(PlayPermission { card: ids[1], player: ME, grant, turn: 2 });
+            assert!(!casts(&mut game, ME, ids[1]).contains(&FREE), "{grant:?}");
+        }
+    }
+
+    /// CR 601.3, 604.1: a permanent's permission to cast cards in exile, and its rule to cast spells from the top of a
+    /// library, are casts the alternative cost stands beside as well.
+    #[test]
+    fn an_alternative_cost_stands_beside_a_cast_from_exile_and_from_a_library() {
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&EXILER, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::exile(ME), ME)]);
+        assert_eq!(casts(&mut game, ME, ids[2]), vec![FREE]);
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::library(ME), ME)]);
+        assert!(casts(&mut game, ME, ids[1]).is_empty());
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&FORGE, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::library(ME), ME)]);
+        assert_eq!(casts(&mut game, ME, ids[2]), vec![FREE]);
+    }
+
+    /// CR 118.9: a mana cost to pay rather than the mana cost is offered as its own cast once that mana could be paid,
+    /// beside the ordinary cast, and each of two such costs is a cast of its own.
+    #[test]
+    fn a_mana_alternative_is_offered_when_its_mana_can_be_paid() {
+        let (mut game, ids) = table(&[(&ARCHMAGE, Zone::BATTLEFIELD, ME), (&GENESIS, Zone::BATTLEFIELD, ME), (&BEAR, Zone::hand(ME), ME), (&DRAGON, Zone::hand(ME), ME)]);
+        assert!(casts(&mut game, ME, ids[2]).is_empty());
+        assert_eq!(casts(&mut game, ME, ids[3]), vec![WAY_ALTERNATIVE + WAY_GRANTED_STRIDE]);
+        game.state.update_player(ME, |p| p.pool = ManaPool([1, 1, 1, 1, 2, 0]));
+        assert_eq!(casts(&mut game, ME, ids[2]), vec![0, WAY_ALTERNATIVE]);
+        assert_eq!(casts(&mut game, ME, ids[3]), vec![WAY_ALTERNATIVE, WAY_ALTERNATIVE + WAY_GRANTED_STRIDE]);
+        let cx = cx(&mut game);
+        let option = ActionOption::on(ActionKind::CastSpell, ids[2], WAY_ALTERNATIVE);
+        assert_eq!(describe(cx.cards(), cx.s(), &cx.g.log, &option), "Pay {W}{U}{B}{R}{G} rather than pay its mana cost");
+    }
+
+    /// CR 118.9, 601.2f-h: cast for the alternative cost, the Dragon goes on the stack with nothing paid, from the graveyard a
+    /// permission casts it from, and the permission is used up.
+    #[test]
+    fn a_spell_cast_for_an_alternative_cost_pays_it_rather_than_its_mana_cost() {
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::graveyard(ME), ME)]);
+        game.state.permission_push(PlayPermission { card: ids[1], player: ME, grant: PlayGrant::CAST, turn: 2 });
+        let mut cx = cx(&mut game);
+        cast(&mut cx, ME, ids[1], FREE, &[], CastTerms::default(), false).expect("cast");
+        let s = cx.s();
+        assert_eq!(s.stack.len(), 1);
+        let spell = s.stack[0].object;
+        assert_eq!(s.obj(spell).card, cx.cards().id_of(&DRAGON));
+        assert_eq!(s.obj(spell).cast_from, Some(ZoneKind::Graveyard));
+        assert_eq!(s.stack[0].way, 0);
+        assert!(s.permissions.is_empty());
+    }
+
+    /// CR 608.2g, 601.2b, 118.9: an effect that has a card cast as it resolves, paying its costs ("you may cast that card"),
+    /// lets it be cast for the alternative cost, which is announced as it is cast: its caster is asked whether to pay the mana
+    /// cost or that, and the Dragon cast for that goes on the stack above the resolving ability with nothing paid.
+    #[test]
+    fn a_cast_made_as_an_effect_resolves_may_be_for_an_alternative_cost() {
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::exile(ME), ME)]);
+        let genesis = game.cards.id_of(&GENESIS);
+        game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+        let frame = game.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+        assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
+        let Some(Request { kind: RequestKind::ChooseModes { modes, .. }, .. }) = cx.s().agenda[frame].pending.clone() else { panic!("a choice of costs") };
+        assert_eq!(modes, vec![Label::ManaCost, Label::AlternativeCost(genesis, 0)]);
+        cx.st().update_frame(frame, |f| {
+            f.pending = None;
+            f.answers = vec![Answer::Modes(vec![1])];
+        });
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+        assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(true));
+        let s = cx.s();
+        assert_eq!(s.stack.len(), 2);
+        assert_eq!(s.obj(s.stack[1].object).card, cx.cards().id_of(&DRAGON));
+        // Cast without paying its mana cost by the effect itself, it is asked nothing.
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&DRAGON, Zone::exile(ME), ME)]);
+        game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+        let frame = game.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+        let free = CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() };
+        assert_eq!(cast_during_resolution(&mut cx, ids[1], free).ok(), Some(true));
+    }
 
     #[test]
     fn a_generic_reduction_takes_only_generic_mana_off() {
