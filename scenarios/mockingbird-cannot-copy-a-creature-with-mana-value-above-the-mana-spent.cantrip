@@ -1,0 +1,48 @@
+# Mockingbird cast with X = 0 has had one mana ({U}) spent, so only creatures with mana value 1 or less can be copied: Thalia
+# (mana value 2) is refused as a choice, beside the Llanowar Elves and Birds of Paradise that are offered (the control).
+# Bot1 copies the Elves: a Bird Elf Druid with flying, 1/1, that taps for {G} (the copied ability).
+
+[Bot1 Deck]
+Island
+Mockingbird
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Mox Emerald
+Thalia, Guardian of Thraben
+Llanowar Elves
+Birds of Paradise
+Plains x9
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mockingbird.Cast
+Bot1.Pass
+Bot1.Accept
+! Bot1.Target(Bot2.Battlefield.Thalia, Guardian of Thraben)
+! Bot1.Target(Bot2.Battlefield.Mox Pearl)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Subtypes = Bird; Druid; Elf
+Bot1.Battlefield.Llanowar Elves.Keywords = Flying
+Bot1.Battlefield.Llanowar Elves.Power = 1

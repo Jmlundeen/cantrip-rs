@@ -1,0 +1,32 @@
+# Mockingbird: "You may have this creature enter as a copy". Declining leaves it what it is printed as: a 1/1 Bird Bard with
+# flying. Bot2's Llanowar Elves was a legal choice (mana value 1, one mana spent), so the question was really asked.
+
+[Bot1 Deck]
+Island
+Mockingbird
+Island x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mockingbird.Cast
+Bot1.Pass
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Mockingbird
+Bot1.Battlefield.Mockingbird.Subtypes = Bard; Bird
+Bot1.Battlefield.Mockingbird.Keywords = Flying
+Bot1.Battlefield.Mockingbird.Power = 1
+Bot1.Battlefield.Mockingbird.Toughness = 1

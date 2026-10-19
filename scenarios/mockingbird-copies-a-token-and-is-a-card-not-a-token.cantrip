@@ -1,0 +1,42 @@
+# Mockingbird copies the copiable values of a token (ruling): Bot2's Lingering Souls leaves two 1/1 white Spirit tokens with flying. Bot1
+# casts Mockingbird with X = 0 (one mana spent) and copies one: mana value 0 (a token has no mana cost, CR 202.3). The result is a
+# card, not a token, named Spirit: a white 1/1 Spirit Bird with flying. It is not a token, so it does not cease to exist
+# (CR 111.7) and, had it left the battlefield, would be a Mockingbird card again.
+
+[Bot1 Deck]
+Island
+Mockingbird
+Island x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mockingbird.Cast
+Bot1.Pass
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Spirit#1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Spirit
+Bot1.Battlefield.Spirit.Subtypes = Bird; Spirit
+Bot1.Battlefield.Spirit.Keywords = Flying
+Bot1.Battlefield.Spirit.Colors = White
+Bot1.Battlefield.Spirit.Token = (absent)
+Bot2.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Spirit; Spirit

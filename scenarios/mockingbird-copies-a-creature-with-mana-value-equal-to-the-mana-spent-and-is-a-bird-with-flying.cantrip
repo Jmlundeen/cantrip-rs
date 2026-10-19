@@ -1,0 +1,50 @@
+# Mockingbird: "You may have this creature enter as a copy of any creature on the battlefield with mana value less than or
+# equal to the amount of mana spent to cast this creature, except it's a Bird in addition to its other types and it has
+# flying." Bot1 casts it with X = 1: {1}{U} is two mana spent (the {U} counts, not just X), so Thalia (mana value 2,
+# equal) and Llanowar Elves (1) are both choices. It enters as Thalia, Guardian of Thraben: a Human Soldier Bird, with first
+# strike and the added flying, 2/1. Bot2's Thalia is unchanged and Bot1's copy is a second legendary permanent of
+# that name under a different controller, so the legend rule (CR 704.5j) does not apply.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mockingbird
+Island x14
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Emerald
+Thalia, Guardian of Thraben
+Llanowar Elves
+Plains x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mockingbird.Cast(X: 1)
+Bot1.Pass
+Bot1.Accept
+Bot1.Target(Bot2.Battlefield.Thalia, Guardian of Thraben)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire; Thalia, Guardian of Thraben
+Bot1.Battlefield.Thalia, Guardian of Thraben.Subtypes = Bird; Human; Soldier
+Bot1.Battlefield.Thalia, Guardian of Thraben.Keywords = FirstStrike; Flying
+Bot1.Battlefield.Thalia, Guardian of Thraben.Power = 2
+Bot1.Battlefield.Thalia, Guardian of Thraben.Toughness = 1
+Bot2.Battlefield = Plains; Mox Pearl; Mox Emerald; Thalia, Guardian of Thraben; Llanowar Elves
+Bot2.Battlefield.Thalia, Guardian of Thraben.Keywords = FirstStrike

@@ -1,0 +1,48 @@
+# Mockingbird returned from the graveyard by Reanimate was not cast, so no mana was spent to cast it (CR 601.2h): it can copy only
+# creatures with mana value 0 or less. Bot2's Llanowar Elves (mana value 1) came first on the battlefield and would be the
+# default pick if it were allowed; only Ornithopter (mana value 0) is, so Mockingbird becomes a Bird Thopter Ornithopter 0/2
+# with no question asked about which. Reanimate costs Bot1 1 life, the Mockingbird's mana value in the graveyard ({X}{U}, X is 0).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Entomb
+Reanimate
+Island
+Island
+Island
+Island
+Mockingbird
+Island x11
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Ornithopter
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Mockingbird)
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Mockingbird)
+Bot1.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield = Mox Jet; Mox Jet; Ornithopter
+Bot1.Battlefield.Ornithopter.Subtypes = Bird; Thopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield = Forest; Llanowar Elves; Ornithopter

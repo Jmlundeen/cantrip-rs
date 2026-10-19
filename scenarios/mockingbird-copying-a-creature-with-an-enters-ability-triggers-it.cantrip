@@ -1,0 +1,42 @@
+# Mockingbird entering as a copy of Baleful Strix has Strix's "When this creature enters, draw a card" (CR 707.9a, 614.12,
+# ruling: any "enters" abilities of the copied creature trigger), because it entered as that creature. Strix has mana value 2,
+# equal to the two mana spent with X = 1. Bot1 holds 5 cards while it is on the stack, then 6 after the draw: the copy is an artifact
+# creature Bird, with flying and deathtouch, and is not the Bard.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mockingbird
+Island x14
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Jet
+Baleful Strix
+Island x13
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Baleful Strix.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Mockingbird.Cast(X: 1)
+? Bot1.Hand.Count = 5
+Bot1.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Battlefield = Island; Mox Sapphire; Baleful Strix
+Bot1.Battlefield.Baleful Strix.Types = Artifact; Creature
+Bot1.Battlefield.Baleful Strix.Subtypes = Bird
+Bot1.Battlefield.Baleful Strix.Keywords = Deathtouch; Flying
+Bot1.Battlefield.Baleful Strix.Power = 1
