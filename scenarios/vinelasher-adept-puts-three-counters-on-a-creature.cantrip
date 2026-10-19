@@ -1,0 +1,31 @@
+# "When this creature enters, put three +1/+1 counters on target creature" (CR 122.6, 115.1): Bot1 casts Vinelasher
+# Adept with two Black Lotuses, all six mana, and puts the counters on its own Ornithopter (0/2), which is 3/5 until the
+# turn ends. The counters come as one event of three.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Ornithopter
+Vinelasher Adept
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Vinelasher Adept.Cast
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 5
+Bot1.Battlefield.Vinelasher Adept.Power = 2
+Bot1.Battlefield.Vinelasher Adept.Toughness = 4
