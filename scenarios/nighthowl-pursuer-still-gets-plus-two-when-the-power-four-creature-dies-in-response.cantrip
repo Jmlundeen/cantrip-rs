@@ -1,0 +1,61 @@
+# The ferocious condition is checked only as the attack is declared (ruling): it is not an intervening "if". On turn 5
+# Bot1 attacks with the Pursuer while controlling Surrak (power 4); with the trigger on the stack Bot2 destroys Surrak with
+# Infernal Grasp (losing 2 life; Surrak's own trigger draws Bot1 a card). The Pursuer trigger still resolves and the
+# Pursuer is a 3/3 that deals 3: Bot2 20 - 2 - 3 = 15.
+
+[Bot1 Deck]
+Swamp
+Nighthowl Pursuer
+Forest
+Forest
+Surrak, Elusive Hunter
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Swamp
+Infernal Grasp
+Swamp x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Nighthowl Pursuer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Surrak, Elusive Hunter.Cast
+Bot1.Pass
+Bot1.Attack(Nighthowl Pursuer > Bot2)
+Bot1.Pass
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Infernal Grasp.Cast(Surrak, Elusive Hunter)
+? Stack.Count = 3
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Surrak, Elusive Hunter
+Bot2.Graveyard = Infernal Grasp
+Bot1.Battlefield.Nighthowl Pursuer.Power = 3
+Bot1.Battlefield.Nighthowl Pursuer.Toughness = 3

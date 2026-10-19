@@ -1,0 +1,49 @@
+# Ferocious needs "a creature with power 4 or greater" that Bot1 controls. Bot1 has only Bejeweled Warg (power 3) and Bot2
+# has Sunset Saboteur (power 4, menace): neither counts, so on turn 5 the attacking Pursuer puts nothing on the stack and
+# stays a 1/1. Bot2's lone Saboteur can't block it (menace) and it deals 1 (Bot2 at 19). The positive control is the
+# power-four scenario, where the same attack triggers.
+
+[Bot1 Deck]
+Swamp
+Nighthowl Pursuer
+Forest
+Forest
+Bejeweled Warg
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Swamp
+Swamp
+Sunset Saboteur
+Swamp x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Nighthowl Pursuer.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bejeweled Warg.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Sunset Saboteur.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Attack(Nighthowl Pursuer > Bot2)
+? Stack.Count = 0
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Nighthowl Pursuer.Power = 1
+Bot1.Battlefield.Nighthowl Pursuer.Toughness = 1
+Bot2.Battlefield.Sunset Saboteur.Power = 4

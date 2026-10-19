@@ -1,0 +1,11 @@
+{
+  "name": "Nighthowl Pursuer",
+  "manaCost": "{B}",
+  "type": "Creature — Wolf",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Menace (This creature can't be blocked except by two or more creatures.)\nFerocious — Whenever this creature attacks while you control a creature with power 4 or greater, this creature gets +2/+2 until end of turn.",
+  "keywords": [
+    "Menace"
+  ]
+}
