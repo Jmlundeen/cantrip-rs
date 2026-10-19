@@ -1679,6 +1679,28 @@ impl<'s> Run<'s> {
                     }
                 }
             }
+            // `! Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 2)`: a removal the question must refuse - more counters from a
+            // permanent than the question lets come off it (Dyadrine's one counter from each of two creatures), judged by the
+            // rules' own check of the answer.
+            RequestKind::RemoveCounters { pools, total, .. } => {
+                // A permanent the question does not offer at all (a noncreature, an opponent's) is itself the refusal, as long as it
+                // exists: it is no pool of the question, so nothing could be taken from it.
+                let offered: Vec<Target> = pools.iter().map(|p| Target::Object(p.object)).collect();
+                let everything: Vec<ObjectId> = (0..self.game.state.objects.len() as u32).map(ObjectId).collect();
+                for piece in action.positional() {
+                    let who = piece.rsplit_once(':').map_or(piece, |(who, _)| who).trim();
+                    if self.target(action, who, &offered)?.is_none() {
+                        if self.objects(action, who, &everything)?.is_empty() {
+                            return fail(format!("line {line}: {text} proves nothing: no such card is in the game"));
+                        }
+                        return Ok(());
+                    }
+                }
+                let answer = self.remove_counters(action, pools, *total)?;
+                if check_answer(&self.game, request, &answer).is_ok() {
+                    return fail(format!("line {line} says {text} must not be a removal the question allows, but it is"));
+                }
+            }
             // `! Bot1.Name(Lightning Bolt)`: the name may not be chosen (CR 201.4a), checked as the engine checks an answer.
             RequestKind::ChooseName { kind, .. } => {
                 for spec in action.positional() {

@@ -516,7 +516,7 @@ impl ScriptStep {
         }
         if let Some(rest) = line.strip_prefix('!') {
             let action = ActionStep::parse(rest.trim(), number)?;
-            if !matches!(action.verb, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend | ScriptVerb::Block | ScriptVerb::Attack | ScriptVerb::Search | ScriptVerb::Accept | ScriptVerb::Modes | ScriptVerb::Target | ScriptVerb::Undo | ScriptVerb::PayCost) && !action.verb.is_question() {
+            if !matches!(action.verb, ScriptVerb::Play | ScriptVerb::Cast | ScriptVerb::Activate | ScriptVerb::Foretell | ScriptVerb::Suspend | ScriptVerb::Block | ScriptVerb::Attack | ScriptVerb::Search | ScriptVerb::Accept | ScriptVerb::Modes | ScriptVerb::Target | ScriptVerb::Undo | ScriptVerb::PayCost | ScriptVerb::RemoveCounters) && !action.verb.is_question() {
                 return Err(ParseError("a refusal (!) names a Play, Cast, Activate, Foretell, Suspend, Block, Attack, Search, Accept, Modes, Target, Undo or PayCost that must not be offered, as ! Bot1.Hand.Island.Play, ! Bot2.Block(Bear > Ox), ! Bot1.Search(Plains), ! Bot1.Accept, ! Bot1.Modes(1; 2), ! Bot1.Target(Island), ! Bot1.Undo or ! Bot1.PayCost".into()));
             }
             return Ok(ScriptStep::Refused { line: number, text: line.to_string(), action });

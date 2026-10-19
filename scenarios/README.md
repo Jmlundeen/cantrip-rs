@@ -326,6 +326,11 @@ card exists in the game. It shows a cost or choice leaves something out (a token
 `Bot1.Choose(Thopter Foundry)` that takes the legal card on the next line. Without arguments it is the bare refusal below.
 Several names that are all among the cards it may take are instead one answer, which the question must refuse: `! Bot1.Choose(A; B; C)` for "up to two".
 
+A removal of counters, `! Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 2)`, is checked at that player's next question of counters to remove
+(CR 118.3, 122.1) and fails if the rules' own check accepts it as an answer (more counters from one permanent than the question lets come
+off it: Dyadrine's one counter from each of two creatures); written like the `RemoveCounters` that answers it, whose next line is the
+positive control.
+
 A name, `! Bot1.Name(Lightning Bolt)`, is checked at that player's next card name question and fails if the question would accept
 that name (CR 201.4a: a nonland name where a land card name is asked for passes the refusal); pair it with the `Bot1.Name(...)` that
 answers it on the next line.
