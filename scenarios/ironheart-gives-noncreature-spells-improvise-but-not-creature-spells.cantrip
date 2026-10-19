@@ -1,0 +1,36 @@
+# Ironheart has improvise itself (CR 702.126a): turn 1, {U}{U}{U} from a Black Lotus and two tapped Ornithopters pay {4}{U}. On
+# turn 3 "noncreature spells you cast have improvise": Basalt Monolith ({3}) is cast with the {B} floating from Mox Jet and two
+# Ornithopters tapped to improvise. The same improvise is refused to a creature spell: Dark Confidant ({1}{B}) with the {B}
+# floating and an Ornithopter for the {1} is not castable (the refusal, beside the Monolith as its positive control).
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Ornithopter
+Ironheart, Clever Champion
+Basalt Monolith
+Dark Confidant
+Mox Jet
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ironheart, Clever Champion.Cast(Convoke: Ornithopter, Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Dark Confidant.Cast(Convoke: Ornithopter)
+Bot1.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Ironheart, Clever Champion; Mox Jet; Ornithopter; Ornithopter; Basalt Monolith
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#2.Tapped = true
+Stack.Count = 0

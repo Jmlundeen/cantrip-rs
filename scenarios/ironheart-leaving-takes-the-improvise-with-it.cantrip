@@ -1,0 +1,41 @@
+# "Noncreature spells you cast have improvise" is a static ability of Ironheart (CR 113.6): Bot2 destroys it with Disenchant (it is
+# an artifact creature) on turn 2, and on turn 3 Basalt Monolith ({3}) with {B} floating and two Ornithopters to improvise is
+# refused. The positive control is the scenario where Ironheart is still on the battlefield.
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Ornithopter
+Ironheart, Clever Champion
+Basalt Monolith
+Mox Jet
+Plains x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ironheart, Clever Champion.Cast(Convoke: Ornithopter, Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Ironheart, Clever Champion)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = Mox Jet; Ornithopter; Ornithopter
+Bot1.Graveyard = Ironheart, Clever Champion; Black Lotus
+Bot2.Graveyard = Disenchant

@@ -1,0 +1,36 @@
+# "Noncreature spells YOU cast have improvise": Bot1's Ironheart gives nothing to Bot2. On turn 2 Bot2, with {B} floating from
+# its Mox Jet and two Ornithopters, cannot cast Basalt Monolith ({3}) by tapping them to improvise (the refusal; the positive
+# control is the other Ironheart scenario, where its own controller does exactly that).
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Ornithopter
+Ironheart, Clever Champion
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Mox Jet
+Basalt Monolith
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Ironheart, Clever Champion.Cast(Convoke: Ornithopter, Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+! Bot2.Hand.Basalt Monolith.Cast(Convoke: Ornithopter, Ornithopter)
+
+[Expect]
+Turn = 2
+Bot2.Battlefield = Mox Jet; Ornithopter; Ornithopter
+Bot1.Battlefield = Ironheart, Clever Champion; Ornithopter; Ornithopter
+Stack.Count = 0
