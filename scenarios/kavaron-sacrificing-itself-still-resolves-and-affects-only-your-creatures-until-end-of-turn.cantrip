@@ -1,0 +1,71 @@
+# The ability is not undone by its source being sacrificed as the cost (CR 602.2b, 112.7a): Bot1 sacrifices Kavaron itself
+# ("a land"), and the ability still creates the Robot and gives +1/+0 and haste to creatures Bot1 controls only: Bot2's Cathar
+# Commando stays 3/1 (checked mid-turn, with the Robot at 3/2). The bonus lasts only until end of turn (CR 514.2): on turn 5
+# the Robot is a 2/2 again and the Mariners 6 power.
+
+[Bot1 Deck]
+Kavaron, Memorial World
+Black Lotus
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Lake-town Mariners
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Island x20
+
+[Actions]
+Bot1.Hand.Kavaron, Memorial World.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lake-town Mariners.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot1.Battlefield.Kavaron, Memorial World.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Kavaron, Memorial World.Activate(Ability: Station)
+Bot1.Choose(Lake-town Mariners)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kavaron, Memorial World.Counters.Charge = 12
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Kavaron, Memorial World.Activate(Ability: Create a 2/2)
+Bot1.Choose(Kavaron, Memorial World)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Robot.Power = 3
+? Bot2.Battlefield.Cathar Commando.Power = 3
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Robot.Power = 2
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Emerald; Mox Jet; Mox Ruby; Lake-town Mariners; Robot
+Bot1.Battlefield.Lake-town Mariners.Power = 6
+Bot1.Graveyard = Kavaron, Memorial World; Black Lotus
