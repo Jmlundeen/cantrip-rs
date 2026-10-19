@@ -117,12 +117,34 @@ pub fn may_put_onto_battlefield(
     source: ObjectId,
     eligible: impl Fn(&Chars) -> bool,
 ) -> Result<Option<ObjectId>, Suspend> {
+    put_from_hand(g, player, source, false, |g, c| eligible(&g.chars(c)))
+}
+
+/// `may_put_onto_battlefield` for "... from your hand onto the battlefield tapped" (CR 614.1c), the card judged as an object
+/// in the hand, so what only the game can say (`Query::mana_value`: X is 0 in a hand, a Room's halves together, CR 107.3b, 202.3)
+/// can decide it. Anticausal Vestige and Insidious Fungus print it.
+pub fn may_put_onto_battlefield_tapped(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    eligible: impl Fn(&dyn Game, ObjectId) -> bool,
+) -> Result<Option<ObjectId>, Suspend> {
+    put_from_hand(g, player, source, true, eligible)
+}
+
+fn put_from_hand(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    tapped: bool,
+    eligible: impl Fn(&dyn Game, ObjectId) -> bool,
+) -> Result<Option<ObjectId>, Suspend> {
     let hand = g.state().zone(Zone::hand(player)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&g.chars(c))).collect();
+    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| eligible(&*g, c)).collect();
     let Some(&card) = choose::cards_from(g, player, source, Purpose::PutOntoBattlefield, hand, eligible, 1, true)?.first() else {
         return Ok(None);
     };
-    Ok(Some(g.put_onto_battlefield(card, player, false)?))
+    Ok(Some(g.put_onto_battlefield(card, player, tapped)?))
 }
 
 /// "As this enters, look at an opponent's hand, then choose any card name." (CR 614.12a, 201.4): the opponent is chosen first

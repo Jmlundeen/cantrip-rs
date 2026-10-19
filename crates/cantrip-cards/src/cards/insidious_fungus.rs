@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, destroy_target, targets};
+use cantrip_mechanics::{destroy_target, hand, targets};
 use cantrip_oracle as oracle;
 
 /// "Destroy target artifact" / "Destroy target enchantment" (CR 701.8): nothing if the target is no longer legal (CR 608.2b); an
@@ -13,14 +13,8 @@ fn destroy_its_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 /// hand is shown, the card just drawn included, and any land card in it may be chosen, or none; nothing is asked with no land card.
 /// Putting a land onto the battlefield is not playing it, so it uses no land play (CR 305.2).
 fn draw_and_put_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    g.draw(you, 1);
-    let hand = g.state().zone(Zone::hand(you)).to_vec();
-    let lands: Vec<ObjectId> = hand.iter().copied().filter(|&c| g.chars(c).is(CardType::Land)).collect();
-    let Some(&land) = choose::cards_from(g, you, item.object, Purpose::PutOntoBattlefield, hand, lands, 1, true)?.first() else {
-        return Ok(());
-    };
-    g.put_all_onto_battlefield_as(&[(land, you, true)])?;
+    g.draw(item.controller, 1);
+    hand::may_put_onto_battlefield_tapped(g, item.controller, item.object, |g, c| g.chars(c).is(CardType::Land))?;
     Ok(())
 }
 
