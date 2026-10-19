@@ -354,18 +354,39 @@ public sealed class BoosterDraftTests(WebClient web) : IDisposable
             BetweenRounds = TimeSpan.FromMilliseconds(200),
             AfterGame = TimeSpan.FromMilliseconds(100),
         });
-        await using PodHost host = await PodHost.StartAsync(pod, PodHost.Loopback(WebClient.Content));
+        // The pod's own table names the site's page for its players to go back to, as the Discord bot's do; its games' none.
+        const string Home = "http://cantrip.test/home";
+        TableOpener loopback = PodHost.Loopback(WebClient.Content);
+        TableOpener opener = async (table, seats) =>
+        {
+            if (table is not BoosterPod) return await loopback(table, seats);
+            GameServer server = await GameServer.StartAsync(new GameServerOptions
+            {
+                Port = 0, Players = seats, ContentRoot = WebClient.Content, Event = table, Return = new ReturnPage(new Uri(Home), "your page"),
+            });
+            return (server, new Uri($"ws://127.0.0.1:{server.Port}/game"));
+        };
+        await using PodHost host = await PodHost.StartAsync(pod, opener);
         using var stop = new CancellationTokenSource(TimeSpan.FromMinutes(4));
         (List<EventSeat> bots, Task playing) = await Bots(host.Address, created, Pod.Select(player => player.Item1), stop.Token);
         await playing;
         Assert.Equal(EventStage.Complete, pod.Stage);
 
-        // Coming back to the pod after it is over: the final standings.
+        // Coming back to the pod after it is over: the final standings, and the way back to the site.
         await using TablePage page = await TablePage.OpenAsync(
             web, $"server={Uri.EscapeDataString(host.Address.AbsoluteUri)}#ticket={pod.IssueTicket("you")}", WebClient.Pictures(nameof(BoosterDraftTests)));
-        TableState state = await page.SettledAsync(state => state.Phase == "Pairings" && state.Pairings is { Final: true });
+        await page.Page.RouteAsync(Home, route => route.FulfillAsync(new Microsoft.Playwright.RouteFulfillOptions
+        {
+            ContentType = "text/html",
+            Body = "<!doctype html><title>Home</title><h1>Home</h1>",
+        }));
+        TableState state = await page.SettledAsync(state => state.Phase == "Pairings" && state.Pairings is { Final: true }
+            && state.Controls.Any(control => control.Label == "Back to your page"));
         await page.PictureAsync("final-standings");
         Assert.Equal(3, state.Pairings!.Round);
+        Assert.DoesNotContain(state.Controls, control => control.Label == "Drop");
+        await page.ClickAsync("Back to your page");
+        await page.Page.WaitForURLAsync(Home, new Microsoft.Playwright.PageWaitForURLOptions { Timeout = 30_000 });
 
         foreach (EventSeat bot in bots) bot.Dispose();
         Assert.Empty(page.Errors);
