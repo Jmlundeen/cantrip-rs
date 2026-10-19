@@ -1,0 +1,44 @@
+# Goldvein Hydra: "When this creature dies, create a number of tapped Treasure tokens equal to its power." Cast with X = 3 (a 3/3), it dies to
+# Bot2's Lightning Bolt and Bot1 gets three Treasure tokens, all tapped (they are created tapped, so they cannot be sacrificed for mana
+# at once: a Treasure's ability needs {T}).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Goldvein Hydra
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Goldvein Hydra.Cast(X: 3)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Goldvein Hydra)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Goldvein Hydra
+Bot1.Battlefield.Count = 7
+Bot1.Battlefield.Treasure Token#1.Tapped = true
+Bot1.Battlefield.Treasure Token#2.Tapped = true
+Bot1.Battlefield.Treasure Token#3.Tapped = true
+Bot2.Graveyard = Lightning Bolt

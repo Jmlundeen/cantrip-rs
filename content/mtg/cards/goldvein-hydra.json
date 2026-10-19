@@ -1,0 +1,9 @@
+{
+  "name": "Goldvein Hydra",
+  "manaCost": "{X}{G}",
+  "type": "Creature — Hydra",
+  "power": 0,
+  "toughness": 0,
+  "oracleText": "Vigilance, trample, haste\nThis creature enters with X +1/+1 counters on it.\nWhen this creature dies, create a number of tapped Treasure tokens equal to its power.",
+  "keywords": ["Vigilance", "Trample", "Haste"]
+}

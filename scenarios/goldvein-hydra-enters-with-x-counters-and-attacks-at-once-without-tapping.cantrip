@@ -1,0 +1,35 @@
+# Goldvein Hydra: "Vigilance, trample, haste. This creature enters with X +1/+1 counters on it." Cast with X = 2 for {2}{G} (Mox Emerald, Mox Jet,
+# Mox Ruby) on turn 1, it is a 2/2 with two +1/+1 counters (its own 0/0 base), attacks the turn it arrives (haste: summoning sickness would
+# forbid it) and deals 2 to Bot2 (18), and stays untapped (vigilance).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Goldvein Hydra
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goldvein Hydra.Cast(X: 2)
+Bot1.Pass
+Bot1.Attack(Goldvein Hydra > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Goldvein Hydra.Power = 2
+Bot1.Battlefield.Goldvein Hydra.Toughness = 2
+Bot1.Battlefield.Goldvein Hydra.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Goldvein Hydra.Tapped = false
+Bot1.Battlefield.Goldvein Hydra.Keywords = Haste; Trample; Vigilance
+Bot1.Battlefield.Goldvein Hydra.Subtypes = Hydra

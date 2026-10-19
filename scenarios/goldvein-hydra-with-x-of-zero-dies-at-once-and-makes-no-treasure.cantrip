@@ -1,0 +1,23 @@
+# Goldvein Hydra cast with X = 0 enters with no counters, a 0/0, and is put into the graveyard by state-based actions (CR 704.5f): it
+# dies, and "a number of tapped Treasure tokens equal to its power" is zero, so no Treasure token is created (CR 107.1b). It has only
+# been paid {G} (a Mox Emerald).
+
+[Bot1 Deck]
+Mox Emerald
+Goldvein Hydra
+Plains x5
+Plains x10
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Goldvein Hydra.Cast(X: 0)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Goldvein Hydra
+Bot1.Battlefield = Mox Emerald

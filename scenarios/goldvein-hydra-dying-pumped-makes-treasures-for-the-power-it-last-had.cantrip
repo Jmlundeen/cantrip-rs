@@ -1,0 +1,54 @@
+# Goldvein Hydra: "equal to its power" is the power it last had on the battlefield (CR 608.2h, the ruling), not its counters. Cast with X = 2,
+# Bot1 answers Bot2's first Lightning Bolt with Giant Growth (+3/+3, a 5/5, the first Bolt's 3 damage does not kill it) and Bot2's second
+# kills it: the effect is still on it as it dies, so Bot1 gets five Treasure tokens, not two.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Jet
+Mox Ruby
+Goldvein Hydra
+Giant Growth
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Goldvein Hydra.Cast(X: 2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Goldvein Hydra)
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Goldvein Hydra)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Goldvein Hydra.Power = 5
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Goldvein Hydra)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Goldvein Hydra; Giant Growth
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Treasure Token#5.Tapped = true
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
