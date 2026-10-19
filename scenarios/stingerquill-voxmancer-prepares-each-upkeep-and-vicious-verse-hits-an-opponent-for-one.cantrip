@@ -1,0 +1,37 @@
+# Stingerquill Voxmancer: "At the beginning of your upkeep, if this creature isn't prepared, it becomes prepared." Bot1 casts
+# it turn 1; at turn 3's upkeep it becomes prepared and a copy of Vicious Verse waits in exile (CR 722.3a, 722.3c). Bot1 casts
+# the copy (a sorcery, {B/R}, paid with Mountain): "deals 1 damage to target opponent" - Bot2 goes to 19, and casting the copy
+# unprepares the Voxmancer (CR 722.3c). At turn 5's upkeep, no longer prepared, it becomes prepared again.
+
+[Bot1 Deck]
+Mountain
+Stingerquill Voxmancer
+Mountain
+Mountain
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stingerquill Voxmancer.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Stingerquill Voxmancer.Prepared = (absent)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Stingerquill Voxmancer.Prepared = true
+? Exile = Vicious Verse
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Exile.Vicious Verse.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Battlefield.Stingerquill Voxmancer.Prepared = (absent)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 19
+Exile = Vicious Verse
+Bot1.Battlefield.Stingerquill Voxmancer.Prepared = true

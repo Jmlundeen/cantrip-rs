@@ -1,0 +1,14 @@
+{
+  "name": "Stingerquill Voxmancer",
+  "manaCost": "{B/R}",
+  "type": "Creature — Goblin Sorcerer",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "At the beginning of your upkeep, if this creature isn't prepared, it becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "prepare": {
+    "name": "Vicious Verse",
+    "manaCost": "{B/R}",
+    "type": "Sorcery",
+    "oracleText": "Vicious Verse deals 1 damage to target opponent."
+  }
+}

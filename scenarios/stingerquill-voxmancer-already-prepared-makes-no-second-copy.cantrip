@@ -1,0 +1,31 @@
+# Stingerquill Voxmancer's upkeep ability has an intervening "if this creature isn't prepared" (CR 603.4): it becomes prepared at
+# turn 3's upkeep, Bot1 does not cast the copy, and at turn 5's upkeep it is prepared already, so nothing triggers and there
+# is still exactly one copy of Vicious Verse in exile (a creature cannot become prepared twice, CR 722.3a).
+
+[Bot1 Deck]
+Mountain
+Stingerquill Voxmancer
+Mountain
+Mountain
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Stingerquill Voxmancer.Cast
+[T3 Bot1.Upkeep]
+? Stack.Count = 1
+[T3 Bot1.Main1]
+? Exile.Count = 1
+[T5 Bot1.Upkeep]
+? Stack.Count = 0
+[T5 Bot1.Main1]
+
+[Expect]
+Exile = Vicious Verse
+Exile.Count = 1
+Bot2.Life = 20
+Bot1.Battlefield.Stingerquill Voxmancer.Prepared = true
