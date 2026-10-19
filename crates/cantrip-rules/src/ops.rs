@@ -1029,6 +1029,11 @@ fn create_tokens_as(
     create_tokens_batch(cx, &tokens, tapped, copy, with)
 }
 
+/// Token copy values, including text changes in the creating instruction (CR 612.4, 707.2).
+fn token_copy(card: CardId, copy: Option<Copiable>, words: Words) -> Option<Copiable> {
+    if words.is_printed() { copy } else { Some(Copiable { words, ..Copiable::of(card) }) }
+}
+
 /// Creates tokens of several definitions as one instruction (CR 111.1, 101.4): all enter at once, and what watches
 /// them sees one event (CR 603.2c).
 pub fn create_tokens_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, copy: Option<Copiable>, with: &[(CounterKind, i16)]) -> R<Vec<ObjectId>> {
@@ -1084,17 +1089,22 @@ fn create_tokens_onto(
     spell: Option<&StackItem>,
     host: Option<ObjectId>,
 ) -> R<Vec<ObjectId>> {
+    // Replacements inspect copy exceptions and changed text too (CR 614.12).
+    let proposed: Vec<(CardId, Option<Copiable>, PlayerId)> = tokens
+        .iter()
+        .map(|&(card, controller)| (card, token_copy(card, copy, words), controller))
+        .collect();
     // CR 614.1a: how many of each there are is decided by what would replace the creation, before any of them is made. The
     // token a copy of a permanent spell becomes as it resolves is not created (CR 111.13, 707.10f), so nothing replaces it.
-    let replaced = if spell.is_some() { None } else { replace::token_batch(cx, tokens) };
-    let tokens = replaced.as_deref().unwrap_or(tokens);
+    let replaced = if spell.is_some() { None } else { replace::token_batch(cx, &proposed) };
+    let tokens = replaced.as_deref().unwrap_or(&proposed);
     let before: Vec<ObjectId> = cx.s().battlefield().to_vec();
     let mut events = Vec::new();
     let mut created = Vec::new();
     // CR 614.12, 101.4: tokens created together enter together. Each one's entering choices and replacements are worked
     // out before any of them is on the battlefield, so none sees another (Giada counts the Angels already there).
     let mut arriving: Vec<(ObjectId, PlayerId, Entering)> = Vec::with_capacity(tokens.len());
-    for &(card, controller) in tokens {
+    for &(card, copy, controller) in tokens {
         let turn = cx.s().turn.number;
         let timestamp = cx.st().timestamp();
         let mut token = Obj::new(card, controller, Zone::GONE);
@@ -1104,7 +1114,6 @@ fn create_tokens_onto(
         // The token a copy of a permanent spell becomes was promised the gift the spell was (CR 707.10, ruling 2024-07-26).
         token.gift = spell.and_then(|s| s.gift);
         let id = cx.st().push_obj(token);
-        let copy = if words.is_printed() { copy } else { Some(Copiable { words, ..Copiable::of(card) }) };
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
         let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.targets[0].object()), attach_player: aura.and_then(|i| i.targets[0].player()), x: 0 , transformed: false, protector: None, instead: None };
         prepare_entry(cx, &mut entering)?;

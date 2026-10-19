@@ -37,6 +37,21 @@ pub fn chars_as_face(cards: &CardTable, state: &GameState, log: &[Record], id: O
     chars
 }
 
+/// Token characteristics at creation: copiable values and intrinsic type abilities, without battlefield or
+/// stack effects (CR 614.12, 707.2).
+pub fn token_chars(cards: &CardTable, card: CardId, copy: Option<Copiable>) -> Chars {
+    let def = cards.get(card);
+    let mut chars = initial(cards, card, copy.as_ref());
+    if chars.is(CardType::Land) {
+        intrinsic_mana(cards, def, &mut chars);
+    }
+    if chars.is(CardType::Battle) {
+        intrinsic_siege(cards, &mut chars);
+    }
+    intrinsic_keyword_abilities(cards, &mut chars);
+    chars
+}
+
 /// While the value lives, the face-down card `card` outside the battlefield and the stack (CR 406.3a) is judged as the card
 /// it is: what playing it would be, asked of the resulting spell or land (CR 406.3a-b, 601.3, 305.1), for a player who may
 /// play it. The card is turned face up only as it is played (`ops::turn_up_to_play`); until then it has no characteristics

@@ -155,6 +155,10 @@ pub trait Query {
     /// An object's characteristics after every continuous effect (CR 613).
     fn chars(&self, id: ObjectId) -> Chars;
 
+    /// Token characteristics at creation, including copy exceptions (CR 614.12, 707.2). Used by token-creation
+    /// replacements.
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars;
+
     /// Whether `id` has lost all its abilities (CR 613.1f), to a resolved effect or a static ability, so that the
     /// abilities its card prints are gone: the one answer every rule read off a card is judged by - static abilities
     /// from layer 6 on, play rules, cost changes, replacement effects, trigger and block rules - so that they agree with

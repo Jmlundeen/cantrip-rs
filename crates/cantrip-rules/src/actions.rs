@@ -1200,6 +1200,10 @@ impl Query for AsFace<'_> {
         if id == self.spell { layers::chars_as_face(self.cx.cards(), self.cx.s(), &self.cx.g.log, id, self.face) } else { self.cx.chars(id) }
     }
 
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.cx.token_chars(card, copy)
+    }
+
     fn card_id(&self, def: &'static CardDef) -> CardId {
         self.cx.card_id(def)
     }
@@ -2616,6 +2620,10 @@ impl Query for QueryAsFace<'_> {
 
     fn chars(&self, id: ObjectId) -> Chars {
         if id == self.spell { layers::chars_as_face(self.cards, self.q.state(), self.q.events(), id, self.face) } else { self.q.chars(id) }
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.q.token_chars(card, copy)
     }
 
     fn card_id(&self, def: &'static CardDef) -> CardId {

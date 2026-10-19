@@ -111,6 +111,9 @@ pub struct TokenCreation {
     pub controller: PlayerId,
     pub token: CardId,
     pub count: u32,
+    /// Copy values used by token-creation replacements (CR 707.2). Clear when replacing the token with another
+    /// definition.
+    pub copy: Option<Copiable>,
 }
 
 /// Life a player is about to gain or lose (CR 119.3, 614.1a): by an effect, as a cost (CR 119.4: paying life is losing
