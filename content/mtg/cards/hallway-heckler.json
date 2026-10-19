@@ -1,0 +1,15 @@
+{
+  "name": "Hallway Heckler",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Elemental Sorcerer",
+  "oracleText": "This creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)\n{T}, Discard a card: Draw a card.",
+  "power": 2,
+  "toughness": 3,
+  "keywords": [],
+  "prepare": {
+    "name": "Vicious Verse",
+    "manaCost": "{B/R}",
+    "type": "Sorcery",
+    "oracleText": "Vicious Verse deals 1 damage to target opponent."
+  }
+}
