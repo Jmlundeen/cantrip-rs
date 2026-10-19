@@ -1,0 +1,61 @@
+# Generous Revival's flashback (CR 702.34a): cast from the graveyard for {4}{W}, it returns a second creature card and is
+# exiled as it leaves the stack rather than put into the graveyard. The plain cast on turn 3 returns one Ornithopter; the
+# flashback on turn 5 returns the other and exiles the card. The extra lands drawn on turns 3 and 5 pay the flashback's
+# five mana.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Jet
+Mox Jet
+Entomb
+Entomb
+Generous Revival
+Swamp
+Swamp
+Ornithopter
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Generous Revival.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Graveyard.Generous Revival.Cast(Bot1.Graveyard.Ornithopter; Ability: Flashback)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Exile = Generous Revival
+Bot1.Graveyard = Entomb; Entomb

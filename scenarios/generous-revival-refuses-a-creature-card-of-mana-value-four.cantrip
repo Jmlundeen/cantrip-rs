@@ -1,0 +1,50 @@
+# Generous Revival: "return target creature card with mana value 3 or less". Entomb buries Cogwork Librarian (mana value
+# 4): with only it in the graveyard the spell has no legal target and is not offered although the mana ({2}{W} from Mox
+# Pearl and two Mox Jets) is there. A second Entomb adds Ornithopter (mana value 0); the same cast then returns it with
+# an additional +1/+1 counter on it (CR 614.1c, 122.6) - the positive control for the refusal.
+
+[Bot1 Deck]
+Swamp
+Mox Pearl
+Mox Jet
+Mox Jet
+Entomb
+Entomb
+Generous Revival
+Cogwork Librarian
+Ornithopter
+Swamp x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Cogwork Librarian)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Generous Revival.Cast
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Generous Revival.Cast(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Generous Revival; Entomb; Entomb; Cogwork Librarian
