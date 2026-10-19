@@ -1,0 +1,47 @@
+# Azog, Moria's Ruin destroys Bot2's Orcish Bowmasters (power 1). Bot2 already controls the Orc Army Bowmasters amassed (1/1), so
+# amassing Goblins 1 creates no token (CR 701.47a): it puts a counter on that Army and it becomes a Goblin in addition to its other types. It
+# is a 2/2 Goblin Orc Army, and the only Army.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Azog, Moria's Ruin
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Orcish Bowmasters
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Orcish Bowmasters.Cast
+Bot2.Pass
+Bot2.Target(Bot1)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Orcish Bowmasters)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 19
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Orcish Bowmasters
+Bot2.Battlefield = Mox Jet; Mox Ruby; Orc Army
+Bot2.Battlefield.Orc Army.Power = 2
+Bot2.Battlefield.Orc Army.Subtypes = Army; Goblin; Orc
+Bot2.Battlefield.Orc Army.Counters.PlusOnePlusOne = 2

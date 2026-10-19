@@ -1,0 +1,55 @@
+# Azog, Moria's Ruin: "Its controller amasses Goblins X ... If you controlled that creature, draw a card." Bot1 controls Bot2's Llanowar Elves through Mind Control. Azog destroys it:
+# the Elves goes to its owner Bot2's graveyard, but Bot1 is the controller it was destroyed under (judged before it goes, CR 608.2h), so Bot1 - not Bot2 - amasses Goblins 1
+# (a 1/1 Goblin Army for Bot1) and draws a card. Hand: a Plains drawn on each of turns 3 and 5 plus the card from Azog.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mind Control
+Azog, Moria's Ruin
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mind Control.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Graveyard = Mind Control
+Bot2.Graveyard = Llanowar Elves
+Bot1.Battlefield = Mox Sapphire; Mox Sapphire; Mox Jet; Mox Ruby; Mox Pearl; Azog, Moria's Ruin; Goblin Army
+Bot1.Battlefield.Goblin Army.Power = 1
+Bot2.Battlefield = Forest

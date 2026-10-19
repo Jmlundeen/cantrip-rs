@@ -1,0 +1,40 @@
+# Azog, Moria's Ruin: "destroy up to one other target creature". Azog itself is not a legal target (the refusal), though Bot2's Llanowar
+# Elves is (the positive control: it is among the choices of the very same question); and "up to one" lets Bot1 choose nothing, in which
+# case the Elves lives and no one amasses or draws.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Azog, Moria's Ruin
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Battlefield.Azog, Moria's Ruin)
+Bot1.Target()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Azog, Moria's Ruin
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot2.Graveyard.Count = 0

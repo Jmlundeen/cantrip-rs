@@ -1,0 +1,49 @@
+# Azog, Moria's Ruin: "When Azog enters, destroy up to one other target creature. Its controller amasses Goblins X, where X is
+# that creature's power. If you controlled that creature, draw a card." Bot1's Azog destroys Bot2's Thalia, Guardian of Thraben (power 2). Bot2,
+# its controller, controls no Army, so creates a 0/0 black Goblin Army token and puts two +1/+1 counters on it (CR 701.47a): a 2/2 Goblin
+# Army. Bot1 did not control Thalia, so draws nothing: its hand is three Plains and the card drawn for the turn: 4, not 5.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Azog, Moria's Ruin
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Thalia, Guardian of Thraben
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Thalia, Guardian of Thraben)
+? Bot1.Hand.Count = 4
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Azog, Moria's Ruin
+Bot2.Graveyard = Thalia, Guardian of Thraben
+Bot2.Battlefield = Plains; Mox Pearl; Goblin Army
+Bot2.Battlefield.Goblin Army.Power = 2
+Bot2.Battlefield.Goblin Army.Toughness = 2
+Bot2.Battlefield.Goblin Army.Counters.PlusOnePlusOne = 2
+Bot2.Battlefield.Goblin Army.Subtypes = Army; Goblin
+Bot2.Battlefield.Goblin Army.Colors = Black

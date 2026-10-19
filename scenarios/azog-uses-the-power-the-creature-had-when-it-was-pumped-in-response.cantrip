@@ -1,0 +1,50 @@
+# Azog, Moria's Ruin: "where X is that creature's power" - the power it last had on the battlefield (CR 608.2h, the ruling), after
+# the trigger has gone on the stack. Bot1 targets Bot2's Llanowar Elves; Bot2 answers with Giant Growth on it, making it a 4/4.
+# The Elves is destroyed, its controller Bot2 amasses Goblins 4: a 4/4 Goblin Army, not a 1/1. Bot1 did not control the Elves
+# and draws nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Azog, Moria's Ruin
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Giant Growth
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Llanowar Elves)
+? Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Llanowar Elves; Giant Growth
+Bot2.Battlefield = Forest; Mox Emerald; Goblin Army
+Bot2.Battlefield.Goblin Army.Power = 4
+Bot2.Battlefield.Goblin Army.Toughness = 4
+Bot2.Battlefield.Goblin Army.Counters.PlusOnePlusOne = 4

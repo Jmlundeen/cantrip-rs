@@ -1,0 +1,35 @@
+# Azog, Moria's Ruin on Bot2's Ornithopter (power 0): X = 0, and "amass Goblins 0" still creates the 0/0 Goblin Army token when its controller has
+# no Army (CR 701.47a, 701.47b: it amassed even though counters can't be put on), which is put into the graveyard by state-based actions
+# (CR 704.5f) and then ceases to exist (CR 111.7). Nothing stays on Bot2's battlefield but its land; Bot1 draws nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Azog, Moria's Ruin
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Count = 0

@@ -1,0 +1,53 @@
+# Azog, Moria's Ruin: the destruction and the amassing are separate instructions; the creature surviving does not stop the rest. Bot2
+# answers the trigger with Boros Charm (permanents you control gain indestructible), so the Llanowar Elves is not destroyed
+# (CR 702.12b); its controller still amasses Goblins 1 (power 1, it is still on the battlefield): a 1/1 Goblin Army, beside the living
+# Elves. Bot1 did not control the Elves and draws nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Azog, Moria's Ruin
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Mox Pearl
+Llanowar Elves
+Boros Charm
+Forest x11
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Azog, Moria's Ruin.Cast
+Bot1.Pass
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Boros Charm.Cast
+Bot2.Modes(Permanents you control gain indestructible)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Boros Charm
+Bot2.Battlefield = Forest; Mox Ruby; Mox Pearl; Llanowar Elves; Goblin Army
+Bot2.Battlefield.Goblin Army.Power = 1
