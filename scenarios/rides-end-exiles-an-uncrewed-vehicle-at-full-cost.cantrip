@@ -1,0 +1,50 @@
+# Ride's End: "Exile target creature or Vehicle." Bot2's Smuggler's Copter is a Vehicle that nobody crewed, so not a
+# creature, and is a legal target (CR 205.3g). It is untapped, so the spell costs the full {4}{W}: Bot1's five mana
+# (two Plains, Mox Pearl, Sol Ring's {C}{C}) pay exactly that, and the Copter is exiled. Bot2's Sol Ring, an artifact
+# that is neither creature nor Vehicle, is refused as a target.
+
+[Bot1 Deck]
+Plains
+Plains
+Mox Pearl
+Sol Ring
+Ride's End
+Island x15
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Smuggler's Copter
+Sol Ring
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Sol Ring.Activate
+Bot2.Hand.Smuggler's Copter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {W}{W}{W}{C}{C}
+! Bot1.Hand.Ride's End.Cast(Bot2.Battlefield.Sol Ring)
+Bot1.Hand.Ride's End.Cast(Bot2.Battlefield.Smuggler's Copter)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Ride's End
+Exile = Smuggler's Copter
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Sol Ring.ManaValue = 1
