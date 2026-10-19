@@ -1,0 +1,52 @@
+# Saheeli, Consul of Oversight: "Whenever you scry or surveil, create a 1/1 colorless Thopter ... This ability triggers
+# only once each turn" (CR 603.2h). Two Considers' surveils in one turn make only one Thopter; the token is a 1/1
+# artifact creature with flying.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Black Lotus
+Black Lotus
+Saheeli, Consul of Oversight
+Consider
+Consider
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Saheeli, Consul of Oversight.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Thopter.Power = 1
+Bot1.Battlefield.Thopter.Toughness = 1
+Bot1.Battlefield.Thopter.Keywords = Flying
+Bot1.Battlefield.Count = 4

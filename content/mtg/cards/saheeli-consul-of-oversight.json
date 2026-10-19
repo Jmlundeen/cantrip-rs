@@ -1,0 +1,11 @@
+{
+  "name": "Saheeli, Consul of Oversight",
+  "manaCost": "{3}{W}{W}",
+  "type": "Legendary Creature — Human Advisor",
+  "power": 4,
+  "toughness": 4,
+  "keywords": [
+    "Flying"
+  ],
+  "oracleText": "Flying\nWhenever you scry or surveil, create a 1/1 colorless Thopter artifact creature token with flying. This ability triggers only once each turn."
+}
