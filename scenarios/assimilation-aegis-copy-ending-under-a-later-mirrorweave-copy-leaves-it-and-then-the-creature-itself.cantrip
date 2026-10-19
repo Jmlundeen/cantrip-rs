@@ -1,0 +1,88 @@
+# Copy effects apply in timestamp order, and one ending leaves the rest (CR 613.2a, 613.7, 611.2b). The first Ornithopter
+# is a Llanowar Elves for as long as Assimilation Aegis stays on it (turn 3). On turn 7 Mirrorweave makes each other creature
+# a copy of Bot2's Haywire Mite until end of turn, a later copy effect over the Aegis's. The Aegis then moves to the second
+# Ornithopter: the first one's earlier copy effect ends under the later one, so it is still a Haywire Mite, and the second's
+# Aegis copy is applied over its Mirrorweave copy, so it is a Llanowar Elves. As the turn ends Mirrorweave's effect ends: the
+# first Ornithopter, with no copy effect left, is an Ornithopter again (not the Elves it was under the Mite), and the second,
+# whose earlier copy effect ended under the Aegis's, is still a Llanowar Elves.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Assimilation Aegis
+Plains
+Mirrorweave
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest
+Haywire Mite
+Forest x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Assimilation Aegis.Cast
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+? Exile = Llanowar Elves
+Bot1.Battlefield.Assimilation Aegis.Activate(Ornithopter#1)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield = Assimilation Aegis; Llanowar Elves; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Plains; Plains
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Hand.Mirrorweave.Cast(Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield = Assimilation Aegis; Haywire Mite; Haywire Mite; Mox Pearl; Mox Ruby; Mox Sapphire; Plains; Plains; Plains
+Bot1.Battlefield.Assimilation Aegis.Activate(Bot1.Battlefield.Haywire Mite#2)
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Plains#3.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield = Assimilation Aegis; Haywire Mite; Llanowar Elves; Mox Pearl; Mox Ruby; Mox Sapphire; Plains; Plains; Plains
+[T8 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Assimilation Aegis; Llanowar Elves; Mox Pearl; Mox Ruby; Mox Sapphire; Ornithopter; Plains; Plains; Plains
+Bot1.Battlefield.Assimilation Aegis.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

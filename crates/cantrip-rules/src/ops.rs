@@ -2641,9 +2641,10 @@ pub fn settle_control(cx: &mut Cx) -> bool {
     changed
 }
 
-/// A permanent becomes a copy of something until end of turn (CR 707.2, 611.2b): its copiable values are `values` (exceptions
-/// the effect states included) from now on, and are what they were again when the turn ends. It stays the same object, with
-/// its counters, damage, status and attachments (CR 707.2). Nothing if it is not on the battlefield.
+/// A permanent becomes a copy of something for `duration` (CR 707.2, 611.2b): its copiable values are `values` (exceptions
+/// the effect states included) from now on, and when the effect ends - however it ends - they are what the copy effects
+/// still on it make them, in timestamp order (CR 613.2a, 613.7; `GameState::effects_keep` undoes it). It stays the same
+/// object, with its counters, damage, status and attachments (CR 707.2). Nothing if it is not on the battlefield.
 pub fn become_copy(cx: &mut Cx, source: ObjectId, id: ObjectId, values: Copiable, duration: Duration) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return;

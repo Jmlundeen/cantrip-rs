@@ -742,27 +742,60 @@ impl GameState {
         self.set_unsettled();
     }
 
-    /// Removes every effect `remove` says to, keeping the order of the rest.
-    /// Keeps the effects at the indices `keep` marks true (one flag per effect, in order); the rest go.
+    /// Keeps the effects at the indices `keep` marks true (one flag per effect, in order); the rest go. A copy effect
+    /// that goes is undone (`effect_remove`).
     pub fn effects_keep(&mut self, keep: &[bool]) {
         debug_assert_eq!(keep.len(), self.effects.len(), "one flag per effect");
         for i in (0..self.effects.len()).rev() {
             if !keep[i] {
-                let effect = self.effects.remove(i);
-                self.log(Undo::EffectRemoved(i as u16, Box::new(effect)));
-                self.set_unsettled();
+                self.effect_remove(i);
             }
         }
     }
 
+    /// Removes every effect `keep` refuses, keeping the order of the rest. A copy effect that goes is undone
+    /// (`effect_remove`).
     pub fn effects_retain(&mut self, mut keep: impl FnMut(&ContinuousEffect) -> bool) {
         let mut i = self.effects.len();
         while i > 0 {
             i -= 1;
             if !keep(&self.effects[i]) {
-                let effect = self.effects.remove(i);
-                self.log(Undo::EffectRemoved(i as u16, Box::new(effect)));
-                self.set_unsettled();
+                self.effect_remove(i);
+            }
+        }
+    }
+
+    /// Removes the effect at `at`. Every way an effect ends comes here, so a copy effect (CR 707.2, layer 1) is undone
+    /// whatever ended it - the turn's end, a "for as long as" condition (CR 611.2b), its source leaving: the permanent's
+    /// copiable values are what the copy effects left on it make them, applied in timestamp order (CR 613.2a, 613.7).
+    /// Each copy effect holds the values it was applied over (`EffectKind::RestoreCopy`), so the copy effects on one
+    /// permanent are a chain from its own values up to `Obj::copy`: the next later one is handed the ended one's values
+    /// to apply over, and with none later the permanent itself is - if it is still that permanent (CR 400.7: an object
+    /// that has left keeps what it last was).
+    fn effect_remove(&mut self, at: usize) {
+        let effect = self.effects.remove(at);
+        self.log(Undo::EffectRemoved(at as u16, Box::new(effect)));
+        self.set_unsettled();
+        let EffectKind::RestoreCopy(prior) = effect.kind else { return };
+        let above = self
+            .effects
+            .iter()
+            .enumerate()
+            .filter(|(_, l)| {
+                l.affected == effect.affected && l.timestamp > effect.timestamp && matches!(l.kind, EffectKind::RestoreCopy(_))
+            })
+            .min_by_key(|(_, l)| l.timestamp)
+            .map(|(i, _)| i);
+        match above {
+            Some(i) => {
+                let later = self.effects[i];
+                self.effect_set(i, ContinuousEffect { kind: EffectKind::RestoreCopy(prior), ..later });
+            }
+            None => {
+                let obj = self.obj(effect.affected);
+                if obj.became.is_none() && obj.zone.is(ZoneKind::Battlefield) {
+                    self.update_obj(effect.affected, |o| o.copy = prior);
+                }
             }
         }
     }

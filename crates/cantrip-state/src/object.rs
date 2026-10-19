@@ -698,8 +698,9 @@ pub enum EffectKind {
     /// A mana ability the effect's controller has of their own until the effect ends (CR 605.1a, 611.2a): an ability of the
     /// source card's `delayed` list. About the player, so it outlives its `affected` object, which is only the source (Channel).
     PlayerManaAbility(AbilityRef),
-    /// Marks that a copy effect until end of turn (CR 707.2, 611.2b) changed the `affected` permanent's copiable values, and
-    /// holds what they were: put back when the effect ends. The copy itself is in `Obj::copy`.
+    /// A copy effect (CR 707.2, layer 1) on the `affected` permanent, for its duration (CR 611.2b): it holds the copiable
+    /// values it was applied over, put back when it ends (or handed to the next later copy effect on the permanent, CR
+    /// 613.7: `GameState::effects_keep`). The copy the latest one makes is in `Obj::copy`.
     RestoreCopy(Option<Copiable>),
     /// A text-changing effect (CR 612, layer 3): every instance of `from` in the object's rules text and type line is
     /// `to` (Trait Doctoring, Artificial Evolution). Card code reads its words through `Query::words`; the layers change

@@ -1,4 +1,3 @@
-# Known bug: a copy given "for as long as" a condition (Duration::AsLongAs) is never undone when the condition lapses: only the end-of-turn cleanup restores a permanent's earlier copiable values (CR 611.2b, 707.2).
 # Assimilation Aegis: "for as long as this Equipment remains attached to it, that creature becomes a copy of a creature card
 # exiled with this Equipment" (CR 611.2b, 707.2). Two equips are paid for at once, the second one on the stack resolving
 # first: Equip {2} on the first Ornithopter makes it a Llanowar Elves (Bot2's, exiled
