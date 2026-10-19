@@ -1,0 +1,67 @@
+# Vivien Reid, "-8: You get an emblem with 'Creatures you control get +2/+2 and have vigilance, trample, and
+# indestructible.'" Loyalty 5 takes three +1s (turns 1, 3, 5: 8) and the -8 on turn 7 sends Vivien to the graveyard
+# (CR 704.5i) but not the emblem (CR 114.4). Bot1's Llanowar Elves, 1/1, becomes a 3/3 with vigilance, trample and
+# indestructible; Bot2's Llanowar Elves is unchanged.
+
+[Bot1 Deck]
+Vivien Reid
+Forest
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Island x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Island x18
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Vivien Reid.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vivien Reid.Activate(Ability: Look at the top four)
+Bot1.Arrange( | Island; Island; Island; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vivien Reid.Activate(Ability: Look at the top four)
+Bot1.Arrange( | Island; Island; Island; Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Vivien Reid.Activate(Ability: Look at the top four)
+Bot1.Arrange( | Island; Island; Island; Island)
+? Bot1.Battlefield.Vivien Reid.Counters.Loyalty = 8
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+[T7 Bot1.Main1]
+Bot1.Battlefield.Vivien Reid.Activate(Ability: emblem)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Emblems.Count = 1
+Bot1.Graveyard = Vivien Reid
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 3
+Bot1.Battlefield.Llanowar Elves.Keywords = Indestructible; Trample; Vigilance
+Bot2.Battlefield.Llanowar Elves.Power = 1
+Bot2.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot2.Emblems.Count = 0
+Stack.Count = 0

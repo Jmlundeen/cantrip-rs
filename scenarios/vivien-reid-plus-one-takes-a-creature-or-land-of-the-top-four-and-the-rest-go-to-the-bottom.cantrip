@@ -1,0 +1,45 @@
+# Vivien Reid, "+1: Look at the top four cards of your library. You may reveal a creature or land card from among them and put it
+# into your hand. Put the rest on the bottom of your library in a random order." The top four are Lightning Bolt, Sol Ring,
+# Llanowar Elves and Island. A Bolt or a Sol Ring is no creature or land card, so taking one is refused
+# (`! Bot1.Arrange(Lightning Bolt | ...)`); Bot1 takes the Elves. Loyalty goes 5 to 6, and the other three cards go to the bottom.
+
+[Bot1 Deck]
+Vivien Reid
+Forest
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Plains
+Lightning Bolt
+Sol Ring
+Llanowar Elves
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Vivien Reid.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vivien Reid.Activate(Ability: Look at the top four)
+! Bot1.Arrange(Lightning Bolt | Sol Ring; Llanowar Elves; Island)
+Bot1.Arrange(Llanowar Elves | Lightning Bolt; Sol Ring; Island)
+
+[Expect]
+Bot1.Hand = Llanowar Elves; Plains
+Bot1.Battlefield.Vivien Reid.Counters.Loyalty = 6
+Bot1.Library.Count = 17
+Stack.Count = 0

@@ -1,0 +1,64 @@
+# Vivien Reid, "-3: Destroy target artifact, enchantment, or creature with flying." On turn 3 Bot2 has Birds of Paradise
+# (flying), Llanowar Elves (no flying) and Mox Ruby (an artifact). The Elves are no legal target
+# (`! Bot1.Target(Llanowar Elves)`); the first -3 destroys the Birds, a creature with flying. Loyalty 5, +1 on turn 1 (6),
+# -3 on turn 3 (3), and a second -3 on turn 5 destroys the Mox Ruby, an artifact (0: Vivien dies, CR 704.5i).
+
+[Bot1 Deck]
+Vivien Reid
+Forest
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Plains
+Island x4
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Birds of Paradise
+Llanowar Elves
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Hand.Vivien Reid.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Vivien Reid.Activate(Ability: Look at the top four)
+Bot1.Arrange( | Island; Island; Island; Island)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Birds of Paradise.Cast
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Vivien Reid.Activate(Bot2.Battlefield.Llanowar Elves; Ability: Destroy target)
+Bot1.Battlefield.Vivien Reid.Activate(Bot2.Battlefield.Birds of Paradise; Ability: Destroy target)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield = Forest; Mox Emerald; Mox Ruby; Llanowar Elves
+[T5 Bot1.Main1]
+Bot1.Battlefield.Vivien Reid.Activate(Bot2.Battlefield.Mox Ruby; Ability: Destroy target)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Forest; Mox Emerald; Llanowar Elves
+Bot2.Graveyard = Mox Ruby; Birds of Paradise
+Bot1.Graveyard = Vivien Reid
+Stack.Count = 0
