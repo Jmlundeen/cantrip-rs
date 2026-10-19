@@ -1,0 +1,31 @@
+# Screeching Soulbreaker: flying is a core keyword (CR 702.9); "Whenever this creature attacks, it deals 1 damage to each
+# opponent and you gain 1 life" fires once when it attacks, draining the lone opponent (CR 120.2, 119.3).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Screeching Soulbreaker
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Screeching Soulbreaker.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Screeching Soulbreaker)
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
