@@ -1,0 +1,36 @@
+# Draconic Visitor: "If one or more artifact tokens would be created under your control, that many 5/5 red Dragon
+# creature tokens with flying are created instead" (CR 614.1a, 616.1). Bot1 casts it, then Voldaren Epicure, whose Blood
+# token is an artifact: a Dragon enters instead, and no Blood token is made.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Black Lotus
+Draconic Visitor
+Voldaren Epicure
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Draconic Visitor.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Voldaren Epicure.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dragon Token.Power = 5
+Bot1.Battlefield.Dragon Token.Toughness = 5
+Bot1.Battlefield.Dragon Token.Keywords = Flying
+Bot1.Battlefield.Blood Token = (absent)
+Bot2.Life = 19
