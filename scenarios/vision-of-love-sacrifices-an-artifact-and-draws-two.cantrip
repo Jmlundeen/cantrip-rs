@@ -1,0 +1,36 @@
+# Vision of Love: "You may sacrifice an artifact or discard a card. If you do, draw two cards." Bot1 casts it with Mox Ruby and a
+# Mountain, with Mox Jet also in play, and chooses to sacrifice, naming Mox Jet: Jet goes to the graveyard, Ruby stays, and two
+# cards are drawn (Islands). The hand held three Islands after the casts and now has five; the library had 17 and has 15.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Vision of Love
+Island
+Island
+Island
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vision of Love.Cast
+Bot1.Pass
+Bot1.Modes(Sacrifice an artifact)
+Bot1.Choose(Mox Jet)
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby
+Bot1.Graveyard = Vision of Love; Mox Jet
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 15
+Stack.Count = 0

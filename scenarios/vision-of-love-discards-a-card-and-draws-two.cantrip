@@ -1,0 +1,33 @@
+# Vision of Love: Bot1 chooses to discard (not to sacrifice its Mox Ruby, which stays) and discards an Island, then draws two
+# cards: four Islands became three, plus two drawn makes five; the library had 17 and has 15. The discard went to the graveyard
+# beside the Vision.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Vision of Love
+Island
+Island
+Island
+Island
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vision of Love.Cast
+Bot1.Pass
+Bot1.Modes(Discard a card)
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby
+Bot1.Graveyard = Vision of Love; Island
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 15
+Stack.Count = 0

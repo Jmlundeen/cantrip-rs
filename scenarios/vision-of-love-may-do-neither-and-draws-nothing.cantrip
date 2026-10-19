@@ -1,0 +1,32 @@
+# Vision of Love is "you may": with Mox Ruby to sacrifice and Islands to discard, three options are offered (sacrifice, discard,
+# neither - the third is Modes(3)) and Bot1 takes neither. Nothing is sacrificed or discarded, so "if you do" fails and no
+# cards are drawn: Ruby stays, the hand keeps its four Islands, the library is untouched at 17.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Vision of Love
+Island
+Island
+Island
+Island
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Vision of Love.Cast
+Bot1.Pass
+Bot1.Modes(3)
+
+[Expect]
+Bot1.Battlefield = Mountain; Mox Ruby
+Bot1.Graveyard = Vision of Love
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 17
+Stack.Count = 0
