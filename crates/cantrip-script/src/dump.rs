@@ -165,11 +165,11 @@ impl StateDump {
             d.set("DrawReason", format!("{reason:?}"));
         }
 
-        let stack: Vec<String> = s.stack.iter().rev().map(|item| game.name(item.object).to_string()).collect();
+        let stack: Vec<String> = s.stack.iter().rev().map(|item| game.known_name(item.object).to_string()).collect();
         d.list("Stack", stack, true);
 
         // The delayed triggered abilities waiting for their moment (CR 603.7), each named for the object it came from.
-        let delayed: Vec<String> = s.delayed.iter().map(|d| game.name(d.source).to_string()).collect();
+        let delayed: Vec<String> = s.delayed.iter().map(|d| game.known_name(d.source).to_string()).collect();
         d.list("Delayed", delayed, false);
 
         let mut exiled: Vec<ObjectId> = s.seats().flat_map(|p| s.zone(Zone::exile(p)).to_vec()).collect();
@@ -177,8 +177,8 @@ impl StateDump {
         // A card exiled face down has no name in exile (CR 406.3): `Exile` lists it as "(face down)", and `Exile.FaceDown`, the
         // dump's own omniscient view, lists what those cards are.
         let face_down = |id: &ObjectId| s.obj(*id).face_down;
-        d.list("Exile", exiled.iter().map(|id| if face_down(id) { "(face down)".to_string() } else { game.name(*id).to_string() }).collect(), false);
-        let hidden: Vec<String> = exiled.iter().filter(|id| face_down(id)).map(|&id| game.name(id).to_string()).collect();
+        d.list("Exile", exiled.iter().map(|id| if face_down(id) { "(face down)".to_string() } else { game.known_name(*id).to_string() }).collect(), false);
+        let hidden: Vec<String> = exiled.iter().filter(|id| face_down(id)).map(|&id| game.known_name(id).to_string()).collect();
         if !hidden.is_empty() {
             d.list("Exile.FaceDown", hidden, false);
         }
@@ -194,7 +194,7 @@ impl StateDump {
                 Event::ZoneChange { old, from, .. } if from.is(ZoneKind::Battlefield) => {
                     let tapped_later = records[at + 1..].iter().any(|later| matches!(later.event, Event::Tapped { permanent } if permanent == old));
                     let tapped = s.obj(old).tapped && !tapped_later;
-                    Some(if tapped { format!("{} (tapped)", game.name(old)) } else { game.name(old).to_string() })
+                    Some(if tapped { format!("{} (tapped)", game.known_name(old)) } else { game.known_name(old).to_string() })
                 }
                 _ => None,
             })
@@ -210,10 +210,10 @@ impl StateDump {
                 Event::DamagePrevented { source, target, amount, by, .. } => {
                     let to = match target {
                         Target::Player(p) => bot(p),
-                        Target::Object(id) => game.name(id).to_string(),
+                        Target::Object(id) => game.known_name(id).to_string(),
                         _ => String::new(),
                     };
-                    Some(format!("{amount} {} > {to} by {}", game.name(source), game.name(by)))
+                    Some(format!("{amount} {} > {to} by {}", game.known_name(source), game.known_name(by)))
                 }
                 _ => None,
             })
@@ -228,16 +228,16 @@ impl StateDump {
             .map(|a| {
                 let at = match a.target {
                     Target::Player(p) => bot(p),
-                    Target::Object(id) => game.name(id).to_string(),
+                    Target::Object(id) => game.known_name(id).to_string(),
                     Target::None | Target::Ability(_) => "nothing".into(),
                 };
                 // An attacker in a band (CR 702.22c) says which: `Benalish Hero > Bot2 (band 1)`.
                 let band = if a.band == 0 { String::new() } else { format!(" (band {})", a.band) };
-                format!("{} > {}{band}", game.name(a.id), at)
+                format!("{} > {}{band}", game.known_name(a.id), at)
             })
             .collect();
         d.list("Combat.Attackers", attackers, false);
-        let blocks = s.blocks.iter().map(|b| format!("{} > {}", game.name(b.blocker), game.name(b.attacker))).collect();
+        let blocks = s.blocks.iter().map(|b| format!("{} > {}", game.known_name(b.blocker), game.known_name(b.attacker))).collect();
         d.list("Combat.Blocks", blocks, false);
         // While a declaration's cost to attack is being paid (CR 508.1h-j): the total, what is still owed, and the attackers
         // it is for. Absent at any other time.
@@ -246,7 +246,7 @@ impl StateDump {
         {
             d.set("Combat.AttackCost", total.to_string());
             d.set("Combat.AttackCost.Remaining", remaining.to_string());
-            d.list("Combat.AttackCost.Attackers", attackers.iter().map(|&a| game.name(a).to_string()).collect(), true);
+            d.list("Combat.AttackCost.Attackers", attackers.iter().map(|&a| game.known_name(a).to_string()).collect(), true);
         }
 
         // Only once there is one (CR 725.1, 726.1): most games never have a monarch or the initiative.
@@ -270,7 +270,7 @@ impl StateDump {
                 .history()
                 .select(EventQuery::kind(EventMask::LOOKED).player(p))
                 .filter_map(|r| match r.event {
-                    Event::Looked { card, .. } => Some(game.name(card).to_string()),
+                    Event::Looked { card, .. } => Some(game.known_name(card).to_string()),
                     _ => None,
                 })
                 .collect();
@@ -344,12 +344,12 @@ impl StateDump {
             // {W}{W} Plains" (restricted mana too, without its restriction).
             let from: Vec<String> = s
                 .mana_from_of(p)
-                .map(|e| format!("{} {}", mana_text(&e.pool), if e.source == ObjectId::NONE { "none".to_string() } else { game.name(e.source).to_string() }))
+                .map(|e| format!("{} {}", mana_text(&e.pool), if e.source == ObjectId::NONE { "none".to_string() } else { game.known_name(e.source).to_string() }))
                 .collect();
             if !from.is_empty() {
                 d.list(&format!("{b}.ManaFrom"), from, false);
             }
-            let names = |ids: &[ObjectId]| ids.iter().map(|&id| game.name(id).to_string()).collect::<Vec<_>>();
+            let names = |ids: &[ObjectId]| ids.iter().map(|&id| game.known_name(id).to_string()).collect::<Vec<_>>();
             d.list(&format!("{b}.Hand"), names(s.zone(Zone::hand(p))), false);
             // Cards this player revealed, in order, from the history (`Event::Revealed`): a beheld card (CR 701.4a), a spliced one.
             let revealed: Vec<String> = game
@@ -357,7 +357,7 @@ impl StateDump {
                 .all()
                 .iter()
                 .filter_map(|r| match r.event {
-                    Event::Revealed { player, card } if player == p => Some(game.name(card).to_string()),
+                    Event::Revealed { player, card } if player == p => Some(game.known_name(card).to_string()),
                     _ => None,
                 })
                 .collect();
@@ -371,7 +371,7 @@ impl StateDump {
                 .all()
                 .iter()
                 .filter_map(|r| match r.event {
-                    Event::CrimeCommitted { player, by } if player == p => Some(game.name(by).to_string()),
+                    Event::CrimeCommitted { player, by } if player == p => Some(game.known_name(by).to_string()),
                     _ => None,
                 })
                 .collect();
@@ -396,8 +396,8 @@ impl StateDump {
                 for &id in &ids {
                     let c = game.chars(id);
                     let outside = zone.is(ZoneKind::Sideboard);
-                    let name = game.name(id);
-                    let same: Vec<ObjectId> = ids.iter().copied().filter(|&o| game.name(o) == name).collect();
+                    let name = game.known_name(id);
+                    let same: Vec<ObjectId> = ids.iter().copied().filter(|&o| game.known_name(o) == name).collect();
                     let key = if same.len() == 1 {
                         format!("{b}.{label}.{name}")
                     } else {
@@ -419,7 +419,7 @@ impl StateDump {
             }
 
             // CR 114: the emblems a player owns, from the one shared command zone.
-            let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).map(|&id| game.name(id).to_string()).collect();
+            let emblems = s.zone(Zone::COMMAND).iter().filter(|&&id| s.obj(id).owner == p).map(|&id| game.known_name(id).to_string()).collect();
             d.list(&format!("{b}.Emblems"), emblems, false);
 
             // The battlefield, and its phased-out permanents (CR 702.26b) apart, as `BotN.PhasedOut` under the player who controlled
@@ -428,8 +428,8 @@ impl StateDump {
                 let permanents: Vec<ObjectId> = s.zone(zone).iter().copied().filter(|&id| s.obj(id).controller == p).collect();
                 d.list(&format!("{b}.{row}"), names(&permanents), false);
                 for &id in &permanents {
-                    let name = game.name(id);
-                    let same: Vec<ObjectId> = permanents.iter().copied().filter(|&o| game.name(o) == name).collect();
+                    let name = game.known_name(id);
+                    let same: Vec<ObjectId> = permanents.iter().copied().filter(|&o| game.known_name(o) == name).collect();
                     let label = if same.len() == 1 {
                         name.to_string()
                     } else {
@@ -463,7 +463,7 @@ impl StateDump {
                     if let Some(host) = obj.attached_to
                         && s.obj(host).became.is_none()
                     {
-                        d.set(format!("{key}.AttachedTo"), game.name(host));
+                        d.set(format!("{key}.AttachedTo"), game.known_name(host));
                     }
                     // An Aura that enchants a player (CR 303.4, 702.5d) is attached to them, by seat.
                     if let Some(player) = obj.attached_player {

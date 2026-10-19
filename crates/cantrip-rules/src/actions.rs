@@ -1244,6 +1244,8 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
 /// Empty when nothing could change it (no cost changer on the battlefield, none of the card's own), which is nearly always,
 /// or for any other way of casting it.
 pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8, candidates: &[Target]) -> Vec<(ManaCost, u32)> {
+    // A card exiled face down is judged as the spell it would be (CR 406.3a), the copy below with it.
+    let _face_up = layers::judged_face_up(&game.state, card);
     let def = game.cards.get(game.state.obj(card).card);
     if !(spell_cost_changers(game) || !def.own_cost_changes.is_empty()) {
         return Vec::new();
@@ -1336,6 +1338,7 @@ pub fn granted_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, 
 /// announced (CR 601.2f): for the menu row, which says what the cast still costs ({1} more under Thalia). `None` for any
 /// other way, or one the permanent no longer gives.
 pub fn alternative_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8) -> Option<(ManaCost, ManaCost)> {
+    let _face_up = layers::judged_face_up(&game.state, card);
     let (_, face) = alternative_slot(index)?;
     let (_, _, alternative) = alternative_at(game, game.cards, player, card, index)?;
     let whole = game.cards.get(game.state.obj(card).card);
@@ -2279,6 +2282,8 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
     // A land card is played as itself; a modal double-faced card whose back face is a land may be played as that
     // (CR 712.4, 712.14a), from wherever a land could be played.
     let offer = |id: ObjectId, options: &mut Vec<ActionOption>| {
+        // A card exiled face down is judged as the land it would be (CR 406.3a).
+        let _face_up = layers::judged_face_up(cx.s(), id);
         if cx.chars(id).is(CardType::Land) {
             options.push(ActionOption::on(ActionKind::PlayLand, id, 0));
         }
@@ -2457,6 +2462,7 @@ pub fn exile_cast_texts(game: &crate::Game, card: ObjectId) -> Vec<(PlayerId, &'
     if !s.obj(card).zone.is(ZoneKind::Exile) {
         return Vec::new();
     }
+    let _face_up = layers::judged_face_up(s, card);
     exile_casts_of(cards, s, log)
         .into_iter()
         .filter(|&(granter, controller, cast)| (cast.allows)(q, &Asker { source: granter, controller }, card, controller))
@@ -2553,7 +2559,12 @@ fn castable(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Available
         return;
     }
     let offered = options.split_off(start);
-    options.extend(offered.into_iter().filter(|o| o.source.is_none_or(|card| !face_forbidden(cx, &forbidders, player, card, o.index))));
+    options.extend(offered.into_iter().filter(|o| {
+        o.source.is_none_or(|card| {
+            let _face_up = layers::judged_face_up(cx.s(), card);
+            !face_forbidden(cx, &forbidders, player, card, o.index)
+        })
+    }));
 }
 
 /// Whether a static ability forbids `player` to cast `card` by the way `way` (CR 101.2, 601.3), judged on the face that way
@@ -2689,6 +2700,8 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
     for zone in zones {
         let own = zone.player == player;
         for &id in cx.s().zone(zone) {
+            // A card exiled face down is judged as the spell it would be (CR 406.3a-b).
+            let _face_up = layers::judged_face_up(cx.s(), id);
             let obj = cx.s().obj(id);
             // From exile, only a prepare spell's copy, by the prepared permanent's controller (CR 722.3), or a
             // card exiled on an Adventure, by the player who exiled it (CR 715.3d).
@@ -3310,6 +3323,8 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
 /// (Snapcaster Mage), "Cast without paying its mana cost", "Cast by paying {1}{U} instead".
 pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &ActionOption) -> std::borrow::Cow<'static, str> {
     let Some(source) = option.source else { return "".into() };
+    // A card exiled face down is described as the spell it would be (CR 406.3a).
+    let _face_up = (option.kind == ActionKind::CastSpell).then(|| layers::judged_face_up(state, source));
     // "Pay life equal to its mana value rather than pay its mana cost" (CR 118.9): the life, for the face cast.
     if option.kind == ActionKind::CastSpell
         && matches!(option.index, 0 | WAY_ADVENTURE | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE)
@@ -3436,6 +3451,8 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             // The land play is counted as the land is played (CR 305.1), before anything that watches it triggers:
             // Fastbond's "if it wasn't the first land you played this turn" counts this one.
             cx.st().update_player(player, |p| p.lands_played += 1);
+            // CR 406.3a: a card exiled face down is turned face up just before it is played.
+            ops::turn_up_to_play(cx, source);
             // A way a permanent gave is noted in the history against it (see the cast's note), and what it grants is the
             // land's from the moment it is on the battlefield.
             let granted = granted_slot(action.index).map(|(k, _)| {
@@ -3568,6 +3585,8 @@ fn cast(
     resolving: bool,
 ) -> R<()> {
     let CastTerms { instead, any_type, exile_after, flashback, life, more, less, copy, way: _ } = terms;
+    // CR 406.3a: a card exiled face down is turned face up just before it is announced.
+    ops::turn_up_to_play(cx, card);
     // A way a permanent grants (CR 118.9) names the face cast as well: the cast goes on as that face's own. So does an
     // alternative cost a static ability gives the spells its caster casts (CR 118.9, 601.2b), read now, as the cast begins,
     // so the cast keeps it if the permanent leaves while it is paid for.
@@ -4138,6 +4157,8 @@ pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     if cast_barred(cx, player).contains(obj.zone.kind()) {
         return Vec::new();
     }
+    // A card exiled face down is judged as the spell it would be (CR 406.3a-b).
+    let _face_up = layers::judged_face_up(cx.s(), card);
     let def = cx.card(obj.card);
     let asker = Asker { source: card, controller: player };
     let forbidders = static_rules::spell_forbidders(cx);
@@ -4207,6 +4228,7 @@ pub fn play_land_during_resolution(cx: &mut Cx, card: ObjectId) -> R<Option<Obje
     }
     let player = cx.s().stack.last().expect("a resolving item").controller;
     cx.st().update_player(player, |p| p.lands_played += 1);
+    ops::turn_up_to_play(cx, card);
     let moved = ops::put_onto_battlefield(cx, &[(card, player, false)], ZoneReason::PlayLand)?;
     Ok(moved.first().copied())
 }
@@ -4314,6 +4336,7 @@ pub fn could_cast_transformed_during_resolution(cx: &Cx, card: ObjectId) -> bool
     if back.has_cost {
         return false;
     }
+    let _face_up = layers::judged_face_up(cx.s(), card);
     let asker = Asker { source: card, controller: player };
     if !cast_only_if_met(cx, back, &asker) {
         return false;

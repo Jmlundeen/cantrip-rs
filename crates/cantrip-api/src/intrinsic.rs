@@ -228,3 +228,8 @@ pub static FACE_DOWN: CardDef = CardDef {
         .special_action()],
     ..CardDef::BLANK
 };
+
+/// What a face-down card in a zone other than the battlefield and the stack is (CR 406.3a): no characteristics at all - no
+/// name, no mana cost, no color, no types, no abilities, no power or toughness. Who may look at it sees the card itself
+/// (CR 406.3), which is a matter of what they know, not of what it is.
+pub static NO_CHARACTERISTICS: CardDef = CardDef { name: "", has_cost: false, ..CardDef::BLANK };

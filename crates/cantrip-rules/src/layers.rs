@@ -37,6 +37,28 @@ pub fn chars_as_face(cards: &CardTable, state: &GameState, log: &[Record], id: O
     chars
 }
 
+/// While the value lives, the face-down card `card` outside the battlefield and the stack (CR 406.3a) is judged as the card
+/// it is: what playing it would be, asked of the resulting spell or land (CR 406.3a-b, 601.3, 305.1), for a player who may
+/// play it. The card is turned face up only as it is played (`ops::turn_up_to_play`); until then it has no characteristics
+/// for every other purpose. Nothing for any other object.
+pub struct JudgedFaceUp<'a> {
+    state: &'a GameState,
+    was: Option<Option<ObjectId>>,
+}
+
+pub fn judged_face_up(state: &GameState, card: ObjectId) -> JudgedFaceUp<'_> {
+    let was = state.obj(card).face_down_card().then(|| state.judged_face_up.replace(Some(card)));
+    JudgedFaceUp { state, was }
+}
+
+impl Drop for JudgedFaceUp<'_> {
+    fn drop(&mut self) {
+        if let Some(was) = self.was {
+            self.state.judged_face_up.set(was);
+        }
+    }
+}
+
 /// What a static ability's functions read: other objects through the layers before the one being applied.
 struct View<'a> {
     cards: &'a CardTable,
@@ -78,6 +100,11 @@ const LAYERS: [Layer; 8] =
 /// static abilities and other continuous effects in turn, in timestamp order unless one depends on another (CR 613.7, 613.8).
 pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, stop: Layer) -> Chars {
     let obj = state.obj(id);
+    // CR 406.3a: a card exiled face down has no characteristics, unless a player who may play it is being asked whether
+    // they could (`judged_face_up`).
+    if obj.face_down_card() && state.judged_face_up.get() != Some(id) {
+        return *printed(cards, cards.no_characteristics, false);
+    }
     let spell = obj.zone.is(ZoneKind::Stack);
     // The copiable values (CR 707.2): a copy effect's, or the face of the card that is up (CR 711.2).
     let card = match &obj.copy {
@@ -317,7 +344,8 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         // A card encoded on a creature functions in exile (CR 702.99a).
         if cards.exile_statics {
             for p in state.seats() {
-                for &source in state.zone(Zone::exile(p)) {
+                // A card exiled face down has no abilities (CR 406.3a).
+                for &source in state.zone(Zone::exile(p)).iter().filter(|&&source| !state.obj(source).face_down) {
                     note(&mut made.list, source, ZoneKind::Exile);
                 }
             }

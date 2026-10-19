@@ -81,6 +81,11 @@ pub struct GameState {
     /// the layers for one position and history, as `lost_to_statics` is (`applying` unused: a land's own such ability keeps
     /// applying and is not counted).
     pub land_text_lost: std::cell::RefCell<LostToStatics>,
+    /// The face-down card outside the battlefield and the stack that is being judged as the card it is, while a player who may
+    /// play it is asked whether they could (CR 406.3a-b, 601.3): the resulting spell or land play has the card's
+    /// characteristics, though the card in exile has none. Set only for the length of that judgment
+    /// (`cantrip_rules::layers::judged_face_up`), `None` at any other time; no part of the position.
+    pub judged_face_up: std::cell::Cell<Option<ObjectId>>,
 }
 
 /// What the rules watch to find a loop (CR 104.4b, 732): `cantrip_rules::loops` is what they do with it. Empty, but for the
@@ -363,6 +368,7 @@ impl GameState {
             static_sources: std::cell::RefCell::new(StaticSources { epoch: u64::MAX, list: Vec::new(), strippers: Vec::new(), setters: Vec::new(), controllers: Vec::new(), honed: Vec::new(), granted: Vec::new(), continuing: false }),
             lost_to_statics: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
             land_text_lost: std::cell::RefCell::new(LostToStatics { key: (u64::MAX, 0), objects: Vec::new(), applying: Vec::new(), finding: false }),
+            judged_face_up: std::cell::Cell::new(None),
         }
     }
 

@@ -1,0 +1,37 @@
+# A card exiled face down has no characteristics (CR 406.3a), so it has no mana cost and its mana value is 0 to anything
+# that reads cards in exile. Bot1 foretells Delayed Blast Fireball (mana value 3) on turn 1, exiling it face down, then
+# casts Ulamog, the Defiler, whose cast trigger has Bot2 exile the top half of its six-card library face up: Counterspell
+# (mana value 2) and two Plains. Ulamog enters with counters equal to the greatest mana value among cards in exile: the
+# face-up Counterspell's 2, not the face-down Fireball's 3.
+
+[Bot1 Deck]
+Island
+Delayed Blast Fireball
+Ulamog, the Defiler
+Black Lotus x4
+Island x10
+
+[Bot2 Deck]
+Plains x7
+Counterspell
+Plains x5
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Delayed Blast Fireball.Foretell
+? Exile.FaceDown = Delayed Blast Fireball
+Bot1.Hand.Ulamog, the Defiler.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+[T1 Bot1.Main2]
+
+[Expect]
+Exile = (face down); Counterspell; Plains; Plains
+Exile.FaceDown = Delayed Blast Fireball
+Bot1.Battlefield.Ulamog, the Defiler.Counters.PlusOnePlusOne = 2

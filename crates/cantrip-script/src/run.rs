@@ -388,7 +388,7 @@ impl<'s> Run<'s> {
 
     fn describe_request(&self, r: &Request) -> String {
         let g = &self.game;
-        let name = |id: ObjectId| g.name(id).to_string();
+        let name = |id: ObjectId| g.known_name(id).to_string();
         match &r.kind {
             RequestKind::Priority { options } | RequestKind::PayCosts { options, .. } | RequestKind::UnlessPays { options, .. } => {
                 let list: Vec<String> = options
@@ -544,8 +544,8 @@ impl<'s> Run<'s> {
                 && let RequestKind::PayCosts { announcing: true, source, x, options, .. } = &request.kind
             {
                 let Ok(wanted) = wanted.trim().parse::<u16>() else { return fail(format!("line {line}: {wanted} is not a number")) };
-                if !action.card.as_deref().is_some_and(|card| self.game.name(*source).eq_ignore_ascii_case(card)) {
-                    return fail(format!("line {line}: {text} proves nothing: {} is the one announcing X", self.game.name(*source)));
+                if !action.card.as_deref().is_some_and(|card| self.game.known_name(*source).eq_ignore_ascii_case(card)) {
+                    return fail(format!("line {line}: {text} proves nothing: {} is the one announcing X", self.game.known_name(*source)));
                 }
                 if *x >= wanted {
                     return fail(format!("line {line} says {text} must not be allowed, but X was announced up to {wanted}"));
@@ -616,7 +616,7 @@ impl<'s> Run<'s> {
                 && answers(action.verb, &request.kind)
             {
                 if let Some(source) = self.undo.offered(request.player) {
-                    return fail(format!("line {line} says {text}, but {}'s mana ability may be taken back", self.game.name(source)));
+                    return fail(format!("line {line} says {text}, but {}'s mana ability may be taken back", self.game.known_name(source)));
                 }
                 self.next();
                 continue;
@@ -770,7 +770,7 @@ impl<'s> Run<'s> {
             let o = s.obj(id);
             // Summoning sickness tells creatures apart (CR 302.6), and nothing else.
             let sick = o.controlled_since == s.turn.number && self.game.chars(id).is(CardType::Creature);
-            (self.game.name(id), o.owner, o.controller, o.zone, o.token, o.tapped, o.damage, o.counter_array(), sick)
+            (self.game.known_name(id), o.owner, o.controller, o.zone, o.token, o.tapped, o.damage, o.counter_array(), sick)
         };
         let one = |id: ObjectId| -> ObjectId {
             if id.index() >= s.objects.len() {
@@ -930,13 +930,13 @@ impl<'s> Run<'s> {
             if !casting.convoke.is_empty() && options.iter().any(|o| o.kind == ActionKind::TapToPay) {
                 let wanted = casting.convoke.pop_front().unwrap();
                 let tap = options.iter().find(|o| {
-                    o.kind == ActionKind::TapToPay && o.source.is_some_and(|s| self.game.name(s).eq_ignore_ascii_case(&wanted))
+                    o.kind == ActionKind::TapToPay && o.source.is_some_and(|s| self.game.known_name(s).eq_ignore_ascii_case(&wanted))
                 });
                 return match tap {
                     Some(o) => Ok(Some(Answer::Act(Action::of(o)))),
                     None => fail(format!(
                         "Convoke: names {wanted}, but the creatures offered are {:?}",
-                        options.iter().filter(|o| o.kind == ActionKind::TapToPay).filter_map(|o| o.source).map(|s| self.game.name(s)).collect::<Vec<_>>()
+                        options.iter().filter(|o| o.kind == ActionKind::TapToPay).filter_map(|o| o.source).map(|s| self.game.known_name(s)).collect::<Vec<_>>()
                     )),
                 };
             }
@@ -953,7 +953,7 @@ impl<'s> Run<'s> {
             && let Some(wanted) = casting.spend.pop_front()
         {
             let game = &self.game;
-            let from = |o: &ActionOption| o.source.map(|s| game.name(s).to_string());
+            let from = |o: &ActionOption| o.source.map(|s| game.known_name(s).to_string());
             return match assign.iter().find(|o| (o.mana, o.restriction) == (Some(wanted.0), wanted.1) && from(o).map(|n| n.to_ascii_lowercase()) == wanted.2.as_ref().map(|n| n.to_ascii_lowercase())) {
                 Some(o) => Ok(Some(Answer::Act(Action::of(o)))),
                 None => fail(format!(
@@ -987,7 +987,7 @@ impl<'s> Run<'s> {
                 return fail(format!(
                     "{} is paying for {} with {remaining} still owed, and the next line does not pay it",
                     bot(request.player),
-                    self.game.name(*source)
+                    self.game.known_name(*source)
                 ));
             }
             RequestKind::UnlessPays { options, .. } => {
@@ -1251,7 +1251,7 @@ impl<'s> Run<'s> {
     fn same_named(&self, kind: ZoneKind, name: &str, holder: PlayerId) -> Vec<ObjectId> {
         self.zone_objects(kind)
             .into_iter()
-            .filter(|&id| self.holder(id) == holder && self.game.name(id).eq_ignore_ascii_case(name))
+            .filter(|&id| self.holder(id) == holder && self.game.known_name(id).eq_ignore_ascii_case(name))
             .collect()
     }
 
@@ -1271,7 +1271,7 @@ impl<'s> Run<'s> {
             return false;
         }
         let Some(card) = &step.card else { return false };
-        if !self.game.name(id).eq_ignore_ascii_case(card) {
+        if !self.game.known_name(id).eq_ignore_ascii_case(card) {
             return false;
         }
         let zone = s.obj(id).zone.kind();
@@ -1310,7 +1310,7 @@ impl<'s> Run<'s> {
             name = base;
             copy = Some(n);
         }
-        let known = card(&name).is_some() || self.game.state.objects.iter().enumerate().any(|(i, _)| self.game.name(ObjectId(i as u32)).eq_ignore_ascii_case(&name));
+        let known = card(&name).is_some() || self.game.state.objects.iter().enumerate().any(|(i, _)| self.game.known_name(ObjectId(i as u32)).eq_ignore_ascii_case(&name));
         if !known {
             return fail(format!("line {}: no card is named \"{name}\"", step.line));
         }
@@ -1319,7 +1319,7 @@ impl<'s> Run<'s> {
             .iter()
             .copied()
             .filter(|&id| {
-                if !live(s, id) || !self.game.name(id).eq_ignore_ascii_case(&name) {
+                if !live(s, id) || !self.game.known_name(id).eq_ignore_ascii_case(&name) {
                     return false;
                 }
                 let kind = s.obj(id).zone.kind();
@@ -1350,7 +1350,7 @@ impl<'s> Run<'s> {
             };
             let stack = &self.game.state.stack;
             let found = candidates.iter().copied().filter(|t| matches!(t, Target::Ability(_))).rev().filter(|t| {
-                matches!(t, Target::Ability(n) if stack.iter().any(|i| i.serial == *n && self.game.name(i.object).eq_ignore_ascii_case(name.trim())))
+                matches!(t, Target::Ability(n) if stack.iter().any(|i| i.serial == *n && self.game.known_name(i.object).eq_ignore_ascii_case(name.trim())))
             }).nth(nth);
             if found.is_some() {
                 return Ok(found);
@@ -1997,7 +1997,7 @@ impl<'s> Run<'s> {
     fn replacement(&self, step: &ActionStep, sources: &[ObjectId], hints: &[&'static str]) -> R<Answer> {
         let named: Vec<&str> = step.positional().collect();
         let offered = || {
-            sources.iter().zip(hints).map(|(&s, h)| format!("{} ({h})", self.game.name(s))).collect::<Vec<_>>().join(" | ")
+            sources.iter().zip(hints).map(|(&s, h)| format!("{} ({h})", self.game.known_name(s))).collect::<Vec<_>>().join(" | ")
         };
         let [spec] = named[..] else {
             return fail(format!("line {}: Replace takes one effect, one of: {}", step.line, offered()));
@@ -2013,7 +2013,7 @@ impl<'s> Run<'s> {
             };
         }
         let found = (0..sources.len())
-            .find(|&i| self.game.name(sources[i]).to_lowercase() == wanted || hints[i].to_lowercase().contains(&wanted));
+            .find(|&i| self.game.known_name(sources[i]).to_lowercase() == wanted || hints[i].to_lowercase().contains(&wanted));
         match found {
             Some(i) => Ok(Answer::Index(i as u8)),
             None => fail(format!("line {}: \"{spec}\" is not one of: {}", step.line, offered())),
@@ -2026,7 +2026,7 @@ impl<'s> Run<'s> {
             let wanted = spec.trim().to_lowercase();
             let found = (0..sources.len()).find(|&i| {
                 !order.contains(&(i as u8))
-                    && (self.game.name(sources[i]).to_lowercase() == wanted
+                    && (self.game.known_name(sources[i]).to_lowercase() == wanted
                         || self.game.cards.ability(abilities[i]).text().to_lowercase().contains(&wanted))
             });
             match found {

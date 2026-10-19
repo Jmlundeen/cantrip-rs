@@ -312,6 +312,14 @@ would go over unclickable.
   (`replace::possible`) or a counter ban could limit its counters. A resolved effect that sets a land's
   subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
   such a land other than abilities stay (KI-51).
+- **A card exiled face down has no characteristics (406.3a)**: `layers::chars` gives a face-down card outside the
+  battlefield and the stack (`Obj::face_down_card`) those of `intrinsic::NO_CHARACTERISTICS` - no name, no mana value, no
+  types, no abilities - for every reader, so nothing that counts or matches cards in exile sees what it is, and its abilities
+  function nowhere. Who may look at it (`seen_by`, 406.3) is knowledge, not characteristics: the host view shows them the
+  card, and a script names it by its card (`Game::known_name`). Playing it is asked of the resulting spell or land (406.3a-b,
+  601.3): while the offers, the costs a menu row shows and a cast during resolution are worked out, `layers::judged_face_up`
+  names that one card on `GameState::judged_face_up` and the layers give it the card's characteristics; as it is played,
+  `ops::turn_up_to_play` turns it face up just before the announcement (601.2) or the land play.
 - **A card's printed characteristics are made once** (`CardTable::printed`), as a pure function of the card, both
   before and after the ability layer, so an object nothing acts on costs a lookup.
 - **The static-ability sources are found once per position** (the epoch cache above), not on every query.

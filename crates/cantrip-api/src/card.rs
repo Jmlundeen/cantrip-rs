@@ -2544,6 +2544,8 @@ pub struct CardTable {
     pub intrinsic: CardId,
     /// What a face-down permanent is (CR 708.2a): its copiable values.
     pub face_down: CardId,
+    /// What a face-down card outside the battlefield and the stack is (CR 406.3a): nothing.
+    pub no_characteristics: CardId,
     /// A Room's two doors (CR 709.5), by the Room's id: the ids of its halves, whose abilities its permanent has while
     /// they are unlocked.
     pub halves: Vec<Option<(CardId, CardId)>>,
@@ -2567,6 +2569,7 @@ impl CardTable {
         let mut cards: Vec<&'static CardDef> = cards.into_iter().collect();
         cards.push(&crate::intrinsic::INTRINSIC);
         cards.push(&crate::intrinsic::FACE_DOWN);
+        cards.push(&crate::intrinsic::NO_CHARACTERISTICS);
         // A back face is registered with its front (the first of a name wins, as for every card).
         let backs: Vec<&'static CardDef> = cards.iter().filter_map(|c| c.back).collect();
         cards.extend(backs);
@@ -2638,6 +2641,9 @@ impl CardTable {
         let face_down = CardId(
             cards.iter().position(|c| std::ptr::eq(*c, &crate::intrinsic::FACE_DOWN)).expect("the face-down values") as u16,
         );
+        let no_characteristics = CardId(
+            cards.iter().position(|c| std::ptr::eq(*c, &crate::intrinsic::NO_CHARACTERISTICS)).expect("no characteristics") as u16,
+        );
         let undercity = cards.iter().position(|c| c.name == "Undercity" && !c.dungeon.is_empty()).map(|i| CardId(i as u16));
         let mut card_names: Vec<&'static str> = cards.iter().filter(|c| c.oracle || !c.dungeon.is_empty()).map(|c| c.name).collect();
         card_names.sort_unstable();
@@ -2667,6 +2673,7 @@ impl CardTable {
             engines,
             intrinsic,
             face_down,
+            no_characteristics,
             undercity,
             backs: Vec::new(),
             halves: Vec::new(),

@@ -98,7 +98,8 @@ pub struct Obj {
     /// A new object (CR 400.7) has none.
     pub exiled: Option<ExileLink>,
     /// Face down (CR 708): a permanent is a nameless 2/2 creature, its card's real values kept in `card` (its `copy` is the
-    /// face-down values, CR 708.2a); a card in exile has no characteristics for anyone who has not seen it (CR 406.3).
+    /// face-down values, CR 708.2a); a card in exile has no characteristics at all (CR 406.3a), and only those who may look
+    /// at it know what card it is (`seen_by`, CR 406.3).
     pub face_down: bool,
     /// For a face-down card in exile: the seats that may look at it, a bit each (CR 406.3). Those who could see where it
     /// came from, and those it was shown to since.
@@ -239,6 +240,12 @@ impl Obj {
 
     pub fn counters(&self, kind: CounterKind) -> i16 {
         self.counters[kind as usize]
+    }
+
+    /// A face-down card in a zone other than the battlefield and the stack (a card exiled face down): it has no
+    /// characteristics (CR 406.3a). A face-down permanent, phased out or not, and a face-down spell have those of CR 708.2a.
+    pub fn face_down_card(&self) -> bool {
+        self.face_down && !matches!(self.zone.kind(), ZoneKind::Battlefield | ZoneKind::PhasedOut | ZoneKind::Stack)
     }
 
     /// Whether it has any counter on it.

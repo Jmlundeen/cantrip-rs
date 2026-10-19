@@ -502,6 +502,15 @@ pub fn turn_face_up(cx: &mut Cx, id: ObjectId, player: PlayerId) {
     cx.emit(Event::TurnedFaceUp { permanent: id, player });
 }
 
+/// CR 406.3a: a card exiled face down that is played is turned face up just before the player announces it (CR 601.2) or
+/// plays it as a land (CR 305.1), so the spell or land it becomes is the card it is. (A card cast face down from exile
+/// would be the exception, CR 708.4; nothing casts one face down from there.)
+pub fn turn_up_to_play(cx: &mut Cx, card: ObjectId) {
+    if cx.s().obj(card).face_down_card() {
+        cx.st().update_obj(card, |o| o.face_down = false);
+    }
+}
+
 /// The door whose half was cast, by the way it was cast (CR 709.3, 709.5d): none for anything but a split card's halves.
 fn cast_door(way: u8) -> u8 {
     match way {
