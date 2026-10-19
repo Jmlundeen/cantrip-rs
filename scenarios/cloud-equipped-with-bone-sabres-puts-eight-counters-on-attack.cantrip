@@ -1,0 +1,43 @@
+# Cloud's enters trigger fetches one Equipment (Bone Sabres, not also Paradise Mantle: Cloud is not equipped when it triggers,
+# so it triggers once). Equipped with Bone Sabres, an Equipment attached to Cloud, the Sabres' attack trigger triggers an
+# additional time (CR 603.2d): two triggers put four +1/+1 counters each on Cloud, which becomes a 10/9 and deals 10.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Cloud, Midgar Mercenary
+Plains
+Plains
+Plains
+Bone Sabres
+Paradise Mantle
+Plains x11
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Cloud, Midgar Mercenary.Cast
+Bot1.Pass
+Bot1.Search(Bone Sabres)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Bone Sabres.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Bone Sabres.Activate(Bot1.Battlefield.Cloud, Midgar Mercenary)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Cloud, Midgar Mercenary > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 10
+Bot1.Battlefield.Cloud, Midgar Mercenary.Counters.PlusOnePlusOne = 8
+Bot1.Battlefield.Cloud, Midgar Mercenary.Power = 10
+Bot1.Battlefield.Cloud, Midgar Mercenary.Toughness = 9
+Bot1.Battlefield.Bone Sabres.AttachedTo = Cloud, Midgar Mercenary
+Bot1.Library.Count = 11

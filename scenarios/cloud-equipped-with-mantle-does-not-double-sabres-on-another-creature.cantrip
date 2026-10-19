@@ -1,0 +1,43 @@
+# Cloud is equipped (Paradise Mantle), but its extra triggering is only for triggered abilities of Cloud or of an Equipment
+# attached to it. Bone Sabres is attached to an Ornithopter, so its attack trigger happens once: four counters, not eight
+# (the control is the scenario where the Sabres are on Cloud itself).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Cloud, Midgar Mercenary
+Paradise Mantle
+Ornithopter
+Plains
+Bone Sabres
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Cloud, Midgar Mercenary.Cast
+Bot1.Pass
+Bot1.Search(Bone Sabres)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Bone Sabres.Cast
+Bot1.Hand.Paradise Mantle.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Paradise Mantle.Activate(Bot1.Battlefield.Cloud, Midgar Mercenary)
+Bot1.Battlefield.Bone Sabres.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Paradise Mantle.AttachedTo = Cloud, Midgar Mercenary
+Bot1.Battlefield.Bone Sabres.AttachedTo = Ornithopter

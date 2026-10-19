@@ -1,0 +1,8 @@
+{
+  "name": "Cloud, Midgar Mercenary",
+  "manaCost": "{W}{W}",
+  "type": "Legendary Creature — Human Soldier Mercenary",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "When Cloud enters, search your library for an Equipment card, reveal it, put it into your hand, then shuffle.\nAs long as Cloud is equipped, if a triggered ability of Cloud or an Equipment attached to it triggers, that ability triggers an additional time."
+}

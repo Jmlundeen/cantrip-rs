@@ -1,0 +1,39 @@
+# Cloud fetches Astrologian's Planisphere and equips it ({2}). Its granted triggered ability ("Whenever you cast a
+# noncreature spell ... put a +1/+1 counter on this creature") is a triggered ability of Cloud, which is equipped, so it
+# triggers an additional time (CR 603.2d): casting Mox Pearl puts two counters on Cloud, making it 4/3. Casting
+# Planisphere itself while Cloud was not yet equipped put none.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Cloud, Midgar Mercenary
+Mox Pearl
+Plains
+Plains
+Plains
+Astrologian's Planisphere
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Cloud, Midgar Mercenary.Cast
+Bot1.Pass
+Bot1.Search(Astrologian's Planisphere)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Astrologian's Planisphere.Cast
+Bot1.Pass
+Bot1.Battlefield.Astrologian's Planisphere.Activate(Bot1.Battlefield.Cloud, Midgar Mercenary)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Cloud, Midgar Mercenary.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Cloud, Midgar Mercenary.Power = 4
+Bot1.Battlefield.Cloud, Midgar Mercenary.Toughness = 3
+Bot1.Battlefield.Hero.Power = 1
+Stack.Count = 0
