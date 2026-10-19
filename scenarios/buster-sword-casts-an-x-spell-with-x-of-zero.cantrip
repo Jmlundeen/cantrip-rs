@@ -1,0 +1,41 @@
+# Buster Sword: Fireball ({X}{R}) cast for nothing has X of 0 (CR 107.3b, 118.9) and mana value 1 as a spell, within 3: it is
+# cast, targeting Bot2, and deals 0 damage. Bot2 took only the 3 combat damage.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Fireball
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Choose(Fireball)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Fireball
+Stack.Count = 0

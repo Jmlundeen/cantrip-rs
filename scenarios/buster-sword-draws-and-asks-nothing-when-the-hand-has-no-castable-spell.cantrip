@@ -1,0 +1,42 @@
+# Buster Sword: the draw happens and, with only lands in hand (a land is not a spell, CR 305.1) and Wrath of God too dear,
+# nothing is asked (the refusal). Wrath of God (the turn's draw) and the Plains the trigger drew both stay in hand.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Wrath of God
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand = Wrath of God; Plains
+Bot1.Library.Count = 13
+Stack.Count = 0

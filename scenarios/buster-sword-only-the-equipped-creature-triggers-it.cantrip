@@ -1,0 +1,43 @@
+# Buster Sword: Ornithopter is equipped (3 damage -> one trigger, one draw); Benalish Hero (1/1, unequipped) also hits Bot2 for 1
+# and triggers nothing: Bot2 at 16, and only one card was drawn by the trigger (hand: the T3 draw and the trigger's, no more).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ornithopter
+Benalish Hero
+Buster Sword
+Plains
+Plains
+Plains x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Buster Sword.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Attack(Ornithopter; Benalish Hero > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Benalish Hero.Power = 1
+Bot1.Hand = Plains; Plains
+Stack.Count = 0

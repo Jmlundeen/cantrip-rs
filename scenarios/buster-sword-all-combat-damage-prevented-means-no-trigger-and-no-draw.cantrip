@@ -1,0 +1,51 @@
+# Buster Sword: "Whenever equipped creature deals combat damage to a player": the equipped Ornithopter (3/4) attacks, but Bot2 has
+# Healing Salve'd the next 3 damage to itself, so all 3 is prevented (CR 615.6) and no damage is dealt: no trigger, no draw and
+# no cast (the refusal). Bot1's hand is only the turn's draw, Hop to It, and Bot2 is still at 20.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Hop to It
+Plains x14
+
+[Bot2 Deck]
+Plains
+Healing Salve
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Prevent the next 3 damage)
+Bot2.Target(Bot2)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Prevented.Count = 1
+Bot1.Hand = Hop to It
+Bot1.Library.Count = 14
+Stack.Count = 0

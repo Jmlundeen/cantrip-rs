@@ -1,0 +1,56 @@
+# Buster Sword: "that damage" is the damage actually dealt. Benalish Hero equipped is 4/3, but Bot2's Healing Salve prevents 3 of
+# it, so 1 damage is dealt (CR 615.6): the trigger draws, and only a spell with mana value 1 or less may be cast free. Ancestral
+# Recall (MV 1) may; Hop to It (MV 3, below the Hero's power of 4) may not (the refusal, with Ancestral Recall the positive control).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Benalish Hero
+Buster Sword
+Ancestral Recall
+Hop to It
+Plains x13
+
+[Bot2 Deck]
+Plains
+Healing Salve
+Plains x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Benalish Hero.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Buster Sword.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Benalish Hero)
+Bot1.Attack(Benalish Hero > Bot2)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Prevent the next 3 damage)
+Bot2.Target(Bot2)
+! Bot1.Choose(Hop to It)
+Bot1.Choose(Ancestral Recall)
+Bot1.Target(Bot1)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Prevented.Count = 1
+Bot1.Graveyard = Ancestral Recall
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 10
+Stack.Count = 0

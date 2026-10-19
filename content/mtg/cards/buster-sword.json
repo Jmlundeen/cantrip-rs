@@ -1,0 +1,6 @@
+{
+  "name": "Buster Sword",
+  "manaCost": "{3}",
+  "type": "Artifact — Equipment",
+  "oracleText": "Equipped creature gets +3/+2.\nWhenever equipped creature deals combat damage to a player, draw a card, then you may cast a spell from your hand with mana value less than or equal to that damage without paying its mana cost.\nEquip {2}"
+}

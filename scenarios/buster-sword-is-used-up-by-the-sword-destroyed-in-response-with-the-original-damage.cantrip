@@ -1,0 +1,49 @@
+# Buster Sword: the trigger is on the stack when Bot1 destroys the Sword with Disenchant. The ability still resolves (CR 113.7a): it
+# draws, and "that damage" is still the 3 dealt, so Hop to It (MV 3) is cast free and makes three Rabbits. The Sword, destroyed, is in
+# the graveyard. Disenchant (the turn's draw) is paid for with Mox Ruby and Mox Pearl.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Disenchant
+Hop to It
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Damage]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Buster Sword)
+Bot1.Pass
+Bot1.Choose(Hop to It)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Hop to It; Disenchant; Buster Sword
+Bot1.Battlefield.Count = 9
+Bot1.Hand.Count = 0
+Stack.Count = 0

@@ -1,0 +1,44 @@
+# Buster Sword: damage 3. Leave // Chance is MV 6 as a card in hand (2 + 4), but the spell cast is one face (CR 709.3a): Leave
+# (MV 2) qualifies; Chance is aftermath, castable from a graveyard only, so Bot1 is not asked which half. Leave returns the target
+# permanent Bot1 owns to hand (Mox Jet).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Leave // Chance
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Choose(Leave // Chance)
+Bot1.Target(Mox Jet)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Leave // Chance
+Bot1.Hand = Plains; Mox Jet
+Stack.Count = 0

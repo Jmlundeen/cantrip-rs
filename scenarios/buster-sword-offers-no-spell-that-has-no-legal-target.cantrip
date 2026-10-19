@@ -1,0 +1,43 @@
+# Buster Sword: a card with no legal target cannot be cast (CR 601.2c): Into the Flood Maw needs a creature an opponent controls and
+# Bot2 has none, so it is not offered (the refusal), while Hop to It, drawn with it, is (the positive control).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Into the Flood Maw
+Hop to It
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+! Bot1.Choose(Into the Flood Maw)
+Bot1.Choose(Hop to It)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Hop to It
+Bot1.Hand = Into the Flood Maw
+Stack.Count = 0

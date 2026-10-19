@@ -1,0 +1,51 @@
+# Buster Sword: "that damage" is fixed when the trigger goes on the stack. Ornithopter (3/4 equipped) deals 3; in response to the
+# trigger Bot1 casts Giant Growth on it (6/7), but the damage dealt was 3: Hop to It (MV 3) may be cast free and Wrath of God
+# (MV 4, within the Ornithopter's new power of 6) may not (the refusal, with Hop to It the positive control). Giant Growth is paid
+# for with Mox Emerald; the cast of Hop to It is free (the rest of the mana is tapped).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Sol Ring
+Ornithopter
+Buster Sword
+Wrath of God
+Giant Growth
+Hop to It
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Damage]
+? Stack.Count = 1
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Ornithopter)
+! Bot1.Choose(Wrath of God)
+Bot1.Choose(Hop to It)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Ornithopter.Power = 6
+Bot1.Graveyard = Hop to It; Giant Growth
+Bot1.Hand = Wrath of God
+Bot1.Battlefield.Count = 9
+Stack.Count = 0

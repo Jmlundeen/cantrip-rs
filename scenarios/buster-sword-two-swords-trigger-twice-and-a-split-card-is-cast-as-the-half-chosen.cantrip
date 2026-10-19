@@ -1,0 +1,61 @@
+# Buster Sword: two Swords on the Ornithopter make it 6/6 (0/2 + 3/2 + 3/2); its 6 damage triggers each Sword once (CR 603.2c),
+# so Bot1 draws twice and may cast twice, each by the 6 damage dealt. The first draw is Cease // Desist: both halves fit (Cease 2,
+# Desist 6), so Bot1 is asked which half is cast (CR 709.3) and chooses Cease: it targets nothing in a graveyard, and Bot1 gains 2
+# life and draws a card. Desist is not cast (every artifact is still there). The second draw is Lightning Bolt (MV 1), cast free at
+# Bot2: 20 - 6 - 3 = 11.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Buster Sword
+Cease // Desist
+Lightning Bolt
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword#2.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Choose(Cease // Desist)
+Bot1.Modes(Cease)
+Bot1.Target()
+Bot1.Target(Bot1)
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 11
+Bot1.Life = 22
+Bot1.Graveyard = Lightning Bolt; Cease // Desist
+Bot1.Battlefield.Ornithopter.Power = 6
+Bot1.Battlefield.Count = 8
+Bot1.Hand.Count = 1
+Stack.Count = 0

@@ -1,0 +1,51 @@
+# Buster Sword: a spell cast without paying its mana cost still pays an optional additional cost chosen (CR 118.9d, 601.2f). The
+# Ornithopter (3/4) deals 3; the trigger draws Burst Lightning (MV 1), which Bot1 casts free but kicked: the kicker {4} is paid
+# from four Moxen tapped with the trigger on the stack (the fifth stays untapped), so it deals 4 instead of 2. Bot2: 20 - 3 - 4 = 13.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Burst Lightning
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Damage]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Choose(Burst Lightning; Kicked: 1)
+Bot1.Target(Bot2)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Graveyard = Burst Lightning
+Bot1.Mana =
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = false
+Stack.Count = 0

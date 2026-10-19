@@ -1,0 +1,47 @@
+# Buster Sword: "deals combat damage to a player" - the equipped Ornithopter (3/4) is blocked by Bot2's Ornithopter, kills it, and
+# Bot2 stays at 20. No trigger: Bot1 draws only for the turn (one Plains in hand, no prompt).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Plains
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Buster Sword.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Buster Sword.Activate(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Block(Ornithopter > Ornithopter)
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Hand = Plains
+Bot1.Battlefield.Ornithopter.Damage = 0
+Stack.Count = 0

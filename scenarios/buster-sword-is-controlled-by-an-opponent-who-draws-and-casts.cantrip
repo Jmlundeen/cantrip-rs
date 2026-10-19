@@ -1,0 +1,48 @@
+# Buster Sword: the controller of the ability draws and casts, not the other player. Bot2 equips its own Ornithopter (turn 2) and
+# attacks on turn 4: 3 damage to Bot1 (17), and Bot2 draws and casts Hop to It (MV 3) free, getting the Rabbits, while Wrath of God
+# (MV 4, drawn the same turn) is refused. Bot1 has no choice to make.
+
+[Bot1 Deck]
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Buster Sword
+Plains
+Wrath of God
+Hop to It
+Plains x13
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Buster Sword.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Buster Sword.Activate(Bot2.Battlefield.Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+! Bot2.Choose(Wrath of God)
+Bot2.Choose(Hop to It)
+[Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Hop to It
+Bot2.Hand = Plains; Wrath of God
+Bot2.Battlefield.Count = 10
+Bot1.Hand.Count = 7
+Stack.Count = 0
