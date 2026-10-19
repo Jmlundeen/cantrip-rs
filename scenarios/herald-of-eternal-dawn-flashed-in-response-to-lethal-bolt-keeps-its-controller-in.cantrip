@@ -1,0 +1,58 @@
+# Herald of Eternal Dawn: flash (CR 702.8a) and "You can't lose the game" (CR 104.3, 704.5a). Bot1 begins at 3 life with
+# its mana untouched. On turn 4 Bot2 Bolts Bot1; Bot1 flashes in the Herald in response (seven mana, WWW, from two Plains,
+# Sol Ring, Mox Pearl and Black Lotus). The Bolt then resolves and takes Bot1 to 0, but the state-based action that would
+# make Bot1 lose does not, so the game goes on.
+
+[Life]
+Bot1: 3
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Mox Pearl
+Black Lotus
+Herald of Eternal Dawn
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Plains
+Plains
+Lightning Bolt
+Disenchant
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Herald of Eternal Dawn.Cast
+[T4 Bot2.Main2]
+? Bot1.Life = 0
+? Result = InProgress
+
+[Expect]
+Result = InProgress
+Bot1.Life = 0
+Bot1.Status = (absent)
+Bot1.Battlefield.Herald of Eternal Dawn.Power = 6
+Bot2.Graveyard.Lightning Bolt.Colors = Red

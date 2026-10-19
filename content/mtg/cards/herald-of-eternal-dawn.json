@@ -1,0 +1,12 @@
+{
+  "name": "Herald of Eternal Dawn",
+  "manaCost": "{4}{W}{W}{W}",
+  "type": "Creature — Angel",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Flash\nFlying\nYou can't lose the game and your opponents can't win the game.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}
