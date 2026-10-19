@@ -1,0 +1,25 @@
+# Mode two: "You draw a card and gain 3 life." Bot1 casts the Charm with two Moxen: it holds the 4 cards of its opening hand
+# left after the Moxen and the Charm, plus the one drawn, and has 23 life; Bot2 is untouched.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Vigorbloom Charm
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Vigorbloom Charm.Cast
+Bot1.Modes(2)
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 20
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 15

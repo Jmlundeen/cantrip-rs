@@ -1,0 +1,39 @@
+# Mode three: "Put a +1/+1 counter on target creature you control. Then it fights target creature an opponent controls."
+# Bot1's Elvish Mystic (1/1) becomes 2/2, then fights Bot2's Llanowar Elves (1/1): the Elves die, and a fight is two-sided,
+# so the Mystic has 1 damage marked and survives only because of the counter.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Elvish Mystic
+Vigorbloom Charm
+Plains x20
+
+[Bot2 Deck]
+Mox Emerald
+Llanowar Elves
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Vigorbloom Charm.Cast
+Bot1.Modes(3)
+Bot1.Target(Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Damage = 1
+Bot2.Graveyard = Llanowar Elves
+Stack.Count = 0

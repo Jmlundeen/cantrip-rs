@@ -1,0 +1,45 @@
+# Mode three, CR 608.2b and 701.14b: Bot2 returns its own Llanowar Elves to hand in response (Unsummon), so only the second
+# target is illegal as the Charm resolves. The Charm still resolves for the legal one: the Mystic gets its +1/+1 counter, and
+# nothing fights (so no damage is marked on it).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Elvish Mystic
+Vigorbloom Charm
+Plains x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Llanowar Elves
+Unsummon
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Vigorbloom Charm.Cast
+Bot1.Modes(3)
+Bot1.Target(Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Unsummon.Cast(Bot2.Battlefield.Llanowar Elves)
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Elvish Mystic.Damage = 0
+Bot2.Hand.Llanowar Elves.Power = 1
+Bot2.Battlefield = Mox Emerald; Mox Sapphire
+Bot2.Graveyard = Unsummon
+Stack.Count = 0
