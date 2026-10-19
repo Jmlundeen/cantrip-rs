@@ -1,0 +1,35 @@
+# Defend the Rider, first mode: "Target permanent you control gains hexproof and indestructible until end of turn." On
+# turn 3 Bot2's Ornithopter is refused (the refusal) beside Bot1's own (the positive control); the two keywords are on
+# Bot1's Ornithopter that turn and gone on turn 5 (CR 611.2a, 514.2). Bot2's is untouched.
+
+[Bot1 Deck]
+Mox Emerald
+Ornithopter
+Plains x5
+Defend the Rider
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Defend the Rider.Cast
+Bot1.Modes(Target permanent you control gains hexproof and indestructible until end of turn.)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Keywords = Flying; Hexproof; Indestructible
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot2.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Graveyard = Defend the Rider

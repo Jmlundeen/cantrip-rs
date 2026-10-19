@@ -1,0 +1,43 @@
+# Defend the Rider, second mode: the Pilot token "saddles Mounts ... as though its power were 2 greater", so its 1 power
+# counts as 3 (CR 702.171a). Turn 1: with only Mother of Runes (power 1) the Caustic Bronco (Saddle 3) cannot be saddled
+# (the refusal); after Defend the Rider makes a Pilot, the Pilot alone saddles it (summoning sickness does not matter:
+# CR 702.171a taps creatures as a cost, not a {T} ability), and the Bronco is saddled.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Caustic Bronco
+Mother of Runes
+Defend the Rider
+Forest
+Swamp x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Caustic Bronco.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mother of Runes.Cast
+! Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Defend the Rider.Cast
+Bot1.Modes(Create a 1/1 colorless Pilot creature token with "This token saddles Mounts and crews Vehicles as though its power were 2 greater.")
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Pilot.Power = 1
+Bot1.Battlefield.Caustic Bronco.Activate
+Bot1.Choose(Pilot)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Caustic Bronco.Saddled = true
+Bot1.Battlefield.Pilot.Tapped = True
+Bot1.Battlefield.Mother of Runes.Tapped = False
