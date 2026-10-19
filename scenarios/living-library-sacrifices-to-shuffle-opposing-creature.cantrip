@@ -1,0 +1,44 @@
+# Deterministic spell and ability coverage (CR 608).
+[Dice]
+1; 1; 1; 1; 1; 1
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mana Crypt
+Living Library
+Island
+Island x25
+[Bot2 Deck]
+Ornithopter
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Living Library.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Living Library.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Living Library; Black Lotus
+Bot2.Battlefield.Count = 0

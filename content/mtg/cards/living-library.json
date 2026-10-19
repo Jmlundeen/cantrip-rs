@@ -1,0 +1,8 @@
+{
+  "name": "Living Library",
+  "manaCost": "{2}",
+  "type": "Artifact Creature — Book Illusion",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "{6}, Sacrifice this creature: Choose target creature or planeswalker an opponent controls. Its owner shuffles it into their library."
+}
