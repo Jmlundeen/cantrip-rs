@@ -1,0 +1,40 @@
+# Urban Retreat: "{2}, Return a tapped creature you control to its owner's hand: Put this card from your hand onto the
+# battlefield. Activate only as a sorcery." Bot1 casts an Ornithopter and two Moxen on turn 1. With the Ornithopter untapped
+# the ability cannot be activated (refused). On turn 3 the Ornithopter attacks and is tapped; while attackers are declared,
+# with the Moxen untapped and the creature tapped, the ability is still refused (sorcery speed: not a main phase). In the
+# second main phase Bot1 pays {2} and returns it to hand, and the land enters tapped ("This land enters tapped"), without
+# using the turn's land play (Bot1 plays a Plains too).
+
+[Bot1 Deck]
+Ornithopter
+Mox Pearl
+Mox Jet
+Urban Retreat
+Plains
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Urban Retreat.Activate
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ornithopter > Bot2)
+! Bot1.Hand.Urban Retreat.Activate
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Urban Retreat.Activate
+Bot1.Hand.Plains.Play
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Urban Retreat.Tapped = true
+
+[Expect]
+Bot1.Hand = Ornithopter; Plains; Plains; Plains
+Bot1.Battlefield = Mox Pearl; Mox Jet; Urban Retreat; Plains
+Bot1.Battlefield.Urban Retreat.Tapped = true

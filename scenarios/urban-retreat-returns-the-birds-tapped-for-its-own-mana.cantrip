@@ -1,0 +1,34 @@
+# Urban Retreat: "{2}, Return a tapped creature you control to its owner's hand: Put this card from your hand onto the
+# battlefield." The creature is chosen as the cost is paid, once the mana abilities are activated (CR 602.2b, 601.2g-h):
+# Bot1's only creature, Birds of Paradise, is untapped when Bot1 activates the ability from the hand, so it is offered
+# because the Birds could tap for mana while it is paid. Bot1 pays {2} with the Forest and the Birds, and only then
+# chooses the creature to return: the Birds, tapped for that very mana. Urban Retreat enters tapped, the Birds in hand.
+
+[Bot1 Deck]
+Forest
+Birds of Paradise
+Urban Retreat
+Forest x17
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Birds of Paradise.Tapped = false
+Bot1.Hand.Urban Retreat.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Birds of Paradise.Activate(Color: Green)
+Bot1.Choose(Birds of Paradise)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot1.Hand = Forest; Forest; Forest; Forest; Forest; Birds of Paradise
+Bot1.Battlefield = Forest; Urban Retreat
+Bot1.Battlefield.Urban Retreat.Tapped = true
