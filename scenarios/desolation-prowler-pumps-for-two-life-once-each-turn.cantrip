@@ -1,0 +1,42 @@
+# Desolation Prowler: "Pay 2 life: This creature gets +2/+2 until end of turn. Activate only once each turn." Turn 5 it is
+# pumped once (4/4, 2 life paid), a second activation that turn is refused (CR 602.5b) beside the positive control of turn 7,
+# where the pump has worn off (2/2) and it is activatable again: 16 life after the two payments.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Desolation Prowler
+Swamp x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Desolation Prowler.Cast
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Desolation Prowler.Power = 2
+Bot1.Battlefield.Desolation Prowler.Activate
+? Bot1.Life = 18
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Desolation Prowler.Power = 4
+? Bot1.Battlefield.Desolation Prowler.Toughness = 4
+! Bot1.Battlefield.Desolation Prowler.Activate
+Bot1.Pass
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Desolation Prowler.Power = 2
+Bot1.Battlefield.Desolation Prowler.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Desolation Prowler.Power = 4
+
+[Expect]
+Turn = 7
+Bot1.Life = 16
+Bot1.Battlefield.Desolation Prowler.Power = 4
+Bot1.Battlefield.Desolation Prowler.Toughness = 4
