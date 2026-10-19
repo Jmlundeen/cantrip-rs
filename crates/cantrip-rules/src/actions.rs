@@ -3573,6 +3573,11 @@ fn cast(
     // so the cast keeps it if the permanent leaves while it is paid for.
     let granted = granted_slot(way);
     let alternative = alternative_at(&*cx, cx.cards(), player, card, way).map(|(_, _, a)| a.cost.mana());
+    // A way number for an alternative cost that nothing gives now is no legal proposal: never its face's mana cost instead,
+    // which a face without one would have cast for {0} (CR 118.6a).
+    if alternative_slot(way).is_some() && alternative.is_none() {
+        return Err(Stop::Cancel);
+    }
     let way = face_way(way);
     let printed = cx.s().obj(card).card;
     let whole = cx.card(printed);
