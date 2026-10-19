@@ -1,0 +1,31 @@
+# Blazing Crescendo: "Target creature gets +3/+1 until end of turn. Exile the top card of your library. Until the end
+# of your next turn, you may play that card." The 0/2 Ornithopter becomes a 3/3, and the Island on top of the library
+# is exiled (CR 611.2c).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Blazing Crescendo
+Plains
+Plains
+Plains
+Island
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Blazing Crescendo.Cast(Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Exile = Island
+Bot1.Graveyard = Blazing Crescendo
