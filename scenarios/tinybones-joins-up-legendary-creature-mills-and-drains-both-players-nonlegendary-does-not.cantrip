@@ -1,0 +1,44 @@
+# "Whenever a legendary creature you control enters, any number of target players each mill a card and lose 1 life."
+# Tinybones targets nobody for its discard ability on turn 1. On turn 3 Ornithopter, not legendary, enters and asks for no target
+# (`! Bot1.Target`); then Aunt May, a legendary creature, enters and Bot1 targets both players: each mills the top card
+# of their library and loses 1 life (19 life each). Each mills a known top card: Bot1 the Forest, Bot2 the Mountain (beside the Island it discarded at cleanup to hand size).
+
+[Bot1 Deck]
+Swamp
+Tinybones Joins Up
+Mox Pearl
+Ornithopter
+Aunt May
+Plains
+Plains
+Plains
+Forest
+Plains x12
+
+[Bot2 Deck]
+Island x8
+Mountain
+Island x11
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Tinybones Joins Up.Cast
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Target
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Target(Bot1; Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot2.Life = 19
+Bot1.Graveyard = Forest
+Bot2.Graveyard = Mountain; Island

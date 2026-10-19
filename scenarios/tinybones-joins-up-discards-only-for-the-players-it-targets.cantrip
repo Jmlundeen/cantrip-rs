@@ -1,0 +1,29 @@
+# "When Tinybones Joins Up enters, any number of target players each discard a card." Bot1 casts it on turn 1 and targets
+# only Bot2 (the slot takes any number, so leaving itself out is legal): Bot2 discards a card of its choice, Bot1 discards
+# nothing.
+
+[Bot1 Deck]
+Swamp
+Tinybones Joins Up
+Plains x18
+
+[Bot2 Deck]
+Island
+Mountain
+Island x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Tinybones Joins Up.Cast
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Mountain)
+
+[Expect]
+Bot1.Battlefield = Swamp; Tinybones Joins Up
+Bot1.Graveyard.Count = 0
+Bot1.Hand.Count = 5
+Bot2.Graveyard = Mountain
+Bot2.Hand.Count = 6
