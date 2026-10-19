@@ -1,0 +1,48 @@
+# Deterministic spell and ability coverage (CR 608).
+[Dice]
+1; 1; 1; 1; 1; 1
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mana Crypt
+Lyra, Tolarian Archangel
+Island
+Island x25
+[Bot2 Deck]
+Ornithopter
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Lyra, Tolarian Archangel.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Lyra, Tolarian Archangel.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Lyra, Tolarian Archangel > Bot2)
+[Bot1.End]
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Angel.Power = 3
+Bot1.Battlefield.Angel.Keywords = Flying
+Bot2.Life = 17
