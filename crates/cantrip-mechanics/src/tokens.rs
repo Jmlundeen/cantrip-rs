@@ -233,6 +233,19 @@ pub static GERM: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The colorless 3/3 Robot Villain artifact creature token named Doombot (CR 111.4): its name is "Doombot", it has no
+/// mana cost or color, and its subtypes are Robot and Villain. Castle Doom and Doctor Doom make it.
+pub static DOOMBOT: CardDef = CardDef {
+    name: "Doombot",
+    has_cost: false,
+    colors: Some(ColorSet::NONE),
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Robot, Subtype::Villain]),
+    power: Some(3),
+    toughness: Some(3),
+    ..CardDef::BLANK
+};
+
 /// A colorless 3/3 Golem artifact creature token. Legion Extruder and Sandstorm Salvager make it.
 pub static GOLEM: CardDef = CardDef {
     name: "Golem",
