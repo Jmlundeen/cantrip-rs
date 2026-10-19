@@ -1,0 +1,40 @@
+# Aurelia, the Warleader: "Whenever Aurelia attacks for the first time each turn, untap all creatures you control. After
+# this phase, there is an additional combat phase" (CR 500.8). Llanowar Elves is cast on turn 1 and tapped for mana on
+# turn 3 to help cast Aurelia (Black Lotus RRR, Mox Pearl W, Plains W, Elves G). Aurelia has haste and attacks: the Elves
+# untap, and she attacks again in the additional combat phase without a second trigger or phase: 3 and 3, Bot2 on 14.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Mox Pearl
+Plains
+Aurelia, the Warleader
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+? Bot1.Battlefield.Llanowar Elves.Tapped = true
+Bot1.Hand.Aurelia, the Warleader.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aurelia, the Warleader)
+Bot1.Attack(Aurelia, the Warleader)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Llanowar Elves.Tapped = false

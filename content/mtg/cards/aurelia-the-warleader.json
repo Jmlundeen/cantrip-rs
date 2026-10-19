@@ -1,0 +1,13 @@
+{
+  "name": "Aurelia, the Warleader",
+  "manaCost": "{2}{R}{R}{W}{W}",
+  "type": "Legendary Creature — Angel",
+  "power": 3,
+  "toughness": 4,
+  "oracleText": "Flying, vigilance, haste\nWhenever Aurelia attacks for the first time each turn, untap all creatures you control. After this phase, there is an additional combat phase.",
+  "keywords": [
+    "Flying",
+    "Vigilance",
+    "Haste"
+  ]
+}
