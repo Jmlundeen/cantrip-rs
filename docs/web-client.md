@@ -196,7 +196,7 @@ prints it, with its Scryfall legalities and color identity (`content/mtg/legalit
 `tools/maintenance/fetch-legality.py`). Card art is the site's own `/art` unless `?art=` says otherwise.
 
 The header has the deck list's toggle, the deck's name, its format (Standard, Pioneer, Modern, Legacy, Vintage,
-Commander, Penny Dreadful), **Save**, **New deck**, whether the deck is legal and why not (`DeckRules`, in
+Commander, Penny Dreadful), **Save**, **New deck**, **Import deck**, whether the deck is legal and why not (`DeckRules`, in
 `Cantrip.Client/Decks`, checked as the deck changes), and **All decks**, back to the site's deck library. On the left, collapsible, are the player's saved decks by
 format, the one open lit, each with a bin; signed out, a way to log in with Discord instead. On top is the search: a box
 matching name, type line and rules text, then Type, the colors W U B R G and C (any of those lit), Mana value and Sort,
@@ -207,6 +207,14 @@ whole card pool costs what a screenful does; a new search starts from the top. B
 columns (`MainPage.Pool.cs`): lands, mana values 0 to 7+, the sideboard pulled out on the left, and for Commander the
 command zone beside it, which takes only a card that may be a commander - alone, or paired with the one there (partner,
 partner with, friends forever, choose a Background, Doctor's companion).
+
+**Import deck** asks for a decklist pasted as Magic Online or Arena export it (`DeckImport`, in `Cantrip.Client/Decks`):
+counts and names, sets, collector numbers and foil marks ignored; Arena's `Commander`, `Companion`, `Deck` and `Sideboard`
+headings (a companion to the sideboard, a `Maybeboard` left out, `About`'s `Name` naming the deck), or Magic Online's
+sideboard after the first blank line or `SB:`. Names match the catalog ignoring case, a split or double-faced card by its
+faces or its front alone. The deck opens as a new one, not saved - for Commander if it names a commander, else in the
+format chosen. When the list names cards the engine does not play, they are listed first, with **Import anyway**
+(without them) and **Cancel**.
 
 A result is double-clicked into its column, or dragged into a column, the sideboard or the command zone, flying there
 from where it was let go; a card of the deck dragged back onto the results leaves it. A double-click moves a card between

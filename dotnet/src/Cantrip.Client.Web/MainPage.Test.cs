@@ -435,7 +435,7 @@ public sealed partial class MainPage
 
     /// <summary>
     /// The deck editor as a test reads it: the deck's name and format, whether it has changes not saved, what makes it
-    /// illegal, the cards in each zone by name, the decks listed and whether a question is being asked.
+    /// illegal, the cards in each zone by name, the decks listed and whether a question is being asked, and what it says.
     /// </summary>
     private void WriteDeckEditor(Utf8JsonWriter json)
     {
@@ -453,6 +453,7 @@ public sealed partial class MainPage
         json.WriteBoolean("signedIn", !_signedOut && _savedDecks is not null);
         json.WriteBoolean("asking", _askOverlay.Visibility == Visibility.Visible);
         json.WriteString("question", _askOverlay.Visibility == Visibility.Visible ? _askTitle.Text : string.Empty);
+        json.WriteString("askDetail", _askOverlay.Visibility == Visibility.Visible ? _askDetail.Text : string.Empty);
         json.WriteString("status", _editorStatus.Text);
         // Every card the search finds, and how many of them are laid out now: only the rows near the view are.
         json.WriteNumber("results", _searchCards.Count);

@@ -28,6 +28,10 @@ namespace Cantrip.Client.Web;
 /// one after asking. Opening another deck with changes unsaved asks whether to save them first, and the browser asks
 /// before the page is left with any (DeckEditor.js). Which column a card is in is this page's alone, as in a draft.
 /// </para>
+/// <para>
+/// Import deck reads a decklist pasted as Magic Online or Arena export it (<see cref="DeckImport"/>) into a new deck,
+/// not saved; a list naming cards the engine does not play lists them and asks before importing the rest without them.
+/// </para>
 /// </summary>
 public sealed partial class MainPage
 {
@@ -83,6 +87,7 @@ public sealed partial class MainPage
     private TextBlock _askTitle = null!;
     private TextBlock _askDetail = null!;
     private StackPanel _askButtons = null!;
+    private Border _askBody = null!;
     private bool _deckListOpen = LocalSettings.Flag(DeckListOpenKey, true);
 
     /// <summary>Every card a deck can be built from, by name and in name order; null until the site has sent them.</summary>
@@ -212,7 +217,7 @@ public sealed partial class MainPage
     private Grid BuildEditorHeader()
     {
         var header = new Grid { ColumnSpacing = 12, Margin = new Thickness(0, 0, 0, 8) };
-        foreach (GridLength width in (GridLength[])[GridLength.Auto, GridLength.Auto, GridLength.Auto, GridLength.Auto, GridLength.Auto, GridLength.Auto, new GridLength(1, GridUnitType.Star), GridLength.Auto])
+        foreach (GridLength width in (GridLength[])[GridLength.Auto, GridLength.Auto, GridLength.Auto, GridLength.Auto, GridLength.Auto, GridLength.Auto, GridLength.Auto, new GridLength(1, GridUnitType.Star), GridLength.Auto])
         {
             header.ColumnDefinitions.Add(new ColumnDefinition { Width = width });
         }
@@ -245,6 +250,13 @@ public sealed partial class MainPage
             return Task.CompletedTask;
         });
 
+        var import = new DockButton("Import deck", primary: false) { VerticalAlignment = VerticalAlignment.Center };
+        import.Clicked += () => WhenSaved(() =>
+        {
+            AskForDeckList();
+            return Task.CompletedTask;
+        });
+
         _editorStatus = EventText(string.Empty, 13, Theme.FgSoft, semibold: true);
         _editorStatus.VerticalAlignment = VerticalAlignment.Center;
 
@@ -252,7 +264,7 @@ public sealed partial class MainPage
         var home = new DockButton("All decks", primary: false) { VerticalAlignment = VerticalAlignment.Center };
         home.Clicked += () => DeckEditorJs.Go("decks");
 
-        FrameworkElement[] parts = [_deckListToggle, title, _deckName, _formatChoice, _saveButton, fresh, _editorStatus, home];
+        FrameworkElement[] parts = [_deckListToggle, title, _deckName, _formatChoice, _saveButton, fresh, import, _editorStatus, home];
         for (int column = 0; column < parts.Length; column++)
         {
             Grid.SetColumn(parts[column], column);
@@ -327,11 +339,23 @@ public sealed partial class MainPage
         };
     }
 
-    /// <summary>A question over the editor, answered with one of its buttons: unsaved changes, a deck to delete.</summary>
+    /// <summary>A question over the editor, answered with one of its buttons: unsaved changes, a deck to delete, a decklist to import.</summary>
     private Grid BuildAsk()
     {
         _askTitle = EventText(string.Empty, 17, Theme.Fg, semibold: true);
         _askDetail = EventText(string.Empty, 13, Theme.FgSoft);
+        _askBody = new Border();
+
+        // A long detail - every card of a decklist the engine does not play - scrolls rather than pushing the buttons off.
+        var detail = new ScrollViewer
+        {
+            HorizontalScrollMode = ScrollMode.Disabled,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollMode = ScrollMode.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            MaxHeight = 320,
+            Content = _askDetail,
+        };
         _askButtons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, HorizontalAlignment = HorizontalAlignment.Right };
         var box = new Border
         {
@@ -343,7 +367,7 @@ public sealed partial class MainPage
             MaxWidth = 460,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            Child = new StackPanel { Spacing = 14, Children = { _askTitle, _askDetail, _askButtons } },
+            Child = new StackPanel { Spacing = 14, Children = { _askTitle, detail, _askBody, _askButtons } },
         };
         return new Grid
         {
@@ -354,11 +378,16 @@ public sealed partial class MainPage
     }
 
     /// <summary>Asks a question over the editor; each answer closes it and does what it says (nothing for one with no action).</summary>
-    private void Ask(string title, string detail, params (string Caption, bool Primary, Func<Task>? Then)[] answers)
+    private void Ask(string title, string detail, params (string Caption, bool Primary, Func<Task>? Then)[] answers) => Ask(title, detail, null, answers);
+
+    /// <summary>Asks a question with something to fill in under it, as the decklist to import.</summary>
+    private void Ask(string title, string detail, FrameworkElement? body, params (string Caption, bool Primary, Func<Task>? Then)[] answers)
     {
         _askTitle.Text = title;
         _askDetail.Text = detail;
         _askDetail.Visibility = detail.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+        _askBody.Child = body;
+        _askBody.Visibility = body is null ? Visibility.Collapsed : Visibility.Visible;
         _askButtons.Children.Clear();
         foreach ((string caption, bool primary, Func<Task>? then) in answers)
         {
@@ -539,6 +568,78 @@ public sealed partial class MainPage
             }),
             ("Discard", false, then),
             ("Cancel", false, null));
+    }
+
+    /// <summary>Asks for a decklist to paste, to import in place of the deck being edited.</summary>
+    private void AskForDeckList()
+    {
+        var list = new TextBox
+        {
+            AcceptsReturn = true,
+            TextWrapping = TextWrapping.NoWrap,
+            Width = 420,
+            Height = 280,
+            FontSize = 13,
+            PlaceholderText = "4 Lightning Bolt (M10) 146\n20 Mountain\n\nSideboard\n2 Smash to Smithereens",
+            RequestedTheme = ElementTheme.Dark,
+        };
+        ScrollViewer.SetVerticalScrollBarVisibility(list, ScrollBarVisibility.Auto);
+        AutomationProperties.SetName(list, "Deck list");
+        list.Loaded += (_, _) => list.Focus(FocusState.Programmatic);
+        Ask("Import a deck", "Paste a deck list as Magic Online or Arena export it. Sets and collector numbers are ignored.", list,
+            ("Import", true, () =>
+            {
+                ImportDeckList(list.Text);
+                return Task.CompletedTask;
+            }),
+            ("Cancel", false, null));
+    }
+
+    /// <summary>
+    /// A pasted decklist into the editor as a new deck, not saved: at once when the engine plays every card of it, and
+    /// otherwise once the player has seen which it does not and said to import the rest anyway.
+    /// </summary>
+    private void ImportDeckList(string text)
+    {
+        if (_catalog is null)
+        {
+            _editorStatus.Text = _catalogFailure ?? "The cards are still loading. Import the deck again in a moment.";
+            return;
+        }
+
+        DeckImport.Result read = DeckImport.Read(text, DeckImport.Matcher(_catalogByName.Keys));
+        if (read.Empty)
+        {
+            _editorStatus.Text = "No cards were found in that deck list.";
+            return;
+        }
+
+        if (read.Unsupported.Count == 0)
+        {
+            OpenImported(read.Deck);
+            return;
+        }
+
+        int missing = read.Unsupported.Count;
+        Ask($"{missing} card{(missing == 1 ? " isn't" : "s aren't")} supported",
+            $"Cantrip doesn't have {(missing == 1 ? "this card" : "these cards")} yet. Imported anyway, the deck leaves {(missing == 1 ? "it" : "them")} out:\n\n"
+                + string.Join("\n", read.Unsupported),
+            ("Import anyway", true, () =>
+            {
+                OpenImported(read.Deck);
+                return Task.CompletedTask;
+            }),
+            ("Cancel", false, null));
+    }
+
+    /// <summary>An imported deck in the editor, unsaved: for Commander when it names a commander, else in the format chosen now.</summary>
+    private void OpenImported(SavedDeck deck)
+    {
+        deck.Format = deck.Commanders.Count > 0 ? DeckFormat.CommanderKey : _editingFormat.Key;
+        OpenDeck(deck);
+        _savedSnapshot = string.Empty;
+        ShowDeckList();
+        DeckEdited();
     }
 
     private async Task OpenSavedAsync(string id)

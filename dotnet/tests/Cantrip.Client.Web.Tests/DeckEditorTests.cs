@@ -314,6 +314,48 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
         Assert.Empty(page.Errors);
     }
 
+    /// <summary>
+    /// A decklist pasted into Import deck as Arena exports it, sets and all: the card the engine does not play is listed
+    /// and Cancel imports nothing; Import anyway opens the rest as a new deck, not saved, its sideboard apart.
+    /// </summary>
+    [Fact]
+    public async Task An_Arena_decklist_is_imported_after_asking_about_the_cards_the_engine_does_not_play()
+    {
+        await using TablePage page = await TablePage.OpenAsync(web.Browser, new Uri(_site.Urls.First() + "/"), "decks", WebClient.Pictures(nameof(DeckEditorTests) + "-import"),
+            headers: [new(AsHeader, "4545")]);
+        await EditorAsync(page, state => state.DeckEditor is { Results: > 0 });
+        const string List = "Deck\n4 Bonehoard Dracosaur (LCI) 134\n20 Mountain (ANA) 59\n2 Not A Real Card (XYZ) 1\n\nSideboard\n3 Clockwork Percussionist (DSK) 130\n";
+
+        await page.ClickAsync("Import deck", "button");
+        DeckEditorState editor = await EditorAsync(page, state => state.DeckEditor!.Question == "Import a deck");
+        await page.TypeAsync("Deck list", List);
+        await page.PictureAsync("pasted");
+        await page.ClickAsync("Import", "button");
+        editor = await EditorAsync(page, state => state.DeckEditor!.Question == "1 card isn't supported");
+        Assert.EndsWith("\n\nNot A Real Card", editor.AskDetail, StringComparison.Ordinal);
+        await page.PictureAsync("unsupported");
+
+        // Cancel imports nothing.
+        await page.ClickAsync("Cancel", "button");
+        editor = await EditorAsync(page, state => !state.DeckEditor!.Asking);
+        Assert.Empty(editor.Main);
+
+        // Import anyway leaves the card out, and the deck is new and not saved.
+        await page.ClickAsync("Import deck", "button");
+        await EditorAsync(page, state => state.DeckEditor!.Question == "Import a deck");
+        await page.TypeAsync("Deck list", List);
+        await page.ClickAsync("Import", "button");
+        await EditorAsync(page, state => state.DeckEditor!.Question == "1 card isn't supported");
+        await page.ClickAsync("Import anyway", "button");
+        editor = await EditorAsync(page, state => !state.DeckEditor!.Asking && state.DeckEditor.Main.Count > 0);
+        Assert.Equal(["4 Bonehoard Dracosaur", "20 Mountain"], editor.Main);
+        Assert.Equal(["3 Clockwork Percussionist"], editor.Side);
+        Assert.Equal(string.Empty, editor.Id);
+        Assert.True(editor.Unsaved);
+        await page.PictureAsync("imported");
+        Assert.Empty(page.Errors);
+    }
+
     private static async Task<CardState> DeckCardAsync(TablePage page, string name)
     {
         TableState state = await page.SettledAsync(state => state.Cards.Any(card => (card.Row is "pool" or "sideboard") && card.Visible && card.Name == name));
