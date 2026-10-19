@@ -1,0 +1,8 @@
+{
+  "name": "Proft, Consulting Detective",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Human Detective",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Whenever you scry or surveil, you may pay {2}. If you do, put a +1/+1 counter on Proft and draw a card. (Draw after you scry or surveil.)"
+}
