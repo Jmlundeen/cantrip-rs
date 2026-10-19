@@ -1,0 +1,49 @@
+# Vastlands Scavenger enters prepared (CR 722), so Bind to Life, an instant (CR 722.3c: the copy is cast with its own types),
+# is cast from exile in Bot2's upkeep. "Mill seven cards. Then put a creature card from among them onto the battlefield":
+# the seven milled are four Islands, Llanowar Elves, Guerrilla Gorilla and Lightning Bolt. An Island is no legal choice
+# (`! Bot1.Choose(Island)`); Bot1 takes the Gorilla, so the Elves, Bolt and Islands stay in the graveyard (with the Black Lotus).
+
+[Bot1 Deck]
+Vastlands Scavenger
+Forest
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Black Lotus
+Island x4
+Llanowar Elves
+Guerrilla Gorilla
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Vastlands Scavenger.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Upkeep]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Exile.Bind to Life.Cast
+! Bot1.Choose(Island)
+Bot1.Choose(Guerrilla Gorilla)
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Emerald; Mox Emerald; Mox Emerald; Vastlands Scavenger; Guerrilla Gorilla
+Bot1.Graveyard = Lightning Bolt; Llanowar Elves; Island; Island; Island; Island; Black Lotus
+Bot1.Battlefield.Vastlands Scavenger.Prepared = (absent)
+Exile.Count = 0
+Stack.Count = 0

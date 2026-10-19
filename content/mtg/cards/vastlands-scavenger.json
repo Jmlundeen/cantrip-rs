@@ -1,0 +1,17 @@
+{
+  "name": "Vastlands Scavenger",
+  "manaCost": "{1}{G}{G}",
+  "type": "Creature — Bear Druid",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Deathtouch\nThis creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "keywords": [
+    "Deathtouch"
+  ],
+  "prepare": {
+    "name": "Bind to Life",
+    "manaCost": "{4}{G}",
+    "type": "Instant",
+    "oracleText": "Mill seven cards. Then put a creature card from among them onto the battlefield."
+  }
+}
