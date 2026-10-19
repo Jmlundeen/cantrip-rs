@@ -1,0 +1,30 @@
+# Tiger-Seal: "At the beginning of your upkeep, tap this creature" and "Whenever you draw your second card each turn, untap
+# this creature." On turn 3 the upkeep taps it; the draw step's card is the first draw (it stays tapped); Opt's draw is the
+# second card, so it untaps (CR 120.3, 603.2).
+
+[Bot1 Deck]
+Island
+Island
+Tiger-Seal
+Opt
+Island x4
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Tiger-Seal.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Tiger-Seal.Tapped = true
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Opt.Cast
+Bot1.Arrange(Plains |)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Tiger-Seal.Tapped = false

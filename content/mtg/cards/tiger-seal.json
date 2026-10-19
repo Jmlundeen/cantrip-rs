@@ -1,0 +1,11 @@
+{
+  "name": "Tiger-Seal",
+  "manaCost": "{U}",
+  "type": "Creature — Cat Seal",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Vigilance\nAt the beginning of your upkeep, tap this creature.\nWhenever you draw your second card each turn, untap this creature.",
+  "keywords": [
+    "Vigilance"
+  ]
+}
