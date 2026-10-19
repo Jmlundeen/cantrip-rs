@@ -1,0 +1,15 @@
+{
+  "name": "Emergency Phytomedic",
+  "manaCost": "{G/W}",
+  "type": "Creature — Dryad Cleric",
+  "oracleText": "This creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "power": 1,
+  "toughness": 1,
+  "keywords": [],
+  "prepare": {
+    "name": "Seed Suture",
+    "manaCost": "{G/W}",
+    "type": "Sorcery",
+    "oracleText": "Put a +1/+1 counter on target creature. You gain 1 life."
+  }
+}
