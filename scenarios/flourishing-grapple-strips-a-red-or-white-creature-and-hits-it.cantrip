@@ -1,0 +1,40 @@
+# Flourishing Grapple: "Target creature or planeswalker an opponent controls that's red or white loses all abilities
+# until end of turn. Target creature you control deals damage equal to its power to that permanent" (CR 613.1f, 120.3).
+# Bot2's Wojek Investigator (2/4 flying, vigilance) loses both keywords and takes 3 from Bot1's Cathar Commando.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Black Lotus
+Cathar Commando
+Flourishing Grapple
+Island x14
+
+[Bot2 Deck]
+Black Lotus
+Wojek Investigator
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Cathar Commando.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Wojek Investigator.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Flourishing Grapple.Cast
+Bot1.Target(Bot2.Battlefield.Wojek Investigator)
+Bot1.Target(Bot1.Battlefield.Cathar Commando)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Wojek Investigator.Keywords = (absent)
+Bot2.Battlefield.Wojek Investigator.Damage = 3
+Bot2.Battlefield.Wojek Investigator.Power = 2
+Bot1.Battlefield.Cathar Commando.Power = 3
