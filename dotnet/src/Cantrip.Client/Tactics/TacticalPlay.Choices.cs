@@ -1106,6 +1106,18 @@ public sealed partial class TacticalPlay
             // "You may choose not to untap this creature" (Old Man of the Sea): kept tapped while it holds what it took.
             "UntapInUntapStep" => UntapsInUntapStep(client, prompt),
 
+            // Iroh, Tea Master: the permanent given to an opponent stays with them, so only a token that is no creature (a Food, a
+            // Treasure, a Clue) is worth giving for an Ally with a counter for each permanent this seat owns that they control.
+            // The prompt's source is the permanent; the targets are those of its resolving ability on the stack, which the view
+            // names for its source card.
+            "GiveControl" => client.Object(prompt.Source) is { } iroh
+                && client.Zone(ZoneKindView.Stack, 0)
+                    .Where(item => item.Kind == ObjectKindView.AbilityOnStack && item.Controller == client.Seat && item.Name == iroh.Name)
+                    .SelectMany(item => item.Targets)
+                    .Select(target => client.Object(target.Object))
+                    .OfType<ObjectView>()
+                    .Any(given => given.Kind == ObjectKindView.Token && !IsCreature(given)),
+
             // Everything else a card says its controller "may" do is something a card's controller wants done: a
             // search, a draw, a free spell, an untap.
             _ => true,
