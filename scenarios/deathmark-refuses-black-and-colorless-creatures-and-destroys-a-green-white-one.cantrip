@@ -1,0 +1,49 @@
+# "Target green or white creature": Dark Confidant (black) and Ornithopter (colorless) are refused as targets, and a
+# sorcery cannot be cast on the opponent's turn (CR 307.1) even at a legal target. Gaddock Teeg is both green and white,
+# which is green or white, so it is the legal target (the positive control) and is destroyed.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Deathmark
+Swamp x17
+
+[Bot2 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Mox Pearl
+Dark Confidant
+Gaddock Teeg
+Ornithopter
+Forest x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Dark Confidant.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Gaddock Teeg.Cast
+Bot2.Hand.Ornithopter.Cast
+! Bot1.Hand.Deathmark.Cast(Bot2.Battlefield.Gaddock Teeg)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+! Bot1.Hand.Deathmark.Cast(Bot2.Battlefield.Dark Confidant)
+! Bot1.Hand.Deathmark.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Deathmark.Cast(Bot2.Battlefield.Gaddock Teeg)
+Bot1.Battlefield.Swamp.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Deathmark
+Bot2.Graveyard = Gaddock Teeg
+Bot2.Battlefield = Forest; Mox Jet; Mox Emerald; Mox Pearl; Dark Confidant; Ornithopter
+Stack.Count = 0

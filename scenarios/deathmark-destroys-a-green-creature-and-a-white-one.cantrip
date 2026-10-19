@@ -1,0 +1,50 @@
+# Thalia taxes Bot1's noncreature spells {1}, so killing her costs {1}{B} (Bot1 taps a Swamp and Mox Jet) and the Elves
+# then cost only {B} (a Swamp). "Destroy target green or white creature": Llanowar Elves (green) and Thalia (white) are each a legal target and are
+# destroyed by one Deathmark apiece (CR 701.8). Bot2 makes the mana for both creatures with its moxen the turn before.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Jet
+Deathmark
+Deathmark
+Swamp x15
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Pearl
+Llanowar Elves
+Thalia, Guardian of Thraben
+Forest x14
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Deathmark.Cast(Bot2.Battlefield.Thalia, Guardian of Thraben)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Deathmark.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Battlefield.Swamp.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Deathmark; Deathmark
+Bot2.Graveyard = Llanowar Elves; Thalia, Guardian of Thraben
+Bot1.Battlefield = Mox Jet; Swamp; Swamp
+Bot2.Battlefield = Forest; Mox Emerald; Mox Emerald; Mox Pearl
+Stack.Count = 0

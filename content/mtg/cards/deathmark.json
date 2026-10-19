@@ -1,0 +1,6 @@
+{
+  "name": "Deathmark",
+  "manaCost": "{B}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target green or white creature."
+}
