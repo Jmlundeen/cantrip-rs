@@ -1,0 +1,47 @@
+# Ferocity of the Hunt gives +1/+0 and deathtouch (asserted while attached), and when the enchanted Elvish Mystic dies
+# in combat (CR 603.6c, 603.10a, looked back) it is returned to the battlefield tapped under its owner's control
+# (CR 110.2a), with the Aura itself in the graveyard.
+
+[Bot1 Deck]
+Forest
+Forest
+Elvish Mystic
+Ferocity of the Hunt
+Forest x16
+
+[Bot2 Deck]
+Forest
+Forest
+Guerrilla Gorilla
+Forest x17
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Hand.Ferocity of the Hunt.Cast(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Elvish Mystic.Power = 2
+? Bot1.Battlefield.Elvish Mystic.Keywords = Deathtouch
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Elvish Mystic > Bot2)
+Bot2.Block(Guerrilla Gorilla > Elvish Mystic)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Elvish Mystic.Tapped = true
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Graveyard = Ferocity of the Hunt
+Bot2.Graveyard = Guerrilla Gorilla

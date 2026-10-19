@@ -1,0 +1,9 @@
+{
+  "name": "Ferocity of the Hunt",
+  "manaCost": "{1}{B/G}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Flash\nEnchant creature\nEnchanted creature gets +1/+0 and has deathtouch.\nWhen enchanted creature dies, return that card to the battlefield tapped under its owner's control.",
+  "keywords": [
+    "Flash"
+  ]
+}
