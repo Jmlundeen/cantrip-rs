@@ -1,0 +1,36 @@
+# Indestructible: Bot2's Disenchant on The Soul Stone destroys nothing (CR 702.12b), so it stays and Disenchant is spent. On turn 3
+# the Stone taps for {B}, which pays for a Dark Ritual (its {B}{B}{B} then sits unused), so its mana ability works.
+
+[Bot1 Deck]
+Mox Jet
+The Soul Stone
+Dark Ritual
+Plains x17
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Disenchant
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.The Soul Stone.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(The Soul Stone)
+[T3 Bot1.Main1]
+Bot1.Battlefield.The Soul Stone.Activate
+Bot1.Hand.Dark Ritual.Cast
+
+[Expect]
+Bot1.Battlefield = Mox Jet; Plains; The Soul Stone
+Bot1.Battlefield.The Soul Stone.Tapped = true
+Bot1.Graveyard = Dark Ritual
+Bot2.Graveyard = Disenchant

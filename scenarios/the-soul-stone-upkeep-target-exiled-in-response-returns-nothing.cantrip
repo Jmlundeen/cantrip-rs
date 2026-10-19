@@ -1,0 +1,51 @@
+# The infinity trigger targets the Bolted Ornithopter in Bot1's graveyard; in response Bot2 sacrifices its Soul-Guide Lantern to
+# exile Bot1's graveyard, so the target is gone and the ability does nothing as it resolves (CR 608.2b): the Ornithopter does not
+# return (it would be a new object in exile anyway, CR 400.7). Bot1's other Ornithopter was exiled to harness the Stone.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+The Soul Stone
+Ornithopter
+Ornithopter
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Soul-Guide Lantern
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Soul Stone.Cast
+Bot1.Battlefield.The Soul Stone.Activate(Ability: Harness)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+Bot2.Target(Bot1.Graveyard.Black Lotus)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Upkeep]
+? Stack.Count = 1
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = The Soul Stone
+Bot1.Graveyard.Count = 0
+Exile.Count = 5
+Stack.Count = 0

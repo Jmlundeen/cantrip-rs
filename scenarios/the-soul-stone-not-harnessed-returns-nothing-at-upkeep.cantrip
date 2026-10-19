@@ -1,0 +1,34 @@
+# The infinity ability is only active once harnessed (CR 701.64): Bot1's unharnessed Soul Stone (cast with its own black mana
+# from a Black Lotus) returns nothing at its upkeep, and the Ornithopter Bot2 Bolted stays in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+The Soul Stone
+Ornithopter
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.The Soul Stone.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield = The Soul Stone
+Bot1.Graveyard = Ornithopter; Black Lotus
+Stack.Count = 0
