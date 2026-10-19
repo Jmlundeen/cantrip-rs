@@ -14,3 +14,13 @@ pub fn targets_fight(g: &mut dyn Game, item: &StackItem, first: usize, second: u
         g.fight(a, b);
     }
 }
+
+/// "[Creature] deals damage equal to its power to [target]" (CR 120.3, 609.7, 120.8): one-sided, the creature being the
+/// source of the damage, so its abilities (lifelink, deathtouch) and colors count. Its power is read now, as the spell or
+/// ability resolves (CR 608.2c); a creature with no power deals none. Hard-Hitting Question and Archdruid's Charm print it.
+pub fn bite(g: &mut dyn Game, creature: ObjectId, victim: ObjectId) {
+    let power = g.chars(creature).power.unwrap_or(0);
+    if power > 0 {
+        g.damage(creature, Target::Object(victim), power as u16);
+    }
+}
