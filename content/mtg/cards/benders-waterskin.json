@@ -1,0 +1,6 @@
+{
+  "name": "Bender's Waterskin",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "Untap this artifact during each other player's untap step.\n{T}: Add one mana of any color."
+}
