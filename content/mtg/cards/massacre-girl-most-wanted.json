@@ -1,0 +1,8 @@
+{
+  "name": "Massacre Girl, Most Wanted",
+  "manaCost": "{4}{B}",
+  "type": "Legendary Creature — Human Assassin",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Whenever another creature or planeswalker you control dies, Massacre Girl deals 1 damage to target opponent and you gain 1 life.\nWhenever an opponent is dealt noncombat damage, put a +1/+1 counter on Massacre Girl."
+}

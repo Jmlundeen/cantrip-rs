@@ -1,0 +1,49 @@
+# Deterministic spell and ability coverage (CR 608).
+[Dice]
+1; 1; 1; 1; 1; 1
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mana Crypt
+Massacre Girl, Most Wanted
+Ornithopter
+Lightning Bolt
+Island x25
+[Bot2 Deck]
+Ornithopter
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Massacre Girl, Most Wanted.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Lightning Bolt.Cast(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Battlefield.Massacre Girl, Most Wanted.Power = 5
+Bot1.Life = 21
+Bot2.Life = 19
