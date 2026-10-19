@@ -1,0 +1,37 @@
+# Yargle, Glutton of Urborg is a vanilla 9/3 (CR 208): it is its characteristics and nothing more. Bot1 casts it and
+# attacks, and the 9 power is dealt to Bot2.
+
+[Bot1 Deck]
+Yargle, Glutton of Urborg
+Swamp
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Hand.Yargle, Glutton of Urborg.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Yargle, Glutton of Urborg)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Yargle, Glutton of Urborg.Power = 9
+Bot1.Battlefield.Yargle, Glutton of Urborg.Toughness = 3
+Bot2.Life = 11
