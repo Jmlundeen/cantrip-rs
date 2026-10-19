@@ -230,10 +230,16 @@ impl Obj {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Copiable {
     pub card: CardId,
-    /// Card types added by exceptions: Phyrexian Metamorph is an artifact in addition to its other types.
+    /// Card types added by exceptions: Phyrexian Metamorph is an artifact in addition to its other types. With
+    /// `types_stated`, every card type it has but a kept instant or sorcery (CR 205.1a).
     pub extra_types: TypeSet,
-    /// Subtypes added by exceptions, as Phantasmal Image is an Illusion in addition to its other types.
+    /// Subtypes added by exceptions, as Phantasmal Image is an Illusion in addition to its other types. With
+    /// `types_stated`, every subtype it has.
     pub extra_subtypes: SubtypeSet,
+    /// "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the exception states what it is, so its card types and
+    /// subtypes are `extra_types` and `extra_subtypes` instead of the copied card's, and a characteristic-defining
+    /// ability that defines them (Changeling) is not copied (CR 707.9d). See `Copiable::typed`.
+    pub types_stated: bool,
     /// Abilities added by exceptions, in order.
     pub extra_abilities: [Option<AbilityRef>; 4],
     /// Keywords added by exceptions: "except it has haste".
@@ -261,6 +267,7 @@ impl Copiable {
             card,
             extra_types: TypeSet::NONE,
             extra_subtypes: SubtypeSet::NONE,
+            types_stated: false,
             extra_abilities: [None; 4],
             extra_keywords: Keywords::NONE,
             colors: None,
@@ -282,6 +289,7 @@ impl Copiable {
     pub fn has_exceptions(&self) -> bool {
         self.extra_types.0 != 0
             || !self.extra_subtypes.is_empty()
+            || self.types_stated
             || self.extra_abilities.iter().any(|a| a.is_some())
             || self.extra_keywords.0 != 0
             || self.colors.is_some()
@@ -298,6 +306,24 @@ impl Copiable {
         self
     }
 
+    /// "Except it's a [subtypes] [types]", with no "in addition to its other types" (CR 707.9b, 205.1a): these are its card
+    /// types and subtypes instead of the copied card's, as the rulings spell out ("The token is a Demon creature instead of
+    /// its other types and is black instead of its other colors"). Supertypes are kept: a copy of a legendary card is
+    /// legendary. An instant or sorcery keeps that type (CR 205.1a). A characteristic-defining ability of the copied card
+    /// that defines its subtypes is not copied (CR 707.9d: Changeling). It replaces the types and subtypes earlier
+    /// exceptions of these values added, and an exception applied after it adds to it; a copy of the copy is what the copy
+    /// is (CR 707.9b). Ardyn, the Usurper ("except it's a 5/5 black Demon": `.typed(TypeSet::of(&[CardType::Creature]),
+    /// SubtypeSet::of(&[Subtype::Demon])).colored(ColorSet::of(Color::Black)).sized(5, 5)`), The Scarab God, God-Pharaoh's
+    /// Gift and Hour of Eternity ("except it's a 4/4 black Zombie") print it. Eternalize and embalm (CR 702.128a, 702.129a)
+    /// make a Zombie in addition to its other types, and use `with_subtype`.
+    pub fn typed(mut self, types: TypeSet, subtypes: SubtypeSet) -> Copiable {
+        self.extra_types = types;
+        self.extra_subtypes = subtypes;
+        self.types_stated = true;
+        self
+    }
+
+    /// "Except it's a [subtype] in addition to its other types."
     pub fn with_subtype(mut self, s: Subtype) -> Copiable {
         self.extra_subtypes = self.extra_subtypes.with(s);
         self

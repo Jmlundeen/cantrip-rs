@@ -369,6 +369,21 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     };
     // "Except it's legendary" (CR 707.9b).
     let legendary = copy.is_some_and(|c| c.legendary);
+    // "Except it's a 5/5 black Demon" (CR 707.9b, 205.1a): the types and subtypes the exception states, instead of the
+    // card's; an instant or sorcery stays one, with its spell types. Changeling, which defines the subtypes it replaced,
+    // is not copied (CR 707.9d), though an exception may give it again.
+    let stated = copy.is_some_and(|c| c.types_stated);
+    let (types, subtypes, printed_keywords) = if stated {
+        let spell = TypeSet(def.types.0 & TypeSet::of(&[CardType::Instant, CardType::Sorcery]).0);
+        let spell_types = if spell.0 != 0 {
+            def.subtypes.iter().filter(|s| !s.is_creature_type()).fold(SubtypeSet::NONE, SubtypeSet::with)
+        } else {
+            SubtypeSet::NONE
+        };
+        (TypeSet(spell.0 | extra_types.0), spell_types.union(extra_subtypes), Keywords(def.keywords.0 & !Keywords::of(&[Keyword::Changeling]).0))
+    } else {
+        (TypeSet(def.types.0 | extra_types.0), words.subtypes(def.subtypes).union(extra_subtypes), def.keywords)
+    };
     let mut abilities = [None; MAX_ABILITIES];
     let mut n = 0;
     // A dungeon or the rules' own card has more abilities than any object does; nothing reads them as an object's.
@@ -383,16 +398,16 @@ fn initial(cards: &CardTable, card: CardId, copy: Option<&Copiable>) -> Chars {
     let mut chars = Chars {
         card,
         name: copy_name.unwrap_or_else(|| renamed(def, words)),
-        types: TypeSet(def.types.0 | extra_types.0),
+        types,
         supertypes: Supertypes { legendary: def.supertypes.legendary || legendary, ..def.supertypes },
         // CR 612.4: a token's subtypes are what the text that made it named.
-        subtypes: words.subtypes(def.subtypes).union(extra_subtypes),
+        subtypes,
         // CR 707.9b: a copy that says what it is gets that, not what the card it copies is (707.9d). A token's color
         // words are its text's (CR 612.4).
         colors: colors.unwrap_or_else(|| words.colors(def.colors())),
         power: pt.map(|(p, _)| p).or(def.power),
         toughness: pt.map(|(_, t)| t).or(def.toughness),
-        keywords: Keywords(def.keywords.0 | extra_keywords.0),
+        keywords: Keywords(printed_keywords.0 | extra_keywords.0),
         // CR 612.4: a color word of a token's text is the text's that made it.
         protection: words.colors(def.protection),
         protection_colorless: false,
@@ -2023,6 +2038,92 @@ mod tests {
         let elf = effect(7, EffectKind::ChangeText { from: Word::Subtype(Subtype::Elf), to: Word::Subtype(Subtype::Goblin) });
         apply_effect(&elf, Layer::Text, &mut chars);
         assert_eq!(chars.keywords, Keywords::of(&[Keyword::Islandwalk, Keyword::Flying]));
+    }
+
+    // --- Copy exceptions that state types (CR 707.9b, 707.9d, 205.1a).
+
+    /// A legendary green artifact creature - Equipment Shapeshifter with changeling and flying, 2/3: everything "except it's a
+    /// 5/5 black Demon" replaces, and what it keeps.
+    static IDOL: CardDef = CardDef {
+        name: "Idol",
+        colors: Some(ColorSet::of(Color::Green)),
+        types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+        supertypes: Supertypes { basic: false, legendary: true, snow: false },
+        subtypes: SubtypeSet::of(&[Subtype::Equipment, Subtype::Shapeshifter]),
+        keywords: Keywords::of(&[Keyword::Changeling, Keyword::Flying]),
+        power: Some(2),
+        toughness: Some(3),
+        ..CardDef::BLANK
+    };
+    /// An instant with a spell type, for the type CR 205.1a keeps.
+    static TRICK: CardDef = CardDef {
+        name: "Trick",
+        types: TypeSet::of(&[CardType::Instant]),
+        subtypes: SubtypeSet::of(&[Subtype::Arcane]),
+        ..CardDef::BLANK
+    };
+
+    fn ardyn(card: CardId) -> Copiable {
+        Copiable::of(card)
+            .typed(TypeSet::of(&[CardType::Creature]), SubtypeSet::of(&[Subtype::Demon]))
+            .colored(ColorSet::of(Color::Black))
+            .sized(5, 5)
+    }
+
+    /// CR 707.9b, 205.1a, 707.9d (Ardyn, the Usurper's ruling: "a Demon creature instead of its other types and ... black
+    /// instead of its other colors. Its base power and toughness are 5/5"): a copy "except it's a 5/5 black Demon" is a
+    /// Demon creature alone - no artifact, no Equipment, no Shapeshifter, and no creature type from Changeling, which defines
+    /// the subtypes the exception states and so is not copied - black, 5/5, still legendary (a supertype) and still flying.
+    /// A copy of that copy has the same values (CR 707.9b), and an exception applied on top of them adds to them.
+    #[test]
+    fn a_copy_except_its_a_demon_is_a_demon_creature_instead_of_its_other_types() {
+        let cards = CardTable::new([&IDOL, &TRICK]);
+        let idol = cards.find("Idol").unwrap();
+        let (mut state, ids) = battlefield(&cards, &["Idol", "Idol", "Idol", "Idol"]);
+        // The card itself, for contrast: its own types, and every creature type.
+        let own = chars(&cards, &state, &[], ids[0]);
+        assert!(own.is(CardType::Artifact) && own.has_subtype(Subtype::Equipment) && own.has_subtype(Subtype::Demon));
+        state.update_obj(ids[1], |o| o.copy = Some(ardyn(idol)));
+        // A copy of the copy (Clone): its copiable values are the copy's, exception included.
+        let values = state.obj(ids[1]).copy.unwrap();
+        state.update_obj(ids[2], |o| o.copy = Some(values));
+        // A copy of the copy with an exception of its own on top (Phantasmal Image's Illusion).
+        state.update_obj(ids[3], |o| o.copy = Some(values.with_subtype(Subtype::Illusion).with_type(CardType::Artifact)));
+        for id in [ids[1], ids[2]] {
+            let c = chars(&cards, &state, &[], id);
+            assert_eq!(c.types, TypeSet::of(&[CardType::Creature]));
+            assert_eq!(c.subtypes, SubtypeSet::of(&[Subtype::Demon]));
+            assert_eq!(c.colors, ColorSet::of(Color::Black));
+            assert_eq!((c.power, c.toughness), (Some(5), Some(5)));
+            assert!(c.supertypes.legendary && c.has(Keyword::Flying) && !c.has(Keyword::Changeling));
+            assert_eq!(c.name, "Idol");
+        }
+        let image = chars(&cards, &state, &[], ids[3]);
+        assert_eq!(image.types, TypeSet::of(&[CardType::Artifact, CardType::Creature]));
+        assert_eq!(image.subtypes, SubtypeSet::of(&[Subtype::Demon, Subtype::Illusion]));
+        // Stated types applied over an earlier exception's replace them (The Scarab God copying the token's card), and an
+        // exception that gives changeling gives every creature type again.
+        let zombie_values = values.with_type(CardType::Artifact).typed(TypeSet::of(&[CardType::Creature]), SubtypeSet::of(&[Subtype::Zombie]));
+        state.update_obj(ids[3], |o| o.copy = Some(zombie_values));
+        let zombie = chars(&cards, &state, &[], ids[3]);
+        assert_eq!(zombie.types, TypeSet::of(&[CardType::Creature]));
+        assert_eq!(zombie.subtypes, SubtypeSet::of(&[Subtype::Zombie]));
+        state.update_obj(ids[3], |o| o.copy = Some(zombie_values.with_keyword(Keyword::Changeling)));
+        let changeling = chars(&cards, &state, &[], ids[3]);
+        assert!(changeling.has_subtype(Subtype::Demon) && changeling.has(Keyword::Changeling) && !changeling.has_subtype(Subtype::Equipment));
+        assert!(values.has_exceptions() && Copiable::of(idol).typed(TypeSet::NONE, SubtypeSet::NONE).has_exceptions());
+    }
+
+    /// CR 205.1a: "an object with either the instant or sorcery card type retains that type", and its spell type with it.
+    #[test]
+    fn a_copy_that_states_types_keeps_an_instants_type() {
+        let cards = CardTable::new([&IDOL, &TRICK]);
+        let (mut state, ids) = battlefield(&cards, &["Trick"]);
+        let trick = cards.find("Trick").unwrap();
+        state.update_obj(ids[0], |o| o.copy = Some(ardyn(trick)));
+        let c = chars(&cards, &state, &[], ids[0]);
+        assert_eq!(c.types, TypeSet::of(&[CardType::Creature, CardType::Instant]));
+        assert_eq!(c.subtypes, SubtypeSet::of(&[Subtype::Arcane, Subtype::Demon]));
     }
 }
 

@@ -931,7 +931,10 @@ no power or toughness in its content file (CR 721.2c). Counters from anywhere co
 away (Vampire Hexmage), and a copy has the striations with its own counters (Phyrexian Metamorph). Adagia, Windswept Bastion;
 Uthros, Titanic Godcore; Evendo, Waking Haven; Wurmwall Sweeper. The web client greys a striation whose number the
 permanent's charge counters have not reached (`CardReading.StationUnreached`); the ability it gives is listed with its
-abilities once it has it. "Except it's legendary" (CR 707.9b) is `Copiable::legendary`.
+abilities once it has it. "Except it's legendary" (CR 707.9b) is `Copiable::legendary`. "Except it's a 5/5 black Demon"
+(CR 707.9b, 205.1a), with no "in addition to its other types", is `Copiable::typed(types, subtypes)`: those are its card
+types and subtypes instead of the copied card's (supertypes kept, an instant or sorcery keeping that type), a Changeling it
+copies is left behind (CR 707.9d), and an exception added after it adds to it (Ardyn, the Usurper; The Scarab God).
 
 ### Effects that end when a card is cast from exile
 
