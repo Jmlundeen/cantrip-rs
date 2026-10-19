@@ -1,0 +1,8 @@
+{
+  "name": "Bloombrute",
+  "manaCost": "{2}{G}{W}",
+  "type": "Creature — Plant Elemental",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Whenever you gain life, draw a card. This ability triggers only once each turn.\n{4}{G}{W}: Target creature gains trample and lifelink until end of turn."
+}
