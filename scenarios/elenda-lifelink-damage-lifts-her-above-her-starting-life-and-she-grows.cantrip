@@ -1,0 +1,35 @@
+# Elenda, Saint of Dusk: the bonus follows the life total as it changes. On turn 3 she attacks as a 4/4 (Bot1 at 20: not above the
+# starting life) and, with lifelink, deals 4 to Bot2 (16) and gains Bot1 4 life (24), so she is then a 5/5 with menace (CR 613,
+# 611.3a) - the state-based change of her characteristics, with no trigger.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Ruby
+Elenda, Saint of Dusk
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Elenda, Saint of Dusk.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Elenda, Saint of Dusk.Power = 4
+Bot1.Attack(Elenda, Saint of Dusk > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Battlefield.Elenda, Saint of Dusk.Power = 5
+Bot1.Battlefield.Elenda, Saint of Dusk.Keywords = Lifelink; Menace

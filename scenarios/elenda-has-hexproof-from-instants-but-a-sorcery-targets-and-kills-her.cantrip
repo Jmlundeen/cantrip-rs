@@ -1,0 +1,44 @@
+# Elenda, Saint of Dusk has "hexproof from instants" (CR 702.11d): an instant can't target her but any other source can. On turn
+# 2 Bot2 can't target her with Lightning Bolt (an instant; the refusal), but Flame Slash, a sorcery, can: 4 damage kills the 4/4
+# (Bot1's life is 20, not above the starting life, so no bonus). The Bolt stays in Bot2's hand (8 cards drawn, minus two Moxen and the Slash is 5).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Ruby
+Elenda, Saint of Dusk
+Island x15
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Flame Slash
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Elenda, Saint of Dusk.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Elenda, Saint of Dusk)
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Flame Slash.Cast(Elenda, Saint of Dusk)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Elenda, Saint of Dusk
+Bot2.Graveyard = Flame Slash
+Bot2.Hand.Count = 5
+Bot2.Graveyard.Count = 1

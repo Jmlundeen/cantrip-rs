@@ -1,0 +1,32 @@
+# Elenda, Saint of Dusk: at 30 life, exactly 10 greater than the starting 20, both abilities apply: +1/+1 and menace, and an
+# additional +5/+5, so a 10/10 with lifelink and menace.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Ruby
+Elenda, Saint of Dusk
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Life]
+Bot1: 30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Elenda, Saint of Dusk.Cast
+
+[Expect]
+Bot1.Battlefield.Elenda, Saint of Dusk.Power = 10
+Bot1.Battlefield.Elenda, Saint of Dusk.Toughness = 10
+Bot1.Battlefield.Elenda, Saint of Dusk.Keywords = Lifelink; Menace
