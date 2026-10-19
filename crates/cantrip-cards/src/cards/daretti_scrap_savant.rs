@@ -68,7 +68,7 @@ fn schedule_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static EMBLEM: CardDef = CardDef {
     name: "Daretti, Scrap Savant emblem",
     has_cost: false,
-    abilities: &[triggered(when(EventMask::ZONE_CHANGE, artifact_to_your_graveyard), schedule_return, "Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.")],
+    abilities: &[triggered(when(EventMask::ZONE_CHANGE, artifact_to_your_graveyard), schedule_return, "Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.").look_back()],
     delayed: &[delayed_trigger(cantrip_mechanics::delayed::return_subject_to_battlefield, "Return that card to the battlefield.")],
     text: "Whenever an artifact is put into your graveyard from the battlefield, return that card to the battlefield at the beginning of the next end step.",
     ..CardDef::BLANK

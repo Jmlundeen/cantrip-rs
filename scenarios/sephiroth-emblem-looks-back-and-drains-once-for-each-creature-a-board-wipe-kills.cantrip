@@ -1,0 +1,84 @@
+# The Sephiroth, One-Winged Angel emblem's "whenever a creature dies" is a leaves-the-battlefield ability, so it looks back
+# (CR 603.10a), and the emblem functions from the command zone it never leaves (CR 114.4): asked both before and after the
+# event, it still triggers exactly once for each creature that dies. Sephiroth's own game to his transformation (four deaths
+# to one Pyroclasm on turn 3: 16 and 24, the emblem made as he transforms). Bot2 makes two more Ornithopters on turn 4; on
+# turn 5 Bot1 makes one and casts a second Pyroclasm: three creatures die at once, the 5/5 Sephiroth lives, and the emblem
+# drains three times: 13 and 27.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sephiroth, Fabled SOLDIER
+Pyroclasm
+Ornithopter
+Ornithopter
+Ornithopter
+Pyroclasm
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Plains
+Plains
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sephiroth, Fabled SOLDIER.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Bot1.Life = 24
+? Bot1.Emblems.Count = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Life = 27
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Sephiroth, One-Winged Angel
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard.Count = 5

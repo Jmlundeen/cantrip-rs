@@ -1119,7 +1119,9 @@ pub struct TriggeredDef {
     pub targets: &'static [TargetSpec],
     pub effect: Effect,
     /// A leaves-the-battlefield ability (CR 603.10a): judged on the board as it was before the event, so it sees
-    /// its own source and everything that left with it.
+    /// its own source and everything that left with it, and is stopped or multiplied by what was there (CR 603.2d).
+    /// An emblem's ability (CR 114.4) is marked the same way: the emblem, in the command zone before and after, is asked
+    /// either way, and the mark decides which board's statics judge it.
     pub look_back: bool,
     /// Functions outside the battlefield too (the ability checks the zone itself), as "at the beginning of your
     /// upkeep, if this card is in your graveyard" does.

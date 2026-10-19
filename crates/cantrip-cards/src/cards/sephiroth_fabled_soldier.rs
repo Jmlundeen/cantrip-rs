@@ -41,7 +41,9 @@ fn drain_and_maybe_transform(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     Ok(())
 }
 
-/// "Whenever a creature dies, target opponent loses 1 life and you gain 1 life." The emblem is no permanent and never leaves, so the ability needs no look-back of its own source (CR 114.4); the dying creature is read as it last was.
+/// "Whenever a creature dies, target opponent loses 1 life and you gain 1 life." A leaves-the-battlefield ability, so it
+/// looks back (CR 603.10a): the dying creature as it last was, and whatever stopped abilities triggering then (Hushbringer
+/// dying in the same wipe). The emblem functions from the command zone, which it never leaves (CR 114.4).
 pub static EMBLEM: CardDef = CardDef {
     name: "Sephiroth, One-Winged Angel emblem",
     has_cost: false,
@@ -50,7 +52,8 @@ pub static EMBLEM: CardDef = CardDef {
         target_player_loses_1_life_you_gain_1,
         "Whenever a creature dies, target opponent loses 1 life and you gain 1 life.",
     )
-    .targets(&[targets::OPPONENT])],
+    .targets(&[targets::OPPONENT])
+    .look_back()],
     text: "Whenever a creature dies, target opponent loses 1 life and you gain 1 life.",
     ..CardDef::BLANK
 };

@@ -1,0 +1,70 @@
+# The Daretti, Scrap Savant emblem's "whenever an artifact is put into your graveyard from the battlefield" is a
+# leaves-the-battlefield ability, so it looks back to the board as it was before the event (CR 603.10a) though the emblem
+# is in the command zone (CR 114.4): an artifact creature dying at the same time as Hushbringer doesn't cause it to trigger
+# (Hushbringer's rulings). Daretti's game to his -10 emblem, with Bot2's Hushbringer out from turn 2: on turn 11 Bot1 makes
+# an Ornithopter and casts Pyroclasm, which kills it and Hushbringer at once; the Ornithopter stays in the graveyard past
+# the end step.
+
+[Bot1 Deck]
+Daretti, Scrap Savant
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Lotus Petal
+Island
+Ornithopter
+Pyroclasm
+Island x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Hushbringer
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Daretti, Scrap Savant.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: Discard up to two)
+Bot1.Choose(Island)
+[T11 Bot1.Main1]
+? Bot1.Battlefield.Daretti, Scrap Savant.Counters.Loyalty = 11
+Bot1.Battlefield.Daretti, Scrap Savant.Activate(Ability: You get an emblem)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+[T12 Bot2.Main1]
+
+[Expect]
+Bot1.Emblems.Count = 1
+Bot1.Battlefield = Daretti, Scrap Savant; Mox Ruby; Mox Jet; Mox Sapphire; Mox Pearl
+Bot1.Graveyard = Ornithopter; Pyroclasm; Island; Island; Island; Island
+Bot2.Battlefield = Plains; Mox Pearl
+Bot2.Graveyard = Hushbringer; Plains; Plains

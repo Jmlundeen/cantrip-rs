@@ -893,11 +893,16 @@ pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<&[ObjectId]>)
             }
             found.append(&mut later);
         }
-        // An emblem's triggered abilities function in the command zone (CR 114.4).
+        // An emblem's triggered abilities function in the command zone (CR 114.4), which it never leaves, so it is there
+        // both before the event and after it: its look-back abilities (a "whenever a creature dies"; CR 603.10a) and the
+        // others alike are asked of it, each once, the look-back ones judged by what stopped or multiplied triggering
+        // before the event (`TriggerStatics`), as any other's are.
         if !cx.s().zone(Zone::COMMAND).is_empty() {
+            let mut later: Found = Vec::new();
             for id in cx.s().zone(Zone::COMMAND).to_vec() {
-                consider(cx, id, false, false, event, mask, &mut statics, &mut found, None);
+                consider(cx, id, true, false, event, mask, &mut statics, &mut found, Some(&mut later));
             }
+            found.append(&mut later);
         }
         // Delayed abilities of "whenever [event] this turn" (CR 603.7b), each of which triggers on every match.
         if cx.s().delayed.iter().any(|d| d.when.is_event()) {

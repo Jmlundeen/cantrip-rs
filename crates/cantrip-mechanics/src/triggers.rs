@@ -837,8 +837,9 @@ pub fn another_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Ev
 }
 
 /// "Whenever a creature dies" (CR 700.4, 603.10a), looked back on: any creature, anyone's, as it last was on the battlefield.
-/// The ability carries the player who then controlled it (CR 608.2h). Use with `look_back: true`. Fecundity and Ashes of the
-/// Abhorrent print it.
+/// The ability carries the player who then controlled it (CR 608.2h). Use with `.look_back()`, on a permanent or an emblem
+/// alike (the Sephiroth, One-Winged Angel emblem): a dies ability is a leaves-the-battlefield ability wherever it functions
+/// from. Fecundity and Ashes of the Abhorrent print it.
 pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, to, .. }
@@ -851,8 +852,8 @@ pub fn creature_dies(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired>
 }
 
 /// "Whenever a creature you control dies" (CR 700.4, 603.10a), looked back on: the creature as it last was on the
-/// battlefield, under the controller it last had. Use with `look_back: true`. Grave Venerations and Warhost's Frenzy
-/// print it.
+/// battlefield, under the controller it last had. Use with `.look_back()`, on a permanent or an emblem alike. Grave
+/// Venerations and Warhost's Frenzy print it.
 pub fn creature_you_control_dies(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { old, from, to, .. }

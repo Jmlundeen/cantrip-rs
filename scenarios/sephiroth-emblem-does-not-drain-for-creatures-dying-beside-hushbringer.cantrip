@@ -1,0 +1,83 @@
+# The Sephiroth, One-Winged Angel emblem's "whenever a creature dies" looks back to the board as it was before the event
+# (CR 603.10a), like any dies ability, though the emblem itself is in the command zone (CR 114.4): a creature dying at the
+# same time as Hushbringer, Hushbringer included, doesn't cause it to trigger (Hushbringer's rulings). Sephiroth's own game
+# to his transformation (four deaths to one Pyroclasm on turn 3: 16 and 24, the emblem made as he transforms). Bot2 makes
+# an Ornithopter and casts Hushbringer on turn 4; on turn 5 Bot1 makes one and casts a second Pyroclasm: Hushbringer and
+# both Ornithopters die at once, and the emblem drains for none of them: 16 and 24 still.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sephiroth, Fabled SOLDIER
+Pyroclasm
+Ornithopter
+Ornithopter
+Ornithopter
+Pyroclasm
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Plains
+Mox Pearl
+Hushbringer
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sephiroth, Fabled SOLDIER.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Bot1.Life = 24
+? Bot1.Emblems.Count = 1
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Hushbringer.Cast
+[T5 Bot1.Main1]
+? Bot2.Battlefield = Ornithopter; Plains; Mox Pearl; Hushbringer
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Sephiroth, One-Winged Angel
+Bot2.Battlefield = Plains; Mox Pearl
+Bot2.Graveyard = Hushbringer; Ornithopter; Ornithopter; Ornithopter; Ornithopter
