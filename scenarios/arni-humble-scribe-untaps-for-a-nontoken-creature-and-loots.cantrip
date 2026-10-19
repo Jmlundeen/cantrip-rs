@@ -1,0 +1,33 @@
+# Arni, Humble Scribe untaps when another nontoken creature enters under his controller (CR 603.6a); {T}: draw a card, then
+# discard a card (CR 701.8).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Arni, Humble Scribe
+Llanowar Elves
+Forest
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arni, Humble Scribe.Cast
+Bot1.Battlefield.Arni, Humble Scribe.Activate
+Bot1.Choose(Forest)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+
+[Expect]
+Bot1.Battlefield.Arni, Humble Scribe.Tapped = false
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard = Forest

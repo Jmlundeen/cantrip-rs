@@ -1,0 +1,33 @@
+# Arni, Humble Scribe does not untap for a creature token (CR 603.6a): a token is not a "nontoken creature".
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Emerald
+Mox Emerald
+Arni, Humble Scribe
+Defend the Rider
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Hand.Arni, Humble Scribe.Cast
+Bot1.Battlefield.Arni, Humble Scribe.Activate
+Bot1.Choose(Island)
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Defend the Rider.Cast
+Bot1.Modes(2)
+
+[Expect]
+Bot1.Battlefield.Arni, Humble Scribe.Tapped = true
+Bot1.Battlefield.Pilot.Token = true
