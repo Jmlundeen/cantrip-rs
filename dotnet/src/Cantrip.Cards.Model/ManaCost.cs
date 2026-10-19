@@ -21,8 +21,8 @@ public enum ManaColor
 /// round-tripping imported data, but it is never the source of truth.
 /// </para>
 /// <para>
-/// Generic, single-color, colorless, two-color hybrid, Phyrexian, and {X} symbols are modelled so far. Monocolored
-/// hybrid and snow slot in as additional symbol kinds without disturbing callers that ask for
+/// Generic, single-color, colorless, hybrid (two-color and monocolored, {2/W} and {C/W}), Phyrexian, and {X} symbols are
+/// modelled so far. Snow slots in as another symbol kind without disturbing callers that ask for
 /// <see cref="ManaValue"/> or <see cref="Colors"/>.
 /// </para>
 /// </summary>
@@ -185,10 +185,11 @@ public sealed class ManaCost
     }
 
     /// <summary>
-    /// Mana value (CR 202.3): generic plus one per colored, colorless or hybrid symbol (CR 202.3d). {X} counts as
-    /// zero, which is right everywhere but on the stack (CR 202.3e).
+    /// Mana value (CR 202.3): generic plus one per colored, colorless or hybrid symbol (CR 202.3d), a hybrid symbol
+    /// counting its largest component, 2 for {2/W} (CR 202.3f). {X} counts as zero, which is right everywhere but on
+    /// the stack (CR 202.3e).
     /// </summary>
-    public int ManaValue => Generic + Colored.Count + Colorless + Hybrid.Count;
+    public int ManaValue => Generic + Colored.Count + Colorless + Hybrid.Sum(symbol => symbol.ManaValue);
 
     public bool HasX => X > 0;
 
@@ -312,6 +313,14 @@ public sealed class ManaCost
             return;
         }
 
+        // A monocolored hybrid symbol, {2/W} or {C/W} (CR 107.4e): one mana of its color, or two generic mana or one
+        // colorless mana.
+        if (symbol.Length == 3 && symbol[1] == '/' && symbol[0] is ('2' or 'C') && ColorOf(symbol[2]) is { } mono)
+        {
+            cost.Hybrid.Add(symbol[0] == '2' ? ManaSymbol.Monocolored(mono) : ManaSymbol.ColorlessHybrid(mono));
+            return;
+        }
+
         // A two-color hybrid symbol, {U/R} (CR 107.4e).
         if (symbol.Length == 3 && symbol[1] == '/' && ColorOf(symbol[0]) is { } first && ColorOf(symbol[2]) is { } second)
         {
@@ -329,7 +338,7 @@ public sealed class ManaCost
             : throw new ManaCostFormatException(
                 input,
                 position,
-                $"'{{{symbol}}}' is not a supported mana symbol. Generic, single-color, colorless, two-color hybrid, Phyrexian, and {{X}} symbols only so far."));
+                $"'{{{symbol}}}' is not a supported mana symbol. Generic, single-color, colorless, hybrid, Phyrexian, and {{X}} symbols only so far."));
     }
 
     private static ManaColor? ColorOf(char letter) => letter switch
@@ -407,13 +416,19 @@ public enum ManaWayKind
 
     /// <summary><see cref="ManaWay.Amount"/> life pays it instead of mana (CR 107.4f).</summary>
     Life,
+
+    /// <summary><see cref="ManaWay.Amount"/> generic mana pays it: a monocolored hybrid symbol's {2} half (CR 107.4e).</summary>
+    Generic,
+
+    /// <summary>One colorless mana pays it: a monocolored hybrid symbol's {C} half (CR 107.4e).</summary>
+    Colorless,
 }
 
 /// <summary>
 /// One way a printed mana symbol may be paid: one mana of a color, or life instead of mana (CR 107.4e-f). A closed
 /// set of concrete kinds with a discriminator, as state must be (<see cref="ManaWayKind"/>) rather than a class per
-/// kind — a symbol carries only the ways it was printed with; a card that needs another way (monocolored hybrid's
-/// generic mana, CR 107.4e) adds a kind here the same way this one did.
+/// kind — a symbol carries only the ways it was printed with; a card that needs another way adds a kind here the same way
+/// monocolored hybrid's generic and colorless halves did (CR 107.4e).
 /// </summary>
 public readonly record struct ManaWay(ManaWayKind Kind, ManaColor Color, int Amount)
 {
@@ -423,10 +438,18 @@ public readonly record struct ManaWay(ManaWayKind Kind, ManaColor Color, int Amo
     /// <summary>This much life pays it instead of mana (CR 107.4f).</summary>
     public static ManaWay Life(int amount) => new(ManaWayKind.Life, default, amount);
 
+    /// <summary>This much generic mana pays it (CR 107.4e): {2/W}'s {2}.</summary>
+    public static ManaWay GenericMana(int amount) => new(ManaWayKind.Generic, default, amount);
+
+    /// <summary>One colorless mana pays it (CR 107.4e): {C/W}'s {C}.</summary>
+    public static ManaWay ColorlessMana() => new(ManaWayKind.Colorless, default, 0);
+
     public override string ToString() => Kind switch
     {
         ManaWayKind.Color => ManaCost.Symbol(Color).ToString(),
         ManaWayKind.Life => "P",
+        ManaWayKind.Generic => Amount.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        ManaWayKind.Colorless => "C",
         _ => "?",
     };
 }
@@ -476,6 +499,23 @@ public readonly record struct ManaSymbol(ManaWay First, ManaWay Second)
         new(ManaWay.Colored(color), ManaWay.Life(2));
 
     /// <summary>
+    /// A monocolored hybrid symbol, {2/W} (CR 107.4e): one mana of its color, or two generic mana, pays it. It is its
+    /// color, and counts 2 toward mana value (CR 202.3f). Printed generic half first.
+    /// </summary>
+    public static ManaSymbol Monocolored(ManaColor color) =>
+        new(ManaWay.GenericMana(2), ManaWay.Colored(color));
+
+    /// <summary>A monocolored hybrid symbol with a colorless half, {C/W} (CR 107.4e): one colorless mana or one mana of its color.</summary>
+    public static ManaSymbol ColorlessHybrid(ManaColor color) =>
+        new(ManaWay.ColorlessMana(), ManaWay.Colored(color));
+
+    /// <summary>What the symbol counts toward mana value: its largest component (CR 202.3f), 2 for {2/W}, else 1.</summary>
+    public int ManaValue => Math.Max(1, Math.Max(First.Kind == ManaWayKind.Generic ? First.Amount : 0, Second.Kind == ManaWayKind.Generic ? Second.Amount : 0));
+
+    /// <summary>The generic mana that pays it instead of its color (CR 107.4e), or null when it has no such way.</summary>
+    public int? GenericCost => First.Kind == ManaWayKind.Generic ? First.Amount : Second.Kind == ManaWayKind.Generic ? Second.Amount : null;
+
+    /// <summary>
     /// How a cast permission has relaxed what mana pays this symbol (CR 609.4b): <see cref="ManaRelaxation.None"/> as
     /// printed. Only a Phyrexian symbol is ever relaxed rather than folded into generic, because it alone has a way
     /// that is not mana — its 2 life (CR 107.4f) — which the permission leaves alone, since it changes how mana may
@@ -496,10 +536,10 @@ public readonly record struct ManaSymbol(ManaWay First, ManaWay Second)
     public IEnumerable<ManaColor> PaidWith => Relaxed == ManaRelaxation.None ? Colors : Enum.GetValues<ManaColor>();
 
     /// <summary>
-    /// Whether colorless mana could pay it — only under "mana of any type" (CR 118.14), colorless being no color
-    /// (CR 105.2a).
+    /// Whether colorless mana could pay it: its {C} half ({C/W}, CR 107.4e), or under "mana of any type" (CR 118.14);
+    /// colorless is no color (CR 105.2a).
     /// </summary>
-    public bool PaidWithColorless => Relaxed == ManaRelaxation.AnyType;
+    public bool PaidWithColorless => Relaxed == ManaRelaxation.AnyType || First.Kind == ManaWayKind.Colorless || Second.Kind == ManaWayKind.Colorless;
 
     /// <summary>
     /// The colors the symbol prints (CR 107.4e-f): both halves of a hybrid symbol, or the one color of a Phyrexian

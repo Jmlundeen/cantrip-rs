@@ -237,6 +237,7 @@ fn cost(text: &str) -> Result<String, String> {
     let mut symbols = [0u32; 6];
     let mut hybrid: Vec<(char, char)> = Vec::new();
     let mut phyrexian = [0u32; 5];
+    let mut twobrid = [0u32; 5];
     let mut rest = text;
     while let Some(open) = rest.find('{') {
         let Some(close) = rest[open..].find('}') else { break };
@@ -254,7 +255,11 @@ fn cost(text: &str) -> Result<String, String> {
             symbols[5] += 1;
         } else if cs.len() == 3 && color(cs[0]).is_some() && cs[1] == '/' && cs[2] == 'P' {
             phyrexian[color(cs[0]).unwrap()] += 1;
-        } else if cs.len() == 3 && color(cs[0]).is_some() && cs[1] == '/' && color(cs[2]).is_some() {
+        } else if cs.len() == 3 && cs[0] == '2' && cs[1] == '/' && color(cs[2]).is_some() {
+            // A monocolored hybrid symbol, {2/W} (CR 107.4e).
+            twobrid[color(cs[2]).unwrap()] += 1;
+        } else if cs.len() == 3 && (color(cs[0]).is_some() || cs[0] == 'C') && cs[1] == '/' && color(cs[2]).is_some() {
+            // A hybrid symbol of two colors, {W/U}, or of colorless and a color, {C/W} (CR 107.4e).
             hybrid.push((cs[0], cs[2]));
         } else {
             return Err(format!("mana symbol {{{sym}}}"));
@@ -266,7 +271,7 @@ fn cost(text: &str) -> Result<String, String> {
     let mut slots: Vec<String> = hybrid.iter().map(|(a, b)| format!("Some((Mana::{a}, Mana::{b}))")).collect();
     slots.resize(6, "None".into());
     Ok(format!(
-        "ManaCost {{ generic: {generic}, symbols: {symbols:?}, hybrid: [{}], phyrexian: {phyrexian:?}, x: {x} }}",
+        "ManaCost {{ generic: {generic}, symbols: {symbols:?}, hybrid: [{}], twobrid: {twobrid:?}, phyrexian: {phyrexian:?}, x: {x} }}",
         slots.join(", ")
     ))
 }

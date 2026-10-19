@@ -245,15 +245,20 @@ impl ManaPool {
     }
 }
 
-/// A mana cost (CR 202): generic, and a count of each colored symbol. Enough for the cards so far; hybrid,
-/// Phyrexian and X arrive with the first cards that print them.
+/// A mana cost (CR 202): generic, and a count of each colored symbol; hybrid, monocolored hybrid, Phyrexian and {X}
+/// symbols. Snow ({S}) is not built.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct ManaCost {
     pub generic: u8,
     /// W U B R G C, as `Mana` orders them.
     pub symbols: [u8; 6],
-    /// Hybrid symbols (CR 107.4e): each paid with either of two colors.
+    /// Hybrid symbols (CR 107.4e): each paid with either of two types of mana. Two colors ({W/U}), or a color and
+    /// colorless ({C/W}, a monocolored hybrid symbol whose other half is {C}).
     pub hybrid: [Option<(Mana, Mana)>; 6],
+    /// Monocolored hybrid symbols with a generic half (CR 107.4e), {2/W} of each color, W U B R G: each paid with one mana
+    /// of that color or two generic mana, chosen as the cost is announced (CR 601.2b, 118.13a); each counts 2 toward the
+    /// mana value (CR 202.3f) and is its color (CR 202.2d).
+    pub twobrid: [u8; 5],
     /// Phyrexian symbols (CR 107.4f) of each color, W U B R G: each paid with that color or 2 life.
     pub phyrexian: [u8; 5],
     /// How many {X} symbols it has (CR 107.3): {X}{X} is 2.
@@ -261,12 +266,13 @@ pub struct ManaCost {
 }
 
 impl ManaCost {
-    pub const ZERO: ManaCost = ManaCost { generic: 0, symbols: [0; 6], hybrid: [None; 6], phyrexian: [0; 5], x: 0 };
+    pub const ZERO: ManaCost = ManaCost { generic: 0, symbols: [0; 6], hybrid: [None; 6], twobrid: [0; 5], phyrexian: [0; 5], x: 0 };
 
     pub fn mana_value(&self) -> u32 {
         self.generic as u32
             + self.symbols.iter().map(|&n| n as u32).sum::<u32>()
             + self.hybrid.iter().flatten().count() as u32
+            + 2 * self.twobrid.iter().map(|&n| n as u32).sum::<u32>()
             + self.phyrexian.iter().map(|&n| n as u32).sum::<u32>()
     }
 
@@ -274,9 +280,33 @@ impl ManaCost {
         self.mana_value() == 0
     }
 
+    /// How many {2/W}-style symbols the cost has.
+    pub fn twobrids(&self) -> u32 {
+        self.twobrid.iter().map(|&n| n as u32).sum()
+    }
+
+    /// The nonhybrid equivalent of its monocolored hybrid symbols (CR 601.2b): the symbols `generic` lists (by their order
+    /// in `twobrid`, W first) paid with {2}, the others with their color.
+    pub fn with_twobrids_paid(&self, generic: &[bool]) -> ManaCost {
+        let mut out = *self;
+        let mut at = 0;
+        for (i, &n) in self.twobrid.iter().enumerate() {
+            for _ in 0..n {
+                if generic.get(at).copied().unwrap_or(false) {
+                    out.generic = out.generic.saturating_add(2);
+                } else {
+                    out.symbols[Color::ALL[i].mana() as usize] += 1;
+                }
+                at += 1;
+            }
+        }
+        out.twobrid = [0; 5];
+        out
+    }
+
     /// The cost as a player who "may spend mana as though it were mana of any color" pays it (CR 609.4b): each colored
-    /// symbol and each hybrid symbol of two colors may be paid with any mana, colorless included (Mycosynth Lattice's
-    /// ruling), so it is paid as generic; a {C} symbol still takes colorless mana, which no color stands for, and a
+    /// symbol and each hybrid symbol may be paid with any mana, colorless included (Mycosynth Lattice's ruling), so it is
+    /// paid as generic, a {2/W} as one mana; a {C} symbol still takes colorless mana, which no color stands for, and a
     /// Phyrexian symbol keeps its 2-life choice (announced before the mana is paid, which turns it into its color's
     /// symbol, and that then any mana pays). The cost itself, and its mana value, are not changed (CR 609.4b): this is the
     /// payment's view of it only.
@@ -288,25 +318,27 @@ impl ManaCost {
             paid.symbols[i] = 0;
         }
         // A hybrid symbol has a colored half, which any mana may now pay.
-        generic += paid.hybrid.iter().flatten().count() as u32;
+        generic += paid.hybrid.iter().flatten().count() as u32 + self.twobrids();
         paid.hybrid = [None; 6];
+        paid.twobrid = [0; 5];
         paid.generic = generic.min(255) as u8;
         paid
     }
 
     /// The cost as it is paid when "mana of any type can be spent" for it (CR 609.4b: Cruelclaw's Heist, Null Summoner):
     /// every symbol a type of mana is asked for by - colored, {C} (colorless is a type, CR 106.1b) and either half of a
-    /// hybrid one - is paid by one mana of any type, so it is paid as generic. The rest of its structure stays: the generic
-    /// mana, the {X} symbols and a Phyrexian symbol's choice of 2 life, which is announced before the mana is paid (CR
-    /// 601.2b) and turns the symbol into its color's, which any mana then pays. The cost itself, and its mana value, are not
-    /// changed: this is the payment's view of it only, so what pays only generic mana (delve, improvise) is still held to
-    /// the cost's own generic part.
+    /// hybrid one - is paid by one mana of any type, so it is paid as generic, a {2/W} as one mana (its colored half). The
+    /// rest of its structure stays: the generic mana, the {X} symbols and a Phyrexian symbol's choice of 2 life, which is
+    /// announced before the mana is paid (CR 601.2b) and turns the symbol into its color's, which any mana then pays. The
+    /// cost itself, and its mana value, are not changed: this is the payment's view of it only, so what pays only generic
+    /// mana (delve, improvise) is still held to the cost's own generic part.
     pub fn paid_with_any_type(&self) -> ManaCost {
         let mut paid = *self;
         let symbols: u32 = self.symbols.iter().map(|&n| n as u32).sum();
-        let hybrid = self.hybrid.iter().flatten().count() as u32;
+        let hybrid = self.hybrid.iter().flatten().count() as u32 + self.twobrids();
         paid.symbols = [0; 6];
         paid.hybrid = [None; 6];
+        paid.twobrid = [0; 5];
         paid.generic = (self.generic as u32 + symbols + hybrid).min(255) as u8;
         paid
     }
@@ -322,6 +354,7 @@ impl ManaCost {
         }
         for i in 0..5 {
             sum.phyrexian[i] = sum.phyrexian[i].saturating_add(other.phyrexian[i]);
+            sum.twobrid[i] = sum.twobrid[i].saturating_add(other.twobrid[i]);
         }
         for pair in other.hybrid.iter().flatten() {
             if let Some(slot) = sum.hybrid.iter().position(|h| h.is_none()) {
@@ -345,8 +378,8 @@ impl ManaCost {
                 }
             }
         }
-        for (i, &n) in self.phyrexian.iter().enumerate() {
-            if n > 0 {
+        for i in 0..5 {
+            if self.phyrexian[i] > 0 || self.twobrid[i] > 0 {
                 set = set.with(Color::ALL[i]);
             }
         }
@@ -365,6 +398,11 @@ impl fmt::Display for ManaCost {
         }
         for (a, b) in self.hybrid.iter().flatten() {
             write!(f, "{{{}/{}}}", a.symbol(), b.symbol())?;
+        }
+        for (i, &n) in self.twobrid.iter().enumerate() {
+            for _ in 0..n {
+                write!(f, "{{2/{}}}", Color::ALL[i].symbol())?;
+            }
         }
         for (i, &n) in self.phyrexian.iter().enumerate() {
             for _ in 0..n {
@@ -1344,5 +1382,28 @@ mod tests {
         assert!(paid.hybrid.iter().all(Option::is_none));
         assert_eq!((paid.x, paid.phyrexian), (1, cost.phyrexian));
         assert_eq!(paid.mana_value(), cost.mana_value());
+    }
+
+    /// CR 107.4e, 202.3f, 202.2d: {2/W}{2/B}{2/G} (Kin-Tree Severance) has mana value 6 and is white, black and green; {C/W}
+    /// is a hybrid symbol of colorless and white, mana value 1. Announced (CR 601.2b) with the {2/B} paid as {2}, it is
+    /// {2}{W}{G}; paid with mana of any type, each {2/W} is one mana.
+    #[test]
+    fn a_monocolored_hybrid_symbol_counts_two_and_is_its_color() {
+        let mut cost = ManaCost::ZERO;
+        cost.twobrid[Color::White as usize] = 1;
+        cost.twobrid[Color::Black as usize] = 1;
+        cost.twobrid[Color::Green as usize] = 1;
+        assert_eq!(cost.mana_value(), 6);
+        assert_eq!(cost.colors(), ColorSet::NONE.with(Color::White).with(Color::Black).with(Color::Green));
+        assert_eq!(cost.to_string(), "{2/W}{2/B}{2/G}");
+        let mut paid = ManaCost { generic: 2, ..ManaCost::ZERO };
+        paid.symbols[Mana::W as usize] = 1;
+        paid.symbols[Mana::G as usize] = 1;
+        assert_eq!(cost.with_twobrids_paid(&[false, true, false]), paid);
+        assert_eq!(cost.paid_with_any_type(), ManaCost { generic: 3, ..ManaCost::ZERO });
+        assert_eq!(cost.paid_with_any_color(), ManaCost { generic: 3, ..ManaCost::ZERO });
+        let colorless_white = ManaCost { hybrid: [Some((Mana::C, Mana::W)), None, None, None, None, None], ..ManaCost::ZERO };
+        assert_eq!((colorless_white.mana_value(), colorless_white.colors()), (1, ColorSet::NONE.with(Color::White)));
+        assert_eq!(colorless_white.to_string(), "{C/W}");
     }
 }

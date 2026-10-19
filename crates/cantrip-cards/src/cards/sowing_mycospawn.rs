@@ -24,7 +24,7 @@ fn exile_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 }
 
 /// Kicker {1}{C} (CR 702.33, 107.4c).
-const KICKER_COST: ManaCost = ManaCost { generic: 1, symbols: [0, 0, 0, 0, 0, 1], hybrid: [None; 6], phyrexian: [0; 5], x: 0 };
+const KICKER_COST: ManaCost = ManaCost { generic: 1, symbols: [0, 0, 0, 0, 0, 1], ..ManaCost::ZERO };
 
 pub static CARD: CardDef = CardDef {
     colors: devoid::COLORS,

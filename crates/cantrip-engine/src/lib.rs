@@ -108,6 +108,11 @@ pub fn label_text(label: &Label) -> &'static str {
         Label::PayLife(Color::Black) => "Pay 2 life for {B/P}",
         Label::PayLife(Color::Red) => "Pay 2 life for {R/P}",
         Label::PayLife(Color::Green) => "Pay 2 life for {G/P}",
+        Label::PayGeneric(Color::White) => "Pay {2} for {2/W}",
+        Label::PayGeneric(Color::Blue) => "Pay {2} for {2/U}",
+        Label::PayGeneric(Color::Black) => "Pay {2} for {2/B}",
+        Label::PayGeneric(Color::Red) => "Pay {2} for {2/R}",
+        Label::PayGeneric(Color::Green) => "Pay {2} for {2/G}",
         Label::Counter(kind) => kind.name(),
         Label::ManaType(mana) => match mana {
             Mana::W => "{W}",

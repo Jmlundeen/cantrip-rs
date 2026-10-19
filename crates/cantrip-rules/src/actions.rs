@@ -1476,7 +1476,7 @@ fn reduce(mut cost: ManaCost, by: &ManaCost) -> ManaCost {
     // A hybrid symbol in a reduction is split by the payer as the reduction is applied (CR 118.7e), a choice not built:
     // refused in every build rather than reduced some other way.
     assert!(
-        by.hybrid.iter().all(Option::is_none),
+        by.hybrid.iter().all(Option::is_none) && by.twobrids() == 0,
         "a cost reduction by hybrid mana needs the payer's choice of half (CR 118.7e), which is not built"
     );
     let mut excess = by.generic as u32;
@@ -1785,6 +1785,15 @@ impl Available {
     }
 
     pub fn covers_for(&self, cost: &ManaCost, payment: &ManaPayment) -> bool {
+        // A monocolored hybrid symbol ({2/W}) is paid as {W} or as {2}, as announced (CR 601.2b): covered if some
+        // announcement is.
+        if cost.twobrid != [0; 5] {
+            let n = cost.twobrids().min(8) as usize;
+            return (0u32..1 << n).any(|mask| {
+                let generic: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
+                self.covers_for(&cost.with_twobrids_paid(&generic), payment)
+            });
+        }
         // CR 609.4b: a player who may spend mana as though it were mana of any color pays a colored symbol with any mana.
         let as_paid;
         let cost = if self.any_color {
@@ -3644,6 +3653,7 @@ fn cast(
     let x_life = if extra.pay_x_life { item.x } else { 0 };
 
     // CR 601.2b, 107.4f: which Phyrexian symbols are paid with life is announced before any target.
+    announce_twobrids(cx, player, spell, &mut cost.mana, any_type)?;
     let life = announce_life(cx, player, spell, &mut cost.mana, any_type)?;
     // CR 601.2b, 702.174a: gift is an optional additional cost, announced, with the opponent it is promised to, before
     // the targets (CR 702.174m): what may be targeted can depend on it. The opponent is the only one without asking.
@@ -4251,6 +4261,9 @@ fn add_cost(a: ManaCost, b: ManaCost) -> ManaCost {
     for i in 0..6 {
         c.symbols[i] += b.symbols[i];
     }
+    for i in 0..5 {
+        c.twobrid[i] += b.twobrid[i];
+    }
     c
 }
 
@@ -4366,6 +4379,59 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
         }
         _ => Err(Stop::Cancel),
     }
+}
+
+/// Announces the nonhybrid equivalent of a cost's monocolored hybrid symbols (CR 601.2b, 118.13a): which {2/W} are paid
+/// with {2} rather than {W}, any number of them, before the cost is totalled, so a generic reduction then reduces what was
+/// announced as {2} (CR 601.2f, 118.7a). They become that generic mana or their color's symbols in `cost`. The advice is
+/// the fewest paid with {2} that leave a cost the player could pay; `any_type`: mana of any type may pay it (CR 609.4b).
+fn announce_twobrids(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut ManaCost, any_type: bool) -> R<()> {
+    let mut symbols: Vec<Color> = Vec::new();
+    for (i, &n) in cost.twobrid.iter().enumerate() {
+        for _ in 0..n {
+            symbols.push(Color::ALL[i]);
+        }
+    }
+    if symbols.is_empty() {
+        return Ok(());
+    }
+    let n = symbols.len();
+    let affordable: Vec<u8> = if n <= 8 {
+        let mut masks: Vec<u32> = (0u32..1 << n).collect();
+        masks.sort_by_key(|m| (m.count_ones(), *m));
+        masks
+            .into_iter()
+            .find(|&mask| {
+                let generic: Vec<bool> = (0..n).map(|i| mask & (1 << i) != 0).collect();
+                let mut rest = cost.with_twobrids_paid(&generic);
+                // Phyrexian symbols are announced next; the advice reads them as their color.
+                for (i, k) in std::mem::take(&mut rest.phyrexian).into_iter().enumerate() {
+                    rest.symbols[Color::ALL[i].mana() as usize] += k;
+                }
+                can_afford(cx, player, source, &if any_type { rest.paid_with_any_type() } else { rest })
+            })
+            .map(|mask| (0..n as u8).filter(|&i| mask & (1 << i) != 0).collect())
+            .unwrap_or_default()
+    } else {
+        Vec::new()
+    };
+    let ask = RequestKind::ChooseModes {
+        source,
+        modes: symbols.iter().map(|&c| Label::PayGeneric(c)).collect(),
+        eligible: (0..n as u8).collect(),
+        count: 0,
+        at_most: n as u8,
+        affordable,
+        additional_cost: true,
+        repeat: false,
+    };
+    let chosen = match cx.ask_core(player, ask, true)? {
+        Answer::Modes(chosen) => chosen,
+        _ => return Err(Stop::Cancel),
+    };
+    let generic: Vec<bool> = (0..n as u8).map(|i| chosen.contains(&i)).collect();
+    *cost = cost.with_twobrids_paid(&generic);
+    Ok(())
 }
 
 /// Announces which Phyrexian symbols are paid with 2 life (CR 107.4f, 601.2b), as the C# engine's prompt: a choice of
@@ -4584,6 +4650,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
         item.x = announce_x(cx, player, source, mana, None, 0, cap, true, 0)?;
     }
+    announce_twobrids(cx, player, source, &mut mana, false)?;
     let life = announce_life(cx, player, source, &mut mana, false)?;
     // CR 602.2a, 701.27f: put on the stack now, before its costs are paid.
     item.since = cx.g.log.len() as u32;
@@ -5530,7 +5597,12 @@ pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 }
 
 /// `pay_mana_with`, and what the mana spent does to what it paid for (`ManaRestriction::effects`, CR 106.6).
-pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
+pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
+    // A monocolored hybrid symbol not yet announced (a cost changed after the announcement) is announced now, as the cost
+    // is paid (CR 118.13b).
+    if total.twobrid != [0; 5] {
+        announce_twobrids(cx, player, source, &mut total, helpers.any_type)?;
+    }
     // CR 609.4b: a player who may spend mana as though it were mana of any color for this cost pays each colored symbol with
     // any mana, and one who may spend mana of any type on it every symbol; the cost is not changed, nor is what was spent.
     // What is owed keeps the cost's symbols, since what pays instead of mana pays only some of them (delve and improvise
@@ -5760,6 +5832,16 @@ fn pay_during_resolution(
     if !can_pay_life(cx, payer, life) {
         return Ok(None);
     }
+    // CR 118.13b: how a monocolored hybrid symbol is paid is chosen immediately before the cost is paid.
+    let announced;
+    let cost = if cost.mana.twobrid != [0; 5] {
+        let mut mana = cost.mana;
+        announce_twobrids(cx, payer, source, &mut mana, false)?;
+        announced = Cost { mana, ..*cost };
+        &announced
+    } else {
+        cost
+    };
     loop {
         // The cost as X now stands: each {X} is X generic mana (CR 107.3f).
         let total = match x {

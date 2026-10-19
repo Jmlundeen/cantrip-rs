@@ -2,7 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::{top_of_library, triggers::THIS_ENTERS};
 use cantrip_oracle as oracle;
 
-/// Mana symbols of `color` (blue as the Oracle prints it, or what a text change made it) in a permanent's mana cost (CR 700.5): hybrid and Phyrexian blue symbols each count once. A copy
+/// Mana symbols of `color` (blue as the Oracle prints it, or what a text change made it) in a permanent's mana cost (CR 700.5): hybrid ({U/R}, {2/U}) and Phyrexian blue symbols each count once. A copy
 /// counts the cost it copies (CR 707.2), none if it has none (CR 707.9b).
 fn symbols_of(q: &dyn Query, id: ObjectId, color: Color) -> u32 {
     let mana = color.mana();
@@ -14,6 +14,7 @@ fn symbols_of(q: &dyn Query, id: ObjectId, color: Color) -> u32 {
     cost.symbols[mana as usize] as u32
         + cost.hybrid.iter().flatten().filter(|(a, b)| *a == mana || *b == mana).count() as u32
         + cost.phyrexian[mana as usize] as u32
+        + cost.twobrid[mana as usize] as u32
 }
 
 /// "Look at the top X cards of your library, where X is your devotion to blue. Put up to one of them on top of your

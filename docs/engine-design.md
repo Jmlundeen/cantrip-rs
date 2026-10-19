@@ -1034,7 +1034,20 @@ creatures' abilities, Mycosynth Lattice's for every player and payment. Where on
 `ManaCost::paid_with_any_color` has it - each colored and hybrid symbol by any mana, colorless included, a {C} symbol by
 colorless only - by the payment itself (`pay_mana_used`) and by the advice (`Available::covers_for`, which asks once per
 player whether the rule holds for every payment, and the activation offers, which ask for their source); the cost, its
-mana value and the mana spent are unchanged, and no restriction on the mana is lifted.
+mana value and the mana spent are unchanged, and no restriction on the mana is lifted. "Mana of any type can be spent to
+cast that spell" (`PlayGrant::any_type`, `ExileCast::any_type`) is the same with {C} too (`ManaCost::paid_with_any_type`,
+`Helpers::any_type`). The payment keeps the cost's symbols and asks for the mana by that view of what is left, so what
+pays instead of mana still pays only its own share: delve and improvise the generic mana, convoke a symbol of its
+creature's color.
+
+### Monocolored hybrid
+
+`ManaCost::twobrid` counts {2/W}-style symbols by color (mana value 2 each, CR 202.3f; the card is that color); {C/W} is
+an ordinary `hybrid` pair with `Mana::C`. As a spell is cast or an ability activated, `announce_twobrids` asks which are
+paid with {2} rather than their color (CR 601.2b, 118.13a; `Label::PayGeneric`, advised with the fewest {2} that leave a
+cost the player could pay), before the total cost, so a generic reduction reduces what was announced as {2}; a cost paid
+on resolution announces just before it is paid (CR 118.13b), and `pay_mana_used` announces whatever is left. The advice
+(`Available::covers_for`) tries every announcement.
 
 ### Tapped for mana
 

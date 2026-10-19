@@ -806,6 +806,8 @@ pub enum Label {
     Extra(CardId, u8),
     /// "Pay 2 life for {W/P}": one Phyrexian symbol paid with life (CR 107.4f).
     PayLife(Color),
+    /// "Pay {2} for {2/W}": one monocolored hybrid symbol paid with two generic mana rather than its color (CR 107.4e).
+    PayGeneric(Color),
     /// A kind of counter, to remove one of as a cost (CR 118.3).
     Counter(CounterKind),
     /// One of the faces a card may be cast as (CR 709.3, 715.3, 712.8a), named by the face's name.

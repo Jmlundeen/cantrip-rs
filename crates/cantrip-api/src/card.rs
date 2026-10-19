@@ -739,6 +739,7 @@ impl Cost {
         let mut i = 0;
         while i < 5 {
             c.mana.phyrexian[i] += other.mana.phyrexian[i];
+            c.mana.twobrid[i] += other.mana.twobrid[i];
             i += 1;
         }
         c.mana.x += other.mana.x;

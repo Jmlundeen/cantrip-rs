@@ -164,6 +164,14 @@ const fn parse_symbols(symbols: &str) -> (ManaCost, bool) {
             }
             3 => {
                 assert!(b[inner.0 + 1] == b'/', "an unknown mana symbol");
+                if b[inner.0] == b'2' {
+                    // A monocolored hybrid symbol, {2/W} (CR 107.4e).
+                    let color = mana_of(b[inner.0 + 2]);
+                    assert!(!matches!(color, Mana::C), "a monocolored hybrid symbol has a color");
+                    c.twobrid[color as usize] += 1;
+                    i = j + 1;
+                    continue;
+                }
                 let first = mana_of(b[inner.0]);
                 if b[inner.0 + 2] == b'P' {
                     assert!(!matches!(first, Mana::C), "Phyrexian colorless mana is not a symbol");
@@ -959,6 +967,7 @@ mod tests {
         assert_eq!(cost("{X}{R}").mana, ManaCost { x: 1, symbols: [0, 0, 0, 1, 0, 0], ..ManaCost::ZERO });
         assert_eq!(cost("{1}{G/W}{G/W}").mana, ManaCost { hybrid: [Some((Mana::G, Mana::W)), Some((Mana::G, Mana::W)), None, None, None, None], generic: 1, ..ManaCost::ZERO });
         assert_eq!(cost("{9}{G/P}").mana, ManaCost { generic: 9, phyrexian: [0, 0, 0, 0, 1], ..ManaCost::ZERO });
+        assert_eq!(cost("{2/W}{C/U}").mana, ManaCost { twobrid: [1, 0, 0, 0, 0], hybrid: [Some((Mana::C, Mana::U)), None, None, None, None, None], ..ManaCost::ZERO });
         assert_eq!(cost("{C}").mana.symbols, [0, 0, 0, 0, 0, 1]);
         assert_eq!(mana("{2}{G}"), cost("{2}{G}").mana);
         let c = cost("{1}, {T}");
