@@ -256,7 +256,12 @@ Every table of a draft, a queue or a pod tells the client each seat's picture (`
 beside the player's name in the queue's seat list, on their plate at a booster draft's table, and in their rail in a
 game - and its stand-in for anyone without one. The `?v=` is when the picture was written, so a new avatar is a new
 address and browsers may keep each one for good. A client hosted elsewhere (`--client`) is told of no pictures, since
-the bot then serves no site to fetch them from. A plain `/cantrip host` game has no player ids, and no pictures.
+the bot then serves no site to fetch them from. A constructed game's seats are given their picture with their ticket
+(`GameServer.Reserve`), the other games' by the event's player ids.
+
+Every table tells the client each seat's Discord account too (`TablePlayerView.Discord`, from a `discord-{id}` player
+id or the ticket), and a right click (or a long press) on the other player's box in a game offers **DM on Discord**,
+which opens `https://discord.com/users/{id}` in a new tab (`ExternalLink`, `Links.js`); `PlayerMenuTests` right-clicks it.
 
 ## Opening the client from Discord
 

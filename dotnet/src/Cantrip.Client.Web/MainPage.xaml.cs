@@ -846,6 +846,7 @@ public sealed partial class MainPage : Page
 
         _opponentHalf = BuildHalf(showsHandFan: true, top: true);
         table.Children.Add(_opponentHalf.Panel);
+        _opponentHalf.Rail.MenuAsked += e => PlayerMenu(_opponentHalf.Rail, e);
 
         var rule = new Border { Background = Theme.Brush(Theme.Line) };
         Grid.SetRow(rule, 1);

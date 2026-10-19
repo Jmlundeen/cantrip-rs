@@ -48,6 +48,12 @@ public sealed class TablePlayerView
     /// cannot be changed from the table.
     /// </summary>
     [Key(6)] public bool Fixed { get; set; }
+
+    /// <summary>
+    /// The player's Discord account, by its id, for a player who came from Discord: what the client offers to message
+    /// them by (<c>https://discord.com/users/{id}</c>). Empty for anyone else.
+    /// </summary>
+    [Key(7)] public string Discord { get; set; } = string.Empty;
 }
 
 /// <summary>Public lobby state. Never contains deck contents, credentials, hands or pending choices.</summary>

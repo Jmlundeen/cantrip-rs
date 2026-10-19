@@ -154,14 +154,16 @@ public sealed class GameServer : IAsyncDisposable
     /// player whose client died gets back in, having no reconnect proof. It never displaces a connected player.
     /// Safe to call from any thread.
     /// </para>
+    /// <paramref name="discord"/> is the player's Discord account and <paramref name="portrait"/> their picture, as
+    /// <see cref="TablePlayerView"/> tells the table them; empty for none.
     /// </summary>
-    public string Reserve(int seat, string name, string deck)
+    public string Reserve(int seat, string name, string deck, string discord = "", string portrait = "")
     {
         if (seat < 1 || seat > _options.Players) throw new ArgumentOutOfRangeException(nameof(seat), "No such seat at this table.");
         if (!ValidName(name)) throw new ArgumentException("A name is 1–32 printable characters.", nameof(name));
         if (!_decks.ContainsKey(deck)) throw new ArgumentException($"'{deck}' is not in this table's catalog.", nameof(deck));
         byte[] ticket = RandomNumberGenerator.GetBytes(32);
-        if (!_reservations.TryAdd(seat, new Reservation(ticket, name.Trim(), deck)))
+        if (!_reservations.TryAdd(seat, new Reservation(ticket, name.Trim(), deck, discord, portrait)))
             throw new InvalidOperationException($"Seat {seat} is already reserved.");
         return Convert.ToHexString(ticket);
     }
@@ -613,7 +615,10 @@ public sealed class GameServer : IAsyncDisposable
             Refuse(connection, ErrorCode.MembershipRefused, "The table is no longer taking players.");
             return;
         }
-        var member = new Member(seat, reservation.Name) { Connection = connection, Deck = reservation.Deck, Ready = true, Reserved = true };
+        var member = new Member(seat, reservation.Name)
+        {
+            Connection = connection, Deck = reservation.Deck, Ready = true, Reserved = true, Discord = reservation.Discord, Portrait = reservation.Portrait,
+        };
         _members.Add(seat, member);
         connection.Member = member;
         Note($"seat {seat} claimed by its ticket");
@@ -1082,6 +1087,7 @@ public sealed class GameServer : IAsyncDisposable
             Players = [.. _members.Values.OrderBy(member => member.Seat).Select(member => new TablePlayerView
             {
                 Seat = member.Seat, Name = member.Name, Deck = member.Deck, Ready = member.Ready, Connected = member.Connection is not null, Fixed = member.Reserved,
+                Discord = member.Discord, Portrait = member.Portrait,
             })],
             EventId = _options.Event?.EventId ?? string.Empty,
             EventName = _options.Event?.Name ?? string.Empty,
@@ -1110,7 +1116,9 @@ public sealed class GameServer : IAsyncDisposable
             foreach (TablePlayerView player in message.Players)
             {
                 player.Ready = hosted.Forming && hosted.IsReady(player.Seat);
-                if (_options.Portraits is { } portraits && hosted.PlayerAt(player.Seat) is { Length: > 0 } id) player.Portrait = portraits(id) ?? string.Empty;
+                if (hosted.PlayerAt(player.Seat) is not { Length: > 0 } id) continue;
+                if (_options.Portraits is { } portraits) player.Portrait = portraits(id) ?? string.Empty;
+                player.Discord = PlayerFace.DiscordOf(id) ?? string.Empty;
             }
 
             message.ReadyLeftMs = hosted.ReadyLeft(_options.TimeProvider.GetUtcNow()) is { } left ? Math.Max(1, (int)left.TotalMilliseconds) : 0;
@@ -1151,11 +1159,14 @@ public sealed class GameServer : IAsyncDisposable
         public bool Ready { get; set; }
         /// <summary>Seated by a ticket, so its name and deck are the reservation's and cannot be changed.</summary>
         public bool Reserved { get; init; }
+        /// <summary>The reservation's Discord account and picture (<see cref="Reserve"/>); empty for none.</summary>
+        public string Discord { get; init; } = string.Empty;
+        public string Portrait { get; init; } = string.Empty;
         public Connection? Connection { get; set; }
         public DateTimeOffset? DisconnectedAt { get; set; }
     }
 
-    private sealed record Reservation(byte[] Ticket, string Name, string Deck);
+    private sealed record Reservation(byte[] Ticket, string Name, string Deck, string Discord, string Portrait);
 
     internal sealed class Connection(WebSocket socket, DateTimeOffset createdAt)
     {

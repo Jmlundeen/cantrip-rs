@@ -100,6 +100,16 @@ public sealed class PlayerRail : Border
                 clicked();
             }
         };
+
+        // A right click on the player - or a long press - asks for what can be done with them (MainPage.PlayerMenu).
+        avatar.RightTapped += (_, e) =>
+        {
+            if (MenuAsked is { } asked)
+            {
+                e.Handled = true;
+                asked(e);
+            }
+        };
         column.Children.Add(avatar);
 
         // As tall as a full hand's fan across the rail, whatever this one holds, so what is below does not move.
@@ -176,6 +186,9 @@ public sealed class PlayerRail : Border
 
     /// <summary>The box that stands for the player, which is what an arrow aimed at them points to.</summary>
     public FrameworkElement Avatar { get; }
+
+    /// <summary>The player's box was right-clicked, or long-pressed.</summary>
+    public event Action<Microsoft.UI.Xaml.Input.RightTappedRoutedEventArgs>? MenuAsked;
 
     private readonly Border _box;
     private readonly TextBlock _badgeText;

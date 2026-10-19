@@ -276,7 +276,8 @@ public sealed class Matchmaker : IAsyncDisposable
             while (_games.ContainsKey(id));
             var address = _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game");
             game = new HostedGame(id, host with { Name = SeatName(host.Name) }, port, address, server, _options.TimeProvider.GetUtcNow(), format);
-            ticket = server.Reserve(1, game.Host.Name, format is null ? _options.Deck.Name : deck!);
+            PlayerFace hostFace = FaceOf(game.Host);
+            ticket = server.Reserve(1, game.Host.Name, format is null ? _options.Deck.Name : deck!, hostFace.Discord ?? string.Empty, hostFace.Picture ?? string.Empty);
             game.Seat(host.Id, ticket);
             _games.Add(id, game);
             Watch(game);
@@ -313,7 +314,8 @@ public sealed class Matchmaker : IAsyncDisposable
                 return Seating.Refused("Choose a deck from the list.", game);
 
             game.Guest = player with { Name = SeatName(player.Name) };
-            string ticket = game.Server.Reserve(2, game.Guest.Name, game.Format is null ? _options.Deck.Name : deck!);
+            PlayerFace guest = FaceOf(game.Guest);
+            string ticket = game.Server.Reserve(2, game.Guest.Name, game.Format is null ? _options.Deck.Name : deck!, guest.Discord ?? string.Empty, guest.Picture ?? string.Empty);
             game.Seat(player.Id, ticket);
             game.Stage = GameStage.Seated;
             seating = new Seating(game, ticket, 2, null);

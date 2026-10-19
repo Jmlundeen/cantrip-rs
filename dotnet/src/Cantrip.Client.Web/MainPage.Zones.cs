@@ -394,6 +394,18 @@ public sealed partial class MainPage
         rail.ShowPortrait(PortraitOf(client, seat));
     }
 
+    /// <summary>
+    /// What can be done with another player, from a right click on their box: message them on Discord, for a player who
+    /// came from there. Nothing for anyone else.
+    /// </summary>
+    private void PlayerMenu(PlayerRail rail, Microsoft.UI.Xaml.Input.RightTappedRoutedEventArgs e)
+    {
+        if (_gameClient is not { } client || rail.Seat == client.Seat) return;
+        string discord = client.Table?.Players.FirstOrDefault(each => each.Seat == rail.Seat)?.Discord ?? string.Empty;
+        if (discord.Length == 0) return;
+        _menu.Open(Root, e.GetPosition(Root), [("DM on Discord", () => { _menu.Close(); ExternalLink.Open($"https://discord.com/users/{discord}"); })]);
+    }
+
     /// <summary>A seat's picture, as the table names it; empty for none.</summary>
     private static string PortraitOf(GameClient client, int seat) =>
         client.Table?.Players.FirstOrDefault(each => each.Seat == seat)?.Portrait ?? string.Empty;
