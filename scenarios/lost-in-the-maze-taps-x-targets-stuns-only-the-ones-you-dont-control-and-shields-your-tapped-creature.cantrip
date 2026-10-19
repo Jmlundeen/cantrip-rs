@@ -1,0 +1,50 @@
+# Lost in the Maze: "When this enchantment enters, tap X target creatures. Put a stun counter on each of those creatures you don't
+# control. Tapped creatures you control have hexproof." Cast with X = 2 ({2}{U}{U}) on Bot1's own Ornithopter (a second, untapped one is left alone) and Bot2's Llanowar Elves.
+# Both become tapped, only the Elves gets a stun counter (CR 122.1g), and the tapped Ornithopter now has hexproof while the untapped one does not (CR 702.11, 613.1f); Bot2's Elves is tapped but not Bot1's to shield, so it does not have it.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Ornithopter
+Lost in the Maze
+Island x15
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lost in the Maze.Cast(X: 2)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves; Bot1.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Llanowar Elves.Tapped = true
+Bot2.Battlefield.Llanowar Elves.Counters.Stun = 1
+Bot2.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Ornithopter#1.Tapped = true
+Bot1.Battlefield.Ornithopter#1.Counters.Stun = (absent)
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying; Hexproof
+Bot1.Battlefield.Ornithopter#2.Tapped = false
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying
+Bot1.Battlefield.Lost in the Maze.Tapped = false
