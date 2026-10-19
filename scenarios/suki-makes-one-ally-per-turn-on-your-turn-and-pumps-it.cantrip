@@ -1,0 +1,61 @@
+# Suki: "Whenever another permanent you control leaves the battlefield during your turn, create a 1/1 white Ally creature
+# token. This ability triggers only once each turn." Bot1 casts Suki with three Mox Pearls on turn 1. On turn 3 Bot1
+# destroys one of its own Mox Pearls (already tapped for mana) with Disenchant: one Ally is made, and "Other creatures you
+# control get +1/+0" makes it 2/1. A second Disenchant on the second Mox Pearl the same turn makes no second Ally (once each
+# turn). The Ally enters after the first Disenchant, so the pump is seen on a creature that came later.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Suki, Courageous Rescuer
+Disenchant
+Disenchant
+Plains
+Plains x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Suki, Courageous Rescuer.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Pearl#1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Ally.Power = 2
+? Bot1.Battlefield.Ally.Toughness = 1
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Pearl#1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Suki, Courageous Rescuer; Mox Pearl; Plains; Ally
+Bot1.Battlefield.Suki, Courageous Rescuer.Power = 2
+Bot1.Battlefield.Ally.Power = 2
+Bot1.Graveyard.Count = 4

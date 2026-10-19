@@ -1,0 +1,59 @@
+# Suki's trigger needs "another permanent you control" leaving "during your turn". Bot1 casts Suki with three Mox Pearls on
+# turn 1. On turn 2 Bot2 destroys one of Bot1's Mox Pearls with Disenchant: not Bot1's turn, so no Ally. On turn 3 Bot1
+# exiles Suki herself with its own Swords to Plowshares: it is Bot1's turn, but Suki is not "another" permanent, so
+# there is no Ally either. (The sibling scenario shows the positive case.)
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Suki, Courageous Rescuer
+Swords to Plowshares
+Plains
+Plains
+Plains x20
+
+[Bot2 Deck]
+Mox Pearl
+Plains
+Disenchant
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Suki, Courageous Rescuer.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Mox Pearl#1)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot1.Battlefield = Suki, Courageous Rescuer; Mox Pearl; Mox Pearl
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Suki, Courageous Rescuer)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Pearl; Plains
