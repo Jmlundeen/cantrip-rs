@@ -1,0 +1,31 @@
+# Diviner of Victory: the printed abilities and resulting state (CR 608.2, 722).
+
+[Bot1 Deck]
+Diviner of Victory
+5 Mox Sapphire
+Island
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Hand.Diviner of Victory.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Exile.Unwind History.Cast(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Diviner of Victory.Power = 2
+Bot1.Battlefield.Diviner of Victory.Prepared = (absent)
+Bot2.Hand.Ornithopter.Power = 0
