@@ -292,11 +292,13 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
         cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
         return;
     }
-    // A spell cast as its Adventure that resolves is exiled, and its owner may cast the creature from there later
-    // (CR 715.4, 715.5); countered, or its targets gone, it is put into the graveyard like any spell.
+    // A spell cast as its Adventure that resolves is exiled by its controller, who may play the card from there later
+    // (CR 715.3d) - in its owner's exile zone, whoever cast it; countered, or its targets gone, it is put into the graveyard
+    // like any spell.
     if item.way == WAY_ADVENTURE && reason == ZoneReason::Resolve {
         let new = ops::move_to_for(cx, item.object, Zone::exile(obj.owner), reason);
-        cx.st().update_obj(new, |o| o.on_adventure = true);
+        let controller = item.controller;
+        cx.st().update_obj(new, |o| o.on_adventure = Some(controller));
         return;
     }
     let def = cx.card(obj.card);

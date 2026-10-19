@@ -1354,6 +1354,9 @@ pub struct ExileCast {
     pub allows: fn(&dyn Query, &Asker, ObjectId, PlayerId) -> bool,
     /// The additional cost owed on each cast by it (CR 118.8); `Cost::NONE` for none.
     pub additional: Cost,
+    /// "And mana of any type can be spent to cast that spell" (CR 609.4b): every symbol of what a cast by it costs is paid
+    /// as generic mana, as a play permission's `PlayGrant::any_type` pays. Null Summoner's threshold ability.
+    pub any_type: bool,
 }
 
 /// A static ability of a permanent that gives cards in a hand miracle (CR 702.94a): "each instant and sorcery card in your

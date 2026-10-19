@@ -62,8 +62,9 @@ pub struct Obj {
     pub chosen_color: Option<Color>,
     /// A creature or land type chosen as it entered.
     pub chosen_subtype: Option<Subtype>,
-    /// Exiled "on an adventure" (CR 715.4): its controller may cast the creature half from exile (CR 715.5).
-    pub on_adventure: bool,
+    /// Exiled "on an adventure" (CR 715.3d): by the player who controlled the Adventure spell as it resolved, who "may play
+    /// it" for as long as it remains exiled - its owner's exile zone holds it, whoever that player is.
+    pub on_adventure: Option<PlayerId>,
     /// For a spell: the kind of zone it was cast from (CR 601.2a), what rebound ("cast from your hand") and "whenever
     /// you cast a spell from exile" ask. Not carried on when it leaves the stack.
     pub cast_from: Option<ZoneKind>,
@@ -204,7 +205,7 @@ impl Obj {
             prepared_from: None,
             chosen_color: None,
             chosen_subtype: None,
-            on_adventure: false,
+            on_adventure: None,
             cast_from: None,
             activated_turn: 0,
             activated_mask: 0,

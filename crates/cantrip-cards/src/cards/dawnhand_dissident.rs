@@ -40,6 +40,7 @@ pub static CARD: CardDef = CardDef {
         text: "Cast by removing three counters from among creatures you control",
         allows,
         additional: remove_counters_among(3, targets::filters::creature),
+        any_type: false,
     }],
     ..oracle::DAWNHAND_DISSIDENT
 };

@@ -2212,11 +2212,14 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
             offer(id, options);
         }
     }
-    // A land card its owner exiled on an Adventure (CR 715.3d): "for as long as that card remains exiled, that player may
-    // play it" - as a land play, at the time and within the number of land plays the rules allow (CR 305.1, 305.2).
-    for &id in cx.s().zone(Zone::exile(player)) {
-        if cx.s().obj(id).on_adventure {
-            offer(id, options);
+    // A land card this player exiled on an Adventure (CR 715.3d), in whichever player's exile zone it is: "for as long as
+    // that card remains exiled, that player may play it" - as a land play, at the time and within the number of land plays
+    // the rules allow (CR 305.1, 305.2).
+    for zone in cx.s().seats().map(Zone::exile) {
+        for &id in cx.s().zone(zone) {
+            if cx.s().obj(id).on_adventure == Some(player) {
+                offer(id, options);
+            }
         }
     }
     // The land cards in the graveyard that a way a permanent gives lets the player play (CR 305.1, 604): once during each of
@@ -2398,7 +2401,7 @@ fn exile_cast_for(
 /// on an Adventure. What the cast owes on top of its cost (CR 118.8) is the permission's.
 fn exile_cast_permission(cx: &Cx, card: ObjectId, face: Option<CardId>, player: PlayerId) -> Option<(ObjectId, &'static ExileCast)> {
     let obj = cx.s().obj(card);
-    if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure || obj.card_copy || permission_for(cx, card, player).is_some() {
+    if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure == Some(player) || obj.card_copy || permission_for(cx, card, player).is_some() {
         return None;
     }
     let casts = exile_casts_of(cx.cards(), cx.s(), &cx.g.log);
@@ -2517,7 +2520,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
         for &id in cx.s().zone(zone) {
             let obj = cx.s().obj(id);
             // From exile, only a prepare spell's copy, by the prepared permanent's controller (CR 722.3), or a
-            // card exiled on an Adventure, by its owner (CR 715.5).
+            // card exiled on an Adventure, by the player who exiled it (CR 715.3d).
             let prepared_copy = zone.is(ZoneKind::Exile)
                 && own
                 && obj.card_copy
@@ -2525,7 +2528,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                     let f = cx.s().obj(from);
                     live(cx.s(), from) && f.zone.is(ZoneKind::Battlefield) && f.prepared && f.controller == player
                 });
-            let adventured = zone.is(ZoneKind::Exile) && own && obj.on_adventure;
+            let adventured = zone.is(ZoneKind::Exile) && obj.on_adventure == Some(player);
             // Or by a permission to cast it from where it is (CR 601.3), from any zone it was granted for.
             let permitted = !zone.is(ZoneKind::Hand) && permission_for(cx, id, player).is_some();
             // Or by a static ability of a permanent that lets cards in exile be cast (CR 601.3, 604.1), judged on the card
@@ -2545,6 +2548,8 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             // could be paid.
             let additional = exile_cast.map(|(_, c)| c.additional);
             let additional_payable = additional.is_none_or(|a| can_pay_other(cx, id, player, &a));
+            // Whether the permission that casts the card itself from here lets mana of any type pay for it (CR 609.4b).
+            let whole_any_type = exile_cast.is_some_and(|(_, c)| c.any_type);
             let permitted = permitted || exile_cast.is_some();
             // A land card is played, never cast (CR 305.1, 305.9), but one with an Adventure may be cast as that (CR 715.3:
             // Lindblum, Industrial Regency's Mage Siege), and only as that.
@@ -2608,8 +2613,9 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                         if let Some(additional) = additional {
                             least = add_cost(least, additional.mana);
                         }
-                        if any_type {
-                            // Mana of any type pays every symbol of it (CR 609.4b).
+                        // Mana of any type pays every symbol of it (CR 609.4b), by the permission of its own or the
+                        // permanent's that casts it from exile.
+                        if any_type || whole_any_type {
                             least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
                         }
                         covers_total(cx, a, player, id, def, least, 0) && added_life_payable(cx, a, player, id, def, targets)
@@ -2624,7 +2630,9 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                     if way.instant_speed {
                         continue;
                     }
-                    if (way.from != zone.kind() && !from_elsewhere(way, elsewhere)) || !own {
+                    // From its own zone of the caster's (the hand, their graveyard), or from wherever a permission lets the card
+                    // be cast, whoever owns it: a permission to cast leaves the card's alternative costs open (CR 601.2b, 118.9).
+                    if !(own && way.from == zone.kind()) && !from_elsewhere(way, elsewhere) {
                         continue;
                     }
                     if let Some(condition) = way.condition
@@ -2637,7 +2645,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                         continue;
                     }
                     let a = available.get_or_init(|| self::available(cx, player));
-                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra))) {
+                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra)), any_type || whole_any_type) {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
@@ -2662,10 +2670,10 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             // From another zone by a permission (sneak names no zone), unless the permission says when (CR 601.3).
             if instants && !land {
                 for (n, way) in def.ways.iter().enumerate() {
-                    if !way.instant_speed || !own {
+                    if !way.instant_speed {
                         continue;
                     }
-                    if way.from != zone.kind() && !from_elsewhere(way, elsewhere && !grant.is_some_and(|g| g.sorcery_speed)) {
+                    if !(own && way.from == zone.kind()) && !from_elsewhere(way, elsewhere && !grant.is_some_and(|g| g.sorcery_speed)) {
                         continue;
                     }
                     if let Some(condition) = way.condition
@@ -2677,7 +2685,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                         continue;
                     }
                     let a = available.get_or_init(|| self::available(cx, player));
-                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra))) {
+                    if !way_covered(cx, a, player, id, def, &additional.map_or(way.cost, |extra| way.cost.and(extra)), any_type || whole_any_type) {
                         continue;
                     }
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, (n + 1) as u8);
@@ -2724,9 +2732,9 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             }
             // What a face cast by the permission costs (CR 118.9, 601.2f): what it names instead, or life equal to the face's
             // mana value, and what it adds; the face's own mana cost from the hand.
-            let face_covered = |face: &CardDef, by_permission: Option<Option<Cost>>| {
+            let face_covered = |face: &CardDef, by_permission: Option<Option<&'static ExileCast>>| {
                 let a = available.get_or_init(|| self::available(cx, player));
-                let Some(additional) = by_permission else {
+                let Some(by_exile_cast) = by_permission else {
                     return a.covers_for(&least_cost(cx, a, player, id, face, face.cost, &[]), &spell_kind(cx, a, id, face));
                 };
                 if life_grant && !can_pay_other(cx, id, player, &life_for_mana_value(face)) {
@@ -2734,10 +2742,10 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                 }
                 let mut least = least_cost(cx, a, player, id, face, instead.unwrap_or(face.cost), &[]);
                 least.generic = least.generic.saturating_add(more);
-                if let Some(additional) = additional {
-                    least = add_cost(least, additional.mana);
+                if let Some(c) = by_exile_cast {
+                    least = add_cost(least, c.additional.mana);
                 }
-                if any_type {
+                if any_type || by_exile_cast.is_some_and(|c| c.any_type) {
                     least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
                 }
                 a.covers_for(&least, &spell_kind(cx, a, id, face))
@@ -2745,12 +2753,12 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
             // Whether a permission casts this face from here, and what it adds (CR 118.8): a permission of the card's own for
             // the card, or a permanent's to cast cards from exile, judged on the face (CR 709.3a, 712.8a), whose additional
             // cost has to be payable.
-            let face_permission = |face: &'static CardDef| -> Option<Option<Cost>> {
+            let face_permission = |face: &'static CardDef| -> Option<Option<&'static ExileCast>> {
                 if zone.is(ZoneKind::Hand) {
                     None
                 } else if by_exile_cast {
                     match exile_cast_for(cx, casts, id, Some(cx.card_id(face)), player) {
-                        Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(Some(c.additional)),
+                        Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(Some(c)),
                         _ => None,
                     }
                 } else if permitted_whole {
@@ -2823,9 +2831,9 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                         continue;
                     }
                     // A permanent's permission to cast from exile is judged on the face (CR 715.3a, 720.3a).
-                    let face_additional = if by_exile_cast {
+                    let face_exile_cast = if by_exile_cast {
                         match exile_cast_for(cx, casts, id, Some(cx.card_id(inset)), player) {
-                            Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(c.additional),
+                            Some((_, c)) if can_pay_other(cx, id, player, &c.additional) => Some(c),
                             _ => continue,
                         }
                     } else {
@@ -2836,10 +2844,10 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                         let a = available.get_or_init(|| self::available(cx, player));
                         let mut least = least_cost(cx, a, player, id, inset, instead.unwrap_or(inset.cost), &[]);
                         least.generic = least.generic.saturating_add(more);
-                        if let Some(additional) = face_additional {
-                            least = add_cost(least, additional.mana);
+                        if let Some(c) = face_exile_cast {
+                            least = add_cost(least, c.additional.mana);
                         }
-                        if any_type {
+                        if any_type || face_exile_cast.is_some_and(|c| c.any_type) {
                             // Mana of any type pays every symbol of it (CR 609.4b).
                             least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
                         }
@@ -2954,9 +2962,13 @@ fn reduction_of(cx: &Cx, creature: ObjectId) -> u8 {
 /// Whether a way of casting `card` is worth offering (advice, CR 601.2g): the least its mana can come to, with emerge's
 /// richest sacrifice, is covered; or, for harmonize (CR 702.180a), is covered once some untapped creature is tapped for
 /// its power, that creature then not tapping for mana.
-fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost) -> bool {
+fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost, any_type: bool) -> bool {
     let mut cost = least_cost(cx, a, player, card, def, way.mana, &[]);
     cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
+    if any_type {
+        // Mana of any type pays every symbol of it (CR 609.4b), as `cast` pays it.
+        cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
+    }
     if covers_total(cx, a, player, card, def, cost, way.exile_from_graveyard) {
         return true;
     }
@@ -3112,7 +3124,7 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
 /// copy). Read without asking whether it allows the cast: the option it describes was offered because it did.
 fn exile_cast_text(cards: &CardTable, state: &GameState, log: &[Record], card: ObjectId) -> Option<&'static str> {
     let obj = state.obj(card);
-    if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure || obj.card_copy || state.permissions.iter().any(|p| p.card == card) {
+    if !obj.zone.is(ZoneKind::Exile) || obj.on_adventure.is_some() || obj.card_copy || state.permissions.iter().any(|p| p.card == card) {
         return None;
     }
     let by = obj.exiled?.by;
@@ -3331,6 +3343,8 @@ fn cast(
     // Cast from exile by a permanent's permission (CR 601.3), it owes what the permission adds (CR 118.8, 601.2f): found now, as
     // the cast begins, so the permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling).
     let exile_permit = if resolving || copy { None } else { exile_cast_permission(cx, card, inset.or(half).or(back).map(|_| face), player) };
+    // "Mana of any type can be spent to cast that spell" (CR 609.4b), by that permission: read as the cast begins too.
+    let any_type = any_type || exile_permit.is_some_and(|(_, c)| c.any_type);
     // Flashback (CR 702.34a) a permission or a permanent gave, or aftermath (CR 702.127a): exiled instead of put anywhere
     // else as it leaves the stack. The way a permanent gave is read now: the spell keeps it if the permanent leaves.
     let flashback = flashback || def.aftermath || granted.is_some_and(|(k, _)| granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.flashback);

@@ -144,7 +144,7 @@ impl Game {
                     entered_with: None,
                     chosen_color: None,
                     chosen_subtype: None,
-                    on_adventure: false,
+                    on_adventure: None,
                     cast_from: None,
                     activated_turn: 0,
                     activated_mask: 0,

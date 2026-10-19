@@ -845,8 +845,10 @@ the same cost on an activated ability, which `activate` pays too, though no card
 
 A permanent's static ability that lets a player cast cards in exile (CR 601.3, 604.1) is `CardDef::exile_casts`, an `ExileCast`:
 whether a card may be cast by it now (asked of the permanent, its controller "you", with the card as the face that would be
-cast, so "creature spells" refuses a creature card's instant Adventure) and an additional cost owed on each cast by it (CR 118.8,
-601.2f). It is a permission, not a way of paying: `castable` treats the card as permitted, so it is cast for its mana cost or any
+cast, so "creature spells" refuses a creature card's instant Adventure; a condition on the game state, Null Summoner's threshold,
+is asked there too, since a static ability is never locked in, CR 611.3a), an additional cost owed on each cast by it (CR 118.8,
+601.2f), and whether mana of any type can be spent on that spell (`any_type`, CR 609.4b, read with the permission as the cast
+begins). It is a permission, not a way of paying: `castable` treats the card as permitted, so it is cast for its mana cost or any
 alternative cost it has (Solitude's evoke), at the speed its type gives (a flash creature at instant speed, the rulings), and the
 additional cost joins `extra` in `actions::cast`, which finds the permission as the cast begins (`exile_cast_permission`), so the
 permanent need not stay while the spell is paid for (Dawnhand Dissident's ruling). A permanent that has lost its abilities gives
@@ -1082,7 +1084,8 @@ permission an Adventure gives the card it exiled (CR 715.3d). Only the face is j
 speed (CR 715.3a, 720.3a) - which a permission to cast spells as though they had flash reads too, through a view of
 the face (`actions::Speed`, as for a split half, a Room's door, a back face and a bestowed Aura) - and on the stack it is that face alone (`Obj::copy`, CR 715.3b, 720.3b), which a copy of it and a
 choice of new targets for it read too (CR 715.3c, 720.3c). As it resolves, an Adventure is exiled on its adventure (CR 715.3d)
-and an Omen is shuffled into its owner's library by its controller (CR 720.3d); a copy of an Omen still shuffles its owner's
+- into its owner's exile, by and for its controller (`Obj::on_adventure`), who "may play it" though another player owns it
+(an Adventure cast by Null Summoner's permission) - and an Omen is shuffled into its owner's library by its controller (CR 720.3d); a copy of an Omen still shuffles its owner's
 library and ceases to exist. Countered, or with every target gone, either goes to the graveyard. The host sends the face as
 `ObjectView::inset_spell`, printed beside the card. A land card with an Adventure (Lindblum, Industrial Regency) is cast
 only as the Adventure, never as itself (CR 305.9), and exiled on its adventure it is played from exile as a land play (CR

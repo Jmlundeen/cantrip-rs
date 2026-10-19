@@ -87,6 +87,7 @@ keeps it).
 | [KI-74](#ki-74-a-question-a-replacement-asks-mid-run-is-not-watched-for-loops) | A question a replacement asks mid-run is not watched for loops | Low | Suspected |
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
+| [KI-77](#ki-77-mana-of-any-type-turns-a-whole-cost-into-generic-mana) | "Mana of any type" turns a whole cost into generic mana | Low | Open |
 
 ## Issues
 
@@ -975,3 +976,18 @@ function must offer a fused way for a fuse card in a hand, with a mana value equ
 content yet.
 
 **Scenarios.** None yet: the first fuse card to be added (Turn // Burn) reaches it through Buster Sword.
+
+### KI-77: "Mana of any type" turns a whole cost into generic mana
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-18, Null Summoner |
+
+**Notes.** "Mana of any type can be spent to cast that spell" (CR 609.4b) changes only how the cost may be paid, not the cost.
+The engine pays it by replacing the cost with generic mana equal to its mana value (`PlayGrant::any_type`, `ExileCast::any_type`;
+`actions::cast` and the offers in `castable_ways` and `way_covered`). That is right for colored, colorless-generic and two-color
+hybrid symbols, but a monocolored hybrid symbol ({2/W}) is then charged two mana where one of any type pays it, and a Phyrexian
+symbol loses the choice of 2 life. Reachable with Cruelclaw's Heist, Black Widow, Laughing Jasper Flint or Null Summoner taking a
+card with such a symbol. A fix pays it as `ManaCost::paid_with_any_color` does, with colorless mana allowed for {C} too.
+
+**Scenarios.** none yet: Null Summoner exiling a card with {2/W} or a Phyrexian symbol is the first to write.
