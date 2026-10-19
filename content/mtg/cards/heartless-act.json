@@ -1,0 +1,6 @@
+{
+  "name": "Heartless Act",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Destroy target creature with no counters on it.\n• Remove up to three counters from target creature."
+}

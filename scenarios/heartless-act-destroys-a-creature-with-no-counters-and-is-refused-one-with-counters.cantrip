@@ -1,0 +1,45 @@
+# Heartless Act, first mode: "Destroy target creature with no counters on it." Abigale gives Bot2's Ornithopter three counters, so it is
+# not a legal target (the refusal), while Bot1's own Ornithopter, with none, is (the positive control) and is destroyed. Bot2's
+# Ornithopter keeps its counters.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Abigale, Eloquent First-Year
+Heartless Act
+Ornithopter
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Counters.Flying = 1
+Bot1.Hand.Heartless Act.Cast
+Bot1.Modes(Destroy target creature)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Heartless Act; Ornithopter; Black Lotus
+Bot2.Battlefield.Ornithopter.Counters.Lifelink = 1
+Stack.Count = 0

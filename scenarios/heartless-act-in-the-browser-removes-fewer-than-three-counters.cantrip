@@ -1,0 +1,48 @@
+# Browser
+# Heartless Act in the browser: its second mode asks which counters of the three on Bot2's Ornithopter come off, "up to" three, with a
+# caption that says so (it is an effect, not a cost). Bot1 takes the flying and the first strike counter and leaves the lifelink counter.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Abigale, Eloquent First-Year
+Heartless Act
+Ornithopter
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Abigale, Eloquent First-Year.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Counters.Flying = 1
+Bot1.Hand.Heartless Act.Cast
+Bot1.Modes(Remove up to three counters)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Client.Bot1.Prompt.Title = Heartless Act: remove up to 3 counters
+? Client.Bot1.Prompt.Detail = Any kinds, as many as you choose, or none  ·  0 of up to 3 chosen  ·  click a permanent to take one of its counters, or a button below
+Bot1.RemoveCounters(Ornithopter: Flying 1; Ornithopter: FirstStrike 1)
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Counters.Flying = (absent)
+Bot2.Battlefield.Ornithopter.Counters.FirstStrike = (absent)
+Bot2.Battlefield.Ornithopter.Counters.Lifelink = 1
+Stack.Count = 0
