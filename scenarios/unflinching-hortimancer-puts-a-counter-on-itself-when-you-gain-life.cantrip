@@ -1,0 +1,35 @@
+# Unflinching Hortimancer: "Whenever you gain life, put a +1/+1 counter on this creature." Healing Salve's first mode
+# gaining 3 life is one life-gain event (CR 119.3), so it is one trigger and one counter, and the counter is permanent.
+
+[Bot1 Deck]
+Plains
+Healing Salve
+Unflinching Hortimancer
+Black Lotus
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Unflinching Hortimancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot1.Battlefield.Unflinching Hortimancer.Power = 3
+Bot1.Battlefield.Unflinching Hortimancer.Toughness = 2
+Bot1.Battlefield.Unflinching Hortimancer.Counters.PlusOnePlusOne = 1

@@ -1,0 +1,37 @@
+# Ward {1} (CR 702.21a): Bot2's Lightning Bolt targeting Unflinching Hortimancer triggers the ward ability, and Bot2
+# declines to pay {1}, so the Bolt is countered and deals no damage - the Hortimancer is untouched.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Unflinching Hortimancer
+Plains x4
+Plains x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Unflinching Hortimancer.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Unflinching Hortimancer)
+Bot2.Decline
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Unflinching Hortimancer
+Bot1.Battlefield.Unflinching Hortimancer.Damage = 0
+Bot2.Graveyard = Lightning Bolt
