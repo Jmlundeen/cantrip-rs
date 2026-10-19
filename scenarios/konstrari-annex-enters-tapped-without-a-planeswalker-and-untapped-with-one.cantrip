@@ -1,0 +1,45 @@
+# Konstrari Annex: the first copy enters tapped with no planeswalker anywhere (CR 614.1c); on turn 3, with Karn on the
+# battlefield, the second copy enters untapped and taps for red (it also taps for green, the other of its colors).
+
+[Bot1 Deck]
+Konstrari Annex
+Konstrari Annex
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Sol Ring
+Karn, Scion of Urza
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Konstrari Annex.Play
+? Bot1.Battlefield.Konstrari Annex.Tapped = true
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast(Spend: R)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Konstrari Annex.Play
+? Bot1.Battlefield.Konstrari Annex#2.Tapped = false
+Bot1.Battlefield.Konstrari Annex#2.Activate(Color: Red)
+? Bot1.Mana = {R}{G}
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Konstrari Annex#1.Tapped = false
+Bot1.Battlefield.Konstrari Annex#2.Tapped = true
