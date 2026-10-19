@@ -1,0 +1,22 @@
+# With no planeswalker anywhere, Stingerquill Annex enters tapped (CR 614.1c) - the land itself is not a planeswalker - so it
+# cannot be tapped for mana that turn (refused), and on Bot1's next turn it untaps and taps for {B}, one of its two colors.
+
+[Bot1 Deck]
+Stingerquill Annex
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Stingerquill Annex.Play
+? Bot1.Battlefield.Stingerquill Annex.Tapped = true
+! Bot1.Battlefield.Stingerquill Annex.Activate(Color: Black)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Stingerquill Annex.Activate(Color: Black)
+? Bot1.Mana = {B}
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Stingerquill Annex.Tapped = true
