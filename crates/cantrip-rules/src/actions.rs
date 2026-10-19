@@ -1323,6 +1323,7 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
 /// mana as the cost changes in play leave it before any target is announced (CR 601.2f): for the menu row of a cast without
 /// paying the mana cost, which says what it still costs ({1} more under Thalia).
 pub fn granted_cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8) -> Option<(Cost, ManaCost)> {
+    let _face_up = layers::judged_face_up(&game.state, card);
     let cost = granted_cast_cost(game, player, card, index)?;
     let (_, face) = granted_slot(index)?;
     let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
@@ -1356,6 +1357,7 @@ pub fn alternative_cast_total(game: &crate::Game, player: PlayerId, card: Object
 /// since a way's text need not say it (Iroh's "the flashback cost is equal to that card's mana cost"). `None` for any other
 /// way, or one the permanent no longer gives.
 pub fn granted_cast_cost(game: &crate::Game, player: PlayerId, card: ObjectId, way: u8) -> Option<Cost> {
+    let _face_up = layers::judged_face_up(&game.state, card);
     let (k, face) = granted_slot(way)?;
     let (granter, controller, rule) = *granted_ways_of(game.cards, &game.state, &game.log).get(k)?;
     let (_, face_def) = faces_to_cast(game.cards.get(game.state.obj(card).card)).into_iter().find(|&(f, _)| f == face)?;
@@ -4270,7 +4272,12 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
     let way = if pays_mana_cost && !terms.flashback {
         let whole = cx.card(cx.s().obj(card).card);
         let all = static_rules::spell_alternatives(cx);
-        let alternatives = alternatives_for(cx, cx.cards(), &all, player, card, cast_face(whole, way), way);
+        // A card exiled face down is judged as the spell it would be (CR 406.3a-b); the question below is asked of the
+        // card, and `cast` turns it face up.
+        let alternatives = {
+            let _face_up = layers::judged_face_up(cx.s(), card);
+            alternatives_for(cx, cx.cards(), &all, player, card, cast_face(whole, way), way)
+        };
         if alternatives.is_empty() {
             if !has_cost {
                 return Ok(false);

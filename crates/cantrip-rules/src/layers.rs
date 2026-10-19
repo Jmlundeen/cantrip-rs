@@ -41,6 +41,14 @@ pub fn chars_as_face(cards: &CardTable, state: &GameState, log: &[Record], id: O
 /// it is: what playing it would be, asked of the resulting spell or land (CR 406.3a-b, 601.3, 305.1), for a player who may
 /// play it. The card is turned face up only as it is played (`ops::turn_up_to_play`); until then it has no characteristics
 /// for every other purpose. Nothing for any other object.
+///
+/// The caches the layers keep on the epoch (`static_sources`, `lost_to_statics`, `land_text_lost`) are not keyed on it: they
+/// are about permanents, and a face-down card in exile is never a static-ability source, judged or not, so what they hold is
+/// the same either way. A judgment that would make them depend on the card would have to key them on it.
+///
+/// It does not ask whether the player may look at the card (`seen_by`): every permission that lets a face-down card be played
+/// today comes from the effect that exiled it and let its player look. A permission to cast "spells with certain qualities
+/// from among face-down cards in exile" must check that first (CR 406.3b, 601.3f).
 pub struct JudgedFaceUp<'a> {
     state: &'a GameState,
     was: Option<Option<ObjectId>>,
