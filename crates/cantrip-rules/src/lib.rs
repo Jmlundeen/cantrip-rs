@@ -1127,8 +1127,8 @@ impl cantrip_api::Game for Cx<'_> {
         self.emit(Event::Surveilled { player, count, looked });
     }
 
-    fn attach(&mut self, attachment: ObjectId, host: ObjectId) {
-        ops::attach(self, attachment, host);
+    fn attach(&mut self, attachment: ObjectId, host: ObjectId) -> bool {
+        ops::attach(self, attachment, host)
     }
 
     fn unattach(&mut self, attachment: ObjectId) {

@@ -399,6 +399,9 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `Prevented` (with `.Count`): every prevention of damage (CR 615.6), in the order the history recorded it: how much, its source,
   whom it would have been dealt to and whose prevention effect it was, `3 Lightning Bolt > Bot1 by Healing Salve` (protection's is
   the protected permanent's, or the source of a player's protection). Absent until damage has been prevented
+- `Attached` (with `.Count`): every time an Aura, Equipment or Fortification became attached to something (CR 701.3a), in the
+  order the history recorded it: `Bonesplitter > Grizzly Bears`, a player an Aura enchants as `Bot2`. An attach to what it is
+  already attached to does nothing and is not one (CR 701.3b). Absent until something has become attached
 - `Exile` lists a card exiled face down as `(face down)` (CR 406.3), and `Exile.FaceDown` says what those cards are (the dump sees
   everything; a player's view does not)
 - `BotN.Life`, `.Poison`, `.Energy`, `.Status` (`Lost`, once the player has lost the game and absent until then), `.Mana` (`{U}{U}`), `.LandsPlayed`

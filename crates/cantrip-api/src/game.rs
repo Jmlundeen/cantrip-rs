@@ -605,7 +605,8 @@ pub trait Game: Query {
     fn gave_gift(&mut self, player: PlayerId, to: PlayerId, gift: Gift);
     /// Attaches an Aura or Equipment to a permanent (CR 701.3a): nothing happens if it could not be attached there
     /// (CR 701.3b) or already is. It becomes a new object with respect to what it is attached to (CR 701.3c, 613.7e).
-    fn attach(&mut self, attachment: ObjectId, host: ObjectId);
+    /// Returns whether it became attached (`Event::Attached`): "when one or more Equipment become attached this way".
+    fn attach(&mut self, attachment: ObjectId, host: ObjectId) -> bool;
     /// Unattaches an Aura or Equipment (CR 701.3d); it stays on the battlefield.
     fn unattach(&mut self, attachment: ObjectId);
     fn tap(&mut self, permanent: ObjectId);

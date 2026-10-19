@@ -1,0 +1,38 @@
+# An Aura spell resolving enters attached to what it targeted (CR 303.4f, 608.3b), and that is becoming attached (CR 701.3a):
+# the history records Rancor becoming attached to Birds of Paradise, after its entry, and Curse of Opulence to Bot2, the
+# player it enchants. Before either, nothing has become attached (the `?`).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Birds of Paradise
+Rancor
+Curse of Opulence
+Forest x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+? Attached = (absent)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Birds of Paradise)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Curse of Opulence.Cast(Bot2)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Rancor.AttachedTo = Birds of Paradise
+Bot1.Battlefield.Curse of Opulence.AttachedTo = Bot2
+Attached = Rancor > Birds of Paradise; Curse of Opulence > Bot2

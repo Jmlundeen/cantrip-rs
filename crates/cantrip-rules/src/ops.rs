@@ -330,6 +330,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             }
         }
         events.push(Event::ZoneChange { old: m.id, new: new_id, from, to, reason });
+        // CR 303.4f, 301.5e: it entered attached to something, so it became attached to it.
+        if entering && let Some(attached) = entered_attached(cx, new_id) {
+            events.push(attached);
+        }
         // CR 708.3: it entered face down, which the history keeps, as turning it face up later ends that (CR 708.8).
         if entering && cx.s().obj(new_id).face_down {
             events.push(Event::EnteredFaceDown { permanent: new_id, controller: cx.s().obj(new_id).controller });
@@ -350,15 +354,16 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
 }
 
 /// Attaches an Aura or Equipment to a permanent (CR 701.3a). Nothing happens when it could not be attached there
-/// (CR 701.3b) or already is. Attaching reassigns its timestamp (CR 701.3c, 613.7e).
-pub fn attach(cx: &mut Cx, attachment: ObjectId, host: ObjectId) {
+/// (CR 701.3b) or already is. Attaching reassigns its timestamp (CR 701.3c, 613.7e), and it has become attached
+/// (`Event::Attached`), what this returns.
+pub fn attach(cx: &mut Cx, attachment: ObjectId, host: ObjectId) -> bool {
     if !live(cx.s(), attachment)
         || !cx.s().obj(attachment).zone.is(ZoneKind::Battlefield)
         || cx.s().obj(attachment).attached_to == Some(host)
         || !crate::attach::host_allows(cx, attachment, host, true)
         || !cx.s().obj(host).zone.is(ZoneKind::Battlefield)
     {
-        return;
+        return false;
     }
     // Moving it off what it was on unattaches it from that first (CR 701.3d).
     if let Some(old) = cx.s().obj(attachment).attached_to
@@ -372,6 +377,20 @@ pub fn attach(cx: &mut Cx, attachment: ObjectId, host: ObjectId) {
         o.attached_to = Some(host);
         o.timestamp = timestamp;
     });
+    cx.emit(Event::Attached { attachment, to: Target::Object(host) });
+    true
+}
+
+/// What a permanent that has just entered the battlefield entered attached to (CR 303.4f, 301.5e): its `Event::Attached`,
+/// recorded after its `ZoneChange`.
+fn entered_attached(cx: &Cx, id: ObjectId) -> Option<Event> {
+    let o = cx.s().obj(id);
+    let to = match (o.attached_to, o.attached_player) {
+        (Some(host), _) => Target::Object(host),
+        (None, Some(p)) => Target::Player(p),
+        (None, None) => return None,
+    };
+    Some(Event::Attached { attachment: id, to })
 }
 
 /// Unattaches an Aura or Equipment (CR 701.3d); it stays where it is.
@@ -1130,6 +1149,8 @@ fn create_tokens_onto(
             Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
             None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, reason: ZoneReason::Created },
         });
+        // CR 303.4f, 301.5e: created attached to something, it became attached to it.
+        events.extend(entered_attached(cx, id));
         events.extend(put);
         created.push(id);
     }

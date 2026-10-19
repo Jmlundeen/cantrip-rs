@@ -223,6 +223,26 @@ impl StateDump {
             d.list("Prevented", prevented, true);
         }
 
+        // Every time an Aura, Equipment or Fortification became attached to something (CR 701.3a), in order, from the
+        // history (`Event::Attached`): "Bonesplitter > Grizzly Bears", "Curse of Opulence > Bot2". Absent until one has.
+        let attached: Vec<String> = records
+            .iter()
+            .filter_map(|r| match r.event {
+                Event::Attached { attachment, to } => {
+                    let to = match to {
+                        Target::Player(p) => bot(p),
+                        Target::Object(id) => game.name(id).to_string(),
+                        _ => String::new(),
+                    };
+                    Some(format!("{} > {to}", game.name(attachment)))
+                }
+                _ => None,
+            })
+            .collect();
+        if !attached.is_empty() {
+            d.list("Attached", attached, true);
+        }
+
         let attackers = s
             .attackers
             .iter()

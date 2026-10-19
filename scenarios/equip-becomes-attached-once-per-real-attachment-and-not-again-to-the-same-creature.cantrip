@@ -1,0 +1,65 @@
+# What the history records as "becomes attached" (CR 701.3a), the event "whenever this Equipment becomes attached to a creature"
+# triggers on. Turn 3: Sword of the Meek is equipped to Birds of Paradise - one attachment - then equipped to the Birds again:
+# that attach does nothing (CR 701.3b), and the history still has the one (the `?` after it). Turn 5: equipping Llanowar Elves
+# moves it (CR 701.3d), a second attachment. Two records in all, in order.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Birds of Paradise
+Sword of the Meek
+Llanowar Elves
+Forest x20
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sword of the Meek.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sword of the Meek.Activate(Birds of Paradise)
+Bot1.Pass
+Bot2.Pass
+? Attached = Sword of the Meek > Birds of Paradise
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Sword of the Meek.Activate(Birds of Paradise)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Attached = Sword of the Meek > Birds of Paradise
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sword of the Meek.Activate(Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Sword of the Meek.AttachedTo = Llanowar Elves
+Attached = Sword of the Meek > Birds of Paradise; Sword of the Meek > Llanowar Elves
+Attached.Count = 2

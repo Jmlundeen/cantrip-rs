@@ -112,6 +112,15 @@ pub enum Event {
     GaveGift { player: PlayerId, to: PlayerId, gift: Gift },
     /// An Aura or Equipment stopped being attached to `from` (CR 701.3d): moved, unattached, or either one left.
     Unattached { attachment: ObjectId, from: ObjectId },
+    /// An Aura, Equipment or Fortification became attached to `to` (CR 701.3a, 301.5, 303.4): an object, or a player an
+    /// Aura enchants. Raised wherever it really does - attached by an effect or an equip, reconfigure or bestow ability, moved
+    /// onto it from something else (after that move's `Unattached`, CR 701.3d), or entering the battlefield attached to it
+    /// (an Aura spell resolving, CR 303.4f and 608.3b; an Aura or Equipment put onto the battlefield or created attached,
+    /// CR 303.4f, 301.5e; a bestowed Aura, CR 702.103b), then after its `ZoneChange` and with the new object as
+    /// `attachment`. Never for an attach to what it is already attached to, which does nothing (CR 701.3b), nor for
+    /// phasing in attached (CR 702.26j). The state is as the attachment left it: "whenever this Equipment becomes attached
+    /// to a creature" reads `to` as it is now.
+    Attached { attachment: ObjectId, to: Target },
     /// A spell's characteristics as it became cast (CR 601.2i), recorded just before its `SpellCast`: what "the second
     /// creature spell you cast this turn" reads.
     Cast(Cast),
@@ -264,6 +273,7 @@ impl Event {
             | Event::PhasedIn { permanent }
             | Event::DoorUnlocked { permanent, .. } => permanent == object,
             Event::Unattached { attachment, from } => attachment == object || from == object,
+            Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
             Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } => false,
         }
@@ -326,6 +336,8 @@ impl EventMask {
     pub const MANA_SPENT: EventMask = EventMask(1 << 46);
     /// A player lost the game, or the game was drawn: recorded only, for the history and the host.
     pub const GAME_OVER: EventMask = EventMask(1 << 47);
+    /// An Aura, Equipment or Fortification became attached to something (CR 701.3a).
+    pub const ATTACHED: EventMask = EventMask(1 << 48);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -373,6 +385,7 @@ impl EventMask {
             Event::CountersPut { .. } => EventMask::COUNTERS,
             Event::Transformed { .. } => EventMask::TRANSFORMED,
             Event::Unattached { .. } => EventMask::UNATTACHED,
+            Event::Attached { .. } => EventMask::ATTACHED,
             Event::Tapped { .. } => EventMask::TAPPED,
             Event::BecameMonarch { .. } => EventMask::BECAME_MONARCH,
             Event::CoinFlipped { .. } => EventMask::COIN_FLIPPED,

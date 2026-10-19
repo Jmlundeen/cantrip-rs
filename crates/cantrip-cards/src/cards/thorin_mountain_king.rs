@@ -18,9 +18,7 @@ fn attach_equipment(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut attached = false;
     for slot in item.spec_targets(0) {
         let Some(equipment) = targets::object(g, item, slot) else { continue };
-        let before = g.attached_to(equipment);
-        g.attach(equipment, creature);
-        attached |= before != Some(creature) && g.attached_to(equipment) == Some(creature);
+        attached |= g.attach(equipment, creature);
     }
     if attached {
         let me = g.card_id(&CARD);
