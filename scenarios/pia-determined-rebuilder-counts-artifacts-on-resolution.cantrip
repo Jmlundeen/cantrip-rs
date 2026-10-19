@@ -1,0 +1,34 @@
+# Pia makes a flying artifact Thopter; her pump counts both it and Ornithopter (CR 608.2h).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Pia, Determined Rebuilder
+Ornithopter
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Pia, Determined Rebuilder.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Pia, Determined Rebuilder.Activate(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Thopter.Power = 1
+Bot1.Battlefield.Thopter.Toughness = 1
+Bot1.Battlefield.Thopter.Keywords = Flying
