@@ -1,0 +1,6 @@
+{
+  "name": "Icy Reception",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Choose one -\n Counter target creature or legendary spell unless its controller pays {3}.\n Target creature gets -5/-0 until end of turn."
+}
