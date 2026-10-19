@@ -19,23 +19,9 @@ fn dragon_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// The 5/5 red Dragon creature token with flying.
-pub static DRAGON: CardDef = CardDef {
-    name: "Dragon",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::Red)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Dragon]),
-    power: Some(5),
-    toughness: Some(5),
-    keywords: Keywords::of(&[Keyword::Flying]),
-    text: "Flying",
-    ..CardDef::BLANK
-};
-
 /// -7: "Create four 5/5 red Dragon creature tokens with flying."
 fn dragons(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &DRAGON, 4)?;
+    tokens::create(g, item.controller, &tokens::DRAGON_5_5, 4)?;
     Ok(())
 }
 
@@ -48,4 +34,4 @@ pub static CARD: CardDef = CardDef {
     ..oracle::SARKHAN_FIREBLOOD
 };
 
-pub static EXTRA: &[&CardDef] = &[&DRAGON];
+pub static EXTRA: &[&CardDef] = &[&tokens::DRAGON_5_5];
