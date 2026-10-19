@@ -89,7 +89,6 @@ keeps it).
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-77](#ki-77-mana-of-any-type-turns-a-whole-cost-into-generic-mana) | "Mana of any type" turns a whole cost into generic mana | Low | Open |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
-| [KI-79](#ki-79-protection-from-a-player-judges-a-departed-damage-source-by-its-owner-not-its-last-controller) | Protection from a player judges a departed damage source by its owner, not its last controller | Low | Unexercised |
 
 ## Issues
 
@@ -1008,19 +1007,3 @@ may attack into a protected player for nothing and leave itself open. A fix tell
 protected from (a field on `PlayerSummaryView` rather than the text), and has the attack plan count no damage to them.
 
 **Scenarios.** none yet.
-
-### KI-79: Protection from a player judges a departed damage source by its owner, not its last controller
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-18, review of Absolute Virtue |
-
-**Notes.** Protection from a player prevents the damage of sources that player controls (CR 702.16k), and a source that has
-left the battlefield is judged as it last existed there (CR 113.7a, 608.2h). `ops::deal_damage_with` and
-`ops::protection_prevents` ask `Object::controller`, which a move off the battlefield resets to the owner (`ops.rs`, the
-zone move), and `LastKnown` keeps no controller. So a creature Bot2 stole from Bot1 that died and whose ability then deals
-damage would be judged Bot1's: Absolute Virtue's protection would not prevent it, and the reverse case would wrongly prevent.
-A permanent's protection from a player (True-Name Nemesis, Figure of Fable) reads the same field, and so does the
-`Event::Damage` controller. A fix records the controller in `LastKnown` and reads it for a departed source.
-
-**Scenarios.** none yet: no implemented card whose source has left the battlefield deals damage under a stolen control.

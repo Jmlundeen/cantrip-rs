@@ -1,0 +1,55 @@
+# CR 702.16, 113.7a, 608.2h: a permanent's protection from a player is from the sources that player controls, and a source that
+# has left the battlefield is judged by its controller as it last existed there. Bot2's True-Name Nemesis has protection from
+# Bot1 (the chosen player). On turn 4 Bot2 steals Bot1's Fanatical Firebrand with Act of Treason, targets its own Nemesis with
+# the Firebrand (legal: Bot2 controls the Firebrand), and sacrifices it as the cost. As the ability resolves the Firebrand is in
+# Bot1's graveyard, but its last controller was Bot2, so the target is still legal, nothing prevents the damage, and the 1/1
+# Nemesis dies. Judged by its owner Bot1, the Nemesis would be protected and survive.
+
+[Bot1 Deck]
+Mountain
+Fanatical Firebrand
+Mountain x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+True-Name Nemesis
+Mountain
+Mox Ruby
+Mox Jet
+Act of Treason
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.True-Name Nemesis.Cast
+Bot2.Pass
+Bot2.ChoosePlayer(Bot1)
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Fanatical Firebrand)
+Bot2.Pass
+Bot2.Battlefield.Fanatical Firebrand.Activate(Bot2.Battlefield.True-Name Nemesis)
+? Bot1.Graveyard = Fanatical Firebrand
+? Stack.Count = 1
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = True-Name Nemesis; Act of Treason; Black Lotus
+Bot1.Graveyard = Fanatical Firebrand
+Bot1.Life = 20
+Bot2.Life = 20
+Stack.Count = 0

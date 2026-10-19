@@ -10,6 +10,9 @@ use crate::vocab::*;
 pub struct Obj {
     pub card: CardId,
     pub owner: PlayerId,
+    /// Who controls it. A move to another zone makes a new object (CR 400.7) and leaves this row as it was, so the row of
+    /// an object that has left the battlefield keeps the player who last controlled it there: its last-known controller
+    /// (CR 113.7a, 608.2h), by which a departed damage source's protection, lifelink and `Event::Damage` are judged.
     pub controller: PlayerId,
     pub zone: Zone,
     pub token: bool,
@@ -934,7 +937,9 @@ impl DelayedWhen {
 /// from (CR 702.167c), and the width of `Obj::activated_mask`.
 pub const MAX_ABILITIES: usize = 32;
 
-/// An object's characteristics as it last existed on the battlefield (CR 608.2h, 603.10), kept when it leaves.
+/// An object's characteristics as it last existed on the battlefield (CR 608.2h, 603.10), kept when it leaves: what the
+/// layers compute, which its row cannot give afterwards. Its last controller needs no copy here: the row keeps it
+/// (`Obj::controller`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct LastKnown {
     pub id: ObjectId,

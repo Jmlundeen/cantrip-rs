@@ -1,0 +1,65 @@
+# CR 702.16k, 113.7a, 608.2h: protection from a player prevents the damage of sources that player controls, and a source that
+# has left the battlefield is judged as it last existed there, its controller included. Bot2 controls Absolute Virtue and on
+# turn 6 steals Bot1's Fanatical Firebrand with Act of Treason. Bot2 targets itself with the Firebrand (legal: Bot2 controls the
+# Firebrand) and sacrifices it as the cost, so the Firebrand is in Bot1's graveyard as the ability resolves. Its last controller
+# was Bot2, not an opponent of Bot2's, so the target is still legal and the 1 damage is dealt to Bot2; judged by its owner Bot1
+# the target would be illegal and the damage prevented.
+
+[Bot1 Deck]
+Mountain
+Fanatical Firebrand
+Mountain x10
+
+[Bot2 Deck]
+Island
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Absolute Virtue
+Mountain
+Act of Treason
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Absolute Virtue.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Fanatical Firebrand)
+Bot2.Pass
+Bot2.Battlefield.Fanatical Firebrand.Activate(Bot2)
+? Bot1.Graveyard = Fanatical Firebrand
+? Stack.Count = 1
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot1.Graveyard = Fanatical Firebrand
+Bot2.Battlefield.Absolute Virtue.Damage = 0
+Stack.Count = 0
