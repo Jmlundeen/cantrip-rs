@@ -1,0 +1,7 @@
+{
+  "name": "Fulminous Forte",
+  "manaCost": "{2}{R}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Fulminous Forte deals 1 damage to each creature and planeswalker your opponents control.\n• Fulminous Forte deals 5 damage to target creature or planeswalker.",
+  "keywords": []
+}

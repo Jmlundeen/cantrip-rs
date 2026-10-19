@@ -1,0 +1,26 @@
+# Deterministic printed-card behavior (CR 603, 608).
+[Bot1 Deck]
+Fulminous Forte
+Mox Ruby x3
+Mountain x20
+
+[Bot2 Deck]
+Ornithopter
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Fulminous Forte.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Bot2.Graveyard = Ornithopter
