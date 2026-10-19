@@ -1,0 +1,37 @@
+# Unsummon: "Return target creature to its owner's hand." Its only target, Bot2's Llanowar Elves, is Lightning Bolted by Bot2 in response and dies; the Unsummon does not
+# resolve (CR 608.2b) and returns nothing, so the Elves is in the graveyard and not in Bot2's hand (Elves back in hand would make it 5, not 4).
+
+[Bot1 Deck]
+Island
+Unsummon
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Forest x12
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Unsummon.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot2.Hand.Count = 4
+Bot1.Graveyard = Unsummon

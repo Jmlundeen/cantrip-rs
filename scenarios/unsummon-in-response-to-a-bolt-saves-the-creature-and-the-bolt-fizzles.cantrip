@@ -1,0 +1,41 @@
+# Unsummon: "Return target creature to its owner's hand." At instant speed, in response to Lightning Bolt aimed at
+# Bot1's Ornithopter, Bot1 returns it to hand. The Bolt's only target is gone, so it is countered on resolution
+# (CR 608.2b) and deals no damage: Ornithopter is in Bot1's hand, not the graveyard, Bot2 spent the Bolt for nothing.
+
+[Bot1 Deck]
+Island
+Ornithopter
+Unsummon
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x14
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Ornithopter)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 5
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Island
+Bot1.Graveyard = Unsummon
+Bot1.Hand = Ornithopter; Island; Island; Island; Island
+Bot2.Graveyard = Lightning Bolt
+Bot1.Life = 20
+Stack.Count = 0

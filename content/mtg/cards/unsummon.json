@@ -1,0 +1,6 @@
+{
+  "name": "Unsummon",
+  "manaCost": "{U}",
+  "type": "Instant",
+  "oracleText": "Return target creature to its owner's hand."
+}

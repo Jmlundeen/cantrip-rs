@@ -1,0 +1,41 @@
+# Unsummon says "target creature": Bot1's Mox Sapphire is not a creature and Bot2's Sylvan Caryatid has hexproof
+# (CR 702.11b), so neither is a legal target (the refusals), while Bot2's Llanowar Elves, a legal target of the very same
+# spell, is the control. The Unsummon then returns only the Elves; the Caryatid stays.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Unsummon
+Island x14
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Sylvan Caryatid
+Forest x11
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Sylvan Caryatid.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+! Bot1.Hand.Unsummon.Cast(Bot1.Battlefield.Mox Sapphire)
+! Bot1.Hand.Unsummon.Cast(Bot2.Battlefield.Sylvan Caryatid)
+Bot1.Hand.Unsummon.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Forest; Mox Emerald; Mox Ruby; Sylvan Caryatid
+Bot1.Graveyard = Unsummon
