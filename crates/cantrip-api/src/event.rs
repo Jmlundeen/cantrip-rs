@@ -199,6 +199,15 @@ pub enum Event {
     GameLost { player: PlayerId, reason: LossReason },
     /// The game ended in a draw (CR 104.4), and why.
     GameDrawn { reason: DrawReason },
+    /// A hidden card was named by a question `player` was asked (the cards looked at by a scry or surveil, a library
+    /// searched, an opponent's hand chosen from): from then on `player` knows what it is. Recorded only, as the answer
+    /// is replayed, so the history says who has seen which hidden card.
+    Shown { player: PlayerId, card: ObjectId },
+    /// `player`'s library was shuffled (CR 701.24): whatever anyone knew of where its cards were is gone. Recorded only.
+    Shuffled { player: PlayerId },
+    /// `card` was put on the bottom of `player`'s library in a random order (CR 401.4): nobody knows where among the
+    /// others it went. Recorded only.
+    Randomized { player: PlayerId, card: ObjectId },
 }
 
 /// Why a player loses the game (CR 104.3): what a "can't lose the game" or "don't lose the game for ..." effect is asked
@@ -261,7 +270,10 @@ impl Event {
             | Event::Surveilled { player, .. }
             | Event::SpeedChanged { player, .. }
             | Event::CrimeCommitted { player, .. }
-            | Event::GameLost { player, .. } => Some(player),
+            | Event::GameLost { player, .. }
+            | Event::Shown { player, .. }
+            | Event::Shuffled { player }
+            | Event::Randomized { player, .. } => Some(player),
             Event::Cast(c) => Some(c.player),
             Event::LandPlayed { player, .. } => Some(player),
             Event::BecameTarget { controller, .. } | Event::EnteredFaceDown { controller, .. } => Some(controller),
@@ -282,7 +294,7 @@ impl Event {
             Event::ZoneChange { old, new, .. } => old == object || new == object,
             Event::Damage { source, target, .. } => source == object || target == Target::Object(object),
             Event::DamagePrevented { source, target, by, .. } => source == object || by == object || target == Target::Object(object),
-            Event::Drew { card, .. } | Event::Discarded { card, .. } | Event::Revealed { card, .. } | Event::Looked { card, .. } | Event::Cycled { card, .. } => {
+            Event::Drew { card, .. } | Event::Discarded { card, .. } | Event::Revealed { card, .. } | Event::Looked { card, .. } | Event::Cycled { card, .. } | Event::Shown { card, .. } | Event::Randomized { card, .. } => {
                 card == object
             }
             Event::AbilityActivated { source, .. }
@@ -309,7 +321,7 @@ impl Event {
             Event::Unattached { attachment, from } => attachment == object || from == object,
             Event::Attached { attachment, to } => attachment == object || to == Target::Object(object),
             Event::ManaSpent { source, on, .. } => source == object || on == object,
-            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } => false,
+            Event::LifeChange { .. } | Event::Searched { .. } | Event::AttackersDeclared { .. } | Event::StepBegan { .. } | Event::BecameMonarch { .. } | Event::TookInitiative { .. } | Event::GaveGift { .. } | Event::ChosenAtRandom { .. } | Event::CoinFlipped { .. } | Event::DieRolled { .. } | Event::TurnEnded { .. } | Event::TurnBegan { .. } | Event::DungeonCompleted { .. } | Event::Scried { .. } | Event::Surveilled { .. } | Event::SpeedChanged { .. } | Event::GameLost { .. } | Event::GameDrawn { .. } | Event::Shuffled { .. } => false,
         }
     }
 }
@@ -379,6 +391,11 @@ impl EventMask {
     pub const TURN_BEGAN: EventMask = EventMask(1 << 51);
     /// A dungeon was completed (CR 309.7): recorded only, for the history.
     pub const DUNGEON_COMPLETED: EventMask = EventMask(1 << 52);
+    /// What a seat was shown, a library shuffled, a card put on the bottom at random: recorded only, for what each
+    /// player knows of the hidden zones.
+    pub const SHOWN: EventMask = EventMask(1 << 53);
+    pub const SHUFFLED: EventMask = EventMask(1 << 54);
+    pub const RANDOMIZED: EventMask = EventMask(1 << 55);
 
     /// An event's kind as the history files it: every event has one. `of` is what triggers listen for, which leaves
     /// out the records no ability triggers on.
@@ -401,6 +418,9 @@ impl EventMask {
             Event::DungeonCompleted { .. } => EventMask::DUNGEON_COMPLETED,
             Event::GameLost { .. } | Event::GameDrawn { .. } => EventMask::GAME_OVER,
             Event::ManaSpent { .. } => EventMask::MANA_SPENT,
+            Event::Shown { .. } => EventMask::SHOWN,
+            Event::Shuffled { .. } => EventMask::SHUFFLED,
+            Event::Randomized { .. } => EventMask::RANDOMIZED,
             other => EventMask::of(other),
         }
     }

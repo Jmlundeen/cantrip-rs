@@ -124,6 +124,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
     });
     let then = if looks_back { crate::settle::Then::now(cx) } else { crate::settle::Then::none() };
     let mut events = Vec::with_capacity(moves.len());
+    let mut shuffled = Vec::new();
     let mut created = Vec::with_capacity(moves.len());
     // CR 701.3d: every attachment these moves end, read before any is made: an attachment leaving the battlefield,
     // and every one attached to something leaving. Each pair once.
@@ -313,8 +314,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         if change.reveal {
             cx.emit(Event::Revealed { player: old.owner, card: new_id });
         }
+        // Shuffled now, announced after the move that put it there is: the history says it arrived, then was shuffled.
         if change.shuffle && to.is(ZoneKind::Library) {
             crate::turn::shuffle(cx.st(), to);
+            shuffled.push(to.player);
         }
         if madness {
             // "When you do" (CR 702.35a, 603.12): a reflexive trigger of the exiled card, its owner's.
@@ -363,6 +366,9 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         }
     }
     cx.emit_batch(&events, Some(crate::settle::Before { battlefield: &before, then: &then }));
+    for player in shuffled {
+        cx.record(Event::Shuffled { player });
+    }
     created
 }
 
@@ -2418,6 +2424,9 @@ pub fn bottom_in_random_order(cx: &mut Cx, player: PlayerId, cards: &[ObjectId])
         cards.swap(i, j);
     }
     arrange_library(cx, player, &[], &cards);
+    for &card in &cards {
+        cx.record(Event::Randomized { player, card });
+    }
 }
 
 /// Puts objects into their owners' libraries together and arranges them there (CR 401.4).
@@ -2455,7 +2464,7 @@ pub fn put_into_library(cx: &mut Cx, ids: &[ObjectId], place: LibraryPlace) -> V
             LibraryPlace::Top => arrange_library(cx, owner, &mine, &[]),
             LibraryPlace::Bottom => arrange_library(cx, owner, &[], &mine),
             LibraryPlace::BottomInRandomOrder => bottom_in_random_order(cx, owner, &mine),
-            LibraryPlace::ShuffledIn => crate::turn::shuffle(cx.st(), Zone::library(owner)),
+            LibraryPlace::ShuffledIn => crate::turn::shuffle_library(cx, owner),
             LibraryPlace::FromTop(depth) => {
                 let library = Zone::library(owner);
                 for &id in &mine {
