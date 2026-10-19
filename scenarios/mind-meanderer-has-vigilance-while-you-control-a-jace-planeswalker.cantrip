@@ -1,0 +1,44 @@
+# Mind Meanderer: "This creature has vigilance as long as you control a Jace planeswalker." Jace, the Mind Sculptor is a
+# Jace planeswalker (CR 205.3i); with it on the battlefield the Meanderer attacks without tapping.
+
+[Bot1 Deck]
+Island
+Island
+Forest
+Forest
+Mox Sapphire
+Mox Emerald
+Jace, the Mind Sculptor
+Mind Meanderer
+Island x10
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mind Meanderer.Cast
+
+[Expect]
+Bot1.Battlefield.Mind Meanderer.Keywords = Flying; Vigilance
