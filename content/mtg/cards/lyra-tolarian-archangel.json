@@ -1,0 +1,11 @@
+{
+  "name": "Lyra, Tolarian Archangel",
+  "manaCost": "{1}{U}{U}",
+  "type": "Legendary Creature — Angel Wizard",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nAt the beginning of each end step, if you've drawn three or more cards this turn, create a 3/3 blue Angel creature token with flying.\n{3}{U}{U}: Until end of turn, whenever Lyra deals combat damage to a player, draw two cards.",
+  "keywords": [
+    "Flying"
+  ]
+}
