@@ -1,0 +1,24 @@
+# campus crier empowers jace from graveyard (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Campus Crier
+Lightning Bolt
+Mox Ruby
+Plains x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Campus Crier.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Campus Crier)
+Bot1.Graveyard.Campus Crier.Activate
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Exile = Campus Crier
