@@ -379,7 +379,8 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
     let Some(at) = pending else {
         for (id, rule) in optional {
             if cx.ask_core(player, RequestKind::May { source: id, purpose: Purpose::Ask(rule.question) }, false)? == Answer::Yes {
-                (rule.on_skip)(cx, &Asker { source: id, controller: player })?;
+                // A replacement effect's own doing, its controller's (CR 609.1, 614.10).
+                cx.acting_as(player, |cx| (rule.on_skip)(cx, &Asker { source: id, controller: player }))?;
                 return Ok(true);
             }
         }
@@ -397,7 +398,8 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
             && i > 0
             && let Some(&(id, rule)) = optional.get(i as usize - 1)
         {
-            (rule.on_skip)(cx, &Asker { source: id, controller: player })?;
+            // A replacement effect's own doing, its controller's (CR 609.1, 614.10).
+            cx.acting_as(player, |cx| (rule.on_skip)(cx, &Asker { source: id, controller: player }))?;
             return Ok(true);
         }
     }
