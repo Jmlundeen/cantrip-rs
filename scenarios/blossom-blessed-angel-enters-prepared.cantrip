@@ -1,0 +1,30 @@
+# Blossom-Blessed Angel enters prepared (CR 722), putting a copy of Seed Suture in exile.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Blossom-Blessed Angel
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Blossom-Blessed Angel.Cast
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Blossom-Blessed Angel.Prepared = true
+Exile = Seed Suture
