@@ -9,14 +9,10 @@ fn enchanted_and_entered_this_turn(view: &dyn LayerQuery, source: ObjectId, affe
     attached_object(view, source, affected, so_far) && entered_this_turn(view.history(), source)
 }
 
-fn hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Hexproof);
-}
-
 pub static CARD: CardDef = CardDef {
     enchant: Some(targets::CREATURE_YOU_CONTROL),
     statics: &[
-        static_ability(Layer::Ability, enchanted_and_entered_this_turn, hexproof, "As long as this Aura entered this turn, enchanted creature has hexproof."),
+        static_ability(Layer::Ability, enchanted_and_entered_this_turn, cantrip_mechanics::statics::have_hexproof, "As long as this Aura entered this turn, enchanted creature has hexproof."),
         static_ability(Layer::PtModify, attached_object, cantrip_mechanics::statics::plus_pt::<1, 1>, "Enchanted creature gets +1/+1."),
     ],
     ..oracle::SHARDMAGES_RESCUE

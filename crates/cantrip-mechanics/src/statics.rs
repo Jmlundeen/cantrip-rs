@@ -90,6 +90,12 @@ pub fn have_flying(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Flying);
 }
 
+/// "... has hexproof" (CR 702.11, layer 6) as a static ability's `StaticDef::apply`. Kaito, Bane of Nightmares' ninja form,
+/// Shardmage's Rescue's enchanted creature and Stoic Sphinx print it.
+pub fn have_hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Hexproof);
+}
+
 /// "... has deathtouch" (CR 702.2, layer 6) as a static ability's `StaticDef::apply`. Bow of Nylea's attacking creatures and
 /// The Swarmweaver's delirium Insects and Spiders print it.
 pub fn have_deathtouch(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

@@ -23,11 +23,6 @@ fn become_a_ninja_creature(q: &dyn LayerQuery, source: ObjectId, chars: &mut Cha
     chars.subtypes = SubtypeSet::of(&[q.words(source).subtype(Subtype::Ninja)]);
 }
 
-/// Layer 6: hexproof.
-fn hexproof(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
-    chars.keywords = chars.keywords.with(Keyword::Hexproof);
-}
-
 // --- The abilities ------------------------------------------------------------------------------------------------
 
 fn emblem(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -86,7 +81,7 @@ pub static CARD: CardDef = CardDef {
     ],
     statics: &[
         static_ability(Layer::Type, affects, become_a_ninja_creature, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a Ninja creature."),
-        static_ability(Layer::Ability, affects, hexproof, "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof.").continues(),
+        static_ability(Layer::Ability, affects, cantrip_mechanics::statics::have_hexproof, "During your turn, as long as Kaito has one or more loyalty counters on him, he has hexproof.").continues(),
         static_ability(Layer::PtSet, affects, base_pt::<3, 4>, "During your turn, as long as Kaito has one or more loyalty counters on him, he's a 3/4.").continues(),
     ],
     ..oracle::KAITO_BANE_OF_NIGHTMARES
