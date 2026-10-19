@@ -1,0 +1,50 @@
+# X is counted as Germinate Recruits resolves, and life gained in several events adds up. Bot1 gains 3 from a Healing
+# Salve, casts Germinate Recruits, and in response gains 3 more from a second Salve (which resolves first): the Recruits
+# makes 6 Cadets, each a 2/2 colorless Wizard Soldier token named Cadet, and Bot1 is at 26.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Healing Salve
+Healing Salve
+Germinate Recruits
+Island x25
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+Bot1.Hand.Germinate Recruits.Cast
+? Stack.Count = 1
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 26
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield = Plains; Mox Pearl; Cadet; Cadet; Cadet; Cadet; Cadet; Cadet
+Bot1.Battlefield.Cadet#1.Token = true
+Bot1.Battlefield.Cadet#1.Power = 2
+Bot1.Battlefield.Cadet#1.Toughness = 2
+Bot1.Battlefield.Cadet#1.Colors = (absent)
+Bot1.Battlefield.Cadet#1.Subtypes = Soldier; Wizard

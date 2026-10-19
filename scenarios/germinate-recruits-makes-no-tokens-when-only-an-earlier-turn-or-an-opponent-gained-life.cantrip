@@ -1,0 +1,52 @@
+# X counts only life "you gained this turn". Bot1 gains 3 on turn 1 (Healing Salve), keeping Plains, Mox Pearl and Mox Jet
+# untapped. On turn 2 Bot2 gains 3 with its own Healing Salve; Bot1 responds-after with Germinate Recruits at instant speed:
+# Bot1's life gained was on another turn and Bot2's life is not Bot1's, so X is 0 and no token is created (no error).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Black Lotus
+Healing Salve
+Germinate Recruits
+Island x25
+
+[Bot2 Deck]
+Plains
+Healing Salve
+Plains x25
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 23
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Target player gains 3 life)
+Bot2.Target(Bot2)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 23
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Germinate Recruits.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 23
+Bot2.Life = 23
+Bot1.Battlefield = Plains; Mox Pearl; Mox Jet
+Bot1.Graveyard = Germinate Recruits; Healing Salve; Black Lotus

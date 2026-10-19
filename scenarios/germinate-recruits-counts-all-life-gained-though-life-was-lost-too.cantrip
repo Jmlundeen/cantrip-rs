@@ -1,0 +1,43 @@
+# Ruling: Germinate Recruits counts the total life gained without taking account of life lost. Bot1 bolts itself (-3, 17),
+# gains 3 from Healing Salve (20), then casts Germinate Recruits: X is 3, not 0, so three Cadets, and Bot1 ends at 20.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Ruby
+Black Lotus
+Lightning Bolt
+Healing Salve
+Germinate Recruits
+Island x25
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 17
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Germinate Recruits.Cast
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Plains; Mox Pearl; Mox Ruby; Cadet; Cadet; Cadet

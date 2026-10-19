@@ -1,0 +1,6 @@
+{
+  "name": "Germinate Recruits",
+  "manaCost": "{2}{W}",
+  "type": "Instant",
+  "oracleText": "Create X 2/2 colorless Wizard Soldier creature tokens named Cadet, where X is the amount of life you gained this turn."
+}
