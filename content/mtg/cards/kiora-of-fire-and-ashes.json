@@ -1,0 +1,8 @@
+{
+  "name": "Kiora of Fire and Ashes",
+  "manaCost": "{4}{R}{R}",
+  "type": "Legendary Creature — Merfolk Noble",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When Kiora enters, create a 5/5 red Dragon creature token with flying.\n{8}: Create a 5/5 red Dragon creature token with flying."
+}
