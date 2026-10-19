@@ -891,6 +891,11 @@ impl<'s> Run<'s> {
             (RequestKind::May { .. }, None) if answer == Answer::Yes && step.named("X").is_some() => {
                 self.casting = Some(Casting::new(request.player, x_of(step)?, spend_of(step)?));
             }
+            // `Bot1.Choose(Burst Lightning; Kicked: 1)`: the card chosen to be cast as an effect resolves ("you may cast a
+            // spell from your hand without paying its mana cost") announces that X or those kicks (CR 107.3a, 118.9d, 601.2b).
+            (RequestKind::ChooseCards { purpose: Purpose::CastFree, .. }, None) if step.named("X").or_else(|| step.named("Kicked")).is_some() => {
+                self.casting = Some(Casting::new(request.player, x_of(step)?, spend_of(step)?));
+            }
             (RequestKind::UnlessPays { .. }, Some(ActionKind::PayCost)) => {
                 self.casting = Some(Casting::new(request.player, None, spend_of(step)?));
             }
