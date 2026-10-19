@@ -17,10 +17,13 @@ pub fn attach_to_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 /// Equip [cost] (CR 702.6a): "[cost]: Attach this to target creature you control. Activate only as a sorcery."
 /// `text` is the ability's text, which a scenario's `Ability:` matches. Umezawa's Jitte and Lavaspur Boots print it.
 pub const fn equip(mana: ManaCost, text: &'static str) -> AbilityDef {
-    ability(Cost::mana(mana), attach_to_target, text)
-        .sorcery_speed()
-        .targets(&[targets::CREATURE_YOU_CONTROL])
-        .equip()
+    equip_cost(Cost::mana(mana), text)
+}
+
+/// Equip with any cost (CR 702.6a): "Equip\u{2014}Pay 3 life" (Dark Knight's Greatsword) and "Equip\u{2014}Sacrifice a creature"
+/// (Dissection Tools). Chain `.once_each_turn()` where the card limits it.
+pub const fn equip_cost(cost: Cost, text: &'static str) -> AbilityDef {
+    ability(cost, attach_to_target, text).sorcery_speed().targets(&[targets::CREATURE_YOU_CONTROL]).equip()
 }
 
 /// Equip [quality] [cost] (CR 702.6a): "[cost]: Attach this to target [quality] creature you control. Equip only as a sorcery."

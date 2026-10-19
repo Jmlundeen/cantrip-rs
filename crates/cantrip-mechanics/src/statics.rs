@@ -108,6 +108,12 @@ pub fn have_deathtouch(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Deathtouch);
 }
 
+/// "... has deathtouch and lifelink" (CR 702.2, 702.15, layer 6) as a static ability's `StaticDef::apply`. Basilisk Collar's and
+/// Dissection Tools' equipped creature.
+pub fn have_deathtouch_and_lifelink(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.keywords = chars.keywords.with(Keyword::Deathtouch).with(Keyword::Lifelink);
+}
+
 /// Delirium (an ability word, CR 207.2c) for a static ability's condition: four or more card types among the cards in the
 /// graveyard of `source`'s controller, judged on the cards' characteristics as the layers made them. `mechanics::delirium` is
 /// the same question outside the layers. `itself_with_delirium` (Dragon's Rage Channeler, Wildfire Wickerfolk) and The

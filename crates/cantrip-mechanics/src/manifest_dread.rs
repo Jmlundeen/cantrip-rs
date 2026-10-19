@@ -8,9 +8,16 @@ use cantrip_api::*;
 /// 2/2 creature) and puts the other into their graveyard. A library of one card manifests that one; of none, nothing
 /// happens. The player is always asked, as the prompt names which card is which.
 pub fn manifest_dread(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
+    manifest_dread_object(g, player, source).map(|_| ())
+}
+
+/// Manifest dread as `manifest_dread` does, answering the face-down permanent it made ("manifest dread, then attach this
+/// Equipment to that creature": Dissection Tools), or `None` when the
+/// library was empty.
+pub fn manifest_dread_object(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<Option<ObjectId>, Suspend> {
     let looked = top_of_library(g, player, 2);
     if looked.is_empty() {
-        return Ok(());
+        return Ok(None);
     }
     let ask = RequestKind::DistributeCards {
         source,
@@ -27,9 +34,9 @@ pub fn manifest_dread(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> R
     {
         manifested = card;
     }
-    g.put_onto_battlefield_face_down(manifested, player)?;
+    let made = g.put_onto_battlefield_face_down(manifested, player)?;
     let rest: Vec<(ObjectId, Zone)> =
         looked.into_iter().filter(|&c| c != manifested).map(|c| (c, Zone::graveyard(player))).collect();
     g.move_together(&rest, ZoneReason::Other);
-    Ok(())
+    Ok(Some(made))
 }
