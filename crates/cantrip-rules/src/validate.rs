@@ -198,7 +198,7 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 Ok(())
             }
         }
-        (RequestKind::RemoveCounters { pools, total, .. }, Answer::Counters(taken)) => {
+        (RequestKind::RemoveCounters { pools, total, up_to, .. }, Answer::Counters(taken)) => {
             let mut sum = 0u32;
             for (i, &(object, kind, n)) in taken.iter().enumerate() {
                 let Some(pool) = pools.iter().find(|p| p.object == object && p.kind == kind) else {
@@ -212,7 +212,14 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 }
                 sum += n as u32;
             }
-            if sum != *total as u32 { no(format!("{sum} counters removed, {total} wanted (CR 118.3)")) } else { Ok(()) }
+            if *up_to {
+                // "Up to" (CR 608.2d): none at all is a choice, more than the number is not.
+                if sum > *total as u32 { no(format!("{sum} counters removed, up to {total} allowed")) } else { Ok(()) }
+            } else if sum != *total as u32 {
+                no(format!("{sum} counters removed, {total} wanted (CR 118.3)"))
+            } else {
+                Ok(())
+            }
         }
         (RequestKind::CollectEvidence { cards, values, minimum, .. }, Answer::Cards(chosen)) => {
             let total: u32 = chosen.iter().filter_map(|c| cards.iter().position(|x| x == c)).map(|i| values[i] as u32).sum();

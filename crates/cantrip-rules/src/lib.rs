@@ -17,6 +17,8 @@ mod ops;
 mod phasing;
 #[cfg(test)]
 mod play_permission_tests;
+#[cfg(test)]
+mod remove_up_to_tests;
 mod replace;
 mod resolve;
 mod settle;
@@ -1231,6 +1233,10 @@ impl cantrip_api::Game for Cx<'_> {
         let before = self.g.state.obj(object).counters(kind);
         counters::remove(self, object, kind, amount);
         before - self.g.state.obj(object).counters(kind)
+    }
+
+    fn remove_counters_up_to(&mut self, player: PlayerId, source: ObjectId, object: ObjectId, maximum: u8) -> Result<u16, Suspend> {
+        counters::remove_up_to(self, player, source, object, maximum).map_err(|_| Suspend)
     }
 
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {

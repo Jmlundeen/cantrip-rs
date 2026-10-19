@@ -1563,10 +1563,12 @@ public sealed class MulliganPromptMessage : PromptPayload
 }
 
 /// <summary>
-/// This client removes <see cref="Total"/> counters, of any kinds, from among permanents as part of a cost (CR 118.3, 122.1):
-/// "by removing three counters from among creatures you control" (Dawnhand Dissident). Each of <see cref="Pools"/> is the
-/// counters of one kind on one permanent, with how many there are; any of them may be taken, adding up to the total.
-/// Answered with a <see cref="CountersRemovedAnswer"/>.
+/// This client removes <see cref="Total"/> counters, of any kinds, from among permanents (CR 122.1): as part of a cost
+/// (CR 118.3), "by removing three counters from among creatures you control" (Dawnhand Dissident), or as an effect resolves.
+/// Each of <see cref="Pools"/> is the counters of one kind on one permanent, with how many there are; any of them may be
+/// taken, adding up to the total - or, with <see cref="UpTo"/>, an effect's "remove up to three counters from target
+/// creature" (Heartless Act, CR 608.2d), to any number from none to the total. Answered with a
+/// <see cref="CountersRemovedAnswer"/>.
 /// </summary>
 [MessagePackObject]
 public sealed class RemoveCountersPromptMessage : PromptPayload
@@ -1574,16 +1576,20 @@ public sealed class RemoveCountersPromptMessage : PromptPayload
     [Key(0)]
     public int Player { get; set; }
 
-    /// <summary>The spell being cast or the ability being activated whose cost this is.</summary>
+    /// <summary>The spell or ability: the one being cast or activated whose cost this is, or the one resolving.</summary>
     [Key(1)]
     public ViewHandle Source { get; set; }
 
-    /// <summary>How many counters come off in all.</summary>
+    /// <summary>How many counters come off in all: with <see cref="UpTo"/>, the most that may.</summary>
     [Key(2)]
     public int Total { get; set; }
 
     [Key(3)]
     public List<CounterPoolMessage> Pools { get; set; } = [];
+
+    /// <summary>"Up to" <see cref="Total"/> (CR 608.2d): any number of counters from none to the total may come off.</summary>
+    [Key(4)]
+    public bool UpTo { get; set; }
 
     /// <summary>As many as there are from each pool in turn, the first offered first, until the total is reached.</summary>
     public override AnswerPayload Default()

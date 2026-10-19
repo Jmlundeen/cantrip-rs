@@ -1210,9 +1210,11 @@ pub struct ChooseDividedTargetsPrompt {
     pub optional: bool,
 }
 
-/// Remove `Total` counters, of any kinds, from among permanents, as part of a cost (CR 118.3, 122.1): "remove three counters
-/// from among creatures you control". Each of `Pools` is the counters of one kind on one permanent, with how many there are;
-/// the answer takes some from any of them, adding up to `Total`. `Source` is the spell or ability whose cost it is.
+/// Remove `Total` counters, of any kinds, from among permanents (CR 122.1): as part of a cost (CR 118.3), "remove three
+/// counters from among creatures you control", or as an effect resolves. Each of `Pools` is the counters of one kind on one
+/// permanent, with how many there are; the answer takes some from any of them, adding up to `Total` - or, with `UpTo`, an
+/// effect's "remove up to three counters from target creature" (CR 608.2d), to any number from none to `Total`. `Source` is
+/// the spell or ability.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct RemoveCountersPrompt {
@@ -1220,6 +1222,7 @@ pub struct RemoveCountersPrompt {
     pub source: ViewHandle,
     pub total: i32,
     pub pools: Vec<CounterPoolMessage>,
+    pub up_to: bool,
 }
 
 /// Counters of one kind on one permanent: `Counter` names the kind as `CounterView` does (`+1/+1`, `stun`).

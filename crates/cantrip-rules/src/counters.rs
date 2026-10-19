@@ -93,6 +93,37 @@ pub fn remove(cx: &mut Cx, id: ObjectId, kind: CounterKind, n: i16) {
     }
 }
 
+/// "Remove up to `maximum` counters from target creature" as an effect resolves (CR 608.2d, 122.1): `player` chooses
+/// which of the counters on `id`, of any kinds and how many of each, from none to `maximum` in all, and they come off
+/// together. Nothing is asked of an object that has changed zones (CR 400.7) or that has no counters. How many came off:
+/// "for each counter removed this way". Heartless Act, Hex Parasite, Price of Betrayal (its permanents).
+pub fn remove_up_to(cx: &mut Cx, player: PlayerId, source: ObjectId, id: ObjectId, maximum: u8) -> crate::R<u16> {
+    if maximum == 0 || !live(cx.s(), id) {
+        return Ok(0);
+    }
+    let obj = cx.s().obj(id);
+    let pools: Vec<CounterPool> = CounterKind::ALL
+        .into_iter()
+        .filter_map(|kind| {
+            let count = obj.counters(kind);
+            (count > 0).then_some(CounterPool { object: id, kind, count: count as u16 })
+        })
+        .collect();
+    if pools.is_empty() {
+        return Ok(0);
+    }
+    let Answer::Counters(taken) = cx.ask_core(player, RequestKind::RemoveCounters { source, pools, total: maximum, up_to: true }, false)? else {
+        return Ok(0);
+    };
+    let mut removed = 0u16;
+    for (object, kind, n) in taken {
+        let before = cx.s().obj(object).counters(kind);
+        remove(cx, object, kind, n.min(i16::MAX as u16) as i16);
+        removed += (before - cx.s().obj(object).counters(kind)) as u16;
+    }
+    Ok(removed)
+}
+
 /// A Siege that has lost its last defense counter triggers its defeat ability (CR 310.12b).
 fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
     if !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {

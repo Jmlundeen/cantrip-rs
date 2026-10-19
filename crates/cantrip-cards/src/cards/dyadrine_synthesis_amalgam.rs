@@ -37,7 +37,7 @@ fn attack(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         return Ok(());
     }
     // The core has checked the answer against the question: it is the counters taken.
-    if let Answer::Counters(taken) = g.ask(you, RequestKind::RemoveCounters { source: item.object, pools, total: 2 })? { remove_and_reward(g, you, taken)?; }
+    if let Answer::Counters(taken) = g.ask(you, RequestKind::RemoveCounters { source: item.object, pools, total: 2, up_to: false })? { remove_and_reward(g, you, taken)?; }
     Ok(())
 }
 

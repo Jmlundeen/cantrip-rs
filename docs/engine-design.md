@@ -910,6 +910,14 @@ triggers). The host sends it as `RemoveCountersPromptMessage`; the web client of
 and takes one of a permanent's counters on a click on it. Dawnhand Dissident's casts pay it; Tayam, Luminous Enigma's ability is
 the same cost on an activated ability, which `activate` pays too, though no card in content has it there yet.
 
+"Remove up to N counters from target creature" as an effect resolves (CR 608.2d, 122.1: Heartless Act, Hex Parasite, Price of
+Betrayal's permanents) is `Game::remove_counters_up_to(player, source, object, n)` (`counters::remove_up_to`): the same
+question with `up_to`, its pools every kind of counter on the one object, answered with none to N of them in all, no more of a
+kind than there are (`validate`); they come off through `counters::remove`, and the verb says how many did ("for each counter
+removed this way"). Nothing is asked of an object with no counters or one that has changed zones. The prompt carries `UpTo`, and
+the web client captions it "remove up to 3 counters", its button removing whatever is chosen, none included. A player's counters
+(Price of Betrayal's "or opponent") have no removal path yet.
+
 A permanent's static ability that lets a player cast cards in exile (CR 601.3, 604.1) is `CardDef::exile_casts`, an `ExileCast`:
 whether a card may be cast by it now (asked of the permanent, its controller "you", with the card as the face that would be
 cast, so "creature spells" refuses a creature card's instant Adventure; a condition on the game state, Null Summoner's threshold,

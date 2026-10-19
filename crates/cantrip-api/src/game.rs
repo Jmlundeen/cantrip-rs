@@ -711,6 +711,12 @@ pub trait Game: Query {
     /// object that has changed zones (CR 400.7). It answers "if you do" and "for each counter removed this way", as Dawn of a
     /// New Age and Coalition Relic ask.
     fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16;
+    /// "Remove up to `maximum` counters from target creature" as the effect resolves (CR 608.2d, 122.1): `player` (the
+    /// effect's controller) chooses which of the counters on `object`, of any kinds and how many of each, from none to
+    /// `maximum` in all, asked as `RequestKind::RemoveCounters` with `up_to`, and they come off. `source` is the spell or
+    /// ability. Nothing is asked of an object with no counters, or one that has changed zones (CR 400.7). Says how many
+    /// came off, for "for each counter removed this way" (Hex Parasite). Heartless Act, Hex Parasite, Price of Betrayal.
+    fn remove_counters_up_to(&mut self, player: PlayerId, source: ObjectId, object: ObjectId, maximum: u8) -> Result<u16, Suspend>;
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration);
     /// An effect about `controller` and not an object (`EffectKind::outlives_affected`), for the player who controls the
     /// resolving ability or spell (CR 109.5: "you") even if its source has since changed hands or left.

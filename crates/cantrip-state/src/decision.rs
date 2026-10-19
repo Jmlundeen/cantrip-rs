@@ -339,7 +339,11 @@ pub enum RequestKind {
     /// control" (Dawnhand Dissident; Tayam, Luminous Enigma). Each of `pools` is the counters of one kind on one permanent,
     /// with how many there are; any of them may be taken, of any kind and from any of the permanents, adding up to `total`.
     /// Answered with `Answer::Counters`.
-    RemoveCounters { source: ObjectId, pools: Vec<CounterPool>, total: u8 },
+    ///
+    /// With `up_to`, an effect's "remove up to `total` counters from target creature" (Heartless Act, Hex Parasite) as it
+    /// resolves (CR 608.2d, 122.1): any number of them from none to `total`, of whichever kinds the player chooses. Without
+    /// it, exactly `total` (a cost, CR 118.3, or an effect that removes a fixed number).
+    RemoveCounters { source: ObjectId, pools: Vec<CounterPool>, total: u8, up_to: bool },
     /// The targets of a slot that divides a total among them, and each one's share (CR 601.2d): "distribute two +1/+1
     /// counters among up to two target creatures". At most `max_targets` of `candidates` (any number when 0), each with a
     /// share of at least 1, adding up to `total`; none at all when the slot is `optional`.

@@ -408,9 +408,10 @@ impl<'s> Run<'s> {
             RequestKind::Craft { cards, minimum, maximum, .. } => {
                 format!("Craft {minimum} to {maximum} of [{}]", cards.iter().map(|&i| name(i)).collect::<Vec<_>>().join(", "))
             }
-            RequestKind::RemoveCounters { pools, total, .. } => {
+            RequestKind::RemoveCounters { pools, total, up_to, .. } => {
                 let list: Vec<String> = pools.iter().map(|p| format!("{}: {} {}", name(p.object), p.kind.token(), p.count)).collect();
-                format!("RemoveCounters {total} from among [{}]", list.join("; "))
+                let up_to = if *up_to { "up to " } else { "" };
+                format!("RemoveCounters {up_to}{total} from among [{}]", list.join("; "))
             }
             other => format!("{} {other:?}", kind_name(other)),
         }
@@ -1169,7 +1170,7 @@ impl<'s> Run<'s> {
                 self.choose_target(step, candidates, *least, *count)?
             }
             (V::Divide, RequestKind::ChooseDividedTargets { candidates, .. }) => Some(self.divide(step, candidates)?),
-            (V::RemoveCounters, RequestKind::RemoveCounters { pools, total, .. }) => Some(self.remove_counters(step, pools, *total)?),
+            (V::RemoveCounters, RequestKind::RemoveCounters { pools, total, up_to, .. }) => Some(self.remove_counters(step, pools, *total, *up_to)?),
             (V::Colors, RequestKind::ChooseColors { choices, count, .. }) => {
                 let mut colors = Vec::new();
                 for spec in step.positional() {
@@ -1682,7 +1683,7 @@ impl<'s> Run<'s> {
             // `! Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 2)`: a removal the question must refuse - more counters from a
             // permanent than the question lets come off it (Dyadrine's one counter from each of two creatures), judged by the
             // rules' own check of the answer.
-            RequestKind::RemoveCounters { pools, total, .. } => {
+            RequestKind::RemoveCounters { pools, total, up_to, .. } => {
                 // A permanent the question does not offer at all (a noncreature, an opponent's) is itself the refusal, as long as it
                 // exists: it is no pool of the question, so nothing could be taken from it.
                 let offered: Vec<Target> = pools.iter().map(|p| Target::Object(p.object)).collect();
@@ -1696,7 +1697,7 @@ impl<'s> Run<'s> {
                         return Ok(());
                     }
                 }
-                let answer = self.remove_counters(action, pools, *total)?;
+                let answer = self.remove_counters(action, pools, *total, *up_to)?;
                 if check_answer(&self.game, request, &answer).is_ok() {
                     return fail(format!("line {line} says {text} must not be a removal the question allows, but it is"));
                 }
@@ -1869,8 +1870,9 @@ impl<'s> Run<'s> {
     }
 
     /// `RemoveCounters(Grizzly Bears: 2; Hill Giant: PlusOnePlusOne 1)`: each permanent named, with how many counters come off
-    /// it, and the kind (as the dump spells it) where it has more than one.
-    fn remove_counters(&self, step: &ActionStep, pools: &[CounterPool], total: u8) -> R<Answer> {
+    /// it, and the kind (as the dump spells it) where it has more than one. For "up to" (`up_to`), `RemoveCounters()` removes
+    /// none, and a number of them past the most is left for the rules to refuse (`! Bot1.RemoveCounters(..)`).
+    fn remove_counters(&self, step: &ActionStep, pools: &[CounterPool], total: u8, up_to: bool) -> R<Answer> {
         let mut objects: Vec<Target> = Vec::new();
         for p in pools {
             if !objects.contains(&Target::Object(p.object)) {
@@ -1906,7 +1908,7 @@ impl<'s> Run<'s> {
         // In the order the question offers the pools, as a page answering it sends them, so the two are the same answer.
         taken.sort_by_key(|&(o, k, _)| pools.iter().position(|p| p.object == o && p.kind == k));
         let sum: u32 = taken.iter().map(|t| t.2 as u32).sum();
-        if sum != total as u32 {
+        if !up_to && sum != total as u32 {
             return fail(format!("line {}: {sum} counters named, {total} to remove", step.line));
         }
         Ok(Answer::Counters(taken))

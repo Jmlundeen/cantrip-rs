@@ -374,7 +374,7 @@ fn choose_counters_among(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: 
     if pools.iter().map(|p| p.count as u32).sum::<u32>() < total as u32 {
         return Err(Stop::Cancel);
     }
-    match cx.ask_core(player, RequestKind::RemoveCounters { source, pools, total }, true)? {
+    match cx.ask_core(player, RequestKind::RemoveCounters { source, pools, total, up_to: false }, true)? {
         Answer::Counters(taken) => Ok(taken),
         _ => Err(Stop::Cancel),
     }
