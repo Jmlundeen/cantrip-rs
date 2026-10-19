@@ -1,0 +1,11 @@
+{
+  "name": "Ghalta the Unstoppable",
+  "manaCost": "{8}{G}",
+  "type": "Legendary Creature — Elder Dinosaur",
+  "oracleText": "This spell costs {X} less to cast, where X is the greatest power among creatures you control.\nTrample\nOther creatures you control have trample.",
+  "power": 8,
+  "toughness": 8,
+  "keywords": [
+    "Trample"
+  ]
+}
