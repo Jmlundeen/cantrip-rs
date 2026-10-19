@@ -117,8 +117,9 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    and take the next. Never work on a card whose live claim is someone else's.
 3. **Keep the claim alive** - it lasts 24 hours from the last sign of work. Open a (draft) pull request whose
    description says `Closes #N` as soon as there is a commit, or push work in progress to a branch named
-   `card/<card-slug>`; every commit pushed there renews the claim. A card waiting on a core gap keeps its claim: claim
-   it again to renew by hand while the gap is built. A card that is abandoned - nobody will build its gap, or the work
+   `card/<card-slug>`; every commit pushed there renews the claim. A card waiting on a core gap keeps its claim, and
+   the claim is never renewed by hand: 24 hours is far more than any one card takes, core gaps and all, so a claim
+   that lapses means the work stopped. A card that is abandoned - nobody will build its gap, or the work
    stops - is released (`card-issues.py release "Card Name"`) with its gap reported.
 4. **Landing it closes the issue:** the commit message (and a pull request description) ends with `Closes #N`.
 
@@ -298,8 +299,7 @@ core-feature agents and review agents run on Opus.
 3. **Gaps.** When a card agent reports a gap, the coordinator starts a core-feature agent (Opus) for it: the core open
    to it, the feature built to its rule for every card the rule describes, the benchmark run, its own commits
    (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents work on
-   separate rules areas. The coordinator renews the waiting card's claim (`claim "Card Name"`) if the work nears 24
-   hours. When the feature agent finishes, the coordinator reviews and lands its commits on `main` (5), then resumes
+   separate rules areas. The waiting card's claim is not renewed. When the feature agent finishes, the coordinator reviews and lands its commits on `main` (5), then resumes
    the waiting card agent (SendMessage) with what landed; the agent rebases on `main` and finishes the card on the
    new core. Other running agents are told what landed so they rebase. Only a gap the coordinator decides not to
    build is released, with its gap recorded on the issue.
