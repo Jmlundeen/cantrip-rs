@@ -1,0 +1,62 @@
+# Zack Fair: "attach AN Equipment that was attached to Zack Fair to that creature" - one, not each. Skullclamp and Basilisk Collar are both
+# attached to Zack as he is sacrificed; Bot1 chooses the Collar, which is attached to the Ornithopter (1/3 with the counter, deathtouch and lifelink),
+# while Skullclamp, the other, stays on the battlefield unattached (it was unattached when he left, CR 704.5n). Skullclamp
+# still draws two for the death of the creature it equipped. Hand: nothing left of the opening seven, the Ornithopter drawn and cast, 2 drawn by Skullclamp.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Zack Fair
+Skullclamp
+Basilisk Collar
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Zack Fair.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Basilisk Collar.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Skullclamp.Activate(Bot1.Battlefield.Zack Fair)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Basilisk Collar.Activate(Bot1.Battlefield.Zack Fair)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Skullclamp.AttachedTo = Zack Fair
+? Bot1.Battlefield.Basilisk Collar.AttachedTo = Zack Fair
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Zack Fair.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Basilisk Collar)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 2
+Bot1.Graveyard = Zack Fair
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Skullclamp; Basilisk Collar; Ornithopter
+Bot1.Battlefield.Basilisk Collar.AttachedTo = Ornithopter
+Bot1.Battlefield.Skullclamp.AttachedTo = (absent)
+Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying; Indestructible; Lifelink
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3

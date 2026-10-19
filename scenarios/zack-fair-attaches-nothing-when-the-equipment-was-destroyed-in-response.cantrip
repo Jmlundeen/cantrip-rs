@@ -1,0 +1,60 @@
+# Zack Fair: the Equipment that was attached to him is attached only if it is still on the battlefield as the ability resolves; one that has gone
+# (a new object, CR 400.7) cannot be. Bot2 destroys Skullclamp with Disenchant in response to the ability: the rest of the ability still happens
+# - the Ornithopter gains indestructible and the +1/+1 counter - and nothing is attached. Skullclamp, which had been on him as he died, drew two cards
+# as a trigger of its own. Hand: 1 Plains left from the opening seven, 1 drawn for the turn, 2 drawn by Skullclamp: 4.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Zack Fair
+Skullclamp
+Ornithopter
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Disenchant
+Plains x13
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Zack Fair.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Skullclamp.Activate(Bot1.Battlefield.Zack Fair)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Zack Fair.Activate(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Skullclamp)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Skullclamp; Zack Fair
+Bot1.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Ornithopter
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+Bot2.Graveyard = Disenchant

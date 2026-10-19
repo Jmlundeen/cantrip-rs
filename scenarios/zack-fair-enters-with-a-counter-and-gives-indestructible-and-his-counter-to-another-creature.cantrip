@@ -1,0 +1,55 @@
+# Zack Fair: "enters with a +1/+1 counter on it" (a 1/2 as it enters, the check before the sacrifice), and "{1}, Sacrifice Zack Fair: Target
+# creature you control gains indestructible until end of turn. Put Zack Fair's counters on that creature". Bot1 sacrifices him
+# for Llanowar Elves: the Elves becomes a 2/2 with the +1/+1 counter, and Bot2's Lightning Bolt (3 damage, more than its toughness) does not kill it
+# this turn (indestructible, CR 702.12b); the next turn it has neither the keyword (until end of turn, CR 514.2) nor lost the counter.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Emerald
+Mox Jet
+Zack Fair
+Llanowar Elves
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Zack Fair.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Zack Fair.Power = 1
+? Bot1.Battlefield.Zack Fair.Toughness = 2
+? Bot1.Battlefield.Zack Fair.Counters.PlusOnePlusOne = 1
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Zack Fair.Activate(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Keywords = Indestructible
+? Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+? Bot1.Battlefield.Llanowar Elves.Power = 2
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Emerald; Mox Jet; Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Toughness = 2
+Bot1.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Zack Fair
+Bot2.Graveyard = Lightning Bolt
