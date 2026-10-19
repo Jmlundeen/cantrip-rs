@@ -1,0 +1,30 @@
+# Deterministic printed-card behavior (CR 603, 608).
+[Bot1 Deck]
+Danitha, Sword of Hope
+Mox Pearl x4
+Skullclamp
+Academic Ascent
+Plains x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Danitha, Sword of Hope.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Hand.Academic Ascent.Cast(Bot1.Battlefield.Danitha, Sword of Hope)
+
+[Expect]
+Bot1.Library.Count = 18
+Bot1.Battlefield.Danitha, Sword of Hope.Power = 4
