@@ -3,17 +3,7 @@ use cantrip_mechanics::targets;
 use cantrip_mechanics::tokens::SERVO;
 use cantrip_oracle as oracle;
 
-/// A 1/1 colorless Thopter artifact creature token with flying.
-pub static THOPTER: CardDef = CardDef {
-    name: "Thopter",
-    has_cost: false,
-    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Thopter]),
-    power: Some(1),
-    toughness: Some(1),
-    keywords: Keywords::of(&[Keyword::Flying]),
-    ..CardDef::BLANK
-};
+pub use cantrip_mechanics::tokens::THOPTER;
 
 /// A 4/4 colorless Construct artifact creature token.
 pub static CONSTRUCT: CardDef = CardDef {
