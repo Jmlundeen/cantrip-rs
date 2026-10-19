@@ -427,6 +427,8 @@ an ability activated or put on the stack, a copy put on the stack (CR 707.10) an
 once per distinct object or player, since one chosen for several instances of "target" (CR 115.3) becomes the target of that
 spell or ability once (CR 601.2c) - ward, Bonecrusher Giant and Pawpatch Recruit trigger once for it.
 
+A card put onto the battlefield transformed (CR 712.14a) enters with its back face up as one entry, `ops::put_onto_battlefield_as`: the counters the instruction gives it ("with a finality counter on it", CR 122.6, 614.1c) are on its `Entering` record with those the face it enters with gives it (a Saga back face's lore counter, CR 714.3a; a planeswalker's loyalty), so the replacements of counters put on a permanent apply to all of them at once and they are announced as it enters - chapter I triggers, and two lore counters from Innkeeper's Talent trigger I and II. `Game::put_onto_battlefield_transformed_with_counters` is Esper Origins's (and would be Ojer Pakpatiq, Deepest Epoch's, tapped with three time counters). A finality counter is the rules' replacement (CR 122.1h) in `ops::move_together`. The benchmark measured 6.75 and 6.88 us per decision before and 6.91 and 7.64 us after on a busy machine (2026-10-16): the path is only reached by the cards that put a card onto the battlefield transformed.
+
 A crime (CR 700.13) is `Event::CrimeCommitted { player, by }`, emitted by `ops::commit_crime` from the three procedures that
 choose targets for a new object - casting a spell (CR 601.2i), activating an ability (CR 602.2) and putting a triggered
 ability on the stack (CR 603.3d), the trigger's controller the criminal - after their `BecameTarget` events, once for the
@@ -937,6 +939,29 @@ abilities once it has it. "Except it's legendary" (CR 707.9b) is `Copiable::lege
 `actions::cast` drops those effects as that object becomes cast (CR 601.2i), after its costs are paid, so a mana ability
 the effect grants may pay for the cast (Emrakul, the Exigent Doom's ruling). The card leaving exile any other way is a
 new object that is never cast as this one, and the effect lasts as long as its affected object.
+
+### Effects that last while a counter is on the object
+
+"For as long as it has a [kind] counter on it" (CR 611.2b) is `Duration::WhileHasCounter(kind)`. `add_effect` refuses to
+start one on an object with no counter of that kind (a replacement kept it off), and the effect ends the moment the last
+one comes off - `ops::end_counter_durations`, called wherever counters are removed (`add_counters` with a negative amount,
+a cost that removes counters, a stun counter replacing an untap, damage to a planeswalker), with the state-based check as
+the backstop - and is deleted, so a counter put on again later does not bring it back. Its source leaving changes nothing.
+A control effect that ends this way gives the permanent back (CR 613.1b). Eluge, the Shoreless Sea; Aquitect's Will,
+Xolatoyac, the Smiling Flood and Quicksilver Fountain print the same words. The paths no printed card can show (a counter
+put back without a new effect; an effect begun without a counter) are `crates/cantrip-script/tests/counter_duration.rs`.
+
+### Permissions to play under a condition
+
+A standing permission to play a card (`PlayPermission`, CR 601.3, 305.1) may hold only while a condition does
+(`PlayGrant::when`, CR 611.2), worked out each time the permission is asked (`actions::permission_for`), so it is
+offered, or not, as the game is then: `PlayCondition::AttackedWithThisTurn(subtype)` ("during any turn you attacked with
+a Rogue", Robber of the Rich) asks this turn's history; `PlayCondition::ControlsSubtype(subtype)` ("you may play them if
+you control a Wizard", Gandalf, Goblins' Bane's Flameshape; Possibility Technician's Kavu) asks whether the holder controls
+a permanent with that subtype now, its characteristics through the layers (a changeling counts). Losing the last one stops
+the permission until another arrives; a spell already cast stays cast. The card in exile keeps the permission all along -
+only a zone change ends it (CR 400.7). The host says the condition beside the permission ("Playable while it stays here,
+if you control a Wizard").
 
 ### Restricted mana
 

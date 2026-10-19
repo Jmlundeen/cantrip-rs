@@ -1,6 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem Publishes main to the public repository, jschibel/cantrip-rs: each commit on
+rem Publishes main to the public repository, cantrip-rs/cantrip-rs: each commit on
 rem origin/main since the last one published is replayed there as its own
 rem commit, with the same tree, message, author and date.
 rem

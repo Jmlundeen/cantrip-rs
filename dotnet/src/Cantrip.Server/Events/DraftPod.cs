@@ -177,6 +177,9 @@ public sealed class DraftPod : ITableEvent
     /// <summary>The pick clock running: the turn it is on (<see cref="Turn"/>) and when it runs out. Not saved.</summary>
     private (int Turn, DateTimeOffset By)? _clock;
 
+    /// <summary>The line of the grid the active player has chosen but not yet taken, and the pick it was chosen for.</summary>
+    private (int Decision, int Line)? _chosenLine;
+
     private int _version;
 
     private readonly DraftTiming _timing;
@@ -817,7 +820,7 @@ public sealed class DraftPod : ITableEvent
             switch (_draft)
             {
                 case GridDraft grid:
-                    grid.TakeForClock();
+                    grid.TakeForClock(_chosenLine is { } chosen && chosen.Decision == grid.Decision ? chosen.Line : null);
                     break;
                 case WinstonDraft winston:
                     winston.TakeForClock();
@@ -959,8 +962,12 @@ public sealed class DraftPod : ITableEvent
                 case GridDraft grid when pick.Take:
                     grid.Take(seat, pick.Decision, pick.Card);
                     break;
-                case GridDraft:
-                    return "A grid draft has nothing to pass: take a row or a column.";
+                case GridDraft grid:
+                    // Not a pass: the line the active player has chosen but not taken, which the clock takes if it runs out.
+                    if (seat != grid.Active || pick.Decision != grid.Decision) return "That pick was for a grid that has since changed.";
+                    if (!grid.CanTake(pick.Card)) return "That is not a row or a column of the grid with anything left in it.";
+                    _chosenLine = (grid.Decision, pick.Card);
+                    return null;
                 case WinstonDraft winston when pick.Take:
                     winston.Take(seat, pick.Decision);
                     break;

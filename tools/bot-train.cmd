@@ -33,9 +33,9 @@ rem ---------------------------------------------------------------------------
 setlocal
 
 set "ROOT=%~dp0.."
-set "LAB=dotnet run --project "%ROOT%\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" --no-build -v q --"
+set "LAB=dotnet run --project "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" --no-build -v q --"
 
-dotnet build "%ROOT%\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" -v q --nologo || exit /b 2
+dotnet build "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" -v q --nologo || exit /b 2
 
 if /i "%~1"=="fit" goto fit
 if /i "%~1"=="tune" goto tune
@@ -44,7 +44,7 @@ if /i "%~1"=="tune" goto tune
 if errorlevel 2 exit /b %ERRORLEVEL%
 
 rem The tuning starts from the file the fit just wrote, which is not in the build yet.
-%LAB% tune --from "%ROOT%\src\Cantrip.Client\Tactics\tactical-model.txt" %*
+%LAB% tune --from "%ROOT%\dotnet\src\Cantrip.Client\Tactics\tactical-model.txt" %*
 endlocal & exit /b %ERRORLEVEL%
 
 :fit
@@ -54,5 +54,5 @@ endlocal & exit /b %ERRORLEVEL%
 
 :tune
 shift
-%LAB% tune --from "%ROOT%\src\Cantrip.Client\Tactics\tactical-model.txt" %1 %2 %3 %4 %5 %6 %7 %8 %9
+%LAB% tune --from "%ROOT%\dotnet\src\Cantrip.Client\Tactics\tactical-model.txt" %1 %2 %3 %4 %5 %6 %7 %8 %9
 endlocal & exit /b %ERRORLEVEL%

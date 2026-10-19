@@ -1,0 +1,6 @@
+{
+  "name": "Kasmina's Transmutation",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment — Aura",
+  "oracleText": "Enchant creature\nEnchanted creature loses all abilities and has base power and toughness 1/1."
+}

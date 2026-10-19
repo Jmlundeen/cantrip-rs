@@ -95,7 +95,27 @@ free.
 
 ### The draft queue page
 
-`/queue` on the bot's site is the queues on the web, open to anyone (`QueueSite`, its page `queue.html`): a section for
+The bot's site has a front door. The bare address (`/`, with no query) is the home page (`HomeSite.LandingPage`, `landing.html`):
+what Cantrip is, with links to the GitHub organization, the Discord server, `/draft`, `/constructed` and a Discord log in.
+The web client is at the same address with a table in its query (`/?server=...#ticket`), which is what a seat's link is, so
+a request with a query goes on to the client. `/home` (`HomeSite`, `home.html`) is the page a signed-in player lands on -
+signing in with no page named comes back to it: the table they are filling, the draft or the constructed game they are in
+with a button back to the seat (the draft and constructed pages' own API gives it), and a place for leagues when there
+are some. `/queue` and `/play`, the pages' former names, redirect to `/draft` and `/constructed`.
+
+`/decks` is the constructed deck editor (`DeckSite`), given a data directory to keep decks in: it sends the player to the
+web client's deck editor (`/?decks`), and serves what that is built from. `/decks/api/catalog`, open to anyone, is every
+card the engine plays as printed (`CardOracle`), with its color identity and its legality in each format the editor
+builds for (Standard, Pioneer, Modern, Legacy, Vintage, Commander, Penny Dreadful), as MessagePack (`CardCatalogView`,
+`Cantrip.Client.Decks`); the legality is `content/<dataset>/legality.json`, made from Scryfall's bulk data by
+`tools/maintenance/fetch-legality.py` and run again as formats move. A signed-in player's decks are theirs alone:
+`/decks/api/list` (each deck's name, format and card count, by format then name), `/decks/api/deck/{id}`, POST
+`/decks/api/save` (a `SavedDeck`; no id makes a new deck) and POST `/decks/api/delete` `{id}`. They are kept as
+`decks/{player}/{deck}.json` in the data directory, in the API's own shape (`DeckJson`). A deck is saved however it
+stands - legality is the editor's to show (`DeckRules`), never a reason to refuse - and refused only when malformed: an
+unknown format, no name or one over 100 characters, a count outside 1 to 999. The player's page (`/home`) links to it.
+
+`/draft` on the bot's site is the queues on the web, open to anyone (`QueueSite`, its page `queue.html`): a section for
 each kind of draft - booster, grid, Winston - with every queue and what it drafts, every table still taking players and
 who is at it, and every draft under way with where it has got to (the status page's own words: *Drafting pack 2 of 3*,
 *Building decks*, *Round 2 of 3*) and a link to it on the status page. Each queue's message in Discord has an
@@ -131,7 +151,7 @@ tables; the table itself is `QueueTable` ([events.md](events.md)).
 
 ## Constructed play
 
-`/play` on the bot's site (`PlaySite`, its page `play.html`) is the same for 1v1 constructed games, open to anyone: a
+`/constructed` on the bot's site (`PlaySite`, its page `play.html`) is the same for 1v1 constructed games, open to anyone: a
 section for each format the bot hosts - for now the **Standard Gauntlet**, whose decks are every list under
 `decks/standard` with cards the engine has (the bot says how many as it starts, and how many it left out) - with every
 game waiting for an opponent and every game being played, by its players' names. Nobody is shown anyone's deck.
@@ -271,6 +291,18 @@ that has been silent for 100.
    and add a public hostname - say `cantrip` on your domain - with service type HTTP and URL `localhost:7779`. Start
    the bot with `--public-url https://cantrip.yourdomain`.
 
+### Every table wants a Discord sign-in
+
+With sign-in set up (`--oauth-client-id` and `CANTRIP_DISCORD_SECRET`) and a `--public-url`, no table opens on a ticket
+alone. **Open in Cantrip** (and the queue and play pages' seats) lead to `/enter`, which signs the player in with
+Discord if the browser is not, then goes on to the client with the same query and ticket. The ticket stays after the `#`
+the whole way, so it is in no request: the page keeps it in the tab for the trip to Discord and back. The table proxy
+then lets a WebSocket through only from a browser signed in as an account the table has a seat for (`TableAccess`): no
+sign-in is refused with 401, a signed-in account with no seat there with 403. The table still checks the ticket itself,
+so both are needed. A seat is kept for its account twelve hours.
+
+Without sign-in or without `--public-url` (tables on their own ports) a ticket opens a seat as it always has.
+
 ## How it is built
 
 `dotnet/src/Cantrip.Discord` is the bot (`cantrip-discord`). It is two parts:
@@ -286,10 +318,10 @@ that has been silent for 100.
 
 `ClientSite` serves the web client and its art, and makes the link that opens a seat in it - and the server's status page
 at `/status`, every event, forming table and game being played and the history of those played ([events.md](events.md#the-status-page)).
-And the draft queue page at `/queue` (`QueueSite`): what `DraftQueues` has forming and the status board has under way,
+And the draft queue page at `/draft` (`QueueSite`): what `DraftQueues` has forming and the status board has under way,
 Discord sign-in, and seats handed out as links to the client. `DraftQueues` is tested with tables of a player's own in
 `DraftQueuesTests`, the pages over real HTTP in `SiteTests` - what they show, that a seat wants signing in, and the
-request that goes to Discord. `/play` is `PlaySite` over the `Matchmaker`, whose games of a format each seat choose a
+request that goes to Discord. `/constructed` is `PlaySite` over the `Matchmaker`, whose games of a format each seat choose a
 deck for (`MatchmakerTests`); both pages sign in through `SiteSignIn`.
 
 The seat itself is a `GameServer` ticket, described in [table-lifecycle.md](table-lifecycle.md#seat-tickets).

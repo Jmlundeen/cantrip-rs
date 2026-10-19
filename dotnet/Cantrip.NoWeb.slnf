@@ -25,6 +25,7 @@
       "tests\\Cantrip.Projection.Tests\\Cantrip.Projection.Tests.csproj",
       "tests\\Cantrip.Server.Tests\\Cantrip.Server.Tests.csproj",
       "tests\\Cantrip.TestKit\\Cantrip.TestKit.csproj",
+      "tools\\Cantrip.ArtWarm\\Cantrip.ArtWarm.csproj",
       "tools\\Cantrip.Bot\\Cantrip.Bot.csproj",
       "tools\\Cantrip.BotLab\\Cantrip.BotLab.csproj",
       "tools\\Cantrip.LlmGames\\Cantrip.LlmGames.csproj",

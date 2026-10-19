@@ -1,0 +1,54 @@
+# Esper Origins, cast from the hand and then with flashback from the graveyard ({3}{G}). Both casts surveil 2 and gain 2
+# life. Only the flashback cast was "cast from a graveyard": that one exiles itself (CR 608.2m) and puts the card onto the
+# battlefield transformed (CR 712.14a) under its owner's control with a finality counter on it. It enters as Summon: Esper
+# Maduin, a green (its color indicator) 4/4 Enchantment Creature - Saga Elemental, with the finality counter and the lore
+# counter a Saga enters with (CR 714.3a) both on it as it enters (CR 122.6, 614.1c). The lore counter triggers chapter I
+# (CR 714.2b): the top card, Llanowar Elves (left there by the second surveil), is revealed and, a permanent card, put
+# into Bot1's hand. Nothing is left in exile: the card that was exiled is the permanent now.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Esper Origins
+Mox Ruby
+Island
+Island
+Lightning Bolt
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange(Lightning Bolt | Island)
+? Bot1.Graveyard = Esper Origins; Island
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Arrange(Llanowar Elves | Lightning Bolt)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 1
+Bot1.Battlefield.Summon: Esper Maduin.Power = 4
+Bot1.Battlefield.Summon: Esper Maduin.Toughness = 4
+Bot1.Battlefield.Summon: Esper Maduin.Types = Enchantment; Creature
+Bot1.Battlefield.Summon: Esper Maduin.Subtypes = Elemental; Saga
+Bot1.Battlefield.Summon: Esper Maduin.Colors = Green
+Bot1.Battlefield.Summon: Esper Maduin.Tapped = false
+Bot1.Revealed = Llanowar Elves
+Bot1.Hand = Mox Ruby; Island; Llanowar Elves
+Bot1.Graveyard = Lightning Bolt; Black Lotus; Island
+Exile.Count = 0

@@ -11,6 +11,8 @@ namespace Cantrip.Server.Events;
 /// players/{player}.json             who they are and the events they are in
 /// events/{event}/event.json         the event (EventRecord)
 /// events/{event}/draft.json         a draft's own state while it runs (WinstonDraft)
+/// {folder}/{id}.json                anything else a host keeps (a Discord bot's queues)
+/// {folder}/{player}/{id}.json       what a host keeps for one player (their saved decks)
 /// </code>
 /// One directory per event, so a league of hundreds of drafts is hundreds of small directories rather than one file
 /// that grows, and an event can be copied, archived or looked at on its own. Every write goes to a temporary file
@@ -158,6 +160,64 @@ public sealed partial class EventStore
         ValidId(folder) && folder is not ("events" or "players") && ValidId(id)
             ? Path.Combine(Root, folder, id + ".json")
             : throw new ArgumentException($"'{folder}/{id}' is not somewhere a host may keep things.", nameof(id));
+
+    /// <summary>
+    /// What a host keeps for one player, one file per id under a folder of the player's own - a player's decks, as
+    /// <c>decks/{player}/{id}.json</c> - as text the host has already written in its own shape. Null when there is none.
+    /// </summary>
+    public string? LoadPlayerText(string folder, string player, string id)
+    {
+        string path = PlayerHostFile(folder, player, id);
+        lock (_gate)
+        {
+            return File.Exists(path) ? File.ReadAllText(path) : null;
+        }
+    }
+
+    /// <summary>Keeps a player's file, written to a temporary file first and moved over the old one, as every write here is.</summary>
+    public void SavePlayerText(string folder, string player, string id, string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        string path = PlayerHostFile(folder, player, id);
+        lock (_gate)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            string temporary = path + ".tmp";
+            using (FileStream stream = File.Create(temporary))
+            {
+                stream.Write(System.Text.Encoding.UTF8.GetBytes(text));
+                stream.Flush(flushToDisk: true);
+            }
+
+            File.Move(temporary, path, overwrite: true);
+        }
+    }
+
+    /// <summary>Removes a player's file. Returns whether there was one.</summary>
+    public bool DeletePlayerText(string folder, string player, string id)
+    {
+        string path = PlayerHostFile(folder, player, id);
+        lock (_gate)
+        {
+            if (!File.Exists(path)) return false;
+            File.Delete(path);
+            return true;
+        }
+    }
+
+    /// <summary>The ids a host keeps a player's files under in a folder.</summary>
+    public IEnumerable<string> PlayerTextIds(string folder, string player)
+    {
+        string directory = Path.GetDirectoryName(PlayerHostFile(folder, player, "x"))!;
+        return Directory.Exists(directory)
+            ? Directory.EnumerateFiles(directory, "*.json").Select(Path.GetFileNameWithoutExtension).OfType<string>().Where(ValidId).Order(StringComparer.Ordinal).ToList()
+            : [];
+    }
+
+    private string PlayerHostFile(string folder, string player, string id) =>
+        ValidId(folder) && folder is not ("events" or "players") && ValidId(player) && ValidId(id)
+            ? Path.Combine(Root, folder, player, id + ".json")
+            : throw new ArgumentException($"'{folder}/{player}/{id}' is not somewhere a host may keep things.", nameof(id));
 
     /// <summary>
     /// Notes in a player's record that they are in an event, making the record if this is their first, and keeps the

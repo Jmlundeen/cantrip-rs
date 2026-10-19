@@ -1,0 +1,60 @@
+# Esper Origins cast with flashback, copied by Lutri, the Spellchaser flashed in over it. The copy surveils 2 and gains 2
+# life, but a copy is not cast (CR 707.10), so "if this spell was cast from a graveyard" is false for it: it exiles nothing
+# and puts nothing onto the battlefield, and ceases to exist as it leaves the stack (CR 707.10a). The original, cast from
+# the graveyard, then does all of it: one Summon: Esper Maduin with one finality counter. Three resolutions of "you gain 2
+# life" in all (the cast from the hand on turn 1, the copy and the original): 26 life.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Esper Origins
+Lutri, the Spellchaser
+Mox Ruby
+Forest
+Island
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange(Forest | Island)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lutri, the Spellchaser.Cast
+Bot1.Pass
+? Stack = Lutri, the Spellchaser; Esper Origins
+Bot1.Pass
+Bot1.Arrange( | Island; Island)
+? Bot1.Life = 24
+? Bot1.Battlefield.Count = 6
+Bot1.Arrange( | Island; Island)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 26
+Bot1.Battlefield = Forest; Forest; Sol Ring; Mox Emerald; Mox Ruby; Lutri, the Spellchaser; Summon: Esper Maduin
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 1
+Exile.Count = 0
+Bot1.Graveyard = Island; Island; Island; Island; Black Lotus; Island

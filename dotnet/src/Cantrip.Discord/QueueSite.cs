@@ -28,6 +28,9 @@ public sealed class QueueSiteOptions
     /// <summary>Who is signed in, and the player they sit down as.</summary>
     public required SiteSignInOptions SignIn { get; init; }
 
+    /// <summary>Who may open which table, when the tables are behind sign-in (<see cref="TableAccess"/>); null for none.</summary>
+    internal TableAccess? Access { get; init; }
+
     /// <summary>A queue's channel by name, as the page labels the queue; null, or a null answer, labels it by its cube alone.</summary>
     public Func<ulong, string?>? ChannelName { get; init; }
 }
@@ -49,7 +52,7 @@ public sealed class QueueSiteOptions
 /// </summary>
 public static class QueueSite
 {
-    public const string Route = "queue";
+    public const string Route = "draft";
 
     private static readonly Lazy<string> Page = new(() =>
     {
@@ -81,7 +84,7 @@ public static class QueueSite
                 : ulong.TryParse(join.Queue, NumberStyles.None, CultureInfo.InvariantCulture, out ulong channel)
                     ? await options.Queues.JoinAsync(channel, player, web: true).ConfigureAwait(false)
                     : QueueSeating.Refused("Pick a table or a queue to join.");
-            return Fresh(context, Seat(options, seating.Address, seating.Ticket, seating.Refusal));
+            return Fresh(context, Seat(options, account.Id, seating.Address, seating.Ticket, seating.Refusal));
         });
 
         app.MapPost($"/{Route}/api/create", async (HttpContext context, CreateRequest create) =>
@@ -89,7 +92,7 @@ public static class QueueSite
             if (Account(context) is not { } account) return Results.Unauthorized();
             DiscordPlayer player = await PlayerOf(options.SignIn, account).ConfigureAwait(false);
             QueueSeating seating = await options.Queues.CreateTableAsync(create.Settings(), player).ConfigureAwait(false);
-            return Fresh(context, Seat(options, seating.Address, seating.Ticket, seating.Refusal));
+            return Fresh(context, Seat(options, account.Id, seating.Address, seating.Ticket, seating.Refusal));
         });
 
         app.MapPost($"/{Route}/api/return", async (HttpContext context, NoBody _) =>
@@ -97,10 +100,10 @@ public static class QueueSite
             if (Account(context) is not { } account) return Results.Unauthorized();
             var player = new DiscordPlayer(account.Id, account.Name);
             if (options.Pods is not null && await options.Pods.ReturnAsync(player).ConfigureAwait(false) is { Refusal: null } pod)
-                return Fresh(context, Seat(options, pod.Address, pod.Ticket, null));
-            if (options.Drafts is null) return Fresh(context, Seat(options, null, null, "You are not in a draft."));
+                return Fresh(context, Seat(options, account.Id, pod.Address, pod.Ticket, null));
+            if (options.Drafts is null) return Fresh(context, Seat(options, account.Id, null, null, "You are not in a draft."));
             DraftSeating back = await options.Drafts.ReturnAsync(player).ConfigureAwait(false);
-            return Fresh(context, Seat(options, back.Draft?.Address, back.Ticket, back.Refusal));
+            return Fresh(context, Seat(options, account.Id, back.Draft?.Address, back.Ticket, back.Refusal));
         });
 
         return app;
@@ -126,8 +129,8 @@ public static class QueueSite
         };
     }
 
-    private static SeatAnswer Seat(QueueSiteOptions options, Uri? address, string? ticket, string? refusal) =>
-        SeatAnswer.For(options.Client, options.Art, address, ticket, refusal);
+    private static SeatAnswer Seat(QueueSiteOptions options, ulong player, Uri? address, string? ticket, string? refusal) =>
+        SeatAnswer.For(options.Client, options.Art, options.Access, player, address, ticket, refusal);
 
     /// <summary>Everything the page shows, and what the player signed in has: their name, the table they sit at, whether they are drafting.</summary>
     internal static object Board(QueueSiteOptions options, WebAccount? account)

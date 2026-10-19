@@ -1,0 +1,32 @@
+# Esper Origins cast from the hand: "Surveil 2. You gain 2 life." Bot1 looks at Island and Lightning Bolt, keeps the Bolt on
+# top and puts the Island into the graveyard (CR 701.25a). "If this spell was cast from a graveyard" is false, so the
+# spell is not exiled and nothing enters: it goes to its owner's graveyard as it finishes resolving (CR 608.2n), above the
+# Island it surveiled there, and the battlefield holds no Summon: Esper Maduin.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Esper Origins
+Island x4
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange(Lightning Bolt | Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 22
+Bot1.Graveyard = Esper Origins; Island
+Bot1.Library.Count = 11
+Exile.Count = 0
+Bot1.Battlefield = Forest; Mox Emerald

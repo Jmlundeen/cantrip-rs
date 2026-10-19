@@ -1,0 +1,13 @@
+[Unit]
+Description=Cloudflare tunnel for Cantrip
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=opc
+ExecStart=/usr/bin/env /usr/local/bin/cloudflared --no-autoupdate --config /home/opc/.cloudflared/config.yml tunnel run cantrip
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

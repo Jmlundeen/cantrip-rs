@@ -12,7 +12,8 @@ namespace Cantrip.Discord;
 /// listen anywhere but here.
 /// <para>
 /// Only the bot's own table ports are passed through; any other port is not found, so the route cannot be used to reach
-/// anything else on the machine. The table still checks every ticket and membership itself: this only carries bytes.
+/// anything else on the machine. The table still checks every ticket and membership itself; behind sign-in
+/// (<see cref="TableAccess"/>) this also checks that the account signed in has a seat there.
 /// </para>
 /// </summary>
 internal static class TableProxy
@@ -32,7 +33,7 @@ internal static class TableProxy
     }
 
     /// <summary>Passes WebSockets at <c>/table/{port}/game</c> through to the tables on <paramref name="host"/>, for the ports allowed.</summary>
-    public static void MapTables(this IEndpointRouteBuilder app, string host, IReadOnlySet<int> ports)
+    public static void MapTables(this IEndpointRouteBuilder app, string host, IReadOnlySet<int> ports, TableAccess? access = null)
     {
         app.Map("/table/{port:int}/game", async (HttpContext context, int port) =>
         {
@@ -46,6 +47,22 @@ internal static class TableProxy
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
+            }
+
+            // Behind sign-in, a table is for the Discord accounts it has seats for, ticket or not.
+            if (access is not null)
+            {
+                if (SiteSignIn.Account(context) is not { } account)
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
+
+                if (!access.Allows(port, account.Id))
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return;
+                }
             }
 
             using var table = new ClientWebSocket();

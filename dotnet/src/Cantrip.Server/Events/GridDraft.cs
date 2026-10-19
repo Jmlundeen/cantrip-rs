@@ -167,13 +167,15 @@ public sealed class GridDraft : IPoolDraft
     }
 
     /// <summary>
-    /// The pick clock has run out on the active player: the line <see cref="ClockLine"/> chooses is taken for them.
+    /// The pick clock has run out on the active player: the line they had chosen, if it can still be taken, otherwise the
+    /// line <see cref="ClockLine"/> chooses, is taken for them.
     /// </summary>
+    /// <param name="chosen">The line the player had chosen but not yet taken, if any.</param>
     /// <returns>The cards taken.</returns>
-    public IReadOnlyList<string> TakeForClock()
+    public IReadOnlyList<string> TakeForClock(int? chosen = null)
     {
         if (IsOver) throw new InvalidOperationException("The draft is over.");
-        return Take(Active, Decision, ClockLine(), auto: true);
+        return Take(Active, Decision, chosen is { } line && CanTake(line) ? line : ClockLine(), auto: true);
     }
 
     /// <summary>

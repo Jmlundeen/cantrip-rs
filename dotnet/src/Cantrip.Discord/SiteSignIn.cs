@@ -42,9 +42,9 @@ public sealed class SiteSignInOptions
 
 /// <summary>
 /// Signing in with Discord on the bot's site, for the pages a player takes a seat from - the draft queues
-/// (<see cref="QueueSite"/>) and constructed play (<see cref="PlaySite"/>):
+/// (<see cref="QueueSite"/>), constructed play (<see cref="PlaySite"/>) and a player's own page (<see cref="HomeSite"/>):
 /// <code>
-/// /signin?then=queue         to Discord and back to that page, signed in
+/// /signin?then=home          to Discord and back to that page, signed in
 /// /signin/discord            where Discord sends the player back
 /// /signout                   POST
 /// </code>
@@ -57,7 +57,7 @@ public static class SiteSignIn
     private const string AvatarClaim = "urn:discord:avatar";
 
     /// <summary>The pages a sign-in may come back to.</summary>
-    private static readonly HashSet<string> Pages = new(StringComparer.Ordinal) { QueueSite.Route, PlaySite.Route };
+    private static readonly HashSet<string> Pages = new(StringComparer.Ordinal) { HomeSite.Route, QueueSite.Route, PlaySite.Route, DeckSite.Route, TableAccess.EnterRoute };
 
     /// <summary>Where Discord sends a player back to once they have signed in; registered as a redirect of the application.</summary>
     public static Uri Callback(Uri site) => new(site, "signin/discord");
@@ -123,7 +123,7 @@ public static class SiteSignIn
                 // Declined, or Discord could not be reached: back to the page, which says so.
                 oauth.Events.OnRemoteFailure = context =>
                 {
-                    context.Response.Redirect($"{context.Properties?.RedirectUri ?? "/" + QueueSite.Route}?signin=failed");
+                    context.Response.Redirect($"{context.Properties?.RedirectUri ?? "/" + HomeSite.Route}?signin=failed");
                     context.HandleResponse();
                     return Task.CompletedTask;
                 };
@@ -160,7 +160,7 @@ public static class SiteSignIn
 
         app.MapGet("/signin", (string? then) =>
         {
-            string page = "/" + (then is not null && Pages.Contains(then) ? then : QueueSite.Route);
+            string page = "/" + (then is not null && Pages.Contains(then) ? then : HomeSite.Route);
             return options.Enabled
                 ? Results.Challenge(new AuthenticationProperties { RedirectUri = page }, [Discord])
                 : Results.Redirect(page);
@@ -202,9 +202,9 @@ public static class SiteSignIn
     /// <summary>A seat as a page takes it: the link that opens it in the web client, or why there is none.</summary>
     public sealed record SeatAnswer(string? Link, string? Refusal)
     {
-        public static SeatAnswer For(Uri client, Uri? art, Uri? address, string? ticket, string? refusal) =>
+        public static SeatAnswer For(Uri client, Uri? art, TableAccess? access, ulong player, Uri? address, string? ticket, string? refusal) =>
             refusal is null && address is not null && ticket is not null
-                ? new SeatAnswer(ClientSite.Link(client, address, ticket, art).AbsoluteUri, null)
+                ? new SeatAnswer(TableAccess.Link(access, client, address, ticket, art, player).AbsoluteUri, null)
                 : new SeatAnswer(null, refusal ?? "No seat could be had.");
     }
 

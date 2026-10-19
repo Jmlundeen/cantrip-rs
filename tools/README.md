@@ -49,21 +49,26 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 |---|---|
 | `discord-bot.cmd` | runs the Discord bot (`docs/discord-bot.md`) |
 | `discord-bot-release.cmd` | stops the bot, builds the Release web client, and starts it again |
+| `publish-server.cmd` | publishes to the server: builds the bot and the web client here, builds the engine host there, publishes the art, and restarts the bot once (`-Fast`, `-SkipClient`, `-SkipArt`); the server is in `tools\deploy.local.json` |
+| `publish-art.cmd` | publishes card art alone, with the server up: brings the pre-sized art cache up to date here and sends what differs (`-DryRun`, `-SkipBuild`) |
 
 ## `maintenance/` - generated files and audits
 
 | | |
 |---|---|
 | `bump-protocol.cmd` | moves `PlayerView.ProtocolVersion` on and records the wire digest |
-| `push-public.cmd` | replays the commits on `origin/main` since the last publish onto the public `jschibel/cantrip-rs` (`-DryRun` lists them) |
+| `push-public.cmd` | replays the commits on `origin/main` since the last publish onto the public `cantrip-rs/cantrip-rs` (`-DryRun` lists them) |
 | `card-coverage.py "Card"` (or `tools\card-coverage.cmd`) | the lines of a card's Rust file its scenarios never run; exits 1 if any (`cargo-llvm-cov`) |
 | `new-card.py "Card"` | everything to read before adding a card, and its file to start from (`docs/adding-cards.md`) |
 | `rebuild-card-test-deck.ps1` | regenerates the card-test deck from the card files |
 | `card-list.py` | any list of cards (a decklist, a set, a Scryfall search, a text file, a pasted list) as the names the card files use, checked against Scryfall (the `import-cards` skill) |
 | `missing-cards.py` | cards on the cube lists, or on one list or file (`--list`, `--file`), that have no card file yet |
+| `format-scrape.py <format>` | the cards a format's winning decks play, from MTGGoldfish and MTGTop8, ranked, into `docs/formats/<format>.json` (pages cached in `target/format-cache`) |
+| `card-issues.py` | GitHub issues for the cards a format plays that have no file: `sync <format>` opens them, `next <format>` lists the free ones, `claim`/`release "Name"` take and give back a card (a claim is a comment, good for 24 hours from the last PR commit or `card/<slug>` push), `status` lists live claims (the `add-cards` skill) |
 | `cubecobra-sync.py` | syncs one cube list from its CubeCobra cube, or fetches a new cube whole by its CubeCobra name (the `import-cards` skill) |
 | `missing-art.py` | the card faces and tokens of a cube list or file (`--list`, `--file`) that have no art yet, one a line |
 | `pick-order.py` | ranks the cubes' cards into their `*.picks.json` pick orders |
+| `fetch-legality.py` | each card's format legalities and color identity from Scryfall's bulk data into `content/mtg/legality.json`, what the deck editor's catalog is built from; run again as formats move |
 | `art-credits.py` | fills `content/<dataset>/artists.json` with the original printing's artist for each picture not yet credited |
 | `mtgpics-art/fetch_art.py` | downloads the original, non-promo art-only picture of each card name read from stdin from mtgpics.com, under its slug file name (the `fetch-card-art` skill) |
 | `scryfall-art/fetch_art.py` | the fallback for what mtgpics lacks: downloads the earliest regular printing's Scryfall `art_crop` of each card name read from stdin, under its slug file name; never replaces a file (the `fetch-card-art` skill) |
@@ -71,6 +76,7 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 ## The rest
 
 - `scripts/` - the PowerShell behind the launchers above; run the `.cmd`, not these.
+- `deploy/` - the server's systemd units, kept for reference; the Discord token and OAuth secret live only on the server, in `/etc/cantrip/bot.env`. `dotnet\tools\Cantrip.ArtWarm` builds the pre-sized art cache `publish-art.cmd` sends.
 - `dotnet\tools\Cantrip.Bot` - plays one seat of a real server without a window; every bot seat above is one of these.
 - `dotnet\tools\Cantrip.Playtest`, `Cantrip.LlmGames` - the runners behind the `bots-*.cmd` launchers. `Cantrip.BotLab` - behind
   `bot-duel.cmd`, `bot-train.cmd` and `bot-draft.cmd`.

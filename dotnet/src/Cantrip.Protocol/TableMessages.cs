@@ -42,6 +42,12 @@ public sealed class TablePlayerView
     /// its own stand-in.
     /// </summary>
     [Key(5)] public string Portrait { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Seated by a ticket, so the name (a Discord player's own) and the deck were set when the seat was reserved and
+    /// cannot be changed from the table.
+    /// </summary>
+    [Key(6)] public bool Fixed { get; set; }
 }
 
 /// <summary>Public lobby state. Never contains deck contents, credentials, hands or pending choices.</summary>

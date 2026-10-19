@@ -1,0 +1,44 @@
+# Gandalf, Goblins' Bane // Flameshape: "you may play them if you control a Wizard" counts a changeling, which is every creature
+# type (CR 702.73a, 205.3m). Turn 1: Black Lotus pays for Flameshape, which exiles Lightning Bolt and an Island face down; Gandalf
+# waits in exile on his Adventure. No Wizard yet: the Bolt cannot be cast, with Mox Ruby untapped. Woodland Changeling comes down
+# and the Bolt can be: cast at Bot2 for 3. Gandalf stays in exile, still castable as a creature, which Bot1 does not do.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Woodland Changeling
+Gandalf, Goblins' Bane
+Island
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gandalf, Goblins' Bane.Cast(Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {R}
+! Bot1.Exile.Lightning Bolt.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Exile = Gandalf, Goblins' Bane; (face down)
+Exile.FaceDown = Island
+Bot1.Battlefield.Woodland Changeling.Subtypes = (every creature type)
+Bot1.Graveyard = Lightning Bolt; Black Lotus

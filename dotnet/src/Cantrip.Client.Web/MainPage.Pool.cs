@@ -44,6 +44,9 @@ public sealed partial class MainPage
         public List<List<int>> Columns = [.. PoolColumnNames.Select(_ => new List<int>())];
         public List<int> Side = [];
 
+        /// <summary>The commanders, for a Commander deck in the deck editor: in the command zone, neither deck nor sideboard.</summary>
+        public List<int> Command = [];
+
         /// <summary>The pool cards of the main deck, without the basic lands.</summary>
         public IEnumerable<int> Main => Columns.SelectMany(column => column).Where(place => !IsBasic(place));
 
@@ -59,6 +62,7 @@ public sealed partial class MainPage
             }
 
             Side.Remove(place);
+            Command.Remove(place);
         }
 
         public bool InSide(int place) => Side.Contains(place);
@@ -108,10 +112,16 @@ public sealed partial class MainPage
 
     private Grid _poolView = null!;
     private TextBlock _poolLabel = null!;
+    private TextBlock _poolHint = null!;
     private Slider _poolSlider = null!;
     private ScrollViewer _mainScroll = null!;
     private ScrollViewer _sideScroll = null!;
     private Border _sideColumn = null!;
+
+    /// <summary>The deck editor's command zone, beside the sideboard: a Commander deck's commanders (MainPage.Decks).</summary>
+    private readonly CardBoardElement _commandBoard = new(PoolCardWidth, Tall(PoolCardWidth)) { Slides = true, HidesCarried = true, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
+    private Border _commandColumn = null!;
+    private TextBlock _commandLabel = null!;
     private DockButton _sideToggle = null!;
     private TextBlock _sideLabel = null!;
 
@@ -148,14 +158,17 @@ public sealed partial class MainPage
             LocalSettings.Store(PoolScaleKey, _poolScale);
             _flights.Settle();
             LayOutPool();
+            LayOutSearch();
         };
         heading.Children.Add(_poolLabel);
         heading.Children.Add(_poolSlider);
-        heading.Children.Add(EventText("Drag cards between columns  ·  double-click to move one to or from the sideboard, or a basic land out of the deck", 12, Theme.FgMuted));
-        ((TextBlock)heading.Children[2]).VerticalAlignment = VerticalAlignment.Center;
+        _poolHint = EventText("Drag cards between columns  ·  double-click to move one to or from the sideboard, or a basic land out of the deck", 12, Theme.FgMuted);
+        _poolHint.VerticalAlignment = VerticalAlignment.Center;
+        heading.Children.Add(_poolHint);
         view.Children.Add(heading);
 
         var body = new Grid { ColumnSpacing = 10 };
+        body.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         body.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         body.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         Grid.SetRow(body, 1);
@@ -198,6 +211,27 @@ public sealed partial class MainPage
         };
         body.Children.Add(_sideColumn);
 
+        // The command zone, only for a Commander deck in the deck editor.
+        _commandLabel = EventText("Commander", 13, Theme.FgSoft, semibold: true);
+        var command = new Grid { RowSpacing = 6 };
+        command.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        command.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        command.Children.Add(_commandLabel);
+        Grid.SetRow(_commandBoard, 1);
+        command.Children.Add(_commandBoard);
+        _commandColumn = new Border
+        {
+            Background = Theme.Brush(Theme.Panel),
+            BorderBrush = Theme.Brush(Theme.Accent),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(6),
+            Visibility = Visibility.Collapsed,
+            Child = command,
+        };
+        Grid.SetColumn(_commandColumn, 1);
+        body.Children.Add(_commandColumn);
+
         _mainScroll = new ScrollViewer
         {
             HorizontalScrollMode = ScrollMode.Auto,
@@ -206,7 +240,7 @@ public sealed partial class MainPage
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = new Grid { Children = { _mainBoard, _poolHeadings } },
         };
-        Grid.SetColumn(_mainScroll, 1);
+        Grid.SetColumn(_mainScroll, 2);
         body.Children.Add(_mainScroll);
 
         _mainScroll.SizeChanged += (_, _) => LayOutPool();
@@ -215,8 +249,8 @@ public sealed partial class MainPage
         // Picked up from either and put down in either: a column of the main deck, or the sideboard.
         MakeDraggable(_mainBoard);
         MakeDraggable(_sideBoard);
-        _dropZones.Add(new DropZone(_mainBoard, handle => InPool(handle) || InPack(handle), (handle, slot) => PutInColumn(handle, slot / 1000, slot % 1000), ColumnSlot, ColumnBar));
-        _dropZones.Add(new DropZone(_sideBoard, handle => (InPool(handle) && !IsBasic(handle.Value)) || InPack(handle),(handle, slot) => PutInSide(handle, slot), SideSlot, SideBar));
+        _dropZones.Add(new DropZone(_mainBoard, handle => InPool(handle) || InPack(handle) || InSearch(handle), (handle, slot) => PutInColumn(handle, slot / 1000, slot % 1000), ColumnSlot, ColumnBar));
+        _dropZones.Add(new DropZone(_sideBoard, handle => (InPool(handle) && !IsBasic(handle.Value)) || InPack(handle) || InSearch(handle), (handle, slot) => PutInSide(handle, slot), SideSlot, SideBar));
         _mainBoard.CardClicked += handle => PoolClicked(_mainBoard, handle);
         _sideBoard.CardClicked += handle => PoolClicked(_sideBoard, handle);
 
@@ -463,7 +497,8 @@ public sealed partial class MainPage
             ? [.. arrangement.Side.Select((place, row) => new CardBoardElement.BoardCell(handled[place], 0, row * step, Tapped: false, Clickable: !_deckSubmitted))]
             : []);
 
-        _poolLabel.Text = PoolSummary(arrangement);
+        LayOutCommand(arrangement, handled, width, height, step);
+        _poolLabel.Text = DeckEditorShown ? EditorSummary(arrangement) : PoolSummary(arrangement);
         DeckChanged();
         FlyPool();
     }
@@ -546,6 +581,12 @@ public sealed partial class MainPage
             return;
         }
 
+        if (InSearch(handle))
+        {
+            AddFromSearch(handle, arrangement => arrangement.Columns[Math.Clamp(column, 0, arrangement.Columns.Count - 1)], row);
+            return;
+        }
+
         if (_arrangement is not { } arrangement || !_poolPlaces.TryGetValue(handle.Value, out int place))
         {
             return;
@@ -564,6 +605,12 @@ public sealed partial class MainPage
         if (InPack(handle))
         {
             PickInto(handle, side: true, 0, row);
+            return;
+        }
+
+        if (InSearch(handle))
+        {
+            AddFromSearch(handle, arrangement => arrangement.Side, row);
             return;
         }
 
@@ -605,7 +652,7 @@ public sealed partial class MainPage
             return;
         }
 
-        if (arrangement.InSide(place))
+        if (arrangement.InSide(place) || arrangement.Command.Contains(place))
         {
             arrangement.Remove(place);
             arrangement.Columns[DefaultColumn(_poolCards[place])].Add(place);
@@ -639,6 +686,12 @@ public sealed partial class MainPage
     /// <summary>A card was moved: laid out again, and sent when it changed which side of the deck it is on.</summary>
     private void PoolMoved(bool sideChanged)
     {
+        if (DeckEditorShown)
+        {
+            DeckEdited();
+            return;
+        }
+
         if (sideChanged && _poolIsDeck)
         {
             SendDeck(submit: false);
@@ -651,14 +704,14 @@ public sealed partial class MainPage
     /// <summary>The pool's cards to the flight layer, which flies a pile just taken into the columns.</summary>
     private void FlyPool()
     {
-        if (!EventShown)
+        if (!EventShown && !DeckEditorShown)
         {
             return;
         }
 
-        _eventPanel.UpdateLayout();
+        (DeckEditorShown ? _deckPanel : _eventPanel).UpdateLayout();
         List<CardFlights.Placed> placed = [];
-        foreach (CardBoardElement board in (CardBoardElement[])[_pileBoard, _gridBoard, _mainBoard, _sideBoard])
+        foreach (CardBoardElement board in (CardBoardElement[])[_pileBoard, _gridBoard, _mainBoard, _sideBoard, _commandBoard, _searchBoard])
         {
             if (board.XamlRoot is null || board.ActualWidth <= 0 || !IsShown(board))
             {

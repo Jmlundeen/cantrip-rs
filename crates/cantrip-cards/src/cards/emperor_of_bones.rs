@@ -36,11 +36,11 @@ fn reanimate(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         choose::card(g, item.controller, item.object, Purpose::PutOntoBattlefield, eligible)?
     };
     let Some(chosen) = chosen else { return Ok(()) };
-    let returned = g.put_onto_battlefield(chosen, item.controller, false)?;
+    // The finality counter is on it as it enters (CR 122.6, 614.1c), not put on it afterwards.
+    let returned = g.put_onto_battlefield_with_counters(chosen, item.controller, false, &[(CounterKind::Finality, 1)])?;
     if !targets::permanent(g, returned) {
         return Ok(());
     }
-    g.add_counters(returned, CounterKind::Finality, 1);
     cantrip_mechanics::effects::gain_haste(g, item.object, returned);
     cantrip_mechanics::delayed::at_next_end_step(g, item, 0, Target::Object(returned));
     Ok(())

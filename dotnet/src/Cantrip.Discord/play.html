@@ -139,7 +139,7 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
 <body>
 <header class="top">
   <h1><span>Cantrip</span> Constructed Play</h1>
-  <nav><a href="queue">Draft queues</a> &middot; <a href="status">Server status</a></nav>
+  <nav><a href="./">Home</a> &middot; <a href="draft">Draft</a> &middot; <a href="status">Server status</a></nav>
   <div class="who" id="who"></div>
 </header>
 <main>
@@ -255,7 +255,7 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
 
   async function refresh() {
     try {
-      const response = await fetch("play/api/board", { cache: "no-store", credentials: "same-origin" });
+      const response = await fetch("constructed/api/board", { cache: "no-store", credentials: "same-origin" });
       if (!response.ok) throw new Error(`${response.status}`);
       board = (await response.json()).value;
     } catch {
@@ -266,7 +266,7 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
 
   function needsSignIn() {
     if (board?.me) return false;
-    if (board?.signIn) location.assign("signin?then=play");
+    if (board?.signIn) location.assign("signin?then=constructed");
     else { failure = "Sign-in isn't set up on this server, so nobody can play from this page."; render(); }
     return true;
   }
@@ -276,7 +276,7 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
       method: "POST", credentials: "same-origin", cache: "no-store",
       headers: { "Content-Type": "application/json" }, body: JSON.stringify(body ?? {}),
     });
-    if (response.status === 401) { location.assign("signin?then=play"); return null; }
+    if (response.status === 401) { location.assign("signin?then=constructed"); return null; }
     if (!response.ok) throw new Error(`The server said ${response.status}.`);
     return (await response.json()).value;
   }
@@ -321,8 +321,8 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
     $("deck-submit").disabled = true;
     $("deck-error").textContent = "";
     const refusal = picking.game
-      ? await seat("play/api/join", { game: picking.game, deck })
-      : await seat("play/api/host", { format: picking.format, deck });
+      ? await seat("constructed/api/join", { game: picking.game, deck })
+      : await seat("constructed/api/host", { format: picking.format, deck });
     $("deck-submit").disabled = false;
     if (refusal) $("deck-error").textContent = refusal;
   });
@@ -335,19 +335,19 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
   document.addEventListener("click", async event => {
     const target = event.target.closest("button");
     if (!target || target.disabled || target.closest("dialog")) return;
-    if (target.id === "signin") location.assign("signin?then=play");
+    if (target.id === "signin") location.assign("signin?then=constructed");
     else if (target.id === "signout") {
       try { await post("signout"); } catch { /* signed out or not, the board says */ }
       await refresh();
     }
     else if (target.dataset.join) pick(board.games.find(g => g.id === target.dataset.join)?.format, target.dataset.join);
     else if (target.dataset.open) {
-      const refusal = await seat("play/api/join", { game: target.dataset.open });
+      const refusal = await seat("constructed/api/join", { game: target.dataset.open });
       if (refusal) { failure = refusal; render(); }
     }
     else if (target.dataset.cancel) {
       try {
-        const answer = await post("play/api/cancel", { game: target.dataset.cancel });
+        const answer = await post("constructed/api/cancel", { game: target.dataset.cancel });
         failure = answer?.refusal ?? null;
       } catch (error) {
         failure = error.message;

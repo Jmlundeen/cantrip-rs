@@ -1,0 +1,70 @@
+# Innkeeper's Talent at level 3: "If you would put one or more counters on a permanent or player, put twice that many of
+# each of those kinds of counters on that permanent or player instead." Esper Origins's flashback puts its card onto the
+# battlefield transformed with a finality counter, and the Saga enters with a lore counter (CR 714.3a): both are counters it
+# enters with, put on it by its controller (CR 122.6, 122.6a), so the replacement doubles both as part of the one entry
+# (CR 614.1c) - two finality counters and two lore counters. Two lore counters trigger chapters I and II at once (CR 714.2b):
+# Llanowar Elves, on top, are revealed and put into the hand, and {G}{G} is added, which casts them with {G} left over.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Innkeeper's Talent
+Mox Emerald
+Mox Ruby
+Esper Origins
+Forest
+Island
+Island
+Lightning Bolt
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange( | Island; Island)
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Arrange(Llanowar Elves; Lightning Bolt | )
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 2
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 2
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Finality = 2
+Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 2
+Bot1.Revealed = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Types = Creature
+Bot1.Mana = {G}
+Bot1.Hand.Count = 0
+Exile.Count = 0

@@ -222,14 +222,14 @@ public sealed class PodHosts : IAsyncDisposable
     /// Sits a bot down in each of the pod's seats its queue kept for one, at the pod's table; from there each follows the
     /// pod to the tables of its games. Returns the pod.
     /// </summary>
-    private static Hosted PlayBots(Hosted hosted)
+    private Hosted PlayBots(Hosted hosted)
     {
         BoosterPod pod = hosted.Host.Pod;
         CancellationToken cancellation = hosted.Bots.Token;
         foreach ((string id, string name, int _) in pod.Players.Where(player => BotSeats.IsBot(player.PlayerId)))
         {
             string ticket = pod.IssueTicket(id);
-            _ = Task.Run(() => BotSeats.PlayPodAsync(hosted.Host.Address, ticket, name, cancellation), CancellationToken.None);
+            _ = Task.Run(() => BotSeats.PlayPodAsync(hosted.Host.Address, _options.ListenAddress, ticket, name, cancellation), CancellationToken.None);
         }
 
         return hosted;

@@ -5,7 +5,7 @@ over the gateway with Discord.Net; a member with a host role runs `/cantrip host
 each gets an ephemeral seat ticket that opens the web client into a ticket-only table where both play RW Aggro.
 `/cantrip draft` hosts a two-player Winston draft, kept as an event in the server's data directory with each
 player's record ([events.md](events.md)), so it survives a restart and a player can return from any computer.
-Draft queues are built, in Discord and on the web: the bot's `/queue` page signs players in with Discord's OAuth2
+Draft queues are built, in Discord and on the web: the bot's `/draft` page signs players in with Discord's OAuth2
 (`identify`, PKCE) to join a queue's tables or set up their own. The table itself still takes the ticket alone; binding
 a seat to the signed-in account, leagues and everything after are still to come. Until OAuth lands, a seat is proven by
 the ticket, which only its Discord account was shown, rather than by an OAuth login.

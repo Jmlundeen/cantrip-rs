@@ -17,6 +17,8 @@
     <InternalsVisibleTo Include="Cantrip.Discord.Tests" />
     <EmbeddedResource Include="queue.html" LogicalName="Cantrip.Discord.queue.html" />
     <EmbeddedResource Include="play.html" LogicalName="Cantrip.Discord.play.html" />
+    <EmbeddedResource Include="home.html" LogicalName="Cantrip.Discord.home.html" />
+    <EmbeddedResource Include="landing.html" LogicalName="Cantrip.Discord.landing.html" />
   </ItemGroup>
 
   <ItemGroup>

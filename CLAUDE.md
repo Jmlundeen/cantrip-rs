@@ -61,6 +61,13 @@ Force the position instead. A `.cantrip` scenario names both decklists in order 
   `tools\card-coverage.cmd "Name"` lists the lines of its file that no scenario runs. Adding a card follows the
   `add-cards` skill: exact to the rules, every line covered, corner cases and interactions scenario'd, playable
   end to end in the client, reviewed.
+- **Cards are claimed on GitHub before they are worked on.** Every missing card a format plays is an issue
+  ("Card: Name", labelled `format:<format>`), from `docs/formats/<format>.json` (the cards its decks play, scraped from
+  MTGGoldfish and MTGTop8 by `tools/maintenance/format-scrape.py`). `python tools/maintenance/card-issues.py next
+  <format>` lists what is free, `claim "Name"` takes a card (opening its issue first if it has none), `release`
+  gives it back. A claim is a comment and lasts 24 hours from the last pull request commit or push to a
+  `card/<slug>` branch; after that the card is free. Never work on a card someone else holds live; commits end with
+  `Closes #N`. `sync <format>` adds the issues a new scrape needs.
 
 The client draws on canvases, so there is no DOM to find a card in. Open the page with `&test` and it publishes where
 every card and control is, by name, on `globalThis.cantripTest`; drive it with Playwright - screenshots, and real
@@ -92,9 +99,10 @@ is pushed from there. Card art never goes in: `content/*/images/` is gitignored 
     events (`Events/`): drafts, deck building and the data directory events and players are kept in (`--data` /
     `CANTRIP_DATA`). `docs/events.md`.
   - `dotnet/src/Cantrip.Discord` — the Discord bot: a Discord-free `Matchmaker` under a thin Discord.Net adapter,
-    serving the web client its tickets open, and the draft queue and constructed play pages (`/queue`, `/play`, Discord sign-in). `docs/discord-bot.md`.
+    serving the web client its tickets open, and the draft queue and constructed play pages (`/draft`, `/constructed`, Discord sign-in), behind a home page (`/`) and a player's own page (`/home`), and the constructed deck editor's decks (`/decks`). `docs/discord-bot.md`.
   - `dotnet/src/Cantrip.Client.Web` — the client: Uno on WebAssembly, in the browser, drawn with Skia.
-    `docs/web-client.md`. What it draws from is in `dotnet/src/Cantrip.Client` and
+    `docs/web-client.md`. `?decks` is the constructed deck editor instead of a table (`MainPage.Decks.cs`; the deck rules are
+    `Cantrip.Client/Decks`, the legality data `content/mtg/legality.json` from `tools/maintenance/fetch-legality.py`). What it draws from is in `dotnet/src/Cantrip.Client` and
     `dotnet/src/Cantrip.Client.Presentation`; its tests are Playwright, in `dotnet/tests/Cantrip.Client.Web.Tests`.
   - `dotnet/src/Cantrip.Client/Tactics` — the tactical bot, the seat meant to be played against: a client like any
     other, so it runs in a player's own tab (`?bots=2`). Its weights are fitted, not chosen: `tools\bot-train.cmd` makes

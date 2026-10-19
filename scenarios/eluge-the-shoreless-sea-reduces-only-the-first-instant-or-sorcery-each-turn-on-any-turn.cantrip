@@ -1,0 +1,69 @@
+# Eluge, the Shoreless Sea: "The first instant or sorcery spell you cast each turn costs {U} (or {1}) less to cast for each land
+# you control with a flood counter on it" (CR 601.2f, 118.7). Turn 3: Eluge (Black Lotus and an Island) floods Bot1's Mountain.
+# Turn 5: in Bot1's upkeep Bot2 casts Lightning Bolt at Bot1 - an opponent's spell, which uses up nothing of Bot1's. Bot1's first
+# instant of the turn, Brainstorm, then costs nothing (no line pays for it: a spell left owing mana fails the script), and the
+# second costs its full {U}, paid by an Island with nothing left over. Turn 6, Bot2's turn: "each turn" is any turn, so Bot1's
+# Lightning Strike ({1}{R}) in Bot2's upkeep is the first of that turn, and with no {U} in its cost the {U} comes off its generic
+# mana instead (CR 118.7c; the rulings): it costs {R}, which the flooded Mountain pays alone - every other land Bot1 has is
+# tapped.
+
+[Bot1 Deck]
+Island
+Mountain
+Black Lotus
+Eluge, the Shoreless Sea
+Brainstorm
+Brainstorm
+Lightning Strike
+Island x14
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Mountain)
+[T5 Bot1.Upkeep]
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate
+[T5 Bot1.Main1]
+? Bot1.Life = 17
+Bot1.Hand.Island.Play
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+? Bot1.Battlefield.Island#1.Tapped = false
+? Bot1.Battlefield.Island#2.Tapped = false
+Bot1.Hand.Brainstorm.Cast
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island; Island)
+Bot1.Battlefield.Island.Activate
+[T6 Bot2.Upkeep]
+Bot1.Hand.Lightning Strike.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate(Ability: {R})
+? Bot1.Mana =
+
+[Expect]
+Bot2.Life = 17
+Bot1.Life = 17
+Bot1.Graveyard = Lightning Strike; Brainstorm; Brainstorm; Black Lotus
+Bot1.Battlefield.Island#1.Tapped = true
+Bot1.Battlefield.Island#2.Tapped = true
+Bot1.Battlefield.Mountain.Tapped = true

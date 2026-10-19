@@ -30,8 +30,8 @@ using Cantrip.Server.Events;
 // wss://.../table/{port}/game, passed through to the table on this machine. The tables then listen only here, so the
 // tunnel to the web port is the only way in. Without it, players connect to each table's own port at --public-host.
 //
-// With drafts and the bot's own site, /queue is the draft queue page: every queue, every table forming and every draft
-// under way, open to anyone. /play is constructed play: the Standard gauntlet, 1v1 games each player brings one of the
+// With drafts and the bot's own site, /draft is the draft queue page: every queue, every table forming and every draft
+// under way, open to anyone. /constructed is constructed play: the Standard gauntlet, 1v1 games each player brings one of the
 // decks under decks/standard to. Players sign in on either with Discord to take a seat, given the application's OAuth2
 // client id (--oauth-client-id, or CANTRIP_DISCORD_CLIENT_ID) and its secret, from the CANTRIP_DISCORD_SECRET environment
 // variable only; {site}/signin/discord is to be registered as its redirect.
@@ -269,6 +269,7 @@ await using var matchmaker = new Matchmaker(new MatchmakerOptions
 
 // The client is static, so one serves every game; only when it is hosted elsewhere does the bot not serve it.
 Microsoft.AspNetCore.Builder.WebApplication? web = null;
+TableAccess? access = null;
 Uri? queuePage = null;
 
 // The Discord side, for the queue page to ask who a signed-in player is on the server; there once the bot is made.
@@ -305,6 +306,9 @@ if (client is null)
         Keys = store is null ? null : Path.Combine(store.Root, "site-keys"),
         Player = account => discord?.WebPlayerAsync(account) ?? Task.FromResult(new DiscordPlayer(account.Id, account.Name)),
     };
+    // Behind sign-in, every table is for the Discord accounts it has a seat for: the links go by the enter page and the
+    // table proxy asks who is signed in. Without sign-in set up, or the proxy, a ticket opens a seat as it always has.
+    access = signIn.Enabled && publicUrl is not null ? new TableAccess() : null;
     QueueSiteOptions? queueSite = null;
     if (queues is not null && drafts is not null && store is not null)
     {
@@ -317,20 +321,26 @@ if (client is null)
             Client = siteAddress,
             Art = art,
             SignIn = signIn,
+            Access = access,
             ChannelName = channel => discord?.ChannelName(channel),
         };
         queuePage = new Uri(siteAddress, QueueSite.Route);
     }
 
-    PlaySiteOptions? playSite = standard.Count == 0 ? null : new PlaySiteOptions { Games = matchmaker, Client = siteAddress, Art = art, SignIn = signIn };
+    PlaySiteOptions? playSite = standard.Count == 0 ? null : new PlaySiteOptions { Games = matchmaker, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
+
+    // The deck editor's catalog, and each player's saved decks, kept in the data directory.
+    DeckSiteOptions? deckSite = store is null ? null : new DeckSiteOptions { ContentRoot = content, Store = store, SignIn = signIn };
 
     string artCache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
     web = await ClientSite.StartAsync(listen, webPort, root, new Cantrip.Art.ArtStore(new Cantrip.Art.ArtStoreOptions { ContentRoot = content, CacheDirectory = artCache }),
-        publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite);
+        publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite, access,
+        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, HasDecks = deckSite is not null }, deckSite);
     client = siteAddress;
     Console.WriteLine($"Serving the web client from {root}; the server's status at {new Uri(client, Cantrip.Server.Host.StatusSite.Route)}.");
     if (queueSite is not null) Console.WriteLine($"The draft queue page at {queuePage}.");
     if (playSite is not null) Console.WriteLine($"Constructed play at {new Uri(siteAddress, PlaySite.Route)}.");
+    if (deckSite is not null) Console.WriteLine($"The deck editor at {new Uri(siteAddress, DeckSite.Route)}.");
     Console.WriteLine(signIn.Enabled
         ? $"Players sign in with Discord, which sends them back to {SiteSignIn.Callback(siteAddress)}: register it as the application's redirect."
         : "Nobody can sign in to take a seat from the site: give --oauth-client-id and CANTRIP_DISCORD_SECRET.");
@@ -338,7 +348,7 @@ if (client is null)
 
 await using Microsoft.AspNetCore.Builder.WebApplication? site = web;
 await using var bot = new DiscordBot(
-    new DiscordBotOptions { Token = token, Guild = guild, Deck = deck.Name, Client = client, Art = art, Cube = cubeName, Portraits = portraits, QueuePage = queuePage },
+    new DiscordBotOptions { Token = token, Guild = guild, Deck = deck.Name, Client = client, Art = art, Cube = cubeName, Portraits = portraits, QueuePage = queuePage, Access = access },
     matchmaker,
     new HostPolicy(hostRoles),
     drafts,

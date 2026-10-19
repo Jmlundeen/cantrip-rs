@@ -1,11 +1,11 @@
 ---
 name: update-notes
-description: Write the player-facing update notes for Cantrip - what went into the public repository (jschibel/cantrip-rs) since the last notes were sent - as three Discord bullet lists, new cards, new core and shared mechanics, and bug fixes, then record the newest commit as reported. Use when asked for update notes, patch notes, release notes or a changelog to post.
+description: Write the player-facing update notes for Cantrip - what went into the public repository (cantrip-rs/cantrip-rs) since the last notes were sent - as three Discord bullet lists, new cards, new core and shared mechanics, and bug fixes, then record the newest commit as reported. Use when asked for update notes, patch notes, release notes or a changelog to post.
 ---
 
 # Update notes
 
-The notes cover the public repository, https://github.com/jschibel/cantrip-rs, from the last commit reported up to its
+The notes cover the public repository, https://github.com/cantrip-rs/cantrip-rs, from the last commit reported up to its
 current `main`. That last commit is kept in `.claude/skills/update-notes/last-reported-commit.txt` (gitignored; one
 line, a full sha).
 

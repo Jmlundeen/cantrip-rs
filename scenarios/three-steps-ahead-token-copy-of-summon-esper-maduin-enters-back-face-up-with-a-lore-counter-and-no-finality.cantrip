@@ -1,0 +1,64 @@
+# A token copy of Summon: Esper Maduin (Three Steps Ahead's "+ {3} - Create a token that's a copy of target artifact or
+# creature you control"). The original is the back face of Esper Origins, so the copy has the back face's values and enters
+# with that face up (CR 707.8; the Esper Origins ruling): a 4/4 green Saga Elemental. It enters with the lore counter
+# every Saga enters with (CR 714.3a), which triggers its own chapter I - the top card, Ornithopter, is revealed and put into
+# the hand - but not with a finality counter: counters are not copied (CR 707.2), and only the original was put onto the
+# battlefield "with a finality counter on it". The original by then has two lore counters (its chapter II on turn 3).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Mox Emerald
+Black Lotus
+Esper Origins
+Three Steps Ahead
+Mox Sapphire
+Island
+Island
+Lightning Bolt
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Esper Origins.Cast
+Bot1.Arrange( | Island; Island)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Graveyard.Esper Origins.Cast(Ability: Flashback)
+Bot1.Arrange(Lightning Bolt; Ornithopter | )
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana = {G}{G}
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Three Steps Ahead.Cast
+Bot1.Modes(Create a token)
+Bot1.Target(Bot1.Battlefield.Summon: Esper Maduin)
+Bot1.Pass
+Bot2.Pass
+? Stack = Summon: Esper Maduin
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Summon: Esper Maduin#1.Counters.Finality = 1
+Bot1.Battlefield.Summon: Esper Maduin#1.Counters.Lore = 2
+Bot1.Battlefield.Summon: Esper Maduin#2.Token = true
+Bot1.Battlefield.Summon: Esper Maduin#2.Counters.Lore = 1
+Bot1.Battlefield.Summon: Esper Maduin#2.Counters.Finality = (absent)
+Bot1.Battlefield.Summon: Esper Maduin#2.Power = 4
+Bot1.Battlefield.Summon: Esper Maduin#2.Subtypes = Elemental; Saga
+Bot1.Battlefield.Summon: Esper Maduin#2.Colors = Green
+Bot1.Revealed = Lightning Bolt; Ornithopter
+Bot1.Hand = Lightning Bolt; Ornithopter

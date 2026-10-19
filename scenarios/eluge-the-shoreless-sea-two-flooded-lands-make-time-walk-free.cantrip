@@ -1,0 +1,48 @@
+# Eluge, the Shoreless Sea with two flooded lands: "costs {U} (or {1}) less ... for each land you control with a flood counter on
+# it" (CR 601.2f, 118.7): {U}{U} less, the second {U} coming off generic mana for want of a second {U} in the cost (the rulings).
+# Turn 3: Eluge (Black Lotus and an Island) floods the Plains. Turn 5: Eluge attacks and floods the Mountain played that turn,
+# and in the second main phase Time Walk ({1}{U}) costs nothing - no line pays for it, and every land stays untapped. Eluge is
+# 3/3 (the Island, the Plains and the Mountain) and Bot2 takes 3.
+
+[Bot1 Deck]
+Island
+Plains
+Black Lotus
+Eluge, the Shoreless Sea
+Time Walk
+Mountain
+Island
+Island x14
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Plains)
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Eluge, the Shoreless Sea > Bot2)
+Bot1.Target(Mountain)
+[T5 Bot1.Main2]
+Bot1.Hand.Time Walk.Cast
+Bot1.Pass
+Bot2.Pass
+[T6 Bot1.Upkeep]
+
+[Expect]
+Turn = 6
+ActivePlayer = Bot1
+Bot2.Life = 17
+Bot1.Graveyard = Time Walk; Black Lotus
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 3
+Bot1.Battlefield.Mountain.Subtypes = Island; Mountain
+Bot1.Battlefield.Plains.Subtypes = Island; Plains

@@ -85,15 +85,14 @@ public sealed partial class ArtStore
     /// </summary>
     public async Task<ArtRendition?> GetAsync(string slug, int size, CancellationToken cancellation)
     {
-        if (!IsSlug(slug) || !Sizes.Contains(size) || Source(slug) is not { } source)
+        if (!IsSlug(slug) || !Sizes.Contains(size))
         {
             return null;
         }
 
-        var info = new FileInfo(source);
-        if (!info.Exists)
+        if (Source(slug) is not { } source || new FileInfo(source) is not { Exists: true } info)
         {
-            return null;
+            return Kept(slug, size);
         }
 
         string stamp = string.Create(
@@ -145,6 +144,35 @@ public sealed partial class ArtStore
         finally
         {
             gate.Release();
+        }
+    }
+
+    /// <summary>
+    /// The rendition already in the cache folder for a slug with no source here, so a host that was given the folder alone
+    /// (copied from another, as the folder is laid out to be) answers for what it holds. Null when it holds none.
+    /// </summary>
+    private ArtRendition? Kept(string slug, int size)
+    {
+        string folder = Path.Combine(_options.CacheDirectory, size.ToString(CultureInfo.InvariantCulture));
+        string file = Path.Combine(folder, $"{slug}.webp");
+        string stampFile = Path.Combine(folder, $"{slug}.stamp");
+        try
+        {
+            if (!File.Exists(file))
+            {
+                return null;
+            }
+
+            // The stamp names the source the picture was built from; without one, the file's own size and time stand in.
+            var info = new FileInfo(file);
+            string stamp = File.Exists(stampFile)
+                ? File.ReadAllText(stampFile)
+                : string.Create(CultureInfo.InvariantCulture, $"{info.Length:x}-{info.LastWriteTimeUtc.Ticks:x}");
+            return new ArtRendition(file, $"\"{size}-{stamp}\"", new DateTimeOffset(info.LastWriteTimeUtc));
+        }
+        catch (IOException)
+        {
+            return null;
         }
     }
 

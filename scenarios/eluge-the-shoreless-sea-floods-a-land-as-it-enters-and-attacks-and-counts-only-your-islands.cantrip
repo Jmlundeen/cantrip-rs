@@ -1,0 +1,78 @@
+# Eluge, the Shoreless Sea: "power and toughness are each equal to the number of Islands you control" (CR 604.3) and "Whenever
+# Eluge enters or attacks, put a flood counter on target land. It's an Island in addition to its other types for as long as it
+# has a flood counter on it" (CR 611.2b, 205.1b). Turn 1 plays an Island, turn 3 a Mountain, and Black Lotus and the Island
+# pay for Eluge. It enters as a 1/1 (one Island), its enters trigger floods the Mountain, which is then an Island in addition
+# to a Mountain - Eluge 2/2 - and taps for {U} (CR 305.6) as well as {R}. Turn 5 it attacks and floods Bot2's Mountain, which becomes an Island in addition to its types,
+# but Eluge counts only the Islands its controller controls: still 3/3 with the third land, not 4/4. Bot2 takes 3. In the second
+# main phase Time Walk ({1}{U}), the first instant or sorcery spell of the turn, costs {U} less for the one flooded land Bot1
+# controls - not {U}{1} less, which counting Bot2's flooded Mountain would make it - so an Island pays its {1} and no mana is
+# left over. Time Walk's extra turn is turn 6; on turn 7 Bot2 controls a flooded land too, but the reduction is only for Eluge's
+# controller's spells: Bot2's Lightning Strike costs its full {1}{R}, paid by its two lands with nothing left over.
+
+[Bot1 Deck]
+Island
+Mountain
+Black Lotus
+Eluge, the Shoreless Sea
+Time Walk
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Island
+Lightning Strike
+Mountain x17
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Battlefield.Mountain)
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 1
+? Bot1.Battlefield.Mountain.Subtypes = Mountain
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 2
+? Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 2
+? Bot1.Battlefield.Mountain.Subtypes = Island; Mountain
+? Bot1.Battlefield.Mountain.Counters.Flood = 1
+Bot1.Battlefield.Mountain.Activate(Ability: {U})
+? Bot1.Mana = {U}
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Attack(Eluge, the Shoreless Sea > Bot2)
+Bot1.Target(Bot2.Battlefield.Mountain)
+[T5 Bot1.Main2]
+Bot1.Hand.Time Walk.Cast
+Bot1.Battlefield.Island.Activate
+? Bot1.Mana =
+[T7 Bot2.Main1]
+Bot2.Hand.Lightning Strike.Cast(Bot1)
+Bot2.Battlefield.Mountain.Activate(Ability: {R})
+Bot2.Battlefield.Island.Activate
+? Bot2.Mana =
+
+[Expect]
+Bot1.Battlefield.Eluge, the Shoreless Sea.Power = 3
+Bot1.Battlefield.Eluge, the Shoreless Sea.Toughness = 3
+Bot1.Battlefield.Mountain.Subtypes = Island; Mountain
+Bot1.Battlefield.Mountain.Counters.Flood = 1
+Bot2.Battlefield.Mountain.Subtypes = Island; Mountain
+Bot2.Battlefield.Mountain.Counters.Flood = 1
+Bot2.Battlefield.Island.Subtypes = Island
+Bot2.Life = 17
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Strike
+Bot1.Graveyard = Time Walk; Black Lotus

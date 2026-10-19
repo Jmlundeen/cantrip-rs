@@ -1,0 +1,74 @@
+# Browser
+# Gandalf, Goblins' Bane // Flameshape: "Look at the top two cards of your library and exile them face down. For as long as they
+# remain exiled, you may play them if you control a Wizard" (CR 406.3, 601.3, 305.1, 611.2). Turn 1: Black Lotus pays for
+# Flameshape, which exiles Lightning Bolt and a Plains face down; Bot1 may look at them, Bot2 may not. With no Wizard neither
+# can be played - not the Bolt, with {R} floating, nor the Plains, with the land play unused - and the page says what the
+# permission waits for. Gandalf himself, cast from exile on his Adventure (CR 715.4), is a Wizard: the Plains is then played as
+# the turn's land play, and on turn 3 the Bolt is cast from exile at Bot2. A noncreature spell cast with Gandalf out makes him
+# +1/+1 until end of turn and deals 1 damage to each opponent: Bot2 takes 3 and 1. Aerial Doombot, a creature spell, cast on
+# turn 1 with Gandalf out, does neither.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Gandalf, Goblins' Bane
+Mountain
+Aerial Doombot
+Lightning Bolt
+Plains
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Gandalf, Goblins' Bane.Cast(Ability: Adventure)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 3
+? Exile.FaceDown = Lightning Bolt; Plains
+? Bot1.Mana = {R}
+# The page names a face-down card by no name, even to the player who may look at it (it writes the real name under it).
+? Client.Bot1.Exile.(hidden).Annotation = Playable while it stays here, if you control a Wizard
+! Bot1.Exile.Lightning Bolt.Cast
+! Bot1.Exile.Plains.Play
+Bot1.Exile.Gandalf, Goblins' Bane.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Plains.Play
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Aerial Doombot.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 20
+? Bot1.Battlefield.Gandalf, Goblins' Bane.Power = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+? Bot2.Life = 20
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Battlefield.Gandalf, Goblins' Bane.Power = 3
+? Bot1.Battlefield.Gandalf, Goblins' Bane.Toughness = 4
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 16
+Exile.Count = 0
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot1.Battlefield.Plains.Types = Land
+Bot1.Battlefield.Gandalf, Goblins' Bane.Power = 3
+Bot1.Battlefield.Gandalf, Goblins' Bane.Toughness = 4

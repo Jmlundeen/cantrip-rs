@@ -1,0 +1,51 @@
+# Eluge, the Shoreless Sea's enters trigger resolves without Eluge (CR 113.7a, 603.4) and its land stays an Island once Eluge is
+# gone: "It's an Island ... for as long as it has a flood counter on it" lasts as long as the counter, not as long as Eluge (CR
+# 611.2b; ruling 2024-07-26: "stays an Island until the flood counter is removed, even if Eluge leaves the battlefield"). Turn 3:
+# Eluge (Black Lotus and an Island) enters a 2/2 (two Islands) and targets Bot2's Plains; Bot2 answers with Swords to Plowshares, so Bot1 gains
+# 2, Eluge's power as it last existed (CR 608.2h). The trigger still floods the Plains, which is an Island in addition to a Plains
+# (CR 205.1b) and taps for {U} (CR 305.6) for Bot2 on its next turn, with Eluge long in exile.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Eluge, the Shoreless Sea
+Island x17
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Eluge, the Shoreless Sea.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Plains)
+Bot1.Pass
+Bot2.Hand.Swords to Plowshares.Cast(Eluge, the Shoreless Sea)
+Bot2.Battlefield.Plains.Activate
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+? Exile = Eluge, the Shoreless Sea
+? Bot1.Life = 22
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Plains.Subtypes = Island; Plains
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate(Ability: {U})
+? Bot2.Mana = {U}
+
+[Expect]
+Exile = Eluge, the Shoreless Sea
+Bot1.Life = 22
+Bot2.Battlefield.Plains.Subtypes = Island; Plains
+Bot2.Battlefield.Plains.Counters.Flood = 1

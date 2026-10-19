@@ -1,0 +1,54 @@
+# Lignify's ruling: it "overwrites characteristic-defining abilities that specify the enchanted creature's power or
+# toughness". Bot2's Tarmogoyf, with an instant (Lightning Bolt) in a graveyard, is a 1/2 by
+# its own ability (layer 7a); once Lignify is attached it has lost that ability (CR 613.1f, 604.3) and its base power and
+# toughness are 0/4 (layer 7b, CR 613.4b), whatever is in the graveyards. It stays a green creature, a Treefolk only.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mountain
+Lignify
+Lightning Bolt
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Tarmogoyf
+Forest
+Forest
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Tarmogoyf.Cast
+[T2 Bot2.Main2]
+? Bot2.Battlefield.Tarmogoyf.Power = 1
+? Bot2.Battlefield.Tarmogoyf.Toughness = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Lignify.Cast(Tarmogoyf)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Lignify.AttachedTo = Tarmogoyf
+Bot2.Battlefield.Tarmogoyf.Power = 0
+Bot2.Battlefield.Tarmogoyf.Toughness = 4
+Bot2.Battlefield.Tarmogoyf.Types = Creature
+Bot2.Battlefield.Tarmogoyf.Subtypes = Treefolk
+Bot2.Battlefield.Tarmogoyf.Colors = Green

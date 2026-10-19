@@ -1,0 +1,6 @@
+{
+  "name": "Lignify",
+  "manaCost": "{1}{G}",
+  "type": "Kindred Enchantment — Treefolk Aura",
+  "oracleText": "Enchant creature\nEnchanted creature is a Treefolk with base power and toughness 0/4 and loses all abilities."
+}

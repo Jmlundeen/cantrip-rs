@@ -25,7 +25,7 @@ setlocal
 
 set "ROOT=%~dp0.."
 
-dotnet build "%ROOT%\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" -v q --nologo || exit /b 2
-dotnet run --project "%ROOT%\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" --no-build -v q -- soak %*
+dotnet build "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" -v q --nologo || exit /b 2
+dotnet run --project "%ROOT%\dotnet\tools\Cantrip.BotLab\Cantrip.BotLab.csproj" --no-build -v q -- soak %*
 
 endlocal & exit /b %ERRORLEVEL%

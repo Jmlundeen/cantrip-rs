@@ -105,7 +105,9 @@ public sealed partial class MainPage
     {
         // A card of the pool flies from where it was let go to wherever it is put, or back where it came from. A card
         // of the pack put in the pool flies from there once it is picked (ShowPool); let go anywhere else, back to the pack.
-        bool packed = InPack(handle);
+        // A card of the deck editor's search results is put in the deck as a pack's card is picked: a copy flies from
+        // where it was let go (MainPage.Decks).
+        bool packed = InPack(handle) || InSearch(handle);
         bool pooled = (_poolPlaces.ContainsKey(handle.Value) || packed) && _carried is not null;
         (DropZone Zone, Point Local)? dropped = at is { } released ? ZoneAt(handle, released) : null;
         _dropPose = null;
