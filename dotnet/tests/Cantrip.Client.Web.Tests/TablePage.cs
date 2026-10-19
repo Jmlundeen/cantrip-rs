@@ -327,7 +327,9 @@ public sealed record DeckEditorState(
     IReadOnlyList<string> Side,
     IReadOnlyList<string> Decks,
     Spot? CommandZone = null,
-    int LaidOut = 0);
+    int LaidOut = 0,
+    IReadOnlyList<string>? Picked = null,
+    Spot? Marquee = null);
 
 /// <summary>A button of the dock, in the order the dock offers them, and whether it can be pressed.</summary>
 public sealed record DockButtonState(string Label, bool Enabled);

@@ -1,3 +1,4 @@
+using Cantrip.Client.Presentation;
 using Cantrip.Protocol;
 using Microsoft.UI.Xaml.Media;
 using SkiaSharp;
@@ -145,6 +146,55 @@ public sealed class CardBoardElement : SKCanvasElement
     }
 
     private ViewHandle? _carried;
+
+    /// <summary>
+    /// The other cards carried off with <see cref="Carried"/>, a group picked together: drawn as it is, faded or not
+    /// drawn at all, until they are put down. Null while none are.
+    /// </summary>
+    public IReadOnlySet<ViewHandle>? CarriedWith
+    {
+        get => _carriedWith;
+        set
+        {
+            _carriedWith = value;
+            Invalidate();
+        }
+    }
+
+    private IReadOnlySet<ViewHandle>? _carriedWith;
+
+    /// <summary>Whether a card is being carried off, alone or with others.</summary>
+    private bool IsCarried(ViewHandle handle) => handle == _carried || _carriedWith?.Contains(handle) == true;
+
+    /// <summary>
+    /// Whether a press on no card and a drag draws a rectangle, which picks the cards it touches (<see cref="Marqueed"/>),
+    /// and a click on no card says so (<see cref="EmptyClicked"/>). A touch on no card is left to scroll the row.
+    /// </summary>
+    public bool Marquees { get; set; }
+
+    /// <summary>A rectangle was drawn: the cards it touches, in the row's order, and the modifiers held as it began.</summary>
+    public event Action<IReadOnlyList<ViewHandle>, Windows.System.VirtualKeyModifiers>? Marqueed;
+
+    /// <summary>A click on no card, on a row that <see cref="Marquees"/>, with the modifiers held.</summary>
+    public event Action<Windows.System.VirtualKeyModifiers>? EmptyClicked;
+
+    /// <summary>The rectangle being drawn, in this element; null while none is.</summary>
+    public Rect? MarqueeBox => _marquee;
+
+    /// <summary>Where a press on no card went down, and the modifiers held, while a rectangle may be drawn from it.</summary>
+    private (Point At, Windows.System.VirtualKeyModifiers Modifiers)? _marqueeFrom;
+    private Rect? _marquee;
+
+    private static readonly SKPaint MarqueeFill = new() { Color = SKColor.Parse("f1b44c").WithAlpha(40), Style = SKPaintStyle.Fill };
+    private static readonly SKPaint MarqueeEdge = new() { Color = SKColor.Parse("f1b44c"), Style = SKPaintStyle.Stroke, StrokeWidth = 1.5f, IsAntialias = true };
+
+    /// <summary>The cards a rectangle in this element touches where they show, in the row's order (<see cref="Marquee.Touched"/>).</summary>
+    public IReadOnlyList<ViewHandle> Touching(Rect box)
+    {
+        List<ViewHandle> drawn = [.. _drawOrder.Where(handle => _cells.ContainsKey(handle) && handle != _concealed && _hidden?.Contains(handle) != true)];
+        List<Box> boxes = [.. drawn.Select(handle => Bounds(handle) is { } at ? new Box(at.X, at.Y, at.Width, at.Height) : default)];
+        return [.. Marquee.Touched(boxes, new Box(box.X, box.Y, box.Width, box.Height)).Select(i => drawn[i])];
+    }
 
     /// <summary>
     /// Whether a card carried off is not drawn at all where it was, rather than faded there: for a layout where the place
@@ -311,7 +361,18 @@ public sealed class CardBoardElement : SKCanvasElement
         };
         PointerMoved += OnPointerCarried;
         PointerReleased += OnPointerReleased;
-        PointerCaptureLost += (_, _) => LetGo(null);
+        PointerCaptureLost += (_, _) =>
+        {
+            // A rectangle cut short draws nothing and picks nothing.
+            if (_marqueeFrom is not null)
+            {
+                _marqueeFrom = null;
+                _marquee = null;
+                Invalidate();
+            }
+
+            LetGo(null);
+        };
     }
 
     public float CellWidth => _cellWidth;
@@ -349,6 +410,15 @@ public sealed class CardBoardElement : SKCanvasElement
         Point at = point.Position;
         if (CardAt(at) is not { } handle)
         {
+            // On no card: a rectangle may be drawn from here, with the mouse or a pen. A touch scrolls.
+            if (Marquees && point.Properties.IsLeftButtonPressed && e.Pointer.PointerDeviceType != Microsoft.UI.Input.PointerDeviceType.Touch)
+            {
+                _marqueeFrom = (at, e.KeyModifiers);
+                _marquee = null;
+                CapturePointer(e.Pointer);
+                e.Handled = true;
+            }
+
             return;
         }
 
@@ -392,6 +462,20 @@ public sealed class CardBoardElement : SKCanvasElement
     /// <summary>Picks the pressed card up once the pointer has moved far enough with the button down, then carries it.</summary>
     private void OnPointerCarried(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
+        if (_marqueeFrom is { } start)
+        {
+            Point now = e.GetCurrentPoint(this).Position;
+            if (_marquee is not null || Math.Abs(now.X - start.At.X) >= PickUpDistance || Math.Abs(now.Y - start.At.Y) >= PickUpDistance)
+            {
+                Box box = Marquee.Between(start.At.X, start.At.Y, now.X, now.Y);
+                _marquee = new Rect(box.X, box.Y, box.Width, box.Height);
+                Invalidate();
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         if (_press is not { } press)
         {
             return;
@@ -416,6 +500,26 @@ public sealed class CardBoardElement : SKCanvasElement
 
     private void OnPointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
+        if (_marqueeFrom is { } start)
+        {
+            Rect? drawn = _marquee;
+            _marqueeFrom = null;
+            _marquee = null;
+            e.Handled = true;
+            ReleasePointerCapture(e.Pointer);
+            Invalidate();
+            if (drawn is { } box)
+            {
+                Marqueed?.Invoke(Touching(box), start.Modifiers);
+            }
+            else
+            {
+                EmptyClicked?.Invoke(start.Modifiers);
+            }
+
+            return;
+        }
+
         if (_press is not { } press)
         {
             return;
@@ -551,7 +655,7 @@ public sealed class CardBoardElement : SKCanvasElement
         foreach (ViewHandle handle in _drawOrder)
         {
             if (!_cells.TryGetValue(handle, out CellState? state) || handle == _concealed || _hidden?.Contains(handle) == true
-                || (HidesCarried && handle == _carried) || Bounds(handle) is not { } box)
+                || (HidesCarried && IsCarried(handle)) || Bounds(handle) is not { } box)
             {
                 continue;
             }
@@ -986,7 +1090,7 @@ public sealed class CardBoardElement : SKCanvasElement
             // One drawing per look at one size, shared by every card that looks the same, here or on any other row.
             (string look, string key) = Keys(state, drawnWidth, drawnHeight);
 
-            if (handle == _concealed || _hidden?.Contains(handle) == true || (HidesCarried && handle == _carried))
+            if (handle == _concealed || _hidden?.Contains(handle) == true || (HidesCarried && IsCarried(handle)))
             {
                 // Not drawn, but a card in the air to here has its face made while it flies, so it lands with it.
                 if (_hidden?.Contains(handle) == true && FaceCache.Get(key) is null && Faces.MayDraw(Faces.Urgency.Shown))
@@ -1041,7 +1145,7 @@ public sealed class CardBoardElement : SKCanvasElement
             if (drawing is not null)
             {
                 // A card carried off is faded where it was, its body with it.
-                bool carried = handle == _carried;
+                bool carried = IsCarried(handle);
                 if (carried)
                 {
                     canvas.SaveLayer(CarriedPaint);
@@ -1108,6 +1212,14 @@ public sealed class CardBoardElement : SKCanvasElement
             canvas.DrawRect(SKRect.Create((float)bar.X, (float)bar.Y, (float)bar.Width, (float)bar.Height), MarkerPaint);
         }
 
+        // The rectangle being drawn to pick cards, over them.
+        if (_marquee is { } marquee)
+        {
+            var drawn = SKRect.Create((float)marquee.X, (float)marquee.Y, (float)marquee.Width, (float)marquee.Height);
+            canvas.DrawRect(drawn, MarqueeFill);
+            canvas.DrawRect(drawn, MarqueeEdge);
+        }
+
         // Once every face in view is drawn, the ones out of view are drawn ahead of being scrolled to, a few a frame, in the
         // row's order - a library search fills in from its top whether or not it is scrolled.
         if (!pending && ahead is not null && DrawAhead(ahead, drawnWidth, drawnHeight))
@@ -1138,7 +1250,7 @@ public sealed class CardBoardElement : SKCanvasElement
         foreach (ViewHandle handle in _drawOrder)
         {
             if (_cells.TryGetValue(handle, out CellState? state)
-                && handle != _concealed && _hidden?.Contains(handle) != true && !(HidesCarried && handle == _carried))
+                && handle != _concealed && _hidden?.Contains(handle) != true && !(HidesCarried && IsCarried(handle)))
             {
                 drawn.Add(state);
             }

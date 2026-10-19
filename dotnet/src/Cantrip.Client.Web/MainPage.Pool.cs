@@ -455,6 +455,7 @@ public sealed partial class MainPage
         _mainBoard.SetCellSize(width, height);
         _sideBoard.SetCellSize(width, height);
         List<ObjectView> handled = PoolHandled();
+        KeepPicks(arrangement);
 
         // The columns, each a stack of cards showing their names. A basic land is a card of its own for every copy.
         List<CardBoardElement.BoardCell> cells = [];
@@ -468,7 +469,7 @@ public sealed partial class MainPage
             {
                 int place = places[row];
                 ObjectView card = IsBasic(place) ? Handled(_poolBasics[BasicKind(place)].Land.Card, place) : handled[place];
-                cells.Add(new CardBoardElement.BoardCell(card, x, PoolHeaderHeight + (row * step), Tapped: false, Clickable: !_deckSubmitted));
+                cells.Add(new CardBoardElement.BoardCell(card, x, PoolHeaderHeight + (row * step), Tapped: false, Clickable: !_deckSubmitted, Selected: Picked(place)));
             }
 
             int count = places.Count;
@@ -494,7 +495,7 @@ public sealed partial class MainPage
         _sideBoard.Width = sideWidth;
         _sideBoard.Height = Math.Max(_poolSideOpen ? ((Math.Max(1, arrangement.Side.Count) - 1) * step) + height : 0, (float)_sideScroll.ActualHeight - 2);
         _sideBoard.SetCells(_poolSideOpen
-            ? [.. arrangement.Side.Select((place, row) => new CardBoardElement.BoardCell(handled[place], 0, row * step, Tapped: false, Clickable: !_deckSubmitted))]
+            ? [.. arrangement.Side.Select((place, row) => new CardBoardElement.BoardCell(handled[place], 0, row * step, Tapped: false, Clickable: !_deckSubmitted, Selected: Picked(place)))]
             : []);
 
         LayOutCommand(arrangement, handled, width, height, step);
@@ -570,7 +571,7 @@ public sealed partial class MainPage
         ? new Rect(0, Math.Max(0, BarAt(OtherTops(arrangement.Side, carried, 0), slot, 0) - 3), PoolWidth, 4)
         : new Rect(0, 0, SideClosedWidth - 14, _sideBoard.ActualHeight);
 
-    private bool IsCarried(int place, ViewHandle carried) => _poolPlaces.GetValueOrDefault(carried.Value, -1) == place;
+    private bool IsCarried(int place, ViewHandle carried) => _poolPlaces.GetValueOrDefault(carried.Value, -1) == place || _carriedPicks?.Contains(place) == true;
 
     /// <summary>Puts a card in a column of the main deck at a place among the others there.</summary>
     private void PutInColumn(ViewHandle handle, int column, int row)
@@ -636,6 +637,12 @@ public sealed partial class MainPage
     /// </summary>
     private void PoolClicked(CardBoardElement board, ViewHandle handle)
     {
+        // In the deck editor, Ctrl or Shift held picks the card or lets it go; a plain click lets every pick go.
+        if (PickClicked(board, handle))
+        {
+            return;
+        }
+
         DateTime now = DateTime.UtcNow;
         bool twice = _lastPoolClick is { } last && last.Board == board && last.Handle == handle && now - last.At < TimeSpan.FromMilliseconds(450);
         _lastPoolClick = twice ? null : (board, handle, now);

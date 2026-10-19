@@ -197,6 +197,7 @@ public sealed partial class MainPage
 
         // The search results are a pack to take from, and somewhere to put a card of the deck to take it out.
         MakeDraggable(_searchBoard);
+        MakePickable();
         _searchBoard.CardClicked += SearchClicked;
         _dropZones.Add(new DropZone(_searchBoard, InPool, (handle, _) => TakeOut(handle)));
         MakeDraggable(_commandBoard);
@@ -568,6 +569,7 @@ public sealed partial class MainPage
 
         var arrangement = new PoolArrangement { EventId = $"deck-{++_decksOpened}" };
         _editorCards.Clear();
+        _deckPicks.Clear();
         foreach (DeckEntry entry in deck.Commanders)
         {
             for (int copy = 0; copy < entry.Count; copy++) arrangement.Command.Add(AddCard(entry.Card));

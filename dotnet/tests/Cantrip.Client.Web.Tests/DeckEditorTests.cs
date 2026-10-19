@@ -223,6 +223,103 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
         Assert.Empty(page.Errors);
     }
 
+    /// <summary>
+    /// Cards of the deck picked together: a rectangle dragged out from no card over three columns picks the three cards
+    /// it touches and not the one beyond; Ctrl-click picks another and lets it go again; the three dragged by one of them
+    /// go together into another column, in their order, and then together into the sideboard; a click on no card lets
+    /// them go; and over the search a drag from no card draws nothing and picks nothing.
+    /// </summary>
+    [Fact]
+    public async Task Cards_picked_with_a_rectangle_are_dragged_together_and_the_search_picks_none()
+    {
+        await using TablePage page = await TablePage.OpenAsync(web.Browser, new Uri(_site.Urls.First() + "/"), "decks", WebClient.Pictures(nameof(DeckEditorTests) + "-picks"),
+            headers: [new(AsHeader, "4444")]);
+        await EditorAsync(page, state => state.DeckEditor is { Results: > 0 });
+
+        // One card each of mana value 1, 2, 3 and 5: four columns.
+        (string Search, string Name)[] cards = [("Doombot", "Aerial Doombot"), ("Abrade", "Abrade"), ("Oculus", "Abhorrent Oculus"), ("Aclazotz", "Aclazotz, Deepest Betrayal")];
+        foreach ((string search, string name) in cards)
+        {
+            await ClearSearchAsync(page);
+            await page.TypeAsync("Search cards: name, type or rules text", search);
+            await page.DoubleClickCardAsync(await SearchCardAsync(page, name));
+            await EditorAsync(page, state => state.DeckEditor!.Main.Contains($"1 {name}"));
+        }
+
+        CardState doombot = await DeckCardAsync(page, "Aerial Doombot");
+        CardState oculus = await DeckCardAsync(page, "Abhorrent Oculus");
+        CardState aclazotz = await DeckCardAsync(page, "Aclazotz, Deepest Betrayal");
+
+        // From the gap left of the first column, below its card, up and right into the middle of the third's card.
+        float fromX = doombot.X - (doombot.W / 2) - 4;
+        float fromY = doombot.Y + (doombot.H / 2) + 30;
+        await page.Page.Mouse.MoveAsync(fromX, fromY);
+        await page.Page.Mouse.DownAsync();
+        await page.Page.Mouse.MoveAsync(oculus.X, oculus.Y, new MouseMoveOptions { Steps = 10 });
+        TableState drawing = await page.SettledAsync(state => state.DeckEditor!.Marquee is not null);
+        Assert.Empty(drawing.DeckEditor!.Picked!);
+        await page.PictureAsync("rectangle");
+        await page.Page.Mouse.UpAsync();
+        DeckEditorState editor = await EditorAsync(page, state => state.DeckEditor!.Picked!.Count > 0);
+        Assert.Equal(["Aerial Doombot", "Abrade", "Abhorrent Oculus"], editor.Picked);
+        Assert.Null(editor.Marquee);
+        await page.PictureAsync("picked");
+
+        // Ctrl-click picks one more, and lets it go again.
+        await page.Page.Keyboard.DownAsync("Control");
+        await page.Page.Mouse.ClickAsync(aclazotz.X, aclazotz.Y);
+        await EditorAsync(page, state => state.DeckEditor!.Picked!.Count == 4);
+        await page.Page.Mouse.ClickAsync(aclazotz.X, aclazotz.Y + 20);
+        await page.Page.Keyboard.UpAsync("Control");
+        editor = await EditorAsync(page, state => state.DeckEditor!.Picked!.Count == 3);
+        Assert.DoesNotContain("Aclazotz, Deepest Betrayal", editor.Picked!);
+
+        // Dragged by the middle one, all three go into Aclazotz's column under it, in their order, and stay picked.
+        CardState abrade = await DeckCardAsync(page, "Abrade");
+        await page.DragAsync(abrade, aclazotz.X, aclazotz.Y + aclazotz.H);
+        TableState moved = await page.SettledAsync(state => state.Cards.Count(card => card.Row == "pool" && MathF.Abs(card.X - aclazotz.X) < 2) == 4);
+        Assert.Equal(["Aclazotz, Deepest Betrayal", "Aerial Doombot", "Abrade", "Abhorrent Oculus"],
+            moved.Cards.Where(card => card.Row == "pool" && MathF.Abs(card.X - aclazotz.X) < 2).OrderBy(card => card.Y).Select(card => card.Name));
+        Assert.Equal(["Aerial Doombot", "Abrade", "Abhorrent Oculus"], moved.DeckEditor!.Picked);
+        await page.PictureAsync("moved-together");
+
+        // Into the sideboard together, by the first of them.
+        await page.ClickAsync("Show sideboard", "button");
+        ControlState hide = (await page.SettledAsync()).Controls.First(control => control.Label == "Hide sideboard");
+        await page.DragAsync(await DeckCardAsync(page, "Aerial Doombot"), hide.X, hide.Y + 120);
+        editor = await EditorAsync(page, state => state.DeckEditor!.Side.Count == 3);
+        Assert.Equal(["1 Aclazotz, Deepest Betrayal"], editor.Main);
+        Assert.Equal(["Aerial Doombot", "Abrade", "Abhorrent Oculus"], editor.Picked);
+        await page.PictureAsync("into-the-sideboard");
+
+        // A click on no card lets them go.
+        aclazotz = await DeckCardAsync(page, "Aclazotz, Deepest Betrayal");
+        await page.Page.Mouse.ClickAsync(aclazotz.X + (aclazotz.W * 2), aclazotz.Y);
+        editor = await EditorAsync(page, state => state.DeckEditor!.Picked!.Count == 0);
+
+        // Over the search, a drag from no card across a card draws no rectangle, picks nothing and moves nothing.
+        await ClearSearchAsync(page);
+        await page.TypeAsync("Search cards: name, type or rules text", "Doombot");
+        CardState result = await SearchCardAsync(page, "Aerial Doombot");
+        await page.Page.Mouse.MoveAsync(result.X + (result.W * 2), result.Y + (result.H / 2) - 5);
+        await page.Page.Mouse.DownAsync();
+        await page.Page.Mouse.MoveAsync(result.X - (result.W / 2) - 2, result.Y - (result.H / 2) + 2, new MouseMoveOptions { Steps = 10 });
+        TableState over = await page.SettledAsync();
+        Assert.Null(over.DeckEditor!.Marquee);
+        await page.Page.Mouse.UpAsync();
+        editor = await EditorAsync(page, state => true);
+        Assert.Empty(editor.Picked!);
+        Assert.Equal(["1 Aclazotz, Deepest Betrayal"], editor.Main);
+        Assert.Equal(3, editor.Side.Count);
+        Assert.Empty(page.Errors);
+    }
+
+    private static async Task<CardState> DeckCardAsync(TablePage page, string name)
+    {
+        TableState state = await page.SettledAsync(state => state.Cards.Any(card => (card.Row is "pool" or "sideboard") && card.Visible && card.Name == name));
+        return state.Cards.First(card => (card.Row is "pool" or "sideboard") && card.Visible && card.Name == name);
+    }
+
     /// <summary>The last card of Vintage by name, as the search sorts: past Z, by its accented capital.</summary>
     private const string LastVintage = "Óin the Brave";
 

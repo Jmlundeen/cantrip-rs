@@ -59,15 +59,23 @@ public sealed partial class MainPage
 
         _tooltip.Hide();
         _grabbed = grabbed;
+
+        // Cards of the deck picked together go together: the others ride behind the one taken hold of.
+        List<ObjectView> with = PickUpPicks(from, handle);
+        float offset = MathF.Round(from.CellWidth * 0.07f);
+        int behind = Math.Min(with.Count, 3);
         _carried = new CardBoardElement(from.CellWidth, from.CellHeight)
         {
-            Width = from.CellWidth,
-            Height = from.CellHeight,
+            Width = from.CellWidth + (behind * offset),
+            Height = from.CellHeight + (behind * offset),
             Opacity = 0.85,
             FliesAlong = false,
         };
 
-        _carried.SetCells([new CardBoardElement.BoardCell(card, 0, 0, Tapped: false)]);
+        _carried.SetCells([
+            .. with.Take(behind).Select((other, i) => new CardBoardElement.BoardCell(other, (behind - i) * offset, (behind - i) * offset, Tapped: false)),
+            new CardBoardElement.BoardCell(card, 0, 0, Tapped: false, Annotation: with.Count > 0 ? $"{with.Count + 1} cards" : null),
+        ]);
         _carryLayer.Children.Clear();
         _carryLayer.Children.Add(_carried);
     }
@@ -113,8 +121,8 @@ public sealed partial class MainPage
         _dropPose = null;
         if (pooled && _carried!.XamlRoot is not null)
         {
-            Point middle = _carried.TransformToVisual(Root).TransformPoint(new Point(_carried.Width / 2, _carried.Height / 2));
-            _dropPose = new CardFlights.Pose((float)middle.X, (float)middle.Y, (float)_carried.Width, 0f);
+            Point middle = _carried.TransformToVisual(Root).TransformPoint(new Point(_carried.CellWidth / 2, _carried.CellHeight / 2));
+            _dropPose = new CardFlights.Pose((float)middle.X, (float)middle.Y, _carried.CellWidth, 0f);
             if (!packed || dropped is null)
             {
                 _flights.Toss(handle, _dropPose.Value);
@@ -131,11 +139,18 @@ public sealed partial class MainPage
             zone.Board.DropBar = null;
         }
 
-        if (dropped is { } target)
+        // Where it goes is counted among the cards not carried; the cards carried with it are put down with it, where they
+        // can go, and are not carried any longer.
+        int? slot = dropped is { } over
+            ? over.Zone.Locate is { } locate ? locate(handle, over.Local) : over.Zone.Board.DropIndex(handle, over.Local)
+            : null;
+        IReadOnlyList<int>? group = PutDownPicks();
+        if (dropped is { } target && slot is { } place)
         {
-            target.Zone.Put(handle, target.Zone.Locate is { } locate
-                ? locate(handle, target.Local)
-                : target.Zone.Board.DropIndex(handle, target.Local));
+            if (group is null || !PutPicks(target.Zone, group, place))
+            {
+                target.Zone.Put(handle, place);
+            }
         }
         else if (pooled)
         {

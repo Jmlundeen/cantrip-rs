@@ -208,11 +208,18 @@ partner with, friends forever, choose a Background, Doctor's companion).
 
 A result is double-clicked into its column, or dragged into a column, the sideboard or the command zone, flying there
 from where it was let go; a card of the deck dragged back onto the results leaves it. A double-click moves a card between
-deck and sideboard, or out of the command zone. Saving keeps the deck however it stands, legal or not. Opening a deck from
+deck and sideboard, or out of the command zone. Several cards of the deck are picked together (`MainPage.Picks.cs`): a
+rectangle dragged out with the mouse from no card, over the columns or the open sideboard, picks every card it touches
+where that card shows (`Marquee`, in `Cantrip.Client.Presentation`), Ctrl or Shift held adding to what is picked;
+Ctrl- or Shift-click picks or lets go one card; a click on no card, or a plain click on a card, lets them all go. Picked
+cards wear the gold border, and dragging any of them carries them all, put down together in their order in a column,
+the sideboard or back on the results; dragging a card not picked carries it alone. The results are never picked, and a
+touch on no card scrolls rather than drawing a rectangle. Saving keeps the deck however it stands, legal or not. Opening a deck from
 the list, or a new one, with changes unsaved asks **Save**, **Discard** or **Cancel**; the bin asks before deleting; and
 the browser asks before a page with unsaved changes is left (`DeckEditor.js`). Where in the columns each card sits is
 not saved: a deck opens in its default columns. The test state has `phase` `DeckEditor` and a `deckEditor` object (the
-deck by zone, its problems, the decks listed, the question asked, where the command zone is); `DeckEditorTests` builds,
+deck by zone, its problems, the decks listed, the question asked, where the command zone is, how many results are
+found and laid out, the cards picked and the rectangle being drawn); `DeckEditorTests` builds,
 saves, opens, edits and deletes a deck against the real deck API with a signed-in player as a header.
 
 ## An ability resolving

@@ -455,6 +455,27 @@ public sealed partial class MainPage
         json.WriteNumber("results", _searchCards.Count);
         json.WriteNumber("laidOut", _searchWindow.End - _searchWindow.First);
 
+        // The cards of the deck picked together, by name in the order they are laid out, and the rectangle being drawn to
+        // pick them, on the page, while one is.
+        json.WriteStartArray("picked");
+        foreach (int place in PicksInOrder())
+        {
+            json.WriteStringValue(place < _editorCards.Count ? _editorCards[place].Name : string.Empty);
+        }
+
+        json.WriteEndArray();
+        foreach (CardBoardElement board in (CardBoardElement[])[_mainBoard, _sideBoard, _searchBoard])
+        {
+            if (board.MarqueeBox is { } marquee && board.XamlRoot is not null)
+            {
+                Rect drawn = board.TransformToVisual(Root).TransformBounds(marquee);
+                json.WriteStartObject("marquee");
+                json.WriteNumber("x", drawn.X + (drawn.Width / 2));
+                json.WriteNumber("y", drawn.Y + (drawn.Height / 2));
+                json.WriteEndObject();
+            }
+        }
+
         // Where the command zone is, to drop a card on with nothing in it yet to find it by.
         if (_commandBoard.XamlRoot is not null && IsShown(_commandBoard) && _commandBoard.ActualWidth > 0)
         {
