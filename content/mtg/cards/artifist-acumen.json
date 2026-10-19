@@ -1,0 +1,6 @@
+{
+  "name": "Artifist Acumen",
+  "manaCost": "{R}",
+  "type": "Sorcery",
+  "oracleText": "Creatures you control gain first strike until end of turn.\nDraw a card."
+}
