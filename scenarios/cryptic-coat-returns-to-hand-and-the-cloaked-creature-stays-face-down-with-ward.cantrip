@@ -1,0 +1,52 @@
+# Cryptic Coat's {1}{U}: "Return this Equipment to its owner's hand" (CR 400.3). The creature it cloaked is a permanent in
+# its own right (CR 701.58a): it stays on the battlefield face down, a 2/2 again (the +1/+0 and unblockability were the
+# Coat's), with ward {2} (CR 702.21a, 701.58a). Bot2's Lightning Bolt at it is countered when Bot2 declines to pay {2}.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Island
+Mox Sapphire
+Island x3
+Snapcaster Mage
+Island x10
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..Power = 3
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Cryptic Coat.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand = Cryptic Coat; Island; Island; Island
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(#1)
+Bot2.Pass
+Bot2.Decline
+? Bot2.Graveyard = Lightning Bolt
+
+[Expect]
+Bot1.Hand = Cryptic Coat; Island; Island; Island
+Bot1.Battlefield.Cryptic Coat = (absent)
+Bot1.Battlefield..FaceDown = true
+Bot1.Battlefield..FaceDownName = Snapcaster Mage
+Bot1.Battlefield..Power = 2
+Bot1.Battlefield..Toughness = 2
+Bot1.Battlefield..Damage = 0
+Bot2.Graveyard = Lightning Bolt

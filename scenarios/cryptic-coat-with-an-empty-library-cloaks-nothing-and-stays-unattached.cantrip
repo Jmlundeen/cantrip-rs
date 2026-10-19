@@ -1,0 +1,22 @@
+# Cryptic Coat with no card in its controller's library (CR 701.58a, 701.3b): nothing is cloaked, so there is nothing to
+# attach to and the Equipment stays on the battlefield unattached. Bot1's deck is its opening hand alone.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Island x5
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Cryptic Coat.AttachedTo = (absent)
+Bot1.Battlefield.Count = 1
+Bot1.Library.Count = 0

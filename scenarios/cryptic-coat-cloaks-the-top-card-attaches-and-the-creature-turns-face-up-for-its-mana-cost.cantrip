@@ -1,0 +1,48 @@
+# Cryptic Coat (CR 701.58a, 701.3b, 702.26): entering, it cloaks the top card of its controller's library - Snapcaster Mage,
+# a face-down 2/2 - and attaches itself to it, so the cloaked creature is 3/2 and can't be blocked. A creature card cloaked
+# may be turned face up any time its controller has priority by paying its mana cost (CR 701.58a, 708.8): {1}{U}, a special
+# action. Turned face up it is the same permanent, now a 2/1 Snapcaster Mage with flash, still equipped: 3/1.
+#
+# Black Lotus pays the Coat; Sol Ring (cast with the Island) and Mox Sapphire pay the {1}{U} to turn the Mage face up.
+
+[Bot1 Deck]
+Black Lotus
+Cryptic Coat
+Island
+Sol Ring
+Mox Sapphire
+Island x2
+Snapcaster Mage
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cryptic Coat.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield..FaceDown = true
+? Bot1.Battlefield..FaceDownName = Snapcaster Mage
+? Bot1.Battlefield..Power = 3
+? Bot1.Battlefield..Toughness = 2
+? Bot1.Battlefield..Keywords = CantBeBlocked
+Bot1.Hand.Island.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.#1.Activate
+? Bot1.Battlefield.Snapcaster Mage.FaceDown = (absent)
+
+[Expect]
+Bot1.Battlefield.Snapcaster Mage.Power = 3
+Bot1.Battlefield.Snapcaster Mage.Toughness = 1
+Bot1.Battlefield.Snapcaster Mage.Keywords = CantBeBlocked; Flash
+Bot1.Battlefield.Cryptic Coat.AttachedTo = Snapcaster Mage
+Bot1.Library.Count = 10
