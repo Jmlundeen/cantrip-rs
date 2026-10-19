@@ -1,0 +1,38 @@
+# "Up to one target": with Bot2's Ornithopter in its graveyard (a creature card, a legal target), Bot1 chooses no target at the
+# beginning of combat on turn 3. Nothing is exiled and no token is made (the control is the scenario where it is targeted).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Ardyn, the Usurper
+Lightning Bolt
+Plains
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ardyn, the Usurper.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Target()
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Ardyn, the Usurper

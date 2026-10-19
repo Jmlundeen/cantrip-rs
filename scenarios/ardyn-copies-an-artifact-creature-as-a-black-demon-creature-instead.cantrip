@@ -1,0 +1,49 @@
+# Starscourge on turn 3 targets Bot2's Ornithopter (colorless artifact creature, Thopter, 0/2 flying), killed with a Bolt: it is
+# exiled and the token is a copy "except it's a 5/5 black Demon" (CR 707.9b): a Demon creature INSTEAD of an artifact creature
+# Thopter, black instead of colorless, 5/5, still with flying. It is a Demon, so Ardyn's static gives it menace, lifelink and
+# haste (haste: it attacks the turn it is made), and it hits for 5 and gains 5.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Ardyn, the Usurper
+Lightning Bolt
+Plains
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ardyn, the Usurper.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Graveyard.Ornithopter)
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Ardyn, the Usurper; Ornithopter
+Bot1.Battlefield.Ornithopter.Colors = Black
+Bot1.Battlefield.Ornithopter.Types = Creature
+Bot1.Battlefield.Ornithopter.Subtypes = Demon
+Bot1.Battlefield.Ornithopter.Power = 5
+Bot1.Battlefield.Ornithopter.Toughness = 5
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Haste; Lifelink; Menace
+Bot2.Life = 15
+Bot1.Life = 25

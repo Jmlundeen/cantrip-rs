@@ -1,0 +1,54 @@
+# Bot1 Bolts Bot2's Gaddock Teeg (legendary green-white 2/2 Kithkin Advisor, {G}{W}); Starscourge exiles it and makes a token copy
+# "except it's a 5/5 black Demon" (CR 707.9b): it keeps the name, the mana cost (mana value 2) and the legendary supertype, but it
+# is black INSTEAD of green and white, and a Demon instead of a Kithkin Advisor, and 5/5. It copies the printed abilities too, so
+# its Teeg ability applies: the token also restricts noncreature spells of mana value 4 or more (not tested here). Ardyn himself is no Demon, so has no keywords.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Ardyn, the Usurper
+Lightning Bolt
+Plains
+Plains x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Gaddock Teeg
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ardyn, the Usurper.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Gaddock Teeg.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Gaddock Teeg)
+Bot1.Target(Bot2.Graveyard.Gaddock Teeg)
+[T3 Bot1.Main2]
+
+[Expect]
+Exile = Gaddock Teeg
+Bot1.Battlefield = Ardyn, the Usurper; Gaddock Teeg
+Bot1.Battlefield.Gaddock Teeg.Supertypes = Legendary
+Bot1.Battlefield.Gaddock Teeg.Colors = Black
+Bot1.Battlefield.Gaddock Teeg.Types = Creature
+Bot1.Battlefield.Gaddock Teeg.Subtypes = Demon
+Bot1.Battlefield.Gaddock Teeg.ManaValue = 2
+Bot1.Battlefield.Gaddock Teeg.Power = 5
+Bot1.Battlefield.Gaddock Teeg.Toughness = 5
+Bot1.Battlefield.Gaddock Teeg.Keywords = Haste; Lifelink; Menace
+Bot1.Battlefield.Ardyn, the Usurper.Subtypes = Elder; Human; Noble
