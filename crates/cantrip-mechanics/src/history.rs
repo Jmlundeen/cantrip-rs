@@ -152,6 +152,12 @@ pub fn you_gained_life_this_turn(q: &dyn Query, asker: &Asker) -> bool {
     gained_life_this_turn(q, asker.controller)
 }
 
+/// "If you've gained 5 or more life this turn" (CR 603.4, 119.3): whether the ability's controller has gained at least five life
+/// this turn, as an intervening "if" or a "to solve" condition. Resplendent Angel and Case of the Uneaten Feast print it.
+pub fn you_gained_five_or_more_life_this_turn(q: &dyn Query, asker: &Asker) -> bool {
+    q.history().life_gained(asker.controller) >= 5
+}
+
 /// "If you lost life this turn" (CR 603.4, 119.3): whether `player` has lost any life this turn, however much they also gained
 /// (damage and paying life count). Lunar Convocation and Thought-Stalker Warlock print it.
 pub fn lost_life_this_turn(q: &dyn Query, player: PlayerId) -> bool {
