@@ -4,11 +4,6 @@ use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{craft, damage_target, targets};
 use cantrip_oracle as oracle;
 
-/// "Target tapped creature an opponent controls."
-fn tapped_creature_an_opponent_controls(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::TAPPED_CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
-}
-
 /// "When this artifact enters, it deals 5 damage to target tapped creature an opponent controls."
 fn five_damage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     damage_target(g, item, 0, 5);
@@ -31,7 +26,7 @@ pub static BACK: CardDef = CardDef {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, five_damage, "When this artifact enters, it deals 5 damage to target tapped creature an opponent controls.")
-            .targets(&[target(tapped_creature_an_opponent_controls)]),
+            .targets(&[targets::TAPPED_CREATURE_AN_OPPONENT_CONTROLS]),
         craft::ability(mana("{3}{W}"), &craft::ARTIFACT, "Craft with artifact {3}{W}"),
     ],
     back: Some(&BACK),

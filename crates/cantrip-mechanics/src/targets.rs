@@ -82,6 +82,11 @@ pub const OTHER_CREATURE: TargetSpec = target(other_creature_filter);
 /// "Target tapped creature" (CR 115.1, 608.2b): tapped when chosen and, legality being checked again on resolution, still
 /// tapped then. Ajani, Outland Chaperone, Cryogen Relic and The Wandering Emperor print it.
 pub const TAPPED_CREATURE: TargetSpec = target(tapped_creature_filter);
+fn tapped_creature_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    tapped_creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
+}
+/// "Target tapped creature an opponent controls" (CR 115.1, 608.2b). Spring-Loaded Sawblades and Super Villain Lockup print it.
+pub const TAPPED_CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = target(tapped_creature_an_opponent_controls_filter);
 fn attacking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     creature_filter(q, asker, t) && matches!(t, Target::Object(id) if q.is_attacking(id))
 }
