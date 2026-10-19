@@ -1,0 +1,8 @@
+{
+  "name": "Marwyn, the Clearcutter",
+  "manaCost": "{R}",
+  "type": "Legendary Creature — Elf Warrior",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "{2}, {T}, Sacrifice an artifact or land: Draw a card."
+}
