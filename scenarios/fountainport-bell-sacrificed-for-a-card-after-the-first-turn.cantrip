@@ -1,0 +1,34 @@
+# Fountainport Bell: "{1}, Sacrifice this artifact: Draw a card." Bot1 declines the search on turn 1; on turn 3 it pays {1} and
+# sacrifices the Bell in the main phase (on turn 1, with the Plains tapped for the Bell and no other mana, its
+# {1} cannot be paid and the ability is not offered: refused), and draws a card (the draw step's card was Lightning Bolt, this one is the Island next to it).
+
+[Bot1 Deck]
+Plains
+Fountainport Bell
+Plains x5
+Lightning Bolt
+Island
+Plains x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Fountainport Bell.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+! Bot1.Battlefield.Fountainport Bell.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Fountainport Bell.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Graveyard = Fountainport Bell
+Bot1.Hand = Plains; Plains; Plains; Plains; Lightning Bolt; Island
+Stack.Count = 0

@@ -1,0 +1,30 @@
+# Fountainport Bell: a library without a basic land card has nothing to find (CR 701.23b): Bot1 accepts, finds nothing (the Tropical
+# Island is a nonbasic land, refused) and reveals nothing; the library is shuffled all the same and the Bell stays.
+
+[Bot1 Deck]
+Plains
+Fountainport Bell
+Plains x5
+Tropical Island
+Lightning Bolt
+Lightning Bolt
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Fountainport Bell.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+! Bot1.Search(Tropical Island)
+Bot1.Search()
+
+[Expect]
+Bot1.Revealed = (absent)
+Bot1.Library.Count = 3
+Bot1.Battlefield = Plains; Fountainport Bell
+Stack.Count = 0

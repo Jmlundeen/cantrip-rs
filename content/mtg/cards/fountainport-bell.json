@@ -1,0 +1,6 @@
+{
+  "name": "Fountainport Bell",
+  "manaCost": "{1}",
+  "type": "Artifact",
+  "oracleText": "When this artifact enters, you may search your library for a basic land card, reveal it, then shuffle and put that card on top.\n{1}, Sacrifice this artifact: Draw a card."
+}

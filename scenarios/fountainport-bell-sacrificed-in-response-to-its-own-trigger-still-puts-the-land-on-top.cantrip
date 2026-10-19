@@ -1,0 +1,33 @@
+# Fountainport Bell's enters trigger is independent of the Bell once it is on the stack (CR 113.7a, 608.2): with the trigger waiting,
+# Bot1 pays {1} (from a Black Lotus) and sacrifices the Bell, drawing the top card (Lightning Bolt). The trigger then resolves
+# regardless: the Island is found and put on top, and (a check on the library that follows) is the next card drawn on turn 3.
+
+[Bot1 Deck]
+Black Lotus
+Fountainport Bell
+Plains x5
+Lightning Bolt
+Island
+Plains x6
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Fountainport Bell.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Battlefield.Fountainport Bell.Activate
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Search(Island)
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Fountainport Bell; Black Lotus
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Lightning Bolt; Island
