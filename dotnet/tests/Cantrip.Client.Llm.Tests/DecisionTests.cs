@@ -465,6 +465,37 @@ public sealed class DecisionTests
     }
 
     [Fact]
+    public void Removes_up_to_the_most_counters_for_an_effect_and_may_stop_short()
+    {
+        // "Remove up to three counters from target creature" (CR 608.2d): a -1/-1 counter off the opponent's creature, then
+        // stopping, the last choice of the second question.
+        var chooser = new ScriptedChooser([1], [1]);
+
+        AnswerPayload answer = new Decisions(chooser).Answer(
+            Seated(Creature(5, "Walking Ballista", 2, 2, controller: 2)),
+            new RemoveCountersPromptMessage
+            {
+                Player = Me,
+                Source = Handle(9),
+                Total = 3,
+                UpTo = true,
+                Pools =
+                [
+                    new CounterPoolMessage { Object = Handle(5), Counter = "+1/+1", Count = 2 },
+                    new CounterPoolMessage { Object = Handle(5), Counter = "-1/-1", Count = 1 },
+                ],
+            });
+
+        var removed = Assert.IsType<CountersRemovedAnswer>(answer);
+        Assert.Equal(["5 -1/-1 1"], removed.Removals.Select(r => $"{r.Object.Value} {r.Counter} {r.Count}"));
+        Assert.Contains("up to 3 counters", chooser.Asked[0].Heading, StringComparison.Ordinal);
+        Assert.Contains("an opponent's", chooser.Asked[0].Choices[0], StringComparison.Ordinal);
+        Assert.Equal("Remove no counters", chooser.Asked[0].Choices[^1]);
+        Assert.Equal("Remove no more counters", chooser.Asked[1].Choices[^1]);
+        Assert.True(chooser.Spent);
+    }
+
+    [Fact]
     public void Chooses_as_many_modes_as_the_spell_asks_for_and_no_repeats()
     {
         var chooser = new ScriptedChooser([1], [0]);

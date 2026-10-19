@@ -417,13 +417,16 @@ public sealed partial class MainPage
 
     /// <summary>
     /// The last answer a gallery fixture's dock sent, which nothing receives: its kind, and for a choice of modes or
-    /// options the indexes chosen ("ModesChosenAnswer 42").
+    /// options the indexes chosen ("ModesChosenAnswer 42"), for a removal of counters each permanent, kind and number
+    /// ("CountersRemovedAnswer 9 -1/-1 2").
     /// </summary>
     private static string Answered(FixtureTransport? transport) =>
         transport?.Sent.OfType<AnswerMessage>().LastOrDefault()?.Answer switch
         {
             null => string.Empty,
             ModesChosenAnswer modes => $"{nameof(ModesChosenAnswer)} {string.Join(",", modes.Modes)}",
+            CountersRemovedAnswer removed =>
+                $"{nameof(CountersRemovedAnswer)} {string.Join("; ", removed.Removals.Select(r => $"{r.Object.Value} {r.Counter} {r.Count}"))}".TrimEnd(),
             { } answer => answer.GetType().Name,
         };
 

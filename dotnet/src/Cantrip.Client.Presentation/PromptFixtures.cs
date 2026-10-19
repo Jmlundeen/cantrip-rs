@@ -283,6 +283,7 @@ public static class PromptFixtures
         "venture-room",
         "choose-option",
         "choose-option-word",
+        "remove-counters-up-to",
         "choose-option-long",
         "modes-many",
         "modes-range",
@@ -1824,6 +1825,28 @@ public static class PromptFixtures
                     Eligible = [0, 1, 2, 3, 4],
                     Count = 1,
                     Heading = "Multiversal Passage: choose a basic land type",
+                };
+
+            case "remove-counters-up-to":
+                // Heartless Act's "remove up to three counters from target creature" as it resolves (CR 608.2d, 122.1): the
+                // counters on the rival's Serra Angel, of two kinds, any of them or none, up to three in all.
+                Announce(view, "Heartless Act", "{1}{B}", "Choose one —\n• Destroy target creature with no counters on it.\n• Remove up to three counters from target creature.", Viewer);
+                Object(view, TheirSentinel).Counters =
+                [
+                    new CounterView { Name = CounterNames.PlusOnePlusOne, Count = 2 },
+                    new CounterView { Name = CounterNames.MinusOneMinusOne, Count = 2 },
+                ];
+                return new RemoveCountersPromptMessage
+                {
+                    Player = Viewer,
+                    Source = new ViewHandle(OnStack),
+                    Total = 3,
+                    UpTo = true,
+                    Pools =
+                    [
+                        new CounterPoolMessage { Object = new ViewHandle(TheirSentinel), Counter = CounterNames.PlusOnePlusOne, Count = 2 },
+                        new CounterPoolMessage { Object = new ViewHandle(TheirSentinel), Counter = CounterNames.MinusOneMinusOne, Count = 2 },
+                    ],
                 };
 
             case "choose-option-word":

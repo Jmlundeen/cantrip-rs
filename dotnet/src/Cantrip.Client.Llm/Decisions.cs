@@ -1100,10 +1100,17 @@ public sealed class Decisions
 
     /// <summary>
     /// Removes counters from among this seat's permanents as a cost (CR 118.3): one question per counter, which kind from which
-    /// permanent, among those with some left, so a -1/-1 counter taken off is told apart from a +1/+1 counter lost.
+    /// permanent, among those with some left, so a -1/-1 counter taken off is told apart from a +1/+1 counter lost. An effect's
+    /// "remove up to three counters" (<see cref="RemoveCountersPromptMessage.UpTo"/>, CR 608.2d) is asked the same way, with
+    /// stopping as the last choice each time, and the counters may be on anyone's permanent.
     /// </summary>
     private AnswerPayload RemoveCounters(GameClient client, RemoveCountersPromptMessage prompt)
     {
+        if (prompt.UpTo)
+        {
+            return RemoveCountersUpTo(client, prompt);
+        }
+
         int[] taken = new int[prompt.Pools.Count];
         for (int i = 0; i < prompt.Total; i++)
         {
@@ -1123,12 +1130,55 @@ public sealed class Decisions
             taken[open[pick]]++;
         }
 
-        return new CountersRemovedAnswer
-        {
-            Removals = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] > 0).Select(p =>
-                new CounterPoolMessage { Object = prompt.Pools[p].Object, Counter = prompt.Pools[p].Counter, Count = taken[p] })],
-        };
+        return Removed(prompt, taken);
     }
+
+    /// <summary>
+    /// "Remove up to N counters from target creature" as an effect resolves (CR 608.2d): one question per counter, which one
+    /// comes off next or none more, each counter named with its permanent and whose it is, until the most are taken.
+    /// </summary>
+    private AnswerPayload RemoveCountersUpTo(GameClient client, RemoveCountersPromptMessage prompt)
+    {
+        int[] taken = new int[prompt.Pools.Count];
+        for (int i = 0; i < prompt.Total; i++)
+        {
+            List<int> open = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] < prompt.Pools[p].Count)];
+            if (open.Count == 0)
+            {
+                break;
+            }
+
+            string Whose(ViewHandle handle) => client.Object(handle)?.Controller == client.Seat ? "yours" : "an opponent's";
+            int pick = One(new Question
+            {
+                Heading = $"{GameText.Named(client, prompt.Source)} lets you remove up to {prompt.Total} counters of any kinds "
+                    + $"({i} removed so far). Removing a +1/+1 counter shrinks a creature; removing a -1/-1 counter grows it. "
+                    + "Which counter do you remove next, if any?",
+                Choices =
+                [
+                    .. open.Select(p =>
+                        $"A {prompt.Pools[p].Counter} counter from {GameText.Named(client, prompt.Pools[p].Object)} ({Whose(prompt.Pools[p].Object)}; "
+                        + $"{prompt.Pools[p].Count - taken[p]} left on it)"),
+                    i == 0 ? "Remove no counters" : "Remove no more counters",
+                ],
+            });
+            if (pick >= open.Count)
+            {
+                break;
+            }
+
+            taken[open[pick]]++;
+        }
+
+        return Removed(prompt, taken);
+    }
+
+    /// <summary>The counters taken, as many of each pool as <paramref name="taken"/> says, in the order the pools are offered.</summary>
+    private static CountersRemovedAnswer Removed(RemoveCountersPromptMessage prompt, int[] taken) => new()
+    {
+        Removals = [.. Enumerable.Range(0, prompt.Pools.Count).Where(p => taken[p] > 0).Select(p =>
+            new CounterPoolMessage { Object = prompt.Pools[p].Object, Counter = prompt.Pools[p].Counter, Count = taken[p] })],
+    };
 
     private AnswerPayload Modes(GameClient client, ChooseModesPromptMessage prompt)
     {

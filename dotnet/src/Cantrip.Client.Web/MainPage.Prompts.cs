@@ -765,6 +765,9 @@ public sealed partial class MainPage
     /// counter on each permanent the question may take from is a button that takes one more of them, saying how many of how many
     /// are taken; a click on a permanent takes one of its own, the first kind with some left. The answer is sent once the total
     /// is reached. When every pool holds a single counter on a different permanent, the subtitle says one counter comes from each.
+    /// An effect's "remove up to three counters from target creature" (<see cref="RemoveCountersPromptMessage.UpTo"/>: Heartless
+    /// Act, CR 608.2d) is captioned "remove up to 3 counters", and its button removes however many are chosen, none included,
+    /// saying how many: "Remove 2 counters", "Remove no counters".
     /// </summary>
     private void FillRemoveCounters(GameClient client, RemoveCountersPromptMessage prompt)
     {
@@ -776,12 +779,23 @@ public sealed partial class MainPage
         bool oneEach = prompt.Pools.All(pool => pool.Count == 1) && prompt.Pools.Select(pool => pool.Object).Distinct().Count() == prompt.Pools.Count;
         string which = oneEach ? $"One counter from each of {prompt.Total} different permanents" : "Any kinds, from among the permanents shown";
 
-        Prompt(
-            $"{source}: remove {counters}",
-            $"{which}  ·  {taken} of {prompt.Total} chosen  ·  click a permanent to take one of its counters, or a button below");
+        if (prompt.UpTo)
+        {
+            which = "Any kinds, as many as you choose, or none";
+        }
 
+        Prompt(
+            prompt.UpTo ? $"{source}: remove up to {(prompt.Total == 1 ? "one counter" : counters)}" : $"{source}: remove {counters}",
+            $"{which}  ·  {taken} of {(prompt.UpTo ? "up to " : string.Empty)}{prompt.Total} chosen  ·  click a permanent to take one of its counters, or a button below");
+
+        string picked = taken switch
+        {
+            0 => "no counters",
+            1 => "1 counter",
+            _ => $"{taken} counters",
+        };
         AddButton(
-            $"Remove {counters}",
+            prompt.UpTo ? $"Remove {picked}" : $"Remove {counters}",
             () => Send(client, new CountersRemovedAnswer
             {
                 Removals =
@@ -792,8 +806,8 @@ public sealed partial class MainPage
                         .Select(chosen => new CounterPoolMessage { Object = chosen.pool.Object, Counter = chosen.pool.Counter, Count = chosen.n }),
                 ],
             }),
-            enabled: taken == prompt.Total,
-            primary: true).Tooltip = $"Remove the {counters} chosen" + Suffix(PassKey);
+            enabled: prompt.UpTo || taken == prompt.Total,
+            primary: true).Tooltip = (prompt.UpTo && taken == 0 ? "Remove none of the counters" : $"Remove the {(prompt.UpTo ? picked : counters)} chosen") + Suffix(PassKey);
 
         if (taken > 0)
         {

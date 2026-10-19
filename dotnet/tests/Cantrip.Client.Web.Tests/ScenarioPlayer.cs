@@ -358,7 +358,8 @@ public sealed class ScenarioPlayer
             {
                 // Counters removed from among permanents as a cost (CR 118.3): the dock's button for each kind on each permanent
                 // takes one more, "Take a -1/-1 counter from Sylvan Caryatid (0 of 2)", clicked that many times; then the
-                // button that removes them.
+                // button that removes them. An effect's "remove up to three counters" (CR 608.2d) is the same, its button saying
+                // how many it removes: "Remove 2 counters", or "Remove no counters" for an answer that takes none.
                 foreach (CounterPoolMessage removal in removed.Removals)
                 {
                     string name = state.Cards.FirstOrDefault(c => c.Handle == removal.Object.Value)?.Name

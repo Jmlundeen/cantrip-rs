@@ -68,6 +68,53 @@ public sealed class PromptGalleryTests(WebClient web)
         Assert.Empty(table.Errors);
     }
 
+    /// <summary>
+    /// Heartless Act's "remove up to three counters from target creature" (CR 608.2d, 122.1): captioned as up to three, its
+    /// button removing what is chosen - none at first, then the -1/-1 counters taken - and no more than three can be taken.
+    /// </summary>
+    [Fact]
+    public async Task Up_to_three_counters_are_removed_as_chosen_or_none()
+    {
+        const string Fixture = "remove-counters-up-to";
+        await using TablePage table = await TablePage.OpenAsync(
+            web, $"prompt={Fixture}", WebClient.Pictures(nameof(PromptGalleryTests)));
+
+        TableState opened = await table.SettledAsync(state => state.Fixture == Fixture);
+        Assert.Equal("Heartless Act: remove up to 3 counters", opened.Title);
+        Assert.Contains("0 of up to 3 chosen", opened.Detail, StringComparison.Ordinal);
+        Assert.Contains(opened.Controls, control => control.Label == "Remove no counters");
+
+        await table.ClickAsync("Take a -1/-1 counter from Serra Angel (0 of 2)", "button");
+        await table.SettledAsync(state => state.Controls.Any(control => control.Label == "Remove 1 counter"));
+        await table.ClickAsync("Take a -1/-1 counter from Serra Angel (1 of 2)", "button");
+        await table.ClickAsync("Take a +1/+1 counter from Serra Angel (0 of 2)", "button");
+        TableState three = await table.SettledAsync(state => state.Controls.Any(control => control.Label == "Remove 3 counters"));
+        await table.PictureAsync("remove-counters-up-to-three");
+
+        // Three is the most: a fourth is not taken.
+        await table.ClickAsync("Take a +1/+1 counter from Serra Angel (1 of 2)", "button");
+        TableState still = await table.SettledAsync();
+        Assert.Contains(still.Controls, control => control.Label == "Take a +1/+1 counter from Serra Angel (1 of 2)");
+        Assert.Contains("3 of up to 3 chosen", three.Detail, StringComparison.Ordinal);
+
+        await table.ClickAsync("Clear", "button");
+        await table.ClickAsync("Take a -1/-1 counter from Serra Angel (0 of 2)", "button");
+        await table.ClickAsync("Take a -1/-1 counter from Serra Angel (1 of 2)", "button");
+        await table.ClickAsync("Remove 2 counters", "button");
+        TableState two = await table.SettledAsync(state => state.Answered.Length > 0);
+        Assert.Equal("CountersRemovedAnswer 9 -1/-1 2", two.Answered);
+
+        await table.Page.EvaluateAsync("name => location.hash = name", "modes-one");
+        await table.SettledAsync(state => state.Fixture == "modes-one");
+        await table.Page.EvaluateAsync("name => location.hash = name", Fixture);
+        await table.SettledAsync(state => state.Fixture == Fixture && state.Answered.Length == 0);
+        await table.ClickAsync("Remove no counters", "button");
+        TableState none = await table.SettledAsync(state => state.Answered.Length > 0);
+        Assert.Equal("CountersRemovedAnswer", none.Answered);
+
+        Assert.Empty(table.Errors);
+    }
+
     /// <summary>The option buttons on the dock: every button but the ones the page always has.</summary>
     private static List<string> Options(TableState state) =>
         [.. state.Controls.Where(control => control.Kind == "button" && Index(control.Label) >= 0).Select(control => control.Label)];
