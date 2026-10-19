@@ -451,7 +451,9 @@ public sealed partial class MainPage
         json.WriteBoolean("asking", _askOverlay.Visibility == Visibility.Visible);
         json.WriteString("question", _askOverlay.Visibility == Visibility.Visible ? _askTitle.Text : string.Empty);
         json.WriteString("status", _editorStatus.Text);
+        // Every card the search finds, and how many of them are laid out now: only the rows near the view are.
         json.WriteNumber("results", _searchCards.Count);
+        json.WriteNumber("laidOut", _searchWindow.End - _searchWindow.First);
 
         // Where the command zone is, to drop a card on with nothing in it yet to find it by.
         if (_commandBoard.XamlRoot is not null && IsShown(_commandBoard) && _commandBoard.ActualWidth > 0)

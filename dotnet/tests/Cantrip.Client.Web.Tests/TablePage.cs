@@ -307,7 +307,8 @@ public sealed record TableState(
 
 /// <summary>
 /// The deck editor (<c>?decks</c>) as the page publishes it: the deck's id, name and format, whether it has changes not
-/// saved, the question asked over it, its status line and problems, how many search results are laid out, each zone's
+/// saved, the question asked over it, its status line and problems, how many cards the search finds and how many of them
+/// are laid out (only the rows near the view are), each zone's
 /// cards ("2 Mountain"), the player's saved decks ("standard: Red Test (2)") and where the command zone is.
 /// </summary>
 public sealed record DeckEditorState(
@@ -325,7 +326,8 @@ public sealed record DeckEditorState(
     IReadOnlyList<string> Main,
     IReadOnlyList<string> Side,
     IReadOnlyList<string> Decks,
-    Spot? CommandZone = null);
+    Spot? CommandZone = null,
+    int LaidOut = 0);
 
 /// <summary>A button of the dock, in the order the dock offers them, and whether it can be pressed.</summary>
 public sealed record DockButtonState(string Label, bool Enabled);

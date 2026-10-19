@@ -199,7 +199,9 @@ Commander, Penny Dreadful), **Save**, **New deck**, whether the deck is legal an
 format, the one open lit, each with a bin; signed out, a way to log in with Discord instead. On top is the search: a box
 matching name, type line and rules text, then Type, the colors W U B R G and C (any of those lit), Mana value and Sort,
 over results in rows - only cards legal in the deck's format, and for Commander, once a commander is chosen, only cards
-within its color identity; at most 120 laid out, each saying how many the deck has. Below is the deck in the draft's
+within its color identity; every one found can be scrolled to, each saying how many the deck has. Only the rows in
+view and two either side are laid out (`GridWindow`, in `Cantrip.Client.Presentation`), again as the view scrolls, so the
+whole card pool costs what a screenful does; a new search starts from the top. Below is the deck in the draft's
 columns (`MainPage.Pool.cs`): lands, mana values 0 to 7+, the sideboard pulled out on the left, and for Commander the
 command zone beside it, which takes only a card that may be a commander - alone, or paired with the one there (partner,
 partner with, friends forever, choose a Background, Doctor's companion).

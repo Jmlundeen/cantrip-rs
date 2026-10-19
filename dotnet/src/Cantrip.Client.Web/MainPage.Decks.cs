@@ -3,6 +3,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.Json;
 using Cantrip.Client.Decks;
+using Cantrip.Client.Presentation;
 using Cantrip.Protocol;
 using Microsoft.UI.Xaml.Automation;
 using BinShape = Microsoft.UI.Xaml.Shapes.Path;
@@ -33,8 +34,11 @@ public sealed partial class MainPage
     /// <summary>The width the search results are drawn at, before the pool's card size.</summary>
     private const float SearchWidth = 100f;
 
-    /// <summary>The most results laid out at once: past that the search is to be narrowed.</summary>
-    private const int MostResults = 120;
+    /// <summary>
+    /// How many rows of results are laid out above and below those in view, so a card scrolled to is there before it
+    /// shows: every result can be scrolled to, but only the rows near the view are made (<see cref="GridWindow"/>).
+    /// </summary>
+    private const int SpareRows = 2;
 
     /// <summary>Where the search results' handles start: one past every pool card's and basic land's.</summary>
     private const int SearchBase = 3_000_000;
@@ -85,6 +89,9 @@ public sealed partial class MainPage
     private CardCatalogView? _catalog;
     private Dictionary<string, CatalogCard> _catalogByName = new(StringComparer.Ordinal);
     private List<CatalogCard> _catalogCards = [];
+
+    /// <summary>Each card's place in <see cref="_catalogCards"/>, which its search handle is made from.</summary>
+    private Dictionary<CatalogCard, int> _catalogPlaces = [];
     private string? _catalogFailure;
 
     /// <summary>
@@ -106,8 +113,18 @@ public sealed partial class MainPage
     private List<DeckSummary>? _savedDecks;
     private bool _signedOut;
 
-    /// <summary>The search results laid out now, by handle.</summary>
+    /// <summary>Every card the search finds, by handle, whether or not its row is laid out now.</summary>
     private readonly Dictionary<int, CatalogCard> _searchCards = [];
+
+    /// <summary>Every card the search finds, in the order shown; only the rows near the view are laid out.</summary>
+    private List<CatalogCard> _searchFound = [];
+
+    /// <summary>How many of each card the deck has, by name, as written over its result.</summary>
+    private Dictionary<string, int> _searchInDeck = new(StringComparer.Ordinal);
+
+    /// <summary>The results' grid as last laid out, and the cells of it laid out now.</summary>
+    private GridWindow _searchGrid;
+    private (int First, int End) _searchWindow = (0, 0);
     private readonly Dictionary<int, ObjectView> _searchViews = [];
     private (ViewHandle Handle, DateTime At)? _lastSearchClick;
 
@@ -166,6 +183,7 @@ public sealed partial class MainPage
         Grid.SetRow(results, 1);
         work.Children.Add(results);
         _searchScroll.SizeChanged += (_, _) => LayOutSearch();
+        _searchScroll.ViewChanged += (_, _) => PlaceSearch(again: false);
 
         // The deck in the draft's columns: the same view, moved here, since this page never shows an event.
         if (_poolView.Parent is Panel holder)
@@ -246,10 +264,10 @@ public sealed partial class MainPage
     {
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
         _searchText = new TextBox { PlaceholderText = "Search cards: name, type or rules text", Width = 300, FontSize = 13, VerticalAlignment = VerticalAlignment.Center, RequestedTheme = ElementTheme.Dark };
-        _searchText.TextChanged += (_, _) => LayOutSearch();
+        _searchText.TextChanged += (_, _) => SearchChanged();
         row.Children.Add(_searchText);
 
-        _typeChoice = new ChoiceDropdown("Type", "Only cards of a type", TypeNames) { Changed = _ => LayOutSearch() };
+        _typeChoice = new ChoiceDropdown("Type", "Only cards of a type", TypeNames) { Changed = _ => SearchChanged() };
         row.Children.Add(_typeChoice);
 
         var colors = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
@@ -260,16 +278,16 @@ public sealed partial class MainPage
             button.Clicked += () =>
             {
                 button.On = !button.On;
-                LayOutSearch();
+                SearchChanged();
             };
             _colorButtons.Add(button);
             colors.Children.Add(button);
         }
 
         row.Children.Add(colors);
-        _manaChoice = new ChoiceDropdown("Mana value", "Only cards of a mana value", ManaNames) { Changed = _ => LayOutSearch() };
+        _manaChoice = new ChoiceDropdown("Mana value", "Only cards of a mana value", ManaNames) { Changed = _ => SearchChanged() };
         row.Children.Add(_manaChoice);
-        _sortChoice = new ChoiceDropdown("Sort", "The order the cards are shown in", SortNames) { Changed = _ => LayOutSearch() };
+        _sortChoice = new ChoiceDropdown("Sort", "The order the cards are shown in", SortNames) { Changed = _ => SearchChanged() };
         row.Children.Add(_sortChoice);
         _searchCount = EventText(string.Empty, 12, Theme.FgMuted);
         _searchCount.VerticalAlignment = VerticalAlignment.Center;
@@ -383,6 +401,7 @@ public sealed partial class MainPage
             }
 
             _catalogCards = [.. _catalogByName.Values.OrderBy(card => card.Name, StringComparer.OrdinalIgnoreCase)];
+            _catalogPlaces = _catalogCards.Select((card, place) => (card, place)).ToDictionary(pair => pair.card, pair => pair.place);
             _catalog = catalog;
             _catalogFailure = null;
         }
@@ -817,7 +836,17 @@ public sealed partial class MainPage
             : [.. found];
     }
 
-    /// <summary>The search results in rows as wide as the pane, each with how many the deck has written over its art.</summary>
+    /// <summary>The search asks for other cards: shown from the top, as a new search is.</summary>
+    private void SearchChanged()
+    {
+        _searchScroll?.ChangeView(null, 0, null, disableAnimation: true);
+        LayOutSearch();
+    }
+
+    /// <summary>
+    /// The search results in rows as wide as the pane, each with how many the deck has written over its art: every card
+    /// found, as tall as they all stand, of which the rows near the view are laid out (<see cref="PlaceSearch"/>).
+    /// </summary>
     private void LayOutSearch()
     {
         if (!DeckEditorShown || _catalog is null || _searchScroll is null)
@@ -826,49 +855,78 @@ public sealed partial class MainPage
             return;
         }
 
-        List<CatalogCard> found = SearchResults();
-        float width = MathF.Round(SearchWidth * _poolScale);
-        float height = Tall(width);
-        float room = MathF.Max(width, (float)_searchScroll.ActualWidth - 4);
-        int across = Math.Max(1, (int)((room + PoolGap) / (width + PoolGap)));
+        _searchFound = SearchResults();
+        _searchCards.Clear();
+        foreach (CatalogCard card in _searchFound)
+        {
+            _searchCards[SearchHandle(card)] = card;
+        }
 
-        Dictionary<string, int> inDeck = new(StringComparer.Ordinal);
+        _searchInDeck = new Dictionary<string, int>(StringComparer.Ordinal);
         if (_arrangement is { } arrangement)
         {
             foreach (int place in arrangement.Columns.SelectMany(column => column).Concat(arrangement.Side).Concat(arrangement.Command))
             {
-                inDeck[_editorCards[place].Name] = inDeck.GetValueOrDefault(_editorCards[place].Name) + 1;
+                _searchInDeck[_editorCards[place].Name] = _searchInDeck.GetValueOrDefault(_editorCards[place].Name) + 1;
             }
         }
 
-        _searchCards.Clear();
-        List<CardBoardElement.BoardCell> cells = [];
-        for (int i = 0; i < Math.Min(found.Count, MostResults); i++)
+        _searchCount.Text = _searchFound.Count == 0
+            ? $"No {_editingFormat.Title} card matches"
+            : $"{_searchFound.Count} card{(_searchFound.Count == 1 ? string.Empty : "s")}";
+        PlaceSearch(again: true);
+        FlyPool();
+    }
+
+    /// <summary>
+    /// Lays out the rows of results in view and a few either side, at the places they have among all of them: again on
+    /// every scroll that brings other rows near, and otherwise only when <paramref name="again"/> says the results or
+    /// their size changed.
+    /// </summary>
+    private void PlaceSearch(bool again)
+    {
+        if (!DeckEditorShown || _catalog is null || _searchScroll is null)
         {
-            CatalogCard card = found[i];
-            int handle = SearchBase + _catalogCards.IndexOf(card);
-            if (!_searchViews.TryGetValue(handle, out ObjectView? view))
+            return;
+        }
+
+        float width = MathF.Round(SearchWidth * _poolScale);
+        float height = Tall(width);
+        float room = MathF.Max(width, (float)_searchScroll.ActualWidth - 4);
+        int across = Math.Max(1, (int)((room + PoolGap) / (width + PoolGap)));
+        var grid = new GridWindow(_searchFound.Count, across, height, PoolGap);
+        double view = _searchScroll.ViewportHeight > 0 ? _searchScroll.ViewportHeight : _searchScroll.ActualHeight;
+        (int First, int End) window = grid.Within(_searchScroll.VerticalOffset, view, SpareRows);
+        if (!again && grid == _searchGrid && window == _searchWindow)
+        {
+            return;
+        }
+
+        _searchGrid = grid;
+        _searchWindow = window;
+        List<CardBoardElement.BoardCell> cells = [];
+        for (int i = window.First; i < window.End; i++)
+        {
+            CatalogCard card = _searchFound[i];
+            int handle = SearchHandle(card);
+            if (!_searchViews.TryGetValue(handle, out ObjectView? shown))
             {
-                view = Handled(card.Card, handle);
-                _searchViews[handle] = view;
+                shown = Handled(card.Card, handle);
+                _searchViews[handle] = shown;
             }
 
-            _searchCards[handle] = card;
-            int had = inDeck.GetValueOrDefault(card.Name);
-            cells.Add(new CardBoardElement.BoardCell(view, (i % across) * (width + PoolGap), (i / across) * (height + PoolGap), Tapped: false,
+            int had = _searchInDeck.GetValueOrDefault(card.Name);
+            cells.Add(new CardBoardElement.BoardCell(shown, (i % across) * (width + PoolGap), (float)grid.Top(i), Tapped: false,
                 Clickable: true, Annotation: had > 0 ? $"{had} in deck" : null));
         }
 
-        int rows = (Math.Min(found.Count, MostResults) + across - 1) / across;
         _searchBoard.SetCellSize(width, height);
         _searchBoard.Width = room;
-        _searchBoard.Height = Math.Max((rows * (height + PoolGap)) - PoolGap, (float)_searchScroll.ActualHeight - 4);
+        _searchBoard.Height = Math.Max(grid.Height, (float)_searchScroll.ActualHeight - 4);
         _searchBoard.SetCells(cells);
-        _searchCount.Text = found.Count == 0
-            ? $"No {_editingFormat.Title} card matches"
-            : found.Count > MostResults ? $"{found.Count} cards  ·  the first {MostResults} shown" : $"{found.Count} card{(found.Count == 1 ? string.Empty : "s")}";
-        FlyPool();
     }
+
+    private int SearchHandle(CatalogCard card) => SearchBase + _catalogPlaces[card];
 
     /// <summary>A search result clicked twice in a row goes into the deck, in its column.</summary>
     private void SearchClicked(ViewHandle handle)

@@ -172,6 +172,81 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
         Assert.Empty(page.Errors);
     }
 
+    /// <summary>
+    /// Every card the search finds can be scrolled to, though only the rows near the view are laid out: the whole of
+    /// Vintage, unfiltered, wheeled down to its last card by name, past the 120 the search once stopped at; and a search
+    /// typed after that shows its cards from the top.
+    /// </summary>
+    [Fact]
+    public async Task The_whole_search_can_be_scrolled_to_its_last_card_with_only_the_rows_in_view_laid_out()
+    {
+        await using TablePage page = await TablePage.OpenAsync(web.Browser, new Uri(_site.Urls.First() + "/"), "decks", WebClient.Pictures(nameof(DeckEditorTests) + "-scroll"),
+            headers: [new(AsHeader, "4343")]);
+        await EditorAsync(page, state => state.DeckEditor is { Results: > 0 });
+        await page.ChooseAsync("Format", "Vintage");
+        DeckEditorState editor = await EditorAsync(page, state => state.DeckEditor!.Format == "vintage");
+
+        // The whole format is found, far more than a screenful, and only a few rows of it are laid out.
+        int vintage = VintageCards();
+        Assert.Equal(vintage, editor.Results);
+        Assert.InRange(editor.LaidOut, 1, 200);
+
+        TableState state = await page.SettledAsync();
+        CardState first = state.Cards.First(card => card.Row == "search" && card.Visible);
+        Assert.DoesNotContain(state.Cards, card => card.Row == "search" && card.Name == LastVintage);
+
+        // Down the wheel, until the last card by name is in view.
+        CardState? last = null;
+        for (int turn = 0; turn < 80 && last is null; turn++)
+        {
+            await page.Page.Mouse.MoveAsync(first.X, first.Y);
+            await page.Page.Mouse.WheelAsync(0, 2000);
+            state = await page.SettledAsync();
+            last = state.Cards.FirstOrDefault(card => card.Row == "search" && card.Visible && card.Name == LastVintage);
+        }
+
+        Assert.NotNull(last);
+        editor = state.DeckEditor!;
+        Assert.Equal(vintage, editor.Results);
+        Assert.InRange(editor.LaidOut, 1, 200);
+        Assert.Contains(state.Cards, card => card.Row == "search" && card.Visible && card.Name == "Zuran Orb");
+        await page.PictureAsync("scrolled-to-the-end");
+
+        // The last card can be taken into the deck from there, as any other.
+        await page.DoubleClickCardAsync(last);
+        await EditorAsync(page, state => state.DeckEditor!.Main.Contains($"1 {LastVintage}"));
+
+        // A new search starts from the top.
+        await page.TypeAsync("Search cards: name, type or rules text", "Zuran");
+        state = await page.SettledAsync(state => state.DeckEditor!.Results == 1);
+        Assert.Contains(state.Cards, card => card.Row == "search" && card.Visible && card.Name == "Zuran Orb");
+        Assert.Empty(page.Errors);
+    }
+
+    /// <summary>The last card of Vintage by name, as the search sorts: past Z, by its accented capital.</summary>
+    private const string LastVintage = "Óin the Brave";
+
+    /// <summary>How many of the content's cards are legal (or restricted) in Vintage, counted from the files themselves.</summary>
+    private static int VintageCards()
+    {
+        using var legality = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(WebClient.Content, "mtg", "legality.json")));
+        System.Text.Json.JsonElement cards = legality.RootElement.GetProperty("cards");
+        HashSet<string> names = [];
+        foreach (string file in Directory.EnumerateFiles(WebClient.Content, "*.json", SearchOption.AllDirectories).Where(path => path.Contains($"{Path.DirectorySeparatorChar}cards{Path.DirectorySeparatorChar}", StringComparison.Ordinal)))
+        {
+            using var card = System.Text.Json.JsonDocument.Parse(File.ReadAllText(file));
+            if (card.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object && card.RootElement.TryGetProperty("name", out System.Text.Json.JsonElement name))
+            {
+                names.Add(name.GetString()!);
+            }
+        }
+
+        return names.Count(name => cards.TryGetProperty(name, out System.Text.Json.JsonElement entry)
+            && entry.TryGetProperty("legalities", out System.Text.Json.JsonElement legalities)
+            && legalities.TryGetProperty("vintage", out System.Text.Json.JsonElement vintage)
+            && vintage.GetString() is "legal" or "restricted");
+    }
+
     private static async Task<DeckEditorState> EditorAsync(TablePage page, Func<TableState, bool> until)
     {
         TableState state = await page.SettledAsync(state => state.DeckEditor is not null && until(state));
