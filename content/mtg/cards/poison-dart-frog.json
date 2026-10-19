@@ -1,0 +1,11 @@
+{
+  "name": "Poison Dart Frog",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Frog",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Reach\n{T}: Add one mana of any color.\n{2}: This creature gains deathtouch until end of turn.",
+  "keywords": [
+    "Reach"
+  ]
+}

@@ -1,0 +1,40 @@
+# Poison Dart Frog: on turn 3 (no longer summoning sick) Bot1 taps it for red mana (any color, not only green) to cast
+# Lightning Bolt at Bot2. Then {2} from Mox Emerald and a Forest give it deathtouch, which it has this turn (reach stays)
+# and no longer on Bot2's turn 4 ("until end of turn", CR 514.2).
+
+[Bot1 Deck]
+Mox Emerald
+Forest
+Poison Dart Frog
+Lightning Bolt
+Forest x20
+
+[Bot2 Deck]
+Island x21
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Poison Dart Frog.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Poison Dart Frog.Activate(Ability: any color; Color: R)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Poison Dart Frog.Activate(Ability: deathtouch)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Poison Dart Frog.Keywords = Deathtouch; Reach
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Poison Dart Frog.Keywords = Reach
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Poison Dart Frog.Keywords = Reach

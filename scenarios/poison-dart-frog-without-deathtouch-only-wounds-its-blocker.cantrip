@@ -1,0 +1,43 @@
+# Control for poison-dart-frog-with-deathtouch-kills-the-creature-it-is-blocked-by: the same attack and block, but the {2}
+# ability is never activated, so the Frog has no deathtouch. Its 1 damage only wounds the Guerrilla Gorilla (2/2), which
+# kills the Frog.
+
+[Bot1 Deck]
+Mox Emerald
+Forest
+Poison Dart Frog
+Forest x20
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Poison Dart Frog.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Poison Dart Frog > Bot2)
+Bot2.Block(Guerrilla Gorilla > Poison Dart Frog)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Guerrilla Gorilla.Damage = 1
+Bot1.Graveyard = Poison Dart Frog
