@@ -1,0 +1,29 @@
+# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+
+[Bot1 Deck]
+Black Lotus
+Koth of the Homestead
+Plains
+Forest
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Koth of the Homestead.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Life = 22
+Bot1.Battlefield.Koth of the Homestead.Power = 3

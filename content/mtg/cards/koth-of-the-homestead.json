@@ -1,0 +1,8 @@
+{
+  "name": "Koth of the Homestead",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Human Citizen",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Landfall — Whenever a land you control enters, you gain 1 life.\nWhenever a Plains you control enters, put a +1/+1 counter on target creature."
+}
