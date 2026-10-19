@@ -970,6 +970,31 @@ public sealed class TacticalPermanentsTests
         Assert.Equal(expected, answer.Kind);
     }
 
+    [Theory]
+    // An opponent's creature for the destroying ability to take.
+    [InlineData(true, ActionKindView.PayCost)]
+    // Nothing of theirs it could destroy: the {2} buys nothing.
+    [InlineData(false, ActionKindView.DeclineCost)]
+    public void Pays_for_Lichs_Relic_only_with_an_opponents_creature_to_destroy(bool theyHaveACreature, ActionKindView expected)
+    {
+        // "When this Equipment enters, you may pay {2}. When you do, for each opponent, destroy up to one target creature or
+        // planeswalker that player controls": the targets are chosen once paid, so the seat looks for one.
+        GameClient client = Seated(theyHaveACreature ? [Creature(5, "Dragon", 5, 5, Them, "Flying")] : [Creature(4, "Bear", 2, 2)]);
+
+        TakeActionAnswer answer = Assert.IsType<TakeActionAnswer>(Bot().Decide(client, new UnlessPaysPromptMessage
+        {
+            Player = Me,
+            Source = Handle(30),
+            Subject = Handle(30),
+            Verb = "DestroyCreatureOrPlaneswalker",
+            Total = "{2}",
+            Remaining = "{0}",
+            Options = [new() { Kind = ActionKindView.PayCost }, new() { Kind = ActionKindView.DeclineCost }],
+        }));
+
+        Assert.Equal(expected, answer.Kind);
+    }
+
     [Fact]
     public void Makes_the_mana_for_a_payment_a_land_at_a_time_and_weighs_the_same_sources_next_payment_afresh()
     {

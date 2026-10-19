@@ -2298,6 +2298,12 @@ public sealed partial class TacticalPlay
                 && client.Zone(ZoneKindView.Graveyard, client.Seat)
                     .Any(card => IsPermanentCard(card) && !IsLand(card) && card.ManaValue <= prompt.Amount),
 
+            // Lich's Relic's {2}: the destroying ability is bought only when an opponent has a creature or planeswalker for it
+            // to take (the targets are chosen once it is paid), and a payment of mana alone costs no life to weigh.
+            "DestroyCreatureOrPlaneswalker" => spare(5)
+                && client.Opponents.Any(opponent => client.BattlefieldOf(opponent.Seat)
+                    .Any(permanent => IsCreature(permanent) || permanent.CardTypes.Contains(CardTypeView.Planeswalker))),
+
             // Lim-Dûl's Vault: another five for a life each is a way to lose to itself.
             "LookAgain" => false,
 

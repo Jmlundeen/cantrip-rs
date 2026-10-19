@@ -1819,7 +1819,8 @@ public sealed class UnlessPaysPromptMessage : PromptPayload
     /// What paying does, in card vocabulary, which the bots read it by: "Countered" for "unless pays" (paying keeps
     /// <see cref="Subject"/> from being countered), "Sacrificed" likewise for a permanent, and for "you may pay. If you
     /// do" what paying buys - "CopySpell", "UntapSource", "ReturnToHand", "ReturnToBattlefield", "ReturnPermanentCard"
-    /// (a card chosen once paid, its mana value at most <see cref="Amount"/>), "CreateCopyToken", "Transform",
+    /// (a card chosen once paid, its mana value at most <see cref="Amount"/>), "DestroyCreatureOrPlaneswalker" (targets
+    /// chosen once paid, among an opponent's creatures and planeswalkers), "CreateCopyToken", "Transform",
     /// "PutOntoBattlefield", "LookAgain", "EnterUntapped".
     /// </summary>
     [Key(9)]
