@@ -1,0 +1,33 @@
+# A token exiled by Personify ceases to exist and does not return (CR 111.7), but the spell still creates its Shapeshifter token. Ajani's Cat Warrior is
+# the target, so exactly one Shapeshifter replaces it. (A card returning is shown in personify-blinks-the-creature-and-makes-a-changeling-shapeshifter.)
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Ajani, Nacatl Pariah
+Personify
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ajani, Nacatl Pariah.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Personify.Cast(Cat Warrior)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Plains; Mox Pearl; Mox Pearl; Mox Pearl; Ajani, Nacatl Pariah; Shapeshifter
+Bot1.Battlefield.Shapeshifter.Token = true
+Bot1.Graveyard = Personify

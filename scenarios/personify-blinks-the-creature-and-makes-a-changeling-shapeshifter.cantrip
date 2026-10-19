@@ -1,0 +1,37 @@
+# Personify exiles Thraben Inspector and returns it as a new object (CR 400.7), so its enters trigger investigates again (second Clue), and then makes a
+# 1/1 colorless Shapeshifter token with changeling (CR 702.73a: every creature type). Mox Pearls pay for everything on turn 1.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Thraben Inspector
+Personify
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Personify.Cast(Thraben Inspector)
+[Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Plains; Mox Pearl; Mox Pearl; Mox Pearl; Thraben Inspector; Shapeshifter; Clue Token; Clue Token
+Bot1.Battlefield.Shapeshifter.Token = true
+Bot1.Battlefield.Shapeshifter.Power = 1
+Bot1.Battlefield.Shapeshifter.Toughness = 1
+Bot1.Battlefield.Shapeshifter.Subtypes = (every creature type)
+Bot1.Battlefield.Shapeshifter.Keywords = Changeling
+Bot1.Graveyard = Personify
+Stack.Count = 0
