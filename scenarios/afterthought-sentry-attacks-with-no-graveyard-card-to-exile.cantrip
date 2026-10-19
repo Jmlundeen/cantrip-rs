@@ -1,0 +1,32 @@
+# Afterthought Sentry's attack trigger is "up to one target card from a graveyard": with no card in any graveyard it
+# resolves with no target, and the Sentry still deals its 2 (CR 601.2c, 608.2b).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Afterthought Sentry
+Mountain
+Mountain
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Afterthought Sentry.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Afterthought Sentry)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Exile.Count = 0
+Bot1.Graveyard.Count = 0

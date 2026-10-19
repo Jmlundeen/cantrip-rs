@@ -1,0 +1,8 @@
+{
+  "name": "Afterthought Sentry",
+  "manaCost": "{2}",
+  "type": "Artifact Creature — Gargoyle",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "{2}: This creature gains flying until end of turn.\nWhenever this creature attacks, exile up to one target card from a graveyard."
+}
