@@ -1,0 +1,38 @@
+# "This land enters tapped unless you control a planeswalker": Bot1 controls Karn, Scion of Urza (cast with Sol Ring and two
+# Moxen), so its Fatehold Annex enters untapped, and taps for {W} or {U} - here {U}; red is not among its colors (refused
+# beside the positive control). Bot2, with no planeswalker of its own - Bot1's does not count - plays its Annex tapped.
+
+[Bot1 Deck]
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Karn, Scion of Urza
+Fatehold Annex
+Island x14
+
+[Bot2 Deck]
+Fatehold Annex
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Karn, Scion of Urza.Cast
+Bot1.Hand.Fatehold Annex.Play
+? Bot1.Battlefield.Fatehold Annex.Tapped = false
+! Bot1.Battlefield.Fatehold Annex.Activate(Color: Red)
+Bot1.Battlefield.Fatehold Annex.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T2 Bot2.Main1]
+Bot2.Hand.Fatehold Annex.Play
+
+[Expect]
+Bot1.Battlefield.Karn, Scion of Urza.Counters.Loyalty = 5
+Bot2.Battlefield.Fatehold Annex.Tapped = true
