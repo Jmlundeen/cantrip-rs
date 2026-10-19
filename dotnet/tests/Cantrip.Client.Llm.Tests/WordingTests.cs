@@ -209,6 +209,31 @@ public sealed class WordingTests
     }
 
     [Fact]
+    public void A_plot_says_the_card_becomes_plotted_and_is_cast_free_later()
+    {
+        var chooser = new ScriptedChooser([0]);
+        ObjectView bears = Creature(3, "Grizzly Bears", 2, 2, Me);
+
+        new Decisions(chooser).Answer(
+            Seated(bears),
+            new ChooseCardsPromptMessage
+            {
+                Player = Me,
+                Source = Handle(9),
+                Purpose = CardChoicePurposeView.Plot,
+                Cards = [Handle(3)],
+                Eligible = [Handle(3)],
+                Count = 1,
+                UpTo = true,
+            });
+
+        string heading = chooser.Asked[0].Heading;
+        Assert.Contains("becomes plotted", heading, StringComparison.Ordinal);
+        Assert.Contains("on a later turn without paying its mana cost", heading, StringComparison.Ordinal);
+        Assert.Contains("a gain, not a loss", heading, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void A_search_of_another_libraries_says_whose_and_where_the_cards_go()
     {
         var chooser = new ScriptedChooser([0]);

@@ -130,6 +130,9 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             ? withoutBanding > 1
                 ? $"A band may have only one creature without banding  ·  {withoutBanding} chosen{where}"
                 : $"{picked.Count} chosen  ·  any with banding, at most one without; the band is blocked as one, and you divide the damage of what blocks it{where}"
+            // Plot (CR 702.170d): what becoming plotted lets its owner do, said before the card is chosen.
+            : prompt.Purpose == CardChoicePurposeView.Plot
+            ? $"{picked.Count} of {prompt.Count} chosen  ·  a plotted card may be cast as a sorcery on a later turn without paying its mana cost{where}"
             : prompt.Purpose == CardChoicePurposeView.TapToReduce
             ? picked.Count == 0
                 ? $"None tapped: the full cost is paid{where}"
@@ -177,6 +180,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
             CardChoicePurposeView.PutCounters => $"Put {Counters(prompt)} on it",
             CardChoicePurposeView.Craft => picked.Count == 1 ? "Exile it" : $"Exile {picked.Count}",
             CardChoicePurposeView.Reveal => picked.Count == 0 ? "Reveal nothing" : "Reveal it",
+            CardChoicePurposeView.Plot => picked.Count == 0 ? "Plot nothing" : picked.Count == 1 ? "Exile and plot it" : $"Exile and plot {picked.Count}",
             CardChoicePurposeView.PreventDamageFrom => "Prevent its damage first",
             CardChoicePurposeView.Band => picked.Count == 0 ? "No band" : picked.Count == 1 ? "Band with it" : $"Band with {picked.Count}",
             CardChoicePurposeView.PayLifeOrPutOnTop => picked.Count == 1 ? "Choose it" : "Choose them",
@@ -271,6 +275,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         CardChoicePurposeView.PutCounters => PromptActionView.PutCounters,
         CardChoicePurposeView.Craft => PromptActionView.Craft,
         CardChoicePurposeView.Reveal => PromptActionView.Reveal,
+        CardChoicePurposeView.Plot => PromptActionView.Plot,
         _ => PromptActionView.Choose,
     };
 
@@ -302,6 +307,7 @@ public sealed record CardChoicePresentation(string Title, string Detail, string 
         PromptActionView.PutCounters => "put the counters on",
         PromptActionView.Craft => "exile to craft",
         PromptActionView.Reveal => "reveal",
+        PromptActionView.Plot => "exile and plot",
         _ => "choose",
     };
 

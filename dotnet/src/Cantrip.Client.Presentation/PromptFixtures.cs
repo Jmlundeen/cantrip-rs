@@ -323,6 +323,7 @@ public static class PromptFixtures
         "choose-exile-cost",
         "choose-exile-graveyard",
         "choose-imprint",
+        "choose-plot",
         "choose-exile-hand",
         "choose-return-to-hand",
         "choose-untap",
@@ -2149,6 +2150,11 @@ public static class PromptFixtures
             // "up to" one, so declining is a legal answer.
             case "choose-imprint":
                 return Choose(CardChoicePurposeView.Exile, Viewer, Hand(), count: 1, upTo: true);
+
+            // Jace Reawakened: the same own hand, up to one, but the card exiled becomes plotted (CR 702.170d) - a card
+            // gained to cast free later, not one given up, and the caption says so.
+            case "choose-plot":
+                return Choose(CardChoicePurposeView.Plot, Viewer, Hand(), count: 1, upTo: true);
 
             case "choose-exile-hand":
                 return Choose(CardChoicePurposeView.Exile, Rival, TheirHand(view), count: 1, upTo: true);

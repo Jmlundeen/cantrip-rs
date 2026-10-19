@@ -762,6 +762,10 @@ pub enum Purpose {
     /// A card chosen to be revealed (CR 701.20a) from among cards looked at: what becomes of it is for the effect to say
     /// (Break Out reveals a creature card, then puts it onto the battlefield or into the hand).
     Reveal,
+    /// A card an effect exiles that then becomes plotted (CR 702.170a, 702.170d): its owner may cast it as a sorcery on a later
+    /// turn without paying its mana cost. Something gained, not given up, as with plot's own special action (Jace
+    /// Reawakened's "you may exile a nonland card with mana value 3 or less from your hand. If you do, it becomes plotted").
+    Plot,
     /// "You may cast it without paying its mana cost" as an effect resolves (CR 118.9, 608.2g), the card staying where it is
     /// if not: suspend, rebound, hideaway, Malcolm.
     CastFree,

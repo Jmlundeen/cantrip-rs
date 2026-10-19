@@ -334,6 +334,9 @@ public enum CardChoicePurposeView
 
     /// <summary>Cards in the chooser's hand drawn this turn, for each of which they then pay the prompt's <c>Life</c> life or put it on top of their library (Sylvan Library): the cards the payments are about, not those that go back.</summary>
     PayLifeOrPutOnTop = 33,
+
+    /// <summary>The chosen card is exiled by an effect and becomes plotted (CR 702.170a, 702.170d): its owner may cast it as a sorcery on a later turn without paying its mana cost (Jace Reawakened). Something gained, not given up; choosing nothing, where the prompt is "up to", declines.</summary>
+    Plot = 34,
 }
 
 /// <summary>Where cards found by a library search go (CR 701.23).</summary>

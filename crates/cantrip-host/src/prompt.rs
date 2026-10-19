@@ -480,6 +480,7 @@ fn purpose_view(purpose: Purpose, opening: bool) -> CardChoicePurposeView {
         Purpose::Blight => V::Blight,
         Purpose::TapToReduce => V::TapToReduce,
         Purpose::Reveal => V::Reveal,
+        Purpose::Plot => V::Plot,
         Purpose::PutCounters(..) => V::PutCounters,
         Purpose::PreventDamageFrom(_) => V::PreventDamageFrom,
         Purpose::PayLifeOrPutOnTop(_) => V::PayLifeOrPutOnTop,

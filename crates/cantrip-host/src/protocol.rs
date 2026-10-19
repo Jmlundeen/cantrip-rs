@@ -268,6 +268,9 @@ pub enum CardChoicePurposeView {
     /// Cards in the chooser's hand drawn this turn, for each of which they then pay `Life` life or put it on top of their
     /// library (Sylvan Library): the cards the payments are about, not those that go back.
     PayLifeOrPutOnTop,
+    /// A card an effect exiles that becomes plotted (CR 702.170a, 702.170d): its owner may cast it as a sorcery on a later turn
+    /// without paying its mana cost (Jace Reawakened). Something gained, not given up.
+    Plot,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

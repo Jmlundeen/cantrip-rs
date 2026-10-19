@@ -1354,6 +1354,7 @@ public sealed class Decisions
             CardChoicePurposeView.PutIntoHand => $"{source}: put {many}{kind} card(s){where} into your hand.",
             CardChoicePurposeView.PutIntoGraveyard => $"{source}: put {many}{kind} card(s) into the graveyard.",
             CardChoicePurposeView.Reveal => $"{source}: choose {many}{kind} card(s) to reveal. What happens to a revealed card is on the card's text.",
+            CardChoicePurposeView.Plot => $"{source}: choose {many}{kind} card(s){where} to exile; each becomes plotted, so you may cast it as a sorcery on a later turn without paying its mana cost. This is a gain, not a loss: choose the card whose mana cost you would most like not to pay (the most expensive), unless you need to cast it at instant speed or this turn.",
             CardChoicePurposeView.ReturnToHand => prompt.Kind.Length > 0
                 ? $"{source}: return {many}{kind}(s) you control to their owner's hand."
                 : $"{source}: return {many} permanent(s) to their owner's hand.",

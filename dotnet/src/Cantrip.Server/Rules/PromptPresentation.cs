@@ -109,6 +109,7 @@ internal static class PromptPresentation
         CardChoicePurposeView.PutCounters => PromptActionView.PutCounters,
         CardChoicePurposeView.Craft => PromptActionView.Craft,
         CardChoicePurposeView.Reveal => PromptActionView.Reveal,
+        CardChoicePurposeView.Plot => PromptActionView.Plot,
         _ => PromptActionView.Choose,
     };
 }

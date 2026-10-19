@@ -628,6 +628,43 @@ public sealed partial class TacticalPlay
     }
 
     /// <summary>
+    /// The cards an effect exiles to become plotted (CR 702.170d: cast as a sorcery on a later turn without paying its mana
+    /// cost): the ones whose mana cost is most worth not paying - the highest mana value first, and among equals one it could
+    /// not pay for next turn anyway, then a card that loses nothing by waiting for sorcery timing (not an instant or a card with
+    /// flash), then the one it wants most. A land is never plotted (it is played, not cast, so it could never leave exile), nor,
+    /// when the choice may be declined, a card of mana value 0, which saves nothing and only waits a turn. A choice that must
+    /// be made takes the best of the rest.
+    /// </summary>
+    private List<ViewHandle> ToPlot(GameClient client, ChooseCardsPromptMessage prompt)
+    {
+        int nextTurn = Mana(client) + (client.MyHand().Any(IsLand) ? 1 : 0);
+        List<ObjectView> known = [.. prompt.Eligible.Select(client.Object).OfType<ObjectView>()];
+        List<ObjectView> ranked = [.. known
+            .OrderBy(card => IsLand(card) ? 1 : 0)
+            .ThenByDescending(card => card.ManaValue)
+            .ThenByDescending(card => card.ManaValue > nextTurn ? 1 : 0)
+            .ThenBy(card => card.CardTypes.Contains(CardTypeView.Instant)
+                || (CardReading.KeywordsOf(card) & Keywords.Flash) != 0 ? 1 : 0)
+            .ThenByDescending(card => Worth(client, card))];
+        int most = Math.Min(prompt.Count, prompt.Eligible.Count);
+        List<ViewHandle> chosen = [.. ranked.Where(card => !IsLand(card) && card.ManaValue > 0).Take(most).Select(card => card.Handle)];
+
+        if (!prompt.UpTo || chosen.Count < prompt.Minimum)
+        {
+            int need = prompt.UpTo ? prompt.Minimum : most;
+            chosen.AddRange(ranked.Select(card => card.Handle).Concat(prompt.Eligible)
+                .Distinct().Where(card => !chosen.Contains(card)).Take(need - chosen.Count));
+        }
+
+        if (Narrating && chosen.Count > 0)
+        {
+            Note($"plots {string.Join(", ", chosen.Select(card => client.Object(card)?.Name ?? "a card"))} to cast for free later");
+        }
+
+        return chosen;
+    }
+
+    /// <summary>
     /// The eligible cards worth most together whose mana values add up to <paramref name="budget"/> or less and that are no
     /// more than the prompt's count: each worth what it would be once in play. Every set is weighed when there are few
     /// enough cards (a look at the top eight is 256); beyond that, the most valuable that still fit, one at a time. A card
@@ -771,6 +808,12 @@ public sealed partial class TacticalPlay
             }
 
             return new CardsChosenAnswer();
+        }
+
+        // A card exiled to become plotted (CR 702.170d) is gained, not given up: cast later for free.
+        if (prompt.Purpose == CardChoicePurposeView.Plot)
+        {
+            return new CardsChosenAnswer { Cards = ToPlot(client, prompt) };
         }
 
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
