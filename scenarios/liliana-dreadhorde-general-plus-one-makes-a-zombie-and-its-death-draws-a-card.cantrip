@@ -1,0 +1,46 @@
+# Liliana, Dreadhorde General: +1 creates a 2/2 black Zombie (loyalty 6 to 7), and "Whenever a creature you control dies,
+# draw a card" (CR 603.2) draws when Bot2's Lightning Bolt kills that Zombie on turn 2: Bot1's hand goes from 2 Islands to 3.
+# Bolt deals 3 to the 2/2, and only the Zombie dies, so exactly one card is drawn.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Liliana, Dreadhorde General
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Liliana, Dreadhorde General.Cast
+Bot1.Pass
+Bot1.Battlefield.Liliana, Dreadhorde General.Activate(Ability: Create a 2/2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Zombie)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Liliana, Dreadhorde General.Counters.Loyalty = 7
+Bot1.Battlefield = Liliana, Dreadhorde General; Mox Jet; Mox Sapphire; Mox Ruby

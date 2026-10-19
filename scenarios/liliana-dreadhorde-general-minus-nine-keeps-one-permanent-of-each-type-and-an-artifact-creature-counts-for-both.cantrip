@@ -1,0 +1,75 @@
+# Liliana, Dreadhorde General's -9: "Each opponent chooses a permanent they control of each permanent type and sacrifices
+# the rest" (CR 205.2a, 701.21a). Liliana enters with 6 loyalty on turn 1 and gains 1 on turns 1, 3 and 5 (9), and on turn 7
+# uses the -9 (she dies at 0, CR 704.5i). Bot2 controls two Plains, Mox Pearl, Crystal Barricade (an artifact creature) and
+# Benalish Hero. It chooses by type, in the order artifact, creature, enchantment, land, planeswalker: the Crystal
+# Barricade as its artifact and again as its creature (a permanent with two types counts for both, the ruling), and a Plains
+# as its land; nothing is asked of a type it has none of. The other Plains, Mox Pearl and Benalish Hero are sacrificed.
+# Bot1's own Zombies are untouched (opponents only).
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Liliana, Dreadhorde General
+Island
+Island
+Island x20
+
+[Bot2 Deck]
+Plains
+Plains
+Mox Pearl
+Crystal Barricade
+Benalish Hero
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Liliana, Dreadhorde General.Cast
+Bot1.Pass
+Bot1.Battlefield.Liliana, Dreadhorde General.Activate(Ability: Create a 2/2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Crystal Barricade.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Liliana, Dreadhorde General.Activate(Ability: Create a 2/2)
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Benalish Hero.Cast
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Liliana, Dreadhorde General.Activate(Ability: Create a 2/2)
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Liliana, Dreadhorde General.Activate(Ability: Each opponent chooses)
+Bot2.Choose(Crystal Barricade)
+Bot2.Choose(Crystal Barricade)
+Bot2.Choose(Plains)
+Bot1.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield = Plains; Crystal Barricade
+Bot2.Graveyard = Benalish Hero; Plains; Mox Pearl
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Zombie#1.Power = 2
+Bot1.Battlefield.Zombie#1.Toughness = 2
+Bot1.Battlefield.Zombie#1.Colors = Black
+Bot1.Graveyard = Liliana, Dreadhorde General; Black Lotus

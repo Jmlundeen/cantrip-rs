@@ -1,0 +1,65 @@
+# Liliana, Dreadhorde General's -4: "Each player sacrifices two creatures of their choice" (CR 701.21a, 101.4). Turn 1 Bot1
+# casts Liliana and makes a Zombie with +1 (loyalty 7). Bot2 controls Benalish Hero, Cathar Commando and Warden of the
+# Inner Sky. On turn 3 the -4 (loyalty 3) has Bot1, with a single creature, sacrifice the Zombie (no choice) and Bot2 choose
+# two of its three: the Hero and the Commando; the Warden stays. Only the Zombie is a creature "you control" for Liliana's draw:
+# Bot1 draws for its turn and once for the Zombie (hand 2 Islands + 2 = 4), and not for Bot2's two creatures.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Sapphire
+Mox Ruby
+Liliana, Dreadhorde General
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Black Lotus
+Plains
+Benalish Hero
+Cathar Commando
+Warden of the Inner Sky
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Liliana, Dreadhorde General.Cast
+Bot1.Pass
+Bot1.Battlefield.Liliana, Dreadhorde General.Activate(Ability: Create a 2/2)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Benalish Hero.Cast
+Bot2.Pass
+Bot2.Hand.Cathar Commando.Cast
+Bot2.Pass
+Bot2.Hand.Warden of the Inner Sky.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Liliana, Dreadhorde General.Activate(Ability: Each player sacrifices two)
+Bot2.Choose(Benalish Hero; Cathar Commando)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Liliana, Dreadhorde General.Counters.Loyalty = 3
+Bot1.Hand.Count = 4
+Bot2.Battlefield = Plains; Warden of the Inner Sky
+Bot2.Graveyard = Cathar Commando; Benalish Hero; Black Lotus
