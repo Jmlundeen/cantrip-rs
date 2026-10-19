@@ -138,6 +138,32 @@ pub fn cast_way(g: &mut dyn Game, player: PlayerId, card: ObjectId, ways: Vec<Ca
     }
 }
 
+/// "You may cast a spell from your hand [that `fits`] without paying its mana cost" as an effect resolves (CR 608.2g, 118.9):
+/// the controller chooses a card in their hand with a way to cast it that `fits` the words (a mana value, a type of the face
+/// that would be cast, CR 709.3a, 715.3a), then the way if the card has several, and casts it for nothing. Nothing is asked when
+/// no card in hand qualifies; `kind` is how the question words the card ("artifact", or "" for any). Buster Sword and Lady
+/// Octopus, Inspired Inventor print it.
+pub fn may_cast_from_hand_free(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    kind: &'static str,
+    fits: impl Fn(&dyn Game, &CastWay) -> bool,
+) -> Result<(), Suspend> {
+    let ways_of = |g: &dyn Game, card: ObjectId| -> Vec<CastWay> {
+        g.cast_ways_during_resolution(card).into_iter().filter(|w| fits(g, w)).collect()
+    };
+    let hand = g.state().zone(Zone::hand(player)).to_vec();
+    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !ways_of(&*g, c).is_empty()).collect();
+    let Some(&card) = cards_from_kind(g, player, source, Purpose::CastFree, kind, hand, eligible, 1, true)?.first() else {
+        return Ok(());
+    };
+    let ways = ways_of(&*g, card);
+    let way = cast_way(g, player, card, ways)?.map(|w| w.way);
+    g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way, ..CastTerms::default() })?;
+    Ok(())
+}
+
 /// "You may cast any number of spells from among [these cards] without paying their mana costs" (CR 608.2g, 118.9): the
 /// controller is offered the castable ones among `cards` one at a time, in the order they like, until they decline or none
 /// is castable. Each is cast as the effect resolves, so it takes its face (when it has several) and its targets as any cast

@@ -26,21 +26,7 @@ fn ingenuity(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn cast_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     let most = g.obj(item.object).counters(CounterKind::Ingenuity).max(0) as u32;
-    let fits = |g: &dyn Game, card: ObjectId| -> Vec<CastWay> {
-        g.cast_ways_during_resolution(card)
-            .into_iter()
-            .filter(|w| g.card(w.face).types.has(CardType::Artifact) && w.mana_value <= most)
-            .collect()
-    };
-    let hand = g.state().zone(Zone::hand(you)).to_vec();
-    let eligible: Vec<ObjectId> = hand.iter().copied().filter(|&c| !fits(&*g, c).is_empty()).collect();
-    let Some(&card) = choose::cards_from_kind(g, you, item.object, Purpose::CastFree, "artifact", hand, eligible, 1, true)?.first() else {
-        return Ok(());
-    };
-    let ways = fits(&*g, card);
-    let Some(way) = choose::cast_way(g, you, card, ways)? else { return Ok(()) };
-    g.cast_during_resolution_as(card, CastTerms { instead: Some(ManaCost::ZERO), way: Some(way.way), ..CastTerms::default() })?;
-    Ok(())
+    choose::may_cast_from_hand_free(g, you, item.object, "artifact", |g, w| g.card(w.face).types.has(CardType::Artifact) && w.mana_value <= most)
 }
 
 pub static CARD: CardDef = CardDef {
