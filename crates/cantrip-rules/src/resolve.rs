@@ -203,6 +203,10 @@ impl Query for Given<'_> {
         self.q.chars(id)
     }
 
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        self.q.token_chars(card, copy)
+    }
+
     fn lost_all_abilities(&self, id: ObjectId) -> bool {
         self.q.lost_all_abilities(id)
     }
@@ -254,6 +258,10 @@ impl Query for Reader<'_> {
 
     fn chars(&self, id: ObjectId) -> Chars {
         layers::chars(self.cards, self.state, self.events, id)
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        layers::token_chars(self.cards, card, copy)
     }
 
     fn lost_all_abilities(&self, id: ObjectId) -> bool {

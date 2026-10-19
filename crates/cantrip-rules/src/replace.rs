@@ -648,28 +648,29 @@ pub fn draw_replaced(cx: &mut Cx, player: PlayerId) -> bool {
     matches!(proposal, Proposal::Draw(CardDraw { replaced: true, .. }))
 }
 
-/// Tokens that would be created (CR 111.1, 614.1a): how many remain once every effect has applied. Several definitions
-/// created as one instruction are asked about each on its own, under each player.
-pub fn token_batch(cx: &mut Cx, tokens: &[(CardId, PlayerId)]) -> Option<Vec<(CardId, PlayerId)>> {
+/// Apply token-creation replacements to each definition, copy and controller group (CR 614.1a). Return the
+/// resulting counts and token types.
+pub fn token_batch(cx: &mut Cx, tokens: &[(CardId, Option<Copiable>, PlayerId)]) -> Option<Vec<(CardId, Option<Copiable>, PlayerId)>> {
     if !possible(cx, None) {
         return None;
     }
-    let mut out: Vec<(CardId, PlayerId)> = Vec::with_capacity(tokens.len());
+    let mut out: Vec<(CardId, Option<Copiable>, PlayerId)> = Vec::with_capacity(tokens.len());
     let mut changed = false;
     let mut i = 0;
     while i < tokens.len() {
-        // The run of one definition under one player, in the order given.
-        let (token, controller) = tokens[i];
+        // The run of one definition, copy and controller, in the order given.
+        let (token, copy, controller) = tokens[i];
         let mut count = 0u32;
-        while i < tokens.len() && tokens[i] == (token, controller) {
+        while i < tokens.len() && tokens[i] == (token, copy, controller) {
             count += 1;
             i += 1;
         }
-        let mut proposal = Proposal::TokenCreation(TokenCreation { controller, token, count });
+        let mut proposal = Proposal::TokenCreation(TokenCreation { controller, token, copy, count });
         apply(cx, &mut proposal);
         let Proposal::TokenCreation(after) = proposal else { unreachable!("an effect cannot change the kind of the event") };
-        changed |= after.count != count;
-        out.extend(std::iter::repeat((token, controller)).take(after.count as usize));
+        // Keep the final replacement’s token definition and copy values (CR 614.1a).
+        changed |= after.count != count || after.token != token || after.copy != copy;
+        out.extend(std::iter::repeat((after.token, after.copy, controller)).take(after.count as usize));
     }
     changed.then_some(out)
 }

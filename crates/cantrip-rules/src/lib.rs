@@ -669,6 +669,10 @@ impl Query for Game {
         layers::chars(self.cards, &self.state, &self.log, id)
     }
 
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        layers::token_chars(self.cards, card, copy)
+    }
+
     fn lost_all_abilities(&self, id: ObjectId) -> bool {
         layers::lost_all_abilities(self.cards, &self.state, &self.log, id)
     }
@@ -700,6 +704,10 @@ impl Query for Cx<'_> {
             Some(e) if e.object == id => e.chars,
             _ => layers::chars(self.g.cards, &self.g.state, &self.g.log, id),
         }
+    }
+
+    fn token_chars(&self, card: CardId, copy: Option<Copiable>) -> Chars {
+        layers::token_chars(self.g.cards, card, copy)
     }
 
     fn lost_all_abilities(&self, id: ObjectId) -> bool {
