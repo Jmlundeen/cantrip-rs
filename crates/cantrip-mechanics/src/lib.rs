@@ -62,6 +62,7 @@ pub mod lands;
 pub mod land_until_cast;
 pub mod mana;
 pub mod manifest_dread;
+pub mod cloak;
 pub mod mayhem;
 pub mod max_speed;
 pub mod miracle;
