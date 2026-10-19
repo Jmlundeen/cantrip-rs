@@ -1,0 +1,57 @@
+# Dark Knight's Greatsword: job select makes a 1/1 Hero and attaches the Greatsword to it: "Equipped creature gets +3/+0 and
+# is a Knight in addition to its other types", so the Hero is a 4/1 Hero Knight. Chaosbringer, "Equip - Pay 3 life.
+# Activate only once each turn" (CR 702.6a, 602.5): on turn 1 it moves to Bot1's Ornithopter (0/2 Thopter, becoming a 3/2
+# Thopter Knight) for 3 life, and a second equip the same turn is refused; the Hero is a 1/1 Hero again. On turn 3 it is
+# offered again and moves back to the Hero for 3 more life, 14.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Dark Knight's Greatsword
+Ornithopter
+Swamp x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dark Knight's Greatsword.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hero.Power = 4
+? Bot1.Battlefield.Hero.Subtypes = Hero; Knight
+? Bot1.Battlefield.Dark Knight's Greatsword.AttachedTo = Hero
+Bot1.Battlefield.Dark Knight's Greatsword.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 17
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Subtypes = Knight; Thopter
+! Bot1.Battlefield.Dark Knight's Greatsword.Activate(Hero)
+? Bot1.Battlefield.Hero.Power = 1
+[T3 Bot1.Main1]
+Bot1.Battlefield.Dark Knight's Greatsword.Activate(Hero)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Life = 14
+Bot1.Battlefield.Hero.Power = 4
+Bot1.Battlefield.Hero.Subtypes = Hero; Knight
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Subtypes = Thopter
