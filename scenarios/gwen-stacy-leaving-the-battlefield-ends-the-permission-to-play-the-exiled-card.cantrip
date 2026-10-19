@@ -1,0 +1,41 @@
+# "You may play that card for as long as you control this creature" (CR 611.2b): Bot2's Lightning Bolt kills Gwen Stacy on
+# turn 2, so on turn 3 Bot1 may not play the Island she exiled from exile (refusal; the same play, with Gwen on the
+# battlefield, is the positive control in the transform scenario). Its hand Island is the turn's land drop instead.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Gwen Stacy
+Island
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gwen Stacy.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Gwen Stacy)
+Bot2.Pass
+[T3 Bot1.Main1]
+! Bot1.Exile.Island.Play
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Gwen Stacy
+Exile.Count = 1
+Bot1.Battlefield = Mox Ruby; Mox Jet; Island

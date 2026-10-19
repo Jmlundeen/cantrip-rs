@@ -1,0 +1,66 @@
+# Gwen Stacy // Ghost-Spider. Turn 1: Gwen enters and exiles the top card (an Island), which Bot1 may play for as long as it
+# controls her. Turn 3: Bot1 transforms her into Ghost-Spider (4/4 flying, vigilance, haste) - the same permanent, so the
+# permission stays (CR 701.27f). Turn 5: Bot1 plays that Island from exile (a land played from exile: +1/+1 counter), puts
+# a second +1/+1 counter on Ghost-Spider with Revitalizing Repast, then removes both counters (the cost) to exile the top card
+# of its library (Mox Emerald) and casts it from exile this turn (a spell from exile: one more counter). It ends with one
+# counter, a 5/5, and Mox Emerald on the battlefield.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Gwen Stacy
+Revitalizing Repast
+Revitalizing Repast
+Island
+Island
+Island
+Mox Emerald
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Gwen Stacy.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Gwen Stacy.Activate(Ability: Transform)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ghost-Spider.Power = 4
+[T5 Bot1.Main1]
+Bot1.Exile.Island.Play
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Revitalizing Repast.Cast(Ghost-Spider)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ghost-Spider.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ghost-Spider.Activate(Ability: Remove two counters)
+Bot1.Pass
+Bot2.Pass
+Bot1.Exile.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ghost-Spider.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ghost-Spider.Power = 5
+Bot1.Battlefield.Mox Emerald.Types = Artifact
+Exile.Count = 0
