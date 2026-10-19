@@ -340,7 +340,13 @@ shapes have an example:
   spell or ability (CR 601.2c): the total cost is determined after them (CR 601.2f), so "equip abilities you activate
   that target this creature cost {2} less" (`attach::equip_targeting_this_costs_less::<2>`, Dwarven Mauler) and "costs
   {1} less for each color of the creature it targets" (Dragonfire Blade) read them; an action whose target is announced
-  with it is offered only with the targets its cost could then be paid for. "Activate only once" is `.once()`;
+  with it is offered only with the targets its cost could then be paid for. A change a resolving spell or ability makes
+  for the turn ("artifact spells you cast this turn cost {1} less to cast": Armor Wars, Urza, Planeswalker, Academy
+  Loremaster's "spells they cast this turn cost {2} more") is a `LastingCostChange { text, change }` in the card's
+  `lasting_cost_changes`, made with `g.spells_cost_this_turn(item, player, index)`: it changes `player`'s spells (only
+  spells, and only theirs - the core checks that) until the turn ends, whether or not its source is still around, so its
+  `change` never asks who controls its `source`; its `text` is shown beside that player's life total while it lasts.
+  "Activate only once" is `.once()`;
   **cast limits and bans** are
   `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster, from: ZoneKind) -> bool`, false forbids casting from that zone:
   Teferi, Drannith Magistrate's "from anywhere other than their hands"); a ban on spells with certain qualities is

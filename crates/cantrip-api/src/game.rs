@@ -568,6 +568,15 @@ pub trait Game: Query {
             self.add_player_effect(controller, source, EffectKind::SkipNextTurn(player), Duration::Indefinite);
         }
     }
+    /// "[Kind of] spells [player] casts this turn cost ... less / more to cast" (CR 611.2a/c, 601.2f), made by the resolving
+    /// spell or ability `item`: the `index`th of the `lasting_cost_changes` of its card (the face that is up, for a permanent's
+    /// ability) changes the total cost of every spell `player` casts until the turn ends (CR 514.2), whether or not the source
+    /// stays on the battlefield. Armor Wars, Urza, Planeswalker, Ballad of the Black Flag, Spellbinding Soprano and Academy
+    /// Loremaster print it. The effect is controlled by `item`'s controller (CR 109.5).
+    fn spells_cost_this_turn(&mut self, item: &StackItem, player: PlayerId, index: u8) {
+        let kind = EffectKind::SpellCostChange { card: item.ability.card, index, player };
+        self.add_player_effect(item.controller, item.object, kind, Duration::EndOfTurn);
+    }
     /// A permanent with a prepare spell becomes prepared (CR 722.2): a copy of the spell is put in exile, which its
     /// controller may cast while it stays prepared. Nothing if it already is, or is not on the battlefield.
     fn become_prepared(&mut self, permanent: ObjectId);

@@ -322,6 +322,22 @@ impl CostDelta {
 /// chosen later; a change that depends on them then does not apply.
 pub type CostChange = fn(&dyn Query, ObjectId, PlayerId, Costed, &[Target]) -> CostDelta;
 
+/// A cost change a resolving spell or ability makes for a duration (CR 611.2a/c, 601.2f): "artifact spells you cast this
+/// turn cost {1} less to cast" (Armor Wars), "artifact, instant, and sorcery spells you cast this turn cost {2} less"
+/// (Urza, Planeswalker), "spells they cast this turn cost {2} more" (Academy Loremaster). The effect
+/// (`EffectKind::SpellCostChange`) names the player whose spells it changes, and lasts whether or not its source is still on
+/// the battlefield; `cantrip_mechanics::costs::spells_this_turn` makes one. A card lists these in its `lasting_cost_changes`.
+#[derive(Clone, Copy)]
+pub struct LastingCostChange {
+    /// What it does, in its own words about the player it changes the spells of ("Artifact spells you cast this turn cost
+    /// {1} less to cast."): shown beside that player's life total while it lasts.
+    pub text: &'static str,
+    /// What it does to the total cost of `costed`, a spell of the effect's player (the core asks it of no one else's, and of
+    /// no ability): a `CostChange` whose `source` is the effect's source, which may have left the battlefield, so it is
+    /// never asked who controls it.
+    pub change: CostChange,
+}
+
 /// A static ability that makes abilities cost less to activate, but never below one mana (CR 601.2f, 118.7): how much
 /// generic mana less the ability `ability` of `permanent` costs `player` to activate, by the permanent `source` that has
 /// it; zero when it does not apply. "Activated abilities of artifacts you control cost {1} less to activate. This effect
@@ -2012,6 +2028,9 @@ pub struct CardDef {
     /// A spell's own cost changes (CR 601.2f): "this spell costs {1} less to cast for each ..." (affinity, Embercleave).
     /// They work wherever the spell is cast from, and the spell is their `source`.
     pub own_cost_changes: &'static [CostChange],
+    /// The cost changes its resolving spells and abilities make for a duration (CR 611.2c, 601.2f): `EffectKind::SpellCostChange`
+    /// names the nth. Not standing abilities: they function only while such an effect lasts.
+    pub lasting_cost_changes: &'static [LastingCostChange],
     /// Its static abilities that make activated abilities cost less, with at least one mana left (CR 601.2f), while it is
     /// on the battlefield.
     pub ability_discounts: &'static [AbilityDiscount],
@@ -2243,6 +2262,7 @@ impl CardDef {
         cast_limit: 0,
         cost_changes: &[],
         own_cost_changes: &[],
+        lasting_cost_changes: &[],
         ability_discounts: &[],
         ability_alternatives: &[],
         granted_ways: &[],

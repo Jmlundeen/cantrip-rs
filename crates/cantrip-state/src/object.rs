@@ -671,6 +671,12 @@ pub enum EffectKind {
     /// object, which is only the source. When it ends, the legend rule applies at once to what they control (its ruling).
     /// The static abilities with these words (Mirror Box, Brothers Yamazaki's pair) are not built.
     NoLegendRule(PlayerId),
+    /// "Artifact spells you cast this turn cost {1} less to cast" (CR 611.2c, 601.2f, 118.7): a cost change a resolved spell
+    /// or ability made, which changes the total cost of the spells `player` casts for as long as it lasts, whether or not
+    /// its source is still on the battlefield (CR 611.2a). It is the `index`th of the
+    /// `lasting_cost_changes` of `card`, the card whose spell or ability made it, which says which spells and by how much.
+    /// About the player, so it reaches spells cast later and outlives its `affected` object, which is only the source.
+    SpellCostChange { card: CardId, index: u8, player: PlayerId },
 }
 
 impl EffectKind {
@@ -694,6 +700,7 @@ impl EffectKind {
                 | EffectKind::NextSpellCantBeCountered
                 | EffectKind::SkipNextTurn(_)
                 | EffectKind::NoLegendRule(_)
+                | EffectKind::SpellCostChange { .. }
         ) || matches!(self, EffectKind::Prevention { to, .. } if to.object().is_none())
     }
 }

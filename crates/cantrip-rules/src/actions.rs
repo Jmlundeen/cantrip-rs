@@ -1090,7 +1090,7 @@ fn offer_spell(cx: &Cx, asker: &Asker, def: &'static CardDef, option: &mut Actio
 /// cost, the cast is judged for each candidate (`covered`), and only those it could be paid for are offered; otherwise it is
 /// judged once, with no target.
 fn offer_costed(cx: &Cx, a: &Available, asker: &Asker, def: &'static CardDef, option: &mut ActionOption, covered: impl Fn(&[Target]) -> bool) -> bool {
-    if targets_with_cast(def) && (!a.changers.is_empty() || !def.own_cost_changes.is_empty()) {
+    if targets_with_cast(def) && (!a.changers.is_empty() || !def.own_cost_changes.is_empty() || lasting_changes(cx)) {
         if !offer_spell(cx, asker, def, option) {
             return false;
         }
@@ -1106,7 +1106,7 @@ fn offer_costed(cx: &Cx, a: &Available, asker: &Asker, def: &'static CardDef, op
 /// additional 3 life") could be paid, with the life its own additional cost asks, from its caster's life total (CR 119.4,
 /// 118.3). Advice, as `least_cost` is.
 fn added_life_payable(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, targets: &[Target]) -> bool {
-    if a.changers.is_empty() && def.own_cost_changes.is_empty() {
+    if a.changers.is_empty() && def.own_cost_changes.is_empty() && !lasting_changes(cx) {
         return true;
     }
     let (_, added) = change_total(cx, &a.changers, player, Costed::Spell(card), ManaCost::ZERO, face_of(cx, card, def), targets);
@@ -1163,6 +1163,21 @@ fn cost_change_sources(cx: &Cx) -> Vec<ObjectId> {
             cx.cards().cost_changes[cx.cards().current(obj).0 as usize] && !cx.lost_all_abilities(id)
         })
         .collect()
+}
+
+/// Whether a cost change a resolved spell or ability made still lasts (CR 611.2c, `EffectKind::SpellCostChange`): read from
+/// the effects in play, which nearly never hold one.
+fn lasting_changes(cx: &Cx) -> bool {
+    cx.s().effects.iter().any(|e| matches!(e.kind, EffectKind::SpellCostChange { .. }))
+}
+
+/// Whether anything in play could change what a spell costs (CR 601.2f): a permanent with a cost change, or a lasting effect
+/// a resolved spell or ability made.
+fn spell_cost_changers(game: &crate::Game) -> bool {
+    game.state.effects.iter().any(|e| matches!(e.kind, EffectKind::SpellCostChange { .. }))
+        || game.state.battlefield().iter().any(|&id| {
+            game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
+        })
 }
 
 /// The game as the cost changes of a spell read it when the spell is judged before it is cast: the card in hand has the
@@ -1232,10 +1247,7 @@ pub fn activation_costs(game: &crate::Game, player: PlayerId, source: ObjectId, 
 /// or for any other way of casting it.
 pub fn cast_costs(game: &crate::Game, player: PlayerId, card: ObjectId, index: u8, candidates: &[Target]) -> Vec<(ManaCost, u32)> {
     let def = game.cards.get(game.state.obj(card).card);
-    let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
-    });
-    if !(changers || !def.own_cost_changes.is_empty()) {
+    if !(spell_cost_changers(game) || !def.own_cost_changes.is_empty()) {
         return Vec::new();
     }
     let base = match (index, granted_slot(index)) {
@@ -1278,14 +1290,11 @@ pub fn cast_total(game: &crate::Game, player: PlayerId, card: ObjectId, index: u
         return None;
     }
     let whole = game.cards.get(game.state.obj(card).card);
-    let changers = game.state.battlefield().iter().any(|&id| {
-        game.cards.cost_changes[game.cards.current(game.state.obj(id)).0 as usize] && !game.lost_all_abilities(id)
-    });
     if granted_slot(index).is_some() {
         return None;
     }
     let face = cast_face(whole, index);
-    if !(changers || !face.own_cost_changes.is_empty()) {
+    if !(spell_cost_changers(game) || !face.own_cost_changes.is_empty()) {
         return None;
     }
     let base = match index {
@@ -1400,7 +1409,9 @@ fn change_parts(
     };
     // The ability's own change ("this ability costs ... less", power-up), asked for this ability alone.
     let ability_own = ability.and_then(|a| activated(cx, a)).and_then(|d| d.cost_change);
-    if sources.is_empty() && own.is_empty() && ability_own.is_none() {
+    // The cost changes resolved spells and abilities made (CR 611.2c): of spells only, as every one printed says.
+    let lasting = matches!(costed, Costed::Spell(_)) && lasting_changes(cx);
+    if sources.is_empty() && own.is_empty() && ability_own.is_none() && !lasting {
         return (cost, 0, 0);
     }
     let mut more = 0u32;
@@ -1429,6 +1440,18 @@ fn change_parts(
         if let Some(ability) = ability {
             for d in def.ability_discounts {
                 discount += d(q, source, player, id, ability) as u32;
+            }
+        }
+    }
+    // "[Kind of] spells you cast this turn cost {1} less" (CR 611.2c, 601.2f): each such effect about the caster, whatever has
+    // become of its source, asks the card that made it what it does to this spell.
+    if lasting {
+        for e in &cx.s().effects {
+            if let EffectKind::SpellCostChange { card, index, player: whose } = e.kind
+                && whose == player
+            {
+                let def = &cx.card(card).lasting_cost_changes[index as usize];
+                add((def.change)(q, e.source, player, costed, targets));
             }
         }
     }
@@ -3052,25 +3075,26 @@ fn has_mana_source(cx: &Cx, id: ObjectId, player: PlayerId) -> bool {
 /// cards another part of the cost exiles from the graveyard, which delve cannot also use.
 fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8) -> bool {
     let no_mana = def.keywords.has(Keyword::CantSpendManaToCast);
-    if !def.pay_with.any() && !no_mana {
+    let with = def.pay_with;
+    if !with.any() && !no_mana {
         return a.covers_for(&cost, &spell_kind(cx, a, card, def));
     }
     let mut cost = cost;
     let mut creatures: Vec<ColorSet> = Vec::new();
     let mut generic: u32 = 0;
-    if def.pay_with.delve {
+    if with.delve {
         let gy = cx.s().zone(Zone::graveyard(player)).iter().filter(|&&c| c != card).count();
         generic += gy.saturating_sub(exiled as usize) as u32;
     }
-    if def.pay_with.improvise || def.pay_with.convoke {
+    if with.improvise || with.convoke {
         for id in cx.permanents_of(player) {
             if cx.s().obj(id).tapped || (!no_mana && has_mana_source(cx, id, player)) {
                 continue;
             }
             let chars = cx.chars(id);
-            if def.pay_with.improvise && chars.is(CardType::Artifact) {
+            if with.improvise && chars.is(CardType::Artifact) {
                 generic += 1;
-            } else if def.pay_with.convoke && chars.is(CardType::Creature) {
+            } else if with.convoke && chars.is(CardType::Creature) {
                 creatures.push(chars.colors);
             }
         }

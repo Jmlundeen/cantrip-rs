@@ -716,6 +716,15 @@ whole of the life the total cost asks - an additional "pay X life", Phyrexian sy
 (CR 119.4, 118.3): a cast or activation that cannot is taken back (CR 733). The advice counts it too: a single-target cast
 announced with its action is not offered at a target whose tax its caster could not pay (`added_life_payable`).
 
+A cost change may be made by a resolving spell or ability for a duration rather than be a static ability (CR 611.2a/c:
+Armor Wars's "artifact spells you cast this turn cost {1} less to cast", Urza, Planeswalker's +2, Academy Loremaster's
+"spells they cast this turn cost {2} more"): an `EffectKind::SpellCostChange { card, index, player }` about the player,
+naming the `index`th of `card`'s `lasting_cost_changes` (`Game::spells_cost_this_turn`). `change_parts` applies it to the
+spells `player` casts with the static changes (increases first, then reductions), whatever has become of its source, and
+it ends with the turn (CR 514.2). The guards that skip cost-change work when no changer is on the battlefield also look
+for one (`lasting_changes`, `spell_cost_changers`). "The next spell you cast this turn costs {1} less" (Hardened Berserker,
+Kaza, Invasion of the Giants), which is used up by the spell it applies to, is not built.
+
 A cost change may set the least the total comes to (`CostDelta::at_least`: Trinisphere's "each spell that would cost less
 than three mana to cast costs three mana to cast"). It is one of the "effects that directly affect the total cost" CR 601.2f
 applies once the total is otherwise determined: after the mana cost or alternative cost, every increase and every reduction

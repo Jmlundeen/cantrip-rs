@@ -636,6 +636,22 @@ impl<'a> Projector<'a> {
             let until = if e.duration == Duration::EndOfTurn { " this turn" } else { "" };
             summary.pending_effects.push(format!("The \"legend rule\" doesn't apply to permanents {whose} control{until}."));
         }
+        // "Artifact spells you cast this turn cost {1} less to cast" (CR 611.2c, 601.2f): a cost change a resolved spell or ability
+        // made about the player's spells, on no object, so the page says it beside their life total in the card's own words,
+        // named for the card that made it. The other seat is told whose spells it changes.
+        for e in s.effects.iter() {
+            if let EffectKind::SpellCostChange { card, index, player } = e.kind
+                && player == p
+            {
+                let def = game.cards.get(card);
+                let text = def.lasting_cost_changes[index as usize].text;
+                summary.pending_effects.push(if p == self.viewer {
+                    format!("{}: {text}", def.name)
+                } else {
+                    format!("{}'s effect on their spells: {text}", def.name)
+                });
+            }
+        }
         // "Whenever [event] this turn" / "when you next [event] this turn" / "until your next turn, whenever [event]" (CR 603.7b):
         // a delayed triggered ability that waits for its event, on no object, so the page says it beside its controller's life
         // total, in the ability's own words
