@@ -43,6 +43,16 @@ pub fn permanent_left_battlefield_this_turn(q: &dyn Query, player: PlayerId) -> 
         .any(|r| matches!(r.event, Event::ZoneChange { old, .. } if q.obj(old).controller == player))
 }
 
+/// The number of permanents `player` has sacrificed this turn (CR 701.21a): every permanent that went from the battlefield to a
+/// graveyard as a sacrifice this turn, token or not, under that player's control as it left. Asked of the history (CR 603.10a).
+/// Obsessive Pursuit counts them; Phoenix Fleet Airship asks whether there was one ("if you sacrificed a permanent this turn").
+pub fn permanents_sacrificed_this_turn(q: &dyn Query, player: PlayerId) -> usize {
+    q.history()
+        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).this_turn())
+        .filter(|r| crate::triggers::sacrificed_by(q, player, &r.event).is_some())
+        .count()
+}
+
 /// The void condition: "a nonland permanent left the battlefield this turn or a spell was warped this turn". Void is an
 /// ability word (CR 207.2c) with no rules of its own; only its second clause has a rule, CR 702.185c: a spell was warped when
 /// it was cast for its warp cost. Any player's permanent counts, a token too, judged as it was as it left the battlefield (CR 608.2h). Elegy Acolyte, Plasma Bolt and

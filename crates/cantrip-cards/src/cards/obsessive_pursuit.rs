@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::history::permanents_sacrificed_this_turn;
 use cantrip_mechanics::{effects, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
@@ -13,15 +14,6 @@ fn lose_life_and_create_a_clue(g: &mut dyn Game, item: &StackItem) -> Result<(),
     g.lose_life(item.controller, 1);
     tokens::create(g, item.controller, &tokens::CLUE, 1)?;
     Ok(())
-}
-
-/// The number of permanents `player` has sacrificed this turn (CR 701.21a): every permanent that went from the battlefield to
-/// a graveyard as a sacrifice this turn, token or not, under that player's control as it left. Asked of the history (CR 603.10a).
-fn permanents_sacrificed_this_turn(q: &dyn Query, player: PlayerId) -> usize {
-    q.history()
-        .select(EventQuery::kind(EventMask::ZONE_CHANGE).from(ZoneKind::Battlefield).this_turn())
-        .filter(|r| triggers::sacrificed_by(q, player, &r.event).is_some())
-        .count()
 }
 
 /// "Put X +1/+1 counters on target attacking creature, where X is the number of permanents you've sacrificed this turn. If X is
