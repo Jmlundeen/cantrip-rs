@@ -1,0 +1,24 @@
+# Overgrown Farmland: with two or more other lands it enters untapped, and taps for either green or white (CR 106.5).
+
+[Bot1 Deck]
+Forest
+Forest
+Overgrown Farmland
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Overgrown Farmland.Play
+Bot1.Battlefield.Overgrown Farmland.Activate(Color: White)
+? Bot1.Mana = {W}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Overgrown Farmland.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Overgrown Farmland.Tapped = true

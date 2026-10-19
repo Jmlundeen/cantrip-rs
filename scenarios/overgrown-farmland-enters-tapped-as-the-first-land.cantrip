@@ -1,0 +1,22 @@
+# Overgrown Farmland counts only its controller's other lands (CR 614.1c): played as the first land, with no other land
+# under Bot1's control, it enters tapped and cannot be tapped for mana that turn.
+
+[Bot1 Deck]
+Overgrown Farmland
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Overgrown Farmland.Play
+? Bot1.Battlefield.Overgrown Farmland.Tapped = true
+! Bot1.Battlefield.Overgrown Farmland.Activate(Color: White)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Overgrown Farmland.Activate(Color: White)
+? Bot1.Mana = {W}
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Overgrown Farmland.Tapped = true
