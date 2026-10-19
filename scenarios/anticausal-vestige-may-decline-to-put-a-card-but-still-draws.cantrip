@@ -1,0 +1,38 @@
+# Anticausal Vestige, warped and exiled at the end step: "you may put" - Bot1 declines. The card is drawn anyway (the draw is not
+# optional), Sol Ring stays in hand and nothing enters; the Vestige is in exile.
+
+
+[Bot1 Deck]
+Island
+Mox Ruby
+Mox Pearl
+Mox Jet
+Anticausal Vestige
+Sol Ring
+Mind Stone
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Anticausal Vestige.Cast(Ability: Warp)
+[Bot1.Main2]
+? Bot1.Battlefield.Anticausal Vestige.Power = 7
+Bot1.Choose()
+[T2 Bot2.Main1]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.Battlefield = Island; Mox Jet; Mox Pearl; Mox Ruby
+
+Bot1.Hand = Lightning Bolt; Mind Stone; Sol Ring

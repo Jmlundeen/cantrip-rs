@@ -1,0 +1,47 @@
+# Anticausal Vestige cast for its full {6} (Island, three Moxen, Black Lotus) and then exiled by Bot2's Swords to Plowshares:
+# any way of leaving the battlefield triggers it, not only warp's exile. Draw first: Mox Emerald is drawn, so it is in the
+# hand for the choice (mana value 0 <= 1 land) and Bot1 puts it onto the battlefield tapped. Mind Stone (2 > 1 land) is
+# not offered. Swords gives Bot1 life equal to its power, 7.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Anticausal Vestige
+Mind Stone
+Mox Emerald
+Island x12
+
+[Bot2 Deck]
+Plains
+Swords to Plowshares
+Plains x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Anticausal Vestige.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Anticausal Vestige)
+! Bot1.Choose(Mind Stone)
+Bot1.Choose(Mox Emerald)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.Life = 27
+Bot1.Battlefield.Mox Emerald.Tapped = true
+Bot1.Battlefield.Count = 5
+Bot1.Hand = Mind Stone
