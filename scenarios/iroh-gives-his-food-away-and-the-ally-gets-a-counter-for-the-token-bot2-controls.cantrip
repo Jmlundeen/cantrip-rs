@@ -1,0 +1,48 @@
+# Iroh enters and makes a Food token. At the beginning of combat Bot1 targets Bot2 and the Food token and accepts: Bot2 gains
+# control of the Food (no duration), and the reflexive "When you do" makes a 1/1 Ally with a +1/+1 counter for each
+# permanent Bot1 owns that Bot2 controls. A token is owned by the player who created it, so that is the Food: the Ally is 2/2.
+
+[Bot1 Deck]
+Plains
+Mountain
+Plains
+Iroh, Tea Master
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Iroh, Tea Master.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Pass
+Bot1.Target(Food Token)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot2.Battlefield = Food Token
+Bot1.Battlefield = Plains; Plains; Mountain; Iroh, Tea Master; Ally
+Bot1.Battlefield.Ally.Power = 2
+Bot1.Battlefield.Ally.Toughness = 2

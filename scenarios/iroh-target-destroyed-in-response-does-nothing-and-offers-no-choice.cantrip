@@ -1,0 +1,60 @@
+# If the permanent Iroh's combat ability targets becomes an illegal target by the time it resolves, the ability does nothing
+# and the "you may" is not offered (ruling). Bot1 targets Iroh himself at the beginning of combat; Bot2 destroys Iroh with
+# Infernal Grasp in response (Bot2 loses 2). Nothing is given away, Bot1 is never asked (`! Bot1.Accept`) and no Ally appears.
+# The Food token from Iroh's enters trigger stays with Bot1.
+
+[Bot1 Deck]
+Plains
+Mountain
+Plains
+Iroh, Tea Master
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Swamp
+Swamp
+Infernal Grasp
+Swamp x17
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Iroh, Tea Master.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Pass
+Bot1.Target(Iroh, Tea Master)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Battlefield.Swamp#1.Activate
+Bot2.Battlefield.Swamp#2.Activate
+Bot2.Hand.Infernal Grasp.Cast(Iroh, Tea Master)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 1
+! Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Iroh, Tea Master
+Bot2.Graveyard = Infernal Grasp
+Bot1.Battlefield = Plains; Plains; Mountain; Food Token
+Bot2.Battlefield.Count = 2

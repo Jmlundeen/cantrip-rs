@@ -1,0 +1,55 @@
+# "A +1/+1 counter on that token for each permanent you own that your opponents control", counted as the reflexive ability
+# resolves. Turn 5: Bot1 gives away the Food token (Ally 1: one owned permanent under Bot2, so 2/2). Turn 7: Bot1 gives
+# away the Mountain it owns; Bot2 now controls two permanents Bot1 owns (Food, Mountain), so Ally 2 gets two counters: 3/3.
+# Bot2's own Plains and Bot1's Iroh, Plains and Allies are not counted.
+
+[Bot1 Deck]
+Plains
+Mountain
+Plains
+Iroh, Tea Master
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Iroh, Tea Master.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot1.Target(Food Token)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T7 Bot1.BeginCombat]
+Bot1.Target(Mountain)
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot2.Battlefield = Plains; Food Token; Mountain
+Bot1.Battlefield = Plains; Plains; Iroh, Tea Master; Ally; Ally
+Bot1.Battlefield.Ally#1.Power = 2
+Bot1.Battlefield.Ally#2.Power = 3
+Bot1.Battlefield.Ally#2.Toughness = 3

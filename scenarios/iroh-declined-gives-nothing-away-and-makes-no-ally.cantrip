@@ -1,0 +1,44 @@
+# "You may have target opponent gain control of target permanent you control": the choice is made as the ability resolves
+# (ruling). Bot1 targets the Food token at the beginning of combat and declines. Control does not change, the reflexive
+# "When you do" never triggers (so the stack is empty afterwards), and no Ally is made. Positive control: the sibling scenario
+# where Bot1 accepts.
+
+[Bot1 Deck]
+Plains
+Mountain
+Plains
+Iroh, Tea Master
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Iroh, Tea Master.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Pass
+Bot1.Target(Food Token)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+? Stack.Count = 0
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Plains; Plains; Mountain; Iroh, Tea Master; Food Token
