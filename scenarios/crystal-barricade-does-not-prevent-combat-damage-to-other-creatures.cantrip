@@ -1,0 +1,47 @@
+# "Noncombat" (CR 615.1, 120.2): Crystal Barricade prevents no combat damage. Bot2's Cathar Commando (3/1) attacks on
+# turn 4 and Bot1 blocks with its own Cathar Commando: each deals 3 to the other's 1 toughness and both die, with
+# Crystal Barricade on the battlefield. Nothing is prevented.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Crystal Barricade
+Cathar Commando
+Island x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Cathar Commando
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Cathar Commando.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Cathar Commando > Bot1)
+Bot1.Block(Cathar Commando > Cathar Commando)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Jet; Crystal Barricade
+Bot1.Graveyard = Cathar Commando
+Bot2.Graveyard = Cathar Commando
+Prevented = (absent)

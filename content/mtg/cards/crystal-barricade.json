@@ -1,0 +1,11 @@
+{
+  "name": "Crystal Barricade",
+  "manaCost": "{1}{W}",
+  "type": "Artifact Creature — Wall",
+  "power": 0,
+  "toughness": 4,
+  "oracleText": "Defender (This creature can't attack.)\nYou have hexproof. (You can't be the target of spells or abilities your opponents control.)\nPrevent all noncombat damage that would be dealt to other creatures you control.",
+  "keywords": [
+    "Defender"
+  ]
+}

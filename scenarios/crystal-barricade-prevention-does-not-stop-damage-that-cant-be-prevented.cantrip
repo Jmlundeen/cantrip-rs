@@ -1,0 +1,46 @@
+# CR 615.12: damage that can't be prevented is dealt in spite of a prevention effect. Bot1 controls Crystal Barricade and
+# Cathar Commando. Bot2 casts Skullcrack at itself ("Damage can't be prevented this turn", 3 damage to Bot2, hexproof only
+# stops Bot2's opponents' spells) and then a Lightning Bolt at Cathar Commando, which dies; nothing is prevented.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Crystal Barricade
+Cathar Commando
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mountain
+Skullcrack
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Skullcrack.Cast(Bot2)
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Cathar Commando)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Graveyard = Cathar Commando
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Jet; Crystal Barricade
+Prevented = (absent)

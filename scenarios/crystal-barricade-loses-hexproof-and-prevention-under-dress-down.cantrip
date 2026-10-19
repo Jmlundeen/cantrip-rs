@@ -1,0 +1,46 @@
+# CR 613.1f: both abilities of Crystal Barricade are static abilities, and a creature that has lost all abilities (Dress
+# Down) has neither. Bot1 controls two Crystal Barricades; under Dress Down (Bot2's, creatures lose all abilities) Bot2's
+# Lightning Bolt can target Bot1 (17) and a second Bolt at one Barricade is not prevented by the other: 3 damage is marked.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Crystal Barricade x2
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mox Sapphire
+Mountain
+Dress Down
+Lightning Bolt x2
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Dress Down.Cast
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Crystal Barricade)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Crystal Barricade#1.Damage = 3
+Bot1.Battlefield.Crystal Barricade#2.Damage = 0
+Prevented = (absent)

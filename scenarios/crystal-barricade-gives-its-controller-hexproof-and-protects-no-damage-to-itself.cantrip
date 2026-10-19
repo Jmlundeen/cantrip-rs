@@ -1,0 +1,45 @@
+# Crystal Barricade: "You have hexproof" (CR 702.11c) - its controller can't be the target of spells or abilities their
+# opponents control, but can be the target of their own. Bot1 casts Crystal Barricade on turn 1 and then its own Lightning
+# Bolt at itself (the positive control: hexproof stops only opponents, Bot1 goes to 17). On turn 2 Bot2's Lightning Bolt
+# can't target Bot1 (refusal, with the red mana to cast it), though it can target Crystal Barricade. "Other creatures you
+# control" leaves Crystal Barricade out (CR 615.1): the Bolt's 3 damage stays marked on it and nothing is prevented.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Crystal Barricade
+Lightning Bolt
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Crystal Barricade)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Crystal Barricade.Damage = 3
+Bot1.Graveyard = Lightning Bolt
+Bot2.Graveyard = Lightning Bolt
+Prevented = (absent)

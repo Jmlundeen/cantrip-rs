@@ -259,6 +259,11 @@ fn you_from_each_opponent(q: &dyn LayerQuery, source: ObjectId, player: PlayerId
     you(q, source, player) && q.state().opponents(player).any(|o| o == from)
 }
 
+/// "You have hexproof" (CR 702.11c) as a `CardDef::player_keywords` entry: the permanent's controller, while it is on the
+/// battlefield with its abilities, can't be the target of spells or abilities their opponents control. Crystal Barricade,
+/// Leyline of Sanctity and Witchbane Orb print it.
+pub const YOU_HAVE_HEXPROOF: PlayerKeywordRule = PlayerKeywordRule { keyword: Keyword::Hexproof, applies: you };
+
 /// "You": the source's controller, as a [`PlayerKeywordRule`] reads it.
 fn you(q: &dyn LayerQuery, source: ObjectId, player: PlayerId) -> bool {
     q.state().obj(source).controller == player

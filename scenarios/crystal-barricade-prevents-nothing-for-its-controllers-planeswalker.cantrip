@@ -1,0 +1,39 @@
+# "Other creatures you control" (CR 615.1): a planeswalker is not a creature, so damage to Bot1's Wrenn and Six is not
+# prevented by Crystal Barricade. Bot2's Lightning Bolt removes its 3 loyalty counters (CR 120.3c) and it dies (CR 704.5i).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Emerald
+Crystal Barricade
+Wrenn and Six
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Wrenn and Six.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Wrenn and Six)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Wrenn and Six
+Prevented = (absent)

@@ -1,0 +1,48 @@
+# CR 702.11c, 613.1b: "You" in Crystal Barricade's "You have hexproof" is its controller. Bot2 gains control of Bot1's
+# Crystal Barricade with Act of Treason on turn 2; then Bot2 has hexproof and Bot1 does not: Bot2's own Lightning Bolt
+# can target Bot1 (the positive control, cast), while Bot1's Lightning Bolt in response can't target Bot2 (refusal).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Crystal Barricade
+Mox Ruby
+Lightning Bolt
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Act of Treason
+Simian Spirit Guide
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Crystal Barricade)
+Bot2.Pass
+Bot2.Hand.Simian Spirit Guide.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 20
+Bot2.Battlefield = Mountain; Mox Ruby; Mox Jet; Crystal Barricade

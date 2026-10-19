@@ -1,0 +1,33 @@
+# Crystal Barricade has defender (CR 702.3b): it can't attack. On turn 3 Bot1's Crystal Barricade is not offered as an
+# attacker, while Cathar Commando, cast the same turn 1 and not summoning sick, is (the positive control): Bot2 takes 3.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Crystal Barricade
+Cathar Commando
+Island x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cathar Commando.Cast
+[T3 Bot1.DeclareAttackers]
+! Bot1.Attack(Crystal Barricade > Bot2)
+Bot1.Attack(Cathar Commando > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17

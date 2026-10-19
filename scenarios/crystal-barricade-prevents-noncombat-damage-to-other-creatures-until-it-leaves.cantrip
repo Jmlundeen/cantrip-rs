@@ -1,0 +1,53 @@
+# Crystal Barricade: "Prevent all noncombat damage that would be dealt to other creatures you control" (CR 615.1). Bot1
+# controls Crystal Barricade (0/4) and Cathar Commando (3/1). Bot2, with Black Lotus and a Mountain, casts four Lightning
+# Bolts: the first at Cathar Commando is prevented by Crystal Barricade (Commando lives, no damage); two at Crystal
+# Barricade itself deal 3 each - it is not one of the "other" creatures - and kill it (6 damage, CR 704.5g); the fourth at
+# Cathar Commando, with Crystal Barricade gone, is no longer prevented and kills it. Only the first Bolt is prevented.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Crystal Barricade
+Cathar Commando
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Mountain
+Lightning Bolt x4
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Crystal Barricade.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cathar Commando.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Cathar Commando)
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Crystal Barricade)
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Crystal Barricade)
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Cathar Commando)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Mox Sapphire; Mox Jet
+Bot1.Graveyard = Cathar Commando; Crystal Barricade
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt; Black Lotus
+Prevented = 3 Lightning Bolt > Cathar Commando by Crystal Barricade
