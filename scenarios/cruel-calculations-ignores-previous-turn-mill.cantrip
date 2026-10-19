@@ -1,0 +1,25 @@
+# cruel calculations counts library to graveyard (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Dark Matter Manipulator
+Cruel Calculations
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Dark Matter Manipulator.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cruel Calculations.Cast(Bot1)
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 6

@@ -1,0 +1,17 @@
+# cruel calculations zero (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Cruel Calculations
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Cruel Calculations.Cast(Bot2)
+
+[Expect]
+Bot1.Hand.Count = 5
