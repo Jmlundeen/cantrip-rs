@@ -1,0 +1,11 @@
+{
+  "name": "Resplendent Angel",
+  "manaCost": "{1}{W}{W}",
+  "type": "Creature — Angel",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nAt the beginning of each end step, if you gained 5 or more life this turn, create a 4/4 white Angel creature token with flying and vigilance.\n{3}{W}{W}{W}: Until end of turn, this creature gets +2/+2 and gains lifelink.",
+  "keywords": [
+    "Flying"
+  ]
+}

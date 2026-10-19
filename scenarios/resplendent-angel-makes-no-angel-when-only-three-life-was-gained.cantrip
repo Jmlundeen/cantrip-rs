@@ -1,0 +1,38 @@
+# The intervening "if you gained 5 or more life this turn" (CR 603.4): Bot1 gains only 3 (Lightning Helix on turn 3), so at its
+# end step the Angel's trigger does not trigger and no token is made. Battlefield: four Moxen and the Angel.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Jet
+Mox Ruby
+Resplendent Angel
+Lightning Helix
+Island
+Island x13
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Resplendent Angel.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Helix.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Battlefield.Count = 5

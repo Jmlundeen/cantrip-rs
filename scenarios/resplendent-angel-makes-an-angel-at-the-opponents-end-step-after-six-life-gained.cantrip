@@ -1,0 +1,50 @@
+# "At the beginning of EACH end step": Bot1 casts Resplendent Angel on turn 1, puts Black Lotus onto the battlefield on turn 3, then in Bot2's main phase on turn 4 casts Restoration
+# Magic's Curaga (gain 6 life), keeping a Mox Ruby untapped with Lightning Bolt in hand so that it is asked at each of Bot2's steps.
+# At Bot2's end step Bot1 has gained 5 or more this turn (CR 603.4), so the Angel makes a 4/4 white Angel token with flying and
+# vigilance for Bot1, though it is not Bot1's end step. Bot1: 20 + 6 = 26.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Ruby
+Resplendent Angel
+Black Lotus
+Restoration Magic
+Lightning Bolt
+Plains x14
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Resplendent Angel.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[T4 Bot2.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Hand.Restoration Magic.Cast
+Bot1.Modes(Curaga)
+Bot1.Pass
+Bot2.Pass
+? Turn = 4
+? Bot1.Life = 26
+? Bot1.Battlefield.Count = 4
+[T4 Bot2.End]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 26
+Bot1.Battlefield.Count = 5
+Bot1.Battlefield.Angel.Power = 4
+Bot1.Battlefield.Angel.Toughness = 4
+Bot1.Battlefield.Angel.Colors = White
+Bot1.Battlefield.Angel.Keywords = Flying; Vigilance
+Bot1.Battlefield.Angel.Token = true
