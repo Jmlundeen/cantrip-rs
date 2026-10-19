@@ -376,7 +376,7 @@ if (client is null)
     PlaySiteOptions? playSite = standard.Count == 0 ? null : new PlaySiteOptions { Games = matchmaker, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
 
     LeagueSiteOptions? leagueSite = leagues is null || leagues.Leagues.Count == 0 ? null
-        : new LeagueSiteOptions { Leagues = leagues, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
+        : new LeagueSiteOptions { Leagues = leagues, Client = siteAddress, Art = art, SignIn = signIn, Access = access, Portraits = portraits };
 
     // The deck editor's catalog, and each player's saved decks, kept in the data directory.
     DeckSiteOptions? deckSite = store is null ? null : new DeckSiteOptions { ContentRoot = content, Store = store, SignIn = signIn };

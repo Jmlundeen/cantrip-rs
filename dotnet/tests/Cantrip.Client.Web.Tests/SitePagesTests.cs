@@ -96,12 +96,15 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
             ],
         });
         Assert.Empty(_leagues.Start());
-        var leaguePage = new LeagueSiteOptions { Leagues = _leagues, Client = site, SignIn = signIn };
+        // Bob has a picture; the others are shown by their initial.
+        var portraits = new PortraitStore(store.Root);
+        await portraits.SaveAsync("discord-1002", Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="));
+        var leaguePage = new LeagueSiteOptions { Leagues = _leagues, Client = site, SignIn = signIn, Portraits = portraits };
 
         var home = new HomeSiteOptions { SignIn = signIn, Drafts = queuePage, Constructed = playPage, Leagues = leaguePage, HasDecks = true, Store = store };
         var art = new ArtStore(new ArtStoreOptions { ContentRoot = WebClient.Content, CacheDirectory = WebClient.ArtCache });
         _site = await ClientSite.StartAsync("127.0.0.1", ports[0], built, art, status: status, signIn: signIn, queues: queuePage, play: playPage, home: home, decks: deckPage,
-            before: SignInByHeader, leagues: leaguePage);
+            before: SignInByHeader, leagues: leaguePage, portraits: portraits);
         _address = site;
 
         // Alice's history: a Winston draft she won, and one called off when Bob dropped; and three decks.
@@ -274,6 +277,10 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         Assert.Equal(1, await page.Locator(".pip.loss").CountAsync());
         Assert.True(await page.Locator("table.data tr.me", new PageLocatorOptions { HasText = "Alice" }).First.IsVisibleAsync());
         Assert.True(await page.Locator("td.trophy-count").First.IsVisibleAsync());
+        // Each player by their picture and name, a link to message them on Discord.
+        ILocator bob = page.Locator("table.data a.who", new PageLocatorOptions { HasText = "Bob" });
+        Assert.Equal("https://discord.com/users/1002", await bob.GetAttributeAsync("href"));
+        Assert.True(await bob.Locator("img").EvaluateAsync<bool>("img => img.complete && img.naturalWidth > 0"));
         Assert.Equal(1, await page.Locator("#content .rows .row", new PageLocatorOptions { HasText = "Run #1" }).CountAsync());
         await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "league-run.png"), FullPage = true });
 

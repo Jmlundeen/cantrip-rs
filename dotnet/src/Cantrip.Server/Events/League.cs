@@ -776,7 +776,7 @@ public sealed class League : IMatchHost
             string result = !each.Complete ? "playing" : each.Winners.Contains(run.PlayerId) ? "won" : each.Winners.Count > 0 || each.Forfeit ? "lost" : "drawn";
             return new LeagueRunMatch(opponent, result, each.Detail);
         })];
-        return new LeagueRunView(run.Id, run.Name, run.Entry, run.Stage, wins, losses, draws, run.Ending, status, run.Started, run.Ended,
+        return new LeagueRunView(run.Id, run.PlayerId, run.Name, run.Entry, run.Stage, wins, losses, draws, run.Ending, status, run.Started, run.Ended,
             run.Stage == LeagueRunStage.Drafting ? 0 : PoolDecks.Cards(run.Pool, run.Deck, _cards.Basics).Count, matches);
     }
 
@@ -825,6 +825,7 @@ public sealed record LeagueView(
 /// <param name="Deck">How many cards its main deck has, once built.</param>
 public sealed record LeagueRunView(
     string Id,
+    string PlayerId,
     string Name,
     int Entry,
     LeagueRunStage Stage,
