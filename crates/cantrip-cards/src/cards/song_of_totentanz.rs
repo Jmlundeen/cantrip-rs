@@ -2,19 +2,7 @@ use cantrip_api::*;
 use cantrip_mechanics::tokens;
 use cantrip_oracle as oracle;
 
-/// The 1/1 black Rat creature token with "This token can't block." (CR 111.1, 509.1b).
-pub static RAT: CardDef = CardDef {
-    name: "Rat",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::Black)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Rat]),
-    power: Some(1),
-    toughness: Some(1),
-    keywords: Keywords::of(&[Keyword::CantBlock]),
-    text: "This token can't block.",
-    ..CardDef::BLANK
-};
+use tokens::RAT_CANT_BLOCK as RAT;
 
 /// "Create X 1/1 black Rat creature tokens with 'This token can't block.' Creatures you control gain haste until end of
 /// turn." The tokens come first, as one instruction (CR 101.4), so they are among the creatures you control as the

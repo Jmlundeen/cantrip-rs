@@ -457,6 +457,18 @@ pub const CREATURE_CARD_IN_A_GRAVEYARD: TargetSpec = target(creature_card_in_a_g
 
 /// "Target card from a graveyard". Emperor of Bones, Ghost Vacuum, Keen-Eyed Curator and Lion Sash print it.
 pub const CARD_IN_A_GRAVEYARD: TargetSpec = target(card_in_a_graveyard_filter);
+/// "Target card from an opponent's graveyard" (CR 115.1, 404.1): a card in the graveyard of a player other than the ability's
+/// controller, still that card (CR 400.7). Gollum, the Abandoned and Lord Skitter, Sewer King ("up to one") print it.
+pub fn card_in_an_opponents_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if {
+        let o = q.obj(id);
+        o.zone.is(ZoneKind::Graveyard) && o.zone.player != asker.controller && o.became.is_none()
+    })
+}
+
+/// "Target card from an opponent's graveyard": see `card_in_an_opponents_graveyard`.
+pub const CARD_IN_AN_OPPONENTS_GRAVEYARD: TargetSpec = target(card_in_an_opponents_graveyard);
+
 /// "Target noncreature spell". Spell Pierce and Stubborn Denial print it.
 pub const NONCREATURE_SPELL: TargetSpec = target(noncreature_spell_filter);
 

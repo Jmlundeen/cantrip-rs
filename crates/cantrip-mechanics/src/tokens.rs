@@ -599,6 +599,21 @@ pub static BAT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 black Rat creature token with "This token can't block." (CR 111.1, 509.1b). Song of Totentanz and Lord Skitter,
+/// Sewer King make it; the card file lists it in its `EXTRA`.
+pub static RAT_CANT_BLOCK: CardDef = CardDef {
+    name: "Rat",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Black)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Rat]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::CantBlock]),
+    text: "This token can't block.",
+    ..CardDef::BLANK
+};
+
 /// "This token can't block or be blocked by non-Spirit creatures" (CR 509.1b): of any possible block it is in, the other
 /// creature must be a Spirit, read through the token's words (CR 612).
 fn spirit_blocking(q: &dyn Query, source: ObjectId, blocker: ObjectId, attacker: ObjectId) -> bool {
