@@ -1,0 +1,29 @@
+# Ghalta the Unstoppable: "This spell costs {X} less to cast, where X is the greatest power among creatures you control"
+# (CR 601.2f, 118.7a). Baloth Prime is 10/10, which covers all {8} of the generic cost, so Ghalta is cast for {G} alone
+# and gives its other creatures trample.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Baloth Prime
+Ghalta the Unstoppable
+Forest x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Baloth Prime.Cast
+Bot1.Hand.Ghalta the Unstoppable.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ghalta the Unstoppable.Power = 8
+Bot1.Battlefield.Ghalta the Unstoppable.Toughness = 8
+Bot1.Battlefield.Baloth Prime.Keywords = Trample
+Bot1.Battlefield.Baloth Prime.Power = 10
