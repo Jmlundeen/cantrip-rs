@@ -1,0 +1,33 @@
+# Head of the Hunt: only creatures "an opponent controls" are exiled. Bot1's own Ornithopter, destroyed by its Lightning Bolt, dies
+# into Bot1's graveyard, and no Wolf is made (Exile is empty).
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Head of the Hunt
+Lightning Bolt
+Ornithopter
+Plains x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Head of the Hunt.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
+Bot1.Battlefield.Count = 2
+Stack.Count = 0

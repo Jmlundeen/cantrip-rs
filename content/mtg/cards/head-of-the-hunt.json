@@ -1,0 +1,11 @@
+{
+  "name": "Head of the Hunt",
+  "manaCost": "{2}{B}{B}",
+  "type": "Creature — Wolf",
+  "power": 4,
+  "toughness": 3,
+  "oracleText": "Flash\nIf a creature an opponent controls would die, exile it instead. When you do, create a 2/2 green Wolf creature token.",
+  "keywords": [
+    "Flash"
+  ]
+}

@@ -1,0 +1,41 @@
+# Head of the Hunt: "If a creature an opponent controls would die, exile it instead. When you do, create a 2/2 green Wolf creature
+# token." Bot1's Lightning Bolt destroys Bot2's Ornithopter: it is exiled, not put into the graveyard, and Bot1 gets a Wolf from the
+# reflexive trigger (on the stack above nothing: Stack.Count is 1 when it is put there). Bot2 has nothing in its graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Black Lotus
+Head of the Hunt
+Lightning Bolt
+Plains x16
+
+[Bot2 Deck]
+Ornithopter
+Plains x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Head of the Hunt.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield.Wolf.Power = 2
+Bot1.Battlefield.Wolf.Colors = Green
+Bot1.Battlefield.Count = 3
+Stack.Count = 0
