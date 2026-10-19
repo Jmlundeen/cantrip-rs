@@ -1,0 +1,8 @@
+{
+  "name": "Repurposed Enforcer",
+  "manaCost": "{1}{W}",
+  "type": "Creature — Human Soldier",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Whenever this creature attacks, empower Jace X, where X is the number of creatures you control. (Put that many loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with \"[-1]: Surveil 1\" and \"[-3]: Draw a card.\")"
+}
