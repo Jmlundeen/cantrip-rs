@@ -1,0 +1,42 @@
+# Viashino Pyromancer: "When this creature enters, it deals 2 damage to target player or planeswalker." Bot2's Ajani
+# Resolute enters with 2 loyalty; the trigger's 2 damage removes all of it (CR 120.3c) and Ajani is put into the
+# graveyard as a state-based action (CR 704.5i). Bot2's life total is untouched.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Viashino Pyromancer
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Pearl
+Ajani Resolute
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Ajani Resolute.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Viashino Pyromancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ajani Resolute)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield = Island; Mox Pearl
+Bot2.Graveyard = Ajani Resolute
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Viashino Pyromancer
