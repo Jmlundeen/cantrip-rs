@@ -1,0 +1,44 @@
+# Gallia, the Merrymaker's "{1}{R}, {T}: Put a +1/+1 counter on target CREATURE THAT ENTERED THIS TURN": on turn 3 the
+# Ornithopter cast on turn 1 is refused (it entered an earlier turn), while the one cast this turn takes the counter. The
+# first Ornithopter, with no +1/+1 counter, is not hasty (CR 702.10a, the static).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Gallia, the Merrymaker
+Ornithopter
+Ornithopter
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Gallia, the Merrymaker.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Battlefield.Gallia, the Merrymaker.Activate(Bot1.Battlefield.Ornithopter#1)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Gallia, the Merrymaker.Activate(Bot1.Battlefield.Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying; Haste

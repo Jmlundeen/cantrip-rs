@@ -1,0 +1,11 @@
+{
+  "name": "Gallia, the Merrymaker",
+  "manaCost": "{1}{R}",
+  "type": "Legendary Creature - Satyr",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Haste\nEach other creature you control with a +1/+1 counter on it has haste.\n{1}{R}, {T}: Put a +1/+1 counter on target creature that entered this turn.",
+  "keywords": [
+    "Haste"
+  ]
+}
