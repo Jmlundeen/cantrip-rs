@@ -1,0 +1,12 @@
+{
+  "name": "Traxos, Academy Guardian",
+  "manaCost": "{3}{U}",
+  "type": "Legendary Artifact Creature — Dragon Construct",
+  "power": 1,
+  "toughness": 5,
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ],
+  "oracleText": "This spell costs {2} less to cast if you've cast a noncreature spell this turn.\nFlying, vigilance\nProwess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)"
+}
