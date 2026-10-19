@@ -54,7 +54,7 @@ fn tapped(game: &mut Game, def: &'static CardDef, controller: PlayerId) -> Objec
 }
 
 fn cx(game: &mut Game) -> Cx<'_> {
-    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None }
+    Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
 }
 
 /// The untap step of `active`'s turn: the untap step's turn-based action alone (CR 502.3).
@@ -124,7 +124,7 @@ fn it_untaps_without_a_choice_though_its_controller_may_keep_it_tapped_in_their_
 fn a_stun_counter_is_removed_instead_of_the_untap_in_another_players_untap_step() {
     let mut game = game();
     let skin = tapped(&mut game, &SKIN, YOU);
-    game.state.update_obj(skin, |o| o.counters[CounterKind::Stun as usize] = 1);
+    crate::counters::put(&mut cx(&mut game), skin, CounterKind::Stun, 1, THEM, crate::counters::How::Effect);
     // CR 122.1d: the stun counter's replacement applies to the permanent becoming untapped in any step.
     untap_step_of(&mut game, THEM);
     assert!(is_tapped(&game, skin));
