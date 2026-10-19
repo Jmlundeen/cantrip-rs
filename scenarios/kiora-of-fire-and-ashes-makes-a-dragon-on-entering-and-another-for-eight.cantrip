@@ -1,0 +1,63 @@
+# Kiora of Fire and Ashes: cast on turn 1 with the Lotus and Moxen, its enters trigger makes a 5/5 red Dragon token
+# with flying. On turn 5, with the Moxen untapped and two Mountains, its {8} ability makes a second one.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mana Crypt
+Kiora of Fire and Ashes
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Kiora of Fire and Ashes.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon.Token = true
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Kiora of Fire and Ashes.Activate(Ability: Create)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Dragon#2.Token = true
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Dragon#1.Power = 5
+Bot1.Battlefield.Dragon#1.Keywords = Flying
+Bot1.Battlefield.Dragon#2.Power = 5
+Bot1.Battlefield.Dragon#2.Keywords = Flying
