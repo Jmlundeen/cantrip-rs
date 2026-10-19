@@ -1,0 +1,36 @@
+# Blossom-Blessed Angel's prepare spell Seed Suture puts a +1/+1 counter on a creature and gains 1 life; casting it
+# unprepares the Angel (CR 722.3c).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Blossom-Blessed Angel
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Blossom-Blessed Angel.Cast
+Bot1.Exile.Seed Suture.Cast(Bot1.Battlefield.Blossom-Blessed Angel)
+
+[Expect]
+Bot1.Battlefield.Blossom-Blessed Angel.Power = 3
+Bot1.Battlefield.Blossom-Blessed Angel.Toughness = 5
+Bot1.Life = 21
+Bot1.Battlefield.Blossom-Blessed Angel.Prepared = (absent)
+Exile.Count = 0

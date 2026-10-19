@@ -1,0 +1,18 @@
+{
+  "name": "Blossom-Blessed Angel",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Angel Cleric",
+  "power": 2,
+  "toughness": 4,
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ],
+  "oracleText": "Flying, vigilance\nThis creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "prepare": {
+    "name": "Seed Suture",
+    "manaCost": "{G/W}",
+    "type": "Sorcery",
+    "oracleText": "Put a +1/+1 counter on target creature. You gain 1 life."
+  }
+}
