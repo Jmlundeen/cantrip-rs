@@ -1,0 +1,62 @@
+# Hapatra, the Desert Frost enters (CR 603.6a, 601.2c): its trigger asks for up to one target creature the opponent controls
+# and taps it with a stun counter. On Bot2's untap step the stun counter is removed instead of untapping (CR 122.1d), so it
+# is still tapped; Bot1's {2}{U} ability then untaps it (CR 701.26a). Bot2's Island is refused as a target; a second
+# scenario's opponent choice is defaulted to none.
+
+[Bot1 Deck]
+Island
+Island
+Sol Ring
+Mox Jet
+Mox Sapphire
+Mox Pearl
+Mox Ruby
+Hapatra, the Desert Frost
+Island x12
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hapatra, the Desert Frost.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Hapatra, the Desert Frost.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Hapatra, the Desert Frost.Power = 4
+Bot1.Battlefield.Hapatra, the Desert Frost.Toughness = 3
+Bot2.Battlefield.Ornithopter.Tapped = false
