@@ -993,6 +993,7 @@ symbol loses the choice of 2 life. Reachable with Cruelclaw's Heist, Black Widow
 card with such a symbol. A fix pays it as `ManaCost::paid_with_any_color` does, with colorless mana allowed for {C} too.
 
 **Scenarios.** none yet: Null Summoner exiling a card with {2/W} or a Phyrexian symbol is the first to write.
+
 ### KI-78: The tactical bot attacks a player whom protection keeps from being dealt damage
 
 | Severity | Status | Area | Found |
