@@ -1802,6 +1802,11 @@ pub type DamageByToughnessRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 /// your opponents control" (Patient Zero, Uthgardt Fury) and "from creatures" (Case of the Market Melee) are the same kind.
 pub type DamageStaysRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
 
+/// Whether a static ability untaps this permanent during each untap step of a player other than the ability's controller
+/// (CR 502.3, 611.3a), given the rule's own asker, read before anything untaps: "untap this artifact" (Bender's Waterskin) is
+/// true of its source, "untap all permanents you control" (Seedborn Muse) of every permanent its controller controls.
+pub type OthersUntapRule = fn(&dyn Query, &Asker, ObjectId) -> bool;
+
 /// Whether an ability of this permanent asks of the mana spent where it came from (CR 106.3): whether mana that `source`
 /// produced is told apart from other mana for it, given the rule's own asker. "Using mana produced by [this]" (Barracks of the
 /// Thousand) tells apart its own; "mana from a Treasure" (Kalain, Reclusive Painter) would tell apart a Treasure's.
@@ -2225,6 +2230,14 @@ pub struct CardDef {
     /// "You may choose not to untap this [permanent] during your untap step" (CR 502.3): its controller is asked, as their
     /// untap step untaps their permanents, whether it untaps. Old Man of the Sea, Rubinia Soulsinger, Seasinger print it.
     pub may_not_untap: bool,
+    /// "Untap [this permanent / all permanents you control of a kind] during each other player's untap step" (CR 502.3,
+    /// 611.3a): while it is on the battlefield with its abilities, in each untap step of a player other than its
+    /// controller, the tapped permanents not controlled by the active player that a rule is true of untap, at the same
+    /// time as the active player's, and with no choice (ruling). "Doesn't untap during its controller's untap step" and
+    /// "you may choose not to untap" speak of that player's own untap step, so they don't stop it; a stun counter still
+    /// replaces the untap (CR 122.1d). "This": Bender's Waterskin, Victory Chimes, Endbringer, Thousand Moons Infantry;
+    /// "all permanents you control": Seedborn Muse; of a kind: Prophet of Kruphix, Unwinding Clock, Drumbellower.
+    pub untap_in_others_untap_steps: &'static [OthersUntapRule],
     /// Its static abilities that allow sorcery-speed abilities at instant speed (CR 606.3).
     pub instant_activation: &'static [InstantActivationRule],
     /// Its static abilities that let spells be cast as though they had flash (CR 307.5): "You may cast Aura and Equipment spells
@@ -2365,6 +2378,7 @@ impl CardDef {
         turn_begin: &[],
         lasting: &[],
         may_not_untap: false,
+        untap_in_others_untap_steps: &[],
         instant_activation: &[],
         flash_rules: &[],
         activation_rules: &[],

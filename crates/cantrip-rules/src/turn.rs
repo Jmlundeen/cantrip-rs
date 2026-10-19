@@ -408,18 +408,26 @@ fn skip_turn(cx: &mut Cx, player: PlayerId) -> R<bool> {
 
 /// CR 502.3: the active player's permanents untap, all at once. Except an exerted one, for the untap step it sits out
 /// (CR 701.43a), and one that doesn't untap during its controller's untap step (CR 502.3); and one with a stun counter
-/// has a counter removed from it instead (CR 122.1d).
-fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
+/// has a counter removed from it instead (CR 122.1d). With them, the other players' permanents that a static ability of
+/// a permanent another player controls untaps "during each other player's untap step" (`CardDef::untap_in_others_untap_steps`).
+pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     // CR 502.3: the active player determines which permanents will untap, then they untap together. A permanent whose
     // card says "you may choose not to untap this ... during your untap step" is the active player's to keep tapped:
     // asked of each, in battlefield order, before any untaps.
     let mut untapping = Vec::new();
+    // The permanents of the other players with an ability that untaps permanents during this untap step: a table lookup
+    // per permanent, and nothing more in a game without one.
+    let mut others: Vec<(ObjectId, PlayerId, &'static CardDef)> = Vec::new();
     for id in cx.s().battlefield().to_vec() {
         let obj = cx.s().obj(id);
-        if obj.controller != active || !obj.tapped {
+        if obj.controller != active {
+            let def = cx.card(cx.cards().current(obj));
+            if !def.untap_in_others_untap_steps.is_empty() {
+                others.push((id, obj.controller, def));
+            }
             continue;
         }
-        if obj.marks.exerted_by == Some(active) || cx.chars(id).has(Keyword::DoesNotUntap) {
+        if !obj.tapped || obj.marks.exerted_by == Some(active) || cx.chars(id).has(Keyword::DoesNotUntap) {
             continue;
         }
         if cx.card(cx.cards().current(obj)).may_not_untap && !cx.lost_all_abilities(id) {
@@ -429,6 +437,26 @@ fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
             }
         }
         untapping.push(id);
+    }
+    // "Untap [these] during each other player's untap step" (CR 611.3a): what each rule is true of now, before anything
+    // untaps, untaps with the active player's permanents and is no one's choice (Bender's Waterskin ruling, 2025-10-02).
+    // A permanent of a player who isn't active is outside "doesn't untap during its controller's untap step" (CR 502.3,
+    // 701.43a); a stun counter still replaces its untap (CR 122.1d, `ops::untap`). A source that has lost all its
+    // abilities has no such rule (CR 613.1f).
+    others.retain(|&(id, _, _)| !cx.lost_all_abilities(id));
+    if !others.is_empty() {
+        for id in cx.s().battlefield().to_vec() {
+            let obj = cx.s().obj(id);
+            if obj.controller == active || !obj.tapped {
+                continue;
+            }
+            if others.iter().any(|&(source, controller, def)| {
+                let asker = Asker { source, controller };
+                def.untap_in_others_untap_steps.iter().any(|rule| rule(&*cx, &asker, id))
+            }) {
+                untapping.push(id);
+            }
+        }
     }
     for id in untapping {
         ops::untap(cx, id);

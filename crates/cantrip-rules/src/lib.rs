@@ -22,6 +22,8 @@ mod settle;
 mod speed;
 mod static_rules;
 mod turn;
+#[cfg(test)]
+mod untap_others_tests;
 mod validate;
 
 use cantrip_api::*;
