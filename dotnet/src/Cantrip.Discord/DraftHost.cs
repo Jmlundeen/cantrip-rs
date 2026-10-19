@@ -347,6 +347,58 @@ public sealed class DraftHost : IAsyncDisposable
     }
 
     /// <summary>
+    /// A player drops out of their draft (<see cref="DraftPod.Drop"/>): a draft of two has nothing left to play without
+    /// them, so it is called off - or, with its game being played, the game is forfeited to the other player. One still
+    /// waiting for its second player is simply called off. The table stays up a while for the other player to see why,
+    /// as a finished draft's does. Null once they have dropped; otherwise why not.
+    /// </summary>
+    public async Task<string?> DropAsync(string draftId, DiscordPlayer player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        HostedDraft? draft;
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (!_drafts.TryGetValue(draftId, out draft) || !draft.IsLive) return "That draft is over.";
+            if (!draft.Seats(player.Id)) return "You are not in that draft.";
+            string id = PlayerId(player);
+            if (draft.Pod is { } pod)
+            {
+                if (pod.Drop(id) is { } refusal) return refusal;
+                if (pod.Stage is EventStage.Complete or EventStage.Cancelled) End(draft, pod.Stage, pod.Detail);
+                draft.Detail = pod.Detail;
+            }
+            else if (draft.Guest is null)
+            {
+                End(draft, EventStage.Cancelled, $"{draft.Host.Name} dropped before anyone joined.");
+            }
+            else
+            {
+                // Made, but with no table free yet to host it: dropped in the data directory, where it would be hosted from.
+                DraftPod waiting;
+                try
+                {
+                    waiting = DraftPod.Open(_options.Store, draft.Id, ContentCache.Get(_options.ContentRoot), _options.TimeProvider);
+                }
+                catch (Exception error) when (error is InvalidOperationException or IOException or System.Text.Json.JsonException)
+                {
+                    return error.Message;
+                }
+
+                if (waiting.Drop(id) is { } refusal) return refusal;
+                End(draft, waiting.Stage, waiting.Detail);
+            }
+        }
+        finally
+        {
+            _gate.Release();
+        }
+
+        await Raise(draft).ConfigureAwait(false);
+        return null;
+    }
+
+    /// <summary>
     /// Drops drafts that never got a second player and closes finished ones once their result has been seen. A draft
     /// under way is never expired here: its own clocks (<see cref="DraftTiming"/>) see that it ends.
     /// </summary>
@@ -572,11 +624,34 @@ public sealed class DraftHost : IAsyncDisposable
     /// A player's live draft, if they have one: one this host knows, or one their record in the data directory says they
     /// are in that is still live there.
     /// </summary>
-    private HostedDraft? Active(ulong player) =>
-        _drafts.Values.FirstOrDefault(draft => draft.IsLive && draft.Seats(player))
-        ?? _options.Store.LoadPlayer(PlayerId(new DiscordPlayer(player, string.Empty)))?.Events
-            .Select(entry => _drafts.GetValueOrDefault(entry.EventId))
-            .FirstOrDefault(draft => draft is { IsLive: true });
+    private HostedDraft? Active(ulong player)
+    {
+        // A player who has dropped from a draft is in it no more, though it plays on a moment to its end.
+        string id = PlayerId(new DiscordPlayer(player, string.Empty));
+        return _drafts.Values.FirstOrDefault(draft => draft.IsLive && draft.Seats(player) && draft.Pod?.HasDropped(id) != true)
+            ?? _options.Store.LoadPlayer(id)?.Events
+                .Select(entry => _drafts.GetValueOrDefault(entry.EventId))
+                .FirstOrDefault(draft => draft is { IsLive: true } && draft.Pod?.HasDropped(id) != true);
+    }
+
+    /// <summary>Whether a draft being played is this host's, by its event id.</summary>
+    public bool Hosts(string eventId)
+    {
+        _gate.Wait();
+        try { return _drafts.TryGetValue(eventId, out HostedDraft? draft) && draft.IsLive; }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>
+    /// The drafts opened from Discord that a player has started and nobody has joined yet: no event is made until someone
+    /// does, so the data directory has nothing of them.
+    /// </summary>
+    public IReadOnlyList<HostedDraft> Waiting(ulong player)
+    {
+        _gate.Wait();
+        try { return [.. _drafts.Values.Where(draft => draft.IsLive && draft.Guest is null && draft.Host.Id == player)]; }
+        finally { _gate.Release(); }
+    }
 
     /// <summary>
     /// A fresh ticket to the live draft a player is in, found from their record in the data directory: how a player

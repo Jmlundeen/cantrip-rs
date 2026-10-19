@@ -63,10 +63,7 @@ public static class PlaySite
         }).ToList();
 
         app.MapGet($"/{Route}", (HttpContext context) =>
-        {
-            context.Response.Headers.CacheControl = "no-cache";
-            return Results.Content(Page.Value, "text/html; charset=utf-8");
-        });
+            SiteChrome.For(context).Page(context, Page.Value, SiteSection.Constructed));
 
         app.MapGet($"/{Route}/api/board", (HttpContext context) =>
         {

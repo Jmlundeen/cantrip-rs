@@ -1,6 +1,7 @@
 using Cantrip.Art;
 using Cantrip.Server.Events;
 using Cantrip.Server.Host;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,8 @@ namespace Cantrip.Discord;
 /// </summary>
 internal static class ClientSite
 {
+    private static readonly Lazy<string> NotFound = new(() => SiteChrome.Resource("notfound.html"));
+
     /// <summary>The link a player clicks: the client, with the table and art in its query and the ticket after the hash.</summary>
     /// <param name="art">Where card art is, as the client's <c>?art=</c> takes it; null leaves the client to its default.</param>
     public static Uri Link(Uri client, Uri address, string ticket, Uri? art) => new UriBuilder(client)
@@ -42,30 +45,55 @@ internal static class ClientSite
     /// the deck editor's catalog and each player's saved decks at <c>/decks</c> (<see cref="DeckSite"/>) - each signing players in
     /// with <paramref name="signIn"/> (<see cref="SiteSignIn"/>). The bare address is the home page (<see cref="HomeSite.LandingPage"/>).
     /// </summary>
+    /// <param name="before">For a test: run first on every request - to sign a test player in, say. Null for nothing.</param>
     public static async Task<WebApplication> StartAsync(string listen, int port, string root, ArtStore art, IReadOnlySet<int>? tables = null, PortraitStore? portraits = null,
-        EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null, TableAccess? access = null, HomeSiteOptions? home = null, DeckSiteOptions? decks = null)
+        EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null, TableAccess? access = null, HomeSiteOptions? home = null, DeckSiteOptions? decks = null,
+        Func<HttpContext, Func<Task>, Task>? before = null)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls($"http://{listen}:{port}");
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
         builder.Services.AddRouting();
         if (signIn is not null) builder.Services.AddSiteSignIn(signIn);
+
+        // One menu bar for every page: the sections this site serves, and whether anyone can sign in.
+        var chrome = new SiteChrome
+        {
+            SignIn = signIn?.Enabled == true,
+            Drafts = queues is not null,
+            Constructed = play is not null,
+            Decks = decks is not null,
+            Events = status is not null,
+        };
+        builder.Services.AddSingleton(chrome);
         WebApplication app = builder.Build();
+        if (before is not null) app.Use(before);
 
         // A ping every 30 seconds: a tunnel or proxy in front (Cloudflare closes a WebSocket silent for 100 seconds) would
         // otherwise drop a player who is only thinking - over a pile, or a deck.
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(30) });
 
-        // The site's front door is the bare address. The client is at the same address with a table in its query
-        // (see Link), so a request with a query goes on to it and a seat's link opens as it always did.
-        app.Use((context, next) =>
+        // The site's front door is the bare address: for a player signed in, their own page. The client is at the same
+        // address with a table in its query (see Link), so a request with a query goes on to it and a seat's link opens
+        // as it always did.
+        app.Use(async (context, next) =>
         {
             if (HttpMethods.IsGet(context.Request.Method) && context.Request.Path == "/" && !context.Request.QueryString.HasValue)
             {
-                return HomeSite.LandingPage(context).ExecuteAsync(context);
+                if (signIn?.Enabled == true && context.User.Identity?.IsAuthenticated != true)
+                {
+                    AuthenticateResult signedIn = await context.AuthenticateAsync().ConfigureAwait(false);
+                    if (signedIn.Succeeded) context.User = signedIn.Principal;
+                }
+
+                IResult page = home is not null && SiteSignIn.Account(context) is not null
+                    ? Results.Redirect(context.Request.PathBase + "/" + HomeSite.Route)
+                    : HomeSite.LandingPage(context);
+                await page.ExecuteAsync(context).ConfigureAwait(false);
+                return;
             }
 
-            return next(context);
+            await next(context).ConfigureAwait(false);
         });
         app.UseWebClient(root);
         app.UseRouting();
@@ -84,7 +112,7 @@ internal static class ClientSite
 
         if (status is not null)
         {
-            app.MapEventStatus(status);
+            app.MapEventStatus(status, (context, page) => chrome.Page(context, page, SiteSection.Events));
         }
 
         if (signIn is not null)
@@ -93,6 +121,15 @@ internal static class ClientSite
         }
 
         app.MapGet("/" + HomeSite.LogoRoute, HomeSite.Logo);
+        app.MapGet("/" + SiteChrome.StyleRoute, (HttpContext context) => SiteChrome.Asset(context, SiteChrome.StyleRoute));
+        app.MapGet("/" + SiteChrome.ScriptRoute, (HttpContext context) => SiteChrome.Asset(context, SiteChrome.ScriptRoute));
+        if (home is null) app.MapGet("/" + HomeSite.AboutRoute, HomeSite.LandingPage);
+
+        // Anything else asked for as a page is not there: said so in the site's own page, with the way on.
+        app.MapFallback((HttpContext context) =>
+            HttpMethods.IsGet(context.Request.Method) && !context.Request.Path.Value!.Contains("/api/", StringComparison.Ordinal)
+                ? chrome.Page(context, NotFound.Value, SiteSection.None, StatusCodes.Status404NotFound)
+                : Results.NotFound());
 
         // The pages' names before they were /draft and /constructed, which links already sent are still to.
         app.MapGet("/queue", () => Results.Redirect("/" + QueueSite.Route, permanent: true));

@@ -4,161 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cantrip - Constructed Play</title>
-<link rel="icon" href="data:,">
-<style>
-:root {
-  --window: #111318;
-  --bar: #191c22;
-  --panel: #1d2127;
-  --panel-hi: #242930;
-  --line: #2c313a;
-  --control: #2a303a;
-  --control-hover: #353c48;
-  --control-border: #3a4250;
-  --fg: #e8eaee;
-  --fg-soft: #a6adb8;
-  --fg-muted: #6c7482;
-  --on-accent: #17130a;
-  --accent: #f1b44c;
-  --accent-hover: #f6c66e;
-  --ready: #6fcf8f;
-  --danger: #e5534b;
-  --hover: #8ec9ff;
-  --discord: #5865f2;
-  color-scheme: dark;
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; }
-body {
-  background: var(--window);
-  color: var(--fg);
-  font: 14px/1.45 "Segoe UI", -apple-system, BlinkMacSystemFont, Inter, Roboto, "Helvetica Neue", sans-serif;
-  min-height: 100vh;
-}
-button, input, select { font: inherit; color: inherit; }
-a { color: var(--hover); }
-.num { font-variant-numeric: tabular-nums; }
-
-header.top {
-  position: sticky; top: 0; z-index: 5;
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-  padding: 12px 24px; background: var(--bar); border-bottom: 1px solid var(--line);
-}
-header.top h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: .2px; }
-header.top h1 span { color: var(--accent); }
-header.top nav a { color: var(--fg-soft); text-decoration: none; font-size: 13px; }
-header.top nav a:hover { color: var(--fg); }
-header.top .who { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-soft); }
-header.top .who strong { color: var(--fg); font-weight: 600; }
-
-main { max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
-
-.notice {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  background: var(--panel); border: 1px solid var(--accent); border-radius: 6px; padding: 10px 14px; margin-bottom: 20px;
-}
-.notice.error { border-color: var(--danger); }
-.notice .grow { flex: 1; min-width: 200px; }
-
-section.format { margin-bottom: 36px; }
-section.format > .heading { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
-section.format > .heading h2 { margin: 0; font-size: 18px; font-weight: 600; }
-section.format > .heading .count { color: var(--fg-muted); font-size: 14px; }
-section.format > .heading button { margin-left: auto; }
-section.format > .about { color: var(--fg-soft); font-size: 13px; margin: 0 0 12px; }
-
-.group { margin-bottom: 16px; }
-.group h3 {
-  margin: 0 0 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--fg-soft);
-}
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.card.mine { border-color: var(--accent); }
-.card .head { display: flex; align-items: baseline; gap: 8px; }
-.card .name { font-weight: 600; font-size: 15px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card .meta { color: var(--fg-soft); font-size: 13px; }
-.card .foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.card .foot .what { color: var(--accent); font-weight: 600; flex: 1; }
-.card .foot a.more { color: var(--fg-muted); font-size: 13px; text-decoration: none; }
-.card .foot a.more:hover { color: var(--fg); }
-.players { display: flex; flex-wrap: wrap; gap: 4px; }
-.chip {
-  display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px;
-  background: var(--control); border: 1px solid var(--control-border); color: var(--fg); white-space: nowrap;
-  max-width: 100%; overflow: hidden; text-overflow: ellipsis;
-}
-.chip.open { color: var(--fg-muted); border-style: dashed; border-color: var(--control-border); background: transparent; }
-.chip.bot { color: var(--fg-soft); border-color: var(--line); background: transparent; }
-.chip.dropped { color: var(--fg-muted); text-decoration: line-through; }
-.badge {
-  display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: .4px;
-  text-transform: uppercase; background: rgba(166,173,184,.14); color: var(--fg-soft); white-space: nowrap;
-}
-.badge.Checking { background: rgba(111,207,143,.14); color: var(--ready); }
-.badge.Drafting { background: rgba(241,180,76,.16); color: var(--accent); }
-.badge.DeckBuilding { background: rgba(142,201,255,.14); color: var(--hover); }
-.badge.Playing { background: rgba(111,207,143,.14); color: var(--ready); }
-.empty { color: var(--fg-muted); padding: 4px 0 8px; }
-
-button.plain, button.primary, button.discord, a.button {
-  border-radius: 4px; padding: 6px 14px; cursor: pointer; border: 1px solid var(--control-border);
-  background: var(--control); text-decoration: none; display: inline-block; font-size: 14px; color: var(--fg);
-}
-button.plain:hover, a.button:hover { background: var(--control-hover); }
-button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
-button.primary:hover { background: var(--accent-hover); }
-button.discord { background: var(--discord); border-color: var(--discord); color: #fff; font-weight: 600; }
-button:disabled { opacity: .5; cursor: default; }
-button:focus-visible, a.button:focus-visible { outline: 2px solid var(--hover); outline-offset: 1px; }
-
-dialog {
-  background: var(--window); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 0;
-  width: min(520px, calc(100vw - 32px));
-}
-dialog::backdrop { background: rgba(0,0,0,.55); }
-dialog form { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
-dialog h2 { margin: 0; font-size: 18px; font-weight: 600; }
-dialog .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-dialog label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--fg-soft); }
-dialog label.wide { grid-column: 1 / -1; }
-dialog select, dialog input {
-  background: var(--control); border: 1px solid var(--control-border); border-radius: 4px; padding: 6px 8px; width: 100%;
-}
-dialog select:focus, dialog input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
-dialog .hint { color: var(--fg-muted); font-size: 12px; margin: 0; }
-dialog .error { color: var(--danger); margin: 0; min-height: 1em; }
-dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
-
-@media (max-width: 600px) {
-  header.top { padding: 10px 16px; }
-  main { padding: 16px 16px 48px; }
-  .cards { grid-template-columns: 1fr; }
-}
-</style>
+<!--site:head-->
 </head>
-<body>
-<header class="top">
-  <h1><span>Cantrip</span> Constructed Play</h1>
-  <nav><a href="./">Home</a> &middot; <a href="draft">Draft</a> &middot; <a href="status">Server status</a></nav>
-  <div class="who" id="who"></div>
-</header>
-<main>
-  <div id="notices"></div>
-  <div id="formats"></div>
+<body data-page="constructed">
+<!--site:header-->
+<main id="main" class="wide">
+  <div class="page-head">
+    <div class="titles">
+      <h1>Constructed</h1>
+      <p class="lead">One-on-one games, each player bringing a deck of their choosing. Set up a game and wait for an opponent, or join one that is waiting.</p>
+    </div>
+  </div>
+  <div id="formats" aria-live="polite"><p class="hint">Loading the games&hellip;</p></div>
 </main>
+<!--site:footer-->
 
-<dialog id="deck">
+<dialog id="deck" aria-labelledby="deck-title">
   <form method="dialog" id="deck-form">
     <h2 id="deck-title">Choose your deck</h2>
     <div class="fields">
-      <label class="wide">Deck<select name="deck" id="deck-select"></select></label>
+      <label class="field wide">Deck<select name="deck" id="deck-select"></select></label>
     </div>
     <p class="hint" id="deck-hint"></p>
-    <p class="error" id="deck-error" role="alert"></p>
+    <p class="form-error" id="deck-error" role="alert"></p>
     <div class="actions">
-      <button type="button" class="plain" id="deck-random">Random deck</button>
-      <button type="button" class="plain" id="deck-cancel">Cancel</button>
-      <button type="submit" class="primary" id="deck-submit">Sit down</button>
+      <button type="button" class="button quiet" id="deck-random">Random deck</button>
+      <button type="button" class="button" id="deck-cancel">Cancel</button>
+      <button type="submit" class="button primary" id="deck-submit">Sit down</button>
     </div>
   </form>
 </dialog>
@@ -176,55 +48,36 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
   const STAGES = { Open: "Waiting", Seated: "Seated", Playing: "Playing" };
 
   let board = null;
-  let failure = null;
   let picking = null;
   let busy = false;
 
   const $ = id => document.getElementById(id);
-  const esc = text => String(text ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  const plural = (n, one, many) => `${n} ${n === 1 ? one : (many ?? one + "s")}`;
+  const { esc, plural, toast } = window.Cantrip;
   const seated = () => Boolean(board?.me?.game);
 
   function gameCard(g) {
     const mine = board.me?.game === g.id;
-    const chips = g.players.map(name => `<span class="chip">${esc(name)}</span>`);
+    const chips = g.players.map(name => `<span class="chip${name === board.me?.name ? " me" : ""}">${esc(name)}</span>`);
     if (g.players.length < 2) chips.push(`<span class="chip open">Open seat</span>`);
-    const what = g.stage === "Open" ? "Waiting for an opponent" : g.stage === "Seated" ? "Waiting for both players to sit down" : "Playing";
+    const what = g.stage === "Open" ? "Waiting for an opponent" : g.stage === "Seated" ? "Waiting for both players to sit down" : "Being played";
     let action = "";
     if (mine) {
-      action = `<button class="primary" data-open="${esc(g.id)}">Open my game</button>`;
-      if (g.stage === "Open") action = `<button class="plain" data-cancel="${esc(g.id)}">Cancel</button>` + action;
+      action = `<button type="button" class="button primary small" data-open="${esc(g.id)}">Open my game</button>`;
+      if (g.stage === "Open") action = `<button type="button" class="button quiet small" data-cancel="${esc(g.id)}">Call off</button>` + action;
     } else if (g.stage === "Open" && !seated()) {
-      action = `<button class="primary" data-join="${esc(g.id)}">Join</button>`;
+      action = `<button type="button" class="button primary small" data-join="${esc(g.id)}">Join</button>`;
     }
     return `<div class="card${mine ? " mine" : ""}">
-      <div class="head"><span class="name">${esc(g.players.join(" vs "))}</span><span class="badge ${g.stage === "Playing" ? "Playing" : ""}">${esc(STAGES[g.stage] ?? g.stage)}</span></div>
+      <div class="head"><span class="name">${esc(g.players.length === 1 ? `${g.players[0]}'s game` : g.players.join(" vs "))}</span><span class="badge ${g.stage === "Playing" ? "Playing" : ""}">${esc(STAGES[g.stage] ?? g.stage)}</span></div>
       <div class="players">${chips.join("")}</div>
       <div class="foot"><span class="what">${esc(what)}</span>${action}</div>
     </div>`;
   }
 
-  function renderWho() {
-    const who = $("who");
-    if (!board) { who.innerHTML = ""; return; }
-    if (board.me) who.innerHTML = `Signed in as <strong>${esc(board.me.name)}</strong> <button class="plain" id="signout">Sign out</button>`;
-    else if (board.signIn) who.innerHTML = `<button class="discord" id="signin">Sign in with Discord</button>`;
-    else who.innerHTML = `<span>Sign-in isn't set up on this server</span>`;
-  }
-
-  function renderNotices() {
-    const notes = [];
-    if (failure) notes.push(`<div class="notice error"><span class="grow">${esc(failure)}</span><button class="plain" data-dismiss>Dismiss</button></div>`);
-    if (board?.me?.game) {
-      notes.push(`<div class="notice"><span class="grow">You have a seat in a game.</span><button class="primary" data-open="${esc(board.me.game)}">Open my game</button></div>`);
-    }
-    $("notices").innerHTML = notes.join("");
-  }
-
-  function renderFormats() {
+  function render() {
     if (!board) return;
     if (!board.formats.length) {
-      $("formats").innerHTML = `<div class="empty">This server hosts no constructed games.</div>`;
+      $("formats").innerHTML = `<div class="empty"><p>This server hosts no constructed games right now.</p><div class="actions"><a class="button primary" href="draft">Find a draft instead</a></div></div>`;
       return;
     }
     $("formats").innerHTML = board.formats.map(f => {
@@ -232,68 +85,37 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
       const games = board.games.filter(g => g.format === f.key);
       const open = games.filter(g => g.stage === "Open");
       const playing = games.filter(g => g.stage !== "Open");
-      return `<section class="format" aria-labelledby="h-${esc(f.key)}">
-        <div class="heading">
-          <h2 id="h-${esc(f.key)}">${esc(about.title)} <span class="count">${esc(about.players)}</span></h2>
-          <span class="count">${games.length === 0 ? "" : `${plural(open.length, "game")} waiting · ${playing.length} being played`}</span>
-          <button class="plain" data-create="${esc(f.key)}">New Game</button>
+      return `<section class="block" aria-labelledby="h-${esc(f.key)}">
+        <div class="block-head">
+          <h2 id="h-${esc(f.key)}">${esc(about.title)}</h2><span class="count">${esc(about.players)}${games.length === 0 ? "" : ` · ${plural(open.length, "game")} waiting · ${playing.length} being played`}</span>
+          <div class="actions"><button type="button" class="button primary small" data-create="${esc(f.key)}" ${seated() ? "disabled title=\"You are in a game already\"" : ""}>New game</button></div>
         </div>
         <p class="about">${esc(about.about)} ${plural(f.decks.length, "deck")} to choose from.</p>
         <div class="group"><h3>Waiting for an opponent</h3>
-          ${open.length ? `<div class="cards">${open.map(gameCard).join("")}</div>` : `<div class="empty">Nobody is waiting. Start a game with New Game.</div>`}
+          ${open.length ? `<div class="cards">${open.map(gameCard).join("")}</div>` : `<div class="empty small">Nobody is waiting. Start a game with <strong>New game</strong>, and it's listed here for an opponent to join.</div>`}
         </div>
         ${playing.length ? `<div class="group"><h3>Being played</h3><div class="cards">${playing.map(gameCard).join("")}</div></div>` : ""}
       </section>`;
     }).join("");
   }
 
-  function render() {
-    renderWho();
-    renderNotices();
-    renderFormats();
-  }
-
   async function refresh() {
-    try {
-      const response = await fetch("constructed/api/board", { cache: "no-store", credentials: "same-origin" });
-      if (!response.ok) throw new Error(`${response.status}`);
-      board = (await response.json()).value;
-    } catch {
-      return;
-    }
+    try { board = await window.Cantrip.getJson("constructed/api/board"); } catch { return; }
     if (!busy) render();
   }
 
   function needsSignIn() {
     if (board?.me) return false;
-    if (board?.signIn) location.assign("signin?then=constructed");
-    else { failure = "Sign-in isn't set up on this server, so nobody can play from this page."; render(); }
+    if (board?.signIn) window.Cantrip.signIn("constructed");
+    else toast("Nobody can sign in on this server, so nobody can play from this page.", "error");
     return true;
-  }
-
-  async function post(path, body) {
-    const response = await fetch(path, {
-      method: "POST", credentials: "same-origin", cache: "no-store",
-      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body ?? {}),
-    });
-    if (response.status === 401) { location.assign("signin?then=constructed"); return null; }
-    if (!response.ok) throw new Error(`The server said ${response.status}.`);
-    return (await response.json()).value;
   }
 
   // Goes to the seat in this tab; returns why not.
   async function seat(path, body) {
     if (needsSignIn() || busy) return null;
     busy = true;
-    try {
-      const answer = await post(path, body);
-      if (answer?.link) { location.assign(answer.link); return null; }
-      return answer?.refusal ?? null;
-    } catch (error) {
-      return error.message || "The server could not be reached.";
-    } finally {
-      busy = false;
-    }
+    try { return await window.Cantrip.seat(path, body); } finally { busy = false; }
   }
 
   // The deck picker, for a new game or a seat at one: the choice is remembered for next time, in this browser only.
@@ -334,35 +156,24 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 10px; }
 
   document.addEventListener("click", async event => {
     const target = event.target.closest("button");
-    if (!target || target.disabled || target.closest("dialog")) return;
-    if (target.id === "signin") location.assign("signin?then=constructed");
-    else if (target.id === "signout") {
-      try { await post("signout"); } catch { /* signed out or not, the board says */ }
-      await refresh();
-    }
-    else if (target.dataset.join) pick(board.games.find(g => g.id === target.dataset.join)?.format, target.dataset.join);
+    if (!target || target.disabled || !target.closest("#formats")) return;
+    if (target.dataset.join) pick(board.games.find(g => g.id === target.dataset.join)?.format, target.dataset.join);
     else if (target.dataset.open) {
       const refusal = await seat("constructed/api/join", { game: target.dataset.open });
-      if (refusal) { failure = refusal; render(); }
+      if (refusal) toast(refusal, "error");
     }
     else if (target.dataset.cancel) {
+      if (!await window.Cantrip.confirm({ title: "Call off your game?", body: ["Nobody has joined it yet."], confirmLabel: "Call it off", danger: true })) return;
       try {
-        const answer = await post("constructed/api/cancel", { game: target.dataset.cancel });
-        failure = answer?.refusal ?? null;
+        const answer = await window.Cantrip.post("constructed/api/cancel", { game: target.dataset.cancel });
+        if (answer?.refusal) toast(answer.refusal, "error"); else if (answer) toast("Your game was called off.");
       } catch (error) {
-        failure = error.message;
+        toast(error.message, "error");
       }
       await refresh();
-      render();
     }
     else if (target.dataset.create) pick(target.dataset.create, null);
-    else if ("dismiss" in target.dataset) { failure = null; render(); }
   });
-
-  if (new URLSearchParams(location.search).get("signin") === "failed") {
-    failure = "Signing in with Discord didn't go through. Try again.";
-    history.replaceState(null, "", location.pathname);
-  }
 
   refresh();
   setInterval(refresh, 3000);

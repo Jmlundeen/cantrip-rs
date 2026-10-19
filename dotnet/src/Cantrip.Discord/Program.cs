@@ -120,6 +120,10 @@ if (client is null)
 Uri? pages = client is null ? publicUrl ?? new Uri($"http://{publicHost}:{webPort}/") : null;
 Cantrip.Server.Host.ReturnPage? draftPage = pages is null ? null : new Cantrip.Server.Host.ReturnPage(new Uri(pages, QueueSite.Route), "Draft Queues");
 
+// A booster pod's own table goes back to the player's page, which lists the pod among their events: from the final
+// standings, or once they have dropped.
+Cantrip.Server.Host.ReturnPage? homePage = pages is null ? null : new Cantrip.Server.Host.ReturnPage(new Uri(pages, HomeSite.Route), "your page");
+
 string? content = StringArg(args, "--content") ?? FindUp("content", "mtg");
 string? decks = FindUp("decks");
 if (content is null || decks is null)
@@ -225,6 +229,7 @@ if (EventStore.Configured(args) is { } data)
             TableAddress = tableAddress,
             Portraits = portraitPaths,
             Art = art,
+            Return = homePage,
         });
         Console.WriteLine($"{await pods.ResumeAsync()} booster draft(s) taken up again.");
 
@@ -344,7 +349,7 @@ if (client is null)
     string artCache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
     web = await ClientSite.StartAsync(listen, webPort, root, new Cantrip.Art.ArtStore(new Cantrip.Art.ArtStoreOptions { ContentRoot = content, CacheDirectory = artCache }),
         publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite, access,
-        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, HasDecks = deckSite is not null }, deckSite);
+        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, HasDecks = deckSite is not null, Store = store }, deckSite);
     client = siteAddress;
     Console.WriteLine($"Serving the web client from {root}; the server's status at {new Uri(client, Cantrip.Server.Host.StatusSite.Route)}.");
     if (queueSite is not null) Console.WriteLine($"The draft queue page at {queuePage}.");

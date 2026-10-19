@@ -112,6 +112,37 @@ public sealed class DraftHostTests : IDisposable
     }
 
     [Fact]
+    public async Task A_player_who_drops_calls_the_draft_off_for_both_and_is_free_to_join_another()
+    {
+        await using DraftHost host = Create();
+        DraftSeating opened = await host.OpenAsync(Alice);
+        await host.JoinAsync(opened.Draft!.Id, Bob);
+        Assert.True(host.Hosts(opened.Draft.Id));
+        Assert.True(host.InDraft(Bob.Id));
+
+        Assert.Equal("You are not in that draft.", await host.DropAsync(opened.Draft.Id, Carol));
+        Assert.Null(await host.DropAsync(opened.Draft.Id, Bob));
+
+        // Over for both, kept so, and neither is in a draft any more.
+        EventRecord record = new EventStore(_data).LoadEvent(opened.Draft.Id)!;
+        Assert.Equal(EventStage.Cancelled, record.Stage);
+        Assert.Equal("Bob dropped from the draft.", record.Detail);
+        Assert.True(record.Participant(DraftHost.PlayerId(Bob))!.Dropped);
+        Assert.False(host.Hosts(opened.Draft.Id));
+        Assert.False(host.InDraft(Bob.Id));
+        Assert.False(host.InDraft(Alice.Id));
+        Assert.Equal("That draft is over.", await host.DropAsync(opened.Draft.Id, Alice));
+        Assert.Null((await host.OpenAsync(Bob)).Refusal);
+
+        // A draft still waiting for its second player is simply called off.
+        DraftSeating waiting = await host.OpenAsync(Carol);
+        Assert.Equal([waiting.Draft!.Id], host.Waiting(Carol.Id).Select(draft => draft.Id));
+        Assert.Null(await host.DropAsync(waiting.Draft.Id, Carol));
+        Assert.Empty(host.Waiting(Carol.Id));
+        Assert.False(host.InDraft(Carol.Id));
+    }
+
+    [Fact]
     public async Task Only_the_host_or_a_moderator_cancels_and_the_event_is_kept_as_cancelled()
     {
         await using DraftHost host = Create();

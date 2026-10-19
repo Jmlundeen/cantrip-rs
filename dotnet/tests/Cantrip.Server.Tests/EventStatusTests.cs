@@ -277,6 +277,10 @@ public sealed class EventStatusTests : IDisposable
     [Fact]
     public void The_status_page_is_built_into_the_host()
     {
-        Assert.Contains("<title>Cantrip - Server Status</title>", StatusSite.Html, StringComparison.Ordinal);
+        Assert.Contains("<title>Cantrip - Events</title>", StatusSite.Html, StringComparison.Ordinal);
+
+        // Served inside the site's own menu bar and footer, which fill these in.
+        foreach (string marker in new[] { "<!--site:head-->", "<!--site:header-->", "<!--site:footer-->" })
+            Assert.Contains(marker, StatusSite.Html, StringComparison.Ordinal);
     }
 }

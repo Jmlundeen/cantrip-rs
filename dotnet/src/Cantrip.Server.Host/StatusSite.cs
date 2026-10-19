@@ -34,13 +34,18 @@ public static class StatusSite
     /// <summary>The page itself, for a test to see it is there.</summary>
     internal static string Html => Page.Value;
 
-    public static IEndpointRouteBuilder MapEventStatus(this IEndpointRouteBuilder app, EventStatusBoard board)
+    /// <param name="frame">
+    /// Serves the page inside the site it is part of - its menu bar and footer, filled in for its markers
+    /// (<c>&lt;!--site:head--&gt;</c>, <c>&lt;!--site:header--&gt;</c>, <c>&lt;!--site:footer--&gt;</c>); null serves it as it stands.
+    /// </param>
+    public static IEndpointRouteBuilder MapEventStatus(this IEndpointRouteBuilder app, EventStatusBoard board, Func<HttpContext, string, IResult>? frame = null)
     {
         ArgumentNullException.ThrowIfNull(app);
         ArgumentNullException.ThrowIfNull(board);
 
         app.MapGet($"/{Route}", (HttpContext context) =>
         {
+            if (frame is not null) return frame(context, Page.Value);
             context.Response.Headers.CacheControl = "no-cache";
             return Results.Content(Page.Value, "text/html; charset=utf-8");
         });

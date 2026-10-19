@@ -3,254 +3,215 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cantrip - My Games</title>
-<link rel="icon" href="data:,">
+<title>Cantrip - Home</title>
+<!--site:head-->
 <style>
-:root {
-  --window: #111318;
-  --bar: #191c22;
-  --panel: #1d2127;
-  --line: #2c313a;
-  --control: #2a303a;
-  --control-hover: #353c48;
-  --control-border: #3a4250;
-  --fg: #e8eaee;
-  --fg-soft: #a6adb8;
-  --fg-muted: #6c7482;
-  --on-accent: #17130a;
-  --accent: #f1b44c;
-  --accent-hover: #f6c66e;
-  --ready: #6fcf8f;
-  --danger: #e5534b;
-  --hover: #8ec9ff;
-  --discord: #5865f2;
-  color-scheme: dark;
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; }
-body {
-  background: var(--window);
-  color: var(--fg);
-  font: 14px/1.45 "Segoe UI", -apple-system, BlinkMacSystemFont, Inter, Roboto, "Helvetica Neue", sans-serif;
-  min-height: 100vh;
-}
-button { font: inherit; color: inherit; }
-a { color: var(--hover); }
-
-header.top {
-  position: sticky; top: 0; z-index: 5;
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-  padding: 12px 24px; background: var(--bar); border-bottom: 1px solid var(--line);
-}
-header.top h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: .2px; }
-header.top h1 span { color: var(--accent); }
-header.top nav a { color: var(--fg-soft); text-decoration: none; font-size: 13px; }
-header.top nav a:hover { color: var(--fg); }
-header.top .who { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-soft); }
-header.top .who strong { color: var(--fg); font-weight: 600; }
-
-main { max-width: 960px; margin: 0 auto; padding: 20px 24px 60px; }
-
-.notice {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  background: var(--panel); border: 1px solid var(--danger); border-radius: 6px; padding: 10px 14px; margin-bottom: 20px;
-}
-.notice .grow { flex: 1; min-width: 200px; }
-
-section { margin-bottom: 32px; }
-section > h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
-section > .about { color: var(--fg-soft); font-size: 13px; margin: 0 0 12px; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.card.mine { border-color: var(--accent); }
-.card .head { display: flex; align-items: baseline; gap: 8px; }
-.card .name { font-weight: 600; font-size: 15px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card .meta { color: var(--fg-soft); font-size: 13px; }
-.card .foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.card .foot .what { color: var(--accent); font-weight: 600; flex: 1; }
-.badge {
-  display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: .4px;
-  text-transform: uppercase; background: rgba(166,173,184,.14); color: var(--fg-soft); white-space: nowrap;
-}
-.badge.live { background: rgba(111,207,143,.14); color: var(--ready); }
-.empty { color: var(--fg-muted); padding: 4px 0 8px; }
-
-button.plain, button.primary, button.discord, a.button {
-  border-radius: 4px; padding: 6px 14px; cursor: pointer; border: 1px solid var(--control-border);
-  background: var(--control); text-decoration: none; display: inline-block; font-size: 14px; color: var(--fg);
-}
-button.plain:hover, a.button:hover { background: var(--control-hover); }
-button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
-button.primary:hover { background: var(--accent-hover); }
-button.discord { background: var(--discord); border-color: var(--discord); color: #fff; font-weight: 600; }
-button:disabled { opacity: .5; cursor: default; }
-button:focus-visible, a.button:focus-visible { outline: 2px solid var(--hover); outline-offset: 1px; }
-
-.signin { text-align: center; padding: 56px 0; }
-.signin p { color: var(--fg-soft); margin: 0 0 16px; }
-
-@media (max-width: 600px) {
-  header.top { padding: 10px 16px; }
-  main { padding: 16px 16px 48px; }
-  .cards { grid-template-columns: 1fr; }
-}
+.outcome { min-width: 110px; text-align: right; }
+@media (max-width: 760px) { .outcome { text-align: left; min-width: 0; } }
 </style>
 </head>
-<body>
-<header class="top">
-  <h1><span>Cantrip</span> My Games</h1>
-  <nav><a href="./">Home</a> &middot; <a href="draft">Draft</a> &middot; <a href="constructed">Constructed</a> &middot; <a href="decks">Deck Editor</a> &middot; <a href="status">Server status</a></nav>
-  <div class="who" id="who"></div>
-</header>
-<main>
-  <div id="notices"></div>
-  <div id="content"></div>
+<body data-page="home">
+<!--site:header-->
+<main id="main">
+  <div id="content" aria-live="polite"><p class="hint">Loading&hellip;</p></div>
 </main>
+<!--site:footer-->
 
 <script>
 (() => {
   "use strict";
 
-  // The page asks the server what the player is in, every few seconds. Getting back to a seat is the draft and constructed
-  // pages' own API, which answers with a link to the web client, the seat's ticket after its #, which nothing here keeps.
+  // The player's own page: what they are playing now - a table filling, a draft or a pod, a constructed game - to get
+  // back to or leave; their events being played and over; and where to go next. Everything is asked of the server
+  // every few seconds; getting back to a seat is the draft and constructed pages' own API, which answers with a link to
+  // the web client, the seat's ticket after its #, which nothing here keeps.
   let board = null;
-  let failure = null;
   let busy = false;
 
   const $ = id => document.getElementById(id);
-  const esc = text => String(text ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  const FORMATS = { booster: "Booster draft", grid: "Grid draft", winston: "Winston draft", standard: "Standard Gauntlet" };
-  const named = key => FORMATS[key] ?? key ?? "Draft";
+  const { esc, plural } = window.Cantrip ?? {};
+  const named = key => window.Cantrip.formatName(key);
+  const when = iso => {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return "";
+    const days = Math.floor((Date.now() - date.getTime()) / 86_400_000);
+    if (days < 1) return `Today, ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+    if (days < 2) return "Yesterday";
+    if (days < 7) return `${days} days ago`;
+    return date.toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" });
+  };
+  const results = id => `status#event=${encodeURIComponent(id)}`;
 
-  function renderWho() {
-    const who = $("who");
-    if (!board) { who.innerHTML = ""; return; }
-    if (board.me) who.innerHTML = `Signed in as <strong>${esc(board.me.name)}</strong> <button class="plain" id="signout">Sign out</button>`;
-    else if (board.signIn) who.innerHTML = `<button class="discord" id="signin">Log in with Discord</button>`;
-  }
-
-  function draftCard(d) {
-    const what = d.drafting ? "Your draft is under way" : "Your table is still filling";
-    const meta = [named(d.format), d.cube].filter(Boolean).join(" · ");
-    const players = d.players && d.seats ? `${d.players.length} of ${d.seats} seated: ${d.players.map(esc).join(", ")}` : "";
-    const action = d.drafting
-      ? `<button class="primary" data-return>Back to my draft</button>`
-      : `<button class="primary" data-table="${esc(d.table)}">Open my table</button>`;
+  function tableCard(d) {
+    const seated = d.players && d.seats ? `${d.players.length} of ${d.seats} seated` : "";
+    const chips = (d.players ?? []).map(name => `<span class="chip${name === board.me.name ? " me" : ""}">${esc(name)}</span>`).join("")
+      + Array.from({ length: Math.max(0, (d.seats ?? 0) - (d.players?.length ?? 0)) }, () => `<span class="chip open">Open seat</span>`).join("");
     return `<div class="card mine">
-      <div class="head"><span class="name">${esc(meta || "Draft")}</span><span class="badge${d.drafting ? " live" : ""}">${d.drafting ? "In progress" : "Forming"}</span></div>
-      ${players ? `<div class="meta">${players}</div>` : ""}
-      <div class="foot"><span class="what">${what}</span>${action}</div>
+      <div class="head"><span class="name">${esc([named(d.format), d.cube].filter(Boolean).join(" · "))}</span><span class="badge${d.checking ? " Checking" : ""}">${d.checking ? "Ready check" : "Filling"}</span></div>
+      <div class="players">${chips}</div>
+      <div class="foot"><span class="what">${d.checking ? "Everyone is here: say you're ready" : esc(seated || "Waiting for players")}</span>
+        <button type="button" class="button quiet small" data-leave>Leave</button>
+        <button type="button" class="button primary small" data-table="${esc(d.table)}">Open my table</button></div>
     </div>`;
   }
 
   function gameCard(g) {
-    const what = g.stage === "Open" ? "Waiting for an opponent" : g.stage === "Seated" ? "Waiting for both players to sit down" : "Playing";
+    const what = g.stage === "Open" ? "Waiting for an opponent" : g.stage === "Seated" ? "Waiting for both players to sit down" : "Being played";
+    const cancel = g.stage === "Open" ? `<button type="button" class="button quiet small" data-cancel="${esc(g.id)}">Call off</button>` : "";
     return `<div class="card mine">
-      <div class="head"><span class="name">${esc(g.players.join(" vs "))}</span><span class="badge${g.stage === "Playing" ? " live" : ""}">${esc(g.stage === "Open" ? "Waiting" : g.stage)}</span></div>
+      <div class="head"><span class="name">${esc(g.players.length === 1 ? `${g.players[0]}'s game` : g.players.join(" vs "))}</span><span class="badge${g.stage === "Playing" ? " live" : ""}">${esc(g.stage === "Open" ? "Waiting" : g.stage)}</span></div>
       <div class="meta">${esc(named(g.format))}</div>
-      <div class="foot"><span class="what">${what}</span><button class="primary" data-game="${esc(g.id)}">Open my game</button></div>
+      <div class="foot"><span class="what">${what}</span>${cancel}<button type="button" class="button primary small" data-game="${esc(g.id)}">Open my game</button></div>
     </div>`;
   }
 
-  function renderContent() {
-    if (!board) { $("content").innerHTML = ""; return; }
-    if (!board.me) {
-      $("content").innerHTML = board.signIn
-        ? `<div class="signin"><p>Log in with Discord to see the games you are in and get back to them.</p><button class="discord" id="signin-big">Log in with Discord</button></div>`
-        : `<div class="signin"><p>Sign-in isn't set up on this server, so there are no accounts to show games for.</p><a class="button" href="./">Home</a></div>`;
-      return;
-    }
-
-    const games = [];
-    if (board.draft) games.push(draftCard(board.draft));
-    if (board.constructed) games.push(gameCard(board.constructed));
-    const places = [];
-    if (board.hasDrafts) places.push(`<a class="button" href="draft">Draft</a>`);
-    if (board.hasConstructed) places.push(`<a class="button" href="constructed">Constructed</a>`);
-    if (board.hasDecks) places.push(`<a class="button" href="decks">Deck Editor</a>`);
-
-    $("content").innerHTML = `
-      <section aria-labelledby="h-games">
-        <h2 id="h-games">Current games</h2>
-        <p class="about">Get back to a seat you have: a table that is filling, a draft or a game under way.</p>
-        ${games.length ? `<div class="cards">${games.join("")}</div>` : `<div class="empty">You are not in a game. Start one from Draft or Constructed.</div>`}
-      </section>
-      <section aria-labelledby="h-leagues">
-        <h2 id="h-leagues">Leagues</h2>
-        <p class="about">Standings and the matches you owe will be here once leagues are running.</p>
-        ${board.leagues.length ? "" : `<div class="empty">No leagues yet.</div>`}
-      </section>
-      ${places.length ? `<section aria-labelledby="h-play"><h2 id="h-play">Find a game</h2><p class="about">Sit down at a table.</p><div class="cards" style="display:flex;gap:10px;flex-wrap:wrap">${places.join("")}</div></section>` : ""}`;
+  // What an event is, past its name: its format and cube where the name does not say them, who against, and the record.
+  function about(e) {
+    const parts = [named(e.format), e.cube].filter(part => part && !e.name.includes(part));
+    if (e.players <= 2 && e.opponents?.length) parts.push(`vs ${e.opponents.join(", ")}`);
+    else parts.push(plural(e.players, "player"));
+    if (e.wins + e.losses + e.draws > 0) parts.push(`${e.wins}-${e.losses}${e.draws ? `-${e.draws}` : ""}`);
+    return parts.join(" · ");
   }
 
-  function renderNotices() {
-    $("notices").innerHTML = failure
-      ? `<div class="notice"><span class="grow">${esc(failure)}</span><button class="plain" data-dismiss>Dismiss</button></div>`
-      : "";
+  function eventCard(e) {
+    const actions = [];
+    if (e.canDrop) actions.push(`<button type="button" class="button danger small" data-drop="${esc(e.id)}">Drop</button>`);
+    actions.push(`<a class="button small" href="${results(e.id)}">${e.rounds > 1 ? "Standings" : "Details"}</a>`);
+    if (!e.dropped) actions.push(`<button type="button" class="button primary small" data-return>Back to my seat</button>`);
+    return `<div class="card mine">
+      <div class="head"><span class="name">${esc(e.name)}</span><span class="badge ${esc(e.stage)}">${esc(e.dropped ? "Dropped" : e.outcome)}</span></div>
+      <div class="meta">${esc(about(e))}</div>
+      ${e.detail ? `<div class="meta">${esc(e.detail)}</div>` : ""}
+      <div class="foot" style="justify-content: flex-end">${actions.join("")}</div>
+    </div>`;
+  }
+
+  function waitingCard(w) {
+    return `<div class="card mine">
+      <div class="head"><span class="name">Winston draft</span><span class="badge">Waiting</span></div>
+      <div class="meta">Opened from Discord ${esc(when(w.created).toLowerCase())}</div>
+      <div class="foot"><span class="what">Waiting for a second player to join in Discord</span><button type="button" class="button danger small" data-drop="${esc(w.id)}" data-waiting>Call off</button></div>
+    </div>`;
+  }
+
+  function recentRow(e) {
+    const tone = e.outcome === "Won" || e.outcome.startsWith("1st") ? "won" : e.stage === "Cancelled" ? "bad" : e.dropped ? "" : "info";
+    return `<div class="row">
+      <div class="main"><div class="title"><a href="${results(e.id)}">${esc(e.name)}</a></div>
+        <div class="sub">${esc([about(e), when(e.updated)].filter(Boolean).join(" · "))}</div></div>
+      <div class="side"><span class="outcome"><span class="badge ${tone}">${esc(e.outcome)}</span></span>
+        <a class="button small" href="${results(e.id)}" aria-label="Results of ${esc(e.name)}">Results</a></div>
+    </div>`;
+  }
+
+  function signedOut() {
+    return board.signIn
+      ? `<div class="signin-card"><img src="logo.png" alt="" width="72" height="72"><h2>Your games, events and decks</h2>
+          <p>Sign in with Discord to see what you're playing, get back to your seat, and keep your decks.</p>
+          <div class="actions"><a class="button discord large" href="signin?then=home" data-site-signin>Sign in with Discord</a></div></div>`
+      : `<div class="signin-card"><img src="logo.png" alt="" width="72" height="72"><h2>Nobody can sign in here</h2>
+          <p>This server has no Discord sign-in set up, so there are no players' pages. Everything being played is still open to look at.</p>
+          <div class="actions">${board.hasDrafts ? `<a class="button primary" href="draft">Draft</a>` : ""}${board.hasConstructed ? `<a class="button" href="constructed">Constructed</a>` : ""}<a class="button" href="status">Events</a></div></div>`;
   }
 
   function render() {
-    renderWho();
-    renderNotices();
-    renderContent();
+    if (!board) return;
+    if (!board.me) { $("content").innerHTML = signedOut(); return; }
+
+    const playing = [];
+    if (board.draft?.table) playing.push(tableCard(board.draft));
+    for (const w of board.waiting ?? []) playing.push(waitingCard(w));
+    const live = board.events.filter(e => e.live);
+    for (const e of live) playing.push(eventCard(e));
+    if (board.constructed) playing.push(gameCard(board.constructed));
+    const recent = board.events.filter(e => !e.live);
+
+    const ways = [];
+    if (board.hasDrafts) ways.push(`<a class="card" href="draft"><span class="tile-title">Draft</span><span class="tile-text">Join a table filling up, or set up a booster, grid or Winston draft of your own.</span><span class="tile-go">Find a table &rarr;</span></a>`);
+    if (board.hasConstructed) ways.push(`<a class="card" href="constructed"><span class="tile-title">Constructed</span><span class="tile-text">A one-on-one game with a deck from the Standard gauntlet.</span><span class="tile-go">Find a game &rarr;</span></a>`);
+    if (board.hasDecks) ways.push(`<a class="card" href="decks"><span class="tile-title">Decks</span><span class="tile-text">${board.decks ? `${plural(board.decks, "deck")} saved. Open one, or build a new one.` : "Build a deck for any format, and keep it."}</span><span class="tile-go">${board.decks ? "Open my decks" : "Build a deck"} &rarr;</span></a>`);
+
+    const nothing = `<div class="empty"><p>You're not in anything right now.</p><div class="actions">${board.hasDrafts ? `<a class="button primary" href="draft">Find a draft</a>` : ""}${board.hasConstructed ? `<a class="button" href="constructed">Play constructed</a>` : ""}</div></div>`;
+
+    $("content").innerHTML = `
+      <div class="page-head"><div class="titles"><h1>Welcome, ${esc(board.me.name)}</h1>
+        <p class="lead">What you're playing, the events you're in, and where to go next.</p></div></div>
+      <section class="block" aria-labelledby="h-now">
+        <div class="block-head"><h2 id="h-now">Playing now</h2>${playing.length ? `<span class="count">${playing.length}</span>` : ""}</div>
+        <p class="about">Get back to your seat at any time, from any computer.</p>
+        ${playing.length ? `<div class="cards">${playing.join("")}</div>` : nothing}
+      </section>
+      <section class="block" aria-labelledby="h-recent">
+        <div class="block-head"><h2 id="h-recent">Recent events</h2>${recent.length ? `<span class="count">${recent.length}</span>` : ""}
+          ${board.events.length ? `<div class="actions"><a class="button quiet small" href="status">Everything played &rarr;</a></div>` : ""}</div>
+        <p class="about">Your drafts that have finished, with your result. Open one for its pairings and standings.</p>
+        ${recent.length ? `<div class="rows">${recent.map(recentRow).join("")}</div>` : `<div class="empty small">Events you play will be listed here once they're over.</div>`}
+      </section>
+      ${ways.length ? `<section class="block" aria-labelledby="h-play"><div class="block-head"><h2 id="h-play">Play</h2></div><div class="tiles">${ways.join("")}</div></section>` : ""}`;
   }
 
   async function refresh() {
-    try {
-      const response = await fetch("home/api/board", { cache: "no-store", credentials: "same-origin" });
-      if (!response.ok) throw new Error(`${response.status}`);
-      board = (await response.json()).value;
-    } catch {
-      return;
-    }
+    try { board = await window.Cantrip.getJson("home/api/board"); } catch { return; }
     if (!busy) render();
   }
 
-  async function post(path, body) {
-    const response = await fetch(path, {
-      method: "POST", credentials: "same-origin", cache: "no-store",
-      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body ?? {}),
-    });
-    if (response.status === 401) { location.assign("signin?then=home"); return null; }
-    if (!response.ok) throw new Error(`The server said ${response.status}.`);
-    return (await response.json()).value;
-  }
-
-  // Goes to the seat in this tab, or says why not.
-  async function seat(path, body) {
+  async function act(work) {
     if (busy) return;
     busy = true;
-    try {
-      const answer = await post(path, body);
-      if (answer?.link) { location.assign(answer.link); return; }
-      failure = answer?.refusal ?? "No seat could be had.";
-    } catch (error) {
-      failure = error.message || "The server could not be reached.";
-    } finally {
-      busy = false;
-    }
+    try { await work(); } finally { busy = false; }
     await refresh();
-    render();
+  }
+
+  function dropQuestion(e, waiting) {
+    if (waiting) return { title: "Call off your draft?", body: ["Nobody has joined it yet. It is called off, and its message in Discord goes."], confirmLabel: "Call it off" };
+    const two = e.players <= 2;
+    const body = two
+      ? (e.stage === "Playing"
+        ? ["You forfeit the game being played, and your opponent wins the draft.", "This can't be undone."]
+        : ["A draft of two can't go on without you: it is called off for both of you.", "This can't be undone."])
+      : [e.stage === "Playing"
+          ? "You won't be paired again. If your match is being played, you concede it to your opponent; your results so far stay in the standings."
+          : e.stage === "Drafting"
+            ? "The draft carries on without you: your picks are made for you so nobody waits, and you won't be paired in the rounds."
+            : "You won't be paired in the rounds. Your results so far stay in the standings.",
+        "This can't be undone."];
+    return { title: `Drop from ${e.name}?`, body, confirmLabel: "Drop", danger: true };
   }
 
   document.addEventListener("click", async event => {
     const target = event.target.closest("button");
-    if (!target || target.disabled) return;
-    if (target.id === "signin" || target.id === "signin-big") location.assign("signin?then=home");
-    else if (target.id === "signout") {
-      try { await post("signout"); } catch { /* signed out or not, the board says */ }
-      await refresh();
+    if (!target || target.disabled || target.closest("dialog") || !target.closest("#content")) return;
+    const { seat, post, toast, confirm } = window.Cantrip;
+    if (target.dataset.table) await act(async () => { const why = await seat("draft/api/join", { table: target.dataset.table }); if (why) toast(why, "error"); });
+    else if ("return" in target.dataset) await act(async () => { const why = await seat("draft/api/return"); if (why) toast(why, "error"); });
+    else if (target.dataset.game) await act(async () => { const why = await seat("constructed/api/join", { game: target.dataset.game }); if (why) toast(why, "error"); });
+    else if ("leave" in target.dataset) {
+      if (!await confirm({ title: "Leave the table?", body: ["Your seat goes to the next player to join."], confirmLabel: "Leave table" })) return;
+      await act(async () => {
+        try { const answer = await post("home/api/leave"); if (answer?.refusal) toast(answer.refusal, "error"); else if (answer) toast("You left the table."); }
+        catch (error) { toast(error.message, "error"); }
+      });
     }
-    else if (target.dataset.table) await seat("draft/api/join", { table: target.dataset.table });
-    else if ("return" in target.dataset) await seat("draft/api/return");
-    else if (target.dataset.game) await seat("constructed/api/join", { game: target.dataset.game });
-    else if ("dismiss" in target.dataset) { failure = null; render(); }
+    else if (target.dataset.cancel) {
+      if (!await confirm({ title: "Call off your game?", body: ["Nobody has joined it yet."], confirmLabel: "Call it off", danger: true })) return;
+      await act(async () => {
+        try { const answer = await post("constructed/api/cancel", { game: target.dataset.cancel }); if (answer?.refusal) toast(answer.refusal, "error"); else if (answer) toast("Your game was called off."); }
+        catch (error) { toast(error.message, "error"); }
+      });
+    }
+    else if (target.dataset.drop) {
+      const e = board.events.find(each => each.id === target.dataset.drop);
+      if (!await confirm(dropQuestion(e, "waiting" in target.dataset))) return;
+      await act(async () => {
+        try {
+          const answer = await post("home/api/drop", { event: target.dataset.drop });
+          if (answer?.refusal) toast(answer.refusal, "error");
+          else if (answer) toast(e ? `You dropped from ${e.name}.` : "Your draft was called off.");
+        } catch (error) { toast(error.message, "error"); }
+      });
+    }
   });
-
-  if (new URLSearchParams(location.search).get("signin") === "failed") {
-    failure = "Signing in with Discord didn't go through. Try again.";
-    history.replaceState(null, "", location.pathname);
-  }
 
   refresh();
   setInterval(refresh, 3000);

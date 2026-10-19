@@ -87,8 +87,9 @@ public sealed partial class TableAccess(TimeProvider? clock = null)
 
         app.MapGet("/" + EnterRoute, (HttpContext context) =>
         {
+            IResult page = SiteChrome.For(context).Page(context, EnterPage, SiteSection.None);
             context.Response.Headers.CacheControl = "no-store";
-            return Results.Content(EnterPage, "text/html; charset=utf-8");
+            return page;
         });
 
         return app;
@@ -103,31 +104,31 @@ public sealed partial class TableAccess(TimeProvider? clock = null)
         <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Cantrip</title>
-        <style>
-          :root { color-scheme: light dark; --bg: #f4f4f6; --fg: #1d1d22; --muted: #5d5d68; }
-          @media (prefers-color-scheme: dark) { :root { --bg: #15151a; --fg: #ececf1; --muted: #9a9aa8; } }
-          body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
-          main { padding: 0 16px; max-width: 28rem; text-align: center; }
-          p { color: var(--muted); }
-          a { color: inherit; }
-        </style>
+        <title>Cantrip - Taking you to your seat</title>
+        <!--site:head-->
         </head>
-        <body>
-        <main>
-          <h1>Cantrip</h1>
-          <p id="say">Checking your Discord sign-in&hellip;</p>
+        <body data-page="">
+        <!--site:header-->
+        <main id="main">
+          <div class="signin-card">
+            <img src="logo.png" alt="" width="72" height="72">
+            <h2>Taking you to your seat</h2>
+            <p id="say" role="status">Checking your Discord sign-in&hellip;</p>
+            <div class="actions" id="ways" hidden><a class="button primary" href="home">Go to my page</a><a class="button" href="./">Home</a></div>
+          </div>
         </main>
+        <!--site:footer-->
         <script>
         (async () => {
           const say = text => { document.getElementById('say').textContent = text; };
+          const stuck = text => { say(text); document.getElementById('ways').hidden = false; };
           const kept = 'cantrip.enter', tried = 'cantrip.enter.signin';
           try {
             // The link's query and ticket, held in this tab across the trip to Discord: the ticket is after the # so no
             // request carries it, and it stays that way.
             let target = location.search + location.hash;
             if (!target) target = sessionStorage.getItem(kept) || '';
-            if (!target) { say('This page opens a seat from the link Discord gave you.'); return; }
+            if (!target) { stuck('This page opens a seat from a link to one: there is none here.'); return; }
 
             const answer = await fetch('whoami', { credentials: 'same-origin', cache: 'no-store' });
             if (answer.ok) {
@@ -139,7 +140,7 @@ public sealed partial class TableAccess(TimeProvider? clock = null)
 
             if (sessionStorage.getItem(tried)) {
               sessionStorage.removeItem(tried);
-              say('Signing in with Discord did not work. Open the link from Discord again to retry.');
+              stuck('Signing in with Discord did not work. Open the link from Discord again to retry.');
               return;
             }
 
@@ -148,7 +149,7 @@ public sealed partial class TableAccess(TimeProvider? clock = null)
             say('Taking you to Discord to sign in…');
             location.replace(new URL('signin?then=enter', location.href));
           } catch (error) {
-            say('Could not check your sign-in. Reload to try again.');
+            stuck('Could not check your sign-in. Reload to try again.');
           }
         })();
         </script>

@@ -28,10 +28,13 @@ public sealed class DeckSiteOptions
 }
 
 /// <summary>
-/// The constructed deck editor's half on the bot's site: the cards a deck is built from, and each player's saved decks.
-/// The editor itself is the web client (<c>/?decks</c>), which draws the cards as it draws a draft's pool.
+/// The constructed deck editor's half on the bot's site: the player's deck library, the cards a deck is built from, and
+/// each player's saved decks. The editor itself is the web client (<c>/?decks</c>), which draws the cards as it draws a
+/// draft's pool.
 /// <code>
-/// /decks                     to the web client's deck editor
+/// /decks                     the deck library: the player's decks by format, to open, copy, rename and delete, and a new one
+/// /decks/edit?deck=ID        to the web client's deck editor, on that deck - or ?format=KEY for a new deck in a format
+/// /decks/api/formats         the formats a deck is built for, by key and title
 /// /decks/api/catalog         every card the engine plays, as printed, with its legalities and color identity (MessagePack)
 /// /decks/api/list            the signed-in player's decks (DeckSummary), by format then name
 /// /decks/api/deck/{id}       one of them (SavedDeck)
@@ -46,6 +49,11 @@ public static class DeckSite
 {
     public const string Route = "decks";
 
+    /// <summary>Where the editor is opened from the site: <c>/decks/edit?deck=ID</c>, or <c>?format=modern</c> for a new deck.</summary>
+    public const string EditRoute = "edit";
+
+    private static readonly Lazy<string> Library = new(() => SiteChrome.Resource("decks.html"));
+
     public static IEndpointRouteBuilder MapDecks(this IEndpointRouteBuilder app, DeckSiteOptions options)
     {
         ArgumentNullException.ThrowIfNull(app);
@@ -53,7 +61,18 @@ public static class DeckSite
         var decks = new DeckStore(options.Store, options.TimeProvider);
         var catalog = new Lazy<byte[]>(() => MessagePackSerializer.Serialize(DeckCatalog.Build(options.ContentRoot)));
 
-        app.MapGet($"/{Route}", () => Results.Redirect("/?" + Route));
+        // The library is the site's page; the editor is the web client, opened on a deck, or a new one in a format.
+        app.MapGet($"/{Route}", (HttpContext context) => SiteChrome.For(context).Page(context, Library.Value, SiteSection.Decks));
+        app.MapGet($"/{Route}/{EditRoute}", (HttpContext context, string? deck, string? format) =>
+        {
+            string query = "?" + Route
+                + (deck is { Length: > 0 } ? "&deck=" + Uri.EscapeDataString(deck) : string.Empty)
+                + (format is { Length: > 0 } ? "&format=" + Uri.EscapeDataString(format) : string.Empty);
+            return Results.Redirect(context.Request.PathBase + "/" + query);
+        });
+
+        app.MapGet($"/{Route}/api/formats", (HttpContext context) =>
+            Fresh(context, DeckFormat.All.Select(format => new { key = format.Key, title = format.Title })));
 
         app.MapGet($"/{Route}/api/catalog", (HttpContext context) =>
         {

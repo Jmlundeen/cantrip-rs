@@ -68,10 +68,7 @@ public static class QueueSite
         ArgumentNullException.ThrowIfNull(options);
 
         app.MapGet($"/{Route}", (HttpContext context) =>
-        {
-            context.Response.Headers.CacheControl = "no-cache";
-            return Results.Content(Page.Value, "text/html; charset=utf-8");
-        });
+            SiteChrome.For(context).Page(context, Page.Value, SiteSection.Draft));
 
         app.MapGet($"/{Route}/api/board", (HttpContext context) => Fresh(context, Board(options, Account(context))));
 

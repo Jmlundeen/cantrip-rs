@@ -3,53 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cantrip - Server Status</title>
-<link rel="icon" href="data:,">
+<title>Cantrip - Events</title>
+<!--site:head-->
 <style>
+/* The site's look is site.css (the bot's SiteChrome); what follows is this page's own. */
 :root {
-  --window: #111318;
-  --bar: #191c22;
-  --panel: #1d2127;
-  --panel-hi: #242930;
-  --line: #2c313a;
-  --control: #2a303a;
-  --control-hover: #353c48;
-  --control-border: #3a4250;
-  --fg: #e8eaee;
-  --fg-soft: #a6adb8;
-  --fg-muted: #6c7482;
-  --on-accent: #17130a;
-  --accent: #f1b44c;
-  --ready: #6fcf8f;
-  --danger: #e5534b;
   --hover: #8ec9ff;
   --mine: #5fae75;
   --theirs: #c9834f;
-  color-scheme: dark;
 }
-* { box-sizing: border-box; }
-html, body { margin: 0; }
-body {
-  background: var(--window);
-  color: var(--fg);
-  font: 14px/1.45 "Segoe UI", -apple-system, BlinkMacSystemFont, Inter, Roboto, "Helvetica Neue", sans-serif;
-  min-height: 100vh;
-}
-button, input, select { font: inherit; color: inherit; }
-.num { font-variant-numeric: tabular-nums; }
+body { font-size: 14px; }
 
-header.top {
-  position: sticky; top: 0; z-index: 5;
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-  padding: 12px 24px; background: var(--bar); border-bottom: 1px solid var(--line);
-}
-header.top h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: .2px; }
-header.top h1 span { color: var(--accent); }
-header.top .live { margin-left: auto; color: var(--fg-muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.live { color: var(--fg-soft); font-size: 13px; display: flex; align-items: center; gap: 8px; align-self: center; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ready); display: inline-block; }
 .dot.stale { background: var(--danger); }
 
-main { max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
 section.block { margin-bottom: 32px; }
 section.block > h2 {
   font-size: 18px; font-weight: 600; margin: 0 0 12px;
@@ -117,7 +85,8 @@ section.block > h2 .count { color: var(--fg-muted); font-size: 14px; font-weight
 .filters .custom { display: none; gap: 10px; }
 .filters .custom.on { display: flex; }
 button.plain {
-  background: var(--control); border: 1px solid var(--control-border); border-radius: 4px; padding: 6px 12px; cursor: pointer;
+  background: var(--control); border: 1px solid var(--control-border); border-radius: var(--radius-small); padding: 7px 14px; min-height: 36px;
+  cursor: pointer; font-weight: 600; font-size: 14px;
 }
 button.plain:hover { background: var(--control-hover); }
 
@@ -132,10 +101,10 @@ td.r, th.r { text-align: right; }
 .more { color: var(--fg-muted); font-size: 13px; padding: 10px 2px; }
 
 /* The event opened: a drawer from the right, the whole window on a phone. */
-.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9; display: none; }
+.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 25; display: none; }
 .scrim.on { display: block; }
 aside.drawer {
-  position: fixed; top: 0; right: 0; bottom: 0; width: min(760px, 100vw); z-index: 10;
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(760px, 100vw); z-index: 26;
   background: var(--window); border-left: 1px solid var(--line); overflow-y: auto;
   transform: translateX(100%); transition: transform .18s ease-out;
 }
@@ -174,7 +143,6 @@ aside.drawer.on { transform: none; }
 .bar-fill { height: 100%; background: var(--accent); }
 
 @media (max-width: 640px) {
-  header.top, main { padding-left: 16px; padding-right: 16px; }
   .cards { grid-template-columns: 1fr; }
   .tiles { grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .tile { padding: 8px 10px; }
@@ -185,13 +153,17 @@ aside.drawer.on { transform: none; }
 }
 </style>
 </head>
-<body>
-<header class="top">
-  <h1><span>Cantrip</span> Server Status</h1>
-  <div class="live" id="live"><span class="dot" id="live-dot"></span><span id="live-text">Connecting...</span></div>
-</header>
+<body data-page="status">
+<!--site:header-->
 
-<main>
+<main id="main" class="wide">
+  <div class="page-head">
+    <div class="titles">
+      <h1>Events</h1>
+      <p class="lead">Everything being played on this server and everything played: open an event for its draft, pairings and standings.</p>
+    </div>
+    <div class="live" id="live"><span class="dot" id="live-dot"></span><span id="live-text">Connecting...</span></div>
+  </div>
   <div class="tiles" id="tiles"></div>
 
   <section class="block" id="active-block">
@@ -243,6 +215,7 @@ aside.drawer.on { transform: none; }
     <div id="history"></div>
   </section>
 </main>
+<!--site:footer-->
 
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">

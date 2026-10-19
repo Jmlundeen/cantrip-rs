@@ -1,4 +1,5 @@
 using System.Reflection;
+using Cantrip.Server.Events;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -19,15 +20,22 @@ public sealed class HomeSiteOptions
 
     /// <summary>Whether the deck editor is there (<see cref="DeckSite"/>): only with a data directory to keep decks in.</summary>
     public bool HasDecks { get; init; }
+
+    /// <summary>The data directory: each player's events, and their decks. Null for none.</summary>
+    public EventStore? Store { get; init; }
 }
 
 /// <summary>
 /// The site's front door and the page a signed-in player lands on.
 /// <code>
-/// /                          the home page: the logo, and where to go (served by ClientSite for a bare /)
+/// /                          the home page for anyone not signed in: the logo, what Cantrip is, and where to go (served by
+///                            ClientSite for a bare /); a player signed in goes on to /home
+/// /about                     the same page, for anyone
 /// /logo.png                  the Cantrip logo
-/// /home                      a player's own page: the table or draft they are in and the game they are playing, to rejoin
+/// /home                      a player's own page: what they are playing, their events being played and over, and where to go
 /// /home/api/board            who is signed in, and what they are in
+/// /home/api/drop             POST {event}: the player drops out of an event they are in
+/// /home/api/leave            POST: the player gives up their seat at a table still filling
 /// </code>
 /// Rejoining is the draft (<see cref="QueueSite"/>) and constructed (<see cref="PlaySite"/>) pages' own API, so a seat is
 /// given the same way from every page.
@@ -36,11 +44,14 @@ public static class HomeSite
 {
     public const string Route = "home";
 
+    /// <summary>The home page as anyone sees it, signed in or not.</summary>
+    public const string AboutRoute = "about";
+
     /// <summary>Where the logo is: beside the home page, whatever else the site serves.</summary>
     public const string LogoRoute = "logo.png";
 
-    private static readonly Lazy<string> Landing = Read("landing");
-    private static readonly Lazy<string> Player = Read("home");
+    private static readonly Lazy<string> Landing = new(() => SiteChrome.Resource("landing.html"));
+    private static readonly Lazy<string> Player = new(() => SiteChrome.Resource("home.html"));
 
     private static readonly Lazy<byte[]> LogoImage = new(() =>
     {
@@ -51,24 +62,13 @@ public static class HomeSite
         return copy.ToArray();
     });
 
-    private static Lazy<string> Read(string name) => new(() =>
-    {
-        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Cantrip.Discord.{name}.html")
-            ?? throw new InvalidOperationException($"The {name} page is not built into the bot.");
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
-    });
+    /// <summary>The home page, for the site's address with nothing asked of it, and for /about.</summary>
+    public static IResult LandingPage(HttpContext context) => SiteChrome.For(context).Page(context, Landing.Value, SiteSection.None);
 
-    /// <summary>The home page, for the site's address with nothing asked of it.</summary>
-    public static IResult LandingPage(HttpContext context)
-    {
-        context.Response.Headers.CacheControl = "no-cache";
-        return Results.Content(Landing.Value, "text/html; charset=utf-8");
-    }
-
-    /// <summary>The logo, which the home page shows and names its tab's icon.</summary>
+    /// <summary>The logo, which every page's menu bar shows and names its tab's icon.</summary>
     public static IResult Logo(HttpContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         context.Response.Headers.CacheControl = "public, max-age=86400";
         return Results.File(LogoImage.Value, "image/png");
     }
@@ -78,19 +78,52 @@ public static class HomeSite
         ArgumentNullException.ThrowIfNull(app);
         ArgumentNullException.ThrowIfNull(options);
 
-        app.MapGet($"/{Route}", (HttpContext context) =>
+        app.MapGet($"/{AboutRoute}", LandingPage);
+        app.MapGet($"/{Route}", (HttpContext context) => SiteChrome.For(context).Page(context, Player.Value, SiteSection.Home));
+        app.MapGet($"/{Route}/api/board", (HttpContext context) => Fresh(context, Board(options, Account(context))));
+
+        app.MapPost($"/{Route}/api/drop", async (HttpContext context, DropRequest drop) =>
         {
-            context.Response.Headers.CacheControl = "no-cache";
-            return Results.Content(Player.Value, "text/html; charset=utf-8");
+            if (Account(context) is not { } account) return Results.Unauthorized();
+            return Fresh(context, new { refusal = await DropAsync(options, account, drop.Event ?? string.Empty).ConfigureAwait(false) });
         });
 
-        app.MapGet($"/{Route}/api/board", (HttpContext context) => Fresh(context, Board(options, Account(context))));
+        app.MapPost($"/{Route}/api/leave", async (HttpContext context, NoBody _) =>
+        {
+            if (Account(context) is not { } account) return Results.Unauthorized();
+            string? refusal = options.Drafts is { } drafts ? await drafts.Queues.LeaveAsync(account.Id).ConfigureAwait(false) : "There are no tables here.";
+            return Fresh(context, new { refusal });
+        });
+
         return app;
+    }
+
+    /// <summary>The event to drop out of, by its id.</summary>
+    public sealed record DropRequest(string? Event);
+
+    /// <summary>
+    /// Drops a player out of an event they are in: a booster pod (<see cref="PodHosts.DropAsync"/>), or a Winston or grid
+    /// draft (<see cref="DraftHost.DropAsync"/>). Null once they have; otherwise why not.
+    /// </summary>
+    internal static async Task<string?> DropAsync(HomeSiteOptions options, WebAccount account, string eventId)
+    {
+        var player = new DiscordPlayer(account.Id, account.Name);
+        if (options.Drafts?.Pods is { } pods && pods.Hosts(eventId)) return await pods.DropAsync(eventId, player).ConfigureAwait(false);
+        if (options.Drafts?.Drafts is { } drafts && drafts.Hosts(eventId)) return await drafts.DropAsync(eventId, player).ConfigureAwait(false);
+        return "That event is not being played any more.";
     }
 
     /// <summary>What the pages show: whether sign-in is on, who is signed in, and what they are in. Names, never ids or tickets.</summary>
     internal static object Board(HomeSiteOptions options, WebAccount? account)
     {
+        string? player = account is null ? null : DraftHost.PlayerId(new DiscordPlayer(account.Id, account.Name));
+        DraftHost? hosts = options.Drafts?.Drafts;
+        PodHosts? pods = options.Drafts?.Pods;
+        bool Hosted(string id) => hosts?.Hosts(id) == true || pods?.Hosts(id) == true;
+
+        IReadOnlyList<PlayerEventSummary> events = player is not null && options.Store is { } store ? PlayerEvents.Of(store, player, Hosted, recent: 12) : [];
+        PlayerEventSummary? playing = events.FirstOrDefault(each => each.Live && !each.Dropped);
+
         object? draft = null;
         if (account is not null && options.Drafts is { } drafts)
         {
@@ -103,10 +136,12 @@ public static class HomeSite
                 {
                     table,
                     drafting,
-                    format = forming?.Settings.Format,
-                    cube = forming?.Cube,
+                    format = forming?.Settings.Format ?? playing?.Format,
+                    cube = forming?.Cube ?? playing?.Cube,
                     players = forming?.Players,
                     seats = forming?.Seats,
+                    checking = forming?.Checking == true,
+                    @event = drafting ? playing?.Id : null,
                 };
             }
         }
@@ -114,8 +149,13 @@ public static class HomeSite
         object? constructed = null;
         if (account is not null && options.Constructed?.Games.GameOf(account.Id) is { } game)
         {
-            constructed = new { id = game.Id, format = game.Format, stage = game.Stage.ToString(), players = game.Players.Select(player => player.Name) };
+            constructed = new { id = game.Id, format = game.Format, stage = game.Stage.ToString(), players = game.Players.Select(each => each.Name) };
         }
+
+        // A draft opened from Discord that nobody has joined yet: no event is made until someone does.
+        IEnumerable<object> waiting = account is null || hosts is null ? [] : hosts.Waiting(account.Id).Select(each => new { id = each.Id, created = each.CreatedAt });
+
+        int? decks = account is not null && options.HasDecks && options.Store is { } kept ? new DeckStore(kept).List(account.Id).Count : null;
 
         return new
         {
@@ -126,7 +166,31 @@ public static class HomeSite
             hasDecks = options.HasDecks,
             draft,
             constructed,
-            leagues = Array.Empty<object>(),
+            waiting,
+            decks,
+            events = events.Select(each => new
+            {
+                id = each.Id,
+                name = each.Name,
+                format = each.Format,
+                cube = each.Cube,
+                stage = each.Stage.ToString(),
+                detail = each.Detail,
+                created = each.Created,
+                updated = each.Updated,
+                live = each.Live,
+                dropped = each.Dropped,
+                wins = each.Wins,
+                losses = each.Losses,
+                draws = each.Draws,
+                rank = each.Rank,
+                players = each.Players,
+                round = each.Round,
+                rounds = each.Rounds,
+                outcome = each.Outcome,
+                opponents = each.Opponents,
+                canDrop = each.Live && !each.Dropped && Hosted(each.Id),
+            }),
         };
     }
 }

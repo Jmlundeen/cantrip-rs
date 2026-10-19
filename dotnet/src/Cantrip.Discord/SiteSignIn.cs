@@ -57,7 +57,11 @@ public static class SiteSignIn
     private const string AvatarClaim = "urn:discord:avatar";
 
     /// <summary>The pages a sign-in may come back to.</summary>
-    private static readonly HashSet<string> Pages = new(StringComparer.Ordinal) { HomeSite.Route, QueueSite.Route, PlaySite.Route, DeckSite.Route, TableAccess.EnterRoute };
+    private static readonly HashSet<string> Pages = new(StringComparer.Ordinal)
+    {
+        HomeSite.Route, QueueSite.Route, PlaySite.Route, DeckSite.Route, $"{DeckSite.Route}/{DeckSite.EditRoute}", Cantrip.Server.Host.StatusSite.Route,
+        HomeSite.AboutRoute, TableAccess.EnterRoute,
+    };
 
     /// <summary>Where Discord sends a player back to once they have signed in; registered as a redirect of the application.</summary>
     public static Uri Callback(Uri site) => new(site, "signin/discord");

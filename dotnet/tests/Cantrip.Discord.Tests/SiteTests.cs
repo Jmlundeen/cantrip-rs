@@ -21,6 +21,7 @@ namespace Cantrip.Discord.Tests;
 public sealed class SiteTests : IDisposable
 {
     private const ulong Channel = 4242;
+    private const string AsHeader = "X-Test-Account";
     private readonly string _data = Path.Combine(Path.GetTempPath(), "cantrip-site-" + Guid.NewGuid().ToString("N"));
 
     public void Dispose()
@@ -132,8 +133,11 @@ public sealed class SiteTests : IDisposable
         foreach (string link in new[] { "signin?then=home", "href=\"draft\"", "href=\"constructed\"" })
             Assert.Contains(link, landing, StringComparison.Ordinal);
 
-        // The logo is on it, and served beside it.
-        Assert.Contains("<img src=\"logo.png\"", landing, StringComparison.Ordinal);
+        // The logo is on it, and served beside it; and it says what Cantrip is for.
+        Assert.Contains("class=\"hero-logo\" src=\"logo.png\"", landing, StringComparison.Ordinal);
+        Assert.Contains("rules engine fast enough to train modern AI on", landing, StringComparison.Ordinal);
+        Assert.Contains("A fast, accurate game of Magic in your browser comes along as a bonus", landing, StringComparison.Ordinal);
+        Assert.Equal(landing, await fixture.Http.GetStringAsync(fixture.Address("about")));
         HttpResponseMessage logo = await fixture.Http.GetAsync(fixture.Address("logo.png"));
         Assert.Equal(HttpStatusCode.OK, logo.StatusCode);
         Assert.Equal("image/png", logo.Content.Headers.ContentType?.MediaType);
@@ -159,7 +163,7 @@ public sealed class SiteTests : IDisposable
         await using Fixture fixture = await Fixture.StartAsync(_data, signIn: false);
         HttpResponseMessage page = await fixture.Http.GetAsync(fixture.Address("home"));
         Assert.Equal(HttpStatusCode.OK, page.StatusCode);
-        Assert.Contains("My Games", await page.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        Assert.Contains("<title>Cantrip - Home</title>", await page.Content.ReadAsStringAsync(), StringComparison.Ordinal);
 
         using JsonDocument board = JsonDocument.Parse(await fixture.Http.GetStringAsync(fixture.Address("home/api/board")));
         JsonElement value = board.RootElement.GetProperty("value");
@@ -192,10 +196,21 @@ public sealed class SiteTests : IDisposable
     {
         await using Fixture fixture = await Fixture.StartAsync(_data, signIn: false);
 
-        // The editor is the web client.
-        HttpResponseMessage editor = await fixture.Http.GetAsync(fixture.Address("decks"));
-        Assert.Equal(HttpStatusCode.Redirect, editor.StatusCode);
-        Assert.Equal("/?decks", editor.Headers.Location!.OriginalString);
+        // The library is the site's page; the editor is the web client, opened on a deck or a new one in a format.
+        HttpResponseMessage library = await fixture.Http.GetAsync(fixture.Address("decks"));
+        Assert.Equal(HttpStatusCode.OK, library.StatusCode);
+        Assert.Contains("<title>Cantrip - Decks</title>", await library.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        foreach ((string path, string client) in new[] { ("decks/edit", "/?decks"), ("decks/edit?deck=deck-1", "/?decks&deck=deck-1"), ("decks/edit?format=modern", "/?decks&format=modern") })
+        {
+            HttpResponseMessage editor = await fixture.Http.GetAsync(fixture.Address(path));
+            Assert.Equal(HttpStatusCode.Redirect, editor.StatusCode);
+            Assert.Equal(client, editor.Headers.Location!.OriginalString);
+        }
+
+        using (JsonDocument formats = JsonDocument.Parse(await fixture.Http.GetStringAsync(fixture.Address("decks/api/formats"))))
+        {
+            Assert.Equal(DeckFormat.All.Select(format => format.Key), formats.RootElement.GetProperty("value").EnumerateArray().Select(format => format.GetProperty("key").GetString()));
+        }
 
         // The catalog, for anyone: every card as printed, with where it is legal and its color identity.
         HttpResponseMessage answer = await fixture.Http.GetAsync(fixture.Address("decks/api/catalog"));
@@ -221,6 +236,154 @@ public sealed class SiteTests : IDisposable
             HttpResponseMessage refused = await fixture.Http.PostAsync(fixture.Address(path), new StringContent(body, Encoding.UTF8, "application/json"));
             Assert.Equal(HttpStatusCode.Unauthorized, refused.StatusCode);
         }
+    }
+
+    [Fact]
+    public async Task Every_page_has_the_same_menu_bar_with_the_logo_its_own_section_lit_and_the_same_footer()
+    {
+        await using Fixture fixture = await Fixture.StartAsync(_data, signIn: false);
+        foreach ((string path, string? section) in new[]
+        {
+            ("", null), ("about", null), ("home", "home"), ("draft", "draft"), ("constructed", "constructed"), ("decks", "decks"), ("status", "status"),
+        })
+        {
+            string page = await fixture.Http.GetStringAsync(fixture.Address(path));
+            Assert.DoesNotContain("<!--site:", page, StringComparison.Ordinal);
+            Assert.Contains("<base href=\"/\">", page, StringComparison.Ordinal);
+            Assert.Contains("<link rel=\"stylesheet\" href=\"site.css\">", page, StringComparison.Ordinal);
+            Assert.Contains("<script src=\"site.js\"></script>", page, StringComparison.Ordinal);
+
+            // The logo, never the word, in the menu bar; every section, the page's own marked as the current one.
+            Assert.Contains("<a class=\"site-logo\" href=\"./\" aria-label=\"Cantrip home\"><img src=\"logo.png\" alt=\"Cantrip\"", page, StringComparison.Ordinal);
+            foreach (string each in new[] { "home", "draft", "constructed", "decks", "status" })
+                Assert.Contains(each == section ? $"<a href=\"{each}\" aria-current=\"page\">" : $"<a href=\"{each}\">", page, StringComparison.Ordinal);
+            Assert.Equal(section is null ? 0 : 1, page.Split("aria-current=\"page\"").Length - 1);
+
+            Assert.Contains("class=\"site-footer\"", page, StringComparison.Ordinal);
+            Assert.Contains("<a href=\"about\">About</a>", page, StringComparison.Ordinal);
+            Assert.Contains("id=\"main\"", page, StringComparison.Ordinal);
+        }
+
+        // What every page shares is served beside them.
+        foreach ((string path, string type) in new[] { ("site.css", "text/css"), ("site.js", "text/javascript") })
+        {
+            HttpResponseMessage asset = await fixture.Http.GetAsync(fixture.Address(path));
+            Assert.Equal(HttpStatusCode.OK, asset.StatusCode);
+            Assert.Equal(type, asset.Content.Headers.ContentType?.MediaType);
+        }
+
+        // Nobody signed in, and nobody able to: no account in the bar, and no sign-in to offer.
+        string home = await fixture.Http.GetStringAsync(fixture.Address("home"));
+        string account = home.Split("<div class=\"site-account\">")[1].Split("</div>")[0];
+        Assert.DoesNotContain("data-site-signout", account, StringComparison.Ordinal);
+        Assert.DoesNotContain("data-site-signin", account, StringComparison.Ordinal);
+
+        // A page that is not there says so in the site's own page, with the way on; an API that is not there is just not there.
+        HttpResponseMessage missing = await fixture.Http.GetAsync(fixture.Address("no/such/page"));
+        Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
+        string nowhere = await missing.Content.ReadAsStringAsync();
+        Assert.Contains("There's no page here", nowhere, StringComparison.Ordinal);
+        Assert.Contains("class=\"site-header\"", nowhere, StringComparison.Ordinal);
+        HttpResponseMessage api = await fixture.Http.GetAsync(fixture.Address("home/api/nothing"));
+        Assert.Equal(HttpStatusCode.NotFound, api.StatusCode);
+        Assert.Empty(await api.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task A_signed_in_player_goes_from_the_front_door_to_their_own_page_which_names_them_in_the_menu_bar()
+    {
+        await using Fixture fixture = await Fixture.StartAsync(_data, signIn: false);
+        HttpResponseMessage door = await fixture.AsAsync(1001, "Alice", HttpMethod.Get, string.Empty);
+        Assert.Equal(HttpStatusCode.Redirect, door.StatusCode);
+        Assert.Equal("/home", door.Headers.Location!.OriginalString);
+
+        // The about page is still theirs to read; every page names them, with a way to sign out.
+        string about = await fixture.AsStringAsync(1001, "Alice", "about");
+        Assert.Contains("rules engine fast enough to train modern AI on", about, StringComparison.Ordinal);
+        foreach (string path in new[] { "home", "draft", "decks", "status" })
+        {
+            string page = await fixture.AsStringAsync(1001, "Alice", path);
+            Assert.Contains("<span class=\"site-name\">Alice</span>", page, StringComparison.Ordinal);
+            Assert.Contains("data-site-signout", page, StringComparison.Ordinal);
+        }
+
+        // A name is text, never markup.
+        string mallory = await fixture.AsStringAsync(1009, "<b>Mallory</b>", "home");
+        Assert.Contains("&lt;b&gt;Mallory&lt;/b&gt;", mallory, StringComparison.Ordinal);
+        Assert.DoesNotContain("<b>Mallory</b>", mallory, StringComparison.Ordinal);
+
+        using JsonDocument board = JsonDocument.Parse(await fixture.AsStringAsync(1001, "Alice", "home/api/board"));
+        JsonElement value = board.RootElement.GetProperty("value");
+        Assert.Equal("Alice", value.GetProperty("me").GetProperty("name").GetString());
+        Assert.Empty(value.GetProperty("events").EnumerateArray());
+        Assert.Equal(0, value.GetProperty("decks").GetInt32());
+    }
+
+    [Fact]
+    public async Task A_player_drops_out_of_their_draft_from_their_page_and_it_is_listed_as_over_with_how_it_ended()
+    {
+        await using Fixture fixture = await Fixture.StartAsync(_data, signIn: false);
+        var alice = new DiscordPlayer(1001, "Alice");
+        var bob = new DiscordPlayer(1002, "Bob");
+        DraftSeating opened = await fixture.Drafts.OpenAsync(alice);
+        Assert.Null((await fixture.Drafts.JoinAsync(opened.Draft!.Id, bob)).Refusal);
+        string id = opened.Draft.Id;
+
+        // Being played: on Bob's page, with a way back to his seat and a way out of it.
+        using (JsonDocument before = JsonDocument.Parse(await fixture.AsStringAsync(1002, "Bob", "home/api/board")))
+        {
+            JsonElement value = before.RootElement.GetProperty("value");
+            Assert.True(value.GetProperty("draft").GetProperty("drafting").GetBoolean());
+            Assert.Equal(id, value.GetProperty("draft").GetProperty("event").GetString());
+            JsonElement live = Assert.Single(value.GetProperty("events").EnumerateArray());
+            Assert.Equal((id, true, true, "winston"), (live.GetProperty("id").GetString(), live.GetProperty("live").GetBoolean(), live.GetProperty("canDrop").GetBoolean(), live.GetProperty("format").GetString()));
+        }
+
+        // Signed out, nobody drops anyone; signed in, not out of someone else's event.
+        HttpResponseMessage anonymous = await fixture.Http.PostAsync(fixture.Address("home/api/drop"), new StringContent($$"""{"event":"{{id}}"}""", Encoding.UTF8, "application/json"));
+        Assert.Equal(HttpStatusCode.Unauthorized, anonymous.StatusCode);
+        Assert.Contains("not in that draft", await Refusal(await fixture.AsAsync(1003, "Carol", HttpMethod.Post, "home/api/drop", $$"""{"event":"{{id}}"}""")), StringComparison.Ordinal);
+
+        HttpResponseMessage dropped = await fixture.AsAsync(1002, "Bob", HttpMethod.Post, "home/api/drop", $$"""{"event":"{{id}}"}""");
+        Assert.Null(await Refusal(dropped));
+        Assert.False(fixture.Drafts.InDraft(bob.Id));
+        Assert.Contains("not being played", await Refusal(await fixture.AsAsync(1002, "Bob", HttpMethod.Post, "home/api/drop", $$"""{"event":"{{id}}"}""")), StringComparison.Ordinal);
+
+        // Over for both, each told how it ended for them, and neither in a draft.
+        foreach ((ulong player, string name) in new[] { (1002UL, "Bob"), (1001UL, "Alice") })
+        {
+            using JsonDocument after = JsonDocument.Parse(await fixture.AsStringAsync(player, name, "home/api/board"));
+            JsonElement value = after.RootElement.GetProperty("value");
+            Assert.Equal(JsonValueKind.Null, value.GetProperty("draft").ValueKind);
+            JsonElement over = Assert.Single(value.GetProperty("events").EnumerateArray());
+            Assert.False(over.GetProperty("live").GetBoolean());
+            Assert.False(over.GetProperty("canDrop").GetBoolean());
+            Assert.Equal(("Called off", player == bob.Id), (over.GetProperty("outcome").GetString(), over.GetProperty("dropped").GetBoolean()));
+            Assert.Equal("Bob dropped from the draft.", over.GetProperty("detail").GetString());
+        }
+    }
+
+    [Fact]
+    public async Task A_player_leaves_a_table_still_filling_from_the_site()
+    {
+        await using Fixture fixture = await Fixture.StartAsync(_data, signIn: false);
+        QueueSeating table = await fixture.Queues.CreateTableAsync(new QueueSettings { Cube = "rw-aggro", Cards = 18, MinimumDeck = 20 }, new DiscordPlayer(1001, "Alice"));
+        Assert.Null(table.Refusal);
+        Assert.NotNull(fixture.Queues.TableOf(1001));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await fixture.Http.PostAsync(fixture.Address("home/api/leave"), new StringContent("{}", Encoding.UTF8, "application/json"))).StatusCode);
+        Assert.Contains("not at a table", await Refusal(await fixture.AsAsync(1002, "Bob", HttpMethod.Post, "home/api/leave", "{}")), StringComparison.Ordinal);
+        Assert.Null(await Refusal(await fixture.AsAsync(1001, "Alice", HttpMethod.Post, "home/api/leave", "{}")));
+        Assert.Null(fixture.Queues.TableOf(1001));
+    }
+
+    /// <summary>An API's refusal, or null for none, from a 200 answer.</summary>
+    private static async Task<string?> Refusal(HttpResponseMessage answer)
+    {
+        Assert.Equal(HttpStatusCode.OK, answer.StatusCode);
+        using JsonDocument body = JsonDocument.Parse(await answer.Content.ReadAsStringAsync());
+        JsonElement refusal = body.RootElement.GetProperty("value").GetProperty("refusal");
+        return refusal.ValueKind == JsonValueKind.Null ? null : refusal.GetString();
     }
 
     [Fact]
@@ -340,11 +503,48 @@ public sealed class SiteTests : IDisposable
 
         public Uri Address(string path) => new($"http://127.0.0.1:{_port}/{path}");
 
+        public DraftHost Drafts => _drafts;
+
+        /// <summary>
+        /// Discord's sign-in is Discord's, so here a player is a header on the request - "1001:Alice" - which this turns
+        /// into the claims the sign-in cookie would carry.
+        /// </summary>
+        private static Task SignInByHeader(Microsoft.AspNetCore.Http.HttpContext context, Func<Task> next)
+        {
+            if (context.Request.Headers.TryGetValue(AsHeader, out var who) && who.ToString().Split(':', 2) is [{ } id, { } name])
+            {
+                context.User = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity(
+                    [new(System.Security.Claims.ClaimTypes.NameIdentifier, id), new(System.Security.Claims.ClaimTypes.Name, name)], "test"));
+            }
+
+            return next();
+        }
+
+        /// <summary>A request made as a player signed in.</summary>
+        public async Task<HttpResponseMessage> AsAsync(ulong id, string name, HttpMethod method, string path, string? body = null)
+        {
+            using var request = new HttpRequestMessage(method, Address(path));
+            request.Headers.Add(AsHeader, $"{id}:{name}");
+            if (body is not null) request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+            return await Http.SendAsync(request);
+        }
+
+        /// <summary>A page or an API's value, as a player signed in.</summary>
+        public async Task<string> AsStringAsync(ulong id, string name, string path)
+        {
+            using HttpResponseMessage response = await AsAsync(id, name, HttpMethod.Get, path);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.Content.ReadAsStringAsync();
+        }
+
         public static async Task<Fixture> StartAsync(string data, bool signIn)
         {
             List<int> ports = FreePorts(6);
             var store = new EventStore(data);
-            var drafts = new DraftHost(new DraftHostOptions { ContentRoot = RepoRoot.ContentRoot, Store = store, Cube = "rw-aggro", CubeCards = [], Ports = ports[1..4] });
+            var drafts = new DraftHost(new DraftHostOptions
+            {
+                ContentRoot = RepoRoot.ContentRoot, Store = store, Cube = "rw-aggro", CubeCards = CubeList.Load(Path.Combine(RepoRoot.Path, "decks", "rw-aggro.txt")), Cards = 18, Ports = ports[1..4],
+            });
             var queues = new DraftQueues(new DraftQueuesOptions
             {
                 ContentRoot = RepoRoot.ContentRoot, Store = store, Drafts = drafts, Ports = ports[1..4], CubeDirectories = [Path.Combine(RepoRoot.Path, "decks")],
@@ -379,9 +579,9 @@ public sealed class SiteTests : IDisposable
                 SignIn = account,
             };
             var playPage = new PlaySiteOptions { Games = games, Client = site, SignIn = account };
-            var home = new HomeSiteOptions { SignIn = account, Drafts = queuePage, Constructed = playPage, HasDecks = true };
+            var home = new HomeSiteOptions { SignIn = account, Drafts = queuePage, Constructed = playPage, HasDecks = true, Store = store };
             var deckSite = new DeckSiteOptions { ContentRoot = RepoRoot.ContentRoot, Store = store, SignIn = account };
-            Microsoft.AspNetCore.Builder.WebApplication web = await ClientSite.StartAsync("127.0.0.1", ports[0], root, art, signIn: account, queues: queuePage, play: playPage, home: home, decks: deckSite);
+            Microsoft.AspNetCore.Builder.WebApplication web = await ClientSite.StartAsync("127.0.0.1", ports[0], root, art, status: queuePage.Board, signIn: account, queues: queuePage, play: playPage, home: home, decks: deckSite, before: SignInByHeader);
             return new Fixture(root, ports[0], web, queues, drafts, games, home, store);
         }
 

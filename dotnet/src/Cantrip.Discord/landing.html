@@ -4,125 +4,96 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cantrip</title>
-<link rel="icon" type="image/png" href="logo.png">
+<meta name="description" content="Cantrip is a Magic: The Gathering rules engine fast enough for modern AI training. Playing it in your browser is a bonus.">
+<!--site:head-->
 <style>
-:root {
-  --window: #111318;
-  --bar: #191c22;
-  --panel: #1d2127;
-  --line: #2c313a;
-  --control: #2a303a;
-  --control-hover: #353c48;
-  --control-border: #3a4250;
-  --fg: #e8eaee;
-  --fg-soft: #a6adb8;
-  --fg-muted: #6c7482;
-  --on-accent: #17130a;
-  --accent: #f1b44c;
-  --accent-hover: #f6c66e;
-  --hover: #8ec9ff;
-  --discord: #5865f2;
-  color-scheme: dark;
-}
-* { box-sizing: border-box; }
-html, body { margin: 0; }
-body {
-  background: var(--window);
-  color: var(--fg);
-  font: 15px/1.5 "Segoe UI", -apple-system, BlinkMacSystemFont, Inter, Roboto, "Helvetica Neue", sans-serif;
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-}
-a { color: var(--hover); }
-
-header.top {
-  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-  padding: 12px 24px; background: var(--bar); border-bottom: 1px solid var(--line);
-}
-header.top .brand { font-size: 20px; font-weight: 600; letter-spacing: .2px; color: var(--accent); }
-header.top nav { display: flex; gap: 18px; flex-wrap: wrap; }
-header.top nav a { color: var(--fg-soft); text-decoration: none; font-size: 14px; }
-header.top nav a:hover { color: var(--fg); }
-header.top .who { margin-left: auto; }
-
-a.button {
-  display: inline-block; border-radius: 4px; padding: 7px 16px; text-decoration: none; font-size: 14px; font-weight: 600;
-  border: 1px solid var(--control-border); background: var(--control); color: var(--fg);
-}
-a.button:hover { background: var(--control-hover); }
-a.button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-a.button.primary:hover { background: var(--accent-hover); }
-a.button.discord { background: var(--discord); border-color: var(--discord); color: #fff; }
-a.button:focus-visible { outline: 2px solid var(--hover); outline-offset: 1px; }
-
-main { flex: 1; width: 100%; max-width: 960px; margin: 0 auto; padding: 56px 24px 40px; display: flex; align-items: center; justify-content: center; }
-.hero { display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; }
-.hero img { width: min(240px, 60vw); height: auto; aspect-ratio: 1; border-radius: 22%; box-shadow: 0 8px 40px rgba(0, 0, 0, .45); }
-.hero h1 { margin: 0; font-size: 44px; line-height: 1.1; font-weight: 700; color: var(--accent); }
-.hero .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-
-footer { padding: 20px 24px; border-top: 1px solid var(--line); color: var(--fg-muted); font-size: 13px; display: flex; gap: 18px; flex-wrap: wrap; }
-footer a { color: var(--fg-soft); text-decoration: none; }
-footer a:hover { color: var(--fg); }
-
-@media (max-width: 600px) {
-  header.top { padding: 10px 16px; }
-  main { padding: 32px 16px 32px; }
-  .hero h1 { font-size: 34px; }
-  footer { padding: 16px; }
+.hero { display: grid; grid-template-columns: auto 1fr; gap: 44px; align-items: center; padding: 24px 0 8px; }
+.hero-logo { width: 220px; height: 220px; border-radius: 22%; box-shadow: 0 12px 48px rgba(0, 0, 0, .5); display: block; }
+.hero h1 { margin: 0 0 12px; font-size: 46px; line-height: 1.05; font-weight: 750; color: var(--accent); letter-spacing: -.5px; }
+.hero .tagline { margin: 0 0 14px; font-size: 21px; line-height: 1.4; color: var(--fg); font-weight: 600; max-width: 620px; }
+.hero p.text { margin: 0 0 12px; color: var(--fg-soft); font-size: 16px; max-width: 620px; }
+.hero .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+.ways { margin-top: 56px; }
+.ways h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .8px; color: var(--fg-soft); margin: 0 0 12px; font-weight: 650; }
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; gap: 22px; text-align: center; padding-top: 4px; }
+  .hero-logo { width: 140px; height: 140px; margin: 0 auto; }
+  .hero h1 { font-size: 36px; }
+  .hero .tagline { font-size: 18px; margin-left: auto; margin-right: auto; }
+  .hero p.text { margin-left: auto; margin-right: auto; }
+  .hero .actions { justify-content: center; }
+  .ways { margin-top: 40px; }
 }
 </style>
 </head>
-<body>
-<header class="top">
-  <span class="brand">Cantrip</span>
-  <nav>
-    <a href="draft">Draft</a>
-    <a href="constructed">Constructed</a>
-    <a href="https://github.com/cantrip-rs/">GitHub</a>
-    <a href="https://discord.gg/x24qcVeT2w">Discord</a>
-  </nav>
-  <div class="who" id="who"><a class="button discord" href="signin?then=home">Log in with Discord</a></div>
-</header>
+<body data-page="about">
+<!--site:header-->
 
-<main>
-  <section class="hero">
-    <img src="logo.png" alt="The Cantrip logo" width="240" height="240">
-    <h1>Cantrip</h1>
-    <div class="actions">
-      <a class="button primary" href="draft">Draft</a>
-      <a class="button" href="constructed">Play Constructed</a>
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <img class="hero-logo" src="logo.png" alt="The Cantrip logo" width="220" height="220">
+    <div>
+      <h1 id="hero-title">Cantrip</h1>
+      <p class="tagline">A Magic: The Gathering rules engine fast enough to train modern AI on.</p>
+      <p class="text">Cantrip plays Magic exactly as the Comprehensive Rules write it, and quickly enough to play out and search the
+        enormous numbers of games that today's machine-learning methods learn from.</p>
+      <p class="text">A fast, accurate game of Magic in your browser comes along as a bonus: draft a cube with friends or bots,
+        or bring a Standard deck.</p>
+      <div class="actions" id="actions">
+        <a class="button discord large" href="signin?then=home" data-site-signin>Sign in with Discord</a>
+        <a class="button large" href="draft">Browse drafts</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="ways" aria-labelledby="ways-title">
+    <h2 id="ways-title">Play</h2>
+    <div class="tiles">
+      <a class="card" href="draft">
+        <span class="tile-title">Draft</span>
+        <span class="tile-text">Booster pods of eight, or two-player grid and Winston drafts of a cube. Then build and play.</span>
+        <span class="tile-go">Find a table &rarr;</span>
+      </a>
+      <a class="card" href="constructed">
+        <span class="tile-title">Constructed</span>
+        <span class="tile-text">One-on-one games with a deck from the Standard gauntlet.</span>
+        <span class="tile-go">Find a game &rarr;</span>
+      </a>
+      <a class="card" href="decks">
+        <span class="tile-title">Decks</span>
+        <span class="tile-text">Build decks for any format from every card the engine plays, and keep them.</span>
+        <span class="tile-go">Open your decks &rarr;</span>
+      </a>
     </div>
   </section>
 </main>
 
-<footer>
-  <a href="https://github.com/cantrip-rs/">GitHub</a>
-  <a href="https://discord.gg/x24qcVeT2w">Discord</a>
-  <a href="status">Server status</a>
-</footer>
-
+<!--site:footer-->
 <script>
-(async () => {
+(() => {
   "use strict";
-  // The log in link works as it stands; this only turns it into a way to the player's page for someone already signed in,
-  // and takes it away where sign-in isn't set up.
-  try {
-    const response = await fetch("home/api/board", { cache: "no-store", credentials: "same-origin" });
-    if (!response.ok) return;
-    const board = (await response.json()).value;
-    const who = document.getElementById("who");
-    if (board.me) {
-      who.innerHTML = "";
-      const link = document.createElement("a");
-      link.className = "button primary";
-      link.href = "home";
-      link.textContent = `${board.me.name}: my games`;
-      who.append(link);
-    } else if (!board.signIn) {
-      who.innerHTML = "";
-    }
-  } catch { /* the link stands */ }
+  // The page works as it stands; this only fits the way in to who is here: a player signed in goes to their page, and
+  // where nobody can sign in, there is nothing to sign in with.
+  const actions = document.getElementById("actions");
+  const signedIn = document.querySelector(".site-me");
+  const signInButton = actions.querySelector("[data-site-signin]");
+  if (signedIn) {
+    signInButton.outerHTML = `<a class="button primary large" href="home">Go to my page</a>`;
+  } else if (!document.querySelector(".site-account [data-site-signin]")) {
+    signInButton.outerHTML = `<a class="button primary large" href="draft">Find a draft</a>`;
+    actions.querySelector('a[href="draft"]:not(.primary)')?.setAttribute("href", "constructed");
+    const second = actions.querySelectorAll("a")[1];
+    if (second) second.textContent = "Play constructed";
+  }
+
+  // Only the ways to play this server has: the menu bar lists them.
+  for (const tile of document.querySelectorAll(".ways a.card")) {
+    if (!document.querySelector(`.site-nav a[href="${tile.getAttribute("href")}"]`)) tile.remove();
+  }
+  for (const link of actions.querySelectorAll("a:not([data-site-signin]):not([href='home'])")) {
+    if (!document.querySelector(`.site-nav a[href="${link.getAttribute("href")}"]`)) link.remove();
+  }
+  if (!document.querySelector(".ways a.card")) document.querySelector(".ways").remove();
 })();
 </script>
 </body>

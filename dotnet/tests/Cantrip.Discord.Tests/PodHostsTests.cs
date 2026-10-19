@@ -39,7 +39,30 @@ public sealed class PodHostsTests : IDisposable
         Assert.Equal(0, pods.Underway(0));
     }
 
-    private static string Create(EventStore store) => BoosterPod.Create(store, ContentCache.Get(RepoRoot.ContentRoot), new BoosterDraftSetup
+    [Fact]
+    public async Task A_player_who_drops_from_their_pod_is_in_no_draft_and_the_pod_plays_on()
+    {
+        var store = new EventStore(_data);
+        string id = Create(store, discord: true);
+        BoosterPod.Open(store, id, ContentCache.Get(RepoRoot.ContentRoot)).Keep(PodHosts.QueueKey, "4242");
+        await using var pods = new PodHosts(new PodHostsOptions { ContentRoot = RepoRoot.ContentRoot, Store = store, Ports = FreePorts(2) });
+        Assert.Equal(1, await pods.ResumeAsync());
+        Assert.True(pods.Hosts(id));
+        Assert.True(pods.InDraft(1003));
+
+        Assert.Null(await pods.DropAsync(id, new DiscordPlayer(1003, "Player 3")));
+        Assert.False(pods.InDraft(1003));
+        Assert.Equal("You are not in a booster draft.", (await pods.ReturnAsync(new DiscordPlayer(1003, "Player 3"))).Refusal);
+        Assert.Equal("You have already dropped.", await pods.DropAsync(id, new DiscordPlayer(1003, "Player 3")));
+        Assert.Equal("That draft is over.", await pods.DropAsync("no-such-event", new DiscordPlayer(1003, "Player 3")));
+
+        // Everyone else is still in it.
+        Assert.True(pods.InDraft(1004));
+        Assert.True(store.LoadEvent(id)!.Participant("discord-1003")!.Dropped);
+        Assert.Equal(1, pods.Underway(4242));
+    }
+
+    private static string Create(EventStore store, bool discord = false) => BoosterPod.Create(store, ContentCache.Get(RepoRoot.ContentRoot), new BoosterDraftSetup
     {
         Name = "Pod",
         Cube = "RW Aggro",
@@ -48,7 +71,7 @@ public sealed class PodHostsTests : IDisposable
         PackSize = 5,
         Rounds = 1,
         Seed = 5,
-        Players = [.. Enumerable.Range(1, 8).Select(seat => ($"p{seat}", $"Player {seat}"))],
+        Players = [.. Enumerable.Range(1, 8).Select(seat => (discord ? $"discord-{1000 + seat}" : $"p{seat}", $"Player {seat}"))],
     }).Record.Id;
 
     private static List<int> FreePorts(int count)

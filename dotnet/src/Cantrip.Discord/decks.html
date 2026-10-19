@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cantrip - Decks</title>
+<!--site:head-->
+</head>
+<body data-page="decks">
+<!--site:header-->
+<main id="main">
+  <div class="page-head">
+    <div class="titles">
+      <h1>Decks</h1>
+      <p class="lead">Your deck library. Build a deck for any format from every card the engine plays: it's checked as you build, and kept however it stands.</p>
+    </div>
+    <div class="actions" id="head-actions"></div>
+  </div>
+  <div id="content" aria-live="polite"><p class="hint">Loading your decks&hellip;</p></div>
+</main>
+<!--site:footer-->
+
+<dialog id="new" aria-labelledby="new-title">
+  <form method="dialog" id="new-form">
+    <h2 id="new-title">New deck</h2>
+    <div class="fields"><label class="field wide">Format<select name="format" id="new-format"></select></label></div>
+    <p class="hint">The deck editor opens on an empty deck in this format. Name it and press Save to keep it here.</p>
+    <div class="actions">
+      <button type="button" class="button" id="new-cancel">Cancel</button>
+      <button type="submit" class="button primary">Open the editor</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="rename" aria-labelledby="rename-title">
+  <form method="dialog" id="rename-form">
+    <h2 id="rename-title">Rename deck</h2>
+    <label class="field">Name<input type="text" name="name" id="rename-name" maxlength="100" required autocomplete="off"></label>
+    <p class="form-error" id="rename-error" role="alert"></p>
+    <div class="actions">
+      <button type="button" class="button" id="rename-cancel">Cancel</button>
+      <button type="submit" class="button primary" id="rename-submit">Rename</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(() => {
+  "use strict";
+
+  // The player's decks, from the site's deck API, grouped by format: each opened in the deck editor (the web client,
+  // /decks/edit?deck=ID), copied, renamed or deleted from here. A new deck starts in the editor, in the format chosen.
+  let formats = [];
+  let decks = null;
+  let signedOut = false;
+  let failed = false;
+  let renaming = null;
+
+  const $ = id => document.getElementById(id);
+  const { esc, plural, toast, confirm } = window.Cantrip;
+  const titleOf = key => formats.find(f => f.key === key)?.title ?? key;
+  const editLink = deck => `decks/edit?deck=${encodeURIComponent(deck.id)}`;
+
+  async function load() {
+    try {
+      formats = await window.Cantrip.getJson("decks/api/formats");
+    } catch { formats = []; }
+    // Nobody signed in has no decks to ask for: the menu bar says who is.
+    if (!document.querySelector(".site-me")) { signedOut = true; render(); return; }
+    try {
+      const response = await fetch("decks/api/list", { cache: "no-store", credentials: "same-origin" });
+      signedOut = response.status === 401;
+      decks = response.ok ? await response.json() : null;
+      failed = !response.ok && !signedOut;
+    } catch {
+      decks = null;
+      failed = true;
+    }
+    render();
+  }
+
+  function deckRow(deck) {
+    return `<div class="row">
+      <div class="main"><div class="title"><a href="${editLink(deck)}">${esc(deck.name)}</a></div>
+        <div class="sub">${esc(titleOf(deck.format))} · ${plural(deck.cards, "card")}</div></div>
+      <div class="side">
+        <button type="button" class="button quiet small" data-rename="${esc(deck.id)}" aria-label="Rename ${esc(deck.name)}">Rename</button>
+        <button type="button" class="button quiet small" data-copy="${esc(deck.id)}" aria-label="Copy ${esc(deck.name)}">Copy</button>
+        <button type="button" class="button danger small" data-delete="${esc(deck.id)}" aria-label="Delete ${esc(deck.name)}">Delete</button>
+        <a class="button primary small" href="${editLink(deck)}" aria-label="Edit ${esc(deck.name)}">Edit</a>
+      </div>
+    </div>`;
+  }
+
+  function render() {
+    const canSignIn = Boolean(document.querySelector(".site-account [data-site-signin]"));
+    $("head-actions").innerHTML = signedOut ? "" : `<button type="button" class="button primary" data-new>New deck</button>`;
+    if (signedOut) {
+      $("content").innerHTML = `<div class="signin-card"><img src="logo.png" alt="" width="72" height="72"><h2>Keep your decks</h2>
+        <p>${canSignIn ? "Sign in with Discord to save decks here and open them again from any computer." : "Nobody can sign in on this server, so decks can't be saved here."} You can still try the editor without saving.</p>
+        <div class="actions">${canSignIn ? `<a class="button discord" href="signin?then=decks" data-site-signin>Sign in with Discord</a>` : ""}<a class="button" href="decks/edit">Open the editor</a></div></div>`;
+      return;
+    }
+    if (failed || decks === null) {
+      $("content").innerHTML = `<div class="notice error"><span class="grow">Your decks couldn't be loaded.</span><button type="button" class="button small" data-retry>Try again</button></div>`;
+      return;
+    }
+    if (decks.length === 0) {
+      $("content").innerHTML = `<div class="empty"><p>No decks yet. Build your first one: pick a format, find cards by name, type or rules text, and drag them in.</p>
+        <div class="actions"><button type="button" class="button primary" data-new>New deck</button></div></div>`;
+      return;
+    }
+    const keys = [...new Set([...formats.map(f => f.key), ...decks.map(d => d.format)])];
+    $("content").innerHTML = keys.filter(key => decks.some(d => d.format === key)).map(key => {
+      const mine = decks.filter(d => d.format === key);
+      return `<section class="block" aria-labelledby="h-${esc(key)}">
+        <div class="block-head"><h2 id="h-${esc(key)}">${esc(titleOf(key))}</h2><span class="count">${plural(mine.length, "deck")}</span>
+          <div class="actions"><a class="button quiet small" href="decks/edit?format=${encodeURIComponent(key)}">New ${esc(titleOf(key))} deck</a></div></div>
+        <div class="rows">${mine.map(deckRow).join("")}</div>
+      </section>`;
+    }).join("");
+  }
+
+  async function saved(id) {
+    const response = await fetch(`decks/api/deck/${encodeURIComponent(id)}`, { cache: "no-store", credentials: "same-origin" });
+    if (response.status === 404) throw new Error("That deck is gone.");
+    if (!response.ok) throw new Error(`The deck couldn't be opened (the server said ${response.status}).`);
+    return response.json();
+  }
+
+  async function save(deck) {
+    const answer = await window.Cantrip.post("decks/api/save", deck);
+    if (answer?.refusal) throw new Error(answer.refusal);
+    return answer;
+  }
+
+  function openNew() {
+    $("new-format").innerHTML = formats.map(f => `<option value="${esc(f.key)}">${esc(f.title)}</option>`).join("");
+    $("new").showModal();
+  }
+
+  $("new-form").addEventListener("submit", event => {
+    event.preventDefault();
+    location.assign(`decks/edit?format=${encodeURIComponent($("new-format").value)}`);
+  });
+  $("new-cancel").addEventListener("click", () => $("new").close());
+
+  $("rename-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    const name = $("rename-name").value.trim();
+    if (!name) { $("rename-error").textContent = "A deck needs a name."; return; }
+    $("rename-submit").disabled = true;
+    try {
+      const deck = await saved(renaming);
+      deck.name = name;
+      await save(deck);
+      $("rename").close();
+      toast(`Renamed to ${name}.`);
+      await load();
+    } catch (error) {
+      $("rename-error").textContent = error.message;
+    } finally {
+      $("rename-submit").disabled = false;
+    }
+  });
+  $("rename-cancel").addEventListener("click", () => $("rename").close());
+
+  document.addEventListener("click", async event => {
+    const target = event.target.closest("button");
+    if (!target || target.disabled || target.closest("dialog")) return;
+    const deck = id => decks?.find(d => d.id === id);
+    if ("new" in target.dataset) openNew();
+    else if ("retry" in target.dataset) load();
+    else if (target.dataset.rename) {
+      renaming = target.dataset.rename;
+      $("rename-name").value = deck(renaming)?.name ?? "";
+      $("rename-error").textContent = "";
+      $("rename").showModal();
+      $("rename-name").select();
+    }
+    else if (target.dataset.copy) {
+      try {
+        const copy = await saved(target.dataset.copy);
+        copy.id = "";
+        copy.name = `${copy.name} (copy)`.slice(0, 100);
+        await save(copy);
+        toast(`Saved a copy: ${copy.name}.`);
+        await load();
+      } catch (error) { toast(error.message, "error"); }
+    }
+    else if (target.dataset.delete) {
+      const which = deck(target.dataset.delete);
+      if (!await confirm({ title: `Delete ${which?.name ?? "this deck"}?`, body: ["It's gone for good: this can't be undone."], confirmLabel: "Delete deck", danger: true })) return;
+      try {
+        await window.Cantrip.post("decks/api/delete", { id: target.dataset.delete });
+        toast(`Deleted ${which?.name ?? "the deck"}.`);
+      } catch (error) { toast(error.message, "error"); }
+      await load();
+    }
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>

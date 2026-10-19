@@ -101,18 +101,48 @@ free.
 
 ### The draft queue page
 
-The bot's site has a front door. The bare address (`/`, with no query) is the home page (`HomeSite.LandingPage`, `landing.html`):
-the logo (`/logo.png`, `logo.png` built into the bot: the repository root's `cantrip.png` at 384 pixels) and the title, with
-links to the GitHub organization, the Discord server, `/draft`, `/constructed` and a Discord log in - and no text about the
-project.
-The web client is at the same address with a table in its query (`/?server=...#ticket`), which is what a seat's link is, so
-a request with a query goes on to the client. `/home` (`HomeSite`, `home.html`) is the page a signed-in player lands on -
-signing in with no page named comes back to it: the table they are filling, the draft or the constructed game they are in
-with a button back to the seat (the draft and constructed pages' own API gives it), and a place for leagues when there
-are some. `/queue` and `/play`, the pages' former names, redirect to `/draft` and `/constructed`.
+The bot's site is every page but a game table, and they are one site: the same menu bar, layout, type, colours,
+components and footer on each (`SiteChrome`). A page is a template built into the bot whose markers - `<!--site:head-->`,
+`<!--site:header-->`, `<!--site:footer-->` - are filled in as it is served: a `<base>` at the site's root (every link is
+relative to it), the logo as the tab's icon, and the shared `/site.css` and `/site.js`. The menu bar shows the Cantrip
+logo (`/logo.png`, `logo.png` built into the bot: the repository root's `cantrip.png` at 384 pixels), never the word,
+and links Home, Draft, Constructed, Decks and Events - only the sections the bot serves - with the page's own lit
+(`aria-current`); at its right, **Sign in with Discord**, or the player's Discord picture (else their initial) and name,
+linking to their page, and **Sign out**. Under 760 pixels the sections fold behind a menu button. The footer links About,
+GitHub and the Discord server. While a signed-in player has a seat somewhere - a table filling, a draft or pod under way,
+a constructed game - a strip under the bar on every page but their own says so with the button back to it (`site.js`
+asks `/home/api/board` every five seconds). `site.js` also gives the pages their helpers: a confirmation dialog for what
+cannot be undone, notices that fade, and going to a seat. A page that is not there (`/no/such/page`) is the site's own
+404 page with the way on; an API that is not there is a bare 404.
 
-`/decks` is the constructed deck editor (`DeckSite`), given a data directory to keep decks in: it sends the player to the
-web client's deck editor (`/?decks`), and serves what that is built from. `/decks/api/catalog`, open to anyone, is every
+| Page | What it is | Reached from | Leads on to |
+| --- | --- | --- | --- |
+| `/` | The home page (`HomeSite.LandingPage`, `landing.html`): the logo, what Cantrip is for, **Sign in with Discord**, **Browse drafts**, and a tile for each way to play. A player signed in goes straight on to `/home`. | The logo; the bare address. | Sign-in, `/draft`, `/constructed`, `/decks`. |
+| `/about` | The same page for anyone, signed in or not. | The footer's About. | As `/`. |
+| `/home` | The player's own page (`home.html`): **Playing now** - the table they are filling (**Open my table**, **Leave**), each event they are in (**Back to my seat**, **Details** or **Standings**, **Drop**), a draft opened from Discord nobody has joined yet (**Call off**), their constructed game (**Open my game**, **Call off** while nobody has joined); **Recent events** - the events they have played, with how each ended for them and their record, each to its results on `/status`; and a tile for each way to play, with how many decks they keep. Signed out, a card to sign in. | Home in the bar; signing in with no page named. | Everything. |
+| `/draft` | The draft queues (`QueueSite`, `queue.html`), below. | Draft in the bar. | A seat in the web client; `/status` for a draft under way. |
+| `/constructed` | Constructed play (`PlaySite`, `play.html`), below. | Constructed in the bar. | A seat in the web client. |
+| `/decks` | The deck library (`DeckSite`, `decks.html`): the player's decks by format, each with **Edit**, **Rename**, **Copy** and **Delete** (asked first), **New deck** in a chosen format. Signed out, a card to sign in, and the editor to try without saving. | Decks in the bar; the Decks tile. | `/decks/edit`. |
+| `/decks/edit` | Goes to the web client's deck editor: `?deck=ID` opens that deck (`/?decks&deck=ID`), `?format=KEY` a new deck in that format. The editor's **All decks** comes back to `/decks`. | The library. | The library. |
+| `/status` | Events (`StatusSite` in `Cantrip.Server.Host`, `status.html`, served in the site's chrome): everything being played and played, each opened at `#event=ID` for its draft, pairings and standings. | Events in the bar; every event's Details, Standings and Results. | Every page, by the bar. |
+| `/enter` | Signs a seat's link in before the client (below), in the site's look; when it cannot go on, it says why with the way to `/home` and `/`. | A seat's link. | The client, or the site. |
+
+The web client is at the same address with a table in its query (`/?server=...#ticket`), which is what a seat's link is, so
+a request with a query goes on to the client. Every table goes back to the site when it is over: a game's result has a
+button back to the page its table names (`ReturnPage`), a draft called off - a player dropped - says why with the same
+button, a booster pod's final standings, or a player who has dropped from the pod, have a button back to the player's
+page, and a seat given up at a table still filling has one back to the draft queues. `/queue` and `/play`, the pages'
+former names, redirect to `/draft` and `/constructed`.
+
+**Dropping out.** A signed-in player drops out of any event they are in from their page: **Drop** asks first, saying
+what dropping does there (`POST /home/api/drop {event}`, `PodHosts.DropAsync` or `DraftHost.DropAsync`;
+[events.md](events.md#dropping-out)). From then on they are in no draft - free to join another - and the event is
+listed under Recent events as dropped. A table still filling is left with **Leave** (`POST /home/api/leave`,
+`DraftQueues.LeaveAsync`), asked first; the seat goes to the next player.
+
+`/decks` is the deck library (`DeckSite`), given a data directory to keep decks in; the editor is the web client's
+(`/?decks`), which the site serves what it is built from. `/decks/api/formats` names the formats a deck is built for.
+`/decks/api/catalog`, open to anyone, is every
 card the engine plays as printed (`CardOracle`), with its color identity and its legality in each format the editor
 builds for (Standard, Pioneer, Modern, Legacy, Vintage, Commander, Penny Dreadful), as MessagePack (`CardCatalogView`,
 `Cantrip.Client.Decks`); the legality is `content/<dataset>/legality.json`, made from Scryfall's bulk data by
@@ -121,7 +151,7 @@ builds for (Standard, Pioneer, Modern, Legacy, Vintage, Commander, Penny Dreadfu
 `/decks/api/save` (a `SavedDeck`; no id makes a new deck) and POST `/decks/api/delete` `{id}`. They are kept as
 `decks/{player}/{deck}.json` in the data directory, in the API's own shape (`DeckJson`). A deck is saved however it
 stands - legality is the editor's to show (`DeckRules`), never a reason to refuse - and refused only when malformed: an
-unknown format, no name or one over 100 characters, a count outside 1 to 999. The player's page (`/home`) links to it.
+unknown format, no name or one over 100 characters, a count outside 1 to 999. The menu bar's Decks and the player's page lead to it.
 
 `/draft` on the bot's site is the queues on the web, open to anyone (`QueueSite`, its page `queue.html`): a section for
 each kind of draft - booster, grid, Winston - with every queue and what it drafts, every table still taking players and
@@ -142,8 +172,9 @@ their avatar kept (or, not being on the server, their account's own), one seat a
   player takes its first seat. It belongs to no channel: a channel's **Join** never seats anyone there, only players who
   pick it on the page. It forms, checks everyone is ready and becomes a draft exactly as a queue's table does, and
   closes once everyone has left it.
-- **Open my table** gives a seated player a fresh link to their seat, and **Back to my draft** takes a player in a draft
-  back to it, as `/cantrip mydraft` does.
+- **Open my table** on their table's card gives a seated player a fresh link to their seat, and **Leave** gives the seat
+  up, asked first; **Back to my draft**, in the strip under the menu bar on every page, takes a player in a draft back to
+  it, as `/cantrip mydraft` does.
 
 The page needs the Discord application's OAuth2 client id (`--oauth-client-id`, or `CANTRIP_DISCORD_CLIENT_ID`) and its
 secret (`CANTRIP_DISCORD_SECRET`, from the environment only), and the redirect `{site}/signin/discord` registered
@@ -168,7 +199,7 @@ A player signed in with Discord, exactly as on the queue page, presses **New Gam
 (the page remembers their last one in that browser; **Random deck** picks one), and the page goes straight to their
 seat. The game is a `/cantrip host` game in all but its decks - the same ports, one game per player across Discord and
 the page, dealt once both players have the table open, expiring if it never is - and the table shows each player the
-deck their opponent brought only as the game shows it. **Open my game** gives a seat back; **Cancel** calls off a game
+deck their opponent brought only as the game shows it. **Open my game** gives a seat back; **Call off** calls off a game
 of one's own that nobody has joined.
 
 ## Drafts
@@ -329,8 +360,13 @@ at `/status`, every event, forming table and game being played and the history o
 And the draft queue page at `/draft` (`QueueSite`): what `DraftQueues` has forming and the status board has under way,
 Discord sign-in, and seats handed out as links to the client. `DraftQueues` is tested with tables of a player's own in
 `DraftQueuesTests`, the pages over real HTTP in `SiteTests` - what they show, that a seat wants signing in, and the
-request that goes to Discord. `/constructed` is `PlaySite` over the `Matchmaker`, whose games of a format each seat choose a
-deck for (`MatchmakerTests`); both pages sign in through `SiteSignIn`.
+request that goes to Discord; that every page has the one menu bar and footer, the 404 page, a signed-in player's way in,
+and dropping out and leaving from the player's page. `/constructed` is `PlaySite` over the `Matchmaker`, whose games of a
+format each seat choose a deck for (`MatchmakerTests`); every page signs in through `SiteSignIn`, and is framed by
+`SiteChrome`. `SitePagesTests` (in `Cantrip.Client.Web.Tests`) opens every page in a browser at a desktop's width and a
+phone's, signed out and in, goes from page to page by the menu bar, drops out of a draft from the player's page, and
+pictures each page under `TestResults\web\SitePagesTests` to be looked at; a test sign-in stands in for Discord's
+(`ClientSite.StartAsync`'s `before`, which tests alone pass).
 
 The seat itself is a `GameServer` ticket, described in [table-lifecycle.md](table-lifecycle.md#seat-tickets).
 

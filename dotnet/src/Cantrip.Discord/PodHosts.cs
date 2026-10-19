@@ -29,6 +29,12 @@ public sealed class PodHostsOptions
     /// <summary>Where card art is, said by every table to the clients at it (<see cref="GameServerOptions.Art"/>); null for not said.</summary>
     public Uri? Art { get; init; }
 
+    /// <summary>
+    /// The site's page a pod's own table names for its players to go back to (<see cref="GameServerOptions.Return"/>):
+    /// from the final standings, or once they have dropped. Its games' tables name none - the pod sends their players on.
+    /// </summary>
+    public ReturnPage? Return { get; init; }
+
     /// <summary>How long a finished pod's table stays up for its players to read the final standings.</summary>
     public TimeSpan Linger { get; init; } = TimeSpan.FromMinutes(30);
 
@@ -148,7 +154,7 @@ public sealed class PodHosts : IAsyncDisposable
         finally { _gate.Release(); }
     }
 
-    /// <summary>Whether a player is in a pod still being played.</summary>
+    /// <summary>Whether a player is in a pod still being played, and has not dropped from it.</summary>
     public bool InDraft(ulong player)
     {
         _gate.Wait();
@@ -172,6 +178,38 @@ public sealed class PodHosts : IAsyncDisposable
         {
             _gate.Release();
         }
+    }
+
+    /// <summary>Whether a pod being played is this host's, by its event id.</summary>
+    public bool Hosts(string eventId)
+    {
+        _gate.Wait();
+        try { return _pods.TryGetValue(eventId, out Hosted? hosted) && hosted.EndedAt is null; }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>
+    /// A player drops out of their pod (<see cref="BoosterPod.Drop(string)"/>): from then on they are in no draft, and free
+    /// to join another. Null once they have; otherwise why not.
+    /// </summary>
+    public async Task<string?> DropAsync(string eventId, DiscordPlayer player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        ulong queue;
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (!_pods.TryGetValue(eventId, out Hosted? hosted) || hosted.EndedAt is not null) return "That draft is over.";
+            if (hosted.Host.Pod.Drop(DraftHost.PlayerId(player)) is { } refusal) return refusal;
+            queue = hosted.Queue;
+        }
+        finally
+        {
+            _gate.Release();
+        }
+
+        await Raise(queue).ConfigureAwait(false);
+        return null;
     }
 
     /// <summary>
@@ -238,7 +276,8 @@ public sealed class PodHosts : IAsyncDisposable
     private Hosted? Live(ulong player)
     {
         string id = DraftHost.PlayerId(new DiscordPlayer(player, string.Empty));
-        return _pods.Values.FirstOrDefault(hosted => hosted.EndedAt is null && hosted.Host.Pod.Players.Any(each => each.PlayerId == id));
+        // A player who has dropped is in the pod no more: free to join another draft.
+        return _pods.Values.FirstOrDefault(hosted => hosted.EndedAt is null && hosted.Host.Pod.Players.Any(each => each.PlayerId == id) && !hosted.Host.Pod.HasDropped(id));
     }
 
     /// <summary>
@@ -262,6 +301,7 @@ public sealed class PodHosts : IAsyncDisposable
                     Event = table,
                     Portraits = _options.Portraits,
                     Art = _options.Art,
+                    Return = table is BoosterPod ? _options.Return : null,
                 }).ConfigureAwait(false);
                 return (server, _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game"));
             }

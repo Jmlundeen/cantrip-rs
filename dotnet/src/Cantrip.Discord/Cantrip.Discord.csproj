@@ -15,10 +15,16 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Cantrip.Discord.Tests" />
+    <InternalsVisibleTo Include="Cantrip.Client.Web.Tests" />
+    <!-- The site's pages, and what every one of them shares (SiteChrome). -->
     <EmbeddedResource Include="queue.html" LogicalName="Cantrip.Discord.queue.html" />
     <EmbeddedResource Include="play.html" LogicalName="Cantrip.Discord.play.html" />
     <EmbeddedResource Include="home.html" LogicalName="Cantrip.Discord.home.html" />
     <EmbeddedResource Include="landing.html" LogicalName="Cantrip.Discord.landing.html" />
+    <EmbeddedResource Include="decks.html" LogicalName="Cantrip.Discord.decks.html" />
+    <EmbeddedResource Include="notfound.html" LogicalName="Cantrip.Discord.notfound.html" />
+    <EmbeddedResource Include="site.css" LogicalName="Cantrip.Discord.site.css" />
+    <EmbeddedResource Include="site.js" LogicalName="Cantrip.Discord.site.js" />
     <!-- The Cantrip logo for the home page and its tab: the image at the repository root (the client's splash), at 384 pixels. -->
     <EmbeddedResource Include="logo.png" LogicalName="Cantrip.Discord.logo.png" />
   </ItemGroup>

@@ -554,6 +554,32 @@ public sealed class DraftQueues : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Gives up a player's seat at the table they are filling, from the site rather than the table: as Leave Table at
+    /// the table does, and a page they have open there is told. Null once they have left; otherwise why not.
+    /// </summary>
+    public async Task<string?> LeaveAsync(ulong player)
+    {
+        string id = DraftHost.PlayerId(new DiscordPlayer(player, string.Empty));
+        Forming? at;
+        await _gate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            at = Tables().FirstOrDefault(forming => forming.Table.Seats(id));
+        }
+        finally
+        {
+            _gate.Release();
+        }
+
+        if (at is null) return "You are not at a table that is filling.";
+
+        // Outside the lock: the table says it changed, which the queue follows under it.
+        return at.Table.Release(id, new SeatReleasedMessage { Detail = "You left the table." })
+            ? null
+            : "Your table's draft has begun: drop from the draft instead.";
+    }
+
     /// <summary>Every table not yet gone: the queues', and the players' own. Called under the lock.</summary>
     private IEnumerable<Forming> Tables() => _queues.Values.SelectMany(queue => queue.Tables).Concat(_own).Where(forming => !forming.Gone);
 
