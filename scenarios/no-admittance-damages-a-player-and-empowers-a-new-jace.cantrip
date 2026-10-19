@@ -1,0 +1,23 @@
+# No Admittance: "deals 3 damage to any target. Empower Jace 1" (CR 701.71a). The damage first, then a blue Jace
+# planeswalker token is made with one loyalty counter because none is controlled.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+No Admittance
+Mountain x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.No Admittance.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Battlefield.Jace.Token = true
