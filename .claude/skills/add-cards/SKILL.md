@@ -288,5 +288,7 @@ core-feature agents and review agents run on Opus.
    prompt points them at correctness, safety and rules adherence, and does not hand them a list of corner cases to
    demand tests for; the coordinator sends back only the blocking findings.
 5. **Land** each finished branch on `main` (cherry-pick its commits; a conflict stops for a look), then the corpus
-   (0 fail), the verify tests, the benchmark if the core changed; push; remove the worktree and its branch.
+   (0 fail), the verify tests, the benchmark if the core changed; `git fetch` and `git rebase origin/main` right
+   before every push (other sessions land on `main` too), re-running the tests if the rebase brought in new commits;
+   push; remove the worktree and its branch.
 6. **Report** what landed, what waited on which core gap and how it was built, and the corpus line.
