@@ -1,0 +1,52 @@
+# Dyadrine, Synthesis Amalgam's token copy: Bot2's Fractured Identity exiles Bot1's Dyadrine (2 counters, cast for {G}{W}) and Bot2
+# creates a token that's a copy of it. A token is never cast, so "equal to the amount of mana spent to cast it" is zero (CR 614.1c,
+# 601.2h; the ruling for a copy): the token is a 0/1 with no counters. Bot1's card is in exile.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Dyadrine, Synthesis Amalgam
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Fractured Identity
+Mox Emerald
+Swamp
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fractured Identity.Cast(Bot1.Battlefield.Dyadrine, Synthesis Amalgam)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Exile = Dyadrine, Synthesis Amalgam
+Bot2.Battlefield.Dyadrine, Synthesis Amalgam.Token = true
+Bot2.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Dyadrine, Synthesis Amalgam.Power = 0
+Bot2.Battlefield.Dyadrine, Synthesis Amalgam.Toughness = 1
+Bot1.Battlefield.Count = 2

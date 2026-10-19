@@ -1,0 +1,35 @@
+# Dyadrine, Synthesis Amalgam's trigger needs a +1/+1 counter on each of two creatures you control (CR 122.1: one counter from each).
+# Dyadrine holds two counters but is the only creature that has any: Bot1's Ornithopter has none, so the removal cannot be done and
+# the optional ability asks nothing, however many counters Dyadrine has (the refusal). Nothing is drawn, no Robot is made.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Ornithopter
+Dyadrine, Synthesis Amalgam
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Dyadrine, Synthesis Amalgam > Bot2)
+! Bot1.Accept
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Count = 4
+Bot1.Hand.Count = 4
+Bot2.Life = 18

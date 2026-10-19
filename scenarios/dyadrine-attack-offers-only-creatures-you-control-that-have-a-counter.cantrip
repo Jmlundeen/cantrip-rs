@@ -1,0 +1,75 @@
+# Dyadrine, Synthesis Amalgam: "remove a +1/+1 counter from each of two creatures you control." Bot1 attacks with Dyadrine (two
+# counters) while it also controls a Walking Ballista (one counter) and a Boommobile, a Vehicle that is not a creature although its
+# exhaust gave it a +1/+1 counter; Bot2 controls a Walking Ballista with a counter too. The Boommobile (not a creature) and Bot2's
+# Ballista (not Bot1's) are not offered (refused), and taking two counters from Dyadrine is refused; the removal that works takes
+# one counter from Dyadrine and one from Bot1's Ballista (its last, so it dies).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Dyadrine, Synthesis Amalgam
+Mox Jet
+Mox Ruby
+Walking Ballista
+Black Lotus
+Boommobile
+Swamp x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Walking Ballista
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Boommobile.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Colors(Red)
+Bot1.Battlefield.Boommobile.Activate(Ability: Exhaust; Bot2; X: 1)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Dyadrine, Synthesis Amalgam > Bot2)
+Bot1.Accept
+! Bot1.RemoveCounters(Boommobile: 1; Dyadrine, Synthesis Amalgam: 1)
+! Bot1.RemoveCounters(Bot2.Battlefield.Walking Ballista: 1; Dyadrine, Synthesis Amalgam: 1)
+! Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 2)
+Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 1; Bot1.Battlefield.Walking Ballista: 1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Walking Ballista; Black Lotus
+Bot1.Battlefield.Boommobile.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Robot.Token = true

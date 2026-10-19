@@ -1,0 +1,38 @@
+# Dyadrine, Synthesis Amalgam with X = 0 costs {G}{W} (mana value 2), but Sphere of Resistance ("Spells cost {1} more to cast") makes it
+# cost three, and the mana spent - three, the tax included - is what it enters with: three counters, a 3/4 (CR 601.2h, the ruling).
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Pearl
+Sphere of Resistance
+Dyadrine, Synthesis Amalgam
+Mox Ruby
+Mox Sapphire
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sphere of Resistance.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Power = 3
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.ManaValue = 2

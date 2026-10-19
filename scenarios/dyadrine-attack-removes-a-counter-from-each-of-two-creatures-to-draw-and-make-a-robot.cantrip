@@ -1,0 +1,49 @@
+# Dyadrine, Synthesis Amalgam: "Whenever you attack, you may remove a +1/+1 counter from each of two creatures you control. If you do,
+# draw a card and create a 2/2 colorless Robot artifact creature token." Dyadrine (X = 0: two counters) and Walking Ballista (X = 2: two
+# counters) come down on turn 1; on turn 3 Bot1 attacks with Dyadrine, accepts, and takes one counter from each: both are left with one
+# (a 1/2 and a 1/1), Bot1 draws and gets a Robot 2/2. Dyadrine's attack deals 1 combat damage, as the counter left after the trigger.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Black Lotus
+Dyadrine, Synthesis Amalgam
+Walking Ballista
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Dyadrine, Synthesis Amalgam > Bot2)
+Bot1.Accept
+! Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 2)
+Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 1; Walking Ballista: 1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Robot.Power = 2
+Bot1.Battlefield.Robot.Toughness = 2
+Bot1.Battlefield.Robot.Token = true
+Bot1.Battlefield.Robot.Types = Artifact; Creature
+Bot1.Hand.Count = 3
+Bot2.Life = 19

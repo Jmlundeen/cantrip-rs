@@ -1,0 +1,37 @@
+# Clone ({3}{U}) enters as a copy of Bot2's Dyadrine, Synthesis Amalgam (2 counters, cast with X = 0). The copy has Dyadrine's "enters
+# with a number of +1/+1 counters equal to the amount of mana spent to cast it" (CR 707.2, 614.1c), and the spell that became the permanent
+# is Clone, cast for four mana, so the copy enters with four counters - not Bot2's two, which a copy does not take (CR 707.2).
+# It is a legendary permanent of Bot1's own, so the legend rule leaves both (different controllers, CR 704.5j).
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Clone
+Island x17
+
+[Bot2 Deck]
+Mox Emerald
+Mox Pearl
+Dyadrine, Synthesis Amalgam
+Island x17
+
+[Actions]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Clone.Cast
+Bot1.Accept
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Power = 4
+Bot2.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 2

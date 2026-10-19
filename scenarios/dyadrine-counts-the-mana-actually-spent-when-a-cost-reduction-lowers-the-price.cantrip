@@ -1,0 +1,41 @@
+# Dyadrine, Synthesis Amalgam: "equal to the amount of mana spent to cast it", not its mana value (CR 601.2h, ruling: "any effects that
+# increase or decrease the cost to cast it will also be taken into account"). Helm of Awakening ("Spells cost {1} less to cast") makes
+# Dyadrine with X = 2 ({2}{G}{W}, mana value 4 on the stack) cost three, so only three mana is spent and it enters with three counters,
+# a 3/4 - not four.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Helm of Awakening
+Dyadrine, Synthesis Amalgam
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Helm of Awakening.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast(X: 2)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Power = 3
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Toughness = 4
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.ManaValue = 2

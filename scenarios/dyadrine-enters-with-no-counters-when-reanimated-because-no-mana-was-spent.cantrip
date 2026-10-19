@@ -1,0 +1,30 @@
+# Dyadrine put onto the battlefield without being cast has had no mana spent to cast it, so "enters with a number of +1/+1 counters
+# ... equal to the amount of mana spent to cast it" gives it none (CR 614.1c, 601.2h): Entomb puts it into the graveyard and Reanimate
+# returns it as a 0/1 (X is 0 off the stack, so its mana value is 2 and Reanimate costs Bot1 2 life, CR 202.3e).
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Reanimate
+Swamp x4
+Dyadrine, Synthesis Amalgam
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Pass
+Bot1.Search(Dyadrine, Synthesis Amalgam)
+Bot1.Hand.Reanimate.Cast(Bot1.Graveyard.Dyadrine, Synthesis Amalgam)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 18
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Power = 0
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Toughness = 1

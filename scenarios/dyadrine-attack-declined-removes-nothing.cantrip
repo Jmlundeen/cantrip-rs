@@ -1,0 +1,42 @@
+# Dyadrine, Synthesis Amalgam's attack trigger is optional ("you may"): Bot1 declines, no counter comes off either creature and
+# there is no card drawn nor Robot (the "if you do" never happens). Control: the scenario where Bot1 accepts.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Black Lotus
+Dyadrine, Synthesis Amalgam
+Walking Ballista
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 2)
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Dyadrine, Synthesis Amalgam > Bot2)
+Bot1.Decline
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Count = 5
+Bot1.Hand.Count = 2
+Bot2.Life = 18

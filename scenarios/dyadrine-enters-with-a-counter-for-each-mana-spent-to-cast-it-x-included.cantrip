@@ -1,0 +1,31 @@
+# Dyadrine, Synthesis Amalgam ({X}{G}{W}, 0/1): "enters with a number of +1/+1 counters on it equal to the amount of mana spent to cast
+# it" (CR 614.1c, 601.2h). Cast with X = 2 it costs {2}{G}{W}, four mana, so it enters with four counters and is a 4/5 trampler
+# (the {G}{W} count as much as the X). Mox Emerald and Mox Pearl pay for the colors, the Black Lotus for the rest.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Black Lotus
+Dyadrine, Synthesis Amalgam
+Swamp x3
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast(X: 2)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 4
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Power = 4
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Toughness = 5
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Keywords = Trample

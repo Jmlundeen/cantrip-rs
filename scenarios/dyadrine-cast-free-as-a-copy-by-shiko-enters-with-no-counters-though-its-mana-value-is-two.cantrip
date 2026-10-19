@@ -1,0 +1,53 @@
+# Dyadrine, Synthesis Amalgam cast as a copy by Shiko, Paragon of the Way: the copy of the card in exile is cast without paying its
+# mana cost, so no mana is spent to cast it and "enters with a number of +1/+1 counters ... equal to the amount of mana spent to cast
+# it" gives none (CR 614.1c, 601.2h, 118.9), though the spell's mana value is 2 (X is 0): the token enters as a 0/1 with no counters.
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Shiko, Paragon of the Way
+Dyadrine, Synthesis Amalgam
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Dyadrine, Synthesis Amalgam)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Dyadrine, Synthesis Amalgam)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Exile = Dyadrine, Synthesis Amalgam
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Token = true
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Power = 0
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Toughness = 1
+Bot1.Graveyard = Entomb; Swamp; Entomb; Black Lotus
+Stack.Count = 0

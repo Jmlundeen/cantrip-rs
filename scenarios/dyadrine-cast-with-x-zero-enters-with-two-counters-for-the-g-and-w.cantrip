@@ -1,0 +1,25 @@
+# Dyadrine with X = 0 costs {G}{W}: two mana spent, so two counters (a 2/3), not none - only the mana actually spent counts.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Dyadrine, Synthesis Amalgam
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Power = 2
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Toughness = 3

@@ -1,0 +1,44 @@
+# Dyadrine's attack trigger with Walking Ballista holding a single counter (X = 1): the +1/+1 counter removed from it leaves a 0/0
+# that dies as a state-based action (CR 704.5f), but the counters really did come off both creatures, so "if you do" holds: Bot1 draws
+# a card and gets the 2/2 Robot. Dyadrine keeps its other counter (X = 0 gave it two, one removed).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Black Lotus
+Dyadrine, Synthesis Amalgam
+Walking Ballista
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Dyadrine, Synthesis Amalgam.Cast
+Bot1.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Walking Ballista.Cast(X: 1)
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Dyadrine, Synthesis Amalgam > Bot2)
+Bot1.Accept
+Bot1.RemoveCounters(Dyadrine, Synthesis Amalgam: 1; Walking Ballista: 1)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Dyadrine, Synthesis Amalgam.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Robot.Token = true
+Bot1.Graveyard = Walking Ballista; Black Lotus
+Bot1.Battlefield.Count = 5
+Bot1.Hand.Count = 3
