@@ -1,0 +1,37 @@
+# Thalia, the Survivor: "Noncreature spells your opponents cast cost {1} more to cast" (CR 601.2f). Bot1 casts Thalia on
+# turn 1. Bot2's Lightning Bolt costs {1}{R}, so on its second turn both of its Mountains are tapped to pay it and the
+# pool is empty: at its own {R} the second Mountain would have been left floating.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Thalia, the Survivor
+Island x16
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thalia, the Survivor.Cast
+Bot1.Battlefield.Plains.Activate
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Bot2.Mana =
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot2.Battlefield.Mountain#1.Tapped = true
+Bot2.Battlefield.Mountain#2.Tapped = true

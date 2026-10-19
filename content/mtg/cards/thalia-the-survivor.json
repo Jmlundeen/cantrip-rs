@@ -1,0 +1,11 @@
+{
+  "name": "Thalia, the Survivor",
+  "manaCost": "{3}{W}",
+  "type": "Legendary Creature — Human Soldier",
+  "power": 3,
+  "toughness": 4,
+  "keywords": [
+    "Lifelink"
+  ],
+  "oracleText": "Lifelink\nNoncreature spells your opponents cast cost {1} more to cast."
+}

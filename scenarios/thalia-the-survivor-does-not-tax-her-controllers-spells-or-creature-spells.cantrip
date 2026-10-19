@@ -1,0 +1,41 @@
+# Thalia, the Survivor taxes only "noncreature spells your opponents cast" (CR 601.2f). Bot1, her controller, casts
+# Lightning Bolt with a single Mox Ruby's {R} and Mother of Runes with a single Plains's {W}: each is offered with just
+# one mana, and each payment leaves an empty pool, so neither was taxed - the Bolt for who casts it, Mother of Runes for
+# what it is.
+
+[Bot1 Deck]
+Plains
+Mountain
+Mox Ruby
+Black Lotus
+Thalia, the Survivor
+Lightning Bolt
+Mother of Runes
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Thalia, the Survivor.Cast
+Bot1.Battlefield.Plains.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Mana =
+[T3 Bot1.Main2]
+[T5 Bot1.Main1]
+Bot1.Hand.Mother of Runes.Cast
+Bot1.Battlefield.Plains.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Mother of Runes.Power = 1
+Bot1.Battlefield.Thalia, the Survivor.Power = 3
+Bot1.Graveyard = Lightning Bolt; Black Lotus
