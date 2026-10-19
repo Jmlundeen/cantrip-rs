@@ -1,0 +1,81 @@
+# "You may cast the exiled card" lets the card be cast as its Adventure too (CR 715.3, 601.3), and mana of any type pays for that
+# spell (CR 609.4b). Bot1's Null Summoner exiles Bot2's Bonecrusher Giant, and Brain Freeze mills Bot1 to threshold. On turn
+# three Bot1 casts Stomp from exile with Mox Jet and Mox Sapphire - no red - and Stomp deals 2 damage to Bot2. Stomp resolves
+# and its controller, Bot1, exiles it on an adventure: "for as long as that card remains exiled, that player may play it"
+# (CR 715.3d), though Bot2 owns it. That cast is the card's own new permission, not the Summoner's (the card is a new object,
+# CR 400.7), so mana of any type no longer pays: with two Islands and Mox Pearl open the Giant's {2}{R} can't be paid. On
+# turn five Mox Ruby pays its {R} and Bot1 casts Bonecrusher Giant, which it controls.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Mox Sapphire
+Mox Pearl
+Brain Freeze
+Island x18
+Island
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Bonecrusher Giant
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Bonecrusher Giant)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 20
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Bonecrusher Giant.Cast(Bot2; Ability: Stomp)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 18
+? Exile = Bonecrusher Giant
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Exile.Bonecrusher Giant.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Exile.Bonecrusher Giant.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Bonecrusher Giant.Power = 4
+Exile.Count = 0
+Bot2.Life = 18
+Bot1.Battlefield.Mox Ruby.Tapped = true

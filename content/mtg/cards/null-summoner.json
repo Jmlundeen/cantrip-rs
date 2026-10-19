@@ -1,0 +1,8 @@
+{
+  "name": "Null Summoner",
+  "manaCost": "{2}{U}{B}",
+  "type": "Creature — Human Warlock",
+  "power": 4,
+  "toughness": 2,
+  "oracleText": "When this creature enters, if you cast it, target opponent reveals their hand. You choose a nonland card from it. Exile that card.\nThreshold — As long as there are seven or more cards in your graveyard, you may cast the exiled card, and mana of any type can be spent to cast that spell."
+}

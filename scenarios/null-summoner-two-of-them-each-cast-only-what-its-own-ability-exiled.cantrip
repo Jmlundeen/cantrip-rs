@@ -1,0 +1,76 @@
+# Two Null Summoners: each one's threshold ability casts "the exiled card", the card its own enters ability exiled (CR 607.2a),
+# and only while that permanent is on the battlefield (CR 604.1, 611.3a). Bot1 casts both on turn one: the first exiles Bot2's
+# Shock, the second one of its Lightning Bolts. Bot2 bolts the first Summoner on turn two. On turn three Brain Freeze mills
+# three, so Bot1's graveyard holds exactly seven cards (two Black Lotuses, the Summoner, Brain Freeze and three Islands):
+# threshold, at its least (CR 207.2c). With Mox Sapphire open the Shock, whose Summoner is gone, can't be cast; the Bolt, by the
+# Summoner still there, can (its {R} paid with blue, CR 609.4b), and it hits Bot2.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Black Lotus
+Mox Jet
+Mox Sapphire
+Null Summoner
+Null Summoner
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Shock
+Lightning Bolt
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Shock)
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+[T2 Bot2.Main1]
+? Exile = Lightning Bolt; Shock
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Null Summoner#1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Null Summoner; Black Lotus; Black Lotus
+[T3 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 7
+! Bot1.Exile.Shock.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Shock
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
+Bot1.Graveyard.Count = 7
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Null Summoner.Power = 4

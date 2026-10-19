@@ -1,0 +1,68 @@
+# The card Null Summoner exiled is cast from exile at the time its type allows: Bot1 casts Bot2's Lightning Bolt in Bot2's own
+# main phase (an instant, CR 307.1, 601.3), with Mox Pearl's {W} (CR 609.4b). Bot2 counters it with Counterspell: a countered
+# spell goes to its owner's graveyard (CR 701.6a, 608.2b), so the Bolt is Bot2's again, out of exile, and nothing more comes
+# of the permission (it was for the card in exile, a new object once it moves, CR 400.7).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Mox Pearl
+Mox Sapphire
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Lightning Bolt
+Counterspell
+Mox Sapphire
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Counterspell; Lightning Bolt
+Exile.Count = 0
+Bot1.Battlefield.Mox Pearl.Tapped = true

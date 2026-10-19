@@ -1,0 +1,69 @@
+# "You may cast the exiled card" lets a split card be cast as either half (CR 709.3, 601.3), and "mana of any type can be spent
+# to cast that spell" pays for the half cast (CR 609.4b). Null Summoner exiles Bot2's Life // Death, and Bot1, with threshold,
+# casts Life ({G}) from exile with Mox Pearl's {W}. Bot1's lands become 1/1 creatures until end of turn; the card, cast from
+# exile, goes to its owner's graveyard.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Mox Pearl
+Mox Sapphire
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Life // Death
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Life // Death)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 20
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Life // Death.Cast(Ability: Life)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Graveyard = Life // Death
+Exile.Count = 0
+Bot1.Battlefield.Island.Types = Land; Creature
+Bot1.Battlefield.Island.Power = 1
+Bot1.Battlefield.Mox Pearl.Tapped = true

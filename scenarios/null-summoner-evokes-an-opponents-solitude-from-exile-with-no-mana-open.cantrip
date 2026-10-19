@@ -1,0 +1,73 @@
+# A permission to cast a card leaves its alternative costs open (CR 601.2b, 118.9), whoever owns the card: Null Summoner's
+# threshold ability lets Bot1 cast the Solitude it exiled from Bot2's hand, so Bot1 may evoke it (CR 702.74a) by exiling a white
+# card from its own hand, Swords to Plowshares, with every mana source tapped. Solitude enters, exiles no creature (its target is
+# "up to one"), and the evoke trigger sacrifices it: it goes to its owner's graveyard, Bot2's.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Mox Sapphire
+Brain Freeze
+Swords to Plowshares
+Island x30
+
+[Bot2 Deck]
+Solitude
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Solitude)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 17
+? Exile = Solitude
+Bot1.Exile.Solitude.Cast(Ability: Evoke)
+Bot1.Choose(Swords to Plowshares)
+? Stack = Solitude
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Solitude
+Exile = Swords to Plowshares
+Bot1.Battlefield.Null Summoner.Power = 4
+Bot1.Hand.Count = 0
+Bot1.Life = 20

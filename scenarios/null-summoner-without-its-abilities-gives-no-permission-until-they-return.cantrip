@@ -1,0 +1,78 @@
+# Null Summoner's threshold ability is an ability of the permanent, so while it has lost all its abilities (CR 613.1f) it lets
+# nothing be cast. Bot1 exiles Bot2's Lightning Bolt and mills itself to threshold. On turn two Bot2 casts Dress Down ("creatures
+# lose all abilities"): with Mox Pearl open Bot1 can't cast the Bolt from exile. At the beginning of the end step Dress Down is
+# sacrificed, the Summoner has its abilities again (CR 611.3a), and Bot1 casts the instant in that end step with the Pearl's {W}
+# (CR 609.4b), hitting Bot2.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Mox Pearl
+Mox Sapphire
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Lightning Bolt
+Dress Down
+Mox Sapphire
+Island x30
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+[T2 Bot2.Main1]
+? Bot1.Graveyard.Count = 20
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Dress Down.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Dress Down.Tapped = false
+Bot2.Pass
+! Bot1.Exile.Lightning Bolt.Cast
+[T2 Bot2.End]
+Bot2.Pass
+Bot1.Pass
+? Bot2.Graveyard = Dress Down
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt; Dress Down
+Exile.Count = 0

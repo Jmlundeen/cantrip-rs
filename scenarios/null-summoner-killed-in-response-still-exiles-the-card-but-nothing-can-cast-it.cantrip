@@ -1,0 +1,76 @@
+# Null Summoner's enters ability is independent of its source once it triggers (CR 113.7a): Bot2 bolts the Summoner in
+# response, and the ability still makes Bot2 reveal its hand and exiles the Shock Bot1 chooses. But the permission to cast it is
+# the Summoner's static ability (CR 604.1, 611.3a), which left the battlefield with it: once Brain Freeze has milled Bot1 to
+# threshold, with Mox Pearl open, the Shock can't be cast from exile. The twin where it is cast is
+# "...casts-the-exiled-card-only-once-it-has-threshold-with-mana-of-any-type".
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Brain Freeze
+Mox Pearl
+Island x31
+
+[Bot2 Deck]
+Lightning Bolt
+Shock
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Null Summoner
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Null Summoner)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Null Summoner; Black Lotus
+Bot2.Pass
+Bot1.Choose(Shock)
+? Exile = Shock
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 21
+! Bot1.Exile.Shock.Cast
+
+[Expect]
+Exile = Shock
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot2.Life = 20
+Bot2.Graveyard = Lightning Bolt

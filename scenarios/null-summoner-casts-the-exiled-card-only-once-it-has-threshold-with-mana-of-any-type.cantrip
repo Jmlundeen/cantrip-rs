@@ -1,0 +1,77 @@
+# Null Summoner, cast, enters: "if you cast it" holds (CR 603.4), so Bot2 reveals its hand (Lightning Bolt and Mountains) and
+# Bot1 chooses a nonland card from it - a Mountain is refused, the Bolt (the positive control) is taken - and exiles it. Its
+# threshold ability is a static ability (CR 604.1, 611.3a) that lets Bot1 cast that card only "as long as there are seven or
+# more cards in your graveyard" (CR 207.2c): with one card there (the Black Lotus) and Mox Pearl's {W} open, the Bolt can't be
+# cast. Brain Freeze, after five spells this turn, mills Bot1 eighteen cards (CR 702.40a); now the Bolt is cast from exile, its
+# {R} paid with the Pearl's {W} because mana of any type can be spent to cast it (CR 609.4b). It hits Bot2 and, a card that
+# left exile, goes to its owner's graveyard.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Mox Pearl
+Mox Sapphire
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Null Summoner
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mountain)
+Bot1.Choose(Lightning Bolt)
+? Exile = Lightning Bolt
+? Bot2.Hand.Count = 6
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Exile.Lightning Bolt.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 20
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Exile.Count = 0
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Null Summoner.Power = 4

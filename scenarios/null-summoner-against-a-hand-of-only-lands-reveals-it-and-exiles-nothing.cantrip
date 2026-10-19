@@ -1,0 +1,36 @@
+# Null Summoner's enters ability against a hand with no nonland card: Bot2 still reveals its hand (the ability says so before
+# any choice, CR 608.2c), but there is nothing Bot1 may choose (CR 608.2d), so no question is asked and nothing is exiled.
+# The intervening "if you cast it" held (CR 603.4): the Summoner was cast from Bot1's hand.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Island x30
+
+[Bot2 Deck]
+Mountain x7
+Lightning Bolt
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack = Null Summoner
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Revealed = Mountain; Mountain; Mountain; Mountain; Mountain; Mountain; Mountain
+Exile.Count = 0
+Bot2.Hand.Count = 7
+Bot1.Battlefield.Null Summoner.Power = 4

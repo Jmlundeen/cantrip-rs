@@ -1,0 +1,71 @@
+# Null Summoner's threshold ability is a static ability, so its "as long as there are seven or more cards in your graveyard"
+# is asked whenever the cast would begin (CR 604.1, 611.3a, 207.2c), not once. Bot1 exiles Bot2's Lightning Bolt and mills
+# itself to twenty cards with Brain Freeze (as in the twin
+# "...casts-the-exiled-card-only-once-it-has-threshold-with-mana-of-any-type", where the Bolt is then cast). On Bot2's turn
+# Soul-Guide Lantern exiles Brain Freeze from Bot1's graveyard as it enters, then is sacrificed to exile Bot1's whole
+# graveyard: with none there and Mox Pearl still open, the instant can't be cast from exile any more. It stays in exile.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Null Summoner
+Mox Pearl
+Mox Sapphire
+Brain Freeze
+Island x30
+
+[Bot2 Deck]
+Lightning Bolt
+Soul-Guide Lantern
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+[T2 Bot2.Main1]
+? Bot1.Graveyard.Count = 20
+? Exile = Lightning Bolt
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Graveyard.Brain Freeze)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Count = 19
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard.Count = 0
+! Bot1.Exile.Lightning Bolt.Cast
+
+[Expect]
+Bot1.Graveyard.Count = 0
+Exile.Count = 21
+Bot2.Life = 20
+Bot1.Battlefield.Mox Pearl.Tapped = false

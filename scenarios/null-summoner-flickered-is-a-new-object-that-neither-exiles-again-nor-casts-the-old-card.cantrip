@@ -1,0 +1,62 @@
+# "The exiled card" is the one this object's enters ability exiled (CR 607.2a), and a permanent that leaves and returns is a
+# new object (CR 400.7). Bot1's Null Summoner exiles Bot2's Lightning Bolt and Bot1 mills itself to threshold with Brain
+# Freeze. On turn three Ephemerate flickers the Summoner: the creature that returns was not cast, so its enters ability does
+# not trigger (the intervening "if you cast it", CR 603.4 - the stack stays empty and Bot2 keeps its hand), and nothing was
+# exiled with it, so with threshold and Island and Mox Sapphire open the Bolt can't be cast from exile. The twin where the
+# Bolt is cast is "...casts-the-exiled-card-only-once-it-has-threshold-with-mana-of-any-type".
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Sapphire
+Null Summoner
+Brain Freeze
+Ephemerate
+Mox Pearl
+Island x30
+
+[Bot2 Deck]
+Lightning Bolt
+Shock
+Mountain x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Null Summoner.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Brain Freeze.Cast(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+Bot1.Target(Bot1)
+[T3 Bot1.Main1]
+? Bot1.Graveyard.Count = 17
+? Exile = Lightning Bolt
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ephemerate.Cast(Null Summoner)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot2.Hand.Count = 7
+! Bot1.Exile.Lightning Bolt.Cast
+
+[Expect]
+Exile = Ephemerate; Lightning Bolt
+Bot1.Battlefield.Null Summoner.Tapped = false
+Bot1.Battlefield.Island.Tapped = false
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot2.Life = 20
+Bot2.Hand.Count = 7
