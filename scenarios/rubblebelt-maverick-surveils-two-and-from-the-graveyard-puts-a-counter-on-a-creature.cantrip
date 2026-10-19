@@ -1,0 +1,42 @@
+# Rubblebelt Maverick: "When this creature enters, surveil 2" and "{G}, Exile this card from your graveyard: Put a +1/+1
+# counter on target creature. Activate only as a sorcery." Faithless Looting (paid with Mox Ruby) discards one Maverick into
+# the graveyard. The other is cast with Mox Emerald and surveils 2 (Island stays on top, Mountain goes to the graveyard,
+# CR 701.25a). Then a Forest pays {G}: the graveyard Maverick is exiled as a cost and the battlefield one becomes 2/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Faithless Looting
+Rubblebelt Maverick
+Rubblebelt Maverick
+Forest
+Plains
+Plains
+Plains
+Island
+Mountain
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Choose(Rubblebelt Maverick; Plains)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rubblebelt Maverick.Cast
+Bot1.Arrange(Island | Mountain)
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+? Bot1.Graveyard = Mountain; Faithless Looting; Plains; Rubblebelt Maverick
+Bot1.Graveyard.Rubblebelt Maverick.Activate(Rubblebelt Maverick)
+
+[Expect]
+Exile = Rubblebelt Maverick
+Bot1.Graveyard = Mountain; Faithless Looting; Plains
+Bot1.Battlefield.Rubblebelt Maverick.Power = 2
+Bot1.Battlefield.Rubblebelt Maverick.Toughness = 2
+Bot1.Library.Count = 9
