@@ -1,0 +1,11 @@
+{
+  "name": "Sureshot Sower",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Human Archer",
+  "power": 3,
+  "toughness": 1,
+  "keywords": [
+    "Reach"
+  ],
+  "oracleText": "Reach\n{3}{G}, Discard this card: Destroy target creature with flying."
+}
