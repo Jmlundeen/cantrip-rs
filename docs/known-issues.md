@@ -86,6 +86,7 @@ keeps it).
 | [KI-73](#ki-73-older-you-may-draw-cards-offer-a-draw-a-cant-draw-rule-forbids) | Older "you may draw" cards offer a draw a can't-draw rule forbids | Low | Open |
 | [KI-74](#ki-74-a-question-a-replacement-asks-mid-run-is-not-watched-for-loops) | A question a replacement asks mid-run is not watched for loops | Low | Suspected |
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
+| [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 
 ## Issues
 
@@ -959,3 +960,18 @@ to pay for it"). The caption would then say the return pays for something, which
 own purpose or caption. Not checked in the browser.
 
 **Scenarios.** none yet.
+
+### KI-76: A fused cast is not among the ways an effect can cast a split card from a hand
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-18, review of Buster Sword |
+
+**Notes.** A fuse split card in a hand may be cast with both halves at once (CR 702.102a); its mana value on the stack is the
+sum of both halves' (CR 708.4, 702.102c). `Game::cast_ways_during_resolution` offers a split card's halves one at a time and no fused
+way, so an effect that casts a spell from a hand with a mana value limit (Buster Sword, Lady Octopus, Omniscience-style free casts)
+never offers the fused cast of a fuse card, and cannot judge its combined mana value against the limit. When fuse is built, the
+function must offer a fused way for a fuse card in a hand, with a mana value equal to the sum of both halves. No fuse card is in
+content yet.
+
+**Scenarios.** None yet: the first fuse card to be added (Turn // Burn) reaches it through Buster Sword.

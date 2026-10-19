@@ -3831,7 +3831,8 @@ pub fn could_cast_during_resolution(cx: &Cx, card: ObjectId) -> bool {
 /// 712.8a): the card itself unless it is a land or a split card (whose halves are what is cast, CR 709.3), a split card's two
 /// halves (an aftermath half only from a graveyard, CR 702.127a), an Adventurer's Adventure, an omen card's Omen (CR 720.3a),
 /// and a modal double-faced card's
-/// back face. Fuse is not among them: it applies only in a hand (CR 702.102a).
+/// back face. A fused cast (CR 702.102a: a fuse split card cast from a hand, both halves at once, its mana value the sum of
+/// theirs) is a way too, from a hand only; it is not built yet (docs/known-issues.md).
 pub fn cast_ways_during_resolution(cx: &Cx, card: ObjectId) -> Vec<CastWay> {
     let Some(player) = cx.s().stack.last().map(|i| i.controller) else { return Vec::new() };
     let obj = cx.s().obj(card);
