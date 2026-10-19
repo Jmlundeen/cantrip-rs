@@ -178,7 +178,9 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    tests: its headless scenarios prove it. A card that does add an interaction makes the change in the same work, and proves it with a browser
    scenario: `# Browser` at the
    top and `? Client.` checks of what the page shows (`docs/scenarios-in-the-browser.md`), run with
-   `tools\test.cmd /filter "ScenarioInBrowser"` (or `tools\scenario-in-browser.cmd name` to watch). If the browser
+   `tools\test.cmd /filter "ScenarioInBrowser"` (or `tools\scenario-in-browser.cmd name` to watch), after
+   `cargo build --profile cards -p cantrip-host`: the table runs the last-built `cantrip-native-host.exe`, and one that
+   predates the card publishes nothing. If the browser
    driver cannot click its way through the new prompt or action, extend `ScenarioPlayer`/`TablePage` - the same rule as
    the harness: never drop the check to fit the driver. A protocol change bumps the version and passes the wire-shape
    test, in the same commit as the change.
