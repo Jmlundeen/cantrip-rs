@@ -1,0 +1,47 @@
+# Lightning Bolt (instant) and Chain Lightning (sorcery) go to the graveyard on turn 3, so on turn 5 a Ghitu Lavarunner is
+# cast with two instant and/or sorcery cards there: it has haste (CR 702.10) and attacks the turn it is cast, and as a 2/2
+# it deals 2 (Bot2: 20 - 3 - 3 - 2 = 12); a summoning-sick creature could not have been declared as an attacker.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Chain Lightning
+Ghitu Lavarunner
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ghitu Lavarunner.Cast
+
+[T5 Bot1.BeginCombat]
+? Bot1.Battlefield.Ghitu Lavarunner.Power = 2
+
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Ghitu Lavarunner > Bot2)
+
+[T5 Bot1.Main2]
+? Bot2.Life = 12
+
+[Expect]
+Turn = 5
+Step = Main2
+Bot2.Life = 12
+Bot1.Battlefield.Ghitu Lavarunner.Power = 2
+Bot1.Battlefield.Ghitu Lavarunner.Keywords = Haste

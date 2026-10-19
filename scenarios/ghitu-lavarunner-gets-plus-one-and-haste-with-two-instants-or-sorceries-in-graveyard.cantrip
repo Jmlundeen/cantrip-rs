@@ -1,0 +1,49 @@
+# Ghitu Lavarunner (1/2) with nothing in the graveyard is a 1/2. A second Lavarunner is cast and killed by Lightning Bolt:
+# the graveyard then holds one instant and one creature card, and the creature does not count as an instant or sorcery
+# (one is not two), so the first stays 1/2. Chain Lightning (sorcery) makes two instant/sorcery cards: it is 2/2 with haste
+# (CR 604.1, 611.3a).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Ghitu Lavarunner
+Ghitu Lavarunner
+Mountain
+Lightning Bolt
+Chain Lightning
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ghitu Lavarunner.Cast
+
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ghitu Lavarunner.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ghitu Lavarunner#2)
+
+[T3 Bot1.Main2]
+? Bot1.Graveyard = Ghitu Lavarunner; Lightning Bolt
+? Bot1.Battlefield.Ghitu Lavarunner.Power = 1
+
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chain Lightning.Cast(Bot2)
+
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Ghitu Lavarunner.Power = 2
+? Bot1.Battlefield.Ghitu Lavarunner.Toughness = 2
+? Bot1.Battlefield.Ghitu Lavarunner.Keywords = Haste
+
+[Expect]
+Turn = 5
+Bot1.Battlefield.Ghitu Lavarunner.Power = 2
+Bot1.Battlefield.Ghitu Lavarunner.Toughness = 2
+Bot1.Battlefield.Ghitu Lavarunner.Keywords = Haste
+Bot1.Graveyard = Chain Lightning; Ghitu Lavarunner; Lightning Bolt

@@ -1,0 +1,8 @@
+{
+  "name": "Ghitu Lavarunner",
+  "manaCost": "{R}",
+  "type": "Creature — Human Wizard",
+  "power": 1,
+  "toughness": 2,
+  "oracleText": "As long as there are two or more instant and/or sorcery cards in your graveyard, this creature gets +1/+0 and has haste."
+}
