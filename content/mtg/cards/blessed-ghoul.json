@@ -1,0 +1,11 @@
+{
+  "name": "Blessed Ghoul",
+  "manaCost": "{W/B}",
+  "type": "Creature — Zombie Cleric",
+  "oracleText": "Lifelink\n{2}{W/B}: Return this card from your graveyard to your hand.",
+  "power": 1,
+  "toughness": 1,
+  "keywords": [
+    "Lifelink"
+  ]
+}
