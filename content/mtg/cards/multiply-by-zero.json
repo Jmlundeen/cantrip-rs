@@ -1,0 +1,6 @@
+{
+  "name": "Multiply by Zero",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "Target creature has base power and toughness 0/0 until end of turn."
+}

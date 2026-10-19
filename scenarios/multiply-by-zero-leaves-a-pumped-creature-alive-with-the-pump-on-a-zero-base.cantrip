@@ -1,0 +1,40 @@
+# The ruling: other effects that raise the creature's power or toughness still apply. Ornithopter (0/2) gets Giant Growth
+# (+3/+3, a 3/5), then Multiply by Zero sets the base to 0/0: it is a 3/3 and lives (layer 7b under 7c). Once the turn ends
+# both effects are gone and it is a 0/2 again.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Giant Growth
+Multiply by Zero
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 5
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Multiply by Zero.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 3
+? Bot1.Battlefield.Ornithopter.Toughness = 3
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Multiply by Zero; Giant Growth

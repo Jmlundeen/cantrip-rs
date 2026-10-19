@@ -1,0 +1,47 @@
+# Multiply by Zero (CR 613.4b): "base power and toughness 0/0" is a layer 7b effect and overrides the characteristic-defining
+# ability of Tarmogoyf (layer 7a). With an instant in a graveyard (Bot2's Lightning Bolt) the Goyf is a 1/2 before the spell;
+# after it, toughness 0 and it dies as a state-based action (CR 704.5f) into Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Multiply by Zero
+Island x17
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Mox Jet
+Lightning Bolt
+Tarmogoyf
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Tarmogoyf.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Tarmogoyf.Power = 1
+? Bot2.Battlefield.Tarmogoyf.Toughness = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Multiply by Zero.Cast(Bot2.Battlefield.Tarmogoyf)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Tarmogoyf = (absent)
+Bot2.Graveyard = Tarmogoyf; Lightning Bolt
+Bot1.Graveyard = Multiply by Zero
