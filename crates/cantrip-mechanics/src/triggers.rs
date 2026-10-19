@@ -1072,6 +1072,18 @@ pub const THIS_ATTACKS_OR_BLOCKS: Trigger = when(EventMask(EventMask::ATTACKS.0 
 pub const THIS_DEALT_DAMAGE: Trigger = when(EventMask::DAMAGE, this_dealt_damage);
 pub const DEALS_COMBAT_DAMAGE_TO_A_CREATURE: Trigger = when(EventMask::DAMAGE, deals_combat_damage_to_a_creature);
 pub const THIS_ATTACKS: Trigger = when(EventMask::ATTACKS, this_attacks);
+
+/// "Whenever a player casts their second spell each turn" (CR 601.2i, 603.2): any player's, counted from the turn's start
+/// (`Event::SpellCast::nth`), so the spells cast before the permanent arrived count too. Ledger Shredder and Hearthborn
+/// Battler print it.
+fn a_player_casts_their_second_spell(_: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { nth: 2, .. } => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+pub const A_PLAYER_CASTS_THEIR_SECOND_SPELL: Trigger = when(EventMask::SPELL_CAST, a_player_casts_their_second_spell);
 pub const THIS_ENTERS_OR_ATTACKS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::ATTACKS.0), this_enters_or_attacks);
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
