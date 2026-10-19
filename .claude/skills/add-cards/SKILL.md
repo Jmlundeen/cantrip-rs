@@ -275,8 +275,10 @@ core-feature agents and review agents run on Opus.
 0. **The worktree pool.** Work happens in a fixed pool of worktrees, `.claude/worktrees/pool-1` .. `pool-N`, each on
    its own branch with its own warm `target/`; N (about 4) is also the cap on build-heavy agents at once, because each
    cargo build takes every core. A slot is made once (`git worktree add .claude/worktrees/pool-<n> -b pool-<n>
-   origin/main`) and never removed. Agents are started without the Agent tool's own worktree isolation; the first
-   thing each does is `EnterWorktree` with its slot's `path`. Every build stays in the slot's own `target/`: never
+   origin/main`) and never removed. Agents are started without the Agent tool's own worktree isolation and work in
+   their slot by absolute path: every shell command starts with `cd <slot>` (so cargo uses the slot's workspace and
+   `target/`) and every file path is under the slot. (`EnterWorktree` refuses a subagent that was not launched inside
+   a worktree, so it cannot be relied on.) Every build stays in the slot's own `target/`: never
    `CARGO_TARGET_DIR` or `--target-dir` pointed at the main checkout's or another slot's, and never a copied
    `target/`, because cargo's freshness records name absolute source paths, and a shared or copied `target/` then
    compiles another tree's files into a test run that claims to test this one.
@@ -309,8 +311,8 @@ core-feature agents and review agents run on Opus.
    commits into its slot rather than waiting for them to land; the duplicates drop out at landing. Other running
    agents are told what landed so they rebase. Only a gap the coordinator decides not to build is released, with its
    gap recorded on the issue.
-4. **Review agents** (Opus) review inside the implementing agent's slot - `EnterWorktree` with that slot's `path`,
-   on the commit as it stands, using its warm build - never in a worktree of their own, and change no files, check
+4. **Review agents** (Opus) review inside the implementing agent's slot - by absolute path as in (0), on the
+   commit as it stands, using its warm build - never in a worktree of their own, and change no files, check
    out nothing and clean nothing there. The implementing agent waits while it is reviewed. Each card is reviewed as
    soon as it is committed and lands as soon as it passes. Their prompt points
    them at correctness, safety and rules adherence, and does not hand them a list of corner cases to demand tests
