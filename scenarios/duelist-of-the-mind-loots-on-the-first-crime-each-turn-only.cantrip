@@ -1,0 +1,56 @@
+# Duelist of the Mind: "Whenever you commit a crime, you may draw a card. If you do, discard a card. This ability triggers only once
+# each turn." Bot1's first Bolt targets itself (not a crime, nothing triggers); its second targets Bot2 (a crime): the trigger goes on the
+# stack above the Bolt and Bot1 draws and discards a Plains; its third Bolt at Bot2 is another crime the same turn and is not asked.
+# Power is 1: one card drawn this turn (Bot1 is on the play and does not draw on turn 1).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Duelist of the Mind
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Duelist of the Mind.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+! Bot1.Accept
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Accept
+Bot1.Choose(Plains)
+? Bot1.Battlefield.Duelist of the Mind.Power = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+! Bot1.Accept
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 14
+Bot1.Graveyard.Count = 5
+Bot1.Hand.Count = 0
+Bot1.Battlefield.Duelist of the Mind.Power = 1
+Stack.Count = 0

@@ -1,0 +1,33 @@
+# Duelist of the Mind: "you may draw": on its crime Bot1 declines, so nothing is drawn and nothing is discarded; its power stays 0.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Duelist of the Mind
+Lightning Bolt
+Plains x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Duelist of the Mind.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Hand.Count = 4
+Bot1.Library.Count = 10
+Bot1.Battlefield.Duelist of the Mind.Power = 1

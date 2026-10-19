@@ -1,0 +1,11 @@
+{
+  "name": "Duelist of the Mind",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Human Advisor",
+  "toughness": 3,
+  "oracleText": "Flying, vigilance\nDuelist of the Mind's power is equal to the number of cards you've drawn this turn.\nWhenever you commit a crime, you may draw a card. If you do, discard a card. This ability triggers only once each turn. (Targeting opponents, anything they control, and/or cards in their graveyards is a crime.)",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}

@@ -1,0 +1,37 @@
+# Duelist of the Mind: "power is equal to the number of cards you've drawn this turn". On turn 3 Bot1 has drawn only the card for the
+# turn (power 1); Brainstorm draws three more (power 4); on Bot2's turn 4 Bot1 has drawn nothing this turn, though it drew four cards
+# last turn and Bot2 has drawn its own (power 0). Duelist is 3 toughness throughout.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Duelist of the Mind
+Brainstorm
+Plains
+Plains
+Plains
+Plains x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Duelist of the Mind.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Duelist of the Mind.Power = 1
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainstorm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Plains; Plains)
+? Bot1.Battlefield.Duelist of the Mind.Power = 4
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Duelist of the Mind.Power = 0
+
+[Expect]
+Bot1.Battlefield.Duelist of the Mind.Power = 0
+Bot1.Battlefield.Duelist of the Mind.Toughness = 3
