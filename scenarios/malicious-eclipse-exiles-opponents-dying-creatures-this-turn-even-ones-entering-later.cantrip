@@ -1,0 +1,57 @@
+# Malicious Eclipse: all creatures get -2/-2, so Bot1's Ornithopter dies into its graveyard but Bot2's, an opponent's creature
+# that would die this turn, is exiled instead. The replacement covers creatures that enter later this turn (the ruling): Bot2
+# flashes in Snapcaster Mage after the Eclipse resolved (so it is not shrunk), and Bot1's Lightning Bolt exiles it too.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Emerald
+Mox Ruby
+Ornithopter
+Malicious Eclipse
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Mox Sapphire
+Ornithopter
+Snapcaster Mage
+Island
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Malicious Eclipse.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Ornithopter; Malicious Eclipse
+? Exile = Ornithopter
+? Bot2.Graveyard.Count = 0
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Snapcaster Mage.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Snapcaster Mage.Toughness = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Snapcaster Mage)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter; Snapcaster Mage
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Lightning Bolt; Ornithopter; Malicious Eclipse

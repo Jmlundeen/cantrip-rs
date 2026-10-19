@@ -1,0 +1,47 @@
+# The replacement lasts this turn only (CR 611.2): the turn after Malicious Eclipse, Bot2's new Ornithopter killed by
+# Lightning Bolt goes to the graveyard as usual. And "a creature an opponent controls" never covers the caster's own
+# creature: Bot1's Ornithopter, killed by the Eclipse itself, is in its graveyard, not exiled.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Emerald
+Mox Ruby
+Ornithopter
+Malicious Eclipse
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Malicious Eclipse.Cast
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Lightning Bolt; Ornithopter; Malicious Eclipse
