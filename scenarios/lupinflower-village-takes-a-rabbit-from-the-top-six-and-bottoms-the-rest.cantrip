@@ -1,0 +1,41 @@
+# "Look at the top six cards ... You may reveal a Bat, Bird, Mouse, or Rabbit card from among them and put it into your hand.
+# Put the rest on the bottom": the top six are Island, Dain Ironfoot (a Dwarf), Jacked Rabbit, Ornithopter, Island and Island.
+# The Rabbit may be taken, the Dwarf may not (refused), and only one card may be taken (two are refused). The Village is
+# sacrificed to pay. Library: 13 cards, 12 after the Rabbit goes to hand; the other five went to the bottom.
+
+[Bot1 Deck]
+Lupinflower Village
+Mox Pearl
+Mox Jet
+Island
+Island
+Island
+Island
+Island
+Dáin Ironfoot
+Jacked Rabbit
+Ornithopter
+Island
+Island
+Mountain x7
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lupinflower Village.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Lupinflower Village.Activate(Ability: Look)
+! Bot1.Arrange(Dáin Ironfoot | Island; Island; Jacked Rabbit; Ornithopter; Island)
+! Bot1.Arrange(Jacked Rabbit; Ornithopter | Island; Island; Dáin Ironfoot; Island)
+Bot1.Arrange(Jacked Rabbit | Island; Island; Dáin Ironfoot; Ornithopter; Island)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand = Jacked Rabbit; Island; Island; Island; Island
+Bot1.Library.Count = 12
+Bot1.Revealed = Jacked Rabbit
+Bot1.Graveyard = Lupinflower Village

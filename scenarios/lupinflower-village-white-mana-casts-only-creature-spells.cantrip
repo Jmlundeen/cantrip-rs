@@ -1,0 +1,27 @@
+# "{T}: Add {W}. Spend this mana only to cast a creature spell" (CR 106.6): the one {W} (the only mana) casts Thraben Inspector
+# but not Enlightened Tutor (refused beside it). The other ability adds {C}.
+
+[Bot1 Deck]
+Lupinflower Village
+Enlightened Tutor
+Thraben Inspector
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Lupinflower Village.Play
+Bot1.Battlefield.Lupinflower Village.Activate(Ability: creature spell)
+? Bot1.Mana = {W} (CreatureSpells)
+! Bot1.Hand.Enlightened Tutor.Cast
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+Bot1.Battlefield.Lupinflower Village.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Battlefield.Thraben Inspector.Power = 1
