@@ -1,0 +1,23 @@
+# command the stage boosts existing cadet (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Command the Stage
+Command the Stage
+Mountain x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Command the Stage.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Command the Stage.Cast
+
+[Expect]
+Bot1.Battlefield.Cadet#1.Power = 3
+Bot1.Battlefield.Cadet#2.Power = 2
