@@ -1,0 +1,8 @@
+{
+  "name": "Skilled Battlecarver",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Warrior",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "During your turn, this creature has first strike.\n{1}{R}: This creature gets +1/+0 until end of turn."
+}
