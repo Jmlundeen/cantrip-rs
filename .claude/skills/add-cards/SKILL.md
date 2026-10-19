@@ -1,6 +1,6 @@
 ---
 name: add-cards
-description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with brief scenarios that execute every line of its code and show it observably correct, playable end to end in the web client and by the bots - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented or fixed, by anyone.
+description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with brief scenarios that execute every line of its code and show it observably correct, playable end to end in the web client - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented or fixed, by anyone.
 ---
 
 # Adding cards
@@ -28,11 +28,11 @@ CLAUDE.md is the repository's rules. The `write-game-script` skill is the scenar
    it: see everything the card puts into the game (a state on an object - doors, a chosen name or type, counters of a
    new kind, a face, a designation; a revealed card; a new zone or pile), make every choice it asks with wording that
    says what the choice does, and take every action it offers (an activated ability, a special action, an alternative
-   cost, an optional cost) with its cost shown. The bots that sit in a seat - the tactical bot
-   (`dotnet/src/Cantrip.Client/Tactics`), the draft bot where it reads cards, and the language-model client - answer
-   its questions sensibly, never by a reading of a question meant for something else (a "choose a creature to
-   blight" read as "choose one to keep" blights the best creature). If the engine side works and the client cannot show
-   or offer it, the card is not done.
+   cost, an optional cost) with its cost shown. If the engine side works and the client cannot show or offer it, the
+   card is not done. The language-model client and the draft bot, where it reads cards, answer its questions
+   sensibly, never by a reading of a question meant for something else. The tactical bot
+   (`dotnet/src/Cantrip.Client/Tactics`) is not part of card work: a card never changes it, never waits on it and is
+   never tested through it - its correctness is proven by hand-authored scenarios alone.
 
 ## Where code goes
 
@@ -167,12 +167,11 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
      something else.
    - **Actions:** every ability, special action and cost the card offers is clickable, with its cost and what it
      does shown, and distinguishable from the card's other actions.
-   - **Bots:** the tactical bot and the language-model client handle every new question and action on purpose.
+   - **Not the tactical bot:** card work does not change, test or wait on the tactical bot.
    A card that only uses what the client already shows and asks needs no client change - the review confirms it.
    **Browser tests are only for a new user interaction**: a prompt, action, cost display or piece of state the client
    did not have before. A card that reuses existing prompts and actions gets no browser scenario and runs no browser
-   tests: its headless scenarios prove it. A bot-only change (the tactical bot, the language-model client) is proven
-   the same way - headless scenarios that play the bot's seat, plus unit tests where useful - not in the browser. A card that does add an interaction makes the change in the same work, and proves it with a browser
+   tests: its headless scenarios prove it. A card that does add an interaction makes the change in the same work, and proves it with a browser
    scenario: `# Browser` at the
    top and `? Client.` checks of what the page shows (`docs/scenarios-in-the-browser.md`), run with
    `tools\test.cmd /filter "ScenarioInBrowser"` (or `tools\scenario-in-browser.cmd name` to watch). If the browser
@@ -250,7 +249,7 @@ safety and the card's adherence to the rules**; the tests are checked for suffic
 - overlap: code in the card that an existing shared function already does, or that does the same as code in another
   card, which should have been shared;
 - the client: everything the card puts into the game is shown, every question it asks has a true caption, every
-  action it offers is clickable with its cost, the bots answer its questions on purpose, and a browser scenario proves
+  action it offers is clickable with its cost, and a browser scenario proves
   each new user interaction the client had to learn - or the reviewer confirms the card needs nothing the client did
   not already do (then no browser scenario is owed).
 
