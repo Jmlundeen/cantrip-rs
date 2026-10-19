@@ -1,0 +1,35 @@
+# Koth uses the Mountain's last known information after Crop Rotation sacrifices it (CR 608.2h).
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Koth, the Geomancer
+Mountain
+Crop Rotation
+Island x2
+Forest x20
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Koth, the Geomancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Crop Rotation.Cast
+Bot1.Choose(Mountain)
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot2.Life = 18
+Bot1.Mana = {R}
+Bot1.Graveyard = Crop Rotation; Mountain; Black Lotus
