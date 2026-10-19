@@ -1,0 +1,21 @@
+# Sun-Blessed Peak enters tapped (CR 614.1c), so the turn it is played it cannot be tapped for mana (the refusal); next turn it
+# is untapped and taps for either {R} or {W}: red here (the other colour is taken by the next scenario).
+
+[Bot1 Deck]
+Sun-Blessed Peak
+Island x19
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Sun-Blessed Peak.Play
+? Bot1.Battlefield.Sun-Blessed Peak.Tapped = true
+! Bot1.Battlefield.Sun-Blessed Peak.Activate(Ability: Add; Color: Red)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sun-Blessed Peak.Activate(Ability: Add; Color: Red)
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Sun-Blessed Peak.Tapped = true
+Bot1.Mana = {R}

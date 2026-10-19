@@ -1,0 +1,17 @@
+# Sun-Blessed Peak's {T}: Add {R} or {W}: white, the colour the enters-tapped scenario leaves.
+
+[Bot1 Deck]
+Sun-Blessed Peak
+Island x19
+
+[Bot2 Deck]
+Swamp x15
+
+[Actions]
+Bot1.Hand.Sun-Blessed Peak.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sun-Blessed Peak.Activate(Ability: Add; Color: White)
+
+[Expect]
+Bot1.Mana = {W}
+Bot1.Battlefield.Sun-Blessed Peak.Tapped = true
