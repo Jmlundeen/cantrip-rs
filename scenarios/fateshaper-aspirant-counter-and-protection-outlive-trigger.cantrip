@@ -1,0 +1,25 @@
+# Deterministic printed-card behavior (CR 603, 608).
+[Bot1 Deck]
+Fateshaper Aspirant
+Mox Pearl x5
+Plains x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Battlefield.Mox Pearl#5.Activate
+Bot1.Hand.Fateshaper Aspirant.Cast
+
+[Expect]
+Bot1.Battlefield.Fateshaper Aspirant.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Fateshaper Aspirant.Keywords = Indestructible; Vigilance
