@@ -1,0 +1,30 @@
+# Pilfer: "Target opponent reveals their hand. You choose a nonland card from it. That player discards that card." Unlike Duress it may take a creature card. Bot2 holds
+# Lightning Bolt, Guerrilla Gorilla (a creature) and Islands: the Island is refused as a choice (the refusal), the Gorilla is taken (the control), and
+# Bot2 discards only it (Bolt and the Islands stay).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Pilfer
+Swamp x10
+
+[Bot2 Deck]
+Lightning Bolt
+Guerrilla Gorilla
+Island x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pilfer.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose(Island)
+Bot1.Choose(Guerrilla Gorilla)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Pilfer
+Bot2.Graveyard = Guerrilla Gorilla
+Bot2.Hand.Count = 6

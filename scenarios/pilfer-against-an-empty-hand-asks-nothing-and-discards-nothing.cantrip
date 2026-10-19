@@ -1,0 +1,44 @@
+# Pilfer against an empty hand: with no cards in it there is nothing to reveal or choose, so Bot1 is asked nothing (the refused Choose) and nothing is discarded. Bot2's whole
+# eight-card deck is on the battlefield by turn 3. The Pilfer resolves and goes to the graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Pilfer
+Swamp x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Pearl
+Mox Emerald
+Mox Ruby
+Mox Jet
+Lotus Petal
+Black Lotus
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pilfer.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Pilfer
+Bot2.Hand.Count = 0
+Bot2.Graveyard.Count = 0

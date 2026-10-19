@@ -1,0 +1,26 @@
+# Pilfer against a hand of lands only: the hand is revealed, and with no nonland card in it there is no choice to make (CR 608.2d) so Bot1 is asked nothing (the refused Choose, which
+# fails if a question is put): the Islands stay in Bot2's hand and its graveyard is empty.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Pilfer
+Swamp x10
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Pilfer.Cast(Bot2)
+Bot1.Pass
+! Bot1.Choose
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Pilfer
+Bot2.Graveyard.Count = 0
+Bot2.Hand.Count = 7
