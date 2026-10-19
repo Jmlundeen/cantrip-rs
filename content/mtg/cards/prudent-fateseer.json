@@ -1,0 +1,14 @@
+{
+  "name": "Prudent Fateseer",
+  "manaCost": "{1}{W/U}{W/U}",
+  "type": "Creature — Dwarf Wizard",
+  "power": 1,
+  "toughness": 4,
+  "oracleText": "This creature enters prepared.\nWhenever you scry or surveil, creatures you control get +1/+0 until end of turn. This ability triggers only once each turn.",
+  "prepare": {
+    "name": "Peer Review",
+    "manaCost": "{2}{W/U}",
+    "type": "Sorcery",
+    "oracleText": "Create a 2/2 colorless Wizard Soldier creature token named Cadet. Surveil 1."
+  }
+}

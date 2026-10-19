@@ -1,0 +1,33 @@
+# The prepared spell makes a Cadet then surveils; two surveils in one turn only pump once (CR 722, 603.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Prudent Fateseer
+Consider
+Black Lotus
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Prudent Fateseer.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Exile.Peer Review.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Consider.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Prudent Fateseer.Power = 2
+Bot1.Battlefield.Cadet.Power = 3
+Bot1.Battlefield.Cadet.Toughness = 2
+Bot1.Battlefield.Prudent Fateseer.Prepared = (absent)
