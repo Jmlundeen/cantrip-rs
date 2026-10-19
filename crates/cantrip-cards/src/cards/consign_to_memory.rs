@@ -2,6 +2,8 @@ use cantrip_api::*;
 use cantrip_mechanics::replicate;
 use cantrip_oracle as oracle;
 
+/// "Target triggered ability or colorless spell" (CR 115.1): a triggered ability on the stack, or a spell there with no
+/// color. An activated ability is not one.
 fn target_trigger_or_colorless_spell(q: &dyn Query, _: &Asker, target: Target) -> bool {
     match target {
         Target::Ability(serial) => q.state().stack.iter().any(|i| i.serial == serial && i.kind == StackKind::Triggered),
@@ -11,18 +13,13 @@ fn target_trigger_or_colorless_spell(q: &dyn Query, _: &Asker, target: Target) -
     }
 }
 
-fn counter_triggered_ability(g: &mut dyn Game, serial: u32) {
-    let at = g.state().stack.iter().position(|i| i.serial == serial)
-        .expect("a legal triggered ability target remains on the stack");
-    let source = g.state().stack[at].object;
-    g.counter_item(source, at);
-}
-
+/// "Counter target triggered ability or colorless spell." (CR 701.6a, 701.6b) Nothing if the target is no longer legal
+/// (CR 608.2b).
 fn counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !g.target_legal(item, 0) { return Ok(()) }
-    let target = item.targets[0];
-    if let Target::Object(id) = target { g.counter(id); }
-    else if let Target::Ability(serial) = target { counter_triggered_ability(g, serial); }
+    match item.targets[0] {
+        Target::Ability(_) => { cantrip_mechanics::counter_target_ability(g, item, 0); }
+        _ => { cantrip_mechanics::counter_target(g, item, 0); }
+    }
     Ok(())
 }
 
