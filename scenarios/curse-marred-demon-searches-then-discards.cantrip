@@ -1,0 +1,23 @@
+# curse marred demon searches then discards (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Curse-Marred Demon
+Mountain x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Curse-Marred Demon.Cast
+Bot1.Search(Mountain)
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 2
+Bot1.Library.Count = 25

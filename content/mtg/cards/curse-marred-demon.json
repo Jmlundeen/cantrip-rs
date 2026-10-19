@@ -1,0 +1,12 @@
+{
+  "name": "Curse-Marred Demon",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Demon",
+  "power": 4,
+  "toughness": 4,
+  "keywords": [
+    "Flying",
+    "Trample"
+  ],
+  "oracleText": "Flying, trample\nWhen this creature enters, search your library for a card, put it into your hand, shuffle, then discard a card at random."
+}
