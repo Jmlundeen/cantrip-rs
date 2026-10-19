@@ -1,0 +1,30 @@
+# Mabel removes all three loyalty counters from another planeswalker (CR 122, 704.5i).
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Swamp
+Jace, the Mind Sculptor
+Mabel, Bitter Recluse
+Island x20
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mabel, Bitter Recluse.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Jace, the Mind Sculptor; Black Lotus
+Bot1.Battlefield.Count = 3
