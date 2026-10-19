@@ -4176,12 +4176,19 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
         }
     };
     // CR 601.2b, 118.9: an alternative cost a static ability gives the spell is announced as it is cast, where the effect has it
-    // cast paying its costs: neither "without paying its mana cost" nor for another cost, nor with flashback (CR 118.9a).
-    let way = if terms.instead.is_none() && terms.life == 0 && !terms.flashback {
+    // cast paying its costs: neither "without paying its mana cost" nor for another cost, nor with flashback (CR 118.9a). A face
+    // with no mana cost is cast only for an alternative cost (CR 118.6a), so its mana cost is no choice then, and without one it
+    // is not cast at all.
+    let pays_mana_cost = terms.instead.is_none() && terms.life == 0;
+    let has_cost = cast_face(cx.card(cx.s().obj(card).card), way).has_cost;
+    let way = if pays_mana_cost && !terms.flashback {
         let whole = cx.card(cx.s().obj(card).card);
         let all = static_rules::spell_alternatives(cx);
         let alternatives = alternatives_for(cx, &all, player, card, cast_face(whole, way), way);
         if alternatives.is_empty() {
+            if !has_cost {
+                return Ok(false);
+            }
             way
         } else {
             let label = |index: u8| {
@@ -4190,7 +4197,9 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
                 let n = cx.card(of).spell_alternatives.iter().position(|a| std::ptr::eq(a, alternative)).unwrap_or(0);
                 Label::AlternativeCost(of, n as u8)
             };
-            let modes: Vec<Label> = std::iter::once(Label::ManaCost).chain(alternatives.iter().map(|&(index, _)| label(index))).collect();
+            // The way each choice casts by: the mana cost's own, where the face has one, then each alternative cost's.
+            let costs: Vec<u8> = has_cost.then_some(way).into_iter().chain(alternatives.iter().map(|&(index, _)| index)).collect();
+            let modes: Vec<Label> = costs.iter().map(|&index| if index == way { Label::ManaCost } else { label(index) }).collect();
             let ask = RequestKind::ChooseModes {
                 source: card,
                 eligible: (0..modes.len() as u8).collect(),
@@ -4202,13 +4211,12 @@ pub fn cast_during_resolution(cx: &mut Cx, card: ObjectId, terms: CastTerms) -> 
                 repeat: false,
             };
             match cx.ask_core(player, ask, false)? {
-                Answer::Modes(chosen) => match chosen.first() {
-                    Some(&n) if n > 0 && (n as usize) <= alternatives.len() => alternatives[n as usize - 1].0,
-                    _ => way,
-                },
-                _ => way,
+                Answer::Modes(chosen) => costs[chosen.first().map_or(0, |&n| n as usize).min(costs.len() - 1)],
+                _ => costs[0],
             }
         }
+    } else if pays_mana_cost && !has_cost {
+        return Ok(false);
     } else {
         way
     };
@@ -6156,6 +6164,16 @@ mod tests {
         toughness: Some(5),
         ..CardDef::BLANK
     };
+    /// A Dragon with no mana cost (CR 118.6a, 202.1b).
+    static COSTLESS: CardDef = CardDef {
+        name: "Alternative Test Costless Dragon",
+        types: TypeSet::of(&[CardType::Creature]),
+        subtypes: SubtypeSet::of(&[Subtype::Dragon]),
+        has_cost: false,
+        power: Some(4),
+        toughness: Some(4),
+        ..CardDef::BLANK
+    };
     static BEAR: CardDef = CardDef {
         name: "Alternative Test Bear",
         types: TypeSet::of(&[CardType::Creature]),
@@ -6169,7 +6187,7 @@ mod tests {
     /// A game in the first player's precombat main phase, the stack empty, with each of `cards` in the zone beside it and
     /// owned by the player beside it, nothing else anywhere and no mana: what each is, in order.
     fn table(cards: &[(&'static CardDef, Zone, PlayerId)]) -> (Game, Vec<ObjectId>) {
-        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&GENESIS, &ARCHMAGE, &EXILER, &FORGE, &DRAGON, &BEAR])));
+        let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&GENESIS, &ARCHMAGE, &EXILER, &FORGE, &DRAGON, &COSTLESS, &BEAR])));
         let mut game = Game::new(table, &crate::Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() });
         game.state.update_turn(|t| {
             t.number = 2;
@@ -6320,6 +6338,27 @@ mod tests {
         let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         let free = CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() };
         assert_eq!(cast_during_resolution(&mut cx, ids[1], free).ok(), Some(true));
+    }
+
+    /// CR 118.6a: a card with no mana cost cast as an effect resolves, paying its costs, is cast only for an alternative cost:
+    /// its mana cost is not among the costs it is asked to choose from, and with no alternative it is not cast.
+    #[test]
+    fn a_card_with_no_mana_cost_is_cast_as_an_effect_resolves_only_for_an_alternative_cost() {
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, ME), (&COSTLESS, Zone::exile(ME), ME)]);
+        let genesis = game.cards.id_of(&GENESIS);
+        game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
+        game.state.frame_push(cantrip_state::Frame::new(cantrip_state::FrameKind::Settle));
+        let frame = game.state.agenda.len() - 1;
+        let mut cx = Cx { g: &mut game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        assert!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).is_err(), "the cost is asked for");
+        let Some(Request { kind: RequestKind::ChooseModes { modes, .. }, .. }) = cx.s().agenda[frame].pending.clone() else { panic!("a choice of costs") };
+        assert_eq!(modes, vec![Label::AlternativeCost(genesis, 0)]);
+        // Under an opponent's Genesis, nothing lets it be cast.
+        let (mut game, ids) = table(&[(&GENESIS, Zone::BATTLEFIELD, THEM), (&COSTLESS, Zone::exile(ME), ME)]);
+        game.state.stack_push(stack_item(StackKind::Triggered, ids[0], AbilityRef { card: genesis, index: 0 }, ME, &[]));
+        let mut cx = self::cx(&mut game);
+        assert_eq!(cast_during_resolution(&mut cx, ids[1], CastTerms::default()).ok(), Some(false));
+        assert!(cx.s().stack.len() == 1);
     }
 
     #[test]

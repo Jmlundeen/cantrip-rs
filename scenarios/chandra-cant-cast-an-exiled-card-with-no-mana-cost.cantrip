@@ -1,0 +1,33 @@
+# Chandra, Torch of Defiance's +1 exiles Lotus Bloom from the top of Bot1's library. "You may cast that card" is a cast paying
+# its costs (CR 608.2g), and a card with no mana cost can be cast only for an alternative cost (CR 118.6a, 202.1b): Bot1
+# accepts, but Lotus Bloom can't be cast, so it stays in exile and Chandra deals 2 damage to Bot2 ("if you don't").
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Chandra, Torch of Defiance
+Island
+Island
+Island
+Lotus Bloom
+Island x8
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Chandra, Torch of Defiance.Cast
+Bot1.Battlefield.Chandra, Torch of Defiance.Activate(Ability: Exile the top)
+Bot1.Accept
+
+[Expect]
+Turn = 1
+Exile = Lotus Bloom
+Bot2.Life = 18
+Stack.Count = 0
