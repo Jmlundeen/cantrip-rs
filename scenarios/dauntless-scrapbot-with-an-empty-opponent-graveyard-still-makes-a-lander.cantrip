@@ -1,0 +1,35 @@
+# Dauntless Scrapbot on turn 1: the opponent's graveyard is empty, so nothing is exiled (no target is needed, the ability
+# is not removed), and the Lander token is still created. Bot1's own graveyard is left alone.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Dauntless Scrapbot
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Lander Token.Types = Artifact
+Bot1.Battlefield.Count = 5

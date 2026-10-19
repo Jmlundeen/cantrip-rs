@@ -1,0 +1,52 @@
+# Dauntless Scrapbot: "When this creature enters, exile each opponent's graveyard. Create a Lander token." Turn 1 Bot1 Bolts
+# Bot2, so its own graveyard holds a Lightning Bolt; Bot2's discards to hand size fill its graveyard with two Islands by
+# turn 5. On turn 5 the Scrapbot enters: both Islands are exiled, Bot1's Bolt is not (only opponents' graveyards), and a Lander
+# token (an artifact) arrives under Bot1's control.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Emerald
+Dauntless Scrapbot
+Lightning Bolt
+Island
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot2.Graveyard.Count = 2
+? Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Dauntless Scrapbot.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+
+[Expect]
+Stack.Count = 0
+Exile.Count = 2
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Lander Token.Types = Artifact
+Bot1.Battlefield.Dauntless Scrapbot.Power = 3
