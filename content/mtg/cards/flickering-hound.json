@@ -1,0 +1,9 @@
+{
+  "name": "Flickering Hound",
+  "manaCost": "{3}{W}",
+  "type": "Creature — Dog",
+  "oracleText": "Whenever you cast a creature spell, exile up to one other target creature you control, then return that card to the battlefield under its owner's control.",
+  "power": 2,
+  "toughness": 2,
+  "keywords": []
+}
