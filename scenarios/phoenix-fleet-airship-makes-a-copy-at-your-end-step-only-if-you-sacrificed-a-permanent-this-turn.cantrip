@@ -1,0 +1,29 @@
+# Phoenix Fleet Airship: "At the beginning of your end step, if you sacrificed a permanent this turn, create a token that's a copy of this
+# Vehicle." On turn 1 Bot1 casts it with a Swamp and the {B}{B}{B} of a sacrificed Black Lotus, so the condition holds at the end step and
+# a token copy appears (2 Airships). On turn 3 nothing is sacrificed, so no copy comes (still 2): the condition is false.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Phoenix Fleet Airship
+Swamp x14
+Swamp x5
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Phoenix Fleet Airship.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Swamp; Phoenix Fleet Airship
+[T2 Bot2.Main1]
+? Bot1.Battlefield = Swamp; Phoenix Fleet Airship; Phoenix Fleet Airship
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Swamp; Phoenix Fleet Airship; Phoenix Fleet Airship

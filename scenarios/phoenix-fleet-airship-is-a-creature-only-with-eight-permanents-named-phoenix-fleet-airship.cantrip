@@ -1,0 +1,41 @@
+# Phoenix Fleet Airship: "As long as you control eight or more permanents named Phoenix Fleet Airship, this Vehicle is an artifact creature."
+# Bot1 sacrifices a permanent in each of its first three turns (Black Lotus, then a Lotus Petal each time), and every Airship it has then
+# makes a copy at the end step: 1 -> 2 -> 4 -> 8. With four it is only a Vehicle; the turn it reaches eight each Airship (the original
+# and the tokens) is an artifact creature, and still a Vehicle: it is a creature without being crewed.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Phoenix Fleet Airship
+Lotus Petal
+Lotus Petal
+Swamp x14
+Swamp x5
+
+[Bot2 Deck]
+Forest x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Phoenix Fleet Airship.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Count = 5
+? Bot1.Battlefield.Phoenix Fleet Airship#1.Types = Artifact
+[T5 Bot1.Main1]
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+[T6 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Count = 9
+Bot1.Battlefield.Phoenix Fleet Airship#1.Types = Artifact; Creature
+Bot1.Battlefield.Phoenix Fleet Airship#8.Types = Artifact; Creature
+Bot1.Battlefield.Phoenix Fleet Airship#8.Power = 4
