@@ -1,0 +1,56 @@
+# Weapons Manufacturing triggers only for a nontoken artifact its controller controls. Turn 1 Bot1 casts it with two Moxen.
+# Turn 2 Bot2 casts a Lotus Petal: an artifact under the opponent's control, no Munitions. Turn 3 Bot1 plays a Mountain (not
+# an artifact), then sacrifices Mox Ruby to Deadly Dispute for a Treasure token (an artifact token, not nontoken): still no
+# Munitions, and the stack is empty throughout. The positive control, a nontoken artifact of Bot1's making one, is
+# weapons-manufacturing-makes-munitions-that-deal-two-damage-when-sacrificed.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Weapons Manufacturing
+Deadly Dispute
+Mountain
+Mountain
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Lotus Petal
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Weapons Manufacturing.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot2.Battlefield.Count = 1
+? Bot1.Battlefield.Count = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Stack.Count = 0
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Mox Ruby)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Treasure Token.Tapped = false
+Bot1.Graveyard = Deadly Dispute; Mox Ruby
+Bot2.Battlefield.Count = 1
+Bot2.Life = 20
+Bot1.Life = 20
+Stack.Count = 0

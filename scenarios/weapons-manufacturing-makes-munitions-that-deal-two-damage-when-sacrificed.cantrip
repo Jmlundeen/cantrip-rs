@@ -1,0 +1,53 @@
+# Weapons Manufacturing: a nontoken artifact entering under its controller's control makes a Munitions token; when that token
+# leaves the battlefield (sacrificed to Deadly Dispute here) it deals 2 damage to any target (Bot2's face). Deadly Dispute's
+# Treasure is an artifact token, and the Munitions token is one too: neither makes another Munitions. Mox Jet is cast after
+# Weapons Manufacturing, so exactly one Munitions exists before the sacrifice.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Weapons Manufacturing
+Deadly Dispute
+Mountain
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Weapons Manufacturing.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Count = 5
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Munitions)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Treasure Token.Tapped = false
+Stack.Count = 0

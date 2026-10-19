@@ -1,0 +1,64 @@
+# Weapons Manufacturing: an artifact creature is an artifact, so Ornithopter entering makes a Munitions token. Sacrificing
+# that token to Deadly Dispute has its leaves-the-battlefield ability deal 2 damage to a creature (Bot2's Llanowar Elves),
+# which dies. The Munitions ability targets any target, so the creature is a legal choice; its other targets are proven by
+# the sibling scenario that hits a player.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Weapons Manufacturing
+Deadly Dispute
+Ornithopter
+Mountain
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Llanowar Elves
+Forest
+Forest x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Weapons Manufacturing.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Battlefield.Count = 2
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Deadly Dispute.Cast
+Bot1.Choose(Munitions)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield.Count = 1
+Bot2.Life = 20
+Bot1.Battlefield.Ornithopter.Tapped = false
+Bot1.Battlefield.Count = 6
+Stack.Count = 0
