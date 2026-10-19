@@ -1,0 +1,26 @@
+# Awaken the Inferno also has basic landcycling {2} (CR 702.29e): "{2}, Discard this card: Search your library for a basic
+# land card, reveal it, put it into your hand, then shuffle."
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Awaken the Inferno
+Swamp x4
+Island
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Awaken the Inferno.Activate
+Bot1.Search(Island)
+
+[Expect]
+Bot1.Graveyard = Awaken the Inferno
+Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Island
+Bot1.Library.Count = 12
