@@ -454,7 +454,7 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 - `BotN.Battlefield.<Name>.Prepared`, `true` for a prepared permanent (CR 722.3a) and absent otherwise; while it is
   set, that permanent's preparation card is the copy in `Exile`
 - `BotN.Battlefield.<Name>.Chosen<Key>`, one per quality chosen about a permanent and kept on it (CR 614.12a, 607.2d):
-  `ChosenName` for a card name (chosen as it entered, or for it as its ability resolved: Petrified Hamlet), `ChosenParity` for Gollum's odd or even, `ChosenColor` for a chosen colour,
+  `ChosenName` for a card name (chosen as it entered, or for it as its ability resolved: Petrified Hamlet), `ChosenOption` for the word chosen as it entered (CR 607.2f: Gollum's `Odd` or `Even`, a Siege's `Khans`), `ChosenColor` for a chosen colour,
   `ChosenSubtype` for a chosen creature type (Three Tree City); and `ChosenModes`, the modes its modal abilities have
   chosen, numbered from 1 and read from the history (`1, 3` for Gollum's counter and draw)
 - `BotN.Battlefield.<Name>.Exerted`, `true` for an exerted permanent (CR 701.43a) and absent otherwise

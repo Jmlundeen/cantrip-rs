@@ -496,8 +496,9 @@ impl StateDump {
                     if let Some(chosen) = obj.marks.chosen_player {
                         d.set(format!("{key}.ChosenPlayer"), chosen.0 + 1);
                     }
-                    if let Some(odd) = obj.marks.chosen_odd {
-                        d.set(format!("{key}.ChosenParity"), if odd { "odd" } else { "even" });
+                    // The word chosen as it entered (CR 607.2f): "Jeskai", "Odd".
+                    if let Some(chosen) = obj.marks.chosen_option {
+                        d.set(format!("{key}.ChosenOption"), label_text(&Label::Option(chosen.card, chosen.index)));
                     }
                     // The modes its modal abilities have chosen, from the history (`Event::ModesChosen`), numbered from 1.
                     let chosen = game.history().all().iter().fold(0u8, |acc, r| match r.event {

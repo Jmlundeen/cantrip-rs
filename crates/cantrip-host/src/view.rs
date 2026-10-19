@@ -1174,6 +1174,10 @@ impl<'a> Projector<'a> {
         if let Some(card) = obj.marks.chosen_card {
             choices.push(ChoiceView { key: "name".into(), value: game.cards.get(card).name.to_string() });
         }
+        // One of the words its text offered to choose between as it entered (CR 607.2f), by the word: "Jeskai", "Odd".
+        if let Some(chosen) = obj.marks.chosen_option {
+            choices.push(ChoiceView { key: "option".into(), value: label_text(&Label::Option(chosen.card, chosen.index)).to_string() });
+        }
         choices.sort_by(|a, b| a.key.cmp(&b.key));
 
         let effect = |kind: EffectKind| s.effects.iter().any(|e| e.affected == id && e.kind == kind);

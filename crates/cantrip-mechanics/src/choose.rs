@@ -191,13 +191,43 @@ pub fn cast_up_to_free(g: &mut dyn Game, player: PlayerId, source: ObjectId, car
     Ok(())
 }
 
+/// "Choose A or B": one of the words a card's text offers to choose between, words that otherwise have no rules meaning
+/// (CR 607.2f), by index into its `labels`: `options` are the indices of the words offered, in the card's order. Asked even
+/// when the choice is forced; the question is captioned with every word offered ("Frostcliff Siege: choose Jeskai or Temur").
+/// Thanos, the Mad Titan's "choose odd or even" asks it as his power-up resolves.
+pub fn option(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: CardId, options: core::ops::Range<u8>) -> Result<u8, Suspend> {
+    let start = options.start;
+    Ok(start + one_of(g, player, source, options.map(|i| Label::Option(card, i)).collect())?)
+}
+
+/// "As [this] enters, choose A or B" (CR 614.12a, 607.2f): the controller chooses one of the words `def`'s text offers (the
+/// `options` of its `labels`) before it enters, and the permanent keeps the choice while it is on the battlefield; it is
+/// no copiable value (CR 707.2), so a copy entering makes its own choice (CR 707.5). `def` is the card whose text this is,
+/// the caller's `&CARD`. The Khans of Tarkir Sieges ("Khans or Dragons": Monastery, Outpost, Palace, Citadel and Frontier
+/// Siege), the Tarkir: Dragonstorm Sieges ("Jeskai or Temur": Frostcliff Siege; Barrensteppe, Glacierwood, Hollowmurk and
+/// Windcrag Siege), Mirrodin Besieged ("Mirran or Phyrexian"), Gollum, Riddle Master and Lavabrink Venturer ("odd or even")
+/// print it. The linked abilities read it with `chosen_option`.
+pub fn option_as_enters(g: &mut dyn Game, entering: &mut Entering, def: &'static CardDef, options: core::ops::Range<u8>) -> Result<(), Suspend> {
+    let card = g.card_id(def);
+    let index = option(g, entering.controller, entering.object, card, options)?;
+    entering.chosen_option = Some(ChosenOption { card, index });
+    Ok(())
+}
+
+/// The word chosen as `id` entered (`option_as_enters`), by index into `def`'s `labels`, for "the chosen [word]" or "• Jeskai
+/// — ..." of `def`'s text: none if no choice was made, or if it was made by another card's ability, which `def`'s abilities
+/// are not linked to (CR 607.2f): a permanent that entered as one card and has since become a copy of another.
+pub fn chosen_option(q: &dyn Query, id: ObjectId, def: &'static CardDef) -> Option<u8> {
+    q.obj(id).marks.chosen_option.filter(|c| std::ptr::eq(q.card(c.card), def)).map(|c| c.index)
+}
+
 /// The labels "choose odd or even" offers, odd first: a card that asks it lists them as its `labels`.
 pub const ODD_OR_EVEN: &[&str] = &["Odd", "Even"];
 
-/// "Choose odd or even" (Gollum, Riddle Master as it enters; Thanos, the Mad Titan's power-up): true for odd. `card` is the
-/// card whose `labels` are `ODD_OR_EVEN`.
+/// "Choose odd or even" (Thanos, the Mad Titan's power-up, as it resolves): true for odd. `card` is the card whose `labels`
+/// are `ODD_OR_EVEN`. "As this enters, choose odd or even" is `option_as_enters`.
 pub fn odd_or_even(g: &mut dyn Game, player: PlayerId, source: ObjectId, card: CardId) -> Result<bool, Suspend> {
-    Ok(one_of(g, player, source, vec![Label::Card(card, 0), Label::Card(card, 1)])? == 0)
+    Ok(option(g, player, source, card, 0..2)? == 0)
 }
 
 /// The labels "you may tap or untap [it]" offers: a card that asks it lists them as its `labels`.

@@ -412,7 +412,7 @@ pub fn resolve(cx: &mut Cx) -> R<Flow> {
                     chosen_subtype: None,
                     chosen_player: None,
                     chosen_card: None,
-                    chosen_odd: None,
+                    chosen_option: None,
                     // An Aura spell enters attached to what it targeted (CR 303.4f, 608.3b).
                     attach: if def.enchant.is_some() { item.targets[0].object() } else { None },
                     attach_player: if def.enchant.is_some() { item.targets[0].player() } else { None },

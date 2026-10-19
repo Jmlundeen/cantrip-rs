@@ -282,6 +282,7 @@ public static class PromptFixtures
         "phyrexian-life",
         "venture-room",
         "choose-option",
+        "choose-option-word",
         "choose-option-long",
         "modes-many",
         "modes-range",
@@ -1823,6 +1824,21 @@ public static class PromptFixtures
                     Eligible = [0, 1, 2, 3, 4],
                     Count = 1,
                     Heading = "Multiversal Passage: choose a basic land type",
+                };
+
+            case "choose-option-word":
+                // One of the words a card's text offers to choose between (CR 607.2f), asked as it enters (CR 614.12a):
+                // the caption names every word, as the card does; the permanent keeps the one chosen.
+                Announce(view, "Frostcliff Siege", "{1}{U}{R}", "As this enchantment enters, choose Jeskai or Temur.\n• Jeskai — Whenever one or more creatures you control deal combat damage to a player, draw a card.\n• Temur — Creatures you control get +1/+0 and have trample and haste.", Viewer, CardTypeView.Enchantment);
+                return new ChooseModesPromptMessage
+                {
+                    Player = Viewer,
+                    Source = new ViewHandle(OnStack),
+                    Modes = ["Jeskai", "Temur"],
+                    Eligible = [0, 1],
+                    Count = 1,
+                    Heading = "Frostcliff Siege: choose Jeskai or Temur",
+                    Detail = "Chosen, not targeted",
                 };
 
             case "choose-option-long":

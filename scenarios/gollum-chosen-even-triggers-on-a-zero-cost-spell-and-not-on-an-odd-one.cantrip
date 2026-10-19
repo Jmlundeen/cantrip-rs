@@ -31,7 +31,7 @@ Bot2.Hand.Lightning Bolt.Cast(Bot1)
 
 [Expect]
 Turn = 4
-Bot1.Battlefield.Gollum, Riddle Master.ChosenParity = even
+Bot1.Battlefield.Gollum, Riddle Master.ChosenOption = Even
 Bot1.Battlefield.Gollum, Riddle Master.Counters.PlusOnePlusOne = 1
 Bot1.Battlefield.Gollum, Riddle Master.Power = 4
 Bot1.Battlefield.Gollum, Riddle Master.ChosenModes = 1

@@ -3,18 +3,15 @@ use cantrip_mechanics::{choose, history};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// "As Gollum enters, choose odd or even" (CR 614.12a), kept on the permanent as the chosen quality. Zero is even.
+/// "As Gollum enters, choose odd or even" (CR 614.12a, 607.2f), kept on the permanent as the chosen quality. Zero is even.
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    let card = g.obj(entering.object).card;
-    let odd = choose::odd_or_even(g, entering.controller, entering.object, card)?;
-    entering.chosen_odd = Some(odd);
-    Ok(())
+    choose::option_as_enters(g, entering, &CARD, 0..2)
 }
 
 /// "Whenever an opponent casts a spell with mana value of the chosen quality": a spell, not an ability, and one of an opponent's.
 fn opponent_casts_a_matching_spell(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     let Event::SpellCast { spell, player, .. } = event else { return None };
-    let odd = q.obj(source).marks.chosen_odd?;
+    let odd = choose::chosen_option(q, source, &CARD)? == 0;
     if *player == q.controller(source) || !choose::mana_value_of_quality(q, *spell, odd) {
         return None;
     }

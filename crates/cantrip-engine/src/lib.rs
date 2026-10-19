@@ -82,7 +82,7 @@ pub fn deal_with(
 /// A label's text, as a client shows it and a scenario names it.
 pub fn label_text(label: &Label) -> &'static str {
     match *label {
-        Label::Card(card, i) => cards().get(card).labels.get(i as usize).copied().unwrap_or(""),
+        Label::Card(card, i) | Label::Option(card, i) => cards().get(card).labels.get(i as usize).copied().unwrap_or(""),
         Label::Name(card) | Label::Face(card) => cards().get(card).name,
         Label::Pile { first: true, empty: true } => "First pile: nothing",
         Label::Pile { first: true, empty: false } => "First pile",

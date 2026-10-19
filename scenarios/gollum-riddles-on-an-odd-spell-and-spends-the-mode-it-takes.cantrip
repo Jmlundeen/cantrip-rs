@@ -30,6 +30,6 @@ Bot1.Modes(Draw a card)
 Turn = 4
 Bot1.Life = 17
 Bot1.Battlefield = Swamp; Swamp; Gollum, Riddle Master
-Bot1.Battlefield.Gollum, Riddle Master.ChosenParity = odd
+Bot1.Battlefield.Gollum, Riddle Master.ChosenOption = Odd
 Bot1.Battlefield.Gollum, Riddle Master.ChosenModes = 3
 Bot2.Graveyard = Lightning Bolt

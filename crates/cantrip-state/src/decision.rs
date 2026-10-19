@@ -796,6 +796,9 @@ pub enum Purpose {
 pub enum Label {
     /// The nth label of the source card's definition.
     Card(CardId, u8),
+    /// The nth label of a card's definition as one of the words its text offers to choose between (CR 607.2f): "choose
+    /// Jeskai or Temur", "choose odd or even". Worded as `Card`; a question of these alone is captioned with all of them.
+    Option(CardId, u8),
     /// A card's name: an option that is one of several cards, named as the C# engine offers them.
     Name(CardId),
     /// One of two piles (CR 700.3), and whether it has nothing in it.

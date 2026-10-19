@@ -595,7 +595,7 @@ fn modes_detail(game: &Game, modes: &[Label], faces: bool) -> (String, bool) {
                 (String::new(), false)
             }
         }
-        None if modes.iter().all(|l| matches!(l, Label::Card(..) | Label::Name(_) | Label::Pile { .. })) => ("Chosen, not targeted".into(), false),
+        None if modes.iter().all(|l| matches!(l, Label::Card(..) | Label::Option(..) | Label::Name(_) | Label::Pile { .. })) => ("Chosen, not targeted".into(), false),
         None => (String::new(), false),
     }
 }
@@ -932,6 +932,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     "Choose which miracle to reveal it with".into()
                 } else if matches!(modes.first(), Some(Label::ManaType(..))) {
                     "Choose which type of mana to add".into()
+                } else if let Some(heading) = options_heading(game, modes) {
+                    heading
                 } else {
                     String::new()
                 },
@@ -1342,6 +1344,31 @@ mod tests {
         assert_eq!((free.maximum_total_mana_value, free.mana_values), (None, Vec::new()));
     }
 
+    /// A choice between the words a card's text offers (CR 607.2f) is captioned with every word, in the card's words and
+    /// under its name; the same labels offered as anything else are not.
+    #[test]
+    fn a_choice_of_a_cards_words_is_captioned_with_them() {
+        let (game, hand) = game_with(&["Gollum, Riddle Master"]);
+        let seat = game.state.seats().next().expect("a seat");
+        let card = game.obj(hand[0]).card;
+        let ask = |modes: Vec<Label>| {
+            let request = Request {
+                id: 1,
+                player: seat,
+                kind: RequestKind::ChooseModes { source: hand[0], modes, eligible: vec![0, 1], count: 1, at_most: 0, affordable: Vec::new(), additional_cost: false, repeat: false },
+                may_cancel: false,
+            };
+            match prompt(&game, &request, &mut HandleSpace::new()).expect("a prompt").0 {
+                PromptPayload::ChooseModesPromptMessage(p) => (p.heading, p.modes),
+                other => panic!("{other:?}"),
+            }
+        };
+        let (heading, modes) = ask(vec![Label::Option(card, 0), Label::Option(card, 1)]);
+        assert_eq!(heading, "Gollum, Riddle Master: choose Odd or Even");
+        assert_eq!(modes, vec!["Odd".to_string(), "Even".to_string()]);
+        assert_eq!(ask(vec![Label::Card(card, 0), Label::Card(card, 1)]).0, "");
+    }
+
     #[test]
     fn casts_during_resolution_are_asked_in_the_words_of_what_they_cost() {
         assert_eq!(may_verb(Purpose::CastFree), ("CastDuringResolution".to_string(), 1));
@@ -1407,6 +1434,23 @@ mod tests {
 /// What a choice of a subtype says it is for: "Choose a creature type" for one an effect names from now on (the heading the
 /// bots read it by), and for a word of a text change (CR 612.1), after the spell's name, which word it is - the one replaced, or the one replacing it -
 /// and its kind, a creature type or a basic land type.
+/// The caption of a choice between the words a card's text offers (CR 607.2f), in its words with the card's name: "Frostcliff
+/// Siege: choose Jeskai or Temur", "Mirrodin Besieged: choose Mirran or Phyrexian". The name is the card whose text it is,
+/// which a permanent entering as a copy of it is not yet (CR 707.5). None when the options are anything else.
+fn options_heading(game: &Game, modes: &[Label]) -> Option<String> {
+    let Some(&Label::Option(card, _)) = modes.first() else { return None };
+    if !modes.iter().all(|l| matches!(l, Label::Option(c, _) if *c == card)) {
+        return None;
+    }
+    let words: Vec<&str> = modes.iter().map(label_text).collect();
+    let listed = match words.split_last() {
+        Some((last, [])) => (*last).to_string(),
+        Some((last, rest)) => format!("{} or {last}", rest.join(", ")),
+        None => return None,
+    };
+    Some(format!("{}: choose {listed}", game.cards.get(card).name))
+}
+
 fn subtype_heading(source: &str, choices: &[Subtype], purpose: WordUse) -> String {
     let kind = if choices.first().is_some_and(|s| s.is_creature_type()) { "creature type" } else { "basic land type" };
     match purpose {

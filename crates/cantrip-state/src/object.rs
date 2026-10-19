@@ -139,14 +139,24 @@ pub struct Marks {
     pub chosen_player: Option<PlayerId>,
     /// A card name chosen as it entered ("choose a card name", CR 614.12): Anointed Peacekeeper's.
     pub chosen_card: Option<CardId>,
-    /// Odd (true) or even (false), chosen as it entered (CR 614.12a).
-    pub chosen_odd: Option<bool>,
+    /// One of the words its text offered to choose between as it entered (CR 614.12a, 607.2f): "choose Khans or
+    /// Dragons", "choose odd or even".
+    pub chosen_option: Option<ChosenOption>,
     /// Who controlled it before the control-changing effects that apply to it now (CR 613.1b): it goes back to them
     /// when the last of those ends. `None` while no such effect applies.
     pub control_base: Option<PlayerId>,
     /// Phased out (CR 110.5, 702.26b), and how: what says when it phases in. `None` while it is phased in. The object is in
     /// `Zone::PHASED_OUT` exactly while this is set.
     pub phased: Option<Phased>,
+}
+
+/// One of the words a card's text offers to choose between, words that otherwise have no rules meaning (CR 607.2f): the
+/// `index`th of `card`'s `labels`. The card is kept with the choice because the ability that refers to it is linked to the
+/// ability that made it (CR 607.2f): a permanent that has since become a copy of a different card has no such choice.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ChosenOption {
+    pub card: CardId,
+    pub index: u8,
 }
 
 /// How a permanent phased out (CR 702.26), which decides how it phases in.

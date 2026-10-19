@@ -262,7 +262,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             new.chosen_subtype = e.chosen_subtype;
             new.marks.chosen_player = e.chosen_player;
             new.marks.chosen_card = e.chosen_card;
-            new.marks.chosen_odd = e.chosen_odd;
+            new.marks.chosen_option = e.chosen_option;
             new.marks.protector = e.protector;
             new.attached_to = e.attach;
             new.attached_player = e.attach_player;
@@ -675,7 +675,7 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
         o.chosen_subtype = entering.chosen_subtype;
         o.marks.chosen_player = entering.chosen_player;
         o.marks.chosen_card = entering.chosen_card;
-        o.marks.chosen_odd = entering.chosen_odd;
+        o.marks.chosen_option = entering.chosen_option;
         o.attached_to = entering.attach;
         o.attached_player = entering.attach_player;
     });
@@ -800,7 +800,7 @@ pub fn put_onto_battlefield_along(
             continue;
         }
         let mut entering =
-            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_odd: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None };
+            Entering { object: id, controller, tapped, counters: entry_counters(with), copy: None, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: None, attach_player: None, x: 0 , transformed: false, protector: None, instead: None };
         prepare_entry(cx, &mut entering)?;
         moves.push(Moving { id, to: Zone::BATTLEFIELD, entering: Some(entering), reason: None });
     }
@@ -850,7 +850,7 @@ pub fn put_onto_battlefield_as(
         chosen_subtype: None,
         chosen_player: None,
         chosen_card: None,
-        chosen_odd: None,
+        chosen_option: None,
         attach: None, attach_player: None,
         x: 0,
         transformed,
@@ -1153,7 +1153,7 @@ fn create_tokens_onto(
         });
         let copy = if words.is_printed() { copy } else { Some(Copiable { words, ..Copiable::of(card) }) };
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
-        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_odd: None, attach: aura.and_then(|i| i.targets[0].object()), attach_player: aura.and_then(|i| i.targets[0].player()), x: 0 , transformed: false, protector: None, instead: None };
+        let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.targets[0].object()), attach_player: aura.and_then(|i| i.targets[0].player()), x: 0 , transformed: false, protector: None, instead: None };
         prepare_entry(cx, &mut entering)?;
         // The token is judged as it would exist on the battlefield (CR 614.12): a token copy as what it copies.
         let copy = entering.copy;
@@ -3071,7 +3071,7 @@ mod tests {
             chosen_subtype: None,
             chosen_player: None,
             chosen_card: None,
-            chosen_odd: None,
+            chosen_option: None,
             attach: None,
             attach_player: None,
             x: 0,
