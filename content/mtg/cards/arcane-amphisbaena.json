@@ -1,0 +1,11 @@
+{
+  "name": "Arcane Amphisbaena",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Snake",
+  "oracleText": "Deathtouch\nWhen this creature enters, empower Jace 2. (Put two loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with \"[-1]: Surveil 1\" and \"[-3]: Draw a card.\")",
+  "power": 1,
+  "toughness": 1,
+  "keywords": [
+    "Deathtouch"
+  ]
+}

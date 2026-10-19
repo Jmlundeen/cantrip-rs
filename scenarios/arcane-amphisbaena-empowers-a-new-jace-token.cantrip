@@ -1,0 +1,29 @@
+# Arcane Amphisbaena: deathtouch is a core keyword (CR 702.2), and "When this creature enters, empower Jace 2" makes a
+# blue Jace planeswalker token with two loyalty counters when its controller has none (CR 701.71a).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Arcane Amphisbaena
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Arcane Amphisbaena.Cast
+
+[Expect]
+Bot1.Battlefield.Arcane Amphisbaena.Keywords = Deathtouch
+Bot1.Battlefield.Arcane Amphisbaena.Power = 1
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
