@@ -1,0 +1,39 @@
+# Edgar, Ancient Bloodlord: "Whenever another creature or planeswalker you control dies, you gain 1 life" and "{2},
+# Sacrifice another creature or planeswalker: Put a +1/+1 counter on Edgar. He gains menace until end of turn"
+# (CR 603.6c, 608.2). Bot1 sacrifices its Ornithopter to the second on its second turn, which also pays the first.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Edgar, Ancient Bloodlord
+Ornithopter
+Island x15
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Edgar, Ancient Bloodlord.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Edgar, Ancient Bloodlord.Activate
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Edgar, Ancient Bloodlord.Power = 3
+Bot1.Battlefield.Edgar, Ancient Bloodlord.Toughness = 4
+Bot1.Battlefield.Edgar, Ancient Bloodlord.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Edgar, Ancient Bloodlord.Keywords = Menace
+Bot1.Graveyard = Ornithopter
