@@ -1,0 +1,25 @@
+# Charge the Sanctum temporary effects expire while the counter remains (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Charge the Sanctum
+Ornithopter
+Plains x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Charge the Sanctum.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Keywords = Flying

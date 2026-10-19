@@ -1,0 +1,23 @@
+# charge the sanctum mode 2 (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Charge the Sanctum
+Ornithopter
+Plains x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Charge the Sanctum.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 3
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying
