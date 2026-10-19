@@ -40,7 +40,7 @@ fn make_illusion(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// (`TargetSpec::EACH_OPPONENT`) and says which one this is.
 fn controlled_by_the_slots_opponent(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     let Target::Object(id) = t else { return false };
-    targets::permanent(q, id) && filters::artifact_or_creature(q, asker, id) && Some(q.controller(id)) == q.slot_opponent()
+    targets::controlled_by_slot_opponent(q, id) && filters::artifact_or_creature(q, asker, id)
 }
 
 const FOR_EACH_OPPONENT: TargetSpec = target(controlled_by_the_slots_opponent).between(0, TargetSpec::EACH_OPPONENT).labelled("Return up to one target artifact or creature {player} controls to its owner's hand");

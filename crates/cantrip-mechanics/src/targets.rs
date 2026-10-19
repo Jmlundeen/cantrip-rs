@@ -196,6 +196,14 @@ fn noncreature_artifact_or_enchantment_filter(q: &dyn Query, _: &Asker, t: Targe
 pub const NONCREATURE_ARTIFACT_OR_ENCHANTMENT: TargetSpec =
     target(noncreature_artifact_or_enchantment_filter);
 
+/// "... that player controls" in a slot of "for each opponent, up to one target [permanent] that player controls" (CR 601.2c, 115.1): a
+/// permanent on the battlefield controlled by the opponent whose slot (`TargetSpec::EACH_OPPONENT`) is being chosen or checked, which
+/// the core says through `Query::slot_opponent`. A slot's filter adds the kind of permanent. The Theorist, Jace Beleren's minus two and
+/// Lich's Relic's reflexive destroy print it.
+pub fn controlled_by_slot_opponent(q: &dyn Query, id: ObjectId) -> bool {
+    permanent(q, id) && Some(q.controller(id)) == q.slot_opponent()
+}
+
 /// The object a resolving item targeted in `slot`, if the target is still legal (CR 608.2b) and is an object (not a
 /// player). Every effect that acts on "target [thing]" begins here rather than pairing `target_legal` with a pattern
 /// match. Used by `destroy_target`, `exile_target` and by most of the cards that act on one target.
