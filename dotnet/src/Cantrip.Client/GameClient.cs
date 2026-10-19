@@ -315,6 +315,9 @@ public sealed class GameClient
         _transport.Dispose();
     }
 
+    /// <summary>The request this client last answered, 0 before its first answer.</summary>
+    public int LastAnswered { get; private set; }
+
     /// <summary>Answers the outstanding prompt and clears it, so the same answer cannot be sent twice.</summary>
     public void Answer(AnswerPayload answer)
     {
@@ -330,6 +333,7 @@ public sealed class GameClient
         // Cleared before sending. With a loopback transport the send runs the engine synchronously and can
         // publish the next prompt inside this call, which would otherwise be overwritten on the way out.
         Prompt = null;
+        LastAnswered = message.RequestId;
         _transport.Send(message);
     }
 

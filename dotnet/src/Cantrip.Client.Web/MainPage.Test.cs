@@ -128,6 +128,7 @@ public sealed partial class MainPage
             WriteDeckEditor(json);
             json.WriteString("prompt", client?.Prompt?.Prompt?.GetType().Name ?? string.Empty);
             json.WriteNumber("requestId", client?.Prompt?.RequestId ?? 0);
+            json.WriteNumber("answeredRequest", client?.LastAnswered ?? 0);
             json.WriteNumber("seat", client?.Seat ?? 0);
             json.WriteString("fixture", _fixture ? _fixtureName : string.Empty);
             json.WriteString("answered", _fixture ? Answered(_fixtureTransport) : string.Empty);

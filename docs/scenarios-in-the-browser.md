@@ -55,7 +55,10 @@ grows prompt by prompt.
 Nothing on the page may answer for the player, or a strict run would fail where the page passed by itself: the page
 opens with auto-mana off (a menu asks the colour), a stop at every step of both players' turns, and Hold Priority on. A
 question the page did answer by itself - a pass it would make for anyone - is noted, and judged by the table like a
-click.
+click. A test of the stops themselves (`ScenarioPlayer.PlayAsync` with `stopsMine`/`stopsTheirs`) opens the page with the
+stops a player would set instead, and priority not held, so the page passes by itself wherever those stops let it, and a
+pass where the script means an action fails at that line; with `opponentThinks`, Bot2 is a protocol client at the table
+too, answering what the script means after a pause, as an opponent at a real table does.
 
 A card in exile or in a graveyard is drawn only while that zone is open, so the driver opens it as a person does - the
 Exile button over the piles, the graveyard pile - to click a card there or to read what its face says

@@ -1,0 +1,43 @@
+# Browser
+# The defender's side of CR 509.4: Bot2's Llanowar Elves attacks Bot1, who could block with Benalish Hero and declares
+# no blockers. The declare blockers step goes on: Bot2, the active player, gets priority and passes, then Bot1 does
+# (CR 117.3a, 117.3d), and Bot1 casts Lightning Bolt at the unblocked Elves before combat damage. No damage is dealt.
+
+[Bot1 Deck]
+Plains
+Benalish Hero
+Mountain
+Lightning Bolt
+Plains x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Benalish Hero.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Llanowar Elves > Bot1)
+[T4 Bot2.DeclareBlockers]
+? Step = Blockers
+? Combat.Blocks.Count = 0
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Graveyard = Llanowar Elves
+Bot1.Graveyard = Lightning Bolt
+Bot1.Battlefield.Benalish Hero.Tapped = false

@@ -271,6 +271,7 @@ public sealed class TablePage : IAsyncDisposable
 /// gallery, the last answer the dock sent - its kind, and the indexes of any modes or options chosen.
 /// <see cref="Combat"/> is each combat group as its ground is captioned, with its attackers: "Attacking Bot2: Ornithopter".
 /// <see cref="Selected"/> is how many creatures are picked up to attack or block, not yet sent anywhere.
+/// <see cref="AnsweredRequest"/> is the request the page last answered, by a click or by itself.
 /// </summary>
 public sealed record TableState(
     bool Ready,
@@ -293,6 +294,7 @@ public sealed record TableState(
     string Answered = "",
     int Selected = 0,
     int RequestId = 0,
+    int AnsweredRequest = 0,
     int Seat = 0,
     IReadOnlyList<PlayerState>? Players = null,
     IReadOnlyList<EffectState>? Effects = null,

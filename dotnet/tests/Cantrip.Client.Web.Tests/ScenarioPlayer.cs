@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Cantrip.Art;
+using Cantrip.Client;
 using Cantrip.Protocol;
 using Cantrip.Server.Host;
 using Cantrip.Server.Rules;
@@ -32,6 +33,9 @@ public sealed class ScenarioPlayer
     private readonly ScenarioTable _table;
     private readonly List<string> _trace = [];
 
+    /// <summary>The requests this driver answered by clicking.</summary>
+    private readonly HashSet<int> _clicked = [];
+
     /// <summary>The label of the button the last choice of cards was confirmed with; empty when the last pick answered itself.</summary>
     private string _lastConfirm = string.Empty;
 
@@ -41,19 +45,37 @@ public sealed class ScenarioPlayer
     /// <summary>A zone opened to click a card whose menu is open: shut once its row is chosen.</summary>
     private (int Seat, bool Graveyard)? _zoneToClose;
 
-    private ScenarioPlayer(TablePage page, ScenarioTable table)
+    /// <summary>Whether the page holds priority, as it does unless it is given the stops a player would set.</summary>
+    private readonly bool _hold;
+
+    /// <summary>Bot2's seat as a client of the table's, answering as the script means after a pause; null when the script answers it.</summary>
+    private readonly (GameClient Client, TimeSpan Thinks)? _opponent;
+
+    private ScenarioPlayer(TablePage page, ScenarioTable table, bool hold, (GameClient Client, TimeSpan Thinks)? opponent)
     {
         _page = page;
         _table = table;
+        _hold = hold;
+        _opponent = opponent;
     }
 
     /// <summary>
     /// Plays the scenario at <paramref name="path"/> to its end. Null when it passed, page and table alike; else what
-    /// failed, with the table's report or the page's, and the last steps taken.
+    /// failed, with the table's report or the page's, and the last steps taken. <paramref name="stopsMine"/> and
+    /// <paramref name="stopsTheirs"/> are the steps the page stops in on Bot1's turn and on Bot2's, every step (and
+    /// priority held) unless given: a test of the stops themselves gives the ones a player would set, does not hold
+    /// priority, and the page passes by itself everywhere else, the table judging each such pass as it judges a click.
+    /// With <paramref name="opponentThinks"/>, Bot2 is a client at the table too, as an opponent at a real table is, and
+    /// answers each of its questions as the script means that long after it is asked.
     /// </summary>
-    public static async Task<string?> PlayAsync(WebClient web, string path)
+    public static async Task<string?> PlayAsync(
+        WebClient web,
+        string path,
+        IReadOnlyList<TurnStepView>? stopsMine = null,
+        IReadOnlyList<TurnStepView>? stopsTheirs = null,
+        TimeSpan? opponentThinks = null)
     {
-        ScenarioSpec scenario = ScenarioSpec.Load(path, [1]);
+        ScenarioSpec scenario = ScenarioSpec.Load(path, opponentThinks is null ? [1] : [1, 2]);
         await using ScenarioTable table = await ScenarioTable.StartAsync(scenario, WebClient.Content);
         await using Microsoft.AspNetCore.Builder.WebApplication art = await ArtServer.StartAsync(
             new ArtStore(new ArtStoreOptions { ContentRoot = WebClient.Content, CacheDirectory = WebClient.ArtCache }), "127.0.0.1", 0);
@@ -62,9 +84,24 @@ public sealed class ScenarioPlayer
             $"server={Uri.EscapeDataString(table.Address.AbsoluteUri)}&art={Uri.EscapeDataString(art.Urls.First())}&seat=1&name=Bot1",
             WebClient.Pictures(Path.Combine(nameof(ScenarioPlayer), scenario.Name)),
             settings: new Dictionary<string, string> { ["auto-mana"] = "false" },
-            storage: new Dictionary<string, string> { ["cantrip-stops-mine"] = EveryStep, ["cantrip-stops-theirs"] = EveryStep });
+            storage: new Dictionary<string, string>
+            {
+                ["cantrip-stops-mine"] = stopsMine is null ? EveryStep : string.Join(",", stopsMine),
+                ["cantrip-stops-theirs"] = stopsTheirs is null ? EveryStep : string.Join(",", stopsTheirs),
+            });
 
-        var player = new ScenarioPlayer(page, table);
+        GameClient? opponent = null;
+        if (opponentThinks is not null)
+        {
+            opponent = new GameClient(await WebSocketTransport.ConnectAsync(table.Address));
+            opponent.Join("Bot2", 2);
+        }
+
+        var player = new ScenarioPlayer(
+            page,
+            table,
+            hold: stopsMine is null && stopsTheirs is null,
+            opponent is null ? null : (opponent, opponentThinks!.Value));
         try
         {
             return await player.PlayAsync();
@@ -74,14 +111,52 @@ public sealed class ScenarioPlayer
             await page.PictureAsync("failed");
             return player.Failure(error.Message);
         }
+        finally
+        {
+            opponent?.Disconnect();
+        }
+    }
+
+    /// <summary>Bot2's client given the question the table asks it, and the answer the script means sent after its pause.</summary>
+    private async Task AnswerAsOpponentAsync(ScenarioExpected expected)
+    {
+        (GameClient client, TimeSpan thinks) = _opponent!.Value;
+        DateTime giveUp = DateTime.UtcNow + Patience;
+        while (client.Prompt?.RequestId != expected.RequestId)
+        {
+            if (DateTime.UtcNow > giveUp)
+            {
+                throw new TimeoutException($"Bot2's client never got request {expected.RequestId}.");
+            }
+
+            if (client.Pump() == 0)
+            {
+                await Task.Delay(5);
+            }
+        }
+
+        if (expected.Undo || expected.Answer is null)
+        {
+            throw new Xunit.Sdk.XunitException($"Bot2's client does not undo ({expected.Line})");
+        }
+
+        await Task.Delay(thinks);
+        client.Answer(expected.Answer);
+        _trace.Add($"Bot2 {expected.Line ?? "(default)"}: {Describe(expected)}");
     }
 
     private async Task<string?> PlayAsync()
     {
-        bool holding = false;
+        bool holding = !_hold;
         while (true)
         {
             ScenarioProgress progress = await _table.NextAsync(Patience);
+            if (progress.Expected is { Seat: 2 } theirs && _opponent is not null)
+            {
+                await AnswerAsOpponentAsync(theirs);
+                continue;
+            }
+
             if (progress.Expected is { Seat: not 1 })
             {
                 continue;
@@ -94,9 +169,11 @@ public sealed class ScenarioPlayer
             }
 
             // A page past the question answered it itself (a pass it would make for anyone): the table judged that answer
-            // as it judges a click, so there is nothing to do but note it.
+            // as it judges a click, so there is nothing to do but note it. It may have nothing new to be asked yet, as
+            // after its last pass of the scenario, so having answered the question by itself counts as past it - not
+            // one this driver answered, which an undo or a payment step asks again under the same request.
             TableState state = progress.Expected is { } asked
-                ? await _page.SettledAsync(s => s.RequestId >= asked.RequestId)
+                ? await _page.SettledAsync(s => s.RequestId >= asked.RequestId || AnsweredItself(s, asked))
                 : await _page.SettledAsync();
 
             if (!holding)
@@ -134,7 +211,7 @@ public sealed class ScenarioPlayer
                 return _page.Errors.Count > 0 ? Failure("the page threw: " + string.Join(" | ", _page.Errors)) : null;
             }
 
-            if (progress.Expected is { } passed && state.RequestId > passed.RequestId)
+            if (progress.Expected is { } passed && (state.RequestId > passed.RequestId || AnsweredItself(state, passed)))
             {
                 _trace.Add($"{passed.Line ?? "(default)"}: {Describe(passed)}, answered by the page itself");
                 continue;
@@ -143,10 +220,15 @@ public sealed class ScenarioPlayer
             if (progress.Expected is { } expected)
             {
                 _trace.Add($"{expected.Line ?? "(default)"}: {Describe(expected)}");
+                _clicked.Add(expected.RequestId);
                 await AnswerAsync(expected, state);
             }
         }
     }
+
+    /// <summary>Whether the page, holding no question, answered this one by itself rather than by this driver's click.</summary>
+    private bool AnsweredItself(TableState state, ScenarioExpected asked) =>
+        state.RequestId == 0 && state.AnsweredRequest >= asked.RequestId && !_clicked.Contains(asked.RequestId);
 
     private string Failure(string message) =>
         $"{message}\n\nBot1's last answers, clicked:\n  {string.Join("\n  ", _trace.TakeLast(15))}"
