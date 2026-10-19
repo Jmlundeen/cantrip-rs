@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cantrip - League</title>
+<!--site:head-->
+<style>
+.league-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
+.league-side section.block { margin-bottom: 28px; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+/* The player's run: its record as pips, what it is doing, and what to do next. */
+.run { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+.run.mine { border-color: rgba(241, 180, 76, .7); box-shadow: inset 3px 0 0 var(--accent); }
+.run-top { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.run-record { font-size: 40px; font-weight: 750; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+.run-record small { display: block; font-size: 12px; font-weight: 650; letter-spacing: .7px; text-transform: uppercase; color: var(--fg-muted); margin-top: 6px; }
+.pips { display: flex; flex-direction: column; gap: 7px; flex: 1; min-width: 220px; }
+.pip-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.pip-row .label { width: 52px; font-size: 12px; color: var(--fg-muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 650; }
+.pip { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--control-border); background: transparent; }
+.pip.win { background: var(--ready); border-color: var(--ready); }
+.pip.loss { background: var(--danger); border-color: var(--danger); }
+.pip.trophy { border-radius: 5px; border-color: var(--accent); }
+.pip.trophy.win { background: var(--accent); }
+.run-status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 15px; }
+.run-status .grow { flex: 1; min-width: 200px; color: var(--fg-soft); }
+.run-status .grow strong { color: var(--fg); }
+.run-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.run-actions .spacer { flex: 1; }
+.searching { display: inline-flex; align-items: center; gap: 10px; color: var(--accent); font-weight: 600; }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--accent-soft); border-top-color: var(--accent); animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.run-matches { display: flex; gap: 6px; flex-wrap: wrap; }
+.result { font-size: 12.5px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg-soft); }
+.result.won { color: var(--ready); border-color: rgba(111, 207, 143, .45); }
+.result.lost { color: var(--danger); border-color: rgba(239, 107, 98, .45); }
+.result.playing { color: var(--accent); border-color: rgba(241, 180, 76, .45); }
+.outcome-banner { border-radius: var(--radius); padding: 12px 14px; font-size: 14.5px; background: var(--panel-hi); border: 1px solid var(--line); }
+.outcome-banner.trophy { background: var(--accent-soft); border-color: rgba(241, 180, 76, .5); }
+.outcome-banner strong { color: var(--fg); }
+
+/* Standings and the rules. */
+table.data td.rec { font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
+table.data tr.me td { background: var(--accent-soft); }
+table.data td.status { color: var(--fg-soft); font-size: 13.5px; }
+dl.rules { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 14px; }
+dl.rules dt { color: var(--fg-muted); }
+dl.rules dd { margin: 0; }
+.trophy-count { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* A deck, as a list. */
+dialog.deck { width: min(720px, calc(100vw - 32px)); }
+.deck-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 22px; max-height: 60vh; overflow: auto; }
+.deck-group h3 { margin: 6px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--fg-soft); }
+.deck-line { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 2px 0; }
+.deck-line .n { width: 18px; text-align: right; color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+.deck-line .card-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cost { display: inline-flex; gap: 2px; }
+.mana {
+  display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 3px; border-radius: 9px;
+  font-size: 10.5px; font-weight: 700; background: #c9c3b7; color: #1b1b1b;
+}
+.mana.W { background: #f7f1d5; } .mana.U { background: #a9d4f3; } .mana.B { background: #b4aba6; }
+.mana.R { background: #f3a68c; } .mana.G { background: #9fd3a8; }
+details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; margin-top: 8px; }
+
+@media (max-width: 960px) {
+  .league-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .run { padding: 16px; }
+  .run-record { font-size: 32px; }
+  .run-actions .spacer { display: none; }
+}
+</style>
+</head>
+<body data-page="league" data-own-banner="true">
+<!--site:header-->
+<main id="main">
+  <div id="content" aria-live="polite"><p class="hint">Loading the league&hellip;</p></div>
+</main>
+<!--site:footer-->
+
+<dialog id="deck" class="deck" aria-labelledby="deck-title">
+  <div class="dialog-body">
+    <h2 id="deck-title">Deck</h2>
+    <div id="deck-body"></div>
+    <div class="actions">
+      <button type="button" class="button" data-deck-close>Close</button>
+      <button type="button" class="button primary" data-deck-edit hidden>Change deck</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  "use strict";
+
+  // One league's page. Everything is asked of the server every few seconds - more often while the player looks for a
+  // match, which asking also keeps them doing. A seat - the draft, the match, the deck table - is the API's answer: a
+  // link to the web client, its ticket after the #, which nothing here keeps.
+  const id = decodeURIComponent(location.pathname.split("/").filter(Boolean).pop() ?? "");
+  let view = null;
+  let busy = false;
+  let lookedForMatch = false;
+  let going = false;
+
+  const $ = elementId => document.getElementById(elementId);
+  const { esc, plural } = window.Cantrip ?? {};
+  const record = r => `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ""}`;
+  const when = iso => {
+    if (!iso) return "";
+    const date = new Date(iso);
+    const days = Math.floor((Date.now() - date.getTime()) / 86_400_000);
+    if (days < 1) return `today, ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+    if (days < 2) return "yesterday";
+    if (days < 7) return `${days} days ago`;
+    return date.toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" });
+  };
+  const since = iso => {
+    const seconds = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+  };
+  const games = rules => rules.gamesToWin === 1 ? "Best of one" : `Best of ${rules.gamesToWin * 2 - 1}`;
+
+  // --- The rules, in words ---------------------------------------------------------------------------------------
+
+  function rulesList(v) {
+    const r = v.rules;
+    const rows = [
+      ["Format", `${window.Cantrip.formatName(r.format)}: ${r.podSize === 8 ? "you and seven bots" : `you and ${r.podSize - 1} bots`} draft ${r.packs} packs of ${r.packSize}; the bots play no games`],
+      ["Cube", v.cube],
+      ["Matches", `${games(r)}, against another player's deck`],
+      ["Trophy", r.winsToTrophy > 0 ? `${plural(r.winsToTrophy, "match win")}` : "No end by winning"],
+      ["Run ends", `At ${plural(r.lossesToEnd, "match loss", "match losses")}`],
+      ["Your deck", r.deckEditing === "betweenMatches" ? "Change it from your pool between any two matches" : "Change it until your first match; then it's set"],
+      ["Entries", r.maxEntries === 0 ? "As many runs as you like, one at a time" : r.maxEntries === 1 ? "One run each" : `${r.maxEntries} runs each, one at a time`],
+      ["Pairing", r.pairing === "free" ? `Whoever else is looking, whatever their record${r.allowRepeatPairings ? "" : "; never the same opponent twice in a run"}` : "By record"],
+      ["Smallest deck", plural(r.minimumDeck, "card")],
+    ];
+    if (r.starts) rows.push(["Starts", new Date(r.starts).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })]);
+    if (r.ends) rows.push(["Ends", new Date(r.ends).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })]);
+    return `<dl class="rules">${rows.map(([term, text]) => `<dt>${esc(term)}</dt><dd>${esc(text)}</dd>`).join("")}</dl>`;
+  }
+
+  // --- The player's run --------------------------------------------------------------------------------------------
+
+  function pips(run, rules) {
+    const wins = rules.winsToTrophy > 0 ? rules.winsToTrophy : Math.max(run.wins, 1);
+    const winPips = Array.from({ length: wins }, (_, i) =>
+      `<span class="pip${i === wins - 1 && rules.winsToTrophy > 0 ? " trophy" : ""}${i < run.wins ? " win" : ""}" aria-hidden="true"></span>`).join("");
+    const lossPips = Array.from({ length: rules.lossesToEnd }, (_, i) => `<span class="pip${i < run.losses ? " loss" : ""}" aria-hidden="true"></span>`).join("");
+    return `<div class="pips" aria-label="${esc(`${plural(run.wins, "win")} of ${wins}, ${plural(run.losses, "loss", "losses")} of ${rules.lossesToEnd}`)}">
+      <div class="pip-row"><span class="label">Wins</span>${winPips}</div>
+      <div class="pip-row"><span class="label">Losses</span>${lossPips}</div></div>`;
+  }
+
+  function matchesOf(run) {
+    if (!run.matches?.length) return "";
+    return `<div class="run-matches">${run.matches.map(m =>
+      `<span class="result ${esc(m.result)}" title="${esc(m.detail)}">${m.result === "playing" ? "Playing" : m.result === "won" ? "Won" : m.result === "lost" ? "Lost" : "Drew"} vs ${esc(m.opponent)}</span>`).join("")}</div>`;
+  }
+
+  function runCard(v) {
+    const mine = v.mine;
+    const run = mine.current;
+    const rules = v.rules;
+    const end = `<button type="button" class="button quiet small" data-end>End run</button>`;
+
+    if (run.stage === "Drafting") {
+      return `<div class="run mine">
+        <div class="run-status"><span class="badge Drafting">Drafting</span><span class="grow">Your draft is under way: <strong>pick your cards and build your deck</strong>. Then come back here to find a match.</span></div>
+        <div class="run-actions"><button type="button" class="button primary" data-play>Back to my draft</button><span class="spacer"></span>${end}</div>
+      </div>`;
+    }
+
+    let status;
+    let actions;
+    if (mine.opponent) {
+      status = `<span class="badge live">Match</span><span class="grow">Your match against <strong>${esc(mine.opponent)}</strong> ${mine.matchReady ? "is ready." : "is about to begin."}</span>`;
+      actions = `<button type="button" class="button primary" data-play ${mine.matchReady ? "" : "disabled"}>Go to my match</button>`;
+    } else if (mine.searchingSince) {
+      status = `<span class="searching"><span class="spinner" aria-hidden="true"></span>Looking for an opponent&hellip; <span class="num" id="waited">${since(mine.searchingSince)}</span></span>
+        <span class="grow">Keep this site open: you'll be taken to your match when one is found.</span>`;
+      actions = `<button type="button" class="button" data-stop>Stop looking</button>`;
+    } else if (mine.editing) {
+      status = `<span class="badge info">Deck</span><span class="grow">Your deck is open to change at its table. Save it there, then find a match.</span>`;
+      actions = `<button type="button" class="button primary" data-edit>Back to my deck</button>`;
+    } else {
+      status = `<span class="badge live">Ready</span><span class="grow">${run.wins + run.losses + run.draws === 0 ? "Your deck is built." : "Between matches."} <strong>Find a match</strong> when you're ready to play.</span>`;
+      actions = `<button type="button" class="button primary large" data-search ${v.open ? "" : "disabled"}>Find a match</button>`;
+    }
+
+    const deckButton = mine.editRefusal || mine.opponent || mine.searchingSince
+      ? `<button type="button" class="button" data-deck="${esc(run.id)}">View deck</button>`
+      : `<button type="button" class="button" data-deck="${esc(run.id)}">View or change deck</button>`;
+    return `<div class="run mine">
+      <div class="run-top">
+        <div class="run-record">${esc(record(run))}<small>Run${run.entry > 1 ? ` #${run.entry}` : ""} &middot; ${esc(plural(run.deck, "card"))}</small></div>
+        ${pips(run, rules)}
+      </div>
+      <div class="run-status">${status}</div>
+      ${matchesOf(run)}
+      <div class="run-actions">${actions}${deckButton}<span class="spacer"></span>${mine.opponent ? "" : end}</div>
+    </div>`;
+  }
+
+  function enterCard(v) {
+    const mine = v.mine;
+    const last = mine.previous[0];
+    const outcome = last && Date.now() - new Date(last.ended).getTime() < 6 * 3_600_000
+      ? `<div class="outcome-banner${last.ending === "trophy" ? " trophy" : ""}">${last.ending === "trophy"
+          ? `<strong>Trophy!</strong> Your last run went ${esc(record(last))}.`
+          : `Your last run ended ${esc(record(last))}${last.ending === "retired" ? " (ended early)" : ""}.`}</div>`
+      : "";
+    const left = mine.entriesLeft === null ? "" : `<p class="hint">${mine.entriesLeft > 0 ? `${plural(mine.entriesLeft, "entry", "entries")} left.` : "No entries left."}</p>`;
+    const can = !mine.entryRefusal;
+    return `<div class="run">
+      ${outcome}
+      <div class="run-status"><span class="grow"><strong>${mine.previous.length ? "Start another run." : "Enter the league."}</strong>
+        You draft against seven bots, build a deck from what you take, and play it against other players' decks a match at a time.</span></div>
+      ${can ? "" : `<p class="hint">${esc(mine.entryRefusal)}</p>`}
+      ${left}
+      <div class="run-actions"><button type="button" class="button primary large" data-enter ${can ? "" : "disabled"}>Start a draft</button></div>
+    </div>`;
+  }
+
+  function signedOutCard(v) {
+    return v.signIn
+      ? `<div class="run"><div class="run-status"><span class="grow"><strong>Sign in to play.</strong> Sign in with Discord to enter the league, draft and find matches.</span></div>
+          <div class="run-actions"><a class="button discord" href="signin?then=${encodeURIComponent(`leagues/${id}`)}" data-site-signin>Sign in with Discord</a></div></div>`
+      : `<div class="run"><div class="run-status"><span class="grow">Nobody can sign in on this server, so nobody can enter. You can still follow the league here.</span></div></div>`;
+  }
+
+  // --- The rest ---------------------------------------------------------------------------------------------------
+
+  function standings(v) {
+    if (!v.players.length) return `<div class="empty small">No runs are being played right now.</div>`;
+    const mineId = v.mine?.current?.id;
+    return `<div class="table-wrap"><table class="data"><thead><tr><th>Player</th><th>Record</th><th>Now</th></tr></thead><tbody>
+      ${v.players.map(p => `<tr${p.id === mineId ? ' class="me"' : ""}><td>${esc(p.name)}${p.entry > 1 ? ` <span class="hint">#${p.entry}</span>` : ""}</td>
+        <td class="rec">${p.stage === "Drafting" ? "&ndash;" : esc(record(p))}</td><td class="status">${esc(p.status)}</td></tr>`).join("")}
+    </tbody></table></div>`;
+  }
+
+  function trophies(v) {
+    if (!v.trophies.length) return `<div class="empty small">No trophies yet. Be the first.</div>`;
+    return `<div class="table-wrap"><table class="data"><thead><tr><th>#</th><th>Player</th><th>Trophies</th></tr></thead><tbody>
+      ${v.trophies.map((t, i) => `<tr${t.me ? ' class="me"' : ""}><td class="num">${i + 1}</td><td>${esc(t.name)}</td><td class="trophy-count">${t.trophies}</td></tr>`).join("")}
+    </tbody></table></div>`;
+  }
+
+  function previous(v) {
+    const runs = v.mine?.previous ?? [];
+    if (!runs.length) return `<div class="empty small">Your decks from runs that have ended will be listed here.</div>`;
+    return `<div class="rows">${runs.map(run => {
+      const tone = run.ending === "trophy" ? "won" : run.ending === "eliminated" ? "" : "info";
+      return `<div class="row"><div class="main"><div class="title">Run #${run.entry} &middot; <span class="num">${esc(record(run))}</span></div>
+          <div class="sub">${esc([run.matches.length ? `${plural(run.matches.length, "match", "matches")} against ${[...new Set(run.matches.map(m => m.opponent))].join(", ")}` : "No matches played", run.ended ? `ended ${when(run.ended)}` : ""].filter(Boolean).join(" · "))}</div></div>
+        <div class="side"><span class="badge ${tone}">${esc(run.status)}</span><button type="button" class="button small" data-deck="${esc(run.id)}">View deck</button></div></div>`;
+    }).join("")}</div>`;
+  }
+
+  function recent(v) {
+    if (!v.recent.length) return `<div class="empty small">No matches have been played yet.</div>`;
+    return `<div class="rows">${v.recent.map(m => `<div class="row"><div class="main">
+      <div class="title">${m.winner ? `${esc(m.winner)} <span class="hint">beat</span> ${esc(m.winner === m.first ? m.second : m.first)}` : `${esc(m.first)} <span class="hint">and</span> ${esc(m.second)}`}</div>
+      <div class="sub">${esc([m.detail, m.ended ? when(m.ended) : ""].filter(Boolean).join(" · "))}</div></div></div>`).join("")}</div>`;
+  }
+
+  function render() {
+    if (!view || busy) return;
+    const v = view;
+    const state = v.upcoming ? `<span class="badge info">Starts soon</span>` : v.open ? `<span class="badge live">Open</span>` : `<span class="badge">Over</span>`;
+    const facts = [v.cube, window.Cantrip.formatName(v.rules.format), games(v.rules)].filter(Boolean).map(text => `<span class="chip">${esc(text)}</span>`).join("");
+    const run = !v.me ? signedOutCard(v) : v.mine?.current ? runCard(v) : enterCard(v);
+    document.title = `Cantrip - ${v.name}`;
+    $("content").innerHTML = `
+      <div class="page-head"><div class="titles"><h1>${esc(v.name)} ${state}</h1>
+        ${v.description ? `<p class="lead">${esc(v.description)}</p>` : ""}<div class="facts">${facts}</div></div>
+        <div class="actions"><a class="button quiet small" href="leagues">&larr; All leagues</a></div></div>
+      <div class="league-layout">
+        <div>
+          <section class="block" aria-labelledby="h-run"><div class="block-head"><h2 id="h-run">Your run</h2>
+            ${v.mine?.trophies ? `<span class="count">${plural(v.mine.trophies, "trophy", "trophies")} won</span>` : ""}</div>${run}</section>
+          <section class="block" aria-labelledby="h-players"><div class="block-head"><h2 id="h-players">Players</h2><span class="count">${v.players.length}</span>
+            ${v.searching ? `<span class="count">&middot; ${v.searching} looking for a match</span>` : ""}</div>
+            <p class="about">Every run being played now, best record first.</p>${standings(v)}</section>
+          ${v.me ? `<section class="block" aria-labelledby="h-previous"><div class="block-head"><h2 id="h-previous">Your previous decks</h2>
+            ${v.mine?.previous?.length ? `<span class="count">${v.mine.previous.length}</span>` : ""}</div>${previous(v)}</section>` : ""}
+        </div>
+        <div class="league-side">
+          <section class="block" aria-labelledby="h-trophies"><div class="block-head"><h2 id="h-trophies">Trophies</h2></div>${trophies(v)}</section>
+          <section class="block" aria-labelledby="h-rules"><div class="block-head"><h2 id="h-rules">How it works</h2></div>${rulesList(v)}
+            <p class="hint" style="margin-top: 10px">${plural(v.entrants, "player")} entered &middot; ${plural(v.runs, "run")} made</p></section>
+          <section class="block" aria-labelledby="h-recent"><div class="block-head"><h2 id="h-recent">Recent matches</h2></div>${recent(v)}</section>
+        </div>
+      </div>`;
+  }
+
+  // --- Asking the server ------------------------------------------------------------------------------------------
+
+  async function refresh() {
+    let next;
+    try { next = await window.Cantrip.getJson(`leagues/api/league/${encodeURIComponent(id)}`); } catch { return; }
+    view = next;
+    const mine = view.mine;
+    if (mine?.searchingSince) lookedForMatch = true;
+
+    // Paired while looking from here: straight to the match.
+    if (mine?.opponent && mine.matchReady && lookedForMatch && !going) {
+      going = true;
+      document.title = "Match found! - Cantrip";
+      window.Cantrip.toast(`Match found: you're playing ${mine.opponent}.`);
+      const why = await window.Cantrip.seat("leagues/api/play", { league: id });
+      if (why) { going = false; window.Cantrip.toast(why, "error"); }
+      return;
+    }
+
+    render();
+  }
+
+  function schedule() {
+    const fast = view?.mine?.searchingSince || (view?.mine?.opponent && !view.mine.matchReady);
+    setTimeout(async () => { await refresh(); schedule(); }, fast ? 1500 : 4000);
+  }
+
+  // The time spent looking, counted between asks.
+  setInterval(() => {
+    const waited = $("waited");
+    if (waited && view?.mine?.searchingSince) waited.textContent = since(view.mine.searchingSince);
+  }, 1000);
+
+  async function act(work) {
+    if (busy) return;
+    busy = true;
+    try { await work(); } catch (error) { window.Cantrip.toast(error.message, "error"); } finally { busy = false; }
+    await refresh();
+  }
+
+  async function answer(path) {
+    const reply = await window.Cantrip.post(path, { league: id });
+    if (reply?.refusal) window.Cantrip.toast(reply.refusal, "error");
+    return reply && !reply.refusal;
+  }
+
+  // --- A deck, as a list ------------------------------------------------------------------------------------------
+
+  function cost(text) {
+    const symbols = (text ?? "").match(/\{[^}]+\}/g) ?? [];
+    return `<span class="cost">${symbols.map(symbol => {
+      const inner = symbol.slice(1, -1);
+      const tone = /^[WUBRG]$/.test(inner) ? inner : /^[WUBRG]\//.test(inner) ? inner[0] : "";
+      return `<span class="mana ${tone}">${esc(inner)}</span>`;
+    }).join("")}</span>`;
+  }
+
+  function lines(cards) {
+    return cards.map(card => `<div class="deck-line" title="${esc(card.types)}"><span class="n">${card.count}</span><span class="card-name">${esc(card.name)}</span>${cost(card.manaCost)}</div>`).join("");
+  }
+
+  async function showDeck(runId) {
+    let deck;
+    try { deck = await window.Cantrip.getJson(`leagues/api/deck/${encodeURIComponent(id)}?run=${encodeURIComponent(runId)}`); }
+    catch { window.Cantrip.toast("That deck could not be shown.", "error"); return; }
+    const count = list => list.reduce((sum, card) => sum + card.count, 0);
+    const groups = [["Creatures", "creature"], ["Spells", "spell"], ["Lands", "land"]]
+      .map(([title, kind]) => [title, deck.main.filter(card => card.kind === kind)])
+      .filter(([, cards]) => cards.length);
+    $("deck-title").textContent = `Run #${deck.entry} deck · ${deck.count} cards`;
+    $("deck-body").innerHTML = `<div class="deck-columns">${groups.map(([title, cards]) =>
+        `<div class="deck-group"><h3>${title} (${count(cards)})</h3>${lines(cards)}</div>`).join("")}</div>
+      ${deck.sideboard.length ? `<details class="side"><summary>Sideboard (${count(deck.sideboard)})</summary><div class="deck-columns">${lines(deck.sideboard)}</div></details>` : ""}`;
+    $("deck").querySelector("[data-deck-edit]").hidden = !deck.editable;
+    $("deck").showModal();
+  }
+
+  // --- What the buttons do ----------------------------------------------------------------------------------------
+
+  document.addEventListener("click", async event => {
+    const target = event.target.closest("button");
+    if (!target || target.disabled) return;
+    const { seat, confirm, toast } = window.Cantrip;
+
+    if ("deckClose" in target.dataset) { $("deck").close(); return; }
+    if ("deckEdit" in target.dataset) {
+      $("deck").close();
+      await act(async () => { const why = await seat("leagues/api/edit", { league: id }); if (why) toast(why, "error"); });
+      return;
+    }
+    if (target.closest("dialog") || !target.closest("#content")) return;
+
+    if (target.dataset.deck) await showDeck(target.dataset.deck);
+    else if ("enter" in target.dataset) {
+      const left = view.mine?.entriesLeft;
+      if (left !== null && left !== undefined && !await confirm({
+        title: "Start a run?", body: [`This uses one of your ${plural(left, "entry", "entries")} left.`], confirmLabel: "Start a draft" })) return;
+      await act(async () => { const why = await seat("leagues/api/enter", { league: id }); if (why) toast(why, "error"); });
+    }
+    else if ("play" in target.dataset) await act(async () => { const why = await seat("leagues/api/play", { league: id }); if (why) toast(why, "error"); });
+    else if ("edit" in target.dataset) await act(async () => { const why = await seat("leagues/api/edit", { league: id }); if (why) toast(why, "error"); });
+    else if ("search" in target.dataset) await act(async () => { if (await answer("leagues/api/search")) lookedForMatch = true; });
+    else if ("stop" in target.dataset) await act(async () => { if (await answer("leagues/api/stop")) lookedForMatch = false; });
+    else if ("end" in target.dataset) {
+      const run = view.mine.current;
+      const drafting = run.stage === "Drafting";
+      const body = [
+        drafting ? "Your draft is called off, and the run ends before it has played." : `Your run ends now at ${plural(run.wins, "win")}.`,
+        `It counts as ${plural(view.rules.lossesToEnd, "loss", "losses")}${view.mine.entriesLeft === null ? "" : ", and uses up its entry"}. This can't be undone.`,
+      ];
+      if (!await confirm({ title: "End your run?", body, confirmLabel: "End my run", danger: true })) return;
+      await act(async () => { if (await answer("leagues/api/end")) toast("Your run is over."); });
+    }
+  });
+
+  $("deck").addEventListener("click", event => { if (event.target === $("deck")) $("deck").close(); });
+
+  refresh().then(schedule);
+})();
+</script>
+</body>
+</html>

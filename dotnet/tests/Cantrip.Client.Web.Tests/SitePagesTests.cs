@@ -17,7 +17,8 @@ namespace Cantrip.Client.Web.Tests;
 /// The bot's site in a browser, as its players use it: every page but a game table, at a desktop's width and a phone's,
 /// signed out and signed in, each with the same menu bar - the logo, the sections, who is signed in - and footer; the
 /// way from page to page by that bar, and on a phone by its menu; a player's own page with what they are playing and
-/// their events over; dropping out of a draft from it, asked first; and the deck library, opening a deck in the editor.
+/// their events over; dropping out of a draft from it, asked first; the deck library, opening a deck in the editor; and a
+/// league's page, with the player's run, its deck, and ending it asked first.
 /// Every page is pictured (TestResults\web\SitePagesTests) to be looked at.
 /// <para>
 /// Discord's sign-in is Discord's, so here the player is a header every request of the page carries, which the site's
@@ -29,6 +30,7 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
 {
     private const string AsHeader = "X-Test-Account";
     private const ulong Alice = 1001;
+    private const string League = "vintage-test";
 
     private static readonly (int Width, int Height, string Name)[] Sizes = [(1440, 900, "desktop"), (390, 844, "phone")];
 
@@ -39,6 +41,8 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
     private DraftHost _drafts = null!;
     private DraftQueues _queues = null!;
     private Matchmaker _games = null!;
+    private PodHosts _pods = null!;
+    private LeagueHosts _leagues = null!;
     private Uri _address = null!;
     private string _live = string.Empty;
     private string _finished = string.Empty;
@@ -70,10 +74,34 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         var queuePage = new QueueSiteOptions { Queues = _queues, Board = status, Drafts = _drafts, Client = site, SignIn = signIn };
         var playPage = new PlaySiteOptions { Games = _games, Client = site, SignIn = signIn };
         var deckPage = new DeckSiteOptions { ContentRoot = WebClient.Content, Store = store, SignIn = signIn };
-        var home = new HomeSiteOptions { SignIn = signIn, Drafts = queuePage, Constructed = playPage, HasDecks = true, Store = store };
+        // A league with runs being played and over, as the data directory keeps one.
+        SeedLeague(store, cube);
+        _pods = new PodHosts(new PodHostsOptions { ContentRoot = WebClient.Content, Store = store, Ports = ports[1..4] });
+        _leagues = new LeagueHosts(new LeagueHostsOptions
+        {
+            ContentRoot = WebClient.Content,
+            Store = store,
+            Pods = _pods,
+            CubeDirectories = [Path.Combine(WebClient.Root, "decks")],
+            Leagues =
+            [
+                new LeagueDefinition
+                {
+                    Id = League,
+                    Name = "Vintage Cube Quick Draft",
+                    Description = "Draft the cube against seven bots, then play your deck against other players' quick-draft decks, best of one. Seven wins earns a trophy; three losses ends the run.",
+                    CubeName = "MTGO Vintage Cube",
+                    Settings = new LeagueSettings { Cube = "rw-aggro" },
+                },
+            ],
+        });
+        Assert.Empty(_leagues.Start());
+        var leaguePage = new LeagueSiteOptions { Leagues = _leagues, Client = site, SignIn = signIn };
+
+        var home = new HomeSiteOptions { SignIn = signIn, Drafts = queuePage, Constructed = playPage, Leagues = leaguePage, HasDecks = true, Store = store };
         var art = new ArtStore(new ArtStoreOptions { ContentRoot = WebClient.Content, CacheDirectory = WebClient.ArtCache });
         _site = await ClientSite.StartAsync("127.0.0.1", ports[0], built, art, status: status, signIn: signIn, queues: queuePage, play: playPage, home: home, decks: deckPage,
-            before: SignInByHeader);
+            before: SignInByHeader, leagues: leaguePage);
         _address = site;
 
         // Alice's history: a Winston draft she won, and one called off when Bob dropped; and three decks.
@@ -100,13 +128,15 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         await _queues.DisposeAsync();
         await _drafts.DisposeAsync();
         await _games.DisposeAsync();
+        await _leagues.DisposeAsync();
+        await _pods.DisposeAsync();
         if (Directory.Exists(_data)) Directory.Delete(_data, recursive: true);
     }
 
     [Fact]
     public async Task Every_page_shares_one_menu_bar_and_footer_at_desktop_and_phone_width_signed_out_and_in()
     {
-        string[] pages = ["", "about", "home", "draft", "constructed", "decks", "status", $"status#event={_live}", "no-such-page"];
+        string[] pages = ["", "about", "home", "draft", "leagues", $"leagues/{League}", "constructed", "decks", "status", $"status#event={_live}", "no-such-page"];
         foreach ((int width, int height, string size) in Sizes)
         {
             foreach (bool signedIn in new[] { false, true })
@@ -222,6 +252,70 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         Assert.Empty(_errors);
     }
 
+    [Fact]
+    public async Task A_player_sees_their_league_run_and_its_deck_looks_for_a_match_and_is_asked_before_ending_the_run()
+    {
+        IPage page = await OpenAsync(1440, 900, signedIn: true);
+
+        // Her page lists the league, with the run she is on.
+        await page.GotoAsync(new Uri(_address, "home").AbsoluteUri);
+        ILocator card = page.Locator("#content .card", new PageLocatorOptions { HasText = "Vintage Cube Quick Draft" });
+        await card.WaitForAsync();
+        Assert.Contains("3-1", await card.InnerTextAsync(), StringComparison.Ordinal);
+
+        // The leagues page, then the league's: her record, the players, the trophies, her previous decks.
+        await page.Locator(".site-nav a", new PageLocatorOptions { HasText = "Leagues" }).ClickAsync();
+        await page.WaitForURLAsync("**/leagues");
+        await page.Locator(".league-card .standing", new PageLocatorOptions { HasText = "3-1" }).WaitForAsync();
+        await page.Locator(".league-card a", new PageLocatorOptions { HasText = "Open my run" }).ClickAsync();
+        await page.WaitForURLAsync($"**/leagues/{League}");
+        await page.Locator(".run-record", new PageLocatorOptions { HasText = "3-1" }).WaitForAsync();
+        Assert.Equal(3, await page.Locator(".pip.win").CountAsync());
+        Assert.Equal(1, await page.Locator(".pip.loss").CountAsync());
+        Assert.True(await page.Locator("table.data tr.me", new PageLocatorOptions { HasText = "Alice" }).First.IsVisibleAsync());
+        Assert.True(await page.Locator("td.trophy-count").First.IsVisibleAsync());
+        Assert.Equal(1, await page.Locator("#content .rows .row", new PageLocatorOptions { HasText = "Run #1" }).CountAsync());
+        await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "league-run.png"), FullPage = true });
+
+        // Her deck, as a list; one of a run over too.
+        await page.Locator("button", new PageLocatorOptions { HasText = "View or change deck" }).ClickAsync();
+        ILocator deck = page.Locator("dialog#deck[open]");
+        await deck.WaitForAsync();
+        Assert.Contains("40 cards", await deck.Locator("h2").InnerTextAsync(), StringComparison.Ordinal);
+        Assert.True(await deck.Locator("[data-deck-edit]").IsVisibleAsync());
+        await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "league-deck.png") });
+        await deck.Locator("button", new() { HasText = "Close" }).ClickAsync();
+        await page.Locator("#content .rows .row button", new() { HasText = "View deck" }).ClickAsync();
+        await deck.WaitForAsync();
+        Assert.False(await deck.Locator("[data-deck-edit]").IsVisibleAsync());
+        await deck.Locator("button", new() { HasText = "Close" }).ClickAsync();
+
+        // Looking for a match, and stopping.
+        await page.Locator("button", new() { HasText = "Find a match" }).ClickAsync();
+        await page.Locator(".searching", new() { HasText = "Looking for an opponent" }).WaitForAsync();
+        Assert.True(_leagues.Find(League)!.League.IsSearching($"discord-{Alice}"));
+        await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "league-searching.png") });
+        await page.Locator("button", new() { HasText = "Stop looking" }).ClickAsync();
+        await page.Locator("button", new() { HasText = "Find a match" }).WaitForAsync();
+
+        // Ending the run is asked first: no keeps it.
+        await page.Locator("button", new() { HasText = "End run" }).ClickAsync();
+        ILocator ask = page.Locator("dialog[open]", new() { HasText = "End your run?" });
+        await ask.WaitForAsync();
+        Assert.Contains("3 losses", await ask.InnerTextAsync(), StringComparison.Ordinal);
+        await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "league-end-question.png") });
+        await ask.Locator("button", new() { HasText = "Cancel" }).ClickAsync();
+        Assert.NotNull(_leagues.Find(League)!.League.View($"discord-{Alice}").Mine!.Current);
+
+        // Yes ends it, as three losses, and it joins her previous decks.
+        await page.Locator("button", new() { HasText = "End run" }).ClickAsync();
+        await page.Locator("dialog[open] button", new() { HasText = "End my run" }).ClickAsync();
+        await page.Locator("button", new() { HasText = "Start a draft" }).WaitForAsync();
+        Assert.Equal(1, await page.Locator("#content .rows .row", new PageLocatorOptions { HasText = "3-3" }).CountAsync());
+        await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "league-after-end.png"), FullPage = true });
+        Assert.Empty(_errors);
+    }
+
     private async Task<IPage> OpenAsync(int width, int height, bool signedIn)
     {
         IBrowserContext context = await web.Browser.NewContextAsync(new BrowserNewContextOptions
@@ -258,6 +352,66 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         });
         store.SaveEvent(record);
         return record.Id;
+    }
+
+    /// <summary>
+    /// A league as the data directory keeps one partway through: Alice on her second run at 3-1 after a trophy, Bob and
+    /// Carol with runs going, Carol with two trophies, and Erin knocked out.
+    /// </summary>
+    private static void SeedLeague(EventStore store, IReadOnlyList<string> cube)
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        List<string> pool = [.. cube.Distinct(StringComparer.Ordinal).Where(name => name is not ("Mountain" or "Plains")).Take(23)];
+        EventDeck Built() => new() { Main = [.. Enumerable.Range(0, pool.Count)], Basics = new() { ["Mountain"] = 9, ["Plains"] = 40 - pool.Count - 9 }, Submitted = true };
+        (string Id, string Name)[] players = [($"discord-{Alice}", "Alice"), ("discord-1002", "Bob"), ("discord-1003", "Carol"), ("discord-1005", "Erin")];
+        LeagueRun Run(int number, int player, int entry, LeagueRunStage stage, string ending, int daysAgo) => new()
+        {
+            Id = $"run-{number}", PlayerId = players[player].Id, Name = players[player].Name, Entry = entry, DraftId = $"draft-{number}", Stage = stage,
+            Pool = pool, Deck = Built(), Started = now.AddDays(-daysAgo - 1), Ended = stage == LeagueRunStage.Over ? now.AddDays(-daysAgo) : null, Ending = ending,
+        };
+
+        List<LeagueRun> runs =
+        [
+            Run(1, 0, 1, LeagueRunStage.Over, LeagueEndings.Trophy, 2),
+            Run(2, 2, 1, LeagueRunStage.Over, LeagueEndings.Trophy, 3),
+            Run(3, 2, 2, LeagueRunStage.Over, LeagueEndings.Trophy, 1),
+            Run(4, 3, 1, LeagueRunStage.Over, LeagueEndings.Eliminated, 1),
+            Run(5, 0, 2, LeagueRunStage.Playing, string.Empty, 0),
+            Run(6, 1, 1, LeagueRunStage.Playing, string.Empty, 0),
+            Run(7, 2, 3, LeagueRunStage.Playing, string.Empty, 0),
+        ];
+        var record = new EventRecord
+        {
+            Id = League, Kind = EventKinds.League, Name = "Vintage Cube Quick Draft", Stage = EventStage.Playing, Created = now.AddDays(-5), Updated = now, Seed = 9,
+            League = new LeagueRecord { Settings = new LeagueSettings { Cube = "rw-aggro" }, Runs = runs },
+            Participants = [.. players.Select((player, seat) => new EventParticipant { PlayerId = player.Id, Name = player.Name, Seat = seat + 1, Seated = true })],
+        };
+
+        // Each run's matches, won or lost, against one of the runs being played: what its record is counted from.
+        void Results(LeagueRun run, int wins, int losses, LeagueRun against)
+        {
+            for (int i = 0; i < wins + losses; i++)
+            {
+                int number = record.Matches.Count + 1;
+                string winner = i < wins ? run.PlayerId : against.PlayerId;
+                record.Matches.Add(new MatchRecord
+                {
+                    Id = $"m{number}", Round = number, Players = [run.PlayerId, against.PlayerId], Entries = [run.Id, "run-0"], Winners = [winner], Complete = true,
+                    Detail = $"{(winner == run.PlayerId ? run.Name : against.Name)} won 1-0",
+                    Games = [new GameRecord { Number = 1, Started = now.AddMinutes(-number * 30), Ended = now.AddMinutes(-number * 30 + 20), Ending = "won", Winners = [winner] }],
+                });
+            }
+        }
+
+        Results(runs[0], 7, 1, runs[5]);
+        Results(runs[1], 7, 2, runs[4]);
+        Results(runs[2], 7, 0, runs[5]);
+        Results(runs[3], 1, 3, runs[6]);
+        Results(runs[4], 3, 1, runs[5]);
+        Results(runs[5], 2, 2, runs[6]);
+        Results(runs[6], 1, 0, runs[4]);
+        store.SaveEvent(record);
+        foreach ((string id, string name) in players) store.Enlist(id, name, record, now.AddDays(-5));
     }
 
     private static Task SignInByHeader(HttpContext context, Func<Task> next)

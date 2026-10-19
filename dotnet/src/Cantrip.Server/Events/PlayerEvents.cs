@@ -52,6 +52,9 @@ public static class PlayerEvents
         {
             if (over > 0 && over >= recent) break;
             if (!EventStore.ValidId(id) || store.LoadEvent(id) is not { } record || record.Participant(playerId) is null) continue;
+
+            // A league, and each draft of a run in one, is the league's to show: its runs are no event of their own.
+            if (record.Kind == EventKinds.League || record.ParentId is not null) continue;
             PlayerEventSummary summary = Summary(record, playerId, record.IsLive && (hosted?.Invoke(id) ?? true));
             all.Add(summary);
             if (!summary.Live) over++;

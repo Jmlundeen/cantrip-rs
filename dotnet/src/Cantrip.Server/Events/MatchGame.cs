@@ -4,21 +4,22 @@ using Cantrip.Server.Rules;
 namespace Cantrip.Server.Events;
 
 /// <summary>
-/// One game of a match of a <see cref="BoosterPod"/>, at a table of its own: the match's two players, seated by tickets
-/// the pod gives them when it sends them here. The first game is dealt as soon as the table opens - whoever is not there
+/// One game of a match - a <see cref="BoosterPod"/>'s round, a <see cref="League"/>'s match - at a table of its own: the match's two players, seated by tickets
+/// the event gives them when it sends them here. The first game is dealt as soon as the table opens - whoever is not there
 /// yet is brought up to date when they sit down - and every later one after both players have sideboarded, or their
 /// time to has run out.
 /// <para>
 /// When the game is over its players are shown the result for a moment, then sent on: to the next game's table, or back
-/// to the pod's. A player who does not come, or is gone too long, forfeits the match (<see cref="BoosterPod.Forfeited"/>).
+/// to the pod's (<see cref="IMatchHost.BackFrom"/>). A player who does not come, or is gone too long, forfeits the match
+/// (<see cref="IMatchHost.Forfeited"/>).
 /// </para>
 /// <para>
-/// All of its state is the pod's, kept under the pod's lock; the table is only somewhere to play it.
+/// All of its state is the event's, kept under the event's lock; the table is only somewhere to play it.
 /// </para>
 /// </summary>
 public sealed class MatchGame : ITableEvent
 {
-    private readonly BoosterPod _pod;
+    private readonly IMatchHost _pod;
     private readonly Dictionary<int, List<string>> _tickets = new() { [1] = [], [2] = [] };
     private readonly DateTimeOffset?[] _firstSeen = new DateTimeOffset?[3];
     private readonly DateTimeOffset?[] _awaySince = new DateTimeOffset?[3];
@@ -32,7 +33,7 @@ public sealed class MatchGame : ITableEvent
     private readonly List<int> _forfeits = [];
     private string? _forfeitReason;
 
-    internal MatchGame(BoosterPod pod, MatchRecord match, int number)
+    internal MatchGame(IMatchHost pod, MatchRecord match, int number)
     {
         _pod = pod;
         Match = match;
@@ -54,6 +55,9 @@ public sealed class MatchGame : ITableEvent
 
     /// <summary>Whether everyone has gone on from this table, and the host can close it.</summary>
     public bool Done { get; private set; }
+
+    /// <summary>Whether the match this game is part of has been decided: nobody is sent on from it to another game.</summary>
+    public bool MatchDecided => Match.Complete;
 
     private DateTimeOffset? SideboardDeadline { get; set; }
 
@@ -123,7 +127,7 @@ public sealed class MatchGame : ITableEvent
         {
             lock (_pod.Gate)
             {
-                return $"Round {Match.Round}, game {Number}: {_pod.Record.Participant(Match.Players[0])!.Name} vs {_pod.Record.Participant(Match.Players[1])!.Name}";
+                return _pod.TableName(Match, Number);
             }
         }
     }
@@ -150,7 +154,7 @@ public sealed class MatchGame : ITableEvent
 
     public string NameAt(int seat)
     {
-        lock (_pod.Gate) return seat is 1 or 2 ? _pod.Record.Participant(Match.Players[seat - 1])!.Name : $"Seat {seat}";
+        lock (_pod.Gate) return seat is 1 or 2 ? _pod.NameOf(Match.Players[seat - 1]) : $"Seat {seat}";
     }
 
     public string PlayerAt(int seat)
@@ -187,14 +191,14 @@ public sealed class MatchGame : ITableEvent
         {
             if (!Sideboarding || seat is not (1 or 2)) return null;
             string player = Match.Players[seat - 1];
-            EventParticipant me = _pod.Record.Participant(player)!;
             int mine = Swiss.GamesOf(Match, player).Won;
             int theirs = Swiss.GamesOf(Match, Match.Players[2 - seat]).Won;
             string standing = mine == theirs ? $"the match is {mine}-{theirs}" : mine > theirs ? $"you lead {mine}-{theirs}" : $"you trail {mine}-{theirs}";
-            return _pod.Deck(me, Match.Decks[player], _changes.GetValueOrDefault(seat), SideboardDeadline, $"Sideboarding for game {Number}: {standing}",
+            return _pod.Cards.Deck(_pod.EventId, _pod.PoolOf(Match, player), Match.Decks[player], _pod.MinimumDeck, _changes.GetValueOrDefault(seat), SideboardDeadline, _pod.Now,
+                $"Sideboarding for game {Number}: {standing}",
                 [.. Match.Players.Select((each, index) => new DeckBuilderSeatView
                 {
-                    Seat = index + 1, Name = _pod.Record.Participant(each)!.Name, Submitted = Match.Decks[each].Submitted,
+                    Seat = index + 1, Name = _pod.NameOf(each), Submitted = Match.Decks[each].Submitted,
                 })]);
         }
     }
@@ -206,9 +210,8 @@ public sealed class MatchGame : ITableEvent
             if (message is not BuildDeckMessage build) return "That is not something to do at this table.";
             if (!Sideboarding || seat is not (1 or 2)) return "Decks are not being changed now.";
             string player = Match.Players[seat - 1];
-            EventParticipant me = _pod.Record.Participant(player)!;
             _changes[seat] = build.Change;
-            (EventDeck? deck, string? refusal) = PoolDecks.Built(Match.Decks[player], me.Pool.Count, build, _pod.BasicCards, _pod.Record.MinimumDeck);
+            (EventDeck? deck, string? refusal) = PoolDecks.Built(Match.Decks[player], _pod.PoolOf(Match, player).Count, build, _pod.Cards.Basics, _pod.MinimumDeck);
             if (deck is null) return refusal;
             Match.Decks[player] = deck;
             _version++;
@@ -232,7 +235,8 @@ public sealed class MatchGame : ITableEvent
             // A game cut off by a restart is dealt again from its own seed; a new one is recorded as it is dealt.
             GameRecord? record = Match.Games.FirstOrDefault(game => game.Number == Number);
             ulong seed = record?.Seed ?? _pod.SeedFor(Match, Number);
-            IRulesHost game = _pod.NewGame(Match, seed, names, rules);
+            IRulesHost game = _pod.Cards.NewGame([.. Match.Players.Select((player, index) =>
+                (index < names.Count ? names[index] : _pod.NameOf(player), _pod.PoolOf(Match, player), Match.Decks[player]))], seed, rules);
             if (record is null)
             {
                 Match.Games.Add(new GameRecord { Number = Number, Seed = seed, Started = _pod.Now });
@@ -280,7 +284,7 @@ public sealed class MatchGame : ITableEvent
                 {
                     foreach (string player in Match.Players.Where(player => !Match.Decks[player].Submitted))
                     {
-                        Match.Decks[player] = PoolDecks.Submitted(_pod.Record.Participant(player)!.Pool, Match.Decks[player], _pod.Record.MinimumDeck, _pod.ColorsOfCard);
+                        Match.Decks[player] = PoolDecks.Submitted(_pod.PoolOf(Match, player), Match.Decks[player], _pod.MinimumDeck, _pod.Cards.ColorsOf);
                     }
 
                     _version++;
@@ -366,7 +370,7 @@ public sealed class MatchGame : ITableEvent
 
     /// <summary>
     /// The game is over and its result has been shown: both players go on to the next game's table once it is open, or
-    /// back to the pod's when the match is decided.
+    /// back to the pod's when the match is decided - or, for an event with nowhere to go back to, they stay with the result.
     /// </summary>
     private void SendOn()
     {
@@ -386,7 +390,7 @@ public sealed class MatchGame : ITableEvent
             string player = Match.Players[seat - 1];
             TableMoveMessage? move = next is not null
                 ? new TableMoveMessage { Server = next.Address!.AbsoluteUri, Ticket = next.IssueTicket(player) }
-                : _pod.BackToPod(player);
+                : _pod.BackFrom(this, player);
             if (move is not null)
             {
                 _vacated.Add((seat, move));

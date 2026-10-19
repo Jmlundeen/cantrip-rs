@@ -1,0 +1,23 @@
+{
+  // The MTGO Vintage Cube, quick draft: you and seven bots draft, the bots play nothing, and your deck is played against
+  // other players' quick-draft decks, best of one, until seven wins (a trophy) or three losses - as Arena's quick draft.
+  "id": "vintage-cube-quick-draft",
+  "name": "Vintage Cube Quick Draft",
+  "description": "Draft the MTGO Vintage Cube against seven bots, then play your deck against other players' quick-draft decks, best of one. Seven wins earns a trophy; three losses ends the run.",
+  "cubeName": "MTGO Vintage Cube",
+  "settings": {
+    "format": "quick-draft",
+    "cube": "modovintage",
+    "podSize": 8,
+    "packs": 3,
+    "packSize": 15,
+    "minimumDeck": 40,
+    "gamesToWin": 1,
+    "winsToTrophy": 7,
+    "lossesToEnd": 3,
+    "deckEditing": "betweenMatches",
+    "maxEntries": 0,
+    "pairing": "free",
+    "allowRepeatPairings": true
+  }
+}

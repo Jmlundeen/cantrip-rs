@@ -22,6 +22,8 @@
     <EmbeddedResource Include="home.html" LogicalName="Cantrip.Discord.home.html" />
     <EmbeddedResource Include="landing.html" LogicalName="Cantrip.Discord.landing.html" />
     <EmbeddedResource Include="decks.html" LogicalName="Cantrip.Discord.decks.html" />
+    <EmbeddedResource Include="leagues.html" LogicalName="Cantrip.Discord.leagues.html" />
+    <EmbeddedResource Include="league.html" LogicalName="Cantrip.Discord.league.html" />
     <EmbeddedResource Include="notfound.html" LogicalName="Cantrip.Discord.notfound.html" />
     <EmbeddedResource Include="site.css" LogicalName="Cantrip.Discord.site.css" />
     <EmbeddedResource Include="site.js" LogicalName="Cantrip.Discord.site.js" />

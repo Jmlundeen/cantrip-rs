@@ -106,7 +106,7 @@ components and footer on each (`SiteChrome`). A page is a template built into th
 `<!--site:header-->`, `<!--site:footer-->` - are filled in as it is served: a `<base>` at the site's root (every link is
 relative to it), the logo as the tab's icon, and the shared `/site.css` and `/site.js`. The menu bar shows the Cantrip
 logo (`/logo.png`, `logo.png` built into the bot: the repository root's `cantrip.png` at 384 pixels), never the word,
-and links Home, Draft, Constructed, Decks and Events - only the sections the bot serves - with the page's own lit
+and links Home, Draft, Leagues, Constructed, Decks and Events - only the sections the bot serves - with the page's own lit
 (`aria-current`); at its right, **Sign in with Discord**, or the player's Discord picture (else their initial) and name,
 linking to their page, and **Sign out**. Under 760 pixels the sections fold behind a menu button. The footer links About,
 GitHub and the Discord server. While a signed-in player has a seat somewhere - a table filling, a draft or pod under way,
@@ -122,6 +122,8 @@ cannot be undone, notices that fade, and going to a seat. A page that is not the
 | `/home` | The player's own page (`home.html`): **Playing now** - the table they are filling (**Open my table**, **Leave**), each event they are in (**Back to my seat**, **Details** or **Standings**, **Drop**), a draft opened from Discord nobody has joined yet (**Call off**), their constructed game (**Open my game**, **Call off** while nobody has joined); **Recent events** - the events they have played, with how each ended for them and their record, each to its results on `/status`; and a tile for each way to play, with how many decks they keep. Signed out, a card to sign in. | Home in the bar; signing in with no page named. | Everything. |
 | `/draft` | The draft queues (`QueueSite`, `queue.html`), below. | Draft in the bar. | A seat in the web client; `/status` for a draft under way. |
 | `/constructed` | Constructed play (`PlaySite`, `play.html`), below. | Constructed in the bar. | A seat in the web client. |
+| `/leagues` | The leagues (`LeagueSite`, `leagues.html`): every league the bot runs, its rules in a line, how many runs are being played and trophies won, and the player's own run in each. | Leagues in the bar; the Leagues tile; Your leagues on `/home`. | `/leagues/{id}`. |
+| `/leagues/{id}` | A league's page (`league.html`): the player's run - its record as pips, **Find a match** (or **Stop looking**, **Go to my match**), **View or change deck**, **End run** (asked first) - or **Start a draft**; every run being played and its record; the trophies won by player; the player's previous decks with their records, each to view; how the league works; the latest matches. | The leagues page; the strip under the bar. | The draft, match or deck table in the web client. |
 | `/decks` | The deck library (`DeckSite`, `decks.html`): the player's decks by format, each with **Edit**, **Rename**, **Copy** and **Delete** (asked first), **New deck** in a chosen format. Signed out, a card to sign in, and the editor to try without saving. | Decks in the bar; the Decks tile. | `/decks/edit`. |
 | `/decks/edit` | Goes to the web client's deck editor: `?deck=ID` opens that deck (`/?decks&deck=ID`), `?format=KEY` a new deck in that format. The editor's **All decks** comes back to `/decks`. | The library. | The library. |
 | `/status` | Events (`StatusSite` in `Cantrip.Server.Host`, `status.html`, served in the site's chrome): everything being played and played, each opened at `#event=ID` for its draft, pairings and standings. | Events in the bar; every event's Details, Standings and Results. | Every page, by the bar. |
@@ -187,6 +189,20 @@ a restart leaves everyone signed in.
 Queues are kept in the data directory (`queues/{channel}.json`). Tables still forming are not: a restart empties them,
 and their players press **Join** again. `DraftQueues` is the Discord-free half, tested in `DraftQueuesTests` with real
 tables; the table itself is `QueueTable` ([events.md](events.md)).
+
+## Leagues
+
+With a data directory, the bot runs every league defined under `leagues/` ([events.md](events.md#leagues)) on its site,
+at `/leagues` (`LeagueHosts`, the Discord-free half; `LeagueSite`). A signed-in player presses **Start a draft** on a
+league's page: their quick draft is made and hosted at once on a draft port, bots in its other seats, and the page goes
+to their seat. Once its deck is in they come back to the page and press **Find a match**; when another run is paired
+with theirs, the page goes to the match's table, which leads back to the league's page when the match is over. A player
+in a draft, or with a seat at a table filling, is refused until they are done there, and a player looks for a match in
+one league at a time. The player's own page lists every league they have entered (**Your leagues**), with their run's
+record and the way back to it; a league draft under way, a match found or a match being looked for shows in the strip
+under the menu bar on every other page. The API is `LeagueSite`'s (`/leagues/api/...`); a deck is shown only to its own
+player. Its tests are `LeagueSiteTests` (real tables, bots, a test sign-in), `LeagueTests` in
+`Cantrip.Server.Tests` for the league itself, and `SitePagesTests` pictures both pages.
 
 ## Constructed play
 

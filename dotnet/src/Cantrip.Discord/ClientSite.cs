@@ -42,13 +42,14 @@ internal static class ClientSite
     /// <paramref name="queues"/>, the draft queue page at <c>/draft</c> (<see cref="QueueSite"/>); and, given
     /// <paramref name="play"/>, the constructed play page at <c>/constructed</c> (<see cref="PlaySite"/>); and, given
     /// <paramref name="home"/>, a player's own page at <c>/home</c> (<see cref="HomeSite"/>); and, given <paramref name="decks"/>,
-    /// the deck editor's catalog and each player's saved decks at <c>/decks</c> (<see cref="DeckSite"/>) - each signing players in
+    /// the deck editor's catalog and each player's saved decks at <c>/decks</c> (<see cref="DeckSite"/>); and, given
+    /// <paramref name="leagues"/>, the leagues at <c>/leagues</c> (<see cref="LeagueSite"/>) - each signing players in
     /// with <paramref name="signIn"/> (<see cref="SiteSignIn"/>). The bare address is the home page (<see cref="HomeSite.LandingPage"/>).
     /// </summary>
     /// <param name="before">For a test: run first on every request - to sign a test player in, say. Null for nothing.</param>
     public static async Task<WebApplication> StartAsync(string listen, int port, string root, ArtStore art, IReadOnlySet<int>? tables = null, PortraitStore? portraits = null,
         EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null, TableAccess? access = null, HomeSiteOptions? home = null, DeckSiteOptions? decks = null,
-        Func<HttpContext, Func<Task>, Task>? before = null)
+        Func<HttpContext, Func<Task>, Task>? before = null, LeagueSiteOptions? leagues = null)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls($"http://{listen}:{port}");
@@ -61,6 +62,7 @@ internal static class ClientSite
         {
             SignIn = signIn?.Enabled == true,
             Drafts = queues is not null,
+            Leagues = leagues is not null,
             Constructed = play is not null,
             Decks = decks is not null,
             Events = status is not null,
@@ -153,6 +155,11 @@ internal static class ClientSite
         if (play is not null)
         {
             app.MapConstructedPlay(play);
+        }
+
+        if (leagues is not null)
+        {
+            app.MapLeagues(leagues);
         }
 
         if (access is not null)

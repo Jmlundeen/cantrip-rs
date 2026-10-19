@@ -10,7 +10,7 @@
   const page = () => document.body?.dataset.page ?? "";
 
   const FORMATS = {
-    booster: "Booster draft", grid: "Grid draft", winston: "Winston draft", standard: "Standard Gauntlet",
+    booster: "Booster draft", grid: "Grid draft", winston: "Winston draft", standard: "Standard Gauntlet", "quick-draft": "Quick draft",
   };
   const formatName = key => FORMATS[key] ?? key ?? "Draft";
 
@@ -134,8 +134,32 @@
 
   let board = null;
 
+  // A league run that wants the player somewhere: a match found, a draft under way, or a match being looked for.
+  function leagueBanner(b) {
+    const league = page => `leagues/${encodeURIComponent(page.id)}`;
+    for (const l of b.leagues ?? []) {
+      const mine = l.mine;
+      if (mine?.opponent) {
+        return { text: `Your <strong>${esc(l.name)}</strong> match against <strong>${esc(mine.opponent)}</strong> ${mine.matchReady ? "is ready" : "is about to begin"}.`,
+          label: "Go to my match", action: () => seat("leagues/api/play", { league: l.id }) };
+      }
+    }
+    for (const l of b.leagues ?? []) {
+      const mine = l.mine;
+      if (mine?.current?.stage === "Drafting") {
+        return { text: `Your <strong>${esc(l.name)}</strong> draft is under way.`, label: "Back to my draft", action: () => seat("leagues/api/play", { league: l.id }) };
+      }
+      if (mine?.searchingSince) {
+        return { text: `Looking for a <strong>${esc(l.name)}</strong> match&hellip; keep this site open.`, label: "Open the league", action: () => { location.assign(league(l)); return null; } };
+      }
+    }
+    return null;
+  }
+
   function bannerFor(b) {
     if (!b?.me) return null;
+    const inLeague = leagueBanner(b);
+    if (inLeague) return inLeague;
     const d = b.draft;
     if (d?.drafting) return { text: d.format ? `Your <strong>${esc(formatName(d.format))}</strong> is under way.` : "Your draft is under way.", label: "Back to my draft", action: () => seat("draft/api/return") };
     if (d?.table) {

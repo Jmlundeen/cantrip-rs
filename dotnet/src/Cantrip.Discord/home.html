@@ -41,6 +41,40 @@
     return date.toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" });
   };
   const results = id => `status#event=${encodeURIComponent(id)}`;
+  const leaguePage = id => `leagues/${encodeURIComponent(id)}`;
+  const record = r => `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ""}`;
+
+  // A league the player has entered: how their run stands - or how the last went - and the way to it.
+  function leagueCard(l) {
+    const mine = l.mine;
+    const run = mine.current;
+    let badge;
+    let what;
+    let action = `<a class="button small${run ? "" : " primary"}" href="${leaguePage(l.id)}">Open league</a>`;
+    if (run?.stage === "Drafting") {
+      badge = `<span class="badge Drafting">Drafting</span>`;
+      what = "Your draft is under way";
+      action = `<a class="button quiet small" href="${leaguePage(l.id)}">Open league</a><button type="button" class="button primary small" data-league-play="${esc(l.id)}">Back to my draft</button>`;
+    } else if (mine.opponent) {
+      badge = `<span class="badge live">Match</span>`;
+      what = `Playing ${mine.opponent}`;
+      action = `<a class="button quiet small" href="${leaguePage(l.id)}">Open league</a><button type="button" class="button primary small" data-league-play="${esc(l.id)}">Go to my match</button>`;
+    } else if (run) {
+      badge = `<span class="badge live">${esc(record(run))}</span>`;
+      what = mine.searchingSince ? "Looking for a match" : "Between matches";
+      action = `<a class="button primary small" href="${leaguePage(l.id)}">${mine.searchingSince ? "Open league" : "Find a match"}</a>`;
+    } else {
+      const last = mine.previous[0];
+      badge = last ? `<span class="badge${last.ending === "trophy" ? " won" : ""}">${esc(last.ending === "trophy" ? "Trophy" : record(last))}</span>` : "";
+      what = last ? `Last run ${record(last)} · ${last.status.toLowerCase()}` : "No run going";
+    }
+    const trophies = mine.trophies ? ` · ${plural(mine.trophies, "trophy", "trophies")}` : "";
+    return `<div class="card${run ? " mine" : ""}">
+      <div class="head"><span class="name">${esc(l.name)}</span>${badge}</div>
+      <div class="meta">${esc([l.cube, named(l.rules.format)].filter(Boolean).join(" · "))}${esc(trophies)}</div>
+      <div class="foot"><span class="what${run ? "" : " plain"}">${esc(what)}</span>${action}</div>
+    </div>`;
+  }
 
   function tableCard(d) {
     const seated = d.players && d.seats ? `${d.players.length} of ${d.seats} seated` : "";
@@ -126,9 +160,13 @@
     for (const e of live) playing.push(eventCard(e));
     if (board.constructed) playing.push(gameCard(board.constructed));
     const recent = board.events.filter(e => !e.live);
+    const leagues = board.leagues ?? [];
+    // A league run that wants the player now - its draft, its match - is something they are playing.
+    for (const l of leagues) if (l.mine.opponent || l.mine.current?.stage === "Drafting") playing.push(leagueCard(l));
 
     const ways = [];
     if (board.hasDrafts) ways.push(`<a class="card" href="draft"><span class="tile-title">Draft</span><span class="tile-text">Join a table filling up, or set up a booster, grid or Winston draft of your own.</span><span class="tile-go">Find a table &rarr;</span></a>`);
+    if (board.hasLeagues) ways.push(`<a class="card" href="leagues"><span class="tile-title">Leagues</span><span class="tile-text">Draft against bots, then play your deck against other players, a match at a time, for a trophy.</span><span class="tile-go">See the leagues &rarr;</span></a>`);
     if (board.hasConstructed) ways.push(`<a class="card" href="constructed"><span class="tile-title">Constructed</span><span class="tile-text">A one-on-one game with a deck from the Standard gauntlet.</span><span class="tile-go">Find a game &rarr;</span></a>`);
     if (board.hasDecks) ways.push(`<a class="card" href="decks"><span class="tile-title">Decks</span><span class="tile-text">${board.decks ? `${plural(board.decks, "deck")} saved. Open one, or build a new one.` : "Build a deck for any format, and keep it."}</span><span class="tile-go">${board.decks ? "Open my decks" : "Build a deck"} &rarr;</span></a>`);
 
@@ -142,6 +180,13 @@
         <p class="about">Get back to your seat at any time, from any computer.</p>
         ${playing.length ? `<div class="cards">${playing.join("")}</div>` : nothing}
       </section>
+      ${board.hasLeagues ? `<section class="block" aria-labelledby="h-leagues">
+        <div class="block-head"><h2 id="h-leagues">Your leagues</h2>${leagues.length ? `<span class="count">${leagues.length}</span>` : ""}
+          <div class="actions"><a class="button quiet small" href="leagues">Every league &rarr;</a></div></div>
+        <p class="about">Your run in each league you've entered. Open one to find a match, see your deck, or start a new run.</p>
+        ${leagues.length ? `<div class="cards">${leagues.map(leagueCard).join("")}</div>`
+          : `<div class="empty small">You haven't entered a league yet. <a href="leagues">See the leagues</a>.</div>`}
+      </section>` : ""}
       <section class="block" aria-labelledby="h-recent">
         <div class="block-head"><h2 id="h-recent">Recent events</h2>${recent.length ? `<span class="count">${recent.length}</span>` : ""}
           ${board.events.length ? `<div class="actions"><a class="button quiet small" href="status">Everything played &rarr;</a></div>` : ""}</div>
@@ -183,7 +228,8 @@
     const target = event.target.closest("button");
     if (!target || target.disabled || target.closest("dialog") || !target.closest("#content")) return;
     const { seat, post, toast, confirm } = window.Cantrip;
-    if (target.dataset.table) await act(async () => { const why = await seat("draft/api/join", { table: target.dataset.table }); if (why) toast(why, "error"); });
+    if (target.dataset.leaguePlay) await act(async () => { const why = await seat("leagues/api/play", { league: target.dataset.leaguePlay }); if (why) toast(why, "error"); });
+    else if (target.dataset.table) await act(async () => { const why = await seat("draft/api/join", { table: target.dataset.table }); if (why) toast(why, "error"); });
     else if ("return" in target.dataset) await act(async () => { const why = await seat("draft/api/return"); if (why) toast(why, "error"); });
     else if (target.dataset.game) await act(async () => { const why = await seat("constructed/api/join", { game: target.dataset.game }); if (why) toast(why, "error"); });
     else if ("leave" in target.dataset) {

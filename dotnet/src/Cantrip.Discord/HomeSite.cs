@@ -18,6 +18,9 @@ public sealed class HomeSiteOptions
     /// <summary>The constructed games, for the one a player is in; null when the bot hosts none.</summary>
     public PlaySiteOptions? Constructed { get; init; }
 
+    /// <summary>The leagues, for the ones a player has entered; null when the bot runs none.</summary>
+    public LeagueSiteOptions? Leagues { get; init; }
+
     /// <summary>Whether the deck editor is there (<see cref="DeckSite"/>): only with a data directory to keep decks in.</summary>
     public bool HasDecks { get; init; }
 
@@ -33,7 +36,8 @@ public sealed class HomeSiteOptions
 /// /about                     the same page, for anyone
 /// /logo.png                  the Cantrip logo
 /// /home                      a player's own page: what they are playing, their events being played and over, and where to go
-/// /home/api/board            who is signed in, what they are in, and their events; ?brief=1 leaves out what is over
+/// /home/api/board            who is signed in, what they are in, their leagues and their events; ?brief=1 leaves out what
+///                            is over. Asked by every page, so it is also what keeps a player looking for a league match
 /// /home/api/drop             POST {event}: the player drops out of an event they are in
 /// /home/api/leave            POST: the player gives up their seat at a table still filling
 /// </code>
@@ -124,6 +128,10 @@ public static class HomeSite
         bool Hosted(string id) => hosts?.Hosts(id) == true || pods?.Hosts(id) == true;
 
         IReadOnlyList<PlayerEventSummary> events = player is not null && options.Store is { } store ? PlayerEvents.Of(store, player, Hosted, recent: brief ? 0 : 12) : [];
+
+        // Every page asks this every few seconds: a player with one open is still there to be paired.
+        if (account is not null) options.Leagues?.Leagues.Seen(account.Id);
+        IReadOnlyList<(HostedLeague League, LeagueView View)> leagues = account is not null && options.Leagues is { } run ? run.Leagues.Of(account.Id) : [];
         PlayerEventSummary? playing = events.FirstOrDefault(each => each.Live && !each.Dropped);
 
         object? draft = null;
@@ -166,10 +174,20 @@ public static class HomeSite
             hasDrafts = options.Drafts is not null,
             hasConstructed = options.Constructed is not null,
             hasDecks = options.HasDecks,
+            hasLeagues = options.Leagues is not null,
             draft,
             constructed,
             waiting,
             decks,
+            leagues = leagues.Select(each => new
+            {
+                id = each.League.Id,
+                name = each.View.Name,
+                cube = LeagueSite.CubeName(each.League),
+                rules = LeagueSite.Rules(each.View.Settings),
+                open = each.View.Open,
+                mine = LeagueSite.Mine(each.View.Mine!),
+            }),
             events = events.Select(each => new
             {
                 id = each.Id,

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cantrip - Leagues</title>
+<!--site:head-->
+<style>
+.league-card { gap: 12px; }
+.league-card .about { color: var(--fg-soft); font-size: 14px; margin: 0; }
+.league-card .facts { display: flex; flex-wrap: wrap; gap: 6px; }
+.league-stats { display: flex; gap: 18px; flex-wrap: wrap; color: var(--fg-soft); font-size: 13.5px; }
+.league-stats strong { color: var(--fg); font-weight: 650; }
+.standing {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 12px; border-radius: var(--radius-small);
+  background: var(--panel-hi); border: 1px solid var(--line);
+}
+.standing .record { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .5px; }
+.standing .grow { flex: 1; min-width: 140px; color: var(--fg-soft); font-size: 13.5px; }
+.standing .grow strong { color: var(--fg); }
+</style>
+</head>
+<body data-page="leagues">
+<!--site:header-->
+<main id="main">
+  <div class="page-head">
+    <div class="titles">
+      <h1>Leagues</h1>
+      <p class="lead">Draft a deck, then play it against other players' decks a match at a time, whenever you like, until you win a trophy or your run ends.</p>
+    </div>
+  </div>
+  <div id="content" aria-live="polite"><p class="hint">Loading the leagues&hellip;</p></div>
+</main>
+<!--site:footer-->
+
+<script>
+(() => {
+  "use strict";
+
+  // Every league the server runs, and how the player signed in stands in each. Asked of the server every few seconds;
+  // everything a player does in a league is on its own page.
+  let board = null;
+
+  const $ = id => document.getElementById(id);
+  const { esc, plural } = window.Cantrip ?? {};
+  const record = r => `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ""}`;
+  const page = id => `leagues/${encodeURIComponent(id)}`;
+
+  // What a league is, in a few chips: the cube, the format, how a match is played.
+  function facts(l) {
+    const games = l.rules.gamesToWin === 1 ? "Best of one" : `Best of ${l.rules.gamesToWin * 2 - 1}`;
+    return [l.cube, window.Cantrip.formatName(l.rules.format), games].filter(Boolean).map(text => `<span class="chip">${esc(text)}</span>`).join("");
+  }
+
+  function ends(rules) {
+    const parts = [];
+    if (rules.winsToTrophy > 0) parts.push(`${plural(rules.winsToTrophy, "win")} for a trophy`);
+    parts.push(`out at ${plural(rules.lossesToEnd, "loss", "losses")}`);
+    parts.push(rules.maxEntries === 0 ? "enter as often as you like" : rules.maxEntries === 1 ? "one entry each" : `${rules.maxEntries} entries each`);
+    return parts.join(" · ");
+  }
+
+  function standing(l) {
+    if (!board.me) return "";
+    const mine = l.mine;
+    const current = mine?.current;
+    if (current) {
+      return `<div class="standing"><span class="record">${esc(record(current))}</span>
+        <span class="grow">Your run ${current.entry > 1 ? `#${current.entry} ` : ""}&middot; <strong>${esc(current.status)}</strong></span></div>`;
+    }
+    const last = mine?.previous?.[0];
+    const trophies = mine?.trophies ?? 0;
+    const said = last
+      ? `Your last run went <strong>${esc(record(last))}</strong>${last.ending === "trophy" ? " and won a trophy" : ""}.`
+      : "You haven't entered yet.";
+    return `<div class="standing"><span class="grow">${said}${trophies ? ` ${plural(trophies, "trophy", "trophies")} in all.` : ""}</span></div>`;
+  }
+
+  function card(l) {
+    const state = l.upcoming ? `<span class="badge info">Soon</span>` : l.open ? `<span class="badge live">Open</span>` : `<span class="badge">Over</span>`;
+    const go = l.mine?.current ? "Open my run" : l.open && board.me && !l.mine?.entryRefusal ? "Enter" : "Open";
+    return `<div class="card league-card${l.mine?.current ? " mine" : ""}">
+      <div class="head"><span class="name">${esc(l.name)}</span>${state}</div>
+      <div class="facts">${facts(l)}</div>
+      ${l.description ? `<p class="about">${esc(l.description)}</p>` : ""}
+      <p class="about">${esc(ends(l.rules))}.</p>
+      <div class="league-stats">
+        <span><strong>${l.playing}</strong> ${l.playing === 1 ? "run" : "runs"} being played</span>
+        <span><strong>${l.trophies}</strong> ${l.trophies === 1 ? "trophy" : "trophies"} won</span>
+        ${l.searching ? `<span><strong>${l.searching}</strong> looking for a match</span>` : ""}
+      </div>
+      ${standing(l)}
+      <div class="foot" style="justify-content: flex-end"><a class="button primary small" href="${page(l.id)}">${go}</a></div>
+    </div>`;
+  }
+
+  function render() {
+    if (!board) return;
+    const signIn = !board.me && board.signIn
+      ? `<div class="notice"><span class="grow">Sign in with Discord to enter a league and see how you stand.</span><a class="button discord small" href="signin?then=leagues" data-site-signin>Sign in with Discord</a></div>`
+      : "";
+    $("content").innerHTML = board.leagues.length
+      ? `${signIn}<div class="cards">${board.leagues.map(card).join("")}</div>`
+      : `<div class="empty"><p>No leagues are running on this server right now.</p><div class="actions"><a class="button" href="draft">Find a draft instead</a></div></div>`;
+  }
+
+  async function refresh() {
+    try { board = await window.Cantrip.getJson("leagues/api/list"); } catch { return; }
+    render();
+  }
+
+  refresh();
+  setInterval(refresh, 5000);
+})();
+</script>
+</body>
+</html>

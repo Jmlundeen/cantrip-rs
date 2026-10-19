@@ -36,6 +36,10 @@ using Cantrip.Server.Events;
 // client id (--oauth-client-id, or CANTRIP_DISCORD_CLIENT_ID) and its secret, from the CANTRIP_DISCORD_SECRET environment
 // variable only; {site}/signin/discord is to be registered as its redirect.
 //
+// With a data directory, every league defined under leagues/ at the top of the checkout is run too: /leagues on the
+// site, where a signed-in player enters one, drafts against bots, and plays their deck against other players' a match at
+// a time. Its tables are on the draft ports.
+//
 // --bot-narration DIR (or CANTRIP_BOT_NARRATION) has every bot seat write down each decision it makes and what it
 // weighed - its picks and deck, then its games - a file a seat in DIR, so a draft or a game lost to a person can be read
 // afterwards. Off by default.
@@ -174,6 +178,7 @@ if (Directory.Exists(Path.Combine(decks, "standard")))
 DraftHost? drafts = null;
 DraftQueues? queues = null;
 PodHosts? pods = null;
+LeagueHosts? leagues = null;
 string? cubeName = null;
 PortraitStore? portraits = null;
 EventStore? store = null;
@@ -218,6 +223,12 @@ if (EventStore.Configured(args) is { } data)
         tablePorts.UnionWith(draftPorts);
         Console.WriteLine($"Drafts of {cubeName} kept in {Path.GetFullPath(data)}, on ports {draftPorts[0]}-{draftPorts[^1]}.");
 
+        // The leagues, as their files define them; each league's page is where its tables lead back to.
+        (List<LeagueDefinition> leagueDefinitions, List<string> leagueProblems) = FindUp("leagues") is { } leagueFiles ? LeagueDefinition.LoadAll(leagueFiles) : ([], []);
+        foreach (string problem in leagueProblems) Console.Error.WriteLine(problem);
+        Cantrip.Server.Host.ReturnPage? LeaguePage(string league) => pages is null ? null
+            : new Cantrip.Server.Host.ReturnPage(LeagueSite.PageOf(pages, league), leagueDefinitions.FirstOrDefault(each => each.Id == league)?.Name ?? "the league");
+
         // Booster drafts' pods: the pod's own table and one for every game of a round, on the same draft ports.
         pods = new PodHosts(new PodHostsOptions
         {
@@ -230,6 +241,7 @@ if (EventStore.Configured(args) is { } data)
             Portraits = portraitPaths,
             Art = art,
             Return = homePage,
+            LeagueReturn = LeaguePage,
         });
         Console.WriteLine($"{await pods.ResumeAsync()} booster draft(s) taken up again.");
 
@@ -251,6 +263,25 @@ if (EventStore.Configured(args) is { } data)
         });
         foreach (string problem in await queues.LoadAsync()) Console.Error.WriteLine(problem);
         Console.WriteLine($"{queues.Queues.Count} draft queue(s).");
+
+        // A player in a draft, or with a seat at a table filling, is at a table already: no league draft or match until
+        // they are done there.
+        DraftHost draftsAt = drafts;
+        PodHosts podsAt = pods;
+        DraftQueues queuesAt = queues;
+        leagues = new LeagueHosts(new LeagueHostsOptions
+        {
+            ContentRoot = content,
+            Store = store,
+            Pods = pods,
+            Leagues = leagueDefinitions,
+            CubeDirectories = [.. new[] { cubes, FindUp("cubes") }.OfType<string>()],
+            Return = LeaguePage,
+            Busy = player => draftsAt.InDraft(player) || podsAt.InDraft(player) ? "You are in a draft: finish it first."
+                : queuesAt.TableOf(player) is not null ? "You have a seat at a draft table: leave it first." : null,
+        });
+        foreach (string problem in leagues.Start()) Console.Error.WriteLine(problem);
+        Console.WriteLine($"{leagues.Leagues.Count} league(s): {string.Join(", ", leagues.Leagues.Select(each => each.Definition.Name))}.");
     }
     catch (Exception error) when (error is IOException or ArgumentException or FormatException)
     {
@@ -266,6 +297,7 @@ else
 await using DraftHost? draftHost = drafts;
 await using DraftQueues? draftQueues = queues;
 await using PodHosts? podHosts = pods;
+await using LeagueHosts? leagueHosts = leagues;
 
 await using var matchmaker = new Matchmaker(new MatchmakerOptions
 {
@@ -343,18 +375,23 @@ if (client is null)
 
     PlaySiteOptions? playSite = standard.Count == 0 ? null : new PlaySiteOptions { Games = matchmaker, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
 
+    LeagueSiteOptions? leagueSite = leagues is null || leagues.Leagues.Count == 0 ? null
+        : new LeagueSiteOptions { Leagues = leagues, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
+
     // The deck editor's catalog, and each player's saved decks, kept in the data directory.
     DeckSiteOptions? deckSite = store is null ? null : new DeckSiteOptions { ContentRoot = content, Store = store, SignIn = signIn };
 
     string artCache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
     web = await ClientSite.StartAsync(listen, webPort, root, new Cantrip.Art.ArtStore(new Cantrip.Art.ArtStoreOptions { ContentRoot = content, CacheDirectory = artCache }),
         publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite, access,
-        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, HasDecks = deckSite is not null, Store = store }, deckSite);
+        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, Leagues = leagueSite, HasDecks = deckSite is not null, Store = store }, deckSite,
+        leagues: leagueSite);
     client = siteAddress;
     Console.WriteLine($"Serving the web client from {root}; the server's status at {new Uri(client, Cantrip.Server.Host.StatusSite.Route)}.");
     if (queueSite is not null) Console.WriteLine($"The draft queue page at {queuePage}.");
     if (playSite is not null) Console.WriteLine($"Constructed play at {new Uri(siteAddress, PlaySite.Route)}.");
     if (deckSite is not null) Console.WriteLine($"The deck editor at {new Uri(siteAddress, DeckSite.Route)}.");
+    if (leagueSite is not null) Console.WriteLine($"The leagues at {new Uri(siteAddress, LeagueSite.Route)}.");
     Console.WriteLine(signIn.Enabled
         ? $"Players sign in with Discord, which sends them back to {SiteSignIn.Callback(siteAddress)}: register it as the application's redirect."
         : "Nobody can sign in to take a seat from the site: give --oauth-client-id and CANTRIP_DISCORD_SECRET.");

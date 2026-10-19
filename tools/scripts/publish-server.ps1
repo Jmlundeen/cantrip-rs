@@ -10,7 +10,7 @@
 #   publish-server.ps1 -Server user@host -Key path    another server (else tools\deploy.local.json; see deploy-common.ps1)
 #
 # What is sent is this working tree - committed or not - so publish what you have tested. The server's copy of the tree is
-# a deployment, not a clone: files that are gone here are gone there (only crates, decks, the cube lists and content). The
+# a deployment, not a clone: files that are gone here are gone there (only crates, decks, the cube lists, the leagues and content). The
 # engine host (crates\cantrip-host) is built on the server, where it will run, because it is native code for the server's
 # processor; cargo there builds only what changed. The bot is down only for the restart.
 #
@@ -78,7 +78,7 @@ Write-Step 'Sending the source and data'
 Push-Location $root
 try {
     # Tracked and not-yet-tracked files, but not the ignored (the art, build output): what a checkout of this tree would hold.
-    $manifest = @(git -c core.quotepath=false ls-files --cached --others --exclude-standard -- crates Cargo.toml Cargo.lock content decks docs/cube-lists |
+    $manifest = @(git -c core.quotepath=false ls-files --cached --others --exclude-standard -- crates Cargo.toml Cargo.lock content decks docs/cube-lists leagues |
             Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Sort-Object -Unique)
     $revision = (git rev-parse --short HEAD).Trim()
     $dirty = @(git status --porcelain).Count
@@ -108,12 +108,12 @@ finally {
 Write-Step 'Taking away what is gone, and building the engine host there'
 
 # Files in the folders sent that the list does not name. The engine's build output and the art folders (the server has
-# none) are not those folders' to prune; nothing outside crates, decks, the cube lists and content is.
+# none) are not those folders' to prune; nothing outside crates, decks, the cube lists, the leagues and content is.
 $build = @'
 set -e
 export LC_ALL=C
 cd ~/cantrip/src
-find crates decks docs/cube-lists content -type f ! -path 'content/*/images/*' ! -path '*/target/*' | sort > ~/cantrip/have.txt
+find crates decks docs/cube-lists leagues content -type f ! -path 'content/*/images/*' ! -path '*/target/*' 2>/dev/null | sort > ~/cantrip/have.txt
 sort ~/cantrip/manifest.txt > ~/cantrip/want.txt
 comm -23 ~/cantrip/have.txt ~/cantrip/want.txt > ~/cantrip/stale.txt
 echo "$(wc -l < ~/cantrip/stale.txt) files to take away"

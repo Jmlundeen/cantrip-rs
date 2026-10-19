@@ -57,6 +57,9 @@ public sealed class EventRecord
     /// <summary>How a draft event drafts; null for an event that does not draft.</summary>
     public DraftSettings? Draft { get; set; }
 
+    /// <summary>A league's rules and every run its players have made in it; null for any other event.</summary>
+    public LeagueRecord? League { get; set; }
+
     /// <summary>The fewest cards a main deck may have. Forty, for limited.</summary>
     public int MinimumDeck { get; set; } = 40;
 
@@ -96,6 +99,12 @@ public static class EventKinds
 
     /// <summary>A two-player grid draft: nine cards a pack in a grid, a row or a column each.</summary>
     public const string GridDraft = "grid-draft";
+
+    /// <summary>
+    /// A league: players enter it, each entry a run with a deck of its own (a quick draft's, its children), and play
+    /// matches against other players' runs until the run wins its trophy or loses too often.
+    /// </summary>
+    public const string League = "league";
 }
 
 /// <summary>A player in an event, and everything of theirs the event keeps.</summary>
@@ -189,6 +198,10 @@ public sealed class MatchRecord
     public string Id { get; set; } = string.Empty;
     public int Round { get; set; }
     public List<string> Players { get; set; } = [];
+
+    /// <summary>In a league, each player's run the match is played by, as <see cref="Players"/> lists them; empty otherwise.</summary>
+    public List<string> Entries { get; set; } = [];
+
     public List<GameRecord> Games { get; set; } = [];
 
     /// <summary>The players who won the match, by player id: empty while it is being played, or for a draw.</summary>

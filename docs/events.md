@@ -202,6 +202,50 @@ game it asks for (`TablesToOpen`), closed once its players have gone on (`Tables
 opener - loopback ports locally, the draft ports behind the public address for the Discord bot. The clocks are the
 host's (`BoosterTiming`): a test gives them milliseconds.
 
+## Leagues
+
+A **league** (`League`, kind `league`) is played over days rather than at one sitting: a player enters it, each entry a
+**run** with a deck of its own, and plays matches against other players' runs whenever they like, until the run wins
+its trophy or loses as often as a run may. The leagues a server runs are data, one file each under `leagues/` at the top
+of the checkout (`LeagueDefinition`: an id, a name, a description, the cube's name, and its rules). The bot makes each
+league's event from its file the first time and takes the name and rules from it every time after, so a league's end
+can be moved by changing its file; its runs and matches are kept.
+
+The rules (`LeagueSettings`):
+
+- **Format**: only `quick-draft` so far: a booster draft of a pod of eight (`podSize`, `packs`, `packSize`) - the player
+  and seven bots that draft (as a booster queue's bot seats do, `BotSeats`) and play nothing. The draft is a
+  `BoosterPod` with no rounds, a child of the league (`ParentId`): over once its deck is in (`BoosterPod.DecksInLine`),
+  its table then saying so and leading back to the league's page.
+- **Matches**: `gamesToWin` - one for best of one, two for best of three, each game at a table of its own with
+  sideboarding between, as a pod's match is (`MatchGame`, now played for any `IMatchHost`). The match clock and the
+  no-show and away forfeits are a pod's (`MatchTiming`); a match forfeited by both players is a loss for each.
+- **End**: `winsToTrophy` (7) wins a trophy; `lossesToEnd` (3) losses end the run. A player may end a run early from
+  the league's page, asked first: it counts as `lossesToEnd` losses. Ending one still drafting calls its draft off. A run
+  whose draft is called off for any other reason is no entry at all.
+- **Deck changes** (`deckEditing`): `untilFirstMatch`, or `betweenMatches` - changed whenever the run is not in a match. A
+  deck is changed at a table of its own (`LeagueDeckTable`, one seat), the same deck builder a draft ends with: every
+  change kept as it is made, Submit saving it and closing the table. A deck table nobody comes to, or left for two
+  minutes, closes with the deck as it was; a deck left short is made up with basic lands when its next match is dealt.
+- **Re-entry** (`maxEntries`): zero for as many runs as a player likes, one at a time; one for no re-entry.
+- **Pairing** (`pairing`, `allowRepeatPairings`): `free` pairs whoever has looked longest with whoever else has looked
+  longest, whatever their records (`LeaguePairing`). Pairing by record, strict or loosening with time
+  (`recordStrict`, `recordLoose`, `loosenAfterSeconds`), has its place in the rules and in `LeaguePairing` and is not
+  played yet: a league asking for it is refused as it is loaded.
+- **When** (`starts`, `ends`): entries open at `starts`; at `ends` nothing more is entered or paired, and runs not in a
+  match end ("league over").
+
+A player looks for a match from the league's page (`League.Search`) and goes on looking while a page of the site is open
+asking after them (`League.Seen`, from the league's page and the board every page asks); one not seen for 45 seconds
+stops, so nobody is paired who has gone and would forfeit. The page takes a player who was looking straight to their
+match's table when one is found; every other page says so in the strip under the menu bar.
+
+Everything is in the league's `event.json`: the rules, every run (`LeagueRecord.Runs`: its player, its draft, its pool
+and deck, how it ended) and every match (`Matches`, each naming its runs in `Entries`). A run's record is counted from
+its matches. Who is looking for a match is not kept: a restart has them ask again, and a match cut off by a restart is
+played again from the game it had got to. A league and its drafts are not on the status page, nor among a player's
+events: the league's own pages show them.
+
 ## Dropping out
 
 A player can leave any event they are in. On the site it is **Drop** on their own page, asked first
@@ -319,8 +363,9 @@ whose pick it is but not its clock. The JSON behind the page is at `/status/api/
 
 ## Not yet
 
-- Leagues and sealed. A Winston or grid draft still goes to Complete after its first game. A booster draft plays its rounds;
-  a league is an event whose children are its drafts (`Children`, `ParentId`).
+- Sealed. A Winston or grid draft still goes to Complete after its first game. A booster draft plays its rounds.
+- League pairing by record, and league formats other than the quick draft. A quick draft waits for its player to sit
+  down however long that takes, holding a draft port.
 - A draft-log viewer: the log is kept (`BoosterDraft.Log`) and nothing shows it yet.
 - One table per port, so the Discord bot's ten draft ports are ten drafts at once - and a booster pod wants five of them
   while a round is played. Hundreds want many tables behind one listener, routed by table.

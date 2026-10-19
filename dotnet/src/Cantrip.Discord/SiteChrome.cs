@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Cantrip.Discord;
 
 /// <summary>The site's sections, as its menu bar names them, for the page to light its own.</summary>
-public enum SiteSection { None, Home, Draft, Constructed, Decks, Events }
+public enum SiteSection { None, Home, Draft, Leagues, Constructed, Decks, Events }
 
 /// <summary>
 /// What every page of the bot's site shares, apart from game tables: the menu bar - the logo, the sections the site has,
@@ -19,7 +19,7 @@ public enum SiteSection { None, Home, Draft, Constructed, Decks, Events }
 /// &lt;!--site:footer--&gt;   the footer
 /// </code>
 /// One chrome serves the whole site, so every page links the same places by the same names. The sections not served -
-/// constructed play with no Standard decks, drafts and decks with no data directory - are left out of the menu.
+/// constructed play with no Standard decks, drafts, leagues and decks with no data directory - are left out of the menu.
 /// </summary>
 public sealed class SiteChrome
 {
@@ -41,6 +41,8 @@ public sealed class SiteChrome
     public bool SignIn { get; init; }
 
     public bool Drafts { get; init; } = true;
+
+    public bool Leagues { get; init; } = true;
 
     public bool Constructed { get; init; } = true;
 
@@ -122,6 +124,7 @@ public sealed class SiteChrome
 
         Link(SiteSection.Home, HomeSite.Route, "Home");
         if (Drafts) Link(SiteSection.Draft, QueueSite.Route, "Draft");
+        if (Leagues) Link(SiteSection.Leagues, LeagueSite.Route, "Leagues");
         if (Constructed) Link(SiteSection.Constructed, PlaySite.Route, "Constructed");
         if (Decks) Link(SiteSection.Decks, DeckSite.Route, "Decks");
         if (Events) Link(SiteSection.Events, Cantrip.Server.Host.StatusSite.Route, "Events");

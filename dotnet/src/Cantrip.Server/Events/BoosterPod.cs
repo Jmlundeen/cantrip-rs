@@ -32,7 +32,10 @@ public sealed class BoosterDraftSetup
 
     public int PackSize { get; init; } = 15;
 
-    /// <summary>How many Swiss rounds are played once the decks are built.</summary>
+    /// <summary>
+    /// How many Swiss rounds are played once the decks are built; zero for none, for a draft whose decks are played
+    /// somewhere else - a league's quick draft - which is over once its decks are in.
+    /// </summary>
     public int Rounds { get; init; } = 3;
 
     /// <summary>The players by id and name, seated round the table in this order.</summary>
@@ -50,7 +53,7 @@ public sealed class BoosterDraftSetup
 /// How long everything in a booster draft is given. Not saved with the event: a host decides, and a test gives the
 /// clocks seconds rather than minutes.
 /// </summary>
-public sealed class BoosterTiming
+public sealed class BoosterTiming : MatchTiming
 {
     /// <summary>The pick clock, per card left in the pack (<see cref="BoosterDraft.SecondsFor"/>).</summary>
     public int SecondsPerCard { get; init; } = 5;
@@ -64,29 +67,11 @@ public sealed class BoosterTiming
     /// <summary>How long decks are built for once the draft is over, before each deck as it stands is submitted.</summary>
     public TimeSpan DeckBuilding { get; init; } = TimeSpan.FromMinutes(10);
 
-    /// <summary>How long a player has to change their deck from their sideboard between the games of a match.</summary>
-    public TimeSpan Sideboarding { get; init; } = TimeSpan.FromMinutes(3);
-
     /// <summary>How long the first round's pairings are shown before its matches begin.</summary>
     public TimeSpan FirstRound { get; init; } = TimeSpan.FromSeconds(15);
 
     /// <summary>How long after a round's last match ends the next round begins.</summary>
     public TimeSpan BetweenRounds { get; init; } = TimeSpan.FromMinutes(1);
-
-    /// <summary>How long a player has to come to their match's table before it is forfeited to their opponent.</summary>
-    public TimeSpan NoShow { get; init; } = TimeSpan.FromMinutes(3);
-
-    /// <summary>How long a player may be gone from their match's table before it is forfeited to their opponent.</summary>
-    public TimeSpan Away { get; init; } = TimeSpan.FromMinutes(5);
-
-    /// <summary>
-    /// Each player's match clock: a chess clock across every game of a match, running while the game waits on them -
-    /// priority, the mulligans, every choice. A player whose clock runs out loses the match. Zero plays without one.
-    /// </summary>
-    public TimeSpan MatchClock { get; init; } = TimeSpan.FromMinutes(25);
-
-    /// <summary>How long the end of a game is shown before its players are taken on to the next game, or back to the pairings.</summary>
-    public TimeSpan AfterGame { get; init; } = TimeSpan.FromSeconds(6);
 }
 
 /// <summary>
@@ -108,16 +93,14 @@ public sealed class BoosterTiming
 /// a restart is dealt again from its start, from the same seed; every clock starts again from the restart.
 /// </para>
 /// </summary>
-public sealed class BoosterPod : ITableEvent
+public sealed class BoosterPod : ITableEvent, IMatchHost
 {
     private const int TicketsKept = 8;
 
     private readonly EventStore _store;
     private readonly EventRecord _record;
     private readonly BoosterDraft _draft;
-    private readonly CardCatalog _cards;
-    private readonly CardOracle _oracle;
-    private readonly Dictionary<string, CardId> _basics;
+    private readonly EventCards _cards;
     private readonly TimeProvider _time;
 
     /// <summary>The tables of the games being played or about to be, by match and game number.</summary>
@@ -141,9 +124,7 @@ public sealed class BoosterPod : ITableEvent
         _draft = draft;
         _time = time;
         Timing = timing;
-        _cards = content.Catalog();
-        _oracle = new CardOracle(_cards);
-        _basics = PoolDecks.Basics(content);
+        _cards = new EventCards(content);
 
         // Read from the cards as they are loaded now, so a draft saved before a card had its draft ability has it too.
         _draft.AdditionalPicks = AdditionalPicks(content, [.. _draft.Unopened.SelectMany(round => round.SelectMany(pack => pack)),
@@ -157,13 +138,15 @@ public sealed class BoosterPod : ITableEvent
             content.Cards.TryGet(new CardId(id), out CardDefinition? card) && card!.DraftAbilities.Contains(DraftAbility.AdditionalPickPutThisIntoPack))];
 
     /// <summary>Everything the pod and its games' tables do is done under this.</summary>
-    internal object Gate { get; } = new();
+    public object Gate { get; } = new();
 
     internal BoosterTiming Timing { get; }
 
+    MatchTiming IMatchHost.Timing => Timing;
+
     internal EventRecord Record => _record;
 
-    internal DateTimeOffset Now => _time.GetUtcNow();
+    public DateTimeOffset Now => _time.GetUtcNow();
 
     /// <summary>
     /// Makes a booster draft and saves it, ready for its players to sit down: the cube's loaded cards, enough of them
@@ -183,8 +166,8 @@ public sealed class BoosterPod : ITableEvent
             throw new ArgumentException("Each player needs an id of their own and a name.", nameof(setup));
         if (setup.Id is not null && (!EventStore.ValidId(setup.Id) || store.LoadEvent(setup.Id) is not null))
             throw new ArgumentException($"'{setup.Id}' is not a new event id.", nameof(setup));
-        if (setup.Rounds is < 1 or > 8)
-            throw new ArgumentException("A booster draft plays one to eight rounds.", nameof(setup));
+        if (setup.Rounds is < 0 or > 8)
+            throw new ArgumentException("A booster draft plays up to eight rounds.", nameof(setup));
 
         (List<string> cube, List<string> missing) = Loaded(content, setup.CubeCards);
         int count = setup.Players.Count * setup.Packs * setup.PackSize;
@@ -365,6 +348,8 @@ public sealed class BoosterPod : ITableEvent
                 {
                     EventStage.Drafting => TablePhase.Drafting,
                     EventStage.DeckBuilding => TablePhase.DeckBuilding,
+                    // A draft with no rounds is over once its decks are in: there are no pairings to show.
+                    EventStage.Complete when Rounds == 0 => TablePhase.Finished,
                     EventStage.Playing or EventStage.Complete => TablePhase.Pairings,
                     EventStage.Cancelled => TablePhase.Finished,
                     _ => TablePhase.Setup,
@@ -587,7 +572,7 @@ public sealed class BoosterPod : ITableEvent
         if (_record.Stage != EventStage.DeckBuilding) return "Decks are not being built.";
         EventParticipant participant = _record.AtSeat(seat)!;
         _changes[seat] = build.Change;
-        (EventDeck? deck, string? refusal) = PoolDecks.Built(participant.Deck, participant.Pool.Count, build, _basics, _record.MinimumDeck);
+        (EventDeck? deck, string? refusal) = PoolDecks.Built(participant.Deck, participant.Pool.Count, build, _cards.Basics, _record.MinimumDeck);
         if (deck is null) return refusal;
         participant.Deck = deck;
         if (_record.Participants.All(each => each.Deck.Submitted))
@@ -617,6 +602,9 @@ public sealed class BoosterPod : ITableEvent
 
     private int Rounds => _record.Draft?.Rounds ?? 3;
 
+    /// <summary>For a draft with no rounds, what its table says once the decks are in.</summary>
+    public const string DecksInLine = "The draft is over and your deck is in.";
+
     private List<string> SeatOrder => [.. _record.Participants.OrderBy(participant => participant.Seat).Select(participant => participant.PlayerId)];
 
     private HashSet<string> Dropped => [.. _record.Participants.Where(participant => participant.Dropped).Select(participant => participant.PlayerId)];
@@ -630,7 +618,7 @@ public sealed class BoosterPod : ITableEvent
             _record.Stage = EventStage.Complete;
             _record.Deadline = null;
             IReadOnlyList<SwissStanding> standings = Swiss.Standings(SeatOrder, _record.Matches, dropped);
-            _record.Detail = standings.Count > 0 ? $"{_record.Participant(standings[0].PlayerId)!.Name} won the draft." : "The draft is over.";
+            _record.Detail = Rounds == 0 ? DecksInLine : standings.Count > 0 ? $"{_record.Participant(standings[0].PlayerId)!.Name} won the draft." : "The draft is over.";
             return;
         }
 
@@ -797,7 +785,7 @@ public sealed class BoosterPod : ITableEvent
             foreach (string player in match.Players)
             {
                 _record.Participant(player)!.Deck.Submitted = true;
-                match.Decks[player] = Copy(_record.Participant(player)!.Deck);
+                match.Decks[player] = EventCards.Copy(_record.Participant(player)!.Deck);
             }
 
             match.Detail = "Game 1 is being played.";
@@ -820,10 +808,10 @@ public sealed class BoosterPod : ITableEvent
     }
 
     /// <summary>The table wanted for the game after this one of its match, if there is one yet.</summary>
-    internal MatchGame? Next(MatchGame game) => _games.GetValueOrDefault($"{game.Match.Id}g{game.Number + 1}");
+    public MatchGame? Next(MatchGame game) => _games.GetValueOrDefault($"{game.Match.Id}g{game.Number + 1}");
 
     /// <summary>A game's table has opened: its players at the pod's table are sent to it.</summary>
-    internal void GameOpened(MatchGame game)
+    public void GameOpened(MatchGame game)
     {
         foreach (string player in game.Match.Players)
         {
@@ -850,7 +838,7 @@ public sealed class BoosterPod : ITableEvent
     }
 
     /// <summary>A ticket back to the pod's table for a player whose game is over, and where it is.</summary>
-    internal TableMoveMessage? BackToPod(string playerId)
+    public TableMoveMessage? BackFrom(MatchGame game, string playerId)
     {
         if (_address is null || _record.Participant(playerId) is not { } participant) return null;
         string ticket = AddTicket(participant);
@@ -859,7 +847,7 @@ public sealed class BoosterPod : ITableEvent
     }
 
     /// <summary>A game of a match has ended: the match goes on to its next game, or is decided.</summary>
-    internal void GameFinished(MatchGame game, IReadOnlyList<string> winners, bool abandoned, string detail)
+    public void GameFinished(MatchGame game, IReadOnlyList<string> winners, bool abandoned, string detail)
     {
         MatchRecord match = game.Match;
         if (match.Games.FirstOrDefault(each => each.Number == game.Number) is { } record)
@@ -898,7 +886,7 @@ public sealed class BoosterPod : ITableEvent
     }
 
     /// <summary>Players were not at their match: it is forfeited to whoever was there, and whoever was not is dropped.</summary>
-    internal void Forfeited(MatchGame game, IReadOnlyList<string> absent)
+    public void Forfeited(MatchGame game, IReadOnlyList<string> absent)
     {
         MatchRecord match = game.Match;
         if (match.Complete) return;
@@ -930,7 +918,7 @@ public sealed class BoosterPod : ITableEvent
     /// A player's match clock ran out: they lose the match, whatever the score - the game being played is their opponent's,
     /// and so is the match.
     /// </summary>
-    internal void TimedOut(MatchGame game, string loser)
+    public void TimedOut(MatchGame game, string loser)
     {
         MatchRecord match = game.Match;
         if (match.Complete) return;
@@ -970,40 +958,20 @@ public sealed class BoosterPod : ITableEvent
         return (first, second, draws);
     }
 
-    internal ulong SeedFor(MatchRecord match, int game) =>
+    public ulong SeedFor(MatchRecord match, int game) =>
         unchecked(_record.Seed + ((ulong)match.Round * 0x9E3779B97F4A7C15UL) + ((ulong)match.Table * 0xC2B2AE3D27D4EB4FUL) + ((ulong)game * 0x165667B19E3779F9UL));
 
-    /// <summary>
-    /// Deals one game of a match on the rules engine asked for: each player's deck for the match, or their event deck
-    /// before any sideboarding, named card by card.
-    /// </summary>
-    internal IRulesHost NewGame(MatchRecord match, ulong seed, IReadOnlyList<string> names, IRulesHostFactory? rules = null)
-    {
-        List<RulesSeat> seats = [.. match.Players.Select((player, index) =>
-        {
-            EventParticipant participant = _record.Participant(player)!;
-            EventDeck deck = match.Decks.GetValueOrDefault(player) ?? participant.Deck;
-            return new RulesSeat(
-                index < names.Count ? names[index] : participant.Name,
-                [.. PoolDecks.Cards(participant.Pool, deck, _basics).Select(card => NameOf(card))],
-                [.. PoolDecks.Sideboard(participant.Pool, deck).Select(card => NameOf(card))]);
-        })];
+    // --- For its games' tables (IMatchHost). -------------------------------------------------------------------------
 
-        // A Limited sideboard is the rest of the pool and any number of basic lands (CR 100.4b; Magic Tournament Rules).
-        return (rules ?? RulesHostFactory.Native).Create(seats, seed, new RulesGameOptions { BasicLandsOutside = [.. PoolDecks.BasicLands.Select(name => NameOf(_basics[name]))] });
-    }
+    EventCards IMatchHost.Cards => _cards;
 
-    /// <summary>
-    /// A pool's card as the rules name it: its id for the engine, which is its name for every card the content has
-    /// (CR 201.2); the loaded card's name, which is how the native engine knows cards, or the id as it stands
-    /// for one the content no longer has, which the host then refuses by name.
-    /// </summary>
-    private string NameOf(CardId card) =>
-        _cards.TryGet(card, out CardDefinition? loaded) ? loaded!.Name : card.Value;
+    public int MinimumDeck => _record.MinimumDeck;
 
-    internal CardCatalog Cards => _cards;
+    public string NameOf(string playerId) => _record.Participant(playerId)?.Name ?? playerId;
 
-    internal IReadOnlyDictionary<string, CardId> BasicCards => _basics;
+    public IReadOnlyList<string> PoolOf(MatchRecord match, string playerId) => _record.Participant(playerId)?.Pool ?? [];
+
+    public string TableName(MatchRecord match, int game) => $"Round {match.Round}, game {game}: {NameOf(match.Players[0])} vs {NameOf(match.Players[1])}";
 
     // --- What the seats are shown. ----------------------------------------------------------------------------------
 
@@ -1043,26 +1011,12 @@ public sealed class BoosterPod : ITableEvent
     private DeckBuildingMessage DeckView(int seat)
     {
         EventParticipant me = _record.AtSeat(seat)!;
-        return Deck(me, me.Deck, _changes.GetValueOrDefault(seat), _record.Deadline, string.Empty,
+        return _cards.Deck(_record.Id, me.Pool, me.Deck, _record.MinimumDeck, _changes.GetValueOrDefault(seat), _record.Deadline, Now, string.Empty,
             [.. _record.Participants.OrderBy(participant => participant.Seat).Select(participant => new DeckBuilderSeatView
             {
                 Seat = participant.Seat, Name = participant.Name, Submitted = participant.Deck.Submitted,
             })]);
     }
-
-    internal DeckBuildingMessage Deck(EventParticipant me, EventDeck deck, int change, DateTimeOffset? deadline, string title, List<DeckBuilderSeatView> seats) => new()
-    {
-        EventId = _record.Id,
-        Pool = [.. me.Pool.Select(Card)],
-        Main = [.. deck.Main],
-        Basics = [.. PoolDecks.BasicLands.Select(name => new BasicLandView { Name = name, Count = deck.Basics.GetValueOrDefault(name), Card = Card(_basics[name].Value) })],
-        Minimum = _record.MinimumDeck,
-        Submitted = deck.Submitted,
-        Change = change,
-        Seats = seats,
-        LeftMs = deadline is { } until ? Math.Max(1, (int)Math.Min(int.MaxValue, Math.Max(0, (until - Now).TotalMilliseconds))) : 0,
-        Title = title,
-    };
 
     private PairingsMessage PairingsView()
     {
@@ -1116,23 +1070,20 @@ public sealed class BoosterPod : ITableEvent
         };
     }
 
-    internal ObjectView Card(string id) =>
-        _oracle.Oracle(new CardId(id)) ?? new ObjectView { Known = true, CardId = id, Name = id };
+    private ObjectView Card(string id) => _cards.Card(id);
 
-    private IReadOnlyList<ColorView> ColorsOf(string id) => Card(id).Colors;
-
-    internal IReadOnlyList<ColorView> ColorsOfCard(string id) => ColorsOf(id);
+    private IReadOnlyList<ColorView> ColorsOf(string id) => _cards.ColorsOf(id);
 
     // --- Keeping it. ----------------------------------------------------------------------------------------------
 
     /// <summary>Something the seats are shown has changed: every table of the pod shows it again.</summary>
-    internal void Changed()
+    public void Changed()
     {
         _version++;
         foreach (MatchGame game in _games.Values) game.Changed();
     }
 
-    internal void Save()
+    public void Save()
     {
         _record.Updated = Now;
         _store.SaveEvent(_record);
@@ -1206,8 +1157,6 @@ public sealed class BoosterPod : ITableEvent
     }
 
     internal static string NewTicket() => Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
-
-    private static EventDeck Copy(EventDeck deck) => new() { Main = [.. deck.Main], Basics = new(deck.Basics, StringComparer.Ordinal), Submitted = deck.Submitted, Revision = deck.Revision };
 
     private static (List<string> Cube, List<string> Missing) Loaded(ContentLibrary content, IReadOnlyList<string> cubeCards)
     {

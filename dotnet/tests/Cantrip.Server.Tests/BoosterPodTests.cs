@@ -38,7 +38,7 @@ public sealed class BoosterPodTests : IDisposable
 
     private static string LsvCube => Path.Combine(RepoRoot.Path, "docs", "cube-lists", "LSVCube.txt");
 
-    private CreatedEvent Create(EventStore store, int packSize = 5, int minimumDeck = 40, IReadOnlyList<string>? cube = null, IReadOnlyList<string>? pickOrder = null) =>
+    private CreatedEvent Create(EventStore store, int packSize = 5, int minimumDeck = 40, IReadOnlyList<string>? cube = null, IReadOnlyList<string>? pickOrder = null, int rounds = 3) =>
         BoosterPod.Create(store, Content, new BoosterDraftSetup
         {
             Name = "Friday pod",
@@ -47,7 +47,7 @@ public sealed class BoosterPodTests : IDisposable
             PickOrder = pickOrder ?? [],
             Packs = 3,
             PackSize = packSize,
-            Rounds = 3,
+            Rounds = rounds,
             MinimumDeck = minimumDeck,
             Seed = 21,
             Players = Eight,
@@ -397,6 +397,32 @@ public sealed class BoosterPodTests : IDisposable
             Assert.True(participant.Deck.Submitted);
             Assert.Equal(40, participant.Deck.Main.Count + participant.Deck.Basics.Values.Sum());
         });
+    }
+
+    [Fact]
+    public void A_draft_with_no_rounds_is_over_once_its_decks_are_in_and_its_table_says_so()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = Create(store, packSize: 5, rounds: 0);
+        BoosterPod pod = BoosterPod.Open(store, created.Record.Id, Content, clock);
+        for (int seat = 1; seat <= 8; seat++) pod.Seated(seat);
+        while (pod.Stage == EventStage.Drafting)
+        {
+            clock.Advance(TimeSpan.FromSeconds(30));
+            pod.Tick(clock.GetUtcNow());
+        }
+
+        clock.Advance(TimeSpan.FromMinutes(10));
+        pod.Tick(clock.GetUtcNow());
+
+        Assert.Equal(EventStage.Complete, pod.Stage);
+        Assert.Equal(TablePhase.Finished, pod.Phase);
+        Assert.Equal(BoosterPod.DecksInLine, pod.Detail);
+        Assert.Empty(pod.TablesToOpen());
+        EventRecord record = store.LoadEvent(created.Record.Id)!;
+        Assert.Empty(record.Matches);
+        Assert.All(record.Participants, participant => Assert.True(participant.Deck.Submitted));
     }
 
     [Fact]

@@ -114,7 +114,8 @@ public sealed class EventStatusBoard
             }
         }
 
-        return [.. ids.Select(Read).OfType<StatusEventDetail>().Where(detail => detail.Event.ParentId is null)];
+        // A league has pages of its own, and its runs' drafts are its own business.
+        return [.. ids.Select(Read).OfType<StatusEventDetail>().Where(detail => detail.Event.ParentId is null && detail.Event.Kind != EventKinds.League)];
     }
 
     private StatusEventDetail? Read(string id)

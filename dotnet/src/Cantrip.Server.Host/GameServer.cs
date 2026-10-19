@@ -177,10 +177,12 @@ public sealed class GameServer : IAsyncDisposable
     public static async Task<GameServer> StartAsync(GameServerOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        // A game seats two to four; an event's table seats its pod, which drafts there and plays at tables of its own.
+        // A game seats two to four; an event's table seats its pod, which drafts there and plays at tables of its own -
+        // or one player, changing a league deck.
         int most = options.Event is null ? 4 : 8;
-        if (options.Players < 2 || options.Players > most || options.ReconnectGrace <= TimeSpan.Zero || options.ReconnectGrace > TimeSpan.FromHours(1))
-            throw new ArgumentException($"A table needs 2–{most} players and a reconnect grace between zero and one hour.", nameof(options));
+        int least = options.Event is null ? 2 : 1;
+        if (options.Players < least || options.Players > most || options.ReconnectGrace <= TimeSpan.Zero || options.ReconnectGrace > TimeSpan.FromHours(1))
+            throw new ArgumentException($"A table needs {least}–{most} players and a reconnect grace between zero and one hour.", nameof(options));
         if (options.Decks.Count > 128 || options.Decks.Any(deck => string.IsNullOrWhiteSpace(deck.Name)
             || deck.Name.Length > 96 || deck.Count is < 1 or > 2000)
             || options.Decks.Select(deck => deck.Name).Distinct(StringComparer.Ordinal).Count() != options.Decks.Count

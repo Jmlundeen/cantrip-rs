@@ -121,6 +121,7 @@ is pushed from there. Card art never goes in: `content/*/images/` is gitignored 
   P/T, Oracle text, core keywords, faces), which the engine's oracle is generated from and the client draws; what a
   card does is its file in `crates/cantrip-cards`. A set only lists cards that exist.
 - `decks/` — decklists as data files, never in code.
+- `leagues/` — the leagues the Discord bot's site runs, one JSON file each (`LeagueDefinition`; `docs/events.md#leagues`).
 - `tools/` — `test.cmd`, `play-game.cmd` (you, bots or a language model at a local table), `play-vs-bot.cmd`,
   `draft-winston-vs-bot.cmd`, `draft-grid-vs-bot.cmd` and `draft-booster-vs-bots.cmd` (a draft against bots, then the
   games), `play-release-build.cmd` (the shipping build), and the bot labs. Generators are in `tools/maintenance/`
