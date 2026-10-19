@@ -1,0 +1,36 @@
+# Mind Roots: "Target player discards two cards. Put up to one land card discarded this way onto the battlefield tapped under your
+# control." Bot1 casts it at Bot2, who chooses a Forest and a Lightning Bolt from hand. The Forest goes from Bot2's graveyard onto Bot1's
+# battlefield, tapped and Bot1's (CR 110.2a); the nonland Bolt is not a choice and stays in Bot2's graveyard. (The refusal: the Bolt is
+# not a land card, so `! Bot1.Choose(Lightning Bolt)` holds.)
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mind Roots
+Swamp x14
+Swamp x6
+
+[Bot2 Deck]
+Forest
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Roots.Cast(Bot2)
+Bot2.Choose(Forest; Lightning Bolt)
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Forest)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = true
+Bot2.Graveyard = Lightning Bolt
+Bot2.Hand.Count = 5
+Bot2.Battlefield.Count = 0

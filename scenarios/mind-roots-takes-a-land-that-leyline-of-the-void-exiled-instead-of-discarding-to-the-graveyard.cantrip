@@ -1,0 +1,46 @@
+# Mind Roots with Leyline of the Void (CR 614.6, 701.9a): Bot1 controls the Leyline, so the Forest Bot2 discards is exiled instead of
+# going to the graveyard, but it was still "discarded this way" and Bot1 may put it onto the battlefield tapped under its control
+# (CR 400.7j: the rest of the effect finds an object a replacement moved to a public zone). The Lightning Bolt discarded with it is exiled too.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Leyline of the Void
+Mox Emerald
+Mox Ruby
+Mind Roots
+Swamp
+Swamp x14
+
+[Bot2 Deck]
+Forest
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Leyline of the Void.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Mind Roots.Cast(Bot2)
+Bot2.Choose(Forest; Lightning Bolt)
+? Exile = Forest; Lightning Bolt
+Bot1.Choose(Forest)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Forest.Tapped = true
+Exile = Lightning Bolt
+Bot2.Graveyard.Count = 0

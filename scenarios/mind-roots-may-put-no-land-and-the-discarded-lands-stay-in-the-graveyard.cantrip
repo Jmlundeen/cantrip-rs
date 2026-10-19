@@ -1,0 +1,31 @@
+# Mind Roots: "up to one land card": Bot2 discards a Forest and an Island and Bot1 chooses none, so both lands stay in Bot2's graveyard
+# and Bot1 gets nothing.
+
+[Bot1 Deck]
+Mox Jet
+Mox Emerald
+Mox Ruby
+Mind Roots
+Swamp x14
+Swamp x6
+
+[Bot2 Deck]
+Forest
+Island x21
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mind Roots.Cast(Bot2)
+Bot2.Choose(Forest; Island)
+Bot1.Choose()
+[Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Island; Forest
+Bot1.Battlefield = Mox Jet; Mox Emerald; Mox Ruby
+Bot2.Hand.Count = 5
