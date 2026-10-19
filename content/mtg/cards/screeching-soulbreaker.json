@@ -1,0 +1,11 @@
+{
+  "name": "Screeching Soulbreaker",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Siren Bard",
+  "oracleText": "Flying\nWhenever this creature attacks, it deals 1 damage to each opponent and you gain 1 life.",
+  "power": 1,
+  "toughness": 4,
+  "keywords": [
+    "Flying"
+  ]
+}
