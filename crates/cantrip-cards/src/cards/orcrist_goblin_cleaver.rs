@@ -4,19 +4,6 @@ use cantrip_mechanics::statics::have_trample;
 use cantrip_mechanics::tokens;
 use cantrip_oracle as oracle;
 
-/// "Whenever equipped creature deals combat damage to a player": the creature this is attached to dealing combat
-/// damage to a player (CR 510.2); each such event is one player and one trigger (CR 603.2c).
-fn equipped_deals_combat_damage_to_a_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Damage { source: dealer, target: Target::Player(_), amount, combat: true, .. }
-            if *amount > 0 && q.attached_to(source) == Some(*dealer) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
-
 /// "Choose a creature type. Create a Treasure token for each creature you control of that type": the type is chosen
 /// as the ability resolves (CR 608.2d), the creatures counted after, and the Treasures created together (CR 101.4).
 fn treasures_for_type(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -42,7 +29,7 @@ fn treasures_for_type(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(when(EventMask::DAMAGE, equipped_deals_combat_damage_to_a_player), treasures_for_type, "Whenever equipped creature deals combat damage to a player, choose a creature type. Create a Treasure token for each creature you control of that type."),
+        triggered(cantrip_mechanics::triggers::EQUIPPED_CREATURE_DEALS_COMBAT_DAMAGE_TO_PLAYER, treasures_for_type, "Whenever equipped creature deals combat damage to a player, choose a creature type. Create a Treasure token for each creature you control of that type."),
         equip(mana("{3}"), "Equip {3}"),
     ],
     statics: &[

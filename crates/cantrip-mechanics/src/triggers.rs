@@ -279,6 +279,21 @@ pub fn equipped_creature_attacks_subject(q: &dyn Query, source: ObjectId, event:
     }
 }
 
+/// "Whenever equipped creature deals combat damage to a player" (CR 510.2, 603.2c): the creature this Equipment is attached to
+/// dealing more than 0 combat damage to a player; each such event is one player and one trigger. The player is the trigger's
+/// subject and the amount of damage its `data[0]` ("that damage"). Bloodforged Battle-Axe, Orcrist, Goblin Cleaver and Buster
+/// Sword print it.
+pub fn equipped_creature_deals_combat_damage_to_player(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: dealer, target: Target::Player(p), amount, combat: true, .. }
+            if *amount > 0 && q.attached_to(source) == Some(*dealer) =>
+        {
+            Some(Fired { subject: Target::Player(*p), data: [*amount as u32, 0] })
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever enchanted player is attacked" (CR 508.1m, 303.4): a creature attacks the player this Curse is attached to,
 /// directly. The attacking creature is the trigger's subject. Curse of Opulence and Curse of Predation print it.
 pub fn enchanted_player_attacked(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
@@ -1061,6 +1076,8 @@ pub const THIS_ENTERS_OR_ATTACKS: Trigger = when(EventMask(EventMask::ZONE_CHANG
 pub const THIS_ATTACKS_DEFENDER: Trigger = when(EventMask::ATTACKS, this_attacks_defender);
 pub const EQUIPPED_CREATURE_ATTACKS: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks);
 pub const EQUIPPED_CREATURE_ATTACKS_SUBJECT: Trigger = when(EventMask::ATTACKS, equipped_creature_attacks_subject);
+pub const EQUIPPED_CREATURE_DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger =
+    when(EventMask::DAMAGE, equipped_creature_deals_combat_damage_to_player);
 pub const ENCHANTED_PLAYER_ATTACKED: Trigger = when(EventMask::ATTACKS, enchanted_player_attacked);
 pub const YOU_ATTACK: Trigger = when_asked(EventMask::ATTACKERS_DECLARED, you_attack);
 pub const INSTANT_OR_SORCERY_YOU_CAST: Trigger = when_asked(EventMask::SPELL_CAST, you_cast_instant_or_sorcery);
