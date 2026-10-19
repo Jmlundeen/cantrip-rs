@@ -1,0 +1,31 @@
+# Mindseeker Oculus: "When this creature enters, empower Jace 4." With no Jace token, a blue Jace planeswalker token is
+# created and gets the four loyalty counters (CR 701.71a).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mindseeker Oculus
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mindseeker Oculus.Cast
+
+[Expect]
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 4
+Bot1.Battlefield.Mindseeker Oculus.Power = 2
+Bot1.Battlefield.Mindseeker Oculus.Toughness = 1
