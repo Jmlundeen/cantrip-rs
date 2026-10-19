@@ -1,0 +1,8 @@
+{
+  "name": "Rank Rat",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Zombie Rat",
+  "oracleText": "When this creature enters, each opponent discards a card.",
+  "power": 1,
+  "toughness": 1
+}
