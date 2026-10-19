@@ -1,0 +1,34 @@
+# Protege's Awakening: "Empower Jace 6. Draw a card." With no Jace token, a blue Jace planeswalker token is created with
+# six loyalty counters, then a card is drawn (CR 701.71a). The card drawn is the Ornithopter on top of the library.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Protege's Awakening
+Island
+Island
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Protege's Awakening.Cast
+
+[Expect]
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 6
+Bot1.Graveyard = Protege's Awakening
+Bot1.Hand = Island; Island; Island; Ornithopter

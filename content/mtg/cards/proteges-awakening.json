@@ -1,0 +1,6 @@
+{
+  "name": "Protege's Awakening",
+  "manaCost": "{3}{U}",
+  "type": "Sorcery",
+  "oracleText": "Empower Jace 6. (Put six loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with \"[-1]: Surveil 1\" and \"[-3]: Draw a card.\")\nDraw a card."
+}
