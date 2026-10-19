@@ -1,0 +1,8 @@
+{
+  "name": "Greenhouse Propagator",
+  "manaCost": "{2}{G}",
+  "type": "Creature - Cat Druid",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Whenever another creature you control enters, you gain 1 life.\n{T}: Add {G}."
+}
