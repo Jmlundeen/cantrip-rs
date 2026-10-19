@@ -1,0 +1,6 @@
+{
+  "name": "Prophesied End",
+  "manaCost": "{1}{W}",
+  "type": "Instant",
+  "oracleText": "Destroy target creature. If it wasn't attacking, its controller draws a card."
+}

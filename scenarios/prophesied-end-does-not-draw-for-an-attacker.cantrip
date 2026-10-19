@@ -1,0 +1,29 @@
+# The creature was attacking before destruction; that controller does not draw (CR 506.3).
+
+[Bot1 Deck]
+Black Lotus
+Prophesied End
+Ornithopter
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[Bot1.Attackers]
+Bot1.Attack(Ornithopter > Bot2)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Prophesied End.Cast(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Prophesied End; Ornithopter; Black Lotus
+Bot1.Library.Count = 29
