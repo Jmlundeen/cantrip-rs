@@ -1,0 +1,33 @@
+# Divining Duelist's first mode: when it enters, Bot1 taps Bot2's Ornithopter.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Divining Duelist
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Divining Duelist.Cast
+Bot1.Pass
+Bot1.Modes(Tap target creature)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Divining Duelist.Tapped = false
+Bot2.Battlefield.Ornithopter.Tapped = true
