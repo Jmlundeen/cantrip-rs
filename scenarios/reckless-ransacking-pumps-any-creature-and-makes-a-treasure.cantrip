@@ -1,0 +1,33 @@
+# Reckless Ransacking targets any creature, not only the caster's: it pumps the opponent's Ornithopter (0/2) to 3/4 and
+# its controller, Bot1, gets the Treasure (CR 111.10a, 608.2c).
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Reckless Ransacking
+Forest x17
+
+[Bot2 Deck]
+Ornithopter
+Swamp x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Reckless Ransacking.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Power = 3
+Bot2.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield = Mountain; Mox Ruby; Treasure Token
+Bot1.Graveyard = Reckless Ransacking
