@@ -1,0 +1,36 @@
+# The owner chooses the destination; noncreature casts before entering count, and the next turn only its first spell empowers (CR 401.4, 603.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Plan for All Outcomes
+Ornithopter
+Mox Sapphire
+Brainstorm
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Plan for All Outcomes.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Decline
+Bot1.Hand.Mox Sapphire.Cast
+[Bot1.Main2]
+? Bot1.Battlefield = Plan for All Outcomes; Mox Sapphire
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Brainstorm.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace.Counters.Loyalty = 1
+Bot1.Battlefield.Count = 3
