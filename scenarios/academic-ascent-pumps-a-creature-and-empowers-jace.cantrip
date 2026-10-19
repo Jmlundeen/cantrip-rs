@@ -1,0 +1,32 @@
+# Academic Ascent: "Target creature gets +2/+2 and gains flying until end of turn. Empower Jace 2." The pump makes the
+# 0/2 Ornithopter a 2/4; with no Jace planeswalker token, empower Jace creates a blue Jace token with two loyalty
+# counters (CR 611.2c, 701.71a).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Academic Ascent
+Plains
+Plains
+Plains
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Academic Ascent.Cast(Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Graveyard = Academic Ascent

@@ -1,0 +1,35 @@
+# Academic Ascent with its target killed in response does not resolve: the pump and the empower both do nothing, and no
+# Jace token is made (CR 608.2b). The positive control is the other Academic Ascent scenario.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Academic Ascent
+Plains
+Plains
+Plains
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Academic Ascent.Cast(Ornithopter)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Ornithopter = (absent)
+Bot1.Battlefield.Jace = (absent)
+Bot1.Life = 20
