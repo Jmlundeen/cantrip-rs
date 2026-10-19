@@ -1,0 +1,30 @@
+# Kaito, Cunning Infiltrator enters with 3 loyalty. -9 is refused at 3 (and -2 is allowed): -2 creates a 2/1 blue Ninja
+# creature token and leaves Kaito at 1. A Ninja token is a creature, blue, 2/1.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Kaito, Cunning Infiltrator
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaito, Cunning Infiltrator.Cast
+! Bot1.Battlefield.Kaito, Cunning Infiltrator.Activate(Ability: You get an emblem)
+Bot1.Battlefield.Kaito, Cunning Infiltrator.Activate(Ability: Create a)
+
+[Expect]
+Bot1.Battlefield.Kaito, Cunning Infiltrator.Counters.Loyalty = 1
+Bot1.Battlefield.Ninja.Power = 2
+Bot1.Battlefield.Ninja.Toughness = 1
+Bot1.Battlefield.Ninja.Colors = Blue
+Bot1.Emblems.Count = 0

@@ -1,0 +1,87 @@
+# Kaito, Cunning Infiltrator reaches 9 loyalty and uses -9. Turn 1: Kaito enters with 3, +1 (no target) with a loot makes 4.
+# Turn 3: +1 targeting Llanowar Elves (it can't be blocked this turn, checked mid-turn) makes 5, and the Elves hit Bot2:
+# "Whenever a creature you control deals combat damage to a player" puts a counter on Kaito, 6. Turn 5: +1 makes 7 and
+# both Elves connect, one trigger for each creature, 9. Turn 7: -9 takes Kaito to 0 (he dies) and gives Bot1 the emblem
+# (only one loyalty ability a turn, so it waits for the next turn). The Ornithopter Bot1 casts afterwards, and the one Bot2
+# casts on turn 8, each make Bot1 a 2/1 blue Ninja: the emblem is Bot1's, "a player" is anyone, and "you" is its owner.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Kaito, Cunning Infiltrator
+Llanowar Elves
+Llanowar Elves
+Island
+Island
+Island
+Island
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kaito, Cunning Infiltrator.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Kaito, Cunning Infiltrator.Activate(Ability: Up to one)
+Bot1.Choose(Island)
+? Bot1.Battlefield.Kaito, Cunning Infiltrator.Counters.Loyalty = 4
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Kaito, Cunning Infiltrator.Activate(Ability: Up to one; Bot1.Battlefield.Llanowar Elves#1)
+Bot1.Choose(Island)
+? Bot1.Battlefield.Llanowar Elves#1.Keywords = CantBeBlocked
+? Bot1.Battlefield.Kaito, Cunning Infiltrator.Counters.Loyalty = 5
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves#1 > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Kaito, Cunning Infiltrator.Counters.Loyalty = 6
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Kaito, Cunning Infiltrator.Activate(Ability: Up to one)
+Bot1.Choose(Island)
+[T5 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves#1 > Bot2; Llanowar Elves#2 > Bot2)
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Kaito, Cunning Infiltrator.Counters.Loyalty = 9
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Battlefield.Kaito, Cunning Infiltrator.Activate(Ability: You get an emblem)
+Bot2.Pass
+? Bot1.Emblems.Count = 1
+Bot1.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Pass
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Emblems.Count = 1
+Bot2.Emblems.Count = 0
+Bot1.Graveyard.Count = 4
+Bot2.Life = 17
+Bot1.Battlefield.Ninja#1.Power = 2
+Bot1.Battlefield.Ninja#1.Toughness = 1
+Bot1.Battlefield.Ninja#2.Power = 2
+Bot2.Battlefield = Ornithopter; Island; Island; Island; Island
