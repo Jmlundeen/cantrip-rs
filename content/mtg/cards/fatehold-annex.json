@@ -1,0 +1,5 @@
+{
+  "name": "Fatehold Annex",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control a planeswalker.\n{T}: Add {W} or {U}."
+}
