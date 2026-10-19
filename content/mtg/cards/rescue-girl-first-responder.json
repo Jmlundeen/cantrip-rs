@@ -1,0 +1,11 @@
+{
+  "name": "Rescue Girl, First Responder",
+  "manaCost": "{2}{W}",
+  "type": "Legendary Creature — Human Cleric",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Flying\n{T}: Return another target permanent you control to its owner's hand. Activate only during your turn.",
+  "keywords": [
+    "Flying"
+  ]
+}
