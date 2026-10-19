@@ -67,7 +67,7 @@ abilities: &[
 ```
 
 - **Costs**: `TAP`, `SACRIFICE_THIS`, `cost("{1}{U}")` (mana symbols as printed, read at compile time; `cost("{1}, {T}")`
-  includes the tap), `loyalty(n)` (and `loyalty_minus_x()` for "−X", X read as `item.x`), `life(n)`, `sacrifice(n, filter)`, `discard(n, filter)`, `remove_counters(kind, n)`, `remove_counters_among(n, filter)` ("remove N counters from among creatures you control", any kinds), `blight::cost(n)` (blight N, CR 701.68a),
+  includes the tap), `loyalty(n)` (and `loyalty_minus_x()` for "−X", X read as `item.x`), `life(n)`, `sacrifice(n, filter)`, `exile_permanents(n, filter)` ("exile a creature you control", CR 118.3: the exiled permanents are the ability's `q.cost_objects(item)`, read with `chars` as they last were, and "exiled with" its source, CR 607.2a; a spell's additional cost is `Cost::exile_permanents`, asked of the history as Fling's sacrifice is), `discard(n, filter)`, `remove_counters(kind, n)`, `remove_counters_among(n, filter)` ("remove N counters from among creatures you control", any kinds), `blight::cost(n)` (blight N, CR 701.68a),
   `DISCARD_THIS`, `EXILE_THIS`, `EXERT`, joined with `.and(..)`; `return_tapped_to_hand(n, filter)` is "return N tapped
   [permanents]", whose permanents are chosen once the mana is paid, so one tapped for mana while paying may be among
   them (web-slinging, `cantrip_mechanics::web_slinging::way(cost, text)`); craft (CR 702.167a) is

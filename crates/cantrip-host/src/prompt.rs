@@ -197,8 +197,15 @@ fn cost_text_of(cost: &Cost, name: &str) -> String {
     if cost.sacrifice_self {
         parts.push(format!("Sacrifice {name}"));
     }
-    if cost.permanents.is_some() {
-        parts.push("Sacrifice a permanent".to_string());
+    if let Some(p) = cost.permanents {
+        let verb = match p.action {
+            _ if cost.tap_permanents => "Tap",
+            PermanentAction::Sacrifice => "Sacrifice",
+            PermanentAction::ReturnToHand => "Return",
+            PermanentAction::Exile => "Exile",
+        };
+        let what = if p.count == 1 { "a permanent".to_string() } else { format!("{} permanents", p.count) };
+        parts.push(format!("{verb} {what}"));
     }
     if cost.discard_self {
         parts.push("Discard".to_string());

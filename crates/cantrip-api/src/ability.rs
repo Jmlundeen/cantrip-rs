@@ -62,6 +62,14 @@ pub const fn return_tapped_to_hand(n: u8, filter: ObjectFilter) -> Cost {
     Cost::return_tapped_to_hand(n, filter)
 }
 
+/// "Exile N [permanents] you control" (CR 118.3): The Soul Stone's "Exile a creature you control", Food Chain's. Chosen as
+/// the cost is chosen (CR 601.2h, 602.2b); the exiled permanents are the ability's `Query::cost_objects` (read as they
+/// last were on the battlefield, CR 608.2h: "the exiled creature's mana value"), and are "exiled with" its source (CR
+/// 607.2a).
+pub const fn exile_permanents(n: u8, filter: ObjectFilter) -> Cost {
+    Cost::exile_permanents(n, filter)
+}
+
 /// "Tap N untapped [permanents] you control" (CR 118.3): not the {T} symbol.
 pub const fn tap_untapped(n: u8, filter: ObjectFilter) -> Cost {
     Cost::tap_untapped(n, filter)

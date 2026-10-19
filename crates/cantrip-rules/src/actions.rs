@@ -621,18 +621,21 @@ fn choose_permanents(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cos
     if p.tapped && eligible.len() < p.count as usize {
         return Err(Stop::Cancel);
     }
-    let purpose = if cost.tap_permanents {
-        Purpose::TapToPay
-    } else if p.to_hand {
-        Purpose::ReturnToHand
-    } else {
-        Purpose::SacrificeCost
+    let purpose = match p.action {
+        _ if cost.tap_permanents => Purpose::TapToPay,
+        PermanentAction::ReturnToHand => Purpose::ReturnToHand,
+        PermanentAction::Exile => Purpose::ExileToPay,
+        PermanentAction::Sacrifice => Purpose::SacrificeCost,
     };
-    // A cost of tapped permanents says so, and names creatures when those are all it can take (web-slinging's).
-    let kind = match p.tapped {
-        true if eligible.iter().all(|&id| cx.chars(id).is(CardType::Creature)) => "tapped creature",
-        true => "tapped permanent",
-        false => "",
+    // A cost of tapped permanents says so, and names creatures when those are all it can take (web-slinging's). An exile
+    // of permanents says they are permanents (or creatures), not cards from a hand or graveyard as other exiles to pay are.
+    let creatures = eligible.iter().all(|&id| cx.chars(id).is(CardType::Creature));
+    let kind = match (p.tapped, p.action) {
+        (true, _) if creatures => "tapped creature",
+        (true, _) => "tapped permanent",
+        (false, PermanentAction::Exile) if creatures => "creature",
+        (false, PermanentAction::Exile) => "permanent",
+        (false, _) => "",
     };
     let ask = RequestKind::ChooseCards { source, purpose, cards: eligible.clone(), eligible, count: p.count, up_to: false, kind, total: None };
     match cx.ask_core(player, ask, true)? {
@@ -790,21 +793,35 @@ fn choose_variable(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost,
     }
 }
 
-/// Pays the permanents part of a cost, once the rest is paid.
-fn pay_permanents(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId]) {
+/// Pays the permanents part of a cost, once the rest is paid. `ability` is the source of the activated ability whose cost
+/// it is: the permanents its cost exiles are "exiled with" it, linked to its other abilities (CR 406.6, 607.2a). A spell's
+/// are not: that rule is of abilities.
+fn pay_permanents(cx: &mut Cx, cost: &Cost, chosen: &[ObjectId], ability: Option<ObjectId>) {
     if cost.tap_permanents {
         for &id in chosen {
             ops::tap(cx, id);
         }
         return;
     }
-    match cost.permanents {
-        Some(PermanentCost { to_hand: true, .. }) => {
+    match cost.permanents.map(|p| p.action) {
+        Some(PermanentAction::ReturnToHand) => {
             ops::return_to_hand(cx, chosen);
         }
-        Some(_) => {
+        Some(PermanentAction::Sacrifice) => {
             ops::sacrifice(cx, chosen);
         }
+        // Exiled together (CR 118.3), each into its owner's exile; one that is no longer the permanent chosen stays where
+        // it is (CR 400.7), as a sacrifice's does.
+        Some(PermanentAction::Exile) => match ability {
+            Some(source) => {
+                let still: Vec<ObjectId> =
+                    chosen.iter().copied().filter(|&id| live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield)).collect();
+                ops::exile_with(cx, &still, source, false);
+            }
+            None => {
+                ops::exile_all(cx, chosen);
+            }
+        },
         None => {}
     }
 }
@@ -3766,7 +3783,7 @@ fn cast(
     pay_blight(cx, &extra, extra_blighted);
     pay_counters_among(cx, &removed);
     pay_counters_among(cx, &extra_removed);
-    pay_permanents(cx, &cost, &chosen);
+    pay_permanents(cx, &cost, &chosen, None);
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
     pay_exiles(cx, &hand_exiles);
@@ -3774,7 +3791,7 @@ fn cast(
     pay_exiles(cx, &extra_exiles);
     pay_exiles(cx, &extra_evidence);
     pay_life_and_counters(cx, player, spell, &cost);
-    pay_permanents(cx, &extra, &extra_chosen);
+    pay_permanents(cx, &extra, &extra_chosen, None);
     pay_behold(cx, player, &beheld);
     pay_behold(cx, player, &extra_beheld);
     ops::sacrifice(cx, &extra_sacrifices);
@@ -4575,7 +4592,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     // Counters put on and taken off permanents next, so a permanent the cost also sacrifices leaves with them.
     pay_blight(cx, &def.cost, blighted);
     pay_counters_among(cx, &removed);
-    pay_permanents(cx, &def.cost, &chosen);
+    pay_permanents(cx, &def.cost, &chosen, Some(source));
     pay_discards(cx, &discards);
     pay_exiles(cx, &exiles);
     pay_life_and_counters(cx, player, source, &def.cost);
@@ -4761,7 +4778,7 @@ pub fn activate_mana(
         let hand = choose_discards(cx, player, source, &def.cost)?;
         pay_discards(cx, &hand);
     }
-    pay_permanents(cx, &def.cost, &chosen);
+    pay_permanents(cx, &def.cost, &chosen, Some(source));
     pay_life_and_counters(cx, player, source, &def.cost);
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, &[source]);
