@@ -239,6 +239,20 @@ public sealed class GameClient
     }
 
     /// <summary>
+    /// Tells the server which row or column of the grid this seat has chosen without taking it yet, so that a pick clock
+    /// that runs out takes that line.
+    /// </summary>
+    public void ChooseLine(int line)
+    {
+        if (Draft is not { Format: "grid" } draft || draft.Active != Seat || line is < 0 or > 5)
+        {
+            return;
+        }
+
+        _transport.Send(new DraftPickMessage { Decision = draft.Decision, Take = false, Card = line });
+    }
+
+    /// <summary>
     /// Answers a booster pick that is due (<see cref="DraftMessage.PickDue"/>) with no card chosen, so the server takes one
     /// at random without waiting any longer.
     /// </summary>

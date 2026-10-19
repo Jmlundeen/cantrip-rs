@@ -394,7 +394,7 @@ public sealed class DraftEventTests : IDisposable
         Assert.Equal(9, first.PileRanks.Count);
 
         Assert.NotNull(pod.Receive(other, new DraftPickMessage { Decision = first.Decision, Take = true, Card = 0 }));
-        Assert.NotNull(pod.Receive(picking, new DraftPickMessage { Decision = first.Decision, Take = false }));
+        Assert.NotNull(pod.Receive(picking, new DraftPickMessage { Decision = first.Decision, Take = false, Card = 6 }));
         Assert.Null(pod.Receive(picking, new DraftPickMessage { Decision = first.Decision, Take = true, Card = 1 }));
 
         var second = (DraftMessage)pod.ViewFor(other)!;
@@ -472,6 +472,32 @@ public sealed class DraftEventTests : IDisposable
         clock.Advance(TimeSpan.FromSeconds(10));
         Assert.Null(pod.Receive(3 - picking, new DraftPickMessage { Decision = after.Decision, Take = true, Card = after.LastLine == 0 ? 1 : 0 }));
         Assert.Equal(30_000, ((DraftMessage)pod.ViewFor(1)!).PickLeftMs);
+    }
+
+    [Fact]
+    public void A_grid_pick_whose_clock_runs_out_takes_the_line_its_player_had_chosen()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = CreateGrid(store);
+        DraftPod pod = DraftPod.Open(store, created.Record.Id, Content, clock, new DraftTiming { GridPick = TimeSpan.FromSeconds(30) });
+        pod.Seated(1);
+        pod.Seated(2);
+
+        var first = (DraftMessage)pod.ViewFor(1)!;
+        int picking = first.Active;
+
+        // Only the active player's choice counts, and only for the pick it names.
+        Assert.NotNull(pod.Receive(3 - picking, new DraftPickMessage { Decision = first.Decision, Take = false, Card = 5 }));
+        Assert.NotNull(pod.Receive(picking, new DraftPickMessage { Decision = first.Decision + 1, Take = false, Card = 5 }));
+        Assert.Null(pod.Receive(picking, new DraftPickMessage { Decision = first.Decision, Take = false, Card = 5 }));
+        Assert.Equal(0, pod.Version);
+
+        clock.Advance(TimeSpan.FromSeconds(30));
+        pod.Tick(clock.GetUtcNow());
+        var after = (DraftMessage)pod.ViewFor(picking)!;
+        Assert.Equal(5, after.LastLine);
+        Assert.Equal(first.Decision + 1, after.Decision);
     }
 
     [Fact]
