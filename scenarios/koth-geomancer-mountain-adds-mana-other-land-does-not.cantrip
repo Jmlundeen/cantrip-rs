@@ -1,0 +1,31 @@
+# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+
+[Bot1 Deck]
+Black Lotus
+Koth, the Geomancer
+Mountain
+Forest
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Koth, the Geomancer.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 18
