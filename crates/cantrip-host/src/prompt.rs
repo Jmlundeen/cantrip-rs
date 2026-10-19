@@ -1012,8 +1012,9 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
             verb: (*verb).to_string(),
             amount: i32::from(*amount),
         }),
-        // Counters removed from among permanents as a cost (CR 118.3): each kind on each permanent, named as the counters on
-        // the table are.
+        // Counters removed from among permanents (CR 118.3, 122.1) - as a cost (Dawnhand Dissident's casts) or as an effect
+        // resolves (Dyadrine's "a +1/+1 counter from each of two creatures", a pool of one each): each kind on each permanent,
+        // named as the counters on the table are.
         RequestKind::RemoveCounters { source, pools, total } => PromptPayload::RemoveCountersPromptMessage(RemoveCountersPrompt {
             player,
             source: source_handle(game, handles, *source),

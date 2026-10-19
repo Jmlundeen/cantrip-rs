@@ -760,10 +760,11 @@ public sealed partial class MainPage
     }
 
     /// <summary>
-    /// Removing counters from among permanents as a cost (CR 118.3): "by removing three counters from among creatures you
-    /// control". Each kind of counter on each permanent the cost may take from is a button that takes one more of them, saying
-    /// how many of how many are taken; a click on a permanent takes one of its own, the first kind with some left. The cost is
-    /// paid once the total is reached.
+    /// Removing counters from among permanents (CR 118.3, 122.1), as a cost ("by removing three counters from among creatures you
+    /// control") or as an effect resolves (Dyadrine's "a +1/+1 counter from each of two creatures you control"). Each kind of
+    /// counter on each permanent the question may take from is a button that takes one more of them, saying how many of how many
+    /// are taken; a click on a permanent takes one of its own, the first kind with some left. The answer is sent once the total
+    /// is reached. When every pool holds a single counter on a different permanent, the subtitle says one counter comes from each.
     /// </summary>
     private void FillRemoveCounters(GameClient client, RemoveCountersPromptMessage prompt)
     {
@@ -771,9 +772,13 @@ public sealed partial class MainPage
         int taken = _selection.CounterRemovals.Values.Sum();
         string counters = prompt.Total == 1 ? "a counter" : $"{prompt.Total} counters";
 
+        // One counter on each of different permanents (Dyadrine): a counter from each of that many permanents, not any kinds.
+        bool oneEach = prompt.Pools.All(pool => pool.Count == 1) && prompt.Pools.Select(pool => pool.Object).Distinct().Count() == prompt.Pools.Count;
+        string which = oneEach ? $"One counter from each of {prompt.Total} different permanents" : "Any kinds, from among the permanents shown";
+
         Prompt(
             $"{source}: remove {counters}",
-            $"Any kinds, from among the permanents shown  ·  {taken} of {prompt.Total} chosen  ·  click a permanent to take one of its counters, or a button below");
+            $"{which}  ·  {taken} of {prompt.Total} chosen  ·  click a permanent to take one of its counters, or a button below");
 
         AddButton(
             $"Remove {counters}",
