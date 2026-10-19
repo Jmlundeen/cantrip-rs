@@ -240,6 +240,10 @@ pub const SURVEIL_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, |g, item| 
 /// `enters: Some(mana::enters_tapped)`, Temple of Deceit.
 pub const SCRY_LAND: AbilityDef = triggered(triggers::THIS_ENTERS, |g, item| effects::scry(g, item, 1), "When this land enters, scry 1.");
 
+/// "{1}, {T}: Add one mana of any color." (CR 605.1a): the filter ability of Crystal Grotto, Giant's Boulder, Capital City and
+/// Conduit Pylons, beside their "{T}: Add {C}.".
+pub const ANY_COLOR_FOR_ONE: AbilityDef = mana_ability(cost("{1}, {T}"), add_any_color(1), "{1}, {T}: Add one mana of any color.");
+
 /// A horizon land's mana ability: "{T}, Pay 1 life: Add {A} or {B}." (`text` is its full text), the color named as it is
 /// activated (CR 106.5). Horizon Canopy and Fiery Islet print it.
 pub const fn pay_life_for_either(a: Color, b: Color, text: &'static str) -> AbilityDef {

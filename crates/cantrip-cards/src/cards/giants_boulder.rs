@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::lands;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_mechanics::{destroy_target, scry, targets};
 use cantrip_oracle as oracle;
@@ -16,7 +17,7 @@ fn destroy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        mana_ability(cost("{1}, {T}"), add_any_color(1), "{1}, {T}: Add one mana of any color."),
+        lands::ANY_COLOR_FOR_ONE,
         triggered(THIS_ENTERS, scry_two, "When this artifact enters, scry 2."),
         ability(cost("{7}, {T}").and(SACRIFICE_THIS), destroy, "{7}, {T}, Sacrifice this artifact: Destroy target permanent.")
             .targets(&[targets::PERMANENT]),
