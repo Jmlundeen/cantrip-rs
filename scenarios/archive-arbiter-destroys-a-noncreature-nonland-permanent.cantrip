@@ -1,0 +1,40 @@
+# Archive Arbiter's first mode destroys a noncreature, nonland permanent an opponent controls (CR 701.7), here a Mox Ruby.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Archive Arbiter
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Battlefield.Mox Pearl#5.Activate
+Bot1.Battlefield.Mox Pearl#6.Activate
+Bot1.Hand.Archive Arbiter.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot2.Battlefield.Mox Ruby)
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Mox Ruby
+Bot1.Life = 20
