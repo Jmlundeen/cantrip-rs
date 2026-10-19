@@ -22,6 +22,9 @@ public sealed partial class MainPage
     /// <summary>The picked cards being carried together, by place, in the order they go down in; null while none are.</summary>
     private List<int>? _carriedPicks;
 
+    /// <summary>What was picked before the rectangle being drawn began; null while none is.</summary>
+    private HashSet<int>? _picksBefore;
+
     private bool Picked(int place) => DeckEditorShown && _deckPicks.Contains(place);
 
     /// <summary>Lets rectangles be drawn over the deck's columns and sideboard; wired once, with the editor.</summary>
@@ -30,7 +33,9 @@ public sealed partial class MainPage
         foreach (CardBoardElement board in (CardBoardElement[])[_mainBoard, _sideBoard])
         {
             board.Marquees = true;
+            board.Marqueeing += (handles, modifiers) => MarqueePicking(handles, modifiers);
             board.Marqueed += (handles, modifiers) => MarqueePicked(handles, modifiers);
+            board.MarqueeCancelled += MarqueeCancelled;
             board.EmptyClicked += modifiers =>
             {
                 if (!Adds(modifiers))
@@ -44,28 +49,52 @@ public sealed partial class MainPage
     private static bool Adds(Windows.System.VirtualKeyModifiers modifiers) =>
         (modifiers & (Windows.System.VirtualKeyModifiers.Control | Windows.System.VirtualKeyModifiers.Shift)) != 0;
 
-    /// <summary>A rectangle drawn: the cards it touched are what is picked, or are picked as well with Ctrl or Shift held.</summary>
-    private void MarqueePicked(IReadOnlyList<ViewHandle> touched, Windows.System.VirtualKeyModifiers modifiers)
+    /// <summary>
+    /// A rectangle being drawn: the cards it touches now are what is picked, or are picked as well with Ctrl or Shift
+    /// held, so the player sees what it picks before letting go.
+    /// </summary>
+    private void MarqueePicking(IReadOnlyList<ViewHandle> touched, Windows.System.VirtualKeyModifiers modifiers)
     {
         if (!DeckEditorShown)
         {
             return;
         }
 
-        if (!Adds(modifiers))
-        {
-            _deckPicks.Clear();
-        }
-
+        _picksBefore ??= [.. _deckPicks];
+        HashSet<int> picks = Adds(modifiers) ? [.. _picksBefore] : [];
         foreach (ViewHandle handle in touched)
         {
             if (_poolPlaces.TryGetValue(handle.Value, out int place))
             {
-                _deckPicks.Add(place);
+                picks.Add(place);
             }
         }
 
-        LayOutPool();
+        if (!picks.SetEquals(_deckPicks))
+        {
+            _deckPicks.Clear();
+            _deckPicks.UnionWith(picks);
+            LayOutPool();
+        }
+    }
+
+    /// <summary>A rectangle drawn: what it touches as it is let go is picked.</summary>
+    private void MarqueePicked(IReadOnlyList<ViewHandle> touched, Windows.System.VirtualKeyModifiers modifiers)
+    {
+        MarqueePicking(touched, modifiers);
+        _picksBefore = null;
+    }
+
+    /// <summary>A rectangle cut short: what was picked before it is picked again.</summary>
+    private void MarqueeCancelled()
+    {
+        if (_picksBefore is { } before)
+        {
+            _picksBefore = null;
+            _deckPicks.Clear();
+            _deckPicks.UnionWith(before);
+            LayOutPool();
+        }
     }
 
     private void LetPicksGo()
@@ -217,7 +246,7 @@ public sealed partial class MainPage
         {
             foreach ((int handle, _) in _poolPlaces.Where(pair => moving.Contains(pair.Value)).ToList())
             {
-                IntoTuckedSide(new ViewHandle(handle), dropped);
+                IntoTuckedSide(new ViewHandle(handle), _dropPoses.GetValueOrDefault(new ViewHandle(handle), dropped));
             }
         }
 

@@ -175,6 +175,12 @@ public sealed class CardBoardElement : SKCanvasElement
     /// <summary>A rectangle was drawn: the cards it touches, in the row's order, and the modifiers held as it began.</summary>
     public event Action<IReadOnlyList<ViewHandle>, Windows.System.VirtualKeyModifiers>? Marqueed;
 
+    /// <summary>The rectangle being drawn changed: the cards it touches now, and the modifiers held as it began.</summary>
+    public event Action<IReadOnlyList<ViewHandle>, Windows.System.VirtualKeyModifiers>? Marqueeing;
+
+    /// <summary>A rectangle was cut short before it was let go: it picks nothing.</summary>
+    public event Action? MarqueeCancelled;
+
     /// <summary>A click on no card, on a row that <see cref="Marquees"/>, with the modifiers held.</summary>
     public event Action<Windows.System.VirtualKeyModifiers>? EmptyClicked;
 
@@ -366,9 +372,14 @@ public sealed class CardBoardElement : SKCanvasElement
             // A rectangle cut short draws nothing and picks nothing.
             if (_marqueeFrom is not null)
             {
+                bool drawn = _marquee is not null;
                 _marqueeFrom = null;
                 _marquee = null;
                 Invalidate();
+                if (drawn)
+                {
+                    MarqueeCancelled?.Invoke();
+                }
             }
 
             LetGo(null);
@@ -470,6 +481,7 @@ public sealed class CardBoardElement : SKCanvasElement
                 Box box = Marquee.Between(start.At.X, start.At.Y, now.X, now.Y);
                 _marquee = new Rect(box.X, box.Y, box.Width, box.Height);
                 Invalidate();
+                Marqueeing?.Invoke(Touching(_marquee.Value), start.Modifiers);
             }
 
             e.Handled = true;

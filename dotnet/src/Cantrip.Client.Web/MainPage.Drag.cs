@@ -41,6 +41,15 @@ public sealed partial class MainPage
     private CardBoardElement? _carried;
     private Point _grabbed;
 
+    /// <summary>Where the copy being carried is on the page: its top left, on the carry layer, which covers the page as the flight layer does.</summary>
+    private Point _carriedAt;
+
+    /// <summary>The cards carried with the one taken hold of, each with how far down and right of it it rides.</summary>
+    private List<(ViewHandle Handle, float Offset)> _carriedStack = [];
+
+    /// <summary>Where each card carried with the one let go was in the stack, on the page; empty when it went alone.</summary>
+    private Dictionary<ViewHandle, CardFlights.Pose> _dropPoses = [];
+
     /// <summary>Lets a row's cards be picked up; wired once per row.</summary>
     private void MakeDraggable(CardBoardElement board)
     {
@@ -76,9 +85,28 @@ public sealed partial class MainPage
             .. with.Take(behind).Select((other, i) => new CardBoardElement.BoardCell(other, (behind - i) * offset, (behind - i) * offset, Tapped: false)),
             new CardBoardElement.BoardCell(card, 0, 0, Tapped: false, Annotation: with.Count > 0 ? $"{with.Count + 1} cards" : null),
         ]);
+        _carried.Hidden = _flights.Flying;
         _carryLayer.Children.Clear();
         _carryLayer.Children.Add(_carried);
+
+        // The others are scooped up into the stack: each flies from its place to its own in the stack, following the
+        // pointer - those the stack has no room to show, to under the card taken hold of.
+        _carriedStack = [.. with.Select((other, i) => (other.Handle, i < behind ? (behind - i) * offset : 0f))];
+        foreach ((ViewHandle other, float down) in _carriedStack)
+        {
+            foreach (CardBoardElement board in (CardBoardElement[])[_mainBoard, _sideBoard])
+            {
+                if (board.Bounds(other) is { } box && board.XamlRoot is not null && board.CardOf(other) is { } face)
+                {
+                    _flights.Gather(other, Middle(board, box), () => StackPose(from, down), face);
+                }
+            }
+        }
     }
+
+    /// <summary>Where a card riding a distance down and right of the one carried is on the page.</summary>
+    private CardFlights.Pose StackPose(CardBoardElement from, float offset) =>
+        new((float)_carriedAt.X + offset + (from.CellWidth / 2), (float)_carriedAt.Y + offset + (from.CellHeight / 2), from.CellWidth, 0f);
 
     /// <summary>Moves the copy with the pointer and marks where the card would go in the row it is over, if that row takes it.</summary>
     private void Carry(ViewHandle handle, Point at)
@@ -89,8 +117,9 @@ public sealed partial class MainPage
         }
 
         Point onLayer = _carryLayer.TransformToVisual(null).Inverse.TransformPoint(at);
-        Canvas.SetLeft(_carried, onLayer.X - _grabbed.X);
-        Canvas.SetTop(_carried, onLayer.Y - _grabbed.Y);
+        _carriedAt = new Point(onLayer.X - _grabbed.X, onLayer.Y - _grabbed.Y);
+        Canvas.SetLeft(_carried, _carriedAt.X);
+        Canvas.SetTop(_carried, _carriedAt.Y);
 
         (DropZone Zone, Point Local)? over = ZoneAt(handle, at);
         foreach (DropZone zone in DropZones())
@@ -119,15 +148,26 @@ public sealed partial class MainPage
         bool pooled = (_poolPlaces.ContainsKey(handle.Value) || packed) && _carried is not null;
         (DropZone Zone, Point Local)? dropped = at is { } released ? ZoneAt(handle, released) : null;
         _dropPose = null;
+        _dropPoses = [];
         if (pooled && _carried!.XamlRoot is not null)
         {
             Point middle = _carried.TransformToVisual(Root).TransformPoint(new Point(_carried.CellWidth / 2, _carried.CellHeight / 2));
             _dropPose = new CardFlights.Pose((float)middle.X, (float)middle.Y, _carried.CellWidth, 0f);
+
+            // The cards carried with it fly out of the stack from where each rode in it, under the one taken hold of.
+            foreach ((ViewHandle other, float down) in _carriedStack)
+            {
+                _dropPoses[other] = _dropPose.Value with { X = _dropPose.Value.X + down, Y = _dropPose.Value.Y + down };
+                _flights.Toss(other, _dropPoses[other]);
+            }
+
             if (!packed || dropped is null)
             {
-                _flights.Toss(handle, _dropPose.Value);
+                _flights.Toss(handle, _dropPose.Value, onTop: _carriedStack.Count > 0);
             }
         }
+
+        _carriedStack = [];
 
         CardBoardElement? copy = _carried;
         _carried = null;

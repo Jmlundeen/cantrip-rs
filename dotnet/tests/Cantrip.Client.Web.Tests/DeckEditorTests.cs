@@ -225,9 +225,11 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
 
     /// <summary>
     /// Cards of the deck picked together: a rectangle dragged out from no card over three columns picks the three cards
-    /// it touches and not the one beyond; Ctrl-click picks another and lets it go again; the three dragged by one of them
-    /// go together into another column, in their order, and then together into the sideboard; a click on no card lets
-    /// them go; and over the search a drag from no card draws nothing and picks nothing.
+    /// it touches and not the one beyond, already while it is drawn; Ctrl-click picks another and lets it go again; the
+    /// three dragged by one of them are gathered into the stack under the pointer as it is taken hold of, and go
+    /// together into another column, in their order, flying there out of the stack where it was let go; then together
+    /// into the sideboard; a click on no card lets them go; and over the search a drag from no card draws nothing and
+    /// picks nothing.
     /// </summary>
     [Fact]
     public async Task Cards_picked_with_a_rectangle_are_dragged_together_and_the_search_picks_none()
@@ -256,8 +258,8 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
         await page.Page.Mouse.MoveAsync(fromX, fromY);
         await page.Page.Mouse.DownAsync();
         await page.Page.Mouse.MoveAsync(oculus.X, oculus.Y, new MouseMoveOptions { Steps = 10 });
-        TableState drawing = await page.SettledAsync(state => state.DeckEditor!.Marquee is not null);
-        Assert.Empty(drawing.DeckEditor!.Picked!);
+        TableState drawing = await page.SettledAsync(state => state.DeckEditor!.Marquee is not null && state.DeckEditor!.Picked!.Count == 3);
+        Assert.Equal(["Aerial Doombot", "Abrade", "Abhorrent Oculus"], drawing.DeckEditor!.Picked);
         await page.PictureAsync("rectangle");
         await page.Page.Mouse.UpAsync();
         DeckEditorState editor = await EditorAsync(page, state => state.DeckEditor!.Picked!.Count > 0);
@@ -275,9 +277,26 @@ public sealed class DeckEditorTests(WebClient web) : IAsyncLifetime
         Assert.DoesNotContain("Aclazotz, Deepest Betrayal", editor.Picked!);
 
         // Dragged by the middle one, all three go into Aclazotz's column under it, in their order, and stay picked.
+        // The other two are scooped up into the stack as it is taken hold of.
         CardState abrade = await DeckCardAsync(page, "Abrade");
-        await page.DragAsync(abrade, aclazotz.X, aclazotz.Y + aclazotz.H);
+        int flown = (await page.SettledAsync()).Flown;
+        await page.Page.Mouse.MoveAsync(abrade.X, abrade.Y);
+        await page.Page.Mouse.DownAsync();
+        await page.Page.Mouse.MoveAsync(abrade.X + 12, abrade.Y + 12, new MouseMoveOptions { Steps = 4 });
+        TableState gathered = await page.SettledAsync(state => state.Flown >= flown + 2);
+        Assert.DoesNotContain(gathered.Cards, card => card.Row == "pool" && card.Name is "Aerial Doombot" or "Abhorrent Oculus" && card.Visible);
+        await page.Page.Mouse.MoveAsync(aclazotz.X, aclazotz.Y + aclazotz.H, new MouseMoveOptions { Steps = 12 });
+        await page.Page.Mouse.UpAsync();
         TableState moved = await page.SettledAsync(state => state.Cards.Count(card => card.Row == "pool" && MathF.Abs(card.X - aclazotz.X) < 2) == 4);
+
+        // Each flew out of the stack where it was let go, not from the column it was picked in.
+        foreach (string name in (string[])["Aerial Doombot", "Abrade", "Abhorrent Oculus"])
+        {
+            CardState landed = moved.Cards.Single(card => card.Row == "pool" && card.Name == name);
+            Assert.True(landed.FlewFrom is { } from && MathF.Abs(from.X - aclazotz.X) < aclazotz.W / 2 && MathF.Abs(from.Y - (aclazotz.Y + aclazotz.H)) < aclazotz.W / 2,
+                $"{name} flew from {landed.FlewFrom}, not out of the stack let go at {(aclazotz.X, aclazotz.Y + aclazotz.H)}.");
+        }
+
         Assert.Equal(["Aclazotz, Deepest Betrayal", "Aerial Doombot", "Abrade", "Abhorrent Oculus"],
             moved.Cards.Where(card => card.Row == "pool" && MathF.Abs(card.X - aclazotz.X) < 2).OrderBy(card => card.Y).Select(card => card.Name));
         Assert.Equal(["Aerial Doombot", "Abrade", "Abhorrent Oculus"], moved.DeckEditor!.Picked);

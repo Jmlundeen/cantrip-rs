@@ -423,6 +423,12 @@ public sealed partial class MainPage : Page
             {
                 board.Hidden = _flights.Flying;
             }
+
+            // The cards gathered into a stack being dragged show in it as they land there.
+            if (_carried is { } carried)
+            {
+                carried.Hidden = _flights.Flying;
+            }
         };
 
         // A change of layout - the window, the panel sliding, the hand's strip - puts cards where they are going.

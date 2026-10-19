@@ -67,7 +67,7 @@ public sealed partial class MainPage
         Padding = new Thickness(16, 12, 16, 12),
     };
 
-    private readonly CardBoardElement _searchBoard = new(SearchWidth, Tall(SearchWidth)) { HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
+    private readonly CardBoardElement _searchBoard = new(SearchWidth, Tall(SearchWidth)) { FliesAlong = false, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top };
     private ScrollViewer _searchScroll = null!;
     private TextBox _deckName = null!;
     private TextBox _searchText = null!;

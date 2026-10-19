@@ -46,6 +46,8 @@ public sealed class CardFlights : SKCanvasElement
         public required bool Leaving;
         /// <summary>Where it is drawn among the other cards in the air: as its row draws it, over what is under it there.</summary>
         public required long Order;
+        /// <summary>Where a card gathered under one being dragged is going now: the pointer moves it as it flies.</summary>
+        public Func<Pose>? Following;
         /// <summary>When it set off: the first frame it is drawn in, so the page's work to launch it is not the flight's time.</summary>
         public DateTime? Started;
         public Pose Current;
@@ -58,6 +60,9 @@ public sealed class CardFlights : SKCanvasElement
 
     /// <summary>Cards let go somewhere by hand, which fly from there to wherever they are laid out next.</summary>
     private readonly Dictionary<ViewHandle, Pose> _tossed = [];
+
+    /// <summary>The tossed cards that fly over all the others: the one dragged, over the cards carried with it.</summary>
+    private readonly HashSet<ViewHandle> _tossedOnTop = [];
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(8) };
     private DateTime _settleUntil;
 
@@ -107,12 +112,36 @@ public sealed class CardFlights : SKCanvasElement
     /// Notes that a card was let go at a place on the page - dragged and dropped - so that the next look flies it from
     /// there to wherever it is laid out, even along the row it came from.
     /// </summary>
-    public void Toss(ViewHandle handle, Pose from)
+    public void Toss(ViewHandle handle, Pose from, bool onTop = false)
     {
-        if (_enabled)
+        if (!_enabled)
         {
-            _tossed[handle] = from;
+            return;
         }
+
+        // A card still being gathered under the one dragged sets off from where it has got to.
+        _tossed[handle] = _flights.TryGetValue(handle, out Flight? gathering) && gathering.Following is not null ? gathering.Current : from;
+        if (onTop)
+        {
+            _tossedOnTop.Add(handle);
+        }
+    }
+
+    /// <summary>
+    /// Flies a card from where it is to a place that moves - under the card being dragged, carried along with it - and
+    /// lets the copy go when it gets there, where the dragged copy draws it from then on.
+    /// </summary>
+    public void Gather(ViewHandle handle, Pose from, Func<Pose> to, ObjectView card)
+    {
+        if (!_enabled)
+        {
+            return;
+        }
+
+        Land(handle);
+        Launch(handle, from, to(), card, leaving: false, order: 0);
+        _flights[handle].Following = to;
+        Refresh();
     }
 
     /// <summary>
@@ -175,6 +204,7 @@ public sealed class CardFlights : SKCanvasElement
         }
 
         List<(ViewHandle Handle, Pose From, Pose To, ObjectView Card)> launching = [];
+        List<(ViewHandle Handle, Pose From, Pose To, ObjectView Card)> tossing = [];
 
         foreach ((ViewHandle handle, Placed? shown) in onScreen)
         {
@@ -192,7 +222,7 @@ public sealed class CardFlights : SKCanvasElement
                 Land(handle);
                 if (Differs(tossed, card.Pose))
                 {
-                    launching.Add((handle, tossed, card.Pose, card.Card));
+                    tossing.Add((handle, tossed, card.Pose, card.Card));
                 }
             }
             else if (_flights.TryGetValue(handle, out Flight? flight))
@@ -224,6 +254,13 @@ public sealed class CardFlights : SKCanvasElement
             _seen[handle] = new Sighting(card.Pose, card.Card, card.Board, card.LocalX, card.LocalY, now);
         }
 
+        // Cards let go by hand all fly, however many were carried together; the one dragged flies over the others.
+        foreach ((ViewHandle handle, Pose from, Pose to, ObjectView card) in tossing)
+        {
+            Launch(handle, from, to, card, leaving: false, order[handle] + (_tossedOnTop.Contains(handle) ? int.MaxValue : 0));
+            changed = true;
+        }
+
         if (launching.Count <= MostAtOnce)
         {
             foreach ((ViewHandle handle, Pose from, Pose to, ObjectView card) in launching)
@@ -248,6 +285,7 @@ public sealed class CardFlights : SKCanvasElement
 
         _departures.Clear();
         _tossed.Clear();
+        _tossedOnTop.Clear();
         Forget(now);
 
         if (changed)
@@ -386,6 +424,11 @@ public sealed class CardFlights : SKCanvasElement
         foreach ((ViewHandle handle, Flight flight) in _flights.OrderBy(pair => pair.Value.Order).ToList())
         {
             flight.Started ??= now;
+            if (flight.Following is { } follow)
+            {
+                flight.To = follow();
+            }
+
             float t = (float)Math.Min(1.0, (now - flight.Started.Value).TotalSeconds / Duration);
             float eased = 1f - MathF.Pow(1f - t, 3f);
             flight.Current = new Pose(
