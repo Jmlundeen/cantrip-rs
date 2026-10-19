@@ -21,7 +21,10 @@ to or label an issue. A claim holds for 24 hours from the last sign of work, and
     - a push to a branch named card/<slug> in this repository, for work with no pull request.
 
 The earliest live claim wins: `claim` posts its comment, reads the issue again, and says so when someone else's claim
-came first. `next` lists what can be taken - issues nobody holds live - in the format's order; `claim` on a card
+came first. A claimant is a GitHub account and a checkout: the comment names the checkout (`--as`, else
+$CANTRIP_CLAIMANT, else the checkout's directory name), so two agents working under one account in their own
+worktrees hold cards apart and never take the same one. Pushes and pull requests carry only the account, and renew
+the live claim of any checkout of that account. `next` lists what can be taken - issues nobody holds live - in the format's order; `claim` on a card
 with no issue opens the issue first, then claims it. Commit messages and pull request descriptions of a card say
 `Closes #N`, so the issue closes when it lands.
 
@@ -48,6 +51,8 @@ FORMATS = os.path.join(ROOT, "docs", "formats")
 HOLD = datetime.timedelta(hours=24)
 BATCH = 1  # cards claimed at once by default: one, since a card takes minutes and a claim keeps others off it
 CLAIM = "<!-- cantrip-claim -->"
+CLAIMANT = "<!-- cantrip-claimant: {} -->"
+CLAIMANT_RE = re.compile(r"<!-- cantrip-claimant: (\S+) -->")
 RELEASE = "<!-- cantrip-release -->"
 CARD = "<!-- cantrip-card: {} -->"
 # A card's priority label: the first tier whose score it reaches. The score is the percent of the format's decks
@@ -136,7 +141,9 @@ def read_state(repo):
                 user = (comment["author"] or {}).get("login")
                 kind = "claim" if CLAIM in comment["body"] else "release" if RELEASE in comment["body"] else None
                 if kind and user:
-                    issue["events"].append((when(comment["createdAt"]), kind, user))
+                    tag = CLAIMANT_RE.search(comment["body"])
+                    issue["events"].append((when(comment["createdAt"]), kind,
+                                            identity(user, tag and tag.group(1))))
             issues[issue["number"]] = issue
     by_slug = {slug_of(i["title"]): i for i in issues.values() if i["title"].startswith("Card: ")}
     for page in graphql(PULLS, repo):
@@ -162,8 +169,22 @@ def slug_of(issue_title):
     return slug(issue_title[len("Card: "):])
 
 
+def identity(login, tag):
+    """A claimant: the account, and the checkout it claimed from when the claim names one."""
+    return f"{login}/{tag}" if tag else login
+
+
+def login_of(who):
+    return who.split("/")[0] if who else who
+
+
+def named(who):
+    login, _, tag = who.partition("/")
+    return f"@{login}" + (f" ({tag})" if tag else "")
+
+
 def holder(issue, now=None):
-    """(user, since, last) of the live claim on an issue, or None."""
+    """(claimant, since, last) of the live claim on an issue, or None."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
     user = since = last = None
     for time_, kind, who in sorted(issue["events"], key=lambda e: (e[0], e[1] != "claim")):
@@ -173,9 +194,9 @@ def holder(issue, now=None):
         elif kind == "ping":
             if user is None and who:
                 user, since, last = who, time_, time_
-            elif who in (None, user):
+            elif who is None or who == login_of(user):
                 last = max(last, time_)
-        elif kind == "release" and who == user:
+        elif kind == "release" and who in (user, login_of(user)):
             user = since = last = None
     if user and now - last < HOLD:
         return user, since, last
@@ -301,7 +322,7 @@ def available(args, repo):
     done = missing.implemented()
     issues = read_state(repo)
     by_name = {i["title"][len("Card: "):]: i for i in issues.values() if i["title"].startswith("Card: ")}
-    me = gh("api", "user")["login"]
+    me = claimant(args)
     result = []
     for card in formats[args.format].values():
         if slug(card["name"]) in done:
@@ -357,26 +378,33 @@ def take(repo, issues, me, name):
     issue = find_or_open(repo, issues, name)
     held = holder(issue)
     if held and held[0] != me:
-        print(f"{name}: #{issue['number']} is held by @{held[0]} until "
+        print(f"{name}: #{issue['number']} is held by {named(held[0])} until "
               f"{(held[2] + HOLD).strftime('%Y-%m-%d %H:%M')} UTC")
         return False
     taken_over = [e for e in issue["events"] if e[1] == "claim" and e[2] != me]
-    note = f" (the earlier claim, by @{taken_over[-1][2]}, ran out)" if taken_over and not held else ""
+    note = f" (the earlier claim, by {named(taken_over[-1][2])}, ran out)" if taken_over and not held else ""
+    login, _, tag = me.partition("/")
     gh("api", "-X", "POST", f"repos/{repo}/issues/{issue['number']}/comments", "--input", "-",
-       body={"body": f"{CLAIM}\nClaimed by @{me}{note}. Held 24 hours from the last push or commit on its pull "
-                     f"request or `card/{slug(name)}` branch; claim again to renew."})
+       body={"body": f"{CLAIM}\n{CLAIMANT.format(tag)}\nClaimed by {named(me)}{note}. Held 24 hours from the last "
+                     f"push or commit on its pull request or `card/{slug(name)}` branch; claim again to renew."})
     issue["events"].append((datetime.datetime.now(datetime.timezone.utc), "claim", me))
     fresh = {i["number"]: i for i in read_state(repo).values()}.get(issue["number"])
     winner = holder(fresh) if fresh else None
     if winner and winner[0] != me:
-        print(f"{name}: #{issue['number']} - @{winner[0]} claimed it first")
+        print(f"{name}: #{issue['number']} - {named(winner[0])} claimed it first")
         return False
     print(f"{name}: #{issue['number']} is yours (Closes #{issue['number']})")
     return True
 
 
+def claimant(args):
+    """This claimant: the signed-in account and this checkout's name."""
+    tag = getattr(args, "claimant", None) or os.environ.get("CANTRIP_CLAIMANT") or os.path.basename(ROOT)
+    return identity(gh("api", "user")["login"], re.sub(r"[^\w.-]", "-", tag))
+
+
 def claim(args, repo):
-    me = gh("api", "user")["login"]
+    me = claimant(args)
     issues = read_state(repo)
     if args.names:
         sys.exit(0 if all([take(repo, issues, me, name) for name in args.names]) else 3)
@@ -396,25 +424,26 @@ def claim(args, repo):
 
 def release(args, repo):
     issues = read_state(repo)
+    tag = claimant(args).partition("/")[2]
     for name in args.names:
         issue = next((i for i in issues.values() if i["title"] == title(name) and i["state"] == "OPEN"), None)
         if issue is None:
             print(f"{name}: no open issue")
             continue
         gh("api", "-X", "POST", f"repos/{repo}/issues/{issue['number']}/comments", "--input", "-",
-           body={"body": f"{RELEASE}\nReleased; the card is free."})
+           body={"body": f"{RELEASE}\n{CLAIMANT.format(tag)}\nReleased; the card is free."})
         print(f"{name}: #{issue['number']} released")
 
 
 def status(args, repo):
-    me = gh("api", "user")["login"]
+    me = claimant(args)
     rows = []
     for issue in read_state(repo).values():
         held = holder(issue) if issue["state"] == "OPEN" else None
         if held:
             rows.append((held[0] != me, issue["number"], issue["title"], held))
     for mine, number, name, (user, since, last) in sorted(rows):
-        print(f"#{number} {name}: @{user}{' (you)' if not mine else ''}, "
+        print(f"#{number} {name}: {named(user)}{' (you)' if not mine else ''}, "
               f"free {(last + HOLD).strftime('%Y-%m-%d %H:%M')} UTC unless there is more work")
     if not rows:
         print("no live claims")
@@ -423,6 +452,8 @@ def status(args, repo):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--repo", help="owner/name; default is origin's")
+    parser.add_argument("--as", dest="claimant",
+                        help="the checkout claims are made as; default $CANTRIP_CLAIMANT, else the checkout's directory")
     commands = parser.add_subparsers(dest="command", required=True)
     one = commands.add_parser("sync")
     one.add_argument("format")
