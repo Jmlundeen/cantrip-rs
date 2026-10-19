@@ -1,0 +1,37 @@
+# Exemplar of Light: "Whenever YOU put one or more +1/+1 counters on this creature" - the counters are put by the
+# controller of the effect that puts them (CR 122.6). Bot2 casts Revitalizing Repast on Bot1's Exemplar on turn 2: the
+# Exemplar becomes 4/4, but Bot1 did not put the counter, so Bot1 draws nothing (hand stays at 4: Bot1 started with 7,
+# played Plains, Black Lotus and the Exemplar).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Exemplar of Light
+Plains x24
+
+[Bot2 Deck]
+Mox Emerald
+Revitalizing Repast
+Island x25
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Exemplar of Light.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Revitalizing Repast.Cast(Bot1.Battlefield.Exemplar of Light)
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+[T2 Bot2.Main2]
+
+[Expect]
+Turn = 2
+Bot1.Battlefield.Exemplar of Light.Power = 4
+Bot1.Hand.Count = 4

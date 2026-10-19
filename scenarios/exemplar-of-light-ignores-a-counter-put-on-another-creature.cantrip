@@ -1,0 +1,42 @@
+# Exemplar of Light: "Whenever you put one or more +1/+1 counters on this creature" is about this creature only (CR 122.6,
+# 603.2). Bot1 puts a +1/+1 counter, with Snakeskin Veil, on a Llanowar Elves instead: the Elves become 2/2, the Exemplar
+# stays 3/3, and no card is drawn (hand: Snakeskin Veil gone, nothing drawn).
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Exemplar of Light
+Forest
+Mox Emerald
+Llanowar Elves
+Snakeskin Veil
+Plains x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Exemplar of Light.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Snakeskin Veil.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Exemplar of Light.Power = 3
+Bot1.Hand.Count = 1

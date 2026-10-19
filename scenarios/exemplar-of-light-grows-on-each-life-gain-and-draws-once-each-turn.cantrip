@@ -1,0 +1,72 @@
+# Exemplar of Light: "Whenever you gain life, put a +1/+1 counter on this creature" triggers for each of its controller's
+# life gains (CR 119.3, 603.2) and not for the opponent's, and "whenever you put one or more +1/+1 counters on this
+# creature, draw a card" then draws, but "triggers only once each turn" (no numbered rule; CR 603.2h is "do this only once each turn"). Turn 1 Bot1 casts Exemplar. Turn 3
+# three Healing Salves: Bot2 gains 3 first (no counter, no card), then Bot1 gains 3 twice: two counters (a 5/5), but the
+# draw trigger fires only for the first, so exactly one card is drawn (hand: 2 before, 1 after: two Salves cast, one card drawn).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Exemplar of Light
+Healing Salve x3
+Plains x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Exemplar of Light.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Exemplar of Light.Power = 3
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 23
+? Stack.Count = 0
+? Bot1.Battlefield.Exemplar of Light.Power = 3
+? Bot1.Hand.Count = 2
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Exemplar of Light.Power = 4
+? Stack.Count = 1
+? Bot1.Hand.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 2
+? Stack.Count = 0
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Healing Salve.Cast
+Bot1.Modes(Target player gains 3 life)
+Bot1.Target(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Exemplar of Light.Power = 5
+? Stack.Count = 0
+
+[Expect]
+Bot1.Life = 26
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Exemplar of Light.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Exemplar of Light.Power = 5

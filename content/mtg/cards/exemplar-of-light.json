@@ -1,0 +1,9 @@
+{
+  "name": "Exemplar of Light",
+  "manaCost": "{2}{W}{W}",
+  "type": "Creature — Angel",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nWhenever you gain life, put a +1/+1 counter on this creature.\nWhenever you put one or more +1/+1 counters on this creature, draw a card. This ability triggers only once each turn.",
+  "keywords": ["Flying"]
+}
