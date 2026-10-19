@@ -270,37 +270,47 @@ does not hold the card and is fixed in the same pass only if it is quick.
 The coordinator dispatches, lands and keeps the queue; it does not implement cards itself. Card agents run on Sonnet;
 core-feature agents and review agents run on Opus.
 
-1. **Work in single cards.** There is no batch to claim: an agent claims its first card (`card-issues.py claim
-   --format <format>`, or the card named), finishes it, then claims the next free one, in list order (never
-   pre-sorted by difficulty), until its quota of cards is done. The coordinator's job is the quota and the format, not
-   the claims, and it releases nothing the agent has not claimed. A card blocked by the core is never released by the
-   agent: it holds the claim while the gap is built (3), and meanwhile claims and works the next card, so it holds at
-   most two - the blocked one and the one in hand. When the gap lands it finishes the blocked card first.
-2. **One agent per quota** (a handful of cards), in its own worktree, in the background. Every agent - card, core or
-   review - builds only in its own worktree's `target/`: never `CARGO_TARGET_DIR` or `--target-dir` pointed at the
-   main checkout's or another worktree's, because the cards crate's generated sources name absolute paths and a
-   shared `target/` then compiles another tree's card files into every test run that uses it. Its prompt points it at this
-   skill and states only what the skill leaves to the coordinator - the format, the quota, which areas are open to
-   it - and adds no requirement the skill does not make. What the skill asks of it: this skill's loop for each card,
-   claiming one card at a time (`Closes #N` from the claim's output); the core is closed to it unless the prompt opens
+0. **The worktree pool.** Work happens in a fixed pool of worktrees, `.claude/worktrees/pool-1` .. `pool-N`, each on
+   its own branch with its own warm `target/`; N (about 4) is also the cap on build-heavy agents at once, because each
+   cargo build takes every core. A slot is made once (`git worktree add .claude/worktrees/pool-<n> -b pool-<n>
+   origin/main`) and never removed. Agents are started without the Agent tool's own worktree isolation; the first
+   thing each does is `EnterWorktree` with its slot's `path`. Every build stays in the slot's own `target/`: never
+   `CARGO_TARGET_DIR` or `--target-dir` pointed at the main checkout's or another slot's, and never a copied
+   `target/`, because cargo's freshness records name absolute source paths, and a shared or copied `target/` then
+   compiles another tree's files into a test run that claims to test this one.
+1. **One card per agent, many agents per slot.** A card agent takes one card in its slot: it starts the slot afresh
+   (`git fetch`, then `git checkout -B pool-<n> origin/main`, once the slot's last work has landed), claims the card
+   (`card-issues.py claim --format <format>`, or the card named), implements it, commits, reports, and stays alive
+   for its review and fixes. When the card has landed, the coordinator ends that agent and starts a fresh one in the
+   same slot for the next card: the finished card's history is no help to the next one and only costs tokens. Cards
+   go in list order (never pre-sorted by difficulty). The coordinator's job is the format and how many slots are
+   busy, not the claims, and it releases nothing an agent has not claimed. A card blocked by the core is never
+   released: its agent commits nothing the gap would change, keeps the claim, sends a gap report and ends; the slot
+   takes the next card meanwhile, and when the gap lands a fresh agent finishes the blocked card from the gap report.
+2. **A card agent's prompt** names its slot and the format, points it at this skill, and adds no requirement the
+   skill does not make. What the skill asks of it: this skill's loop for its card, claiming before any work
+   (`Closes #N` from the claim's output); the core is closed to it unless the prompt opens
    it, though a missing keyword module may be added in `cantrip-mechanics`; a card blocked by the core is never faked
    and never released: the agent keeps the claim, commits nothing for that card's behaviour that the gap would
-   change, sends the coordinator a gap report - the card, its issue, the exact rule (CR) and what `cantrip-api`
-   lacks - and goes on to its next card (1); the client work a card needs (step 8) is part of the card, not a
-   follow-up; one commit per card, and a short report to the coordinator as each card is committed (its commits,
-   coverage, what it needed from the client, anything odd in the core) so it can be reviewed and landed while the
-   agent works on; the targeted checks of step 9, rebased on `origin/main`; no push. Card agents run no browser tests
+   change, sends the coordinator a gap report - the card, its issue, the exact rule (CR), what `cantrip-api` lacks
+   and what it learned of the card - and ends (1); the client work a card needs (step 8) is part of the card, not a
+   follow-up; one commit for the card, and a short report to the coordinator when it is committed (its commits,
+   coverage, what it needed from the client, anything odd in the core); the targeted checks of step 9, rebased on
+   `origin/main`; no push. Card agents run no browser tests
    unless a card added a new user interaction; then one agent at a time runs only that interaction's browser
    scenarios.
-3. **Gaps.** When a card agent reports a gap, the coordinator starts a core-feature agent (Opus) for it: the core open
-   to it, the feature built to its rule for every card the rule describes, the benchmark run, its own commits
-   (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents work on
-   separate rules areas. The waiting card's claim is not renewed. When the feature agent finishes, the coordinator reviews and lands its commits on `main` (5), then resumes
-   the waiting card agent (SendMessage) with what landed; the agent rebases on `main` and finishes the card on the
-   new core. Other running agents are told what landed so they rebase. Only a gap the coordinator decides not to
-   build is released, with its gap recorded on the issue.
-4. **Review agents** (Opus) read each card read-only against the review list as soon as its agent reports it
-   committed - card by card, never held for the whole quota - and it lands as soon as it passes. Their prompt points
+3. **Gaps.** When a card agent reports a gap, the coordinator starts a core-feature agent (Opus) for it in a free
+   slot: the core open to it, the feature built to its rule for every card the rule describes, the benchmark run, its
+   own commits (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents
+   work on separate rules areas. The waiting card's claim is not renewed. As soon as the feature passes its review,
+   the waiting card is started - a fresh card agent, given the gap report, that cherry-picks the reviewed core
+   commits into its slot rather than waiting for them to land; the duplicates drop out at landing. Other running
+   agents are told what landed so they rebase. Only a gap the coordinator decides not to build is released, with its
+   gap recorded on the issue.
+4. **Review agents** (Opus) review inside the implementing agent's slot - `EnterWorktree` with that slot's `path`,
+   on the commit as it stands, using its warm build - never in a worktree of their own, and change no files, check
+   out nothing and clean nothing there. The implementing agent waits while it is reviewed. Each card is reviewed as
+   soon as it is committed and lands as soon as it passes. Their prompt points
    them at correctness, safety and rules adherence, and does not hand them a list of corner cases to demand tests
    for; the coordinator sends back only the blocking findings.
 5. **Land** each reviewed card or core change on `main` (cherry-pick its commits; a conflict stops for a look), then
@@ -309,7 +319,8 @@ core-feature agents and review agents run on Opus.
    before every push (other sessions land on `main` too). The full run is needed once, on a rebased `main`; if more
    commits arrive while it runs, rebase again, build, and run only the scenarios of the cards and mechanics the
    landing touches (`corpus -- --card "Name"` for each) before pushing - the session that landed those commits ran
-   the full suite on them. Push; remove the worktree and its branch.
+   the full suite on them. Push; then end the slot's agent, and the slot takes its next card (1). Slots are never
+   removed.
 6. **Report** what landed, what waited on which core gap and how it was built, and the corpus line.
 7. **Improve the process, always.** The coordinator keeps looking for ways to make this workflow - its own steps
    and the card, core, review and harness agents' - faster, measured against three pillars in this order, never
