@@ -1,0 +1,49 @@
+# "Up to one target" (CR 115.1d): Bot1 chooses no target for the Rat-entering trigger, so Bot2's spent Lotus Petal stays in its
+# graveyard and nothing is exiled, while the Rat is still made.
+
+[Bot1 Deck]
+Swamp
+Lotus Petal
+Mox Jet
+Mox Ruby
+Lord Skitter, Sewer King
+Mox Pearl
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Lotus Petal
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Battlefield.Lotus Petal.Activate(Color: Black)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Lord Skitter, Sewer King.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lord Skitter, Sewer King.Power = 3
+! Bot1.Target
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+
+[Expect]
+Exile.Count = 0
+Bot1.Graveyard = Lotus Petal
+Bot2.Graveyard = Lotus Petal
+Bot1.Battlefield.Rat.Power = 1
+Bot1.Battlefield.Rat.Keywords = CantBlock

@@ -1,0 +1,52 @@
+# At the beginning of combat on Bot1's turn Lord Skitter makes a 1/1 Rat that can't block; the Rat entering triggers
+# Skitter ("another Rat you control enters"), exiling up to one target card from an opponent's graveyard: Bot1 may not
+# target its own spent Lotus Petal (CR 115.1) and exiles Bot2's. Mox Pearl entering earlier is no Rat and exiles nothing.
+# Skitter's own entering is no trigger (it is not "another", and nothing was in his way: both graveyards stay as they were).
+
+[Bot1 Deck]
+Swamp
+Lotus Petal
+Mox Jet
+Mox Ruby
+Lord Skitter, Sewer King
+Mox Pearl
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Lotus Petal
+Swamp x12
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Lotus Petal.Cast
+Bot1.Battlefield.Lotus Petal.Activate(Color: Black)
+[T2 Bot2.Main1]
+Bot2.Hand.Lotus Petal.Cast
+Bot2.Battlefield.Lotus Petal.Activate(Color: Black)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Lord Skitter, Sewer King.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lord Skitter, Sewer King.Power = 3
+! Bot1.Target
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot1.Graveyard.Lotus Petal)
+Bot1.Target(Bot2.Graveyard.Lotus Petal)
+
+[Expect]
+Exile = Lotus Petal
+Bot1.Graveyard = Lotus Petal
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield.Rat.Power = 1
+Bot1.Battlefield.Rat.Keywords = CantBlock

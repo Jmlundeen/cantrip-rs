@@ -1,0 +1,8 @@
+{
+  "name": "Lord Skitter, Sewer King",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Rat Noble",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever another Rat you control enters, exile up to one target card from an opponent's graveyard.\nAt the beginning of combat on your turn, create a 1/1 black Rat creature token with \"This token can't block.\""
+}
