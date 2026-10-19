@@ -1,0 +1,52 @@
+# Petty Revenge needs "power 3 or less" as it is cast and again as it resolves (CR 608.2b, the ruling). Bot1 aims it at Bot2's Demon Wall
+# (3/3); Bot2 answers with Giant Growth (+3/+3), making its power 6. The target is illegal on resolution, so the spell does not resolve:
+# the Wall lives and, as a spell that did not resolve, Petty Revenge is put into its owner's graveyard rather than shuffled into the library
+# (the ruling): Disruptive Stormbrood is in Bot1's graveyard and the library is as small as after the draw (7).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Disruptive Stormbrood
+Plains
+Plains
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Demon Wall
+Giant Growth
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Demon Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Disruptive Stormbrood.Cast(Bot2.Battlefield.Demon Wall; Ability: Omen)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Giant Growth.Cast(Bot2.Battlefield.Demon Wall)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Library.Count = 7
+Bot1.Graveyard = Disruptive Stormbrood
+Bot2.Graveyard = Giant Growth
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Emerald; Demon Wall
+Bot2.Battlefield.Demon Wall.Power = 6

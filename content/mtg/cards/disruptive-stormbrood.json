@@ -1,0 +1,15 @@
+{
+  "name": "Disruptive Stormbrood",
+  "manaCost": "{4}{G}",
+  "type": "Creature — Dragon",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Flying\nWhen this creature enters, destroy up to one target artifact or enchantment.",
+  "keywords": ["Flying"],
+  "omen": {
+    "name": "Petty Revenge",
+    "manaCost": "{1}{B}",
+    "type": "Sorcery — Omen",
+    "oracleText": "Destroy target creature with power 3 or less. (Then shuffle this card into its owner's library.)"
+  }
+}

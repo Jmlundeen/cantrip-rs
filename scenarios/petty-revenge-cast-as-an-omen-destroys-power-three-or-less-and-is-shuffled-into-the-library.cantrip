@@ -1,0 +1,60 @@
+# Disruptive Stormbrood cast from the hand as its Omen, Petty Revenge (CR 720.3): "Destroy target creature with power 3 or less. (Then shuffle this
+# card into its owner's library.)" Bot2's Giant Cindermaw has power 4, so it can't be targeted (the refusal), while its Demon Wall, power 3,
+# can (the control) and is destroyed. Petty Revenge costs {1}{B}, a Mox Jet and a Mox Ruby; as it resolves it is shuffled into its owner's
+# library (CR 720.3d): Bot1's library holds one more card afterwards than after the turn-3 draw (7, then 8), and the creature was never
+# cast, so nothing entered.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Disruptive Stormbrood
+Plains
+Plains
+Plains
+Plains
+Plains x8
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Pearl
+Mox Sapphire
+Demon Wall
+Giant Cindermaw
+Plains x8
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Demon Wall.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Giant Cindermaw.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Hand.Disruptive Stormbrood.Cast(Bot2.Battlefield.Giant Cindermaw; Ability: Omen)
+Bot1.Hand.Disruptive Stormbrood.Cast(Bot2.Battlefield.Demon Wall; Ability: Omen)
+? Stack = Petty Revenge
+? Bot1.Library.Count = 7
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 20
+Bot1.Library.Count = 8
+Bot1.Graveyard.Count = 0
+Exile.Count = 0
+Bot1.Battlefield = Mox Jet; Mox Ruby
+Bot2.Graveyard = Demon Wall
+Bot2.Battlefield = Mox Jet; Mox Ruby; Mox Emerald; Mox Pearl; Mox Sapphire; Giant Cindermaw
