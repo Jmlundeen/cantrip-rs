@@ -1,0 +1,17 @@
+{
+  "name": "Kellan, the Fae-Blooded",
+  "manaCost": "{2}{R}",
+  "type": "Legendary Creature — Human Faerie",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Double strike\nOther creatures you control get +1/+0 for each Aura and Equipment attached to Kellan.",
+  "keywords": [
+    "DoubleStrike"
+  ],
+  "adventure": {
+    "name": "Birthright Boon",
+    "manaCost": "{1}{W}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "Search your library for an Aura or Equipment card, reveal it, put it into your hand, then shuffle. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}

@@ -1,0 +1,41 @@
+# Kellan's Adventure, Birthright Boon ({1}{W}, Sorcery): search the library for an Aura or Equipment card, reveal it, put it
+# into the hand. Bot1 fetches Skullclamp (leaving the creature Ornithopter and the library's other cards), the card goes on
+# an adventure in exile (CR 715.4), and Kellan is then cast from exile as a creature.
+
+[Bot1 Deck]
+Island
+Mox Pearl
+Mox Ruby
+Kellan, the Fae-Blooded
+Island x3
+Skullclamp
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kellan, the Fae-Blooded.Cast(Ability: Adventure)
+Bot1.Pass
+Bot1.Search(Skullclamp)
+? Exile.Count = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Kellan, the Fae-Blooded.Cast
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Kellan, the Fae-Blooded.Power = 2
+Bot1.Battlefield.Kellan, the Fae-Blooded.Types = Creature
+Exile.Count = 0
+Bot1.Hand.Count = 5

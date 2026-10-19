@@ -1,0 +1,73 @@
+# Kellan, the Fae-Blooded: "Other creatures you control get +1/+0 for each Aura and Equipment attached to Kellan." Bot1's
+# Ornithopter (0/2) is 0 with nothing on him, 1 with Skullclamp (Equipment) attached to Kellan, 2 once Rancor (an Aura)
+# is attached as well - each counts. Kellan himself is not pumped by it (Skullclamp's +1/-1 and Rancor's +2/+0 make him
+# 5/1) and Bot2's Ornithopter never is. On turn 3 (Rancor drawn) Skullclamp is moved to the Ornithopter: only Rancor is on Kellan, so
+# the Ornithopter is 0 + 1 (Kellan) + 1 (Skullclamp) = 2 and Kellan 4/2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Kellan, the Fae-Blooded
+Skullclamp
+Ornithopter
+Rancor
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Kellan, the Fae-Blooded.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Skullclamp.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Skullclamp.Activate(Kellan, the Fae-Blooded)
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Rancor.Cast(Kellan, the Fae-Blooded)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Kellan, the Fae-Blooded.Power = 5
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Skullclamp.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Skullclamp.AttachedTo = Ornithopter
+Bot1.Battlefield.Rancor.AttachedTo = Kellan, the Fae-Blooded
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Kellan, the Fae-Blooded.Power = 4
+Bot1.Battlefield.Kellan, the Fae-Blooded.Toughness = 2
+Bot2.Battlefield.Ornithopter.Power = 0
