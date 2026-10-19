@@ -90,6 +90,19 @@ pub fn create_token_copy_of_it(
     Ok(())
 }
 
+/// "Create a copy of [an object] in exile. You may cast the copy without paying its mana cost" (CR 707.12, 118.9, 608.2g): the
+/// copy is of `of` as it last existed, wherever it is now, owned by `player`. It is cast while the effect resolves, whatever its
+/// timing (CR 608.2g), if it has a legal target and `player` says yes; one that is not cast, because it could not be or was not
+/// wanted, stays in exile, where it ceases to exist (CR 707.10a, 704.5e). Paradigm's recurring copy and Shiko, Paragon of the Way
+/// print it.
+pub fn may_cast_a_copy_without_paying(g: &mut dyn Game, player: PlayerId, of: ObjectId) -> Result<(), Suspend> {
+    let copy = g.create_copy_in_exile(of, player);
+    if g.could_cast_during_resolution(copy) && g.ask(player, RequestKind::May { source: copy, purpose: Purpose::CastCopyFree })? == Answer::Yes {
+        g.cast_during_resolution_as(copy, CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() })?;
+    }
+    Ok(())
+}
+
 /// "Create a token that's a copy of target [permanent]" (CR 707.2, 111.1): the copiable values of the first target, for
 /// the ability's or spell's controller. Nothing happens if that target is no longer legal (CR 608.2b). Esika's Chariot,
 /// Octomancer, Three Steps Ahead and Caretaker's Talent print it.

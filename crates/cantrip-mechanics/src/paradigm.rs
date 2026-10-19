@@ -44,13 +44,7 @@ pub const SPELL_ABILITY: Effect = spell_ability;
 /// leave it in exile, where it ceases to exist (CR 707.10a); a cast given up the same. A cast copy ceases to exist as it
 /// leaves the stack.
 fn cast_a_copy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let copy = g.create_copy_in_exile(item.object, item.controller);
-    if g.could_cast_during_resolution(copy)
-        && g.ask(item.controller, RequestKind::May { source: copy, purpose: Purpose::CastCopyFree })? == Answer::Yes
-    {
-        g.cast_during_resolution_as(copy, CastTerms { instead: Some(ManaCost::ZERO), ..CastTerms::default() })?;
-    }
-    Ok(())
+    crate::copy::may_cast_a_copy_without_paying(g, item.controller, item.object)
 }
 
 pub const TRIGGER: AbilityDef = delayed_trigger(
