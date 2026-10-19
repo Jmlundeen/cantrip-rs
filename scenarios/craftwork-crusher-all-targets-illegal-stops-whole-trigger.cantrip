@@ -1,0 +1,30 @@
+# Craftwork Crusher's only target becomes illegal; the whole trigger fails, including its nontargeted token mode (CR 608.2b).
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Craftwork Crusher
+Ornithopter
+Mox Ruby
+Lightning Bolt
+Forest x25
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Craftwork Crusher.Cast
+Bot1.Modes(1; 2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Graveyard.Ornithopter.Power = 0
+Bot1.Battlefield.Craftwork Crusher.Power = 7
