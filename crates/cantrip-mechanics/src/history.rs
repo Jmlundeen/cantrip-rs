@@ -214,3 +214,9 @@ pub fn sacrificed_creatures_power(q: &dyn Query, spell: ObjectId) -> i32 {
 pub fn in_your_first_turns(q: &dyn Query, player: PlayerId, n: u16) -> bool {
     q.state().turn.active == player && q.state().player(player).turns_taken <= n
 }
+
+/// The first noncreature spell a player casts this turn (CR 603.2), including spells cast before
+/// a permanent entered. Plan for All Outcomes and The Queen of Dale ask this same history question.
+pub fn first_noncreature_spell_this_turn(q: &dyn Query, spell: ObjectId, player: PlayerId) -> bool {
+    !q.history().casts_by(player).any(|c| c.spell != spell && !c.is(CardType::Creature))
+}

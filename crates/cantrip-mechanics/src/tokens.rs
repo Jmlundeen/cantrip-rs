@@ -3,6 +3,19 @@
 use cantrip_api::*;
 use crate::statics::itself;
 
+/// A 1/1 colorless Thopter artifact creature token with flying (CR 111).
+/// Pia, Determined Rebuilder and Retrofitter Foundry create this exact token.
+pub static THOPTER: CardDef = CardDef {
+    name: "Thopter",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Artifact, CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Thopter]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    ..CardDef::BLANK
+};
+
 /// A Royal Role token (CR 111.10m, 303.7): "a colorless Aura Role enchantment token named Royal with enchant creature and
 /// 'Enchanted creature gets +1/+1 and has ward {1}.'" Royal Treatment, Charmed Clothier, Gylwain, Casting Director,
 /// Besotted Knight and Redtooth Genealogist make it, attached to a creature (`create_role`).
@@ -714,3 +727,18 @@ pub static GOBLIN_ARMY: CardDef = CardDef {
     toughness: Some(0),
     ..CardDef::BLANK
 };
+
+/// The 5/5 red flying Dragon token made by Sarkhan, Fireblood and Kiora of Fire and Ashes.
+pub static DRAGON_5_5: CardDef = CardDef {
+    name: "Dragon",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Dragon]),
+    power: Some(5),
+    toughness: Some(5),
+    keywords: Keywords::of(&[Keyword::Flying]),
+    text: "Flying",
+    ..CardDef::BLANK
+};
+
