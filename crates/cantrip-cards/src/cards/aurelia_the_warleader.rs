@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::THIS_ATTACKS;
+use cantrip_mechanics::triggers::THIS_ATTACKS_FOR_THE_FIRST_TIME_EACH_TURN;
 use cantrip_oracle as oracle;
 
 /// Untap all creatures you control (CR 701.26a). After this phase, there is an additional combat phase (CR 500.8).
@@ -14,10 +14,9 @@ fn untap_and_extra_combat(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
-        THIS_ATTACKS,
+        THIS_ATTACKS_FOR_THE_FIRST_TIME_EACH_TURN,
         untap_and_extra_combat,
         "Whenever Aurelia attacks for the first time each turn, untap all creatures you control. After this phase, there is an additional combat phase.",
-    )
-    .triggers_each_turn(1)],
+    )],
     ..oracle::AURELIA_THE_WARLEADER
 };
