@@ -1,0 +1,61 @@
+# Stormkeld Vanguard's Adventure, Bear Down: "Destroy target artifact or enchantment. (Then exile this card. You may cast the creature later from exile.)" Bot2's Llanowar Elves is
+# neither (the refusal), its Sol Ring is an artifact (the control) and is destroyed. As Bear Down resolves the card is exiled instead of going to the graveyard
+# (CR 715.4), and on Bot1's next turn the Vanguard is cast from exile as a creature for {4}{G}{G} (CR 715.5): a 6/7 on the battlefield, the exile empty.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sol Ring
+Stormkeld Vanguard
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Emerald
+Sol Ring
+Llanowar Elves
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Sol Ring.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Stormkeld Vanguard.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Bear Down)
+Bot1.Hand.Stormkeld Vanguard.Cast(Bot2.Battlefield.Sol Ring; Ability: Bear Down)
+[T3 Bot1.Main2]
+? Exile = Stormkeld Vanguard
+? Bot1.Graveyard.Count = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Exile.Stormkeld Vanguard.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot2.Graveyard = Sol Ring
+Bot2.Battlefield = Mox Pearl; Mox Emerald; Llanowar Elves
+Bot1.Battlefield.Stormkeld Vanguard.Power = 6
+Bot1.Battlefield.Stormkeld Vanguard.Toughness = 7
+Bot1.Graveyard.Count = 0

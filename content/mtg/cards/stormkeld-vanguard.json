@@ -1,0 +1,14 @@
+{
+  "name": "Stormkeld Vanguard",
+  "manaCost": "{4}{G}{G}",
+  "type": "Creature — Giant Warrior",
+  "power": 6,
+  "toughness": 7,
+  "oracleText": "This creature can't be blocked by creatures with power 2 or less.",
+  "adventure": {
+    "name": "Bear Down",
+    "manaCost": "{1}{G}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "Destroy target artifact or enchantment. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}

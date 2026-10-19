@@ -1,0 +1,63 @@
+# Stormkeld Vanguard: "This creature can't be blocked by creatures with power 2 or less." Cast from the hand for {4}{G}{G} (two Mox Emeralds, a Mox Jet, a Mox Ruby and a Sol Ring), a 6/7.
+# It attacks on turn 3 into Bot2's Thalia, Guardian of Thraben (power 2: the refusal) and Demon Wall (power 3, may block: the control). The Wall blocks, takes 6 and
+# dies; the Vanguard takes 3 and lives.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sol Ring
+Stormkeld Vanguard
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Thalia, Guardian of Thraben
+Demon Wall
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Stormkeld Vanguard.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Thalia, Guardian of Thraben.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Demon Wall.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Stormkeld Vanguard > Bot2)
+! Bot2.Block(Thalia, Guardian of Thraben > Stormkeld Vanguard)
+Bot2.Block(Demon Wall > Stormkeld Vanguard)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Demon Wall
+Bot2.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Mox Sapphire; Thalia, Guardian of Thraben
+Bot1.Battlefield.Stormkeld Vanguard.Power = 6
+Bot1.Battlefield.Stormkeld Vanguard.Toughness = 7
+Bot1.Battlefield.Stormkeld Vanguard.Damage = 3
