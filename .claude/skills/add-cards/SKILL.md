@@ -118,6 +118,14 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    first when it has none (a card named outside every format list gets one too), then claims it with a comment, and
    prints `#N`. Exit status 3 means the card is held by someone else (or they claimed it a moment earlier): leave it
    and take the next. Never work on a card whose live claim is someone else's.
+   **A card that already exists is validated, not rebuilt.** If the card an issue names already has a content file
+   (in this checkout, on a local branch, or `claim` says "already implemented"), the issue is almost always a listing
+   error: give it a cursory look of a minute or two and move on. The look is only this: if its Oracle text needs code,
+   the card file exists and its code reasonably looks like it does what the text reads (and the content JSON's text
+   is the card's). If it passes, close the issue as already implemented, saying so in a comment, and take the next
+   card. Anything doubtful is logged as a bug in `docs/known-issues.md`, not fixed by a rebuild. Only when the
+   cursory look fails - no code where the text needs it, or code that plainly does something else - is the card
+   re-implemented through the loop below.
 3. **Keep the claim alive** - it lasts 24 hours from the last sign of work. Open a (draft) pull request whose
    description says `Closes #N` as soon as there is a commit, or push work in progress to a branch named
    `card/<card-slug>`; every commit pushed there renews the claim. A card waiting on a core gap keeps its claim, and
