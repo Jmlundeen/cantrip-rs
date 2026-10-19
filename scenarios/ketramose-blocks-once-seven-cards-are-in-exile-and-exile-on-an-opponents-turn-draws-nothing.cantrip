@@ -1,0 +1,92 @@
+# Ketramose: "can't ... block unless there are seven or more cards in exile", and its draw is "during your turn" only. Bot2
+# discards an Island at the end of each of its turns 2-10 (five in its graveyard) and casts two Mox Emeralds and a Llanowar Elves with each on turn 12.
+# Turn 13, Bot1: Soul-Guide Lantern's enters trigger exiles one Island (Bot1 19) and sacrificing it exiles the other four (5 in
+# exile, Bot1 18). Turn 14, Bot2's turn: Bot1 exiles a Llanowar Elves with Swords to Plowshares in Bot2's upkeep (6 in exile) and
+# Bot1 does NOT draw or lose life (still 18). Bot2's other Llanowar Elves attacks and with six cards in exile Ketramose can't
+# block (no blockers declaration is asked at all). Turn 15: a second Lantern exiles a card of Bot1's own graveyard (7; Bot1 16, after the Elves hit it for 1 on turn 14).
+# Turn 16: the Llanowar Elves attacks again and Ketramose blocks it and kills it; lifelink makes it Bot1 20.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ketramose, the New Dawn
+Soul-Guide Lantern
+Swords to Plowshares
+Soul-Guide Lantern
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Emerald
+Llanowar Elves
+Llanowar Elves
+Island x3
+Island x5
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ketramose, the New Dawn.Cast
+[T12 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald#1.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald#2.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T13 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Soul-Guide Lantern.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+Bot1.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 18
+? Exile.Count = 5
+[T14 Bot2.Upkeep]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Llanowar Elves#1)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 6
+? Bot1.Life = 18
+[T14 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+! Bot1.Block
+[T14 Bot2.Main2]
+[T15 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Soul-Guide Lantern.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Island)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 7
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 16
+[T16 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot1)
+Bot1.Block(Ketramose, the New Dawn > Llanowar Elves)
+[T16 Bot2.Main2]
+
+[Expect]
+Exile.Count = 7
+Bot1.Life = 20
+Bot2.Battlefield = Mox Emerald; Mox Emerald

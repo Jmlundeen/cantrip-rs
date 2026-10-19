@@ -1,0 +1,13 @@
+{
+  "name": "Ketramose, the New Dawn",
+  "manaCost": "{1}{W}{B}",
+  "type": "Legendary Creature — God",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Menace, lifelink, indestructible\nKetramose can't attack or block unless there are seven or more cards in exile.\nWhenever one or more cards are put into exile from graveyards and/or the battlefield during your turn, you draw a card and lose 1 life.",
+  "keywords": [
+    "Menace",
+    "Lifelink",
+    "Indestructible"
+  ]
+}

@@ -1,0 +1,44 @@
+# "Ketramose can't attack or block unless there are seven or more cards in exile." With no card in exile, Bot1's Ketramose
+# (on the battlefield since turn 1) is refused as an attacker on turn 3 and as a blocker of Bot2's attacking Ornithopter on turn
+# 4, while Bot1's own Ornithopter (the creature that keeps the engine asking about attackers, and the positive control for the
+# block) blocks without trouble. The positive controls for Ketramose itself (seven cards in exile) are in
+# the other ketramose-* scenarios.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ketramose, the New Dawn
+Ornithopter
+Island x2
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Island x26
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ketramose, the New Dawn.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Ketramose, the New Dawn > Bot2)
+Bot1.Attack()
+[T4 Bot2.Main1]
+Bot2.Attack(Ornithopter > Bot1)
+! Bot1.Block(Ketramose, the New Dawn > Ornithopter)
+Bot1.Block(Ornithopter > Ornithopter)
+[T4 Bot2.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Life = 20
+Bot2.Battlefield = Ornithopter
+Bot1.Battlefield.Ketramose, the New Dawn.Damage = 0

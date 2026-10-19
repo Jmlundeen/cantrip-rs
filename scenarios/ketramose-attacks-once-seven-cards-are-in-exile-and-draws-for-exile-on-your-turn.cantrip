@@ -1,0 +1,91 @@
+# Ketramose: "can't attack ... unless there are seven or more cards in exile" (a card in any player's exile counts) and
+# "Whenever one or more cards are put into exile from graveyards and/or the battlefield during your turn, you draw a card and lose
+# 1 life." Bot2 discards an Island at the end of each of its turns 2-10 (five in its graveyard) and casts an Ornithopter on turn 12.
+# Turn 13, Bot1: Soul-Guide Lantern's enters trigger exiles one Island (1 in exile; one trigger: Bot1 19), sacrificing it
+# exiles the other four at once (5; ONE trigger for the four cards: Bot1 18), Swords to Plowshares exiles the Ornithopter from the
+# battlefield (6; Bot1 17). With six cards in exile Ketramose is refused as an attacker (the Ornithopter of Bot1 is why
+# the declaration is asked). Turn 15: Bot2's turn-14 discard is exiled by the second Lantern (7; Bot1 16) and Ketramose attacks
+# unblocked: lifelink 4, Bot1 20, Bot2 16.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Ketramose, the New Dawn
+Ornithopter
+Soul-Guide Lantern
+Swords to Plowshares
+Soul-Guide Lantern
+Island x20
+
+[Bot2 Deck]
+Island x7
+Island x5
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Ketramose, the New Dawn.Cast
+Bot1.Hand.Ornithopter.Cast
+[T12 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T13 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Soul-Guide Lantern.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Graveyard.Island)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+? Bot1.Life = 20
+? Bot1.Hand.Count = 7
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 19
+? Bot1.Hand.Count = 8
+Bot1.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each opponent's graveyard)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 18
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 17
+? Exile.Count = 6
+! Bot1.Attack(Ketramose, the New Dawn > Bot2)
+Bot1.Attack()
+[T15 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Soul-Guide Lantern.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Graveyard.Island)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 7
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 16
+Bot1.Attack(Ketramose, the New Dawn > Bot2)
+[T15 Bot1.Main2]
+
+[Expect]
+Exile.Count = 7
+Bot1.Life = 20
+Bot2.Life = 16
+Bot1.Battlefield.Ketramose, the New Dawn.Tapped = true
