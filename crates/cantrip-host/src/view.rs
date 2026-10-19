@@ -736,6 +736,21 @@ impl<'a> Projector<'a> {
                 summary.pending_effects.push(format!("{} have {word}.", if p == self.viewer { "You" } else { "They" }));
             }
         }
+        // Protection from players (CR 702.16k) from a static ability of a permanent, as it applies now: "each of your
+        // opponents" when it covers every one of them (Absolute Virtue), else the players by name.
+        let opponents: Vec<PlayerId> = s.opponents(p).collect();
+        let from: Vec<PlayerId> = opponents.iter().copied().filter(|&o| game.player_protected_by_static_from(p, o)).collect();
+        if !from.is_empty() {
+            let you = if p == self.viewer { "You" } else { "They" };
+            let whom = if from.len() == opponents.len() && from.len() > 1 {
+                format!("each of {} opponents", if p == self.viewer { "your" } else { "their" })
+            } else {
+                let names: Vec<String> =
+                    from.iter().map(|o| self.names.get(o.0 as usize).cloned().unwrap_or_else(|| format!("player {}", o.0 + 1))).collect();
+                names.join(" and from ")
+            };
+            summary.pending_effects.push(format!("{you} have protection from {whom}."));
+        }
         // "Players can't gain life" (CR 119.7): from a permanent's static ability while it is on the battlefield, or a resolved
         // effect about the player (Screaming Nemesis's "for the rest of the game"), as it applies now.
         // "Can't lose life" (CR 119.8) likewise, from a static ability; both at once are a life total that can't change

@@ -33,10 +33,14 @@ pub fn host_allows(q: &dyn Query, attachment: ObjectId, host: ObjectId, attachin
     false
 }
 
-/// Whether an Aura with "enchant player" can enchant `player` right now (CR 303.4, 704.5m): a player still in the game
-/// whom its enchant ability allows.
-pub fn player_allows(q: &dyn Query, aura: ObjectId, player: PlayerId) -> bool {
-    if q.state().player(player).lost {
+/// Whether an Aura with "enchant player" can enchant `player` right now (CR 303.4, 704.5m): a player still in the game,
+/// without protection from it (CR 702.16c: from everything, CR 702.16j, or from the Aura's controller, 702.16k), whom its
+/// enchant ability allows.
+pub fn player_allows(cx: &Cx, aura: ObjectId, player: PlayerId) -> bool {
+    let q: &dyn Query = cx;
+    if q.state().player(player).lost
+        || crate::layers::player_protection(cx.cards(), cx.s(), &cx.g.log, player, q.controller(aura)).is_some()
+    {
         return false;
     }
     let ac = q.chars(aura);

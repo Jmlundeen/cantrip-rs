@@ -1,0 +1,51 @@
+# CR 702.16c, 702.16j, 704.5m: a player with protection from everything can't be enchanted by any Aura, their own included,
+# and an Aura attached to them goes to its owner's graveyard as a state-based action. Bot1 enchants itself with its own Curse
+# of Opulence on turn 1 and Bot2 enchants Bot1 with another on turn 2; both are still attached as Bot1's turn 3 begins (the
+# positive control). Bot1 casts The One Ring: once its trigger gives Bot1 protection from everything, both Curses go to
+# their owners' graveyards.
+
+[Bot1 Deck]
+Mountain
+Curse of Opulence
+The One Ring
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Island x13
+
+[Bot2 Deck]
+Mountain
+Curse of Opulence
+Island x18
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Curse of Opulence.Cast(Bot1)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Curse of Opulence.Cast(Bot1)
+Bot2.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Curse of Opulence.AttachedTo = Bot1
+? Bot2.Battlefield.Curse of Opulence.AttachedTo = Bot1
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.The One Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mountain; The One Ring; Mox Pearl; Mox Sapphire; Mox Jet; Mox Emerald
+Bot1.Graveyard = Curse of Opulence
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Curse of Opulence

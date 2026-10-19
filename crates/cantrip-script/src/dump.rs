@@ -465,6 +465,10 @@ impl StateDump {
                     {
                         d.set(format!("{key}.AttachedTo"), game.name(host));
                     }
+                    // An Aura that enchants a player (CR 303.4, 702.5d) is attached to them, by seat.
+                    if let Some(player) = obj.attached_player {
+                        d.set(format!("{key}.AttachedTo"), bot(player));
+                    }
                     if obj.marks.monstrous {
                         d.set(format!("{key}.Monstrous"), true);
                     }

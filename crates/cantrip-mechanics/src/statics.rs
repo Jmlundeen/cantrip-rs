@@ -250,6 +250,15 @@ pub fn opponents_cant_gain_life(_: &dyn Query, asker: &Asker, player: PlayerId) 
 /// battlefield with its abilities. True Believer and Ivory Mask print it.
 pub const YOU_HAVE_SHROUD: PlayerKeywordRule = PlayerKeywordRule { keyword: Keyword::Shroud, applies: you };
 
+/// "You have protection from each of your opponents" (CR 702.16i, 702.16k) as a `CardDef::player_protection` entry: the
+/// permanent's controller has a protection from each player who is their opponent, as control and the opponents are now, while
+/// it is on the battlefield with its abilities. A keyword ability, so shared from its first card: Absolute Virtue prints it.
+pub const YOU_HAVE_PROTECTION_FROM_EACH_OPPONENT: PlayerProtectionRule = PlayerProtectionRule { applies: you_from_each_opponent };
+
+fn you_from_each_opponent(q: &dyn LayerQuery, source: ObjectId, player: PlayerId, from: PlayerId) -> bool {
+    you(q, source, player) && q.state().opponents(player).any(|o| o == from)
+}
+
 /// "You": the source's controller, as a [`PlayerKeywordRule`] reads it.
 fn you(q: &dyn LayerQuery, source: ObjectId, player: PlayerId) -> bool {
     q.state().obj(source).controller == player

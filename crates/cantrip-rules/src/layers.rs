@@ -1368,15 +1368,15 @@ pub fn can_target(cards: &CardTable, state: &GameState, log: &[Record], asker: &
         // An ability on the stack can be targeted while it is there (CR 115.1, 115.5).
         Target::Ability(serial) => state.stack.iter().any(|i| i.serial == serial && i.kind != StackKind::Spell),
         // A player with hexproof (CR 702.11c) can't be targeted by their opponents' spells and abilities.
-        // A player with protection from everything (CR 702.16j) can't be targeted by anything, their own included.
+        // A player with protection from everything (CR 702.16j) can't be targeted by anything, their own included; one with
+        // protection from a player (CR 702.16k), by nothing that player controls.
         // A player with shroud (CR 702.18a) can't be targeted by anything, their own included.
         Target::Player(p) => {
+            let opponent = p != asker.controller;
             !state.player(p).lost
-                && !(p != asker.controller
-                    && (state.effects.iter().any(|e| e.kind == EffectKind::PlayerHexproof && e.controller == p)
-                        || player_has(cards, state, log, p, Keyword::Hexproof)))
+                && !(opponent && state.effects.iter().any(|e| e.kind == EffectKind::PlayerHexproof && e.controller == p))
                 && !state.effects.iter().any(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == p)
-                && !player_has(cards, state, log, p, Keyword::Shroud)
+                && !player_statics_forbid_targeting(cards, state, log, p, asker.controller)
         }
         Target::Object(id) => {
             if !live(state, id) {
@@ -1614,6 +1614,53 @@ pub fn player_has(cards: &CardTable, state: &GameState, log: &[Record], player: 
             && cards.get(card).player_keywords.iter().any(|r| r.keyword == keyword && (r.applies)(&view, source, player))
             && !lost_all_abilities(cards, state, log, source)
     })
+}
+
+/// Whether a static ability of a permanent on the battlefield with its abilities keeps `asker` from targeting `player`, in
+/// one look at the battlefield: shroud (CR 702.18a), hexproof against an opponent (CR 702.11c), or protection from `asker`
+/// (CR 702.16b, 702.16k) - what `player_has` and `player_protected_by_static` each say.
+fn player_statics_forbid_targeting(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, asker: PlayerId) -> bool {
+    let view = View { cards, state, log, stop: Layer::Ability };
+    let opponent = player != asker;
+    state.battlefield().iter().any(|&source| {
+        let card = cards.current(state.obj(source));
+        if !cards.player_keywords[card.0 as usize] {
+            return false;
+        }
+        let def = cards.get(card);
+        (def.player_keywords
+            .iter()
+            .any(|r| (r.keyword == Keyword::Shroud || (opponent && r.keyword == Keyword::Hexproof)) && (r.applies)(&view, source, player))
+            || def.player_protection.iter().any(|r| (r.applies)(&view, source, player, asker)))
+            && !lost_all_abilities(cards, state, log, source)
+    })
+}
+
+/// The permanent on the battlefield with its abilities whose static ability gives `player` protection from `from`
+/// (`CardDef::player_protection`: Absolute Virtue's "You have protection from each of your opponents", CR 702.16k), if any.
+pub fn player_protected_by_static(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, from: PlayerId) -> Option<ObjectId> {
+    let view = View { cards, state, log, stop: Layer::Ability };
+    state.battlefield().iter().copied().find(|&source| {
+        let card = cards.current(state.obj(source));
+        cards.player_keywords[card.0 as usize]
+            && cards.get(card).player_protection.iter().any(|r| (r.applies)(&view, source, player, from))
+            && !lost_all_abilities(cards, state, log, source)
+    })
+}
+
+/// What gives `player` protection from objects `from` controls (CR 702.16j, 702.16k), if anything: a resolved effect giving
+/// them protection from everything (Teferi's Protection, The One Ring), or a static ability giving them protection from
+/// `from` (Absolute Virtue). The object whose protection it is, for ordering it with replacement effects (CR 616.1) and
+/// recording a prevention. `from` controls the spell, ability, Aura or damage source - its owner, when no one controls it
+/// (CR 702.16k "owned by that player but not controlled by another player", 108.4a): a card off the battlefield and the
+/// stack is its owner's (`Object::controller`).
+pub fn player_protection(cards: &CardTable, state: &GameState, log: &[Record], player: PlayerId, from: PlayerId) -> Option<ObjectId> {
+    state
+        .effects
+        .iter()
+        .find(|e| e.kind == EffectKind::PlayerProtectionFromEverything && e.controller == player)
+        .map(|e| e.source)
+        .or_else(|| player_protected_by_static(cards, state, log, player, from))
 }
 
 /// Summoning sickness (CR 302.6): a creature that has not been under its controller's control continuously since

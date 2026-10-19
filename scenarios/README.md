@@ -459,7 +459,8 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
   chosen, numbered from 1 and read from the history (`1, 3` for Gollum's counter and draw)
 - `BotN.Battlefield.<Name>.Exerted`, `true` for an exerted permanent (CR 701.43a) and absent otherwise
 - `BotN.Battlefield.<Name>.GoadedBy` (`Bot2`), the players who goaded a creature (CR 701.15a), absent otherwise
-- `BotN.Battlefield.<Name>.AttachedTo` (`Grizzly Bears`), what an Aura or Equipment enchants or equips, absent otherwise
+- `BotN.Battlefield.<Name>.AttachedTo` (`Grizzly Bears`), what an Aura or Equipment enchants or equips, or the player an
+  Aura enchants (`Bot2`, CR 303.4), absent otherwise
 
 Lists use `;`. Library, graveyard and stack are listed top first and compared in order. Hand, battlefield and exile
 are compared as sets.

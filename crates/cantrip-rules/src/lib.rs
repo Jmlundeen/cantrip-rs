@@ -436,6 +436,12 @@ impl Game {
         layers::player_has(self.cards, &self.state, &self.log, player, keyword)
     }
 
+    /// Whether a static ability on the battlefield gives `player` protection from `from` right now (CR 702.16k: "You have
+    /// protection from each of your opponents").
+    pub fn player_protected_by_static_from(&self, player: PlayerId, from: PlayerId) -> bool {
+        layers::player_protected_by_static(self.cards, &self.state, &self.log, player, from).is_some()
+    }
+
     /// Whether `player` can't lose life right now (CR 119.8): a static ability on the battlefield says so.
     pub fn cant_lose_life(&self, player: PlayerId) -> bool {
         static_rules::cant_lose_life(self, self.cards, player)

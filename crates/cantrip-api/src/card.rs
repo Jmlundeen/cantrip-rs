@@ -1630,6 +1630,18 @@ pub struct PlayerKeywordRule {
     pub applies: fn(&dyn LayerQuery, ObjectId, PlayerId) -> bool,
 }
 
+/// A static ability that gives a player protection from a player (CR 702.16k), while its source is on the battlefield with
+/// its abilities: `applies` is asked of the source, the player who would have the protection, and the player it would be
+/// from, and sees the layers as they are before the abilities layer. The protected player can't be targeted by spells or
+/// abilities that player controls, can't be enchanted by Auras that player controls, and damage from sources that player
+/// controls (or owns, while no one controls them) is prevented; nothing else changes - an effect that targets no one still
+/// applies to them. "Protection from each of your opponents" is a protection from each opponent (CR 702.16i): Absolute
+/// Virtue prints it.
+#[derive(Clone, Copy)]
+pub struct PlayerProtectionRule {
+    pub applies: fn(&dyn LayerQuery, ObjectId, PlayerId, PlayerId) -> bool,
+}
+
 /// A triggered ability that an event would trigger, as a [`TriggerRule`] or an [`AdditionalTrigger`] is asked about it: its
 /// source (a permanent, or a card in another zone whose ability functions there), the player who would control it, and its
 /// definition.
@@ -2118,6 +2130,9 @@ pub struct CardDef {
     /// Its static abilities that give players keyword abilities ("You have shroud", CR 702.18a), while it is on the
     /// battlefield with its abilities.
     pub player_keywords: &'static [PlayerKeywordRule],
+    /// Its static abilities that give players protection from players ("You have protection from each of your opponents",
+    /// CR 702.16k), while it is on the battlefield with its abilities.
+    pub player_protection: &'static [PlayerProtectionRule],
     /// Its static abilities that make some damage unpreventable (CR 615.12).
     pub unpreventable_damage: &'static [UnpreventableRule],
     /// Its static abilities that stop players from gaining life (CR 119.7), while it is on the battlefield: the gain, the
@@ -2305,6 +2320,7 @@ impl CardDef {
         attacks_despite_defender: &[],
         targeting_rules: &[],
         player_keywords: &[],
+        player_protection: &[],
         unpreventable_damage: &[],
         cant_gain_life: &[],
         cant_lose_life: &[],
@@ -2413,7 +2429,8 @@ pub struct CardTable {
     pub attack_rules: Vec<bool>,
     /// Per card: it has a targeting rule. Read to find the few battlefield sources of one, never to ask the table.
     pub targeting_rules: Vec<bool>,
-    /// Per card: it gives players keyword abilities (`CardDef::player_keywords`). Read to find the few battlefield sources of one.
+    /// Per card: it gives players keyword abilities (`CardDef::player_keywords`) or protection (`CardDef::player_protection`).
+    /// Read to find the few battlefield sources of one.
     pub player_keywords: Vec<bool>,
     /// Which cards have a triggered mana ability: looked for among the permanents only when a permanent is tapped for mana.
     pub mana_triggers: Vec<bool>,
@@ -2522,7 +2539,7 @@ impl CardTable {
         let block_rules: Vec<bool> = cards.iter().map(|c| !c.block_rules.is_empty()).collect();
         let attack_rules: Vec<bool> = cards.iter().map(|c| !c.attack_rules.is_empty()).collect();
         let targeting_rules: Vec<bool> = cards.iter().map(|c| !c.targeting_rules.is_empty()).collect();
-        let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty()).collect();
+        let player_keywords: Vec<bool> = cards.iter().map(|c| !c.player_keywords.is_empty() || !c.player_protection.is_empty()).collect();
         let mana_triggers: Vec<bool> =
             cards.iter().map(|c| c.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.mana_ability))).collect();
         let intrinsic = CardId(
