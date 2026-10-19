@@ -1,0 +1,38 @@
+# Hide on the Ceiling with X = 0 ({U} alone) has no targets (CR 601.2c): it is cast and resolves, exiling nothing, and there is nothing to return
+# at the end step. Bot1's Ornithopter and Bot2's Llanowar Elves, both legal targets for a larger X, are untouched and no card ever stands in exile.
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Hide on the Ceiling
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Hide on the Ceiling.Cast(X: 0)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile.Count = 0
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Delayed.Count = 0
+Bot1.Battlefield = Mox Sapphire; Ornithopter
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Graveyard = Hide on the Ceiling

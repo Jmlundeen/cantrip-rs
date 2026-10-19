@@ -1,0 +1,47 @@
+# Hide on the Ceiling is an instant: in Bot2's turn, with Lightning Bolt aimed at Bot1's Ornithopter on the stack, Bot1 exiles the Ornithopter with X = 1
+# ({1}{U}). The Bolt's target is gone when it resolves, so it is countered (CR 608.2b) and deals no damage. The Ornithopter returns at the beginning of
+# that turn's end step, Bot2's: a new object under Bot1's control, still Bot1's.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Ornithopter
+Hide on the Ceiling
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hide on the Ceiling.Cast(X: 1)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Life = 20
+? Exile = Ornithopter
+[T2 Bot2.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Ornithopter
+Bot1.Life = 20
+Bot2.Graveyard = Lightning Bolt
+Bot1.Graveyard = Hide on the Ceiling

@@ -1,0 +1,53 @@
+# Hide on the Ceiling with two targets: if one is illegal as it resolves the other is still affected (CR 608.2b). Bot1 targets Bot2's Llanowar Elves and its
+# own Ornithopter with X = 2; in response Bot2 Lightning Bolts its own Elves, which dies. The Ornithopter is exiled and returns at the beginning of the
+# end step; the Elves, in the graveyard, is not an exiled card and does not.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Hide on the Ceiling
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Forest
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hide on the Ceiling.Cast(X: 2)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves; Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+? Exile = Ornithopter
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Battlefield = Forest; Mox Ruby
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt

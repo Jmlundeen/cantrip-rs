@@ -1,0 +1,50 @@
+# Hide on the Ceiling: a token that is exiled ceases to exist (CR 111.7, 704.5d), so it is not among "the exiled cards" that come back. Bot1 exiles one of Bot2's
+# Spirit tokens (from Lingering Souls) and its own Ornithopter with X = 2; at the end step only the Ornithopter returns. Bot2 is left with
+# the other Spirit.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Hide on the Ceiling
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Lingering Souls
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lingering Souls.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hide on the Ceiling.Cast(X: 2)
+Bot1.Target(Bot2.Battlefield.Spirit#1; Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile = Ornithopter
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Battlefield = Mox Pearl; Mox Jet; Mox Ruby; Spirit

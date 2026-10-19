@@ -1,0 +1,48 @@
+# Hide on the Ceiling: "Exile X target artifacts and/or creatures. Return the exiled cards to the battlefield under their owners' control at the beginning
+# of the next end step." Cast with X = 2 ({2}{U}) in Bot1's main phase on its own Ornithopter (an artifact creature) and Bot2's Llanowar Elves: both are in exile for
+# the rest of the main phase and the combat, then both return at the beginning of this turn's end step, each under its owner's control. They are new
+# objects (CR 400.7): the Elves is summoning sick again and the Ornithopter's tapped state is gone.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Ornithopter
+Hide on the Ceiling
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Hide on the Ceiling.Cast(X: 2)
+Bot1.Target(Bot2.Battlefield.Llanowar Elves; Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile = Llanowar Elves; Ornithopter
+? Bot2.Battlefield = Forest
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Mox Ruby; Ornithopter
+Bot2.Battlefield.Llanowar Elves.SummoningSick = true
+Bot1.Graveyard = Hide on the Ceiling

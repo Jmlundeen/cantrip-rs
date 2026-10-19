@@ -1,0 +1,51 @@
+# Hide on the Ceiling: "If a double-faced card is exiled this way, it will return to the battlefield with its front face up, regardless of which face was
+# up when it was exiled" (the ruling, CR 712.14). Bot1's Concealing Curtains is transformed into Revealing Eye (3/4 menace), then exiled with X = 1; at the end
+# step it returns as the Concealing Curtains, a 0/4 defender, and is a new object.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Concealing Curtains
+Hide on the Ceiling
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Concealing Curtains.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Concealing Curtains.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Revealing Eye.Power = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hide on the Ceiling.Cast(X: 1)
+Bot1.Target(Bot1.Battlefield.Revealing Eye)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Exile.Count = 1
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Concealing Curtains.Power = 0
+Bot1.Battlefield.Concealing Curtains.Toughness = 4
+Bot1.Battlefield.Concealing Curtains.Keywords = Defender
