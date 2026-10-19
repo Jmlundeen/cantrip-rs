@@ -1,0 +1,56 @@
+# Stoic Sphinx on Bot2's turn: Bot1 has cast no spell yet this turn, so the Sphinx has hexproof (Keywords: Flash; Flying; Hexproof)
+# and Bot2 cannot target it with Lightning Bolt (refused). Bot2 Bolts Bot1 instead - Bot2's own spell changes nothing, the Sphinx keeps
+# its hexproof ("you" haven't cast a spell); Bot1 responds with its own Lightning Bolt - a spell
+# cast this turn - and the Sphinx loses hexproof at once (Flash; Flying), so Bot2's second Bolt may now target it, and its 3 damage
+# kills the 5/3. (The Sphinx was cast on turn 1, which has nothing to do with turn 2.)
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Stoic Sphinx
+Lightning Bolt
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Stoic Sphinx.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+? Bot1.Battlefield.Stoic Sphinx.Keywords = Flash; Flying; Hexproof
+! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Stoic Sphinx)
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Bot1.Battlefield.Stoic Sphinx.Keywords = Flash; Flying; Hexproof
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Bot1.Battlefield.Stoic Sphinx.Keywords = Flash; Flying
+Bot1.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Stoic Sphinx)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt; Stoic Sphinx; Black Lotus
+Bot1.Battlefield.Count = 2
+Bot1.Life = 17
+Bot2.Life = 17

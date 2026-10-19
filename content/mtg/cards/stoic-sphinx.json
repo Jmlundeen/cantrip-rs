@@ -1,0 +1,12 @@
+{
+  "name": "Stoic Sphinx",
+  "manaCost": "{2}{U}{U}",
+  "type": "Creature — Sphinx",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "Flash\nFlying\nThis creature has hexproof as long as you haven't cast a spell this turn.",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}
