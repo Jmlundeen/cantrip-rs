@@ -141,7 +141,7 @@
         </div>
         <p class="about">${f.about}</p>
         <div class="group"><h3>Seating players</h3>
-          ${forming.length ? `<div class="cards">${forming.join("")}</div>` : `<div class="empty small">No tables are taking players. ${unavailable ? "" : `Start one with <strong>New ${esc(f.title.toLowerCase())}</strong>.`}</div>`}
+          ${forming.length ? `<div class="cards">${forming.join("")}</div>` : `<div class="empty small">${unavailable ? "This server doesn't run booster drafts." : `No tables are taking players. Start one with <strong>New ${esc(f.title.toLowerCase())}</strong>.`}</div>`}
         </div>
         ${underway.length ? `<div class="group"><h3>Under way</h3><div class="cards">${underway.map(underwayCard).join("")}</div></div>` : ""}
       </section>`;
