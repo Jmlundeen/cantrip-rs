@@ -1,0 +1,6 @@
+{
+  "name": "Kindred Judgment",
+  "manaCost": "{5}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Choose a creature type. Destroy all creatures that aren't of the chosen type."
+}
