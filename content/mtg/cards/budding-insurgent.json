@@ -1,0 +1,11 @@
+{
+  "name": "Budding Insurgent",
+  "manaCost": "{2}{G}",
+  "type": "Creature — Dryad Scout",
+  "power": 3,
+  "toughness": 3,
+  "keywords": [
+    "Vigilance"
+  ],
+  "oracleText": "Vigilance\nSacrifice this creature: Destroy target artifact or enchantment. If that permanent was a legendary enchantment, draw a card. Activate only as a sorcery."
+}
