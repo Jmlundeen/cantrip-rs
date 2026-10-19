@@ -806,7 +806,9 @@ Zombie creature spells you cast" (Rooftop Storm) and "you may cast spells from y
 `InsteadOfManaCost`, CR 118.9, 601.2b). Such an ability is a way of paying, not a permission (CR 601.3): it stands beside
 every cast the player may already make of a face for that face's mana cost - from a hand, a graveyard (Yawgmoth's Will, the
 card's own say-so, aftermath, retrace), exile (an Adventure, `ExileCast`, a `PlayPermission`), a library's top
-(`PlayRule::LibraryTopSpells`) - as a way number of its own (`WAY_ALTERNATIVE + k * 6 + face`, `alternative_way`), so the
+(`PlayRule::LibraryTopSpells`) - as a way number of its own (`WAY_ALTERNATIVE + k * 6 + face`, `alternative_way`: k counts only those that apply to this cast, and one two permanents
+of a player give once, so an opponent's take no slot and two copies are one choice; the cast reads it back by the same count,
+`alternative_at`), so the
 client sees it as its own cast with its cost (`alternative_cast_total`) and the cast goes on as that face's own
 (`face_way`), with that mana as `instead`. Each face is judged alone (CR 709.3a, 715.3a, 712.8a), in the zone it is cast
 from. It is offered whether or not the mana cost could be paid, and for a card with no mana cost (CR 118.6a). It is the one

@@ -87,21 +87,21 @@ pub fn granted_face_way(face: u8) -> u8 {
 
 /// How a spell is cast for an alternative cost a static ability of a permanent on the battlefield gives the spells a player
 /// casts (CR 118.9, 601.2b: `CardDef::spell_alternatives`), as a way number: `WAY_ALTERNATIVE + k * WAY_GRANTED_STRIDE +
-/// face` for the kth such cost the battlefield gives, in the order the permanents and their rules are listed, and the face
-/// of the card it is cast as (`GRANTED_FACE_*`). It is a way of paying, not a permission: it stands beside a cast the
+/// face` for the kth such cost that applies to this cast, in the order the permanents and their rules are listed, one that
+/// two permanents of a player give counted once, and the face of the card it is cast as (`GRANTED_FACE_*`). It is a way of paying, not a permission: it stands beside a cast the
 /// player may already make for the face's mana cost, from wherever that cast is made, and goes on as that cast
 /// (`face_way`) with this cost paid rather than the mana cost. The band lies above the granted ways' and below the
 /// split halves'.
 pub const WAY_ALTERNATIVE: u8 = WAY_GRANTED + WAY_GRANTED_SLOTS * WAY_GRANTED_STRIDE;
-/// How many such costs a battlefield may give at once.
+/// How many such costs may apply to one cast at once.
 pub const WAY_ALTERNATIVE_SLOTS: u8 = 4;
 
-/// The way number of the kth alternative cost the battlefield gives, cast as `face`.
+/// The way number of the kth alternative cost that applies to a cast, cast as `face`.
 pub fn alternative_way(k: usize, face: u8) -> u8 {
     WAY_ALTERNATIVE + k as u8 * WAY_GRANTED_STRIDE + face
 }
 
-/// The alternative cost (its index among those the battlefield gives) and the face a way number names, or `None` for a
+/// The alternative cost (its index among those that apply to the cast) and the face a way number names, or `None` for a
 /// way that is not one.
 pub fn alternative_slot(way: u8) -> Option<(usize, u8)> {
     let n = way.checked_sub(WAY_ALTERNATIVE)?;
