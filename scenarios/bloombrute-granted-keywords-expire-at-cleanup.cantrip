@@ -1,0 +1,31 @@
+# Bloombrute's activated ability grants trample and lifelink until end of turn (CR 702.15, 702.19).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Bloombrute
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Bloombrute.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Bloombrute.Activate(Bot1.Battlefield.Bloombrute)
+
+[T3 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Bloombrute.Keywords = (absent)
