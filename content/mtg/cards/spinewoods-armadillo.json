@@ -1,0 +1,11 @@
+{
+  "name": "Spinewoods Armadillo",
+  "manaCost": "{4}{G}{G}",
+  "type": "Creature — Armadillo",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Reach\nWard {3} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {3}.)\n{1}{G}, Discard this card: Search your library for a basic land card or a Desert card, reveal it, put it into your hand, then shuffle. You gain 3 life.",
+  "keywords": [
+    "Reach"
+  ]
+}

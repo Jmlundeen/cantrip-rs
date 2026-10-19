@@ -1,0 +1,37 @@
+# Spinewoods Armadillo: the search is for "a basic land card or a Desert card". The first activation (turn 1, Mox Emerald
+# and Mox Ruby) finds the basic Forest. On turn 3 that Forest is played and a second Armadillo is activated into a library of
+# nothing but Lightning Bolts: it finds nothing, yet "You gain 3 life" still happens (it is not conditional on the search):
+# 20 + 3 + 3 = 26.
+
+[Bot1 Deck]
+Spinewoods Armadillo
+Spinewoods Armadillo
+Mox Emerald
+Mox Ruby
+Mox Jet
+Island
+Island
+Forest
+Lightning Bolt x12
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spinewoods Armadillo.Activate(Ability: Search)
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Spinewoods Armadillo.Activate(Ability: Search)
+
+[Expect]
+Bot1.Graveyard = Spinewoods Armadillo; Spinewoods Armadillo
+Bot1.Life = 26
+Bot1.Battlefield.Forest.Tapped = true

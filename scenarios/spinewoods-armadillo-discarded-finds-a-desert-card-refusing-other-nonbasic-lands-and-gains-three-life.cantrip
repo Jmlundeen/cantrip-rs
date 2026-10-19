@@ -1,0 +1,32 @@
+# Spinewoods Armadillo: "{1}{G}, Discard this card: Search your library for a basic land card or a Desert card, reveal it,
+# put it into your hand, then shuffle. You gain 3 life." Activated from the hand with Mox Emerald and Mox Ruby, it goes to
+# the graveyard as a cost. Arid Archway (a nonbasic Desert) is found; Bloodstained Mire (a nonbasic land that is no Desert)
+# and Lightning Bolt are refused beside it. Bot1 gains 3 life (20 -> 23).
+
+[Bot1 Deck]
+Spinewoods Armadillo
+Mox Emerald
+Mox Ruby
+Island x4
+Arid Archway
+Bloodstained Mire
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Spinewoods Armadillo.Activate(Ability: Search)
+! Bot1.Search(Bloodstained Mire)
+! Bot1.Search(Lightning Bolt)
+Bot1.Search(Arid Archway)
+
+[Expect]
+Bot1.Graveyard = Spinewoods Armadillo
+Bot1.Hand = Island; Island; Island; Island; Arid Archway
+Bot1.Life = 23
