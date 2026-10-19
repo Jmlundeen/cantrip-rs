@@ -1,0 +1,48 @@
+# Hellcat, Undying Vigilante: "When Hellcat dies, return her to the battlefield under her owner's control with a +1/+1 counter on
+# her. She loses all abilities and gains haste."
+# Bot2 kills the 2/2 Hellcat with Lightning Bolt. She returns, untapped, with a +1/+1 counter (a 3/3, CR 122.6) and with haste
+# only: she lost her printed Haste and the dying trigger, then gained haste, which comes later (CR 613.1f, 613.7). So a second
+# Lightning Bolt, now killing the 3/3, finds no trigger: she stays in the graveyard (she would return a second time as a 4/4 if the
+# ability had stayed). Haste is shown by her not being summoning sick as a new object.
+# Mox Emerald pays {G}{G}; Mox Ruby pays each Bolt.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Hellcat, Undying Vigilante
+Forest x17
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Hellcat, Undying Vigilante.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T2 Bot2.Main2]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Hellcat, Undying Vigilante)
+[T2 Bot2.End]
+? Bot1.Battlefield.Hellcat, Undying Vigilante.Counters.PlusOnePlusOne = 1
+? Bot1.Battlefield.Hellcat, Undying Vigilante.Power = 3
+? Bot1.Battlefield.Hellcat, Undying Vigilante.Toughness = 3
+? Bot1.Battlefield.Hellcat, Undying Vigilante.Keywords = Haste
+? Bot1.Battlefield.Hellcat, Undying Vigilante.Tapped = false
+? Bot1.Battlefield.Hellcat, Undying Vigilante.SummoningSick = false
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Hellcat, Undying Vigilante)
+[T3 Bot1.Upkeep]
+
+[Expect]
+Bot1.Graveyard = Hellcat, Undying Vigilante
+Bot1.Battlefield.Count = 2
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

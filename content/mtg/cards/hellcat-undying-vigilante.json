@@ -1,0 +1,11 @@
+{
+  "name": "Hellcat, Undying Vigilante",
+  "manaCost": "{G}{G}",
+  "type": "Legendary Creature — Human Hero",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Haste\nWhen Hellcat dies, return her to the battlefield under her owner's control with a +1/+1 counter on her. She loses all abilities and gains haste.",
+  "keywords": [
+    "Haste"
+  ]
+}
