@@ -1,0 +1,53 @@
+# Solarium Sentry: "mana value 2 or less" - three is out (the boundary, CR 202.3). Bot2 casts Black Lotus and Mox Ruby (mana value 0: +2
+# each, 24), then Delayed Blast Fireball ({1}{R}{R}, mana value 3), which deals 2 damage to Bot1 and to Bot1's creatures: no trigger, Bot1
+# goes down to 22, the Sentry (3/3) surviving with 2 damage; then Lightning Bolt (mana value 1) at Bot2 itself: +2, 24. With a trigger
+# for the Fireball it would end at 26.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Solarium Sentry
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Delayed Blast Fireball
+Lightning Bolt
+Mountain x3
+Mountain x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solarium Sentry.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 24
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Delayed Blast Fireball.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 22
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 17
+Bot1.Battlefield.Solarium Sentry.Damage = 2
+Stack.Count = 0

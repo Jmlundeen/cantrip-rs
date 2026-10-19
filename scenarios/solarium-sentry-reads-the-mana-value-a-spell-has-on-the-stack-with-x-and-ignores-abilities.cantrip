@@ -1,0 +1,65 @@
+# Solarium Sentry: "a spell with mana value 2 or less" is judged by the spell on the stack, where X counts (CR 202.3e, 601.2i).
+# Bot2 casts the Black Lotus and three Moxen (mana value 0 each: four triggers, +8), then Walking Ballista ({X}{X}) with X = 1 (mana
+# value 2: +2) and with X = 2 (mana value 4: nothing), and activates a Ballista's ability, which is not a spell: nothing. Bot1 ends at
+# 20 + 8 + 2 = 30.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Solarium Sentry
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Walking Ballista
+Walking Ballista
+Swamp
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solarium Sentry.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 28
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Walking Ballista.Cast(X: 1)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 30
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Walking Ballista.Cast(X: 2)
+? Bot1.Life = 30
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Walking Ballista#1.Activate(Bot2)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 30
+Bot2.Life = 19
+Stack.Count = 0

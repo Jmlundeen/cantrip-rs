@@ -1,0 +1,49 @@
+# Solarium Sentry: "Whenever an opponent casts a spell with mana value 2 or less, you gain 2 life." Bot1's own Ornithopter cast
+# (mana value 0) does not trigger it (an opponent's spells only): Bot1 stays at 20. On turn 2 Bot2's Mox Ruby (mana value 0) does:
+# Bot1 gains 2, to 22; and Lightning Bolt (mana value 1) does too, though it targets Bot2 itself: 24. The trigger resolves before the
+# spell it is about.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Pearl
+Solarium Sentry
+Ornithopter
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Swamp x6
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Solarium Sentry.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 22
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 24
+Bot2.Life = 17
+Bot1.Battlefield.Solarium Sentry.Power = 3
+Stack.Count = 0
