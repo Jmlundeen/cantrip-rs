@@ -1,0 +1,6 @@
+{
+  "name": "Murmuring Volume",
+  "manaCost": "{3}",
+  "type": "Artifact — Book",
+  "oracleText": "{T}: Add one mana of any color.\n{2}, {T}, Discard a card: Draw a card."
+}

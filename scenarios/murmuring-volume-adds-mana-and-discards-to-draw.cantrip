@@ -1,0 +1,33 @@
+# Both activated abilities: a colored mana ability, then a paid discard after untapping (CR 605, 701.9).
+
+[Bot1 Deck]
+Black Lotus
+Murmuring Volume
+Ornithopter
+Black Lotus
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Murmuring Volume.Cast
+[Bot1.Main2]
+Bot1.Battlefield.Murmuring Volume.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Murmuring Volume.Activate(Ability: Discard)
+Bot1.Choose(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Black Lotus; Black Lotus
+Bot1.Battlefield.Murmuring Volume.Tapped = true
