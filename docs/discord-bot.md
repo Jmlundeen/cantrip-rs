@@ -96,7 +96,9 @@ free.
 ### The draft queue page
 
 The bot's site has a front door. The bare address (`/`, with no query) is the home page (`HomeSite.LandingPage`, `landing.html`):
-what Cantrip is, with links to the GitHub organization, the Discord server, `/draft`, `/constructed` and a Discord log in.
+the logo (`/logo.png`, `logo.png` built into the bot: the repository root's `cantrip.png` at 384 pixels) and the title, with
+links to the GitHub organization, the Discord server, `/draft`, `/constructed` and a Discord log in - and no text about the
+project.
 The web client is at the same address with a table in its query (`/?server=...#ticket`), which is what a seat's link is, so
 a request with a query goes on to the client. `/home` (`HomeSite`, `home.html`) is the page a signed-in player lands on -
 signing in with no page named comes back to it: the table they are filling, the draft or the constructed game they are in

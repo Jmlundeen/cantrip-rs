@@ -24,7 +24,8 @@ public sealed class HomeSiteOptions
 /// <summary>
 /// The site's front door and the page a signed-in player lands on.
 /// <code>
-/// /                          the home page: what Cantrip is, and where to go (served by ClientSite for a bare /)
+/// /                          the home page: the logo, and where to go (served by ClientSite for a bare /)
+/// /logo.png                  the Cantrip logo
 /// /home                      a player's own page: the table or draft they are in and the game they are playing, to rejoin
 /// /home/api/board            who is signed in, and what they are in
 /// </code>
@@ -35,8 +36,20 @@ public static class HomeSite
 {
     public const string Route = "home";
 
+    /// <summary>Where the logo is: beside the home page, whatever else the site serves.</summary>
+    public const string LogoRoute = "logo.png";
+
     private static readonly Lazy<string> Landing = Read("landing");
     private static readonly Lazy<string> Player = Read("home");
+
+    private static readonly Lazy<byte[]> LogoImage = new(() =>
+    {
+        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Cantrip.Discord.logo.png")
+            ?? throw new InvalidOperationException("The logo is not built into the bot.");
+        using var copy = new MemoryStream();
+        stream.CopyTo(copy);
+        return copy.ToArray();
+    });
 
     private static Lazy<string> Read(string name) => new(() =>
     {
@@ -51,6 +64,13 @@ public static class HomeSite
     {
         context.Response.Headers.CacheControl = "no-cache";
         return Results.Content(Landing.Value, "text/html; charset=utf-8");
+    }
+
+    /// <summary>The logo, which the home page shows and names its tab's icon.</summary>
+    public static IResult Logo(HttpContext context)
+    {
+        context.Response.Headers.CacheControl = "public, max-age=86400";
+        return Results.File(LogoImage.Value, "image/png");
     }
 
     public static IEndpointRouteBuilder MapHome(this IEndpointRouteBuilder app, HomeSiteOptions options)

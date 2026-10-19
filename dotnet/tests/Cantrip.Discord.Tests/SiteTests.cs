@@ -132,6 +132,13 @@ public sealed class SiteTests : IDisposable
         foreach (string link in new[] { "signin?then=home", "href=\"draft\"", "href=\"constructed\"" })
             Assert.Contains(link, landing, StringComparison.Ordinal);
 
+        // The logo is on it, and served beside it.
+        Assert.Contains("<img src=\"logo.png\"", landing, StringComparison.Ordinal);
+        HttpResponseMessage logo = await fixture.Http.GetAsync(fixture.Address("logo.png"));
+        Assert.Equal(HttpStatusCode.OK, logo.StatusCode);
+        Assert.Equal("image/png", logo.Content.Headers.ContentType?.MediaType);
+        Assert.Equal(new byte[] { 0x89, (byte)'P', (byte)'N', (byte)'G' }, (await logo.Content.ReadAsByteArrayAsync())[..4]);
+
         // A seat's link: the client, with the table in the query.
         string client = await fixture.Http.GetStringAsync(fixture.Address("?server=ws%3A%2F%2Flocalhost%3A7782%2Fgame"));
         Assert.DoesNotContain("github.com", client, StringComparison.Ordinal);

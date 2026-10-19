@@ -92,6 +92,8 @@ internal static class ClientSite
             app.MapSiteSignIn(signIn);
         }
 
+        app.MapGet("/" + HomeSite.LogoRoute, HomeSite.Logo);
+
         // The pages' names before they were /draft and /constructed, which links already sent are still to.
         app.MapGet("/queue", () => Results.Redirect("/" + QueueSite.Route, permanent: true));
         app.MapGet("/play", () => Results.Redirect("/" + PlaySite.Route, permanent: true));

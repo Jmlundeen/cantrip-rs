@@ -19,6 +19,8 @@
     <EmbeddedResource Include="play.html" LogicalName="Cantrip.Discord.play.html" />
     <EmbeddedResource Include="home.html" LogicalName="Cantrip.Discord.home.html" />
     <EmbeddedResource Include="landing.html" LogicalName="Cantrip.Discord.landing.html" />
+    <!-- The Cantrip logo for the home page and its tab: the image at the repository root (the client's splash), at 384 pixels. -->
+    <EmbeddedResource Include="logo.png" LogicalName="Cantrip.Discord.logo.png" />
   </ItemGroup>
 
   <ItemGroup>
