@@ -557,3 +557,23 @@ fn protection_a_permanent_was_given_is_shown_and_a_printed_one_is_not_repeated()
     });
     assert!(progenitus_seen, "the scenario never showed Progenitus");
 }
+
+/// A player's protection from a player (CR 702.16k) is shown to both players beside the protected player, as control is now:
+/// while Bot1 controls Absolute Virtue, Bot1 is told "You have protection from Bot2." and Bot2 that Bot1 has it; once Bot2's
+/// Act of Treason has taken the Virtue, Bot2 is told it has protection from Bot1, and Bot1 is told nothing of its own.
+#[test]
+fn protection_from_a_player_is_shown_to_both_players_and_follows_control() {
+    let (mut bot1_protected, mut bot2_protected) = (false, false);
+    play_looking("absolute-virtue-stolen-protects-its-new-controller-and-not-its-owner", |_, views, _| {
+        let first = says(views, 0, 0, "You have protection from Bot2.");
+        assert_eq!(says(views, 1, 0, "They have protection from Bot2."), first, "the seats are told different things of Bot1");
+        let second = says(views, 1, 1, "You have protection from Bot1.");
+        assert_eq!(says(views, 0, 1, "They have protection from Bot1."), second, "the seats are told different things of Bot2");
+        assert!(!(first && second), "both players were shown protection at once");
+        assert!(!(bot2_protected && first), "Bot1's protection came back while Bot2 controlled the Virtue");
+        bot1_protected |= first;
+        bot2_protected |= second;
+        false
+    });
+    assert!(bot1_protected && bot2_protected, "not both were shown: {bot1_protected} {bot2_protected}");
+}

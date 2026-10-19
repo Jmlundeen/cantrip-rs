@@ -1,0 +1,49 @@
+# CR 101.2, 701.6: "This spell can't be countered." Bot1 casts Absolute Virtue on turn 3; Bot2's Counterspell targets it and
+# resolves, doing nothing, and Absolute Virtue resolves and enters.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Absolute Virtue
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Absolute Virtue.Cast
+? Stack = Absolute Virtue
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Absolute Virtue)
+? Stack = Counterspell; Absolute Virtue
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Absolute Virtue; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald
+Bot1.Graveyard = Black Lotus
+Bot2.Graveyard = Counterspell
+Stack.Count = 0

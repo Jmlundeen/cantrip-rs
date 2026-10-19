@@ -1,0 +1,61 @@
+# CR 702.16i, 702.16k: "protection from each of your opponents" is a protection from each of them. With three players, Bot1's
+# Absolute Virtue protects Bot1 from Bot2 and from Bot3: on turn 3 Bot3's Lightning Bolt can't target Bot1 (refusal) and is
+# cast at Bot2 instead (the positive control - Bot2 has no protection from anyone); on turn 5 Bot2's Bolt can't target Bot1
+# either and targets Bot3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Absolute Virtue
+Island x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Bot3 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Absolute Virtue.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot3.Main1]
+Bot3.Hand.Mountain.Play
+Bot3.Battlefield.Mountain.Activate
+! Bot3.Hand.Lightning Bolt.Cast(Bot1)
+Bot3.Hand.Lightning Bolt.Cast(Bot2)
+Bot3.Pass
+[T5 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Hand.Lightning Bolt.Cast(Bot3)
+Bot2.Pass
+[T5 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 17
+Bot3.Life = 17
+Bot2.Graveyard = Lightning Bolt
+Bot3.Graveyard = Lightning Bolt

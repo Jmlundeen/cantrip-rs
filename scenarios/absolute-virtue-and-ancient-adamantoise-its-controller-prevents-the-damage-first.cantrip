@@ -1,0 +1,61 @@
+# Absolute Virtue's protection (CR 702.16e, 702.16k) and Ancient Adamantoise's redirection ("All damage that would be dealt to
+# you ... is dealt to this creature instead") both apply to the 1 combat damage Bot2's Fanatical Firebrand would deal to
+# Bot1, and Bot1, the affected player, chooses which applies first (CR 616.1). Bot1 has the protection apply first: the
+# damage is prevented, and there is nothing left to redirect (CR 615.6). The Adamantoise is dealt nothing, and the
+# prevention is recorded as Absolute Virtue's. The other order is
+# absolute-virtue-and-ancient-adamantoise-its-controller-redirects-the-damage-first.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Island
+Show and Tell
+Ancient Adamantoise
+Mox Ruby
+Absolute Virtue
+Island x11
+
+[Bot2 Deck]
+Mountain
+Fanatical Firebrand
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Ancient Adamantoise)
+Bot2.Choose()
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Absolute Virtue.Cast
+Bot1.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Fanatical Firebrand.Cast
+Bot2.Pass
+Bot2.Attack(Fanatical Firebrand > Bot1)
+Bot1.Replace(Absolute Virtue)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Ancient Adamantoise.Damage = 0
+Prevented = 1 Fanatical Firebrand > Bot1 by Absolute Virtue

@@ -1,0 +1,70 @@
+# CR 702.16e, 702.16k: protection from a player prevents all damage that player's objects would deal to the protected
+# player, targeted or not - Fiery Confluence's "2 damage to each opponent", chosen three times, targets no one, and each 2
+# is prevented. But protection is only about targeting, damage and enchanting (CR 702.16b-e): an effect that does none of
+# those still applies. Bot2's Wheel of Fortune has each player discard their hand and draw seven, Bot1 included: Bot1 casts
+# Absolute Virtue on turn 1, draws Ancestral Recall on turn 3 and holds it, and the Wheel on turn 4 discards it.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Absolute Virtue
+Ancestral Recall
+Island x12
+
+[Bot2 Deck]
+Mountain
+Black Lotus
+Mox Ruby
+Mox Jet
+Mox Emerald
+Fiery Confluence
+Wheel of Fortune
+Island x13
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Absolute Virtue.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Emerald.Cast
+[T3 Bot1.Main1]
+? Bot1.Hand = Ancestral Recall
+[T4 Bot2.Main1]
+Bot2.Hand.Fiery Confluence.Cast
+Bot2.Modes(2; 2; 2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Pass
+? Bot1.Life = 20
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Wheel of Fortune.Cast
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Prevented = 2 Fiery Confluence > Bot1 by Absolute Virtue; 2 Fiery Confluence > Bot1 by Absolute Virtue; 2 Fiery Confluence > Bot1 by Absolute Virtue
+Bot1.Hand.Count = 7
+Bot1.Graveyard = Ancestral Recall; Black Lotus
+Bot2.Graveyard = Wheel of Fortune; Island; Island; Black Lotus; Fiery Confluence

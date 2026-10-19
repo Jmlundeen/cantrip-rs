@@ -1,0 +1,12 @@
+{
+  "name": "Absolute Virtue",
+  "manaCost": "{6}{W}{U}",
+  "type": "Legendary Creature — Avatar Warrior",
+  "power": 8,
+  "toughness": 8,
+  "oracleText": "This spell can't be countered.\nFlying\nYou have protection from each of your opponents. (You can't be dealt damage, enchanted, or targeted by anything controlled by your opponents.)",
+  "keywords": [
+    "CantBeCountered",
+    "Flying"
+  ]
+}

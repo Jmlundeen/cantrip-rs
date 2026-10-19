@@ -1,0 +1,70 @@
+# CR 702.16k, 613.1b: "You" in "You have protection from each of your opponents" is Absolute Virtue's controller, as control
+# is now. On turn 4 Bot2 gains control of Bot1's Absolute Virtue with Act of Treason: now Bot2 has protection from Bot1 and
+# Bot1 has none. Bot2's Lightning Bolt targets Bot1 (cast); Bot1's Lightning Bolt can't target Bot2 (refusal) but targets
+# Absolute Virtue (the positive control, with the same red mana). The hasty Virtue attacks Bot1 for 8, which nothing
+# prevents.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Absolute Virtue
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Act of Treason
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Absolute Virtue.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Absolute Virtue)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+? Bot2.Battlefield.Absolute Virtue.Power = 8
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+! Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Absolute Virtue)
+Bot1.Pass
+Bot2.Attack(Absolute Virtue > Bot1)
+? Bot1.Life = 17
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 9
+Bot2.Life = 20
+Bot2.Battlefield.Absolute Virtue.Damage = 3
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Act of Treason

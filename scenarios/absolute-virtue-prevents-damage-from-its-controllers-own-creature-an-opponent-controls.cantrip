@@ -1,0 +1,59 @@
+# CR 702.16k: protection from a player covers the objects that player controls, whoever owns them. On turn 4 Bot2 gains
+# control of Bot1's own Llanowar Elves with Act of Treason and attacks Bot1 with it: the Elves are Bot2's, so their combat
+# damage to Bot1 is prevented by Absolute Virtue's protection.
+
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Absolute Virtue
+Island x12
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Act of Treason
+Island x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Absolute Virtue.Cast
+Bot1.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot2.Attack(Llanowar Elves > Bot1)
+? Combat.Attackers = Llanowar Elves > Bot1
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Prevented = 1 Llanowar Elves > Bot1 by Absolute Virtue
+Bot2.Graveyard = Act of Treason

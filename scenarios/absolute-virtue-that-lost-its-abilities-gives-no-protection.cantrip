@@ -1,0 +1,60 @@
+# CR 613.1f, 702.16k: the protection is a static ability of Absolute Virtue; once it has lost all its abilities, its
+# controller has no protection. On turn 2 Bot2's Lightning Bolt can't target Bot1 (refusal, with Simian Spirit Guide's red mana floating);
+# Bot2's Turn to Frog makes Absolute Virtue a 1/1 Frog with no abilities until end of turn, and then the same Bolt targets
+# Bot1 and deals 3.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Absolute Virtue
+Island x13
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Simian Spirit Guide
+Turn to Frog
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Absolute Virtue.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Simian Spirit Guide.Activate
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main2]
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Turn to Frog.Cast(Bot1.Battlefield.Absolute Virtue)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+? Bot1.Battlefield.Absolute Virtue.Power = 1
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+[T2 Bot2.End]
+
+[Expect]
+Bot1.Life = 17
+Bot1.Battlefield.Absolute Virtue.Keywords = (absent)
+Bot2.Graveyard = Lightning Bolt; Turn to Frog

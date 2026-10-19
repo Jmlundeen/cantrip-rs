@@ -88,6 +88,8 @@ keeps it).
 | [KI-75](#ki-75-words-of-winds-return-a-permanent-question-may-be-captioned-as-a-cost) | Words of Wind's "return a permanent" question may be captioned as a cost | Low | Suspected |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-77](#ki-77-mana-of-any-type-turns-a-whole-cost-into-generic-mana) | "Mana of any type" turns a whole cost into generic mana | Low | Open |
+| [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
+| [KI-79](#ki-79-protection-from-a-player-judges-a-departed-damage-source-by-its-owner-not-its-last-controller) | Protection from a player judges a departed damage source by its owner, not its last controller | Low | Unexercised |
 
 ## Issues
 
@@ -160,7 +162,7 @@ the line goes.
 | A Case that loses all its abilities: it stays solved (CR 719.3b) and its "Solved" ability is gone, a play rule under `PlayRule::While` with it (`each_play_rule` skips a permanent that lost its abilities) | nothing | No implemented card takes the abilities of an enchantment (Oko, The Wondrous Wasp and Tishana's Tidebinder reach only artifacts, creatures and planeswalkers). |
 | A "Solved" static ability of the layers (`solved::solved_in_layers`, CR 702.169b) | nothing | No implemented Case has one: Case of the Locked Hothouse's is a play rule. |
 | The host showing a player the top card of their library while a permanent says they may look at it any time (`PlayRule::LookAtLibraryTop`, `observable`), whether or not it can be played | nothing | No `Client.` key reads a library pile, and the browser driver plays nothing from a library. Bolas's Citadel, Mystic Forge and a solved Case of the Locked Hothouse have it. |
-| Damage redirected (CR 614.1a) to a planeswalker or battle, or away from one: `ops::deal_damage_with` judges loyalty and defense against the recipient the replacement effects leave, and a player's protection from everything is ordered with a redirection (`replace::Origin::Protection`, CR 616.1) | Ancient Adamantoise's scenarios (creatures and players) | Ancient Adamantoise only redirects to itself, a creature, and no implemented card gives its controller protection from everything while it is out; a planeswalker of Bot1's hit while it is out would reach the first half. |
+| Damage redirected (CR 614.1a) to a planeswalker or battle, or away from one: `ops::deal_damage_with` judges loyalty and defense against the recipient the replacement effects leave | Ancient Adamantoise's scenarios (creatures and players; a player's protection ordered with its redirection, CR 616.1, in `absolute-virtue-and-ancient-adamantoise-*`) | Ancient Adamantoise only redirects to itself, a creature; a planeswalker of Bot1's hit while it is out would reach it. |
 | Planetarium of Wan Shi Tong that left the battlefield and came back the same turn after a card was cast with it: "do this only once each turn" is looked for among the controller's casts with the ability of any Planetarium (CR 603.2h: "its source's controller has not yet taken the indicated action"), so the new object (CR 400.7) does not trigger again; keyed on the object it would | nothing | No implemented card blinks or returns an artifact to the battlefield in a turn the Planetarium has already cast with. |
 | Damage prevention ordered against damage replacement (CR 616.1: when replacement and prevention effects both apply to one damage event, the affected player or the affected object's controller chooses which applies first). `ops::deal_damage_with` always runs the replacement chain first (`replace::damage`: Artist's Talent's and Torbran-style "deals that much plus 2 instead") and protection's prevention (CR 702.16e) after it; the player is never asked. For replacements that only change the amount, the order cannot change the result - protection prevents all of that source's damage, whatever the amount. It can for a replacement that redirects the damage to another player or permanent, or an "instead" that changes what is dealt to whom: applied first, protection would have prevented the damage before any redirection, so the player's choice decides it. No content card alters `d.target` (or the source) of a damage proposal today. Damage of 0 never reaches the chain, which is CR 120.8 ("replacement effects that would increase the damage ... have no event to replace"), so Artist's Talent's `d.amount > 0` guard is reached only if an earlier replacement in the chain reduces the damage to 0 (CR 615.6) | nothing | No implemented card prevents a fixed amount of damage, redirects damage by a replacement, or replaces damage down to 0. |
 | Beyond the Quiet's "Spacecraft" half (`chars.has_subtype(Subtype::Spacecraft)`): exiling a Spacecraft that is not a creature, which the Oracle text requires and the code does | The creature half of the same filter (a crewed Vehicle exiled, an uncrewed one left) | No Spacecraft card exists in content yet, so no scenario can put one on the battlefield. |
@@ -991,3 +993,33 @@ symbol loses the choice of 2 life. Reachable with Cruelclaw's Heist, Black Widow
 card with such a symbol. A fix pays it as `ManaCost::paid_with_any_color` does, with colorless mana allowed for {C} too.
 
 **Scenarios.** none yet: Null Summoner exiling a card with {2/W} or a Phyrexian symbol is the first to write.
+### KI-78: The tactical bot attacks a player whom protection keeps from being dealt damage
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client | 2026-10-18, Absolute Virtue |
+
+**Notes.** The engine is right: damage from an opponent's sources to a player with protection from them, or from everything,
+is prevented (CR 702.16e, 702.16j, 702.16k: Absolute Virtue, Teferi's Protection, The One Ring), and the host tells both seats
+("They have protection from Bot1."). Targeting is the engine's, so the bot never aims a spell at such a player. But its attack
+planning (`TacticalPlay.Combat.cs`, `Combat`) scores the damage an unblocked attacker would deal that player as life lost, so it
+may attack into a protected player for nothing and leave itself open. A fix tells the bot, in the view, whom each player is
+protected from (a field on `PlayerSummaryView` rather than the text), and has the attack plan count no damage to them.
+
+**Scenarios.** none yet.
+
+### KI-79: Protection from a player judges a departed damage source by its owner, not its last controller
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-18, review of Absolute Virtue |
+
+**Notes.** Protection from a player prevents the damage of sources that player controls (CR 702.16k), and a source that has
+left the battlefield is judged as it last existed there (CR 113.7a, 608.2h). `ops::deal_damage_with` and
+`ops::protection_prevents` ask `Object::controller`, which a move off the battlefield resets to the owner (`ops.rs`, the
+zone move), and `LastKnown` keeps no controller. So a creature Bot2 stole from Bot1 that died and whose ability then deals
+damage would be judged Bot1's: Absolute Virtue's protection would not prevent it, and the reverse case would wrongly prevent.
+A permanent's protection from a player (True-Name Nemesis, Figure of Fable) reads the same field, and so does the
+`Event::Damage` controller. A fix records the controller in `LastKnown` and reads it for a departed source.
+
+**Scenarios.** none yet: no implemented card whose source has left the battlefield deals damage under a stolen control.

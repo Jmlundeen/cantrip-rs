@@ -1,0 +1,72 @@
+# CR 608.2b, 702.16k: a target is checked again as the spell resolves. On turn 4 Bot2's Oblivion Ring exiles Bot1's Absolute
+# Virtue, so Bot1 has no protection and Bot2's Lightning Bolt can target Bot1. In response Bot1's Abrupt Decay destroys the
+# Ring; its leaves-the-battlefield trigger returns Absolute Virtue (CR 610.3), and Bot1 has protection from Bot2 again. The
+# Bolt's only target is now illegal, so it doesn't resolve: Bot1 stays at 20. Absolute Virtue is a new object (CR 400.7),
+# untouched.
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Absolute Virtue
+Abrupt Decay
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Oblivion Ring
+Lightning Bolt
+Island x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Absolute Virtue.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+! Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Oblivion Ring.Cast
+Bot2.Pass
+Bot2.Target(Absolute Virtue)
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+? Bot1.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+? Stack = Lightning Bolt
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Abrupt Decay.Cast(Oblivion Ring)
+Bot1.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield = Absolute Virtue; Mox Pearl; Mox Sapphire; Mox Jet; Mox Ruby; Mox Emerald
+Bot1.Graveyard = Abrupt Decay; Black Lotus
+Bot2.Graveyard = Lightning Bolt; Oblivion Ring
+Stack.Count = 0
