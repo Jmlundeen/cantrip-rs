@@ -36,12 +36,14 @@ internal static class ClientSite
     /// (<see cref="TableProxy"/>), so that one public address reaches everything; and, given <paramref name="portraits"/>,
     /// players' pictures at <c>/portraits/{player}.png</c>, where the tables tell the client they are; and, given
     /// <paramref name="status"/>, the server's status page at <c>/status</c> (<see cref="StatusSite"/>); and, given
-    /// <paramref name="queues"/>, the draft queue page at <c>/queue</c> (<see cref="QueueSite"/>); and, given
-    /// <paramref name="play"/>, the constructed play page at <c>/play</c> (<see cref="PlaySite"/>) - each signing players in
-    /// with <paramref name="signIn"/> (<see cref="SiteSignIn"/>).
+    /// <paramref name="queues"/>, the draft queue page at <c>/draft</c> (<see cref="QueueSite"/>); and, given
+    /// <paramref name="play"/>, the constructed play page at <c>/constructed</c> (<see cref="PlaySite"/>); and, given
+    /// <paramref name="home"/>, a player's own page at <c>/home</c> (<see cref="HomeSite"/>); and, given <paramref name="decks"/>,
+    /// the deck editor's catalog and each player's saved decks at <c>/decks</c> (<see cref="DeckSite"/>) - each signing players in
+    /// with <paramref name="signIn"/> (<see cref="SiteSignIn"/>). The bare address is the home page (<see cref="HomeSite.LandingPage"/>).
     /// </summary>
     public static async Task<WebApplication> StartAsync(string listen, int port, string root, ArtStore art, IReadOnlySet<int>? tables = null, PortraitStore? portraits = null,
-        EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null, TableAccess? access = null)
+        EventStatusBoard? status = null, SiteSignInOptions? signIn = null, QueueSiteOptions? queues = null, PlaySiteOptions? play = null, TableAccess? access = null, HomeSiteOptions? home = null, DeckSiteOptions? decks = null)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder();
         builder.WebHost.UseUrls($"http://{listen}:{port}");
@@ -53,6 +55,18 @@ internal static class ClientSite
         // A ping every 30 seconds: a tunnel or proxy in front (Cloudflare closes a WebSocket silent for 100 seconds) would
         // otherwise drop a player who is only thinking - over a pile, or a deck.
         app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(30) });
+
+        // The site's front door is the bare address. The client is at the same address with a table in its query
+        // (see Link), so a request with a query goes on to it and a seat's link opens as it always did.
+        app.Use((context, next) =>
+        {
+            if (HttpMethods.IsGet(context.Request.Method) && context.Request.Path == "/" && !context.Request.QueryString.HasValue)
+            {
+                return HomeSite.LandingPage(context).ExecuteAsync(context);
+            }
+
+            return next(context);
+        });
         app.UseWebClient(root);
         app.UseRouting();
         if (signIn is not null) app.UseSiteSignIn(signIn);
@@ -76,6 +90,20 @@ internal static class ClientSite
         if (signIn is not null)
         {
             app.MapSiteSignIn(signIn);
+        }
+
+        // The pages' names before they were /draft and /constructed, which links already sent are still to.
+        app.MapGet("/queue", () => Results.Redirect("/" + QueueSite.Route, permanent: true));
+        app.MapGet("/play", () => Results.Redirect("/" + PlaySite.Route, permanent: true));
+
+        if (home is not null)
+        {
+            app.MapHome(home);
+        }
+
+        if (decks is not null)
+        {
+            app.MapDecks(decks);
         }
 
         if (queues is not null)

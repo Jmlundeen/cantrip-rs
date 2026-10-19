@@ -52,7 +52,7 @@ public sealed class QueueSiteOptions
 /// </summary>
 public static class QueueSite
 {
-    public const string Route = "queue";
+    public const string Route = "draft";
 
     private static readonly Lazy<string> Page = new(() =>
     {

@@ -36,6 +36,7 @@ public static class ClientConfig
         Perf = query.ContainsKey("perf");
         Test = query.ContainsKey("test");
         CardSheet = query.ContainsKey("cardsheet");
+        Decks = query.ContainsKey("decks");
         Auto = query.ContainsKey("auto");
         Narrate = query.ContainsKey("narrate");
         BotSeed = int.TryParse(query.GetValueOrDefault("bot-seed"), out int botSeed) ? botSeed : null;
@@ -49,9 +50,12 @@ public static class ClientConfig
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Distinct()];
 
+        // The deck editor has no table to say where art is: it is beside the page, on the site that served it.
         ArtTemplate = query.GetValueOrDefault("art") is { Length: > 0 } art
             ? Template(art)
-            : $"{(Server.Scheme == "wss" ? "https" : "http")}://{Server.Host}:{Server.Port + 1}{ArtPath}";
+            : Decks
+                ? Page.GetLeftPart(UriPartial.Authority) + ArtPath
+                : $"{(Server.Scheme == "wss" ? "https" : "http")}://{Server.Host}:{Server.Port + 1}{ArtPath}";
     }
 
     private static string Template(string art) =>
@@ -97,6 +101,13 @@ public static class ClientConfig
 
     /// <summary>Whether to show a sheet of sample card faces instead of the table (<c>?cardsheet</c>), for pictures of how a template lays a face out (<see cref="CardSheetElement"/>).</summary>
     public static bool CardSheet { get; }
+
+    /// <summary>
+    /// Whether to show the constructed deck editor instead of a table (<c>?decks</c>): a player's saved decks, the cards
+    /// to build them from and the deck in columns, from the bot's site rather than a game server (<see cref="MainPage"/>'s
+    /// deck editor).
+    /// </summary>
+    public static bool Decks { get; }
 
     /// <summary>Whether this seat plays itself (<c>?auto</c>), as a bot seat would, for a test to watch a whole game.</summary>
     public static bool Auto { get; }

@@ -2,6 +2,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Text.Json;
 using Cantrip.Client;
+using Cantrip.Client.Decks;
 using Cantrip.Client.Presentation;
 using Cantrip.Protocol;
 using Microsoft.UI.Xaml.Media;
@@ -73,7 +74,7 @@ public sealed partial class MainPage
             GameClient? client = _gameClient;
             // Ready once the table is up, or the draft or the deck being built before it.
             // A table forming from a queue, and a seat given up, are pages of their own too.
-            bool ready = (client?.View is not null || EventShown || PairingsShown || client?.Table is { Forming: true } || client?.Released is not null)
+            bool ready = (client?.View is not null || EventShown || DeckEditorShown || PairingsShown || client?.Table is { Forming: true } || client?.Released is not null)
                 && _deckLoading.Visibility != Visibility.Visible;
 
             // What the page is still doing, by name, so a test that waited for it to finish can say what never did.
@@ -108,9 +109,14 @@ public sealed partial class MainPage
                 busy.Add("slides");
             }
 
-            if (_needsRedraw)
+            if (_needsRedraw && client is not null)
             {
                 busy.Add("redraw");
+            }
+
+            if (DeckEditorShown && _catalog is null && _catalogFailure is null)
+            {
+                busy.Add("catalog");
             }
 
             json.WriteStartObject();
@@ -118,7 +124,8 @@ public sealed partial class MainPage
             json.WriteBoolean("busy", busy.Count > 0);
             json.WriteString("doing", string.Join(" ", busy));
             json.WriteBoolean("over", client?.IsOver ?? false);
-            json.WriteString("phase", client?.Released is not null ? "Released" : client?.Table is { Forming: true } ? "Forming" : client?.Table?.Phase.ToString() ?? string.Empty);
+            json.WriteString("phase", DeckEditorShown ? "DeckEditor" : client?.Released is not null ? "Released" : client?.Table is { Forming: true } ? "Forming" : client?.Table?.Phase.ToString() ?? string.Empty);
+            WriteDeckEditor(json);
             json.WriteString("prompt", client?.Prompt?.Prompt?.GetType().Name ?? string.Empty);
             json.WriteNumber("requestId", client?.Prompt?.RequestId ?? 0);
             json.WriteNumber("seat", client?.Seat ?? 0);
@@ -234,7 +241,8 @@ public sealed partial class MainPage
 
                     GeneralTransform toPage = board.TransformToVisual(Root);
                     // An event's rows by name: a booster pack's cards are told from the pool's by it, not by where they are.
-                    string row = board == _pileBoard ? "pack" : board == _gridBoard ? "grid" : board == _mainBoard ? "pool" : board == _sideBoard ? "sideboard" : string.Empty;
+                    string row = board == _pileBoard ? "pack" : board == _gridBoard ? "grid" : board == _mainBoard ? "pool" : board == _sideBoard ? "sideboard"
+                        : board == _commandBoard ? "commander" : board == _searchBoard ? "search" : string.Empty;
                     // The table's rows by name, as a scenario's client checks read them (docs/scenarios-in-the-browser.md).
                     string place = board == _stackBoard ? "stack"
                         : board == _handBoard ? "hand"
@@ -419,6 +427,66 @@ public sealed partial class MainPage
             { } answer => answer.GetType().Name,
         };
 
+    /// <summary>
+    /// The deck editor as a test reads it: the deck's name and format, whether it has changes not saved, what makes it
+    /// illegal, the cards in each zone by name, the decks listed and whether a question is being asked.
+    /// </summary>
+    private void WriteDeckEditor(Utf8JsonWriter json)
+    {
+        if (!DeckEditorShown || _arrangement is null)
+        {
+            return;
+        }
+
+        SavedDeck deck = CurrentDeck();
+        json.WriteStartObject("deckEditor");
+        json.WriteString("id", deck.Id);
+        json.WriteString("name", deck.Name);
+        json.WriteString("format", deck.Format);
+        json.WriteBoolean("unsaved", DeckUnsaved());
+        json.WriteBoolean("signedIn", !_signedOut && _savedDecks is not null);
+        json.WriteBoolean("asking", _askOverlay.Visibility == Visibility.Visible);
+        json.WriteString("question", _askOverlay.Visibility == Visibility.Visible ? _askTitle.Text : string.Empty);
+        json.WriteString("status", _editorStatus.Text);
+        json.WriteNumber("results", _searchCards.Count);
+
+        // Where the command zone is, to drop a card on with nothing in it yet to find it by.
+        if (_commandBoard.XamlRoot is not null && IsShown(_commandBoard) && _commandBoard.ActualWidth > 0)
+        {
+            Rect zone = _commandBoard.TransformToVisual(Root).TransformBounds(new Rect(0, 0, _commandBoard.ActualWidth, _commandBoard.ActualHeight));
+            json.WriteStartObject("commandZone");
+            json.WriteNumber("x", zone.X + (zone.Width / 2));
+            json.WriteNumber("y", zone.Y + Math.Min(zone.Height / 2, 60));
+            json.WriteEndObject();
+        }
+        json.WriteStartArray("problems");
+        foreach (string problem in _catalog is null ? [] : DeckRules.Problems(deck, _catalogByName))
+        {
+            json.WriteStringValue(problem);
+        }
+
+        json.WriteEndArray();
+        foreach ((string zone, List<DeckEntry> entries) in (ReadOnlySpan<(string, List<DeckEntry>)>)[("commanders", deck.Commanders), ("main", deck.Main), ("side", deck.Side)])
+        {
+            json.WriteStartArray(zone);
+            foreach (DeckEntry entry in entries)
+            {
+                json.WriteStringValue($"{entry.Count} {entry.Card}");
+            }
+
+            json.WriteEndArray();
+        }
+
+        json.WriteStartArray("decks");
+        foreach (DeckSummary saved in _savedDecks ?? [])
+        {
+            json.WriteStringValue($"{saved.Format}: {saved.Name} ({saved.Cards})");
+        }
+
+        json.WriteEndArray();
+        json.WriteEndObject();
+    }
+
     /// <summary>Every popup open over the page: a card's menu and a drop-down's list are popups.</summary>
     private IEnumerable<UIElement> Popups()
     {
@@ -450,7 +518,7 @@ public sealed partial class MainPage
 
             string? kind = child switch
             {
-                DockButton or CollapseButton => "button",
+                DockButton or CollapseButton or BinButton => "button",
                 DockToggle => "toggle",
                 Border { Tag: SidePanel.TabTag } => "tab",
                 ChoiceDropdown => "dropdown",

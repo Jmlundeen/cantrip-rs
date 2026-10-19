@@ -180,6 +180,8 @@ public sealed partial class MainPage
         (_gridBoard, _ => null),
         (_mainBoard, _ => null),
         (_sideBoard, _ => new CardLook(Note: "In your sideboard.")),
+        (_commandBoard, _ => new CardLook(Note: "Your commander.")),
+        (_searchBoard, _ => null),
     ];
 
     /// <summary>Whether the event panel is up: what a test reads as the page being ready before there is a game.</summary>
@@ -764,6 +766,7 @@ public sealed partial class MainPage
 
         _gridLine = line;
         _gridLineFor = draft.Decision;
+        client.ChooseLine(line);
         LayOutGrid(client, draft);
     }
 

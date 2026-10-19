@@ -126,7 +126,7 @@ public sealed partial class MainPage : Page
         // Not a reimplementation of the wire protocol - this is Cantrip.Client/Cantrip.Protocol
         // themselves, compiled into this browser-wasm build and talking to a real Cantrip.Server.Host
         // over a real WebSocket.
-        _ = ConnectToServerAsync();
+        _ = ClientConfig.Decks ? OpenDeckEditorAsync() : ConnectToServerAsync();
         StartTestState();
     }
 
@@ -218,6 +218,15 @@ public sealed partial class MainPage : Page
         Grid.SetRowSpan(_pairingsPanel, 3);
         Grid.SetColumnSpan(_pairingsPanel, 2);
         Root.Children.Add(_pairingsPanel);
+
+        // The constructed deck editor, for a page opened for it (?decks) rather than for a table.
+        if (ClientConfig.Decks)
+        {
+            BuildDeckEditor();
+            Grid.SetRowSpan(_deckPanel, 3);
+            Grid.SetColumnSpan(_deckPanel, 2);
+            Root.Children.Add(_deckPanel);
+        }
 
         // A card held up to be read, a card's tooltip, and a card being carried, over everything but the lobby.
         foreach (FrameworkElement layer in (FrameworkElement[])[_flights, _inspector, _tooltip, _carryLayer])

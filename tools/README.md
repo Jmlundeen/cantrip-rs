@@ -57,7 +57,7 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 | | |
 |---|---|
 | `bump-protocol.cmd` | moves `PlayerView.ProtocolVersion` on and records the wire digest |
-| `push-public.cmd` | replays the commits on `origin/main` since the last publish onto the public `jschibel/cantrip-rs` (`-DryRun` lists them) |
+| `push-public.cmd` | replays the commits on `origin/main` since the last publish onto the public `cantrip-rs/cantrip-rs` (`-DryRun` lists them) |
 | `card-coverage.py "Card"` (or `tools\card-coverage.cmd`) | the lines of a card's Rust file its scenarios never run; exits 1 if any (`cargo-llvm-cov`) |
 | `new-card.py "Card"` | everything to read before adding a card, and its file to start from (`docs/adding-cards.md`) |
 | `rebuild-card-test-deck.ps1` | regenerates the card-test deck from the card files |
@@ -68,6 +68,7 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 | `cubecobra-sync.py` | syncs one cube list from its CubeCobra cube, or fetches a new cube whole by its CubeCobra name (the `import-cards` skill) |
 | `missing-art.py` | the card faces and tokens of a cube list or file (`--list`, `--file`) that have no art yet, one a line |
 | `pick-order.py` | ranks the cubes' cards into their `*.picks.json` pick orders |
+| `fetch-legality.py` | each card's format legalities and color identity from Scryfall's bulk data into `content/mtg/legality.json`, what the deck editor's catalog is built from; run again as formats move |
 | `art-credits.py` | fills `content/<dataset>/artists.json` with the original printing's artist for each picture not yet credited |
 | `mtgpics-art/fetch_art.py` | downloads the original, non-promo art-only picture of each card name read from stdin from mtgpics.com, under its slug file name (the `fetch-card-art` skill) |
 | `scryfall-art/fetch_art.py` | the fallback for what mtgpics lacks: downloads the earliest regular printing's Scryfall `art_crop` of each card name read from stdin, under its slug file name; never replaces a file (the `fetch-card-art` skill) |

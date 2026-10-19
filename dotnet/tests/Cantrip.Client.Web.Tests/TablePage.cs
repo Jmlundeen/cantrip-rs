@@ -42,16 +42,31 @@ public sealed class TablePage : IAsyncDisposable
     /// before the page reads them; <paramref name="storage"/> is anything else in localStorage, by its full key
     /// ("cantrip-stops-mine").
     /// </summary>
-    public static async Task<TablePage> OpenAsync(
+    public static Task<TablePage> OpenAsync(
         WebClient web,
         string query,
         string pictures,
         IReadOnlyDictionary<string, string>? settings = null,
-        IReadOnlyDictionary<string, string>? storage = null)
+        IReadOnlyDictionary<string, string>? storage = null) =>
+        OpenAsync(web.Browser, web.Site, query, pictures, settings, storage);
+
+    /// <summary>
+    /// Opens the client served from another site than the suite's own - one with more behind it, as the deck editor's
+    /// site has its decks - sending <paramref name="headers"/> with every request the page makes.
+    /// </summary>
+    public static async Task<TablePage> OpenAsync(
+        IBrowser browser,
+        Uri site,
+        string query,
+        string pictures,
+        IReadOnlyDictionary<string, string>? settings = null,
+        IReadOnlyDictionary<string, string>? storage = null,
+        IEnumerable<KeyValuePair<string, string>>? headers = null)
     {
-        IBrowserContext context = await web.Browser.NewContextAsync(new BrowserNewContextOptions
+        IBrowserContext context = await browser.NewContextAsync(new BrowserNewContextOptions
         {
             ViewportSize = WebClient.Headed ? ViewportSize.NoViewport : new ViewportSize { Width = WebClient.Width, Height = WebClient.Height },
+            ExtraHTTPHeaders = headers,
         });
 
         foreach ((string name, string value) in settings ?? new Dictionary<string, string>())
@@ -68,7 +83,7 @@ public sealed class TablePage : IAsyncDisposable
         var table = new TablePage(context, page, pictures);
         // Into the query, before any fragment the caller gave (a ticket after the hash).
         int hash = query.IndexOf('#', StringComparison.Ordinal);
-        string address = hash < 0 ? $"{web.Site}?{query}&test" : $"{web.Site}?{query[..hash]}&test{query[hash..]}";
+        string address = hash < 0 ? $"{site}?{query}&test" : $"{site}?{query[..hash]}&test{query[hash..]}";
         await page.GotoAsync(address);
         return table;
     }
@@ -221,6 +236,20 @@ public sealed class TablePage : IAsyncDisposable
         await ClickAsync(item, "item");
     }
 
+    /// <summary>Picks a card up and carries it to a point, letting go there, as a person drags it with the mouse.</summary>
+    public async Task DragAsync(CardState card, float x, float y)
+    {
+        await Page.Mouse.MoveAsync(card.X, card.Y);
+        await Page.Mouse.DownAsync();
+        await Page.Mouse.MoveAsync(card.X + 12, card.Y + 12, new MouseMoveOptions { Steps = 4 });
+        await Page.Mouse.MoveAsync(x, y, new MouseMoveOptions { Steps = 12 });
+        await Page.Mouse.UpAsync();
+    }
+
+    /// <summary>Clicks a card twice in quick succession.</summary>
+    public async Task DoubleClickCardAsync(CardState card) =>
+        await Page.Mouse.DblClickAsync(card.X, card.Y);
+
     /// <summary>Takes a picture of the page, numbered in the order taken, and returns where it went.</summary>
     public async Task<string> PictureAsync(string name)
     {
@@ -273,7 +302,30 @@ public sealed record TableState(
     IReadOnlyList<string>? LogText = null,
     bool GraveyardsOpen = false,
     IReadOnlyList<DockButtonState>? Dock = null,
-    IReadOnlyList<string>? Combat = null);
+    IReadOnlyList<string>? Combat = null,
+    DeckEditorState? DeckEditor = null);
+
+/// <summary>
+/// The deck editor (<c>?decks</c>) as the page publishes it: the deck's id, name and format, whether it has changes not
+/// saved, the question asked over it, its status line and problems, how many search results are laid out, each zone's
+/// cards ("2 Mountain"), the player's saved decks ("standard: Red Test (2)") and where the command zone is.
+/// </summary>
+public sealed record DeckEditorState(
+    string Id,
+    string Name,
+    string Format,
+    bool Unsaved,
+    bool SignedIn,
+    bool Asking,
+    string Question,
+    string Status,
+    int Results,
+    IReadOnlyList<string> Problems,
+    IReadOnlyList<string> Commanders,
+    IReadOnlyList<string> Main,
+    IReadOnlyList<string> Side,
+    IReadOnlyList<string> Decks,
+    Spot? CommandZone = null);
 
 /// <summary>A button of the dock, in the order the dock offers them, and whether it can be pressed.</summary>
 public sealed record DockButtonState(string Label, bool Enabled);

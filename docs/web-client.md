@@ -185,6 +185,34 @@ seat has dropped or the event is over. Every move between the pod's table and a 
 page. The test state has `pairings` (round, final, starts-in, each match in words). `BoosterDraftTests` drafts seat 1
 against seven bots - pick, deck building, pairings - and pictures a pod played out by bots at its final standings.
 
+## The constructed deck editor
+
+`?decks` (what the bot's site opens at `/decks`, and the player landing page links as **Deck Editor**) shows the deck
+editor instead of a table (`MainPage.Decks.cs`): no game server, only the site it was served from. The cards are the
+site's catalog (`/decks/api/catalog`, a `CardCatalogView` in MessagePack): every card the engine plays, as `CardOracle`
+prints it, with its Scryfall legalities and color identity (`content/mtg/legality.json`, made by
+`tools/maintenance/fetch-legality.py`). Card art is the site's own `/art` unless `?art=` says otherwise.
+
+The header has the deck list's toggle, the deck's name, its format (Standard, Pioneer, Modern, Legacy, Vintage,
+Commander, Penny Dreadful), **Save**, **New deck**, whether the deck is legal and why not (`DeckRules`, in
+`Cantrip.Client/Decks`, checked as the deck changes), and **Home**. On the left, collapsible, are the player's saved decks by
+format, the one open lit, each with a bin; signed out, a way to log in with Discord instead. On top is the search: a box
+matching name, type line and rules text, then Type, the colors W U B R G and C (any of those lit), Mana value and Sort,
+over results in rows - only cards legal in the deck's format, and for Commander, once a commander is chosen, only cards
+within its color identity; at most 120 laid out, each saying how many the deck has. Below is the deck in the draft's
+columns (`MainPage.Pool.cs`): lands, mana values 0 to 7+, the sideboard pulled out on the left, and for Commander the
+command zone beside it, which takes only a card that may be a commander - alone, or paired with the one there (partner,
+partner with, friends forever, choose a Background, Doctor's companion).
+
+A result is double-clicked into its column, or dragged into a column, the sideboard or the command zone, flying there
+from where it was let go; a card of the deck dragged back onto the results leaves it. A double-click moves a card between
+deck and sideboard, or out of the command zone. Saving keeps the deck however it stands, legal or not. Opening a deck from
+the list, or a new one, with changes unsaved asks **Save**, **Discard** or **Cancel**; the bin asks before deleting; and
+the browser asks before a page with unsaved changes is left (`DeckEditor.js`). Where in the columns each card sits is
+not saved: a deck opens in its default columns. The test state has `phase` `DeckEditor` and a `deckEditor` object (the
+deck by zone, its problems, the decks listed, the question asked, where the command zone is); `DeckEditorTests` builds,
+saves, opens, edits and deletes a deck against the real deck API with a signed-in player as a header.
+
 ## An ability resolving
 
 When an activated or triggered ability resolves (`ResolutionEffectsElement`, `MainPage.Resolutions.cs`), its source

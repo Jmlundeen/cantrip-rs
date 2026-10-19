@@ -54,6 +54,7 @@
     <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\Keys.js" />
     <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\Ticket.js" />
     <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\Title.js" />
+    <EmbeddedResource Include="Platforms\WebAssembly\WasmScripts\DeckEditor.js" />
   </ItemGroup>
 
   <!-- Card frames, icons, fonts and the frame template, from the tracked content files. -->

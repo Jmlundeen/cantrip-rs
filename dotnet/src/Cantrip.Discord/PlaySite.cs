@@ -40,7 +40,7 @@ public sealed class PlaySiteOptions
 /// </summary>
 public static class PlaySite
 {
-    public const string Route = "play";
+    public const string Route = "constructed";
 
     private static readonly Lazy<string> Page = new(() =>
     {

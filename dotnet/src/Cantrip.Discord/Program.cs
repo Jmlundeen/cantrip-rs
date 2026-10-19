@@ -30,8 +30,8 @@ using Cantrip.Server.Events;
 // wss://.../table/{port}/game, passed through to the table on this machine. The tables then listen only here, so the
 // tunnel to the web port is the only way in. Without it, players connect to each table's own port at --public-host.
 //
-// With drafts and the bot's own site, /queue is the draft queue page: every queue, every table forming and every draft
-// under way, open to anyone. /play is constructed play: the Standard gauntlet, 1v1 games each player brings one of the
+// With drafts and the bot's own site, /draft is the draft queue page: every queue, every table forming and every draft
+// under way, open to anyone. /constructed is constructed play: the Standard gauntlet, 1v1 games each player brings one of the
 // decks under decks/standard to. Players sign in on either with Discord to take a seat, given the application's OAuth2
 // client id (--oauth-client-id, or CANTRIP_DISCORD_CLIENT_ID) and its secret, from the CANTRIP_DISCORD_SECRET environment
 // variable only; {site}/signin/discord is to be registered as its redirect.
@@ -329,13 +329,18 @@ if (client is null)
 
     PlaySiteOptions? playSite = standard.Count == 0 ? null : new PlaySiteOptions { Games = matchmaker, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
 
+    // The deck editor's catalog, and each player's saved decks, kept in the data directory.
+    DeckSiteOptions? deckSite = store is null ? null : new DeckSiteOptions { ContentRoot = content, Store = store, SignIn = signIn };
+
     string artCache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
     web = await ClientSite.StartAsync(listen, webPort, root, new Cantrip.Art.ArtStore(new Cantrip.Art.ArtStoreOptions { ContentRoot = content, CacheDirectory = artCache }),
-        publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite, access);
+        publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite, access,
+        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, HasDecks = deckSite is not null }, deckSite);
     client = siteAddress;
     Console.WriteLine($"Serving the web client from {root}; the server's status at {new Uri(client, Cantrip.Server.Host.StatusSite.Route)}.");
     if (queueSite is not null) Console.WriteLine($"The draft queue page at {queuePage}.");
     if (playSite is not null) Console.WriteLine($"Constructed play at {new Uri(siteAddress, PlaySite.Route)}.");
+    if (deckSite is not null) Console.WriteLine($"The deck editor at {new Uri(siteAddress, DeckSite.Route)}.");
     Console.WriteLine(signIn.Enabled
         ? $"Players sign in with Discord, which sends them back to {SiteSignIn.Callback(siteAddress)}: register it as the application's redirect."
         : "Nobody can sign in to take a seat from the site: give --oauth-client-id and CANTRIP_DISCORD_SECRET.");
