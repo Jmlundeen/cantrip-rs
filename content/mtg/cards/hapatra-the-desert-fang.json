@@ -1,0 +1,9 @@
+{
+  "name": "Hapatra, the Desert Fang",
+  "manaCost": "{2}{B}{B}{G}",
+  "type": "Legendary Creature — Human Cleric",
+  "oracleText": "When Hapatra enters, for each opponent, put X -1/-1 counters on up to one target creature that player controls, where X is the greatest mana value among cards in your graveyard.",
+  "power": 3,
+  "toughness": 3,
+  "keywords": []
+}

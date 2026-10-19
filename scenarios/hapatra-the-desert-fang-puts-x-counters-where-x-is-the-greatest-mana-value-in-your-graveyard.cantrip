@@ -1,0 +1,41 @@
+# Hapatra, the Desert Fang: "When Hapatra enters, for each opponent, put X -1/-1 counters on up to one target creature
+# that player controls, where X is the greatest mana value among cards in your graveyard" (CR 608.2h). Bot1's Bitter
+# Triumph, mana value 2, is in the graveyard, so the second Ornithopter (0/2) gets two counters and dies.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Bitter Triumph
+Hapatra, the Desert Fang
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Bitter Triumph.Cast(Bot2.Battlefield.Ornithopter#1)
+Bot1.Modes(Pay 3 life)
+Bot1.Hand.Hapatra, the Desert Fang.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Graveyard.Count = 2
+Bot1.Battlefield.Hapatra, the Desert Fang.Power = 3
+Bot1.Battlefield.Hapatra, the Desert Fang.Toughness = 3
+Bot1.Graveyard.Count = 4
