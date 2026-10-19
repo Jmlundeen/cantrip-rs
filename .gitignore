@@ -67,3 +67,9 @@ __pycache__/
 
 # Where `tools\publish-server.cmd` publishes to (the server address and key path). Local to this machine.
 tools/deploy.local.json
+
+# The AI player's generated models, reference data and build output (ai/spike/export.py, its Rust and web runners).
+ai/**/out/
+ai/**/*.onnx
+ai/spike/rs/target/
+ai/spike/web/node_modules/
