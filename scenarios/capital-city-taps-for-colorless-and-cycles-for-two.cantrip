@@ -1,0 +1,30 @@
+# Capital City: {T} adds {C} (turn 1, the pool shows one colorless). Cycling {2} (CR 702.29): on turn 3 the second City in hand
+# is discarded for {2} (the first City's {C} and an Island's {U}) and Bot1 draws a card - Lightning Bolt, the card after the draw step's
+# Island - so the City is in the graveyard and the Bolt in hand.
+
+[Bot1 Deck]
+Capital City
+Capital City
+Island x5
+Island
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Capital City.Play
+Bot1.Battlefield.Capital City.Activate(Ability: {T}: Add {C})
+? Bot1.Mana = {C}
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Capital City.Activate(Ability: {T}: Add {C})
+Bot1.Hand.Capital City.Activate(Ability: Cycling)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Capital City
+Bot1.Hand = Island; Island; Island; Island; Island; Lightning Bolt
+Bot1.Battlefield = Capital City; Island

@@ -1,0 +1,5 @@
+{
+  "name": "Capital City",
+  "type": "Land — Town",
+  "oracleText": "{T}: Add {C}.\n{1}, {T}: Add one mana of any color.\nCycling {2} ({2}, Discard this card: Draw a card.)"
+}
