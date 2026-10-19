@@ -29,7 +29,7 @@ fn look_and_reveal(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.reveal(you, &[top]);
     let card = g.chars(top);
     if card.is(CardType::Instant) || card.is(CardType::Sorcery) {
-        g.transform_by(item.object, item);
+        g.transform_by(item.object, item)?;
     }
     Ok(())
 }

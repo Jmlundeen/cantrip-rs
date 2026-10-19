@@ -297,7 +297,7 @@ pub fn begin_step(cx: &mut Cx) -> R<Flow> {
             crate::phasing::untap_step(cx, active);
             // CR 502.2: the untap step's second turn-based action reads what the previous turn's active player cast,
             // before the counts are cleared for this turn.
-            crate::day_night::check_untap_step(cx);
+            crate::day_night::check_untap_step(cx)?;
             // "Until your next turn" ends as that turn begins (CR 611.2b).
             if cx.s().effects.iter().any(|e| e.duration == Duration::UntilNextTurnOf(active)) {
                 cx.st().effects_retain(|e| e.duration != Duration::UntilNextTurnOf(active));

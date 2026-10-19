@@ -47,7 +47,7 @@ fn other_double_faced_artifact_you_control(q: &dyn Query, asker: &Asker, t: Targ
 /// way.
 fn transform_and_gnomes(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Some(artifact) = cantrip_mechanics::targets::object(g, item, 0) {
-        g.transform(artifact);
+        g.transform(artifact)?;
     }
     tokens::create(g, item.controller, &GNOME, 2)?;
     Ok(())

@@ -314,8 +314,7 @@ pub const SACRIFICE_TO_DESTROY_ARTIFACT_OR_ENCHANTMENT: AbilityDef = ability(
 /// ability was put on the stack or, for a delayed ability, created (CR 701.27f). Aang, Swift Savior, Concealing Curtains,
 /// Norman Osborn, Temple of the Dead and Aang, at the Crossroads's delayed ability print it.
 pub fn transform_self(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.transform_by(item.object, item);
-    Ok(())
+    g.transform_by(item.object, item)
 }
 
 /// "When [this] dies, return it to the battlefield tapped and transformed under its owner's control" (CR 712.14a): the card

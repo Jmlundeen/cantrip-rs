@@ -295,8 +295,7 @@ pub static PHYREXIAN: CardDef = CardDef {
 };
 
 fn transform_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.transform_by(item.object, item);
-    Ok(())
+    g.transform_by(item.object, item)
 }
 
 /// The double-faced Incubator artifact token (CR 111.10i, 701.53b): "{2}: Transform this token." Its counters are

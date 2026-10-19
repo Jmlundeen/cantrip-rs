@@ -69,7 +69,7 @@ fn may_tap_five_to_transform(g: &mut dyn Game, item: &StackItem) -> Result<(), S
     for permanent in choose::cards(g, you, item.object, Purpose::Tap, untapped, 5, false)? {
         g.tap(permanent);
     }
-    g.transform_by(item.object, item);
+    g.transform_by(item.object, item)?;
     Ok(())
 }
 

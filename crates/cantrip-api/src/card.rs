@@ -47,6 +47,22 @@ pub type TriggerCondition = fn(&dyn Query, &Asker) -> bool;
 /// is not on the battlefield yet.
 pub type Enters = fn(&mut dyn Game, &mut Entering) -> Result<(), Suspend>;
 
+/// "As this [permanent] transforms (into [this face]), ..." (CR 712.20): "If a double-faced card would have an 'As [this
+/// permanent] transforms . . .' ability after it transforms or converts, that ability is applied while that permanent is
+/// transforming or converting, not afterward." A static ability of the face the permanent turns over to, read as it
+/// would be once turned over - so it is that face's (`CardDef::as_transforms` of the back face for "transforms into" the
+/// back), and a permanent that would have lost all its abilities there has none (CR 613.1f) - and applied by the core as
+/// part of the transformation itself, whatever spell, ability or rule made it transform (`Game::transform`,
+/// `transform_by`, day and night). Before the `Event::Transformed` it is part of, so "whenever this transforms" sees what
+/// it did. A permanent put onto the battlefield transformed did not transform (CR 712.14a; Sephiroth's ruling): it is
+/// not applied then.
+///
+/// `asker` is the permanent and its controller, the ability's "you". The ability may ask (`Game::ask`): the effect that
+/// made it transform runs again from its start once answered, as every question does. Sephiroth, One-Winged Angel's "you
+/// get an emblem", Shinryu, Transcendent Rival's "choose an opponent", Curse of Leeches' "attach it to a player", and
+/// Olag, Ludevic's Hubris's "it becomes a copy of a creature card exiled with it" print it.
+pub type AsTransforms = fn(&mut dyn Game, &Asker) -> Result<(), Suspend>;
+
 /// A permanent about to enter the battlefield, and how.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Entering {
@@ -1977,6 +1993,9 @@ pub struct CardDef {
     pub additional_choice: &'static [ExtraCost],
     /// Its own entering replacements, applied as it enters from anywhere (CR 614.12).
     pub enters: Option<Enters>,
+    /// Its "as this transforms into [this face]" ability (CR 712.20), on the face it is printed on: applied as the permanent
+    /// turns over to this face. See `AsTransforms`.
+    pub as_transforms: Option<AsTransforms>,
     /// Abilities its effects create to trigger later (CR 603.7), as `AbilityRef::delayed(card, n)`.
     pub delayed: &'static [AbilityDef],
     /// Its prepare spell (CR 722): what a copy cast while it is prepared is a copy of.
@@ -2264,6 +2283,7 @@ impl CardDef {
         additional_cost: None,
         additional_choice: &[],
         enters: None,
+        as_transforms: None,
         delayed: &[],
         prepare: None,
         madness: None,

@@ -36,7 +36,7 @@ fn rummage(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// (CR 106.6).
 fn pay_to_transform(g: &mut dyn Game, item: &StackItem, cost: ManaCost) -> Result<(), Suspend> {
     if g.may_pay(item.controller, item.object, item.object, of_mana(cost), &TRANSFORM)? {
-        g.transform_by(item.object, item);
+        g.transform_by(item.object, item)?;
     }
     Ok(())
 }

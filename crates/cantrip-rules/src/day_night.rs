@@ -9,6 +9,7 @@
 
 use cantrip_api::*;
 
+use crate::R;
 use crate::layers::live;
 use crate::{Cx, ops};
 
@@ -32,7 +33,7 @@ pub fn role(keywords: Keywords) -> Option<bool> {
 /// CR 702.145d and 702.145g, then CR 702.145c and 702.145f: a game that is neither day nor night gains a designation
 /// from any permanent with either keyword, and every permanent whose face disagrees with the designation is turned
 /// over. Whether anything happened.
-pub fn apply(cx: &mut Cx, bound: &[Bound]) -> bool {
+pub fn apply(cx: &mut Cx, bound: &[Bound]) -> R<bool> {
     let mut acted = false;
     // Daybound is asked first: nightbound makes it night only while no permanent with daybound is out.
     if cx.s().turn.day_night == DayNight::Neither && !bound.is_empty() {
@@ -40,27 +41,28 @@ pub fn apply(cx: &mut Cx, bound: &[Bound]) -> bool {
         cx.st().update_turn(|t| t.day_night = gained);
         acted = true;
     }
-    turn_disagreeing(cx, bound) || acted
+    Ok(turn_disagreeing(cx, bound)? || acted)
 }
 
 /// CR 731.1: makes it day or night because something said so. Everything whose face now disagrees is turned over
 /// before this returns. Nothing happens when the game already has that designation; nothing here ever takes one away.
-pub fn become_designation(cx: &mut Cx, designation: DayNight) {
+pub fn become_designation(cx: &mut Cx, designation: DayNight) -> R<()> {
     if designation == DayNight::Neither || cx.s().turn.day_night == designation {
-        return;
+        return Ok(());
     }
     cx.st().update_turn(|t| t.day_night = designation);
     let bound = permanents(cx);
-    turn_disagreeing(cx, &bound);
+    turn_disagreeing(cx, &bound)?;
+    Ok(())
 }
 
 /// The untap step's second turn-based action (CR 502.2, 731.2): if it is day and the previous turn's active player
 /// cast no spells during that turn, it becomes night; if it is night and they cast two or more, it becomes day. A game
 /// that is neither is not checked at all.
-pub fn check_untap_step(cx: &mut Cx) {
+pub fn check_untap_step(cx: &mut Cx) -> R<()> {
     let turn = cx.s().turn;
     if turn.day_night == DayNight::Neither || turn.number < 2 {
-        return;
+        return Ok(());
     }
     // CR 726.2: what the previous turn's active player cast during that turn.
     let previous = turn.number - 1;
@@ -68,9 +70,9 @@ pub fn check_untap_step(cx: &mut Cx) {
     let next = match turn.day_night {
         DayNight::Day if cast == 0 => DayNight::Night,
         DayNight::Night if cast >= 2 => DayNight::Day,
-        _ => return,
+        _ => return Ok(()),
     };
-    become_designation(cx, next);
+    become_designation(cx, next)
 }
 
 /// CR 702.145b's first static ability: "if it is night and this permanent is represented by a double-faced card, it
@@ -94,7 +96,7 @@ fn permanents(cx: &Cx) -> Vec<Bound> {
 /// CR 702.145c and 702.145f: any time a permanent is front face up with daybound and it is night, or back face up
 /// with nightbound and it is day, it is turned over. One at a time and read again between each, because turning a
 /// permanent over changes which of the two keywords it has.
-fn turn_disagreeing(cx: &mut Cx, bound: &[Bound]) -> bool {
+fn turn_disagreeing(cx: &mut Cx, bound: &[Bound]) -> R<bool> {
     let mut acted = false;
     let mut bound: Vec<Bound> = bound.iter().map(|b| Bound { id: b.id, daybound: b.daybound }).collect();
     // A rules bug should surface as a clear stop rather than a hung game.
@@ -107,12 +109,12 @@ fn turn_disagreeing(cx: &mut Cx, bound: &[Bound]) -> bool {
                 && cx.cards().backs[obj.card.0 as usize].is_some()
                 && ((b.daybound && designation == DayNight::Night) || (!b.daybound && designation == DayNight::Day))
         }) else {
-            return acted;
+            return Ok(acted);
         };
         let id = next.id;
-        ops::turn_over(cx, id);
+        ops::turn_over(cx, id)?;
         acted = true;
         bound = permanents(cx);
     }
-    acted
+    Ok(acted)
 }

@@ -5,6 +5,8 @@
 
 pub mod tree;
 mod actions;
+#[cfg(test)]
+mod as_transforms_tests;
 mod attach;
 mod day_night;
 mod designations;
@@ -949,12 +951,12 @@ impl cantrip_api::Game for Cx<'_> {
         ops::put_onto_battlefield_as(self, object, controller, tapped, true, ZoneReason::Other, counters).map_err(|_| Suspend)
     }
 
-    fn transform(&mut self, permanent: ObjectId) {
-        ops::transform(self, permanent, None);
+    fn transform(&mut self, permanent: ObjectId) -> Result<(), Suspend> {
+        ops::transform(self, permanent, None).map_err(|_| Suspend)
     }
 
-    fn transform_by(&mut self, permanent: ObjectId, item: &StackItem) {
-        ops::transform(self, permanent, Some(item));
+    fn transform_by(&mut self, permanent: ObjectId, item: &StackItem) -> Result<(), Suspend> {
+        ops::transform(self, permanent, Some(item)).map_err(|_| Suspend)
     }
 
     fn create_emblem(&mut self, def: CardId, player: PlayerId) -> ObjectId {
@@ -1207,12 +1209,12 @@ impl cantrip_api::Game for Cx<'_> {
         self.g.state.add_mana(player, mana, amount, source, None, false);
     }
 
-    fn become_day(&mut self) {
-        day_night::become_designation(self, DayNight::Day);
+    fn become_day(&mut self) -> Result<(), Suspend> {
+        day_night::become_designation(self, DayNight::Day).map_err(|_| Suspend)
     }
 
-    fn become_night(&mut self) {
-        day_night::become_designation(self, DayNight::Night);
+    fn become_night(&mut self) -> Result<(), Suspend> {
+        day_night::become_designation(self, DayNight::Night).map_err(|_| Suspend)
     }
 
     fn note_done(&mut self, source: ObjectId, ability: AbilityRef) {

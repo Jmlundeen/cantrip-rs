@@ -78,7 +78,7 @@ fn a_land_is_played_and_a_spell_cast_from_exile_while_you_control_it_and_transfo
     // The opponent holds no permission.
     assert!(permission_for(&cx, spell, THEM).is_none());
     // CR 712.18: it transforms into a face without the text, and is the same object, so the permission goes on.
-    ops::turn_over(&mut cx, spider);
+    ops::turn_over(&mut cx, spider).unwrap();
     assert!(cx.s().obj(spider).transformed && live(cx.s(), spider));
     crate::settle::state_based_actions_alone(&mut cx).unwrap();
     assert!(land_playable(&cx, land));

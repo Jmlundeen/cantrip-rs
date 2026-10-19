@@ -422,6 +422,19 @@ object the instruction never finds (CR 400.7). Aang, at the Crossroads's delayed
 activated transforms of the Incubator token, Ulvenwald Oddity, Aang, Swift Savior, Norman Osborn and Temple of the
 Dead, and Dowsing Device's and Cecil, Dark Knight's triggered ones are what it governs. Nothing in content converts (CR 701.28), so no convert event is recorded.
 
+"As this [permanent] transforms (into [this face]), ..." is `CardDef::as_transforms` (`AsTransforms`, CR 712.20: an ability
+the permanent would have after it transforms "is applied while that permanent is transforming ..., not afterward"). It is
+a static ability of the face turned over to, so `ops::turn_over` - where every transformation happens, an effect's
+(`Game::transform`), the permanent's own ability's (`transform_by`) and day and night's - turns the permanent over, then
+applies the ability of the face now up unless the permanent has lost all its abilities there (CR 613.1f), with its
+controller as "you", and only then records `Event::Transformed`. The ability may ask a question, so the transform verbs,
+`Game::become_day`/`become_night` and the day/night procedures return the suspension and the run replays as every
+question does. A permanent put onto the battlefield transformed did not transform (CR 712.14a) and never reaches it.
+Sephiroth, One-Winged Angel ("you get an emblem"), Shinryu, Transcendent Rival ("choose an opponent"), Curse of Leeches
+("attach it to a player") and Olag, Ludevic's Hubris print it; `cantrip-rules/src/as_transforms_tests.rs` proves it over
+test cards. The benchmark measured 11.57 and 11.55 us per decision before and 11.15 and 11.26 us after (with two noisy
+runs of 11.93 and 13.57 between, on a shared machine, 2026-10-18): the check is one field read per transformation.
+
 Becoming a target is `Event::BecameTarget { target, by, controller }`, emitted by `ops::became_targets` as a spell is cast,
 an ability activated or put on the stack, a copy put on the stack (CR 707.10) and targets changed or chosen anew (CR 115.7):
 once per distinct object or player, since one chosen for several instances of "target" (CR 115.3) becomes the target of that

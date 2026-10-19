@@ -887,15 +887,15 @@ fn enters_with_intrinsic_counters(cards: &CardTable, new: &mut Obj) {
 ///
 /// `by` is the spell or ability whose instruction this is, when the caller names it (`Game::transform_by`); otherwise the
 /// one resolving (`Cx::resolving`), so the rule below holds for every caller.
-pub fn transform(cx: &mut Cx, id: ObjectId, by: Option<&StackItem>) {
+pub fn transform(cx: &mut Cx, id: ObjectId, by: Option<&StackItem>) -> R<()> {
     let by = by.copied().or_else(|| cx.resolving().copied());
     if !live(cx.s(), id)
         || crate::day_night::role(cx.chars(id).keywords).is_some()
         || by.is_some_and(|item| transformed_since(cx, &item, id))
     {
-        return;
+        return Ok(());
     }
-    turn_over(cx, id);
+    turn_over(cx, id)
 }
 
 /// CR 701.27f: "If an activated or triggered ability of a permanent that isn't a delayed triggered ability of that
@@ -918,17 +918,31 @@ fn transformed_since(cx: &Cx, item: &StackItem, id: ObjectId) -> bool {
 }
 
 /// Turns a permanent over (CR 701.27a), once whatever is doing it has established that it may.
-pub fn turn_over(cx: &mut Cx, id: ObjectId) {
+///
+/// CR 712.20: "If a double-faced card would have an 'As [this permanent] transforms . . .' ability after it transforms or
+/// converts, that ability is applied while that permanent is transforming or converting, not afterward." So the ability
+/// is read from the permanent as it is once turned over - the face now up (`CardDef::as_transforms`), unless it has lost
+/// all its abilities there (CR 613.1f) - and applied here, before the transformation's event, by whatever turned it
+/// over. Entering the battlefield transformed is no transformation (CR 712.14a) and never comes here.
+pub fn turn_over(cx: &mut Cx, id: ObjectId) -> R<()> {
     if !live(cx.s(), id) {
-        return;
+        return Ok(());
     }
     let obj = cx.s().obj(id);
     if !obj.zone.is(ZoneKind::Battlefield) || obj.copy.is_some() || cx.cards().backs[obj.card.0 as usize].is_none() {
-        return;
+        return Ok(());
     }
+    let face = cx.cards().face(obj.card, !obj.transformed);
     cx.st().update_obj(id, |o| o.transformed = !o.transformed);
     note_statics(cx, id);
+    if let Some(as_transforms) = cx.cards().get(face).as_transforms
+        && !cx.lost_all_abilities(id)
+    {
+        let controller = cx.s().obj(id).controller;
+        as_transforms(cx, &Asker { source: id, controller })?;
+    }
     cx.emit(Event::Transformed { object: id });
+    Ok(())
 }
 
 /// Creates an emblem (CR 114.2): an object in the command zone, owned by the player, that nothing moves.

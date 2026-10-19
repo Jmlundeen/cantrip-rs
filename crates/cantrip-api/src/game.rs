@@ -452,12 +452,13 @@ pub trait Game: Query {
     /// is (CR 712.14a).
     fn put_onto_battlefield_transformed_with_counters(&mut self, object: ObjectId, controller: PlayerId, tapped: bool, counters: &[(CounterKind, i16)]) -> Result<ObjectId, Suspend>;
     /// Transforms a permanent (CR 701.27a): the other face is up. It stays the same object (CR 712.18). Nothing if it is not
-    /// a double-faced permanent on the battlefield (CR 701.27c).
-    fn transform(&mut self, permanent: ObjectId);
+    /// a double-faced permanent on the battlefield (CR 701.27c). The face it turns over to applies its "as this transforms"
+    /// ability as it does (CR 712.20, `CardDef::as_transforms`), which may ask a question.
+    fn transform(&mut self, permanent: ObjectId) -> Result<(), Suspend>;
     /// `transform` as the instruction of the spell or ability `item`, named explicitly: an ability of the permanent does
     /// nothing if the permanent has transformed since the ability was put on the stack, or since a delayed ability was
     /// created (CR 701.27f, `StackItem::since`).
-    fn transform_by(&mut self, permanent: ObjectId, item: &StackItem);
+    fn transform_by(&mut self, permanent: ObjectId, item: &StackItem) -> Result<(), Suspend>;
     /// Creates `count` tokens that are copies of a permanent (CR 707.2, 111.1), all at once, under `controller`.
     fn create_token_copies(&mut self, of: ObjectId, controller: PlayerId, count: u32) -> Result<Vec<ObjectId>, Suspend>;
     /// Creates `count` tokens that are copies of these copiable values (CR 707.2, 111.1), the exceptions the effect
@@ -496,9 +497,10 @@ pub trait Game: Query {
     /// stack item's `x` is it, for an effect that does "that many" of something (and for a copy of the ability).
     fn reflexive_trigger_counted(&mut self, source: ObjectId, controller: PlayerId, ability: AbilityRef, subject: Target, count: u16);
     /// It becomes day (CR 731.1): every daybound or nightbound permanent whose face disagrees is turned over. Nothing if
-    /// it already is day; a game that has had a designation always has one.
-    fn become_day(&mut self);
-    fn become_night(&mut self);
+    /// it already is day; a game that has had a designation always has one. A permanent turned over applies its face's "as
+    /// this transforms" ability (CR 712.20), which may ask a question.
+    fn become_day(&mut self) -> Result<(), Suspend>;
+    fn become_night(&mut self) -> Result<(), Suspend>;
     /// Records that the controller did what the ability lets them do only once each turn (CR 603.2h), for
     /// `History::done`.
     fn note_done(&mut self, source: ObjectId, ability: AbilityRef);

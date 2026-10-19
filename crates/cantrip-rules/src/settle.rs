@@ -245,7 +245,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         }
     }
     // CR 702.145d, 702.145g, 702.145c, 702.145f: day and night, as far as the permanents with daybound or nightbound go.
-    if crate::day_night::apply(cx, &bound) {
+    if crate::day_night::apply(cx, &bound)? {
         acted = true;
     }
     destroyed.retain(|&id| !cx.chars(id).has(Keyword::Indestructible));
