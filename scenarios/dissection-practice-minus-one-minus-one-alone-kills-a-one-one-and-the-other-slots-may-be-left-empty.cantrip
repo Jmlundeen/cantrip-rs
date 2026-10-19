@@ -1,0 +1,30 @@
+# Dissection Practice: the "up to one" slots may be left empty (CR 115.1d, 601.2c). Here the +1/+1 slot chooses nothing and the -1/-1
+# slot chooses Misshapen Fiend (1/1), which dies as a state-based action (CR 704.5f). The drain still happens, and with a single
+# opponent Bot2 is the lone candidate. Control: the previous scenario, where a +1/+1 on the same creature keeps it alive.
+
+[Bot1 Deck]
+Black Lotus
+Misshapen Fiend
+Dissection Practice
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Misshapen Fiend.Cast
+Bot1.Pass
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Target(Bot2)
+Bot1.Target()
+Bot1.Target(Misshapen Fiend)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 21
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Misshapen Fiend; Dissection Practice; Black Lotus

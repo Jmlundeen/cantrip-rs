@@ -1,0 +1,49 @@
+# Dissection Practice: Bot2 answers the spell with Dawn's Truce, so Bot2 (the player) has hexproof until end of turn and is no longer a
+# legal target (CR 608.2b, 702.11b). Bot2's life total is not frozen, only the targeting changed. The spell does not fizzle: the
+# Misshapen Fiend is still a legal target, so it resolves and performs every instruction that does not affect an illegal target (CR
+# 608.2b): Bot2 is not affected, so loses nothing, but "you gain 1 life" is its own instruction that does not affect the opponent
+# (no "that much"), so Bot1 still gains 1 (21) and the Fiend still gets +1/+1 (2/2). Control: the first Dissection Practice scenario.
+
+[Bot1 Deck]
+Black Lotus
+Misshapen Fiend
+Swamp x4
+Dissection Practice
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Dawn's Truce
+Plains x5
+Plains x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Misshapen Fiend.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Misshapen Fiend)
+Bot1.Target()
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 21
+Bot1.Battlefield.Misshapen Fiend.Power = 2
+Bot1.Battlefield.Misshapen Fiend.Toughness = 2
+Bot1.Graveyard = Dissection Practice; Black Lotus

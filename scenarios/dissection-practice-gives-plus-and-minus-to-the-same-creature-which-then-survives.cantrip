@@ -1,0 +1,31 @@
+# Dissection Practice: both "up to one target creature" slots may name the same creature (they are separate targets, CR 115.3 only
+# bars one target slot from naming an object twice). Misshapen Fiend (1/1) gets +1/+1 and -1/-1 and stays a 1/1 - it survives, which it
+# could not if only the -1/-1 applied (CR 704.5f). The control is the next scenario, where the -1/-1 alone kills it.
+
+[Bot1 Deck]
+Black Lotus
+Misshapen Fiend
+Dissection Practice
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Misshapen Fiend.Cast
+Bot1.Pass
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Target(Bot2)
+Bot1.Target(Misshapen Fiend)
+Bot1.Target(Misshapen Fiend)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 21
+Bot1.Battlefield.Misshapen Fiend.Power = 1
+Bot1.Battlefield.Misshapen Fiend.Toughness = 1
+Bot1.Graveyard = Dissection Practice; Black Lotus

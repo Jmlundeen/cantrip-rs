@@ -1,0 +1,43 @@
+# Dissection Practice targets Bot2 and Bot2's Ornithopter (-1/-1). In response Bot2 casts Teferi's Protection: Bot2 has protection
+# from everything and its permanents, the Ornithopter included, phase out (CR 702.26b), so neither target is legal on resolution and
+# the spell does not resolve at all (CR 608.2b): no life is lost or gained. Control: the scenario where only the opponent is illegal.
+
+[Bot1 Deck]
+Swamp
+Dissection Practice
+Swamp x5
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Teferi's Protection
+Ornithopter
+Plains x4
+Plains x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Target(Bot2)
+Bot1.Target()
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Teferi's Protection.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot1.Life = 20
+Bot2.PhasedOut = Ornithopter
+Bot1.Graveyard = Dissection Practice

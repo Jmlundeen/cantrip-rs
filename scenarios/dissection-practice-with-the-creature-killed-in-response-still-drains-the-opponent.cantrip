@@ -1,0 +1,44 @@
+# Dissection Practice targets Bot2 and Bot2's Ornithopter (-1/-1, no +1/+1). Bot2 answers by Lightning Bolting its own Ornithopter,
+# so one of the two targets is illegal when the spell resolves (CR 608.2b) - the other is not, so the spell still resolves and does
+# what it can: Bot2 loses 1 life and Bot1 gains 1. The creature is simply gone; nothing is pumped.
+
+[Bot1 Deck]
+Swamp
+Dissection Practice
+Swamp x5
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Ornithopter
+Mountain x4
+Mountain x10
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Dissection Practice.Cast
+Bot1.Target(Bot2)
+Bot1.Target()
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 21
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
+Bot1.Graveyard = Dissection Practice
