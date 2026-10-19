@@ -1,0 +1,38 @@
+# Both base P/T modes overwrite prior base values, then expire (CR 613.4b).
+
+[Bot1 Deck]
+Black Lotus
+Perfected Theory
+Perfected Theory
+Ornithopter
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Perfected Theory.Cast
+Bot1.Modes(1)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 1
+? Bot1.Battlefield.Ornithopter.Toughness = 1
+Bot1.Hand.Perfected Theory.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+[Bot1.Main2]
+? Bot1.Battlefield.Ornithopter.Power = 4
+? Bot1.Battlefield.Ornithopter.Toughness = 5
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
