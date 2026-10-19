@@ -1,0 +1,52 @@
+# Bot1 owns two creature cards by turn 3: one Ornithopter exiled by Swords to Plowshares and one in the graveyard
+# (Lightning Bolt); Dark Ritual will be a third card there, but a noncreature one. Huskburster Swarm costs {7}{B}, {1}
+# less for each creature card, in both zones: {5}{B}. With 5 mana (Mox Jet into Dark Ritual makes BBB, Mox Ruby, Mox
+# Pearl) it is refused: the Ritual counted would make it {4}{B}. With Mox Sapphire's sixth mana it is cast, which
+# the graveyard card alone ({6}{B}) would not allow: the exiled one counts.
+
+[Bot1 Deck]
+Ornithopter
+Ornithopter
+Mox Jet
+Dark Ritual
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Huskburster Swarm
+Swamp x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Ruby
+Swords to Plowshares
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Huskburster Swarm.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Huskburster Swarm.Cast
+
+[Expect]
+Bot1.Battlefield.Huskburster Swarm.Keywords = Deathtouch; Menace
+Exile = Ornithopter
+Bot1.Graveyard = Dark Ritual; Ornithopter
+Bot1.Hand.Count = 0
