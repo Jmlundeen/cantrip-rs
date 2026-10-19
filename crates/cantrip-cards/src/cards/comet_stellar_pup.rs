@@ -15,7 +15,11 @@ pub static SQUIRREL: CardDef = CardDef {
 };
 
 fn loyalty(g: &mut dyn Game, comet: ObjectId, delta: i16) {
-    g.add_counters(comet, CounterKind::Loyalty, delta);
+    if delta >= 0 {
+        g.add_counters(comet, CounterKind::Loyalty, delta);
+    } else {
+        g.remove_counters(comet, CounterKind::Loyalty, -delta);
+    }
 }
 
 /// "0: Roll a six-sided die." The roll is the game's own recorded randomness (CR 706); each result of its table is this
