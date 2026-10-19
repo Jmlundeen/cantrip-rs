@@ -317,6 +317,10 @@ public sealed class SiteTests : IDisposable
         Assert.Equal("Alice", value.GetProperty("me").GetProperty("name").GetString());
         Assert.Empty(value.GetProperty("events").EnumerateArray());
         Assert.Equal(0, value.GetProperty("decks").GetInt32());
+
+        // What every page asks, for the seat a player has somewhere, leaves out what they have played and kept.
+        using JsonDocument brief = JsonDocument.Parse(await fixture.AsStringAsync(1001, "Alice", "home/api/board?brief=1"));
+        Assert.Equal(JsonValueKind.Null, brief.RootElement.GetProperty("value").GetProperty("decks").ValueKind);
     }
 
     [Fact]

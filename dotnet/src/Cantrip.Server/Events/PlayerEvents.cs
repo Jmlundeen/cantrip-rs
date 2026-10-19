@@ -44,11 +44,17 @@ public static class PlayerEvents
         ArgumentNullException.ThrowIfNull(store);
         if (store.LoadPlayer(playerId) is not { } player) return [];
 
+        // Newest joined first, read only as far as the latest over that are asked for: a player of hundreds of events is
+        // not hundreds of files read each time their page looks. An event still being played is a recent one.
         List<PlayerEventSummary> all = [];
-        foreach (string id in player.Events.Select(entry => entry.EventId).Distinct(StringComparer.Ordinal))
+        int over = 0;
+        foreach (string id in player.Events.OrderByDescending(entry => entry.Joined).Select(entry => entry.EventId).Distinct(StringComparer.Ordinal))
         {
+            if (over > 0 && over >= recent) break;
             if (!EventStore.ValidId(id) || store.LoadEvent(id) is not { } record || record.Participant(playerId) is null) continue;
-            all.Add(Summary(record, playerId, record.IsLive && (hosted?.Invoke(id) ?? true)));
+            PlayerEventSummary summary = Summary(record, playerId, record.IsLive && (hosted?.Invoke(id) ?? true));
+            all.Add(summary);
+            if (!summary.Live) over++;
         }
 
         return [.. all.Where(each => each.Live).OrderByDescending(each => each.Updated),

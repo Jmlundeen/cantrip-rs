@@ -137,7 +137,7 @@
   function bannerFor(b) {
     if (!b?.me) return null;
     const d = b.draft;
-    if (d?.drafting) return { text: `Your <strong>${esc(formatName(d.format === null ? undefined : d.format) || "draft")}</strong> is under way.`, label: "Back to my draft", action: () => seat("draft/api/return") };
+    if (d?.drafting) return { text: d.format ? `Your <strong>${esc(formatName(d.format))}</strong> is under way.` : "Your draft is under way.", label: "Back to my draft", action: () => seat("draft/api/return") };
     if (d?.table) {
       const seated = d.players && d.seats ? ` (${d.players.length} of ${d.seats} seated)` : "";
       return { text: `You have a seat at a <strong>${esc(formatName(d.format))}</strong> table that is filling${esc(seated)}.`, label: "Open my table", action: () => seat("draft/api/join", { table: d.table }) };
@@ -167,7 +167,7 @@
   async function watch() {
     if (!document.querySelector(".site-me")) return;
     const look = async () => {
-      try { board = await getJson("home/api/board"); } catch { return; }
+      try { board = await getJson("home/api/board?brief=1"); } catch { return; }
       renderBanner();
       document.dispatchEvent(new CustomEvent("cantrip:board", { detail: board }));
     };

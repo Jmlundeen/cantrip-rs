@@ -33,7 +33,7 @@ public sealed class HomeSiteOptions
 /// /about                     the same page, for anyone
 /// /logo.png                  the Cantrip logo
 /// /home                      a player's own page: what they are playing, their events being played and over, and where to go
-/// /home/api/board            who is signed in, and what they are in
+/// /home/api/board            who is signed in, what they are in, and their events; ?brief=1 leaves out what is over
 /// /home/api/drop             POST {event}: the player drops out of an event they are in
 /// /home/api/leave            POST: the player gives up their seat at a table still filling
 /// </code>
@@ -80,7 +80,9 @@ public static class HomeSite
 
         app.MapGet($"/{AboutRoute}", LandingPage);
         app.MapGet($"/{Route}", (HttpContext context) => SiteChrome.For(context).Page(context, Player.Value, SiteSection.Home));
-        app.MapGet($"/{Route}/api/board", (HttpContext context) => Fresh(context, Board(options, Account(context))));
+
+        // ?brief=1, as every page asks it for the seat a player has somewhere: what they are in, not what they have played.
+        app.MapGet($"/{Route}/api/board", (HttpContext context, string? brief) => Fresh(context, Board(options, Account(context), brief is "1" or "true")));
 
         app.MapPost($"/{Route}/api/drop", async (HttpContext context, DropRequest drop) =>
         {
@@ -114,14 +116,14 @@ public static class HomeSite
     }
 
     /// <summary>What the pages show: whether sign-in is on, who is signed in, and what they are in. Names, never ids or tickets.</summary>
-    internal static object Board(HomeSiteOptions options, WebAccount? account)
+    internal static object Board(HomeSiteOptions options, WebAccount? account, bool brief = false)
     {
         string? player = account is null ? null : DraftHost.PlayerId(new DiscordPlayer(account.Id, account.Name));
         DraftHost? hosts = options.Drafts?.Drafts;
         PodHosts? pods = options.Drafts?.Pods;
         bool Hosted(string id) => hosts?.Hosts(id) == true || pods?.Hosts(id) == true;
 
-        IReadOnlyList<PlayerEventSummary> events = player is not null && options.Store is { } store ? PlayerEvents.Of(store, player, Hosted, recent: 12) : [];
+        IReadOnlyList<PlayerEventSummary> events = player is not null && options.Store is { } store ? PlayerEvents.Of(store, player, Hosted, recent: brief ? 0 : 12) : [];
         PlayerEventSummary? playing = events.FirstOrDefault(each => each.Live && !each.Dropped);
 
         object? draft = null;
@@ -155,7 +157,7 @@ public static class HomeSite
         // A draft opened from Discord that nobody has joined yet: no event is made until someone does.
         IEnumerable<object> waiting = account is null || hosts is null ? [] : hosts.Waiting(account.Id).Select(each => new { id = each.Id, created = each.CreatedAt });
 
-        int? decks = account is not null && options.HasDecks && options.Store is { } kept ? new DeckStore(kept).List(account.Id).Count : null;
+        int? decks = account is not null && !brief && options.HasDecks && options.Store is { } kept ? new DeckStore(kept).List(account.Id).Count : null;
 
         return new
         {
