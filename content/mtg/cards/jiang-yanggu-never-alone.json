@@ -1,0 +1,8 @@
+{
+  "name": "Jiang Yanggu, Never Alone",
+  "manaCost": "{3}{G}",
+  "type": "Legendary Creature — Human Druid",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "When Jiang Yanggu enters, create Mowu, a legendary 3/3 green Dog creature token.\nAt the beginning of your end step, untap all tokens you control."
+}

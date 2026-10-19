@@ -1,0 +1,43 @@
+# Jiang Yanggu enters, makes Mowu, a legendary 3/3 green Dog token (CR 111.1). On turn 3 Mowu attacks and is still
+# tapped in the end step, where the "untap all tokens you control" trigger (CR 603.1) untaps it - the Moxen and lands
+# are not tokens and are left alone.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Jiang Yanggu, Never Alone
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Jiang Yanggu, Never Alone.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mowu.Token = true
+? Bot1.Battlefield.Mowu.Power = 3
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Mowu > Bot2)
+? Bot1.Battlefield.Mowu.Tapped = true
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Mowu.Tapped = false
+
+[Expect]
+Turn = 3
+Bot2.Life = 17
+Bot1.Battlefield.Mowu.Tapped = false
