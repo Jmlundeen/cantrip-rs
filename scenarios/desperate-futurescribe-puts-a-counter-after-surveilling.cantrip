@@ -1,0 +1,44 @@
+# Desperate Futurescribe: Bot1 surveilled with Consider this turn, so the beginning-of-combat trigger puts a +1/+1 counter
+# on Ornithopter instead of giving +1/+1 until end of turn (CR 614.1a).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Ornithopter
+Desperate Futurescribe
+Consider
+Island
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Desperate Futurescribe.Cast
+[T4 Bot2.Main1]
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Arrange(Island)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
