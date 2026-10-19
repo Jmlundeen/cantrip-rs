@@ -1,0 +1,40 @@
+# The creature spell controller may pay three to avoid the counter (CR 118.12).
+
+[Bot1 Deck]
+Black Lotus
+Icy Reception
+Island
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Belladonna Took
+Island
+Island
+Island
+Island
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Belladonna Took.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Icy Reception.Cast
+Bot1.Modes(1)
+Bot1.Target(Stack.Belladonna Took)
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.PayCost
+[Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Belladonna Took.Power = 2
