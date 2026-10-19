@@ -1,0 +1,52 @@
+# Dracogenesis gives an alternative cost, not a permission: a Dragon cast from exile, where another rule lets it be cast, is free too.
+# Nova Hellkite is cast on turn 3 for its warp cost and exiled at the end step; on turn 5 every Mox is tapped first and it is cast from
+# exile for nothing (the Moxen could not have paid its {3}{R}{R}).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Dracogenesis
+Nova Hellkite
+Plains x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dracogenesis.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Nova Hellkite.Cast(Ability: Warp)
+[T4 Bot2.Main1]
+? Exile.Count = 1
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Nova Hellkite.Cast(Ability: Without paying)
+[Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Nova Hellkite.Power = 4
+Bot1.Battlefield.Count = 7

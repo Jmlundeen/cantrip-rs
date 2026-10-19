@@ -1,0 +1,42 @@
+# Dracogenesis: "You may cast" - its controller only. Bot2 casts it on turn 2 and then casts its own Dragon, the Phyrexian Dragon Engine
+# it drew, for nothing (the positive control). On turn 3 Bot1 holds a Dragon Engine too and is not offered that way (the refusal).
+
+[Bot1 Deck]
+Phyrexian Dragon Engine
+Plains x20
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Dracogenesis
+Phyrexian Dragon Engine
+Plains x13
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Dracogenesis.Cast
+Bot2.Hand.Phyrexian Dragon Engine.Cast(Ability: Without paying)
+[T3 Bot1.Main1]
+! Bot1.Hand.Phyrexian Dragon Engine.Cast(Ability: Without paying)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Phyrexian Dragon Engine.Power = 2
+Bot1.Hand.Phyrexian Dragon Engine.Power = 2
+Bot1.Battlefield.Count = 0

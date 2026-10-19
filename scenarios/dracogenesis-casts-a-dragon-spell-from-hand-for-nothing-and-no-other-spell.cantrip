@@ -1,0 +1,53 @@
+# Dracogenesis: "You may cast Dragon spells without paying their mana costs." Turn 1 Bot1 casts it with five Moxen and Black Lotus.
+# On turn 3 the Phyrexian Dragon Engine (a Dragon) is cast from hand for nothing: the five Moxen stay untapped, which a cast
+# that took its {3} would not leave them (CR 118.9). On turn 5
+# Hop to It (not a Dragon) is not offered that way (the refusal) while it is cast for its mana cost, three Moxen (the positive control).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Black Lotus
+Dracogenesis
+Phyrexian Dragon Engine
+Hop to It
+Plains x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dracogenesis.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Phyrexian Dragon Engine.Cast(Ability: Without paying)
+? Bot1.Battlefield.Mox Ruby.Tapped = false
+? Bot1.Battlefield.Mox Pearl.Tapped = false
+? Bot1.Battlefield.Mox Jet.Tapped = false
+? Bot1.Battlefield.Mox Sapphire.Tapped = false
+? Bot1.Battlefield.Mox Emerald.Tapped = false
+[T5 Bot1.Main1]
+! Bot1.Hand.Hop to It.Cast(Ability: Without paying)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Hop to It.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Phyrexian Dragon Engine.Power = 2
+Bot1.Graveyard = Hop to It; Black Lotus
+Bot1.Battlefield.Count = 10
