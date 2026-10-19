@@ -1,0 +1,32 @@
+# Deterministic printed-card behavior (CR 603, 608).
+[Bot1 Deck]
+Danitha, Spear of Agony
+Mox Jet x3
+Mox Ruby
+Lightning Bolt x2
+Swamp x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Danitha, Spear of Agony.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Danitha, Spear of Agony.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Battlefield.Danitha, Spear of Agony.Counters.PlusOnePlusOne = 1
+Bot1.Life = 17
+Bot2.Life = 17

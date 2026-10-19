@@ -1,0 +1,11 @@
+{
+  "name": "Danitha, Spear of Agony",
+  "manaCost": "{2}{B}",
+  "type": "Legendary Creature — Human Knight",
+  "oracleText": "First strike\nWhenever you cast a spell that targets an opponent or a creature an opponent controls, put a +1/+1 counter on Danitha.",
+  "power": 2,
+  "toughness": 2,
+  "keywords": [
+    "FirstStrike"
+  ]
+}
