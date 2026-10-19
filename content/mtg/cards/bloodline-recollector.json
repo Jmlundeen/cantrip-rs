@@ -1,0 +1,14 @@
+{
+  "name": "Bloodline Recollector",
+  "manaCost": "{1}{B}",
+  "type": "Creature — Vampire Warlock",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "At the beginning of each end step, if three or more creatures died this turn, this creature becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "prepare": {
+    "name": "Ancestral Craving",
+    "manaCost": "{B}",
+    "type": "Instant",
+    "oracleText": "Target player draws three cards and loses 3 life."
+  }
+}
