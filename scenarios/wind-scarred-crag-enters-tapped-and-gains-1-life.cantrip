@@ -1,0 +1,22 @@
+# "This land enters tapped. When this land enters, you gain 1 life.": Bot1 plays the Crag on turn one; it is tapped
+# (CR 614.1c) and its trigger gains 1 life (20 -> 21), so it cannot be tapped for mana that turn.
+
+[Bot1 Deck]
+Wind-Scarred Crag
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Wind-Scarred Crag.Play
+Bot2.Pass
+? Bot1.Life = 21
+! Bot1.Battlefield.Wind-Scarred Crag.Activate(Color: Red)
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Battlefield.Wind-Scarred Crag.Tapped = true
+Bot1.Mana = 
+Stack.Count = 0

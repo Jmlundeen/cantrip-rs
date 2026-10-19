@@ -1,0 +1,24 @@
+# "{T}: Add {R} or {W}." The color is chosen as the ability is activated: red on turn three, white on turn five;
+# colorless and blue are refused.
+
+[Bot1 Deck]
+Wind-Scarred Crag
+Plains x19
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Wind-Scarred Crag.Play
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Wind-Scarred Crag.Activate(Color: Blue)
+! Bot1.Battlefield.Wind-Scarred Crag.Activate(Color: Colorless)
+Bot1.Battlefield.Wind-Scarred Crag.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T5 Bot1.Main1]
+Bot1.Battlefield.Wind-Scarred Crag.Activate(Color: White)
+? Bot1.Mana = {W}
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Wind-Scarred Crag.Tapped = true
