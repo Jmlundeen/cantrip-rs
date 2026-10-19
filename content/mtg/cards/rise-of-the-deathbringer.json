@@ -1,0 +1,6 @@
+{
+  "name": "Rise of the Deathbringer",
+  "manaCost": "{4}{B}",
+  "type": "Instant",
+  "oracleText": "Choose one —\n• Draw cards equal to the greatest power among creatures you control. You lose life equal to the number of cards drawn this way.\n• All creatures get -3/-3 until end of turn."
+}

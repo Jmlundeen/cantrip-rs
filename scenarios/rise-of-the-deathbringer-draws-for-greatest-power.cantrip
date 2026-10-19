@@ -1,0 +1,31 @@
+# The greatest creature power determines the attempted draw; the actual draws determine life loss (CR 121, 608.2h).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Rise of the Deathbringer
+Belladonna Took
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Belladonna Took.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Rise of the Deathbringer.Cast
+Bot1.Modes(1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Library.Count = 28
