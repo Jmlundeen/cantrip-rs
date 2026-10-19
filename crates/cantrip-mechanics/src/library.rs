@@ -371,6 +371,25 @@ pub fn mill_then_may_take_into_hand(
     Ok(g.return_to_hand(&chosen))
 }
 
+/// "Mill `count` cards. Then put a [`wanted`] card from among the milled cards onto the battlefield" (CR 701.17, 701.17c): the
+/// card is not optional, one is chosen whenever any milled card qualifies, and the milled cards are found where they went (a
+/// graveyard, or exile by a replacement effect). An Aura chooses what it enchants as it enters (CR 303.4f). Fetch Quest
+/// (a creature, enchantment, or land) and Bind to Life (a creature) print it.
+pub fn mill_then_put_onto_battlefield(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    count: u32,
+    wanted: fn(&Chars) -> bool,
+) -> Result<(), Suspend> {
+    let among = g.mill(player, count);
+    let eligible: Vec<ObjectId> = among.iter().copied().filter(|&c| wanted(&g.chars(c))).collect();
+    if let Some(card) = crate::choose::card_from(g, player, source, Purpose::PutOntoBattlefield, among, eligible)? {
+        g.put_onto_battlefield(card, player, false)?;
+    }
+    Ok(())
+}
+
 /// "In any order" (CR 401.4): `player` puts `cards` on one `end` of their library (`DestinationKind::LibraryTop` or
 /// `LibraryBottom`) in the order they choose, the first lowest. Nobody is asked about fewer than two cards. The cards in
 /// that order, for `put_into_library` or `arrange_library`. Bow of Nylea and Valakut Awakening put cards on the bottom,

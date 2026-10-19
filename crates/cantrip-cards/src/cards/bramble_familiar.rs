@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets::filters;
-use cantrip_mechanics::choose;
+use cantrip_mechanics::library::mill_then_put_onto_battlefield;
 use cantrip_oracle as oracle;
 
 /// "Mill seven cards. Then put a creature, enchantment, or land card from among the milled cards onto the battlefield."
@@ -8,20 +8,9 @@ use cantrip_oracle as oracle;
 /// moved to (CR 701.17c), a graveyard or, by a replacement effect, exile. An Adventurer card is only its creature card in
 /// those zones (CR 715.4). An Aura chooses what it enchants as it enters (CR 303.4f).
 fn fetch_quest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let player = item.controller;
-    let among = g.mill(player, 7);
-    let eligible: Vec<ObjectId> = among
-        .iter()
-        .copied()
-        .filter(|&c| {
-            let chars = g.chars(c);
-            chars.is(CardType::Creature) || chars.is(CardType::Enchantment) || chars.is(CardType::Land)
-        })
-        .collect();
-    if let Some(card) = choose::card_from(g, player, item.object, Purpose::PutOntoBattlefield, among, eligible)? {
-        g.put_onto_battlefield(card, player, false)?;
-    }
-    Ok(())
+    mill_then_put_onto_battlefield(g, item.controller, item.object, 7, |chars| {
+        chars.is(CardType::Creature) || chars.is(CardType::Enchantment) || chars.is(CardType::Land)
+    })
 }
 
 /// The Adventure (CR 715): Fetch Quest.
