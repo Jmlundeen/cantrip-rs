@@ -1,0 +1,39 @@
+# Undulating Witness's "{2}: This creature gets +1/-1 until end of turn" on a 3/5: five activations make it 8/0, and the
+# state-based action puts it into its owner's graveyard (CR 704.5f). The five Black Lotuses pay the {4}{U} and the ten mana.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Undulating Witness
+Island x13
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Undulating Witness.Cast
+Bot1.Battlefield.Undulating Witness.Activate
+Bot1.Battlefield.Undulating Witness.Activate
+Bot1.Battlefield.Undulating Witness.Activate
+Bot1.Battlefield.Undulating Witness.Activate
+Bot1.Battlefield.Undulating Witness.Activate
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Undulating Witness; Black Lotus; Black Lotus; Black Lotus; Black Lotus; Black Lotus
+Bot1.Battlefield.Count = 0
+Bot1.Mana =

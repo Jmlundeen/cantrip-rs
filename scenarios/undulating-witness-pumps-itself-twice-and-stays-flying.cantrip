@@ -1,0 +1,32 @@
+# Undulating Witness is a 3/5 flyer with "{2}: This creature gets +1/-1 until end of turn" (CR 613.4d, 611.2a).
+# Bot1 casts it with two Black Lotuses and activates the ability twice with a third, each activation one layer-7c
+# effect for the turn: the Witness is 5/3 and still flying.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Undulating Witness
+Island x16
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Undulating Witness.Cast
+Bot1.Battlefield.Undulating Witness.Activate
+Bot1.Battlefield.Undulating Witness.Activate
+? Bot1.Mana =
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Undulating Witness.Power = 5
+Bot1.Battlefield.Undulating Witness.Toughness = 3
+Bot1.Battlefield.Undulating Witness.Keywords = Flying
