@@ -1,0 +1,12 @@
+{
+  "name": "Stingerback Terror",
+  "manaCost": "{2}{R}{R}",
+  "type": "Creature — Scorpion Dragon",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Flying, trample\nThis creature gets -1/-1 for each card in your hand.\nPlot {2}{R} (You may pay {2}{R} and exile this card from your hand. Cast it as a sorcery on a later turn without paying its mana cost. Plot only as a sorcery.)",
+  "keywords": [
+    "Flying",
+    "Trample"
+  ]
+}

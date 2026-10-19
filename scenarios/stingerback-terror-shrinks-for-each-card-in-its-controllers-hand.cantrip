@@ -1,0 +1,32 @@
+# Stingerback Terror is a 7/7 that gets -1/-1 for each card in its controller's hand (CR 613.4c). Bot1 casts it off four Moxen with two
+# Mountains left in hand -> 5/5, and the size follows the hand: playing a Mountain makes it 6/6. Bot2's seven-card hand does not count.
+
+[Bot1 Deck]
+Stingerback Terror
+Mox Ruby x4
+Mountain x2
+Mountain x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stingerback Terror.Cast
+Bot2.Pass
+? Bot1.Hand.Count = 2
+? Bot1.Battlefield.Stingerback Terror.Power = 5
+? Bot1.Battlefield.Stingerback Terror.Toughness = 5
+Bot1.Hand.Mountain.Play
+
+[Expect]
+Bot1.Battlefield.Stingerback Terror.Power = 6
+Bot1.Battlefield.Stingerback Terror.Toughness = 6
+Bot2.Hand.Count = 7

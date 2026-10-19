@@ -1,0 +1,31 @@
+# Stingerback Terror, Plot {2}{R} (CR 702.170): Bot1 pays {2}{R} with three Moxen and exiles it (a special action). It can't be cast the
+# turn it was plotted (the refusal); on turn 3 it is cast from exile for no mana (the Moxen stay untapped) and, with the hand at
+# four cards in hand, a 3/3 (7 - 4).
+
+[Bot1 Deck]
+Stingerback Terror
+Mox Ruby x3
+Mountain x16
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stingerback Terror.Activate(Ability: Plot)
+? Exile = Stingerback Terror
+! Bot1.Exile.Stingerback Terror.Cast
+[T3 Bot1.Main1]
+Bot1.Exile.Stingerback Terror.Cast
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Stingerback Terror.Power = 3
+Bot1.Hand.Count = 4
+Exile.Count = 0
+Bot1.Battlefield.Mox Ruby#1.Tapped = false
