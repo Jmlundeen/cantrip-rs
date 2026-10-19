@@ -1,0 +1,42 @@
+# Graft Surgeon: "put its counters on up to one target creature you control" - with no target chosen the ability resolves and
+# puts them nowhere (CR 115.1d), the +1/+1 counter simply ceasing to exist with the creature (CR 122.2).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Plains
+Graft Surgeon
+Ornithopter
+Plains x14
+
+[Bot2 Deck]
+Mountain
+Flame Slash
+Mountain x18
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Graft Surgeon.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flame Slash.Cast(Bot1.Battlefield.Graft Surgeon)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Graveyard = Graft Surgeon
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Flame Slash

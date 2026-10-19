@@ -1,0 +1,8 @@
+{
+  "name": "Graft Surgeon",
+  "manaCost": "{2}{W}",
+  "type": "Creature - Human Cleric",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "This creature enters with a +1/+1 counter on it.\nWhen this creature dies, put its counters on up to one target creature you control."
+}
