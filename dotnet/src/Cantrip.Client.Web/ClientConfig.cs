@@ -37,6 +37,8 @@ public static class ClientConfig
         Test = query.ContainsKey("test");
         CardSheet = query.ContainsKey("cardsheet");
         Decks = query.ContainsKey("decks");
+        DeckId = query.GetValueOrDefault("deck") is { Length: > 0 } deck ? deck : null;
+        DeckFormatKey = query.GetValueOrDefault("format") is { Length: > 0 } format ? format : null;
         Auto = query.ContainsKey("auto");
         Narrate = query.ContainsKey("narrate");
         BotSeed = int.TryParse(query.GetValueOrDefault("bot-seed"), out int botSeed) ? botSeed : null;
@@ -108,6 +110,15 @@ public static class ClientConfig
     /// deck editor).
     /// </summary>
     public static bool Decks { get; }
+
+    /// <summary>
+    /// The saved deck the deck editor opens with (<c>?decks&amp;deck=ID</c>, as the site's deck library links it), or
+    /// null for a new one.
+    /// </summary>
+    public static string? DeckId { get; }
+
+    /// <summary>The format a new deck in the deck editor starts in (<c>?decks&amp;format=modern</c>); null for Standard.</summary>
+    public static string? DeckFormatKey { get; }
 
     /// <summary>Whether this seat plays itself (<c>?auto</c>), as a bot seat would, for a test to watch a whole game.</summary>
     public static bool Auto { get; }

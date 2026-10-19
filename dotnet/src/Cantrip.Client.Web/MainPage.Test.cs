@@ -74,7 +74,9 @@ public sealed partial class MainPage
             GameClient? client = _gameClient;
             // Ready once the table is up, or the draft or the deck being built before it.
             // A table forming from a queue, and a seat given up, are pages of their own too.
-            bool ready = (client?.View is not null || EventShown || DeckEditorShown || PairingsShown || client?.Table is { Forming: true } || client?.Released is not null)
+            // So is an event over with no game to show it, which the lobby's place says (LobbyPanel.RenderOver).
+            bool ready = (client?.View is not null || EventShown || DeckEditorShown || PairingsShown || client?.Table is { Forming: true } || client?.Released is not null
+                    || (client?.Table is { Phase: TablePhase.Finished } && _lobby.Visibility == Visibility.Visible))
                 && _deckLoading.Visibility != Visibility.Visible;
 
             // What the page is still doing, by name, so a test that waited for it to finish can say what never did.

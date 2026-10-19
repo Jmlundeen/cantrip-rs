@@ -181,21 +181,23 @@ round with its table, both players, the games each has won and how it stands ("G
 2-1"), this seat's lit; "Round 2 begins in 0:42" once the round's last match is over; and the standings with points,
 record and the three tiebreakers. A player comes back here after their match and watches the rest finish; at the end it
 is the final standings. **Drop**, in the header's corner, asks again before it sends `DropMessage`; it is gone once the
-seat has dropped or the event is over. Every move between the pod's table and a game's table is a `TableMove`, so each game is a fresh
+seat has dropped or the event is over, and in its place is the way back to the site the pod's table names (**Back to
+your page**, `TableMessage.Return`, the Discord bot's player page). Every move between the pod's table and a game's table is a `TableMove`, so each game is a fresh
 page. The test state has `pairings` (round, final, starts-in, each match in words). `BoosterDraftTests` drafts seat 1
 against seven bots - pick, deck building, pairings - and pictures a pod played out by bots at its final standings.
 
 ## The constructed deck editor
 
-`?decks` (what the bot's site opens at `/decks`, and the player landing page links as **Deck Editor**) shows the deck
-editor instead of a table (`MainPage.Decks.cs`): no game server, only the site it was served from. The cards are the
+`?decks` (what the bot's site's deck library opens at `/decks/edit`) shows the deck editor instead of a table
+(`MainPage.Decks.cs`): no game server, only the site it was served from. `&deck=ID` opens one of the player's decks as it
+starts, and `&format=KEY` starts a new deck in that format. The cards are the
 site's catalog (`/decks/api/catalog`, a `CardCatalogView` in MessagePack): every card the engine plays, as `CardOracle`
 prints it, with its Scryfall legalities and color identity (`content/mtg/legality.json`, made by
 `tools/maintenance/fetch-legality.py`). Card art is the site's own `/art` unless `?art=` says otherwise.
 
 The header has the deck list's toggle, the deck's name, its format (Standard, Pioneer, Modern, Legacy, Vintage,
 Commander, Penny Dreadful), **Save**, **New deck**, whether the deck is legal and why not (`DeckRules`, in
-`Cantrip.Client/Decks`, checked as the deck changes), and **Home**. On the left, collapsible, are the player's saved decks by
+`Cantrip.Client/Decks`, checked as the deck changes), and **All decks**, back to the site's deck library. On the left, collapsible, are the player's saved decks by
 format, the one open lit, each with a bin; signed out, a way to log in with Discord instead. On top is the search: a box
 matching name, type line and rules text, then Type, the colors W U B R G and C (any of those lit), Mana value and Sort,
 over results in rows - only cards legal in the deck's format, and for Commander, once a commander is chosen, only cards
@@ -358,6 +360,12 @@ stops the countdown - the player is looking - and the **Menu** tab keeps the but
 that names nothing - one of the player's own (`tools\play-vs-bot.cmd`, `?bots=2`), or a booster pod's game, whose
 players the pod sends on to the next game or back to its pairings and standings (`TableMoveMessage`) - has the result
 alone, as before.
+
+An event over with no game of its own to say so - a Winston or grid draft called off because a player dropped, or did not
+take their seat - is a page of its own where the lobby is (`LobbyPanel.RenderOver`): the event's name, why it ended
+(`TableMessage.Detail`, which the table takes from the event), and the button back to the page the table names. A seat
+given up at a table still filling - left, or not ready in time - has the same button back to the draft queues.
+`GoingBackTests` drops a player from a draft and goes back from the other's page.
 
 ## Open
 

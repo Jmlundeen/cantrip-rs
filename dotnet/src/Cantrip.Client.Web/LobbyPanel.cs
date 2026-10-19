@@ -43,17 +43,20 @@ public sealed class LobbyPanel : Grid
             {
                 _released = released;
                 _ticker.Stop();
-                RenderReleased(released);
+                RenderReleased(released, client.Table);
             }
 
             return true;
         }
 
-        bool setup = client.Table is { Phase: TablePhase.Setup };
+        // An event over before any game of its own ended it - a draft called off - is said here too, with the way back.
+        bool over = client.Table is { Phase: TablePhase.Finished, EventId.Length: > 0 } && !client.IsOver;
+        bool setup = client.Table is { Phase: TablePhase.Setup } || over;
         Visibility = setup ? Visibility.Visible : Visibility.Collapsed;
+        if (over) Background = Theme.Brush(Theme.Window);
 
         // A table forming from a queue is a page of its own, with no empty board showing behind it.
-        Background = client.Table is { Forming: true } ? Theme.Brush(Theme.Window) : null;
+        Background = client.Table is { Forming: true } || over ? Theme.Brush(Theme.Window) : null;
         if (!setup)
         {
             return false;
@@ -88,6 +91,12 @@ public sealed class LobbyPanel : Grid
         });
 
         _ticker.Stop();
+        if (table.Phase == TablePhase.Finished)
+        {
+            RenderOver(table, column);
+            return;
+        }
+
         if (table.Forming)
         {
             RenderForming(client, table, column);
@@ -305,8 +314,34 @@ public sealed class LobbyPanel : Grid
         _countdown.Text = left == 1 ? "1 second left" : $"{left} seconds left";
     }
 
+    /// <summary>An event over with no game of its own to show it - a draft called off: why, and the way back to the site.</summary>
+    private static void RenderOver(TableMessage table, StackPanel column)
+    {
+        column.MaxWidth = 520;
+        column.Children.Add(Text(table.EventName.Length > 0 ? table.EventName : "Event", 24, Theme.Fg, semibold: true));
+        column.Children.Add(Text(table.Detail.Length > 0 ? table.Detail : "This event is over.", 15, Theme.FgSoft));
+        AddWayBack(table, column);
+    }
+
+    /// <summary>
+    /// The way back to the site the table came from, as a button, when the table names it (<see cref="TableMessage.Return"/>);
+    /// otherwise a word that the page can be closed.
+    /// </summary>
+    private static void AddWayBack(TableMessage? table, StackPanel column, string? otherwise = null)
+    {
+        if (Cantrip.Client.Presentation.GoingBack.PageOf(table) is { } page)
+        {
+            var back = new DockButton(table!.ReturnName.Length > 0 ? $"Back to {table.ReturnName}" : "Back", primary: true).Filling();
+            back.Clicked += () => TableMove.Back(page);
+            column.Children.Add(back);
+            return;
+        }
+
+        column.Children.Add(Text(otherwise ?? "You can close this page.", 14, Theme.FgMuted));
+    }
+
     /// <summary>The seat is gone: why, and where to go from here.</summary>
-    private void RenderReleased(SeatReleasedMessage released)
+    private void RenderReleased(SeatReleasedMessage released, TableMessage? table)
     {
         Children.Clear();
         var column = new StackPanel { Orientation = Orientation.Vertical, Spacing = 12 };
@@ -324,7 +359,7 @@ public sealed class LobbyPanel : Grid
 
         column.Children.Add(Text("You're no longer at this table", 24, Theme.Fg, semibold: true));
         column.Children.Add(Text(released.Detail, 15, Theme.FgSoft));
-        column.Children.Add(Text("You can close this page. To play, press Join in the queue's channel in Discord.", 14, Theme.FgMuted));
+        AddWayBack(table, column, "You can close this page. To play, press Join in the queue's channel in Discord.");
     }
 
     /// <summary>A player's picture beside their name, or the stand-in for someone without one.</summary>

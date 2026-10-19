@@ -248,8 +248,9 @@ public sealed partial class MainPage
         _editorStatus = EventText(string.Empty, 13, Theme.FgSoft, semibold: true);
         _editorStatus.VerticalAlignment = VerticalAlignment.Center;
 
-        var home = new DockButton("Home", primary: false) { VerticalAlignment = VerticalAlignment.Center };
-        home.Clicked += () => DeckEditorJs.Go("home");
+        // Back to the site's deck library, where the editor is opened from.
+        var home = new DockButton("All decks", primary: false) { VerticalAlignment = VerticalAlignment.Center };
+        home.Clicked += () => DeckEditorJs.Go("decks");
 
         FrameworkElement[] parts = [_deckListToggle, title, _deckName, _formatChoice, _saveButton, fresh, _editorStatus, home];
         for (int column = 0; column < parts.Length; column++)
@@ -381,9 +382,15 @@ public sealed partial class MainPage
     {
         _deckPanel.Visibility = Visibility.Visible;
         BrowserTitle.Show("Cantrip - Deck Editor");
-        OpenDeck(new SavedDeck { Name = string.Empty, Format = DeckFormat.StandardKey });
+        OpenDeck(new SavedDeck { Name = string.Empty, Format = DeckFormat.Find(ClientConfig.DeckFormatKey)?.Key ?? DeckFormat.StandardKey });
         ShowDeckList();
         await Task.WhenAll(LoadCatalogAsync(), RefreshDeckListAsync());
+
+        // Opened from the site's deck library on one of the player's decks.
+        if (ClientConfig.DeckId is { } id && _savedDecks?.Any(deck => deck.Id == id) == true)
+        {
+            await OpenSavedAsync(id);
+        }
     }
 
     private async Task LoadCatalogAsync()
@@ -456,7 +463,7 @@ public sealed partial class MainPage
         {
             _deckListRows.Children.Add(EventText("Log in with Discord to save your decks and open them again.", 12, Theme.FgSoft));
             var signIn = new DockButton("Log in with Discord", primary: true).Filling();
-            signIn.Clicked += () => DeckEditorJs.Go("signin?then=decks");
+            signIn.Clicked += () => DeckEditorJs.Go("signin?then=decks/edit");
             _deckListRows.Children.Add(signIn);
             return;
         }

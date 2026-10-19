@@ -25,6 +25,8 @@ public sealed partial class MainPage
     private StackPanel _standingsRows = null!;
     private TextBlock _pairingsHeading = null!;
     private DockButton _dropButton = null!;
+    private DockButton _pairingsBack = null!;
+    private Uri? _pairingsBackTo;
     private StackPanel _dropConfirm = null!;
     private PairingsMessage? _pairingsShown;
     private DateTime? _roundBy;
@@ -93,6 +95,13 @@ public sealed partial class MainPage
         _dropButton.Tooltip = "Leave the event: you are not paired again, and your standing is kept as it is.";
         corner.Children.Add(_dropButton);
 
+        _pairingsBack = new DockButton("Back", primary: true) { HorizontalAlignment = HorizontalAlignment.Right, Visibility = Visibility.Collapsed };
+        _pairingsBack.Clicked += () =>
+        {
+            if (_pairingsBackTo is { } page) TableMove.Back(page);
+        };
+        corner.Children.Add(_pairingsBack);
+
         var yes = new DockButton("Yes, drop", primary: true).Filling();
         var no = new DockButton("Stay in", primary: false).Filling();
         var answers = new Grid { ColumnSpacing = 8 };
@@ -159,6 +168,12 @@ public sealed partial class MainPage
         _dropButton.Visibility = CanDrop(pairings, client.Seat) && _dropConfirm.Visibility != Visibility.Visible
             ? Visibility.Visible
             : Visibility.Collapsed;
+
+        // Out of the event - over, or dropped from - the way back to the site the table names.
+        Uri? back = CanDrop(pairings, client.Seat) ? null : Cantrip.Client.Presentation.GoingBack.PageOf(client.Table);
+        _pairingsBack.Visibility = back is null ? Visibility.Collapsed : Visibility.Visible;
+        _pairingsBackTo = back;
+        if (back is not null) _pairingsBack.Caption = client.Table!.ReturnName.Length > 0 ? $"Back to {client.Table.ReturnName}" : "Back";
         string name = client.Table?.EventName is { Length: > 0 } eventName ? eventName : "Draft";
         _pairingsTitle.Text = pairings.Final ? $"{name}  ·  final standings" : $"{name}  ·  round {pairings.Round} of {pairings.Rounds}";
         _pairingsLine.Text = pairings.Detail;

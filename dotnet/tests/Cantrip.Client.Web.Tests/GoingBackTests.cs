@@ -79,4 +79,56 @@ public sealed class GoingBackTests(WebClient web)
 
         Assert.Empty(table.Errors);
     }
+
+    [Fact]
+    public async Task A_draft_called_off_because_the_other_player_dropped_says_so_with_a_button_back_to_the_site()
+    {
+        const string Queues = "http://cantrip.test/draft";
+        string data = Path.Combine(Path.GetTempPath(), "cantrip-going-back-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var store = new Cantrip.Server.Events.EventStore(data);
+            Cantrip.Server.Events.CreatedEvent created = Cantrip.Server.Events.DraftPod.CreateWinston(store, ContentCache.Get(WebClient.Content), new Cantrip.Server.Events.WinstonDraftSetup
+            {
+                Name = "Winston draft: RW Aggro",
+                Cube = "rw-aggro",
+                CubeCards = Cantrip.Server.Events.CubeList.Load(Path.Combine(WebClient.Root, "decks", "rw-aggro.txt")),
+                Cards = 18,
+                Players = [("alice", "Alice"), ("bob", "Bob")],
+            });
+            Cantrip.Server.Events.DraftPod pod = Cantrip.Server.Events.DraftPod.Open(store, created.Record.Id, ContentCache.Get(WebClient.Content));
+            await using GameServer server = await GameServer.StartAsync(new GameServerOptions
+            {
+                Port = 0,
+                Players = 2,
+                ContentRoot = WebClient.Content,
+                Event = pod,
+                Return = new ReturnPage(new Uri(Queues), "Draft Queues"),
+            });
+            var address = new Uri($"ws://localhost:{server.Port}/game");
+
+            await using TablePage table = await TablePage.OpenAsync(
+                web, $"server={Uri.EscapeDataString(address.AbsoluteUri)}#ticket={created.Tickets["alice"]}", WebClient.Pictures(nameof(GoingBackTests)));
+            await table.Page.RouteAsync(Queues, route => route.FulfillAsync(new RouteFulfillOptions
+            {
+                ContentType = "text/html",
+                Body = "<!doctype html><title>Draft Queues</title><h1>Draft Queues</h1>",
+            }));
+
+            // Alice waits for Bob to sit down; Bob drops from the site instead.
+            for (int wait = 0; wait < 300 && store.LoadEvent(created.Record.Id)!.Participant("alice")!.Seated is false; wait++) await Task.Delay(100);
+            Assert.True(store.LoadEvent(created.Record.Id)!.Participant("alice")!.Seated);
+            Assert.Null(pod.Drop("bob"));
+            await table.SettledAsync(state => state.Controls.Any(control => control.Label == "Back to Draft Queues"));
+            await table.PictureAsync("called-off");
+
+            await table.ClickAsync("Back to Draft Queues");
+            await table.Page.WaitForURLAsync(Queues, new PageWaitForURLOptions { Timeout = 30_000 });
+            Assert.Empty(table.Errors);
+        }
+        finally
+        {
+            if (Directory.Exists(data)) Directory.Delete(data, recursive: true);
+        }
+    }
 }
