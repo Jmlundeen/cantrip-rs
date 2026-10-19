@@ -1,0 +1,27 @@
+# Hexhaven Battalion: "Create three 2/2 colorless Wizard Soldier creature tokens named Cadet. Empower Jace 2"
+# (CR 701.71, 722.3). Bot1 makes three Cadets, then the empower creates a Jace token with two loyalty counters.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Hexhaven Battalion
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Hexhaven Battalion.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Cadet#1.Power = 2
+Bot1.Battlefield.Cadet#2.Toughness = 2
+Bot1.Battlefield.Cadet#3.Power = 2
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Count = 4
