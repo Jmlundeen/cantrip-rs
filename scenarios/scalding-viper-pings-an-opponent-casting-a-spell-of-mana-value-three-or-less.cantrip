@@ -1,0 +1,59 @@
+# Scalding Viper: "Whenever an opponent casts a spell with mana value 3 or less, this creature deals 1 damage to that
+# player." Bot1's own Mox Pearl cast after the Viper is out does nothing (an opponent's spells only): Bot1 stays at 20.
+# On turn 2 Bot2 casts Black Lotus (mana value 0: 19), Mox Ruby (0: 18), Basalt Monolith with the Lotus's {R}{R}{R} (3, the
+# boundary, CR 202.3: 17) and Lightning Bolt (1: 16) at Bot1 (17): each cast is one damage to Bot2, the caster, and not to
+# Bot1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Scalding Viper
+Mox Pearl
+Swamp x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Basalt Monolith
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Scalding Viper.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+? Bot2.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 19
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 18
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Basalt Monolith.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 17
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 16
+Stack.Count = 0

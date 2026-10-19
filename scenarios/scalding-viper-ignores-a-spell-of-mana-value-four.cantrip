@@ -1,0 +1,44 @@
+# Scalding Viper: "mana value 3 or less" - four is out (the boundary, CR 202.3). Bot2 casts Black Lotus (19) and Mox Ruby
+# (18), then Panharmonicon ({4}, mana value 4) with the Lotus's {R}{R}{R} and the Mox: no damage, Bot2 stays at 18. With a
+# trigger for it, it would end at 17.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Sapphire
+Scalding Viper
+Swamp x16
+
+[Bot2 Deck]
+Black Lotus
+Mox Ruby
+Panharmonicon
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Scalding Viper.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 18
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Panharmonicon.Cast
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot2.Life = 18
+Bot2.Battlefield.Panharmonicon.Types = Artifact

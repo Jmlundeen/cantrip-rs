@@ -1,0 +1,14 @@
+{
+  "name": "Scalding Viper",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Elemental Snake",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Whenever an opponent casts a spell with mana value 3 or less, this creature deals 1 damage to that player.",
+  "adventure": {
+    "name": "Steam Clean",
+    "manaCost": "{1}{U}",
+    "type": "Sorcery — Adventure",
+    "oracleText": "Return target nonland permanent to its owner's hand. (Then exile this card. You may cast the creature later from exile.)"
+  }
+}
