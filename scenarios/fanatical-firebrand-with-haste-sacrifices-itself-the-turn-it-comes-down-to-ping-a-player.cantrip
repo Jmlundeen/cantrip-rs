@@ -1,0 +1,29 @@
+# Fanatical Firebrand: "Haste" lets it pay the {T} of "{T}, Sacrifice this creature: It deals 1 damage to any target." the turn it
+# is cast (CR 702.10). The sacrifice is a cost (CR 602.2b), so the Firebrand is in the graveyard while the ability is still on the
+# stack, and the ability, which does not depend on it, still resolves and deals 1 damage to Bot2 (CR 113.7a, 608.2h).
+
+[Bot1 Deck]
+Mountain
+Fanatical Firebrand
+Mountain x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot2)
+? Bot1.Graveyard = Fanatical Firebrand
+? Stack.Count = 1
+? Bot2.Life = 20
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Bot1.Graveyard = Fanatical Firebrand
+Bot1.Battlefield = Mountain
+Stack.Count = 0

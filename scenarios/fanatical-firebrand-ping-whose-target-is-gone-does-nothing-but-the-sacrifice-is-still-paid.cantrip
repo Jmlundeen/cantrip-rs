@@ -1,0 +1,49 @@
+# Fanatical Firebrand's ability targets Bot2's Elvish Mystic. In response Bot2 Lightning Bolts its own Mystic, so on resolution the
+# only target is illegal and the ability does not resolve (CR 608.2b): nothing is dealt - Bot2's life stays 20. The Firebrand was
+# sacrificed as a cost (CR 602.2b), so it is in the graveyard regardless. Control: the scenario where the Mystic is still there.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Fanatical Firebrand
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Black Lotus
+Forest
+Elvish Mystic
+Lightning Bolt
+Forest x3
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Elvish Mystic)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Elvish Mystic; Lightning Bolt; Black Lotus
+Bot1.Graveyard = Fanatical Firebrand
+Stack.Count = 0

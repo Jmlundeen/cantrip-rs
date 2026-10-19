@@ -1,0 +1,43 @@
+# Fanatical Firebrand: "It deals 1 damage" - the Firebrand was sacrificed as a cost, so the damage is dealt by it as it last existed on the
+# battlefield (CR 113.7a, 608.2h, 120.3d-e). Equipped with Basilisk Collar (deathtouch and lifelink) it pings Bot2's Ornithopter (0/2): the
+# 1 damage is deathtouch damage and kills it, and Bot1 gains 1 life from the lifelink (21), though the Firebrand is already in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Fanatical Firebrand
+Basilisk Collar
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Hand.Basilisk Collar.Cast
+Bot1.Pass
+Bot1.Battlefield.Basilisk Collar.Activate(Bot1.Battlefield.Fanatical Firebrand)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Fanatical Firebrand.Keywords = Deathtouch; Haste; Lifelink
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 21
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Fanatical Firebrand; Black Lotus

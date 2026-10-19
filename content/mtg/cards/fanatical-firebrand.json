@@ -1,0 +1,11 @@
+{
+  "name": "Fanatical Firebrand",
+  "manaCost": "{R}",
+  "type": "Creature — Goblin Pirate",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Haste\n{T}, Sacrifice this creature: It deals 1 damage to any target.",
+  "keywords": [
+    "Haste"
+  ]
+}

@@ -1,0 +1,26 @@
+# Fanatical Firebrand: its ability costs {T} (CR 602.2b), so a Firebrand tapped by attacking (no vigilance) cannot activate it. It
+# attacks the turn it is cast thanks to haste and deals 1 combat damage; the refusal is judged in the combat damage step and the
+# end of combat, with the Firebrand tapped. The control is the first Firebrand scenario, where the untapped Firebrand activates.
+
+[Bot1 Deck]
+Mountain
+Fanatical Firebrand
+Mountain x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Fanatical Firebrand > Bot2)
+! Bot1.Battlefield.Fanatical Firebrand.Activate
+[T1 Bot1.Main2]
+! Bot1.Battlefield.Fanatical Firebrand.Activate
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Fanatical Firebrand.Tapped = true

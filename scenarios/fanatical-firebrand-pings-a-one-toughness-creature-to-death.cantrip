@@ -1,0 +1,38 @@
+# Fanatical Firebrand: "any target" includes a creature (CR 115.1, 120.3). Its 1 damage kills Bot2's Elvish Mystic (1/1) by lethal
+# damage as a state-based action (CR 704.5g), though the Firebrand has already been sacrificed to pay for the ability. Bot2's Mystic
+# comes down on turn 2; Bot1 casts the Firebrand on turn 3 (it needs no waiting thanks to haste).
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mountain
+Fanatical Firebrand
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x5
+Forest x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+Bot1.Pass
+Bot1.Battlefield.Fanatical Firebrand.Activate(Bot2.Battlefield.Elvish Mystic)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 20
+Bot2.Battlefield = Forest
+Bot2.Graveyard = Elvish Mystic
+Bot1.Graveyard = Fanatical Firebrand
