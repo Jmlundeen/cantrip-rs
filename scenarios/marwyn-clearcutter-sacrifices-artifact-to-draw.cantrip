@@ -1,0 +1,32 @@
+# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+
+[Bot1 Deck]
+Mountain
+Marwyn, the Clearcutter
+Black Lotus
+Ornithopter
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Marwyn, the Clearcutter.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Marwyn, the Clearcutter.Activate
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot1.Battlefield.Marwyn, the Clearcutter.Tapped = true
