@@ -1,0 +1,62 @@
+# The leaves-the-battlefield ability belongs to the Vestige's controller as it left (CR 603.2, 603.10a, 608.2), not its owner. Bot1 hard-casts
+# the Vestige on turn 1 (Black Lotus and three Moxen). On turn 2 Bot2 steals it with Act of Treason and exiles it with Swords to
+# Plowshares: Bot2 draws a card and puts a permanent card from Bot2's own hand (Mox Emerald, mana value 0 <= 0 lands) onto its battlefield
+# tapped; Bot1, the owner, draws nothing and its hand is unchanged. Bot2 gains 7 life from the Swords (the Vestige's power).
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Anticausal Vestige
+Island
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Act of Treason
+Swords to Plowshares
+Mox Emerald
+Plains
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Anticausal Vestige.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Act of Treason.Cast(Bot1.Battlefield.Anticausal Vestige)
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot2.Battlefield.Anticausal Vestige)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Choose(Mox Emerald)
+[T2 Bot2.Main2]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot2.Life = 27
+Bot2.Battlefield.Mox Emerald.Tapped = true
+Bot2.Hand = Plains; Plains
+Bot1.Hand = Island; Island

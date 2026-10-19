@@ -1,0 +1,57 @@
+# A token that is a copy of Anticausal Vestige has the ability (CR 707.2), and a token leaving the battlefield is a zone change that
+# triggers it (CR 111.7, 603.6c) even though the token ceases to exist. Bot1 hard-casts the Vestige on turn 1 (Black Lotus and three Moxen),
+# and on turn 3 plays a second Mountain and casts Kiki-Jiki and copies it; the token is sacrificed at the beginning of the end step, and that leaving makes Bot1 draw
+# and put Sol Ring (1 <= 2 lands) onto the battlefield tapped. The original Vestige is untouched and the token is gone.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Black Lotus
+Anticausal Vestige
+Kiki-Jiki, Mirror Breaker
+Sol Ring
+Island x14
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Anticausal Vestige.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Kiki-Jiki, Mirror Breaker.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Kiki-Jiki, Mirror Breaker.Activate(Anticausal Vestige)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Anticausal Vestige#2.Token = true
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Sol Ring)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Battlefield.Count = 8
+Bot1.Hand.Count = 0

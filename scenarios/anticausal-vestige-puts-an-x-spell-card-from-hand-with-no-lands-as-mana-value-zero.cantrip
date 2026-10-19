@@ -1,0 +1,38 @@
+# Anticausal Vestige warped with four Moxen, so Bot1 controls no lands when it is exiled at the end step. A card in hand has the mana
+# value of its printed cost with X as 0 (CR 107.3b, 202.3e): Engineered Explosives ({X}) is 0 <= 0 lands and is offered, entering
+# tapped; Sol Ring (1 > 0) is the refused control. Engineered Explosives enters with no sunburst counters (nothing was spent).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Anticausal Vestige
+Engineered Explosives
+Sol Ring
+Island
+Island x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Anticausal Vestige.Cast(Ability: Warp)
+[Bot1.Main2]
+! Bot1.Choose(Sol Ring)
+Bot1.Choose(Engineered Explosives)
+[T2 Bot2.Main1]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.Battlefield.Engineered Explosives.Tapped = true
+Bot1.Battlefield.Count = 5
+Bot1.Hand = Island; Sol Ring

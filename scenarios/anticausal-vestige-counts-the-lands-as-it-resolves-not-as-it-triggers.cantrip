@@ -1,0 +1,50 @@
+# "The number of lands you control" is read as the ability resolves (CR 608.2c). Warped on turn 3 with two Islands and two Moxen, the
+# Vestige is exiled at the end step and its leaves-the-battlefield ability goes on the stack with Bot1 controlling two lands. In response
+# Bot2 sacrifices Strip Mine to destroy one of Bot1's Islands, so only one land is left: Mind Stone (mana value 2, which the count at
+# trigger time would have allowed) is refused, and Sol Ring (1) is the control that is offered and put in tapped.
+
+[Bot1 Deck]
+Island
+Island
+Mox Ruby
+Mox Pearl
+Anticausal Vestige
+Mind Stone
+Sol Ring
+Island
+Island x12
+
+[Bot2 Deck]
+Strip Mine
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anticausal Vestige.Cast(Ability: Warp)
+[T3 Bot1.End]
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Strip Mine.Activate(Ability: Destroy; Bot1.Battlefield.Island)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Mind Stone)
+Bot1.Choose(Sol Ring)
+[T4 Bot2.Main1]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.Battlefield = Island; Mox Pearl; Mox Ruby; Sol Ring
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Hand = Island; Island; Mind Stone
+Bot2.Graveyard = Strip Mine

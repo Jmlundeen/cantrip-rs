@@ -1,0 +1,38 @@
+# A Room card in a hand has the combined mana value of both halves (CR 709.3a, 202.3): Unholy Annex // Ritual Chamber is 3 + 5 = 8.
+# Anticausal Vestige, warped on turn 5 with three Islands and a Mox, may put a card of mana value up to 3: the Room is refused, though
+# Unholy Annex alone (mana value 3) would fit. Sol Ring (1) is the control that is offered and put in tapped.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Mox Ruby
+Anticausal Vestige
+Unholy Annex // Ritual Chamber
+Sol Ring
+Island x13
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Anticausal Vestige.Cast(Ability: Warp)
+[Bot1.Main2]
+! Bot1.Choose(Unholy Annex // Ritual Chamber)
+Bot1.Choose(Sol Ring)
+[T6 Bot2.Main1]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Hand = Island; Island; Island; Unholy Annex // Ritual Chamber

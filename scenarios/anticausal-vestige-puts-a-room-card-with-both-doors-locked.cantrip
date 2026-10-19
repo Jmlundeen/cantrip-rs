@@ -1,0 +1,43 @@
+# A Room put onto the battlefield without being cast enters with both doors locked (CR 709.5g), and is then a card with no name, no mana cost
+# and no abilities. Anticausal Vestige, warped on turn 15 with eight lands, may put a card of mana value up to 8, the Room's combined 3 + 5
+# (CR 709.3a): it is put in tapped, both doors locked, and its mana value on the battlefield is 0 (CR 709.5c).
+
+[Bot1 Deck]
+Anticausal Vestige
+Unholy Annex // Ritual Chamber
+Island x5
+Island x14
+
+[Bot2 Deck]
+Plains x30
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T11 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T15 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Island#4.Activate
+Bot1.Hand.Anticausal Vestige.Cast(Ability: Warp)
+[Bot1.Main2]
+Bot1.Choose(Unholy Annex // Ritual Chamber)
+[T16 Bot2.Main1]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.Battlefield..Doors.Count = 0
+Bot1.Battlefield..ManaValue = 0
+Bot1.Battlefield..Tapped = true

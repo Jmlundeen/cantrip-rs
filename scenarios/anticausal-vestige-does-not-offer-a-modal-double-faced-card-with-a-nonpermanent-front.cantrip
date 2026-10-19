@@ -1,0 +1,38 @@
+# A modal double-faced card in a hand has only its front face's characteristics (CR 712.8a): Shatterskull Smashing is a sorcery of mana
+# value 2 there, not the land on its back, so it is no permanent card and Anticausal Vestige cannot put it onto the battlefield even
+# with two lands (2 <= 2, so only its type refuses it). Sol Ring (1) is the control that is offered and put in tapped.
+
+[Bot1 Deck]
+Island
+Island
+Mox Ruby
+Mox Pearl
+Anticausal Vestige
+Shatterskull Smashing
+Sol Ring
+Island
+Island x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Anticausal Vestige.Cast(Ability: Warp)
+[Bot1.Main2]
+! Bot1.Choose(Shatterskull Smashing)
+Bot1.Choose(Sol Ring)
+[T4 Bot2.Main1]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.Battlefield.Sol Ring.Tapped = true
+Bot1.Hand = Island; Island; Shatterskull Smashing

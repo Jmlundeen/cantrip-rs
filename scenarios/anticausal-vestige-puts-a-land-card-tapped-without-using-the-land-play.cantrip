@@ -1,0 +1,47 @@
+# A land card is a permanent card with mana value 0 (CR 110.4a, 202.3), so Anticausal Vestige may put one from hand onto the battlefield
+# tapped; putting it there is not playing it (CR 305.2a), so the turn's land play is still unused. Bot1 hard-casts the Vestige on turn 1
+# (Black Lotus and three Moxen) and on turn 3 exiles it with its own Swords to Plowshares before playing a land: it draws, puts an Island
+# from hand onto the battlefield tapped (0 lands controlled, 0 <= 0), and still plays another Island as its land play.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Ruby
+Mox Pearl
+Mox Jet
+Anticausal Vestige
+Swords to Plowshares
+Island
+Island
+Island x12
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Anticausal Vestige.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Anticausal Vestige)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot1.LandsPlayed = 0
+? Bot1.Battlefield.Island.Tapped = true
+Bot1.Hand.Island.Play
+[Bot1.Main2]
+
+[Expect]
+Exile = Anticausal Vestige
+Bot1.LandsPlayed = 1
+Bot1.Battlefield.Count = 5
