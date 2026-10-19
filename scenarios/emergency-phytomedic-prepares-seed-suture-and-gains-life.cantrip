@@ -1,0 +1,25 @@
+# Emergency Phytomedic: the printed abilities and resulting state (CR 608.2, 722).
+
+[Bot1 Deck]
+Emergency Phytomedic
+5 Mox Emerald
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Emergency Phytomedic.Cast
+Bot1.Exile.Seed Suture.Cast(Bot1.Battlefield.Emergency Phytomedic)
+
+[Expect]
+Bot1.Life = 21
+Bot1.Battlefield.Emergency Phytomedic.Prepared = (absent)
