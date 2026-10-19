@@ -1,0 +1,58 @@
+# Loch Mare enters with three -1/-1 counters (a 1/2). Removing a counter pays for drawing a card (3 -> 2 counters, the
+# draw lands in hand); removing the other two pays for tapping Bot2's Ornithopter and stunning it (CR 122.1d), which
+# leaves Mare a 4/5 with no counters.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Loch Mare
+Island
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Loch Mare.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loch Mare.Counters.MinusOneMinusOne = 3
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Loch Mare.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loch Mare.Counters.MinusOneMinusOne = 2
+? Bot1.Hand.Count = 2
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Loch Mare.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Loch Mare.Counters.MinusOneMinusOne = (absent)
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Ornithopter.Counters.Stun = 1

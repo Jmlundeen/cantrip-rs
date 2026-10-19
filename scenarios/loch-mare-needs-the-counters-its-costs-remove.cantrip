@@ -1,0 +1,63 @@
+# Loch Mare's costs take counters off itself: with one counter left it can draw (to none) but not tap and stun, which
+# needs two; with none it can do neither. Bot2's Ornithopter is a legal target throughout, so only the cost refuses.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Pearl
+Loch Mare
+Island
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Loch Mare.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Loch Mare.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Loch Mare.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loch Mare.Counters.MinusOneMinusOne = 1
+! Bot1.Battlefield.Loch Mare.Activate(Bot2.Battlefield.Ornithopter; Ability: Tap)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Loch Mare.Activate(Ability: Draw a card)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Loch Mare.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Mox Ruby.Activate
+! Bot1.Battlefield.Loch Mare.Activate(Ability: Draw a card)
+
+[Expect]
+Turn = 3
+Bot1.Hand.Count = 4
+Bot2.Battlefield.Ornithopter.Counters.Stun = (absent)
+Bot2.Battlefield.Ornithopter.Tapped = false
