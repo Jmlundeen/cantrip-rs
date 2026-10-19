@@ -5,9 +5,16 @@
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
 //! `enters_tapped_unless_you_control` or `enters_tapped_unless_you_control_either` below; the card sets it in `enters`.
 
-use crate::library::{search_to_battlefield, search_to_hand, Find};
+use crate::library::{search_to_battlefield, search_to_hand, search_to_top, Find};
 use crate::{choose, effects, mana, triggers};
 use cantrip_api::*;
+
+/// "A basic land card" (CR 205.4a, 305.6): a land card with the basic supertype, as the library search of every fetch below
+/// asks it of the cards in the library.
+pub fn is_basic_land_card(q: &dyn Query, card: ObjectId) -> bool {
+    let chars = q.chars(card);
+    chars.is(CardType::Land) && chars.supertypes.basic
+}
 
 /// A subtype as the number the generic land templates take: `sub(Subtype::Island)`.
 pub const fn sub(subtype: Subtype) -> u16 {
@@ -110,10 +117,7 @@ pub fn search_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, sour
 /// `search_basic_land_to_battlefield`, giving the land that arrived (none if the player found none) for an ability that goes
 /// on to do something to it: Elven Passage's "untap that land".
 pub fn fetch_basic_land_to_battlefield(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
-    search_to_battlefield(g, player, source, Find::ONE, tapped, |q, c| {
-        let chars = q.chars(c);
-        chars.is(CardType::Land) && chars.supertypes.basic
-    })
+    search_to_battlefield(g, player, source, Find::ONE, tapped, is_basic_land_card)
 }
 
 /// What "you may search your library for a basic land card, reveal it, put it into your hand, then shuffle" asks.
@@ -128,10 +132,7 @@ pub const FETCH_BASIC_TO_HAND: Question = Question::new(
 /// "Search your library for a basic land card, reveal it, put it into your hand, then shuffle" (CR 701.23): the player
 /// finding one or none, and the library shuffled either way. Bushwhack's first mode and Environmental Scientist print it.
 pub fn search_basic_land_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
-    search_to_hand(g, player, source, Find::ONE.revealed(), |q, c| {
-        let chars = q.chars(c);
-        chars.is(CardType::Land) && chars.supertypes.basic
-    })?;
+    search_to_hand(g, player, source, Find::ONE.revealed(), is_basic_land_card)?;
     Ok(())
 }
 
@@ -143,6 +144,34 @@ pub fn may_search_basic_land_to_hand(g: &mut dyn Game, player: PlayerId, source:
         return Ok(());
     }
     search_basic_land_to_hand(g, player, source)
+}
+
+/// What "you may search your library for a basic land card, reveal it, then shuffle and put that card on top" asks.
+pub const FETCH_BASIC_TO_TOP: Question = Question::new(
+    "SearchLibrary",
+    "search your library for a basic land card?",
+    "Reveal it, then shuffle and put that card on top of your library",
+    "Search",
+    "Don't search",
+);
+
+/// "Search your library for a basic land card, reveal it, then shuffle and put that card on top" (CR 701.23, 701.20): the
+/// player finding one or none; the card is revealed while it is still in the library and, the library shuffled, placed on top
+/// (it never changes zones). Fountainport Bell is the only printed card with this exact recipe so far; it is kept beside its
+/// hand and battlefield siblings (`search_basic_land_to_hand`, `search_basic_land_to_battlefield`) so the basic-land predicate and
+/// the question wording are the shared ones, and `library::search_to_top` is shared with Enlightened Tutor and Mystical Tutor.
+pub fn search_basic_land_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
+    search_to_top(g, player, source, Find::ONE.revealed(), is_basic_land_card)?;
+    Ok(())
+}
+
+/// "You may search your library for a basic land card, reveal it, then shuffle and put that card on top": asked first whether
+/// to, and declining skips the search and the shuffle (CR 701.23). Fountainport Bell's enters trigger.
+pub fn may_search_basic_land_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
+    if !effects::ask_may(g, player, source, Purpose::Ask(&FETCH_BASIC_TO_TOP))? {
+        return Ok(());
+    }
+    search_basic_land_to_top(g, player, source)
 }
 
 fn return_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
