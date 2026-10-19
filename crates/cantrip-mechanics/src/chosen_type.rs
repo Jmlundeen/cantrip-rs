@@ -1,5 +1,5 @@
 //! "Choose a creature type" permanents (CR 205.3m, 614.12a): the type is chosen as the permanent enters and kept on it, and
-//! its abilities say "of the chosen type". Banner of Kinship, Chronicle of Victory and Door of Destinies print the lot.
+//! its abilities say "of the chosen type". Banner of Kinship, Chronicle of Victory, Door of Destinies, Obelisk of Urd and Patchwork Banner print the lot.
 
 use cantrip_api::*;
 
@@ -18,14 +18,14 @@ pub fn choose_type_among(g: &mut dyn Game, entering: &mut Entering, choices: Vec
     Ok(Some(chosen))
 }
 
-/// `choose_creature_type` as a card's `enters`. Chronicle of Victory and Door of Destinies print exactly this.
+/// `choose_creature_type` as a card's `enters`. Chronicle of Victory, Door of Destinies, Obelisk of Urd and Patchwork Banner print exactly this.
 pub fn enters_choosing_a_creature_type(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     choose_creature_type(g, entering)?;
     Ok(())
 }
 
 /// "Creatures you control of the chosen type" (CR 205.3m): what a static ability of the permanent affects, a creature that
-/// is the chosen type, under the permanent's controller. Banner of Kinship, Chronicle of Victory and Door of Destinies
+/// is the chosen type, under the permanent's controller. Banner of Kinship, Chronicle of Victory, Door of Destinies, Obelisk of Urd and Patchwork Banner
 /// use it as `StaticDef::affects`.
 pub fn creatures_you_control_of_chosen_type(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     let s = q.state();
