@@ -1,0 +1,39 @@
+# Bot1 casts Frostcliff Siege on turn 1 (three Moxen) and chooses Jeskai; Llanowar Elves (Mox Emerald) come down too. On
+# turn 3 the Elves hit Bot2 for 1 (no +1/+0: the Temur ability is not the chosen one, and the Elves have no haste or
+# trample), and "Whenever one or more creatures you control deal combat damage to a player, draw a card" draws one.
+# Hand: 7 cards - 6 played = 1 Island left (the first player skips the turn-1 draw), + the turn-3 draw + the trigger = 3.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Frostcliff Siege
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Frostcliff Siege.Cast
+Bot1.Name(Jeskai)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Frostcliff Siege.ChosenOption = Jeskai
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Hand.Count = 3

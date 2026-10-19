@@ -1,0 +1,40 @@
+# Bot1 casts Frostcliff Siege off three Moxen on turn 1 and chooses Temur, then casts Llanowar Elves (off Mox Emerald)
+# and attacks with it the same turn: "Creatures you control get +1/+0 and have trample and haste" (CR 702.10, 702.19,
+# 613.4c). The Elves are a 2/1 with haste and trample, deal 2 to Bot2 (20 - 2 = 18), and no card is drawn because the
+# Jeskai ability is not the chosen one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Mox Emerald
+Frostcliff Siege
+Llanowar Elves
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Frostcliff Siege.Cast
+Bot1.Name(Temur)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T1 Bot1.DeclareAttackers]
+Bot1.Attack(Llanowar Elves > Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Frostcliff Siege.ChosenOption = Temur
+Bot1.Battlefield.Llanowar Elves.Power = 2
+Bot1.Battlefield.Llanowar Elves.Keywords = Haste; Trample
+Bot1.Hand.Count = 1
