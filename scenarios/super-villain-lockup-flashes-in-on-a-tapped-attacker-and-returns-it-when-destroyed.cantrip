@@ -1,0 +1,50 @@
+# Super Villain Lockup has flash: Bot1 casts it as Bot2 attacks with two of its three Ornithopters. "Exile target tapped
+# creature an opponent controls" may not target the third, untapped Ornithopter (refused) but exiles an attacking, tapped
+# one until the Lockup leaves the battlefield (CR 610.3). On turn five Bot1 destroys the Lockup with Disenchant and the
+# Ornithopter returns to the battlefield under its owner's control.
+
+[Bot1 Deck]
+Plains
+Plains
+Plains
+Super Villain Lockup
+Disenchant
+Plains x15
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Bot2.Battlefield.Ornithopter#1 > Bot1; Bot2.Battlefield.Ornithopter#2 > Bot1)
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Super Villain Lockup.Cast
+! Bot1.Target(Bot2.Battlefield.Ornithopter#3)
+Bot1.Target(Bot2.Battlefield.Ornithopter#1)
+[T5 Bot1.Main1]
+? Bot2.Battlefield.Count = 2
+? Exile.Count = 1
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Disenchant.Cast(Super Villain Lockup)
+[Bot1.Main2]
+
+[Expect]
+Turn = 5
+Exile.Count = 0
+Stack.Count = 0
+Bot2.Battlefield = Ornithopter; Ornithopter; Ornithopter
+Bot1.Battlefield = Plains; Plains; Plains
+Bot1.Graveyard = Disenchant; Super Villain Lockup

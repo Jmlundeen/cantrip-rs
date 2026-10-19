@@ -1,0 +1,9 @@
+{
+  "name": "Super Villain Lockup",
+  "manaCost": "{1}{W}",
+  "type": "Enchantment",
+  "oracleText": "Flash\nWhen this enchantment enters, exile target tapped creature an opponent controls until this enchantment leaves the battlefield.",
+  "keywords": [
+    "Flash"
+  ]
+}
