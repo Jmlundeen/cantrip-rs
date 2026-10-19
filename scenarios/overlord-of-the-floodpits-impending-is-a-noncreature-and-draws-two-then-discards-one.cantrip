@@ -1,0 +1,39 @@
+# Cast for its impending cost {1}{U}{U} it is a non-creature Enchantment with four time counters (CR 702.176a), and its
+# enters ability draws two cards (Elvish Mystic, Figure of Destiny) and only then discards one: Lightning Bolt, which
+# Bot1 held before the draw. Hand after: 5 + 2 - 1 = 6.
+
+[Bot1 Deck]
+Island
+Island
+Island
+Overlord of the Floodpits
+Lightning Bolt
+Forest
+Forest
+Island
+Island
+Elvish Mystic
+Figure of Destiny
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Overlord of the Floodpits.Cast(Ability: Impending)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Overlord of the Floodpits.Types = Enchantment
+Bot1.Battlefield.Overlord of the Floodpits.Counters.Time = 4
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Elvish Mystic; Figure of Destiny; Forest; Forest; Island; Island

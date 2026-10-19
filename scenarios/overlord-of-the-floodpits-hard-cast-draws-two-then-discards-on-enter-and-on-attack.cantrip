@@ -1,0 +1,48 @@
+# Cast for its mana cost {3}{U}{U} on turn 9 off five Islands it is a creature with no time counters. Its enters ability
+# draws Elvish Mystic and Figure of Destiny and discards the Mystic; on turn 11 it attacks (under Bot1's control since
+# turn 9) and the attack ability draws Lightning Bolt and Llanowar Elves and discards the Elves: draw two, then discard
+# one each time (CR 603.2). Bot2 takes 5.
+
+[Bot1 Deck]
+Island x7
+Overlord of the Floodpits
+Island x3
+Elvish Mystic
+Figure of Destiny
+Island
+Lightning Bolt
+Llanowar Elves
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T9 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Island#4.Activate
+Bot1.Battlefield.Island#5.Activate
+Bot1.Hand.Overlord of the Floodpits.Cast
+Bot1.Choose(Elvish Mystic)
+[T11 Bot1.Main1]
+Bot1.Attack(Overlord of the Floodpits > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Llanowar Elves)
+[T11 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Graveyard = Llanowar Elves; Elvish Mystic
+Bot1.Battlefield.Overlord of the Floodpits.Types = Enchantment; Creature
+Bot1.Battlefield.Overlord of the Floodpits.Counters.Time = (absent)
