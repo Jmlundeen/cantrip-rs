@@ -1,0 +1,34 @@
+# Mode three: "Exile target artifact or enchantment". Mox Emerald (an artifact) is exiled, not put into the graveyard; Llanowar
+# Elves (neither) is refused as the target, and stays.
+
+[Bot1 Deck]
+Black Lotus
+Archdruid's Charm
+Plains x5
+Plains x11
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Island x17
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(3)
+! Bot1.Target(Bot2.Battlefield.Llanowar Elves)
+Bot1.Target(Bot2.Battlefield.Mox Emerald)
+
+[Expect]
+Exile = Mox Emerald
+Bot2.Graveyard.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves
+Stack.Count = 0

@@ -1,0 +1,41 @@
+# Mode two, the ruling: Bot2 returns the Elvish Mystic to its owner's hand in response (Unsummon), so the creature you control
+# is an illegal target as Archdruid's Charm resolves: no counter is put (it would be on nothing) and no damage is dealt to the
+# Ornithopter, which is still a legal target.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Elvish Mystic
+Archdruid's Charm
+Plains x3
+Plains x10
+
+[Bot2 Deck]
+Island
+Unsummon
+Ornithopter
+Island x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(2)
+Bot1.Target(Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Elvish Mystic)
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot2.Graveyard = Unsummon
+Bot1.Graveyard = Archdruid's Charm; Black Lotus; Black Lotus
+Stack.Count = 0

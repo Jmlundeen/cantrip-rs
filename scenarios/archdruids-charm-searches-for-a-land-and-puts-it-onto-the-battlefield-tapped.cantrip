@@ -1,0 +1,30 @@
+# Mode one: a land card found is put onto the battlefield tapped (CR 701.23), not into the hand. A Mox Emerald is neither a
+# creature nor a land card, so it cannot be found (the refusal), and the Forest, a land card, can.
+
+[Bot1 Deck]
+Black Lotus
+Archdruid's Charm
+Plains x5
+Forest
+Mox Emerald
+Llanowar Elves
+Plains x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+! Bot1.Search(Mox Emerald)
+Bot1.Search(Forest)
+
+[Expect]
+Bot1.Battlefield = Forest
+Bot1.Battlefield.Forest.Tapped = true
+Bot1.Revealed = Forest
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains
+Bot1.Graveyard = Archdruid's Charm; Black Lotus
+Bot1.Library.Count = 10

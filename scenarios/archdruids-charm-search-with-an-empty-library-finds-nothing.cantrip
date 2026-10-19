@@ -1,0 +1,23 @@
+# Mode one with no cards in the library: there is nothing to look for, so no search question is asked, and the spell still
+# finishes (the library is shuffled, which changes nothing). The hand and battlefield are unchanged.
+
+[Bot1 Deck]
+Black Lotus
+Archdruid's Charm
+Plains x5
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains
+Bot1.Library.Count = 0
+Bot1.Graveyard = Archdruid's Charm; Black Lotus
+Stack.Count = 0

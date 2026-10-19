@@ -1,0 +1,26 @@
+# "Search for a creature or land card" may come up empty (CR 701.23b): Bot1 takes nothing, the Forest and the Elves stay in
+# the library, and the hand and battlefield are unchanged.
+
+[Bot1 Deck]
+Black Lotus
+Archdruid's Charm
+Plains x5
+Forest
+Llanowar Elves
+Plains x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+Bot1.Search()
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains
+Bot1.Library.Count = 11
+Bot1.Graveyard = Archdruid's Charm; Black Lotus

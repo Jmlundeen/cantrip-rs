@@ -1,0 +1,26 @@
+# Dryad Arbor is a land and a creature, so it is a land card: mode one puts it onto the battlefield tapped, not into the hand.
+
+[Bot1 Deck]
+Black Lotus
+Archdruid's Charm
+Plains x5
+Dryad Arbor
+Llanowar Elves
+Plains x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(1)
+Bot1.Search(Dryad Arbor)
+
+[Expect]
+Bot1.Battlefield = Dryad Arbor
+Bot1.Battlefield.Dryad Arbor.Tapped = true
+Bot1.Revealed = Dryad Arbor
+Bot1.Library.Count = 10
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains

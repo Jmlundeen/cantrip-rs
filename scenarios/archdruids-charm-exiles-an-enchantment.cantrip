@@ -1,0 +1,31 @@
+# Mode three, the enchantment half of "artifact or enchantment": Bot2's Oblivion Ring (an enchantment, not an artifact) is
+# exiled, not put into the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Archdruid's Charm
+Plains x5
+Plains x11
+
+[Bot2 Deck]
+Black Lotus
+Oblivion Ring
+Island x18
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Oblivion Ring.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Archdruid's Charm.Cast
+Bot1.Modes(3)
+Bot1.Target(Bot2.Battlefield.Oblivion Ring)
+
+[Expect]
+Exile = Oblivion Ring
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield.Count = 0
+Stack.Count = 0
