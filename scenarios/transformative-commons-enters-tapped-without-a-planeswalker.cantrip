@@ -1,0 +1,22 @@
+# With no planeswalker anywhere, Transformative Commons enters tapped (CR 614.1c) - the land itself is not a planeswalker - so it
+# cannot be tapped for mana that turn (refused), and on Bot1's next turn it untaps and taps for {G}, one of its two colors.
+
+[Bot1 Deck]
+Transformative Commons
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Transformative Commons.Play
+? Bot1.Battlefield.Transformative Commons.Tapped = true
+! Bot1.Battlefield.Transformative Commons.Activate(Color: Green)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Transformative Commons.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Transformative Commons.Tapped = true
