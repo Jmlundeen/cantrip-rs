@@ -1,0 +1,38 @@
+# Heartstring Puller enters (CR 603.6a): one 2/2 colorless Wizard Soldier token named Cadet is created, and the Puller's
+# printed trample sits on the 3/1.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Mox Pearl
+Heartstring Puller
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Heartstring Puller.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mountain; Mox Ruby; Mox Jet; Mox Pearl; Heartstring Puller; Cadet
+Bot1.Battlefield.Heartstring Puller.Power = 3
+Bot1.Battlefield.Heartstring Puller.Toughness = 1
+Bot1.Battlefield.Heartstring Puller.Keywords = Trample
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Toughness = 2
+Bot1.Battlefield.Cadet.Types = Creature
+Bot1.Battlefield.Cadet.Subtypes = Soldier; Wizard
+Bot1.Mana = 
