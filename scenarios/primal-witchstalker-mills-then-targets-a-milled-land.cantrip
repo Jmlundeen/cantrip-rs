@@ -1,0 +1,29 @@
+# The reflexive target is chosen after milling so a newly milled land is eligible (CR 603.12).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Primal Witchstalker
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Primal Witchstalker.Cast
+Bot1.Target(Graveyard.Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Island.Tapped = true
+Bot1.Graveyard.Count = 5
+Bot1.Library.Count = 26
