@@ -1,0 +1,8 @@
+{
+  "name": "Saheeli, Jewel of Avishkar",
+  "manaCost": "{2}{U}{R}",
+  "type": "Legendary Creature — Human Artificer",
+  "power": 2,
+  "toughness": 4,
+  "oracleText": "Thopters you control have haste.\nWhenever you cast a noncreature spell, create a 1/1 colorless Thopter artifact creature token with flying."
+}
