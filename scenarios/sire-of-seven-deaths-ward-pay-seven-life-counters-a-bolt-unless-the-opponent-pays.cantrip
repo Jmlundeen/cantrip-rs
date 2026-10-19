@@ -1,0 +1,63 @@
+# Sire of Seven Deaths: {7} 7/7 with reach, first strike, vigilance, menace, trample, lifelink and "Ward--Pay 7 life."
+# (CR 702.21a). Bot1 casts it on turn 3 from five Moxen and Sol Ring. On turn 4 Bot2 bolts it twice. The first
+# Bolt: Bot2 declines the ward cost, so it is countered, the Sire is undamaged and Bot2 keeps 20 life. The second: Bot2
+# pays 7 life (20 to 13), the Bolt resolves and deals 3 damage to the 7/7, which survives.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Sol Ring
+Sire of Seven Deaths
+Island x14
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {W}{U}{B}{R}{G}{C}{C}
+Bot1.Hand.Sire of Seven Deaths.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Sire of Seven Deaths.Keywords = FirstStrike; Lifelink; Menace; Reach; Trample; Vigilance
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sire of Seven Deaths)
+Bot2.Decline
+Bot1.Pass
+? Bot1.Battlefield.Sire of Seven Deaths.Damage = 0
+? Bot2.Life = 20
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Sire of Seven Deaths)
+Bot2.Accept
+Bot1.Pass
+? Bot1.Battlefield.Sire of Seven Deaths.Damage = 3
+[T5 Bot1.Main1]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Battlefield.Sire of Seven Deaths.Power = 7
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

@@ -1,0 +1,16 @@
+{
+  "name": "Sire of Seven Deaths",
+  "manaCost": "{7}",
+  "type": "Creature — Eldrazi",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "Reach, first strike\nVigilance, menace\nTrample, lifelink\nWard—Pay 7 life.",
+  "keywords": [
+    "Reach",
+    "FirstStrike",
+    "Vigilance",
+    "Menace",
+    "Trample",
+    "Lifelink"
+  ]
+}
