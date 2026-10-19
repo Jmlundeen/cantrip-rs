@@ -1,0 +1,5064 @@
+{
+ "format": "standard",
+ "generated": "2026-10-18",
+ "sources": {
+  "MTGGoldfish": {
+   "archetypes": 60,
+   "metagamePercent": 98.4
+  },
+  "MTGTop8": {
+   "decks": 181,
+   "events": 26,
+   "days": 60
+  }
+ },
+ "cards": [
+  {
+   "name": "Strategic Betrayal",
+   "goldfish": 39.02,
+   "top8": 49.72,
+   "decks": 90,
+   "score": 44.37
+  },
+  {
+   "name": "Disdainful Stroke",
+   "goldfish": 49.49,
+   "top8": 38.12,
+   "decks": 69,
+   "score": 43.8
+  },
+  {
+   "name": "Flashfreeze",
+   "goldfish": 45.73,
+   "top8": 38.67,
+   "decks": 70,
+   "score": 42.2
+  },
+  {
+   "name": "Duress",
+   "goldfish": 30.39,
+   "top8": 48.07,
+   "decks": 87,
+   "score": 39.23
+  },
+  {
+   "name": "Requiting Hex",
+   "goldfish": 30.08,
+   "top8": 39.78,
+   "decks": 72,
+   "score": 34.93
+  },
+  {
+   "name": "Multiversal Passage",
+   "goldfish": 33.54,
+   "top8": 30.94,
+   "decks": 56,
+   "score": 32.24
+  },
+  {
+   "name": "Spell Snare",
+   "goldfish": 30.08,
+   "top8": 31.49,
+   "decks": 57,
+   "score": 30.78
+  },
+  {
+   "name": "Erode",
+   "goldfish": 32.42,
+   "top8": 26.52,
+   "decks": 48,
+   "score": 29.47
+  },
+  {
+   "name": "Negate",
+   "goldfish": 22.05,
+   "top8": 32.6,
+   "decks": 59,
+   "score": 27.33
+  },
+  {
+   "name": "Gloomlake Verge",
+   "goldfish": 23.17,
+   "top8": 29.83,
+   "decks": 54,
+   "score": 26.5
+  },
+  {
+   "name": "Watery Grave",
+   "goldfish": 20.53,
+   "top8": 29.83,
+   "decks": 54,
+   "score": 25.18
+  },
+  {
+   "name": "Bitter Triumph",
+   "goldfish": 19.31,
+   "top8": 30.94,
+   "decks": 56,
+   "score": 25.12
+  },
+  {
+   "name": "Ghost Vacuum",
+   "goldfish": 34.55,
+   "top8": 15.47,
+   "decks": 28,
+   "score": 25.01
+  },
+  {
+   "name": "Seam Rip",
+   "goldfish": 28.46,
+   "top8": 20.99,
+   "decks": 38,
+   "score": 24.73
+  },
+  {
+   "name": "Rest in Peace",
+   "goldfish": 24.9,
+   "top8": 23.76,
+   "decks": 43,
+   "score": 24.33
+  },
+  {
+   "name": "Starting Town",
+   "goldfish": 19.92,
+   "top8": 28.18,
+   "decks": 51,
+   "score": 24.05
+  },
+  {
+   "name": "Steam Vents",
+   "goldfish": 26.83,
+   "top8": 19.89,
+   "decks": 36,
+   "score": 23.36
+  },
+  {
+   "name": "Restless Reef",
+   "goldfish": 18.29,
+   "top8": 26.52,
+   "decks": 48,
+   "score": 22.41
+  },
+  {
+   "name": "Burst Lightning",
+   "goldfish": 29.78,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 21.52
+  },
+  {
+   "name": "Torpor Orb",
+   "goldfish": 18.9,
+   "top8": 23.76,
+   "decks": 43,
+   "score": 21.33
+  },
+  {
+   "name": "Shoot the Sheriff",
+   "goldfish": 16.67,
+   "top8": 24.86,
+   "decks": 45,
+   "score": 20.77
+  },
+  {
+   "name": "Day of Judgment",
+   "goldfish": 24.29,
+   "top8": 17.13,
+   "decks": 31,
+   "score": 20.71
+  },
+  {
+   "name": "Get Lost",
+   "goldfish": 22.97,
+   "top8": 18.23,
+   "decks": 33,
+   "score": 20.6
+  },
+  {
+   "name": "Hallowed Fountain",
+   "goldfish": 20.53,
+   "top8": 20.44,
+   "decks": 37,
+   "score": 20.48
+  },
+  {
+   "name": "Spell Pierce",
+   "goldfish": 24.19,
+   "top8": 16.57,
+   "decks": 30,
+   "score": 20.38
+  },
+  {
+   "name": "Voice of Victory",
+   "goldfish": 26.52,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 20.16
+  },
+  {
+   "name": "Day of Black Sun",
+   "goldfish": 13.92,
+   "top8": 25.97,
+   "decks": 47,
+   "score": 19.95
+  },
+  {
+   "name": "Shipwreck Marsh",
+   "goldfish": 18.19,
+   "top8": 21.55,
+   "decks": 39,
+   "score": 19.87
+  },
+  {
+   "name": "Cavern of Souls",
+   "goldfish": 16.57,
+   "top8": 21.55,
+   "decks": 39,
+   "score": 19.06
+  },
+  {
+   "name": "Theorix Charm",
+   "goldfish": 17.48,
+   "top8": 19.89,
+   "decks": 36,
+   "score": 18.69
+  },
+  {
+   "name": "Annul",
+   "goldfish": 22.97,
+   "top8": 12.15,
+   "decks": 22,
+   "score": 17.56
+  },
+  {
+   "name": "Riverpyre Verge",
+   "goldfish": 21.24,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 17.52
+  },
+  {
+   "name": "Spirebluff Canal",
+   "goldfish": 21.54,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 16.3
+  },
+  {
+   "name": "Deadly Cover-Up",
+   "goldfish": 14.23,
+   "top8": 17.68,
+   "decks": 32,
+   "score": 15.96
+  },
+  {
+   "name": "Floodfarm Verge",
+   "goldfish": 13.82,
+   "top8": 17.68,
+   "decks": 32,
+   "score": 15.75
+  },
+  {
+   "name": "Stock Up",
+   "goldfish": 18.09,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 15.68
+  },
+  {
+   "name": "Sacred Foundry",
+   "goldfish": 16.87,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 15.34
+  },
+  {
+   "name": "Blood Crypt",
+   "goldfish": 14.02,
+   "top8": 16.02,
+   "decks": 29,
+   "score": 15.02
+  },
+  {
+   "name": "Tishana's Tidebinder",
+   "goldfish": 15.65,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 14.73
+  },
+  {
+   "name": "No More Lies",
+   "goldfish": 15.35,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 14.58
+  },
+  {
+   "name": "Wan Shi Tong, Librarian",
+   "goldfish": 7.93,
+   "top8": 20.44,
+   "decks": 37,
+   "score": 14.19
+  },
+  {
+   "name": "Consult the Star Charts",
+   "goldfish": 13.62,
+   "top8": 14.36,
+   "decks": 26,
+   "score": 13.99
+  },
+  {
+   "name": "Opt",
+   "goldfish": 18.6,
+   "top8": 8.84,
+   "decks": 16,
+   "score": 13.72
+  },
+  {
+   "name": "Sleight of Hand",
+   "goldfish": 18.29,
+   "top8": 8.84,
+   "decks": 16,
+   "score": 13.56
+  },
+  {
+   "name": "Soul-Guide Lantern",
+   "goldfish": 9.76,
+   "top8": 17.13,
+   "decks": 31,
+   "score": 13.45
+  },
+  {
+   "name": "Colorstorm Stallion",
+   "goldfish": 18.8,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 13.27
+  },
+  {
+   "name": "Demolition Field",
+   "goldfish": 15.24,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 13.14
+  },
+  {
+   "name": "Godless Shrine",
+   "goldfish": 13.01,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 13.13
+  },
+  {
+   "name": "Eddymurk Crab",
+   "goldfish": 17.89,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 13.09
+  },
+  {
+   "name": "Impractical Joke",
+   "goldfish": 18.19,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 12.96
+  },
+  {
+   "name": "Llanowar Elves",
+   "goldfish": 12.09,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 12.95
+  },
+  {
+   "name": "Emeritus of Ideation",
+   "goldfish": 9.86,
+   "top8": 16.02,
+   "decks": 29,
+   "score": 12.94
+  },
+  {
+   "name": "Soulstone Sanctuary",
+   "goldfish": 11.48,
+   "top8": 14.36,
+   "decks": 26,
+   "score": 12.92
+  },
+  {
+   "name": "Petrified Hamlet",
+   "goldfish": 11.99,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 12.9
+  },
+  {
+   "name": "Prismari Charm",
+   "goldfish": 18.29,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 12.73
+  },
+  {
+   "name": "Stormcarved Coast",
+   "goldfish": 17.68,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 12.71
+  },
+  {
+   "name": "Hidden Lair",
+   "goldfish": 9.86,
+   "top8": 15.47,
+   "decks": 28,
+   "score": 12.66
+  },
+  {
+   "name": "Sunbillow Verge",
+   "goldfish": 14.63,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 12.57
+  },
+  {
+   "name": "Hearth Elemental",
+   "goldfish": 17.78,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 12.48
+  },
+  {
+   "name": "Ba Sing Se",
+   "goldfish": 11.69,
+   "top8": 12.71,
+   "decks": 23,
+   "score": 12.2
+  },
+  {
+   "name": "Blazemire Verge",
+   "goldfish": 12.8,
+   "top8": 11.6,
+   "decks": 21,
+   "score": 12.2
+  },
+  {
+   "name": "Deceit",
+   "goldfish": 9.96,
+   "top8": 14.36,
+   "decks": 26,
+   "score": 12.16
+  },
+  {
+   "name": "Floodpits Drowner",
+   "goldfish": 10.26,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 12.04
+  },
+  {
+   "name": "Kaito, Bane of Nightmares",
+   "goldfish": 9.96,
+   "top8": 13.81,
+   "decks": 25,
+   "score": 11.89
+  },
+  {
+   "name": "Pinnacle Starcage",
+   "goldfish": 10.16,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 11.71
+  },
+  {
+   "name": "Superior Spider-Man",
+   "goldfish": 9.04,
+   "top8": 14.36,
+   "decks": 26,
+   "score": 11.7
+  },
+  {
+   "name": "Enduring Curiosity",
+   "goldfish": 9.96,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 11.61
+  },
+  {
+   "name": "The Wondrous Wasp",
+   "goldfish": 9.86,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 11.56
+  },
+  {
+   "name": "Into the Flood Maw",
+   "goldfish": 20.83,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 11.52
+  },
+  {
+   "name": "Dream Beavers",
+   "goldfish": 9.65,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 11.46
+  },
+  {
+   "name": "Spyglass Siren",
+   "goldfish": 9.65,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 11.46
+  },
+  {
+   "name": "Return the Favor",
+   "goldfish": 19.0,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 11.44
+  },
+  {
+   "name": "Fountainport",
+   "goldfish": 11.79,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 11.42
+  },
+  {
+   "name": "We Say Thee Nay!",
+   "goldfish": 9.96,
+   "top8": 12.71,
+   "decks": 23,
+   "score": 11.34
+  },
+  {
+   "name": "Seasoned Cryomancer",
+   "goldfish": 9.25,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 11.25
+  },
+  {
+   "name": "Winternight Stories",
+   "goldfish": 7.93,
+   "top8": 14.36,
+   "decks": 26,
+   "score": 11.14
+  },
+  {
+   "name": "Mightform Harmonizer",
+   "goldfish": 10.57,
+   "top8": 11.6,
+   "decks": 21,
+   "score": 11.09
+  },
+  {
+   "name": "Surrak, Elusive Hunter",
+   "goldfish": 9.15,
+   "top8": 12.71,
+   "decks": 23,
+   "score": 10.93
+  },
+  {
+   "name": "Fabled Passage",
+   "goldfish": 10.77,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 10.91
+  },
+  {
+   "name": "Escape Tunnel",
+   "goldfish": 10.57,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 10.81
+  },
+  {
+   "name": "Icetill Explorer",
+   "goldfish": 10.57,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 10.81
+  },
+  {
+   "name": "The Theorist, Jace Beleren",
+   "goldfish": 5.89,
+   "top8": 15.47,
+   "decks": 28,
+   "score": 10.68
+  },
+  {
+   "name": "Earthbender Ascension",
+   "goldfish": 10.57,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 10.54
+  },
+  {
+   "name": "Mossborn Hydra",
+   "goldfish": 10.57,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 10.54
+  },
+  {
+   "name": "Sapling Nursery",
+   "goldfish": 10.57,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 10.54
+  },
+  {
+   "name": "Sazh's Chocobo",
+   "goldfish": 10.57,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 10.54
+  },
+  {
+   "name": "Keen-Eyed Curator",
+   "goldfish": 9.65,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 10.35
+  },
+  {
+   "name": "Undercity Sewers",
+   "goldfish": 7.22,
+   "top8": 13.26,
+   "decks": 24,
+   "score": 10.24
+  },
+  {
+   "name": "Sear",
+   "goldfish": 13.82,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 10.22
+  },
+  {
+   "name": "Great Hall of the Biblioplex",
+   "goldfish": 13.21,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 10.2
+  },
+  {
+   "name": "Three Steps Ahead",
+   "goldfish": 9.65,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 10.07
+  },
+  {
+   "name": "Broadside Barrage",
+   "goldfish": 12.91,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 10.04
+  },
+  {
+   "name": "Ancient Vendetta",
+   "goldfish": 12.2,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 9.41
+  },
+  {
+   "name": "Smaug the Magnificent",
+   "goldfish": 11.08,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 9.41
+  },
+  {
+   "name": "Clarion Conqueror",
+   "goldfish": 10.26,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 9.27
+  },
+  {
+   "name": "Sunderflock",
+   "goldfish": 12.3,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 9.19
+  },
+  {
+   "name": "Meltstrider's Resolve",
+   "goldfish": 9.96,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 9.12
+  },
+  {
+   "name": "Curious Farm Animals",
+   "goldfish": 9.86,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 9.07
+  },
+  {
+   "name": "Esper Origins",
+   "goldfish": 9.76,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 9.02
+  },
+  {
+   "name": "Doomsday Excruciator",
+   "goldfish": 6.91,
+   "top8": 11.05,
+   "decks": 20,
+   "score": 8.98
+  },
+  {
+   "name": "Meticulous Archive",
+   "goldfish": 10.16,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 8.95
+  },
+  {
+   "name": "Traumatic Critique",
+   "goldfish": 12.2,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 8.86
+  },
+  {
+   "name": "Get Out",
+   "goldfish": 11.99,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 8.75
+  },
+  {
+   "name": "Overgrown Tomb",
+   "goldfish": 7.52,
+   "top8": 9.94,
+   "decks": 18,
+   "score": 8.73
+  },
+  {
+   "name": "Uldaros Theorix",
+   "goldfish": 6.81,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 8.65
+  },
+  {
+   "name": "Haliya, Guided by Light",
+   "goldfish": 9.86,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 8.52
+  },
+  {
+   "name": "Inspiring Vantage",
+   "goldfish": 9.86,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 8.52
+  },
+  {
+   "name": "Deserted Beach",
+   "goldfish": 6.71,
+   "top8": 9.94,
+   "decks": 18,
+   "score": 8.32
+  },
+  {
+   "name": "Hydro-Man, Fluid Felon",
+   "goldfish": 11.79,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 8.11
+  },
+  {
+   "name": "Qarsi Revenant",
+   "goldfish": 5.69,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 8.1
+  },
+  {
+   "name": "Bleachbone Verge",
+   "goldfish": 6.71,
+   "top8": 9.39,
+   "decks": 17,
+   "score": 8.05
+  },
+  {
+   "name": "Overlord of the Balemurk",
+   "goldfish": 6.71,
+   "top8": 8.84,
+   "decks": 16,
+   "score": 7.78
+  },
+  {
+   "name": "Shattered Sanctum",
+   "goldfish": 5.39,
+   "top8": 9.94,
+   "decks": 18,
+   "score": 7.66
+  },
+  {
+   "name": "Elven Passage",
+   "goldfish": 9.15,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 7.62
+  },
+  {
+   "name": "Momo, Friendly Flier",
+   "goldfish": 10.06,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 7.52
+  },
+  {
+   "name": "Fire Magic",
+   "goldfish": 6.61,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 7.45
+  },
+  {
+   "name": "Shared Roots",
+   "goldfish": 10.37,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 7.39
+  },
+  {
+   "name": "Wastewood Verge",
+   "goldfish": 6.71,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 7.22
+  },
+  {
+   "name": "Warg Tactics",
+   "goldfish": 9.35,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 7.16
+  },
+  {
+   "name": "Stomping Ground",
+   "goldfish": 5.28,
+   "top8": 8.84,
+   "decks": 16,
+   "score": 7.06
+  },
+  {
+   "name": "Leatherhead, Swamp Stalker",
+   "goldfish": 6.3,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 7.02
+  },
+  {
+   "name": "Quantum Riddler",
+   "goldfish": 6.2,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 6.96
+  },
+  {
+   "name": "Captain Marvel, Earth's Protector",
+   "goldfish": 6.0,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 6.87
+  },
+  {
+   "name": "Ral, Crackling Wit",
+   "goldfish": 7.62,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 6.85
+  },
+  {
+   "name": "Outrageous Robbery",
+   "goldfish": 6.91,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 6.77
+  },
+  {
+   "name": "Flashback",
+   "goldfish": 7.42,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 6.75
+  },
+  {
+   "name": "Blooming Marsh",
+   "goldfish": 5.18,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 6.73
+  },
+  {
+   "name": "Tablet of Discovery",
+   "goldfish": 7.11,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 6.6
+  },
+  {
+   "name": "Amalia Benavides Aguirre",
+   "goldfish": 6.5,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 6.56
+  },
+  {
+   "name": "Case of the Uneaten Feast",
+   "goldfish": 6.5,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 6.56
+  },
+  {
+   "name": "Hinterland Sanctifier",
+   "goldfish": 6.5,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 6.56
+  },
+  {
+   "name": "Lunar Convocation",
+   "goldfish": 6.5,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 6.56
+  },
+  {
+   "name": "Moseo, Vein's New Dean",
+   "goldfish": 6.5,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 6.56
+  },
+  {
+   "name": "Starscape Cleric",
+   "goldfish": 6.5,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 6.56
+  },
+  {
+   "name": "Mistrise Village",
+   "goldfish": 7.52,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 6.52
+  },
+  {
+   "name": "Raven Eagle",
+   "goldfish": 9.55,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 6.43
+  },
+  {
+   "name": "Liliana the Faultless",
+   "goldfish": 6.71,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 6.39
+  },
+  {
+   "name": "Jeskai Revelation",
+   "goldfish": 6.61,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 6.35
+  },
+  {
+   "name": "Thundering Falls",
+   "goldfish": 11.89,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 6.22
+  },
+  {
+   "name": "Firebending Lesson",
+   "goldfish": 6.81,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 6.16
+  },
+  {
+   "name": "The Ooze",
+   "goldfish": 4.57,
+   "top8": 7.73,
+   "decks": 14,
+   "score": 6.15
+  },
+  {
+   "name": "Sunspine Lynx",
+   "goldfish": 4.98,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 6.08
+  },
+  {
+   "name": "Nowhere to Run",
+   "goldfish": 10.26,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 5.96
+  },
+  {
+   "name": "Sundown Pass",
+   "goldfish": 6.91,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 5.94
+  },
+  {
+   "name": "Biotech Specialist",
+   "goldfish": 4.57,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 5.88
+  },
+  {
+   "name": "Gene Pollinator",
+   "goldfish": 4.57,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 5.88
+  },
+  {
+   "name": "Greedy Freebooter",
+   "goldfish": 4.57,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 5.88
+  },
+  {
+   "name": "Lively Dirge",
+   "goldfish": 4.57,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 5.88
+  },
+  {
+   "name": "Obsessive Pursuit",
+   "goldfish": 4.57,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 5.88
+  },
+  {
+   "name": "The Sackville-Bagginses",
+   "goldfish": 4.57,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 5.88
+  },
+  {
+   "name": "Umbral Collar Zealot",
+   "goldfish": 4.57,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 5.88
+  },
+  {
+   "name": "Flow State",
+   "goldfish": 6.2,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 5.86
+  },
+  {
+   "name": "Restless Anchorage",
+   "goldfish": 6.2,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 5.86
+  },
+  {
+   "name": "The Legend of Roku",
+   "goldfish": 9.45,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 5.83
+  },
+  {
+   "name": "Ultima",
+   "goldfish": 5.28,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 5.68
+  },
+  {
+   "name": "Lumbering Worldwagon",
+   "goldfish": 7.93,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 5.62
+  },
+  {
+   "name": "Callous Inspector",
+   "goldfish": 4.57,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 5.6
+  },
+  {
+   "name": "Dalkovan Encampment",
+   "goldfish": 7.11,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 5.49
+  },
+  {
+   "name": "Inevitable Defeat",
+   "goldfish": 5.39,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 5.46
+  },
+  {
+   "name": "Gigantic Big Bear",
+   "goldfish": 7.93,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 5.34
+  },
+  {
+   "name": "Nova Hellkite",
+   "goldfish": 7.93,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 5.34
+  },
+  {
+   "name": "Pyrrhic Strike",
+   "goldfish": 6.81,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 5.34
+  },
+  {
+   "name": "Castle Doom",
+   "goldfish": 3.86,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 5.25
+  },
+  {
+   "name": "Yuriko, Hope from the Shadows",
+   "goldfish": 0.0,
+   "top8": 10.5,
+   "decks": 19,
+   "score": 5.25
+  },
+  {
+   "name": "Lightning Helix",
+   "goldfish": 5.49,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 5.23
+  },
+  {
+   "name": "Together as One",
+   "goldfish": 5.28,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 5.12
+  },
+  {
+   "name": "M.O.D.O.K.",
+   "goldfish": 0.1,
+   "top8": 9.94,
+   "decks": 18,
+   "score": 5.02
+  },
+  {
+   "name": "The Mind Stone",
+   "goldfish": 3.96,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 5.02
+  },
+  {
+   "name": "Cori Mountain Monastery",
+   "goldfish": 6.71,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 5.01
+  },
+  {
+   "name": "Pompous Battlemage",
+   "goldfish": 6.71,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 5.01
+  },
+  {
+   "name": "Slickshot Show-Off",
+   "goldfish": 6.71,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 5.01
+  },
+  {
+   "name": "Gleaming Bastion",
+   "goldfish": 3.35,
+   "top8": 6.63,
+   "decks": 12,
+   "score": 4.99
+  },
+  {
+   "name": "Cryogen Relic",
+   "goldfish": 3.86,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 4.97
+  },
+  {
+   "name": "Price of Freedom",
+   "goldfish": 6.61,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 4.96
+  },
+  {
+   "name": "Concealed Courtyard",
+   "goldfish": 1.02,
+   "top8": 8.84,
+   "decks": 16,
+   "score": 4.93
+  },
+  {
+   "name": "Deep-Cavern Bat",
+   "goldfish": 6.5,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 4.91
+  },
+  {
+   "name": "Elusive Otter",
+   "goldfish": 6.5,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 4.91
+  },
+  {
+   "name": "Emptiness",
+   "goldfish": 6.5,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 4.91
+  },
+  {
+   "name": "Secret Identity",
+   "goldfish": 6.5,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 4.91
+  },
+  {
+   "name": "Wild Ride",
+   "goldfish": 6.5,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 4.91
+  },
+  {
+   "name": "Plunder the Trollshaws",
+   "goldfish": 5.69,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 4.78
+  },
+  {
+   "name": "Decorum Dissertation",
+   "goldfish": 6.5,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 4.63
+  },
+  {
+   "name": "Zoraline, Cosmos Caller",
+   "goldfish": 6.5,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 4.63
+  },
+  {
+   "name": "Vicious Rivalry",
+   "goldfish": 4.78,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 4.6
+  },
+  {
+   "name": "Vengeful Tracker",
+   "goldfish": 7.52,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 4.59
+  },
+  {
+   "name": "Twinmaw Stormbrood",
+   "goldfish": 6.71,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 4.46
+  },
+  {
+   "name": "North Wind Avatar",
+   "goldfish": 5.59,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 4.45
+  },
+  {
+   "name": "Authority of the Consuls",
+   "goldfish": 3.86,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 4.42
+  },
+  {
+   "name": "Perilous Snare",
+   "goldfish": 3.86,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 4.42
+  },
+  {
+   "name": "Repurposing Bay",
+   "goldfish": 3.86,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 4.42
+  },
+  {
+   "name": "Simulacrum Synthesizer",
+   "goldfish": 3.86,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 4.42
+  },
+  {
+   "name": "The Fire Crystal",
+   "goldfish": 3.86,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 4.42
+  },
+  {
+   "name": "United Battlefront",
+   "goldfish": 3.86,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 4.42
+  },
+  {
+   "name": "Boros Charm",
+   "goldfish": 6.5,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 4.36
+  },
+  {
+   "name": "Essence Channeler",
+   "goldfish": 6.5,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 4.36
+  },
+  {
+   "name": "Maelstrom of the Spirit Dragon",
+   "goldfish": 6.5,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 4.36
+  },
+  {
+   "name": "Magmatic Hellkite",
+   "goldfish": 6.5,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 4.36
+  },
+  {
+   "name": "Sarkhan, Dragon Ascendant",
+   "goldfish": 6.5,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 4.36
+  },
+  {
+   "name": "Spider-Sense",
+   "goldfish": 4.17,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 4.29
+  },
+  {
+   "name": "Deadly Precision",
+   "goldfish": 4.57,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 4.22
+  },
+  {
+   "name": "Countersculpt",
+   "goldfish": 1.12,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 4.15
+  },
+  {
+   "name": "Theorist's Sanctum",
+   "goldfish": 1.12,
+   "top8": 7.18,
+   "decks": 13,
+   "score": 4.15
+  },
+  {
+   "name": "Braided Net",
+   "goldfish": 3.86,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 4.14
+  },
+  {
+   "name": "Spring-Loaded Sawblades",
+   "goldfish": 3.86,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 4.14
+  },
+  {
+   "name": "Vren, the Relentless",
+   "goldfish": 0.0,
+   "top8": 8.29,
+   "decks": 15,
+   "score": 4.14
+  },
+  {
+   "name": "Breeding Pool",
+   "goldfish": 4.37,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 4.12
+  },
+  {
+   "name": "Stingcaster Mage",
+   "goldfish": 6.81,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 3.96
+  },
+  {
+   "name": "Harvester of Misery",
+   "goldfish": 4.57,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 3.94
+  },
+  {
+   "name": "Dragonhawk, Fate's Tempest",
+   "goldfish": 6.71,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 3.91
+  },
+  {
+   "name": "Desolation of Smaug",
+   "goldfish": 6.5,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 3.8
+  },
+  {
+   "name": "Abandoned Air Temple",
+   "goldfish": 4.67,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.71
+  },
+  {
+   "name": "Practiced Offense",
+   "goldfish": 2.44,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 3.71
+  },
+  {
+   "name": "Fanatical Offering",
+   "goldfish": 4.57,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.67
+  },
+  {
+   "name": "Preacher of the Schism",
+   "goldfish": 2.34,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 3.65
+  },
+  {
+   "name": "Unsummon",
+   "goldfish": 6.1,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 3.6
+  },
+  {
+   "name": "Riverchurn Monument",
+   "goldfish": 2.64,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 3.53
+  },
+  {
+   "name": "Leonardo, Cutting Edge",
+   "goldfish": 6.5,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 3.52
+  },
+  {
+   "name": "Terminal Criticism",
+   "goldfish": 4.27,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.51
+  },
+  {
+   "name": "Abrade",
+   "goldfish": 3.05,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 3.46
+  },
+  {
+   "name": "Professor Dellian Fel",
+   "goldfish": 0.81,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 3.45
+  },
+  {
+   "name": "Null Summoner",
+   "goldfish": 2.44,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 3.43
+  },
+  {
+   "name": "Guerrilla Gorilla",
+   "goldfish": 4.57,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 3.39
+  },
+  {
+   "name": "Mockingbird",
+   "goldfish": 3.35,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 3.33
+  },
+  {
+   "name": "Springleaf Drum",
+   "goldfish": 3.35,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 3.33
+  },
+  {
+   "name": "Sentinel of the Nameless City",
+   "goldfish": 4.88,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 3.27
+  },
+  {
+   "name": "Raise the Past",
+   "goldfish": 6.5,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 3.25
+  },
+  {
+   "name": "Guiding Hydra",
+   "goldfish": 3.66,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.21
+  },
+  {
+   "name": "Hired Claw",
+   "goldfish": 4.17,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 3.19
+  },
+  {
+   "name": "Requisition Raid",
+   "goldfish": 0.3,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 3.19
+  },
+  {
+   "name": "Starfield Shepherd",
+   "goldfish": 3.56,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.16
+  },
+  {
+   "name": "Avengers Disassembled",
+   "goldfish": 1.32,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 3.15
+  },
+  {
+   "name": "Garruk, Veiled Butcher",
+   "goldfish": 4.57,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 3.12
+  },
+  {
+   "name": "Beza, the Bounding Spring",
+   "goldfish": 0.71,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 3.11
+  },
+  {
+   "name": "Elspeth, Storm Slayer",
+   "goldfish": 0.71,
+   "top8": 5.52,
+   "decks": 10,
+   "score": 3.11
+  },
+  {
+   "name": "Sage of the Skies",
+   "goldfish": 3.46,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.11
+  },
+  {
+   "name": "Daydream",
+   "goldfish": 3.35,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.05
+  },
+  {
+   "name": "Nurturing Pixie",
+   "goldfish": 3.35,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 3.05
+  },
+  {
+   "name": "Enlightened Confidant",
+   "goldfish": 0.0,
+   "top8": 6.08,
+   "decks": 11,
+   "score": 3.04
+  },
+  {
+   "name": "Formidable Speaker",
+   "goldfish": 2.64,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 2.98
+  },
+  {
+   "name": "Iridescent Vinelasher",
+   "goldfish": 3.56,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 2.88
+  },
+  {
+   "name": "Mutagen Man, Living Ooze",
+   "goldfish": 4.57,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 2.83
+  },
+  {
+   "name": "Temple Garden",
+   "goldfish": 2.34,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 2.83
+  },
+  {
+   "name": "Settle the Wreckage",
+   "goldfish": 1.73,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 2.8
+  },
+  {
+   "name": "Oildeep Gearhulk",
+   "goldfish": 2.24,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 2.78
+  },
+  {
+   "name": "Maelstrom Pulse",
+   "goldfish": 0.81,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 2.62
+  },
+  {
+   "name": "Rockface Village",
+   "goldfish": 3.56,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.61
+  },
+  {
+   "name": "Willowrush Verge",
+   "goldfish": 2.44,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 2.6
+  },
+  {
+   "name": "Wistfulness",
+   "goldfish": 2.44,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 2.6
+  },
+  {
+   "name": "Azog, Moria's Ruin",
+   "goldfish": 4.57,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 2.56
+  },
+  {
+   "name": "Torch the Tower",
+   "goldfish": 0.71,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 2.56
+  },
+  {
+   "name": "Sheltered by Ghosts",
+   "goldfish": 2.24,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 2.5
+  },
+  {
+   "name": "Sphinx of False Conclusions",
+   "goldfish": 1.12,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 2.5
+  },
+  {
+   "name": "Candy Trail",
+   "goldfish": 0.0,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 2.48
+  },
+  {
+   "name": "Carnivorous Cultivator",
+   "goldfish": 0.0,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 2.48
+  },
+  {
+   "name": "Jace's Machinations",
+   "goldfish": 0.0,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 2.48
+  },
+  {
+   "name": "The Misty Mountains Cold",
+   "goldfish": 0.0,
+   "top8": 4.97,
+   "decks": 9,
+   "score": 2.48
+  },
+  {
+   "name": "Dawn's Truce",
+   "goldfish": 2.44,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 2.33
+  },
+  {
+   "name": "Chainsaw",
+   "goldfish": 1.83,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 2.29
+  },
+  {
+   "name": "Hushwood Verge",
+   "goldfish": 2.34,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 2.27
+  },
+  {
+   "name": "Flamecache Gecko",
+   "goldfish": 2.85,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.25
+  },
+  {
+   "name": "Gev, Scaled Scorch",
+   "goldfish": 2.85,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.25
+  },
+  {
+   "name": "Ingris Stingerquill",
+   "goldfish": 2.85,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.25
+  },
+  {
+   "name": "Master of Barbs",
+   "goldfish": 2.85,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.25
+  },
+  {
+   "name": "Stingerquill Charm",
+   "goldfish": 2.85,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.25
+  },
+  {
+   "name": "Stinging Vitriol",
+   "goldfish": 2.85,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.25
+  },
+  {
+   "name": "Zack Fair",
+   "goldfish": 3.35,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 2.23
+  },
+  {
+   "name": "Clay-Fired Bricks",
+   "goldfish": 0.0,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 2.21
+  },
+  {
+   "name": "Rottenmouth Viper",
+   "goldfish": 0.0,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 2.21
+  },
+  {
+   "name": "Sandman, Shifting Scoundrel",
+   "goldfish": 0.0,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 2.21
+  },
+  {
+   "name": "Wolverine, Fierce Fighter",
+   "goldfish": 0.0,
+   "top8": 4.42,
+   "decks": 8,
+   "score": 2.21
+  },
+  {
+   "name": "The Queen of Dale",
+   "goldfish": 3.15,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 2.12
+  },
+  {
+   "name": "Cecil, Dark Knight",
+   "goldfish": 0.3,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 2.08
+  },
+  {
+   "name": "Fatehold Charm",
+   "goldfish": 0.2,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 2.04
+  },
+  {
+   "name": "Origin of Metalbending",
+   "goldfish": 1.32,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 2.04
+  },
+  {
+   "name": "Karn, Argent Defender",
+   "goldfish": 0.71,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 2.01
+  },
+  {
+   "name": "Giant Cindermaw",
+   "goldfish": 2.34,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.0
+  },
+  {
+   "name": "Rapid Rescue",
+   "goldfish": 2.34,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.0
+  },
+  {
+   "name": "Witherbloom Charm",
+   "goldfish": 2.34,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 2.0
+  },
+  {
+   "name": "Fireglass Mentor",
+   "goldfish": 2.85,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.98
+  },
+  {
+   "name": "Haunted Ridge",
+   "goldfish": 2.85,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.98
+  },
+  {
+   "name": "Laughing Jasper Flint",
+   "goldfish": 2.85,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.98
+  },
+  {
+   "name": "Thought-Stalker Warlock",
+   "goldfish": 2.85,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.98
+  },
+  {
+   "name": "Valley Flamecaller",
+   "goldfish": 2.85,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.98
+  },
+  {
+   "name": "Ajani Resolute",
+   "goldfish": 0.0,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 1.94
+  },
+  {
+   "name": "Fomori Vault",
+   "goldfish": 0.0,
+   "top8": 3.87,
+   "decks": 7,
+   "score": 1.94
+  },
+  {
+   "name": "Pit of Offerings",
+   "goldfish": 0.51,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 1.91
+  },
+  {
+   "name": "Cosmogrand Zenith",
+   "goldfish": 3.25,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.9
+  },
+  {
+   "name": "Doorkeeper Thrull",
+   "goldfish": 1.42,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.81
+  },
+  {
+   "name": "Moonshadow",
+   "goldfish": 1.42,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.81
+  },
+  {
+   "name": "Ardyn, the Usurper",
+   "goldfish": 1.93,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.79
+  },
+  {
+   "name": "Awaken the Honored Dead",
+   "goldfish": 1.93,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.79
+  },
+  {
+   "name": "Bofur, Reliable Guardian",
+   "goldfish": 1.93,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.79
+  },
+  {
+   "name": "Bringer of the Last Gift",
+   "goldfish": 1.93,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.79
+  },
+  {
+   "name": "Lavaspur Boots",
+   "goldfish": 1.93,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.79
+  },
+  {
+   "name": "Terror of the Peaks",
+   "goldfish": 1.93,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.79
+  },
+  {
+   "name": "Basilisk Collar",
+   "goldfish": 1.83,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.75
+  },
+  {
+   "name": "Dragonfire Blade",
+   "goldfish": 1.83,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.75
+  },
+  {
+   "name": "Kíli the Resourceful",
+   "goldfish": 1.83,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.75
+  },
+  {
+   "name": "The Lonely Mountain",
+   "goldfish": 1.83,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.75
+  },
+  {
+   "name": "Thorin, Mountain-king",
+   "goldfish": 1.83,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.75
+  },
+  {
+   "name": "Inti, Seneschal of the Sun",
+   "goldfish": 1.22,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.71
+  },
+  {
+   "name": "Marauding Mako",
+   "goldfish": 1.22,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.71
+  },
+  {
+   "name": "Monument to Endurance",
+   "goldfish": 1.22,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.71
+  },
+  {
+   "name": "Ravine Raider",
+   "goldfish": 2.85,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.7
+  },
+  {
+   "name": "Dwalin, Weaponmaster",
+   "goldfish": 1.73,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.69
+  },
+  {
+   "name": "Dwarven Mauler",
+   "goldfish": 1.73,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.69
+  },
+  {
+   "name": "Dáin's Company",
+   "goldfish": 1.73,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.69
+  },
+  {
+   "name": "Leyline Axe",
+   "goldfish": 1.73,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.69
+  },
+  {
+   "name": "Hard-Hitting Question",
+   "goldfish": 0.0,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 1.66
+  },
+  {
+   "name": "Stir Up Trouble",
+   "goldfish": 0.0,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 1.66
+  },
+  {
+   "name": "The Irencrag",
+   "goldfish": 0.0,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 1.66
+  },
+  {
+   "name": "White Auracite",
+   "goldfish": 0.0,
+   "top8": 3.31,
+   "decks": 6,
+   "score": 1.66
+  },
+  {
+   "name": "Bloodghast",
+   "goldfish": 1.02,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.61
+  },
+  {
+   "name": "Carnage, Crimson Chaos",
+   "goldfish": 1.02,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.61
+  },
+  {
+   "name": "Cool but Rude",
+   "goldfish": 1.02,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.61
+  },
+  {
+   "name": "Hardened Academic",
+   "goldfish": 1.02,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.61
+  },
+  {
+   "name": "Iron-Shield Elf",
+   "goldfish": 1.02,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.61
+  },
+  {
+   "name": "Oblivious Bookworm",
+   "goldfish": 1.93,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.52
+  },
+  {
+   "name": "Snakeskin Veil",
+   "goldfish": 0.2,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 1.48
+  },
+  {
+   "name": "Vraska's Final Mercy",
+   "goldfish": 1.83,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.47
+  },
+  {
+   "name": "Faebloom Trick",
+   "goldfish": 0.1,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 1.43
+  },
+  {
+   "name": "Shattered Acolyte",
+   "goldfish": 1.73,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.42
+  },
+  {
+   "name": "Split Up",
+   "goldfish": 1.73,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 1.42
+  },
+  {
+   "name": "Bilbo's Gambit",
+   "goldfish": 0.61,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.41
+  },
+  {
+   "name": "Thor, God of Thunder",
+   "goldfish": 0.0,
+   "top8": 2.76,
+   "decks": 5,
+   "score": 1.38
+  },
+  {
+   "name": "Chandra, Torch of Defiance",
+   "goldfish": 2.03,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.29
+  },
+  {
+   "name": "Bounce Off",
+   "goldfish": 0.91,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.28
+  },
+  {
+   "name": "Adagia, Windswept Bastion",
+   "goldfish": 0.3,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.25
+  },
+  {
+   "name": "Uthros, Titanic Godcore",
+   "goldfish": 0.3,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.25
+  },
+  {
+   "name": "Disruptive Stormbrood",
+   "goldfish": 1.93,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.24
+  },
+  {
+   "name": "Glimpse the Core",
+   "goldfish": 0.2,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.21
+  },
+  {
+   "name": "Pick Your Poison",
+   "goldfish": 0.2,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.21
+  },
+  {
+   "name": "Steamcore Scholar",
+   "goldfish": 0.2,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.21
+  },
+  {
+   "name": "Tersa Lightshatter",
+   "goldfish": 0.71,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.19
+  },
+  {
+   "name": "Case of the Crimson Pulse",
+   "goldfish": 1.73,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.14
+  },
+  {
+   "name": "Spider Manifestation",
+   "goldfish": 0.61,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.14
+  },
+  {
+   "name": "Vibrant Outburst",
+   "goldfish": 0.61,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.14
+  },
+  {
+   "name": "Cryptic Caves",
+   "goldfish": 0.0,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.1
+  },
+  {
+   "name": "Glorious Decay",
+   "goldfish": 0.0,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.1
+  },
+  {
+   "name": "Ugin, Eye of the Storms",
+   "goldfish": 0.0,
+   "top8": 2.21,
+   "decks": 4,
+   "score": 1.1
+  },
+  {
+   "name": "Avatar's Wrath",
+   "goldfish": 0.51,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.08
+  },
+  {
+   "name": "Goldvein Hydra",
+   "goldfish": 0.51,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.08
+  },
+  {
+   "name": "Abandon Attachments",
+   "goldfish": 1.52,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.04
+  },
+  {
+   "name": "Accumulate Wisdom",
+   "goldfish": 1.52,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.04
+  },
+  {
+   "name": "Ajani Unrelenting",
+   "goldfish": 1.52,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.04
+  },
+  {
+   "name": "Combustion Technique",
+   "goldfish": 1.52,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.04
+  },
+  {
+   "name": "It'll Quench Ya!",
+   "goldfish": 1.52,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 1.04
+  },
+  {
+   "name": "Interdimensional Web Watch",
+   "goldfish": 0.41,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 1.03
+  },
+  {
+   "name": "Botanical Sanctum",
+   "goldfish": 1.42,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.98
+  },
+  {
+   "name": "Dark Matter Manipulator",
+   "goldfish": 1.42,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.98
+  },
+  {
+   "name": "Ill-Timed Explosion",
+   "goldfish": 0.3,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.98
+  },
+  {
+   "name": "Elegy Acolyte",
+   "goldfish": 0.81,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.96
+  },
+  {
+   "name": "Heritage Reclamation",
+   "goldfish": 0.2,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.93
+  },
+  {
+   "name": "Ral Zarek, Guest Lecturer",
+   "goldfish": 0.2,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.93
+  },
+  {
+   "name": "Hexing Squelcher",
+   "goldfish": 0.71,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.91
+  },
+  {
+   "name": "Skateboard",
+   "goldfish": 0.71,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.91
+  },
+  {
+   "name": "Avatar of Burgeoning Echoes",
+   "goldfish": 1.22,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.89
+  },
+  {
+   "name": "Magebane Lizard",
+   "goldfish": 1.22,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.89
+  },
+  {
+   "name": "Ouroboroid",
+   "goldfish": 1.22,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.89
+  },
+  {
+   "name": "Hide on the Ceiling",
+   "goldfish": 0.1,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.88
+  },
+  {
+   "name": "Malcolm, Alluring Scoundrel",
+   "goldfish": 0.1,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.88
+  },
+  {
+   "name": "Mjölnir, Hammer of Thor",
+   "goldfish": 0.1,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.88
+  },
+  {
+   "name": "Belladonna Took",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "Frontline Rush",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "Jennifer Walters",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "Political Triumph",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "Song of Totentanz",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "Stadium Headliner",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "The Last Ronin's Technique",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "Warleader's Call",
+   "goldfish": 0.61,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.85
+  },
+  {
+   "name": "Great Divide Guide",
+   "goldfish": 1.12,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.84
+  },
+  {
+   "name": "Bedeck // Bedazzle",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Essence Scatter",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Magda, the Hoardmaster",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Pawpatch Formation",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Pilfer",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Royal Treatment",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Seedship Impact",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Stormkeld Vanguard",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Urgent Necropsy",
+   "goldfish": 0.0,
+   "top8": 1.66,
+   "decks": 3,
+   "score": 0.83
+  },
+  {
+   "name": "Aang, Swift Savior",
+   "goldfish": 0.51,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.81
+  },
+  {
+   "name": "Cache Grab",
+   "goldfish": 1.63,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.81
+  },
+  {
+   "name": "Geist of Saint Thalia",
+   "goldfish": 1.63,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.81
+  },
+  {
+   "name": "Improvisation Capstone",
+   "goldfish": 0.51,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.81
+  },
+  {
+   "name": "Marang River Regent",
+   "goldfish": 0.51,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.81
+  },
+  {
+   "name": "Artist's Talent",
+   "goldfish": 1.52,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.76
+  },
+  {
+   "name": "Full Bore",
+   "goldfish": 0.41,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.76
+  },
+  {
+   "name": "Intimidation Tactics",
+   "goldfish": 0.41,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.76
+  },
+  {
+   "name": "Pyroclasm",
+   "goldfish": 0.41,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.76
+  },
+  {
+   "name": "Underground Mortuary",
+   "goldfish": 0.41,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.76
+  },
+  {
+   "name": "Corpses of the Lost",
+   "goldfish": 0.91,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.73
+  },
+  {
+   "name": "Forsaken Miner",
+   "goldfish": 0.91,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.73
+  },
+  {
+   "name": "Archenemy's Charm",
+   "goldfish": 0.3,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.7
+  },
+  {
+   "name": "Unholy Annex // Ritual Chamber",
+   "goldfish": 0.3,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.7
+  },
+  {
+   "name": "Adventurer's Inn",
+   "goldfish": 0.2,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.65
+  },
+  {
+   "name": "Michelangelo's Technique",
+   "goldfish": 0.2,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.65
+  },
+  {
+   "name": "Sunken Citadel",
+   "goldfish": 0.2,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.65
+  },
+  {
+   "name": "The End",
+   "goldfish": 0.2,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.65
+  },
+  {
+   "name": "Ashling, Rekindled",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Dissection Practice",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Fanatical Firebrand",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Gollum, Riddle Master",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Lich's Relic",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Lightning Strike",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Pawpatch Recruit",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Realm of Koh",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Tomik, Izzet Sparkmage",
+   "goldfish": 0.71,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.63
+  },
+  {
+   "name": "Dyadrine, Synthesis Amalgam",
+   "goldfish": 1.22,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.61
+  },
+  {
+   "name": "Case of the Stashed Skeleton",
+   "goldfish": 0.1,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.6
+  },
+  {
+   "name": "Chandra, Chill of Compliance",
+   "goldfish": 0.1,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.6
+  },
+  {
+   "name": "Shiko, Paragon of the Way",
+   "goldfish": 0.1,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.6
+  },
+  {
+   "name": "The Soul Stone",
+   "goldfish": 0.1,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.6
+  },
+  {
+   "name": "Aang's Iceberg",
+   "goldfish": 0.61,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.58
+  },
+  {
+   "name": "Aven Interrupter",
+   "goldfish": 0.61,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.58
+  },
+  {
+   "name": "Brightglass Gearhulk",
+   "goldfish": 0.61,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.58
+  },
+  {
+   "name": "Cruelclaw's Heist",
+   "goldfish": 0.61,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.58
+  },
+  {
+   "name": "Hop to It",
+   "goldfish": 0.61,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.58
+  },
+  {
+   "name": "Restless Cottage",
+   "goldfish": 0.61,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.58
+  },
+  {
+   "name": "Analyze the Pollen",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Armor Wars",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Aunt May",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Boomerang Basics",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Dusk Rose Reliquary",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Fountainport Bell",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Gold Pan",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Invasion Submersible",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Iron Man Armor",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Ironheart, Clever Champion",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Krang, Master Mind",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Legion Extruder",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Lush Portico",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Mole Man, Moloid Master",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Morlun, Devourer of Spiders",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Pinnacle Emissary",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Promising Vein",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Raubahn, Bull of Ala Mhigo",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Sewer-veillance Cam",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Solarium Sentry",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Something Worth Saving",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Sorcerous Spyglass",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Stoic Sphinx",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "The Legend of Kuruk",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Weapons Manufacturing",
+   "goldfish": 0.0,
+   "top8": 1.1,
+   "decks": 2,
+   "score": 0.55
+  },
+  {
+   "name": "Ancestral Anger",
+   "goldfish": 0.51,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.53
+  },
+  {
+   "name": "Callous Sell-Sword",
+   "goldfish": 0.51,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.53
+  },
+  {
+   "name": "Dreadmaw's Ire",
+   "goldfish": 0.51,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.53
+  },
+  {
+   "name": "Razorkin Needlehead",
+   "goldfish": 0.51,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.53
+  },
+  {
+   "name": "Balmor, Battlemage Captain",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Break Out",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Drake Hatcher",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Dreamroot Cascade",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Octopus Form",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Poison Dart Frog",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Shore Up",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Turn Inside Out",
+   "goldfish": 0.41,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.48
+  },
+  {
+   "name": "Desolation Prowler",
+   "goldfish": 0.91,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.46
+  },
+  {
+   "name": "Absolute Virtue",
+   "goldfish": 0.3,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.43
+  },
+  {
+   "name": "Dauntless Scrapbot",
+   "goldfish": 0.3,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.43
+  },
+  {
+   "name": "Kona, Rescue Beastie",
+   "goldfish": 0.3,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.43
+  },
+  {
+   "name": "Omni-Changeling",
+   "goldfish": 0.3,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.43
+  },
+  {
+   "name": "Omniscience",
+   "goldfish": 0.3,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.43
+  },
+  {
+   "name": "Thornspire Verge",
+   "goldfish": 0.3,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.43
+  },
+  {
+   "name": "Plasma Bolt",
+   "goldfish": 0.81,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.41
+  },
+  {
+   "name": "Aang, at the Crossroads",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Ajani, Outland Chaperone",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Appa, Steadfast Guardian",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Bolt Bend",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Bovine Intervention",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Bramble Familiar",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Deathmark",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Devastating Onslaught",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Doc Aurlock, Grizzled Genius",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Firdoch Core",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Heartwood Crafter",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Hex Magic",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "High Noon",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Iroh's Demonstration",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Lavaleaper",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Outcaster Trailblazer",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Solitary Cell",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Temur Battlecrier",
+   "goldfish": 0.2,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.38
+  },
+  {
+   "name": "Emberheart Challenger",
+   "goldfish": 0.71,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.35
+  },
+  {
+   "name": "Garruk, Curse Breaker",
+   "goldfish": 0.71,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.35
+  },
+  {
+   "name": "Nighthowl Pursuer",
+   "goldfish": 0.71,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.35
+  },
+  {
+   "name": "Sunset Saboteur",
+   "goldfish": 0.71,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.35
+  },
+  {
+   "name": "Beseech the Mirror",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Buster Sword",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Caretaker's Talent",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Cloud, Midgar Mercenary",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Demonic Pact",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Down, Down to Goblin-town",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Generous Plunderer",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Greed's Gambit",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Harmless Offering",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Iroh, Tea Master",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Kutzil's Flanker",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Lorehold Charm",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Shock",
+   "goldfish": 0.1,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.33
+  },
+  {
+   "name": "Assassin's Trophy",
+   "goldfish": 0.61,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.3
+  },
+  {
+   "name": "Bejeweled Warg",
+   "goldfish": 0.61,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.3
+  },
+  {
+   "name": "Fear of Missing Out",
+   "goldfish": 0.61,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.3
+  },
+  {
+   "name": "Scorching Shot",
+   "goldfish": 0.61,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.3
+  },
+  {
+   "name": "Tarmogoyf",
+   "goldfish": 0.61,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.3
+  },
+  {
+   "name": "Agatha's Soul Cauldron",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Anticausal Vestige",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Anzrag's Rampage",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Archdruid's Charm",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Arid Archway",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Astelli Reclaimer",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Bloodthirsty Conqueror",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Bristly Bill, Spine Sower",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Bushwhack",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Capital City",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Casey Jones, Vigilante",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Cease // Desist",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Celestial Armor",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Chomping Changeling",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Cloak and Dagger, Entwined",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Compel Brutality",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Conduit Pylons",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Crystal Barricade",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Dawnhand Dissident",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Doc Ock's Tentacles",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Dracogenesis",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Dredger's Insight",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Elenda, Saint of Dusk",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Emeritus of Abundance",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Emrakul, the Exigent Doom",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Enduring Innocence",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Essence Burn",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Eumidian Terrabotanist",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Garnet, Princess of Alexandria",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Germinate Recruits",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Giant's Boulder",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Gideon the Oathless",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Glacial Dragonhunt",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Gollum the Abandoned",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Grim Bauble",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Gwen Stacy",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Hearthborn Battler",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Hedge Maze",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Improvised Arsenal",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Innkeeper's Talent",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Insidious Fungus",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Jace Reawakened",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Kavaron, Memorial World",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Ketramose, the New Dawn",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Kin-Tree Severance",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Lady Octopus, Inspired Inventor",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Leyline of the Void",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Liliana, Dreadhorde General",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Loch Mare",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Long Goodbye",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Lord Skitter, Sewer King",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Lost in the Maze",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Lupinflower Village",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Mai, Scornful Striker",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Malicious Eclipse",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Mazemind Tome",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Mind Roots",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Multiply by Zero",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Ojer Axonil, Deepest Might",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Origin of the Avengers",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Overlord of the Floodpits",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Overlord of the Mistmoors",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Phoenix Fleet Airship",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Proft, Sinister Mastermind",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Ravenous Robots",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Refute Destiny",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Rescue Skiff",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Ride's End",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Roiling Dragonstorm",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Rust Harvester",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Samut, Hazoret's Champion",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Scales of Shale",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Scavenging Ooze",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Sephiroth, Fabled SOLDIER",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Shadowy Backstreet",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Simulacrum Shaper",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Sire of Seven Deaths",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Spectacular Spider-Man",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Sphinx of the Final Word",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Spinewoods Armadillo",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Stab",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Stingerquill Voxmancer",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Suki, Courageous Rescuer",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Summon: Bahamut",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Summon: Fenrir",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Super Shredder",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Super Villain Lockup",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Super-Soldier Serum",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Tezzeret, Cruel Captain",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "The Echoverse Fulcrum",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "The Enigma Jewel",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Theorist's Proxy",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Timeline Culler",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Tinybones Joins Up",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Tinybones, the Pickpocket",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Tragic Trajectory",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Unidentified Hovership",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Urban Retreat",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Vastlands Scavenger",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Vigorbloom Charm",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Virulent Emissary",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Vision of Love",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Vivien Reid",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Withering Curse",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Withering Torment",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Yuna, Hope of Spira",
+   "goldfish": 0.0,
+   "top8": 0.55,
+   "decks": 1,
+   "score": 0.28
+  },
+  {
+   "name": "Ashling's Command",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Burnout Bashtronaut",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Eclipsed Realms",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Flamebraider",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Gathering Place",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Molten-Core Maestro",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Roaming Throne",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Sanar, Unfinished Genius",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Scalding Viper",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Slagstorm",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Vibrance",
+   "goldfish": 0.51,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.26
+  },
+  {
+   "name": "Agna Qel'a",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Ancient Cornucopia",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Deathcap Glade",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Frostcliff Siege",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Patchwork Beastie",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Restoration Magic",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Vraska, the Cutting Glare",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Wildfire Wickerfolk",
+   "goldfish": 0.41,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.2
+  },
+  {
+   "name": "Ajani's Anguish",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Evendo, Waking Haven",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Giada, Font of Hope",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Inspiring Overseer",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Leonardo's Technique",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Lyra, Archangel of Dawn",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Precise Redaction",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Restless Vinestalk",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Secluded Courtyard",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Wojek Investigator",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Ygra, Eater of All",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Youthful Valkyrie",
+   "goldfish": 0.3,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.15
+  },
+  {
+   "name": "Airbender Ascension",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Bender's Waterskin",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Chief Warg's Company",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Craterhoof Behemoth",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Dark Knight's Greatsword",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Doctor Doom",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Duelist of the Mind",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Edge Rover",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Elegant Parlor",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Gideon's Memorial",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Head of the Hunt",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Heartless Act",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Hollow Marauder",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Huskburster Swarm",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Kaito, Cunning Infiltrator",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Lightstall Inquisitor",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Mosswood Dreadknight",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Overprotect",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Puppet Crafting",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Quag Feast",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Rubblebelt Maverick",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Scrapshooter",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Shang-Chi, Master of Kung Fu",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Skycoach Conductor",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "The Eagles Are Coming!",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Tiger-Seal",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Town Greeter",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Training Compound",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Valgavoth's Lair",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Violent Urge",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Way of the Pyromancer",
+   "goldfish": 0.2,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.1
+  },
+  {
+   "name": "Abhorrent Oculus",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Aetherize",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Assimilation Aegis",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Astrologian's Planisphere",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Aurelia, the Law Above",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Aurelia, the Warleader",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Blossoming Defense",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Boltwave",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Call a Surprise Witness",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Chart a Course",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Cryptic Coat",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Dazzling Angel",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Defend the Rider",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Dissection Tools",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Eluge, the Shoreless Sea",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "End of the Hunt",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Exemplar of Light",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Eye of Jace",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Faerie Dreamthief",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Faerie Fencing",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Flitterwing Nuisance",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Flock Impostor",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Frenzied Baloth",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Gandalf, Goblins' Bane",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Ghitu Lavarunner",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Gold Rush",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Hellcat, Undying Vigilante",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Helping Hand",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Herald of Eternal Dawn",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Holy Cow",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Kellan, the Fae-Blooded",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Leyline of Resonance",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Lyra Dawnbringer",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Opera Love Song",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Patchwork Banner",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Personify",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Picklock Prankster",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Reckless Ransacking",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Resplendent Angel",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Riptide Gearhulk",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Samurai's Katana",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Spell Stutter",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Stingerback Terror",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Sun-Blessed Peak",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Sygg, Wanderwine Wisdom",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Temple of Triumph",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "The Mighty Thor, Jane Foster",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Valorous Stance",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Viashino Pyromancer",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  },
+  {
+   "name": "Wind-Scarred Crag",
+   "goldfish": 0.1,
+   "top8": 0.0,
+   "decks": 0,
+   "score": 0.05
+  }
+ ]
+}

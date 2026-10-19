@@ -96,6 +96,29 @@ Share what is functionally identical, when sharing makes each card's code simple
 cover something that only looks alike: a flag or parameter that only one caller uses, or a branch on which card is
 calling, means it was not the same thing. Leave that in its own card.
 
+## Which card, and claiming it
+
+Every card that is worked on is an issue on GitHub, claimed by whoever works on it, so two people never build the same
+card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the rest); `gh` must be signed in.
+
+1. **Which cards.** If the request names cards, those are the cards. Otherwise the cards come from a format's list of
+   cards that decks actually play (`docs/formats/<format>.json`, best-played first, made from MTGGoldfish and MTGTop8
+   by `format-scrape.py`), and the format is the contributor's to choose: **ask which format** unless they said (the
+   lists present are the files in `docs/formats/`; today Standard). `card-issues.py next <format> -n 5` prints the
+   next cards that are not implemented and that nobody holds - a claim older than 24 hours with no pull request
+   commit or `card/<slug>` push since counts as nobody's. Take them in that order and never skip one for being
+   hard; a card the engine cannot yet do is released (below) with its gap reported, not passed over silently.
+2. **Claim before any work, one command per card:** `card-issues.py claim "Card Name"`. It opens the card's issue
+   first when it has none (a card named outside every format list gets one too), then claims it with a comment, and
+   prints `#N`. Exit status 3 means the card is held by someone else (or they claimed it a moment earlier): leave it
+   and take the next. Never work on a card whose live claim is someone else's.
+3. **Keep the claim alive** - it lasts 24 hours from the last sign of work. Open a (draft) pull request whose
+   description says `Closes #N` as soon as there is a commit, or push work in progress to a branch named
+   `card/<card-slug>`; every commit pushed there renews the claim. A card that will wait longer than that is released
+   (`card-issues.py release "Card Name"`), as is every card the work turns out unable to land. Claim again to renew
+   by hand.
+4. **Landing it closes the issue:** the commit message (and a pull request description) ends with `Closes #N`.
+
 ## The loop for one card
 
 1. **Read the rules before any code.**
@@ -158,9 +181,10 @@ calling, means it was not the same thing. Leave that in its own card.
    and, only if it added a new user interaction, that interaction's browser scenarios; other wall-clock tests only
    when the change touches what they cover (CLAUDE.md).
 10. **Review** (below), then commit: `Card: <Name>` - the content JSON, the card file and its scenarios - one card per
-    commit; core, mechanics and client changes in their own commits before it (`Engine: ...`, `Mechanics: ...`,
-    `Client: ...`). Commit and push as CLAUDE.md says; a contributor without push access opens a pull request with the
-    coverage report and the review in its description.
+    commit, its message ending with `Closes #N` (the card's issue); core, mechanics and client changes in their own
+    commits before it (`Engine: ...`, `Mechanics: ...`, `Client: ...`). Commit and push as CLAUDE.md says; a
+    contributor without push access opens a pull request with the coverage report and the review in its description,
+    which also says `Closes #N`.
 
 ## Scenarios: what a card owes
 
@@ -253,9 +277,12 @@ land. Self-reported "exact" is not proof.
 
 The coordinator dispatches, lands and keeps the queue; it does not implement cards itself in a batch.
 
-1. **Batches** of 15-30 cards, in list order (never pre-sorted by difficulty).
+1. **Batches** of 15-30 cards, in list order (never pre-sorted by difficulty) - `card-issues.py next <format> -n 30`,
+   or the cards named. The coordinator claims every card of a batch before its agent starts (`claim` takes several
+   names), hands the agent the issue numbers, and releases the cards a report says were skipped.
 2. **One agent per batch**, in its own worktree, in the background. Its prompt: this skill's loop for each card (the
-   list inline); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
+   list inline, with the issue numbers for `Closes #N`; the claims are already made, and since agents do not push the
+   coordinator claims the batch again every few hours while they run, so the claims do not lapse); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
    `cantrip-mechanics`; a card blocked by the core is skipped with its exact gap (the rule, and what `cantrip-api`
    lacks), never faked; the client work a card needs (step 8) is part of the card, not a follow-up; one commit per
    card; at the end `git rebase main`, the corpus and the verify tests; no push; a report of implemented cards with
