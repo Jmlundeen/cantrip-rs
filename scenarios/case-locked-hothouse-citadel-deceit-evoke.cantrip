@@ -1,0 +1,67 @@
+# Case and Citadel both permit the top spell, but the Case route must still allow Deceit's printed Evoke cost.
+# Evoke is an alternative cost (CR 702.74a); the Citadel route instead pays life equal to mana value (CR 118.9).
+# Sources: https://magic.wizards.com/en/rules ; https://magic.wizards.com/en/news/feature/lorwyn-eclipsed-release-notes
+
+[Bot1 Deck]
+Swamp
+Swamp
+Mox Sapphire
+Forest
+Case of the Locked Hothouse
+Bolas's Citadel
+Black Lotus
+Swamp
+Plains
+Plains
+Ponder
+Plains x3
+Plains
+Plains
+Deceit
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Case of the Locked Hothouse.Cast
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Swamp#3.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+[T9 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Bolas's Citadel.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+[T11 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T13 Bot1.Main1]
+Bot1.Hand.Plains.Play
+[T13 Bot1.End]
+Bot1.Pass
+[T17 Bot1.Main1]
+Bot1.Library.Deceit.Cast(Ability: Evoke {U/B}{U/B})
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 20
+Bot1.Battlefield.Case of the Locked Hothouse.Solved = true
+Bot1.Graveyard = Deceit; Black Lotus
+Stack.Count = 0

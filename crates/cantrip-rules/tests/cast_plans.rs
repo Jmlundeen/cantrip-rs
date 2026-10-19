@@ -117,6 +117,93 @@ static RESOLUTION_PROBE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+static RESOLUTION_FLASHBACK_WAY: WayDef = WayDef {
+    text: "Flashback {0}",
+    cost: Cost::mana(ManaCost::ZERO),
+    from: ZoneKind::Graveyard,
+    only_from: true,
+    exile_after: true,
+    condition: None,
+    instant_speed: true,
+    enters_attacking: false,
+    kind: WayKind::Other,
+};
+
+static RESOLUTION_FLASHBACK_SPELL: CardDef = CardDef {
+    name: "Cast Plan Resolution Flashback Probe",
+    oracle: true,
+    cost: ManaCost { generic: 2, ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: Some(SpellDef::MODAL),
+    ways: &[RESOLUTION_FLASHBACK_WAY],
+    ..CardDef::BLANK
+};
+
+fn cast_own_graveyard_card_during_resolution(
+    g: &mut dyn cantrip_api::Game,
+    item: &StackItem,
+) -> Result<(), Suspend> {
+    if let Some(&card) = g.state().zone(Zone::graveyard(item.controller)).first() {
+        let _ = g.cast_during_resolution(card, None)?;
+    }
+    Ok(())
+}
+
+static RESOLUTION_FLASHBACK_INSTRUCTION: CardDef = CardDef {
+    name: "Cast Plan Flashback Instruction Probe",
+    oracle: true,
+    cost: ManaCost::ZERO,
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: Some(SpellDef {
+        targets: &[],
+        effect: cast_own_graveyard_card_during_resolution,
+    }),
+    ..CardDef::BLANK
+};
+
+static LIBRARY_SPLIT_LEFT: CardDef = CardDef {
+    name: "Cast Plan Split Left",
+    oracle: true,
+    cost: ManaCost { generic: 2, ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: Some(SpellDef::MODAL),
+    ..CardDef::BLANK
+};
+
+static LIBRARY_SPLIT_RIGHT: CardDef = CardDef {
+    name: "Cast Plan Split Right",
+    oracle: true,
+    cost: ManaCost { generic: 4, ..ManaCost::ZERO },
+    types: TypeSet::of(&[CardType::Instant]),
+    spell: Some(SpellDef::MODAL),
+    ..CardDef::BLANK
+};
+
+static LIBRARY_SPLIT: CardDef = CardDef {
+    name: "Cast Plan Split Probe",
+    oracle: true,
+    split: Some((&LIBRARY_SPLIT_LEFT, &LIBRARY_SPLIT_RIGHT)),
+    ..CardDef::BLANK
+};
+
+fn allows_any_top_spell(_: &dyn Query, _: &Asker, _: ObjectId) -> bool {
+    true
+}
+
+static LIBRARY_LIFE_SOURCE: CardDef = CardDef {
+    name: "Cast Plan Library Life Source",
+    types: TypeSet::of(&[CardType::Artifact]),
+    play_rules: &[PlayRule::LibraryTop],
+    ..CardDef::BLANK
+};
+
+static LIBRARY_MANA_SOURCE: CardDef = CardDef {
+    name: "Cast Plan Library Mana Source",
+    types: TypeSet::of(&[CardType::Artifact]),
+    play_rules: &[PlayRule::LibraryTopSpells(allows_any_top_spell)],
+    ..CardDef::BLANK
+};
+
 static PROBE_SOURCE: CardDef = CardDef {
     name: "Permission Source Probe",
     types: TypeSet::of(&[CardType::Artifact]),
@@ -187,6 +274,13 @@ fn table() -> &'static CardTable {
             &ADVENTURE_PROBE,
             &ADVENTURE_PROBE_FACE,
             &RESOLUTION_PROBE,
+            &RESOLUTION_FLASHBACK_SPELL,
+            &RESOLUTION_FLASHBACK_INSTRUCTION,
+            &LIBRARY_SPLIT_LEFT,
+            &LIBRARY_SPLIT_RIGHT,
+            &LIBRARY_SPLIT,
+            &LIBRARY_LIFE_SOURCE,
+            &LIBRARY_MANA_SOURCE,
             &PROBE_SOURCE,
             &FILLER,
             &GRANTOR_0,
@@ -303,7 +397,12 @@ fn resolve_free_cast(game: &mut RulesGame) {
                 let selected = eligible
                     .iter()
                     .copied()
-                    .find(|&index| matches!(modes[index as usize], Label::GrantedWay(_, _)))
+                    .find(|&index| {
+                        matches!(
+                            modes[index as usize],
+                            Label::GrantedWay(_, _) | Label::PrintedWay(_, _)
+                        )
+                    })
                     .or_else(|| eligible.first().copied())
                     .expect("at least one offered mode");
                 Answer::Modes(vec![selected])
@@ -325,6 +424,215 @@ fn resolve_free_cast(game: &mut RulesGame) {
         game.answer(request.id, request.player, answer).unwrap();
     }
     panic!("the selected free cast did not resolve");
+}
+
+/// A cast instructed during resolution can choose its own flashback route; flashback's exile consequence then applies.
+#[test]
+fn resolution_cast_can_choose_its_printed_flashback_and_exiles_afterward() {
+    let cards = table();
+    let instruction = cards.find("Cast Plan Flashback Instruction Probe").unwrap();
+    let flashback = cards.find("Cast Plan Resolution Flashback Probe").unwrap();
+    let filler = cards.find("Cast Plan Filler").unwrap();
+    let mut game = RulesGame::new(
+        cards,
+        &Setup {
+            decks: vec![
+                vec![instruction, flashback, filler, filler, filler, filler, filler],
+                vec![filler; 7],
+            ],
+            seed: 1,
+            ..Setup::default()
+        },
+    );
+    let player = PlayerId(0);
+    let instruction_id = game.state.zone(Zone::hand(player))[0];
+    let flashback_id = game.state.zone(Zone::hand(player))[1];
+    assert!(game.state.zone_remove(Zone::hand(player), flashback_id));
+    game.state
+        .update_obj(flashback_id, |object| object.zone = Zone::graveyard(player));
+    game.state.zone_push(Zone::graveyard(player), flashback_id);
+    game.state.update_turn(|turn| {
+        turn.number = 1;
+        turn.active = player;
+        turn.priority = player;
+        turn.set_step(Step::PrecombatMain);
+        turn.began = true;
+    });
+    game.state.frame_push(Frame::new(FrameKind::Priority));
+    game.run();
+
+    let request = game.pending().expect("priority request").clone();
+    let option = match &request.kind {
+        RequestKind::Priority { options } => options
+            .iter()
+            .find(|option| {
+                option.kind == ActionKind::CastSpell
+                    && option.source == Some(instruction_id)
+            })
+            .expect("the resolution instruction is castable")
+            .clone(),
+        other => panic!("expected priority, got {other:?}"),
+    };
+    game.answer(request.id, request.player, Answer::Act(Action::of(&option)))
+        .unwrap();
+    resolve_free_cast(&mut game);
+
+    let cast = game.log.iter().find_map(|record| match record.event {
+        Event::Cast(cast) if cast.spell != instruction_id && cast.from == ZoneKind::Graveyard => {
+            Some(cast)
+        }
+        _ => None,
+    });
+    assert!(cast.is_some(), "the resolving effect must cast the graveyard card");
+    assert_eq!(cast.unwrap().way, 1, "the cast used the printed flashback way");
+    assert!(game.state.zone(Zone::exile(player)).iter().any(|&id| {
+        game.state.obj(id).card == flashback
+    }), "a spell cast with flashback is exiled when it leaves the stack");
+    assert!(!game.state.zone(Zone::graveyard(player)).iter().any(|&id| {
+        game.state.obj(id).card == flashback
+    }));
+}
+
+/// Split-face library routes keep each permission's cost attached to each face's own mana value.
+#[test]
+fn library_split_faces_keep_their_cost_for_each_permission_route() {
+    let cards = table();
+    let split_card = cards.find("Cast Plan Split Probe").unwrap();
+    let filler = cards.find("Cast Plan Filler").unwrap();
+    let mut game = RulesGame::new(
+        cards,
+        &Setup {
+            decks: vec![
+                vec![filler, filler, filler, filler, filler, filler, filler, split_card],
+                vec![filler; 7],
+            ],
+            seed: 1,
+            ..Setup::default()
+        },
+    );
+    let player = PlayerId(0);
+    let top = *game.state.zone(Zone::library(player)).first().unwrap();
+    let life_source = game
+        .state
+        .push_obj(Obj::new(cards.find("Cast Plan Library Life Source").unwrap(), player, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, life_source);
+    let mana_source = game
+        .state
+        .push_obj(Obj::new(cards.find("Cast Plan Library Mana Source").unwrap(), player, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, mana_source);
+    game.state.update_turn(|turn| {
+        turn.number = 1;
+        turn.active = player;
+        turn.priority = player;
+        turn.set_step(Step::PrecombatMain);
+        turn.began = true;
+    });
+    game.state.update_player(player, |state| {
+        state.pool.0[Mana::C as usize] = 4;
+    });
+    game.state.frame_push(Frame::new(FrameKind::Priority));
+    game.run();
+
+    let options = permission_options(&game, top);
+    let life_routes: Vec<_> = options
+        .iter()
+        .filter_map(|option| {
+            let plan = option.cast_plan?;
+            (plan.permission == (CastPermission::LibraryTop { source: life_source, rule: 0 }))
+                .then_some((option, plan))
+        })
+        .collect();
+    let mana_routes: Vec<_> = options
+        .iter()
+        .filter_map(|option| {
+            let plan = option.cast_plan?;
+            (plan.permission == (CastPermission::LibraryTop { source: mana_source, rule: 0 }))
+                .then_some((option, plan))
+        })
+        .collect();
+    assert_eq!(life_routes.len(), 2, "Citadel-style permission offers each split face");
+    assert_eq!(mana_routes.len(), 2, "Forge-style permission independently offers each split face");
+
+    let mut seen_life_values = Vec::new();
+    let mut seen_mana_costs = Vec::new();
+    for (_, plan) in life_routes {
+        assert_eq!(plan.cost, CastCostChoice::LifeForManaValue);
+        let cost = cast_plan_cost(&game, player, top, plan).unwrap();
+        seen_life_values.push(cost.life);
+    }
+    let mut four_mana_route = None;
+    for (option, plan) in mana_routes {
+        assert_eq!(plan.cost, CastCostChoice::Printed);
+        let cost = cast_plan_cost(&game, player, top, plan).unwrap();
+        seen_mana_costs.push(cost.mana.generic);
+        assert_eq!(cost.life, 0);
+        if cost.mana.generic == 4 {
+            four_mana_route = Some(option.clone());
+        }
+    }
+    seen_life_values.sort_unstable();
+    seen_mana_costs.sort_unstable();
+    assert_eq!(seen_life_values, [2, 4]);
+    assert_eq!(seen_mana_costs, [2, 4]);
+
+    let request = game.pending().unwrap().clone();
+    let route = four_mana_route.expect("the more expensive face is selectable for mana");
+    game.answer(request.id, request.player, Answer::Act(Action::of(&route)))
+        .unwrap();
+    resolve_free_cast(&mut game);
+    assert!(game.log.iter().any(|record| matches!(record.event,
+        Event::Cast(cast) if cast.from == ZoneKind::Library && cast.value == 4
+    )), "executing the selected route casts the four-mana split face from the library");
+}
+
+/// A cost-taking LibraryTopSpells grant may use a printed alternative; life-for-mana-value must not borrow it.
+#[test]
+fn library_printed_alternative_is_bound_to_the_non_life_permission() {
+    let cards = table();
+    let way_card = cards.find("Cast Plan Way Probe").unwrap();
+    let filler = cards.find("Cast Plan Filler").unwrap();
+    let mut game = RulesGame::new(
+        cards,
+        &Setup {
+            decks: vec![
+                vec![filler, filler, filler, filler, filler, filler, filler, way_card],
+                vec![filler; 7],
+            ],
+            seed: 1,
+            ..Setup::default()
+        },
+    );
+    let player = PlayerId(0);
+    let top = *game.state.zone(Zone::library(player)).first().unwrap();
+    let life_source = game
+        .state
+        .push_obj(Obj::new(cards.find("Cast Plan Library Life Source").unwrap(), player, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, life_source);
+    let mana_source = game
+        .state
+        .push_obj(Obj::new(cards.find("Cast Plan Library Mana Source").unwrap(), player, Zone::BATTLEFIELD));
+    game.state.zone_push(Zone::BATTLEFIELD, mana_source);
+    game.state.update_turn(|turn| {
+        turn.number = 1;
+        turn.active = player;
+        turn.priority = player;
+        turn.set_step(Step::PrecombatMain);
+        turn.began = true;
+    });
+    game.state.frame_push(Frame::new(FrameKind::Priority));
+    game.run();
+
+    let options = permission_options(&game, top);
+    let under_life = options.iter().any(|option| option.cast_plan.is_some_and(|plan| {
+        plan.permission == (CastPermission::LibraryTop { source: life_source, rule: 0 })
+            && plan.cost == (CastCostChoice::PrintedWay { way: 0 })
+    }));
+    let under_mana = options.iter().any(|option| option.cast_plan.is_some_and(|plan| {
+        plan.permission == (CastPermission::LibraryTop { source: mana_source, rule: 0 })
+            && plan.cost == (CastCostChoice::PrintedWay { way: 0 })
+    }));
+    assert!(!under_life, "life-for-mana-value cannot be mixed with a printed alternative cost");
+    assert!(under_mana, "an independent cost-taking permission retains the printed alternative route");
 }
 
 fn overlapping_permissions(free_first: bool) -> (RulesGame, ObjectId, u32) {
@@ -504,7 +812,7 @@ fn adventure_exile_cast_remains_selectable_beside_a_forced_cost_permission() {
     assert!(game.state.zone_remove(Zone::graveyard(player), spell));
     game.state.update_obj(spell, |object| {
         object.zone = Zone::exile(player);
-        object.on_adventure = true;
+        object.on_adventure = Some(PlayerId(0));
     });
     game.state.zone_push(Zone::exile(player), spell);
     let grant_source = source(&mut game);

@@ -48,7 +48,7 @@ Casting options include `CastPlanId`, an opaque positive identity within the cur
 and cost route whose terms the server displayed. The identity carries no engine object IDs and has no meaning in a
 later question; the enclosing request ID still identifies the question. Zero retains the older answer form only when
 its kind/source/index identifies one unambiguous route. Unknown IDs and IDs belonging to another option are rejected.
-The C# MessagePack protocol is version 185; existing keys keep their numbers and these fields are appended.
+The C# MessagePack protocol is version 193; existing keys keep their numbers and these fields are appended.
 
 A mana ability can be taken back while nothing hidden has been shown and nothing has followed from it. While the last
 answer a seat gave activated one, and it and everything since only tapped, sacrificed from the battlefield, removed

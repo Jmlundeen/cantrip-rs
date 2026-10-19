@@ -183,6 +183,7 @@ pub enum CastCostChoice {
     PrintedWay { way: u32 },
     Overload,
     GrantedWay { source: ObjectId, rule: u32 },
+    SpellAlternative { source: ObjectId, rule: u32 },
     LifeForManaValue,
     EffectSpecified,
 }
