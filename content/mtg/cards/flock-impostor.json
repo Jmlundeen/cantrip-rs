@@ -1,0 +1,13 @@
+{
+  "name": "Flock Impostor",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Shapeshifter",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Changeling (This card is every creature type.)\nFlash\nFlying\nWhen this creature enters, return up to one other target creature you control to its owner's hand.",
+  "keywords": [
+    "Changeling",
+    "Flash",
+    "Flying"
+  ]
+}

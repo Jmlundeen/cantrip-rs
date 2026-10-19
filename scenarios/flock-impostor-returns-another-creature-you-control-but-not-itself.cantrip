@@ -1,0 +1,41 @@
+# Flock Impostor: "return up to one other target creature you control to its owner's hand". Turn 3: Thraben Inspector,
+# then Impostor (Plains + Sol Ring). Its own trigger may not target Impostor itself ("other", refused beside the
+# allowed case); it targets Inspector, which goes back to Bot1's hand; the Impostor stays, a 2/2 flier.
+
+[Bot1 Deck]
+Plains
+Plains
+Sol Ring
+Thraben Inspector
+Flock Impostor
+Plains x11
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Thraben Inspector.Cast
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Hand.Flock Impostor.Cast
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Target(Flock Impostor)
+Bot1.Target(Thraben Inspector)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Hand = Plains; Plains; Plains; Thraben Inspector
+Bot1.Battlefield = Plains; Plains; Sol Ring; Flock Impostor; Clue Token
+Bot1.Battlefield.Flock Impostor.Power = 2
