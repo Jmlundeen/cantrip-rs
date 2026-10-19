@@ -1,0 +1,28 @@
+# Tam's Resistance: the +1/+1 counter and vigilance are one spell's two effects (CR 608.2c), and with no Jace in play
+# "Empower Jace 4" creates the Jace token first (CR 701.57b) and puts four loyalty counters on it.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Forest
+Tam's Resistance
+Forest x3
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Tam's Resistance.Cast(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Vigilance
+Bot1.Battlefield.Jace.Counters.Loyalty = 4
