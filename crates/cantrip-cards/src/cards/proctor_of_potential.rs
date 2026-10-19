@@ -1,0 +1,44 @@
+use cantrip_api::*;
+use cantrip_mechanics::effects;
+use cantrip_mechanics::triggers::CREATURE_YOU_CONTROL_ENTERS;
+use cantrip_oracle as oracle;
+
+/// "Whenever this creature or another creature you control enters, surveil 1" (CR 603.6a, 701.25): this creature itself
+/// included.
+fn surveil_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    effects::surveil(g, item, 1)
+}
+
+/// "You've scried or surveilled this turn" (CR 701.22, 701.25): an intervening condition on the activation, read when
+/// the ability is activated.
+fn scried_or_surveilled_this_turn(q: &dyn Query, asker: &Asker) -> bool {
+    let you = asker.controller;
+    q.history().this_turn().iter().any(|r| {
+        matches!(r.event, Event::Scried { player, .. } | Event::Surveilled { player, .. } if player == you)
+    })
+}
+
+/// "{W}{U}: Return this card from your graveyard to the battlefield with a finality counter on it" (CR 122.6, 614.1c):
+/// it enters with the counter on it, so it is exiled instead of dying (CR 122.1h).
+fn return_with_finality(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.put_onto_battlefield_with_counters(item.object, item.controller, false, &[(CounterKind::Finality, 1)])?;
+    Ok(())
+}
+
+pub static CARD: CardDef = CardDef {
+    abilities: &[
+        triggered(
+            CREATURE_YOU_CONTROL_ENTERS,
+            surveil_one,
+            "Whenever this creature or another creature you control enters, surveil 1.",
+        ),
+        ability(
+            cost("{W}{U}"),
+            return_with_finality,
+            "{W}{U}: Return this card from your graveyard to the battlefield with a finality counter on it. Activate only if you've scried or surveilled this turn.",
+        )
+        .from(ZoneKind::Graveyard)
+        .condition(scried_or_surveilled_this_turn),
+    ],
+    ..oracle::PROCTOR_OF_POTENTIAL
+};
