@@ -2,22 +2,10 @@ use cantrip_api::*;
 use cantrip_mechanics::amass::amass;
 use cantrip_mechanics::effects::target_player_loses_1_life_you_gain_1;
 use cantrip_mechanics::hand::discard_chosen_nonland_from_revealed_hand;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{targets, tokens};
 use cantrip_oracle as oracle;
 
-/// The 0/0 black Goblin Army creature token amass makes.
-pub static GOBLIN_ARMY: CardDef = CardDef {
-    name: "Goblin Army",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::Black)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Goblin, Subtype::Army]),
-    power: Some(0),
-    toughness: Some(0),
-    ..CardDef::BLANK
-};
-
-pub static EXTRA: &[&CardDef] = &[&GOBLIN_ARMY];
+pub static EXTRA: &[&CardDef] = &[&tokens::GOBLIN_ARMY];
 
 /// I - "Target opponent reveals their hand. You choose a nonland card from it. That player discards that card." With its
 /// target illegal the chapter does not resolve at all (CR 608.2b).
@@ -29,7 +17,7 @@ fn reveal_and_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
 
 /// II - "Amass Goblins 1" (CR 701.47a).
 fn amass_goblins(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    amass(g, item.controller, item.object, &GOBLIN_ARMY, Subtype::Goblin, 1)
+    amass(g, item.controller, item.object, &tokens::GOBLIN_ARMY, Subtype::Goblin, 1)
 }
 
 pub static CARD: CardDef = CardDef {

@@ -634,3 +634,16 @@ pub static WHITE_FLYING_SPIRIT: CardDef = CardDef {
 pub fn create_a_treasure(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     create_treasure(g, item.controller)
 }
+
+/// The 0/0 black Goblin Army creature token amass Goblins makes when its controller has no Army (CR 701.47a). Down, Down to
+/// Goblin Town and Azog, Moria's Ruin amass Goblins.
+pub static GOBLIN_ARMY: CardDef = CardDef {
+    name: "Goblin Army",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Black)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Goblin, Subtype::Army]),
+    power: Some(0),
+    toughness: Some(0),
+    ..CardDef::BLANK
+};
