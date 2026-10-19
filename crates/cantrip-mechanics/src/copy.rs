@@ -37,6 +37,22 @@ pub fn enter_as_copy_asking(
         .copied()
         .filter(|&id| id != entering && eligible(&g.chars(id)))
         .collect();
+    enter_as_copy_of_one_of(g, entry, &candidates, exception, question)
+}
+
+/// `enter_as_copy_asking` over the permanents the caller has already chosen: for a card whose "any creature on the
+/// battlefield" is narrowed by something the entering permanent knows (Mockingbird's mana value no greater than the mana
+/// spent to cast it), which a `fn(&Chars)` filter cannot see. `candidates` must not hold the entering permanent. It is the body of
+/// `enter_as_copy_asking`, so every `enter_as_copy` card goes through it (Clone, Evil Twin, Phantasmal Image, Phyrexian Metamorph, Omni-Changeling,
+/// Vesuva); Mockingbird calls it directly.
+pub fn enter_as_copy_of_one_of(
+    g: &mut dyn Game,
+    entry: &mut Entering,
+    candidates: &[ObjectId],
+    exception: fn(&dyn Query, Copiable) -> Copiable,
+    question: &'static Question,
+) -> Result<(), Suspend> {
+    let entering = entry.object;
     if candidates.is_empty() {
         return Ok(());
     }
