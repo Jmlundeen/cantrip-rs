@@ -128,7 +128,7 @@ fn suspend_upkeep(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !crate::game::is_live(g, card) || !g.obj(card).zone.is(ZoneKind::Exile) || g.obj(card).counters(CounterKind::Time) <= 0 {
         return Ok(());
     }
-    g.add_counters(card, CounterKind::Time, -1);
+    g.remove_counters(card, CounterKind::Time, 1);
     // "When the last is removed" is a triggered ability of its own, put on the stack the next time a player gets priority.
     if g.obj(card).counters(CounterKind::Time) == 0 {
         let ability = AbilityRef { card: g.card_id(&INTRINSIC), index: SUSPEND_CAST };

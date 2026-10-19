@@ -379,11 +379,24 @@ fn takes(cx: &mut Cx, proposal: &Proposal, source: ObjectId, question: &'static 
 }
 
 /// Runs what an effect does to the game as it applies (`ReplacementThen`): the modified event, every part of which meets only
-/// the effects that have not yet had their opportunity at the event (CR 614.5), `applied`.
-fn run_then(cx: &mut Cx, applied: &[Applied], then: impl FnOnce(&mut Cx)) {
+/// the effects that have not yet had their opportunity at the event (CR 614.5), `applied`. What it does, the effect's
+/// controller does (CR 609.1): the counters it puts are theirs (`Cx::doer`).
+fn run_then(cx: &mut Cx, applied: &[Applied], controller: PlayerId, then: impl FnOnce(&mut Cx)) {
     let outer = std::mem::replace(&mut cx.lineage, applied.to_vec());
-    then(cx);
+    cx.acting_as(controller, then);
     cx.lineage = outer;
+}
+
+/// The counters a replacement effect gives a card arriving in a zone other than the battlefield (the void counter of
+/// Dauthi Voidwalker) are put by the effect's controller (CR 609.1); those a permanent enters with stay its controller's
+/// unless the effect names another (CR 122.6a).
+fn note_counters_by(before: &Proposal, after: &mut Proposal, controller: PlayerId) {
+    if let (Proposal::ZoneChange(b), Proposal::ZoneChange(a)) = (before, after)
+        && a.counters != b.counters
+        && !a.to.is(ZoneKind::Battlefield)
+    {
+        a.counters_by = controller;
+    }
 }
 
 /// Applies the effects to the proposal, one at a time: each is judged again after the one before it has changed the
@@ -413,9 +426,10 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 let asker = Asker { source, controller };
                 let before = *proposal;
                 apply(&*cx, &asker, proposal);
+                note_counters_by(&before, proposal, controller);
                 if let Some(then) = then {
                     let after = *proposal;
-                    run_then(cx, &applied, |cx| then(cx, &asker, &before, &after));
+                    run_then(cx, &applied, controller, |cx| then(cx, &asker, &before, &after));
                 }
             }
             Origin::Granted(timestamp) => {
@@ -429,9 +443,10 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
                 }
                 let before = *proposal;
                 apply(&*cx, &asker, e.affected, proposal);
+                note_counters_by(&before, proposal, e.controller);
                 if let Some(then) = then {
                     let after = *proposal;
-                    run_then(cx, &applied, |cx| then(cx, &asker, e.affected, &before, &after));
+                    run_then(cx, &applied, e.controller, |cx| then(cx, &asker, e.affected, &before, &after));
                 }
             }
             // "That player discards it, but exiles it instead of putting it into their graveyard" (CR 702.35a): the
@@ -554,12 +569,13 @@ pub fn zone_change(cx: &mut Cx, change: ZoneChange) -> ZoneChange {
 
 /// Counters that would be put on a permanent, or that one enters with (CR 122.6, 614.1a): how many of each kind
 /// remain once every effect has applied. The permanent is judged as it is now, or as it would exist on the
-/// battlefield if it is entering (CR 614.12). `effect` says an effect puts them, not a cost or a turn-based action
-/// (`CounterPlacement::effect`).
-pub fn counters(
+/// battlefield if it is entering (CR 614.12). `putter` puts them (CR 122.6a). `effect` says an effect puts them, not a
+/// cost or a turn-based action (`CounterPlacement::effect`). Called by the put path, `crate::counters`, alone.
+pub(crate) fn counters(
     cx: &mut Cx,
     object: ObjectId,
     controller: PlayerId,
+    putter: PlayerId,
     entering: bool,
     effect: bool,
     counts: [i16; CounterKind::COUNT],
@@ -574,8 +590,6 @@ pub fn counters(
     if !possible(cx, Some(object)) || counts.iter().all(|&n| n <= 0) {
         return counts;
     }
-    // CR 122.6a: counters an object enters with are put on it by its controller, unless the effect names another player.
-    let putter = if entering { Some(controller) } else { cx.actor() };
     let mut proposal = Proposal::Counters(CounterPlacement { object, controller, entering, counts, putter, effect });
     apply(cx, &mut proposal);
     match proposal {
@@ -594,17 +608,17 @@ fn without_banned(cx: &Cx, object: ObjectId, controller: PlayerId, mut counts: [
     counts
 }
 
-/// Counters that would be put on a player (CR 122.6): how many poison and energy counters remain once every effect has
-/// applied.
-pub fn player_counters(cx: &mut Cx, player: PlayerId, poison: u16, energy: u16) -> (u16, u16) {
-    if !possible(cx, None) || (poison == 0 && energy == 0) {
-        return (poison, energy);
+/// Counters `putter` would put on a player (CR 122.6, 122.6a): how many of each kind remain once every effect has applied.
+/// Called by the put path, `crate::counters`, alone.
+pub(crate) fn player_counters(cx: &mut Cx, player: PlayerId, putter: PlayerId, counts: crate::counters::PlayerCounts) -> crate::counters::PlayerCounts {
+    if !possible(cx, None) {
+        return counts;
     }
-    let putter = cx.actor();
-    let mut proposal = Proposal::PlayerCounters(PlayerCounters { player, putter, poison, energy });
+    let crate::counters::PlayerCounts { poison, energy, experience } = counts;
+    let mut proposal = Proposal::PlayerCounters(PlayerCounters { player, putter, poison, energy, experience });
     apply(cx, &mut proposal);
     match proposal {
-        Proposal::PlayerCounters(c) => (c.poison, c.energy),
+        Proposal::PlayerCounters(c) => crate::counters::PlayerCounts { poison: c.poison, energy: c.energy, experience: c.experience },
         _ => unreachable!("an effect cannot change the kind of the event"),
     }
 }
@@ -771,7 +785,7 @@ mod tests {
     /// Has the first player draw `count` cards: their hand, library and life afterwards.
     fn draw(game: &mut Game, count: u32) -> (usize, usize, i32) {
         let frame = game.state.agenda.len() - 1;
-        let mut cx = Cx { g: game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+        let mut cx = Cx { g: game, frame, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         crate::ops::draw_cards(&mut cx, ME, count);
         assert!(cx.s().agenda[frame].pending.is_none(), "every question was answered");
         let s = cx.s();

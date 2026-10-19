@@ -5,7 +5,7 @@ use cantrip_oracle as oracle;
 /// Pay {E}{E} if able; otherwise return this permanent and get {E} (CR 118.3, 701.15).
 fn pay_or_return(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    if g.state().player(you).energy >= 2 {
+    if g.state().player(you).energy() >= 2 {
         g.change_energy(you, -2);
     } else {
         g.return_to_hand(&[item.object]);

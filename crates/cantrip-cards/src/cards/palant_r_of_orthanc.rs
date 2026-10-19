@@ -6,7 +6,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("HaveControllerDraw", "have its controller draw a card?", "If you don't, its controller mills a card for each influence counter on it and you lose life equal to the total mana value of those cards", "Let them draw", "Mill, lose life");
 
-const INFLUENCE: usize = CounterKind::Influence as usize;
 
 /// Put an influence counter on this and scry 2. Then target opponent may have you draw a card; if they don't, you mill
 /// X cards, X being the influence counters on this (as it last was if it has gone, CR 608.2h), and they lose life equal
@@ -19,7 +18,7 @@ fn offer(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         g.add_counters(this, CounterKind::Influence, 1);
     }
     scry(g, you, this, 2)?;
-    let influence = g.obj(this).counters[INFLUENCE].max(0) as u32;
+    let influence = g.obj(this).counters(CounterKind::Influence).max(0) as u32;
     if effects::ask_may(g, them, this, Purpose::Ask(&ASK))? {
         g.draw(you, 1);
         return Ok(());

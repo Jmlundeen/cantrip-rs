@@ -866,12 +866,23 @@ since: the history does not keep the controller or the types an object entered w
 
 ### Counters put by an effect, by a cost and by a turn-based action
 
+Every counter comes to be on an object or a player through one path, `cantrip_rules::counters` (`put`, `put_all`,
+`entering` and `place_arrived` for what a permanent enters or a card arrives with, `put_on_player`), and every counter is
+put by a player, named there as a `PlayerId`, never left out: the controller of the spell or ability whose effect puts it
+(CR 608.2; card code's `Game::add_counters` asks `Cx::doer`, which is also the controller of a replacement effect or mana
+ability being carried out), the player paying a cost (CR 118.3) or doing a turn-based action ("that player puts a lore
+counter", CR 714.3c), the controller of a source whose damage puts -1/-1 or gives poison counters (CR 120.3b, 120.3d), or
+for a permanent entering, its controller (CR 122.6a) - its intrinsic loyalty, defense and lore counters (CR 306.5b, 310.4b,
+714.3a) included, a token copy's too. The storage is private to `cantrip-state` (`Obj::counters`, `Player::poison`,
+`energy`, `experience`); reading and removing are open, and the one adder, `put_path_add`, is called from the put path
+alone, which a test (`only_the_put_path_puts_counters`) holds to. No scenario writes counters either: they are played on.
+
 Counters that would be put on a permanent are one `Proposal::Counters` (CR 122.6, 614.1a), whose `CounterPlacement` says who puts
 them (`putter`, CR 122.6a: "if you would put", Innkeeper's Talent) and whether an effect does (`effect`: "if an effect would put",
-Doubling Season). An effect is a resolving spell's or ability's, or the replacement effect a permanent enters with counters by
+Doubling Season); counters on a player are one `Proposal::PlayerCounters`, poison, energy and experience, with its `putter`. An effect is a resolving spell's or ability's, or the replacement effect a permanent enters with counters by
 (CR 614.1c: a planeswalker's loyalty, CR 306.5b; a battle's defense, CR 310.4b; a Saga's first lore counter, CR 714.3a). A cost's
 counters are none (CR 118.3): a loyalty ability's (CR 606.4), "put a page counter on this artifact" (Mazemind Tome) and blight's
-(CR 701.68a) go through the replacements with `effect` false (`ops::put_counters`), as does the lore counter a player puts on each
+(CR 701.68a) go through the replacements with `effect` false (`counters::How::Cost`), as does the lore counter a player puts on each
 Saga as their precombat main phase begins (CR 714.3c, a turn-based action). So Doubling Season doubles a planeswalker's entering
 loyalty and not its +1, and Innkeeper's Talent doubles both. A cost that would put counters a static ability forbids (CR 101.2,
 `CardDef::counter_bans`: Solemnity, Melira) can't be paid (CR 118.3, Solemnity's ruling): such a loyalty ability, counter cost or
@@ -892,7 +903,7 @@ event yet: no card in content triggers on it.
 over the payer's permanents: counters of any kinds, from any of them. It is payable while there are that many among them, and
 is asked as `RequestKind::RemoveCounters` - each kind on each permanent a `CounterPool` with how many there are, answered with
 `Answer::Counters` (how many of which kind from which permanent, adding up to the total, which `validate` checks) - chosen
-after the mana like blight and removed as the cost is paid (`ops::add_counters`, so a Siege's last defense counter still
+after the mana like blight and removed as the cost is paid (`counters::remove`, so a Siege's last defense counter still
 triggers). The host sends it as `RemoveCountersPromptMessage`; the web client offers a button for each kind on each permanent
 and takes one of a permanent's counters on a click on it. Dawnhand Dissident's casts pay it; Tayam, Luminous Enigma's ability is
 the same cost on an activated ability, which `activate` pays too, though no card in content has it there yet.
@@ -1003,7 +1014,7 @@ new object that is never cast as this one, and the effect lasts as long as its a
 
 "For as long as it has a [kind] counter on it" (CR 611.2b) is `Duration::WhileHasCounter(kind)`. `add_effect` refuses to
 start one on an object with no counter of that kind (a replacement kept it off), and the effect ends the moment the last
-one comes off - `ops::end_counter_durations`, called wherever counters are removed (`add_counters` with a negative amount,
+one comes off - `ops::end_counter_durations`, called wherever counters are removed (`counters::remove`,
 a cost that removes counters, a stun counter replacing an untap, damage to a planeswalker), with the state-based check as
 the backstop - and is deleted, so a counter put on again later does not bring it back. Its source leaving changes nothing.
 A control effect that ends this way gives the permanent back (CR 613.1b). Eluge, the Shoreless Sea; Aquitect's Will,
@@ -1338,7 +1349,7 @@ benchmark is unchanged within the noise (2026-10-16, alternating: 57.4 (an outli
 A keyword counter gives its permanent the keyword it is named for (CR 122.1b): flying, first strike, double strike,
 deathtouch, decayed, haste, hexproof, indestructible, lifelink, menace, reach, shadow, trample and vigilance
 (`CounterKind::KEYWORDS`). The ability is a layer-6 effect (CR 613.1f) with the timestamp of its counters: each counter
-gets one as it is put on, and every counter of its kind already there gets the same (CR 613.7c). `ops::add_counters`
+gets one as it is put on, and every counter of its kind already there gets the same (CR 613.7c). `counters::put_all`
 stamps the kind (`GameState::counter_stamps`, written only when a keyword counter is put on a permanent, and empty in
 nearly every game); a kind the permanent entered with has the permanent's own timestamp. `layers::keyword_counters` puts
 each kind the object has among its layer-6 effects as "gains [keyword]" at that timestamp, so "loses all abilities" takes

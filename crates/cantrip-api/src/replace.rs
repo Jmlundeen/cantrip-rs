@@ -27,6 +27,10 @@ pub struct ZoneChange {
     /// The counters an effect gives it as it arrives, whatever the zone (CR 122.6, 614.1c): the void counter a card
     /// exiled in place of a graveyard carries. Not those a permanent enters with of its own (`Entering`).
     pub counters: [i16; CounterKind::COUNT],
+    /// The player who puts `counters` on it (CR 122.6a): the player it arrives under, for a permanent entering with them
+    /// unless the effect names another; the controller of the replacement effect that gives them to a card arriving in any
+    /// other zone (CR 609.1), which the core sets as the effect applies.
+    pub counters_by: PlayerId,
     /// It is revealed as it moves (CR 701.20a).
     pub reveal: bool,
     /// The library it arrives in is shuffled afterwards (CR 701.24a).
@@ -50,23 +54,28 @@ pub struct CounterPlacement {
     pub entering: bool,
     /// How many of each kind would be put.
     pub counts: [i16; CounterKind::COUNT],
-    /// The player who puts them (CR 122.6a): who controls the spell or ability, or does the action, doing it. None for
-    /// the rules' own doing. "If you would put one or more counters on a permanent or player" is keyed to this.
-    pub putter: Option<PlayerId>,
+    /// The player who puts them (CR 122.6a), always one: the controller of the spell or ability whose effect puts them
+    /// (CR 608.2), the player paying a cost or doing the action (CR 118.3, 714.3c), the controller of a source whose damage
+    /// puts them (CR 120.3d), or for a permanent entering, its controller unless the effect names another (CR 122.6a).
+    /// "If you would put one or more counters on a permanent or player" is keyed to this.
+    pub putter: PlayerId,
     /// An effect puts them (CR 609.1): a resolving spell's or ability's, or the replacement effect a permanent enters with
     /// them by (CR 614.1c, 122.6). Not a cost's (CR 118.3: a loyalty ability's, CR 606.4) nor a turn-based action's (a Saga's
     /// lore counter, CR 714.3c). "If an effect would put one or more counters" (Doubling Season) is keyed to this.
     pub effect: bool,
 }
 
-/// Counters that would be put on a player (CR 122.1, 122.6): poison counters and energy counters, which a player has
+/// Counters that would be put on a player (CR 122.1, 122.6): poison, energy and experience counters, which a player has
 /// rather than an object.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct PlayerCounters {
     pub player: PlayerId,
-    pub putter: Option<PlayerId>,
+    /// The player who puts them, always one, as for `CounterPlacement::putter`: the controller of a source whose damage
+    /// gives poison counters (CR 120.3b, 702.90b), or of the spell or ability whose effect does.
+    pub putter: PlayerId,
     pub poison: u16,
     pub energy: u16,
+    pub experience: u16,
 }
 
 /// An instruction to draw cards, before any of the individual draws (CR 121.2a).

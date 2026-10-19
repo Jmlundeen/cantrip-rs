@@ -23,7 +23,10 @@ pub struct Obj {
     pub damage: u16,
     /// Dealt damage by a source with deathtouch since the last state-based action check (CR 704.5h).
     pub deathtouched: bool,
-    pub counters: [i16; CounterKind::COUNT],
+    /// The counters on it (CR 122). Private: they are read through `counters` and `counter_array`, taken off through
+    /// `remove_counters`, and put on only by the put path, `cantrip_rules::counters`, which names the player who puts them
+    /// (CR 122.6a) and lets the replacement effects of counters being put apply (CR 614.1a).
+    counters: [i16; CounterKind::COUNT],
     /// When it entered its zone (CR 613.7d), for ordering and for layer timestamps.
     pub timestamp: u32,
     /// The copy effect it entered with (CR 707.2, 613.2): the values it copied, which are its own copiable values.
@@ -236,6 +239,40 @@ impl Obj {
 
     pub fn counters(&self, kind: CounterKind) -> i16 {
         self.counters[kind as usize]
+    }
+
+    /// Whether it has any counter on it.
+    pub fn has_counters(&self) -> bool {
+        self.counters.iter().any(|&c| c != 0)
+    }
+
+    /// Every kind of counter on it, by `CounterKind` number.
+    pub fn counter_array(&self) -> [i16; CounterKind::COUNT] {
+        self.counters
+    }
+
+    /// Takes up to `n` counters of one kind off it (CR 122.1), never below none. Taking counters off is not putting
+    /// them on, so anything may do it.
+    pub fn remove_counters(&mut self, kind: CounterKind, n: i16) {
+        let c = &mut self.counters[kind as usize];
+        *c = (*c - n.max(0)).max(0);
+    }
+
+    /// Takes every counter off it: an object made into a normal form, for comparing positions (`cantrip_rules::loops`).
+    pub fn clear_counters(&mut self) {
+        self.counters = [0; CounterKind::COUNT];
+    }
+
+    /// The write of the put path. Only `cantrip_rules::counters` calls this, once it has named the player putting the
+    /// counters and applied the replacement effects of their being put (CR 122.6, 122.6a, 614.1a); a test there,
+    /// `only_the_put_path_puts_counters`, fails the build of any other caller. Negative counts are ignored.
+    #[doc(hidden)]
+    pub fn put_path_add(&mut self, counts: &[i16; CounterKind::COUNT]) {
+        for (n, &add) in self.counters.iter_mut().zip(counts) {
+            if add > 0 {
+                *n = n.saturating_add(add);
+            }
+        }
     }
 }
 
@@ -988,12 +1025,13 @@ pub struct Player {
     pub turn_began: u32,
     /// Turns this player has begun (CR 500): "your first three turns of the game".
     pub turns_taken: u16,
-    /// Poison counters (CR 122.1f): ten lose the game (CR 704.5c).
-    pub poison: u8,
-    /// Energy counters (CR 107.14, 122.1): a player's own store, gained and paid.
-    pub energy: u8,
+    /// Poison counters (CR 122.1f): ten lose the game (CR 704.5c). Private, as an object's counters are (`Obj::counters`):
+    /// read through `poison`, put on only by the put path.
+    poison: u8,
+    /// Energy counters (CR 107.14, 122.1): a player's own store, gained and paid (`pay_energy`).
+    energy: u8,
     /// Experience counters (CR 122.1): a player's own store, only ever gained.
-    pub experience: u8,
+    experience: u8,
     /// The city's blessing (CR 702.131): had for the rest of the game once gained.
     pub citys_blessing: bool,
     /// An enduring story (CR 702.195b): had for the rest of the game once gained.
@@ -1420,6 +1458,46 @@ impl ManaRestriction {
 }
 
 impl Player {
+    /// A player as the game begins (CR 103.4): `life` life, and nothing else.
+    pub fn starting(life: i32) -> Player {
+        Player { life, starting_life: life, ..Player::default() }
+    }
+
+    /// Poison counters (CR 122.1f).
+    pub fn poison(&self) -> u8 {
+        self.poison
+    }
+
+    /// Energy counters (CR 107.14).
+    pub fn energy(&self) -> u8 {
+        self.energy
+    }
+
+    /// Experience counters (CR 122.1).
+    pub fn experience(&self) -> u8 {
+        self.experience
+    }
+
+    /// Pays `n` energy (CR 107.14): energy counters taken off, never below none. Not putting counters.
+    pub fn pay_energy(&mut self, n: u8) {
+        self.energy = self.energy.saturating_sub(n);
+    }
+
+    /// Takes every counter off the player: a normal form, for comparing positions (`cantrip_rules::loops`).
+    pub fn clear_counters(&mut self) {
+        (self.poison, self.energy, self.experience) = (0, 0, 0);
+    }
+
+    /// The write of the put path for a player's counters: only `cantrip_rules::counters` calls this (see
+    /// `Obj::put_path_add`). Each kind stops at 255.
+    #[doc(hidden)]
+    pub fn put_path_add(&mut self, poison: u16, energy: u16, experience: u16) {
+        let add = |n: u8, more: u16| (n as u32 + more as u32).min(255) as u8;
+        self.poison = add(self.poison, poison);
+        self.energy = add(self.energy, energy);
+        self.experience = add(self.experience, experience);
+    }
+
     /// Spends `n` mana of one kind from the pool, the ordinary mana of that kind before the mana that lasts.
     /// The mana in the pool that lasts until the end of combat.
     pub fn lasting_mana(&self) -> ManaPool {

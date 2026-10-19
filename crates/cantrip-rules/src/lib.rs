@@ -8,6 +8,7 @@ mod actions;
 #[cfg(test)]
 mod as_transforms_tests;
 mod attach;
+mod counters;
 mod day_night;
 mod designations;
 mod layers;
@@ -27,7 +28,7 @@ mod untap_others_tests;
 mod validate;
 
 use cantrip_api::*;
-use cantrip_state::{Frame, FrameKind, Mark, Marks, Rng};
+use cantrip_state::{Frame, FrameKind, Mark, Rng};
 
 pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction};
 pub use validate::{check as check_answer, distribution_problem, name_problem};
@@ -120,47 +121,7 @@ impl Game {
             let library = deck.iter().map(|&card| (card, Zone::library(p)));
             let sideboard = setup.sideboards.get(seat).into_iter().flatten().chain(&setup.basic_lands_outside).map(|&card| (card, Zone::sideboard(p)));
             for (card, zone) in library.chain(sideboard).collect::<Vec<_>>() {
-                let id = state.push_obj(Obj {
-                    card,
-                    owner: p,
-                    controller: p,
-                    zone,
-                    token: false,
-                    tapped: false,
-                    controlled_since: 0,
-                    damage: 0,
-                    deathtouched: false,
-                    counters: [0; CounterKind::COUNT],
-                    timestamp: 0,
-                    copy: None,
-                    loyalty_turn: 0,
-                    became: None,
-                    exile_on_leave: false,
-                    kicked: 0,
-                    paid: 0,
-                    gift: None,
-                    spent: ManaPool::default(),
-                    cast_way: 0,
-                    class_level: 0,
-                    prepared: false,
-                    card_copy: false,
-                    prepared_from: None,
-                    attached_to: None,
-                    attached_player: None,
-                    entered_with: None,
-                    chosen_color: None,
-                    chosen_subtype: None,
-                    on_adventure: None,
-                    cast_from: None,
-                    activated_turn: 0,
-                    activated_mask: 0,
-                    x: 0,
-                    marks: Marks::default(),
-                    transformed: false,
-                    exiled: None,
-                    face_down: false,
-                    seen_by: 0,
-                });
+                let id = state.push_obj(Obj::new(card, p, zone));
                 state.zone_push(zone, id);
             }
         }
@@ -188,7 +149,7 @@ impl Game {
         } else {
             // A scenario's deal: seven each, in turn order, kept.
             for p in game.state.apnap().collect::<Vec<_>>() {
-                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+                let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
                 for _ in 0..7 {
                     ops::draw(&mut cx, p);
                 }
@@ -247,7 +208,7 @@ impl Game {
 
             let kind = self.state.agenda[at].kind;
             let (flow, asked_at) = {
-                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+                let mut cx = Cx { g: self, frame: at, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
                 let flow = match kind {
                     FrameKind::Opening => turn::opening(&mut cx),
                     FrameKind::BeginStep => turn::begin_step(&mut cx),
@@ -517,6 +478,9 @@ pub(crate) struct Cx<'a> {
     /// could not stop at (`ask_core`) is wound back to here, so the question is put to the position it was asked in, with
     /// the objects it names, and not to the one the run began from.
     pub asked_at: Option<(Mark, usize)>,
+    /// The player whose replacement effect or mana ability is being carried out (CR 609.1, 605): the player `doer` names,
+    /// over the frame's. None outside one.
+    pub doer: Option<PlayerId>,
 }
 
 impl<'a> Cx<'a> {
@@ -614,14 +578,31 @@ impl<'a> Cx<'a> {
         }
     }
 
-    /// The player doing what the running frame does (CR 122.6a): who a player's action is, or who controls the spell or
-    /// ability that is resolving. None for the rules' own doing.
-    pub fn actor(&self) -> Option<PlayerId> {
-        match self.cause() {
-            Cause::Player(p) => Some(p),
-            Cause::Spell(_) | Cause::Ability { .. } => self.g.state.stack.last().map(|i| i.controller),
-            _ => None,
+    /// The player doing what card code is doing now (CR 608.2, 609.1): the controller of the replacement effect or mana
+    /// ability whose effect is being carried out (`Cx::doer`), else the player whose action the frame is, else the
+    /// controller of the spell or ability resolving. What the rules themselves do names its player itself (the turn's lore
+    /// counters, CR 714.3c; damage's counters, CR 120.3b-d), so no frame of the rules' own runs card code that puts counters
+    /// without one of these; the active player stands in should one ever do, and a debug build stops there.
+    pub fn doer(&self) -> PlayerId {
+        if let Some(p) = self.doer {
+            return p;
         }
+        match self.g.state.agenda.get(self.frame).map(|f| f.kind) {
+            Some(FrameKind::Act { player }) => player,
+            Some(FrameKind::Resolve) if let Some(item) = self.resolving() => item.controller,
+            _ => {
+                debug_assert!(false, "card code acted with no player doing it");
+                self.g.state.turn.active
+            }
+        }
+    }
+
+    /// Runs `f` as `player`'s doing (`doer`): the effect of a replacement effect or a mana ability they control.
+    pub(crate) fn acting_as<T>(&mut self, player: PlayerId, f: impl FnOnce(&mut Self) -> T) -> T {
+        let outer = self.doer.replace(player);
+        let done = f(self);
+        self.doer = outer;
+        done
     }
 
     /// What the frame being run is doing, as an event's cause.
@@ -1084,15 +1065,15 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn give_experience(&mut self, player: PlayerId, amount: u32) {
-        // CR 101.2: a player who can't get experience counters gets none (Solemnity's "players can't get counters").
-        if static_rules::player_counters_banned(&*self, self.g.cards, player, PlayerCounter::Experience) {
-            return;
-        }
-        self.g.state.update_player(player, |p| p.experience = p.experience.saturating_add(amount.min(255) as u8));
+        // Counters the effect's controller puts on the player (CR 122.6, 608.2), a replacement of counters being put
+        // applying (Vorinclex's "on a permanent or player").
+        let by = self.doer();
+        counters::put_on_player(self, player, counters::PlayerCounts { experience: amount.min(u16::MAX as u32) as u16, ..Default::default() }, by);
     }
 
     fn give_poison(&mut self, player: PlayerId, amount: u32) {
-        ops::give_poison(self, player, amount);
+        let by = self.doer();
+        ops::give_poison(self, player, amount, by);
     }
 
     fn become_copy(&mut self, source: ObjectId, permanent: ObjectId, values: Copiable, duration: Duration) {
@@ -1158,7 +1139,8 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn monstrosity(&mut self, permanent: ObjectId, counters: i16) {
-        ops::monstrosity(self, permanent, counters);
+        let by = self.doer();
+        ops::monstrosity(self, permanent, counters, by);
     }
 
     fn become_saddled(&mut self, permanent: ObjectId) {
@@ -1235,7 +1217,18 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) {
-        ops::add_counters(self, object, kind, amount);
+        if amount < 0 {
+            counters::remove(self, object, kind, -amount);
+            return;
+        }
+        let by = self.doer();
+        counters::put(self, object, kind, amount, by, counters::How::Effect);
+    }
+
+    fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16 {
+        let before = self.g.state.obj(object).counters(kind);
+        counters::remove(self, object, kind, amount);
+        before - self.g.state.obj(object).counters(kind)
     }
 
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration) {
@@ -1413,7 +1406,8 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn change_energy(&mut self, player: PlayerId, delta: i32) {
-        ops::change_energy(self, player, delta);
+        let by = self.doer();
+        ops::change_energy(self, player, delta, by);
     }
 
     fn proliferate(&mut self, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {

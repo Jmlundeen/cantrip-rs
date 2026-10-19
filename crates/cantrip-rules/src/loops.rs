@@ -606,7 +606,7 @@ fn players_amounts(s: &GameState) -> Vec<i32> {
     let mut out = Vec::new();
     for (i, p) in s.players.iter().enumerate() {
         let library = s.zone(Zone::library(PlayerId(i as u8))).len() as i32;
-        for (what, n) in [(amount::LIFE, p.life), (amount::POISON, p.poison as i32), (amount::LIBRARY, library)] {
+        for (what, n) in [(amount::LIFE, p.life), (amount::POISON, p.poison() as i32), (amount::LIBRARY, library)] {
             out.push(code(what, i) as i32);
             out.push(n);
         }
@@ -774,10 +774,11 @@ fn position(s: &GameState, canon: &Canon) -> Position {
     for (i, p) in s.players.iter().enumerate() {
         p.hash(&mut h.exact);
         let mut shape = *p;
-        (shape.life, shape.poison, shape.energy, shape.experience) = (0, 0, 0, 0);
+        shape.life = 0;
+        shape.clear_counters();
         (shape.pool, shape.lasting) = Default::default();
         shape.hash(&mut h.shape);
-        for (what, n) in [(LIFE, p.life), (POISON, p.poison as i32), (ENERGY, p.energy as i32), (EXPERIENCE, p.experience as i32)] {
+        for (what, n) in [(LIFE, p.life), (POISON, p.poison() as i32), (ENERGY, p.energy() as i32), (EXPERIENCE, p.experience() as i32)] {
             amounts.push((code(what, i), n));
         }
         for m in 0..6 {
@@ -824,13 +825,13 @@ fn position(s: &GameState, canon: &Canon) -> Position {
             if o.damage != 0 {
                 amounts.push((code(DAMAGE, n), o.damage as i32));
             }
-            for (k, &count) in o.counters.iter().enumerate() {
+            for (k, &count) in o.counter_array().iter().enumerate() {
                 if count != 0 {
                     amounts.push((code(COUNTER + k as u32, n), count as i32));
                 }
             }
             o.damage = 0;
-            o.counters = [0; CounterKind::COUNT];
+            o.clear_counters();
             (o, refs).hash(&mut h.shape);
             n += 1;
         }
@@ -909,7 +910,7 @@ mod tests {
     }
 
     fn cx(game: &mut Game) -> Cx<'_> {
-        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None }
+        Cx { g: game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None }
     }
 
     /// The permanent leaves and comes back: a new object (CR 400.7), at a later timestamp, and its ability triggers again,

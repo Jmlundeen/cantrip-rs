@@ -298,7 +298,7 @@ impl StateDump {
                 d.set(format!("{b}.Speed"), speed);
             }
             d.set(format!("{b}.Life"), player.life);
-            d.set(format!("{b}.Poison"), player.poison);
+            d.set(format!("{b}.Poison"), player.poison());
             if player.lost {
                 d.set(format!("{b}.Status"), "Lost");
             }
@@ -309,9 +309,9 @@ impl StateDump {
             }) {
                 d.set(format!("{b}.LostTo"), format!("{reason:?}"));
             }
-            d.set(format!("{b}.Energy"), player.energy);
-            if player.experience > 0 {
-                d.set(format!("{b}.Experience"), player.experience);
+            d.set(format!("{b}.Energy"), player.energy());
+            if player.experience() > 0 {
+                d.set(format!("{b}.Experience"), player.experience());
             }
             d.set(format!("{b}.LandsPlayed"), player.lands_played);
             // "Skips their next N turns" (CR 500.11, 614.10): the turns still to skip, one effect each.

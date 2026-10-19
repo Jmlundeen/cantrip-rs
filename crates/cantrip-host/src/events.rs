@@ -295,7 +295,7 @@ impl Tracker {
                 self.lost[p.index()] = true;
                 let reason = if player.life <= 0 {
                     LossReasonView::Life
-                } else if player.poison >= 10 {
+                } else if player.poison() >= 10 {
                     LossReasonView::Poison
                 } else if player.drew_from_empty {
                     LossReasonView::EmptyLibrary

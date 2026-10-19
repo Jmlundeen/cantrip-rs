@@ -56,7 +56,7 @@ fn your_end_step(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired
 fn remove_a_time_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let this = item.object;
     if g.is_on_battlefield(this) && g.obj(this).became.is_none() && g.obj(this).counters(CounterKind::Time) > 0 {
-        g.add_counters(this, CounterKind::Time, -1);
+        g.remove_counters(this, CounterKind::Time, 1);
     }
     Ok(())
 }

@@ -23,7 +23,7 @@ fn hope(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if g.remove_counters(this, CounterKind::Hope, 1) > 0 {
         g.draw(item.controller, 1);
     }
-    if g.obj(this).counters[HOPE] > 0 {
+    if g.obj(this).counters(CounterKind::Hope) > 0 {
         return Ok(());
     }
     g.sacrifice(&[this]);

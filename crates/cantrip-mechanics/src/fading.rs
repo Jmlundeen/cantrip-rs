@@ -26,8 +26,8 @@ fn fade(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !g.is_on_battlefield(this) || g.obj(this).became.is_some() {
         return Ok(());
     }
-    if g.obj(this).counters[FADE] > 0 {
-        g.add_counters(this, CounterKind::Fade, -1);
+    if g.obj(this).counters(CounterKind::Fade) > 0 {
+        g.remove_counters(this, CounterKind::Fade, 1);
         return Ok(());
     }
     g.sacrifice(&[this]);

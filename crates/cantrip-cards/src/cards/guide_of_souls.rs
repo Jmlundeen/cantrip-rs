@@ -15,7 +15,7 @@ fn bank(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// resolves, so it is an optional payment in the effect, and a player without all three is not asked.
 fn pay_energy(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    if g.state().player(you).energy < 3 {
+    if g.state().player(you).energy() < 3 {
         return Ok(());
     }
     if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {

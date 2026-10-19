@@ -8,7 +8,7 @@ use cantrip_api::*;
 
 /// "If it had no -1/-1 counters on it" (CR 603.4): the permanent as it last was on the battlefield.
 fn had_no_minus_counters(q: &dyn Query, asker: &Asker) -> bool {
-    q.obj(asker.source).counters[CounterKind::MinusOne as usize] == 0
+    q.obj(asker.source).counters(CounterKind::MinusOne) == 0
 }
 
 /// The return: the card the permanent became in the graveyard, if it is still there (CR 400.7).

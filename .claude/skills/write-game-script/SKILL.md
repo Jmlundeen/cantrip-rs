@@ -90,6 +90,9 @@ sweeping seeds (CLAUDE.md).
   - A cast for an alternative cost names it the same way (`Cast(Duress; Ability: Return)` for Daze).
   - Mana of any one color needs `Color:` (`Color: C` for colorless).
 - **Fixed dice.** A `[Dice]` section fixes the faces rolled, in order (README).
+- **Starting conditions, not board state.** A scenario may set its starting conditions (life with `[Life]`, dice with
+  `[Dice]`), but every counter and every piece of board state comes from game actions played in the script: poison
+  counters from infect or toxic damage, never written in.
 - **Cards outside the game.** A `[Bot1 Sideboard]` section, written as a deck is, is what Bot1 owns outside the game (CR
   400.11a), for a card that brings one in (North Wind Avatar); `[Basic Lands Outside]` makes it a Limited game whose
   sideboards hold any number of the basic lands it lists. `Bot1.Sideboard` is the dump's key (README).

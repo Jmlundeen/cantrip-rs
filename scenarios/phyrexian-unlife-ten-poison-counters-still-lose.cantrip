@@ -1,12 +1,10 @@
 # Phyrexian Unlife keeps its controller in only for having 0 or less life (CR 104.3d, 704.5c; the 2011-06-01 ruling).
-# Bot1 begins at 1 life with nine poison counters; Bot2's first Bolt takes Bot1 to -2 (life loss, no poison), and its second
-# is dealt as though it had infect: three more poison counters, twelve, and Bot1 loses to them - not to its life total.
+# Bot1 begins at 1 life; Bot2's first Bolt takes Bot1 to -2 (life loss, no poison), and Bot2's Glistener Elf, with Giant
+# Growth and Berserk, deals Bot1 8 infect damage: eight poison counters. Bot2's second Bolt is dealt as though it had infect:
+# three more poison counters, eleven, and Bot1 loses to them - not to its life total.
 
 [Life]
 Bot1: 1
-
-[Poison]
-Bot1: 9
 
 [Bot1 Deck]
 Plains
@@ -19,13 +17,15 @@ Island
 Island x10
 
 [Bot2 Deck]
-Mountain
+Forest
+Glistener Elf
+Mox Emerald
+Mox Ruby
 Mountain
 Lightning Bolt
 Lightning Bolt
-Island
-Island
-Island
+Giant Growth
+Berserk
 Island x10
 
 [Actions]
@@ -34,7 +34,11 @@ Bot1.Battlefield.Plains.Activate
 Bot1.Hand.Sol Ring.Cast
 Bot1.Hand.Mox Pearl.Cast
 [T2 Bot2.Main1]
-Bot2.Hand.Mountain.Play
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Glistener Elf.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Plains.Play
 Bot1.Battlefield.Sol Ring.Activate
@@ -42,17 +46,24 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Hand.Phyrexian Unlife.Cast
 [T4 Bot2.Main1]
 Bot2.Hand.Mountain.Play
-Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain.Activate
 Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot2.Attack(Glistener Elf > Bot1)
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Giant Growth.Cast(Glistener Elf)
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Berserk.Cast(Glistener Elf)
 [T4 Bot2.Main2]
-? Bot1.Poison = 9
+? Bot1.Poison = 8
 ? Bot1.Life = -2
-Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mox Ruby.Activate
 Bot2.Hand.Lightning Bolt.Cast(Bot1)
 
 [Expect]
 Result = Bot2 won
 Bot1.Status = Lost
 Bot1.LostTo = Poison
-Bot1.Poison = 12
+Bot1.Poison = 11
 Bot1.Life = -2

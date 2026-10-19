@@ -702,15 +702,15 @@ pub trait Game: Query {
     fn add_mana_until_end_of_combat(&mut self, player: PlayerId, mana: Mana, amount: u8);
     /// Adds mana that can only be spent as `restriction` allows (CR 106.6).
     fn add_restricted_mana(&mut self, player: PlayerId, mana: Mana, amount: u8, restriction: ManaRestriction);
+    /// Puts `amount` counters of one kind on an object, as the effect being carried out does (CR 609.1, 122.6): put by the
+    /// player whose effect it is (CR 608.2, 122.6a) - the controller of the spell or ability resolving, of the replacement
+    /// effect applying, or the player doing the action - and through the replacement effects of counters being put
+    /// (CR 614.1a). A negative `amount` takes that many off instead (`remove_counters`).
     fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16);
     /// Removes up to `amount` counters of one kind from an object (CR 122.1) and says how many came off: none from an
     /// object that has changed zones (CR 400.7). It answers "if you do" and "for each counter removed this way", as Dawn of a
     /// New Age and Coalition Relic ask.
-    fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16 {
-        let before = self.obj(object).counters(kind);
-        self.add_counters(object, kind, -amount);
-        before - self.obj(object).counters(kind)
-    }
+    fn remove_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) -> i16;
     fn add_effect(&mut self, source: ObjectId, affected: ObjectId, kind: EffectKind, duration: Duration);
     /// An effect about `controller` and not an object (`EffectKind::outlives_affected`), for the player who controls the
     /// resolving ability or spell (CR 109.5: "you") even if its source has since changed hands or left.

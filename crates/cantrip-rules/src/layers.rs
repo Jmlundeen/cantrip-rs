@@ -121,7 +121,7 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
     // What could apply at all, found once: most objects have no effects, no statics touch them, and no counters.
     // A spell's text can be changed too (CR 612.1: "target spell or permanent").
     let has_effects = (on_battlefield || spell) && state.effects.iter().any(|e| e.affected == id);
-    let has_counters = on_battlefield && obj.counters.iter().any(|&c| c != 0);
+    let has_counters = on_battlefield && obj.has_counters();
     let has_own = !def.statics.is_empty();
     // The permanents (and graveyard cards) whose static abilities could apply, found once for every layer: most games
     // look at a flag and find none.

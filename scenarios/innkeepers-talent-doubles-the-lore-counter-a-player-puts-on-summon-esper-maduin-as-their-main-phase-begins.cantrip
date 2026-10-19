@@ -1,6 +1,5 @@
-# Known bug: the lore counter a player puts on their Saga as their precombat main phase begins (CR 714.3c, "that player
-# puts a lore counter") has no player putting it in the engine, so "If you would put one or more counters" (Innkeeper's
-# Talent, level 3) does not double it (KI-46).
+# Innkeeper's Talent doubles the lore counter a player puts on their Saga as their precombat main phase begins (CR 714.3c:
+# "that player puts a lore counter", so "If you would put one or more counters" is theirs, CR 122.6a).
 #
 # Summon: Esper Maduin enters on turn 5 (Esper Origins flashed back) with one lore counter, before Innkeeper's Talent
 # reaches level 3 later that turn. On turn 7 Bot1 puts the turn's lore counter on it, and the Talent doubles it to two
@@ -69,7 +68,9 @@ Bot1.Pass
 Bot1.Target(Bot1.Battlefield.Ornithopter)
 [T7 Bot1.Main1]
 Bot1.Triggers(Add {G}{G}; Other creatures you control)
+? Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 3
+? Stack.Count = 2
 
 [Expect]
-Bot1.Battlefield.Summon: Esper Maduin.Counters.Lore = 3
-Stack.Count = 2
+Bot1.Battlefield.Ornithopter.Power = 5
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Trample

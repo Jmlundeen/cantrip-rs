@@ -331,7 +331,7 @@ pub struct Mark(pub u32);
 impl GameState {
     pub fn new(players: usize, seed: u64) -> GameState {
         GameState {
-            players: vec![Player { life: 20, starting_life: 20, ..Player::default() }; players],
+            players: vec![Player::starting(20); players],
             restricted_mana: Vec::new(),
             mana_from: Vec::new(),
             counter_stamps: Vec::new(),

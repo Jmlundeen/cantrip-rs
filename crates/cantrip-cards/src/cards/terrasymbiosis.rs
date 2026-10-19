@@ -16,7 +16,7 @@ fn you_put_plus_one_counters(q: &dyn Query, source: ObjectId, event: &Event) -> 
     match event {
         Event::CountersPut { object, kind: CounterKind::PlusOne, amount, by, .. }
             if *amount > 0
-                && *by == Some(q.controller(source))
+                && *by == q.controller(source)
                 && q.controller(*object) == q.controller(source)
                 && q.chars(*object).is(CardType::Creature)
                 && !q.history().done(source, draw_ability(q, source)) =>

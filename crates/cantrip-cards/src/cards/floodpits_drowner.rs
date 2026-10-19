@@ -14,7 +14,7 @@ fn tap_and_stun(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Target creature with a stun counter on it" (CR 115.1, 122.1g).
 fn creature_with_a_stun_counter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).counters[CounterKind::Stun as usize] > 0)
+    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if q.obj(id).counters(CounterKind::Stun) > 0)
 }
 
 /// "Shuffle this creature and target creature with a stun counter on it into their owners' libraries" (CR 701.24a): both

@@ -14,7 +14,7 @@ fn discharge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
     g.change_energy(you, 3);
     let mut paid = 0u16;
-    while g.state().player(you).energy > 0 {
+    while g.state().player(you).energy() > 0 {
         if !cantrip_mechanics::effects::ask_may(g, you, item.object, Purpose::Ask(&ASK))? {
             break;
         }

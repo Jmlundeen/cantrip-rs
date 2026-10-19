@@ -6,7 +6,7 @@ use cantrip_state::{PendingTrigger, Span};
 
 use crate::actions::target_candidates_given;
 use crate::layers::{self, live};
-use crate::{Cx, Flow, R, ops};
+use crate::{Cx, Flow, R, counters, ops};
 
 /// Whether a permanent is a bestowed Aura (CR 702.103b): the Aura face its card has while it is bestowed is what its copy
 /// effect says it is, until it ceases to be bestowed (CR 702.103f).
@@ -369,7 +369,10 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
             roles_surplus.push(id);
         }
     }
-    // A permanent that satisfies several of these changes zones once, and what is not destruction wins over it.
+    // A permanent that satisfies several of these changes zones once, and what is not destruction wins over it. A Saga is
+    // sacrificed by its controller (CR 714.4, 704.5s: "that Saga's controller sacrifices it"), so "whenever you sacrifice"
+    // sees it; the rest are put into graveyards, which is no sacrifice.
+    let sagas_sacrificed = sacrificed.clone();
     for id in sacrificed.into_iter().chain(surplus).chain(roles_surplus) {
         if !to_graveyard.contains(&id) {
             to_graveyard.push(id);
@@ -380,7 +383,11 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         // All at once (CR 704.3): a creature that dies to its toughness and one destroyed by damage leave together.
         let mut moves: Vec<ops::Moving> = Vec::new();
         for id in to_graveyard.into_iter().chain(destroyed) {
-            moves.push(ops::Moving::to(id, Zone::graveyard(cx.s().obj(id).owner)));
+            let mut moving = ops::Moving::to(id, Zone::graveyard(cx.s().obj(id).owner));
+            if sagas_sacrificed.contains(&id) {
+                moving.reason = Some(ZoneReason::Sacrifice);
+            }
+            moves.push(moving);
         }
         ops::move_together(cx, &moves, ZoneReason::StateBased);
         acted = true;
@@ -388,8 +395,8 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     // CR 704.5q, at the same time as the rest (CR 704.3): a permanent leaving in this check leaves with the counters it had.
     for (id, n) in annihilate {
         if live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-            ops::add_counters(cx, id, CounterKind::PlusOne, -n);
-            ops::add_counters(cx, id, CounterKind::MinusOne, -n);
+            counters::remove(cx, id, CounterKind::PlusOne, n);
+            counters::remove(cx, id, CounterKind::MinusOne, n);
             acted = true;
         }
     }

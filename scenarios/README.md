@@ -143,11 +143,11 @@ A scenario that needs a player near death says so instead of playing the life aw
 total (not the starting life of the format, so "half your starting life total" is unchanged), one player per line, `Bot1: 1`.
 A player it does not name starts at 20.
 
-## Poison counters: `[Poison]`
+## Starting conditions and the board
 
-A `[Poison]` section gives a player the poison counters they begin the game with, one player per line, `Bot2: 9`, for a
-scenario that needs a player near ten (CR 122.1f, 704.5c) without playing the counters onto them. A player it does not name
-begins with none.
+A scenario may set its starting conditions - life totals (`[Life]`) and dice (`[Dice]`) - but every counter and every
+piece of board state comes from game actions: a player near ten poison counters gets them from infect or toxic damage or
+a card that gives them, played in the script, never from a section that writes them.
 
 ## How lines are played
 

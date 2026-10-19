@@ -1,10 +1,7 @@
-# Platinum Angel and poison (CR 704.5c, 104.3d). Bot1 begins with nine poison counters and casts the Angel on turn 3. On turn
-# 4 Bot2's Glistener Elf, an infect creature, deals Bot1 1 combat damage: a tenth poison counter (CR 702.90b), and with the
-# Angel out Bot1 doesn't lose. On turn 6 Bot2 Disenchants the Angel, and at the next check Bot1, with ten poison counters,
-# loses.
-
-[Poison]
-Bot1: 9
+# Platinum Angel and poison (CR 704.5c, 104.3d). Bot1 casts the Angel on turn 3. On turn 4 Bot2's Glistener Elf, an infect
+# creature, attacks wearing Rancor, gets Giant Growth and then Berserk (1 + 2 + 3 = 6, doubled to 12), and deals Bot1 12
+# combat damage: twelve poison counters (CR 702.90b), and with the Angel out Bot1 doesn't lose. On turn 6 Bot2
+# Disenchants the Angel, and at the next check Bot1, with twelve poison counters, loses.
 
 [Bot1 Deck]
 Plains
@@ -19,11 +16,13 @@ Island x10
 [Bot2 Deck]
 Forest
 Glistener Elf
-Plains
+Mox Emerald
+Forest
+Rancor
+Giant Growth
+Berserk
 Plains
 Disenchant
-Island
-Island
 Island x10
 
 [Actions]
@@ -34,6 +33,7 @@ Bot1.Hand.Mox Pearl.Cast
 Bot1.Hand.Black Lotus.Cast
 [T2 Bot2.Main1]
 Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
 Bot2.Battlefield.Forest.Activate
 Bot2.Hand.Glistener Elf.Cast
 [T3 Bot1.Main1]
@@ -45,20 +45,28 @@ Bot1.Battlefield.Sol Ring.Activate
 Bot1.Battlefield.Black Lotus.Activate(Color: White)
 Bot1.Hand.Platinum Angel.Cast
 [T4 Bot2.Main1]
-Bot2.Hand.Plains.Play
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Hand.Rancor.Cast(Glistener Elf)
+Bot2.Pass
 Bot2.Attack(Glistener Elf > Bot1)
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Giant Growth.Cast(Glistener Elf)
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Berserk.Cast(Glistener Elf)
 [T4 Bot2.Main2]
-? Bot1.Poison = 10
+? Bot1.Poison = 12
 ? Bot1.Life = 20
 ? Result = InProgress
 [T6 Bot2.Main1]
 Bot2.Hand.Plains.Play
-Bot2.Battlefield.Plains#1.Activate
-Bot2.Battlefield.Plains#2.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Forest#1.Activate
 Bot2.Hand.Disenchant.Cast(Platinum Angel)
 
 [Expect]
 Result = Bot2 won
 Bot1.Status = Lost
 Bot1.LostTo = Poison
-Bot1.Poison = 10
+Bot1.Poison = 12

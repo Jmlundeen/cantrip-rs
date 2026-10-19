@@ -35,9 +35,6 @@ pub struct GameScript {
     pub dice: Vec<u8>,
     /// Life totals the players begin with when not 20 (a `[Life]` section: `Bot1: 3`), as (seat index, life).
     pub life: Vec<(usize, i32)>,
-    /// Poison counters the players begin with (a `[Poison]` section: `Bot1: 9`), as (seat index, counters): a position near
-    /// ten forced instead of played (CR 122.1f).
-    pub poison: Vec<(usize, u8)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -603,7 +600,6 @@ enum Section {
     Opening,
     Dice,
     Life,
-    Poison,
 }
 
 impl GameScript {
@@ -659,14 +655,6 @@ impl GameScript {
                             _ => return Err(ParseError("a [Life] section gives a starting life total per player, as Bot1: 3".into())),
                         }
                     }
-                    Section::Poison => {
-                        let (key, value) = line.split_once(':').unwrap_or(("", ""));
-                        let seat = key.trim().to_ascii_uppercase().strip_prefix("BOT").and_then(|n| n.parse::<usize>().ok()).filter(|n| (1..=4).contains(n));
-                        match (seat, value.trim().parse::<u8>()) {
-                            (Some(seat), Ok(poison)) => script.poison.push((seat - 1, poison)),
-                            _ => return Err(ParseError("a [Poison] section gives the poison counters a player begins with, as Bot1: 9".into())),
-                        }
-                    }
                     Section::Dice => {
                         for face in line.split(';') {
                             match face.trim().parse::<u8>() {
@@ -713,7 +701,6 @@ fn section_header(line: &str) -> Option<Section> {
         "[OPENING]" => Some(Section::Opening),
         "[DICE]" => Some(Section::Dice),
         "[LIFE]" => Some(Section::Life),
-        "[POISON]" => Some(Section::Poison),
         "[BASIC LANDS OUTSIDE]" => Some(Section::BasicLandsOutside),
         other => {
             let rest = other.strip_prefix("[BOT")?;
@@ -771,13 +758,6 @@ mod tests {
             other => panic!("{other:?}"),
         }
         assert_eq!(script.expectations[0].key, "Bot1.Graveyard");
-    }
-
-    #[test]
-    fn a_poison_section_gives_each_player_their_counters() {
-        let script = GameScript::parse("[Bot1 Deck]\nIsland\n[Bot2 Deck]\nSwamp\n[Poison]\nBot2: 9\n[Expect]\nBot2.Poison = 9\n", "x").unwrap();
-        assert_eq!(script.poison, vec![(1, 9)]);
-        assert!(GameScript::parse("[Bot1 Deck]\nIsland\n[Poison]\nBot5: 9\n", "x").is_err());
     }
 
     #[test]

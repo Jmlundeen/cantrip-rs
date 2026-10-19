@@ -46,7 +46,7 @@ fn remove_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if !cantrip_mechanics::effects::ask_may(g, item.controller, me, Purpose::Ask(&ASK))? {
         return Ok(());
     }
-    g.add_counters(me, kind, -1);
+    g.remove_counters(me, kind, 1);
     let this = g.card_id(&CARD);
     g.reflexive_trigger(me, item.controller, AbilityRef::delayed(this, 0), item.subject);
     Ok(())

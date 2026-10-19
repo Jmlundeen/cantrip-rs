@@ -29,7 +29,7 @@ fn effect_puts(_: &dyn Query, asker: &Asker, p: &Proposal) -> bool {
 
 /// "If you would put one or more counters on a permanent, put twice that many instead."
 fn you_put(_: &dyn Query, asker: &Asker, p: &Proposal) -> bool {
-    matches!(p, Proposal::Counters(c) if c.putter == Some(asker.controller))
+    matches!(p, Proposal::Counters(c) if c.putter == asker.controller)
 }
 
 fn twice(_: &dyn Query, _: &Asker, p: &mut Proposal) {

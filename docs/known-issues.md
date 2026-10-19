@@ -61,7 +61,6 @@ keeps it).
 | [KI-43](#ki-43-a-modal-double-faced-cards-back-face-cast-by-a-permission-is-not-exercised) | A modal double-faced card's back face cast by a permission is not exercised | Low | Unexercised |
 | [KI-44](#ki-44-no-emblem-gives-a-way) | No emblem gives a way | Low | Open |
 | [KI-45](#ki-45-the-number-a-cost-sacrifices-is-kept-as-the-spells-x) | The number a cost sacrifices is kept as the spell's X | Low | Suspected |
-| [KI-46](#ki-46-the-lore-counter-a-player-puts-on-a-saga-as-their-main-phase-begins-has-no-player-putting-it) | The lore counter a player puts on a Saga as their main phase begins has no player putting it | Medium | Open |
 | [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
@@ -522,23 +521,6 @@ sacrificed for a spell that has no X. No card in content reads X of a Viper. A f
 
 **Scenarios.** none: no card reaches it.
 
-### KI-46: The lore counter a player puts on a Saga as their main phase begins has no player putting it
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Medium | Open | engine | 2026-10-17, scenarios of Esper Origins |
-
-**Notes.** CR 714.3c: "As a player's precombat main phase begins, that player puts a lore counter on each Saga they control."
-`ops::add_lore_counters` runs as a turn-based action whose cause is the rules, so `replace::counters` finds no putter
-(`Cx::actor` is `None` for `Cause::Rules`), and "If you would put one or more counters on a permanent or player" (Innkeeper's
-Talent at level 3, `replacements::double_counters_applies`, keyed to the putter) does not double it. The lore counter a Saga
-enters with is doubled, as its controller puts it (CR 122.6a). A fix names the active player as the putter of the turn's lore
-counters.
-
-**Scenarios.**
-- [`scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip`](../scenarios/innkeepers-talent-doubles-the-lore-counter-a-player-puts-on-summon-esper-maduin-as-their-main-phase-begins.cantrip)
-  (marked `# Known bug`): one lore counter becomes two, so chapters II and III trigger together.
-
 ### KI-48: Emperor of Bones puts its finality counter on after the creature enters
 
 | Severity | Status | Area | Found |
@@ -731,7 +713,7 @@ seat controls a land of its type. The web client shows the keyword on the card, 
 
 **Notes.** Doubling Season doubles counters "an effect" puts (`CounterPlacement::effect`), and not those a cost or a turn-based
 action puts (CR 118.3, 714.3c). The -1/-1 counters damage from a source with infect puts on a creature (CR 120.3d, 702.90c) are
-put as an effect's (`ops::add_counters`), combat damage's included, though combat damage is dealt by a turn-based action
+put as an effect's (`counters::How::Effect`, by the source's controller, CR 120.3d), combat damage's included, though combat damage is dealt by a turn-based action
 (CR 510.2). No ruling says which they are; a wither source would ask the same (none is in content).
 
 **Scenarios.** none yet: an infect creature dealing combat damage to a creature whose controller has a Doubling Season.

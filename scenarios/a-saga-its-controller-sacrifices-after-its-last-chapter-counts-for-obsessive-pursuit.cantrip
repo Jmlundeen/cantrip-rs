@@ -1,0 +1,32 @@
+# A Saga whose last chapter has resolved is sacrificed by its controller (CR 714.4, 704.5s: "that Saga's controller
+# sacrifices it"), so it is a permanent they sacrificed this turn. Urza's Saga's third chapter resolves on turn 5 and the
+# Saga is sacrificed; Bot1 attacks with Ornithopter, and Obsessive Pursuit puts X = 1 +1/+1 counter on it.
+
+[Bot1 Deck]
+Urza's Saga
+Ornithopter
+Swamp
+Obsessive Pursuit
+Swamp
+Swamp
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Urza's Saga.Play
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Urza's Saga.Activate
+Bot1.Hand.Obsessive Pursuit.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Urza's Saga

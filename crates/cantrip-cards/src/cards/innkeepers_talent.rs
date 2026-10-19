@@ -16,7 +16,7 @@ fn has_counters(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: 
     let s = view.state();
     s.obj(source).class_level >= 2
         && s.obj(affected).controller == s.obj(source).controller
-        && s.obj(affected).counters.iter().any(|&n| n > 0)
+        && s.obj(affected).has_counters()
 }
 
 fn grant_ward(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {

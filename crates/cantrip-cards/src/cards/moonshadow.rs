@@ -17,7 +17,7 @@ fn permanent_card_to_your_graveyard(q: &dyn Query, source: ObjectId, event: &Eve
 fn remove_a_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let source = item.object;
     if targets::permanent(g, source) && g.obj(source).counters(CounterKind::MinusOne) > 0 {
-        g.add_counters(source, CounterKind::MinusOne, -1);
+        g.remove_counters(source, CounterKind::MinusOne, 1);
     }
     Ok(())
 }

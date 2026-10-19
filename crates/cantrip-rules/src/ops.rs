@@ -5,7 +5,7 @@ use cantrip_api::*;
 use cantrip_state::PendingTrigger;
 
 use crate::layers::{self, live};
-use crate::{Cx, R, replace};
+use crate::{Cx, R, counters, replace};
 
 /// A player commits a crime (CR 700.13) as they cast a spell, activate an ability or put a triggered ability on the stack
 /// that targets at least one opponent; at least one permanent, spell or ability an opponent controls; and/or at least one
@@ -82,6 +82,9 @@ struct Plan {
     madness: bool,
     entering: bool,
     new: Obj,
+    /// The counters it arrives with (CR 122.6), once the replacements have applied, and the player putting them.
+    counts: [i16; CounterKind::COUNT],
+    counts_by: PlayerId,
     last_known: Option<LastKnown>,
 }
 
@@ -164,6 +167,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             controller: entry.map_or(old.controller, |e| e.controller),
             tapped: entry.is_some_and(|e| e.tapped),
             counters: [0; CounterKind::COUNT],
+            counters_by: entry.map_or(old.controller, |e| e.controller),
             reveal: false,
             shuffle: false,
             is_card: !old.token && !old.card_copy,
@@ -198,62 +202,38 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         };
         let turn = cx.s().turn.number;
         let entering = to.is(ZoneKind::Battlefield);
-        let mut new = Obj {
-            card: old.card,
-            owner: old.owner,
-            controller: if entering || to.is(ZoneKind::Stack) { old.controller } else { old.owner },
-            zone: to,
-            token: old.token,
-            tapped: false,
-            controlled_since: turn,
-            damage: 0,
-            deathtouched: false,
-            counters: [0; CounterKind::COUNT],
-            // Given as it arrives, below.
-            timestamp: 0,
-            copy: None,
-            loyalty_turn: 0,
-            became: None,
-            exile_on_leave: false,
-            kicked: if entering && from.is(ZoneKind::Stack) { old.kicked } else { 0 },
-            gift: if entering && from.is(ZoneKind::Stack) { old.gift } else { None },
-            paid: if entering && from.is(ZoneKind::Stack) { old.paid } else { 0 },
-            spent: if entering && from.is(ZoneKind::Stack) { old.spent } else { ManaPool::default() },
-            cast_way: if entering && from.is(ZoneKind::Stack) { old.cast_way } else { 0 },
-            class_level: 0,
-            prepared: false,
-            card_copy: old.card_copy,
-            prepared_from: None,
-            attached_to: None,
-            attached_player: None,
-            entered_with: None,
-            chosen_color: None,
-            chosen_subtype: None,
-            on_adventure: None,
-            cast_from: None,
-            activated_turn: 0,
-            activated_mask: 0,
-            x: if entering && from.is(ZoneKind::Stack) { old.x } else { 0 },
-            marks: Marks {
-                cast_untimely: entering && from.is(ZoneKind::Stack) && old.marks.cast_untimely,
-                // CR 709.5d: a Room enters with the unlocked designation of the half that was cast as a spell, and with
-                // neither if neither was.
-                doors: if entering && from.is(ZoneKind::Stack) && cx.cards().get(old.card).is_room() { cast_door(old.cast_way) } else { 0 },
-                ..Marks::default()
-            },
-            transformed: false,
-            exiled: None,
-            face_down: false,
-            seen_by: 0,
+        let from_stack = entering && from.is(ZoneKind::Stack);
+        let mut new = Obj::new(old.card, old.owner, to);
+        new.controller = if entering || to.is(ZoneKind::Stack) { old.controller } else { old.owner };
+        new.token = old.token;
+        new.controlled_since = turn;
+        // Given as it arrives, below.
+        new.timestamp = 0;
+        if from_stack {
+            new.kicked = old.kicked;
+            new.gift = old.gift;
+            new.paid = old.paid;
+            new.spent = old.spent;
+            new.cast_way = old.cast_way;
+            new.x = old.x;
+        }
+        new.card_copy = old.card_copy;
+        new.marks = Marks {
+            cast_untimely: from_stack && old.marks.cast_untimely,
+            // CR 709.5d: a Room enters with the unlocked designation of the half that was cast as a spell, and with
+            // neither if neither was.
+            doors: if from_stack && cx.cards().get(old.card).is_room() { cast_door(old.cast_way) } else { 0 },
+            ..Marks::default()
         };
         if from.is(ZoneKind::Graveyard) && !old.token {
         }
         // What the replacements left of its arrival: tapped, and the counters they give it, a void counter on a card
         // exiled in place of a graveyard as much as those of a permanent (CR 122.6).
         new.tapped = entering && change.tapped;
-        new.counters = change.counters;
+        let mut counts = change.counters;
+        let mut counts_by = change.counters_by;
         if let Some(e) = m.entering.filter(|_| entering) {
-            for (n, with) in new.counters.iter_mut().zip(e.counters) {
+            for (n, with) in counts.iter_mut().zip(e.counters) {
                 *n += with;
             }
             new.controller = e.controller;
@@ -275,20 +255,23 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             new.face_down = true;
         }
         if entering {
-            enters_with_intrinsic_counters(cx.cards(), &mut new);
-            // Counters it enters with are counters put on it (CR 122.6, 614.1a): replacements that change how many
-            // apply to them, the permanent judged as it would exist on the battlefield (CR 614.12).
-            let (controller, counts) = (new.controller, new.counters);
-            new.counters = match m.entering {
-                Some(e) => judged_entering(cx, &Entering { counters: counts, ..e }, counts.iter().any(|&n| n > 0), |cx| {
-                    replace::counters(cx, m.id, controller, true, true, counts)
+            counters::intrinsic(cx.cards(), &new, &mut counts);
+            // Counters it enters with are counters put on it (CR 122.6, 614.1a), by its controller (CR 122.6a):
+            // replacements that change how many apply to them, the permanent judged as it would exist on the battlefield
+            // (CR 614.12).
+            let controller = new.controller;
+            counts_by = controller;
+            let with = counts;
+            counts = match m.entering {
+                Some(e) => judged_entering(cx, &Entering { counters: with, ..e }, with.iter().any(|&n| n > 0), |cx| {
+                    counters::entering(cx, m.id, controller, controller, with)
                 }),
-                None => replace::counters(cx, m.id, controller, true, true, counts),
+                None => counters::entering(cx, m.id, controller, controller, with),
             };
         }
-        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, last_known });
+        plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known });
     }
-    for Plan { m, reason, old, from, to, change, madness, entering, mut new, last_known } in plans {
+    for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known } in plans {
         let m = &m;
         if let Some(last_known) = last_known {
             cx.st().last_known_push(last_known);
@@ -302,8 +285,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             cx.st().stack_remove(at);
         }
         new.timestamp = cx.st().timestamp();
-        let entered_with = new.counters;
         let new_id = cx.st().push_obj(new);
+        // The counters it arrives with are on it as it arrives (CR 614.1c), announced after its move.
+        let mut put = Vec::new();
+        counters::place_arrived(cx, new_id, counts, counts_by, &mut put);
         note_statics(cx, new_id);
         if to.is(ZoneKind::Library) {
             cx.st().zone_insert(to, 0, new_id);
@@ -353,11 +338,8 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         if entering && cx.s().obj(new_id).marks.doors != 0 {
             events.push(Event::DoorUnlocked { permanent: new_id, door: cx.s().obj(new_id).marks.doors, player: cx.s().obj(new_id).controller });
         }
-        // The counters a permanent enters with were put on it (CR 122.6).
-        if entering {
-            let by = cx.s().obj(new_id).controller;
-            counters_entered_with(&mut events, new_id, by, &entered_with);
-        }
+        // The counters it arrived with were put on it (CR 122.6).
+        events.extend(put);
         created.push(new_id);
         if m.entering.is_some_and(|e| e.prepared) && entering {
             become_prepared(cx, new_id);
@@ -667,7 +649,7 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
         o.controller = entering.controller;
         o.transformed = entering.transformed;
         o.timestamp = timestamp;
-        o.counters = entering.counters;
+        counters::hypothetical(o, &entering.counters);
         if entering.copy.is_some() {
             o.copy = entering.copy;
         }
@@ -861,24 +843,6 @@ pub fn put_onto_battlefield_as(
     Ok(move_together(cx, &[Moving { id, to: Zone::BATTLEFIELD, entering: Some(entering), reason: None }], reason)[0])
 }
 
-/// What a permanent enters with because of what it is: a planeswalker its printed loyalty (CR 306.5b), a Saga a lore
-/// counter (CR 714.3a), announced with the rest of the counters it enters with once it is there.
-fn enters_with_intrinsic_counters(cards: &CardTable, new: &mut Obj) {
-    let card = new.copy.map(|c| c.card).unwrap_or_else(|| cards.face(new.card, new.transformed));
-    let def = cards.get(card);
-    if let Some(loyalty) = def.loyalty {
-        new.counters[CounterKind::Loyalty as usize] += loyalty;
-    }
-    // A battle its printed defense (CR 310.4b).
-    if let Some(defense) = def.defense {
-        new.counters[CounterKind::Defense as usize] += defense;
-    }
-    let saga = def.subtypes.has(Subtype::Saga) && def.abilities.iter().any(|a| matches!(a, AbilityDef::Triggered(t) if t.chapter > 0));
-    if saga {
-        new.counters[CounterKind::Lore as usize] += 1;
-    }
-}
-
 /// Transforms a permanent (CR 701.27a): its other face is up. The same object, so nothing about it is new (CR 712.18).
 /// Only a double-faced card on the battlefield transforms; a copy of one does not (CR 701.27c).
 ///
@@ -955,47 +919,11 @@ pub fn create_emblem(cx: &mut Cx, def: CardId, player: PlayerId) -> ObjectId {
     let copy = (!words.is_printed()).then(|| Copiable { words, ..Copiable::of(def) });
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
-    let id = cx.st().push_obj(Obj {
-        card: def,
-        owner: player,
-        controller: player,
-        zone: Zone::COMMAND,
-        token: false,
-        tapped: false,
-        controlled_since: turn,
-        damage: 0,
-        deathtouched: false,
-        counters: [0; CounterKind::COUNT],
-        timestamp,
-        copy,
-        loyalty_turn: 0,
-        became: None,
-        exile_on_leave: false,
-        kicked: 0,
-        paid: 0,
-        gift: None,
-        spent: ManaPool::default(),
-        cast_way: 0,
-        class_level: 0,
-        prepared: false,
-        card_copy: false,
-        prepared_from: None,
-        attached_to: None,
-        attached_player: None,
-        entered_with: None,
-        chosen_color: None,
-        chosen_subtype: None,
-        on_adventure: None,
-        cast_from: None,
-        activated_turn: 0,
-        activated_mask: 0,
-        x: 0,
-        marks: Marks::default(),
-        transformed: false,
-        exiled: None,
-        face_down: false,
-        seen_by: 0,
-    });
+    let mut obj = Obj::new(def, player, Zone::COMMAND);
+    obj.controlled_since = turn;
+    obj.timestamp = timestamp;
+    obj.copy = copy;
+    let id = cx.st().push_obj(obj);
     cx.st().zone_push(Zone::COMMAND, id);
     note_statics(cx, id);
     id
@@ -1109,48 +1037,13 @@ fn create_tokens_onto(
     for &(card, controller) in tokens {
         let turn = cx.s().turn.number;
         let timestamp = cx.st().timestamp();
-        let id = cx.st().push_obj(Obj {
-            card,
-            owner: controller,
-            controller,
-            zone: Zone::GONE,
-            token: true,
-            tapped: false,
-            controlled_since: turn,
-            damage: 0,
-            deathtouched: false,
-            counters: [0; CounterKind::COUNT],
-            timestamp,
-            copy: None,
-            loyalty_turn: 0,
-            became: None,
-            exile_on_leave: false,
-            kicked: 0,
-            paid: 0,
-            // The token a copy of a permanent spell becomes was promised the gift the spell was (CR 707.10, ruling 2024-07-26).
-            gift: spell.and_then(|s| s.gift),
-            spent: ManaPool::default(),
-            cast_way: 0,
-            class_level: 0,
-            prepared: false,
-            card_copy: false,
-            prepared_from: None,
-            attached_to: None,
-            attached_player: None,
-            entered_with: None,
-            chosen_color: None,
-            chosen_subtype: None,
-            on_adventure: None,
-            cast_from: None,
-            activated_turn: 0,
-            activated_mask: 0,
-            x: 0,
-            marks: Marks::default(),
-            transformed: false,
-            exiled: None,
-            face_down: false,
-            seen_by: 0,
-        });
+        let mut token = Obj::new(card, controller, Zone::GONE);
+        token.token = true;
+        token.controlled_since = turn;
+        token.timestamp = timestamp;
+        // The token a copy of a permanent spell becomes was promised the gift the spell was (CR 707.10, ruling 2024-07-26).
+        token.gift = spell.and_then(|s| s.gift);
+        let id = cx.st().push_obj(token);
         let copy = if words.is_printed() { copy } else { Some(Copiable { words, ..Copiable::of(card) }) };
         let aura = spell.filter(|_| cx.card(card).enchant.is_some());
         let mut entering = Entering { object: id, controller, tapped, counters: entry_counters(with), copy, prepared: false, chosen_color: None, chosen_subtype: None, chosen_player: None, chosen_card: None, chosen_option: None, attach: aura.and_then(|i| i.targets[0].object()), attach_player: aura.and_then(|i| i.targets[0].player()), x: 0 , transformed: false, protector: None, instead: None };
@@ -1182,6 +1075,7 @@ fn create_tokens_onto(
             controller,
             tapped: entering.tapped,
             counters: [0; CounterKind::COUNT],
+            counters_by: controller,
             reveal: false,
             shuffle: false,
             is_card: false,
@@ -1197,16 +1091,19 @@ fn create_tokens_onto(
         for (n, with) in entering.counters.iter_mut().zip(change.counters) {
             *n += with;
         }
-        let counts = entering.counters;
+        // A token copy of a planeswalker, a battle or a Saga enters with its loyalty, defense or lore counters too
+        // (CR 306.5b, 310.4b, 714.3a), put on by its controller like the rest (CR 122.6a).
+        let mut counts = entering.counters;
+        counters::intrinsic(cx.cards(), cx.s().obj(id), &mut counts);
+        entering.counters = counts;
         entering.counters =
-            judged_entering(cx, &entering, counts.iter().any(|&n| n > 0), |cx| replace::counters(cx, id, controller, true, true, counts));
+            judged_entering(cx, &entering, counts.iter().any(|&n| n > 0), |cx| counters::entering(cx, id, controller, controller, counts));
         arriving.push((id, controller, entering));
     }
     for (id, controller, entering) in arriving {
         cx.st().update_obj(id, |o| {
             o.zone = Zone::BATTLEFIELD;
             o.tapped = entering.tapped;
-            o.counters = entering.counters;
             o.copy = entering.copy;
             // What the token chose as it entered (CR 614.12): a copy of Painter's Servant picks its own color.
             o.chosen_color = entering.chosen_color;
@@ -1215,10 +1112,8 @@ fn create_tokens_onto(
             o.attached_to = entering.attach;
             o.attached_player = entering.attach_player;
         });
-        // A token copy of a planeswalker or a Saga enters with its loyalty or lore counter too.
-        let mut with = *cx.s().obj(id);
-        enters_with_intrinsic_counters(cx.cards(), &mut with);
-        cx.st().update_obj(id, |o| o.counters = with.counters);
+        let mut put = Vec::new();
+        counters::place_arrived(cx, id, entering.counters, controller, &mut put);
         // Once every counter it enters with is on it, a hone counter among them (CR 122.1j).
         note_statics(cx, id);
         cx.st().zone_push(Zone::BATTLEFIELD, id);
@@ -1226,22 +1121,11 @@ fn create_tokens_onto(
             Some(spell) => Event::ZoneChange { old: spell.object, new: id, from: Zone::STACK, to: Zone::BATTLEFIELD, reason: ZoneReason::Resolve },
             None => Event::ZoneChange { old: id, new: id, from: Zone::GONE, to: Zone::BATTLEFIELD, reason: ZoneReason::Created },
         });
-        counters_entered_with(&mut events, id, controller, &with.counters);
+        events.extend(put);
         created.push(id);
     }
     cx.emit_batch(&events, Some(&before));
     Ok(created)
-}
-
-/// Announces the counters a permanent entered with, as counters put on it (CR 122.6): a Saga's lore counter too, so its
-/// first chapter triggers (CR 714.3a, 714.2b), and all of them, so "when the Nth ... counter is put" sees each it entered with.
-fn counters_entered_with(events: &mut Vec<Event>, object: ObjectId, by: PlayerId, counters: &[i16; CounterKind::COUNT]) {
-    for kind in CounterKind::ALL {
-        let amount = counters[kind as usize];
-        if amount > 0 {
-            events.push(Event::CountersPut { object, kind, amount, total: amount, by: Some(by) });
-        }
-    }
 }
 
 /// Becomes prepared (CR 722.2): the permanent is marked, and a copy of its prepare spell is put into exile under its
@@ -1260,7 +1144,9 @@ pub fn copy_card_into(cx: &mut Cx, card: ObjectId, controller: PlayerId, zone: Z
     let def = cx.s().obj(card).card;
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
-    let copy = cx.st().push_obj(Obj { card_copy: true, controlled_since: turn, timestamp, ..Obj::new(def, controller, zone) });
+    let mut obj = Obj::new(def, controller, zone);
+    (obj.card_copy, obj.controlled_since, obj.timestamp) = (true, turn, timestamp);
+    let copy = cx.st().push_obj(obj);
     cx.st().zone_push(zone, copy);
     copy
 }
@@ -1276,47 +1162,9 @@ pub fn become_prepared(cx: &mut Cx, permanent: ObjectId) {
     cx.st().update_obj(permanent, |o| o.prepared = true);
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
-    let copy = cx.st().push_obj(Obj {
-        card: spell,
-        owner: controller,
-        controller,
-        zone: Zone::exile(controller),
-        token: false,
-        tapped: false,
-        controlled_since: turn,
-        damage: 0,
-        deathtouched: false,
-        counters: [0; CounterKind::COUNT],
-        timestamp,
-        copy: None,
-        loyalty_turn: 0,
-        became: None,
-        exile_on_leave: false,
-        kicked: 0,
-        paid: 0,
-        gift: None,
-        spent: ManaPool::default(),
-        cast_way: 0,
-        class_level: 0,
-        prepared: false,
-        card_copy: true,
-        prepared_from: Some(permanent),
-        attached_to: None,
-        attached_player: None,
-        entered_with: None,
-        chosen_color: None,
-        chosen_subtype: None,
-        on_adventure: None,
-        cast_from: None,
-        activated_turn: 0,
-        activated_mask: 0,
-        x: 0,
-        marks: Marks::default(),
-        transformed: false,
-        exiled: None,
-        face_down: false,
-        seen_by: 0,
-    });
+    let mut obj = Obj::new(spell, controller, Zone::exile(controller));
+    (obj.controlled_since, obj.timestamp, obj.card_copy, obj.prepared_from) = (turn, timestamp, true, Some(permanent));
+    let copy = cx.st().push_obj(obj);
     cx.st().zone_push(Zone::exile(controller), copy);
 }
 
@@ -1345,29 +1193,23 @@ pub fn copy_spell(cx: &mut Cx, spell: ObjectId, copier: PlayerId, new_targets: b
 
     let turn = cx.s().turn.number;
     let timestamp = cx.st().timestamp();
-    let copy = cx.st().push_obj(Obj {
-        owner: copier,
-        controller: copier,
-        zone: Zone::STACK,
-        timestamp,
-        controlled_since: turn,
-        // A copy was paid for by no one: no mana spent (CR 707.10), so none of what mana does to the spell it pays for
-        // (CR 106.6: Cavern of Souls' "can't be countered", Arena of Glory's haste) is the copy's.
-        spent: ManaPool::default(),
-        // Nor was it cast (CR 707.10): it was cast from no zone (Sevinne's Reclamation's copy, not cast from a graveyard,
-        // does not copy itself), at no time (Necromancy's "if you cast it any time a sorcery couldn't have been cast"),
-        // and by no way a permanent gave, so it gains nothing such a way gives (Serra Paragon's). What was chosen and
-        // paid as the original was cast is the copy's too: X, kicks, other additional costs, gift and the alternative
-        // cost (`x`, `kicked`, `paid`, `gift`, `cast_way`), with its copiable values (`card`, `copy`, CR 707.2) and the
-        // face it is (`transformed`, `face_down`). Its object was never cast, so the history has no cast of it either.
-        cast_from: None,
-        marks: Marks { cant_be_countered: false, gains_haste: false, cast_untimely: false, gains: None, ..original.marks },
-        card_copy: true,
-        prepared_from: None,
-        prepared: false,
-        became: None,
-        ..original
-    });
+    let mut obj = original;
+    (obj.owner, obj.controller, obj.zone, obj.timestamp, obj.controlled_since) = (copier, copier, Zone::STACK, timestamp, turn);
+    // A copy was paid for by no one: no mana spent (CR 707.10), so none of what mana does to the spell it pays for
+    // (CR 106.6: Cavern of Souls' "can't be countered", Arena of Glory's haste) is the copy's.
+    obj.spent = ManaPool::default();
+    // Nor was it cast (CR 707.10): it was cast from no zone (Sevinne's Reclamation's copy, not cast from a graveyard,
+    // does not copy itself), at no time (Necromancy's "if you cast it any time a sorcery couldn't have been cast"),
+    // and by no way a permanent gave, so it gains nothing such a way gives (Serra Paragon's). What was chosen and
+    // paid as the original was cast is the copy's too: X, kicks, other additional costs, gift and the alternative
+    // cost (`x`, `kicked`, `paid`, `gift`, `cast_way`), with its copiable values (`card`, `copy`, CR 707.2) and the
+    // face it is (`transformed`, `face_down`). Its object was never cast, so the history has no cast of it either.
+    obj.cast_from = None;
+    obj.marks = Marks { cant_be_countered: false, gains_haste: false, cast_untimely: false, gains: None, ..original.marks };
+    (obj.card_copy, obj.prepared_from, obj.prepared, obj.became) = (true, None, false, None);
+    // A new object, with no counters (CR 707.2: counters are not copied).
+    obj.clear_counters();
+    let copy = cx.st().push_obj(obj);
     cx.st().zone_push(Zone::STACK, copy);
     item.object = copy;
     item.controller = copier;
@@ -2035,8 +1877,10 @@ pub fn deal_damage_with(
 
             if source_chars.has(Keyword::Infect) || batch.as_though_infect(cx, p) {
                 // Damage from a source with infect is dealt to a player as that many poison counters (CR 702.90b,
-                // 120.3b), and so is damage dealt "as though its source had infect" (Phyrexian Unlife).
-                put_player_counters(cx, p, amount, 0);
+                // 120.3b), and so is damage dealt "as though its source had infect" (Phyrexian Unlife): "that source's
+                // controller" gives them, so "if you would put one or more counters" is theirs.
+                let by = cx.s().obj(source).controller;
+                counters::put_on_player(cx, p, counters::PlayerCounts { poison: amount, ..Default::default() }, by);
             } else {
                 change_life(cx, p, -(amount as i32));
             }
@@ -2059,8 +1903,10 @@ pub fn deal_damage_with(
             if target_chars.is(CardType::Creature) {
                 if source_chars.has(Keyword::Infect) {
                     // Damage from a source with infect is dealt to a creature as that many -1/-1 counters (CR 702.90c,
-                    // 120.3d); it is still damage dealt, so deathtouch counts (CR 702.2b).
-                    add_counters(cx, id, CounterKind::MinusOne, amount.min(i16::MAX as u16) as i16);
+                    // 120.3d), which "that source's controller" puts on it, whoever's turn or spell it is; it is still
+                    // damage dealt, so deathtouch counts (CR 702.2b). Put as an effect's (KI-60).
+                    let amount = amount.min(i16::MAX as u16) as i16;
+                    counters::put(cx, id, CounterKind::MinusOne, amount, source_controller, counters::How::Effect);
                     cx.st().update_obj(id, |o| o.deathtouched |= deathtouch);
                 } else {
                     if heal_marked {
@@ -2078,16 +1924,11 @@ pub fn deal_damage_with(
             // CR 120.3h, 310.6: damage dealt to a battle removes that many defense counters.
             if target_chars.is(CardType::Battle) {
                 let removed = amount.min(cx.s().obj(id).counters(CounterKind::Defense).max(0) as u16) as i16;
-                if removed > 0 {
-                    add_counters(cx, id, CounterKind::Defense, -removed);
-                }
+                counters::remove(cx, id, CounterKind::Defense, removed);
             }
             if target_chars.is(CardType::Planeswalker) {
-                cx.st().update_obj(id, |o| {
-                    let loyalty = &mut o.counters[CounterKind::Loyalty as usize];
-                    *loyalty = (*loyalty - amount as i16).max(0);
-                });
-                end_lapsed_durations(cx, id);
+                // CR 120.3c: that many loyalty counters are removed.
+                counters::remove(cx, id, CounterKind::Loyalty, amount.min(i16::MAX as u16) as i16);
             }
             lifelink(cx, source, &source_chars, amount, batch);
             Some(Event::Damage { source, target, amount, combat, controller: cx.s().obj(source).controller, colors: source_chars.colors })
@@ -2395,89 +2236,10 @@ pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
     }
 }
 
-/// Puts counters on an object, or takes them off with a negative amount, as an effect does (CR 609.1). Putting them is an
-/// event replacement effects can change (CR 122.6, 614.1a): "that many plus one" instead.
-pub fn add_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16) {
-    put_counters(cx, id, kind, amount, true);
-}
-
-/// Puts counters on an object, or takes them off with a negative amount: by an effect (`effect`), or as a cost (CR 118.3) or
-/// a turn-based action (CR 714.3c), which the replacement effects of counters put by "an effect" do not see
-/// (`CounterPlacement::effect`). Every other replacement of counters being put applies to all of them.
-pub fn put_counters(cx: &mut Cx, id: ObjectId, kind: CounterKind, amount: i16, effect: bool) {
-    if !live(cx.s(), id) {
-        return;
-    }
-    let mut counts = [0; CounterKind::COUNT];
-    counts[kind as usize] = amount;
-    if amount > 0 && cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        let controller = cx.s().obj(id).controller;
-        counts = replace::counters(cx, id, controller, false, effect, counts);
-    }
-    let defense = cx.s().obj(id).counters(CounterKind::Defense);
-    cx.st().update_obj(id, |o| {
-        for (n, add) in o.counters.iter_mut().zip(counts) {
-            if add != 0 {
-                *n = (*n + add).max(0);
-            }
-        }
-    });
-    if counts.iter().any(|&n| n < 0) {
-        end_lapsed_durations(cx, id);
-    }
-    // The layers look for hone counters from now on (CR 122.1j).
-    if counts[CounterKind::Hone as usize] > 0 {
-        cx.st().see_statics();
-    }
-    // CR 310.12b: when the last defense counter comes off a Siege, its defeat ability triggers.
-    if kind == CounterKind::Defense && defense > 0 && cx.s().obj(id).counters(CounterKind::Defense) == 0 {
-        siege_defeat_triggers(cx, id);
-    }
-    // The counters that were put are announced (CR 121.1, 122.6a), for a Saga's chapters (CR 714.2b) and for "whenever counters
-    // are put on this", as many as the replacements left, with the player who put them.
-    let put = counts[kind as usize];
-    // CR 613.7c: a counter gets a timestamp as it is put on, and every counter of its kind already there gets the same one;
-    // the ability a keyword counter gives applies in layer 6 at it (CR 613.1f, 122.1b).
-    // Every keyword kind put, the replacements' too.
-    if cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        for k in CounterKind::KEYWORDS {
-            if counts[k as usize] > 0 {
-                cx.st().stamp_counters(id, k);
-            }
-        }
-    }
-    if put > 0 {
-        let by = cx.actor();
-        let total = cx.s().obj(id).counters(kind);
-        cx.emit(Event::CountersPut { object: id, kind, amount: put, total, by });
-    }
-}
-
-/// A Siege that has lost its last defense counter triggers its defeat ability (CR 310.12b).
-fn siege_defeat_triggers(cx: &mut Cx, id: ObjectId) {
-    if !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        return;
-    }
-    let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
-    if !chars.has_subtype(Subtype::Siege) {
-        return;
-    }
-    let ability = AbilityRef { card: cx.cards().intrinsic, index: cantrip_api::intrinsic::SIEGE_DEFEAT };
-    let controller = cx.s().obj(id).controller;
-    cx.st().trigger_push(cantrip_state::PendingTrigger {
-        source: id,
-        ability,
-        controller,
-        subject: Target::None,
-        data: [0; 2],
-        members: cantrip_state::Span::default(),
-        count: None,
-        since: None,
-    });
-}
-
-/// CR 714.3c: as the active player's precombat main phase begins, they put a lore counter on each Saga they control
-/// that has chapter abilities. A turn-based action, so it does not use the stack.
+/// CR 714.3c: as the active player's precombat main phase begins, that player puts a lore counter on each Saga they
+/// control that has chapter abilities - "that player puts", so "if you would put one or more counters" (Innkeeper's
+/// Talent, Vorinclex) applies (CR 122.6a). A turn-based action (CR 703.4f), so neither an effect's counter (Doubling
+/// Season) nor one that uses the stack.
 pub fn add_lore_counters(cx: &mut Cx) {
     let active = cx.s().turn.active;
     for id in cx.s().battlefield().to_vec() {
@@ -2488,50 +2250,37 @@ pub fn add_lore_counters(cx: &mut Cx) {
         if chars.has_subtype(Subtype::Saga)
             && chars.abilities().any(|a| matches!(cx.cards().ability(a), AbilityDef::Triggered(t) if t.chapter > 0))
         {
-            // A turn-based action's counter, not an effect's (CR 714.3c, 703.4f).
-            put_counters(cx, id, CounterKind::Lore, 1, false);
+            counters::put(cx, id, CounterKind::Lore, 1, active, counters::How::TurnBased);
         }
     }
 }
 
-/// Puts poison and energy counters on a player (CR 122.1, 122.6): an event replacement effects can change.
-pub fn put_player_counters(cx: &mut Cx, player: PlayerId, poison: u16, energy: u16) {
-    // CR 101.2: a player who can't get counters of a kind gets none (Melira, Sylvok Outcast), and no replacement effect of
-    // the event that doesn't happen applies.
-    let banned = |cx: &Cx, kind| crate::static_rules::player_counters_banned(cx, cx.cards(), player, kind);
-    let poison = if poison > 0 && banned(cx, PlayerCounter::Poison) { 0 } else { poison };
-    let energy = if energy > 0 && banned(cx, PlayerCounter::Energy) { 0 } else { energy };
-    let (poison, energy) = replace::player_counters(cx, player, poison, energy);
-    cx.st().update_player(player, |p| {
-        p.poison = (p.poison as u32 + poison as u32).min(255) as u8;
-        p.energy = (p.energy as u32 + energy as u32).min(255) as u8;
-    });
-}
-
-/// A player gets energy counters, or pays them with a negative `delta` (CR 107.14, 122.1).
-pub fn change_energy(cx: &mut Cx, player: PlayerId, delta: i32) {
+/// A player gets energy counters, put by `by` (CR 107.14, 122.6), or pays them with a negative `delta` (CR 122.1).
+pub fn change_energy(cx: &mut Cx, player: PlayerId, delta: i32, by: PlayerId) {
     if delta > 0 {
-        put_player_counters(cx, player, 0, delta as u16);
+        counters::put_on_player(cx, player, counters::PlayerCounts { energy: delta.min(u16::MAX as i32) as u16, ..Default::default() }, by);
         return;
     }
-    cx.st().update_player(player, |p| p.energy = (p.energy as i32 + delta).clamp(0, 255) as u8);
+    let pay = (-delta).clamp(0, 255) as u8;
+    cx.st().update_player(player, |p| p.pay_energy(pay));
 }
 
 /// Proliferate (CR 701.34a): the permanents on the battlefield and the players in the game that have a counter are
 /// offered, battlefield order first; any number are chosen, and each gets one more of every kind it had. What each had is
-/// read before any counter goes on, so one put on by a replacement effect is not "already there" for a later one.
+/// read before any counter goes on, so one put on by a replacement effect is not "already there" for a later one. The
+/// proliferating player puts them all (CR 122.6a).
 pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     let mut candidates: Vec<Target> = cx
         .s()
         .battlefield()
         .iter()
         .copied()
-        .filter(|&id| cx.s().obj(id).counters.iter().any(|&n| n > 0))
+        .filter(|&id| cx.s().obj(id).counter_array().iter().any(|&n| n > 0))
         .map(Target::Object)
         .collect();
     for p in cx.s().seats() {
         let pl = cx.s().player(p);
-        if !pl.lost && (pl.poison > 0 || pl.energy > 0) {
+        if !pl.lost && (pl.poison() > 0 || pl.energy() > 0 || pl.experience() > 0) {
             candidates.push(Target::Player(p));
         }
     }
@@ -2548,30 +2297,36 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
         any_number: true,
     };
     let Answer::Targets(chosen) = cx.ask_core(player, ask, false)? else { return Ok(()) };
-    // Which kinds each one has, read first: objects' counters, then a player's poison and energy.
-    let plan: Vec<(Target, [i16; CounterKind::COUNT], bool, bool)> = chosen
+    // Which kinds each one has, read first: objects' counters, then a player's poison, energy and experience.
+    let one = |n: u8| u16::from(n > 0);
+    let plan: Vec<(Target, [i16; CounterKind::COUNT], counters::PlayerCounts)> = chosen
         .iter()
         .map(|&t| match t {
-            Target::Object(id) => (t, cx.s().obj(id).counters, false, false),
-            Target::Player(p) => (t, [0; CounterKind::COUNT], cx.s().player(p).poison > 0, cx.s().player(p).energy > 0),
-            _ => (t, [0; CounterKind::COUNT], false, false),
+            Target::Object(id) => (t, cx.s().obj(id).counter_array(), counters::PlayerCounts::default()),
+            Target::Player(p) => {
+                let pl = cx.s().player(p);
+                let counts = counters::PlayerCounts { poison: one(pl.poison()), energy: one(pl.energy()), experience: one(pl.experience()) };
+                (t, [0; CounterKind::COUNT], counts)
+            }
+            _ => (t, [0; CounterKind::COUNT], counters::PlayerCounts::default()),
         })
         .collect();
-    for (target, counters, poison, energy) in plan {
+    for (target, had, counts) in plan {
         match target {
             Target::Object(id) => {
                 for kind in CounterKind::ALL {
-                    if counters[kind as usize] > 0 && live(cx.s(), id) {
-                        add_counters(cx, id, kind, 1);
+                    if had[kind as usize] > 0 && live(cx.s(), id) {
+                        counters::put(cx, id, kind, 1, player, counters::How::Effect);
                     }
                 }
             }
             Target::Player(p) => {
-                if poison {
-                    put_player_counters(cx, p, 1, 0);
-                }
-                if energy {
-                    change_energy(cx, p, 1);
+                for counts in [
+                    counters::PlayerCounts { poison: counts.poison, ..Default::default() },
+                    counters::PlayerCounts { energy: counts.energy, ..Default::default() },
+                    counters::PlayerCounts { experience: counts.experience, ..Default::default() },
+                ] {
+                    counters::put_on_player(cx, p, counts, player);
                 }
             }
             _ => {}
@@ -2605,8 +2360,7 @@ pub fn untap(cx: &mut Cx, id: ObjectId) {
         return;
     }
     if cx.s().obj(id).counters(CounterKind::Stun) > 0 {
-        cx.st().update_obj(id, |o| o.counters[CounterKind::Stun as usize] -= 1);
-        end_lapsed_durations(cx, id);
+        counters::remove(cx, id, CounterKind::Stun, 1);
         return;
     }
     cx.st().update_obj(id, |o| o.tapped = false);
@@ -2623,13 +2377,13 @@ pub fn exert(cx: &mut Cx, id: ObjectId) {
 }
 
 /// Monstrosity N (CR 701.37a): a permanent that is not monstrous gets N +1/+1 counters and becomes monstrous, and what
-/// watches for it triggers (CR 701.37c).
-pub fn monstrosity(cx: &mut Cx, id: ObjectId, counters: i16) {
+/// watches for it triggers (CR 701.37c). `by` puts the counters: the controller of the ability that does it.
+pub fn monstrosity(cx: &mut Cx, id: ObjectId, n: i16, by: PlayerId) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) || cx.s().obj(id).marks.monstrous {
         return;
     }
     cx.st().update_obj(id, |o| o.marks.monstrous = true);
-    add_counters(cx, id, CounterKind::PlusOne, counters);
+    counters::put(cx, id, CounterKind::PlusOne, n, by, counters::How::Effect);
     cx.emit(Event::Monstrous { permanent: id });
 }
 
@@ -2901,9 +2655,10 @@ pub fn lose_game(cx: &mut Cx, player: PlayerId) {
     }
 }
 
-/// A player gets poison counters (CR 122.1f); ten lose the game as a state-based action (CR 704.5c).
-pub fn give_poison(cx: &mut Cx, player: PlayerId, amount: u32) {
-    put_player_counters(cx, player, amount.min(u16::MAX as u32) as u16, 0);
+/// A player gets poison counters (CR 122.1f), put on them by `by` (CR 122.6a); ten lose the game as a state-based action
+/// (CR 704.5c).
+pub fn give_poison(cx: &mut Cx, player: PlayerId, amount: u32, by: PlayerId) {
+    counters::put_on_player(cx, player, counters::PlayerCounts { poison: amount.min(u16::MAX as u32) as u16, ..Default::default() }, by);
 }
 
 /// The way `player` loses the game to the next state-based action check (CR 704.5a-c), if they do: 0 or less life, a draw
@@ -2911,7 +2666,7 @@ pub fn give_poison(cx: &mut Cx, player: PlayerId, amount: u32) {
 /// that a static ability says they don't lose for (CR 104.3: Platinum Angel, Phyrexian Unlife).
 pub fn loses_to_state_based_actions(cx: &Cx, player: PlayerId) -> Option<LossReason> {
     let p = cx.s().player(player);
-    [(p.life <= 0, LossReason::Life), (p.drew_from_empty, LossReason::EmptyLibrary), (p.poison >= 10, LossReason::Poison)]
+    [(p.life <= 0, LossReason::Life), (p.drew_from_empty, LossReason::EmptyLibrary), (p.poison() >= 10, LossReason::Poison)]
         .into_iter()
         .find(|&(applies, reason)| applies && !crate::static_rules::doesnt_lose(cx, cx.cards(), player, reason))
         .map(|(_, reason)| reason)
@@ -3108,7 +2863,7 @@ mod tests {
     fn entering_counters(on_battlefield: &[&'static CardDef]) -> Vec<(&'static str, i16)> {
         let (mut game, held) = game_with(on_battlefield);
         let hand = Zone::hand(PlayerId(0));
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         let mut out = Vec::new();
         for &id in &held {
             let mut entering = entering(id);
@@ -3148,7 +2903,7 @@ mod tests {
         let relic = held[1];
         let row = *game.state.obj(relic);
         let battlefield = game.state.battlefield().to_vec();
-        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None };
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
         let would = as_it_would_exist(&mut cx, &entering(relic));
         assert!(would.chars.is(CardType::Creature) && would.chars.is(CardType::Artifact) && would.lost);
         assert!(*cx.s().obj(relic) == row && cx.s().battlefield() == battlefield.as_slice());

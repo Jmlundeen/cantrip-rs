@@ -1,0 +1,47 @@
+# A planeswalker enters with its printed loyalty by its own replacement ability (CR 306.5b), counters it enters with
+# (CR 122.6), so a token copy of one enters with them doubled under Doubling Season like any planeswalker does. Bot1's
+# Fractured Identity exiles Bot2's Liliana of the Veil and Bot1 creates a token copy of it: 6 loyalty, not 3.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Doubling Season
+Mox Pearl
+Mox Sapphire
+Fractured Identity
+Plains x12
+
+[Bot2 Deck]
+Swamp
+Dark Ritual
+Liliana of the Veil
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Doubling Season.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Dark Ritual.Cast
+Bot2.Pass
+Bot2.Hand.Liliana of the Veil.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fractured Identity.Cast(Liliana of the Veil)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Liliana of the Veil.Token = true
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 6

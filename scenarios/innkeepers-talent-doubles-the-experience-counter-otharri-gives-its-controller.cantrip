@@ -1,0 +1,49 @@
+# An experience counter is a counter put on a player (CR 122.1, 122.6), by the controller of the ability that gives it
+# (CR 608.2), so "If you would put one or more counters on a permanent or player" (Innkeeper's Talent, level 3) doubles it.
+# Otharri attacks on turn 3: Bot1 gets two experience counters, and Otharri makes two attacking Rebels.
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Black Lotus
+Innkeeper's Talent
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Otharri, Suns' Glory
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Innkeeper's Talent.Cast
+Bot1.Pass
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 2)
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Innkeeper's Talent.Activate(Ability: Level 3)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Otharri, Suns' Glory.Cast
+Bot1.Pass
+Bot1.Attack(Otharri, Suns' Glory > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Experience = 2
+Bot1.Battlefield = Forest; Innkeeper's Talent; Mox Emerald; Mox Pearl; Mox Ruby; Otharri, Suns' Glory; Rebel; Rebel; Sol Ring

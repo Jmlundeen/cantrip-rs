@@ -11,7 +11,7 @@ fn untapped_artifact_or_creature_you_control(q: &dyn Query, asker: &Asker, id: O
 
 /// "As long as this creature has three or more counters on it" (CR 122.1): counters of any kind, added up.
 fn has_three_or_more_counters(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
-    source == affected && q.state().obj(source).counters.iter().map(|&n| n.max(0) as i32).sum::<i32>() >= 3
+    source == affected && q.state().obj(source).counter_array().iter().map(|&n| n.max(0) as i32).sum::<i32>() >= 3
 }
 
 fn flying_and_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {

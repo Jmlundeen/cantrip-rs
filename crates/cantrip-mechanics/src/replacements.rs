@@ -20,8 +20,8 @@ pub fn plus_one_counters_applies(q: &dyn Query, asker: &Asker, proposal: &Propos
 /// the counters, never to the recipient. Innkeeper's Talent (level 3) and Vorinclex, Monstrous Raider print it.
 pub fn double_counters_applies(proposal: &Proposal, asker: &Asker) -> bool {
     match proposal {
-        Proposal::Counters(c) => c.putter == Some(asker.controller) && c.counts.iter().any(|&n| n > 0),
-        Proposal::PlayerCounters(c) => c.putter == Some(asker.controller) && (c.poison > 0 || c.energy > 0),
+        Proposal::Counters(c) => c.putter == asker.controller && c.counts.iter().any(|&n| n > 0),
+        Proposal::PlayerCounters(c) => c.putter == asker.controller && (c.poison > 0 || c.energy > 0 || c.experience > 0),
         _ => false,
     }
 }
@@ -37,6 +37,7 @@ pub fn double_counters_apply(proposal: &mut Proposal) {
         Proposal::PlayerCounters(c) => {
             c.poison = c.poison.saturating_mul(2);
             c.energy = c.energy.saturating_mul(2);
+            c.experience = c.experience.saturating_mul(2);
         }
         _ => {}
     }

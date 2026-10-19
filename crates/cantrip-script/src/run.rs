@@ -204,11 +204,6 @@ impl<'s> Run<'s> {
                 player.life = life;
             }
         }
-        for &(seat, poison) in &script.poison {
-            if let Some(player) = game.state.players.get_mut(seat) {
-                player.poison = poison;
-            }
-        }
         Ok(Run {
             script,
             game,
@@ -774,7 +769,7 @@ impl<'s> Run<'s> {
             let o = s.obj(id);
             // Summoning sickness tells creatures apart (CR 302.6), and nothing else.
             let sick = o.controlled_since == s.turn.number && self.game.chars(id).is(CardType::Creature);
-            (self.game.name(id), o.owner, o.controller, o.zone, o.token, o.tapped, o.damage, o.counters, sick)
+            (self.game.name(id), o.owner, o.controller, o.zone, o.token, o.tapped, o.damage, o.counter_array(), sick)
         };
         let one = |id: ObjectId| -> ObjectId {
             if id.index() >= s.objects.len() {
