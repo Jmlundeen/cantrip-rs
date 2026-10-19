@@ -24,6 +24,10 @@ image-reference/
 # Agent worktrees
 .claude/worktrees/
 
+# Personal Claude Code permissions (for example letting auto mode run git push); each contributor sets their own.
+.claude/settings.json
+.claude/settings.local.json
+
 # A local note of the Discord bot token. Never commit it.
 tools/discord_token.txt
 
