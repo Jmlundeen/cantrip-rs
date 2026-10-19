@@ -129,6 +129,15 @@ pub fn search_to_hand(
     Ok(moved)
 }
 
+/// "Search your library for an Aura or Equipment card, reveal it, put it into your hand, then shuffle" (CR 701.23). Open the
+/// Armory and Birthright Boon (Kellan, the Fae-Blooded's Adventure) print it.
+pub fn search_aura_or_equipment_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<Vec<ObjectId>, Suspend> {
+    search_to_hand(g, player, source, Find::ONE.revealed(), |q, c| {
+        let chars = q.chars(c);
+        chars.has_subtype(Subtype::Aura) || chars.has_subtype(Subtype::Equipment)
+    })
+}
+
 /// "Search your library for [cards], put them into your graveyard, then shuffle" (CR 701.23). Entomb and Goblin
 /// Engineer print it.
 pub fn search_to_graveyard(
