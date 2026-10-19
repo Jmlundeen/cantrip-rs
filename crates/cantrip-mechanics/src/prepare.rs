@@ -9,3 +9,27 @@ pub fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), 
     entering.prepared = true;
     Ok(())
 }
+
+/// Whether this object is a prepare spell (CR 722.3c-d), including copies. The
+/// exile-only `prepared_from` link belongs to the old object after casting, so
+/// follow the history's zone-change and copy provenance rather than a card name.
+/// Codie, Ravenous Codex asks this when a spell becomes cast.
+pub fn is_prepare_spell(q: &dyn Query, mut object: ObjectId) -> bool {
+    if q.obj(object).prepared_from.is_some() {
+        return true;
+    }
+    for record in q.history().all().iter().rev() {
+        let predecessor = match record.event {
+            Event::ZoneChange { old, new, .. } if new == object => Some(old),
+            Event::Copied { copy, original, .. } if copy == object => Some(original),
+            _ => None,
+        };
+        if let Some(previous) = predecessor {
+            object = previous;
+            if q.obj(object).prepared_from.is_some() {
+                return true;
+            }
+        }
+    }
+    false
+}
