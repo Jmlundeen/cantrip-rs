@@ -287,9 +287,14 @@ pub trait Query {
         self.obj(left).became.filter(|&new| self.obj(new).became.is_none() && !self.obj(new).zone.is(ZoneKind::Gone))
     }
 
-    /// What an Aura or Equipment is attached to, if that is still the permanent it was and is on the battlefield.
+    /// What an Aura or Equipment is attached to, if both are still the permanents they were and on the battlefield: one
+    /// that has left is attached to nothing (CR 400.7), though its old row still names what it was on.
     fn attached_to(&self, id: ObjectId) -> Option<ObjectId> {
-        let host = self.obj(id).attached_to?;
+        let o = self.obj(id);
+        if o.became.is_some() || !o.zone.is(ZoneKind::Battlefield) {
+            return None;
+        }
+        let host = o.attached_to?;
         let h = self.obj(host);
         (h.became.is_none() && h.zone.is(ZoneKind::Battlefield)).then_some(host)
     }
