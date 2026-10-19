@@ -1,0 +1,11 @@
+{
+  "name": "Edgar, Moonlit Sovereign",
+  "manaCost": "{3}{G}{G}",
+  "type": "Legendary Creature — Werewolf Noble",
+  "oracleText": "Flash\nAt the beginning of your end step, if you didn't cast a spell this turn, put two +1/+1 counters on Edgar.\n{4}{G}: Put a +1/+1 counter on each creature you control with a +1/+1 counter on it.",
+  "power": 4,
+  "toughness": 4,
+  "keywords": [
+    "Flash"
+  ]
+}
