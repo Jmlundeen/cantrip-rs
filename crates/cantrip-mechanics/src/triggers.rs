@@ -605,6 +605,18 @@ pub fn noncreature_spell_you_cast(q: &dyn Query, me: &Asker, event: &Event) -> O
     }
 }
 
+/// "Whenever a player casts a noncreature spell" (CR 603.2, 601.2i): any player's, the ability's controller included, read as
+/// the spell stands on the stack. The ability is about the player who cast it (`StackItem::subject`). Magebane Lizard and Mai,
+/// Scornful Striker print it.
+pub fn player_casts_noncreature_spell(q: &dyn Query, _: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if !q.chars(*spell).is(CardType::Creature) => Fired::about(Target::Player(*player)),
+        _ => None,
+    }
+}
+
+pub const A_PLAYER_CASTS_A_NONCREATURE_SPELL: Trigger = when(EventMask::SPELL_CAST, player_casts_noncreature_spell);
+
 /// "Whenever you cast an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10a), by this
 /// ability's controller, read as it stands on the stack. The spell rides along as the trigger's subject ("that spell").
 /// Colorstorm Stallion's opus and Stormchaser's Talent's third level print it.
