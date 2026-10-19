@@ -1,0 +1,68 @@
+# Wrecking Gecko: Ward {2} (CR 702.21) counters an opponent's spell unless that player pays; "{6}{G}{G}: This creature
+# gets +4/+4 and gains trample until end of turn" (CR 613.4c, 611.2). Bot2 casts Last Gasp at the Gecko with no mana
+# left, so Ward is not paid and Last Gasp is countered. Bot1 then pumps the Gecko and attacks.
+
+[Bot1 Deck]
+Wrecking Gecko
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Forest
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Last Gasp
+Swamp
+Swamp
+Swamp
+Swamp
+Swamp x13
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Hand.Wrecking Gecko.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Last Gasp.Cast(Bot1.Battlefield.Wrecking Gecko)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Wrecking Gecko.Activate
+Bot1.Attack(Wrecking Gecko)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Wrecking Gecko.Power = 9
+Bot1.Battlefield.Wrecking Gecko.Toughness = 9
+Bot1.Battlefield.Wrecking Gecko.Keywords = Trample
+Bot2.Life = 11
+Bot2.Graveyard = Last Gasp

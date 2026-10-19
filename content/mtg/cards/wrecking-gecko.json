@@ -1,0 +1,8 @@
+{
+  "name": "Wrecking Gecko",
+  "manaCost": "{4}{G}",
+  "type": "Artifact Creature — Lizard Construct",
+  "oracleText": "Ward {2} (Whenever this creature becomes the target of a spell or ability an opponent controls, counter it unless that player pays {2}.)\n{6}{G}{G}: This creature gets +4/+4 and gains trample until end of turn.",
+  "power": 5,
+  "toughness": 5
+}
