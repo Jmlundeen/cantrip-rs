@@ -1,0 +1,40 @@
+# Scales of Shale: "Affinity for Lizards. Target creature gets +2/+0 and gains lifelink and indestructible until end of
+# turn." Bot1 controls one Lizard (Basking Rootwalla), so the spell costs {1}{B} (CR 702.41a) and Swamp + Mox Jet pay it
+# exactly. The 1/1 Rootwalla becomes 3/1 with lifelink and indestructible, attacks unblocked: Bot2 takes 3, Bot1 gains 3.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Emerald
+Basking Rootwalla
+Scales of Shale
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Basking Rootwalla.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}{B}
+Bot1.Hand.Scales of Shale.Cast(Bot1.Battlefield.Basking Rootwalla)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Basking Rootwalla.Power = 3
+? Bot1.Battlefield.Basking Rootwalla.Toughness = 1
+? Bot1.Battlefield.Basking Rootwalla.Keywords = Indestructible; Lifelink
+Bot1.Attack(Basking Rootwalla > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Life = 23
+Bot2.Life = 17
+Bot1.Graveyard = Scales of Shale

@@ -1,0 +1,6 @@
+{
+  "name": "Scales of Shale",
+  "manaCost": "{2}{B}",
+  "type": "Instant",
+  "oracleText": "Affinity for Lizards (This spell costs {1} less to cast for each Lizard you control.)\nTarget creature gets +2/+0 and gains lifelink and indestructible until end of turn."
+}

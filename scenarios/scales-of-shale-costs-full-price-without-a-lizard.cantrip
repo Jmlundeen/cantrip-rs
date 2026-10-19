@@ -1,0 +1,35 @@
+# Scales of Shale at {2}{B} with no Lizard (CR 702.41a: the reduction is {1} per Lizard, here none). Bot1's {B}{B} cannot
+# cast it at Bot2's Ornithopter; adding an Island's {U} pays the full {2}{B}. The 0/2 Ornithopter becomes 2/2.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Scales of Shale
+Island x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+? Bot1.Mana = {B}{B}
+! Bot1.Hand.Scales of Shale.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Scales of Shale.Cast(Bot2.Battlefield.Ornithopter)
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Ornithopter.Power = 2
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Scales of Shale
+Bot2.Battlefield.Ornithopter.Keywords = Flying; Indestructible; Lifelink
