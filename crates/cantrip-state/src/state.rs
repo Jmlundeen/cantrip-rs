@@ -770,8 +770,8 @@ impl GameState {
     /// copiable values are what the copy effects left on it make them, applied in timestamp order (CR 613.2a, 613.7).
     /// Each copy effect holds the values it was applied over (`EffectKind::RestoreCopy`), so the copy effects on one
     /// permanent are a chain from its own values up to `Obj::copy`: the next later one is handed the ended one's values
-    /// to apply over, and with none later the permanent itself is - if it is still that permanent (CR 400.7: an object
-    /// that has left keeps what it last was).
+    /// to apply over, and with none later the permanent itself is - if it is still that permanent, on the battlefield or
+    /// phased out (CR 400.7: an object that has left keeps what it last was).
     fn effect_remove(&mut self, at: usize) {
         let effect = self.effects.remove(at);
         self.log(Undo::EffectRemoved(at as u16, Box::new(effect)));
@@ -792,8 +792,9 @@ impl GameState {
                 self.effect_set(i, ContinuousEffect { kind: EffectKind::RestoreCopy(prior), ..later });
             }
             None => {
+                // On the battlefield or phased out, the same object either way (CR 702.26d).
                 let obj = self.obj(effect.affected);
-                if obj.became.is_none() && obj.zone.is(ZoneKind::Battlefield) {
+                if obj.became.is_none() && (obj.zone.is(ZoneKind::Battlefield) || obj.zone.is(ZoneKind::PhasedOut)) {
                     self.update_obj(effect.affected, |o| o.copy = prior);
                 }
             }

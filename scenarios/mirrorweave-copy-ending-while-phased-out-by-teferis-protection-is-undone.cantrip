@@ -1,0 +1,55 @@
+# A copy effect that ends while its permanent is phased out is still undone (CR 702.26d, 611.2b, 707.2): the phased-out
+# permanent is the same object. Mirrorweave makes Bot1's Ornithopter a copy of Bot2's Haywire Mite until end of turn; then
+# Teferi's Protection phases out every permanent Bot1 controls. The turn ends with the Ornithopter phased out, and the copy
+# effect with it: as it phases in on Bot1's next turn it is an Ornithopter, a 0/2, not a Haywire Mite.
+
+[Bot1 Deck]
+Plains
+Ornithopter
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Mirrorweave
+Teferi's Protection
+Plains
+Plains x10
+
+[Bot2 Deck]
+Forest
+Haywire Mite
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Hand.Mirrorweave.Cast(Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Haywire Mite.Power = 1
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Teferi's Protection.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.PhasedOut = Plains; Plains; Haywire Mite; Mox Pearl; Mox Sapphire
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.PhasedOut.Count = 0
+Bot1.Battlefield = Plains; Plains; Ornithopter; Mox Pearl; Mox Sapphire
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

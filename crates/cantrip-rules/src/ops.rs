@@ -513,10 +513,27 @@ pub fn turn_face_up(cx: &mut Cx, id: ObjectId, player: PlayerId) {
         cx.emit(Event::Revealed { player: controller, card: id });
         return;
     }
-    cx.st().update_obj(id, |o| {
-        o.face_down = false;
-        o.copy = None;
-    });
+    // Turned up it is its own card under whatever copy effects are on it (CR 708.8, 613.2b): with any, the earliest one now
+    // applies over the card's own values instead of the face-down 2/2's, and the copy it makes stays.
+    let earliest = cx
+        .s()
+        .effects
+        .iter()
+        .enumerate()
+        .filter(|(_, e)| e.affected == id && matches!(e.kind, EffectKind::RestoreCopy(_)))
+        .min_by_key(|(_, e)| e.timestamp)
+        .map(|(at, _)| at);
+    match earliest {
+        Some(at) => {
+            let e = cx.s().effects[at];
+            cx.st().effect_set(at, cantrip_state::ContinuousEffect { kind: EffectKind::RestoreCopy(None), ..e });
+            cx.st().update_obj(id, |o| o.face_down = false);
+        }
+        None => cx.st().update_obj(id, |o| {
+            o.face_down = false;
+            o.copy = None;
+        }),
+    }
     note_statics(cx, id);
     cx.emit(Event::TurnedFaceUp { permanent: id, player });
 }
@@ -2598,6 +2615,18 @@ pub fn lasting_holds(cx: &Cx, e: &cantrip_state::ContinuousEffect) -> bool {
     }
 }
 
+/// Whether an effect's duration has begun as the effect would first apply (CR 611.2b): "for as long as [its source]
+/// remains on the battlefield" with the source gone, "for as long as it has a [kind] counter on it" (or is tapped) already
+/// false, or a card's own "for as long as" condition already false never starts, and the effect does nothing. Asked by
+/// whatever creates a continuous effect (`Game::add_effect`, `become_copy`).
+pub fn duration_begins(cx: &Cx, e: &cantrip_state::ContinuousEffect) -> bool {
+    let s = cx.s();
+    if e.duration == Duration::WhileSourceOnBattlefield && !(live(s, e.source) && s.obj(e.source).zone.is(ZoneKind::Battlefield)) {
+        return false;
+    }
+    e.duration.holds_for(s.obj(e.affected)) && lasting_holds(cx, e)
+}
+
 /// Ends each effect whose "for as long as [condition]" duration (`Duration::AsLongAs`) is no longer true (CR 611.2b), as
 /// the state-based actions are checked: it is over for good, though the condition become true again. A control-changing
 /// effect that ends gives its permanent back with the next `settle_control`. Whether any ended.
@@ -2643,24 +2672,29 @@ pub fn settle_control(cx: &mut Cx) -> bool {
 
 /// A permanent becomes a copy of something for `duration` (CR 707.2, 611.2b): its copiable values are `values` (exceptions
 /// the effect states included) from now on, and when the effect ends - however it ends - they are what the copy effects
-/// still on it make them, in timestamp order (CR 613.2a, 613.7; `GameState::effects_keep` undoes it). It stays the same
-/// object, with its counters, damage, status and attachments (CR 707.2). Nothing if it is not on the battlefield.
+/// still on it make them, in timestamp order (CR 613.2a, 613.7; `GameState::effect_remove` undoes it). It stays the same
+/// object, with its counters, damage, status and attachments (CR 707.2). Nothing if it is not on the battlefield, and
+/// nothing if its duration is already over as it would begin (CR 611.2b), as for any other continuous effect.
 pub fn become_copy(cx: &mut Cx, source: ObjectId, id: ObjectId, values: Copiable, duration: Duration) {
     if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
         return;
     }
     let prior = cx.s().obj(id).copy;
-    cx.st().update_obj(id, |o| o.copy = Some(values));
     let controller = cx.s().obj(source).controller;
     let timestamp = cx.st().timestamp();
-    cx.st().effect_push(cantrip_state::ContinuousEffect {
+    let effect = cantrip_state::ContinuousEffect {
         source,
         controller,
         timestamp,
         affected: id,
         kind: EffectKind::RestoreCopy(prior),
         duration,
-    });
+    };
+    if !duration_begins(cx, &effect) {
+        return;
+    }
+    cx.st().update_obj(id, |o| o.copy = Some(values));
+    cx.st().effect_push(effect);
     note_statics(cx, id);
 }
 

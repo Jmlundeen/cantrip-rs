@@ -1256,24 +1256,14 @@ impl cantrip_api::Game for Cx<'_> {
         if self.g.state.obj(affected).zone.is(ZoneKind::PhasedOut) && !kind.outlives_affected() {
             return;
         }
-        if duration == Duration::WhileSourceOnBattlefield
-            && !(live(&self.g.state, source) && self.g.state.obj(source).zone.is(ZoneKind::Battlefield))
-        {
-            return;
-        }
-        // "For as long as it has a [kind] counter on it" whose condition is already false does nothing (CR 611.2b).
-        if !duration.holds_for(self.g.state.obj(affected)) {
-            return;
-        }
         let controller = self.g.state.obj(source).controller;
         let timestamp = self.g.state.timestamp();
-        // "For as long as [condition]" whose condition is false as it would begin does nothing (CR 611.2b).
-        if let Duration::AsLongAs(..) = duration
-            && !ops::lasting_holds(self, &ContinuousEffect { source, controller, timestamp, affected, kind, duration })
-        {
+        let effect = ContinuousEffect { source, controller, timestamp, affected, kind, duration };
+        // A duration already over as the effect would begin never starts, and the effect does nothing (CR 611.2b).
+        if !ops::duration_begins(self, &effect) {
             return;
         }
-        self.g.state.effect_push(ContinuousEffect { source, controller, timestamp, affected, kind, duration });
+        self.g.state.effect_push(effect);
         // A static ability given to a permanent that affects other objects makes it a source of static abilities.
         if let EffectKind::AddAbility(ability) = kind
             && matches!(self.cards().ability(ability), AbilityDef::Static(s) if !s.own)

@@ -1216,7 +1216,7 @@ fn cleanup(cx: &mut Cx) -> R<()> {
             .map(|e| e.affected)
             .collect();
         // A permanent that was only a copy until end of turn is what it was again (CR 707.2, 611.2b), as far as the copy
-        // effects that are left say: the state undoes a copy effect as it removes it (`GameState::effects_retain`).
+        // effects that are left say: the state undoes a copy effect as it removes it (`GameState::effect_remove`).
         cx.st().effects_retain(|e| e.duration != Duration::EndOfTurn);
         for id in controlled {
             ops::refresh_control(cx, id);

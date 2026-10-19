@@ -700,7 +700,7 @@ pub enum EffectKind {
     PlayerManaAbility(AbilityRef),
     /// A copy effect (CR 707.2, layer 1) on the `affected` permanent, for its duration (CR 611.2b): it holds the copiable
     /// values it was applied over, put back when it ends (or handed to the next later copy effect on the permanent, CR
-    /// 613.7: `GameState::effects_keep`). The copy the latest one makes is in `Obj::copy`.
+    /// 613.7: `GameState::effect_remove`). The copy the latest one makes is in `Obj::copy`.
     RestoreCopy(Option<Copiable>),
     /// A text-changing effect (CR 612, layer 3): every instance of `from` in the object's rules text and type line is
     /// `to` (Trait Doctoring, Artificial Evolution). Card code reads its words through `Query::words`; the layers change
