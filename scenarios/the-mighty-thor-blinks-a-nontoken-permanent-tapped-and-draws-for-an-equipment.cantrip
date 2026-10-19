@@ -1,0 +1,61 @@
+# The Mighty Thor, Jane Foster. Turn 3: Bot1's Lightning Greaves (an Equipment Bot1 controls) enters and Thor draws a card
+# (hand 3 before, 3 after: Greaves leaves the hand, the card drawn replaces it). Thor then attacks: its trigger refuses Bot2's
+# Inkling (a token, "nontoken") beside the allowed Ornithopter, which is exiled and returned as a new object, tapped (CR 400.7,
+# 110.5b), so it cannot block; Bot2's Inkling is untapped and the target is not it.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Ruby
+Mox Jet
+The Mighty Thor, Jane Foster
+Lightning Greaves
+Plains
+Plains x13
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Emeritus of Truce
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Mighty Thor, Jane Foster.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Emeritus of Truce.Cast
+Bot2.Target(Bot2)
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+? Bot1.Hand.Count = 3
+Bot1.Hand.Lightning Greaves.Cast
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 3
+Bot1.Attack(The Mighty Thor, Jane Foster > Bot2)
+! Bot1.Target(Inkling)
+Bot1.Target(Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Tapped = true
+Bot2.Battlefield.Inkling.Tapped = false
+Bot2.Life = 17
