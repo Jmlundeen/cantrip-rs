@@ -1,0 +1,8 @@
+{
+  "name": "Eardrum Rattler",
+  "manaCost": "{1}{R}",
+  "type": "Creature — Human Bard",
+  "power": "2",
+  "toughness": "2",
+  "oracleText": "{1}, {T}: Another target creature you control with power 2 or less can't be blocked this turn."
+}

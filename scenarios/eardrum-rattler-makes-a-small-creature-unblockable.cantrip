@@ -1,0 +1,41 @@
+# Eardrum Rattler's activated ability: Fanatical Firebrand (power 1) can't be blocked this turn, so Bot2's Ornithopter may
+# not block it. The Rattler itself is a legal attacker too but is not the target.
+
+[Bot1 Deck]
+Mountain
+Fanatical Firebrand
+Mountain
+Eardrum Rattler
+Mountain
+Mountain x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fanatical Firebrand.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Eardrum Rattler.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Eardrum Rattler.Activate(Ability: can't be blocked; Bot1.Battlefield.Fanatical Firebrand)
+Bot1.Attack(Fanatical Firebrand > Bot2)
+! Bot2.Block(Ornithopter > Fanatical Firebrand)
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Battlefield.Eardrum Rattler.Tapped = true

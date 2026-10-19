@@ -1,0 +1,36 @@
+# Eardrum Rattler's ability targets "another creature you control": the Rattler itself is not another creature, and Bot2's
+# Ornithopter, though small enough, is not one Bot1 controls. Both activations are refused.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Eardrum Rattler
+Mountain
+Mountain x16
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Eardrum Rattler.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Battlefield.Eardrum Rattler.Activate(Ability: can't be blocked; Bot1.Battlefield.Eardrum Rattler)
+! Bot1.Battlefield.Eardrum Rattler.Activate(Ability: can't be blocked; Bot2.Battlefield.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Eardrum Rattler.Tapped = false
