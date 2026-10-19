@@ -163,6 +163,33 @@ pub fn search_to_battlefield(
     Ok(arrived)
 }
 
+/// "Search your library for [a card] and reveal it. Put it onto the battlefield tapped if it's a land card. Otherwise, put
+/// it into your hand. Then shuffle." (CR 701.23, 701.20, 305.4): `how` is one card (`Find::ONE`, which may go unfound,
+/// CR 701.23b; `.revealed()` for "and reveal it"), and the search tells the searcher where each kind of card goes
+/// (`SearchDestination::LandTappedElseHand`). Whether it is a land card is read as it is in the library, where a
+/// double-faced card has only its front face's characteristics (CR 712.8a). A land is put onto the battlefield tapped
+/// under the searcher's control, which is not playing it (CR 305.4); any other card goes to the hand. The library is
+/// shuffled whether or not a card was found. The card found, where it went. Archdruid's Charm's first mode prints it: it
+/// is the library-search form of the split Nadu, Winged Wisdom and Nissa, Sage Animist make with the top card of the
+/// library (untapped, after no search), and Treasure Chest's 20 makes for an artifact card with a "may".
+pub fn search_land_tapped_else_hand(
+    g: &mut dyn Game,
+    player: PlayerId,
+    source: ObjectId,
+    how: Find,
+    eligible: impl Fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Option<ObjectId>, Suspend> {
+    debug_assert_eq!(how.count, 1, "the search finds a card: one card goes one way or the other");
+    let found = find(g, player, source, SearchDestination::LandTappedElseHand, how, eligible)?;
+    let went = match found.first() {
+        Some(&land) if g.chars(land).is(CardType::Land) => Some(g.put_onto_battlefield(land, player, true)?),
+        Some(&card) => g.move_together(&[(card, Zone::hand(player))], ZoneReason::Search).first().copied(),
+        None => None,
+    };
+    g.shuffle(player);
+    Ok(went)
+}
+
 /// "Search your library for [a card], then shuffle and put that card on top" (CR 701.23): the library is shuffled
 /// and the card placed on top; it never changes zones. Enlightened Tutor and Vampiric Tutor print it.
 pub fn search_to_top(
