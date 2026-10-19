@@ -1,0 +1,43 @@
+# Surgical Precision, first mode: "Destroy target creature with toughness 4 or greater. You gain 1 life." Bot2 has a
+# Fanatic of Rhonas (1/4, toughness exactly 4 -- legal) and an Elvish Mystic (1/1 -- refused, CR 115.1). The Fanatic is
+# destroyed and Bot1 gains 1 life (20 -> 21).
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Surgical Precision
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Forest
+Fanatic of Rhonas
+Elvish Mystic
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Surgical Precision.Cast
+Bot1.Modes(Destroy target creature with toughness 4 or greater)
+! Bot1.Target(Bot2.Battlefield.Elvish Mystic)
+Bot1.Target(Bot2.Battlefield.Fanatic of Rhonas)
+
+[Expect]
+Bot1.Life = 21
+Bot2.Graveyard = Fanatic of Rhonas
+Bot2.Battlefield.Elvish Mystic.Power = 1
+Bot1.Graveyard = Surgical Precision

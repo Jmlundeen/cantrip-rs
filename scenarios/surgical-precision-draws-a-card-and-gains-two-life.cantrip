@@ -1,0 +1,39 @@
+# Surgical Precision, second mode: "You draw a card and gain 2 life." Both modes are on offer (Bot2 controls a Fanatic of
+# Rhonas, a legal first-mode target), and Bot1 names the second: it draws a card and gains 2 life (20 -> 22), and the
+# Fanatic is left alone.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Surgical Precision
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Forest
+Fanatic of Rhonas
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Surgical Precision.Cast
+Bot1.Modes(Draw a card and gain 2 life)
+
+[Expect]
+Bot1.Life = 22
+Bot1.Hand.Count = 6
+Bot1.Library.Count = 8
+Bot2.Battlefield.Fanatic of Rhonas.Toughness = 4
+Bot1.Graveyard = Surgical Precision
