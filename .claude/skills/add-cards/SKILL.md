@@ -31,8 +31,9 @@ CLAUDE.md is the repository's rules. The `write-game-script` skill is the scenar
    cost, an optional cost) with its cost shown. If the engine side works and the client cannot show or offer it, the
    card is not done. The language-model client and the draft bot, where it reads cards, answer its questions
    sensibly, never by a reading of a question meant for something else. The tactical bot
-   (`dotnet/src/Cantrip.Client/Tactics`) is not part of card work: a card never changes it, never waits on it and is
-   never tested through it - its correctness is proven by hand-authored scenarios alone.
+   (`dotnet/src/Cantrip.Client/Tactics`) is not part of card work and is no development tool: no card, core or
+   review agent reads, changes, runs, tests through or waits on it, and a review raises no finding about how it plays
+   a card - its correctness is proven by hand-authored scenarios alone.
 
 ## Where code goes
 
@@ -169,7 +170,8 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
      something else.
    - **Actions:** every ability, special action and cost the card offers is clickable, with its cost and what it
      does shown, and distinguishable from the card's other actions.
-   - **Not the tactical bot:** card work does not change, test or wait on the tactical bot.
+   - **Not the tactical bot:** card and core work does not read, change, run, test or wait on the tactical bot, and
+     reviews do not check it.
    A card that only uses what the client already shows and asks needs no client change - the review confirms it.
    **Browser tests are only for a new user interaction**: a prompt, action, cost display or piece of state the client
    did not have before. A card that reuses existing prompts and actions gets no browser scenario and runs no browser
