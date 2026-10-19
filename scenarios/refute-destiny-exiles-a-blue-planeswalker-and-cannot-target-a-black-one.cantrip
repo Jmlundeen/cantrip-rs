@@ -1,0 +1,47 @@
+# Refute Destiny: "creature or planeswalker". Bot2 has Liliana of the Veil (black) and Jace, the Mind Sculptor (blue), each
+# cast with a Black Lotus. The refusal: Refute Destiny cannot target Liliana; the positive control: it can target Jace
+# (blue), a planeswalker, and exiles him. Bot1 keeps the surveilled Lightning Bolt on top.
+
+[Bot1 Deck]
+Plains
+Plains
+Refute Destiny
+Plains x4
+Plains
+Lightning Bolt
+Black Lotus
+Plains x4
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Mox Sapphire
+Liliana of the Veil
+Jace, the Mind Sculptor
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.Refute Destiny.Cast(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Hand.Refute Destiny.Cast(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot1.Pass
+Bot1.Arrange(Lightning Bolt |)
+
+[Expect]
+Stack.Count = 0
+Exile = Jace, the Mind Sculptor
+Bot2.Battlefield = Mox Sapphire; Liliana of the Veil
+Bot1.Library = Lightning Bolt; Black Lotus; Plains; Plains; Plains; Plains

@@ -1,0 +1,49 @@
+# Refute Destiny: "Exile target creature or planeswalker that's green or blue. Surveil 1." Bot2's Llanowar Elves (green) is
+# exiled by Refute Destiny on turn 3, then Bot1 surveils 1 (CR 701.46a) and puts the top card, Lightning Bolt, into the
+# graveyard, so the next card, Black Lotus, is on top. The refusals: Ornithopter (colorless) and Ragavan (red) are not legal
+# targets, beside the allowed green creature.
+
+[Bot1 Deck]
+Plains
+Plains
+Refute Destiny
+Plains x4
+Plains
+Lightning Bolt
+Black Lotus
+Plains x4
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Ragavan, Nimble Pilferer
+Ornithopter
+Island x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Plains.Activate
+! Bot1.Hand.Refute Destiny.Cast(Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.Refute Destiny.Cast(Bot2.Battlefield.Ragavan, Nimble Pilferer)
+Bot1.Hand.Refute Destiny.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot1.Arrange(| Lightning Bolt)
+
+[Expect]
+Stack.Count = 0
+Exile = Llanowar Elves
+Bot1.Graveyard = Refute Destiny; Lightning Bolt
+Bot1.Library = Black Lotus; Plains; Plains; Plains; Plains
+Bot2.Battlefield = Mox Emerald; Mox Ruby; Ragavan, Nimble Pilferer; Ornithopter
