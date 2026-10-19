@@ -1,0 +1,64 @@
+# Shiko, Paragon of the Way: "target nonland card with mana value 3 or less from your graveyard". Bot1's graveyard holds a Swamp (a
+# land card) and Wrath of God (mana value 4), and Bot2's holds a Lightning Bolt (an opponent's); none of those may be chosen
+# (refused). The Entomb in Bot1's graveyard (mana value 1) can, and its copy is cast for free: another card of Bot1's choice is put
+# into the graveyard (Lightning Bolt, a card that was not in it before), which proves the copy was the Entomb.
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Shiko, Paragon of the Way
+Wrath of God
+Lightning Bolt
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Entomb
+Swamp x6
+Lightning Bolt
+Swamp x11
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Wrath of God)
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Entomb.Cast
+Bot2.Search(Lightning Bolt)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+! Bot1.Target(Bot1.Graveyard.Swamp)
+! Bot1.Target(Bot1.Graveyard.Wrath of God)
+! Bot1.Target(Bot2.Graveyard.Lightning Bolt)
+Bot1.Target(Bot1.Graveyard.Entomb)
+Bot1.Pass
+Bot1.Accept
+Bot1.Search(Lightning Bolt)
+
+[Expect]
+Exile = Entomb
+Bot1.Graveyard = Lightning Bolt; Entomb; Wrath of God; Swamp; Black Lotus
+Bot2.Graveyard = Entomb; Lightning Bolt
+Stack.Count = 0

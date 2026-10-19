@@ -1,0 +1,52 @@
+# Shiko, Paragon of the Way: "mana value 3 or less" includes exactly three. Delayed Blast Fireball ({1}{R}{R}, mana value 3) is a legal
+# target in Bot1's graveyard (the boundary; the Wrath of God scenario refuses mana value 4) and its copy, cast for free from exile (where Shiko made it), deals
+# 5 damage instead of 2 ("if this spell was cast from exile") to each opponent and each creature they control: Bot2 goes to 15, Bot1
+# is unhurt. The Fireball card stays in exile.
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Shiko, Paragon of the Way
+Delayed Blast Fireball
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Delayed Blast Fireball)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Delayed Blast Fireball)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Exile = Delayed Blast Fireball
+Bot2.Life = 15
+Bot1.Life = 20
+Bot1.Graveyard = Entomb; Swamp; Entomb; Black Lotus
+Stack.Count = 0

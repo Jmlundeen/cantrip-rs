@@ -1,0 +1,44 @@
+# Shiko, Paragon of the Way: "When Shiko enters, exile target nonland card with mana value 3 or less from your graveyard. Copy it, then
+# you may cast the copy without paying its mana cost." Bot1's Lightning Bolt, cast on turn 1, is in the graveyard; Shiko (cast on turn 3
+# with three Moxen and a Black Lotus) exiles it, copies the card in exile (CR 707.12) and casts the copy for free: 3 more damage, so
+# Bot2 has taken 6. The Bolt card stays exiled (the copy is not the card, and ceases to exist, CR 707.10a, 704.5e).
+
+[Bot1 Deck]
+Mox Ruby
+Lightning Bolt
+Mox Sapphire
+Mox Pearl
+Black Lotus
+Shiko, Paragon of the Way
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot1.Accept
+Bot1.Target(Bot2)
+Bot1.Pass
+
+[Expect]
+Bot2.Life = 14
+Exile = Lightning Bolt
+Bot1.Graveyard = Black Lotus
+Stack.Count = 0

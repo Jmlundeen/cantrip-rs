@@ -1,0 +1,48 @@
+# Shiko, Paragon of the Way: the cast of the copy is optional ("you may cast the copy"). Bot1 exiles Lightning Bolt and declines; the
+# copy ceases to exist in exile (CR 707.10a, 704.5e) and the Bolt card stays exiled, so Bot2 takes no damage and Bot1's graveyard
+# loses only the Bolt.
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Shiko, Paragon of the Way
+Lightning Bolt
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Lightning Bolt)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot1.Decline
+
+[Expect]
+Exile = Lightning Bolt
+Bot2.Life = 20
+Stack.Count = 0

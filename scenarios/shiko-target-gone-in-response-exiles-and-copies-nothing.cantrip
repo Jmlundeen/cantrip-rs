@@ -1,0 +1,69 @@
+# Shiko, Paragon of the Way: the target card must still be in the graveyard when the ability resolves (CR 608.2b, 400.7). Bot1 targets the
+# Ornithopter; in response Bot2 sacrifices its Soul-Guide Lantern to exile Bot1's whole graveyard (the Lantern's own enters trigger had
+# already exiled the Black Lotus). The target is gone: nothing is exiled or copied, no copy is cast, no token is made - Bot1's battlefield
+# is its three Moxen, two Swamps and Shiko (no Ornithopter token), and the exile holds the five cards: the Lotus the Lantern's enters
+# trigger exiled and the four the sacrifice exiled.
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Shiko, Paragon of the Way
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Mox Jet
+Soul-Guide Lantern
+Swamp x5
+Swamp x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Soul-Guide Lantern.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Target(Bot1.Graveyard.Black Lotus)
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Soul-Guide Lantern.Activate(Ability: Exile each)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Exile.Count = 5
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Count = 6
+Stack.Count = 0

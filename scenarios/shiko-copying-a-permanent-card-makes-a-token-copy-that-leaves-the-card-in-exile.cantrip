@@ -1,0 +1,52 @@
+# Shiko, Paragon of the Way exiles Ornithopter (mana value 0) from Bot1's graveyard, copies the card in exile and casts the copy: a
+# copy of a permanent spell becomes a token as it resolves (CR 707.10f). Bot1 ends with an Ornithopter token on the battlefield and the
+# Ornithopter card in exile. Two Entombs put Ornithopter and a Swamp into the graveyard beside themselves and the Black Lotus (the
+# Entomb shuffles the library, which holds only Swamps by then, so the draws are known).
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Shiko, Paragon of the Way
+Ornithopter
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Exile = Ornithopter
+Bot1.Battlefield.Ornithopter.Token = true
+Bot1.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot1.Graveyard = Entomb; Swamp; Entomb; Black Lotus
+Stack.Count = 0

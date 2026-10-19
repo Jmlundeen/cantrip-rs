@@ -1,0 +1,12 @@
+{
+  "name": "Shiko, Paragon of the Way",
+  "manaCost": "{2}{U}{R}{W}",
+  "type": "Legendary Creature — Spirit Dragon",
+  "power": 4,
+  "toughness": 5,
+  "oracleText": "Flying, vigilance\nWhen Shiko enters, exile target nonland card with mana value 3 or less from your graveyard. Copy it, then you may cast the copy without paying its mana cost. (A copy of a permanent spell becomes a token.)",
+  "keywords": [
+    "Flying",
+    "Vigilance"
+  ]
+}

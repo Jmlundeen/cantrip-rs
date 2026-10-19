@@ -1,0 +1,50 @@
+# Shiko, Paragon of the Way: the copy is cast "without paying its mana cost" but must still be castable (CR 601.2c, 608.2g). Mana Tithe,
+# exiled and copied, needs a target spell ("Counter target spell unless its controller pays {1}"), and the only thing on the stack is Shiko's
+# own ability: no legal target, so the copy cannot be cast and Bot1 is not even asked (refused); it ceases to exist in exile.
+# Control: the Lightning Bolt scenario, where the copy has a target and is cast.
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Ruby
+Mox Sapphire
+Mox Pearl
+Shiko, Paragon of the Way
+Mana Tithe
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Mana Tithe)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Swamp)
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Shiko, Paragon of the Way.Cast
+Bot1.Pass
+Bot1.Target(Bot1.Graveyard.Mana Tithe)
+Bot1.Pass
+! Bot1.Accept
+Bot1.Pass
+
+[Expect]
+Exile = Mana Tithe
+Bot1.Battlefield.Shiko, Paragon of the Way.Power = 4
+Stack.Count = 0
