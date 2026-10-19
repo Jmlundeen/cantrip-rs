@@ -89,6 +89,7 @@ keeps it).
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-79](#ki-79-an-alternative-cost-a-permanent-gives-is-not-offered-beside-a-granted-way-that-casts-for-the-mana-cost) | An alternative cost a permanent gives is not offered beside a granted way that casts for the mana cost | Low | Open |
 | [KI-80](#ki-80-a-cast-made-as-an-effect-resolves-never-uses-the-cards-own-alternative-costs) | A cast made as an effect resolves never uses the card's own alternative costs | Low | Open |
+| [KI-82](#ki-82-a-creature-with-negative-power-counts-as-0-towards-a-crew-saddle-or-teamwork-total) | A creature with negative power counts as 0 towards a crew, saddle or teamwork total | Medium | Open |
 
 ## Issues
 
@@ -1003,3 +1004,20 @@ nor evoke, nor web-slinging. A fix announces those with the others in the cost q
 `Label::AlternativeCost`), each judged as the priority offer judges it (`from_elsewhere`, a way's `condition`).
 
 **Scenarios.** none yet.
+
+### KI-82: A creature with negative power counts as 0 towards a crew, saddle or teamwork total
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-19, review of saddling as though power were greater |
+
+**Notes.** A cost that taps creatures with total power N or greater (crew, CR 702.122a; saddle, 702.171a; teamwork) adds
+their powers, and a negative one is used as it is (CR 107.1b: "If a calculation or comparison needs to use a negative
+value, it does so"): a -1/1 tapped beside a 3/3 for crew 3 makes a total of 2, too little. `tap_candidates`
+(`cantrip-rules/src/actions.rs`) floors each power at 0 instead - after the 2 a creature that "crews Vehicles" or "saddles
+Mounts as though its power were 2 greater" adds - so a creature at -1 (or -3 with that bonus) can be tapped at no cost to
+the total, and becomes a creature that crewed or saddled. A fix makes the powers of `RequestKind::TapForPower` signed (they
+are `u8`), with the validation, the host prompt and the client's sum.
+
+**Scenarios.** none yet; any implemented crew Vehicle (Shorikai, Genesis Engine) with a creature a -X/-X effect shrank could
+reach it.
