@@ -1,0 +1,11 @@
+{
+  "name": "Tinybones, the Pickpocket",
+  "manaCost": "{B}",
+  "type": "Legendary Creature — Skeleton Rogue",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Deathtouch\nWhenever Tinybones deals combat damage to a player, you may cast target nonland permanent card from that player's graveyard, and mana of any type can be spent to cast that spell.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

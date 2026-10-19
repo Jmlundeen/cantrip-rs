@@ -1,0 +1,38 @@
+# Tinybones: "Whenever Tinybones deals combat damage to a player, you may cast target nonland permanent card from that
+# player's graveyard, and mana of any type can be spent to cast that spell." Bot2 bolts its own Llanowar Elves on turn 2, so
+# its graveyard holds a creature card and an instant. On turn 3 Tinybones hits Bot2: the Lightning Bolt is no legal target
+# (not a permanent card), so the Elves are the only one and are chosen without a question. Bot1 casts them as the ability resolves, paying their {G} with black
+# mana from its Mox Jet, and they enter under Bot1's control. Lightning Bolt stays in Bot2's graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Tinybones, the Pickpocket
+Plains x18
+
+[Bot2 Deck]
+Mox Ruby
+Mox Emerald
+Llanowar Elves
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Tinybones, the Pickpocket.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Attack(Tinybones, the Pickpocket)
+Bot1.Accept
+Bot1.Battlefield.Mox Jet.Activate
+
+[Expect]
+Bot2.Life = 19
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield = Mox Jet; Tinybones, the Pickpocket; Llanowar Elves
