@@ -1,0 +1,72 @@
+# Sygg, Wanderwine Wisdom. Turn 1: Sygg is cast with the two moxes (its enter trigger targets itself). Turn 3: "at the
+# beginning of your first main phase, you may pay {W}. If you do, transform Sygg" - the Plains pays as the ability
+# resolves and Sygg turns over (CR 701.27a); "whenever this creature transforms into Sygg, Wanderbrine Shield, target
+# creature you control gains protection from each color until your next turn" gives Sygg protection from all five colors,
+# which is gone when turn 5 begins (CR 611.2b). Turn 5: paying {U} turns it back, and "whenever this creature enters or
+# transforms into Sygg, Wanderwine Wisdom" (CR 701.27e) grants the target - Sygg - "whenever this creature deals combat
+# damage to a player or planeswalker, draw a card" until end of turn. Sygg can't be blocked, so Bot2's Ornithopter does not
+# stop it, and the damage draws Bot1 one card.
+
+[Bot1 Deck]
+Plains
+Mox Sapphire
+Mox Ruby
+Sygg, Wanderwine Wisdom
+Island
+Island
+Island
+Plains x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sygg, Wanderwine Wisdom.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.PayCost
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield.Sygg, Wanderbrine Shield.Colors = White
+? Bot1.Battlefield.Sygg, Wanderbrine Shield.ProtectionFrom = Black; Blue; Green; Red; White
+? Bot1.Battlefield.Sygg, Wanderbrine Shield.Keywords = CantBeBlocked
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Sygg, Wanderbrine Shield.ProtectionFrom = Black; Blue; Green; Red; White
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Sygg, Wanderbrine Shield.ProtectionFrom = (absent)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.PayCost
+Bot1.Target(Sygg, Wanderwine Wisdom)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+Bot1.Attack(Sygg, Wanderwine Wisdom > Bot2)
+! Bot2.Block(Ornithopter > Bot1.Battlefield.Sygg, Wanderwine Wisdom)
+[T5 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Hand.Count = 5
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Sygg, Wanderwine Wisdom.Colors = Blue
+Bot1.Battlefield.Sygg, Wanderwine Wisdom.Keywords = CantBeBlocked
+Bot1.Hand.Count = 5

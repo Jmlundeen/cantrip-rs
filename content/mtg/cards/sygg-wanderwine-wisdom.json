@@ -1,0 +1,24 @@
+{
+  "name": "Sygg, Wanderwine Wisdom",
+  "manaCost": "{1}{U}",
+  "type": "Legendary Creature — Merfolk Wizard",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Sygg can't be blocked.\nWhenever this creature enters or transforms into Sygg, Wanderwine Wisdom, target creature gains \"Whenever this creature deals combat damage to a player or planeswalker, draw a card\" until end of turn.\nAt the beginning of your first main phase, you may pay {W}. If you do, transform Sygg.",
+  "keywords": [
+    "CantBeBlocked"
+  ],
+  "backFace": {
+    "name": "Sygg, Wanderbrine Shield",
+    "colorIndicator": [
+      "White"
+    ],
+    "type": "Legendary Creature — Merfolk Rogue",
+    "power": 2,
+    "toughness": 2,
+    "oracleText": "Sygg can't be blocked.\nWhenever this creature transforms into Sygg, Wanderbrine Shield, target creature you control gains protection from each color until your next turn.\nAt the beginning of your first main phase, you may pay {U}. If you do, transform Sygg.",
+    "keywords": [
+      "CantBeBlocked"
+    ]
+  }
+}
