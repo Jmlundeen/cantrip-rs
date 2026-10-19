@@ -1,0 +1,22 @@
+# With no planeswalker anywhere, Theorix Annex enters tapped (CR 614.1c) - the land itself is not a planeswalker - so it
+# cannot be tapped for mana that turn (refused), and on Bot1's next turn it untaps and taps for {U}, one of its two colors.
+
+[Bot1 Deck]
+Theorix Annex
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Theorix Annex.Play
+? Bot1.Battlefield.Theorix Annex.Tapped = true
+! Bot1.Battlefield.Theorix Annex.Activate(Color: Blue)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Theorix Annex.Activate(Color: Blue)
+? Bot1.Mana = {U}
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Theorix Annex.Tapped = true
