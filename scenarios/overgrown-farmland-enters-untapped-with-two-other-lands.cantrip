@@ -1,0 +1,25 @@
+# With two other lands under Bot1's control, Overgrown Farmland enters untapped and taps for {G} or {W} - here {G};
+# red is not among its colors (refused beside the positive control).
+
+[Bot1 Deck]
+Forest
+Forest
+Overgrown Farmland
+Forest x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Overgrown Farmland.Play
+? Bot1.Battlefield.Overgrown Farmland.Tapped = false
+! Bot1.Battlefield.Overgrown Farmland.Activate(Color: Red)
+Bot1.Battlefield.Overgrown Farmland.Activate(Color: Green)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Overgrown Farmland.Tapped = true

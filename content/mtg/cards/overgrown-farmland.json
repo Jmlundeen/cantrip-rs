@@ -1,0 +1,5 @@
+{
+  "name": "Overgrown Farmland",
+  "type": "Land",
+  "oracleText": "This land enters tapped unless you control two or more other lands.\n{T}: Add {G} or {W}."
+}
