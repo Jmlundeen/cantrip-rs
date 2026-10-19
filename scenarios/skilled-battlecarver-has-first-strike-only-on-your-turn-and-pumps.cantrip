@@ -1,0 +1,34 @@
+# Skilled Battlecarver: "During your turn, this creature has first strike." On Bot1's own turn it has first strike; on
+# Bot2's turn it does not (CR 500.1, layer 6). Its "{1}{R}: This creature gets +1/+0 until end of turn." raises its power
+# from 2 to 3 (CR 611.2).
+
+[Bot1 Deck]
+Mountain
+Skilled Battlecarver
+Mountain
+Mountain x12
+
+[Bot2 Deck]
+Island x14
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Skilled Battlecarver.Cast
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Skilled Battlecarver.Keywords = FirstStrike
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Skilled Battlecarver.Keywords = (absent)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Skilled Battlecarver.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Skilled Battlecarver.Power = 3
+
+[Expect]
+Bot1.Battlefield.Skilled Battlecarver.Toughness = 1
