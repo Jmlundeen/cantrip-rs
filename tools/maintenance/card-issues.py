@@ -3,7 +3,7 @@
     python tools/maintenance/card-issues.py sync <format> [--dry-run] [--limit N]
     python tools/maintenance/card-issues.py next <format> [-n 5] [--json]
     python tools/maintenance/card-issues.py claim "Card Name" ["Other Card" ...]
-    python tools/maintenance/card-issues.py claim --format <format> [-n 4]
+    python tools/maintenance/card-issues.py claim --format <format> [-n 1]
     python tools/maintenance/card-issues.py release "Card Name" ["Other Card" ...]
     python tools/maintenance/card-issues.py status
 
@@ -46,7 +46,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 FORMATS = os.path.join(ROOT, "docs", "formats")
 HOLD = datetime.timedelta(hours=24)
-BATCH = 4  # cards claimed at once by default: a batch small enough to finish inside one claim
+BATCH = 1  # cards claimed at once by default: one, since a card takes minutes and a claim keeps others off it
 CLAIM = "<!-- cantrip-claim -->"
 RELEASE = "<!-- cantrip-release -->"
 CARD = "<!-- cantrip-card: {} -->"
@@ -381,12 +381,12 @@ def claim(args, repo):
     if args.names:
         sys.exit(0 if all([take(repo, issues, me, name) for name in args.names]) else 3)
     if not args.format:
-        sys.exit("name the cards to claim, or --format to claim the format's next batch")
+        sys.exit("name the cards to claim, or --format to claim the format's next free card")
     args.n = args.n or BATCH
     got = 0
     for card, _, mine in available(args, repo)[0]:
         if mine:
-            continue  # already ours: a batch is new cards
+            continue  # already ours: claim a new card
         if got == args.n:
             break
         got += take(repo, issues, me, card["name"])

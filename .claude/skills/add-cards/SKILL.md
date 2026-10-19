@@ -105,11 +105,12 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    cards that decks actually play (`docs/formats/<format>.json`, best-played first, made from MTGGoldfish and MTGTop8
    by `format-scrape.py`), and the format is the contributor's to choose: **ask which format** unless they said (the
    lists present are the files in `docs/formats/`; today Standard). `card-issues.py next <format>` prints the
-   next four cards that are not implemented and that nobody holds - a claim older than 24 hours with no pull request
+   next cards that are not implemented and that nobody holds - a claim older than 24 hours with no pull request
    commit or `card/<slug>` push since counts as nobody's. Take them in that order and never skip one for being
    hard; a card the engine cannot yet do is released (below) with its gap reported, not passed over silently.
-2. **Claim before any work, four cards at a time:** `card-issues.py claim --format <format>` takes the next four free
-   cards, or `claim "Card Name" ["Other Card" ...]` takes the ones named. It opens the card's issue
+2. **Claim one card at a time, before any work on it:** `card-issues.py claim --format <format>` takes the next free
+   card, or `claim "Card Name"` the one named; the next card is claimed only when this one has landed or been
+   released, because a card takes minutes and a pile of claims keeps others off cards nobody is working on. It opens the card's issue
    first when it has none (a card named outside every format list gets one too), then claims it with a comment, and
    prints `#N`. Exit status 3 means the card is held by someone else (or they claimed it a moment earlier): leave it
    and take the next. Never work on a card whose live claim is someone else's.
@@ -276,17 +277,15 @@ land. Self-reported "exact" is not proof.
 
 ## Many cards: agents
 
-The coordinator dispatches, lands and keeps the queue; it does not implement cards itself in a batch.
+The coordinator dispatches, lands and keeps the queue; it does not implement cards itself.
 
-1. **Batches** of 4 cards, in list order (never pre-sorted by difficulty) - the next four free ones
-   (`card-issues.py claim --format <format>` claims them and prints their issue numbers), or the cards named. A batch
-   is 4 because a claim is good for 24 hours and a batch must land inside one; more than 4 cards at once is more
-   claims than anyone can keep honest. The coordinator claims a batch before its agent starts, hands the agent the
-   issue numbers, and releases the cards a report says were skipped. As an agent finishes, the next batch is
-   claimed for the next agent.
-2. **One agent per batch**, in its own worktree, in the background. Its prompt: this skill's loop for each card (the
-   list inline, with the issue numbers for `Closes #N`; the claims are already made, and since agents do not push the
-   coordinator claims the batch again if an agent runs past the day, so the claims do not lapse); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
+1. **Work in single cards.** There is no batch to claim: an agent claims its first card (`card-issues.py claim
+   --format <format>`, or the card named), finishes it, then claims the next free one, in list order (never
+   pre-sorted by difficulty), until its quota of cards is done. The coordinator's job is the quota and the format, not
+   the claims, and it releases nothing the agent has not claimed. A card an agent cannot finish is released
+   (`release "Card Name"`) with its gap reported.
+2. **One agent per quota** (a handful of cards), in its own worktree, in the background. Its prompt: this skill's loop for
+   each card, the format, its quota, and that it claims one card at a time (`Closes #N` from the claim's output); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
    `cantrip-mechanics`; a card blocked by the core is skipped with its exact gap (the rule, and what `cantrip-api`
    lacks), never faked; the client work a card needs (step 8) is part of the card, not a follow-up; one commit per
    card; at the end `git rebase main`, the corpus and the verify tests; no push; a report of implemented cards with
@@ -296,7 +295,7 @@ The coordinator dispatches, lands and keeps the queue; it does not implement car
 3. **Gaps** that several skipped cards share become a core-feature agent: the core open to it, each feature built to
    its rule, the waiting cards implemented, the benchmark run. Feature agents work on separate rules areas; running agents
    are told what landed so they rebase.
-4. **Review agents** read the batch's cards read-only against the review list, before they land.
+4. **Review agents** read the cards of a quota read-only against the review list, before they land.
 5. **Land** each finished branch on `main` (cherry-pick its commits; a conflict stops for a look), then the corpus
    (0 fail), the verify tests, the benchmark if the core changed; push; remove the worktree and its branch.
 6. **Report** what landed, what was skipped and why, and the corpus line.
