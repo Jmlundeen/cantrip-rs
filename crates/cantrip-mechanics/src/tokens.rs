@@ -438,6 +438,18 @@ pub fn create_emblem(g: &mut dyn Game, player: PlayerId, def: &'static CardDef) 
     g.create_emblem(def, player)
 }
 
+/// The 1/1 white Ally creature token. Appa, Steadfast Guardian and Iroh, Tea Master make it.
+pub static ALLY: CardDef = CardDef {
+    name: "Ally",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Ally]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
 /// The 1/1 white Soldier creature token. Hero of Bladehold, Elspeth, Storm Slayer and Torsten, Founder of Benalia make
 /// it. (Third Path Iconoclast's is an artifact Soldier of the same name.)
 pub static SOLDIER: CardDef = CardDef {
