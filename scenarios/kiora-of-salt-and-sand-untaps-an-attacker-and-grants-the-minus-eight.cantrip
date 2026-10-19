@@ -1,0 +1,68 @@
+# Kiora of Salt and Sand: with Jace's loyalty ability activated this turn, the attack trigger untaps the attacking
+# Kiora and it can't be blocked (CR 611.2c). The static gives planeswalkers you control the -8 ability: Jace climbs
+# to nine loyalty over three turns, and on turn 9 the granted ability makes the 8/8 blue Leviathan token.
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Kiora of Salt and Sand
+Jace, the Mind Sculptor
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kiora of Salt and Sand.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Jace, the Mind Sculptor.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Ability: +2; Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Kiora of Salt and Sand > Bot2)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Kiora of Salt and Sand.Tapped = false
+? Bot1.Battlefield.Kiora of Salt and Sand.Keywords = CantBeBlocked
+[T5 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Ability: +2; Bot2)
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Ability: +2; Bot2)
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+? Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 9
+Bot1.Battlefield.Jace, the Mind Sculptor.Activate(Ability: Create)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Leviathan.Token = true
+
+[Expect]
+Bot1.Battlefield.Leviathan.Power = 8
+Bot1.Battlefield.Leviathan.Toughness = 8
+Bot1.Battlefield.Leviathan.Keywords = Hexproof
+Bot1.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 1
