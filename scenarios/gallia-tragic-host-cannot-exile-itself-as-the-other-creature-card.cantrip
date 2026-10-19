@@ -1,0 +1,48 @@
+# Gallia, Tragic Host's cost is "exile ANOTHER creature card from your graveyard" (CR 118.3): with only Gallia herself in the
+# graveyard the ability is refused, since a cost that would exile the source is not payment. A second Entomb buries an
+# Ornithopter and the same activation then returns Gallia tapped with a +1/+1 counter.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Black Lotus
+Entomb
+Entomb
+Gallia, Tragic Host x4
+Ornithopter x4
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Gallia, Tragic Host)
+! Bot1.Graveyard.Gallia, Tragic Host.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Graveyard.Gallia, Tragic Host.Activate
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Gallia, Tragic Host.Tapped = true
+Bot1.Battlefield.Gallia, Tragic Host.Counters.PlusOnePlusOne = 1
+Exile = Ornithopter
+Bot1.Graveyard = Black Lotus; Entomb; Entomb

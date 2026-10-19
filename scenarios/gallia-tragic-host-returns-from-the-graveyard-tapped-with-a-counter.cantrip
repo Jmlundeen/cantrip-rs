@@ -1,0 +1,50 @@
+# Gallia, Tragic Host's graveyard ability (CR 113.6k): {4}{B} paid from Swamp, two Mox Jets and Black Lotus, exiling the
+# Ornithopter that Entomb buried as the other creature card. Gallia returns to the battlefield tapped as a new object with a
+# +1/+1 counter on her, so she is a tapped 3/2 with menace.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Black Lotus
+Entomb
+Entomb
+Ornithopter x4
+Swamp x12
+Gallia, Tragic Host x4
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Gallia, Tragic Host)
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Graveyard.Gallia, Tragic Host.Activate
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Gallia, Tragic Host.Tapped = true
+Bot1.Battlefield.Gallia, Tragic Host.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Gallia, Tragic Host.Power = 3
+Bot1.Battlefield.Gallia, Tragic Host.Toughness = 2
+Bot1.Battlefield.Gallia, Tragic Host.Keywords = Menace
+Exile = Ornithopter
+Bot1.Graveyard = Black Lotus; Entomb; Entomb
