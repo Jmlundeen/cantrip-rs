@@ -1,0 +1,37 @@
+# The trigger is independent of its source (CR 113.7a, 608.2). Turn 3 the first Archway returns the Plains. Turn 5 the second
+# Archway enters and Bot2 destroys it with Wasteland in response; when its trigger resolves Bot1 returns the first Archway,
+# "another Desert" (the second is in the graveyard, the first is not it), and surveils 1: the Island on top goes to the
+# graveyard beside the destroyed Archway.
+
+[Bot1 Deck]
+Plains
+Arid Archway
+Arid Archway
+Swamp x4
+Swamp
+Swamp
+Island
+Swamp x9
+
+[Bot2 Deck]
+Wasteland
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Wasteland.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Arid Archway.Play
+Bot1.Choose(Plains)
+! Bot1.Arrange
+[T5 Bot1.Main1]
+Bot1.Hand.Arid Archway.Play
+Bot2.Battlefield.Wasteland.Activate(Ability: Destroy; Arid Archway#2)
+Bot1.Choose(Arid Archway)
+Bot1.Arrange( | Island)
+
+[Expect]
+Bot1.Battlefield.Count = 0
+Bot1.Graveyard = Island; Arid Archway
+Bot1.Hand = Arid Archway; Plains; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp

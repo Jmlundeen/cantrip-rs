@@ -1,0 +1,36 @@
+# "If another Desert was returned this way, surveil 1." Turn 3: the first Arid Archway returns the Plains, a land that is no
+# Desert, so there is no surveil (graveyard still empty, no Arrange asked). Turn 5: the second Archway returns the first
+# Archway, another Desert, and Bot1 surveils: the Island on top of the library goes to the graveyard. The first Archway is
+# back in hand.
+
+[Bot1 Deck]
+Plains
+Arid Archway
+Arid Archway
+Swamp x4
+Swamp
+Swamp
+Island
+Swamp x9
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Arid Archway.Play
+Bot1.Choose(Plains)
+! Bot1.Arrange
+? Bot1.Graveyard.Count = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Arid Archway.Play
+Bot1.Choose(Arid Archway#1)
+Bot1.Arrange( | Island)
+
+[Expect]
+Turn = 5
+Bot1.Graveyard = Island
+Bot1.Battlefield = Arid Archway
+Bot1.Battlefield.Arid Archway.Tapped = true
+Bot1.Hand = Arid Archway; Plains; Swamp; Swamp; Swamp; Swamp; Swamp; Swamp
