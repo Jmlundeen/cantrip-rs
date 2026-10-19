@@ -1,0 +1,46 @@
+# Razorkin Needlehead: "Whenever an opponent draws a card". Putting a card into a hand without drawing it is not drawing (ruling
+# 2024-09-20, CR 121.1). Turn 2 Bot2's draw step is a real draw and pings Bot2 once (19: the positive control); then Bot2 casts
+# Demonic Tutor, searching its library for an Island into its hand, and takes no damage (still 19).
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Razorkin Needlehead
+Mountain x20
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Demonic Tutor
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Razorkin Needlehead.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot2.Life = 19
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Demonic Tutor.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Search(Island)
+? Stack.Count = 0
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Life = 20
+Stack.Count = 0
+Bot2.Graveyard = Demonic Tutor

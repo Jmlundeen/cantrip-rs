@@ -1,0 +1,47 @@
+# Razorkin Needlehead has first strike only during its controller's turn: on Bot2's turn 4 it blocks Bot2's attacking
+# Guerrilla Gorilla (2/2) with no first strike, so both deal damage and both die. Bot2's draws on turns 2 and 4 each ping
+# Bot2 for 1 (18); Bot1's own turn-3 draw does not.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Razorkin Needlehead
+Mountain x20
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Razorkin Needlehead.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Main1]
+? Bot2.Life = 18
+? Bot1.Life = 20
+? Bot1.Battlefield.Razorkin Needlehead.Keywords = (absent)
+Bot2.Attack(Guerrilla Gorilla > Bot1)
+Bot1.Block(Razorkin Needlehead > Guerrilla Gorilla)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Razorkin Needlehead
+Bot2.Graveyard = Guerrilla Gorilla
+Bot2.Life = 18
+Bot1.Life = 20

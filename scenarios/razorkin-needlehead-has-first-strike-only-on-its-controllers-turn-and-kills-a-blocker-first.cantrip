@@ -1,0 +1,51 @@
+# Razorkin Needlehead: "This creature has first strike during your turn." Turn 1 Bot1 casts it (first strike on its own turn).
+# Turn 2 (Bot2's) it has none, and Bot2's draw pings Bot2 for 1. Turn 3 Bot1 attacks into Bot2's Guerrilla Gorilla: first strike
+# kills the 2/2 blocker before it deals damage, so Needlehead survives. Bot1's own draws never ping (opponents only).
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Razorkin Needlehead
+Mountain x20
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Guerrilla Gorilla
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Razorkin Needlehead.Cast
+Bot1.Pass
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Razorkin Needlehead.Keywords = FirstStrike
+[T2 Bot2.Main1]
+? Bot1.Battlefield.Razorkin Needlehead.Keywords = (absent)
+? Bot2.Life = 19
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Guerrilla Gorilla.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+? Bot1.Battlefield.Razorkin Needlehead.Keywords = FirstStrike
+Bot1.Attack(Razorkin Needlehead > Bot2)
+Bot2.Block(Guerrilla Gorilla > Razorkin Needlehead)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Guerrilla Gorilla
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Razorkin Needlehead.Keywords = FirstStrike
+Bot2.Life = 19
+Bot1.Life = 20

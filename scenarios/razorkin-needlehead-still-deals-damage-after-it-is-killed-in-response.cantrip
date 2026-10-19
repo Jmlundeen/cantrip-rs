@@ -1,0 +1,44 @@
+# Razorkin Needlehead: its trigger is already on the stack when Bot2 Bolts it in the turn-4 draw step, so the ability resolves
+# with the Needlehead gone and still deals its 1 damage, the source's last-known information being used (CR 113.7a, 608.2h):
+# Bot2 is at 18 (19 after the turn-2 draw, 18 after this one), though the Needlehead is in Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Razorkin Needlehead
+Mountain x20
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Razorkin Needlehead.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot2.Life = 19
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+[T4 Bot2.Draw]
+? Stack.Count = 1
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Razorkin Needlehead)
+Bot2.Pass
+Bot1.Pass
+? Bot1.Graveyard = Razorkin Needlehead
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Razorkin Needlehead
+Bot1.Life = 20
+Stack.Count = 0

@@ -1,0 +1,36 @@
+# Razorkin Needlehead triggers for each card an opponent draws, not for each draw event: Bot2's turn-2 draw step is 1 damage
+# and Brainstorm's three cards are 3 more (4 total, 16). Bot1's own draw (turn 3) deals no damage to Bot1.
+
+[Bot1 Deck]
+Mox Ruby
+Mountain
+Razorkin Needlehead
+Mountain x20
+
+[Bot2 Deck]
+Island
+Brainstorm
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Razorkin Needlehead.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot2.Life = 19
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Brainstorm.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Life = 20
+
+[Expect]
+Bot2.Life = 16
+Bot1.Life = 20
+Stack.Count = 0

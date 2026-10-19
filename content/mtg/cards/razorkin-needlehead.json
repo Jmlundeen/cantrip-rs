@@ -1,0 +1,8 @@
+{
+  "name": "Razorkin Needlehead",
+  "manaCost": "{R}{R}",
+  "type": "Creature — Human Assassin",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "This creature has first strike during your turn.\nWhenever an opponent draws a card, this creature deals 1 damage to them."
+}
