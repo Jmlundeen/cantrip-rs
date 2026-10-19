@@ -1,0 +1,11 @@
+{
+  "name": "Craftwork Crusher",
+  "manaCost": "{3}{R}{R}{G}{G}",
+  "type": "Artifact Creature — Boar Construct",
+  "power": 7,
+  "toughness": 5,
+  "keywords": [
+    "Trample"
+  ],
+  "oracleText": "Trample\nWhen this creature enters, choose two —\n• This creature deals 4 damage to target creature or planeswalker.\n• Create a 2/2 colorless Wizard Soldier creature token named Cadet.\n• Draw a card."
+}
