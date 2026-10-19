@@ -537,6 +537,19 @@ pub static SERVO: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 2/2 green Wolf creature token (CR 111.4). Chief Warg's Company and Head of the Hunt make it.
+pub static WOLF: CardDef = CardDef {
+    name: "Wolf",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Green)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Wolf]),
+    power: Some(2),
+    toughness: Some(2),
+    shares_name: true,
+    ..CardDef::BLANK
+};
+
 /// A 1/1 blue Fish creature token (CR 702.174f). Into the Flood Maw's gift makes it, tapped.
 pub static FISH: CardDef = CardDef {
     name: "Fish",
