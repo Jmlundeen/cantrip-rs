@@ -1,0 +1,31 @@
+# Keeper of the Quiet Hour: "When this creature enters, empower Jace 2." With no Jace token, a blue Jace planeswalker token
+# is created and gets the two loyalty counters (CR 701.71a).
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Pearl
+Keeper of the Quiet Hour
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Keeper of the Quiet Hour.Cast
+
+[Expect]
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Keeper of the Quiet Hour.Power = 3
+Bot1.Battlefield.Keeper of the Quiet Hour.Toughness = 2

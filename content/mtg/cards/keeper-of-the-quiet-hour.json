@@ -1,0 +1,8 @@
+{
+  "name": "Keeper of the Quiet Hour",
+  "manaCost": "{3}",
+  "type": "Artifact Creature — Chimera",
+  "oracleText": "When this creature enters, empower Jace 2. (Put two loyalty counters on a Jace token you control. If you don't control one, first create a blue Jace planeswalker token with \"[-1]: Surveil 1\" and \"[-3]: Draw a card.\")",
+  "power": 3,
+  "toughness": 2
+}
