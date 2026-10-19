@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{choose, damage_target, exile_and_return_transformed, targets, triggers, effects, tokens};
+use cantrip_mechanics::{damage_target, each_opponent_keeps_one_of_each_type, exile_and_return_transformed, targets, triggers, effects, tokens};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("ExileAndReturn", "exile Ajani, then return him to the battlefield transformed?", "He returns as Ajani, Nacatl Avenger", "Exile and transform", "Don't");
@@ -90,25 +90,13 @@ fn damage_for_creatures(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspen
 /// permanents they control, then sacrifices the rest." Each opponent in turn order keeps one of each kind they have
 /// more than one of (asked kind by kind), and what is not kept is sacrificed together.
 fn minus_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let mut doomed = Vec::new();
-    for who in g.state().apnap().collect::<Vec<_>>() {
-        if who == item.controller {
-            continue;
-        }
-        let theirs: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| !g.chars(id).is(CardType::Land)).collect();
-        let mut kept: Vec<ObjectId> = Vec::new();
-        for kind in [CardType::Artifact, CardType::Creature, CardType::Enchantment, CardType::Planeswalker] {
-            let eligible: Vec<ObjectId> = theirs.iter().copied().filter(|&id| g.chars(id).is(kind)).collect();
-            if eligible.len() <= 1 {
-                kept.extend(eligible);
-                continue;
-            }
-            kept.extend(choose::card_from(g, who, item.object, Purpose::Keep, theirs.clone(), eligible)?);
-        }
-        doomed.extend(theirs.into_iter().filter(|id| !kept.contains(id)));
-    }
-    g.sacrifice(&doomed);
-    Ok(())
+    each_opponent_keeps_one_of_each_type(
+        g,
+        item.controller,
+        item.object,
+        &[CardType::Artifact, CardType::Creature, CardType::Enchantment, CardType::Planeswalker],
+        |chars| !chars.is(CardType::Land),
+    )
 }
 
 pub static BACK: CardDef = CardDef {

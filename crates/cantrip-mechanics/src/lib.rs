@@ -224,6 +224,51 @@ pub fn each_player_sacrifices(
     sacrifice_together(g, &players, source, count, kind)
 }
 
+/// "Each opponent chooses [one permanent of each of `kinds`] from among the [`among`] permanents they control, then
+/// sacrifices the rest" (CR 701.21a, 101.4): each opponent in turn order keeps one permanent of each kind, asked kind by
+/// kind and in view of all their `among` permanents, unless they control no more than one of that kind. A permanent with
+/// several of the types may be chosen for several (the rulings), and counts as kept for all of them. Everything an opponent
+/// controls among `among` that was not kept is sacrificed, all of it together, after every opponent has chosen. Ajani,
+/// Nacatl Pariah's back face (the artifact, creature, enchantment and planeswalker among their nonland permanents) and
+/// Liliana, Dreadhorde General's -9 (each permanent type) print it.
+pub fn each_opponent_keeps_one_of_each_type(
+    g: &mut dyn Game,
+    controller: PlayerId,
+    source: ObjectId,
+    kinds: &[CardType],
+    among: fn(&Chars) -> bool,
+) -> Result<(), Suspend> {
+    let mut doomed = Vec::new();
+    for who in g.state().apnap().collect::<Vec<_>>() {
+        if who == controller {
+            continue;
+        }
+        let theirs: Vec<ObjectId> = g.permanents_of(who).into_iter().filter(|&id| among(&g.chars(id))).collect();
+        let mut kept: Vec<ObjectId> = Vec::new();
+        for &kind in kinds {
+            let eligible: Vec<ObjectId> = theirs.iter().copied().filter(|&id| g.chars(id).is(kind)).collect();
+            if eligible.len() <= 1 {
+                kept.extend(eligible);
+                continue;
+            }
+            // Each question names the type it is for: one permanent may be offered under several types.
+            let word = match kind {
+                CardType::Artifact => "artifact",
+                CardType::Battle => "battle",
+                CardType::Creature => "creature",
+                CardType::Enchantment => "enchantment",
+                CardType::Land => "land",
+                CardType::Planeswalker => "planeswalker",
+                _ => "permanent",
+            };
+            kept.extend(choose::cards_from_kind(g, who, source, Purpose::Keep, word, theirs.clone(), eligible, 1, false)?);
+        }
+        doomed.extend(theirs.into_iter().filter(|id| !kept.contains(id)));
+    }
+    g.sacrifice(&doomed);
+    Ok(())
+}
+
 /// Each of `players` in the order given chooses what they sacrifice, all on the board as it is before anything is
 /// sacrificed, and then the choices are sacrificed at once (CR 101.4, 701.21a). Returns the choices with who made them.
 fn sacrifice_together(
