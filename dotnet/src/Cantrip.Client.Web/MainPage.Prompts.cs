@@ -1751,6 +1751,14 @@ public sealed partial class MainPage
             string title = prompt.Question.Contains("{source}", StringComparison.Ordinal)
                 ? prompt.Question.Replace("{source}", source, StringComparison.Ordinal)
                 : $"{source}: {prompt.Question}";
+
+            // Garnet asks once per Saga, and two Sagas can share a name: say how many lore counters this one has.
+            if (prompt.Verb == "RemoveLoreCounter"
+                && client.Object(prompt.Source)?.Counters.FirstOrDefault(counter => counter.Name == "lore") is { } lore)
+            {
+                title += $" ({lore.Count} lore counters)";
+            }
+
             Ask(title, prompt.Detail, prompt.Yes, prompt.No, yesIsPrimary: !prompt.NoDefault);
             return;
         }
