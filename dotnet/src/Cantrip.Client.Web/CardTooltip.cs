@@ -164,14 +164,16 @@ public sealed class CardTooltip : Canvas
     {
         if (card.FaceDown)
         {
-            // A face-down permanent is a 2/2 with no text (CR 708.2a); a card exiled face down has no characteristics
-            // at all (CR 406.3a).
+            // A face-down permanent is a 2/2 with no text (CR 708.2a), or with the text the rule that turned it face down
+            // gives it (a cloaked one's ward {2}, CR 701.58a); a card exiled face down has no characteristics at all
+            // (CR 406.3a).
             bool permanent = card.Zone == ZoneKindView.Battlefield;
             List<string> said =
             [
-                permanent
-                    ? $"A face-down {card.Power}/{card.Toughness} creature with no name, text or cost."
-                    : "A card exiled face down. It has no name, text, types or cost.",
+                !permanent ? "A card exiled face down. It has no name, text, types or cost."
+                : card.OracleText.Length > 0
+                    ? $"A face-down {card.Power}/{card.Toughness} creature with no name or cost. It has {char.ToLowerInvariant(card.OracleText[0])}{card.OracleText[1..].Replace('\n', ' ')}."
+                    : $"A face-down {card.Power}/{card.Toughness} creature with no name, text or cost.",
             ];
 
             if (card.FaceDownName.Length > 0)

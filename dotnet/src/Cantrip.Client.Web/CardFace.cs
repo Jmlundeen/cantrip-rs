@@ -1220,6 +1220,13 @@ public static partial class CardFace
     public static List<string> StatusWords(ObjectView card)
     {
         List<string> parts = [];
+        // A face-down permanent's own text is what the rule that turned it face down gives it - a cloaked one's ward {2}
+        // (CR 701.58a) - and its back has nowhere else to say it.
+        if (card.FaceDown && card.OracleText.Length > 0)
+        {
+            parts.Add(card.OracleText.Replace('\n', ' ').ToUpperInvariant());
+        }
+
         if (card.CantBeCountered && card.Zone == ZoneKindView.Stack)
         {
             parts.Add("CAN'T BE COUNTERED");
