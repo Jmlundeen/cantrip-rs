@@ -1,33 +1,7 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
-use cantrip_mechanics::{triggers::THIS_ENTERS, tokens};
+use cantrip_mechanics::job_select::{HERO, JOB_SELECT};
 use cantrip_oracle as oracle;
-
-/// The 1/1 colorless Hero creature token job select makes.
-static HERO: CardDef = CardDef {
-    name: "Hero",
-    has_cost: false,
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Hero]),
-    power: Some(1),
-    toughness: Some(1),
-    ..CardDef::BLANK
-};
-
-/// Job select: "create a 1/1 colorless Hero creature token, then attach this to it." An Equipment that has left the
-/// battlefield attaches to nothing, and a token a replacement stopped is not there to be equipped (CR 701.3b).
-fn job_select(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let made = tokens::create(g, item.controller, &HERO, 1)?;
-    if let Some(&token) = made.first()
-        && is_live(g, token)
-        && g.is_on_battlefield(token)
-        && is_live(g, item.object)
-        && g.is_on_battlefield(item.object)
-    {
-        g.attach(item.object, token);
-    }
-    Ok(())
-}
 
 /// "Equipped creature is a Wizard in addition to its other types" (layer 4).
 fn wizard(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
@@ -53,7 +27,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(THIS_ENTERS, job_select, "Job select (When this Equipment enters, create a 1/1 colorless Hero creature token, then attach this to it.)"),
+        JOB_SELECT,
         equip(mana("{2}"), "Diana \u{2014} Equip {2}"),
     ],
     delayed: &[triggered(when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0), cast_noncreature_or_draw_third), grow, "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.")],

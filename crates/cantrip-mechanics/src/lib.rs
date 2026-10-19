@@ -34,6 +34,7 @@ pub mod gift;
 pub mod goyf;
 pub mod harness;
 pub mod hexproof_from;
+pub mod job_select;
 pub mod hideaway_play;
 pub mod cleave;
 pub mod craft;
