@@ -288,8 +288,10 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             // A cast a permanent grants (CR 604, 118.9) says what it costs, which the way's text need not: Iroh's flashback
             // "equal to that card's mana cost", Underworld Breach's escape. A face it casts shows it as its cost; the card
             // itself, beside the way's text, unless that text already names a cost ("Flashback {1}").
+            // Whoever is asked casts it: a card in an opponent's exile cast under a permission is not its owner's cast.
+            let asked = game.pending().map_or(game.state.turn.priority, |r| r.player);
             if granted_slot(o.index).is_some()
-                && let Some(cost) = granted_cast_cost(game, game.state.obj(src).owner, src, o.index)
+                && let Some(cost) = granted_cast_cost(game, asked, src, o.index)
             {
                 let text = cost_text_of(&cost, def.name);
                 if granted_face.is_some() {
@@ -298,7 +300,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                     m.description = if m.description.is_empty() { text } else { format!("{} {text}", m.description) };
                 }
             }
-            let player = game.state.obj(src).controller;
+            let player = asked;
             // A way that casts without paying the mana cost (CR 118.9), whose X is 0 (CR 107.3b), is marked so,
             // and its row says what it comes to with the cost changes in play before any target ({0}, or {1} under Thalia).
             let granted = granted_slot(o.index).and_then(|_| granted_cast_total(game, player, src, o.index));
@@ -335,7 +337,6 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             m.tapped_after_mana = way.is_some_and(|c| c.permanents.is_some_and(|p| p.tapped));
             // Paid in life rather than its mana cost (CR 118.9, 119.4: Inside Information, Bolas's Citadel): the life is the
             // cost the row shows and the seats weigh, and no mana cost, which is not paid; an X in it is 0 (CR 107.3).
-            let asked = game.pending().map_or(game.state.turn.priority, |r| r.player);
             if let Some(life) = life_for_cast(game, game.cards, asked, src, o.index) {
                 m.life_cost = i32::from(life);
                 m.cost_text = format!("for {life} life");
