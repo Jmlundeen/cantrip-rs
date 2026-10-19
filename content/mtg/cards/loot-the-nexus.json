@@ -1,0 +1,8 @@
+{
+  "name": "Loot, the Nexus",
+  "manaCost": "{2}{G}",
+  "type": "Legendary Creature — Beast Noble",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "{T}: Choose a color. Add one mana of that color for each different power among creatures you control."
+}
