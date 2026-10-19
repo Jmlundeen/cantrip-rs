@@ -196,13 +196,12 @@ public sealed partial class MainPage
             holder.Children.Remove(_poolView);
         }
 
-        _poolHint.Text = "Drag cards from the search into the deck, between columns and to the sideboard  ·  double-click to move one to or from the sideboard  ·  drag a card back onto the search to take it out";
+        _poolHint.Text = "Drag cards from the search into the deck, between columns and to the sideboard  ·  drag a box or Ctrl-click to move several  ·  double-click: to or from the sideboard  ·  drag back onto the search to take out";
         Grid.SetRow(_poolView, 2);
         work.Children.Add(_poolView);
 
         // The search results are a pack to take from, and somewhere to put a card of the deck to take it out.
         MakeDraggable(_searchBoard);
-        MakePickable();
         _searchBoard.CardClicked += SearchClicked;
         _dropZones.Add(new DropZone(_searchBoard, InPool, (handle, _) => TakeOut(handle)));
         MakeDraggable(_commandBoard);

@@ -3,7 +3,8 @@ using Cantrip.Protocol;
 namespace Cantrip.Client.Web;
 
 /// <summary>
-/// Cards of the deck picked together in the deck editor, to be dragged as one. A rectangle dragged out from a place with no
+/// Cards of the deck picked together, to be dragged as one: in the deck editor, and wherever a deck is built from a pool -
+/// after a draft, at a league's deck table, sideboarding between games - until it is submitted (<see cref="PicksAllowed"/>). A rectangle dragged out from a place with no
 /// card, over the deck's columns or its sideboard, picks every card it touches where that card shows (Ctrl or Shift held
 /// adds them to what is picked); Ctrl- or Shift-click picks a card or lets it go; a click on no card, or a plain click on
 /// a card, lets them all go. Picked cards wear the gold border. Taking hold of a picked card carries every picked card,
@@ -25,9 +26,15 @@ public sealed partial class MainPage
     /// <summary>What was picked before the rectangle being drawn began; null while none is.</summary>
     private HashSet<int>? _picksBefore;
 
-    private bool Picked(int place) => DeckEditorShown && _deckPicks.Contains(place);
+    /// <summary>Whether cards may be picked now: in the deck editor, or a deck being built from a pool and not yet submitted.</summary>
+    private bool PicksAllowed => DeckEditorShown || (_poolIsDeck && !_deckSubmitted);
 
-    /// <summary>Lets rectangles be drawn over the deck's columns and sideboard; wired once, with the editor.</summary>
+    private bool Picked(int place) => PicksAllowed && _deckPicks.Contains(place);
+
+    /// <summary>
+    /// Lets rectangles be drawn over the deck's columns and sideboard; wired once, with the pool's view. Whether one is
+    /// drawn follows <see cref="PicksAllowed"/> (<see cref="KeepPicks"/>).
+    /// </summary>
     private void MakePickable()
     {
         foreach (CardBoardElement board in (CardBoardElement[])[_mainBoard, _sideBoard])
@@ -55,7 +62,7 @@ public sealed partial class MainPage
     /// </summary>
     private void MarqueePicking(IReadOnlyList<ViewHandle> touched, Windows.System.VirtualKeyModifiers modifiers)
     {
-        if (!DeckEditorShown)
+        if (!PicksAllowed)
         {
             return;
         }
@@ -106,10 +113,12 @@ public sealed partial class MainPage
         }
     }
 
-    /// <summary>Forgets picks of cards no longer in the deck or its sideboard.</summary>
+    /// <summary>Forgets picks of cards no longer in the deck or its sideboard, and every pick where none may be made.</summary>
     private void KeepPicks(PoolArrangement arrangement)
     {
-        if (!DeckEditorShown)
+        _mainBoard.Marquees = PicksAllowed;
+        _sideBoard.Marquees = PicksAllowed;
+        if (!PicksAllowed)
         {
             _deckPicks.Clear();
             return;
@@ -125,7 +134,7 @@ public sealed partial class MainPage
     /// </summary>
     private bool PickClicked(CardBoardElement board, ViewHandle handle)
     {
-        if (!DeckEditorShown || (board != _mainBoard && board != _sideBoard) || !_poolPlaces.TryGetValue(handle.Value, out int place))
+        if (!PicksAllowed || (board != _mainBoard && board != _sideBoard) || !_poolPlaces.TryGetValue(handle.Value, out int place))
         {
             return false;
         }
@@ -157,7 +166,7 @@ public sealed partial class MainPage
     /// </summary>
     private List<ObjectView> PickUpPicks(CardBoardElement from, ViewHandle handle)
     {
-        if (!DeckEditorShown || (from != _mainBoard && from != _sideBoard) || !_poolPlaces.TryGetValue(handle.Value, out int place))
+        if (!PicksAllowed || (from != _mainBoard && from != _sideBoard) || !_poolPlaces.TryGetValue(handle.Value, out int place))
         {
             return [];
         }

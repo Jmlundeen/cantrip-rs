@@ -266,6 +266,9 @@ public sealed partial class MainPage
                         json.WriteString("place", place);
                         json.WriteNumber("handle", card.Handle.Value);
                         json.WriteBoolean("tapped", card.Tapped);
+                        // A card of a deck picked to be dragged with others (MainPage.Picks.cs).
+                        json.WriteBoolean("picked", (board == _mainBoard || board == _sideBoard)
+                            && _poolPlaces.TryGetValue(card.Handle.Value, out int pickedPlace) && Picked(pickedPlace));
                         // A Room's doors as the face draws them, each by name and whether it is locked (CR 709.5c), and what the
                         // card offers its controller to do, as the menu words it (the unlock reads with its cost).
                         json.WriteString("doors", card.UnlockedDoors.Count > 0 && card.UnlockedDoors.Count == card.Halves.Count

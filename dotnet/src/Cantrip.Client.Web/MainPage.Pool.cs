@@ -249,6 +249,7 @@ public sealed partial class MainPage
         // Picked up from either and put down in either: a column of the main deck, or the sideboard.
         MakeDraggable(_mainBoard);
         MakeDraggable(_sideBoard);
+        MakePickable();
         _dropZones.Add(new DropZone(_mainBoard, handle => InPool(handle) || InPack(handle) || InSearch(handle), (handle, slot) => PutInColumn(handle, slot / 1000, slot % 1000), ColumnSlot, ColumnBar));
         _dropZones.Add(new DropZone(_sideBoard, handle => (InPool(handle) && !IsBasic(handle.Value)) || InPack(handle) || InSearch(handle), (handle, slot) => PutInSide(handle, slot), SideSlot, SideBar));
         _mainBoard.CardClicked += handle => PoolClicked(_mainBoard, handle);
@@ -456,6 +457,12 @@ public sealed partial class MainPage
         _sideBoard.SetCellSize(width, height);
         List<ObjectView> handled = PoolHandled();
         KeepPicks(arrangement);
+        if (!DeckEditorShown)
+        {
+            _poolHint.Text = PicksAllowed
+                ? "Drag between columns  ·  drag a box or Ctrl-click to move several  ·  double-click: to or from the sideboard, or a basic land out"
+                : "Drag cards between columns  ·  double-click to move one to or from the sideboard, or a basic land out of the deck";
+        }
 
         // The columns, each a stack of cards showing their names. A basic land is a card of its own for every copy.
         List<CardBoardElement.BoardCell> cells = [];

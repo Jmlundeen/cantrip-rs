@@ -365,6 +365,36 @@ public sealed class DraftTests(WebClient web)
         Assert.DoesNotContain(state.Cards, card => card.Visible && card.Name == "Mountain" && MathF.Abs(card.X - otherColumn) < 2);
         await page.PictureAsync("deck-built");
 
+        // Cards picked together go as one, as in the deck editor: Ctrl-click two drafted cards by their names, then drag
+        // one of them onto the sideboard - both go, and stay picked; dragged back by the other, both come back.
+        state = await page.SettledAsync();
+        List<CardState> feet = [.. state.Cards.Where(card => card.Visible && card.Row == "pool" && card.Name.Length > 0 && card.Name != "Mountain")
+            .OrderBy(card => card.X).ThenBy(card => card.Y).Take(2)];
+        Assert.Equal(2, feet.Count);
+        await page.Page.Keyboard.DownAsync("Control");
+        foreach (CardState foot in feet)
+        {
+            await page.Page.Mouse.ClickAsync(foot.X, NameStrip(foot));
+        }
+
+        await page.Page.Keyboard.UpAsync("Control");
+        state = await page.SettledAsync(state => state.Cards.Count(card => card.Picked) == 2);
+        Assert.Equal(feet.Select(card => card.Handle).Order(), state.Cards.Where(card => card.Picked).Select(card => card.Handle).Order());
+        await page.PictureAsync("picked-together");
+        CardState sided = state.Cards.First(card => card.Visible && card.Row == "sideboard");
+        await DragByNameAsync(feet[0], sided.X, sided.Y + sided.H);
+        await MainDeckOf(drafted - 3);
+        state = await page.SettledAsync(state => state.Cards.Count(card => card.Row == "sideboard" && card.Picked) == 2);
+        await page.PictureAsync("sided-together");
+        CardState back = state.Cards.First(card => card.Row == "sideboard" && card.Picked && card.Handle == feet[1].Handle);
+        await DragByNameAsync(back, feet[0].X, feet[0].Y + feet[0].H);
+        await MainDeckOf(drafted - 1);
+        state = await page.SettledAsync(state => state.Cards.Count(card => card.Row == "pool" && card.Picked) == 2);
+
+        // A click on no card lets them go.
+        await page.Page.Mouse.ClickAsync(feet[0].X, feet[0].Y + (feet[0].H * 3));
+        await page.SettledAsync(state => !state.Cards.Any(card => card.Picked));
+
         // Saved as it was built, so a reload or another computer finds it as it is.
         EventDeck saved = store.LoadEvent(created.Record.Id)!.Participant("you")!.Deck;
         Assert.Equal(drafted - 1, saved.Main.Count);
@@ -390,6 +420,15 @@ public sealed class DraftTests(WebClient web)
 
         // A card in a column is covered by the ones below it but for its name, which is where it is taken hold of.
         static float NameStrip(CardState card) => card.Y - (card.H / 2) + 8;
+
+        async Task DragByNameAsync(CardState card, float x, float y)
+        {
+            await page.Page.Mouse.MoveAsync(card.X, NameStrip(card));
+            await page.Page.Mouse.DownAsync();
+            await page.Page.Mouse.MoveAsync(card.X + 20, NameStrip(card) + 10, new() { Steps = 4 });
+            await page.Page.Mouse.MoveAsync(x, y, new() { Steps = 12 });
+            await page.Page.Mouse.UpAsync();
+        }
 
         // Waits for the deck the server keeps to have this many cards of the pool in its main deck.
         async Task MainDeckOf(int count)

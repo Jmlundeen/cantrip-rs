@@ -148,7 +148,10 @@ changes once decks are built, and a sideboard made during the draft becomes the 
 one handle from the pile it is drafted from to its column, so a pile taken flies into place, a card taken blind flies
 from the stack, and a card moved along the columns slides. While building, every basic land added is a card of its own at the foot of
 the lands column; each has a minus and a plus beside the columns (published to tests as "Remove Forest" and "Add Forest"),
-and **Submit deck** is enabled at the event's minimum. `?auto` drafts and builds too (`DraftPlay`), and the test
+and **Submit deck** is enabled at the event's minimum. Until it is submitted, cards are picked and dragged together as in
+the constructed deck editor (`MainPage.Picks.cs`): a box drawn from no card, or Ctrl/Shift-clicks, and a picked card
+taken hold of carries the others - the same after a draft, at a league's deck table and sideboarding between games,
+which are all this one screen. `?auto` drafts and builds too (`DraftPlay`), and the test
 state's `phase` says which screen is up. `DraftTests` plays a draft through to the deal against a bot, pictured.
 
 A booster draft (`format` "booster") shows the table from above instead of the piles (`DraftTableElement`): an oval
