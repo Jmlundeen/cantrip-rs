@@ -1,0 +1,31 @@
+# The enters trigger may target its source; the pump expires at cleanup (CR 611.2a).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Rampart Hunter
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Rampart Hunter.Cast
+[Bot1.Main2]
+? Bot1.Battlefield.Rampart Hunter.Power = 5
+? Bot1.Battlefield.Rampart Hunter.Toughness = 5
+[T2 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Rampart Hunter.Power = 3
+Bot1.Battlefield.Rampart Hunter.Toughness = 3
+Bot1.Battlefield.Rampart Hunter.Keywords = Deathtouch
