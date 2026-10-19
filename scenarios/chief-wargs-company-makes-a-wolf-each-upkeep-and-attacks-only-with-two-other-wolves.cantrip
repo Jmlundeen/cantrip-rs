@@ -1,0 +1,35 @@
+# Chief Warg's Company is cast on turn 1. Its upkeep trigger makes a 2/2 Wolf token on each of Bot1's upkeeps (turns 3 and 5).
+# (Ornithopter is there so that an attack is declared on turn 3 at all.) On turn 3 it is itself a Wolf and there is one other Wolf: that is one other Wolf, not two, so it can't attack (CR 508.1c; it
+# does not count itself). On turn 5 there are two other Wolves, so it attacks, with the turn 3 Wolf (no longer summoning sick), and 5 + 2 damage is dealt to Bot2 (the token is a 2/2).
+
+[Bot1 Deck]
+Forest
+Mox Jet
+Mox Emerald
+Chief Warg's Company
+Ornithopter
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Chief Warg's Company.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield = Chief Warg's Company; Forest; Mox Emerald; Mox Jet; Ornithopter; Wolf
+! Bot1.Attack(Chief Warg's Company > Bot2)
+[T5 Bot1.Main1]
+? Bot1.Battlefield = Chief Warg's Company; Forest; Mox Emerald; Mox Jet; Ornithopter; Wolf; Wolf
+Bot1.Attack(Chief Warg's Company; Wolf#1 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Battlefield = Chief Warg's Company; Forest; Mox Emerald; Mox Jet; Ornithopter; Wolf; Wolf

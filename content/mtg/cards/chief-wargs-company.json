@@ -1,0 +1,11 @@
+{
+  "name": "Chief Warg's Company",
+  "manaCost": "{1}{B}{G}",
+  "type": "Creature — Wolf",
+  "power": 5,
+  "toughness": 3,
+  "oracleText": "Trample\nThis creature can't attack unless you control two or more other Wolves.\nAt the beginning of your upkeep, create a 2/2 green Wolf creature token.",
+  "keywords": [
+    "Trample"
+  ]
+}
