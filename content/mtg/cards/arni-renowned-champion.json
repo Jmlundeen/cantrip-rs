@@ -1,0 +1,11 @@
+{
+  "name": "Arni, Renowned Champion",
+  "manaCost": "{3}{R}",
+  "type": "Legendary Creature — Human Berserker",
+  "power": 1,
+  "toughness": 5,
+  "keywords": [
+    "Trample"
+  ],
+  "oracleText": "Trample\nWhenever another creature you control enters, Arni gets +X/+0 until end of turn, where X is that creature's power."
+}

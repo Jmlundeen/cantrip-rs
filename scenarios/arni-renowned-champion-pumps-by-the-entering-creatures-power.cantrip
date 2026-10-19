@@ -1,0 +1,34 @@
+# Arni, Renowned Champion: whenever another creature you control enters, Arni gets +X/+0 until end of turn, where X is
+# that creature's power (CR 603.6a, 208.1). A 1/1 Llanowar Elves makes it 2/5, and it has trample (CR 702.19).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Arni, Renowned Champion
+Mox Emerald
+Llanowar Elves
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Arni, Renowned Champion.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+
+[Expect]
+Bot1.Battlefield.Arni, Renowned Champion.Power = 2
+Bot1.Battlefield.Arni, Renowned Champion.Toughness = 5
+Bot1.Battlefield.Arni, Renowned Champion.Keywords = Trample
