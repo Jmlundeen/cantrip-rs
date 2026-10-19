@@ -1,0 +1,52 @@
+# Compel Brutality, first mode: the creature you control is the source of the damage, so it must still be a legal target as the
+# spell resolves (CR 608.2b). Bot2 destroys Hercules in response (Get Lost; Bot1 gets two Map tokens): Hercules can no longer
+# deal damage though the other target is still legal, so Bot2's Ornithopter (0/2: Hercules' 3 damage would kill it) survives, and the
+# Compel Brutality still goes to the graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Compel Brutality
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Get Lost
+Ornithopter
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Compel Brutality.Cast
+Bot1.Modes(Target creature you control deals damage)
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Target(Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Get Lost.Cast(Hercules, Prince of Power)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Ornithopter.Damage = 0
+Bot1.Graveyard = Compel Brutality; Hercules, Prince of Power
+Bot1.Battlefield.Map Token#1.Token = true
