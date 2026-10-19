@@ -1,0 +1,14 @@
+{
+  "name": "Pyre Rhymer",
+  "manaCost": "{1}{R}{R}",
+  "type": "Creature — Elemental Sorcerer",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Prowess\nThis creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "prepare": {
+    "name": "Molten Tide",
+    "manaCost": "{R}",
+    "type": "Instant",
+    "oracleText": "Until end of turn, whenever you tap a Mountain for mana, add an additional {R}."
+  }
+}
