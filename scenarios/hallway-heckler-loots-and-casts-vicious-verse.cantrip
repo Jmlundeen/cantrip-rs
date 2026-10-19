@@ -1,0 +1,31 @@
+# Hallway Heckler: the printed abilities and resulting state (CR 608.2, 722).
+
+[Bot1 Deck]
+Hallway Heckler
+5 Mox Ruby
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Hand.Hallway Heckler.Cast
+Bot1.Exile.Vicious Verse.Cast(Bot2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Hallway Heckler.Activate
+Bot1.Choose(Island)
+
+[Expect]
+Bot1.Battlefield.Hallway Heckler.Prepared = (absent)
+Bot2.Life = 19
+Bot1.Graveyard = Island
