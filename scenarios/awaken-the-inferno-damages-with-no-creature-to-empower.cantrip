@@ -1,0 +1,36 @@
+# Awaken the Inferno: with no creature of yours to target, its "up to one target creature you control" chooses none and
+# the damage to the opponent's creature still happens (CR 608.2b).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Awaken the Inferno
+Mountain x13
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Battlefield.Mox Ruby#4.Activate
+Bot1.Battlefield.Mox Ruby#5.Activate
+Bot1.Hand.Awaken the Inferno.Cast
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot1.Life = 20
