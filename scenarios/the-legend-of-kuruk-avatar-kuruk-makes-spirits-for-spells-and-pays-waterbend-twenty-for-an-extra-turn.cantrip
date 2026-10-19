@@ -1,0 +1,117 @@
+# Avatar Kuruk (The Legend of Kuruk transformed): "Whenever you cast a spell, create a 1/1 colorless Spirit creature token ..." and "Exhaust -
+# Waterbend {20}: Take an extra turn after this one." The Saga reaches chapter III on turn 5 and returns as Avatar Kuruk; Bot1 then casts
+# two Black Lotuses and four Ornithopters (each cast makes a Spirit token: six). Bot2's own spell on turn 6 makes none ("Whenever YOU
+# cast"). On turn 7 Bot1 casts another Ornithopter (a seventh Spirit) and pays {20} with seven mana (Island, three Moxen, one Lotus) and
+# thirteen untapped artifacts and creatures tapped for waterbend (CR 701.67a), Avatar Kuruk itself among them, five Ornithopters and seven
+# Spirits. The extra turn (CR 500.7) is turn 8, Bot1's again. There the {20} could be paid again - the second Lotus, the untapped
+# Moxen, Island, Kuruk, the Ornithopters and Spirits, and the Ornithopter just cast, come to 22 - yet the exhaust ability is refused,
+# because exhaust may be activated only once (CR 702.177a). The new Avatar Kuruk is a new object: no lore counters.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+The Legend of Kuruk
+Black Lotus
+Black Lotus
+Ornithopter x10
+
+[Bot2 Deck]
+Mox Jet
+Swamp x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.The Legend of Kuruk.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Ornithopter; Ornithopter | )
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Ornithopter; Ornithopter | )
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Avatar Kuruk.Power = 4
+? Bot1.Battlefield.Avatar Kuruk.Counters.Lore = (absent)
+
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spirit#1.Token = true
+? Bot1.Battlefield.Spirit#6.Power = 1
+? Bot1.Battlefield.Count = 17
+[T6 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Count = 17
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Count = 19
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Avatar Kuruk.Activate(Convoke: Avatar Kuruk, Spirit, Spirit, Spirit, Spirit, Spirit, Spirit, Spirit, Ornithopter, Ornithopter, Ornithopter, Ornithopter, Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T8 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Avatar Kuruk.Activate
+
+[Expect]
+Turn = 8
+ActivePlayer = Bot1
+Bot1.Battlefield.Count = 20
+Bot1.Battlefield.Spirit#8.Power = 1
+Bot1.Battlefield.Spirit#8.Colors = (absent)
+Bot1.Battlefield.Avatar Kuruk.Tapped = false

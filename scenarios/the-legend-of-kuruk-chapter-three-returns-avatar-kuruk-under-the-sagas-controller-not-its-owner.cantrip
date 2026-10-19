@@ -1,0 +1,59 @@
+# The Legend of Kuruk: chapter III is "Exile this Saga, then return it to the battlefield transformed under YOUR control" - the controller
+# of the chapter ability, who need not own the Saga (CR 712.14a, 113.8). Bot1 casts the Saga on turn 1 (chapter I: scry 2 and draw)
+# and gives it to Bot2 with Harmless Offering. The lore counters are Bot2's from then on: chapter II on turn 2 is Bot2's scry and
+# draw, chapter III on turn 4 returns it as Avatar Kuruk under Bot2's control, though Bot1 owns the card. Bot1's battlefield has no
+# Kuruk; Bot2's has a new object with no lore counters.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+The Legend of Kuruk
+Harmless Offering
+Mox Ruby
+Mox Jet
+Mox Emerald
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.The Legend of Kuruk.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Swamp; Swamp | )
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Harmless Offering.Cast
+Bot1.Target(Bot2)
+Bot1.Target(The Legend of Kuruk)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.The Legend of Kuruk.Counters.Lore = 1
+[T2 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+Bot2.Arrange(Swamp; Swamp | )
+? Bot2.Battlefield.The Legend of Kuruk.Counters.Lore = 2
+[T4 Bot2.Main1]
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Avatar Kuruk.Power = 4
+Bot2.Battlefield.Avatar Kuruk.Toughness = 3
+Bot2.Battlefield.Avatar Kuruk.Counters.Lore = (absent)
+Bot1.Battlefield.Count = 4
+Exile.Count = 0

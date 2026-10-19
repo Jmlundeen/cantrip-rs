@@ -1,0 +1,59 @@
+# The Legend of Kuruk: "I, II - Scry 2, then draw a card. III - Exile this Saga, then return it to the battlefield transformed
+# under your control." Chapter I (turn 1): scry 2 sees Forest and Mountain, keeps Forest on top and bottoms Mountain, and the draw
+# is the Forest. Chapter II (turn 3, after the draw step takes Swamp): scry 2 sees Tropical Island and Volcanic Island, bottoms both,
+# and the draw is Misty Rainforest. Chapter III (turn 5): the Saga is exiled and returns as Avatar Kuruk (CR 712.14a), a colorless
+# legendary Avatar creature 4/3 - a new object, so it has no lore counters and is no Saga.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+The Legend of Kuruk
+Plains x4
+Forest
+Mountain
+Swamp
+Tropical Island
+Volcanic Island
+Misty Rainforest
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.The Legend of Kuruk.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Forest | Mountain)
+? Bot1.Hand.Count = 5
+[T3 Bot1.Main1]
+? Bot1.Battlefield.The Legend of Kuruk.Counters.Lore = 2
+? Bot1.Hand.Count = 6
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Tropical Island; Volcanic Island)
+? Bot1.Hand.Count = 7
+[T5 Bot1.Main1]
+? Bot1.Battlefield.The Legend of Kuruk.Counters.Lore = 3
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 8
+
+[Expect]
+Bot1.Hand = Plains; Plains; Plains; Plains; Plains; Forest; Swamp; Misty Rainforest
+Bot1.Battlefield.Avatar Kuruk.Types = Creature
+Bot1.Battlefield.Avatar Kuruk.Supertypes = Legendary
+Bot1.Battlefield.Avatar Kuruk.Subtypes = Avatar
+Bot1.Battlefield.Avatar Kuruk.Power = 4
+Bot1.Battlefield.Avatar Kuruk.Counters.Lore = (absent)
+Bot1.Battlefield.Avatar Kuruk.Toughness = 3
+Bot1.Battlefield.Avatar Kuruk.Colors = (absent)
+Bot1.Battlefield.Avatar Kuruk.SummoningSick = true
+Exile.Count = 0
