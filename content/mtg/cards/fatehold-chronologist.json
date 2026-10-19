@@ -1,0 +1,17 @@
+{
+  "name": "Fatehold Chronologist",
+  "manaCost": "{1}{W/U}",
+  "type": "Creature — Bird Wizard",
+  "oracleText": "Flying\nThis creature enters prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
+  "power": 1,
+  "toughness": 2,
+  "keywords": [
+    "Flying"
+  ],
+  "prepare": {
+    "name": "Peer Review",
+    "manaCost": "{2}{W/U}",
+    "type": "Sorcery",
+    "oracleText": "Create a 2/2 colorless Wizard Soldier creature token named Cadet. Surveil 1."
+  }
+}
