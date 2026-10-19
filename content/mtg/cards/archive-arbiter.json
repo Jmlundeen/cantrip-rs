@@ -1,0 +1,11 @@
+{
+  "name": "Archive Arbiter",
+  "manaCost": "{6}",
+  "type": "Artifact Creature — Sphinx",
+  "power": 4,
+  "toughness": 4,
+  "keywords": [
+    "Flying"
+  ],
+  "oracleText": "Flying\nWhen this creature enters, choose one —\n• Destroy target noncreature, nonland permanent.\n• You gain 4 life."
+}
