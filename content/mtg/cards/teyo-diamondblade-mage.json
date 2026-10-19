@@ -1,0 +1,11 @@
+{
+  "name": "Teyo, Diamondblade Mage",
+  "manaCost": "{3}{B}",
+  "type": "Legendary Creature — Human Warlock",
+  "power": 3,
+  "toughness": 1,
+  "keywords": [
+    "Flash"
+  ],
+  "oracleText": "Flash\nWhen Teyo enters, target permanent you control gains deathtouch until end of turn. Put a +1/+1 counter on it if it's a creature. Put a loyalty counter on it if it's a planeswalker."
+}
