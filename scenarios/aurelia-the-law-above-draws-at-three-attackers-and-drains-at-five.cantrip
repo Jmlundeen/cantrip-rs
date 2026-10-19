@@ -1,0 +1,60 @@
+# Aurelia, the Law Above. Turn 1: five Moxen pay for Aurelia and an Ornithopter. Turn 3: Bot1 attacks with two creatures
+# (Aurelia, haste or not, and the Ornithopter): fewer than three, no trigger, no card. Turns 3 and 5 an Ornithopter is drawn
+# and cast each. Turn 7: Bot1 attacks with four (Aurelia and three Ornithopters): "three or more" draws a card (the last
+# Ornithopter), "five or more" does not trigger. Turn 9: Bot1 attacks with five: it draws (an Island) and Aurelia deals 3
+# damage to each opponent and Bot1 gains 3 life. Aurelia's 4 flying damage in each of the three attacks is Bot2's other loss.
+# Bot2: 20 - 3 x 4 - 3 = 5. Bot1: 20 + 3 = 23. Bot1's hand: two Islands (the turn-9 draw and the turn-9 trigger's card).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Aurelia, the Law Above
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Ornithopter
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aurelia, the Law Above.Cast
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Aurelia, the Law Above > Bot2; Ornithopter#1 > Bot2)
+[T3 Bot1.Main2]
+? Bot1.Hand.Count = 0
+[T5 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T7 Bot1.DeclareAttackers]
+Bot1.Attack(Aurelia, the Law Above > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2; Ornithopter#3 > Bot2)
+[T7 Bot1.Main2]
+? Bot2.Life = 12
+Bot1.Hand.Ornithopter.Cast
+[T9 Bot1.DeclareAttackers]
+Bot1.Attack(Aurelia, the Law Above > Bot2; Ornithopter#1 > Bot2; Ornithopter#2 > Bot2; Ornithopter#3 > Bot2; Ornithopter#4 > Bot2)
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 5
+Bot1.Life = 23
+Bot1.Hand.Count = 2

@@ -1,0 +1,45 @@
+# "Whenever A PLAYER attacks with three or more creatures, you draw a card": Bot2, not Aurelia's controller, attacks with
+# three Ornithopters on turn 4, and Bot1 (Aurelia's controller) draws a card. Bot2 gains nothing and Bot1 loses nothing
+# (the Ornithopters have no power). Bot1's hand: the Island from the turn-3 draw... plus the turn-4 trigger's card.
+# Bot1: 7 cards - 5 Moxen - Aurelia = 1 (an Island), + the turn-3 draw = 2, + the trigger = 3.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Mox Emerald
+Aurelia, the Law Above
+Island
+Island x13
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x17
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Aurelia, the Law Above.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T4 Bot2.DeclareAttackers]
+Bot2.Attack(Ornithopter#1 > Bot1; Ornithopter#2 > Bot1; Ornithopter#3 > Bot1)
+[T4 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Life = 20
+Bot2.Life = 20

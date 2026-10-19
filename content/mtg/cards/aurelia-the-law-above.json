@@ -1,0 +1,13 @@
+{
+  "name": "Aurelia, the Law Above",
+  "manaCost": "{3}{R}{W}",
+  "type": "Legendary Creature — Angel",
+  "power": 4,
+  "toughness": 4,
+  "oracleText": "Flying, vigilance, haste\nWhenever a player attacks with three or more creatures, you draw a card.\nWhenever a player attacks with five or more creatures, Aurelia deals 3 damage to each of your opponents and you gain 3 life.",
+  "keywords": [
+    "Flying",
+    "Vigilance",
+    "Haste"
+  ]
+}
