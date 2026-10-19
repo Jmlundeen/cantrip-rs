@@ -1,0 +1,29 @@
+# Fatehold Chronologist: the printed abilities and resulting state (CR 608.2, 722).
+
+[Bot1 Deck]
+Fatehold Chronologist
+5 Mox Sapphire
+Island
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Battlefield.Mox Sapphire#4.Activate
+Bot1.Battlefield.Mox Sapphire#5.Activate
+Bot1.Hand.Fatehold Chronologist.Cast
+Bot1.Exile.Peer Review.Cast
+
+[Expect]
+Bot1.Battlefield.Fatehold Chronologist.Prepared = (absent)
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Toughness = 2
