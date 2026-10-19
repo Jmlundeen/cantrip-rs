@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::crew::crew;
-use cantrip_mechanics::{choose, choose_from_hand, damage_target, haste_until_end_of_turn, targets, tokens, triggers};
+use cantrip_mechanics::{damage_target, effects, haste_until_end_of_turn, targets, tokens, triggers};
 use cantrip_oracle as oracle;
 
 /// "Target Vehicle you control" (CR 115.1, 301.7): a permanent with the Vehicle subtype that its controller controls.
@@ -15,47 +15,6 @@ fn animate_vehicle(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(vehicle) = targets::object(g, item, 0) else { return Ok(()) };
     g.add_effect(item.object, vehicle, EffectKind::AddTypes(TypeSet::of(&[CardType::Artifact, CardType::Creature])), Duration::EndOfTurn);
     haste_until_end_of_turn(g, item.object, vehicle);
-    Ok(())
-}
-
-/// The options of the +2, as `labels` below.
-const SACRIFICE: u8 = 0;
-const DISCARD: u8 = 1;
-const NEITHER: u8 = 2;
-
-/// +2: "You may sacrifice an artifact or discard a card. If you do, draw a card." (CR 608.2c-d). The player chooses as the
-/// ability resolves which of the two to do, or neither; an option with nothing to do it with (no artifact, an empty hand) is
-/// not offered. The card is drawn only if the sacrifice or the discard actually happened (CR 608.2c).
-fn sacrifice_or_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let you = item.controller;
-    let artifacts: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact)).collect();
-    let mut options = Vec::new();
-    if !artifacts.is_empty() {
-        options.push(SACRIFICE);
-    }
-    if !g.state().zone(Zone::hand(you)).is_empty() {
-        options.push(DISCARD);
-    }
-    if options.is_empty() {
-        return Ok(());
-    }
-    options.push(NEITHER);
-    let card = g.obj(item.object).card;
-    let labels = options.iter().map(|&i| Label::Card(card, i)).collect();
-    let done = match options[choose::one_of(g, you, item.object, labels)? as usize] {
-        SACRIFICE => {
-            let chosen = choose::cards(g, you, item.object, Purpose::Sacrifice, artifacts, 1, false)?;
-            !g.sacrifice(&chosen).is_empty()
-        }
-        DISCARD => {
-            let chosen = choose_from_hand(g, you, item.object, 1)?;
-            !g.discard_together(&chosen).is_empty()
-        }
-        _ => false,
-    };
-    if done {
-        g.draw(you, 1);
-    }
     Ok(())
 }
 
@@ -112,7 +71,7 @@ pub static CARD: CardDef = CardDef {
             "At the beginning of combat on your turn, choose up to one target Vehicle you control. Until end of turn, it becomes an artifact creature and gains haste.",
         )
         .targets(&[up_to_one(vehicle_you_control)]),
-        ability(loyalty(2), sacrifice_or_discard, "+2: You may sacrifice an artifact or discard a card. If you do, draw a card."),
+        ability(loyalty(2), |g, item| effects::may_sacrifice_an_artifact_or_discard_to_draw(g, item, 1), "+2: You may sacrifice an artifact or discard a card. If you do, draw a card."),
         ability(loyalty(0), create_vehicle, "0: Create a 3/2 colorless Vehicle artifact token with crew 1."),
         ability(loyalty(-7), emblem, "\u{2212}7: You get an emblem with \"Whenever an artifact you control enters, this emblem deals 3 damage to any target.\""),
     ],

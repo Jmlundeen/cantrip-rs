@@ -172,6 +172,47 @@ pub fn may_discard_a_card(g: &mut dyn Game, item: &StackItem) -> Result<bool, Su
     Ok(true)
 }
 
+/// "You may sacrifice an artifact or discard a card. If you do, draw `n` cards" (CR 608.2c-d, 701.9, 701.21). The player chooses
+/// as the effect resolves which of the two to do, or neither; an option with nothing to do it with (no artifact, an empty hand)
+/// is not offered, and nothing is asked with neither possible. The cards are drawn only if the sacrifice or the discard actually
+/// happened. The options are the card's `labels`, in the order "Sacrifice an artifact", "Discard a card", "Neither". Chandra,
+/// Spark Hunter (one card) and Vision of Love (two) print it.
+pub fn may_sacrifice_an_artifact_or_discard_to_draw(g: &mut dyn Game, item: &StackItem, n: u32) -> Result<(), Suspend> {
+    const SACRIFICE: u8 = 0;
+    const DISCARD: u8 = 1;
+    const NEITHER: u8 = 2;
+    let you = item.controller;
+    let artifacts: Vec<ObjectId> = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Artifact)).collect();
+    let mut options = Vec::new();
+    if !artifacts.is_empty() {
+        options.push(SACRIFICE);
+    }
+    if !g.state().zone(Zone::hand(you)).is_empty() {
+        options.push(DISCARD);
+    }
+    if options.is_empty() {
+        return Ok(());
+    }
+    options.push(NEITHER);
+    let card = g.obj(item.object).card;
+    let labels = options.iter().map(|&i| Label::Card(card, i)).collect();
+    let done = match options[crate::choose::one_of(g, you, item.object, labels)? as usize] {
+        SACRIFICE => {
+            let chosen = crate::choose::cards(g, you, item.object, Purpose::Sacrifice, artifacts, 1, false)?;
+            !g.sacrifice(&chosen).is_empty()
+        }
+        DISCARD => {
+            let chosen = crate::choose_from_hand(g, you, item.object, 1)?;
+            !g.discard_together(&chosen).is_empty()
+        }
+        _ => false,
+    };
+    if done {
+        g.draw(you, n);
+    }
+    Ok(())
+}
+
 /// "Discard a card, then draw N cards" (CR 701.9, 121.1): the controller chooses a card of their hand and discards it (nothing is
 /// asked of an empty hand), then draws, whether or not they discarded. Fear of Missing Out (one card) and Case of the Crimson
 /// Pulse (two) print it.
