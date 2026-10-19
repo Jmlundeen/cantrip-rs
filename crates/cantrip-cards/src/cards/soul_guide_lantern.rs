@@ -8,13 +8,8 @@ fn exile_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// Exile each opponent's graveyard, every card at once.
 fn exile_graveyards(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let mut cards = Vec::new();
-    for opponent in g.state().opponents(item.controller).collect::<Vec<_>>() {
-        cards.extend_from_slice(g.state().zone(Zone::graveyard(opponent)));
-    }
-    g.exile_all(&cards);
+    effects::exile_each_opponents_graveyard(g, item.controller);
     Ok(())
 }
 

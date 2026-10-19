@@ -557,6 +557,16 @@ pub fn greatest_mana_value_creature_or_planeswalker(g: &dyn Game, player: Player
     group.into_iter().filter(|&id| g.mana_value(id) == greatest).collect()
 }
 
+/// "Exile each opponent's graveyard" (CR 406.2, 608.2f): every card in the graveyard of each opponent of `controller` still in
+/// the game (CR 800.4a), in one move. Soul-Guide Lantern and Dauntless Scrapbot print it.
+pub fn exile_each_opponents_graveyard(g: &mut dyn Game, controller: PlayerId) {
+    let mut cards = Vec::new();
+    for opponent in g.state().opponents(controller).collect::<Vec<_>>() {
+        cards.extend_from_slice(g.state().zone(Zone::graveyard(opponent)));
+    }
+    g.exile_all(&cards);
+}
+
 /// "Exile all creatures" (CR 406.2, 608.2f): every creature on the battlefield, whoever controls it, in one move, tokens too.
 /// How many were exiled (CR 608.2c: the moves made, those a replacement sent elsewhere included), for "X is the number of
 /// creatures exiled this way". Sunfall and Overwrite the Multiverse print it.
