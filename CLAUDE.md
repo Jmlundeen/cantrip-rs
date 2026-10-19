@@ -84,7 +84,8 @@ is cheaper than a seed hunt and it stays fixed.
 
 ## Commits go to GitHub
 
-The repository is `origin`, https://github.com/jschibel/cantrip (private). Push every commit as soon as it is made:
+The repository is `origin`, https://github.com/cantrip-rs/cantrip-rs (public); `cantrip-private`,
+https://github.com/jschibel/cantrip, is the owner's older private copy. Push every commit as soon as it is made:
 `git push` after each `git commit` on `main`, without being asked. Work in an agent worktree lands on `main` first and
 is pushed from there. Card art never goes in: `content/*/images/` is gitignored and was stripped from the history.
 
