@@ -1,5 +1,5 @@
 //! Affinity (CR 702.41a): affinity for artifacts (Emry, Lurker of the Loch and Thoughtcast) and for a basic land type
-//! (Sapling Nursery's Forests).
+//! (Sapling Nursery's Forests) and a creature type (Scales of Shale's Lizards).
 
 use cantrip_api::*;
 
@@ -23,4 +23,17 @@ pub fn for_land_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: P
     let wanted = crate::lands::word(q, source, TYPE);
     let lands = q.permanents_of(player).into_iter().filter(|&id| q.chars(id).is(CardType::Land) && q.chars(id).subtypes.has(wanted)).count();
     CostDelta::less(lands.min(255) as u8)
+}
+
+/// "Affinity for [creature type]s" (CR 702.41a): this spell costs {1} less to cast for each permanent of that type you
+/// control, `TYPE` being `lands::sub(Subtype::Lizard)` and so on. The type is a word of the spell's rules text, read through
+/// its words (CR 612.2), and a permanent has it when the layers made it that type (a changeling has every creature type).
+/// Scales of Shale prints affinity for Lizards.
+pub fn for_creature_type<const TYPE: u16>(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    if !matches!(costed, Costed::Spell(_)) {
+        return CostDelta::NONE;
+    }
+    let wanted = crate::lands::word(q, source, TYPE);
+    let creatures = q.permanents_of(player).into_iter().filter(|&id| q.chars(id).has_subtype(wanted)).count();
+    CostDelta::less(creatures.min(255) as u8)
 }
