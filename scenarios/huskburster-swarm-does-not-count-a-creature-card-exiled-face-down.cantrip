@@ -1,0 +1,63 @@
+# A card exiled face down has no characteristics (CR 406.3a), so it is no creature card to Huskburster Swarm's cost. On turn 2
+# Bot2 exiles Bot1's Ornithopter face up with Swords to Plowshares and, with Outrageous Robbery (X = 2), the top two cards
+# of Bot1's library, two more Ornithopters, face down. Only the face-up one reduces the cost: {7}{B}. With 5 mana (Mox Jet
+# into Dark Ritual makes BBB, Mox Ruby, Mox Pearl) the Swarm is refused (it would cost {5}{B} if the face-down cards counted);
+# with Mox Sapphire and Mox Emerald it has 7 and is cast (it would cost {8} if the face-up one did not count either).
+
+[Bot1 Deck]
+Ornithopter
+Mox Jet
+Dark Ritual
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Ornithopter
+Ornithopter
+Huskburster Swarm
+Swamp x10
+
+[Bot2 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Pearl
+Outrageous Robbery
+Swords to Plowshares
+Island x13
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Swords to Plowshares.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Jet#1.Activate
+Bot2.Battlefield.Mox Jet#2.Activate
+Bot2.Battlefield.Mox Jet#3.Activate
+Bot2.Battlefield.Mox Jet#4.Activate
+Bot2.Hand.Outrageous Robbery.Cast(Bot1; X: 2)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+! Bot1.Hand.Huskburster Swarm.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Huskburster Swarm.Cast
+
+[Expect]
+Bot1.Battlefield.Huskburster Swarm.Keywords = Deathtouch; Menace
+Exile = (face down); (face down); Ornithopter
+Bot1.Hand.Count = 0
