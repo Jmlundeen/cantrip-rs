@@ -1,0 +1,55 @@
+# Ravine Raider: menace, and "{1}{B}: This creature gets +1/+1 until end of turn." Bot2's lone Llanowar Elves can't block it (menace, CR 702.110b: the refusal; the
+# double block of the next scenario is the control). Unblocked, Bot1 pays {1}{B} twice after blockers are declared, making it a 3/3 that deals
+# 3 to Bot2 (17); the two activations add up. The turn ends, so on Bot2's turn it is a 1/1 again.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Ruby
+Mox Pearl
+Ravine Raider
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Ravine Raider.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ravine Raider > Bot2)
+! Bot2.Block(Llanowar Elves > Ravine Raider)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ravine Raider.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Ravine Raider.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ravine Raider.Power = 3
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Ravine Raider.Power = 1
+? Bot1.Battlefield.Ravine Raider.Toughness = 1
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Ravine Raider.Subtypes = Lizard; Rogue
+Bot1.Battlefield.Ravine Raider.Keywords = Menace

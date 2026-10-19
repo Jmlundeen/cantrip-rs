@@ -1,0 +1,49 @@
+# Ravine Raider double blocked (menace is satisfied by two creatures): Bot2's Llanowar Elves and Birds of Paradise block it. A 1/1 would die
+# to the 1 damage the Elves deals, but Bot1 pays {1}{B} after blockers are declared: 2/2, it survives (damage 1 of toughness 2), and
+# its 2 damage, assigned 1 to each, kills both blockers. The pump is until end of turn; nothing is left of it afterwards.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ravine Raider
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Llanowar Elves
+Birds of Paradise
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ravine Raider.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Birds of Paradise.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ravine Raider > Bot2)
+Bot2.Block(Llanowar Elves > Ravine Raider; Birds of Paradise > Ravine Raider)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ravine Raider.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.AssignDamage(Ravine Raider > Llanowar Elves: 1; Ravine Raider > Birds of Paradise: 1)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Birds of Paradise; Llanowar Elves
+Bot2.Battlefield = Forest; Mox Emerald
+Bot1.Battlefield.Ravine Raider.Power = 2
+Bot1.Battlefield.Ravine Raider.Damage = 1

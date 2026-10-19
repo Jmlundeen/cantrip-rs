@@ -1,0 +1,46 @@
+# Ravine Raider: "{1}{B}: This creature gets +1/+1 until end of turn." The cost needs a black mana: with only a Mox Ruby and a Mox Pearl (red and white) and no black source on the battlefield (the Black Lotus that paid for the Raider is gone) the activation is not offered (the refusal); once Bot1 casts and taps a Mox Jet it is (the control), paid {B} for
+# the B and one of the others for the generic, and the Raider is a 2/2 and deals 2 to Bot2 (18).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Ravine Raider
+Mox Jet
+Plains x2
+Plains x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ravine Raider.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Ravine Raider.Activate
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Ravine Raider > Bot2)
+[T3 Bot1.DeclareBlockers]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Ravine Raider.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Ravine Raider.Power = 2
+Bot1.Battlefield.Ravine Raider.Toughness = 2
