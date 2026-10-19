@@ -251,3 +251,9 @@ pub fn may_tap_or_untap_target(g: &mut dyn Game, item: &StackItem, card: CardId)
 pub fn mana_value_of_quality(q: &dyn Query, id: ObjectId, odd: bool) -> bool {
     (q.mana_value(id) % 2 == 1) == odd
 }
+
+/// `chosen_option` for a static ability's `affects`, which reads through the layers (CR 613): a Siege's "• Temur — Creatures
+/// you control get +1/+0 ..." applies only while its source has the word chosen.
+pub fn chosen_option_in_layers(q: &dyn LayerQuery, id: ObjectId, def: &'static CardDef) -> Option<u8> {
+    q.state().obj(id).marks.chosen_option.filter(|c| std::ptr::eq(q.cards().get(c.card), def)).map(|c| c.index)
+}
