@@ -1,0 +1,56 @@
+# Gold Pan: "Equip {1}" attaches to a creature you control, only as a sorcery (CR 702.6a, 301.5): not while its enters trigger is
+# on the stack (refused) nor, with an untapped Mox Pearl to pay and an Ornithopter to attach to, while Bot2's Ornithopter spell is on the
+# stack during Bot2's turn (refused; the same equip is made at Bot1's own main phase on turn 3, the positive control), and not to Bot2's Ornithopter (not offered as a target). The Treasure pays for the first equip on turn 1;
+# on turn 3 Bot1 moves it to the other Ornithopter with a Mox, and the first goes back to 0/2 while the second becomes 1/3.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Ornithopter
+Ornithopter
+Gold Pan
+Mox Pearl
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gold Pan.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 1
+! Bot1.Battlefield.Gold Pan.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Gold Pan.Activate(Bot1.Battlefield.Ornithopter#1)
+Bot1.Battlefield.Treasure Token.Activate(Color: Red)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+! Bot1.Battlefield.Gold Pan.Activate(Bot1.Battlefield.Ornithopter#2)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Gold Pan.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Gold Pan.Activate(Bot1.Battlefield.Ornithopter#2)
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Ornithopter#1.Toughness = 2
+Bot1.Battlefield.Ornithopter#2.Power = 1
+Bot1.Battlefield.Ornithopter#2.Toughness = 3
+Bot1.Battlefield.Gold Pan.AttachedTo = Ornithopter
+Bot2.Battlefield.Ornithopter.Power = 0
