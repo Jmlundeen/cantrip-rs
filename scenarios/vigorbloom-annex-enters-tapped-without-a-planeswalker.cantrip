@@ -1,0 +1,22 @@
+# With no planeswalker anywhere, Vigorbloom Annex enters tapped (CR 614.1c) - the land itself is not a planeswalker - so it
+# cannot be tapped for mana that turn (refused), and on Bot1's next turn it untaps and taps for {G}, one of its two colors.
+
+[Bot1 Deck]
+Vigorbloom Annex
+Island x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Vigorbloom Annex.Play
+? Bot1.Battlefield.Vigorbloom Annex.Tapped = true
+! Bot1.Battlefield.Vigorbloom Annex.Activate(Color: Green)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Vigorbloom Annex.Activate(Color: Green)
+? Bot1.Mana = {G}
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Vigorbloom Annex.Tapped = true
