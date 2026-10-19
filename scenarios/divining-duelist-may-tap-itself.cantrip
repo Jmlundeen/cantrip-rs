@@ -1,0 +1,26 @@
+# The trigger's "target creature" may name the Duelist itself (CR 603.2, 115.1): with no other creature around, the
+# tap mode chooses the source.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Pearl
+Mox Jet
+Divining Duelist
+Island x10
+
+[Bot2 Deck]
+Forest x13
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Divining Duelist.Cast
+Bot1.Modes(Tap target creature)
+
+[Expect]
+Bot1.Battlefield.Divining Duelist.Tapped = true
+Bot1.Battlefield = Mox Sapphire; Mox Pearl; Mox Jet; Divining Duelist

@@ -1,0 +1,37 @@
+# Divining Duelist's third mode: Bot1 draws a card, then discards Lightning Bolt.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Divining Duelist
+Lightning Bolt
+Island x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire#1.Activate
+Bot1.Battlefield.Mox Sapphire#2.Activate
+Bot1.Battlefield.Mox Sapphire#3.Activate
+Bot1.Hand.Divining Duelist.Cast
+Bot1.Pass
+Bot1.Modes(Draw a card, then discard a card)
+Bot1.Choose(Lightning Bolt)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand.Count = 4
+Bot1.Battlefield.Divining Duelist.Tapped = false

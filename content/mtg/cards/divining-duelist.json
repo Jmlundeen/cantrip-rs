@@ -1,0 +1,11 @@
+{
+  "name": "Divining Duelist",
+  "manaCost": "{2}{U}",
+  "type": "Creature — Merfolk Wizard",
+  "power": "3",
+  "toughness": "2",
+  "oracleText": "Flash\nWhen this creature enters, choose one —\n• Tap target creature.\n• Untap target creature.\n• Draw a card, then discard a card.",
+  "keywords": [
+    "Flash"
+  ]
+}
