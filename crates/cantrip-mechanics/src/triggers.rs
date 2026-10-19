@@ -308,6 +308,25 @@ pub fn equipped_creature_deals_combat_damage_to_player(q: &dyn Query, source: Ob
     }
 }
 
+/// "Whenever this Equipment becomes attached to a creature" (CR 701.3a, 301.5, 603.2): this Equipment (or Aura) became
+/// attached to a creature on the battlefield - by equip or reconfigure, by an effect that attaches it, moved from another
+/// creature, or entering attached - and not when an attach to the creature it is already on does nothing (CR 701.3b), nor
+/// on phasing in (CR 702.26j). The creature is the trigger's subject ("that creature"). Assimilation Aegis, Blade of
+/// Shared Souls, Enormous Energy Blade, Inchblade Companion and Killer Cosplay print it.
+pub fn this_becomes_attached_to_a_creature(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attached { attachment, to: Target::Object(host) }
+            if *attachment == source && q.is_on_battlefield(*host) && q.chars(*host).is(CardType::Creature) =>
+        {
+            Fired::about(Target::Object(*host))
+        }
+        _ => None,
+    }
+}
+
+/// `this_becomes_attached_to_a_creature` as a trigger condition: `triggered(THIS_BECOMES_ATTACHED_TO_A_CREATURE, ..)`.
+pub const THIS_BECOMES_ATTACHED_TO_A_CREATURE: Trigger = when(EventMask::ATTACHED, this_becomes_attached_to_a_creature);
+
 /// "Whenever enchanted player is attacked" (CR 508.1m, 303.4): a creature attacks the player this Curse is attached to,
 /// directly. The attacking creature is the trigger's subject. Curse of Opulence and Curse of Predation print it.
 pub fn enchanted_player_attacked(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
