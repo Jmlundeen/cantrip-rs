@@ -1,0 +1,35 @@
+# Theoretical Necromancer's ability is activated from the graveyard (CR 602.2b): exiling the card is the cost, so it is
+# in exile while the ability returns the other creature card to its owner's hand. Thought Scour put both cards there on
+# turn 1; the four mana is floated on turn 3, because mana empties as each step ends (CR 500.4).
+
+[Bot1 Deck]
+Thought Scour
+Island
+Black Lotus
+Swamp
+Island x3
+Theoretical Necromancer
+Hired Blade
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Graveyard.Theoretical Necromancer.Activate(Bot1.Graveyard.Hired Blade)
+
+[Expect]
+Stack.Count = 0
+Exile = Theoretical Necromancer
+Bot1.Graveyard = Black Lotus; Thought Scour
+Bot1.Hand = Hired Blade; Island; Island; Island; Island; Island
