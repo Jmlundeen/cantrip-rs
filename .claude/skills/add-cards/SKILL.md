@@ -1,6 +1,6 @@
 ---
 name: add-cards
-description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with scenarios that execute every line of its code and cover its corner cases and interactions, playable end to end in the web client and by the bots - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented or fixed, by anyone.
+description: Add one or more Magic cards to the Cantrip rules engine - each card exact to its Oracle text and the Comprehensive Rules, built from the engine's shared rules verbs and keyword mechanics, with brief scenarios that execute every line of its code and show it observably correct, playable end to end in the web client and by the bots - and, for many cards, run them through parallel agents and land their work. Use whenever a card is added, implemented or fixed, by anyone.
 ---
 
 # Adding cards
@@ -20,9 +20,9 @@ CLAUDE.md is the repository's rules. The `write-game-script` skill is the scenar
    or the card is not added and the gap is reported. A card that is wrong is worse than a card that is missing.
 2. **Rules belong to the engine, never to the card.** A card file holds only what that one card does alone. It calls
    the engine's verbs for rules procedures and the shared mechanics for keywords and recipes.
-3. **Every line of the card's code is executed by its scenarios**, every branch both ways, and the scenarios cover the
-   card's corner cases and its interactions with the rest of the game. Measured, not claimed
-   (`tools\card-coverage.cmd`).
+3. **Every line of the card's code is executed by its scenarios**, every branch both ways, and each shows the card
+   observably doing what its text says. Measured, not claimed (`tools\card-coverage.cmd`). Scenarios are brief;
+   corner cases are tested only where an interaction can plausibly go wrong (below).
 4. **An independent review against the Oracle text and the rules** before it lands.
 5. **The card works end to end, in the client.** A card is done when a person at a table in the web client can play
    it: see everything the card puts into the game (a state on an object - doors, a chosen name or type, counters of a
@@ -196,52 +196,28 @@ A scenario (`scenarios/<what-it-proves>.cantrip`; syntax in `scenarios/README.md
 is a real game: both decklists in order, every answer, and the state it must end in. Positions are forced by the
 script. **Never sweep RNG seeds**, and never rely on a bot's choices to reach a position.
 
-A card's scenarios, together, must:
+Keep them brief: a few short scenarios that exercise all of the card's code and show that it is observably correct.
+Not every usage of every mechanic needs a test, and a corner case is not tested for its own sake. A card's scenarios,
+together, must:
 
 - **Execute every line of the card's code and take every branch both ways**: each `if` true and false, each `match`
   arm, each early return, each mode, each way to cast it, each cost and alternative cost, each ability, each face.
   `tools\card-coverage.cmd` checks the lines; the branches are on you, listed in the review.
-- **Prove each sentence of the Oracle text**, positively, and negatively wherever it limits anything - "can't",
-  "only", "unless", "up to", "another", "you control", "an opponent", "nontoken", "once each turn", a mana value or
-  type restriction: a refusal (`! Bot1.Hand.Card.Cast`, `! Bot2.Block(..)`, `! Bot1.Attack(..)`,
-  `! Bot1.Search(..)`) beside a positive control - the same action where the limit does not apply - so the refusal
-  cannot pass for the wrong reason.
-- **Cover every corner case the rules decide for this card**:
-  - targets: no legal target (it cannot be cast, or the trigger is removed), a target that becomes illegal before
-    resolution (CR 608.2b), one of several targets becoming illegal (the rest still happen), protection, hexproof,
-    shroud, ward;
-  - zone changes: the source left the battlefield before its ability resolves (last-known information, CR 113.7a,
-    608.2h), an object that left and came back is a new object (CR 400.7), a token that leaves ceases to exist;
-  - players: controller versus owner (steal it), each opponent, a player who has lost, APNAP order (CR 101.4);
-  - numbers: X of zero, zero or negative results, damage above toughness, life at or below zero, an empty library, an
-    empty hand, counters of more than one kind;
-  - other forms of the card: a copy of the spell (no mana spent, so X is 0), a token copy of the permanent, a
-    face-down permanent, another face;
-  - more than one: two of the card, two of its triggers at once and their order, "one or more" events as one;
-  - replacement and prevention: an effect that replaces what the card does (regeneration, "exile instead",
-    "can't be countered", damage prevention), and "can't be regenerated";
-  - timing: responses on the stack, split second, sorcery speed, combat, the step the card names, "until end of turn"
-    through cleanup;
-  - layers: an effect that changes the card's characteristics, and the card's own continuous effect against another
-    (timestamps, dependency, CR 613).
-- **Exercise the combinations the card enters into**: the cards and rules it most plausibly meets, above all those
-  that touch the same rules - a sweeper with indestructible and with regeneration; an enters trigger with a copy and a
-  flicker; a cost reduction with an alternative cost and X; a replacement with another replacement and the affected
-  player choosing their order (CR 616.1); a static ability with a layer-dependent one. One scenario per interaction.
-- **Verify the rules, not just that the script runs.** Every scenario ends with an `[Expect]` block that states the
-  state the rules require at the end of the game - zones (battlefield, graveyard, exile, hand, library counts), life
-  totals, counters, tapped state, attachments, controller, power and toughness, keywords, the stack - taken from the
-  Oracle text, the rulings and the Comprehensive Rules, **never copied from whatever the engine produced**. A scenario
-  that merely plays through without such an `[Expect]` proves nothing; one with only `?` mid-game checks and no
-  `[Expect]` is not accepted; and an `[Expect]` that would also hold if the rule under test were broken is not
-  accepted either. Each sentence of the card's text, each ruling and each corner case is proven by an expectation that
-  fails when that rule is wrong. Put `?` checks where the position matters before the end (the stack, a prompt, a
-  count at resolution) and `!` refusals beside a positive control. Then prove the scenario can fail: break the card (or
-  the rule) and confirm the scenario goes red, as the `write-game-script` skill says, and say in the review which
-  expectation catches which sentence. List the expectations a reviewer should check against the rules: a reviewer
-  checks the expected values themselves against the rules, not only that they pass.
-- **Assert the outcome precisely** (`[Expect]` and `?` checks): the keys that prove the behaviour and no others, so a
-  scenario fails for the right reason.
+- **Show what the card's text does**, and where the card's own code enforces a limit ("only", "up to", "another", a
+  mana value or type restriction), a refusal (`! Bot1.Hand.Card.Cast`, `! Bot1.Choose(..)`) beside the allowed case,
+  so the refusal cannot pass for the wrong reason. A limit the engine or a shared mechanic enforces (targeting,
+  timing, equip, cycling) is already tested there.
+- **Test a corner case only where it makes sense**: where the card's own code makes a decision an interaction could
+  plausibly get wrong - it reads a value that can change before it is used ("that damage", "the number of lands"), it
+  holds last-known information, it combines with another rule in a way its code handles itself. A card complex enough
+  to need very specific testing gets it. Corner cases the engine handles for every card (an illegal target fizzling,
+  a source gone before resolution, cleanup) are not retested card by card.
+- **Verify the rules, not just that the script runs.** Every scenario ends with an `[Expect]` block stating the state
+  the rules require - taken from the Oracle text, the rulings and the CR, **never copied from whatever the engine
+  produced** - and at least one expectation in it fails if the card is wrong. An `[Expect]` that would also hold if
+  the card were broken is not accepted. Put `?` checks where the position matters before the end.
+- **Assert the outcome precisely**: the keys that prove the behaviour and no others, so a scenario fails for the
+  right reason.
 
 Name each scenario for the behaviour it proves (`wrath-of-god-destroys-a-creature-regenerated-in-response`) and start
 it with a `#` comment: what it shows, why its actions are arranged that way, and the rule it proves.
@@ -260,12 +236,16 @@ wrong. "0 fail" means no unexpected failures; the known-bug count is reported be
 ## Review
 
 Before a card lands, someone other than its author - a person, or a separate agent that had no part in writing it -
-reads it with the Oracle text, the rulings and the CR open:
+reads it with the Oracle text, the rulings and the CR open. **Its primary concerns are the code's correctness and
+safety and the card's adherence to the rules**; the tests are checked for sufficiency, not exhaustiveness:
 
 - every sentence of the Oracle text against the code, and every line of the code against the text: nothing missing,
   nothing extra, nothing approximate, nothing deviating from the rules;
 - the "never" list above, line by line;
-- the scenarios against "what a card owes", the coverage report and the branch list;
+- the scenarios: every line covered (the coverage report), each `[Expect]` correct by the rules and able to fail.
+  More tests are asked for only when the scenarios are obviously insufficient - code that no expectation would catch
+  being wrong - or when the card is complex enough to need a specific test, or an interaction has a clear potential to
+  go wrong. A list of corner cases is not a finding;
 - any core or mechanics change against its rule, its second card (a non-keyword recipe) and the benchmark;
 - overlap: code in the card that an existing shared function already does, or that does the same as code in another
   card, which should have been shared;
@@ -275,7 +255,9 @@ reads it with the Oracle text, the rulings and the CR open:
   not already do (then no browser scenario is owed).
 
 The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
-land. Self-reported "exact" is not proof.
+land. Self-reported "exact" is not proof. A finding blocks the card when it is a rules deviation, a code defect, an
+item on the "never" list, or a test that is obviously insufficient; the rest (wording, citations, optional sharing)
+does not hold the card and is fixed in the same pass only if it is quick.
 
 ## Many cards: agents
 
@@ -303,7 +285,9 @@ core-feature agents and review agents run on Opus.
    the waiting card agent (SendMessage) with what landed; the agent rebases on `main` and finishes the card on the
    new core. Other running agents are told what landed so they rebase. Only a gap the coordinator decides not to
    build is released, with its gap recorded on the issue.
-4. **Review agents** (Opus) read the cards of a quota read-only against the review list, before they land.
+4. **Review agents** (Opus) read the cards of a quota read-only against the review list, before they land. Their
+   prompt points them at correctness, safety and rules adherence, and does not hand them a list of corner cases to
+   demand tests for; the coordinator sends back only the blocking findings.
 5. **Land** each finished branch on `main` (cherry-pick its commits; a conflict stops for a look), then the corpus
    (0 fail), the verify tests, the benchmark if the core changed; push; remove the worktree and its branch.
 6. **Report** what landed, what waited on which core gap and how it was built, and the corpus line.
