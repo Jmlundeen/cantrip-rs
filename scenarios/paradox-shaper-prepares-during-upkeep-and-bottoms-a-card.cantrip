@@ -1,0 +1,31 @@
+# The upkeep prepares, the prepared copy mills, and its activated ability bottoms a graveyard card (CR 722, 603.4).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Paradox Shaper
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Paradox Shaper.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Exile.Omit Variables.Cast
+Bot1.Battlefield.Paradox Shaper.Activate(Graveyard.Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Paradox Shaper.Prepared = (absent)
+Bot1.Graveyard.Count = 4
+Bot1.Library.Count = 27

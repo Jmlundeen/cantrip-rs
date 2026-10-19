@@ -1,0 +1,14 @@
+{
+  "name": "Paradox Shaper",
+  "manaCost": "{1}{U/B}",
+  "type": "Creature — Octopus Wizard",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "At the beginning of your upkeep, if this creature isn't prepared, it becomes prepared.\n{2}: Put target card from your graveyard on the bottom of your library.",
+  "prepare": {
+    "name": "Omit Variables",
+    "manaCost": "{U/B}",
+    "type": "Sorcery",
+    "oracleText": "Mill three cards. (Put the top three cards of your library into your graveyard.)"
+  }
+}
