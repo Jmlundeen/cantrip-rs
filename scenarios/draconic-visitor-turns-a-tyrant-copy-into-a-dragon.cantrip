@@ -1,0 +1,70 @@
+# Vaultborn Tyrant’s copy is an artifact via its copy exception. Draconic Visitor replaces it with a Dragon
+# without retaining the Tyrant’s copy values (CR 614.12, 707.9b).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Black Lotus
+Draconic Visitor
+Vaultborn Tyrant
+Forest
+Sol Ring
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Island x13
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Draconic Visitor.Cast
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Vaultborn Tyrant.Cast
+[T8 Bot2.Main1]
+Bot2.Battlefield.Mountain#1.Activate
+Bot2.Battlefield.Mountain#2.Activate
+Bot2.Battlefield.Mountain#3.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Vaultborn Tyrant)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Vaultborn Tyrant)
+[T9 Bot1.Upkeep]
+
+[Expect]
+Turn = 9
+Bot1.Life = 23
+Bot1.Battlefield = Mountain; Mox Ruby; Sol Ring; Forest; Forest; Forest; Draconic Visitor; Dragon Token
+Bot1.Battlefield.Dragon Token.Types = Creature
+Bot1.Battlefield.Dragon Token.Power = 5
+Bot1.Battlefield.Dragon Token.Toughness = 5
+Bot1.Battlefield.Dragon Token.Keywords = Flying
+Bot1.Battlefield.Vaultborn Tyrant = (absent)
+Bot1.Graveyard = Vaultborn Tyrant; Black Lotus
