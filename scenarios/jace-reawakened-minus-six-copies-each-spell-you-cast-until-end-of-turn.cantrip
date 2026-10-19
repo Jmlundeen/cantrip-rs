@@ -1,0 +1,89 @@
+# "-6: Until end of turn, whenever you cast a spell, copy it. You may choose new targets for the copy." Jace is cast on turn 7
+# and raised to 6 loyalty by a +1 on each of turns 7, 9 and 11. On turn 13 the -6 resolves and Bot1 casts Lightning Bolt at Bot2:
+# the copy is aimed at Bot2's Ornithopter instead, so Bot2 takes 3 (17) and the Ornithopter dies. The delayed ability is
+# "whenever YOU cast", so Bot2's own Lightning Bolt in response, while the -6 is in effect (Bot1 takes 3: 17, and the stack
+# holds only the three spells and trigger, no copy of it), is not copied, and it is "until end of turn", so Bot1's second Bolt on turn 15 is not either (Bot2 14, one Bolt of damage).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Mox Ruby
+Jace Reawakened
+Lightning Bolt
+Lightning Bolt
+Island
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Ruby
+Ornithopter
+Lightning Bolt
+Island x4
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Mox Ruby.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace Reawakened.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace Reawakened.Activate(Ability: +1: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[T9 Bot1.Main1]
+Bot1.Battlefield.Jace Reawakened.Activate(Ability: +1: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+[T11 Bot1.Main1]
+Bot1.Battlefield.Jace Reawakened.Activate(Ability: +1: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Bot1.Battlefield.Jace Reawakened.Counters.Loyalty = 6
+[T13 Bot1.Main1]
+Bot1.Battlefield.Jace Reawakened.Activate(Ability: −6)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 3
+Bot2.Pass
+Bot1.Pass
+? Bot1.Life = 17
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 17
+[T15 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+[T15 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 17
+Bot2.Life = 14
+Bot2.Graveyard = Ornithopter; Lightning Bolt; Island; Island; Island; Island
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Jace Reawakened; Island; Island; Island; Island

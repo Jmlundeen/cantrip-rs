@@ -1,0 +1,33 @@
+# "You can't cast Jace Reawakened during your first, second, or third turns of the game." Bot1 has UU available (Island and
+# Mox Sapphire) on its turns 1, 3 and 5 (its first three turns) and is refused each time; on turn 7, its fourth turn, the same
+# mana casts it (the positive control, so the refusals are not for want of mana), and it enters with 3 loyalty.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Jace Reawakened
+Island x4
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+! Bot1.Hand.Jace Reawakened.Cast
+[T3 Bot1.Main1]
+! Bot1.Hand.Jace Reawakened.Cast
+[T5 Bot1.Main1]
+! Bot1.Hand.Jace Reawakened.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace Reawakened.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Mox Sapphire; Jace Reawakened
+Bot1.Battlefield.Jace Reawakened.Counters.Loyalty = 3

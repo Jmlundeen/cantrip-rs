@@ -1,0 +1,45 @@
+# "+1: You may exile a nonland card with mana value 3 or less from your hand. If you do, it becomes plotted." Bot1's hand holds
+# Island (a land), Wrath of God (mana value 4) and Lightning Bolt (1): only the Bolt may be chosen (the others are refused),
+# and it is exiled and plotted. It can't be cast the turn it became plotted, but on turn 9 Bot1 casts it from exile without
+# paying its mana cost (Bot1 has no red source for the Bolt's {R}) and Bot2 takes 3.
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Jace Reawakened
+Lightning Bolt
+Wrath of God
+Island x2
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace Reawakened.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace Reawakened.Activate(Ability: +1: You may exile)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Choose(Wrath of God)
+! Bot1.Choose(Island)
+Bot1.Choose(Lightning Bolt)
+! Bot1.Exile.Lightning Bolt.Cast
+[T9 Bot1.Main1]
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Jace Reawakened.Counters.Loyalty = 4
+Bot1.Graveyard = Lightning Bolt
+Exile.Count = 0

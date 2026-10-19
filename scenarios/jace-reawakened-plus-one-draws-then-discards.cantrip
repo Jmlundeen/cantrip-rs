@@ -1,0 +1,35 @@
+# "+1: Draw a card, then discard a card." On turn 7 (its fourth) Bot1 casts Jace and uses the first +1: loyalty 4, one card
+# drawn (the Mountain, the 11th card of the library) and a card of Bot1's choice discarded (Lightning Bolt, not the drawn card).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Jace Reawakened
+Lightning Bolt
+Island x3
+Island x3
+Mountain
+Island x16
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace Reawakened.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace Reawakened.Activate(Ability: +1: Draw a card)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace Reawakened.Counters.Loyalty = 4
+Bot1.Graveyard = Lightning Bolt
+Bot1.Hand = Island; Island; Island; Island; Island; Island; Mountain

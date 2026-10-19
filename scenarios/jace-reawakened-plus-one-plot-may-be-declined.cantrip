@@ -1,0 +1,33 @@
+# The plot +1 is "you may": Bot1 declines (the empty answer) with Lightning Bolt eligible in hand, so nothing is exiled and the
+# Bolt stays in the hand. Loyalty still goes up by 1 (the cost).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Jace Reawakened
+Lightning Bolt
+Island x3
+Island x20
+
+[Bot2 Deck]
+Island x27
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T7 Bot1.Main1]
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Jace Reawakened.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Jace Reawakened.Activate(Ability: +1: You may exile)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+[T7 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Jace Reawakened.Counters.Loyalty = 4
+Bot1.Hand = Island; Island; Island; Island; Island; Island; Lightning Bolt
