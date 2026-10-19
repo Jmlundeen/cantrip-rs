@@ -1,0 +1,6 @@
+{
+  "name": "Wrath of the Bloodmane",
+  "manaCost": "{2}{R}",
+  "type": "Instant",
+  "oracleText": "This spell costs {1} less to cast if you control a legendary creature.\nWrath of the Bloodmane deals 4 damage to target creature or planeswalker."
+}

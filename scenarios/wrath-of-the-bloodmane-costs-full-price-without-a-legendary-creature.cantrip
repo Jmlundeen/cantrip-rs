@@ -1,0 +1,32 @@
+# The other half of Wrath of the Bloodmane's cost change (CR 601.2f): with no legendary creature, its {2}{R} is not
+# reduced, so the two Moxen that paid the {1}{R} in the legendary case cannot cast it and the spell is not offered.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Wrath of the Bloodmane
+Swamp x5
+Swamp x10
+
+[Bot2 Deck]
+Swamp
+Ornithopter
+Swamp x18
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Wrath of the Bloodmane.Cast(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 6
+Bot2.Battlefield = Ornithopter; Swamp
