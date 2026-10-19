@@ -403,6 +403,21 @@ pub fn may_draw(g: &mut dyn Game, player: PlayerId, source: ObjectId, n: u32, qu
     Ok(true)
 }
 
+const MAY_LOOT: Question = Question::new("Draw", "draw a card?", "If you do, discard a card", "Draw and discard", "Don't draw");
+
+/// "You may draw a card. If you do, discard a card" (CR 121.3, 608.2c): the choice is not offered a player who can't draw
+/// (`may_draw`), and "if you do" is whether a card was drawn, not whether the player said yes, so a draw that a replacement
+/// took (CR 614.6) or an empty library made discards nothing. Smuggler's Copter, Jeskai Ascendancy and Duelist of the Mind
+/// print it.
+pub fn may_draw_then_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let player = item.controller;
+    let before = g.history().drawn(player);
+    if may_draw(g, player, item.object, 1, &MAY_LOOT)? && g.history().drawn(player) > before {
+        crate::discard_chosen(g, player, item.object, 1)?;
+    }
+    Ok(())
+}
+
 const MAY_MILL: Question = Question::new("Mill", "mill a card?", "The top card of your library goes into your graveyard", "Mill", "Don't mill");
 
 /// "You may mill a card" (CR 701.17a): asked of the ability's controller, then the mill. Mole Man's Moloid tokens and
