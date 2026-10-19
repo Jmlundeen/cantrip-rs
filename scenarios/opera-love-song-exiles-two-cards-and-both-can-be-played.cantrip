@@ -1,0 +1,39 @@
+# Opera Love Song, first mode: the top two cards (Mountain, Lightning Bolt) are exiled, and Bot1 may play them: the
+# exiled Mountain as the turn's land drop (CR 305.1, a permission to play, not only to cast) and then the Bolt with it.
+[Bot1 Deck]
+Mountain
+Mountain
+Opera Love Song
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Opera Love Song.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+? Exile = Mountain; Lightning Bolt
+Bot1.Exile.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot2.Life = 17
+Exile.Count = 0
+Bot1.Graveyard = Lightning Bolt; Opera Love Song

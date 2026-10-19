@@ -1,0 +1,37 @@
+# Opera Love Song's second mode takes both of its targets (CR 601.2c): each Llanowar Elves is 3/1, so the two unblocked attackers deal 6.
+[Bot1 Deck]
+Forest
+Llanowar Elves
+Llanowar Elves
+Mountain
+Mountain
+Opera Love Song
+Mountain
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Opera Love Song.Cast
+Bot1.Modes(2)
+Bot1.Target(Llanowar Elves#1; Llanowar Elves#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Llanowar Elves#1; Llanowar Elves#2 > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Stack.Count = 0
