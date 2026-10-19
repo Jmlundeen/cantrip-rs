@@ -1,0 +1,42 @@
+# The enters trigger fights an opposing creature; without a Jace the creature lacks vigilance (CR 701.14).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Mind Meanderer
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Black Lotus
+Belladonna Took
+Island
+Island
+Island
+Island
+Island
+Island x30
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Hand.Belladonna Took.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mind Meanderer.Cast
+Bot1.Target(Bot2.Battlefield.Belladonna Took)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Mind Meanderer.Power = 4
+Bot1.Battlefield.Mind Meanderer.Toughness = 4
+Bot1.Battlefield.Mind Meanderer.Damage = 2
+Bot1.Battlefield.Mind Meanderer.Keywords = Flying
+Bot2.Graveyard = Belladonna Took; Black Lotus
