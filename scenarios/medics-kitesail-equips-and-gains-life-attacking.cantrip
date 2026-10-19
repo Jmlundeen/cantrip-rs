@@ -1,0 +1,44 @@
+# Deterministic spell and ability coverage (CR 608).
+[Dice]
+1; 1; 1; 1; 1; 1
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Emerald
+Mox Sapphire
+Mana Crypt
+Medic's Kitesail
+Ornithopter
+Island x25
+[Bot2 Deck]
+Ornithopter
+Island x30
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mana Crypt.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mana Crypt.Activate
+Bot1.Hand.Medic's Kitesail.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Medic's Kitesail.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+[Bot1.Main2]
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 19
+Bot1.Battlefield.Ornithopter.Keywords = Flying
+Bot1.Battlefield.Ornithopter.Power = 1
