@@ -1,0 +1,39 @@
+# Chandra's Emberling has haste and "Whenever you cast a noncreature spell, put a +1/+1 counter on this creature." A
+# creature spell (Ornithopter) does not trigger it; the Lightning Bolt drawn and cast on turn 3 does, exactly once.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Mox Ruby
+Chandra's Emberling
+Ornithopter
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Chandra's Emberling.Cast
+Bot1.Hand.Ornithopter.Cast
+? Bot1.Battlefield.Chandra's Emberling.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#3.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Bot1.Battlefield.Chandra's Emberling.Keywords = Haste
+Bot1.Battlefield.Chandra's Emberling.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Chandra's Emberling.Power = 3
+Bot1.Battlefield.Chandra's Emberling.Toughness = 3
+Bot2.Life = 17
