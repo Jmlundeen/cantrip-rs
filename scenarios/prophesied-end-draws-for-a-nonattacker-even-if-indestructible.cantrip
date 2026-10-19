@@ -1,0 +1,28 @@
+# Destroying an indestructible nonattacker fails but its controller still draws (CR 101.3, 608.2c).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Ketramose, the New Dawn
+Prophesied End
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Ketramose, the New Dawn.Cast
+Bot1.Hand.Prophesied End.Cast(Bot1.Battlefield.Ketramose, the New Dawn)
+[Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Ketramose, the New Dawn.Power = 4
+Bot1.Library.Count = 29
