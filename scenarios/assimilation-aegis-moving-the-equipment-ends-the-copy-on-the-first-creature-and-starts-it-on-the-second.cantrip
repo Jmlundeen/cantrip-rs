@@ -1,0 +1,61 @@
+# Known bug: a copy given "for as long as" a condition (Duration::AsLongAs) is never undone when the condition lapses: only the end-of-turn cleanup restores a permanent's earlier copiable values (CR 611.2b, 707.2).
+# Assimilation Aegis: "for as long as this Equipment remains attached to it, that creature becomes a copy of a creature card
+# exiled with this Equipment" (CR 611.2b, 707.2). Two equips are paid for at once, the second one on the stack resolving
+# first: Equip {2} on the first Ornithopter makes it a Llanowar Elves (Bot2's, exiled
+# by the Equipment). Equipping the second moves the Equipment: the first is an Ornithopter again (0/2) and the second is the
+# Elves (1/1): the copy ends where the Equipment no longer is, and starts again on the creature it becomes attached to.
+
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Ornithopter
+Assimilation Aegis
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Assimilation Aegis.Cast
+Bot1.Target(Llanowar Elves)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Assimilation Aegis.Activate(Ornithopter#2)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Assimilation Aegis.Activate(Ornithopter#1)
+Bot1.Battlefield.Plains#2.Activate
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Attached.Count = 2
+Stack.Count = 0
+Bot1.Battlefield.Assimilation Aegis.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2

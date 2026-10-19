@@ -1005,6 +1005,21 @@ nor evoke, nor web-slinging. A fix announces those with the others in the cost q
 
 **Scenarios.** none yet.
 
+### KI-81: A copy that lasts "for as long as" a condition is not undone when the condition lapses
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | engine | 2026-10-19, Assimilation Aegis |
+
+**Notes.** `become_copy` (`ops.rs`) sets the permanent's copy and pushes a `RestoreCopy(prior)` effect with the given
+duration. Only the end-of-turn cleanup (`turn.rs`) applies the `RestoreCopy` of an `EndOfTurn` effect; an effect with
+`Duration::AsLongAs` that `end_lapsed_conditions` removes (CR 611.2b: Assimilation Aegis's "for as long as this Equipment
+remains attached to it") leaves the permanent a copy for good. The rules require the permanent to be what it was again
+(CR 707.2, 613.7, with any later copy effect still applied on top, as the cleanup does). A fix restores the prior copiable
+values for every `RestoreCopy` effect that ends, whatever the reason, in the same timestamp order.
+
+**Scenarios.** `assimilation-aegis-moving-the-equipment-ends-the-copy-on-the-first-creature-and-starts-it-on-the-second`.
+
 ### KI-82: A creature with negative power counts as 0 towards a crew, saddle or teamwork total
 
 | Severity | Status | Area | Found |

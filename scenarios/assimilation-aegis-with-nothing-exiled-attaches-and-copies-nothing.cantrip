@@ -1,0 +1,50 @@
+# Assimilation Aegis: "exile up to one target creature" - Bot1 chooses none (Bot2 has Llanowar Elves, a legal target), so no
+# card is exiled with the Equipment (CR 607.2a) and "becomes a copy of a creature card exiled with this Equipment" has nothing
+# to copy: when Equip {2} attaches it to the Ornithopter, it stays a 0/2 Ornithopter.
+
+[Bot1 Deck]
+Plains
+Plains
+Ornithopter
+Assimilation Aegis
+Black Lotus
+Mox Pearl
+Mox Sapphire
+Plains x13
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Assimilation Aegis.Cast
+Bot1.Target()
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Assimilation Aegis.Activate(Ornithopter)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Exile.Count = 0
+Bot2.Battlefield = Forest; Llanowar Elves
+Attached.Count = 1
+Stack.Count = 0
+Bot1.Battlefield.Assimilation Aegis.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
