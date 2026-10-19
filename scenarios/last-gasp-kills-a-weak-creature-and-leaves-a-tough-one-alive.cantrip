@@ -1,0 +1,53 @@
+# Last Gasp: "Target creature gets -3/-3 until end of turn." Elvish Mystic (1/1) becomes -2/-2 and dies as a
+# state-based action (CR 704.5f); Fanatic of Rhonas (1/4) becomes -2/1 and stays (CR 613.4c, layer 7c). Bot1's Moxen pay
+# {B}{B} each turn from the second turn on.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Last Gasp
+Last Gasp
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Elvish Mystic
+Fanatic of Rhonas
+Forest
+Forest
+Forest x13
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Last Gasp.Cast(Bot2.Battlefield.Elvish Mystic)
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest#1.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Last Gasp.Cast(Bot2.Battlefield.Fanatic of Rhonas)
+
+[Expect]
+Bot2.Graveyard = Elvish Mystic
+Bot2.Battlefield.Fanatic of Rhonas.Power = -2
+Bot2.Battlefield.Fanatic of Rhonas.Toughness = 1
+Bot2.Life = 20

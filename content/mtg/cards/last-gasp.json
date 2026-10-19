@@ -1,0 +1,6 @@
+{
+  "name": "Last Gasp",
+  "manaCost": "{1}{B}",
+  "type": "Instant",
+  "oracleText": "Target creature gets -3/-3 until end of turn."
+}
