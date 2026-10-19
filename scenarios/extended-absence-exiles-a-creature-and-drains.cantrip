@@ -1,0 +1,41 @@
+# Extended Absence: "Exile target creature or planeswalker. Extended Absence deals 1 damage to each opponent and you gain
+# 1 life." Elvish Mystic is exiled, the lone opponent loses 1 life and the caster gains 1 (CR 701.13, 120.2, 119.3).
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Swamp
+Extended Absence
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Forest
+Elvish Mystic
+Forest x17
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Extended Absence.Cast(Bot2.Battlefield.Elvish Mystic)
+
+[Expect]
+Exile = Elvish Mystic
+Bot1.Life = 21
+Bot2.Life = 19
