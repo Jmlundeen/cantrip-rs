@@ -650,3 +650,16 @@ pub fn gain_control_untap_haste(g: &mut dyn Game, item: &StackItem) -> Option<Ob
     crate::haste_until_end_of_turn(g, item.object, creature);
     Some(creature)
 }
+
+const TRANSFORM: Question = Question::new("Transform", "pay {cost} to transform {subject}?", "", "Pay {cost}", "Don't transform");
+
+/// "You may pay [cost]. If you do, transform [this]." Asked as the ability resolves, wherever the permanent is: paying is
+/// the choice, and it transforms only if it is still the permanent the ability is of and it hasn't transformed since the
+/// ability was put onto the stack (CR 701.27f). The mana paid is no spell's, so mana for spells can't pay it (CR 106.6).
+/// Ashling, Rekindled and Sygg, Wanderwine Wisdom print it.
+pub fn may_pay_to_transform(g: &mut dyn Game, item: &StackItem, cost: ManaCost) -> Result<(), Suspend> {
+    if g.may_pay(item.controller, item.object, item.object, of_mana(cost), &TRANSFORM)? {
+        g.transform_by(item.object, item)?;
+    }
+    Ok(())
+}

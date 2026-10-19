@@ -1201,3 +1201,39 @@ pub const DEALS_COMBAT_DAMAGE_TO_PLAYER: Trigger = when(EventMask::DAMAGE, deals
 pub const OPPONENT_ACTIVATES_ABILITY_OF_ARTIFACT_CREATURE_OR_LAND: Trigger =
     when_asked(EventMask::ABILITY_ACTIVATED, opponent_activates_ability_of_artifact_creature_or_land);
 pub const YOU_ACTIVATE_A_LOYALTY_ABILITY: Trigger = when_asked(EventMask::ABILITY_ACTIVATED, you_activate_a_loyalty_ability);
+
+/// "Whenever this creature transforms into [this face]" (CR 701.27e): the ability is that face's, so it is there to see
+/// only once the permanent has turned over to it (CR 603.2, 603.6). A permanent that enters with this face up has not
+/// transformed (CR 712.14). Ashling, Rimebound, Revealing Eye and Sygg, Wanderbrine Shield print it.
+pub fn this_transforms(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Transformed { object } if *object == source => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// "Whenever this creature enters or transforms into [this face]": either event (CR 603.2). Ashling, Rekindled and Sygg,
+/// Wanderwine Wisdom print it.
+pub fn this_enters_or_transforms(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    this_enters(q, source, event).or_else(|| this_transforms(q, source, event))
+}
+
+pub const THIS_TRANSFORMS: Trigger = when(EventMask::TRANSFORMED, this_transforms);
+pub const THIS_ENTERS_OR_TRANSFORMS: Trigger = when(EventMask(EventMask::ZONE_CHANGE.0 | EventMask::TRANSFORMED.0), this_enters_or_transforms);
+
+/// "Whenever this creature deals combat damage to a player or planeswalker": one triggering for each player or
+/// planeswalker it dealt damage to (CR 603.2c), judged as the damage is dealt (CR 510.2). Psychic Frog prints it, and Sygg,
+/// Wanderwine Wisdom grants it.
+pub fn deals_combat_damage_to_player_or_planeswalker(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Damage { source: dealer, target, amount, combat: true, .. } if *dealer == source && *amount > 0 => match target {
+            Target::Player(_) => Fired::PLAIN,
+            Target::Object(id) if q.chars(*id).is(CardType::Planeswalker) => Fired::PLAIN,
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+pub const DEALS_COMBAT_DAMAGE_TO_PLAYER_OR_PLANESWALKER: Trigger =
+    when(EventMask::DAMAGE, deals_combat_damage_to_player_or_planeswalker);
