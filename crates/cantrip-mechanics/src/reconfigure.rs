@@ -9,18 +9,11 @@ use crate::attach::attach_to_target;
 use crate::impending::not_a_creature;
 use cantrip_api::*;
 
-fn other_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id)
-        if id != asker.source && q.is_on_battlefield(id) && q.controller(id) == asker.controller && q.chars(id).is(CardType::Creature))
-}
-
-const OTHER_CREATURE_YOU_CONTROL: TargetSpec = target(other_creature_you_control);
-
 /// "Attach this permanent to another target creature you control": the permanent itself is a creature until attached.
 pub const fn attach(cost: ManaCost, text: &'static str) -> AbilityDef {
     ability(Cost::mana(cost), attach_to_target, text)
         .sorcery_speed()
-        .targets(&[OTHER_CREATURE_YOU_CONTROL])
+        .targets(&[crate::targets::OTHER_CREATURE_YOU_CONTROL])
 }
 
 fn unattach_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {

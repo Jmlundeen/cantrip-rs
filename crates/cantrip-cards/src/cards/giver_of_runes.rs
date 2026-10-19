@@ -4,10 +4,6 @@ use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("ProtectFromColorless", "protection from colorless?", "If you don't, you choose a color instead", "From colorless", "Choose a color");
 
-fn other_creature_you_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    (targets::CREATURE_YOU_CONTROL.filter)(q, asker, t) && t != Target::Object(asker.source)
-}
-
 /// Protection from colorless, or from a color chosen as the ability resolves (CR 702.16a, 611.2c): a yes/no for
 /// colorless, then on no a color.
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -24,6 +20,6 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[ability(TAP, effect, "{T}: Another target creature you control gains protection from colorless or from the color of your choice until end of turn.")
-        .targets(&[target(other_creature_you_control)])],
+        .targets(&[targets::OTHER_CREATURE_YOU_CONTROL])],
     ..oracle::GIVER_OF_RUNES
 };

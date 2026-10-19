@@ -95,6 +95,13 @@ fn attacking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// still is as the ability resolves, or the target is illegal. Raffine, Scheming Seer and Raubahn, Bull of Ala Mhigo print it.
 pub const ATTACKING_CREATURE: TargetSpec = target(attacking_creature_filter);
 pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
+/// "Another target creature you control", "other target creature you control" (CR 115.1, 109.5): a creature on the battlefield
+/// under your control other than the source. Dour Port Mage, Giver of Runes, Oliphaunt, Flock Impostor and the reconfigure
+/// ability print it; a slot of up to one is `up_to_one(other_creature_you_control_filter)`.
+pub fn other_creature_you_control_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_you_control_filter(q, asker, t) && t != Target::Object(asker.source)
+}
+pub const OTHER_CREATURE_YOU_CONTROL: TargetSpec = target(other_creature_you_control_filter);
 
 /// "Creature or Vehicle" (CR 205.3g, 301.7): a permanent on the battlefield that is a creature, or a Vehicle whether or not
 /// it is crewed into a creature right now. Bounce Off and Perilous Snare target one; Reckoner Shakedown chooses one.

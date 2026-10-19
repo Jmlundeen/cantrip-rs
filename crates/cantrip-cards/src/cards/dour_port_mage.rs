@@ -24,11 +24,6 @@ fn return_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-fn another_creature_you_control(q: &dyn Query, asker: &Asker, target: Target) -> bool {
-    matches!(target, Target::Object(id) if id != asker.source && cantrip_mechanics::targets::permanent(q, id)
-        && q.controller(id) == asker.controller && q.chars(id).is(CardType::Creature))
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(when(EventMask::ZONE_CHANGE, creature_leaves_without_dying), draw,
@@ -36,7 +31,7 @@ pub static CARD: CardDef = CardDef {
             .once_per_batch().look_back(),
         ability(cost("{1}{U}").and(TAP), return_creature,
             "{1}{U}, {T}: Return another target creature you control to its owner's hand.")
-            .targets(&[target(another_creature_you_control)]),
+            .targets(&[cantrip_mechanics::targets::OTHER_CREATURE_YOU_CONTROL]),
     ],
     ..oracle::DOUR_PORT_MAGE
 };
