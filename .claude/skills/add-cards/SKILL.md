@@ -104,11 +104,12 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
 1. **Which cards.** If the request names cards, those are the cards. Otherwise the cards come from a format's list of
    cards that decks actually play (`docs/formats/<format>.json`, best-played first, made from MTGGoldfish and MTGTop8
    by `format-scrape.py`), and the format is the contributor's to choose: **ask which format** unless they said (the
-   lists present are the files in `docs/formats/`; today Standard). `card-issues.py next <format> -n 5` prints the
-   next cards that are not implemented and that nobody holds - a claim older than 24 hours with no pull request
+   lists present are the files in `docs/formats/`; today Standard). `card-issues.py next <format>` prints the
+   next four cards that are not implemented and that nobody holds - a claim older than 24 hours with no pull request
    commit or `card/<slug>` push since counts as nobody's. Take them in that order and never skip one for being
    hard; a card the engine cannot yet do is released (below) with its gap reported, not passed over silently.
-2. **Claim before any work, one command per card:** `card-issues.py claim "Card Name"`. It opens the card's issue
+2. **Claim before any work, four cards at a time:** `card-issues.py claim --format <format>` takes the next four free
+   cards, or `claim "Card Name" ["Other Card" ...]` takes the ones named. It opens the card's issue
    first when it has none (a card named outside every format list gets one too), then claims it with a comment, and
    prints `#N`. Exit status 3 means the card is held by someone else (or they claimed it a moment earlier): leave it
    and take the next. Never work on a card whose live claim is someone else's.
@@ -277,12 +278,15 @@ land. Self-reported "exact" is not proof.
 
 The coordinator dispatches, lands and keeps the queue; it does not implement cards itself in a batch.
 
-1. **Batches** of 15-30 cards, in list order (never pre-sorted by difficulty) - `card-issues.py next <format> -n 30`,
-   or the cards named. The coordinator claims every card of a batch before its agent starts (`claim` takes several
-   names), hands the agent the issue numbers, and releases the cards a report says were skipped.
+1. **Batches** of 4 cards, in list order (never pre-sorted by difficulty) - the next four free ones
+   (`card-issues.py claim --format <format>` claims them and prints their issue numbers), or the cards named. A batch
+   is 4 because a claim is good for 24 hours and a batch must land inside one; more than 4 cards at once is more
+   claims than anyone can keep honest. The coordinator claims a batch before its agent starts, hands the agent the
+   issue numbers, and releases the cards a report says were skipped. As an agent finishes, the next batch is
+   claimed for the next agent.
 2. **One agent per batch**, in its own worktree, in the background. Its prompt: this skill's loop for each card (the
    list inline, with the issue numbers for `Closes #N`; the claims are already made, and since agents do not push the
-   coordinator claims the batch again every few hours while they run, so the claims do not lapse); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
+   coordinator claims the batch again if an agent runs past the day, so the claims do not lapse); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
    `cantrip-mechanics`; a card blocked by the core is skipped with its exact gap (the rule, and what `cantrip-api`
    lacks), never faked; the client work a card needs (step 8) is part of the card, not a follow-up; one commit per
    card; at the end `git rebase main`, the corpus and the verify tests; no push; a report of implemented cards with

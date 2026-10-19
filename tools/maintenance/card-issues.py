@@ -3,6 +3,7 @@
     python tools/maintenance/card-issues.py sync <format> [--dry-run] [--limit N]
     python tools/maintenance/card-issues.py next <format> [-n 5] [--json]
     python tools/maintenance/card-issues.py claim "Card Name" ["Other Card" ...]
+    python tools/maintenance/card-issues.py claim --format <format> [-n 4]
     python tools/maintenance/card-issues.py release "Card Name" ["Other Card" ...]
     python tools/maintenance/card-issues.py status
 
@@ -45,6 +46,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 FORMATS = os.path.join(ROOT, "docs", "formats")
 HOLD = datetime.timedelta(hours=24)
+BATCH = 4  # cards claimed at once by default: a batch small enough to finish inside one claim
 CLAIM = "<!-- cantrip-claim -->"
 RELEASE = "<!-- cantrip-release -->"
 CARD = "<!-- cantrip-card: {} -->"
@@ -347,36 +349,49 @@ def find_or_open(repo, issues, name):
     return made
 
 
+def take(repo, issues, me, name):
+    """Claim one card: True when it is now ours, False when someone else holds it or has implemented it."""
+    if slug(name) in missing.implemented():
+        print(f"{name}: already implemented")
+        return False
+    issue = find_or_open(repo, issues, name)
+    held = holder(issue)
+    if held and held[0] != me:
+        print(f"{name}: #{issue['number']} is held by @{held[0]} until "
+              f"{(held[2] + HOLD).strftime('%Y-%m-%d %H:%M')} UTC")
+        return False
+    taken_over = [e for e in issue["events"] if e[1] == "claim" and e[2] != me]
+    note = f" (the earlier claim, by @{taken_over[-1][2]}, ran out)" if taken_over and not held else ""
+    gh("api", "-X", "POST", f"repos/{repo}/issues/{issue['number']}/comments", "--input", "-",
+       body={"body": f"{CLAIM}\nClaimed by @{me}{note}. Held 24 hours from the last push or commit on its pull "
+                     f"request or `card/{slug(name)}` branch; claim again to renew."})
+    issue["events"].append((datetime.datetime.now(datetime.timezone.utc), "claim", me))
+    fresh = {i["number"]: i for i in read_state(repo).values()}.get(issue["number"])
+    winner = holder(fresh) if fresh else None
+    if winner and winner[0] != me:
+        print(f"{name}: #{issue['number']} - @{winner[0]} claimed it first")
+        return False
+    print(f"{name}: #{issue['number']} is yours (Closes #{issue['number']})")
+    return True
+
+
 def claim(args, repo):
     me = gh("api", "user")["login"]
     issues = read_state(repo)
-    status = 0
-    for name in args.names:
-        if slug(name) in missing.implemented():
-            print(f"{name}: already implemented")
-            status = 1
-            continue
-        issue = find_or_open(repo, issues, name)
-        held = holder(issue)
-        if held and held[0] != me:
-            print(f"{name}: #{issue['number']} is held by @{held[0]} until "
-                  f"{(held[2] + HOLD).strftime('%Y-%m-%d %H:%M')} UTC")
-            status = 3
-            continue
-        taken_over = [e for e in issue["events"] if e[1] == "claim" and e[2] != me]
-        note = f" (the earlier claim, by @{taken_over[-1][2]}, ran out)" if taken_over and not held else ""
-        gh("api", "-X", "POST", f"repos/{repo}/issues/{issue['number']}/comments", "--input", "-",
-           body={"body": f"{CLAIM}\nClaimed by @{me}{note}. Held 24 hours from the last push or commit on its pull "
-                         f"request or `card/{slug(name)}` branch; claim again to renew."})
-        issue["events"].append((datetime.datetime.now(datetime.timezone.utc), "claim", me))
-        fresh = {i["number"]: i for i in read_state(repo).values()}.get(issue["number"])
-        winner = holder(fresh) if fresh else None
-        if winner and winner[0] != me:
-            print(f"{name}: #{issue['number']} - @{winner[0]} claimed it first")
-            status = 3
-        else:
-            print(f"{name}: #{issue['number']} is yours (Closes #{issue['number']})")
-    sys.exit(status)
+    if args.names:
+        sys.exit(0 if all([take(repo, issues, me, name) for name in args.names]) else 3)
+    if not args.format:
+        sys.exit("name the cards to claim, or --format to claim the format's next batch")
+    args.n = args.n or BATCH
+    got = 0
+    for card, _, mine in available(args, repo)[0]:
+        if mine:
+            continue  # already ours: a batch is new cards
+        if got == args.n:
+            break
+        got += take(repo, issues, me, card["name"])
+    print(f"{got} of {args.n} claimed; they are yours for 24 hours")
+    sys.exit(0 if got == args.n else 3)
 
 
 def release(args, repo):
@@ -415,11 +430,14 @@ def main():
     one.add_argument("--limit", type=int, default=0, help="open at most this many issues in this run")
     one = commands.add_parser("next")
     one.add_argument("format")
-    one.add_argument("-n", type=int, default=5)
+    one.add_argument("-n", type=int, default=BATCH)
     one.add_argument("--json", action="store_true")
-    for word in ("claim", "release"):
-        one = commands.add_parser(word)
-        one.add_argument("names", nargs="+")
+    one = commands.add_parser("claim")
+    one.add_argument("names", nargs="*")
+    one.add_argument("--format", help="with no names, claim this format's next free cards")
+    one.add_argument("-n", type=int, default=0, help=f"how many (default {BATCH})")
+    one = commands.add_parser("release")
+    one.add_argument("names", nargs="+")
     commands.add_parser("status")
     args = parser.parse_args()
     repo = repository(args.repo)
