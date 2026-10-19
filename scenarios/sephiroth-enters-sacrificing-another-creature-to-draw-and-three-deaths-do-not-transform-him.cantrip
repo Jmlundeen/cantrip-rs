@@ -1,0 +1,74 @@
+# Sephiroth, Fabled SOLDIER: "Whenever Sephiroth enters or attacks, you may sacrifice another creature. If you do, draw a
+# card." Bot1 casts an Ornithopter, then Sephiroth (Mox Jet, Ruby, Pearl), and sacrifices the Ornithopter as he enters: a card
+# is drawn (the third Ornithopter) and the sacrifice is a creature dying, so his other ability drains 1 (Bot2 19, Bot1 21). That is the first resolution
+# of the turn. On turn 3 (a new count) Bot1 makes an Ornithopter, Bot2 has two, and Pyroclasm kills all three: three
+# resolutions are not four, so Sephiroth stays the front face, no emblem (Bot2 16, Bot1 24). Turn 3 then attacks: he may
+# sacrifice another creature, and Bot1 declines (the empty answer): nothing is drawn, and his 3 damage leaves Bot2 at 13.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sephiroth, Fabled SOLDIER
+Pyroclasm
+Ornithopter
+Ornithopter
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sephiroth, Fabled SOLDIER.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 19
+? Bot1.Life = 21
+? Bot1.Hand = Ornithopter; Ornithopter; Pyroclasm
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Bot1.Life = 24
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Sephiroth, Fabled SOLDIER > Bot2)
+Bot1.Choose()
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 13
+Bot1.Life = 24
+Bot1.Hand.Count = 1
+Bot1.Battlefield.Sephiroth, Fabled SOLDIER.Types = Creature
+Bot1.Battlefield.Sephiroth, Fabled SOLDIER.Power = 3
+Bot1.Emblems.Count = 0

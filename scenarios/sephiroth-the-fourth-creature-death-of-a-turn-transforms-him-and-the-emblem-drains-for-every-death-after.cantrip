@@ -1,0 +1,78 @@
+# Sephiroth, Fabled SOLDIER: "Whenever another creature dies, target opponent loses 1 life and you gain 1 life. If this is
+# the fourth time this ability has resolved this turn, transform Sephiroth." Bot1 casts Sephiroth on turn 1 (Mox Jet, Ruby and
+# Pearl); nothing else is in play, so his enters ability asks nothing. Bot2 makes three Ornithopters on turn 2. On turn 3 Bot1
+# makes one and casts Pyroclasm: four creatures die at once, so the ability triggers four times and resolves four times: the
+# fourth transforms him (CR 608.2m, 701.27), and "as this creature transforms" he gets the emblem (CR 712.20): 20 - 4 = 16 for
+# Bot2, 20 + 4 = 24 for Bot1. Two more Ornithopters enter, and Sephiroth, One-Winged Angel (5/5 flier) attacks: he sacrifices
+# both ("any number", draw that many: two Islands), and the emblem drains for each death, as Sephiroth's own front-face ability
+# is gone: 14 and 26, then his 5 damage: Bot2 ends at 9.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Sephiroth, Fabled SOLDIER
+Pyroclasm
+Ornithopter
+Ornithopter
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sephiroth, Fabled SOLDIER.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Pyroclasm.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 16
+? Bot1.Life = 24
+? Bot1.Battlefield.Sephiroth, One-Winged Angel.Types = Creature
+? Bot1.Battlefield.Sephiroth, One-Winged Angel.Power = 5
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Attack(Sephiroth, One-Winged Angel > Bot2)
+Bot1.Choose(Ornithopter; Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 9
+Bot1.Life = 26
+Bot1.Battlefield.Sephiroth, One-Winged Angel.Keywords = Flying
+Bot1.Graveyard = Ornithopter; Ornithopter; Ornithopter; Pyroclasm
+Bot1.Hand = Island; Island
