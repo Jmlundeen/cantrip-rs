@@ -850,7 +850,10 @@ fn position(s: &GameState, canon: &Canon) -> Position {
         h.both(&(canon.id(e.source), e.controller, rank(e.timestamp), canon.id(e.affected), e.kind, e.duration));
     }
     for p in &s.permissions {
-        h.both(&(canon.id(p.card), p.player, p.grant, p.turn));
+        // The permanent a "for as long as you control" permission is about, by where it is, as every object is.
+        let source = p.grant.expiry.controlled().map(|id| canon.id(id));
+        let grant = PlayGrant { expiry: if source.is_some() { Expiry::WhileControls(ObjectId::NONE) } else { p.grant.expiry }, ..p.grant };
+        h.both(&(canon.id(p.card), p.player, grant, source, p.turn));
     }
     for t in &s.triggers {
         h.both(&(canon.id(t.source), t.ability, t.controller, canon.target(t.subject), t.data, canon.members(t.members), t.count));

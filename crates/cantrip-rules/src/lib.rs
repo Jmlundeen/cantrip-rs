@@ -12,6 +12,8 @@ mod layers;
 mod loops;
 mod ops;
 mod phasing;
+#[cfg(test)]
+mod play_permission_tests;
 mod replace;
 mod resolve;
 mod settle;
@@ -1351,7 +1353,11 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn allow_play(&mut self, card: ObjectId, player: PlayerId, grant: PlayGrant) {
         let turn = self.g.state.turn.number;
-        self.g.state.permission_push(PlayPermission { card, player, grant, turn });
+        let permission = PlayPermission { card, player, grant, turn };
+        // A "for as long as you control" duration that is already over as it would begin does nothing (CR 611.2b).
+        if self.g.state.permission_lasts(&permission) {
+            self.g.state.permission_push(permission);
+        }
     }
 
     fn could_cast_transformed_during_resolution(&self, card: ObjectId) -> bool {

@@ -1226,7 +1226,7 @@ fn cleanup(cx: &mut Cx) -> R<()> {
                     Expiry::Never => true,
                     Expiry::EndOfTurn => false,
                     Expiry::EndOfYourNextTurn => !(p.player == active && number > p.turn),
-                    Expiry::UntilYourNextEndStep => true,
+                    Expiry::UntilYourNextEndStep | Expiry::WhileControls(_) => true,
                 }
         });
     }

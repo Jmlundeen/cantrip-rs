@@ -429,6 +429,11 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         // actions are checked again with the new controllers.
         acted |= ops::settle_control(cx);
     }
+    // "For as long as you control [this permanent]" permissions end with the permanent's leaving (CR 611.2b, 400.7); a
+    // change of control or phasing out ends them as it happens (`refresh_control`, `phase_out`).
+    if !cx.s().permissions.is_empty() {
+        cx.st().end_lapsed_permissions();
+    }
     Ok(acted)
 }
 

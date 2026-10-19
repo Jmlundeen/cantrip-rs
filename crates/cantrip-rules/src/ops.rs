@@ -2785,6 +2785,10 @@ pub fn refresh_control(cx: &mut Cx, id: ObjectId) -> bool {
             let blocks = cx.s().blocks.iter().copied().filter(|b| b.blocker != id && b.attacker != id).collect();
             cx.st().set_blocks(blocks);
         }
+        // "For as long as you control [it]" is over for good, though control come back (CR 611.2b).
+        if cx.s().permissions.iter().any(|p| p.grant.expiry.controlled() == Some(id)) {
+            cx.st().end_lapsed_permissions();
+        }
     }
     controller != obj.controller
 }

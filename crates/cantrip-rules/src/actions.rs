@@ -2122,9 +2122,12 @@ pub fn permission_for(cx: &Cx, card: ObjectId, player: PlayerId) -> Option<PlayP
 }
 
 /// Whether a permission lets `player` play its card now, as far as its own terms say (CR 601.3, 305.1): not on the turn it
-/// was given if it is for a later turn (CR 702.185a), and only while its condition holds (CR 611.2).
+/// was given if it is for a later turn (CR 702.185a), only while its condition holds (CR 611.2), and only while a "for as
+/// long as you control" duration does (CR 611.2b; one that lapsed mid-resolution has not been dropped yet).
 fn permission_stands(cx: &Cx, p: &PlayPermission, player: PlayerId) -> bool {
-    !(p.grant.later_turns && p.turn == cx.s().turn.number) && p.grant.when.is_none_or(|when| play_condition_holds(cx, player, when))
+    !(p.grant.later_turns && p.turn == cx.s().turn.number)
+        && p.grant.when.is_none_or(|when| play_condition_holds(cx, player, when))
+        && cx.s().permission_lasts(p)
 }
 
 /// Whether the condition on a permission to play holds now (CR 611.2): asked of the history of this turn, which no later

@@ -1084,6 +1084,11 @@ impl<'a> Projector<'a> {
             Expiry::EndOfTurn => "this turn".to_string(),
             Expiry::EndOfYourNextTurn => format!("until {whose} next turn ends"),
             Expiry::UntilYourNextEndStep => format!("until {whose} next end step"),
+            // Named as the permanent is now: a transformed one by its other face (CR 712.18).
+            Expiry::WhileControls(source) => {
+                let name = self.game.cards.get(self.game.chars(source).card).name;
+                format!("for as long as {} control {name}", if mine { "you" } else { "they" })
+            }
         };
         let mut text = format!("{prefix}{} {window}", if grant.lands { "Playable" } else { "Castable" });
         // A condition the permission stands under is said, so one not met reads as the conditional it is.

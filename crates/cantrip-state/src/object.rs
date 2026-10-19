@@ -770,6 +770,23 @@ pub enum Expiry {
     EndOfYourNextTurn,
     /// "Until your next end step" (CR 500.4): ends as the holder's next end step begins, before its triggers.
     UntilYourNextEndStep,
+    /// "For as long as you control [this permanent]" (CR 611.2b): it lasts while the holder controls this object on the
+    /// battlefield, and ends for good the first time they don't - the permanent leaves (a returned one is a new object,
+    /// CR 400.7), phases out (CR 702.26f) or changes controller, though it come back - and it does nothing if that is
+    /// already so as it would begin. Transforming it ends nothing: it is the same object (CR 712.18). Gwen Stacy and
+    /// Lightning, Security Sergeant (exile the top card of your library, play it) print it; Victor Mancha, Runaway, Taster
+    /// of Wares, Hama, the Bloodbender and Kotose, the Silent Spider word theirs about other cards they exile.
+    WhileControls(ObjectId),
+}
+
+impl Expiry {
+    /// The permanent a "for as long as you control" permission is about (`Expiry::WhileControls`), if it is one.
+    pub fn controlled(self) -> Option<ObjectId> {
+        match self {
+            Expiry::WhileControls(source) => Some(source),
+            _ => None,
+        }
+    }
 }
 
 /// What a permission to play a card is, apart from who holds it and for which card.

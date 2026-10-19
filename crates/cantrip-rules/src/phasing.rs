@@ -85,6 +85,10 @@ pub fn phase_out(cx: &mut Cx, permanents: &[ObjectId], until_leaves: Option<Obje
         });
         cx.record(Event::PhasedOut { permanent: id, controller, indirect });
     }
+    // CR 702.26f: so does a "for as long as you control" permission about one of them, for good though it phase in.
+    if cx.s().permissions.iter().any(|p| p.grant.expiry.controlled().is_some_and(leaving)) {
+        cx.st().end_lapsed_permissions();
+    }
 }
 
 /// Phases in, all at once (CR 702.26c), each of `permanents` that phased out directly, and with each everything that phased

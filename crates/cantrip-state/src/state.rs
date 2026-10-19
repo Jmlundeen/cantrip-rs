@@ -763,6 +763,29 @@ impl GameState {
         self.log(Undo::PermissionPushed);
     }
 
+    /// Whether a permission's "for as long as you control" duration still holds (`Expiry::WhileControls`, CR 611.2b): its
+    /// holder controls that object, still the object it was (CR 400.7), on the battlefield (phased out is not, CR
+    /// 702.26f). Any other expiry holds as far as this goes.
+    pub fn permission_lasts(&self, p: &PlayPermission) -> bool {
+        p.grant.expiry.controlled().is_none_or(|source| {
+            let obj = self.obj(source);
+            obj.became.is_none() && obj.zone.is(ZoneKind::Battlefield) && obj.controller == p.player
+        })
+    }
+
+    /// Ends each "for as long as you control" permission whose duration no longer holds (`permission_lasts`): for good,
+    /// whatever happens later (CR 611.2b). Free while there is none.
+    pub fn end_lapsed_permissions(&mut self) {
+        if self.permissions.iter().any(|p| !self.permission_lasts(p)) {
+            let keep: Vec<bool> = self.permissions.iter().map(|p| self.permission_lasts(p)).collect();
+            let mut at = keep.len();
+            self.permissions_retain(|_| {
+                at -= 1;
+                keep[at]
+            });
+        }
+    }
+
     /// Removes every permission `keep` says not to keep, keeping the order of the rest.
     pub fn permissions_retain(&mut self, mut keep: impl FnMut(&PlayPermission) -> bool) {
         let mut i = self.permissions.len();
