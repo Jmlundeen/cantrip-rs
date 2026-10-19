@@ -1,0 +1,31 @@
+# Frostbite Pyromental: hasty 4/4 trampler cast on turn 3, attacks Bot2 (no blockers), deals 4 and draws two cards, then is
+# sacrificed at the beginning of the end step.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Ruby
+Frostbite Pyromental
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Frostbite Pyromental.Cast
+Bot1.Attack(Frostbite Pyromental > Bot2)
+[T3 Bot1.End]
+
+[Expect]
+Bot2.Life = 16
+Bot1.Graveyard = Frostbite Pyromental

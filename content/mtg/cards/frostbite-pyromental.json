@@ -1,0 +1,12 @@
+{
+  "name": "Frostbite Pyromental",
+  "manaCost": "{U}{R}{R}",
+  "type": "Creature — Elemental",
+  "power": "4",
+  "toughness": "4",
+  "oracleText": "Trample, haste\nWhenever this creature deals combat damage to a player, draw two cards.\nAt the beginning of the end step, sacrifice this creature.",
+  "keywords": [
+    "Trample",
+    "Haste"
+  ]
+}
