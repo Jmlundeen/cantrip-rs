@@ -1,0 +1,32 @@
+# The Phoenix died on Bot2's turn (Lightning Bolt) - one creature, and the next turn begins with none dead this turn - so
+# the intervening if is false at the beginning of Bot1's combat and the card stays in the graveyard.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Dark Ritual
+Darklight Phoenix
+Swamp x16
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Mountain x18
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Darklight Phoenix.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Darklight Phoenix)
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Graveyard = Darklight Phoenix; Dark Ritual

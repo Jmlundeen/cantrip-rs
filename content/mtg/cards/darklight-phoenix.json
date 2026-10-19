@@ -1,0 +1,12 @@
+{
+  "name": "Darklight Phoenix",
+  "manaCost": "{3}{B}",
+  "type": "Creature — Phoenix",
+  "power": "3",
+  "toughness": "2",
+  "oracleText": "Flying, haste\nAt the beginning of combat on your turn, if two or more creatures died this turn, return this card from your graveyard to the battlefield.",
+  "keywords": [
+    "Flying",
+    "Haste"
+  ]
+}
