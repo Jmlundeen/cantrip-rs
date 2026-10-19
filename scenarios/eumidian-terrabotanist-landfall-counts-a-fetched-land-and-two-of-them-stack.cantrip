@@ -1,0 +1,57 @@
+# Landfall is for any reason a land enters, and each Terrabotanist triggers on its own (ruling 2025-07-25). Turn 1: four
+# mana from Forest and three Moxen cast two Terrabotanists. Turn 3: Fabled Passage played (two triggers: Bot1 22), then
+# cracked ({T}, sacrifice) to put a Forest onto the battlefield (two more triggers: Bot1 24); the Passage leaving the
+# battlefield is not a land entering.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Eumidian Terrabotanist
+Eumidian Terrabotanist
+Fabled Passage
+Forest
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Eumidian Terrabotanist.Cast
+Bot1.Hand.Eumidian Terrabotanist.Cast
+? Bot1.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Fabled Passage.Play
+Bot1.Triggers(Eumidian Terrabotanist; Eumidian Terrabotanist)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 22
+Bot1.Battlefield.Fabled Passage.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Forest)
+Bot1.Triggers(Eumidian Terrabotanist; Eumidian Terrabotanist)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 24
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 24
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Mox Ruby; Eumidian Terrabotanist; Eumidian Terrabotanist

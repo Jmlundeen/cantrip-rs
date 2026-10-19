@@ -1,0 +1,8 @@
+{
+  "name": "Eumidian Terrabotanist",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Insect Druid",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Landfall — Whenever a land you control enters, you gain 1 life."
+}

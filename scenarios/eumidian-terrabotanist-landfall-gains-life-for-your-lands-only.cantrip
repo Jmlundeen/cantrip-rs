@@ -1,0 +1,49 @@
+# Landfall -- "Whenever a land you control enters, you gain 1 life." Bot1 casts the Terrabotanist on turn 1 off a Forest and
+# a Mox Emerald: the Terrabotanist itself entering (a creature) is not a land, a land the opponent plays on turn 2 is not
+# one "you control" (stack empty, Bot1 stays at 20), and a Mox Jet cast on turn 3 with the Terrabotanist out is not a land
+# (a nonland permanent entering). Bot1's own Forest on turn 3 is: Bot1 gains 1 (21).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Eumidian Terrabotanist
+Forest
+Mountain
+Mountain
+Mox Jet
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Eumidian Terrabotanist.Cast
+? Bot1.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+? Stack.Count = 0
+? Bot1.Life = 20
+? Bot2.Life = 20
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Life = 20
+Bot1.Hand.Forest.Play
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Battlefield = Forest; Forest; Mox Emerald; Mox Jet; Eumidian Terrabotanist
