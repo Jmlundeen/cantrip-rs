@@ -1,0 +1,44 @@
+# Origin of the Avengers: chapter II "You may put a Hero creature card with mana value 3 or less from your hand onto the battlefield. If you
+# don't, draw a card." Bot1's hand holds Brave Brawler (a Hero, mana value 2: the only choice), a second Ornithopter (not a Hero) and Amazing
+# Spider-Girl (a Hero, mana value 5), and refuses the other two (`! Bot1.Choose`). Putting the Brawler onto the battlefield means no card is
+# drawn (the hand stays at 3 after the draw of turn 3). Chapter III on turn 5 puts a +1/+1 counter on each creature Bot1 controls (Ornithopter and
+# Brave Brawler) and none on Bot2's Llanowar Elves; the Saga is then sacrificed.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Origin of the Avengers
+Brave Brawler
+Ornithopter
+Ornithopter
+Amazing Spider-Girl
+Plains x14
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Origin of the Avengers.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+! Bot1.Choose(Ornithopter)
+! Bot1.Choose(Amazing Spider-Girl)
+Bot1.Choose(Brave Brawler)
+? Bot1.Hand.Count = 3
+[T5 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Ornithopter; Brave Brawler
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Brave Brawler.Counters.PlusOnePlusOne = 1
+Bot2.Battlefield.Llanowar Elves.Counters.PlusOnePlusOne = (absent)

@@ -1,0 +1,31 @@
+# Origin of the Avengers, chapter II: "If you don't, draw a card." Bot1 holds Brave Brawler (an eligible Hero) and declines to put it
+# onto the battlefield (chooses nothing), so it draws a card instead: hand 7 -> 4 after casting Plains, Mox Pearl and the Saga,
+# 5 with the draw step, 6 with the chapter's card; the Brawler stays in hand.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Origin of the Avengers
+Brave Brawler
+Ornithopter
+Amazing Spider-Girl
+Plains
+Plains x14
+
+[Bot2 Deck]
+Forest x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Origin of the Avengers.Cast
+[T3 Bot1.Main1]
+Bot1.Choose()
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 6
+Bot1.Hand.Brave Brawler.Power = 2
+Bot1.Battlefield = Plains; Mox Pearl; Origin of the Avengers
