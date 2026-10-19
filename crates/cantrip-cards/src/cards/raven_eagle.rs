@@ -1,6 +1,6 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::THIS_ENTERS_OR_ATTACKS;
-use cantrip_mechanics::{effects, history, targets, tokens};
+use cantrip_mechanics::triggers::{THIS_ENTERS_OR_ATTACKS, YOU_DRAW_YOUR_SECOND_CARD};
+use cantrip_mechanics::{effects, targets, tokens};
 use cantrip_oracle as oracle;
 
 /// "Exile up to one target card from a graveyard. If a creature card is exiled this way, create a Clue token." The card's type
@@ -17,16 +17,6 @@ fn exile_a_card(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
-/// "Whenever you draw your second card each turn" (CR 120.3, 603.2): the draw of a card by the controller when exactly one
-/// card was drawn by them earlier this turn (the history holds the draws before the one being matched). The third and later
-/// draws match nothing, and a draw while this is off the battlefield is never matched.
-fn you_draw_your_second_card(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::Drew { player, .. } if *player == me.controller && history::drawn_this_turn(q, *player) == 1 => Fired::PLAIN,
-        _ => None,
-    }
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
@@ -36,7 +26,7 @@ pub static CARD: CardDef = CardDef {
         )
         .targets(&[targets::CARD_IN_A_GRAVEYARD.optional()]),
         triggered(
-            when_asked(EventMask::DREW, you_draw_your_second_card),
+            YOU_DRAW_YOUR_SECOND_CARD,
             effects::each_opponent_loses_1_life_you_gain_1,
             "Whenever you draw your second card each turn, each opponent loses 1 life and you gain 1 life.",
         ),
