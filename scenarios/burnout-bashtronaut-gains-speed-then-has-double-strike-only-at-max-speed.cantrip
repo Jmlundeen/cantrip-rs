@@ -1,0 +1,57 @@
+# Burnout Bashtronaut: Menace; Start your engines! (CR 702.179); "{2}: +1/+0 until end of turn"; "Max speed — This creature
+# has double strike" (CR 702.178a, 702.4). Cast on turn 1 it gives Bot1 speed 1 (CR 704.5aa). Bot2 has no creature, so the
+# attacks on turns 3, 5 and 7 each make Bot2 lose life and raise the speed once (CR 702.179d): 2, 3, then 4 - and at speed 3
+# it has menace only. The turn 7 hit takes it to max speed after the damage, so Bot2 is at 17 (one damage a turn). On
+# turn 9 it has double strike: paying {2} once makes it 2/1, and it deals 2 in each damage step: 4, so Bot2 ends at 13.
+
+[Bot1 Deck]
+Burnout Bashtronaut
+Mountain x19
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Burnout Bashtronaut.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Speed = 1
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Burnout Bashtronaut > Bot2)
+[T3 Bot1.Main2]
+? Bot2.Life = 19
+? Bot1.Speed = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Burnout Bashtronaut > Bot2)
+[T5 Bot1.Main2]
+? Bot2.Life = 18
+? Bot1.Speed = 3
+? Bot1.Battlefield.Burnout Bashtronaut.Keywords = Menace
+[T7 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Attack(Burnout Bashtronaut > Bot2)
+[T7 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Speed = 4
+[T9 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Bot1.Battlefield.Burnout Bashtronaut.Keywords = DoubleStrike; Menace
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Burnout Bashtronaut.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Burnout Bashtronaut.Power = 2
+Bot1.Attack(Burnout Bashtronaut > Bot2)
+[T9 Bot1.Main2]
+
+[Expect]
+Turn = 9
+Bot1.Speed = 4
+Bot2.Life = 13
+Bot1.Battlefield.Burnout Bashtronaut.Power = 2
+Bot1.Battlefield.Burnout Bashtronaut.Keywords = DoubleStrike; Menace

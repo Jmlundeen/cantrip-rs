@@ -1,0 +1,11 @@
+{
+  "name": "Burnout Bashtronaut",
+  "manaCost": "{R}",
+  "type": "Creature — Goblin Warrior",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Menace\nStart your engines! (If you have no speed, it starts at 1. It increases once on each of your turns when an opponent loses life. Max speed is 4.)\n{2}: This creature gets +1/+0 until end of turn.\nMax speed — This creature has double strike.",
+  "keywords": [
+    "Menace"
+  ]
+}

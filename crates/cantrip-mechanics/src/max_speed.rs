@@ -9,8 +9,8 @@ use cantrip_api::*;
 
 use crate::start_your_engines::has_max_speed;
 
-/// "As long as your speed is 4" (CR 702.178a): the permanent itself, while its controller has max speed.
-fn itself_at_max_speed(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
+/// "As long as your speed is 4" (CR 702.178a): the permanent itself, while its controller has max speed. Perilous Snare's granted ability and Burnout Bashtronaut's double strike use it.
+pub fn itself_at_max_speed(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
     source == affected && has_max_speed(view.state(), view.state().obj(source).controller)
 }
 
