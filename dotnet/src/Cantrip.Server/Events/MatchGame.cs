@@ -29,6 +29,8 @@ public sealed class MatchGame : ITableEvent
     private DateTimeOffset? _endedAt;
     private bool _dealt;
     private bool _ended;
+    private readonly List<int> _forfeits = [];
+    private string? _forfeitReason;
 
     internal MatchGame(BoosterPod pod, MatchRecord match, int number)
     {
@@ -88,6 +90,25 @@ public sealed class MatchGame : ITableEvent
     {
         _ended = true;
         Done = true;
+    }
+
+    /// <summary>
+    /// A player dropped from the event during this game, and the pod has given the match to their opponent: a game being
+    /// played is ended against them by the table (<see cref="TakeForfeits"/>), saying why; one not dealt yet never is.
+    /// Either way its players are sent on once the result has been shown.
+    /// </summary>
+    internal void Concede(int seat, string why)
+    {
+        if (_ended || seat is not (1 or 2)) return;
+        _ended = true;
+        _endedAt = _pod.Now;
+        if (_dealt)
+        {
+            _forfeits.Add(seat);
+            _forfeitReason = why;
+        }
+
+        _version++;
     }
 
     internal void Changed() => _version++;
@@ -314,6 +335,22 @@ public sealed class MatchGame : ITableEvent
             _endedAt = _pod.Now;
             _pod.TimedOut(this, Match.Players[seat - 1]);
         }
+    }
+
+    public IReadOnlyList<int> TakeForfeits()
+    {
+        lock (_pod.Gate)
+        {
+            if (_forfeits.Count == 0) return [];
+            List<int> forfeits = [.. _forfeits];
+            _forfeits.Clear();
+            return forfeits;
+        }
+    }
+
+    public string? ForfeitReason(int seat)
+    {
+        lock (_pod.Gate) return _forfeitReason;
     }
 
     public IReadOnlyList<(int Seat, ServerMessage Farewell)> TakeVacated()

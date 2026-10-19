@@ -88,6 +88,12 @@ public interface ITableEvent
     /// </summary>
     IReadOnlyList<int> TakeForfeits() => [];
 
+    /// <summary>
+    /// Why a seat forfeited the game when it was not for being away - its player dropped from the event - as the table
+    /// is to say it; null for being away.
+    /// </summary>
+    string? ForfeitReason(int seat) => null;
+
     // --- A table still being formed from a queue. An event made up front is never forming, and needs none of this. ---
 
     /// <summary>

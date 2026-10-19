@@ -450,7 +450,7 @@ public sealed class BoosterPod : ITableEvent
             {
                 DraftPickMessage pick => Pick(seat, pick),
                 BuildDeckMessage build => Build(seat, build),
-                DropMessage => Drop(seat),
+                DropMessage => DropSeat(seat),
                 _ => "That is not something to do in this event.",
             };
         }
@@ -476,8 +476,9 @@ public sealed class BoosterPod : ITableEvent
         {
             switch (_record.Stage)
             {
-                case EventStage.Drafting when _draft.Tick(now, seat => Asking(seat, now)):
-                    Picked();
+                case EventStage.Drafting:
+                    Hurry(now);
+                    if (_draft.Tick(now, seat => Asking(seat, now))) Picked();
                     break;
                 case EventStage.DeckBuilding when _record.Deadline is { } deadline && now >= deadline:
                     foreach (EventParticipant participant in _record.Participants.Where(participant => !participant.Deck.Submitted))
@@ -538,7 +539,7 @@ public sealed class BoosterPod : ITableEvent
     /// </summary>
     private bool Asking(int seat, DateTimeOffset now)
     {
-        if (!_connected.Contains(seat) || _draft.Current(seat) is { Cards.Count: 1 }) return false;
+        if (!_connected.Contains(seat) || _draft.Current(seat) is { Cards.Count: 1 } || _record.AtSeat(seat) is { Dropped: true }) return false;
         int pick = _draft.Picks[seat - 1];
         if (_asked.TryGetValue(seat, out var asked) && asked.Pick == pick) return now < asked.By;
         _asked[seat] = (pick, now + Timing.PickAnswer);
@@ -567,6 +568,9 @@ public sealed class BoosterPod : ITableEvent
             foreach (EventParticipant each in _record.Participants)
             {
                 each.Deck = new EventDeck { Main = [.. Enumerable.Range(0, each.Pool.Count)] };
+
+                // Nobody waits on a player who has dropped: their deck is in as it stands.
+                if (each.Dropped) each.Deck = PoolDecks.Submitted(each.Pool, each.Deck, _record.MinimumDeck, ColorsOf);
             }
         }
         else
@@ -666,30 +670,121 @@ public sealed class BoosterPod : ITableEvent
     }
 
     /// <summary>
-    /// A player drops from the event: they are paired no more. Before a round begins it is paired again without them,
-    /// so nobody is given a match against a player who has gone; once it has begun, their match has to be over first -
-    /// played out, or its games conceded. Dropping leaves the standings as they are, with the player last, marked so.
+    /// A player drops from the event, from outside its tables - the site's Drop - by their player id. Safe from any
+    /// thread. Null once they have dropped; otherwise why not.
     /// </summary>
-    private string? Drop(int seat)
+    public string? Drop(string playerId)
+    {
+        lock (Gate)
+        {
+            return _record.Participant(playerId) is { } participant ? DropSeat(participant.Seat) : "You are not in this event.";
+        }
+    }
+
+    /// <summary>Whether a player has dropped from the event - or been dropped, for not coming to their match.</summary>
+    public bool HasDropped(string playerId)
+    {
+        lock (Gate) return _record.Participant(playerId)?.Dropped == true;
+    }
+
+    /// <summary>
+    /// A player drops from the event: they are paired no more, and nobody waits on them. While the packs go round the
+    /// clock picks for them at once, so their neighbours are not held up; while decks are built theirs is submitted as it
+    /// stands. Before a round begins it is paired again without them, so nobody is given a match against a player who
+    /// has gone; during their match they concede it, as a tournament has a player who leaves mid-match do: the game being
+    /// played and the match are their opponent's, and the games already played stand. Dropping leaves the
+    /// standings as they are, with the player last, marked so.
+    /// </summary>
+    private string? DropSeat(int seat)
     {
         if (_record.AtSeat(seat) is not { } participant) return "That seat is not in this event.";
-        if (_record.Stage != EventStage.Playing) return "The event is over: there is nothing to drop from.";
+        if (!_record.IsLive) return "The event is over: there is nothing to drop from.";
         if (participant.Dropped) return "You have already dropped.";
-        if (_record.Deadline is null && RoundMatches().Any(match => !match.Complete && match.Players.Contains(participant.PlayerId)))
-            return "Your match is being played: finish it, or concede its games, before you drop.";
 
         participant.Dropped = true;
-        if (_record.Deadline is { } begins)
+        switch (_record.Stage)
         {
-            // Nothing of the round has been played: it is paired again, to begin when it was going to.
-            _record.Matches.RemoveAll(match => match.Round == _record.Round);
-            _record.Round--;
-            PairNext(begins > Now ? begins - Now : TimeSpan.Zero);
+            case EventStage.Seating:
+                // Nobody waits for them to sit down.
+                Seated(seat);
+                break;
+            case EventStage.Drafting:
+                Hurry(Now);
+                if (_draft.Tick(Now, each => Asking(each, Now))) Picked();
+                break;
+            case EventStage.DeckBuilding:
+                if (!participant.Deck.Submitted) participant.Deck = PoolDecks.Submitted(participant.Pool, participant.Deck, _record.MinimumDeck, ColorsOf);
+                if (_record.Participants.All(each => each.Deck.Submitted))
+                {
+                    DecksBuilt();
+                    return null;
+                }
+
+                break;
+            case EventStage.Playing when _record.Deadline is { } begins:
+                // Nothing of the round has been played: it is paired again, to begin when it was going to.
+                _record.Matches.RemoveAll(match => match.Round == _record.Round);
+                _record.Round--;
+                PairNext(begins > Now ? begins - Now : TimeSpan.Zero);
+                break;
+            case EventStage.Playing:
+                if (RoundMatches().FirstOrDefault(match => !match.Complete && match.Players.Contains(participant.PlayerId)) is { } match)
+                {
+                    Conceded(match, participant.PlayerId);
+                }
+                else
+                {
+                    // Their match is over, or they had the bye: the next round is paired without them. A drop that leaves
+                    // too few to pair ends the event once the round is over.
+                    RoundOver();
+                }
+
+                break;
         }
 
         Changed();
         Save();
         return null;
+    }
+
+    /// <summary>
+    /// The pick clock of every seat that has dropped runs out now: the clock picks for them at once rather than holding the
+    /// table up.
+    /// </summary>
+    private void Hurry(DateTimeOffset now)
+    {
+        foreach (EventParticipant participant in _record.Participants.Where(participant => participant.Dropped))
+        {
+            int index = participant.Seat - 1;
+            if (index >= 0 && index < _draft.Deadlines.Count && _draft.Current(participant.Seat) is not null && (_draft.Deadlines[index] is null || _draft.Deadlines[index] > now))
+            {
+                _draft.Deadlines[index] = now;
+            }
+        }
+    }
+
+    /// <summary>
+    /// A player dropped while their match was on: they concede it - the game being played is their opponent's, and so is
+    /// the match, whatever the score; the games already played stand, as when a match clock runs out.
+    /// </summary>
+    private void Conceded(MatchRecord match, string loser)
+    {
+        string winner = match.Players.First(player => player != loser);
+        string name = _record.Participant(loser)!.Name;
+        MatchGame? table = _games.Values.Where(game => game.Match == match && !game.Done).OrderByDescending(game => game.Number).FirstOrDefault();
+        if (table is not null && match.Games.FirstOrDefault(each => each.Number == table.Number && each.Ending.Length == 0) is { } record)
+        {
+            record.Ended = Now;
+            record.Ending = "won";
+            record.Winners = [winner];
+            record.Detail = $"{name} dropped.";
+        }
+
+        match.Complete = true;
+        match.Winners = [winner];
+        match.Detail = $"{_record.Participant(winner)!.Name} won: {name} dropped.";
+        table?.Concede(match.Players.IndexOf(loser) + 1, $"{name} dropped from the event.");
+        RoundOver();
     }
 
     /// <summary>The round's wait is over: a table is wanted for the first game of every match.</summary>

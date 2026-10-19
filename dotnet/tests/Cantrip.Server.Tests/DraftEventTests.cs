@@ -662,6 +662,98 @@ public sealed class DraftEventTests : IDisposable
     }
 
     [Fact]
+    public void A_player_who_drops_before_the_game_calls_the_draft_off_and_it_is_over_for_both()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = Create(store);
+        DraftPod pod = DraftPod.Open(store, created.Record.Id, Content, clock);
+        pod.Seated(1);
+        pod.Seated(2);
+        Assert.Equal(EventStage.Drafting, pod.Stage);
+        int version = pod.Version;
+
+        Assert.Equal("You are not in this draft.", pod.Drop("carol"));
+        Assert.Null(pod.Drop("bob"));
+
+        // Over for both, and the table is told: it shows the event finished.
+        Assert.Equal(EventStage.Cancelled, pod.Stage);
+        Assert.Equal(TablePhase.Finished, pod.Phase);
+        Assert.NotEqual(version, pod.Version);
+        EventRecord record = store.LoadEvent(created.Record.Id)!;
+        Assert.Equal("Bob dropped from the draft.", record.Detail);
+        Assert.True(record.Participant("bob")!.Dropped);
+        Assert.True(pod.HasDropped("bob"));
+        Assert.Empty(store.LiveEvents());
+        Assert.Contains("over", pod.Drop("alice"));
+
+        // As each player's own list has it.
+        PlayerEventSummary bob = Assert.Single(PlayerEvents.Of(store, "bob"));
+        Assert.Equal(("Called off", false, true), (bob.Outcome, bob.Live, bob.Dropped));
+        Assert.Equal("Called off", PlayerEvents.Of(store, "alice").Single().Outcome);
+    }
+
+    [Fact]
+    public void A_player_who_drops_during_the_game_forfeits_it_and_the_other_wins_the_draft()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = Create(store);
+        DraftPod pod = DraftPod.Open(store, created.Record.Id, Content, clock);
+        pod.Seated(1);
+        pod.Seated(2);
+        pod.Connected(1, true);
+        pod.Connected(2, true);
+        DraftOut(pod);
+        clock.Advance(TimeSpan.FromMinutes(10));
+        pod.Tick(clock.GetUtcNow());
+        pod.Deal(["Alice", "Bob"], new CapturingRulesFactory());
+        Assert.Equal("Playing", PlayerEvents.Of(store, "alice").Single().Outcome);
+
+        // Alice drops: the table is to end the game against her, saying why, and records what it did.
+        Assert.Null(pod.Drop("alice"));
+        Assert.Equal([1], pod.TakeForfeits());
+        Assert.Equal("Alice dropped from the draft.", pod.ForfeitReason(1));
+        Assert.Null(pod.ForfeitReason(2));
+        Assert.Equal("You have already dropped.", pod.Drop("alice"));
+        pod.GameEnded(false, [2], "Alice dropped from the draft.");
+
+        EventRecord record = store.LoadEvent(created.Record.Id)!;
+        Assert.Equal(EventStage.Complete, record.Stage);
+        MatchRecord match = record.Matches.Single();
+        Assert.Equal(["bob"], match.Winners);
+        Assert.True(match.Forfeit);
+        Assert.Equal("Bob won round 1. Alice dropped from the draft.", record.Detail);
+
+        PlayerEventSummary bob = PlayerEvents.Of(store, "bob").Single();
+        Assert.Equal(("Won", 1, 0), (bob.Outcome, bob.Wins, bob.Losses));
+        Assert.Equal("Dropped", PlayerEvents.Of(store, "alice").Single().Outcome);
+    }
+
+    [Fact]
+    public void A_players_events_list_the_ones_being_played_first_then_the_latest_over()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent first = Create(store);
+        DraftPod.Open(store, first.Record.Id, Content, clock).Cancel("Called off by the host.");
+        CreatedEvent second = Create(store);
+
+        IReadOnlyList<PlayerEventSummary> alice = PlayerEvents.Of(store, "alice");
+        Assert.Equal([second.Record.Id, first.Record.Id], alice.Select(each => each.Id));
+        Assert.Equal(("Taking seats", true), (alice[0].Outcome, alice[0].Live));
+        Assert.Equal("winston", alice[0].Format);
+        Assert.Equal("rw-aggro", alice[0].Cube);
+
+        // One the host no longer runs is not being played; and only as many over as asked for.
+        PlayerEventSummary stopped = PlayerEvents.Of(store, "alice", hosted: _ => false).First(each => each.Id == second.Record.Id);
+        Assert.Equal(("Not finished", false), (stopped.Outcome, stopped.Live));
+        Assert.Equal([second.Record.Id], PlayerEvents.Of(store, "alice", recent: 0).Select(each => each.Id));
+        Assert.Empty(PlayerEvents.Of(store, "nobody"));
+        Assert.Equal(["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "102nd"], new[] { 1, 2, 3, 4, 11, 12, 13, 21, 102 }.Select(PlayerEvents.Ordinal));
+    }
+
+    [Fact]
     public void An_id_that_could_reach_outside_the_data_directory_is_refused()
     {
         var store = new EventStore(_data);

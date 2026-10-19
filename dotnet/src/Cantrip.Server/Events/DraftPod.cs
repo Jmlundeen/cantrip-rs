@@ -198,6 +198,9 @@ public sealed class DraftPod : ITableEvent
     /// <summary>Whether the game being played was forfeited: the table ends it, and its match is marked so.</summary>
     private bool _forfeited;
 
+    /// <summary>Why a seat forfeited, when it was not for being away: its player dropped (<see cref="Drop"/>).</summary>
+    private readonly Dictionary<int, string> _forfeitReasons = [];
+
     private DraftPod(EventStore store, EventRecord record, IPoolDraft draft, ContentLibrary content, TimeProvider time, DraftTiming timing)
     {
         _store = store;
@@ -516,6 +519,65 @@ public sealed class DraftPod : ITableEvent
         }
     }
 
+    /// <summary>
+    /// A player drops from the event - the site's Drop. A draft of two has nothing left to play without them: while the
+    /// game is being played they forfeit it, and the other player wins the match; before then the event is called off.
+    /// Safe from any thread. Null once they have dropped; otherwise why not.
+    /// </summary>
+    public string? Drop(string playerId)
+    {
+        lock (_gate)
+        {
+            if (_record.Participant(playerId) is not { } participant) return "You are not in this draft.";
+            if (!_record.IsLive) return "The draft is over: there is nothing to drop from.";
+            if (participant.Dropped) return "You have already dropped.";
+
+            participant.Dropped = true;
+            string why = $"{participant.Name} dropped from the draft.";
+            if (_record.Stage == EventStage.Playing && CurrentGame() is { Ending.Length: 0 })
+            {
+                _forfeitReasons[participant.Seat] = why;
+                if (_dealtAt is not null)
+                {
+                    // At the table: the table ends the game against them (TakeForfeits), and GameEnded records it.
+                    if (!_forfeited)
+                    {
+                        _forfeits.Add(participant.Seat);
+                        _forfeited = true;
+                    }
+
+                    Save();
+                    _version++;
+                    return null;
+                }
+
+                // Not dealt again since a restart: decided here, as the table would have.
+                _forfeited = true;
+                GameEnded(false, [.. _record.Participants.Where(each => each.Seat != participant.Seat).Select(each => each.Seat)], why);
+                _version++;
+                return null;
+            }
+
+            _record.Stage = EventStage.Cancelled;
+            _record.Deadline = null;
+            _record.Detail = why;
+            Save();
+            _version++;
+            return null;
+        }
+    }
+
+    /// <summary>Whether a player has dropped from the event.</summary>
+    public bool HasDropped(string playerId)
+    {
+        lock (_gate) return _record.Participant(playerId)?.Dropped == true;
+    }
+
+    public string? ForfeitReason(int seat)
+    {
+        lock (_gate) return _forfeitReasons.GetValueOrDefault(seat);
+    }
+
     /// <summary>Where the event stands, in a line, as saved.</summary>
     public string Detail
     {
@@ -770,6 +832,7 @@ public sealed class DraftPod : ITableEvent
                 : winners.Count == 0
                     ? $"Round {_record.Round} was a draw."
                     : $"{string.Join(" and ", winners.Select(id => _record.Participant(id)!.Name))} won round {_record.Round}.";
+            if (!abandoned && _forfeitReasons.Count > 0) _record.Detail += " " + string.Join(" ", _forfeitReasons.Values);
             Save();
         }
     }

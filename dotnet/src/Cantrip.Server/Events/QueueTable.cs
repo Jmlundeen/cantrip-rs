@@ -497,6 +497,8 @@ public sealed class QueueTable : ITableEvent
     public void ClockRanOut(int seat) => Pod?.ClockRanOut(seat);
 
     public IReadOnlyList<int> TakeForfeits() => Pod?.TakeForfeits() ?? [];
+
+    public string? ForfeitReason(int seat) => Pod?.ForfeitReason(seat);
 }
 
 /// <summary>How a queue's table forms, and what it becomes.</summary>

@@ -785,7 +785,9 @@ public sealed class GameServer : IAsyncDisposable
             {
                 Note($"seat(s) {string.Join(", ", forfeits)} forfeited");
                 string absent = string.Join(" and ", forfeits.Select(hosted.NameAt));
-                EndAgainst(forfeits, $"{absent} {(forfeits.Count == 1 ? "was" : "were")} not at the table.", ranOut: false);
+                string why = forfeits.Select(hosted.ForfeitReason).OfType<string>().FirstOrDefault()
+                    ?? $"{absent} {(forfeits.Count == 1 ? "was" : "were")} not at the table.";
+                EndAgainst(forfeits, why, ranOut: false);
             }
 
             FollowVacated(hosted);

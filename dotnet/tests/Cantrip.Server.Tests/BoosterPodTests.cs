@@ -501,14 +501,109 @@ public sealed class BoosterPodTests : IDisposable
     }
 
     [Fact]
-    public void A_player_whose_match_is_being_played_cannot_drop_until_it_is_over()
+    public void A_player_who_drops_during_their_match_concedes_it_and_the_game_being_played_is_ended_against_them()
     {
-        (_, _, BoosterPod pod, Clock clock) = Paired();
+        (EventStore store, CreatedEvent created, BoosterPod pod, Clock clock) = Paired();
         clock.Advance(TimeSpan.FromSeconds(15));
         pod.Tick(clock.GetUtcNow());
+        IReadOnlyList<MatchGame> tables = pod.TablesToOpen();
+        foreach ((MatchGame game, int i) in tables.Select((game, i) => (game, i)))
+        {
+            game.Opened(new Uri($"ws://localhost:{9000 + i}/game"));
+            game.Seated(1);
+            game.Seated(2);
+        }
 
-        Assert.Contains("concede", pod.Receive(5, new DropMessage()));
-        Assert.False(((PairingsMessage)pod.ViewFor(5)!).Standings.Single(standing => standing.Seat == 5).Dropped);
+        // Ann and Eve's first game is dealt; Eve drops from the site, mid-game.
+        MatchGame annsTable = tables.Single(game => game.NameAt(1) == "Ann");
+        Assert.True(annsTable.ReadyToDeal);
+        annsTable.Deal(["Ann", "Eve"], new CapturingRulesFactory());
+        Assert.Equal("You are not in this event.", pod.Drop("zed"));
+        Assert.Null(pod.Drop("eve"));
+        Assert.True(pod.HasDropped("eve"));
+
+        // The table ends the game against her, saying why, and its own end changes nothing more.
+        Assert.Equal([2], annsTable.TakeForfeits());
+        Assert.Equal("Eve dropped from the event.", annsTable.ForfeitReason(2));
+        Assert.Equal(TablePhase.Finished, annsTable.Phase);
+        annsTable.GameEnded(false, [1], "Eve dropped from the event.");
+
+        EventRecord record = store.LoadEvent(created.Record.Id)!;
+        MatchRecord match = record.Matches.Single(each => each.Players.Contains("eve"));
+        Assert.True(match.Complete);
+        Assert.Equal(["ann"], match.Winners);
+        Assert.Equal("Ann won: Eve dropped.", match.Detail);
+        Assert.Equal(("won", "ann"), (match.Games.Single().Ending, match.Games.Single().Winners.Single()));
+        Assert.True(record.Participant("eve")!.Dropped);
+        var pairings = (PairingsMessage)pod.ViewFor(1)!;
+        Assert.True(pairings.Standings.Single(standing => standing.Seat == 5).Dropped);
+        Assert.Equal(5, pairings.Standings[^1].Seat);
+
+        // Ann goes back to the pairings once the result has been shown.
+        clock.Advance(TimeSpan.FromSeconds(10));
+        annsTable.Tick(clock.GetUtcNow());
+        Assert.Contains(annsTable.TakeVacated(), vacated => vacated.Seat == 1 && vacated.Farewell is TableMoveMessage);
+
+        // The others play on; once they are done the next round is paired without Eve, and the odd player out has the bye.
+        foreach (MatchGame other in tables.Where(game => game != annsTable))
+        {
+            other.Deal(["A", "B"], new CapturingRulesFactory());
+            other.GameEnded(false, [1], "won");
+        }
+
+        foreach (MatchGame next in pod.TablesToOpen())
+        {
+            next.Opened(new Uri("ws://localhost:9100/game"));
+            next.Deal(["A", "B"], new CapturingRulesFactory());
+            next.GameEnded(false, [1], "won");
+        }
+
+        record = store.LoadEvent(created.Record.Id)!;
+        Assert.Equal(2, record.Round);
+        List<MatchRecord> second = [.. record.Matches.Where(each => each.Round == 2)];
+        Assert.DoesNotContain(second, each => each.Players.Contains("eve"));
+        Assert.Single(second, each => each.Bye);
+        Assert.Equal(7, second.Sum(each => each.Players.Count));
+    }
+
+    [Fact]
+    public void A_player_who_drops_during_the_draft_is_picked_for_at_once_their_deck_submitted_and_never_paired()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = Create(store, packSize: 5);
+        BoosterPod pod = BoosterPod.Open(store, created.Record.Id, Content, clock);
+        for (int seat = 1; seat <= 8; seat++) pod.Seated(seat);
+        Assert.Equal(EventStage.Drafting, pod.Stage);
+
+        // Cat drops: her first pick is made for her straight away, without her clock running down.
+        Assert.Null(pod.Drop("cat"));
+        Assert.Single(pod.Picks, pick => pick.Seat == 3 && pick.Auto);
+        Assert.DoesNotContain(pod.Picks, pick => pick.Seat != 3);
+
+        // Every pack that comes to her is picked from as it arrives; the rest are drafted by the clock.
+        while (pod.Stage == EventStage.Drafting)
+        {
+            clock.Advance(TimeSpan.FromSeconds(30));
+            pod.Tick(clock.GetUtcNow());
+        }
+
+        EventRecord record = store.LoadEvent(created.Record.Id)!;
+        Assert.Equal(15, record.Participant("cat")!.Pool.Count);
+
+        // Dan drops while decks are built: his is submitted as it stands, and nobody is paired with either.
+        Assert.Equal(EventStage.DeckBuilding, pod.Stage);
+        Assert.Null(pod.Drop("dan"));
+        record = store.LoadEvent(created.Record.Id)!;
+        Assert.True(record.Participant("dan")!.Deck.Submitted);
+        Assert.True(record.Participant("cat")!.Deck.Submitted);
+        clock.Advance(TimeSpan.FromMinutes(10));
+        pod.Tick(clock.GetUtcNow());
+
+        var pairings = (PairingsMessage)pod.ViewFor(1)!;
+        Assert.Equal(3, pairings.Matches.Count);
+        Assert.DoesNotContain(pairings.Matches, match => match.FirstSeat is 3 or 4 || match.SecondSeat is 3 or 4);
+        Assert.Equal([3, 4], pairings.Standings.TakeLast(2).Select(standing => standing.Seat).Order());
     }
 
     [Fact]
