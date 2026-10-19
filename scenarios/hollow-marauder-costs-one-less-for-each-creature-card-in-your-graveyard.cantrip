@@ -1,0 +1,51 @@
+# Bot2 bolts Bot1's Llanowar Elves on turn 2, leaving one creature card in Bot1's graveyard; on turn 3 Bot1's own Dark
+# Ritual joins it there, a noncreature card, which must not count. Hollow Marauder costs {5}{B} (one creature card). With
+# 5 mana in the pool (Mox Jet into Dark Ritual makes BBB, Mox Ruby, Mox Emerald) it is refused: it would cost {4}{B}, within
+# reach, only if the Ritual counted. Black Lotus then makes 8 and it is cast. Bot2 discards an Island (mana value 0, not
+# 4 or greater), so Bot1 draws a card.
+# Bot1: 7 cards - Emerald, Elves = 5, +1 turn-3 draw = 6, - Jet, Ruby, Ritual, Lotus, Marauder = 1, +1 = 2.
+
+[Bot1 Deck]
+Mox Emerald
+Llanowar Elves
+Mox Jet
+Dark Ritual
+Black Lotus
+Hollow Marauder
+Mox Ruby
+Swamp x13
+
+[Bot2 Deck]
+Mountain
+Lightning Bolt
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Hollow Marauder.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Hollow Marauder.Cast
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot2.Choose(Island)
+
+[Expect]
+Bot1.Battlefield.Hollow Marauder.Keywords = Flying
+Bot1.Graveyard = Black Lotus; Dark Ritual; Llanowar Elves
+Bot1.Hand.Count = 2
+Bot2.Hand.Count = 5

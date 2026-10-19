@@ -1,0 +1,43 @@
+# Three players. Bot1 casts Hollow Marauder on turn 1 (Mox Jet, Dark Ritual x2 and Black Lotus pay all 7) and targets both
+# opponents. Bot2 (first in turn order) discards Wrath of God, mana value 4: the boundary of "4 or greater", so no card is
+# drawn for Bot2. Bot3 discards Deceiver Exarch, mana value 3, so Bot1 draws one card for Bot3 only.
+# Bot1: 7 cards + the turn-1 draw (CR 103.8a, three players) = 8, minus Jet, Ritual, Ritual, Lotus, Marauder = 3, +1 = 4.
+
+[Bot1 Deck]
+Mox Jet
+Dark Ritual
+Dark Ritual
+Black Lotus
+Hollow Marauder
+Swamp
+Swamp
+Swamp x13
+
+[Bot2 Deck]
+Wrath of God
+Island x19
+
+[Bot3 Deck]
+Deceiver Exarch
+Island x19
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Hand.Dark Ritual.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Hollow Marauder.Cast
+Bot1.Target(Bot2; Bot3)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot2.Choose(Wrath of God)
+Bot3.Choose(Deceiver Exarch)
+
+[Expect]
+Bot1.Battlefield.Hollow Marauder.Keywords = Flying
+Bot1.Hand.Count = 4
+Bot2.Graveyard = Wrath of God
+Bot3.Graveyard = Deceiver Exarch
