@@ -61,6 +61,13 @@ Force the position instead. A `.cantrip` scenario names both decklists in order 
   `tools\card-coverage.cmd "Name"` lists the lines of its file that no scenario runs. Adding a card follows the
   `add-cards` skill: exact to the rules, every line covered, corner cases and interactions scenario'd, playable
   end to end in the client, reviewed.
+- **Cards are claimed on GitHub before they are worked on.** Every missing card a format plays is an issue
+  ("Card: Name", labelled `format:<format>`), from `docs/formats/<format>.json` (the cards its decks play, scraped from
+  MTGGoldfish and MTGTop8 by `tools/maintenance/format-scrape.py`). `python tools/maintenance/card-issues.py next
+  <format>` lists what is free, `claim "Name"` takes a card (opening its issue first if it has none), `release`
+  gives it back. A claim is a comment and lasts 24 hours from the last pull request commit or push to a
+  `card/<slug>` branch; after that the card is free. Never work on a card someone else holds live; commits end with
+  `Closes #N`. `sync <format>` adds the issues a new scrape needs.
 
 The client draws on canvases, so there is no DOM to find a card in. Open the page with `&test` and it publishes where
 every card and control is, by name, on `globalThis.cantripTest`; drive it with Playwright - screenshots, and real

@@ -63,6 +63,8 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 | `rebuild-card-test-deck.ps1` | regenerates the card-test deck from the card files |
 | `card-list.py` | any list of cards (a decklist, a set, a Scryfall search, a text file, a pasted list) as the names the card files use, checked against Scryfall (the `import-cards` skill) |
 | `missing-cards.py` | cards on the cube lists, or on one list or file (`--list`, `--file`), that have no card file yet |
+| `format-scrape.py <format>` | the cards a format's winning decks play, from MTGGoldfish and MTGTop8, ranked, into `docs/formats/<format>.json` (pages cached in `target/format-cache`) |
+| `card-issues.py` | GitHub issues for the cards a format plays that have no file: `sync <format>` opens them, `next <format>` lists the free ones, `claim`/`release "Name"` take and give back a card (a claim is a comment, good for 24 hours from the last PR commit or `card/<slug>` push), `status` lists live claims (the `add-cards` skill) |
 | `cubecobra-sync.py` | syncs one cube list from its CubeCobra cube, or fetches a new cube whole by its CubeCobra name (the `import-cards` skill) |
 | `missing-art.py` | the card faces and tokens of a cube list or file (`--list`, `--file`) that have no art yet, one a line |
 | `pick-order.py` | ranks the cubes' cards into their `*.picks.json` pick orders |
