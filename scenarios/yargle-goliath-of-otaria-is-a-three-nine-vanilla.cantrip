@@ -1,0 +1,37 @@
+# Yargle, Goliath of Otaria is a vanilla 3/9 (CR 208): it is its characteristics and nothing more. Bot1 casts it and
+# attacks, and the 3 power is dealt to Bot2.
+
+[Bot1 Deck]
+Yargle, Goliath of Otaria
+Island
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+[T1 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Hand.Yargle, Goliath of Otaria.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Yargle, Goliath of Otaria)
+[T3 Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Yargle, Goliath of Otaria.Power = 3
+Bot1.Battlefield.Yargle, Goliath of Otaria.Toughness = 9
+Bot2.Life = 17
