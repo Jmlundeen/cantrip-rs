@@ -11,6 +11,12 @@ pub fn your_creatures(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, 
     so_far.is(CardType::Creature) && s.obj(affected).controller == s.obj(source).controller
 }
 
+/// "Other creatures you control" (CR 613.1f, layer 6): `your_creatures` without the source itself, judged on what the earlier
+/// layers made the object. Hexing Squelcher, Ulvenwald Oddity and Suki, Courageous Rescuer use it as `StaticDef::affects`.
+pub fn other_creatures_you_control(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
+    affected != source && your_creatures(q, source, affected, so_far)
+}
+
 /// "Creatures" / "all creatures" (CR 613.1f): every creature on the battlefield, whoever controls it, judged on what the
 /// earlier layers made the object. Intruder Alarm and Lavaleaper ("All creatures have haste") use it as
 /// `StaticDef::affects`.
