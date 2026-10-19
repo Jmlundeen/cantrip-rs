@@ -1,0 +1,36 @@
+# "Whenever a player casts their second spell each turn": any player's, its controller's included, and the target is an
+# opponent of the Battler's controller, so Bot1's own second spell on turn 3 (Mox Sapphire, then Mox Emerald) costs Bot2 2
+# life, not Bot1. The first spell of the turn does nothing, and neither does the Battler's own cast on turn 1.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Hearthborn Battler
+Mox Sapphire
+Mox Emerald
+Island
+Island x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hearthborn Battler.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+? Bot2.Life = 20
+Bot1.Hand.Mox Emerald.Cast
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20

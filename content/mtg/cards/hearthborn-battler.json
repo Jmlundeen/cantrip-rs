@@ -1,0 +1,11 @@
+{
+  "name": "Hearthborn Battler",
+  "manaCost": "{2}{R}",
+  "type": "Creature — Lizard Warlock",
+  "power": 2,
+  "toughness": 3,
+  "oracleText": "Haste\nWhenever a player casts their second spell each turn, this creature deals 2 damage to target opponent.",
+  "keywords": [
+    "Haste"
+  ]
+}

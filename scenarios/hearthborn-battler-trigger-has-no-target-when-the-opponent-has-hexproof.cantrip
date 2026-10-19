@@ -1,0 +1,45 @@
+# "Target opponent" is a target (CR 115.1): a player with hexproof can't be chosen, and the trigger is removed from the
+# stack with no target (CR 603.3d). Bot2's second spell on turn 2 (two Moxen, with Pearl and Sapphire left untapped) costs it 2
+# life (the positive control, 18). On turn 4 Bot2 casts Crystal Barricade ("You have hexproof") as its first spell and a Mox
+# Jet as its second: the Battler's trigger has no legal target, so Bot2 stays at 18.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Hearthborn Battler
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Sapphire
+Crystal Barricade
+Mox Jet
+Island
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hearthborn Battler.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Crystal Barricade.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+[T4 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield = Mox Pearl; Mox Sapphire; Mox Jet; Crystal Barricade

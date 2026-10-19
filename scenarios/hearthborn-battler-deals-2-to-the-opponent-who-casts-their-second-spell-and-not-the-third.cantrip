@@ -1,0 +1,39 @@
+# Hearthborn Battler: "Whenever a player casts their second spell each turn, this creature deals 2 damage to target opponent."
+# Bot1 casts three Moxen and then the Battler on turn 1: the Battler is not on the battlefield when any of those spells is
+# cast, so nothing happens (Bot2 is still at 20, checked mid-game). On turn 2 Bot2 casts a Mox (first spell: nothing), a
+# second Mox (the trigger: 2 damage to Bot2, the only opponent of Bot1) and a third (nothing more). Bot2 ends at 18.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Hearthborn Battler
+Island x20
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hearthborn Battler.Cast
+Bot1.Pass
+? Bot2.Life = 20
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Life = 20
+Bot1.Battlefield.Hearthborn Battler.Damage = 0

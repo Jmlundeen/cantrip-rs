@@ -1,0 +1,43 @@
+# The trigger is independent of its source once on the stack (CR 113.7a, 608.2h): the Battler deals the damage as it last
+# existed. Bot2 casts a Mox Ruby (first spell) and a Lightning Bolt at the Battler (second spell, so the trigger goes
+# on the stack above it), then a second Lightning Bolt in response, which kills the Battler (3 damage on 3 toughness) before
+# the trigger resolves. The trigger still deals 2 damage to Bot2 (18); the first Bolt has no target left and fizzles.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Hearthborn Battler
+Island x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hearthborn Battler.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Hearthborn Battler)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Hearthborn Battler)
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Hearthborn Battler
+Bot2.Life = 18
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
