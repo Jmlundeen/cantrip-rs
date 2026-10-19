@@ -1,0 +1,34 @@
+# A normal cast creates unmodified Cadets; flashback counts cards while the spell is on the stack (CR 702.34).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Recursive Recruitment
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Recursive Recruitment.Cast
+Bot1.Graveyard.Recursive Recruitment.Cast(Ability: Flashback)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Cadet#1.Power = 2
+Bot1.Battlefield.Cadet#3.Power = 3
+Exile = Recursive Recruitment
