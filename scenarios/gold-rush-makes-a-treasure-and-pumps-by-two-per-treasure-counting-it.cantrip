@@ -1,0 +1,40 @@
+# Gold Rush with one Treasure already out: it makes a second first, so Ornithopter (0/2) gets +4/+4 for the two Treasures
+# (CR 608.2c: the instructions are followed in order; the bonus counts as it resolves).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Emerald
+Ornithopter
+Gold Pan
+Gold Rush
+Forest x14
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Gold Pan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Treasure Token.Token = true
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Gold Rush.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main1]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 4
+Bot1.Battlefield.Ornithopter.Toughness = 6

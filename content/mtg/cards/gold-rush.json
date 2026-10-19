@@ -1,0 +1,6 @@
+{
+  "name": "Gold Rush",
+  "manaCost": "{1}{G}",
+  "type": "Instant",
+  "oracleText": "Create a Treasure token. Until end of turn, up to one target creature gets +2/+2 for each Treasure you control."
+}
