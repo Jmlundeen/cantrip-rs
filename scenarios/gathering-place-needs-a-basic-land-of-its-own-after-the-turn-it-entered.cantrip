@@ -1,0 +1,28 @@
+# Gathering Place after the turn it entered. On turn 3 Bot1 controls only a Temple Garden (Forest and Plains types but not
+# basic, CR 205.4a) and Bot2 controls an Island (not Bot1's): {G} is refused (the refusal) while {C} is still offered. On
+# turn 5 a basic Forest of Bot1's turns the ability back on (the positive control: the same action, the same land).
+
+[Bot1 Deck]
+Gathering Place
+Temple Garden
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Gathering Place.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Temple Garden.Play
+! Bot1.Battlefield.Gathering Place.Activate(Ability: or; Color: Green)
+Bot1.Battlefield.Gathering Place.Activate(Ability: {C})
+? Bot1.Mana = {C}
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Gathering Place.Activate(Ability: or; Color: Green)
+
+[Expect]
+Bot1.Mana = {G}
