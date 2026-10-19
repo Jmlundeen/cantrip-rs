@@ -87,6 +87,18 @@ public sealed class TableMessage : ServerMessage
     /// </summary>
     [Key(12)] public string Art { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The page the player came to this table from, and goes back to once its game is over and nothing more is played
+    /// here: an absolute http(s) address on the site that hosts the table - its draft queues, or its constructed play -
+    /// or empty for none: a table of one's own, or one whose players are sent on to another table (a booster pod's games,
+    /// which send them back to the pod's pairings). The table says so rather than the link, as it says <see cref="Art"/>,
+    /// so it holds however the table was reached.
+    /// </summary>
+    [Key(13)] public string Return { get; set; } = string.Empty;
+
+    /// <summary>The name of the page <see cref="Return"/> goes to, for its button ("Draft Queues"); empty with none.</summary>
+    [Key(14)] public string ReturnName { get; set; } = string.Empty;
+
     public override string Describe() => $"table {Phase}, {Players.Count}/{Capacity} players";
 }
 

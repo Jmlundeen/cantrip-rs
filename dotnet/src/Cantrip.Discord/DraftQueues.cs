@@ -116,6 +116,12 @@ public sealed class DraftQueuesOptions
     /// <summary>Where card art is, said by every table to the clients at it (<see cref="GameServerOptions.Art"/>); null for not said.</summary>
     public Uri? Art { get; init; }
 
+    /// <summary>
+    /// The site's page its players go back to once a table's game is over (<see cref="GameServerOptions.Return"/>); null
+    /// when the bot serves no pages.
+    /// </summary>
+    public ReturnPage? Return { get; init; }
+
     /// <summary>How long a full table's players have to say they are ready.</summary>
     public TimeSpan ReadyWindow { get; init; } = TimeSpan.FromSeconds(30);
 
@@ -662,6 +668,7 @@ public sealed class DraftQueues : IAsyncDisposable
                     Event = table,
                     Portraits = _options.Portraits,
                     Art = _options.Art,
+                    Return = _options.Return,
                 }).ConfigureAwait(false);
                 made = new Forming(table, server, port, _options.TableAddress?.Invoke(server.Port) ?? new Uri($"ws://{_options.PublicHost}:{server.Port}/game"), settings, cube);
                 Forming watched = made;

@@ -67,7 +67,17 @@ public sealed class GameServerOptions
 
     /// <summary>Where card art is, told to every client at the table (<see cref="TableMessage.Art"/>); null for not said.</summary>
     public Uri? Art { get; init; }
+
+    /// <summary>
+    /// The page players go back to once this table's game is over (<see cref="TableMessage.Return"/>): the site's draft
+    /// queues or constructed play. Null for none - a table of one's own, or one whose players are sent on to another
+    /// table when its game is over.
+    /// </summary>
+    public ReturnPage? Return { get; init; }
 }
+
+/// <summary>A page of the site that hosts a table, which its players go back to once its game is over, and its name for the button.</summary>
+public sealed record ReturnPage(Uri Address, string Name);
 
 /// <summary>How a table ended: the phase it ended in, the seats that won (none for a draw or an abandonment), and
 /// why, when the table says.</summary>
@@ -1069,6 +1079,8 @@ public sealed class GameServer : IAsyncDisposable
             EventId = _options.Event?.EventId ?? string.Empty,
             EventName = _options.Event?.Name ?? string.Empty,
             Art = _options.Art?.OriginalString ?? string.Empty,
+            Return = _options.Return?.Address.AbsoluteUri ?? string.Empty,
+            ReturnName = _options.Return?.Name ?? string.Empty,
         };
 
         // An event's players are known before they sit down, so a seat still waiting for its player is shown as theirs; a

@@ -336,6 +336,20 @@ when it would end the game - every other player still in is of one team - since 
 player (CR 800.4a) is not supported yet (`GameEngine.CanConcede`). The test state names each tab as a control of kind
 `tab`.
 
+## When the game is over
+
+The result is said over the board (`MainPage.Outcome.cs`): who won, and why, from the log's loss lines, with **Look at
+the board** to put it away. A table that names the page its players came from (`TableMessage.Return`, with its name in
+`ReturnName`) is gone back to from there (`GoingBack`, in `Cantrip.Client.Presentation`): the Discord bot's tables name
+its draft queues (`/draft`) after a Winston or grid draft's game, and its constructed play (`/constructed`) after a
+constructed game, which is a match of one game. The result then has **Back to Draft Queues** (or **Back to Constructed
+Play**) above **Look at the board**, and a line under them counting down: after 30 seconds the page goes back by itself
+(`Ticket.js`'s `cantripGoBack`, an http(s) address only), leaving the table in the tab's history. **Look at the board**
+stops the countdown - the player is looking - and the **Menu** tab keeps the button for when they are done. A table
+that names nothing - one of the player's own (`tools\play-vs-bot.cmd`, `?bots=2`), or a booster pod's game, whose
+players the pod sends on to the next game or back to its pairings and standings (`TableMoveMessage`) - has the result
+alone, as before.
+
 ## Open
 
 - The emblem pile beside a player's graveyard.

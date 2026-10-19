@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using Cantrip.Client;
 using Cantrip.Protocol;
 using Cantrip.Server;
+using Cantrip.Server.Host;
 using Cantrip.TestKit;
 using Xunit;
 
@@ -33,13 +34,32 @@ public sealed class MatchmakerTests
         public void Advance(TimeSpan duration) => Interlocked.Add(ref _ticks, duration.Ticks);
     }
 
-    private static Matchmaker Create(int tables = 2, Clock? clock = null) => new(new MatchmakerOptions
+    private static Matchmaker Create(int tables = 2, Clock? clock = null, ReturnPage? back = null) => new(new MatchmakerOptions
     {
         ContentRoot = RepoRoot.ContentRoot,
         Deck = RwAggro.Value,
         Ports = FreePorts(tables),
         TimeProvider = (TimeProvider?)clock ?? TimeProvider.System,
+        Return = back,
     });
+
+    [Fact]
+    public async Task A_games_table_names_the_constructed_page_to_go_back_to_once_it_is_over()
+    {
+        var page = new ReturnPage(new Uri("https://cantrip.example/constructed"), "Constructed Play");
+        await using Matchmaker matchmaker = Create(back: page);
+        Seating hosted = await matchmaker.HostAsync(Alice);
+        GameClient alice = await Connect(hosted.Game!, hosted.Ticket!);
+        try
+        {
+            await Until(() => alice.Table is not null, alice);
+            Assert.Equal(("https://cantrip.example/constructed", "Constructed Play"), (alice.Table!.Return, alice.Table.ReturnName));
+        }
+        finally
+        {
+            alice.Disconnect();
+        }
+    }
 
     /// <summary>Ports nothing is listening on right now, as the pool a host would configure.</summary>
     private static List<int> FreePorts(int count)

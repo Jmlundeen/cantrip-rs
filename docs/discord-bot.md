@@ -19,7 +19,13 @@ Once both seats are taken, the button reads **My ticket** and hands a seated pla
 ticket also takes back its seat if the client dies mid-game, so pressing **Open in Cantrip** again is how to get back
 in.
 The host or anyone with Manage Server can **Cancel**. A table that is not dealt within 30 minutes expires. An ended
-table stays up for two minutes so both clients can see the result, then its port is freed. A player is in at most one
+table stays up for two minutes so both clients can see the result, then its port is freed. When the bot serves the
+client, every table names the site's page its players go back to once the game is over (`ReturnPage`, `TableMessage.Return`):
+constructed play for a game from `/cantrip host` or `/constructed` (when the bot has Standard decks to offer), the draft
+queues for a Winston or grid draft from `/cantrip draft`, a queue or the `/draft` page. The result has a button back
+there, and the page goes by itself after 30 seconds unless the player has put the result away to look at the board
+([web-client.md](web-client.md#when-the-game-is-over)). A booster pod's games name none: the pod sends its players back
+to its pairings, and at the end its final standings. A player is in at most one
 unfinished game at a time.
 
 ## Draft queues

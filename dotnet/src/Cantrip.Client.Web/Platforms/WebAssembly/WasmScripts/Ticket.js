@@ -27,3 +27,12 @@ globalThis.cantripGoToTable = function (server, ticket) {
     url.hash = "ticket=" + encodeURIComponent(ticket);
     window.location.replace(url.toString());
 };
+
+// A table whose game is over goes back to the page its player came from - the site's draft queues, its constructed play
+// (TableMessage.Return). Only an http(s) address is gone to, whatever the table names.
+globalThis.cantripGoBack = function (page) {
+    const url = new URL(page, window.location.href);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+        window.location.assign(url.toString());
+    }
+};

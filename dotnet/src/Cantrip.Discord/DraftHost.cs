@@ -50,6 +50,12 @@ public sealed class DraftHostOptions
     /// <summary>Where card art is, said by every table to the clients at it (<see cref="GameServerOptions.Art"/>); null for not said.</summary>
     public Uri? Art { get; init; }
 
+    /// <summary>
+    /// The site's page its players go back to once a table's game is over (<see cref="GameServerOptions.Return"/>); null
+    /// when the bot serves no pages.
+    /// </summary>
+    public ReturnPage? Return { get; init; }
+
     /// <summary>How long a draft may wait for its second player.</summary>
     public TimeSpan OpenTimeout { get; init; } = TimeSpan.FromMinutes(30);
 
@@ -459,6 +465,7 @@ public sealed class DraftHost : IAsyncDisposable
                     Event = pod,
                     Portraits = _options.Portraits,
                     Art = _options.Art,
+                    Return = _options.Return,
                 }).ConfigureAwait(false);
                 draft.Port = candidate;
                 draft.Pod = pod;

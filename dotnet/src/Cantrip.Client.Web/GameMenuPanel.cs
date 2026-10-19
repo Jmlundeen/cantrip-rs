@@ -5,13 +5,15 @@ namespace Cantrip.Client.Web;
 /// <summary>
 /// The game tab of the side panel: what a player can do to the game as a whole rather than within it. For now that is
 /// conceding, which asks once more before it is sent - a concession cannot be taken back, and the button is one stray
-/// click from the log tab.
+/// click from the log tab - and, once the game is over at a table that names the page its player came from, going back
+/// there (MainPage.Outcome).
 /// </summary>
 public sealed class GameMenuPanel : ScrollViewer
 {
     private readonly DockButton _concede;
     private readonly TextBlock _note;
     private readonly StackPanel _confirm;
+    private readonly DockButton _return;
     private bool _playing;
 
     public GameMenuPanel()
@@ -82,7 +84,24 @@ public sealed class GameMenuPanel : ScrollViewer
         _confirm.Children.Add(answers);
         rows.Children.Add(_confirm);
 
+        _return = new DockButton("Back", primary: true) { Visibility = Visibility.Collapsed }.Filling();
+        _return.Clicked += () => ReturnRequested?.Invoke();
+        rows.Children.Add(_return);
+
         ShowPlaying(false);
+    }
+
+    /// <summary>Raised when the player asks to go back to the page they came to the table from.</summary>
+    public event Action? ReturnRequested;
+
+    /// <summary>The button back to the page the player came from, saying this; null hides it, for a game not over or a table that names none.</summary>
+    public void ShowReturn(string? caption)
+    {
+        _return.Visibility = caption is null ? Visibility.Collapsed : Visibility.Visible;
+        if (caption is not null && _return.Caption != caption)
+        {
+            _return.Caption = caption;
+        }
     }
 
     /// <summary>Raised when the player has asked to concede and said yes when asked again.</summary>

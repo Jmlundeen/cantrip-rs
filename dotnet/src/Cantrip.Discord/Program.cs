@@ -115,6 +115,11 @@ if (client is null)
     art ??= publicUrl ?? new Uri($"http://{publicHost}:{webPort}/");
 }
 
+// The site's own pages - its draft queues, its constructed play - which a table's players go back to once its game is
+// over: only when the bot serves them, beside the client.
+Uri? pages = client is null ? publicUrl ?? new Uri($"http://{publicHost}:{webPort}/") : null;
+Cantrip.Server.Host.ReturnPage? draftPage = pages is null ? null : new Cantrip.Server.Host.ReturnPage(new Uri(pages, QueueSite.Route), "Draft Queues");
+
 string? content = StringArg(args, "--content") ?? FindUp("content", "mtg");
 string? decks = FindUp("decks");
 if (content is null || decks is null)
@@ -204,6 +209,7 @@ if (EventStore.Configured(args) is { } data)
             TableAddress = tableAddress,
             Portraits = portraitPaths,
             Art = art,
+            Return = draftPage,
         });
         tablePorts.UnionWith(draftPorts);
         Console.WriteLine($"Drafts of {cubeName} kept in {Path.GetFullPath(data)}, on ports {draftPorts[0]}-{draftPorts[^1]}.");
@@ -236,6 +242,7 @@ if (EventStore.Configured(args) is { } data)
             TableAddress = tableAddress,
             Portraits = portraitPaths,
             Art = art,
+            Return = draftPage,
         });
         foreach (string problem in await queues.LoadAsync()) Console.Error.WriteLine(problem);
         Console.WriteLine($"{queues.Queues.Count} draft queue(s).");
@@ -265,6 +272,8 @@ await using var matchmaker = new Matchmaker(new MatchmakerOptions
     PublicHost = publicHost,
     TableAddress = tableAddress,
     Art = art,
+    // A game hosted from Discord is a constructed game as much as one from the page.
+    Return = pages is null || standard.Count == 0 ? null : new Cantrip.Server.Host.ReturnPage(new Uri(pages, PlaySite.Route), "Constructed Play"),
 });
 
 // The client is static, so one serves every game; only when it is hosted elsewhere does the bot not serve it.
@@ -290,7 +299,7 @@ if (client is null)
         Console.ResetColor();
     }
 
-    Uri siteAddress = publicUrl ?? new Uri($"http://{publicHost}:{webPort}/");
+    Uri siteAddress = pages!;
 
     // Everything being played and everything played, at /status: the events kept in the data directory, the queues'
     // tables still forming and the games hosted on their own. The queue page shows the drafts under way from it too.

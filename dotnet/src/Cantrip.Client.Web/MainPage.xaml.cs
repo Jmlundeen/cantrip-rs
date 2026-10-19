@@ -172,6 +172,7 @@ public sealed partial class MainPage : Page
         _log = new LogPanelControl();
         _side = new SidePanel(_log, new SettingsPanel(), new GameMenuPanel());
         _side.Menu.ConcedeRequested += () => _gameClient?.Concede();
+        _side.Menu.ReturnRequested += GoBack;
         _side.HideRequested += () => SetSideOpen(false);
         _sideSlot = new Grid { Width = _sideOpen ? SidePanel.PanelWidth : 0, Children = { _side } };
         _sideSlot.SizeChanged += (_, e) => _sideSlot.Clip = new Microsoft.UI.Xaml.Media.RectangleGeometry
@@ -1338,6 +1339,7 @@ public sealed partial class MainPage : Page
             FollowRestore(client);
             KeepSeat(client);
             FollowConnection(client);
+            FollowGoingBack(client);
 
             // Answered for the player where they would only have passed; the view it leaves is the one drawn below.
             AutoAnswer(client);

@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using Cantrip.Client;
 using Cantrip.Protocol;
 using Cantrip.Server.Events;
+using Cantrip.Server.Host;
 using Cantrip.TestKit;
 using Xunit;
 
@@ -39,9 +40,9 @@ public sealed class DraftQueuesTests : IDisposable
         public void Advance(TimeSpan duration) => Interlocked.Add(ref _ticks, duration.Ticks);
     }
 
-    private (DraftQueues Queues, DraftHost Drafts) Create() => Create(out _);
+    private (DraftQueues Queues, DraftHost Drafts) Create(ReturnPage? back = null) => Create(out _, back);
 
-    private (DraftQueues Queues, DraftHost Drafts) Create(out PodHosts pods)
+    private (DraftQueues Queues, DraftHost Drafts) Create(out PodHosts pods, ReturnPage? back = null)
     {
         List<int> ports = FreePorts(6);
         var store = new EventStore(_data);
@@ -53,9 +54,27 @@ public sealed class DraftQueuesTests : IDisposable
         var queues = new DraftQueues(new DraftQueuesOptions
         {
             ContentRoot = RepoRoot.ContentRoot, Store = store, Drafts = drafts, Pods = pods, Ports = ports, TimeProvider = _clock,
-            CubeDirectories = [Path.Combine(RepoRoot.Path, "decks")],
+            CubeDirectories = [Path.Combine(RepoRoot.Path, "decks")], Return = back,
         });
         return (queues, drafts);
+    }
+
+    [Fact]
+    public async Task A_queues_table_names_the_draft_queue_page_to_go_back_to_once_its_game_is_over()
+    {
+        var page = new ReturnPage(new Uri("https://cantrip.example/draft"), "Draft Queues");
+        (DraftQueues queues, DraftHost drafts) = Create(page);
+        await using (drafts)
+        await using (queues)
+        {
+            Assert.Null(await queues.ConfigureAsync(Settings()));
+            QueueSeating seating = await queues.JoinAsync(Channel, new DiscordPlayer(2001, "Player 1"));
+            GameClient client = await Sit(seating.Address!, seating.Ticket!);
+            await Until(() => client.Table is not null, client);
+
+            Assert.Equal(("https://cantrip.example/draft", "Draft Queues"), (client.Table!.Return, client.Table.ReturnName));
+            client.Disconnect();
+        }
     }
 
     [Fact]

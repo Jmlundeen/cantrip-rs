@@ -40,6 +40,12 @@ public sealed class MatchmakerOptions
     /// <summary>Where card art is, said by every table to the clients at it (<see cref="GameServerOptions.Art"/>); null for not said.</summary>
     public Uri? Art { get; init; }
 
+    /// <summary>
+    /// The site's page its players go back to once a table's game is over (<see cref="GameServerOptions.Return"/>); null
+    /// when the bot serves no pages.
+    /// </summary>
+    public ReturnPage? Return { get; init; }
+
     /// <summary>How long a table may wait for its players to sit down and the cards to be dealt.</summary>
     public TimeSpan SetupTimeout { get; init; } = TimeSpan.FromMinutes(30);
 
@@ -240,6 +246,7 @@ public sealed class Matchmaker : IAsyncDisposable
                         ListenAddress = _options.ListenAddress,
                         TimeProvider = _options.TimeProvider,
                         Art = _options.Art,
+                    Return = _options.Return,
                     }).ConfigureAwait(false);
                     port = candidate;
                     break;

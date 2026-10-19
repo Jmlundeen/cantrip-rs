@@ -11,6 +11,25 @@ public static partial class TableMove
     [JSImport("globalThis.cantripGoToTable")]
     private static partial void GoToTable(string server, string ticket);
 
+    [JSImport("globalThis.cantripGoBack")]
+    private static partial void GoBack(string page);
+
+    /// <summary>
+    /// Leaves the table for the page the player came to it from, once its game is over (TableMessage.Return), as a link
+    /// to it would: the table stays in the tab's history.
+    /// </summary>
+    public static void Back(Uri page)
+    {
+        try
+        {
+            GoBack(page.AbsoluteUri);
+        }
+        catch (JSException)
+        {
+            // A page without the script stays where it is.
+        }
+    }
+
     public static void Go(string server, string ticket)
     {
         try
