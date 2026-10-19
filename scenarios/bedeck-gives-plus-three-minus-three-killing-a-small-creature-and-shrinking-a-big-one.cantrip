@@ -1,0 +1,54 @@
+# Bedeck: "Target creature gets +3/-3 until end of turn." Its {B/R}{B/R} is paid with black alone (two Mox Jets each). Bot2's Llanowar Elves (1/1) becomes 4/-2
+# and dies (CR 704.5f); Bot2's Concealing Curtains (0/4) becomes 3/1 and survives, only until end of turn: the next turn it is a 0/4 again.
+# The spell is cast as Bedeck, the half named in the line.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Bedeck // Bedazzle
+Bedeck // Bedazzle
+Plains
+Plains x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Llanowar Elves
+Concealing Curtains
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Bedeck)
+Bot1.Pass
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Bot2.Battlefield.Concealing Curtains; Ability: Bedeck)
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Graveyard = Llanowar Elves
+? Bot2.Battlefield.Concealing Curtains.Power = 3
+? Bot2.Battlefield.Concealing Curtains.Toughness = 1
+[T4 Bot2.Main1]
+? Bot2.Battlefield.Concealing Curtains.Power = 0
+? Bot2.Battlefield.Concealing Curtains.Toughness = 4
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Mox Emerald; Mox Jet; Concealing Curtains
+Bot1.Graveyard = Bedeck // Bedazzle; Bedeck // Bedazzle

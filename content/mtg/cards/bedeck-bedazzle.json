@@ -1,0 +1,18 @@
+{
+  "name": "Bedeck // Bedazzle",
+  "oracleText": "",
+  "halves": [
+    {
+      "name": "Bedeck",
+      "manaCost": "{B/R}{B/R}",
+      "type": "Instant",
+      "oracleText": "Target creature gets +3/-3 until end of turn."
+    },
+    {
+      "name": "Bedazzle",
+      "manaCost": "{4}{B}{R}",
+      "type": "Instant",
+      "oracleText": "Destroy target nonbasic land. Bedazzle deals 2 damage to target opponent or planeswalker."
+    }
+  ]
+}

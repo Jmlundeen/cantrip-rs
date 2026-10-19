@@ -1,0 +1,42 @@
+# Bedeck's {B/R}{B/R} may be paid with red or black (a hybrid symbol is either, CR 107.4e): Bot1 pays with a Mox Ruby and a Mox Jet. Its only target, Bot2's
+# Llanowar Elves, is Lightning Bolted by Bot2 in response, so Bedeck does not resolve (CR 608.2b) and does nothing: Bot2's Mox Emerald is untouched and
+# Bot1's Bedeck card is in the graveyard.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Bedeck // Bedazzle
+Plains x4
+Plains x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Plains x12
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Bot2.Battlefield.Llanowar Elves; Ability: Bedeck)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves; Lightning Bolt
+Bot2.Battlefield = Mox Emerald; Mox Ruby
+Bot1.Graveyard = Bedeck // Bedazzle

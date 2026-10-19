@@ -1,0 +1,59 @@
+# Bedazzle: "target opponent or planeswalker" - a planeswalker is a legal target, whoever controls it. Bot2's Jace, the Mind Sculptor (loyalty 3) takes 2 damage, removing two
+# loyalty counters (CR 120.3c): loyalty 1, and Bot2's life is untouched (20). The Strip Mine is destroyed all the same.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Sol Ring
+Bedeck // Bedazzle
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Strip Mine
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Jace, the Mind Sculptor
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Ability: Bedazzle)
+Bot1.Target(Bot2.Battlefield.Strip Mine)
+Bot1.Target(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Strip Mine
+Bot2.Battlefield.Jace, the Mind Sculptor.Counters.Loyalty = 1

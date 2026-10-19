@@ -1,0 +1,52 @@
+# Bedazzle: "Destroy target nonbasic land. Bedazzle deals 2 damage to target opponent or planeswalker." Bot1's own Plains is a basic land (the refusal) and
+# Bot1 itself is not an opponent (the refusal); Bot2's Strip Mine, nonbasic, and Bot2 are the legal targets (the controls). The Strip Mine is destroyed
+# and Bot2 takes 2 (18). It costs {4}{B}{R}: a Mox Jet, a Mox Ruby, a Mox Sapphire, a Mox Emerald and a Sol Ring ({C}{C}), six mana.
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Sol Ring
+Bedeck // Bedazzle
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Strip Mine
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Ability: Bedazzle)
+! Bot1.Target(Bot1.Battlefield.Plains)
+Bot1.Target(Bot2.Battlefield.Strip Mine)
+! Bot1.Target(Bot1)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Strip Mine
+Bot1.Life = 20
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Mox Emerald; Sol Ring; Plains
+Bot1.Graveyard = Bedeck // Bedazzle

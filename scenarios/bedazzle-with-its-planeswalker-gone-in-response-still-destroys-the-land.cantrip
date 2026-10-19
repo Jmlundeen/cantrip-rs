@@ -1,0 +1,64 @@
+# Bedazzle's two targets are judged separately (CR 608.2b): Bot1 aims it at Bot2's Strip Mine and at Bot2's Jace, the Mind Sculptor; in response Bot2 Lightning Bolts its own Jace
+# (3 damage, loyalty 3) and it dies. The Strip Mine is still destroyed, and the 2 damage that had no target is not dealt anywhere: Bot2's life stays 20 (and Bot2's Bolt hit
+# Jace, not a player).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Bedeck // Bedazzle
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Strip Mine
+Mox Sapphire
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Ruby
+Jace, the Mind Sculptor
+Lightning Bolt
+Plains x8
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Jace, the Mind Sculptor.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Ability: Bedazzle)
+Bot1.Target(Bot2.Battlefield.Strip Mine)
+Bot1.Target(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Jace, the Mind Sculptor)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Strip Mine; Jace, the Mind Sculptor; Lightning Bolt

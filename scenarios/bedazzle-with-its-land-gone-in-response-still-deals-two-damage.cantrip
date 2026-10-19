@@ -1,0 +1,53 @@
+# Bedazzle has two targets and each is judged on its own as it resolves (CR 608.2b, the ruling "if one of the targets is illegal, the other is still
+# affected"). Bot1 aims it at Bot2's Strip Mine and at Bot2; in response Bot2 sacrifices the Strip Mine to destroy Bot1's Plains. The land target is gone, so
+# nothing is destroyed by Bedazzle, but Bot2 still takes the 2 damage (18).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Sol Ring
+Bedeck // Bedazzle
+Plains x3
+Plains x12
+
+[Bot2 Deck]
+Strip Mine
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Ability: Bedazzle)
+Bot1.Target(Bot2.Battlefield.Strip Mine)
+Bot1.Target(Bot2)
+Bot2.Battlefield.Strip Mine.Activate(Ability: Destroy; Bot1.Battlefield.Plains)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Strip Mine
+Bot1.Graveyard = Bedeck // Bedazzle; Plains
+Bot1.Battlefield = Mox Jet; Mox Ruby; Mox Pearl; Mox Sapphire; Mox Emerald; Sol Ring

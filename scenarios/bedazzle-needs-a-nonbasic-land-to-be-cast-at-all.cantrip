@@ -1,0 +1,53 @@
+# Bedazzle has two required targets: "target nonbasic land" and "target opponent or planeswalker". With only Bot2's Forest (a basic land) on the battlefield it is not offered
+# though Bot1 holds the six mana (the refusal); once Bot2 has played a Strip Mine on its next turn the same cast is offered (the control) and destroys it and deals 2 (18).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Sol Ring
+Bedeck // Bedazzle
+Plains x2
+Plains x13
+
+[Bot2 Deck]
+Forest
+Strip Mine
+Forest x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+! Bot1.Hand.Bedeck // Bedazzle.Cast(Ability: Bedazzle)
+[T4 Bot2.Main1]
+Bot2.Hand.Strip Mine.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Bedeck // Bedazzle.Cast(Ability: Bedazzle)
+Bot1.Target(Bot2.Battlefield.Strip Mine)
+Bot1.Target(Bot2)
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Strip Mine
+Bot2.Battlefield = Forest
+Bot1.Graveyard = Bedeck // Bedazzle
