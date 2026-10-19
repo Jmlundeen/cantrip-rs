@@ -1,0 +1,55 @@
+# Kindred Judgment: choose Elf, then destroy all creatures that aren't of the chosen type (CR 608.2d-f). Bot1's
+# Llanowar Elves (an Elf) survives; Bot1's Ornithopter and Bot2's Ornithopter have no creature type, so both die
+# together (CR 701.8a).
+
+[Bot1 Deck]
+Black Lotus
+Mox Emerald
+Mox Jet
+Mox Pearl
+Mox Ruby
+Kindred Judgment
+Llanowar Elves
+Ornithopter
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kindred Judgment.Cast
+Bot1.Modes(Elf)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Graveyard.Count = 3
+
+[Expect]
+Bot1.Graveyard = Kindred Judgment; Ornithopter; Black Lotus
+Bot2.Graveyard = Ornithopter; Island
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby; Llanowar Elves
