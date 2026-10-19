@@ -1430,9 +1430,13 @@ public sealed class Decisions
         IReadOnlyList<int> picks = Many(new Question
         {
             Heading = $"You are searching {library} for {(prompt.Optional && prompt.Count >= 255 ? "any number of cards" : count == 1 ? "a card" : $"{count} cards")}, "
-                + (prompt.Destination == SearchDestinationView.Found
-                    ? "and what becomes of it is decided once it is found. What do you take?"
-                    : $"to go to {Destination(prompt.Destination)}. What do you take?"),
+                + (prompt.Destination switch
+                {
+                    SearchDestinationView.Found => "and what becomes of it is decided once it is found. What do you take?",
+                    SearchDestinationView.LandTappedElseHand =>
+                        "and it is revealed: a land card goes onto the battlefield tapped, any other card into your hand. What do you take?",
+                    _ => $"to go to {Destination(prompt.Destination)}. What do you take?",
+                }),
             Note = prompt.Optional ? "You may find nothing, which shuffles the library and takes nothing." : string.Empty,
             Choices = [.. prompt.Eligible.Select(card => GameText.Named(client, card))],
             Picks = count,

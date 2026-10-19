@@ -1175,6 +1175,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     SearchDestination::Found => SearchDestinationView::Found,
                     SearchDestination::BattlefieldTapped => SearchDestinationView::BattlefieldTapped,
                     SearchDestination::CastFree => SearchDestinationView::CastFree,
+                    SearchDestination::LandTappedElseHand => SearchDestinationView::LandTappedElseHand,
                 },
                 owner: seat(owner),
             })

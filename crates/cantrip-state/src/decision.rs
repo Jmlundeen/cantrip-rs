@@ -430,12 +430,16 @@ pub enum SearchDestination {
     ExileFaceDown,
     /// Cast by the searcher as the effect resolves.
     Cast,
-    /// Where it goes depends on the card found (Transmute Artifact): the search says only what it looks for.
     /// Onto the battlefield tapped (Nissa, Winds of Abandon).
     BattlefieldTapped,
     /// Cast by the searcher without paying its mana cost (Sunforger).
     CastFree,
+    /// Where it goes depends on the card found and on choices made after (Transmute Artifact): the search says only what
+    /// it looks for.
     Found,
+    /// A land card onto the battlefield tapped under the searcher's control, any other card into the searcher's hand
+    /// (Archdruid's Charm): the type of the card found decides, as it was in the library.
+    LandTappedElseHand,
 }
 
 /// What declaring one creature as an attacker of one player, planeswalker or battle costs (CR 508.1d, 508.1h): the sum of

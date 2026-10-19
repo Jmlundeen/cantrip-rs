@@ -1597,6 +1597,7 @@ public sealed partial class MainPage
             SearchDestinationView.BattlefieldTapped => "to put onto the battlefield tapped",
             SearchDestinationView.CastFree => "to cast without paying its mana cost",
             SearchDestinationView.Found => string.Empty,
+            SearchDestinationView.LandTappedElseHand => "a land card to put onto the battlefield tapped, any other into your hand",
             SearchDestinationView.Exile => "to exile",
             SearchDestinationView.ExileFaceDown => "to exile face down",
             SearchDestinationView.Cast => "to cast as the effect resolves",
@@ -1610,10 +1611,14 @@ public sealed partial class MainPage
             _ => "Take",
         };
 
-        // Where they go, said after the cards; a search that says only what it looks for (Transmute Artifact) says what follows.
-        string what = prompt.Destination == SearchDestinationView.Found
-            ? "  ·  what becomes of it is decided once it is found"
-            : $" {destination}";
+        // Where they go, said after the cards; a search that says only what it looks for (Transmute Artifact) says what follows,
+        // and one whose card goes one of two ways by its type (Archdruid's Charm) says both.
+        string what = prompt.Destination switch
+        {
+            SearchDestinationView.Found => "  ·  what becomes of it is decided once it is found",
+            SearchDestinationView.LandTappedElseHand => $"  ·  {destination}",
+            _ => $" {destination}",
+        };
 
         Prompt(
             title,

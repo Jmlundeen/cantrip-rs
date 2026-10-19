@@ -309,6 +309,7 @@ public static class PromptFixtures
         "search-exile",
         "search-exile-face-down",
         "search-cast",
+        "search-land-or-hand",
         "choose-discard",
         "choose-discard-up-to",
         "choose-from-their-hand",
@@ -2082,6 +2083,10 @@ public static class PromptFixtures
             case "search-cast":
                 // Sunforger: one instant with a stated quality, cast from the library as the ability resolves (CR 608.2g).
                 return Search(view, cards: 9, count: 1, optional: true, SearchDestinationView.Cast);
+
+            case "search-land-or-hand":
+                // Archdruid's Charm: a creature or land card, the land put onto the battlefield tapped, any other into the hand.
+                return Search(view, cards: 9, count: 1, optional: true, SearchDestinationView.LandTappedElseHand);
 
             case "choose-discard":
                 return Choose(CardChoicePurposeView.Discard, Viewer, Hand(), count: 2);

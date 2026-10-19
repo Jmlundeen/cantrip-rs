@@ -283,6 +283,7 @@ pub enum SearchDestinationView {
     BattlefieldTapped,
     CastFree,
     Found,
+    LandTappedElseHand,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

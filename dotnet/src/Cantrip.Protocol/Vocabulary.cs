@@ -355,6 +355,10 @@ public enum SearchDestinationView
 
     /// What becomes of the card depends on which is found (Transmute Artifact): the search says only what it looks for.
     Found = 9,
+
+    /// A land card onto the battlefield tapped, any other card into the searcher's hand (Archdruid's Charm): the type of the
+    /// card found decides.
+    LandTappedElseHand = 10,
 }
 
 /// <summary>One of the places a card may be sent by a distribution: scry's bottom, surveil's graveyard, Stock Up's hand.</summary>
