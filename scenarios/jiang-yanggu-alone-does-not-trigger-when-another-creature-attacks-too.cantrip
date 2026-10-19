@@ -1,0 +1,41 @@
+# Jiang Yanggu, Alone: "attacks a player ALONE" (CR 603.3b, 508.1) - with an Ornithopter attacking alongside it the
+# trigger does not fire at all, so no card is discarded and the 4/4 stays 4/4.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Jiang Yanggu, Alone
+Ornithopter
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jiang Yanggu, Alone.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Jiang Yanggu, Alone > Bot2; Ornithopter > Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Jiang Yanggu, Alone.Power = 4
+Bot1.Battlefield.Jiang Yanggu, Alone.Toughness = 4
+Bot2.Life = 16

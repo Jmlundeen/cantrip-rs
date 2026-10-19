@@ -1,0 +1,44 @@
+# Jiang Yanggu, Alone attacks a player alone (CR 603.3b, 508.1): the trigger discards one card (Lightning Bolt), draws one,
+# and puts a +1/+1 counter on the attacker for the one card discarded this turn, so the 4/4 deals 5.
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Jet
+Jiang Yanggu, Alone
+Lightning Bolt
+Mountain
+Mountain
+Mountain x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Jiang Yanggu, Alone.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Jiang Yanggu, Alone)
+Bot1.Choose(Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Jiang Yanggu, Alone.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Jiang Yanggu, Alone.Power = 5
+Bot1.Battlefield.Jiang Yanggu, Alone.Toughness = 5
+Bot1.Graveyard = Lightning Bolt; Black Lotus
+Bot2.Life = 15
