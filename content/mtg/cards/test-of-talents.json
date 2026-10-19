@@ -1,0 +1,6 @@
+{
+  "name": "Test of Talents",
+  "manaCost": "{1}{U}",
+  "type": "Instant",
+  "oracleText": "Counter target instant or sorcery spell. Search its controller's graveyard, hand, and library for any number of cards with the same name as that spell and exile them. That player shuffles, then draws a card for each card exiled from their hand this way."
+}

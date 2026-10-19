@@ -1,0 +1,37 @@
+# Consign to Memory can target a triggered ability on the stack (CR 115.1b).
+
+[Bot1 Deck]
+Island
+Island
+Consign to Memory
+Island x12
+
+[Bot2 Deck]
+Forest
+Forest
+Island
+Rogue Refiner
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+[T1 Bot1.Main2]
+Bot2.Hand.Forest.Play
+[T2 Bot2.Main2]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+Bot2.Hand.Forest.Play
+[T4 Bot2.Main2]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Forest#2.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Rogue Refiner.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Consign to Memory.Cast(Stack.Rogue Refiner)
+
+[Expect]
+Bot1.Graveyard = Consign to Memory
+Bot2.Battlefield.Rogue Refiner.Power = 3
+Bot2.Energy = 0

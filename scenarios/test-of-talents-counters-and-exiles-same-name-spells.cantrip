@@ -1,0 +1,33 @@
+# Test of Talents counters Lightning Bolt, exiles same-name cards from its controller's graveyard, hand, and library, then draws for the hand card (CR 701.5, 701.12).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Test of Talents
+Island x12
+
+[Bot2 Deck]
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Mountain
+Island x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+[T1 Bot1.Main2]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot1.Hand.Test of Talents.Cast(Stack.Lightning Bolt)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard =
+Bot2.Hand = Island; Island; Island; Island; Island; Island
+Exile = Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Hand.Count = 5
+Stack.Count = 0

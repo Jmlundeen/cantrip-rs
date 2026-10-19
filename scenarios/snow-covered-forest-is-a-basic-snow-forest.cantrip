@@ -1,0 +1,21 @@
+# Snow-Covered Forest is a Basic Snow Forest and its Forest subtype supplies green mana (CR 205.4, 305.6).
+
+[Bot1 Deck]
+Snow-Covered Forest
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Snow-Covered Forest.Play
+Bot1.Battlefield.Snow-Covered Forest.Activate
+? Bot1.Mana = {G}
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Snow-Covered Forest
+Bot1.Battlefield.Snow-Covered Forest.Types = Land
+Bot1.Battlefield.Snow-Covered Forest.Supertypes = Basic; Snow
+Bot1.Battlefield.Snow-Covered Forest.Subtypes = Forest
+Bot1.Battlefield.Snow-Covered Forest.Tapped = true

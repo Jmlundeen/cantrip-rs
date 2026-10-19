@@ -1,0 +1,35 @@
+# Collector Ouphe stops Sol Ring's activated mana ability; Ouphe itself costs {1}{G} (CR 602.5, 605.1a).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Forest
+Collector Ouphe
+Mountain
+Shock
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Collector Ouphe.Cast
+! Bot1.Battlefield.Sol Ring.Activate
+[T3 Bot1.Main2]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Collector Ouphe)
+Bot1.Battlefield.Sol Ring.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Forest; Mountain; Sol Ring
+Bot1.Graveyard = Collector Ouphe; Shock
+Bot1.Graveyard = Collector Ouphe; Shock

@@ -1,0 +1,49 @@
+# Aetherize returns two of your attacking creatures in one event batch; Dour Port-Mage triggers once (CR 603.2c).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Ornithopter
+Ornithopter
+Dour Port-Mage
+Island x20
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Aetherize
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Dour Port-Mage.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Ornithopter; Ornithopter#2; Dour Port-Mage)
+Bot2.Hand.Aetherize.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+Bot1.Pass
+[Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 7

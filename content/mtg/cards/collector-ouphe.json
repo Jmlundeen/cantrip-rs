@@ -1,0 +1,8 @@
+{
+  "name": "Collector Ouphe",
+  "manaCost": "{1}{G}",
+  "type": "Creature — Ouphe",
+  "oracleText": "Activated abilities of artifacts can't be activated.",
+  "power": "2",
+  "toughness": "2"
+}

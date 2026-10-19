@@ -1,0 +1,42 @@
+# Harbinger makes nonbasic Breeding Pool an Island; basic Mountain keeps its Mountain type (CR 305.7, 613.1d).
+
+[Bot1 Deck]
+Island
+Sol Ring
+Island
+Mountain
+Harbinger of the Seas
+Breeding Pool
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Sol Ring.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Mana = {U}{U}{C}{C}
+Bot1.Hand.Harbinger of the Seas.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+? Bot1.Battlefield.Mountain.Subtypes = Mountain
+? Bot1.Battlefield.Mountain.Supertypes = Basic
+Bot1.Hand.Breeding Pool.Play
+? Bot1.Battlefield.Breeding Pool.Subtypes = Island
+Bot1.Battlefield.Breeding Pool.Activate
+? Bot1.Mana = {U}
+Bot1.Battlefield.Island#1.Activate
+? Bot1.Mana = {U}{U}
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Breeding Pool.Subtypes = Island
+Bot1.Battlefield.Mountain.Subtypes = Mountain
+Bot1.Battlefield.Mountain.Supertypes = Basic
+Bot1.Battlefield.Island#1.Subtypes = Island

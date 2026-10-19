@@ -1,0 +1,34 @@
+# Birthing Ritual may decline its sacrifice; the looked-at cards remain in the library (CR 603.4).
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Forest
+Forest
+Birthing Ritual
+Island x4
+Llanowar Elves
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Birthing Ritual.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Pass
+[T5 Bot1.End]
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard =
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Birthing Ritual.Types = Enchantment

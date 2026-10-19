@@ -1,0 +1,8 @@
+{
+  "name": "Dour Port-Mage",
+  "manaCost": "{1}{U}",
+  "type": "Creature — Frog Wizard",
+  "oracleText": "Whenever one or more other creatures you control leave the battlefield without dying, draw a card.\n{1}{U}, {T}: Return another target creature you control to its owner's hand.",
+  "power": "1",
+  "toughness": "3"
+}

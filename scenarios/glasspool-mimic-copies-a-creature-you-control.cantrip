@@ -1,0 +1,32 @@
+# Glasspool Mimic copies a creature you control as it enters, adding Shapeshifter and Rogue to the copied types (CR 614.1c, 707.2).
+
+[Bot1 Deck]
+Island
+Ornithopter
+Island
+Island
+Glasspool Mimic
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main2]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Glasspool Mimic.Cast
+Bot1.Accept
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Island; Island; Island; Ornithopter; Ornithopter
+Bot1.Battlefield.Ornithopter#2.Subtypes = Rogue; Shapeshifter; Thopter
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot1.Battlefield.Ornithopter#2.Toughness = 2

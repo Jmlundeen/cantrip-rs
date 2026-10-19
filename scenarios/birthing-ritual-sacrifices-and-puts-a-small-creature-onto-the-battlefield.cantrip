@@ -1,0 +1,36 @@
+# Birthing Ritual sacrifices a creature, uses its mana value plus one, puts an eligible creature from the top seven onto the battlefield, and bottoms the rest (CR 603.4, 608.2h).
+
+[Bot1 Deck]
+Forest
+Ornithopter
+Forest
+Forest
+Birthing Ritual
+Island x4
+Llanowar Elves
+Llanowar Elves
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+[T1 Bot1.Main2]
+Bot1.Hand.Forest.Play
+[T3 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Birthing Ritual.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Pass
+[T5 Bot1.End]
+Bot1.Accept
+Bot1.Choose(Ornithopter)
+Bot1.Choose(Llanowar Elves)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter
+Bot1.Battlefield = Forest; Forest; Forest; Birthing Ritual; Llanowar Elves

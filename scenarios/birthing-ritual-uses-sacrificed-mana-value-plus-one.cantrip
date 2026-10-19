@@ -1,0 +1,43 @@
+# Birthing Ritual uses one plus the sacrificed creature's mana value, allowing a mana value three creature from the top seven.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Collector Ouphe
+Birthing Ritual
+Island
+Island
+Island x2
+Outcaster Trailblazer
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+[T1 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Collector Ouphe.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+[T3 Bot1.Main2]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Birthing Ritual.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Forest#3.Activate
+Bot1.Pass
+[T5 Bot1.End]
+Bot1.Accept
+Bot1.Choose(Collector Ouphe)
+Bot1.Choose(Outcaster Trailblazer)
+Bot1.Colors(Blue)
+? Bot1.Mana = {U}
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Collector Ouphe
+Bot1.Battlefield.Outcaster Trailblazer.Power = 4
+Bot1.Battlefield.Outcaster Trailblazer.Toughness = 2

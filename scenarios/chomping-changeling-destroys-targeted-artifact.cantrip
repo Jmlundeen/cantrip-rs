@@ -1,0 +1,25 @@
+# Chomping Changeling may target an artifact as it enters; the chosen Sol Ring is destroyed (CR 603.3, 608.2b).
+
+[Bot1 Deck]
+Forest
+Sol Ring
+Chomping Changeling
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+[T3 Bot1.Main2]
+Bot1.Hand.Chomping Changeling.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Target(Bot1.Battlefield.Sol Ring)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Sol Ring
+Bot1.Battlefield = Forest; Chomping Changeling
