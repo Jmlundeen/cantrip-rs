@@ -112,7 +112,11 @@ linking to their page, and **Sign out**. Under 760 pixels the sections fold behi
 GitHub and the Discord server. While a signed-in player has a seat somewhere - a table filling, a draft or pod under way,
 a constructed game - a strip under the bar on every page but their own says so with the button back to it (`site.js`
 asks `/home/api/board` every five seconds). `site.js` also gives the pages their helpers: a confirmation dialog for what
-cannot be undone, notices that fade, and going to a seat. A page that is not there (`/no/such/page`) is the site's own
+cannot be undone, notices that fade, going to a seat, and a player as every list shows one (`Cantrip.who`): their
+picture, else their initial, and their name, a link to message them on Discord (`https://discord.com/users/{id}`, in a
+new tab). The APIs give such a player as `{ name, picture, discord }` (`PlayerFace`: the picture from the portraits kept
+in the data directory, the Discord account from a `discord-{id}` player id; a bot has neither). The status page, served
+without `site.js` by a host of its own too, keeps its own copy. A page that is not there (`/no/such/page`) is the site's own
 404 page with the way on; an API that is not there is a bare 404.
 
 | Page | What it is | Reached from | Leads on to |

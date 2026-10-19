@@ -257,7 +257,7 @@ public sealed class EventStatusTests : IDisposable
     [Fact]
     public void A_host_s_other_tables_are_shown_with_its_events()
     {
-        StatusTable forming = new(StatusTableKinds.Forming, DraftFormats.Grid, "LSVCube", "Forming", ["Alice"], 2, 0, Now, "1 of 2 seated");
+        StatusTable forming = new(StatusTableKinds.Forming, DraftFormats.Grid, "LSVCube", "Forming", [new PlayerFace("Alice")], 2, 0, Now, "1 of 2 seated");
         var board = new EventStatusBoard(null, () => [forming]);
 
         StatusActive active = board.Active();

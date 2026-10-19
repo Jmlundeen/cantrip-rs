@@ -44,11 +44,6 @@
 /* Standings and the rules. */
 table.data td.rec { font-variant-numeric: tabular-nums; font-weight: 650; white-space: nowrap; }
 table.data tr.me td { background: var(--accent-soft); }
-.who { display: inline-flex; align-items: center; gap: 10px; vertical-align: middle; color: inherit; text-decoration: none; }
-a.who:hover .who-name { text-decoration: underline; }
-.who .face { width: 28px; height: 28px; border-radius: 50%; flex: none; overflow: hidden; display: grid; place-items: center;
-  background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 700; }
-.who .face img { width: 28px; height: 28px; display: block; }
 table.data td.status { color: var(--fg-soft); font-size: 13.5px; }
 dl.rules { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 14px; }
 dl.rules dt { color: var(--fg-muted); }
@@ -113,7 +108,7 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
   let going = false;
 
   const $ = elementId => document.getElementById(elementId);
-  const { esc, plural } = window.Cantrip ?? {};
+  const { esc, plural, who } = window.Cantrip ?? {};
   const record = r => `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ""}`;
   const when = iso => {
     if (!iso) return "";
@@ -165,7 +160,7 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
   function matchesOf(run) {
     if (!run.matches?.length) return "";
     return `<div class="run-matches">${run.matches.map(m =>
-      `<span class="result ${esc(m.result)}" title="${esc(m.detail)}">${m.result === "playing" ? "Playing" : m.result === "won" ? "Won" : m.result === "lost" ? "Lost" : "Drew"} vs ${esc(m.opponent)}</span>`).join("")}</div>`;
+      `<span class="result ${esc(m.result)}" title="${esc(m.detail)}">${m.result === "playing" ? "Playing" : m.result === "won" ? "Won" : m.result === "lost" ? "Lost" : "Drew"} vs ${who(m.opponent, true)}</span>`).join("")}</div>`;
   }
 
   function runCard(v) {
@@ -184,7 +179,7 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
     let status;
     let actions;
     if (mine.opponent) {
-      status = `<span class="badge live">Match</span><span class="grow">Your match against <strong>${esc(mine.opponent)}</strong> ${mine.matchReady ? "is ready." : "is about to begin."}</span>`;
+      status = `<span class="badge live">Match</span><span class="grow">Your match against <strong>${who(mine.opponent, true)}</strong> ${mine.matchReady ? "is ready." : "is about to begin."}</span>`;
       actions = `<button type="button" class="button primary" data-play ${mine.matchReady ? "" : "disabled"}>Go to my match</button>`;
     } else if (mine.searchingSince) {
       status = `<span class="searching"><span class="spinner" aria-hidden="true"></span>Looking for an opponent&hellip; <span class="num" id="waited">${since(mine.searchingSince)}</span></span>
@@ -241,20 +236,11 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
 
   // --- The rest ---------------------------------------------------------------------------------------------------
 
-  // A player's picture (else their initial) and name; for a Discord account, a link to message them there.
-  function who(name, picture, discord) {
-    const face = picture ? `<img src="${esc(picture)}" alt="" width="28" height="28" loading="lazy">` : `<span aria-hidden="true">${esc((name[0] ?? "?").toUpperCase())}</span>`;
-    const inner = `<span class="face">${face}</span><span class="who-name">${esc(name)}</span>`;
-    return discord
-      ? `<a class="who" href="https://discord.com/users/${esc(discord)}" target="_blank" rel="noopener" title="Message ${esc(name)} on Discord">${inner}</a>`
-      : `<span class="who">${inner}</span>`;
-  }
-
   function standings(v) {
     if (!v.players.length) return `<div class="empty small">No runs are being played right now.</div>`;
     const mineId = v.mine?.current?.id;
     return `<div class="table-wrap"><table class="data"><thead><tr><th>Player</th><th>Record</th><th>Now</th></tr></thead><tbody>
-      ${v.players.map(({ run: p, picture, discord }) => `<tr${p.id === mineId ? ' class="me"' : ""}><td>${who(p.name, picture, discord)}${p.entry > 1 ? ` <span class="hint">#${p.entry}</span>` : ""}</td>
+      ${v.players.map(p => `<tr${p.id === mineId ? ' class="me"' : ""}><td>${who(p.player)}${p.entry > 1 ? ` <span class="hint">#${p.entry}</span>` : ""}</td>
         <td class="rec">${p.stage === "Drafting" ? "&ndash;" : esc(record(p))}</td><td class="status">${esc(p.status)}</td></tr>`).join("")}
     </tbody></table></div>`;
   }
@@ -262,8 +248,15 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
   function trophies(v) {
     if (!v.trophies.length) return `<div class="empty small">No trophies yet. Be the first.</div>`;
     return `<div class="table-wrap"><table class="data"><thead><tr><th>#</th><th>Player</th><th>Trophies</th></tr></thead><tbody>
-      ${v.trophies.map((t, i) => `<tr${t.me ? ' class="me"' : ""}><td class="num">${i + 1}</td><td>${esc(t.name)}</td><td class="trophy-count">${t.trophies}</td></tr>`).join("")}
+      ${v.trophies.map((t, i) => `<tr${t.me ? ' class="me"' : ""}><td class="num">${i + 1}</td><td>${who(t.player)}</td><td class="trophy-count">${t.trophies}</td></tr>`).join("")}
     </tbody></table></div>`;
+  }
+
+  // Everyone a run played, once each.
+  function opponents(run) {
+    const seen = new Map();
+    for (const m of run.matches) if (!seen.has(m.opponent.name)) seen.set(m.opponent.name, m.opponent);
+    return [...seen.values()].map(player => who(player, true)).join(", ");
   }
 
   function previous(v) {
@@ -272,7 +265,7 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
     return `<div class="rows">${runs.map(run => {
       const tone = run.ending === "trophy" ? "won" : run.ending === "eliminated" ? "" : "info";
       return `<div class="row"><div class="main"><div class="title">Run #${run.entry} &middot; <span class="num">${esc(record(run))}</span></div>
-          <div class="sub">${esc([run.matches.length ? `${plural(run.matches.length, "match", "matches")} against ${[...new Set(run.matches.map(m => m.opponent))].join(", ")}` : "No matches played", run.ended ? `ended ${when(run.ended)}` : ""].filter(Boolean).join(" · "))}</div></div>
+          <div class="sub">${[run.matches.length ? `${esc(plural(run.matches.length, "match", "matches"))} against ${opponents(run)}` : "No matches played", run.ended ? esc(`ended ${when(run.ended)}`) : ""].filter(Boolean).join(" &middot; ")}</div></div>
         <div class="side"><span class="badge ${tone}">${esc(run.status)}</span><button type="button" class="button small" data-deck="${esc(run.id)}">View deck</button></div></div>`;
     }).join("")}</div>`;
   }
@@ -280,7 +273,7 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
   function recent(v) {
     if (!v.recent.length) return `<div class="empty small">No matches have been played yet.</div>`;
     return `<div class="rows">${v.recent.map(m => `<div class="row"><div class="main">
-      <div class="title">${m.winner ? `${esc(m.winner)} <span class="hint">beat</span> ${esc(m.winner === m.first ? m.second : m.first)}` : `${esc(m.first)} <span class="hint">and</span> ${esc(m.second)}`}</div>
+      <div class="title">${m.winner ? `${who(m.winner === m.first.name ? m.first : m.second, true)} <span class="hint">beat</span> ${who(m.winner === m.first.name ? m.second : m.first, true)}` : `${who(m.first, true)} <span class="hint">and</span> ${who(m.second, true)}`}</div>
       <div class="sub">${esc([m.detail, m.ended ? when(m.ended) : ""].filter(Boolean).join(" · "))}</div></div></div>`).join("")}</div>`;
   }
 
@@ -327,7 +320,7 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
     if (mine?.opponent && mine.matchReady && lookedForMatch && !going) {
       going = true;
       document.title = "Match found! - Cantrip";
-      window.Cantrip.toast(`Match found: you're playing ${mine.opponent}.`);
+      window.Cantrip.toast(`Match found: you're playing ${mine.opponent.name}.`);
       const why = await window.Cantrip.seat("leagues/api/play", { league: id });
       if (why) { going = false; window.Cantrip.toast(why, "error"); }
       return;

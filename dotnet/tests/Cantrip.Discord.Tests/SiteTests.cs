@@ -54,10 +54,11 @@ public sealed class SiteTests : IDisposable
         Assert.Equal("grid", queue.GetProperty("settings").GetProperty("format").GetString());
         JsonElement table = Assert.Single(value.GetProperty("tables").EnumerateArray());
         Assert.Equal(JsonValueKind.Null, table.GetProperty("queue").ValueKind);
-        Assert.Equal(["Alice"], table.GetProperty("players").EnumerateArray().Select(player => player.GetString()));
+        Assert.Equal(["Alice"], table.GetProperty("players").EnumerateArray().Select(player => player.GetProperty("name").GetString()));
         Assert.Equal(2, table.GetProperty("seats").GetInt32());
 
-        // Names only: no player id, and no ticket.
+        // Each player by name and Discord account, which the page links to a message to them by: no player id, and no ticket.
+        Assert.Equal("1001", table.GetProperty("players")[0].GetProperty("discord").GetString());
         Assert.DoesNotContain("discord-", text, StringComparison.Ordinal);
         Assert.DoesNotContain(alice.Ticket!, text, StringComparison.Ordinal);
 
@@ -106,7 +107,7 @@ public sealed class SiteTests : IDisposable
         // Alice's game, waiting, with her name and not her deck; Bob's game from Discord is not the page's.
         JsonElement game = Assert.Single(value.GetProperty("games").EnumerateArray());
         Assert.Equal((hosted.Game!.Id, "Open"), (game.GetProperty("id").GetString(), game.GetProperty("stage").GetString()));
-        Assert.Equal(["Alice"], game.GetProperty("players").EnumerateArray().Select(player => player.GetString()));
+        Assert.Equal(["Alice"], game.GetProperty("players").EnumerateArray().Select(player => player.GetProperty("name").GetString()));
         Assert.False(game.TryGetProperty("deck", out _));
         Assert.DoesNotContain(hosted.Ticket!, text, StringComparison.Ordinal);
 
@@ -177,11 +178,11 @@ public sealed class SiteTests : IDisposable
         Seating game = await fixture.Games.HostAsync(new DiscordPlayer(1001, "Alice"), "standard", "ub-reanimator");
         Assert.Null(game.Refusal);
 
-        string alice = JsonSerializer.Serialize(HomeSite.Board(fixture.Home, new WebAccount(1001, "Alice", null)));
+        string alice = JsonSerializer.Serialize(HomeSite.Board(fixture.Home, new WebAccount(1001, "Alice", null)), new JsonSerializerOptions(JsonSerializerDefaults.Web));
         using JsonDocument aliceBoard = JsonDocument.Parse(alice);
         JsonElement mine = aliceBoard.RootElement;
         Assert.Equal("Alice", mine.GetProperty("me").GetProperty("name").GetString());
-        Assert.Equal(["Alice"], mine.GetProperty("draft").GetProperty("players").EnumerateArray().Select(player => player.GetString()));
+        Assert.Equal(["Alice"], mine.GetProperty("draft").GetProperty("players").EnumerateArray().Select(player => player.GetProperty("name").GetString()));
         Assert.Equal(game.Game!.Id, mine.GetProperty("constructed").GetProperty("id").GetString());
         Assert.DoesNotContain(table.Ticket!, alice, StringComparison.Ordinal);
         Assert.DoesNotContain(game.Ticket!, alice, StringComparison.Ordinal);

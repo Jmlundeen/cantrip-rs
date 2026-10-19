@@ -129,7 +129,7 @@ public sealed class LeagueSiteTests : IAsyncLifetime
         Assert.Null(await Refusal(1001, "Alice", "leagues/api/search"));
         Assert.Null(await Refusal(1002, "Bob", "leagues/api/search"));
         mine = await Until(1001, "Alice", mine => mine.GetProperty("matchReady").GetBoolean());
-        Assert.Equal("Bob", mine.GetProperty("opponent").GetString());
+        Assert.Equal("Bob", mine.GetProperty("opponent").GetProperty("name").GetString());
         Assert.Contains("#ticket=", await Link(1001, "Alice", "leagues/api/play"), StringComparison.Ordinal);
         Assert.Contains("finish it first", await Refusal(1001, "Alice", "leagues/api/end"), StringComparison.Ordinal);
 
@@ -139,7 +139,7 @@ public sealed class LeagueSiteTests : IAsyncLifetime
             JsonElement value = board.RootElement.GetProperty("value");
             Assert.True(value.GetProperty("hasLeagues").GetBoolean());
             JsonElement listed = Assert.Single(value.GetProperty("leagues").EnumerateArray());
-            Assert.Equal((League, "Bob"), (listed.GetProperty("id").GetString(), listed.GetProperty("mine").GetProperty("opponent").GetString()));
+            Assert.Equal((League, "Bob"), (listed.GetProperty("id").GetString(), listed.GetProperty("mine").GetProperty("opponent").GetProperty("name").GetString()));
         }
 
         // Carol has not entered: she cannot look for a match, or end a run.

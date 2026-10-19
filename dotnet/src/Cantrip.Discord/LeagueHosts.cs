@@ -77,6 +77,9 @@ public sealed class LeagueHostsOptions
     /// <summary>Where the cube lists are, which a quick draft's cube is named from.</summary>
     public IReadOnlyList<string> CubeDirectories { get; init; } = [];
 
+    /// <summary>Each player's picture, by player id, as the league's pages show it beside their name; null for none.</summary>
+    public Func<string, string?>? Portraits { get; init; }
+
     /// <summary>The site's page for a league, which its tables lead back to, by the league's id; null for none.</summary>
     public Func<string, ReturnPage?>? Return { get; init; }
 
@@ -154,6 +157,7 @@ public sealed class LeagueHosts : IAsyncDisposable
                 CubeList.Find(definition.Settings.Cube, [.. _options.CubeDirectories]);
                 League league = League.Ensure(_options.Store, ContentCache.Get(_options.ContentRoot), definition.Id, definition.Name, definition.Settings,
                     _options.TimeProvider, _options.Timing);
+                league.Portraits = _options.Portraits;
                 _leagues.Add(new HostedLeague(definition, league));
             }
             catch (Exception error) when (error is IOException or ArgumentException or InvalidOperationException)

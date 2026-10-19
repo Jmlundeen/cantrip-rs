@@ -78,7 +78,7 @@ public static class PlaySite
                 {
                     id = game.Id,
                     format = game.Format,
-                    players = game.Players.Select(player => player.Name),
+                    players = game.Players.Select(options.Games.FaceOf),
                     stage = game.Stage.ToString(),
                     created = game.CreatedAt,
                 }),

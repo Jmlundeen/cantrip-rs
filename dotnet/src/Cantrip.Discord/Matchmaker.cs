@@ -40,6 +40,9 @@ public sealed class MatchmakerOptions
     /// <summary>Where card art is, said by every table to the clients at it (<see cref="GameServerOptions.Art"/>); null for not said.</summary>
     public Uri? Art { get; init; }
 
+    /// <summary>Each player's picture, by player id, as the pages show it beside their name; null for none.</summary>
+    public Func<string, string?>? Portraits { get; init; }
+
     /// <summary>
     /// The site's page its players go back to once a table's game is over (<see cref="GameServerOptions.Return"/>); null
     /// when the bot serves no pages.
@@ -168,6 +171,9 @@ public sealed class Matchmaker : IAsyncDisposable
         finally { _gate.Release(); }
     }
 
+    /// <summary>A player in a game, as the pages list them: their name, picture and Discord account.</summary>
+    public PlayerFace FaceOf(DiscordPlayer player) => PlayerFace.Of(DraftHost.PlayerId(player), player.Name, _options.Portraits);
+
     /// <summary>Every game not yet over, as the server's status page shows it: who is playing, and where the game stands.</summary>
     public IReadOnlyList<StatusTable> StatusTables()
     {
@@ -175,7 +181,7 @@ public sealed class Matchmaker : IAsyncDisposable
         try
         {
             return [.. _games.Values.Where(game => game.Stage != GameStage.Ended).OrderBy(game => game.CreatedAt).Select(game => new StatusTable(
-                StatusTableKinds.Game, string.Empty, string.Empty, game.Stage.ToString(), [.. game.Players.Select(player => player.Name)], 2, 0, game.CreatedAt,
+                StatusTableKinds.Game, string.Empty, string.Empty, game.Stage.ToString(), [.. game.Players.Select(FaceOf)], 2, 0, game.CreatedAt,
                 game.Stage switch { GameStage.Open => "Waiting for a second player.", GameStage.Seated => "Waiting for both players to connect.", _ => string.Empty }))];
         }
         finally

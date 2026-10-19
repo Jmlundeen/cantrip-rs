@@ -48,7 +48,7 @@ public sealed class QueueSiteOptions
 /// /queue/api/return          POST: the player's seat back in the draft they are in
 /// </code>
 /// A seat's link carries its ticket after the <c>#</c>, as every other link to a table does, and goes only to the player
-/// it seats. The board shows names, never a player id, a ticket or a picture's address.
+/// it seats. The board shows each player's name, picture and Discord account (<see cref="PlayerFace"/>), never a ticket.
 /// </summary>
 public static class QueueSite
 {
@@ -173,7 +173,7 @@ public static class QueueSite
                 round = summary.Round,
                 rounds = summary.Rounds,
                 created = summary.Created,
-                players = summary.Players.Select(player => new { name = player.Name, dropped = player.Dropped }),
+                players = summary.Players.Select(player => new { name = player.Name, dropped = player.Dropped, picture = player.Picture, discord = player.Discord }),
             }),
         };
     }

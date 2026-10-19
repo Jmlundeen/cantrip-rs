@@ -20,9 +20,6 @@ public sealed class LeagueSiteOptions
 
     /// <summary>Who may open which table, when the tables are behind sign-in (<see cref="TableAccess"/>); null for none.</summary>
     internal TableAccess? Access { get; init; }
-
-    /// <summary>Players' pictures, shown beside their names; null for none.</summary>
-    public PortraitStore? Portraits { get; init; }
 }
 
 /// <summary>
@@ -180,7 +177,7 @@ public static class LeagueSite
             entrants = view.Entrants,
             runs = view.RunsPlayed,
             searching = view.Searching,
-            players = view.Players.Select(run => Standing(options, run)),
+            players = view.Players.Select(Run),
             trophies = view.Trophies,
             recent = view.Recent,
             mine = view.Mine is { } mine ? Mine(mine) : null,
@@ -224,24 +221,12 @@ public static class LeagueSite
         trophies = mine.Trophies,
     };
 
-    /// <summary>
-    /// A run being played, as the players' table shows it: the run, its player's picture (null for none), and their Discord
-    /// account's id - what a name is a link to a message to them by - for a player who signed in with Discord.
-    /// </summary>
-    private static object Standing(LeagueSiteOptions options, LeagueRunView run) => new
-    {
-        run = Run(run),
-        picture = options.Portraits?.PathFor(run.PlayerId),
-        discord = run.PlayerId.StartsWith("discord-", StringComparison.Ordinal) && ulong.TryParse(run.PlayerId["discord-".Length..], out ulong account)
-            ? account.ToString(System.Globalization.CultureInfo.InvariantCulture)
-            : null,
-    };
-
     /// <summary>A run, as anyone may see it: who, how it stands, whom it played. Its id is only for its own player to ask for its deck by.</summary>
     private static object Run(LeagueRunView run) => new
     {
         id = run.Id,
         name = run.Name,
+        player = run.Player,
         entry = run.Entry,
         stage = run.Stage.ToString(),
         wins = run.Wins,

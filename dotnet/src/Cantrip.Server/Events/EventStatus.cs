@@ -16,6 +16,7 @@ public sealed class EventStatusBoard
     private readonly EventStore? _store;
     private readonly Func<IReadOnlyList<StatusTable>>? _tables;
     private readonly Func<IReadOnlyCollection<string>>? _hosting;
+    private readonly Func<string, string?>? _portraits;
     private readonly Dictionary<string, (DateTime Written, StatusEventDetail Detail)> _read = new(StringComparer.Ordinal);
     private readonly object _gate = new();
 
@@ -29,9 +30,12 @@ public sealed class EventStatusBoard
     /// the store has as live that the host is not running - played by another host in the same directory, or stopped for
     /// good - is not being played: it is shown among the events over, as not finished.
     /// </param>
-    public EventStatusBoard(EventStore? store, Func<IReadOnlyList<StatusTable>>? tables = null, Func<IReadOnlyCollection<string>>? hosting = null)
+    /// <param name="portraits">Each player's picture by id (<see cref="PortraitStore.PathFor"/>), shown beside their name; null for none.</param>
+    public EventStatusBoard(EventStore? store, Func<IReadOnlyList<StatusTable>>? tables = null, Func<IReadOnlyCollection<string>>? hosting = null,
+        Func<string, string?>? portraits = null)
     {
         _store = store;
+        _portraits = portraits;
         _tables = tables;
         _hosting = hosting;
     }
@@ -137,11 +141,11 @@ public sealed class EventStatusBoard
 
         StatusEventDetail detail = Project(record, record.Draft?.Format switch
         {
-            DraftFormats.Booster => Booster(record, _store.LoadDraft<BoosterDraft>(id)),
-            DraftFormats.Grid => Grid(record, _store.LoadDraft<GridDraft>(id)),
-            DraftFormats.Winston => Winston(record, _store.LoadDraft<WinstonDraft>(id)),
+            DraftFormats.Booster => Booster(record, _store.LoadDraft<BoosterDraft>(id), _portraits),
+            DraftFormats.Grid => Grid(record, _store.LoadDraft<GridDraft>(id), _portraits),
+            DraftFormats.Winston => Winston(record, _store.LoadDraft<WinstonDraft>(id), _portraits),
             _ => null,
-        });
+        }, _portraits);
 
         lock (_gate)
         {
@@ -152,14 +156,16 @@ public sealed class EventStatusBoard
     }
 
     /// <summary>The public face of an event, its draft as <paramref name="draft"/> says it stands.</summary>
-    public static StatusEventDetail Project(EventRecord record, StatusDraft? draft)
+    public static StatusEventDetail Project(EventRecord record, StatusDraft? draft, Func<string, string?>? portraits = null)
     {
         ArgumentNullException.ThrowIfNull(record);
         string Name(string playerId) => record.Participant(playerId)?.Name ?? "Someone";
+        PlayerFace Face(string playerId) => PlayerFace.Of(playerId, Name(playerId), portraits);
         bool building = record.Stage == EventStage.DeckBuilding;
 
         List<StatusPlayer> players = [.. record.Participants.OrderBy(participant => participant.Seat).Select(participant => new StatusPlayer(
-            participant.Name, participant.Seat, participant.Dropped, participant.Seated, building && participant.Deck.Submitted))];
+            participant.Name, participant.Seat, participant.Dropped, participant.Seated, building && participant.Deck.Submitted,
+            Face(participant.PlayerId).Picture, PlayerFace.DiscordOf(participant.PlayerId)))];
 
         int rounds = record.Draft?.Rounds ?? 0;
         HashSet<string> dropped = [.. record.Participants.Where(participant => participant.Dropped).Select(participant => participant.PlayerId)];
@@ -167,14 +173,16 @@ public sealed class EventStatusBoard
             ? [.. Swiss.Standings([.. record.Participants.OrderBy(participant => participant.Seat).Select(participant => participant.PlayerId)], record.Matches, dropped)
                 .Select(standing => new StatusStanding(standing.Rank, Name(standing.PlayerId), standing.Points,
                     standing.Wins, standing.Losses, standing.Draws, standing.GameWins, standing.GameLosses, standing.GameDraws,
-                    standing.OpponentMatchWin, standing.GameWin, standing.OpponentGameWin, standing.Dropped))]
+                    standing.OpponentMatchWin, standing.GameWin, standing.OpponentGameWin, standing.Dropped,
+                    Face(standing.PlayerId).Picture, PlayerFace.DiscordOf(standing.PlayerId)))]
             : [];
 
         List<StatusRound> played = [.. record.Matches.GroupBy(match => match.Round).OrderBy(round => round.Key).Select(round => new StatusRound(round.Key,
             [.. round.OrderBy(match => match.Table).Select(match => new StatusMatch(
                 match.Table,
                 [.. match.Players.Select(player => new StatusMatchPlayer(Name(player), Swiss.GamesOf(match, player).Won,
-                    match.ClockMs.TryGetValue(player, out long left) ? left : null))],
+                    match.ClockMs.TryGetValue(player, out long left) ? left : null,
+                    Face(player).Picture, PlayerFace.DiscordOf(player)))],
                 match.Complete,
                 match.Bye,
                 match.Forfeit,
@@ -241,7 +249,7 @@ public sealed class EventStatusBoard
     /// A booster draft as the table sees it: the pack being drafted, which way it goes, and for each seat how many cards
     /// it has taken, how many packs wait for it and when its pick clock runs out. Not one card.
     /// </summary>
-    private static StatusDraft? Booster(EventRecord record, BoosterDraft? draft)
+    private static StatusDraft? Booster(EventRecord record, BoosterDraft? draft, Func<string, string?>? portraits)
     {
         if (draft is null) return null;
         return new StatusDraft(
@@ -257,7 +265,9 @@ public sealed class EventStatusBoard
                 draft.PoolOf(seat).Count,
                 draft.QueueOf(seat).Count,
                 draft.IsOver || seat > draft.Deadlines.Count ? null : draft.Deadlines[seat - 1],
-                false))],
+                false,
+                SeatFace(record, seat, portraits).Picture,
+                SeatFace(record, seat, portraits).Discord))],
             0,
             [],
             -1,
@@ -265,8 +275,12 @@ public sealed class EventStatusBoard
             draft.Seats * draft.Packs * draft.PackSize);
     }
 
+    /// <summary>The player in a draft's seat, as a list shows them; nobody's for a seat no one has.</summary>
+    private static PlayerFace SeatFace(EventRecord record, int seat, Func<string, string?>? portraits) =>
+        record.AtSeat(seat) is { } participant ? PlayerFace.Of(participant.PlayerId, participant.Name, portraits) : new PlayerFace($"Seat {seat}");
+
     /// <summary>A grid draft: the grid being laid out, whose pick it is, and how many cards each player has taken.</summary>
-    private static StatusDraft? Grid(EventRecord record, GridDraft? draft)
+    private static StatusDraft? Grid(EventRecord record, GridDraft? draft, Func<string, string?>? portraits)
     {
         if (draft is null) return null;
         return new StatusDraft(
@@ -277,7 +291,8 @@ public sealed class EventStatusBoard
             0,
             draft.IsOver ? null : draft.PickOfPack,
             [.. Enumerable.Range(1, draft.Seats).Select(seat => new StatusDraftSeat(
-                record.AtSeat(seat)?.Name ?? $"Seat {seat}", seat, draft.PoolOf(seat).Count, 0, null, draft.Active == seat))],
+                record.AtSeat(seat)?.Name ?? $"Seat {seat}", seat, draft.PoolOf(seat).Count, 0, null, draft.Active == seat,
+                SeatFace(record, seat, portraits).Picture, SeatFace(record, seat, portraits).Discord))],
             0,
             [],
             -1,
@@ -286,7 +301,7 @@ public sealed class EventStatusBoard
     }
 
     /// <summary>A Winston draft: the stack's and the piles' sizes, which pile is being looked at and by whom.</summary>
-    private static StatusDraft? Winston(EventRecord record, WinstonDraft? draft)
+    private static StatusDraft? Winston(EventRecord record, WinstonDraft? draft, Func<string, string?>? portraits)
     {
         if (draft is null) return null;
         int drafted = draft.Pools.Sum(pool => pool.Count);
@@ -298,7 +313,8 @@ public sealed class EventStatusBoard
             0,
             null,
             [.. Enumerable.Range(1, draft.Seats).Select(seat => new StatusDraftSeat(
-                record.AtSeat(seat)?.Name ?? $"Seat {seat}", seat, draft.PoolOf(seat).Count, 0, null, draft.Active == seat))],
+                record.AtSeat(seat)?.Name ?? $"Seat {seat}", seat, draft.PoolOf(seat).Count, 0, null, draft.Active == seat,
+                SeatFace(record, seat, portraits).Picture, SeatFace(record, seat, portraits).Discord))],
             draft.Stack.Count,
             [.. draft.Piles.Select(pile => pile.Count)],
             draft.IsOver ? -1 : draft.Looking,
@@ -354,7 +370,8 @@ public sealed record StatusEvent(
     string? ParentId);
 
 /// <summary>A player in an event, by the name they go by at the table. <see cref="Submitted"/> only while decks are built.</summary>
-public sealed record StatusPlayer(string Name, int Seat, bool Dropped, bool Seated, bool Submitted);
+/// <see cref="Picture"/> and <see cref="Discord"/> are as <see cref="PlayerFace"/>'s.
+public sealed record StatusPlayer(string Name, int Seat, bool Dropped, bool Seated, bool Submitted, string? Picture = null, string? Discord = null);
 
 /// <summary>Everything public about one event.</summary>
 public sealed record StatusEventDetail(
@@ -387,7 +404,7 @@ public sealed record StatusDraft(
     int Cards);
 
 /// <summary>A seat at a draft: how many cards it has taken, packs waiting for it, when its pick clock runs out, whether it is to pick.</summary>
-public sealed record StatusDraftSeat(string Name, int Seat, int Drafted, int Queued, DateTimeOffset? PickBy, bool Active);
+public sealed record StatusDraftSeat(string Name, int Seat, int Drafted, int Queued, DateTimeOffset? PickBy, bool Active, string? Picture = null, string? Discord = null);
 
 /// <summary>A player's place in a Swiss event, with the record and tiebreakers that put them there.</summary>
 public sealed record StatusStanding(
@@ -403,7 +420,9 @@ public sealed record StatusStanding(
     double OpponentMatchWin,
     double GameWin,
     double OpponentGameWin,
-    bool Dropped);
+    bool Dropped,
+    string? Picture = null,
+    string? Discord = null);
 
 /// <summary>A round's pairings and how each match stands.</summary>
 public sealed record StatusRound(int Round, IReadOnlyList<StatusMatch> Matches);
@@ -421,7 +440,7 @@ public sealed record StatusMatch(
     IReadOnlyList<StatusGame> Games);
 
 /// <summary>A player in a match: games won, and what is left on their match clock as last saved (null before it started).</summary>
-public sealed record StatusMatchPlayer(string Name, int Wins, long? ClockMs);
+public sealed record StatusMatchPlayer(string Name, int Wins, long? ClockMs, string? Picture = null, string? Discord = null);
 
 public sealed record StatusGame(int Number, DateTimeOffset Started, DateTimeOffset? Ended, string Ending, string? Winner, string Detail);
 
@@ -434,7 +453,7 @@ public sealed record StatusTable(
     string Format,
     string Cube,
     string Stage,
-    IReadOnlyList<string> Players,
+    IReadOnlyList<PlayerFace> Players,
     int Seats,
     int Bots,
     DateTimeOffset Created,

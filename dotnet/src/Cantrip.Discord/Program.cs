@@ -277,6 +277,7 @@ if (EventStore.Configured(args) is { } data)
             Leagues = leagueDefinitions,
             CubeDirectories = [.. new[] { cubes, FindUp("cubes") }.OfType<string>()],
             Return = LeaguePage,
+            Portraits = portraitPaths,
             Busy = player => draftsAt.InDraft(player) || podsAt.InDraft(player) ? "You are in a draft: finish it first."
                 : queuesAt.TableOf(player) is not null ? "You have a seat at a draft table: leave it first." : null,
         });
@@ -309,6 +310,7 @@ await using var matchmaker = new Matchmaker(new MatchmakerOptions
     PublicHost = publicHost,
     TableAddress = tableAddress,
     Art = art,
+    Portraits = portraits is null ? null : portraits.PathFor,
     // A game hosted from Discord is a constructed game as much as one from the page.
     Return = pages is null || standard.Count == 0 ? null : new Cantrip.Server.Host.ReturnPage(new Uri(pages, PlaySite.Route), "Constructed Play"),
 });
@@ -343,7 +345,8 @@ if (client is null)
     // An event is being played only while the bot hosts it: one left live in the directory by a draft played locally,
     // or by one stopped for good, is not.
     var status = new EventStatusBoard(store, () => [.. queues?.StatusTables() ?? [], .. matchmaker.StatusTables()],
-        () => [.. drafts?.Drafts.Where(draft => draft.IsLive).Select(draft => draft.Id) ?? [], .. pods?.Hosting ?? []]);
+        () => [.. drafts?.Drafts.Where(draft => draft.IsLive).Select(draft => draft.Id) ?? [], .. pods?.Hosting ?? []],
+        portraits is null ? null : portraits.PathFor);
     var signIn = new SiteSignInOptions
     {
         Site = siteAddress,
@@ -376,7 +379,7 @@ if (client is null)
     PlaySiteOptions? playSite = standard.Count == 0 ? null : new PlaySiteOptions { Games = matchmaker, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
 
     LeagueSiteOptions? leagueSite = leagues is null || leagues.Leagues.Count == 0 ? null
-        : new LeagueSiteOptions { Leagues = leagues, Client = siteAddress, Art = art, SignIn = signIn, Access = access, Portraits = portraits };
+        : new LeagueSiteOptions { Leagues = leagues, Client = siteAddress, Art = art, SignIn = signIn, Access = access };
 
     // The deck editor's catalog, and each player's saved decks, kept in the data directory.
     DeckSiteOptions? deckSite = store is null ? null : new DeckSiteOptions { ContentRoot = content, Store = store, SignIn = signIn };
@@ -384,7 +387,8 @@ if (client is null)
     string artCache = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Cantrip", "art-cache");
     web = await ClientSite.StartAsync(listen, webPort, root, new Cantrip.Art.ArtStore(new Cantrip.Art.ArtStoreOptions { ContentRoot = content, CacheDirectory = artCache }),
         publicUrl is null ? null : tablePorts, portraits, status, signIn, queueSite, playSite, access,
-        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, Leagues = leagueSite, HasDecks = deckSite is not null, Store = store }, deckSite,
+        new HomeSiteOptions { SignIn = signIn, Drafts = queueSite, Constructed = playSite, Leagues = leagueSite, HasDecks = deckSite is not null, Store = store,
+            Portraits = portraits is null ? null : portraits.PathFor }, deckSite,
         leagues: leagueSite);
     client = siteAddress;
     Console.WriteLine($"Serving the web client from {root}; the server's status at {new Uri(client, Cantrip.Server.Host.StatusSite.Route)}.");

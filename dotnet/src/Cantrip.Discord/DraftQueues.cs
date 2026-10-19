@@ -73,7 +73,7 @@ public sealed record QueueBoardQueue(QueueSettings Settings, string Cube);
 /// A table still forming. <see cref="Channel"/> is its queue's, or zero for a table a player set up on the queue page with
 /// settings of their own, which only that page seats players at. <see cref="Seats"/> are the players' seats, less the bots'.
 /// </summary>
-public sealed record QueueBoardTable(string Id, ulong Channel, QueueSettings Settings, string Cube, IReadOnlyList<string> Players, int Seats, bool Checking, DateTimeOffset Created);
+public sealed record QueueBoardTable(string Id, ulong Channel, QueueSettings Settings, string Cube, IReadOnlyList<PlayerFace> Players, int Seats, bool Checking, DateTimeOffset Created);
 
 /// <summary>What a player gets for joining a queue: the table's address and a ticket to their seat, or why not.</summary>
 public sealed record QueueSeating(Uri? Address, string? Ticket, int Seat, string? Refusal)
@@ -391,7 +391,7 @@ public sealed class DraftQueues : IAsyncDisposable
                 forming.Settings.Format,
                 forming.CubeName,
                 forming.Table.Checking ? "Checking" : "Forming",
-                [.. forming.Table.Players.Select(player => player.Name)],
+                [.. forming.Table.Players.Select(player => PlayerFace.Of(player.PlayerId, player.Name, _options.Portraits))],
                 forming.Seats,
                 forming.Settings.Bots,
                 forming.Table.Created,
@@ -428,7 +428,7 @@ public sealed class DraftQueues : IAsyncDisposable
                     forming.Settings.Channel,
                     forming.Settings,
                     forming.CubeName,
-                    [.. forming.Table.Players.Select(player => player.Name)],
+                    [.. forming.Table.Players.Select(player => PlayerFace.Of(player.PlayerId, player.Name, _options.Portraits))],
                     forming.Seats,
                     forming.Table.Checking,
                     forming.Table.Created))]);

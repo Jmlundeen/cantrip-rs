@@ -58,6 +58,17 @@ section.block > h2 .count { color: var(--fg-muted); font-size: 14px; font-weight
 .chip.muted { color: var(--fg-muted); border-color: var(--line); background: transparent; }
 .chip.dropped { color: var(--fg-muted); text-decoration: line-through; }
 .chip.ok { border-color: var(--ready); color: var(--ready); background: transparent; }
+/* A player: picture and name, a link to message them on Discord - as the site's own pages show one (site.css). */
+.who { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; color: inherit; text-decoration: none; max-width: 100%; }
+.who .who-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.who:hover .who-name { text-decoration: underline; }
+.who .face {
+  width: 22px; height: 22px; border-radius: 50%; flex: none; overflow: hidden; display: grid; place-items: center;
+  background: var(--accent-soft, var(--control)); color: var(--accent); font-size: 11px; font-weight: 700;
+}
+.who .face img { width: 100%; height: 100%; display: block; }
+.who.small { gap: 5px; }
+.who.small .face { width: 16px; height: 16px; font-size: 9px; }
 .badge {
   display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: .4px;
   text-transform: uppercase; background: var(--control); color: var(--fg-soft); white-space: nowrap;
@@ -257,6 +268,17 @@ aside.drawer.on { transform: none; }
 
   // Everything a player can name - their name above all - goes onto the page as text, never as markup.
   const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+  // A player - { name, picture, discord } - by their picture (else their initial) and name, a link to message them on
+  // Discord for a Discord account; as the site's pages show one (site.js), since this page is served without them too.
+  const who = (player, small = false) => {
+    const { name = "", picture = null, discord = null } = player ?? {};
+    const face = picture ? `<img src="${esc(picture)}" alt="" loading="lazy">` : `<span aria-hidden="true">${esc((name[0] ?? "?").toUpperCase())}</span>`;
+    const inner = `<span class="face">${face}</span><span class="who-name">${esc(name)}</span>`;
+    const kind = `who${small ? " small" : ""}`;
+    return discord
+      ? `<a class="${kind}" href="https://discord.com/users/${esc(discord)}" target="_blank" rel="noopener" title="Message ${esc(name)} on Discord">${inner}</a>`
+      : `<span class="${kind}">${inner}</span>`;
+  };
 
   const now = () => Date.now() + skew;
   const plural = (n, one, many) => `${n} ${n === 1 ? one : (many ?? one + "s")}`;
@@ -304,7 +326,7 @@ aside.drawer.on { transform: none; }
     return list.map(p => {
       const cls = p.dropped ? "chip dropped" : building && p.submitted ? "chip ok" : "chip";
       const title = p.dropped ? "Dropped" : building ? (p.submitted ? "Deck submitted" : "Building") : "";
-      return `<span class="${cls}" title="${esc(title)}">${esc(p.name)}</span>`;
+      return `<span class="${cls}" title="${esc(title)}">${who(p, true)}</span>`;
     }).join("");
   }
 
@@ -324,7 +346,7 @@ aside.drawer.on { transform: none; }
     const stage = t.kind === "forming" ? "forming" : t.stage;
     const stageText = t.kind === "forming" ? "Forming" : ({ Open: "Open", Seated: "Seating", Playing: "Playing" }[t.stage] ?? t.stage);
     const seats = t.seats - t.bots;
-    const names = t.players.map(name => `<span class="chip">${esc(name)}</span>`).join("")
+    const names = t.players.map(p => `<span class="chip">${who(p, true)}</span>`).join("")
       + Array.from({ length: Math.max(0, seats - t.players.length) }, () => `<span class="chip muted">open seat</span>`).join("")
       + (t.bots > 0 ? `<span class="chip muted">${esc(plural(t.bots, "bot"))}</span>` : "");
     return `<div class="event static">
@@ -437,7 +459,7 @@ aside.drawer.on { transform: none; }
       <th class="r" title="Opponents' match-win percentage">OMW</th><th class="r" title="Game-win percentage">GW</th><th class="r" title="Opponents' game-win percentage">OGW</th></tr></thead>
       <tbody>${standings.map(s => `<tr>
         <td class="r num">${s.dropped ? "-" : s.rank}</td>
-        <td>${esc(s.name)}${s.dropped ? ` <span class="small">dropped</span>` : ""}</td>
+        <td>${who(s)}${s.dropped ? ` <span class="small">dropped</span>` : ""}</td>
         <td class="r num score">${s.points}</td>
         <td class="r num">${s.wins}-${s.losses}${s.draws ? `-${s.draws}` : ""}</td>
         <td class="r num">${s.gameWins}-${s.gameLosses}${s.gameDraws ? `-${s.gameDraws}` : ""}</td>
@@ -447,14 +469,14 @@ aside.drawer.on { transform: none; }
 
   function matchRow(m, live, swiss) {
     if (m.bye) {
-      return `<tr><td class="num">${m.table || ""}</td><td><span class="won">${esc(m.players[0]?.name)}</span></td><td class="score">bye</td><td></td><td class="small">2-0</td></tr>`;
+      return `<tr><td class="num">${m.table || ""}</td><td><span class="won">${who(m.players[0], true)}</span></td><td class="score">bye</td><td></td><td class="small">2-0</td></tr>`;
     }
     const [a, b] = m.players;
     const name = p => {
       if (!p) return "";
       const cls = m.complete ? (m.winner && m.winner.split(" and ").includes(p.name) ? "won" : "lost") : "";
       const clock = live && !m.complete && p.clockMs != null ? ` <span class="small num" title="Match clock left">${left(p.clockMs)}</span>` : "";
-      return `<span class="${cls}">${esc(p.name)}</span>${clock}`;
+      return `<span class="${cls}">${who(p, true)}</span>${clock}`;
     };
     const status = m.timedOut ? `${esc(m.timedOut)} ran out of time`
       : m.forfeit ? "Forfeit"
@@ -521,7 +543,7 @@ aside.drawer.on { transform: none; }
     const seats = `<div class="table-wrap"><table>
       <thead><tr><th class="r">Seat</th><th>Player</th><th class="r">Cards drafted</th>${booster && !over ? `<th class="r">Packs waiting</th><th>Pick clock</th>` : ""}${!booster && !over ? "<th></th>" : ""}</tr></thead>
       <tbody>${draft.seats.map(s => `<tr>
-        <td class="r num">${s.seat}</td><td>${esc(s.name)}</td><td class="r num">${s.drafted}</td>
+        <td class="r num">${s.seat}</td><td>${who(s)}</td><td class="r num">${s.drafted}</td>
         ${booster && !over ? `<td class="r num">${s.queued}</td><td>${s.queued > 0 ? countdown(s.pickBy) : `<span class="small">waiting</span>`}</td>` : ""}
         ${!booster && !over ? `<td>${s.active ? `<span class="badge Drafting">picking</span>` : ""}</td>` : ""}
       </tr>`).join("")}</tbody></table></div>`;

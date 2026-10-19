@@ -29,7 +29,7 @@
   let busy = false;
 
   const $ = id => document.getElementById(id);
-  const { esc, plural } = window.Cantrip ?? {};
+  const { esc, plural, who } = window.Cantrip ?? {};
   const named = key => window.Cantrip.formatName(key);
   const when = iso => {
     const date = new Date(iso);
@@ -57,7 +57,7 @@
       action = `<a class="button quiet small" href="${leaguePage(l.id)}">Open league</a><button type="button" class="button primary small" data-league-play="${esc(l.id)}">Back to my draft</button>`;
     } else if (mine.opponent) {
       badge = `<span class="badge live">Match</span>`;
-      what = `Playing ${mine.opponent}`;
+      what = `Playing ${mine.opponent.name}`;
       action = `<a class="button quiet small" href="${leaguePage(l.id)}">Open league</a><button type="button" class="button primary small" data-league-play="${esc(l.id)}">Go to my match</button>`;
     } else if (run) {
       badge = `<span class="badge live">${esc(record(run))}</span>`;
@@ -78,7 +78,7 @@
 
   function tableCard(d) {
     const seated = d.players && d.seats ? `${d.players.length} of ${d.seats} seated` : "";
-    const chips = (d.players ?? []).map(name => `<span class="chip${name === board.me.name ? " me" : ""}">${esc(name)}</span>`).join("")
+    const chips = (d.players ?? []).map(p => `<span class="chip${p.name === board.me.name ? " me" : ""}">${who(p, true)}</span>`).join("")
       + Array.from({ length: Math.max(0, (d.seats ?? 0) - (d.players?.length ?? 0)) }, () => `<span class="chip open">Open seat</span>`).join("");
     return `<div class="card mine">
       <div class="head"><span class="name">${esc([named(d.format), d.cube].filter(Boolean).join(" · "))}</span><span class="badge${d.checking ? " Checking" : ""}">${d.checking ? "Ready check" : "Filling"}</span></div>
@@ -93,19 +93,19 @@
     const what = g.stage === "Open" ? "Waiting for an opponent" : g.stage === "Seated" ? "Waiting for both players to sit down" : "Being played";
     const cancel = g.stage === "Open" ? `<button type="button" class="button quiet small" data-cancel="${esc(g.id)}">Call off</button>` : "";
     return `<div class="card mine">
-      <div class="head"><span class="name">${esc(g.players.length === 1 ? `${g.players[0]}'s game` : g.players.join(" vs "))}</span><span class="badge${g.stage === "Playing" ? " live" : ""}">${esc(g.stage === "Open" ? "Waiting" : g.stage)}</span></div>
+      <div class="head"><span class="name">${g.players.length === 1 ? `${who(g.players[0], true)}'s game` : g.players.map(p => who(p, true)).join(" vs ")}</span><span class="badge${g.stage === "Playing" ? " live" : ""}">${esc(g.stage === "Open" ? "Waiting" : g.stage)}</span></div>
       <div class="meta">${esc(named(g.format))}</div>
       <div class="foot"><span class="what">${what}</span>${cancel}<button type="button" class="button primary small" data-game="${esc(g.id)}">Open my game</button></div>
     </div>`;
   }
 
-  // What an event is, past its name: its format and cube where the name does not say them, who against, and the record.
+  // What an event is, past its name, as HTML: its format and cube where the name does not say them, who against, and the record.
   function about(e) {
-    const parts = [named(e.format), e.cube].filter(part => part && !e.name.includes(part));
-    if (e.players <= 2 && e.opponents?.length) parts.push(`vs ${e.opponents.join(", ")}`);
-    else parts.push(plural(e.players, "player"));
-    if (e.wins + e.losses + e.draws > 0) parts.push(`${e.wins}-${e.losses}${e.draws ? `-${e.draws}` : ""}`);
-    return parts.join(" · ");
+    const parts = [named(e.format), e.cube].filter(part => part && !e.name.includes(part)).map(esc);
+    if (e.players <= 2 && e.opponents?.length) parts.push(`vs ${e.opponents.map(p => who(p, true)).join(", ")}`);
+    else parts.push(esc(plural(e.players, "player")));
+    if (e.wins + e.losses + e.draws > 0) parts.push(esc(`${e.wins}-${e.losses}${e.draws ? `-${e.draws}` : ""}`));
+    return parts.join(" &middot; ");
   }
 
   function eventCard(e) {
@@ -115,7 +115,7 @@
     if (!e.dropped) actions.push(`<button type="button" class="button primary small" data-return>Back to my seat</button>`);
     return `<div class="card mine">
       <div class="head"><span class="name">${esc(e.name)}</span><span class="badge ${esc(e.stage)}">${esc(e.dropped ? "Dropped" : e.outcome)}</span></div>
-      <div class="meta">${esc(about(e))}</div>
+      <div class="meta">${about(e)}</div>
       ${e.detail ? `<div class="meta">${esc(e.detail)}</div>` : ""}
       <div class="foot" style="justify-content: flex-end">${actions.join("")}</div>
     </div>`;
@@ -133,7 +133,7 @@
     const tone = e.outcome === "Won" || e.outcome.startsWith("1st") ? "won" : e.stage === "Cancelled" ? "bad" : e.dropped ? "" : "info";
     return `<div class="row">
       <div class="main"><div class="title"><a href="${results(e.id)}">${esc(e.name)}</a></div>
-        <div class="sub">${esc([about(e), when(e.updated)].filter(Boolean).join(" · "))}</div></div>
+        <div class="sub">${[about(e), esc(when(e.updated))].filter(Boolean).join(" &middot; ")}</div></div>
       <div class="side"><span class="outcome"><span class="badge ${tone}">${esc(e.outcome)}</span></span>
         <a class="button small" href="${results(e.id)}" aria-label="Results of ${esc(e.name)}">Results</a></div>
     </div>`;

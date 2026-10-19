@@ -137,7 +137,7 @@ public sealed class DraftQueuesTests : IDisposable
             Assert.Equal(1, alice.Seat);
             QueueBoardTable own = Assert.Single(queues.Board().Tables);
             Assert.Equal((0UL, "grid", "rw-aggro", 2), (own.Channel, own.Settings.Format, own.Cube, own.Seats));
-            Assert.Equal(["Alice"], own.Players);
+            Assert.Equal(["Alice"], own.Players.Select(player => player.Name));
             Assert.Equal(own.Id, queues.TableOf(Alice.Id));
 
             // The channel's Join opens a table of its own rather than seat anyone at hers.

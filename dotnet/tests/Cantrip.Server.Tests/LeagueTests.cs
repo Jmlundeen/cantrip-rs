@@ -106,7 +106,7 @@ public sealed class LeagueTests : IDisposable
         MatchGame game = Assert.Single(league.TablesToOpen());
         Assert.Equal("Test League: Ann vs Ben", game.Name);
         Assert.False(league.IsSearching("ann"));
-        Assert.Equal("Ben", league.View("ann").Mine!.Opponent);
+        Assert.Equal("Ben", league.View("ann").Mine!.Opponent!.Name);
         Assert.False(league.View("ann").Mine!.MatchReady);
         Assert.Equal("Your match's table is opening. Try again in a moment.", league.Seat("ann").Refusal);
 
@@ -124,7 +124,7 @@ public sealed class LeagueTests : IDisposable
         game.GameEnded(abandoned: false, [2], "Ben won.");
         Assert.Equal((0, 1), (Current(league, "ann").Wins, Current(league, "ann").Losses));
         Assert.Equal((1, 0), (Current(league, "ben").Wins, Current(league, "ben").Losses));
-        Assert.Equal([new LeagueRunMatch("Ann", "won", "Ben won 1-0")], Current(league, "ben").Matches);
+        Assert.Equal([new LeagueRunMatch(new PlayerFace("Ann"), "won", "Ben won 1-0")], Current(league, "ben").Matches);
         Assert.Equal("Ben", Assert.Single(league.View(null).Recent).Winner);
 
         // Nobody is sent anywhere: the result stays up, and leads back to the league's page.
@@ -151,7 +151,7 @@ public sealed class LeagueTests : IDisposable
         LeagueRunView trophy = Assert.Single(ann.Previous);
         Assert.Equal((7, 0, LeagueEndings.Trophy, "Trophy"), (trophy.Wins, trophy.Losses, trophy.Ending, trophy.Status));
         Assert.Equal(1, ann.Trophies);
-        Assert.Equal([new LeagueTrophies("Ann", 1, true)], league.View("ann").Trophies);
+        Assert.Equal([new LeagueTrophies(new PlayerFace("Ann"), 1, true)], league.View("ann").Trophies);
 
         // Ben's first two runs went 0-3; the third is 0-1 and still going.
         LeagueMine ben = league.View("ben").Mine!;

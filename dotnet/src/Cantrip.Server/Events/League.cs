@@ -708,6 +708,11 @@ public sealed class League : IMatchHost
     // --- What the site shows. --------------------------------------------------------------------------------------
 
     /// <summary>The league as a player sees it - or anyone, for null: names and records only, never a deck but their own.</summary>
+    /// <summary>Each player's picture by id, as the site shows it beside their name (<see cref="PortraitStore.PathFor"/>); null for none.</summary>
+    public Func<string, string?>? Portraits { get; set; }
+
+    private PlayerFace FaceOf(string playerId) => PlayerFace.Of(playerId, NameOf(playerId), Portraits);
+
     public LeagueView View(string? playerId)
     {
         lock (Gate)
@@ -716,10 +721,10 @@ public sealed class League : IMatchHost
             List<LeagueRunView> active = [.. Runs.Where(run => run.Stage != LeagueRunStage.Over).Select(RunView)
                 .OrderByDescending(run => run.Wins).ThenBy(run => run.Losses).ThenBy(run => run.Started)];
             List<LeagueTrophies> trophies = [.. Runs.Where(run => run.Ending == LeagueEndings.Trophy).GroupBy(run => run.PlayerId)
-                .Select(group => new LeagueTrophies(NameOf(group.Key), group.Count(), group.Key == playerId))
-                .OrderByDescending(each => each.Trophies).ThenBy(each => each.Name, StringComparer.OrdinalIgnoreCase)];
+                .Select(group => new LeagueTrophies(FaceOf(group.Key), group.Count(), group.Key == playerId))
+                .OrderByDescending(each => each.Trophies).ThenBy(each => each.Player.Name, StringComparer.OrdinalIgnoreCase)];
             List<LeagueMatchView> recent = [.. _record.Matches.Where(match => match.Complete).OrderByDescending(match => match.Round).Take(8).Select(match =>
-                new LeagueMatchView(NameOf(match.Players[0]), NameOf(match.Players[1]), match.Winners.Count == 1 ? NameOf(match.Winners[0]) : null, match.Detail,
+                new LeagueMatchView(FaceOf(match.Players[0]), FaceOf(match.Players[1]), match.Winners.Count == 1 ? NameOf(match.Winners[0]) : null, match.Detail,
                     match.Games.Select(game => game.Ended).Max(), playerId is not null && match.Players.Contains(playerId)))];
 
             LeagueMine? mine = null;
@@ -727,7 +732,7 @@ public sealed class League : IMatchHost
             {
                 LeagueRun? current = Current(playerId);
                 MatchRecord? match = current is null ? null : MatchOf(current);
-                string? opponent = match?.Players.FirstOrDefault(player => player != playerId) is { } other ? NameOf(other) : null;
+                PlayerFace? opponent = match?.Players.FirstOrDefault(player => player != playerId) is { } other ? FaceOf(other) : null;
                 bool ready = match is not null && _games.Values.Any(game => game.Match == match && !game.Done && game.Address is not null);
                 int entries = EntriesOf(playerId);
                 mine = new LeagueMine(
@@ -772,11 +777,11 @@ public sealed class League : IMatchHost
         };
         List<LeagueRunMatch> matches = [.. _record.Matches.Where(each => each.Entries.Contains(run.Id)).OrderBy(each => each.Round).Select(each =>
         {
-            string opponent = each.Players.FirstOrDefault(player => player != run.PlayerId) is { } other ? NameOf(other) : string.Empty;
+            PlayerFace opponent = each.Players.FirstOrDefault(player => player != run.PlayerId) is { } other ? FaceOf(other) : new PlayerFace(string.Empty);
             string result = !each.Complete ? "playing" : each.Winners.Contains(run.PlayerId) ? "won" : each.Winners.Count > 0 || each.Forfeit ? "lost" : "drawn";
             return new LeagueRunMatch(opponent, result, each.Detail);
         })];
-        return new LeagueRunView(run.Id, run.PlayerId, run.Name, run.Entry, run.Stage, wins, losses, draws, run.Ending, status, run.Started, run.Ended,
+        return new LeagueRunView(run.Id, PlayerFace.Of(run.PlayerId, run.Name, Portraits), run.Name, run.Entry, run.Stage, wins, losses, draws, run.Ending, status, run.Started, run.Ended,
             run.Stage == LeagueRunStage.Drafting ? 0 : PoolDecks.Cards(run.Pool, run.Deck, _cards.Basics).Count, matches);
     }
 
@@ -825,7 +830,7 @@ public sealed record LeagueView(
 /// <param name="Deck">How many cards its main deck has, once built.</param>
 public sealed record LeagueRunView(
     string Id,
-    string PlayerId,
+    PlayerFace Player,
     string Name,
     int Entry,
     LeagueRunStage Stage,
@@ -840,12 +845,12 @@ public sealed record LeagueRunView(
     IReadOnlyList<LeagueRunMatch> Matches);
 
 /// <param name="Result">"won", "lost", "drawn", or "playing".</param>
-public sealed record LeagueRunMatch(string Opponent, string Result, string Detail);
+public sealed record LeagueRunMatch(PlayerFace Opponent, string Result, string Detail);
 
-public sealed record LeagueTrophies(string Name, int Trophies, bool Me);
+public sealed record LeagueTrophies(PlayerFace Player, int Trophies, bool Me);
 
 /// <param name="Winner">The winner's name; null for a draw, or a match nobody won.</param>
-public sealed record LeagueMatchView(string First, string Second, string? Winner, string Detail, DateTimeOffset? Ended, bool Mine);
+public sealed record LeagueMatchView(PlayerFace First, PlayerFace Second, string? Winner, string Detail, DateTimeOffset? Ended, bool Mine);
 
 /// <param name="Current">The run being played, if there is one.</param>
 /// <param name="Previous">Every run over, newest first.</param>
@@ -853,7 +858,7 @@ public sealed record LeagueMatchView(string First, string Second, string? Winner
 /// <param name="EntryRefusal">Why a new run may not be made now; null when it may.</param>
 /// <param name="EditRefusal">Why the current run's deck may not be changed now; null when it may.</param>
 /// <param name="SearchingSince">Since when they have looked for a match; null when they are not looking.</param>
-/// <param name="Opponent">Who they are playing now, by name; null when they are in no match.</param>
+/// <param name="Opponent">Who they are playing now; null when they are in no match.</param>
 /// <param name="MatchReady">Whether their match's table is open to go to.</param>
 /// <param name="Editing">Whether their deck is being changed at its table.</param>
 public sealed record LeagueMine(
@@ -864,7 +869,7 @@ public sealed record LeagueMine(
     string? EntryRefusal,
     string? EditRefusal,
     DateTimeOffset? SearchingSince,
-    string? Opponent,
+    PlayerFace? Opponent,
     bool MatchReady,
     bool Editing,
     int Trophies);

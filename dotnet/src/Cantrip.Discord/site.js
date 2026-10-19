@@ -14,6 +14,22 @@
   };
   const formatName = key => FORMATS[key] ?? key ?? "Draft";
 
+  // A player as every list shows them: their picture (else their initial) and their name, and - for a Discord account -
+  // a link to message them there. `player` is { name, picture, discord } as the APIs give it, or a bare name. `small`
+  // for one in a line of text or a chip rather than a table's row.
+  const who = (player, small = false) => {
+    const { name = "", picture = null, discord = null } = typeof player === "string" ? { name: player } : player ?? {};
+    const size = small ? 18 : 28;
+    const face = picture
+      ? `<img src="${esc(picture)}" alt="" width="${size}" height="${size}" loading="lazy">`
+      : `<span aria-hidden="true">${esc((name[0] ?? "?").toUpperCase())}</span>`;
+    const inner = `<span class="face">${face}</span><span class="who-name">${esc(name)}</span>`;
+    const kind = `who${small ? " small" : ""}`;
+    return discord
+      ? `<a class="${kind}" href="https://discord.com/users/${esc(discord)}" target="_blank" rel="noopener" title="Message ${esc(name)} on Discord">${inner}</a>`
+      : `<span class="${kind}">${inner}</span>`;
+  };
+
   // To Discord and back to this page, signed in.
   function signIn(then) {
     location.assign(`signin?then=${encodeURIComponent(then ?? (page() || "home"))}`);
@@ -140,7 +156,7 @@
     for (const l of b.leagues ?? []) {
       const mine = l.mine;
       if (mine?.opponent) {
-        return { text: `Your <strong>${esc(l.name)}</strong> match against <strong>${esc(mine.opponent)}</strong> ${mine.matchReady ? "is ready" : "is about to begin"}.`,
+        return { text: `Your <strong>${esc(l.name)}</strong> match against <strong>${esc(mine.opponent.name)}</strong> ${mine.matchReady ? "is ready" : "is about to begin"}.`,
           label: "Go to my match", action: () => seat("leagues/api/play", { league: l.id }) };
       }
     }
@@ -199,7 +215,7 @@
     setInterval(look, 5000);
   }
 
-  window.Cantrip = { esc, plural, post, seat, getJson, toast, confirm, signIn, formatName, get board() { return board; } };
+  window.Cantrip = { esc, plural, post, seat, getJson, toast, confirm, signIn, formatName, who, get board() { return board; } };
 
   function start() {
     menu();

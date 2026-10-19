@@ -52,11 +52,15 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         string built = Path.Combine(WebClient.Root, "dotnet", "src", "Cantrip.Client.Web", "bin", "Debug", "net10.0-browserwasm", "wwwroot");
         List<int> ports = FreePorts(8);
         var store = new EventStore(_data);
+        // Bob has a picture; the others are shown by their initial.
+        var portraits = new PortraitStore(store.Root);
+        await portraits.SaveAsync("discord-1002", Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="));
         IReadOnlyList<string> cube = CubeList.Load(Path.Combine(WebClient.Root, "decks", "rw-aggro.txt"));
         _drafts = new DraftHost(new DraftHostOptions { ContentRoot = WebClient.Content, Store = store, Cube = "LSVCube", CubeCards = cube, Cards = 18, Ports = ports[1..4] });
         _queues = new DraftQueues(new DraftQueuesOptions
         {
             ContentRoot = WebClient.Content, Store = store, Drafts = _drafts, Ports = ports[1..4], CubeDirectories = [Path.Combine(WebClient.Root, "docs", "cube-lists")],
+            Portraits = portraits.PathFor,
         });
         string decks = Path.Combine(WebClient.Root, "decks");
         DeckList rwAggro = DeckList.Load(DeckList.Find(decks, "rw-aggro"));
@@ -66,11 +70,13 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
             Deck = rwAggro,
             Formats = new Dictionary<string, IReadOnlyList<DeckList>> { ["standard"] = [rwAggro, DeckList.Load(DeckList.Find(decks, "ub-reanimator"))] },
             Ports = ports[4..],
+            Portraits = portraits.PathFor,
         });
 
         var site = new Uri($"http://127.0.0.1:{ports[0]}/");
         var signIn = new SiteSignInOptions { Site = site, ClientId = "1234567890", ClientSecret = "not-a-secret", Keys = Path.Combine(_data, "site-keys") };
-        var status = new EventStatusBoard(store, hosting: () => [.. _drafts.Drafts.Where(draft => draft.IsLive).Select(draft => draft.Id)]);
+        var status = new EventStatusBoard(store, hosting: () => [.. _drafts.Drafts.Where(draft => draft.IsLive).Select(draft => draft.Id)],
+            portraits: portraits.PathFor);
         var queuePage = new QueueSiteOptions { Queues = _queues, Board = status, Drafts = _drafts, Client = site, SignIn = signIn };
         var playPage = new PlaySiteOptions { Games = _games, Client = site, SignIn = signIn };
         var deckPage = new DeckSiteOptions { ContentRoot = WebClient.Content, Store = store, SignIn = signIn };
@@ -83,6 +89,7 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
             Store = store,
             Pods = _pods,
             CubeDirectories = [Path.Combine(WebClient.Root, "decks")],
+            Portraits = portraits.PathFor,
             Leagues =
             [
                 new LeagueDefinition
@@ -96,12 +103,9 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
             ],
         });
         Assert.Empty(_leagues.Start());
-        // Bob has a picture; the others are shown by their initial.
-        var portraits = new PortraitStore(store.Root);
-        await portraits.SaveAsync("discord-1002", Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="));
-        var leaguePage = new LeagueSiteOptions { Leagues = _leagues, Client = site, SignIn = signIn, Portraits = portraits };
+        var leaguePage = new LeagueSiteOptions { Leagues = _leagues, Client = site, SignIn = signIn };
 
-        var home = new HomeSiteOptions { SignIn = signIn, Drafts = queuePage, Constructed = playPage, Leagues = leaguePage, HasDecks = true, Store = store };
+        var home = new HomeSiteOptions { SignIn = signIn, Drafts = queuePage, Constructed = playPage, Leagues = leaguePage, HasDecks = true, Store = store, Portraits = portraits.PathFor };
         var art = new ArtStore(new ArtStoreOptions { ContentRoot = WebClient.Content, CacheDirectory = WebClient.ArtCache });
         _site = await ClientSite.StartAsync("127.0.0.1", ports[0], built, art, status: status, signIn: signIn, queues: queuePage, play: playPage, home: home, decks: deckPage,
             before: SignInByHeader, leagues: leaguePage, portraits: portraits);
@@ -200,6 +204,8 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         Assert.Equal(2, await page.Locator("#content .rows .row").CountAsync());
         Assert.True(await page.Locator(".row", new PageLocatorOptions { HasText = "Won" }).IsVisibleAsync());
         Assert.True(await page.Locator(".row", new PageLocatorOptions { HasText = "Called off" }).IsVisibleAsync());
+        // Whom she played, by picture and name, a link to message them on Discord.
+        await PlayerShownAsync(page.Locator(".row", new PageLocatorOptions { HasText = "Won" }), "Bob", 1002);
 
         // Every section is a click away, and comes back.
         foreach ((string link, string url, string heading) in new[] { ("Draft", "**/draft", "Draft"), ("Constructed", "**/constructed", "Constructed"), ("Decks", "**/decks", "Decks"), ("Events", "**/status", "Events"), ("Home", "**/home", "Welcome, Alice") })
@@ -244,6 +250,7 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         await page.Locator("#content .rows .row a", new() { HasText = "Winston draft" }).First.ClickAsync();
         await page.WaitForURLAsync("**/status#event=*");
         await page.Locator("#drawer.on").WaitForAsync();
+        await PlayerShownAsync(page.Locator("#drawer"), "Carol", 1003, picture: false);
         await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "results.png") });
 
         // Signing out goes back to the front door, signed out.
@@ -278,9 +285,7 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         Assert.True(await page.Locator("table.data tr.me", new PageLocatorOptions { HasText = "Alice" }).First.IsVisibleAsync());
         Assert.True(await page.Locator("td.trophy-count").First.IsVisibleAsync());
         // Each player by their picture and name, a link to message them on Discord.
-        ILocator bob = page.Locator("table.data a.who", new PageLocatorOptions { HasText = "Bob" });
-        Assert.Equal("https://discord.com/users/1002", await bob.GetAttributeAsync("href"));
-        Assert.True(await bob.Locator("img").EvaluateAsync<bool>("img => img.complete && img.naturalWidth > 0"));
+        await PlayerShownAsync(page.Locator("table.data").First, "Bob", 1002);
         Assert.Equal(1, await page.Locator("#content .rows .row", new PageLocatorOptions { HasText = "Run #1" }).CountAsync());
         await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(_pictures, "league-run.png"), FullPage = true });
 
@@ -337,6 +342,26 @@ public sealed class SitePagesTests(WebClient web) : IAsyncLifetime
         };
         page.PageError += (_, error) => _errors.Add($"{page.Url}: {error}");
         return page;
+    }
+
+    /// <summary>
+    /// A player shown in <paramref name="within"/>: their picture, loaded - or their initial, for one with none - and their
+    /// name, a link to message them on Discord.
+    /// </summary>
+    private static async Task PlayerShownAsync(ILocator within, string name, ulong discord, bool picture = true)
+    {
+        ILocator player = within.Locator("a.who", new LocatorLocatorOptions { HasText = name }).First;
+        await player.WaitForAsync();
+        Assert.Equal($"https://discord.com/users/{discord}", await player.GetAttributeAsync("href"));
+        Assert.Equal("_blank", await player.GetAttributeAsync("target"));
+        if (!picture)
+        {
+            Assert.Equal(name[..1], await player.Locator(".face").InnerTextAsync());
+            return;
+        }
+
+        await player.Locator("img").WaitForAsync();
+        Assert.True(await player.Locator("img").EvaluateAsync<bool>("img => img.complete && img.naturalWidth > 0"));
     }
 
     /// <summary>A Winston draft Alice won against Bob, as the data directory keeps one over.</summary>

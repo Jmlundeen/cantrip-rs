@@ -52,12 +52,12 @@
   let busy = false;
 
   const $ = id => document.getElementById(id);
-  const { esc, plural, toast } = window.Cantrip;
+  const { esc, plural, toast, who } = window.Cantrip;
   const seated = () => Boolean(board?.me?.game);
 
   function gameCard(g) {
     const mine = board.me?.game === g.id;
-    const chips = g.players.map(name => `<span class="chip${name === board.me?.name ? " me" : ""}">${esc(name)}</span>`);
+    const chips = g.players.map(p => `<span class="chip${p.name === board.me?.name ? " me" : ""}">${who(p, true)}</span>`);
     if (g.players.length < 2) chips.push(`<span class="chip open">Open seat</span>`);
     const what = g.stage === "Open" ? "Waiting for an opponent" : g.stage === "Seated" ? "Waiting for both players to sit down" : "Being played";
     let action = "";
@@ -68,7 +68,7 @@
       action = `<button type="button" class="button primary small" data-join="${esc(g.id)}">Join</button>`;
     }
     return `<div class="card${mine ? " mine" : ""}">
-      <div class="head"><span class="name">${esc(g.players.length === 1 ? `${g.players[0]}'s game` : g.players.join(" vs "))}</span><span class="badge ${g.stage === "Playing" ? "Playing" : ""}">${esc(STAGES[g.stage] ?? g.stage)}</span></div>
+      <div class="head"><span class="name">${g.players.length === 1 ? `${who(g.players[0], true)}'s game` : g.players.map(p => who(p, true)).join(" vs ")}</span><span class="badge ${g.stage === "Playing" ? "Playing" : ""}">${esc(STAGES[g.stage] ?? g.stage)}</span></div>
       <div class="players">${chips.join("")}</div>
       <div class="foot"><span class="what">${esc(what)}</span>${action}</div>
     </div>`;

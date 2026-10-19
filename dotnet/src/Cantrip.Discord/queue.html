@@ -59,7 +59,7 @@
   let busy = false;
 
   const $ = id => document.getElementById(id);
-  const { esc, plural, toast } = window.Cantrip;
+  const { esc, plural, toast, who } = window.Cantrip;
 
   function settingsLine(s) {
     const deck = `decks of ${s.minimumDeck}+`;
@@ -71,7 +71,7 @@
   }
 
   function seatChips(players, seats, bots) {
-    const chips = players.map(name => `<span class="chip${name === board.me?.name ? " me" : ""}">${esc(name)}</span>`);
+    const chips = players.map(p => `<span class="chip${p.name === board.me?.name ? " me" : ""}">${who(p, true)}</span>`);
     for (let i = players.length; i < seats; i++) chips.push(`<span class="chip open">Open seat</span>`);
     for (let i = 0; i < bots; i++) chips.push(`<span class="chip bot">${bots === 1 ? "Bot" : `Bot ${i + 1}`}</span>`);
     return `<div class="players">${chips.join("")}</div>`;
@@ -115,7 +115,7 @@
   }
 
   function underwayCard(e) {
-    const players = e.players.map(p => `<span class="chip${p.dropped ? " dropped" : ""}${p.name === board.me?.name ? " me" : ""}">${esc(p.name)}</span>`).join("");
+    const players = e.players.map(p => `<span class="chip${p.dropped ? " dropped" : ""}${p.name === board.me?.name ? " me" : ""}">${who(p, true)}</span>`).join("");
     return `<div class="card">
       <div class="head"><span class="name">${esc(e.cube || e.name)}</span><span class="badge ${esc(e.stage)}">${esc(STAGES[e.stage] ?? e.stage)}</span></div>
       <div class="players">${players}</div>

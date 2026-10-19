@@ -27,7 +27,7 @@ public sealed record PlayerEventSummary(
     int Round,
     int Rounds,
     string Outcome,
-    IReadOnlyList<string> Opponents);
+    IReadOnlyList<PlayerFace> Opponents);
 
 /// <summary>
 /// The events a player is in, from their record in the data directory (<see cref="PlayerRecord.Events"/>): the ones
@@ -39,7 +39,9 @@ public static class PlayerEvents
     /// Every event of <paramref name="playerId"/>'s being played, then the <paramref name="recent"/> latest over, newest first.
     /// </summary>
     /// <param name="hosted">Whether the host runs an event now; null takes every live record as being played.</param>
-    public static IReadOnlyList<PlayerEventSummary> Of(EventStore store, string playerId, Func<string, bool>? hosted = null, int recent = 10)
+    /// <param name="portraits">Each player's picture by id, shown beside an opponent's name; null for none.</param>
+    public static IReadOnlyList<PlayerEventSummary> Of(EventStore store, string playerId, Func<string, bool>? hosted = null, int recent = 10,
+        Func<string, string?>? portraits = null)
     {
         ArgumentNullException.ThrowIfNull(store);
         if (store.LoadPlayer(playerId) is not { } player) return [];
@@ -55,7 +57,7 @@ public static class PlayerEvents
 
             // A league, and each draft of a run in one, is the league's to show: its runs are no event of their own.
             if (record.Kind == EventKinds.League || record.ParentId is not null) continue;
-            PlayerEventSummary summary = Summary(record, playerId, record.IsLive && (hosted?.Invoke(id) ?? true));
+            PlayerEventSummary summary = Summary(record, playerId, record.IsLive && (hosted?.Invoke(id) ?? true), portraits);
             all.Add(summary);
             if (!summary.Live) over++;
         }
@@ -65,7 +67,7 @@ public static class PlayerEvents
     }
 
     /// <summary>One event, as <paramref name="playerId"/> - who is in it - sees it.</summary>
-    public static PlayerEventSummary Summary(EventRecord record, string playerId, bool live)
+    public static PlayerEventSummary Summary(EventRecord record, string playerId, bool live, Func<string, string?>? portraits = null)
     {
         ArgumentNullException.ThrowIfNull(record);
         EventParticipant me = record.Participant(playerId) ?? throw new ArgumentException($"'{playerId}' is not in event {record.Id}.", nameof(playerId));
@@ -95,20 +97,20 @@ public static class PlayerEvents
             record.Round,
             rounds,
             Outcome(record, me, standing, played, live, rounds),
-            Opponents(record, playerId));
+            Opponents(record, playerId, portraits));
     }
 
     /// <summary>
-    /// Who the player has played or is to play, by name, in the order they met: the other player of a draft of two, the
-    /// opponents of each round of a pod.
+    /// Who the player has played or is to play, in the order they met: the other player of a draft of two, the opponents
+    /// of each round of a pod.
     /// </summary>
-    private static List<string> Opponents(EventRecord record, string playerId)
+    private static List<PlayerFace> Opponents(EventRecord record, string playerId, Func<string, string?>? portraits)
     {
         if (record.Participants.Count <= 2)
-            return [.. record.Participants.Where(participant => participant.PlayerId != playerId).Select(participant => participant.Name)];
+            return [.. record.Participants.Where(participant => participant.PlayerId != playerId).Select(participant => PlayerFace.Of(participant.PlayerId, participant.Name, portraits))];
         return [.. record.Matches.Where(match => match.Players.Contains(playerId)).OrderBy(match => match.Round)
             .SelectMany(match => match.Players.Where(player => player != playerId))
-            .Select(player => record.Participant(player)?.Name ?? player)];
+            .Select(player => PlayerFace.Of(player, record.Participant(player)?.Name ?? player, portraits))];
     }
 
     private static string Outcome(EventRecord record, EventParticipant me, SwissStanding? standing, bool played, bool live, int rounds)

@@ -26,6 +26,9 @@ public sealed class HomeSiteOptions
 
     /// <summary>The data directory: each player's events, and their decks. Null for none.</summary>
     public EventStore? Store { get; init; }
+
+    /// <summary>Each player's picture, by player id, shown beside their name; null for none.</summary>
+    public Func<string, string?>? Portraits { get; init; }
 }
 
 /// <summary>
@@ -127,7 +130,7 @@ public static class HomeSite
         PodHosts? pods = options.Drafts?.Pods;
         bool Hosted(string id) => hosts?.Hosts(id) == true || pods?.Hosts(id) == true;
 
-        IReadOnlyList<PlayerEventSummary> events = player is not null && options.Store is { } store ? PlayerEvents.Of(store, player, Hosted, recent: brief ? 0 : 12) : [];
+        IReadOnlyList<PlayerEventSummary> events = player is not null && options.Store is { } store ? PlayerEvents.Of(store, player, Hosted, recent: brief ? 0 : 12, options.Portraits) : [];
 
         // Every page asks this every few seconds: a player with one open is still there to be paired.
         if (account is not null) options.Leagues?.Leagues.Seen(account.Id);
@@ -159,7 +162,7 @@ public static class HomeSite
         object? constructed = null;
         if (account is not null && options.Constructed?.Games.GameOf(account.Id) is { } game)
         {
-            constructed = new { id = game.Id, format = game.Format, stage = game.Stage.ToString(), players = game.Players.Select(each => each.Name) };
+            constructed = new { id = game.Id, format = game.Format, stage = game.Stage.ToString(), players = game.Players.Select(options.Constructed!.Games.FaceOf) };
         }
 
         // A draft opened from Discord that nobody has joined yet: no event is made until someone does.
