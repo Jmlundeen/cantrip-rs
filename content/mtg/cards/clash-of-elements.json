@@ -1,0 +1,6 @@
+{
+  "name": "Clash of Elements",
+  "manaCost": "{1}{U}{R}",
+  "type": "Instant",
+  "oracleText": "Choose target nonland permanent. Its owner may put it on top of their library. If they do, Clash of Elements deals 2 damage to them. If they didn't put the card on top of their library, they put it on the bottom."
+}
