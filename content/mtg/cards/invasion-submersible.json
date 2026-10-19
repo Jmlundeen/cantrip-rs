@@ -1,0 +1,8 @@
+{
+  "name": "Invasion Submersible",
+  "manaCost": "{2}{U}",
+  "type": "Artifact — Vehicle",
+  "power": 0,
+  "toughness": 0,
+  "oracleText": "When this Vehicle enters, return up to one other target nonland permanent to its owner's hand.\nExhaust — Waterbend {3}: This Vehicle becomes an artifact creature. Put three +1/+1 counters on it. (While paying a waterbend cost, you can tap your artifacts and creatures to help. Each one pays for {1}. Activate each exhaust ability only once.)"
+}

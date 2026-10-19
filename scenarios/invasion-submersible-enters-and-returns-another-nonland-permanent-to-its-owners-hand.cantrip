@@ -1,0 +1,45 @@
+# Invasion Submersible: "When this Vehicle enters, return up to one other target nonland permanent to its owner's hand." Bot2's
+# Ornithopter is returned; the Submersible itself ("other") and Bot2's Swamp (a land) are not among the candidates (refused).
+# The Swamp stays, and the Submersible, a 0/0 Vehicle that is not a creature, stays too.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Invasion Submersible
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Invasion Submersible.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Swamp)
+! Bot1.Target(Bot1.Battlefield.Invasion Submersible)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Swamp
+Bot2.Hand.Count = 7
+Bot2.Hand.Ornithopter.Toughness = 2
+Bot1.Battlefield.Invasion Submersible.Types = Artifact
+Bot1.Battlefield.Invasion Submersible.Subtypes = Vehicle

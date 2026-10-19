@@ -1,0 +1,41 @@
+# Invasion Submersible: "return up to ONE other target nonland permanent" - Bot1 chooses no target although Bot2's Ornithopter is there
+# (CR 115.1d, 601.2c). The trigger is still put on the stack and resolves, doing nothing: Bot2's Ornithopter stays on the battlefield.
+# Control: the other enters scenario, where the target is chosen and returned.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Invasion Submersible
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Invasion Submersible.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+? Stack.Count = 1
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot2.Hand.Count = 7
+Stack.Count = 0

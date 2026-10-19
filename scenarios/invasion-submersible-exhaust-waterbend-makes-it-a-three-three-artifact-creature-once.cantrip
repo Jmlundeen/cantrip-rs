@@ -1,0 +1,55 @@
+# Invasion Submersible: "Exhaust - Waterbend {3}: This Vehicle becomes an artifact creature. Put three +1/+1 counters on it."
+# Waterbend (CR 701.67a) is paid by tapping the Vehicle itself (any untapped artifact or creature you control will do, itself included)
+# and two Moxen instead of spending mana (Convoke: names them). The Vehicle, with no duration
+# said, becomes a creature for good (CR 611.2a): an artifact creature - Vehicle 3/3 with three +1/+1 counters on a 0/0. Exhaust
+# can be activated only once (CR 702.177a): the second activation is refused although the Sol Ring, Mox Pearl and Mox Emerald could pay.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Invasion Submersible
+Mox Pearl
+Mox Emerald
+Sol Ring
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Invasion Submersible.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Invasion Submersible.Types = Artifact
+Bot1.Battlefield.Invasion Submersible.Activate(Convoke: Invasion Submersible, Mox Ruby, Mox Jet)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Invasion Submersible.Activate
+
+[Expect]
+Bot1.Battlefield.Invasion Submersible.Types = Artifact; Creature
+Bot1.Battlefield.Invasion Submersible.Subtypes = Vehicle
+Bot1.Battlefield.Invasion Submersible.Power = 3
+Bot1.Battlefield.Invasion Submersible.Toughness = 3
+Bot1.Battlefield.Invasion Submersible.Counters.PlusOnePlusOne = 3
+Bot1.Battlefield.Invasion Submersible.Tapped = true
+Bot1.Battlefield.Mox Pearl.Tapped = false
+Bot1.Battlefield.Mox Ruby.Tapped = true
+Bot1.Battlefield.Mox Jet.Tapped = true
+Bot1.Battlefield.Sol Ring.Tapped = false

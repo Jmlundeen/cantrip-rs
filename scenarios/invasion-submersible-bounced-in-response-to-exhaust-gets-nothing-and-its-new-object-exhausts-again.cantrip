@@ -1,0 +1,66 @@
+# Invasion Submersible: Bot2 answers the exhaust ability with Brazen Borrower's Petty Theft, returning the Vehicle to Bot1's hand. The
+# ability resolves without a Vehicle to act on (CR 400.7: the card in the hand is a new object), so no counters and no creature.
+# The recast Submersible is a new object too (the exhaust ruling): its exhaust ability can be activated again, once more, and then
+# makes a 3/3 artifact creature. The Moxen tapped for waterbend (Convoke:) are the artifacts that pay.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Mox Jet
+Invasion Submersible
+Mox Pearl
+Mox Emerald
+Sol Ring
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Brazen Borrower
+Swamp x6
+Swamp x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Invasion Submersible.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Invasion Submersible.Activate(Convoke: Mox Ruby, Mox Jet, Mox Pearl)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast(Bot1.Battlefield.Invasion Submersible; Ability: Adventure)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Invasion Submersible.Colors = Blue
+? Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Invasion Submersible.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Battlefield.Invasion Submersible.Activate(Convoke: Mox Ruby, Mox Jet, Mox Pearl)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Invasion Submersible.Types = Artifact; Creature
+Bot1.Battlefield.Invasion Submersible.Power = 3
+Bot1.Battlefield.Invasion Submersible.Counters.PlusOnePlusOne = 3
