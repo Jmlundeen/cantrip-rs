@@ -258,6 +258,20 @@ pub fn opponents_cant_gain_life(_: &dyn Query, asker: &Asker, player: PlayerId) 
     player != asker.controller
 }
 
+/// "You can't lose the game" (CR 104.3) as a `CardDef::loss_rules` entry: however its controller would lose - 0 or less life, a
+/// draw from an empty library, ten poison counters, an effect that says so - they don't, while the permanent is on the
+/// battlefield with its abilities. A concession is no effect and still loses (CR 104.3a). Platinum Angel and Herald of
+/// Eternal Dawn print it.
+pub fn you_cant_lose_the_game(_: &dyn Query, asker: &Asker, player: PlayerId, _: LossReason) -> bool {
+    player == asker.controller
+}
+
+/// "Your opponents can't win the game" (CR 104.2b, 102.2) as a `CardDef::win_rules` entry: an effect that says an opponent wins
+/// does nothing. Platinum Angel and Herald of Eternal Dawn print it.
+pub fn your_opponents_cant_win_the_game(_: &dyn Query, asker: &Asker, player: PlayerId) -> bool {
+    player != asker.controller
+}
+
 /// "You have shroud" (CR 702.18a) as a `CardDef::player_keywords` entry: the permanent's controller, while it is on the
 /// battlefield with its abilities. True Believer and Ivory Mask print it.
 pub const YOU_HAVE_SHROUD: PlayerKeywordRule = PlayerKeywordRule { keyword: Keyword::Shroud, applies: you };
