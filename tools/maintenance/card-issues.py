@@ -207,6 +207,21 @@ missing = load("missing-cards")
 slug = missing.slug
 
 
+def done_anywhere():
+    """Every card done in this checkout or on any local branch of the repository: a card is given out to nobody once
+    its content file exists, landed or not (a reviewed card waiting on a land/ branch, another worktree's slot)."""
+    done = missing.implemented()
+    git = ["git", "-C", ROOT]
+    base = subprocess.run(git + ["rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    refs = subprocess.run(git + ["for-each-ref", "--format=%(refname)", "refs/heads"],
+                          capture_output=True, text=True).stdout.split()
+    for ref in refs:
+        added = subprocess.run(git + ["diff", "--name-only", "--diff-filter=A", f"{base}...{ref}", "--",
+                                      "content/*/cards/*.json"], capture_output=True, text=True).stdout.split()
+        done.update(slug(os.path.basename(path)[: -len(".json")]) for path in added)
+    return done
+
+
 def card_issue_body(name, card, entries):
     """The text of a card's issue: what the card is, who plays it, and how to take it."""
     lines = []
@@ -319,7 +334,7 @@ def available(args, repo):
     formats = formats_of()
     if args.format not in formats:
         sys.exit(f"no docs/formats/{args.format}.json; run format-scrape.py {args.format}")
-    done = missing.implemented()
+    done = done_anywhere()
     issues = read_state(repo)
     by_name = {i["title"][len("Card: "):]: i for i in issues.values() if i["title"].startswith("Card: ")}
     me = claimant(args)
@@ -372,8 +387,8 @@ def find_or_open(repo, issues, name):
 
 def take(repo, issues, me, name):
     """Claim one card: True when it is now ours, False when someone else holds it or has implemented it."""
-    if slug(name) in missing.implemented():
-        print(f"{name}: already implemented")
+    if slug(name) in done_anywhere():
+        print(f"{name}: already implemented, here or on a local branch")
         return False
     issue = find_or_open(repo, issues, name)
     held = holder(issue)
