@@ -8,6 +8,12 @@ rem                                     run on the wall clock
 rem   test.cmd /all                     every test, the wall-clock ones included
 rem   test.cmd /noweb                   every test but the browser tests
 rem   test.cmd /nobuild                 skip the build; test what is already built
+rem   test.cmd /engine                  the rules engine's tests alone (cargo test
+rem                                     over the workspace, the scenario corpus
+rem                                     included): what a change to cards,
+rem                                     mechanics or scenarios can break. No .NET
+rem                                     build or test; run the whole suite when
+rem                                     the host, protocol or client change
 rem   test.cmd /filter "FullyQualifiedName~Swiss"
 rem                                     only matching .NET tests; the expression
 rem                                     is passed to dotnet test --filter as is,
@@ -54,6 +60,7 @@ set "SLOW="
 :args
 if "%~1"=="" goto parsed
 if /i "%~1"=="/nobuild"  ( set "BUILD=" & shift & goto args )
+if /i "%~1"=="/engine"   ( set "ENGINE=1" & shift & goto args )
 if /i "%~1"=="/noweb"    ( set "WEB=" & set "SLOW=1" & shift & goto args )
 if /i "%~1"=="/all"      ( set "SLOW=1" & shift & goto args )
 if /i "%~1"=="/filter"   ( set "ARGS=%ARGS% --filter "%~2"" & set "FILTERED=1" & shift & shift & goto args )
@@ -74,6 +81,10 @@ rem slowest project by far and nothing /noweb runs needs it.
 set "SOLUTION=%ROOT%\dotnet\Cantrip.sln"
 if not defined WEB set "SOLUTION=%ROOT%\dotnet\Cantrip.NoWeb.slnf"
 
+rem /engine: the .NET side is neither built nor tested.
+set "RESULT=0"
+if defined ENGINE goto engine
+
 rem A build failure ends the run, but it still goes through :report. Exiting here
 rem printed compiler errors and no verdict at all, which reads as success to
 rem anything that only keeps the tail of the output.
@@ -89,6 +100,8 @@ if defined BUILDFAILED (
 
 dotnet test "%SOLUTION%" --no-build --nologo %ARGS%
 set "RESULT=%ERRORLEVEL%"
+
+:engine
 
 rem The rules engine (the Rust workspace at the root): its unit tests and the scenario corpus. Run from the workspace's
 rem directory so its rust-toolchain.toml chooses the toolchain; the first build takes minutes, later ones seconds.
@@ -114,12 +127,13 @@ endlocal & exit /b %RESULT%
 
 :usage
 echo.
-echo Usage: test.cmd [/all ^| /noweb] [/nobuild] [/filter EXPRESSION] [/detailed]
+echo Usage: test.cmd [/all ^| /noweb ^| /engine] [/nobuild] [/filter EXPRESSION] [/detailed]
 echo.
 echo   (default)            the fast tests: none that run on the wall clock
 echo   /all                 every test, browser and wall-clock tests included
 echo   /noweb               every test but the web client's browser tests
 echo   /nobuild             skip the build step
+echo   /engine              the rules engine's tests alone: no .NET build or test
 echo   /filter EXPRESSION   run only matching .NET tests, e.g. "FullyQualifiedName~Swiss"
 echo   /detailed            list each test and print full failure messages
 echo.

@@ -4,7 +4,9 @@ A Magic-like rules engine, server and web client. The rules engine is Rust: the 
 (`Cargo.toml`, `crates/`). The server, Discord bot and web client are C#, under `dotnet/`, and reach the engine through
 `IRulesHost`. `tools\test.cmd` builds everything and runs the fast tests - every test that does not run on the wall
 clock, the Rust workspace included (`cargo test --profile cards --workspace` with `CANTRIP_VERIFY=1`); run it before
-finishing a change. Wall-clock tests - the browser tests, and those marked `[Trait("Category", "WallClock")]` (real
+finishing a change. A change that touches only cards, content, mechanics or scenarios runs `tools\test.cmd
+/engine`, the Rust workspace alone: nothing on the .NET side can tell a card apart. A core, host or client change
+runs the whole suite. Wall-clock tests - the browser tests, and those marked `[Trait("Category", "WallClock")]` (real
 sockets, the engine host's whole games, the Discord bot's tables, whole events played by bots) - run only when the work
 touches what they cover: `test.cmd /filter "..."` for those, `/noweb` for all but the browser's, `/all` for everything.
 Never run them as a habit or to time the suite; a new test that waits on time takes a fake `TimeProvider` instead,

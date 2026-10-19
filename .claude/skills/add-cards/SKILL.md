@@ -318,8 +318,11 @@ core-feature agents and review agents run on Opus.
    them at correctness, safety and rules adherence, and does not hand them a list of corner cases to demand tests
    for; the coordinator sends back only the blocking findings.
 5. **Land** each reviewed card or core change on `main` (cherry-pick its commits; a conflict stops for a look), then
-   `tools\test.cmd` (the corpus with 0 fail and the verify tests, among the rest) - one run for everything ready to
-   land together, so two core changes ready at once share a run; `git fetch` and `git rebase origin/main` right
+   one test run for everything ready to land together: `tools\test.cmd /engine` (the Rust workspace - the corpus
+   with 0 fail and the verify tests) when the batch touches only cards, content, mechanics and scenarios, since
+   nothing on the .NET side can tell a card apart; the whole `tools\test.cmd` when it touches the core
+   (`cantrip-state`, `cantrip-rules`, `cantrip-api`), the host, the protocol, the client or anything under `dotnet/`, and otherwise at a much lower cadence (the last
+   landing of a session, or every ten or so landings); `git fetch` and `git rebase origin/main` right
    before every push (other sessions land on `main` too). The full run is needed once, on a rebased `main`; if more
    commits arrive while it runs, rebase again, build, and run only the scenarios of the cards and mechanics the
    landing touches (`corpus -- --card "Name"` for each) before pushing - the session that landed those commits ran
