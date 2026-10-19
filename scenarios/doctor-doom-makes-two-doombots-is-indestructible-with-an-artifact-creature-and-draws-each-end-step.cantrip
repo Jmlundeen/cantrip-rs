@@ -1,0 +1,62 @@
+# Doctor Doom: cast on turn 1 for {4}{B}{B} (Black Lotus's {B}{B}{B}, Mox Jet, Mox Ruby, Mox Pearl), it makes two 3/3 Doombot
+# artifact creatures, and while Bot1 controls an artifact creature it has indestructible (CR 604.1). At Bot1's end step it draws
+# a card and loses 1 life (20 to 19, hand 7 - 5 cast + 1). On turn 2 Bot2 Lightning Bolts both Doombots (3 damage each kills a 3/3):
+# with no artifact creature and no Plan, Doctor Doom has lost indestructible.
+
+[Bot1 Deck]
+Black Lotus
+Mox Jet
+Mox Ruby
+Mox Pearl
+Doctor Doom
+Swamp x15
+
+[Bot2 Deck]
+Black Lotus
+Lightning Bolt
+Lightning Bolt
+Mountain x15
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Doctor Doom.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield = Doctor Doom; Doombot; Doombot; Mox Jet; Mox Pearl; Mox Ruby
+? Bot1.Battlefield.Doctor Doom.Keywords = Indestructible
+[T2 Bot2.Main1]
+? Bot1.Life = 19
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Doombot)
+Bot2.Hand.Lightning Bolt.Cast(Doombot#2)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Life = 19
+Bot1.Battlefield.Doombot = (absent)
+Bot1.Battlefield.Doctor Doom.Keywords = (absent)
