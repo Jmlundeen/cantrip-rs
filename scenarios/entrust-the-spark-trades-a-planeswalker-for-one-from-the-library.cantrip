@@ -1,0 +1,35 @@
+# Entrust the Spark: "You may sacrifice a planeswalker. If you do, search your library for a planeswalker card, put it
+# onto the battlefield, then shuffle" (CR 608.2d, 701.21a). Bot1 sacrifices its Ajani Resolute and finds an Ajani,
+# Outland Chaperone, which enters with its three loyalty counters.
+
+[Bot1 Deck]
+Plains
+Black Lotus
+Black Lotus
+Ajani Resolute
+Entrust the Spark
+Island
+Island
+Ajani, Outland Chaperone
+Island x12
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Entrust the Spark.Cast
+Bot1.Choose(Ajani Resolute)
+Bot1.Search(Ajani, Outland Chaperone)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ajani, Outland Chaperone.Counters.Loyalty = 3
+Bot1.Graveyard = Entrust the Spark; Ajani Resolute; Black Lotus; Black Lotus
