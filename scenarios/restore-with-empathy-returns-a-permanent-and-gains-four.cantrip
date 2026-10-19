@@ -1,0 +1,26 @@
+# A permanent card is returned; a nonpermanent cannot be targeted (CR 115.1, 608.2b).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Restore with Empathy
+Ornithopter
+Lightning Bolt
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Restore with Empathy.Cast(Graveyard.Black Lotus)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 24
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Restore with Empathy

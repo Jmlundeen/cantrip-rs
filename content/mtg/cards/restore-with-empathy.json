@@ -1,0 +1,6 @@
+{
+  "name": "Restore with Empathy",
+  "manaCost": "{2}{G}",
+  "type": "Instant",
+  "oracleText": "Return target permanent card from your graveyard to your hand. You gain 4 life."
+}
