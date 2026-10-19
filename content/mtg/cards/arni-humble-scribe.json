@@ -1,0 +1,8 @@
+{
+  "name": "Arni, Humble Scribe",
+  "manaCost": "{2}{U}",
+  "type": "Legendary Creature — Human Wizard",
+  "power": 3,
+  "toughness": 2,
+  "oracleText": "Whenever another nontoken creature you control enters, untap Arni.\n{T}: Draw a card, then discard a card."
+}
