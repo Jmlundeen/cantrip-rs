@@ -1,0 +1,48 @@
+# Bestial Incursion makes a 4/4 green Beast token with trample, then flashes back for {5}{G} to make another and exile
+# itself (CR 111.1, 702.34a). Six mana sources pay four, then six again on the next turn.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Bestial Incursion
+Forest x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Hand.Bestial Incursion.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Graveyard.Bestial Incursion.Cast(Ability: Flashback)
+
+[Expect]
+Bot1.Battlefield.Beast#1.Token = true
+Bot1.Battlefield.Beast#1.Power = 4
+Bot1.Battlefield.Beast#1.Toughness = 4
+Bot1.Battlefield.Beast#1.Keywords = Trample
+Bot1.Battlefield.Beast#2.Token = true
+Bot1.Battlefield.Beast#2.Power = 4
+Exile = Bestial Incursion
+Bot1.Graveyard.Count = 0
