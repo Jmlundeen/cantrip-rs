@@ -1,0 +1,6 @@
+{
+  "name": "Roiling Dragonstorm",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment",
+  "oracleText": "When this enchantment enters, draw two cards, then discard a card.\nWhen a Dragon you control enters, return this enchantment to its owner's hand."
+}

@@ -1,0 +1,42 @@
+# Roiling Dragonstorm: "When this enchantment enters, draw two cards, then discard a card." Bot1 casts it off Mox Sapphire
+# and Mox Jet, draws two Islands (three in hand) and discards one. "When a Dragon you control enters, return this enchantment to its
+# owner's hand": an Ornithopter (not a Dragon) enters and Roiling Dragonstorm stays (`?` check); Clarion Conqueror (a
+# Dragon) cast with Black Lotus's {W}{W}{W} returns it, so the Enchantment is back in hand beside the two Islands.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Black Lotus
+Roiling Dragonstorm
+Clarion Conqueror
+Ornithopter
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Roiling Dragonstorm.Cast
+Bot1.Pass
+Bot1.Choose(Island)
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+? Bot1.Battlefield.Roiling Dragonstorm.Types = Enchantment
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Clarion Conqueror.Cast
+Bot1.Pass
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Ornithopter; Clarion Conqueror
+Bot1.Hand = Island; Island; Roiling Dragonstorm
+Bot1.Graveyard = Black Lotus; Island
