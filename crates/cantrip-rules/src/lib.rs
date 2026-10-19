@@ -16,6 +16,8 @@ mod loops;
 mod ops;
 mod phasing;
 #[cfg(test)]
+mod cloak_tests;
+#[cfg(test)]
 mod play_permission_tests;
 #[cfg(test)]
 mod remove_up_to_tests;
@@ -854,8 +856,8 @@ impl cantrip_api::Game for Cx<'_> {
         ops::look_at(self, player, cards);
     }
 
-    fn put_onto_battlefield_face_down(&mut self, object: ObjectId, controller: PlayerId) -> Result<ObjectId, Suspend> {
-        ops::put_onto_battlefield_face_down(self, object, controller).map_err(|_| Suspend)
+    fn put_onto_battlefield_face_down(&mut self, object: ObjectId, controller: PlayerId, how: FaceDown, tapped: bool) -> Result<Option<ObjectId>, Suspend> {
+        ops::put_onto_battlefield_face_down(self, object, controller, how, tapped).map_err(|_| Suspend)
     }
 
     fn turn_face_up(&mut self, permanent: ObjectId, player: PlayerId) {

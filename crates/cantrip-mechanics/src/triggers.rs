@@ -426,35 +426,13 @@ fn squad_copies(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// additional cost is the card's `kicker`.
 pub const SQUAD: AbilityDef = triggered(when(EventMask::ZONE_CHANGE, entered_squadded), squad_copies, "Squad: When this creature enters, if its squad cost was paid, create a token that's a copy of it for each time its squad cost was paid.");
 
-fn ward_matches(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
-    match event {
-        Event::BecameTarget { target: Target::Object(t), by, controller } if *t == source && *controller != q.controller(source) => {
-            // What targeted it, who controls that, and where it is on the stack (it is the top item as it is announced).
-            Some(Fired {
-                subject: Target::Object(*by),
-                data: [controller.0 as u32, q.state().stack.len().saturating_sub(1) as u32],
-            })
-        }
-        _ => None,
-    }
-}
-
-fn ward_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let Target::Object(by) = item.subject else { return Ok(()) };
-    let payer = PlayerId(item.data[0] as u8);
-    if !g.may_pay(payer, item.object, by, Cost { mana: generic(N), ..Cost::NONE }, &crate::COUNTERED_UNLESS_PAID)? {
-        g.counter_item(by, item.data[1] as usize);
-    }
-    Ok(())
-}
+use cantrip_api::intrinsic::ward_matches;
 
 /// Ward {N} (CR 702.21a): "Whenever this becomes the target of a spell or ability an opponent controls, counter it
 /// unless that player pays {N}." A creature granted ward (Lavaspur Boots) has it from the granting card's delayed
-/// abilities; Kappa Cannoneer prints it with {4}.
-pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
-    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_effect::<N>, text)
-        .ward()
-}
+/// abilities; Kappa Cannoneer prints it with {4}. Defined with the rules' own abilities, as a cloaked permanent has it
+/// (CR 701.58a).
+pub use cantrip_api::intrinsic::ward;
 
 /// Ward's life cost, paid or not (CR 702.21a, 118.12a): the payer may pay `amount` life when they have that much (CR
 /// 119.4), and the spell or ability that targeted is countered unless they do. A cost is at most 255 life; beyond that

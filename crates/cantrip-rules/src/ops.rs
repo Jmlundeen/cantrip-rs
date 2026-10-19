@@ -250,7 +250,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         }
         // CR 708.3: an object turned face down before it entered is a face-down permanent as it arrives; its card's own
         // values are what it is turned face up as (CR 708.2a).
-        if entering && !from.is(ZoneKind::Battlefield) && old.copy.is_some_and(|c| c.card == cx.cards().face_down) {
+        if entering && !from.is(ZoneKind::Battlefield) && old.copy.is_some_and(|c| cx.card(c.card).face_down) {
             new.copy = old.copy;
             new.face_down = true;
         }
@@ -491,12 +491,27 @@ pub fn look_at(cx: &mut Cx, player: PlayerId, cards: &[ObjectId]) {
     }
 }
 
-/// Puts an object onto the battlefield face down (CR 708.3, 701.40a): it is turned face down before it enters, so what
-/// replaces its entering judges a nameless 2/2 creature, and its card's own "enters" replacements do not apply.
-pub fn put_onto_battlefield_face_down(cx: &mut Cx, id: ObjectId, controller: PlayerId) -> R<ObjectId> {
-    let values = Copiable::of(cx.cards().face_down);
+/// Puts an object onto the battlefield face down (CR 708.3; manifest, CR 701.40a; cloak, CR 701.58a): it is turned face
+/// down before it enters, so what replaces its entering judges the face-down permanent `how` lists (a nameless 2/2
+/// creature, with ward {2} if cloaked), and its card's own "enters" replacements do not apply. The permanent, if it entered
+/// face down; a card kept from entering or sent elsewhere keeps its own characteristics (CR 701.40f, 701.58f).
+pub fn put_onto_battlefield_face_down(cx: &mut Cx, id: ObjectId, controller: PlayerId, how: FaceDown, tapped: bool) -> R<Option<ObjectId>> {
+    // CR 708.2b: a face-down permanent can't be turned face down; an object that changed zones is no longer the one
+    // chosen (CR 400.7).
+    if !live(cx.s(), id) || cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+        return Ok(None);
+    }
+    let values = Copiable::of(cx.cards().face_down_values(how));
+    let was = cx.s().obj(id).copy;
     cx.st().update_obj(id, |o| o.copy = Some(values));
-    Ok(put_onto_battlefield(cx, &[(id, controller, false)], ZoneReason::Other)?[0])
+    let entered = put_onto_battlefield(cx, &[(id, controller, tapped)], ZoneReason::Other)?
+        .first()
+        .copied()
+        .filter(|&new| cx.s().obj(new).zone.is(ZoneKind::Battlefield) && cx.s().obj(new).face_down);
+    if entered.is_none() && live(cx.s(), id) {
+        cx.st().update_obj(id, |o| o.copy = was);
+    }
+    Ok(entered)
 }
 
 /// `player` turns a face-down permanent face up (CR 701.40b, 708.2): it is the card it is, the same object (CR 708.8).
@@ -631,7 +646,7 @@ pub fn move_to_for(cx: &mut Cx, id: ObjectId, to: Zone, reason: ZoneReason) -> O
 /// replacements, nor daybound's "enters transformed" - a Walking Ballista enters with no counters, a Clone copies nothing.
 pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     // CR 708.3: a face-down permanent has no abilities, so none of its card's "enters" replacements apply.
-    if cx.s().obj(entering.object).copy.is_some_and(|c| c.card == cx.cards().face_down) {
+    if cx.s().obj(entering.object).copy.is_some_and(|c| cx.card(c.card).face_down) {
         return Ok(());
     }
     // Most positions have no static ability that could take an entering permanent's abilities: then it has its own.

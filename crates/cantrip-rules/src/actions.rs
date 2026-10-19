@@ -5049,7 +5049,7 @@ fn special_action_cost(cx: &Cx, player: PlayerId, source: ObjectId, ability: Abi
 
 fn special_action_printed_cost(cx: &Cx, source: ObjectId, ability: AbilityRef, def: &ActivatedDef) -> ManaCost {
     let card = cx.s().obj(source).card;
-    if ability.card == cx.cards().face_down {
+    if cx.cards().turns_face_up(ability) {
         return ManaCost { x: 0, ..cx.card(card).cost };
     }
     if ability.card == cx.cards().intrinsic {

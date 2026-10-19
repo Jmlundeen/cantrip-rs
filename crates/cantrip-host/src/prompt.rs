@@ -221,10 +221,10 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     let source = o.source.map(|s| handles.handle(s)).unwrap_or(ViewHandle::NONE);
     let mut m = ActionOptionMessage::new(action_kind_view(o.kind), source);
     m.ability_index = i32::from(o.index);
-    // A face-down permanent's one ability turns it face up (CR 701.40b).
+    // A face-down permanent's own ability that turns it face up (CR 701.40b, 701.58b).
     if o.kind == ActionKind::ActivateAbility
         && let Some(s) = o.source
-        && game.chars(s).abilities().nth(o.index as usize).is_some_and(|a| a.card == game.cards.face_down)
+        && game.chars(s).abilities().nth(o.index as usize).is_some_and(|a| game.cards.turns_face_up(a))
     {
         m.kind = ActionKindView::TurnFaceUp;
     }

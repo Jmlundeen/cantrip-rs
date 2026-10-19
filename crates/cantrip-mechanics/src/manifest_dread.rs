@@ -34,9 +34,9 @@ pub fn manifest_dread_object(g: &mut dyn Game, player: PlayerId, source: ObjectI
     {
         manifested = card;
     }
-    let made = g.put_onto_battlefield_face_down(manifested, player)?;
+    let made = g.put_onto_battlefield_face_down(manifested, player, FaceDown::Manifested, false)?;
     let rest: Vec<(ObjectId, Zone)> =
         looked.into_iter().filter(|&c| c != manifested).map(|c| (c, Zone::graveyard(player))).collect();
     g.move_together(&rest, ZoneReason::Other);
-    Ok(Some(made))
+    Ok(made)
 }

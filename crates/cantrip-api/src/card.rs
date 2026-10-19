@@ -2177,6 +2177,11 @@ pub struct CardDef {
     /// Start your engines! (CR 702.179a): a player who controls a permanent of this card and has no speed gets a speed
     /// of 1, as a state-based action (CR 704.5aa).
     pub start_your_engines: bool,
+    /// These are what a face-down permanent is (CR 708.2): the copiable values the rule that turned it face down lists - a
+    /// 2/2 creature for a manifested one (CR 701.40a, 708.2a), and with ward {2} for a cloaked one (CR 701.58a). An object
+    /// whose copiable values are such a definition was turned face down before it entered (CR 708.3); its first ability
+    /// turns it face up (`intrinsic::TURN_FACE_UP`). Only the rules' own definitions (`crate::intrinsic`) set it.
+    pub face_down: bool,
     /// A permanent of this card whose controller sacrifices it at the beginning of the cleanup step when this says so (CR 514.1, 603.7):
     /// Necromancy's \"if you cast it any time a sorcery couldn't have been cast\".
     pub sacrifice_at_cleanup: Option<fn(&dyn Query, ObjectId) -> bool>,
@@ -2397,6 +2402,7 @@ impl CardDef {
         ascend: false,
         storied: false,
         start_your_engines: false,
+        face_down: false,
         sacrifice_at_cleanup: None,
         shares_name: false,
         splice: None,
@@ -2543,8 +2549,10 @@ pub struct CardTable {
     pub engines: Vec<bool>,
     /// The rules' own abilities (`crate::intrinsic`): what a basic land type gives a land (CR 305.6).
     pub intrinsic: CardId,
-    /// What a face-down permanent is (CR 708.2a): its copiable values.
+    /// What a manifested permanent is (CR 701.40a, 708.2a): its copiable values.
     pub face_down: CardId,
+    /// What a cloaked permanent is (CR 701.58a): its copiable values.
+    pub cloaked: CardId,
     /// What a face-down card outside the battlefield and the stack is (CR 406.3a): nothing.
     pub no_characteristics: CardId,
     /// A Room's two doors (CR 709.5), by the Room's id: the ids of its halves, whose abilities its permanent has while
@@ -2565,11 +2573,21 @@ pub struct CardTable {
     pub card_named: Vec<bool>,
 }
 
+/// How a card is put onto the battlefield face down, which says what it is while it is (CR 708.2): manifested, a 2/2
+/// creature (CR 701.40a); cloaked, a 2/2 creature with ward {2} (CR 701.58a). Either is turned face up for its card's
+/// mana cost if it is a creature card (CR 701.40b, 701.58b).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FaceDown {
+    Manifested,
+    Cloaked,
+}
+
 impl CardTable {
     pub fn new(cards: impl IntoIterator<Item = &'static CardDef>) -> CardTable {
         let mut cards: Vec<&'static CardDef> = cards.into_iter().collect();
         cards.push(&crate::intrinsic::INTRINSIC);
         cards.push(&crate::intrinsic::FACE_DOWN);
+        cards.push(&crate::intrinsic::CLOAKED);
         cards.push(&crate::intrinsic::NO_CHARACTERISTICS);
         // A back face is registered with its front (the first of a name wins, as for every card).
         let backs: Vec<&'static CardDef> = cards.iter().filter_map(|c| c.back).collect();
@@ -2642,6 +2660,9 @@ impl CardTable {
         let face_down = CardId(
             cards.iter().position(|c| std::ptr::eq(*c, &crate::intrinsic::FACE_DOWN)).expect("the face-down values") as u16,
         );
+        let cloaked = CardId(
+            cards.iter().position(|c| std::ptr::eq(*c, &crate::intrinsic::CLOAKED)).expect("the cloaked values") as u16,
+        );
         let no_characteristics = CardId(
             cards.iter().position(|c| std::ptr::eq(*c, &crate::intrinsic::NO_CHARACTERISTICS)).expect("no characteristics") as u16,
         );
@@ -2674,6 +2695,7 @@ impl CardTable {
             engines,
             intrinsic,
             face_down,
+            cloaked,
             no_characteristics,
             undercity,
             backs: Vec::new(),
@@ -2716,6 +2738,20 @@ impl CardTable {
 
     pub fn get(&self, id: CardId) -> &'static CardDef {
         self.cards[id.0 as usize]
+    }
+
+    /// The copiable values a permanent put onto the battlefield face down `as` has (CR 708.2).
+    pub fn face_down_values(&self, how: FaceDown) -> CardId {
+        match how {
+            FaceDown::Manifested => self.face_down,
+            FaceDown::Cloaked => self.cloaked,
+        }
+    }
+
+    /// Whether `ability` is a face-down permanent's own "turn this permanent face up" (CR 701.40b, 701.58b): a special
+    /// action that costs its card's mana cost.
+    pub fn turns_face_up(&self, ability: AbilityRef) -> bool {
+        self.get(ability.card).face_down && ability.index == crate::intrinsic::TURN_FACE_UP
     }
 
     /// The definition an object currently has: a copy's, else the face showing (CR 707.2, 712.3). The printed card of a

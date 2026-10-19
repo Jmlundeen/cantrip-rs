@@ -312,6 +312,13 @@ would go over unclickable.
   (`replace::possible`) or a counter ban could limit its counters. A resolved effect that sets a land's
   subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
   such a land other than abilities stay (KI-51).
+- **A face-down permanent is what the rule that put it there lists (708.2)**: `Game::put_onto_battlefield_face_down` takes
+  `FaceDown::Manifested` (701.40a, a 2/2) or `FaceDown::Cloaked` (701.58a, a 2/2 with ward {2}), and gives the card those
+  copiable values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) before it enters (708.3). The core recognises them as data,
+  `CardDef::face_down`, never by comparing card ids, and the special action that turns either face up is each one's ability
+  `intrinsic::TURN_FACE_UP` (`CardTable::turns_face_up`), paid with its card's mana cost (701.40b, 701.58b). Ward {N}
+  (`intrinsic::ward`) is defined with them, since a cloaked permanent has it by the rules; cards reach it as
+  `cantrip_mechanics::triggers::ward`, and cloak itself as `cantrip_mechanics::cloak`.
 - **A card exiled face down has no characteristics (406.3a)**: `layers::chars` gives a face-down card outside the
   battlefield and the stack (`Obj::face_down_card`) those of `intrinsic::NO_CHARACTERISTICS` - no name, no mana value, no
   types, no abilities - for every reader, so nothing that counts or matches cards in exile sees what it is, and its abilities

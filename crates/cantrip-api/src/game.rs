@@ -4,7 +4,7 @@
 
 use cantrip_state::*;
 
-use crate::card::{CounterTo, LibraryPlace};
+use crate::card::{CounterTo, FaceDown, LibraryPlace};
 use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef};
 use crate::chars::Chars;
 use crate::history::{History, Record};
@@ -666,9 +666,12 @@ pub trait Game: Query {
     fn exile_face_down(&mut self, cards: &[ObjectId], by: Option<ObjectId>) -> Vec<ObjectId>;
     /// `player` looks at face-down cards in exile (CR 406.3), and may from now on.
     fn look_at(&mut self, player: PlayerId, cards: &[ObjectId]);
-    /// Puts an object onto the battlefield face down (CR 708.3): a 2/2 creature with no name, types or abilities
-    /// (CR 708.2a), its controller able to turn it face up for its mana cost if it is a creature card (CR 701.40b).
-    fn put_onto_battlefield_face_down(&mut self, object: ObjectId, controller: PlayerId) -> Result<ObjectId, Suspend>;
+    /// Puts an object onto the battlefield face down under `controller`'s control (CR 708.3), tapped if `tapped`: what it is
+    /// face down is `how` it was put there (`FaceDown`: manifested, CR 701.40a; cloaked, CR 701.58a), and its controller
+    /// may turn it face up for its mana cost if it is a creature card (CR 701.40b, 701.58b). The permanent, or None if it
+    /// did not enter face down: a card that changed zones since it was chosen (CR 400.7), or one a rule or effect kept off
+    /// the battlefield or sent elsewhere, which keeps its own characteristics (CR 701.40f, 701.58f).
+    fn put_onto_battlefield_face_down(&mut self, object: ObjectId, controller: PlayerId, how: FaceDown, tapped: bool) -> Result<Option<ObjectId>, Suspend>;
     /// `player` turns a face-down permanent face up (CR 701.40b, 708.2, 708.8): the player taking the special action, or
     /// the controller of the effect that turns it up. Recorded as `Event::TurnedFaceUp`. Nothing if it is not one.
     fn turn_face_up(&mut self, permanent: ObjectId, player: PlayerId);

@@ -13,7 +13,7 @@
 //! - `ObjectView::fingerprint`, `spent_lines`, `known_by` and `ZoneView::known`: the engine keeps
 //!   no record of who has been shown which hidden card, so only a reveal of this step crosses (as an object).
 //! - `SpellTargetView::text` is empty and `still_legal` always true.
-//! - Face-down permanents (morph, manifest) are not in the engine yet.
+//! - Morph and disguise (CR 702.37, 702.168) are not in the engine yet; manifested and cloaked permanents are.
 //! - `PlayerSummaryView::counters`: not filled.
 
 use std::collections::HashSet;

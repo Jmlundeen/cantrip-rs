@@ -463,8 +463,7 @@ pub fn counter_target_ability(g: &mut dyn Game, item: &StackItem, slot: usize) -
 
 /// What "counter [it] unless [its controller] pays [cost]" asks the payer (CR 118.12a): ward's (CR 702.21a) and the
 /// counterspells' that leave it to the spell's controller (Mana Leak, No More Lies).
-pub const COUNTERED_UNLESS_PAID: Question =
-    Question::new("Countered", "pay {cost}, or {subject} is countered?", "", "Pay {cost}", "Let it be countered");
+pub use cantrip_api::intrinsic::COUNTERED_UNLESS_PAID;
 
 /// "Counter target spell unless its controller pays `cost`" (CR 118.12, 701.6): the spell's controller is asked, and may
 /// make mana for it while asked; the cost is judged as the effect resolves, so a card whose cost depends on the board

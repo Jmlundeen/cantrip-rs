@@ -200,8 +200,8 @@ pub static INTRINSIC: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// "Turn it face up" (CR 701.40b, 708.7): a face-down permanent that is a creature card may be turned face up any time
-/// its controller has priority, by paying its mana cost. A special action (CR 116.2): no stack. The cost is the card's
+/// "Turn it face up" (CR 701.40b, 701.58b, 708.7): a face-down permanent that is a creature card may be turned face up any
+/// time its controller has priority, by paying its mana cost. A special action (CR 116.2): no stack. The cost is the card's
 /// own, which the rules read off the permanent (`actions::special_action`), not off this ability.
 fn turn_face_up(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.turn_face_up(item.object, item.controller);
@@ -215,19 +215,75 @@ fn can_turn_face_up(q: &dyn Query, asker: &Asker) -> bool {
     obj.face_down && def.types.has(CardType::Creature) && def.has_cost
 }
 
-/// What a face-down permanent is (CR 708.2a): a 2/2 creature with no name, no mana cost, no color, no subtypes and no
-/// abilities but the one to turn it face up. A face-down permanent has this as its copiable values (CR 707.2).
+/// The index of "turn this permanent face up" among the abilities of every face-down definition (`CardDef::face_down`).
+pub const TURN_FACE_UP: u8 = 0;
+
+const TURN_UP: AbilityDef = ability(Cost::NONE, turn_face_up, "Turn this permanent face up by paying its mana cost.")
+    .condition(can_turn_face_up)
+    .special_action();
+
+/// What a manifested face-down permanent is (CR 701.40a, 708.2a): a 2/2 creature with no name, no mana cost, no color, no
+/// subtypes and no abilities but the one to turn it face up. A face-down permanent has this as its copiable values (CR
+/// 707.2).
 pub static FACE_DOWN: CardDef = CardDef {
     name: "",
     has_cost: false,
     types: TypeSet::of(&[CardType::Creature]),
     power: Some(2),
     toughness: Some(2),
-    abilities: &[ability(Cost::NONE, turn_face_up, "Turn this permanent face up by paying its mana cost.")
-        .condition(can_turn_face_up)
-        .special_action()],
+    abilities: &[TURN_UP],
+    face_down: true,
     ..CardDef::BLANK
 };
+
+/// What a cloaked permanent is (CR 701.58a): a 2/2 creature with ward {2}, no name, no mana cost, no color and no
+/// subtypes, turned face up as a manifested one is (CR 701.58b).
+pub static CLOAKED: CardDef = CardDef {
+    name: "",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    text: "Ward {2}",
+    abilities: &[TURN_UP, ward::<2>("Ward {2}")],
+    face_down: true,
+    ..CardDef::BLANK
+};
+
+/// "Pay {cost}, or it is countered?": the question a "counter it unless that player pays" asks (CR 118.12).
+pub const COUNTERED_UNLESS_PAID: Question =
+    Question::new("Countered", "pay {cost}, or {subject} is countered?", "", "Pay {cost}", "Let it be countered");
+
+/// Ward's trigger event (CR 702.21a): this permanent became the target of a spell or ability an opponent controls. Its
+/// subject is what targeted it, and its data who controls that and where it is on the stack.
+pub fn ward_matches(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::BecameTarget { target: Target::Object(t), by, controller } if *t == source && *controller != q.controller(source) => {
+            // What targeted it, who controls that, and where it is on the stack (it is the top item as it is announced).
+            Some(Fired {
+                subject: Target::Object(*by),
+                data: [controller.0 as u32, q.state().stack.len().saturating_sub(1) as u32],
+            })
+        }
+        _ => None,
+    }
+}
+
+fn ward_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let Target::Object(by) = item.subject else { return Ok(()) };
+    let payer = PlayerId(item.data[0] as u8);
+    if !g.may_pay(payer, item.object, by, Cost { mana: generic(N), ..Cost::NONE }, &COUNTERED_UNLESS_PAID)? {
+        g.counter_item(by, item.data[1] as usize);
+    }
+    Ok(())
+}
+
+/// Ward {N} (CR 702.21a): "Whenever this becomes the target of a spell or ability an opponent controls, counter it
+/// unless that player pays {N}." Here because a cloaked permanent has it by the rules (CR 701.58a); the cards that print
+/// or grant it reach it as `cantrip_mechanics::triggers::ward`.
+pub const fn ward<const N: u8>(text: &'static str) -> AbilityDef {
+    triggered(when(EventMask::BECAME_TARGET, ward_matches), ward_effect::<N>, text).ward()
+}
 
 /// What a face-down card in a zone other than the battlefield and the stack is (CR 406.3a): no characteristics at all - no
 /// name, no mana cost, no color, no types, no abilities, no power or toughness. Who may look at it sees the card itself
