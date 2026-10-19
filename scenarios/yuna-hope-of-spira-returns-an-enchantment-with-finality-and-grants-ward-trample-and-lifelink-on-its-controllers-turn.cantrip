@@ -1,0 +1,77 @@
+# Yuna, Hope of Spira. Turn 1 Bot1 casts Spirit of the Labyrinth (an enchantment creature); Bot2 bolts it on turn 2, so an
+# enchantment card is in Bot1's graveyard. Turn 3 Bot1 casts Llanowar Elves (not an enchantment) and Yuna. At the beginning of
+# Bot1's end step Yuna returns the Spirit with a finality counter (CR 122.6). In that end step it is Bot1's turn, so Yuna and the
+# Spirit have trample, lifelink and ward {2} (the Elves, not an enchantment creature, have none), and Bot2's second Bolt at the
+# Spirit, with a single untapped Mox Ruby to pay for it, cannot pay ward {2}: it is countered and the Spirit takes no damage.
+
+[Bot1 Deck]
+Mox Pearl
+Forest
+Spirit of the Labyrinth
+Sol Ring
+Black Lotus
+Yuna, Hope of Spira
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spirit of the Labyrinth)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Yuna, Hope of Spira.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Yuna, Hope of Spira.Keywords = Lifelink; Trample
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+[T3 Bot1.End]
+! Bot1.Target(Bot1.Graveyard.Black Lotus)
+Bot1.Target(Bot1.Graveyard.Spirit of the Labyrinth)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spirit of the Labyrinth.Counters.Finality = 1
+? Bot1.Battlefield.Spirit of the Labyrinth.Keywords = Lifelink; Trample
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spirit of the Labyrinth)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Spirit of the Labyrinth.Counters.Finality = 1
+Bot1.Battlefield.Spirit of the Labyrinth.Damage = 0
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt

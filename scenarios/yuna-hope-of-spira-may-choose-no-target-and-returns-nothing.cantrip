@@ -1,0 +1,63 @@
+# Yuna, Hope of Spira: "up to one target" - Bot1 chooses no target for the end-step trigger, so the Spirit of the Labyrinth stays in
+# the graveyard and nothing returns (CR 601.2c, 115.1b).
+
+[Bot1 Deck]
+Mox Pearl
+Forest
+Spirit of the Labyrinth
+Sol Ring
+Black Lotus
+Yuna, Hope of Spira
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spirit of the Labyrinth)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Yuna, Hope of Spira.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Yuna, Hope of Spira.Keywords = Lifelink; Trample
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+[T3 Bot1.End]
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Graveyard = Black Lotus; Spirit of the Labyrinth
+Bot1.Battlefield = Forest; Llanowar Elves; Mox Pearl; Sol Ring; Yuna, Hope of Spira

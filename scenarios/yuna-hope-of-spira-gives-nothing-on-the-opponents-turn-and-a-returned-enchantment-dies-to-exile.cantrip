@@ -1,0 +1,75 @@
+# Yuna, Hope of Spira, on the opponent's turn. Set up as the first scenario: Yuna's end-step trigger returns the Spirit of the
+# Labyrinth with a finality counter. On turn 4 (Bot2's) it is not Bot1's turn, so neither Yuna nor the Spirit has trample, lifelink
+# or ward {2}: Bot2's Bolt, with no ward to pay, resolves and kills the Spirit, and the finality counter exiles it instead of
+# putting it into the graveyard (CR 122.6, 614.1).
+
+[Bot1 Deck]
+Mox Pearl
+Forest
+Spirit of the Labyrinth
+Sol Ring
+Black Lotus
+Yuna, Hope of Spira
+Llanowar Elves
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spirit of the Labyrinth)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Yuna, Hope of Spira.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Yuna, Hope of Spira.Keywords = Lifelink; Trample
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+[T3 Bot1.End]
+Bot1.Target(Bot1.Graveyard.Spirit of the Labyrinth)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Spirit of the Labyrinth.Counters.Finality = 1
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Spirit of the Labyrinth.Keywords = (absent)
+? Bot1.Battlefield.Yuna, Hope of Spira.Keywords = (absent)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Spirit of the Labyrinth)
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot1.Battlefield = Forest; Llanowar Elves; Mox Pearl; Sol Ring; Yuna, Hope of Spira
+Bot1.Graveyard = Black Lotus
+Exile = Spirit of the Labyrinth
+Bot2.Graveyard = Lightning Bolt; Lightning Bolt
