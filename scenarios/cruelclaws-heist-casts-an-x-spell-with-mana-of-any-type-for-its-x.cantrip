@@ -1,0 +1,41 @@
+# Cruelclaw's Heist with its gift exiles Bot2's Fireball ({X}{R}), which Bot1 may cast with mana of any type (CR
+# 609.4b). X is still announced and paid as generic mana (CR 107.3, 601.2b): with X 2, the {2}{R} is paid by a Mox
+# Pearl, a Mox Sapphire and a Mox Emerald, none of them red, and Bot2 is dealt 2 damage.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Cruelclaw's Heist
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Island x20
+
+[Bot2 Deck]
+Fireball
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Accept
+Bot1.Choose(Fireball)
+[T1 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Exile.Fireball.Cast(X: 2)
+Bot1.Target(Bot2)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot2.Graveyard = Fireball
+Bot1.Battlefield.Mox Pearl.Tapped = true
+Bot1.Battlefield.Mox Emerald.Tapped = true

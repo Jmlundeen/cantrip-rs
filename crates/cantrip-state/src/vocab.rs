@@ -294,6 +294,23 @@ impl ManaCost {
         paid
     }
 
+    /// The cost as it is paid when "mana of any type can be spent" for it (CR 609.4b: Cruelclaw's Heist, Null Summoner):
+    /// every symbol a type of mana is asked for by - colored, {C} (colorless is a type, CR 106.1b) and either half of a
+    /// hybrid one - is paid by one mana of any type, so it is paid as generic. The rest of its structure stays: the generic
+    /// mana, the {X} symbols and a Phyrexian symbol's choice of 2 life, which is announced before the mana is paid (CR
+    /// 601.2b) and turns the symbol into its color's, which any mana then pays. The cost itself, and its mana value, are not
+    /// changed: this is the payment's view of it only, so what pays only generic mana (delve, improvise) is still held to
+    /// the cost's own generic part.
+    pub fn paid_with_any_type(&self) -> ManaCost {
+        let mut paid = *self;
+        let symbols: u32 = self.symbols.iter().map(|&n| n as u32).sum();
+        let hybrid = self.hybrid.iter().flatten().count() as u32;
+        paid.symbols = [0; 6];
+        paid.hybrid = [None; 6];
+        paid.generic = (self.generic as u32 + symbols + hybrid).min(255) as u8;
+        paid
+    }
+
     /// The two costs added symbol by symbol (CR 709.4b: a split card's mana cost is its halves' combined; a Room's
     /// is that of its unlocked doors, CR 709.5).
     pub fn plus(&self, other: &ManaCost) -> ManaCost {
@@ -1309,6 +1326,23 @@ mod tests {
         assert_eq!(paid.symbols, [0, 0, 0, 0, 0, 1]);
         assert!(paid.hybrid.iter().all(Option::is_none));
         assert_eq!(paid.x, 1);
+        assert_eq!(paid.mana_value(), cost.mana_value());
+    }
+
+    /// CR 609.4b: paid with mana of any type, {1}{R}{R/G}{C}{X}{B/P} is paid as {4}{X}{B/P} - the colored, hybrid and {C}
+    /// symbols by any mana - keeping the {X} and the Phyrexian symbol's 2-life choice, and its mana value unchanged.
+    #[test]
+    fn a_cost_paid_with_any_type_keeps_its_x_and_phyrexian_symbols() {
+        let mut cost = ManaCost { generic: 1, x: 1, ..ManaCost::ZERO };
+        cost.symbols[Mana::R as usize] = 1;
+        cost.symbols[Mana::C as usize] = 1;
+        cost.hybrid[0] = Some((Mana::R, Mana::G));
+        cost.phyrexian[Color::Black as usize] = 1;
+        let paid = cost.paid_with_any_type();
+        assert_eq!(paid.generic, 4);
+        assert_eq!(paid.symbols, [0; 6]);
+        assert!(paid.hybrid.iter().all(Option::is_none));
+        assert_eq!((paid.x, paid.phyrexian), (1, cost.phyrexian));
         assert_eq!(paid.mana_value(), cost.mana_value());
     }
 }

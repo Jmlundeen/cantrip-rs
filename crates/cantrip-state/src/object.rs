@@ -800,7 +800,8 @@ pub struct PlayGrant {
     /// "Play", not "cast" (CR 305.1): a land among them may be played as a land play too.
     pub lands: bool,
     pub expiry: Expiry,
-    /// Mana of any type can be spent to cast it (CR 609.4b, 118.14): every symbol of its cost is paid as generic.
+    /// Mana of any type can be spent to cast it (CR 609.4b, 118.14): any mana pays any symbol of its cost, which is not
+    /// changed (`ManaCost::paid_with_any_type`).
     pub any_type: bool,
     /// Generic mana added to what casting it costs (CR 601.2f): Elite Spellbinder's "costs {2} more to cast".
     pub more: u8,

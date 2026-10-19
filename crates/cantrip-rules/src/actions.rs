@@ -2670,10 +2670,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                         }
                         // Mana of any type pays every symbol of it (CR 609.4b), by the permission of its own or the
                         // permanent's that casts it from exile.
-                        if any_type || whole_any_type {
-                            least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
-                        }
-                        covers_total(cx, a, player, id, def, least, 0) && added_life_payable(cx, a, player, id, def, targets)
+                        covers_total(cx, a, player, id, def, least, 0, any_type || whole_any_type) && added_life_payable(cx, a, player, id, def, targets)
                     };
                     let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
                     if offer_costed(cx, a, &asker, def, &mut option, covered) {
@@ -2716,7 +2713,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                 {
                     let a = available.get_or_init(|| self::available(cx, player));
                     let cost = least_cost(cx, a, player, id, def, overload, &[]);
-                    if covers_total(cx, a, player, id, def, cost, 0) {
+                    if covers_total(cx, a, player, id, def, cost, 0, false) {
                         options.push(ActionOption::on(ActionKind::CastSpell, id, WAY_OVERLOAD));
                     }
                 }
@@ -2774,7 +2771,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                             let a = available.get_or_init(|| self::available(cx, player));
                             let covered = |targets: &[Target]| {
                                 let least = least_cost(cx, a, player, id, face_def, cost.mana, targets);
-                                covers_total(cx, a, player, id, face_def, least, cost.exile_from_graveyard)
+                                covers_total(cx, a, player, id, face_def, least, cost.exile_from_graveyard, false)
                                     && added_life_payable(cx, a, player, id, face_def, targets)
                             };
                             let mut option = ActionOption::on(ActionKind::CastSpell, id, granted_way(k, face_way));
@@ -2801,7 +2798,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                     least = add_cost(least, c.additional.mana);
                 }
                 if any_type || by_exile_cast.is_some_and(|c| c.any_type) {
-                    least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                    least = least.paid_with_any_type();
                 }
                 a.covers_for(&least, &spell_kind(cx, a, id, face))
             };
@@ -2904,7 +2901,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
                         }
                         if any_type || face_exile_cast.is_some_and(|c| c.any_type) {
                             // Mana of any type pays every symbol of it (CR 609.4b).
-                            least = ManaCost { generic: least.mana_value().min(255) as u8, ..ManaCost::ZERO };
+                            least = least.paid_with_any_type();
                         }
                         a.covers_for(&least, &spell_kind(cx, a, id, inset))
                     } && offer_spell(cx, &asker, inset, &mut option)
@@ -2930,7 +2927,7 @@ fn castable_ways(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<Avai
         if allowed && !land_rules(cx, player).top_for_life && !def.is(CardType::Land) && def.has_cost && instant == instants {
             let a = available.get_or_init(|| self::available(cx, player));
             let mut option = ActionOption::on(ActionKind::CastSpell, id, 0);
-            if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, def.cost, &[]), 0)
+            if covers_total(cx, a, player, id, def, least_cost(cx, a, player, id, def, def.cost, &[]), 0, false)
                 && offer_spell(cx, &Asker { source: id, controller: player }, def, &mut option)
             {
                 options.push(option);
@@ -3020,11 +3017,8 @@ fn reduction_of(cx: &Cx, creature: ObjectId) -> u8 {
 fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, way: &Cost, any_type: bool) -> bool {
     let mut cost = least_cost(cx, a, player, card, def, way.mana, &[]);
     cost.generic = cost.generic.saturating_sub(emerge_reduction(cx, player, card, way));
-    if any_type {
-        // Mana of any type pays every symbol of it (CR 609.4b), as `cast` pays it.
-        cost = ManaCost { generic: cost.mana_value().min(255) as u8, ..ManaCost::ZERO };
-    }
-    if covers_total(cx, a, player, card, def, cost, way.exile_from_graveyard) {
+    // Mana of any type pays every symbol of it (CR 609.4b), as `cast` pays it.
+    if covers_total(cx, a, player, card, def, cost, way.exile_from_graveyard, any_type) {
         return true;
     }
     way.tap_to_reduce
@@ -3032,7 +3026,7 @@ fn way_covered(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &C
             let without = available_without(cx, player, Some(creature));
             let mut reduced = cost;
             reduced.generic = reduced.generic.saturating_sub(reduction_of(cx, creature));
-            covers_total(cx, &without, player, card, def, reduced, way.exile_from_graveyard)
+            covers_total(cx, &without, player, card, def, reduced, way.exile_from_graveyard, any_type)
         })
 }
 
@@ -3126,12 +3120,15 @@ fn pay_with(cx: &Cx, grantors: &[ObjectId], player: PlayerId, spell: ObjectId, d
 /// Whether a spell's total cost could be paid (advice, CR 601.2g-h): by the mana at hand, with what else may pay for it
 /// (convoke's creatures, delve's graveyard, improvise's artifacts) each paying their share, or by those alone when no
 /// mana may be spent on it. A permanent that is a mana source is counted as that, not twice. `exiled` is how many
-/// cards another part of the cost exiles from the graveyard, which delve cannot also use.
-fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8) -> bool {
+/// cards another part of the cost exiles from the graveyard, which delve cannot also use. `any_type`: mana of any type may
+/// pay it (CR 609.4b), any of what is left once the others have paid their share.
+#[allow(clippy::too_many_arguments)]
+fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8, any_type: bool) -> bool {
     let no_mana = def.keywords.has(Keyword::CantSpendManaToCast);
     let with = pay_with(cx, &a.grantors, player, card, def, face_of(cx, card, def));
+    let as_paid = |cost: ManaCost| if any_type { cost.paid_with_any_type() } else { cost };
     if !with.any() && !no_mana {
-        return a.covers_for(&cost, &spell_kind(cx, a, card, def));
+        return a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def));
     }
     let mut cost = cost;
     let mut creatures: Vec<ColorSet> = Vec::new();
@@ -3155,7 +3152,7 @@ fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &
     }
     cost = convoked(&cost, &creatures);
     cost.generic = cost.generic.saturating_sub(generic.min(255) as u8);
-    if no_mana { cost.is_zero() } else { a.covers_for(&cost, &spell_kind(cx, a, card, def)) }
+    if no_mana { cost.is_zero() } else { a.covers_for(&as_paid(cost), &spell_kind(cx, a, card, def)) }
 }
 
 /// The text an option is matched by and a menu row shows: an alternative cost's, a granted way's or an ability's. A cast a
@@ -3647,7 +3644,7 @@ fn cast(
     let x_life = if extra.pay_x_life { item.x } else { 0 };
 
     // CR 601.2b, 107.4f: which Phyrexian symbols are paid with life is announced before any target.
-    let life = announce_life(cx, player, spell, &mut cost.mana)?;
+    let life = announce_life(cx, player, spell, &mut cost.mana, any_type)?;
     // CR 601.2b, 702.174a: gift is an optional additional cost, announced, with the opponent it is promised to, before
     // the targets (CR 702.174m): what may be targeted can depend on it. The opponent is the only one without asking.
     if let Some(gift) = def.gift
@@ -3768,11 +3765,6 @@ fn cast(
         cost.mana.generic = cost.mana.generic.saturating_sub((item.x as u32 * less_each as u32).min(255) as u8);
     }
 
-    // Mana of any type may pay for it (CR 609.4b).
-    if any_type {
-        cost.mana = ManaCost { generic: cost.mana.mana_value().min(255) as u8, ..ManaCost::ZERO };
-    }
-
     // CR 601.2f-h: permanents the cost names are chosen, the mana paid, then the rest of the cost; an additional
     // cost's choices come once the mana is paid (CR 601.2h), as the C# engine asks them, and so do tapped permanents
     // (web-slinging's), which a mana ability activated while paying may have tapped (CR 601.2g).
@@ -3802,7 +3794,17 @@ fn cast(
     let life_owed = cost.life as u32 + extra.life as u32 + life as u32 + x_life as u32;
     // CR 601.2f-h: what besides mana may pay for it, its own convoke, delve and improvise and what a permanent gives the spell.
     let with = pay_with(cx, &pay_with_grantors(cx), player, spell, def, None);
-    let helpers = Helpers { with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles, attackers: &[], life: life_owed };
+    let helpers = Helpers {
+        with,
+        waterbend,
+        creatures: false,
+        no_mana: def.keywords.has(Keyword::CantSpendManaToCast),
+        purpose: Paying::Casting,
+        reserved: &exiles,
+        attackers: &[],
+        life: life_owed,
+        any_type,
+    };
     let (spent, restrictions) = pay_mana_used(cx, player, spell, cost.mana, &helpers)?;
     // CR 106.6: a creature spell paid for with mana that gives it haste has haste once it resolves; a spell paid for with
     // mana that makes it uncounterable can't be countered.
@@ -4368,8 +4370,9 @@ fn choose_modes(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: Abilit
 
 /// Announces which Phyrexian symbols are paid with 2 life (CR 107.4f, 601.2b), as the C# engine's prompt: a choice of
 /// up to as many as the life total covers, cheapest first. The symbols not paid with life become colored mana in
-/// `cost`. Returns the life to pay with the rest of the cost.
-fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut ManaCost) -> R<u8> {
+/// `cost`. Returns the life to pay with the rest of the cost. `any_type`: mana of any type may pay it (CR 609.4b), which
+/// the advice of how few to pay with life reads.
+fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut ManaCost, any_type: bool) -> R<u8> {
     let mut symbols: Vec<Color> = Vec::new();
     for (i, &n) in cost.phyrexian.iter().enumerate() {
         for _ in 0..n {
@@ -4389,7 +4392,7 @@ fn announce_life(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &mut Man
                         rest.symbols[c.mana() as usize] += 1;
                     }
                     rest.phyrexian = [0; 5];
-                    can_afford(cx, player, source, &rest)
+                    can_afford(cx, player, source, &if any_type { rest.paid_with_any_type() } else { rest })
                 })
                 .map(|k| (0..k).collect())
                 .unwrap_or_default();
@@ -4581,7 +4584,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         let cap = cx.s().obj(source).counters(CounterKind::Loyalty).max(0) as u16;
         item.x = announce_x(cx, player, source, mana, None, 0, cap, true, 0)?;
     }
-    let life = announce_life(cx, player, source, &mut mana)?;
+    let life = announce_life(cx, player, source, &mut mana, false)?;
     // CR 602.2a, 701.27f: put on the stack now, before its costs are paid.
     item.since = cx.g.log.len() as u32;
     cx.st().stack_push(item);
@@ -5029,6 +5032,44 @@ fn spend(owed: &mut ManaCost, mana: Mana) {
     }
 }
 
+/// What a payment may spend on a cost's symbols (CR 609.4b): only the mana each asks for, mana as though it were of any
+/// color (Mycosynth Lattice: a colored or hybrid symbol), or mana of any type (Cruelclaw's Heist: {C} too).
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum AnyMana {
+    No,
+    Color,
+    Type,
+}
+
+impl AnyMana {
+    /// The mana a payer is asked for: `owed` with every symbol any mana may pay as generic.
+    fn view(self, owed: &ManaCost) -> ManaCost {
+        match self {
+            AnyMana::No => *owed,
+            AnyMana::Color => owed.paid_with_any_color(),
+            AnyMana::Type => owed.paid_with_any_type(),
+        }
+    }
+
+    /// `spend`, where a unit may also pay a symbol of another type: its own symbol first, then another it may pay, the
+    /// generic mana last, which leaves what pays only generic mana (delve, improvise) the most to pay.
+    fn spend(self, owed: &mut ManaCost, mana: Mana) {
+        let own = owed.symbols[mana as usize] > 0 || owed.hybrid.iter().flatten().any(|&(a, b)| a == mana || b == mana);
+        if self == AnyMana::No || own {
+            return spend(owed, mana);
+        }
+        // Mana as though of any color pays no {C}, which no color stands for.
+        let types = if self == AnyMana::Type { 6 } else { 5 };
+        if let Some(i) = (0..types).find(|&i| owed.symbols[i] > 0) {
+            owed.symbols[i] -= 1;
+        } else if let Some(slot) = owed.hybrid.iter().position(Option::is_some) {
+            owed.hybrid[slot] = None;
+        } else if owed.generic > 0 {
+            owed.generic -= 1;
+        }
+    }
+}
+
 /// Whether a unit of `mana` pays anything still owed.
 fn pays(owed: &ManaCost, mana: Mana) -> bool {
     owed.generic > 0
@@ -5322,10 +5363,13 @@ pub(crate) struct Helpers<'a> {
     /// The life the total cost asks besides its mana (CR 119.4, 601.2h), paid with it once the mana is: for the question to
     /// say.
     pub life: u32,
+    /// "Mana of any type can be spent to cast that spell" (CR 609.4b): any mana pays any of its symbols.
+    pub any_type: bool,
 }
 
 impl Helpers<'static> {
-    pub const NONE: Helpers<'static> = Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[], attackers: &[], life: 0 };
+    pub const NONE: Helpers<'static> =
+        Helpers { with: PayWith::NONE, waterbend: 0, creatures: false, no_mana: false, purpose: Paying::Other, reserved: &[], attackers: &[], life: 0, any_type: false };
 }
 
 /// What a mana payment is for, as far as restricted mana is concerned (CR 106.6): see `payment_for`.
@@ -5488,9 +5532,18 @@ pub(crate) fn pay_mana_with(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
 /// `pay_mana_with`, and what the mana spent does to what it paid for (`ManaRestriction::effects`, CR 106.6).
 pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, total: ManaCost, helpers: &Helpers) -> R<(ManaPool, u8)> {
     // CR 609.4b: a player who may spend mana as though it were mana of any color for this cost pays each colored symbol with
-    // any mana; the cost is not changed, nor is what was spent.
-    let mut owed =
-        if static_rules::spend_any_color_for(cx, player, source, helpers.purpose == Paying::Activating) { total.paid_with_any_color() } else { total };
+    // any mana, and one who may spend mana of any type on it every symbol; the cost is not changed, nor is what was spent.
+    // What is owed keeps the cost's symbols, since what pays instead of mana pays only some of them (delve and improvise
+    // generic mana, convoke a symbol of its creature's color, CR 702.66a, 702.126a, 702.51a); the mana is asked for as the
+    // payment's view of what is left.
+    let any = if helpers.any_type {
+        AnyMana::Type
+    } else if static_rules::spend_any_color_for(cx, player, source, helpers.purpose == Paying::Activating) {
+        AnyMana::Color
+    } else {
+        AnyMana::No
+    };
+    let mut owed = total;
     let mut paid = ManaPool::default();
     let mut used = 0u8;
     // What has paid instead of mana: creatures tapped for convoke (by their colors), and cards exiled or artifacts
@@ -5507,13 +5560,14 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
     loop {
         let mut cost = owed;
         cost.generic = cost.generic.saturating_sub(generic_paid);
-        let due = convoked(&cost, &convoking);
-        if due.is_zero() {
+        let left = convoked(&cost, &convoking);
+        if left.is_zero() {
             break;
         }
+        let due = any.view(&left);
         let pool = if helpers.no_mana { ManaPool::default() } else { spendable(cx, player, source, helpers.purpose) };
         let candidates =
-            if helpers.any() { pay_candidates(cx, player, source, helpers, &cost, &due, &convoking, &delved, bent) } else { Vec::new() };
+            if helpers.any() { pay_candidates(cx, player, source, helpers, &cost, &left, &convoking, &delved, bent) } else { Vec::new() };
         let mut decided = ways(&pool, &due);
         // Ordinary mana a rule tells apart by its source (CR 106.3), by the source that produced it.
         let told = if helpers.no_mana { Vec::new() } else { static_rules::mana_told_apart(cx, cx.cards(), player) };
@@ -5605,7 +5659,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, tot
                         }
                     }
                     paid.0[mana as usize] += 1;
-                    spend(&mut owed, mana);
+                    any.spend(&mut owed, mana);
                 }
                 ActionKind::ConfirmCasting => {
                     let Ways::One(spent) = decided else { return Err(Stop::Cancel) };
@@ -5845,6 +5899,24 @@ mod tests {
         assert_eq!(reduce(mana("{2}{C}"), &mana("{C}{C}")), mana("{1}"));
         // CR 118.7f: a Phyrexian symbol takes off mana of its color.
         assert_eq!(reduce(mana("{1}{G}"), &mana("{G/P}")), mana("{1}"));
+    }
+
+    #[test]
+    fn mana_of_any_type_pays_a_symbol_before_the_generic_mana() {
+        // CR 609.4b: mana of any type pays {1}{U}{C} as {3}, and a unit pays its own symbol, then another, the generic
+        // last, which is left for delve or improvise (CR 702.66a, 702.126a).
+        let mut owed = mana("{1}{U}{C}");
+        assert_eq!(AnyMana::Type.view(&owed), mana("{3}"));
+        AnyMana::Type.spend(&mut owed, Mana::C);
+        assert_eq!(owed, mana("{1}{U}"));
+        AnyMana::Type.spend(&mut owed, Mana::R);
+        assert_eq!(owed, mana("{1}"));
+        // As though of any color, mana pays no {C} (Mycosynth Lattice's ruling): red pays the {U} and then the generic.
+        let mut owed = mana("{1}{U}{C}");
+        assert_eq!(AnyMana::Color.view(&owed), mana("{2}{C}"));
+        AnyMana::Color.spend(&mut owed, Mana::R);
+        AnyMana::Color.spend(&mut owed, Mana::R);
+        assert_eq!(owed, mana("{C}"));
     }
 
     #[test]

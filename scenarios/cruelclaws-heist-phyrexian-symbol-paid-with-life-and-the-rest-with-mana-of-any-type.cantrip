@@ -1,0 +1,39 @@
+# Cruelclaw's Heist with its gift exiles Bot2's Dismember ({1}{B/P}{B/P}), which Bot1 may cast with mana of any type
+# (CR 609.4b): that keeps a Phyrexian symbol's choice of 2 life (CR 107.4f). Bot1 pays one {B/P} with 2 life and the
+# {1}{B} left with a Mox Pearl and a Mox Ruby, neither black: 20 down to 18, and its Ornithopter gets -5/-5 and dies.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Cruelclaw's Heist
+Mox Pearl
+Mox Ruby
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Dismember
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cruelclaw's Heist.Cast
+Bot1.Accept
+Bot1.Choose(Dismember)
+[T1 Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Exile.Dismember.Cast(Ornithopter)
+Bot1.Modes(1)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Life = 18
+Bot1.Graveyard = Ornithopter; Cruelclaw's Heist
+Bot2.Graveyard = Dismember
