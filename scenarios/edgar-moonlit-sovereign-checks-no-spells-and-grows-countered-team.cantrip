@@ -1,0 +1,34 @@
+# Deterministic printed-card behavior (CR 603, 608).
+[Bot1 Deck]
+Edgar, Moonlit Sovereign
+Mox Emerald x5
+Forest x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Hand.Edgar, Moonlit Sovereign.Cast
+[T3 Bot1.End]
+Bot1.Pass
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Edgar, Moonlit Sovereign.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Battlefield.Mox Emerald#4.Activate
+Bot1.Battlefield.Mox Emerald#5.Activate
+Bot1.Battlefield.Edgar, Moonlit Sovereign.Activate
+
+[Expect]
+Bot1.Battlefield.Edgar, Moonlit Sovereign.Counters.PlusOnePlusOne = 3
