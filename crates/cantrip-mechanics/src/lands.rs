@@ -174,10 +174,17 @@ pub fn may_search_basic_land_to_top(g: &mut dyn Game, player: PlayerId, source: 
     search_basic_land_to_top(g, player, source)
 }
 
-fn return_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+/// "Return a land you control to its owner's hand" (CR 603.6a): the land the controller chooses as the ability resolves, not
+/// targeted, asked whenever there is a land to choose; the ability's own source may be the one. The bounce lands return it
+/// at once (`bounce_land`); Arid Archway looks at it first, to see whether it is another Desert.
+pub fn choose_a_land_to_return(g: &mut dyn Game, item: &StackItem) -> Result<Option<ObjectId>, Suspend> {
     let player = item.controller;
     let lands: Vec<ObjectId> = g.permanents_of(player).into_iter().filter(|&id| g.chars(id).is(CardType::Land)).collect();
-    if let Some(land) = choose::card(g, player, item.object, Purpose::ReturnToHand, lands)? {
+    choose::card(g, player, item.object, Purpose::ReturnToHand, lands)
+}
+
+fn return_a_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if let Some(land) = choose_a_land_to_return(g, item)? {
         g.return_to_hand(&[land]);
     }
     Ok(())
