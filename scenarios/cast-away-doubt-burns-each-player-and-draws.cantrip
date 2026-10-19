@@ -1,0 +1,31 @@
+# Cast Away Doubt: "Draw two cards. Cast Away Doubt deals 2 damage to each player." Both players lose 2 life (CR 120.2)
+# and the caster draws two.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Mox Jet
+Cast Away Doubt
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Hand.Cast Away Doubt.Cast
+
+[Expect]
+Bot1.Life = 18
+Bot2.Life = 18
+Bot1.Hand.Count = 6
+Bot1.Graveyard = Cast Away Doubt

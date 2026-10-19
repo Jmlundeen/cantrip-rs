@@ -1,0 +1,6 @@
+{
+  "name": "Cast Away Doubt",
+  "manaCost": "{2}{B}",
+  "type": "Sorcery",
+  "oracleText": "Draw two cards. Cast Away Doubt deals 2 damage to each player."
+}
