@@ -1,0 +1,30 @@
+# Artifist Acumen: "Creatures you control gain first strike until end of turn. Draw a card." The Ornithopter is a
+# creature and gets first strike; the Mox Ruby is not and does not (CR 611.2c). The drawn card is the Island on top of
+# the library.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Ornithopter
+Artifist Acumen
+Plains
+Plains
+Plains
+Island
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Artifist Acumen.Cast
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = FirstStrike; Flying
+Bot1.Battlefield.Mox Ruby.Keywords = (absent)
+Bot1.Hand = Plains; Plains; Plains; Island
+Bot1.Graveyard = Artifist Acumen
