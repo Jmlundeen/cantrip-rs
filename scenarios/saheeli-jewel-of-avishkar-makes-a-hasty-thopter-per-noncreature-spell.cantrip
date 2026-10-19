@@ -1,0 +1,42 @@
+# Saheeli, Jewel of Avishkar: each noncreature spell Bot1 casts after she is on the battlefield makes a 1/1 Thopter,
+# and "Thopters you control have haste" (CR 613.1f, layer 6) gives both tokens haste.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Mox Jet
+Mox Jet
+Saheeli, Jewel of Avishkar
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Saheeli, Jewel of Avishkar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Thopter#1.Keywords = Flying; Haste
+Bot1.Battlefield.Thopter#2.Keywords = Flying; Haste
+Bot1.Battlefield.Count = 6
+Bot1.Battlefield.Saheeli, Jewel of Avishkar.Power = 2
