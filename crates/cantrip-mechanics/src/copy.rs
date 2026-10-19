@@ -154,3 +154,12 @@ pub fn create_hasty_token_copy_sacrificed_at_end_step(g: &mut dyn Game, item: &S
 /// each token it carries that is still on the battlefield under its controller (`delayed::sacrifice_created`).
 pub const SACRIFICE_IT_AT_END_STEP: AbilityDef =
     delayed_trigger(crate::delayed::sacrifice_created, "Sacrifice it at the beginning of the next end step.");
+
+/// "Copy that spell. You may choose new targets for the copy" (CR 707.10, 707.10c) for a trigger about the spell that was cast
+/// (`Fired::about` the spell): the copy is not cast, and is made from its last-known information if the spell has left the stack
+/// (CR 608.2h). Leyline of Resonance, Loki Laufeyson and Jace Reawakened print it.
+pub fn copy_the_cast_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let spell = item.subject.object().expect("the cast spell");
+    g.copy_spell(spell, item.controller, true)?;
+    Ok(())
+}

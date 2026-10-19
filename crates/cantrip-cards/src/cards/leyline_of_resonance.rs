@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::statics;
+use cantrip_mechanics::{copy, statics};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -23,18 +23,10 @@ fn instant_or_sorcery_targeting_only_one_creature_you_control(q: &dyn Query, sou
     Fired::about(Target::Object(*spell))
 }
 
-/// "Copy that spell. You may choose new targets for the copy" (CR 707.10, 707.10c).
-fn copy_it(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    // The subject is always the spell that was cast (`Fired::about` above).
-    let spell = item.subject.object().expect("the cast spell");
-    g.copy_spell(spell, item.controller, true)?;
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         when(EventMask::SPELL_CAST, instant_or_sorcery_targeting_only_one_creature_you_control),
-        copy_it,
+        copy::copy_the_cast_spell,
         "Whenever you cast an instant or sorcery spell that targets only a single creature you control, copy that spell. You may choose new targets for the copy.",
     )],
     opening_hand: Some(statics::BEGIN_ON_THE_BATTLEFIELD),

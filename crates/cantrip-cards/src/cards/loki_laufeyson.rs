@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{delayed, power_up, targets, triggers};
+use cantrip_mechanics::{copy, delayed, power_up, targets, triggers};
 use cantrip_oracle as oracle;
 
 /// "When you next cast an instant or sorcery spell with mana value less than or equal to Loki's power this turn": a spell
@@ -17,14 +17,6 @@ fn next_instant_or_sorcery_within_lokis_power(q: &dyn Query, me: &Asker, event: 
 /// sets up its own, so two would both copy the same next spell.
 fn watch(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     delayed::next_this_turn(g, item, 0, item.object);
-    Ok(())
-}
-
-/// "Copy that spell. You may choose new targets for the copy" (CR 707.10, 707.10c): copied from its last-known information
-/// if it has left the stack (CR 707.10, 608.2h).
-fn copy_that_spell(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let spell = item.subject.object().expect("the cast spell");
-    g.copy_spell(spell, item.controller, true)?;
     Ok(())
 }
 
@@ -49,7 +41,7 @@ pub static CARD: CardDef = CardDef {
     ],
     delayed: &[triggered(
         when_asked(EventMask::SPELL_CAST, next_instant_or_sorcery_within_lokis_power),
-        copy_that_spell,
+        copy::copy_the_cast_spell,
         "When you next cast an instant or sorcery spell with mana value less than or equal to Loki's power this turn, copy that spell. You may choose new targets for the copy.",
     )],
     ..oracle::LOKI_LAUFEYSON

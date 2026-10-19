@@ -1,11 +1,11 @@
 use cantrip_api::*;
+use cantrip_mechanics::history::in_your_first_turns;
 use cantrip_oracle as oracle;
 
 /// "Enters tapped unless it's your first, second, or third turn of the game": only the active player has a turn
 /// going on, so on anyone else's turn it enters tapped.
 fn enters(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
-    let player = entering.controller;
-    if g.state().turn.active != player || g.state().player(player).turns_taken > 3 {
+    if !in_your_first_turns(g, entering.controller, 3) {
         entering.tapped = true;
     }
     Ok(())
