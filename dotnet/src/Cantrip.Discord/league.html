@@ -129,16 +129,16 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
 
   function rulesList(v) {
     const r = v.rules;
+    const count = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    const bestOf = { 1: "One", 2: "Three", 3: "Five" }[r.gamesToWin] ?? `${r.gamesToWin * 2 - 1}`;
     const rows = [
-      ["Format", `${window.Cantrip.formatName(r.format)}: ${r.podSize === 8 ? "you and seven bots" : `you and ${r.podSize - 1} bots`} draft ${r.packs} packs of ${r.packSize}; the bots play no games`],
-      ["Cube", v.cube],
-      ["Matches", `${games(r)}, against another player's deck`],
-      ["Trophy", r.winsToTrophy > 0 ? `${plural(r.winsToTrophy, "match win")}` : "No end by winning"],
-      ["Run ends", `At ${plural(r.lossesToEnd, "match loss", "match losses")}`],
-      ["Your deck", r.deckEditing === "betweenMatches" ? "Change it from your pool between any two matches" : "Change it until your first match; then it's set"],
-      ["Entries", r.maxEntries === 0 ? "As many runs as you like, one at a time" : r.maxEntries === 1 ? "One run each" : `${r.maxEntries} runs each, one at a time`],
-      ["Pairing", r.pairing === "free" ? `Whoever else is looking, whatever their record${r.allowRepeatPairings ? "" : "; never the same opponent twice in a run"}` : "By record"],
-      ["Smallest deck", plural(r.minimumDeck, "card")],
+      ["Format", r.format === "quick-draft" ? "Quick draft: draft with bots, play vs players" : window.Cantrip.formatName(r.format)],
+      ["Card Pool", v.cube],
+      ["Matches", `Best of ${bestOf}`],
+      ["Trophy", r.winsToTrophy > 0 ? count(r.winsToTrophy, "Win", "Wins") : "None"],
+      ["Defeat", count(r.lossesToEnd, "Loss", "Losses")],
+      ["Deck Editing Between Rounds", r.deckEditing === "betweenMatches" ? "Allowed" : "Not allowed"],
+      ["Reentry", r.maxEntries === 0 ? "Unlimited" : r.maxEntries === 1 ? "None" : `Up to ${r.maxEntries} runs`],
     ];
     if (r.starts) rows.push(["Starts", new Date(r.starts).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })]);
     if (r.ends) rows.push(["Ends", new Date(r.ends).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })]);
@@ -293,7 +293,7 @@ details.side summary { cursor: pointer; color: var(--fg-soft); font-size: 14px; 
         </div>
         <div class="league-side">
           <section class="block" aria-labelledby="h-trophies"><div class="block-head"><h2 id="h-trophies">Trophies</h2></div>${trophies(v)}</section>
-          <section class="block" aria-labelledby="h-rules"><div class="block-head"><h2 id="h-rules">How it works</h2></div>${rulesList(v)}
+          <section class="block" aria-label="League rules">${rulesList(v)}
             <p class="hint" style="margin-top: 10px">${plural(v.entrants, "player")} entered &middot; ${plural(v.runs, "run")} made</p></section>
           <section class="block" aria-labelledby="h-recent"><div class="block-head"><h2 id="h-recent">Recent matches</h2></div>${recent(v)}</section>
         </div>
