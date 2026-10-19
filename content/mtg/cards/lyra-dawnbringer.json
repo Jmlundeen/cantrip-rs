@@ -1,0 +1,13 @@
+{
+  "name": "Lyra Dawnbringer",
+  "manaCost": "{3}{W}{W}",
+  "type": "Legendary Creature — Angel",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying, first strike, lifelink\nOther Angels you control get +1/+1 and have lifelink.",
+  "keywords": [
+    "Flying",
+    "FirstStrike",
+    "Lifelink"
+  ]
+}

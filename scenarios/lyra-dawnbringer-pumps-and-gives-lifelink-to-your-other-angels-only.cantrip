@@ -1,0 +1,65 @@
+# Lyra Dawnbringer: "Other Angels you control get +1/+1 and have lifelink." Bot1's Youthful Valkyrie (an Angel) and then Lyra herself
+# are cast. The Valkyrie (1/3, +1/+1 counter from its own trigger when Lyra enters) gets lifelink and +1/+1 from Lyra, so 3/5; Lyra has her own printed flying, first strike and lifelink; Bot1's
+# Llanowar Elves (not an Angel) gets nothing, and neither does Bot2's Youthful Valkyrie (an Angel, but not one Bot1
+# controls). CR 613.1f, 702.15.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Youthful Valkyrie
+Llanowar Elves
+Lyra Dawnbringer
+Plains x11
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Youthful Valkyrie
+Plains x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Youthful Valkyrie.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Youthful Valkyrie.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Lyra Dawnbringer.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Lyra Dawnbringer.Keywords = FirstStrike; Flying; Lifelink
+? Bot1.Battlefield.Youthful Valkyrie.Keywords = Flying; Lifelink
+
+[Expect]
+Bot1.Battlefield.Youthful Valkyrie.Keywords = Flying; Lifelink
+Bot1.Battlefield.Youthful Valkyrie.Power = 3
+Bot1.Battlefield.Youthful Valkyrie.Toughness = 5
+Bot1.Battlefield.Lyra Dawnbringer.Power = 5
+Bot1.Battlefield.Lyra Dawnbringer.Toughness = 5
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Bot2.Battlefield.Youthful Valkyrie.Power = 1
+Bot2.Battlefield.Youthful Valkyrie.Toughness = 3
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot2.Battlefield.Youthful Valkyrie.Keywords = Flying
