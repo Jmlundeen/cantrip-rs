@@ -1,0 +1,32 @@
+# Teyo, Lightshield Expert: "target permanent you control gains hexproof until end of turn. ... Put a loyalty counter on
+# it if it's a planeswalker" (CR 608.2c, 306.5b). Bot1 casts Ajani Resolute and then Teyo with a Black Lotus, a Plains
+# and a Mox Pearl, choosing the planeswalker: hexproof and a loyalty counter, no +1/+1 counter.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Ajani Resolute
+Teyo, Lightshield Expert
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Teyo, Lightshield Expert.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Target(Ajani Resolute)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 3
+Bot1.Battlefield.Ajani Resolute.Counters.PlusOnePlusOne = (absent)
+Bot1.Battlefield.Ajani Resolute.Keywords = Hexproof
+Bot1.Battlefield.Teyo, Lightshield Expert.Power = 1
