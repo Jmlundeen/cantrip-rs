@@ -1,0 +1,50 @@
+# Mai, Scornful Striker: "Whenever a player casts a noncreature spell, they lose 2 life." Bot1 controls Mai. On turn 2 Bot2 casts two Moxen (artifacts,
+# noncreature: 2 life each, 20 -> 16, Bot1 loses nothing), then a creature spell (Llanowar Elves): nothing happens, so the loss is for noncreature spells only.
+# Then Bot2 casts Lightning Bolt at Bot1: the one who loses 2 life is Bot2, the caster, not Mai's controller (16 -> 14), and Bot1 takes the Bolt's 3 (20 -> 17).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Mai, Scornful Striker
+Swamp x2
+Swamp x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Lightning Bolt
+Swamp x2
+Swamp x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mai, Scornful Striker.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 16
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Pass
+? Bot2.Life = 14
+? Bot1.Life = 20
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 17
+Bot2.Battlefield.Llanowar Elves.Tapped = false
+Bot1.Battlefield.Mai, Scornful Striker.Keywords = FirstStrike

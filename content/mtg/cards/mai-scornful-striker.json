@@ -1,0 +1,11 @@
+{
+  "name": "Mai, Scornful Striker",
+  "manaCost": "{1}{B}",
+  "type": "Legendary Creature — Human Noble Ally",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "First strike\nWhenever a player casts a noncreature spell, they lose 2 life.",
+  "keywords": [
+    "FirstStrike"
+  ]
+}
