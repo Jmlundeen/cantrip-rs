@@ -1,0 +1,56 @@
+# Lich's Relic in a three-player game: "for each opponent, destroy up to one target creature or planeswalker that player controls".
+# The core makes a slot for each opponent; Bot2 and Bot3 each control two Ornithopters. Bot1 picks one of Bot2's and one of
+# Bot3's, and each opponent loses exactly one - the other Ornithopters stay. Bot1's turn four is the first with a Black Lotus to pay.
+
+[Bot1 Deck]
+Black Lotus
+Lich's Relic
+Island x5
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x5
+Island x12
+
+[Bot3 Deck]
+Ornithopter
+Ornithopter
+Island x5
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Ornithopter.Cast
+Bot3.Pass
+Bot3.Hand.Ornithopter.Cast
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.PayCost
+Bot1.Target(Bot2.Battlefield.Ornithopter#1)
+! Bot1.Target(Bot2.Battlefield.Ornithopter#2)
+Bot1.Target(Bot3.Battlefield.Ornithopter#1)
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot2.Graveyard = Ornithopter
+Bot3.Battlefield = Ornithopter
+Bot3.Graveyard = Ornithopter
+Stack.Count = 0

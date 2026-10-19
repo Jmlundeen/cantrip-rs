@@ -1,0 +1,46 @@
+# Lich's Relic's reflexive ability targets Bot2's Ornithopter (the one creature Bot2 controls). In response Bot2 Lightning Bolts its
+# own Ornithopter, so the only target is illegal on resolution and the ability does not resolve (CR 608.2b); the {2} was
+# paid all the same, and nothing else is destroyed - Bot2's Black Lotus is sacrificed for the Bolt's mana, not by the Relic.
+
+[Bot1 Deck]
+Black Lotus
+Lich's Relic
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Ornithopter
+Lightning Bolt
+Mountain x4
+Mountain x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Red)
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter; Lightning Bolt; Black Lotus
+Bot1.Battlefield = Lich's Relic
+Stack.Count = 0

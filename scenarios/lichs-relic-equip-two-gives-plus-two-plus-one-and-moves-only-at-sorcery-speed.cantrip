@@ -1,0 +1,39 @@
+# Lich's Relic: "Equipped creature gets +2/+1. Equip {2}" (CR 301.5, 702.6). Bot1 declines the {2} for the enters ability and
+# pays equip {2} with the Black Lotus's remaining mana to attach it to its Ornithopter (0/2), which becomes 2/3. Equip is a
+# sorcery-speed ability, so with Bot2 holding priority in response to a spell it is not offered (refused), and it is offered at
+# the Bot1's own main phase with an empty stack (the positive control).
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Lich's Relic
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Swamp x7
+Swamp x10
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+? Stack.Count = 1
+! Bot1.Battlefield.Lich's Relic.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Lich's Relic.Activate(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 3
+Bot1.Battlefield.Lich's Relic.AttachedTo = Ornithopter
+Stack.Count = 0

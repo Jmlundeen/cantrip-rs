@@ -1,0 +1,42 @@
+# Lich's Relic: "When this Equipment enters, you may pay {2}. When you do, for each opponent, destroy up to one target creature or
+# planeswalker that player controls." Bot1 pays {2} (the Black Lotus's other two mana), and the reflexive ability (CR 603.12) takes
+# a target among the creatures Bot2 controls: Bot1's own Ornithopter is not one of the candidates (refused), Bot2's is, and is
+# destroyed. Bot1's Ornithopter survives.
+
+[Bot1 Deck]
+Ornithopter
+Black Lotus
+Lich's Relic
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp x10
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+! Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield = Ornithopter; Lich's Relic
+Stack.Count = 0

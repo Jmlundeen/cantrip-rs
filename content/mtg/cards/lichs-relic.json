@@ -1,0 +1,6 @@
+{
+  "name": "Lich's Relic",
+  "manaCost": "{B}",
+  "type": "Artifact — Equipment",
+  "oracleText": "When this Equipment enters, you may pay {2}. When you do, for each opponent, destroy up to one target creature or planeswalker that player controls.\nEquipped creature gets +2/+1.\nEquip {2}"
+}

@@ -1,0 +1,35 @@
+# Lich's Relic: the {2} is optional ("you may pay"). Declined, nothing is paid and the "when you do" reflexive ability never
+# triggers (CR 603.12), so Bot2's Ornithopter stays. Control: the scenario where paying destroys it.
+
+[Bot1 Deck]
+Black Lotus
+Lich's Relic
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Ornithopter
+Swamp x6
+Swamp x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+! Bot1.Target
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot2.Graveyard.Count = 0
+Bot1.Battlefield = Lich's Relic
+Stack.Count = 0

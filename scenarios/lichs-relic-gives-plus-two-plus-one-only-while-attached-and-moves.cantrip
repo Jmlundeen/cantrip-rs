@@ -1,0 +1,49 @@
+# Lich's Relic: "Equipped creature gets +2/+1" - only the creature it is attached to (CR 301.5, 613.4c). Equipped on turn 1 to the first
+# Ornithopter (0/2) it makes a 2/3; moved on turn 3 with equip {2} to the second, the first is a 0/2 again at once and the second is
+# the 2/3 (and the Relic still on the battlefield, unattached, would give nothing).
+
+[Bot1 Deck]
+Black Lotus
+Ornithopter
+Ornithopter
+Lich's Relic
+Mox Jet
+Mox Ruby
+Swamp
+Swamp x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Decline
+Bot1.Battlefield.Lich's Relic.Activate(Bot1.Battlefield.Ornithopter#1)
+? Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter#1.Power = 2
+? Bot1.Battlefield.Ornithopter#1.Toughness = 3
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Lich's Relic.Activate(Bot1.Battlefield.Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Ornithopter#1.Toughness = 2
+Bot1.Battlefield.Ornithopter#2.Power = 2
+Bot1.Battlefield.Ornithopter#2.Toughness = 3
+Bot1.Battlefield.Lich's Relic.AttachedTo = Ornithopter

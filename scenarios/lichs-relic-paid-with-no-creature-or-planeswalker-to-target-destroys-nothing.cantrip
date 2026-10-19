@@ -1,0 +1,33 @@
+# Lich's Relic: the payment is allowed with nothing to destroy, and then the reflexive ability, which has no legal target
+# ("up to one" chosen as none), is not put on the stack at all (CR 603.3d) - Bot2 controls only a land, which is neither a
+# creature nor a planeswalker. No target is asked for, and the Relic stays. Control: the scenario where Bot2 has a creature.
+
+[Bot1 Deck]
+Black Lotus
+Lich's Relic
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Swamp x7
+Swamp x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+! Bot1.Target
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield = Swamp
+Bot1.Battlefield = Lich's Relic
+Stack.Count = 0

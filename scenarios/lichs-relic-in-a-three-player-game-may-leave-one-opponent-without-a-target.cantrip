@@ -1,0 +1,54 @@
+# Lich's Relic in a three-player game: each opponent's slot is "up to one" (minimum 0, CR 601.2c, 115.1d), so Bot1 may take a creature
+# from Bot2 and none from Bot3. Bot2's Ornithopter#1 is destroyed; Bot3 keeps both of its Ornithopters.
+
+[Bot1 Deck]
+Black Lotus
+Lich's Relic
+Island x5
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Ornithopter
+Island x5
+Island x12
+
+[Bot3 Deck]
+Ornithopter
+Ornithopter
+Island x5
+Island x12
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot3.Main1]
+Bot3.Hand.Ornithopter.Cast
+Bot3.Pass
+Bot3.Hand.Ornithopter.Cast
+Bot3.Pass
+[T4 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+Bot1.PayCost
+Bot1.Target(Bot2.Battlefield.Ornithopter#1)
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+Bot3.Pass
+
+[Expect]
+Bot2.Battlefield = Ornithopter
+Bot2.Graveyard = Ornithopter
+Bot3.Battlefield = Ornithopter; Ornithopter
+Bot3.Graveyard.Count = 0
+Stack.Count = 0

@@ -1,0 +1,39 @@
+# Lich's Relic: the target may be a planeswalker as well as a creature (CR 701.8): Bot2's Liliana of the Veil, the only thing
+# Bot2 controls but a land, is the one candidate and is destroyed (to Bot2's graveyard).
+
+[Bot1 Deck]
+Black Lotus
+Lich's Relic
+Swamp x4
+Swamp x10
+
+[Bot2 Deck]
+Black Lotus
+Liliana of the Veil
+Swamp x5
+Swamp x10
+
+[Actions]
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Lich's Relic.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.PayCost
+Bot1.Target(Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 0
+Bot2.Graveyard = Liliana of the Veil; Black Lotus
+Stack.Count = 0
