@@ -615,6 +615,19 @@ pub fn player_casts_noncreature_spell(q: &dyn Query, _: ObjectId, event: &Event)
     }
 }
 
+/// "Whenever an opponent casts a spell with mana value `N` or less" (CR 601.2i, 603.2, 202.3): a spell cast (not a copy, CR 707.10a,
+/// and not an ability) by a player other than the source's controller, with the mana value it has on the stack, where an {X} in
+/// its cost counts as the X chosen for it (CR 202.3e). The ability is about the player who cast it (`StackItem::subject`, "that
+/// player"). Solarium Sentry (2) and Scalding Viper (3) print it.
+pub fn opponent_casts_spell_with_mana_value_at_most<const N: u32>(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match event {
+        Event::SpellCast { spell, player, .. } if *player != q.controller(source) && q.mana_value(*spell) <= N => {
+            Fired::about(Target::Player(*player))
+        }
+        _ => None,
+    }
+}
+
 pub const A_PLAYER_CASTS_A_NONCREATURE_SPELL: Trigger = when(EventMask::SPELL_CAST, player_casts_noncreature_spell);
 
 /// "Whenever you cast an instant or sorcery spell" (CR 603.2, 601.2i): a spell cast, not one copied (CR 707.10a), by this
