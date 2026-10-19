@@ -1,0 +1,31 @@
+# Paying puts a counter and draws; declining a later trigger does neither (CR 118.12).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Proft, Consulting Detective
+Preordain
+Preordain
+Ornithopter
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Proft, Consulting Detective.Cast
+Bot1.Hand.Preordain.Cast
+Bot1.PayCost
+Bot1.Hand.Preordain.Cast
+Bot1.Decline
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Proft, Consulting Detective.Counters.PlusOnePlusOne = 1
+Bot1.Library.Count = 27
