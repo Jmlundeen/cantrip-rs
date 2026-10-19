@@ -276,7 +276,10 @@ core-feature agents and review agents run on Opus.
    the claims, and it releases nothing the agent has not claimed. A card blocked by the core is never released by the
    agent: it holds the claim while the gap is built (3), and meanwhile claims and works the next card, so it holds at
    most two - the blocked one and the one in hand. When the gap lands it finishes the blocked card first.
-2. **One agent per quota** (a handful of cards), in its own worktree, in the background. Its prompt points it at this
+2. **One agent per quota** (a handful of cards), in its own worktree, in the background. Every agent - card, core or
+   review - builds only in its own worktree's `target/`: never `CARGO_TARGET_DIR` or `--target-dir` pointed at the
+   main checkout's or another worktree's, because the cards crate's generated sources name absolute paths and a
+   shared `target/` then compiles another tree's card files into every test run that uses it. Its prompt points it at this
    skill and states only what the skill leaves to the coordinator - the format, the quota, which areas are open to
    it - and adds no requirement the skill does not make. What the skill asks of it: this skill's loop for each card,
    claiming one card at a time (`Closes #N` from the claim's output); the core is closed to it unless the prompt opens
