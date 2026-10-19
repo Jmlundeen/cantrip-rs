@@ -457,6 +457,9 @@ impl GameState {
 
     /// A new object, in no zone's list yet.
     pub fn push_obj(&mut self, obj: Obj) -> ObjectId {
+        // A new object has no counters (CR 400.7): those it arrives with are put on it by the put path once it is here
+        // (`cantrip_rules::counters`). `Obj` is `Copy`, so a copy of an object that has some would bring them in past it.
+        debug_assert!(!obj.has_counters(), "a new object carries counters past the put path");
         let id = ObjectId(self.objects.len() as u32);
         self.objects.push(obj);
         self.log(Undo::ObjectPushed);
