@@ -1,0 +1,29 @@
+# Returns a creature card then creates or empowers Jace (CR 701.71).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Rewrite Regrets
+Ornithopter
+Lightning Bolt
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Rewrite Regrets.Cast(Graveyard.Ornithopter)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
