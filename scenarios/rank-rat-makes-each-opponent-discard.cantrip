@@ -1,0 +1,27 @@
+# Rank Rat: "When this creature enters, each opponent discards a card." The lone opponent discards one card (CR 701.9);
+# with a hand of Islands the default discard leaves one in its graveyard.
+
+[Bot1 Deck]
+Swamp
+Mox Jet
+Rank Rat
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Rank Rat.Cast
+
+[Expect]
+Bot1.Battlefield.Rank Rat.Power = 1
+Bot1.Battlefield.Rank Rat.Toughness = 1
+Bot2.Graveyard.Count = 1
