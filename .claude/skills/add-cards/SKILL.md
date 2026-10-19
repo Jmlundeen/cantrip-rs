@@ -107,18 +107,19 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    lists present are the files in `docs/formats/`; today Standard). `card-issues.py next <format>` prints the
    next cards that are not implemented and that nobody holds - a claim older than 24 hours with no pull request
    commit or `card/<slug>` push since counts as nobody's. Take them in that order and never skip one for being
-   hard; a card the engine cannot yet do is released (below) with its gap reported, not passed over silently.
+   hard; a card the engine cannot yet do is held while its gap is built in the core (below), not passed over
+   silently.
 2. **Claim one card at a time, before any work on it:** `card-issues.py claim --format <format>` takes the next free
    card, or `claim "Card Name"` the one named; the next card is claimed only when this one has landed or been
-   released, because a card takes minutes and a pile of claims keeps others off cards nobody is working on. It opens the card's issue
+   released, and a card waiting on a core gap stays claimed, because a card takes minutes and a pile of claims keeps others off cards nobody is working on. It opens the card's issue
    first when it has none (a card named outside every format list gets one too), then claims it with a comment, and
    prints `#N`. Exit status 3 means the card is held by someone else (or they claimed it a moment earlier): leave it
    and take the next. Never work on a card whose live claim is someone else's.
 3. **Keep the claim alive** - it lasts 24 hours from the last sign of work. Open a (draft) pull request whose
    description says `Closes #N` as soon as there is a commit, or push work in progress to a branch named
-   `card/<card-slug>`; every commit pushed there renews the claim. A card that will wait longer than that is released
-   (`card-issues.py release "Card Name"`), as is every card the work turns out unable to land. Claim again to renew
-   by hand.
+   `card/<card-slug>`; every commit pushed there renews the claim. A card waiting on a core gap keeps its claim: claim
+   it again to renew by hand while the gap is built. A card that is abandoned - nobody will build its gap, or the work
+   stops - is released (`card-issues.py release "Card Name"`) with its gap reported.
 4. **Landing it closes the issue:** the commit message (and a pull request description) ends with `Closes #N`.
 
 ## The loop for one card
@@ -277,25 +278,32 @@ land. Self-reported "exact" is not proof.
 
 ## Many cards: agents
 
-The coordinator dispatches, lands and keeps the queue; it does not implement cards itself.
+The coordinator dispatches, lands and keeps the queue; it does not implement cards itself. Card agents run on Sonnet;
+core-feature agents and review agents run on Opus.
 
 1. **Work in single cards.** There is no batch to claim: an agent claims its first card (`card-issues.py claim
    --format <format>`, or the card named), finishes it, then claims the next free one, in list order (never
    pre-sorted by difficulty), until its quota of cards is done. The coordinator's job is the quota and the format, not
-   the claims, and it releases nothing the agent has not claimed. A card an agent cannot finish is released
-   (`release "Card Name"`) with its gap reported.
+   the claims, and it releases nothing the agent has not claimed. A card blocked by the core is never released by the
+   agent: it holds the claim and waits for the gap to be built (3).
 2. **One agent per quota** (a handful of cards), in its own worktree, in the background. Its prompt: this skill's loop for
    each card, the format, its quota, and that it claims one card at a time (`Closes #N` from the claim's output); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
-   `cantrip-mechanics`; a card blocked by the core is skipped with its exact gap (the rule, and what `cantrip-api`
-   lacks), never faked; the client work a card needs (step 8) is part of the card, not a follow-up; one commit per
-   card; at the end `git rebase main`, the corpus and the verify tests; no push; a report of implemented cards with
-   their coverage and what each needed from the client, skipped cards with their gaps, and anything odd found in the
-   core. Card agents run no browser tests unless a card added a new user interaction; then one agent at a time runs
-   only that interaction's browser scenarios.
-3. **Gaps** that several skipped cards share become a core-feature agent: the core open to it, each feature built to
-   its rule, the waiting cards implemented, the benchmark run. Feature agents work on separate rules areas; running agents
-   are told what landed so they rebase.
-4. **Review agents** read the cards of a quota read-only against the review list, before they land.
+   `cantrip-mechanics`; a card blocked by the core is never faked and never released: the agent keeps the claim,
+   commits nothing for that card's behaviour that the gap would change, and ends its turn with a gap report - the
+   card, its issue, the exact rule (CR) and what `cantrip-api` lacks - then waits to be resumed; the client work a card
+   needs (step 8) is part of the card, not a follow-up; one commit per card; at the end `git rebase main`, the corpus
+   and the verify tests; no push; a report of implemented cards with their coverage and what each needed from the
+   client, and anything odd found in the core. Card agents run no browser tests unless a card added a new user
+   interaction; then one agent at a time runs only that interaction's browser scenarios.
+3. **Gaps.** When a card agent reports a gap, the coordinator starts a core-feature agent (Opus) for it: the core open
+   to it, the feature built to its rule for every card the rule describes, the benchmark run, its own commits
+   (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents work on
+   separate rules areas. The coordinator renews the waiting card's claim (`claim "Card Name"`) if the work nears 24
+   hours. When the feature agent finishes, the coordinator reviews and lands its commits on `main` (5), then resumes
+   the waiting card agent (SendMessage) with what landed; the agent rebases on `main` and finishes the card on the
+   new core. Other running agents are told what landed so they rebase. Only a gap the coordinator decides not to
+   build is released, with its gap recorded on the issue.
+4. **Review agents** (Opus) read the cards of a quota read-only against the review list, before they land.
 5. **Land** each finished branch on `main` (cherry-pick its commits; a conflict stops for a look), then the corpus
    (0 fail), the verify tests, the benchmark if the core changed; push; remove the worktree and its branch.
-6. **Report** what landed, what was skipped and why, and the corpus line.
+6. **Report** what landed, what waited on which core gap and how it was built, and the corpus line.
