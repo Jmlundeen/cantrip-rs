@@ -1,0 +1,63 @@
+# Samurai's Katana: job select makes a 1/1 Hero and attaches the Katana to it: "Equipped creature gets +2/+2, has trample and
+# haste, and is a Samurai in addition to its other types", so the Hero is a 3/3 Hero Samurai with trample and haste. Murasame,
+# "Equip {5}" (CR 702.6a): with only one untapped Mox it is refused, and on turn 3 with five Moxen it moves the Katana to Bot1's
+# Ornithopter (0/2 Thopter -> 2/4 Thopter Samurai, trample, haste); the Hero is a plain 1/1 Hero again.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Mox Emerald
+Samurai's Katana
+Ornithopter
+Mountain x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Samurai's Katana.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Hero.Power = 3
+? Bot1.Battlefield.Hero.Toughness = 3
+? Bot1.Battlefield.Hero.Subtypes = Hero; Samurai
+? Bot1.Battlefield.Hero.Keywords = Haste; Trample
+? Bot1.Battlefield.Samurai's Katana.AttachedTo = Hero
+! Bot1.Battlefield.Samurai's Katana.Activate(Ornithopter)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Samurai's Katana.Activate(Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Turn = 3
+Bot1.Battlefield.Hero.Power = 1
+Bot1.Battlefield.Hero.Subtypes = Hero
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Subtypes = Samurai; Thopter
+Bot1.Battlefield.Samurai's Katana.AttachedTo = Ornithopter
