@@ -1,0 +1,31 @@
+# Teyo, Diamondblade Mage: "target permanent you control gains deathtouch until end of turn. Put a +1/+1 counter on it
+# if it's a creature" (CR 608.2c, 702.2). Bot1 casts Teyo ({3}{B}) with a Black Lotus and a Swamp, choosing its
+# Ornithopter, which has deathtouch and a counter: 1/3.
+
+[Bot1 Deck]
+Swamp
+Black Lotus
+Ornithopter
+Teyo, Diamondblade Mage
+Island x14
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Teyo, Diamondblade Mage.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Target(Ornithopter)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 3
