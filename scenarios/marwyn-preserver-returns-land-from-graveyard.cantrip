@@ -1,0 +1,33 @@
+# Sacrifice a Forest to Crop Rotation, then return that land with Marwyn (CR 400.7).
+[Bot1 Deck]
+Forest
+Marwyn, the Preserver
+Black Lotus
+Crop Rotation
+Island x3
+Forest x10
+[Bot2 Deck]
+Island x30
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Marwyn, the Preserver.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Crop Rotation.Cast
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Forest)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Marwyn, the Preserver.Activate(Forest)
+Bot1.Pass
+Bot2.Pass
+[Expect]
+Bot1.Graveyard = Crop Rotation; Black Lotus
+Bot1.Hand.Count = 4
