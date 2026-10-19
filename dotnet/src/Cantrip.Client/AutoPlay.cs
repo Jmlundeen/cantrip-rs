@@ -599,23 +599,23 @@ public static class AutoPlay
     /// <see cref="RandomPlay"/> and the model seat.
     /// </summary>
     /// <summary>
-    /// Whether a cast offered is by web-slinging (CR 702.188a): an alternative cost, the way's text the keyword's. Its tapped
-    /// creature is returned once the mana is paid, so the payment has to leave one tapped (<see cref="WebSlingingMana"/>).
+    /// Whether a cast or activation offered returns a tapped creature chosen once the mana is paid (CR 601.2g-h, 602.2b: a
+    /// web-slinging cast, CR 702.188a, or Urban Retreat's ability), as the server marks it: the payment has to leave one
+    /// tapped (<see cref="TappedCreatureMana"/>), or the action is taken back.
     /// </summary>
-    public static bool IsWebSlinging(ActionOptionMessage option)
+    public static bool ReturnsTappedAfterMana(ActionOptionMessage option)
     {
         ArgumentNullException.ThrowIfNull(option);
-        return option.Kind == ActionKindView.CastSpell && option.AbilityIndex > 0
-            && option.Description.StartsWith("Web-slinging", StringComparison.Ordinal);
+        return option.TappedAfterMana;
     }
 
     /// <summary>
-    /// For a web-slinging cast with none of this seat's creatures tapped, the mana ability of an untapped creature of its own:
+    /// For a cast or activation that returns a tapped creature (<see cref="ReturnsTappedAfterMana"/>) with none of this seat's creatures tapped, the mana ability of an untapped creature of its own:
     /// one that adds mana the cost still owes, named for that mana, or else any, whose mana is then left over (CR 601.2g lets
     /// a mana ability be activated whether or not its mana is needed) but whose creature is tapped. Null when a creature is
     /// tapped already or none has a mana ability.
     /// </summary>
-    public static TakeActionAnswer? WebSlingingMana(GameClient client, PayCostsPromptMessage prompt)
+    public static TakeActionAnswer? TappedCreatureMana(GameClient client, PayCostsPromptMessage prompt)
     {
         ArgumentNullException.ThrowIfNull(client);
         ArgumentNullException.ThrowIfNull(prompt);

@@ -316,6 +316,13 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
                 def.ways.get(o.index as usize - 1).map_or(def.cost, |w| w.cost.mana)
             };
             m.has_x = cost.x > 0;
+            // A way whose cost returns tapped permanents, chosen once the mana is paid (web-slinging, CR 702.188a, 601.2g-h).
+            let way = match granted {
+                Some((way, _)) => Some(way),
+                None if granted_face.or(inset).is_none() && o.index > 0 => def.ways.get(o.index as usize - 1).map(|w| w.cost),
+                None => None,
+            };
+            m.tapped_after_mana = way.is_some_and(|c| c.permanents.is_some_and(|p| p.tapped));
             // Paid in life rather than its mana cost (CR 118.9, 119.4: Inside Information, Bolas's Citadel): the life is the
             // cost the row shows and the seats weigh, and no mana cost, which is not paid; an X in it is 0 (CR 107.3).
             let asked = game.pending().map_or(game.state.turn.priority, |r| r.player);
@@ -351,6 +358,8 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             let ability = game.chars(src).abilities().nth(o.index as usize).map(|a| game.cards.ability(a));
             if let Some(AbilityDef::Activated(d)) = ability {
                 m.life_cost = i32::from(d.cost.life);
+                // A cost that returns tapped permanents, chosen once the mana is paid (CR 602.2b, 601.2g-h: Urban Retreat).
+                m.tapped_after_mana = !d.is_mana_ability() && d.cost.permanents.is_some_and(|p| p.tapped);
                 // A special action whose cost a static ability changes (CR 116.2k, 118.7: "plotting cards from your hand costs
                 // {2} less"): the row says what it costs now, which its printed text does not.
                 if d.special_action

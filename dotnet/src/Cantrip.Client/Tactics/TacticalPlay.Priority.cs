@@ -560,7 +560,7 @@ public sealed partial class TacticalPlay
         ActionOptionMessage option = candidate.Option;
 
         _kick = candidate.Kick;
-        _webSlinging = AutoPlay.IsWebSlinging(option);
+        _tappedAfterMana = AutoPlay.ReturnsTappedAfterMana(option);
         _pending = ((option.Source.Value, option.Kind, option.AbilityIndex), Board(view));
         _pendingName = view.Objects.FirstOrDefault(card => card.Handle == option.Source)?.Name;
 
@@ -2189,7 +2189,7 @@ public sealed partial class TacticalPlay
         // Web-slinging returns a tapped creature, judged once the mana is paid (CR 702.188a, 601.2g-h): with no creature of
         // its own tapped yet, a creature's mana ability pays first, for mana the cost still owes, so that there is one to
         // return. A land tapped instead would leave the cost unpayable and the cast taken back.
-        if (_webSlinging && AutoPlay.WebSlingingMana(client, prompt) is { } creature)
+        if (_tappedAfterMana && AutoPlay.TappedCreatureMana(client, prompt) is { } creature)
         {
             return creature;
         }

@@ -88,7 +88,7 @@ public sealed class WebSlingingTests
             Player = Me,
             Options =
             [
-                new() { Kind = ActionKindView.CastSpell, Source = Handle(90), AbilityIndex = 1, Description = "Web-slinging {W}", Affordable = true },
+                new() { Kind = ActionKindView.CastSpell, Source = Handle(90), AbilityIndex = 1, Description = "Web-slinging {W}", Affordable = true, TappedAfterMana = true },
             ],
         });
         Assert.Equal(1, Assert.IsType<TakeActionAnswer>(cast).AbilityIndex);

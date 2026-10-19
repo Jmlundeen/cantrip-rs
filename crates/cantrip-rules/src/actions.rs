@@ -4681,11 +4681,25 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
 
     // Behold is paid when a spell is cast only (CR 701.4a): an activated ability that had it would get the cost for free.
     assert!(def.cost.behold.is_none(), "an activated ability's behold is not built");
-    // A cost of tapped permanents is chosen once the mana is paid (CR 601.2g-h), which only a spell's does yet: no
-    // activated ability has one.
-    // `every_activated_ability_has_a_cost_activation_can_pay` (cantrip-engine) refuses such a card before any game.
-    assert!(!permanents_after_mana(&def.cost), "an activated ability's cost of tapped permanents is not built");
-    let chosen = choose_permanents(cx, player, source, &def.cost)?;
+    // CR 601.2g-h by way of 602.2b: the permanents the cost names are chosen with the rest of the cost, before the mana,
+    // except tapped ones ("return a tapped creature you control"), chosen once the mana is paid, as a spell's are
+    // (`cast`): a mana ability activated while paying may have tapped them.
+    let late = permanents_after_mana(&def.cost);
+    let mut chosen = if late { Vec::new() } else { choose_permanents(cx, player, source, &def.cost)? };
+    let discards = choose_discards(cx, player, source, &def.cost)?;
+    let exiles = choose_exiles(cx, player, source, &def.cost)?;
+    let tappers = choose_tappers(cx, player, source, &def.cost)?;
+    let counter = choose_counter_kind(cx, player, source, &def.cost)?;
+    pay_mana_with(
+        cx,
+        player,
+        source,
+        mana,
+        &Helpers { waterbend: if def.waterbend { u8::MAX } else { 0 }, creatures: def.tap_creatures_for_mana, purpose: Paying::Activating, ..Helpers::NONE },
+    )?;
+    if late {
+        chosen = choose_permanents(cx, player, source, &def.cost)?;
+    }
     // What an attacking creature the cost returns or sacrifices was attacking, for the effect to read (ninjutsu,
     // CR 702.49a: the ninja attacks the same player, planeswalker or battle).
     if let Some(first) = chosen.first()
@@ -4696,9 +4710,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         with.subject = attack.target;
         cx.st().stack_set(at, with);
     }
-    let discards = choose_discards(cx, player, source, &def.cost)?;
-    let exiles = choose_exiles(cx, player, source, &def.cost)?;
-    let tappers = choose_tappers(cx, player, source, &def.cost)?;
     // The permanents the cost chose stay with the ability, for its effect to name ("the tapped creature's power",
     // `Query::cost_objects`, CR 602.2b, 601.2h, 608.2h).
     if !chosen.is_empty() || !tappers.is_empty() {
@@ -4709,14 +4720,6 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         with.members = members;
         cx.st().stack_set(at, with);
     }
-    let counter = choose_counter_kind(cx, player, source, &def.cost)?;
-    pay_mana_with(
-        cx,
-        player,
-        source,
-        mana,
-        &Helpers { waterbend: if def.waterbend { u8::MAX } else { 0 }, creatures: def.tap_creatures_for_mana, purpose: Paying::Activating, ..Helpers::NONE },
-    )?;
     // Craft's materials are exiled as the cost is paid (CR 601.2h by way of 602.2b), after the mana abilities (CR 601.2g):
     // they are chosen now, from what is still there, so a Black Lotus sacrificed for the mana is no material. Too few left
     // is a cost that can't be paid, and the activation is taken back.

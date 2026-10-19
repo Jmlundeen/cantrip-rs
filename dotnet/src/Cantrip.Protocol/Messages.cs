@@ -2082,6 +2082,14 @@ public sealed class ActionOptionMessage
     /// </summary>
     [Key(30)]
     public bool WithoutPayingManaCost { get; set; }
+
+    /// <summary>
+    /// For a cast or an activation: its cost returns tapped permanents, chosen once the mana is paid (CR 601.2g-h, 602.2b:
+    /// web-slinging's "return a tapped creature you control", Urban Retreat's). One tapped for mana while paying may be one
+    /// of them, and a payment that leaves too few tapped is taken back.
+    /// </summary>
+    [Key(31)]
+    public bool TappedAfterMana { get; set; }
 }
 
 /// <summary>

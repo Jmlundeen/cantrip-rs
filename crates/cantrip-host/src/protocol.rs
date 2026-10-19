@@ -703,6 +703,10 @@ pub struct ActionOptionMessage {
     /// For a cast: a way a permanent gives that casts the spell without paying its mana cost (CR 118.9, Omniscience).
     /// `cost_text` is what it comes to with the cost changes in play, before any target ({0}, or {1} under Thalia).
     pub without_paying_mana_cost: bool,
+    /// For a cast or an activation: its cost returns tapped permanents, chosen once the mana is paid (CR 601.2g-h, 602.2b:
+    /// web-slinging's "return a tapped creature you control", Urban Retreat's), so one tapped for mana while paying may be
+    /// one of them, and a payment that leaves too few tapped is taken back.
+    pub tapped_after_mana: bool,
 }
 
 impl ActionOptionMessage {
@@ -737,6 +741,7 @@ impl ActionOptionMessage {
             life_gained: 0,
             granted_by: String::new(),
             without_paying_mana_cost: false,
+            tapped_after_mana: false,
             pays_nothing: false,
         }
     }

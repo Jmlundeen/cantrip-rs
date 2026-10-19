@@ -337,9 +337,9 @@ public sealed partial class MainPage
                 how = $"{how}  ·  or pay life for {{{CardActions.Symbol(_actions.PayLife[0].Produces[0])}/P}}";
             }
 
-            // Web-slinging (CR 702.188a): the creature returned must be tapped once the mana is paid, so while none of the
+            // Web-slinging (CR 702.188a), Urban Retreat: the creature returned must be tapped once the mana is paid, so while none of the
             // player's creatures is, the caption says how one becomes tapped; a payment that leaves none is taken back.
-            if (_webSlinging && !client.BattlefieldOf(client.Seat).Any(card => card.Tapped && card.CardTypes.Contains(CardTypeView.Creature)))
+            if (_tappedAfterMana && !client.BattlefieldOf(client.Seat).Any(card => card.Tapped && card.CardTypes.Contains(CardTypeView.Creature)))
             {
                 how = $"{how}  ·  tap a creature for mana: it will be the one returned";
             }

@@ -698,10 +698,12 @@ it. A cost of tapped permanents (`PermanentCost::tapped`, web-slinging's "return
 702.188a) is chosen once the mana is paid, since mana abilities come first (CR 601.2g) and one of them may have tapped
 the creature (Spider-Sense's ruling): it is offered while a creature is tapped or a mana ability its controller could
 activate would tap one, its own {T} or Springleaf Drum's, and a payment that leaves none tapped can't be completed, so
-the cast is taken back (CR 601.2h). Only a spell's cost has one yet; an activated ability with one is refused by a
-card-table test (`every_activated_ability_has_a_cost_activation_can_pay`) and an assertion in `activate`. The web
-client's payment caption for a web-slinging cast says to tap a creature for mana while none is tapped; the cast that
-leaves none is still taken back after it is paid.
+the cast is taken back (CR 601.2h). An activated ability's is the same (CR 602.2b: Urban Retreat's "{2}, Return a
+tapped creature you control to its owner's hand", activated from the hand), offered by the same test and chosen once
+`activate` has paid the mana; only a mana ability, whose permanents come with its activation, can't have one (none
+printed does), refused by a card-table test (`every_activated_ability_has_a_cost_activation_can_pay`). The host marks
+such a cast or activation `TappedAfterMana`, and the web client's payment caption for it says to tap a creature for
+mana while none is tapped; one that leaves none is still taken back after it is paid.
 
 ### Costs that depend on the targets
 

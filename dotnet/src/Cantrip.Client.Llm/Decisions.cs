@@ -59,10 +59,10 @@ public sealed class Decisions
     private readonly HashSet<ViewHandle> _abandoned = [];
 
     /// <summary>
-    /// Whether the spell being paid for is cast by web-slinging (CR 702.188a): its tapped creature is chosen once the mana is
-    /// paid, so the payment taps a creature for mana first (<see cref="AutoPlay.WebSlingingMana"/>).
+    /// Whether what is being paid for returns a tapped creature (web-slinging, CR 702.188a; Urban Retreat): it is chosen once the mana is
+    /// paid, so the payment taps a creature for mana first (<see cref="AutoPlay.TappedCreatureMana"/>).
     /// </summary>
-    private bool _webSlinging;
+    private bool _tappedAfterMana;
 
     /// <summary>
     /// The point this seat said to stop passing at, or none while it is answering every window.
@@ -180,7 +180,7 @@ public sealed class Decisions
     private AnswerPayload Priority(GameClient client, PriorityPromptMessage prompt)
     {
         _targetX = Unchosen;
-        _webSlinging = false;
+        _tappedAfterMana = false;
         Step(client);
 
         if (_asked >= MostQuestions)
@@ -237,7 +237,7 @@ public sealed class Decisions
         }
 
         ActionOptionMessage option = offered[pick];
-        _webSlinging = AutoPlay.IsWebSlinging(option);
+        _tappedAfterMana = AutoPlay.ReturnsTappedAfterMana(option);
 
         // The X this spell will be cast for, chosen here where the server has said how large it could be, and paid up
         // to over the prompts that follow.
@@ -357,7 +357,7 @@ public sealed class Decisions
         }
 
         // Web-slinging (CR 702.188a): the creature returned must be tapped once the mana is paid, or the cast is taken back.
-        string slinging = AutoPlay.IsWebSlinging(option)
+        string slinging = AutoPlay.ReturnsTappedAfterMana(option)
             ? "; you also return a tapped creature you control to its owner's hand, chosen after the mana is paid, so a creature"
                 + " you tap for this mana can be the one returned, and with no creature tapped by then the cast is taken back"
             : string.Empty;
@@ -472,8 +472,8 @@ public sealed class Decisions
             return AutoPlay.Announce(prompt, _targetX);
         }
 
-        // Web-slinging returns a creature tapped as the cost is paid: with none tapped, one of its own pays first.
-        if (_webSlinging && AutoPlay.WebSlingingMana(client, prompt) is { } creature)
+        // Web-slinging (or Urban Retreat) returns a creature tapped as the cost is paid: with none tapped, one of its own pays first.
+        if (_tappedAfterMana && AutoPlay.TappedCreatureMana(client, prompt) is { } creature)
         {
             return creature;
         }

@@ -131,17 +131,18 @@ pub fn label_text(label: &Label) -> &'static str {
 mod tests {
     use super::*;
 
-    /// Activating an ability (CR 602.2) pays neither behold nor a cost of tapped permanents chosen once the mana is paid
-    /// (web-slinging's): those are built for spells only, so a card whose activated ability has one is refused here, before any
-    /// game reaches the assertion in `activate`.
+    /// Activating an ability (CR 602.2) pays no behold, which is built for spells only (the assertion in `activate`). A mana
+    /// ability's permanents come with its activation (`activate_mana`), so one whose cost names tapped permanents would
+    /// choose them before its own mana is paid, not after (CR 605.3a, 601.2g-h): no printed mana ability has such a cost,
+    /// and a card whose ability has either is refused here, before any game.
     #[test]
     fn every_activated_ability_has_a_cost_activation_can_pay() {
         for def in &cards().cards {
             for ability in def.abilities.iter().chain(def.delayed.iter()) {
                 if let AbilityDef::Activated(a) = ability {
                     assert!(
-                        a.cost.behold.is_none() && !a.cost.permanents.is_some_and(|p| p.tapped),
-                        "{}: an activated ability's behold or cost of tapped permanents is not built",
+                        a.cost.behold.is_none() && !(a.is_mana_ability() && a.cost.permanents.is_some_and(|p| p.tapped)),
+                        "{}: an activated ability's behold or a mana ability's cost of tapped permanents is not built",
                         def.name
                     );
                 }

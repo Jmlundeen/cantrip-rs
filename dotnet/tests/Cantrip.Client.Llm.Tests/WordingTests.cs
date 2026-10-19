@@ -148,7 +148,7 @@ public sealed class WordingTests
                 Player = Me,
                 Options =
                 [
-                    new() { Kind = ActionKindView.CastSpell, Source = Handle(2), Affordable = true, AbilityIndex = 1, Description = "Web-slinging {U}" },
+                    new() { Kind = ActionKindView.CastSpell, Source = Handle(2), Affordable = true, AbilityIndex = 1, Description = "Web-slinging {U}", TappedAfterMana = true },
                 ],
             });
 

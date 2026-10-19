@@ -84,7 +84,7 @@ public sealed partial class TacticalPlay : IAutoPlayer
     /// Whether the spell being paid for is cast by web-slinging (CR 702.188a): the tapped creature it returns is chosen once
     /// the mana is paid, so a creature tapped for that mana may be the one.
     /// </summary>
-    private bool _webSlinging;
+    private bool _tappedAfterMana;
 
     /// <summary>The creature <c>Station</c> chose to tap for a station ability, which the cost's choice then taps.</summary>
     private ViewHandle _stationWith = ViewHandle.None;
@@ -285,7 +285,7 @@ public sealed partial class TacticalPlay : IAutoPlayer
         {
             _pending = null;
             _kick = false;
-            _webSlinging = false;
+            _tappedAfterMana = false;
             return _wander.Decide(prompt);
         }
 
