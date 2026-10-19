@@ -1,0 +1,64 @@
+# Summon: Fenrir. Chapter III draws only if its controller controls the creature with the greatest power or tied for it:
+# Bot2's Lodestone Golem (5 power) beats Fenrir's 3, so Bot1 draws nothing (the refusal; the tied case draws in the other
+# scenario). Chapter II's "next creature spell this turn" ends with turn 3, when no creature spell was cast in it: an
+# Ornithopter cast on turn 5 enters as the 0/2 it is, with no counter.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Summon: Fenrir
+Ornithopter
+Island
+Island
+Forest
+Island x12
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Sapphire
+Lodestone Golem
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Summon: Fenrir.Cast
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Forest)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Lodestone Golem.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+? Bot1.Hand.Count = 5
+Bot1.Pass
+Bot2.Pass
+? Bot1.Hand.Count = 5
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Ornithopter.Power = 0
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Summon: Fenrir
+Bot1.Battlefield.Ornithopter.Power = 0
