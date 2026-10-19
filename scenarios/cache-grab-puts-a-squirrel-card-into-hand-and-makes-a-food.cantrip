@@ -1,0 +1,34 @@
+# Cache Grab: "Mill four cards. You may put a permanent card from among the cards milled this way into your hand. If you control a Squirrel or returned a Squirrel card to
+# your hand this way, create a Food token." The four cards milled are Woodland Changeling (a changeling is every creature type, a Squirrel among them: CR 702.73a), Lightning
+# Bolt (not a permanent card: the refusal) and two Plains. Bot1 controls no Squirrel; it puts the Changeling into its hand, so it returned a Squirrel card: a Food token.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Cache Grab
+Plains x4
+Woodland Changeling
+Lightning Bolt
+Plains
+Plains
+Plains x6
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cache Grab.Cast
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Woodland Changeling)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Cache Grab; Plains; Plains; Lightning Bolt
+Bot1.Battlefield = Mox Emerald; Mox Jet; Food Token
+Bot1.Library.Count = 6

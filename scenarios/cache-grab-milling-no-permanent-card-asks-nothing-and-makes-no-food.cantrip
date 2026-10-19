@@ -1,0 +1,32 @@
+# Cache Grab milling four instants: there is no permanent card among them, so nothing is asked (the refused Choose) and nothing is put into the hand; Bot1 controls no
+# Squirrel, so no Food. All four cards stay in the graveyard with the Cache Grab.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Cache Grab
+Plains x4
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Plains x6
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cache Grab.Cast
+Bot1.Pass
+! Bot1.Choose
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Cache Grab; Lightning Bolt; Lightning Bolt; Lightning Bolt; Lightning Bolt
+Bot1.Battlefield = Mox Emerald; Mox Jet
+Bot1.Library.Count = 6

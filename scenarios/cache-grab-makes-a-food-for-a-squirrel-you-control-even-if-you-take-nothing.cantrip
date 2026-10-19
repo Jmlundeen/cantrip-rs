@@ -1,0 +1,38 @@
+# Cache Grab: "If you control a Squirrel or returned a Squirrel card to your hand": the two are alternatives, and the first is judged as the spell resolves.
+# Bot1's Woodland Changeling (every creature type, so a Squirrel) is on the battlefield, so the Food is made though Bot1 puts nothing into its hand ("you may",
+# up to one): the four Plains milled are permanent cards it declines. One Food only.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Emerald
+Mox Ruby
+Woodland Changeling
+Cache Grab
+Plains
+Plains x4
+Plains x8
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Cache Grab.Cast
+Bot1.Pass
+Bot1.Choose()
+[T1 Bot1.End]
+
+[Expect]
+Bot1.Hand.Count = 1
+Bot1.Graveyard.Count = 5
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Emerald; Mox Ruby; Woodland Changeling; Food Token

@@ -1,0 +1,34 @@
+# Cache Grab: with no Squirrel controlled and a non-Squirrel permanent card put into the hand (a Plains), "if you control a Squirrel or returned a Squirrel card"
+# is false: no Food token. The four cards milled are a Plains, Lightning Bolt (not a permanent card, the refusal), a Woodland Changeling and a Plains; Bot1 takes the first
+# Plains, so the Changeling that stays in the graveyard is not returned and the Squirrel it would be does not count.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Cache Grab
+Plains x4
+Plains
+Lightning Bolt
+Woodland Changeling
+Plains
+Plains x6
+
+[Bot2 Deck]
+Plains x16
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cache Grab.Cast
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Plains#1)
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot1.Graveyard = Cache Grab; Woodland Changeling; Lightning Bolt; Plains
+Bot1.Battlefield = Mox Emerald; Mox Jet
+Bot1.Library.Count = 6
