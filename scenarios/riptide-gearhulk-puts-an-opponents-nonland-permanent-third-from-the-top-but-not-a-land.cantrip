@@ -1,0 +1,44 @@
+# Riptide Gearhulk ({1}{W}{W}{U}{U}: Black Lotus for UUU, two Mox Pearls) enters and its trigger asks for up to one target
+# nonland permanent the opponent controls. Bot2's Island is refused (a nonland permanent only); Bot2's Ornithopter goes into
+# Bot2's library third from the top, beneath the two cards above it.
+
+[Bot1 Deck]
+Riptide Gearhulk
+Black Lotus
+Mox Pearl
+Mox Pearl
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Island
+Swamp x5
+Forest
+Mountain
+Plains
+Swamp x5
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Riptide Gearhulk.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Target(Bot2.Battlefield.Island)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Riptide Gearhulk; Mox Pearl; Mox Pearl
+Bot2.Battlefield = Island
+Bot2.Library = Mountain; Plains; Ornithopter; Swamp; Swamp; Swamp; Swamp; Swamp

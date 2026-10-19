@@ -1,0 +1,11 @@
+{
+  "name": "Riptide Gearhulk",
+  "manaCost": "{1}{W}{W}{U}{U}",
+  "type": "Artifact Creature — Construct",
+  "power": 2,
+  "toughness": 5,
+  "oracleText": "Double strike\nProwess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nWhen this creature enters, for each opponent, put up to one target nonland permanent that player controls into its owner's library third from the top.",
+  "keywords": [
+    "DoubleStrike"
+  ]
+}

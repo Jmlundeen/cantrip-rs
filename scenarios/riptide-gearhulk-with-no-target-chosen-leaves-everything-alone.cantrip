@@ -1,0 +1,42 @@
+# Riptide Gearhulk enters and its trigger targets "up to one": Bot1 chooses no target, so Bot2's Ornithopter stays and the
+# library is untouched.
+
+[Bot1 Deck]
+Riptide Gearhulk
+Black Lotus
+Mox Pearl
+Mox Pearl
+Plains x3
+Plains x13
+
+[Bot2 Deck]
+Ornithopter
+Island
+Swamp x5
+Forest
+Mountain
+Plains
+Swamp x5
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Riptide Gearhulk.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target()
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Riptide Gearhulk; Mox Pearl; Mox Pearl
+Bot2.Battlefield = Island; Ornithopter
+Bot2.Library = Mountain; Plains; Swamp; Swamp; Swamp; Swamp; Swamp
