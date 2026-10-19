@@ -1,0 +1,69 @@
+# Compel Brutality, first mode: "Target creature you control deals damage equal to its power to target creature or planeswalker an
+# opponent controls." Turn 3 Bot1's Hercules (power 3) hits Bot2's Oko (loyalty 4) and removes 3 loyalty counters (CR 120.3c):
+# 1 is left. The second target refuses Bot1's own Ornithopter (an opponent must control it), beside the positive control of
+# Oko. Turn 5 Hercules hits Bot2's Elvish Mystic (1/1) and kills it; the damage is one-sided, so Hercules has none marked.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Emerald
+Mox Emerald
+Hercules, Prince of Power
+Ornithopter
+Compel Brutality
+Compel Brutality
+Island x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Oko, Thief of Crowns
+Elvish Mystic
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Emerald#3.Activate
+Bot1.Hand.Hercules, Prince of Power.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Compel Brutality.Cast
+Bot1.Modes(Target creature you control deals damage)
+Bot1.Target(Hercules, Prince of Power)
+! Bot1.Target(Ornithopter)
+Bot1.Target(Oko, Thief of Crowns)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 1
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Hand.Compel Brutality.Cast
+Bot1.Modes(Target creature you control deals damage)
+Bot1.Target(Hercules, Prince of Power)
+Bot1.Target(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 1
+Bot2.Graveyard = Elvish Mystic
+Bot1.Battlefield.Hercules, Prince of Power.Damage = 0
+Bot1.Graveyard = Compel Brutality; Compel Brutality

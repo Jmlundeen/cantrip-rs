@@ -1,0 +1,57 @@
+# Compel Brutality, second mode: "Target planeswalker you control deals damage equal to its loyalty to target creature or
+# planeswalker an opponent controls." Loyalty is the loyalty counters it has as the spell resolves (CR 306.5b, 608.2c): Bot1's
+# Liliana of the Veil enters with 3 and +1s on turn 3 to 4 (each player discards), so she deals 4, not 3, to Bot2's Oko (loyalty
+# 4), which has none left and goes to the graveyard (CR 704.5i). The first target refuses Bot1's own Ornithopter (a creature, not
+# a planeswalker) beside the positive control of Liliana. The damage is dealt by Liliana, one-sided: she keeps her 4.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Emerald
+Liliana of the Veil
+Ornithopter
+Compel Brutality
+Island x14
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Oko, Thief of Crowns
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Liliana of the Veil.Activate(Ability: Each player discards)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Compel Brutality.Cast
+Bot1.Modes(Target planeswalker you control deals damage)
+! Bot1.Target(Ornithopter)
+! Bot1.Target(Oko, Thief of Crowns)
+Bot1.Target(Liliana of the Veil)
+Bot1.Target(Oko, Thief of Crowns)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot2.Battlefield.Count = 3
+Bot2.Graveyard.Count = 2
+Bot1.Battlefield.Liliana of the Veil.Counters.Loyalty = 4
+Bot1.Graveyard.Count = 2

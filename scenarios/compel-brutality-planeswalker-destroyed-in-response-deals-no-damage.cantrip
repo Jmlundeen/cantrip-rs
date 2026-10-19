@@ -1,0 +1,61 @@
+# The planeswalker that deals the damage must still be a legal target as Compel Brutality resolves (CR 608.2b). Bot1 aims
+# Liliana of the Veil (loyalty 3) at Bot2's Oko (loyalty 4); Bot2 destroys Liliana in response with Get Lost (Bot1 gets two Map
+# tokens). Liliana can no longer deal damage though Oko is still a legal target, so Oko keeps all 4 loyalty counters, and
+# Compel Brutality still goes to the graveyard (the Oko untouched is the proof the damage did not come from anywhere else).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Emerald
+Liliana of the Veil
+Compel Brutality
+Island x15
+
+[Bot2 Deck]
+Mox Emerald
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Mox Pearl
+Oko, Thief of Crowns
+Get Lost
+Island x14
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Liliana of the Veil.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Oko, Thief of Crowns.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Hand.Compel Brutality.Cast
+Bot1.Modes(Target planeswalker you control deals damage)
+Bot1.Target(Liliana of the Veil)
+Bot1.Target(Oko, Thief of Crowns)
+Bot1.Pass
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Hand.Get Lost.Cast(Liliana of the Veil)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+
+[Expect]
+Bot2.Battlefield.Oko, Thief of Crowns.Counters.Loyalty = 4
+Bot1.Graveyard = Compel Brutality; Liliana of the Veil
+Bot1.Battlefield.Map Token#1.Token = true
