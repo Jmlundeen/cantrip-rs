@@ -1,0 +1,33 @@
+# Both target counts and flashback exile; each legal target gets one counter (CR 608.2b, 702.34).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Predictive Preparations
+Ornithopter
+Ornithopter
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Predictive Preparations.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter#1)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Graveyard.Predictive Preparations.Cast(Ability: Flashback)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot1.Battlefield.Ornithopter#2)
+[Bot1.End]
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter#2.Counters.PlusOnePlusOne = 1
+Exile = Predictive Preparations
