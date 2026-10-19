@@ -420,6 +420,13 @@ pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS: TargetSpec =
 /// 0). Portable Hole and Seam Rip print it.
 pub const NONLAND_PERMANENT_AN_OPPONENT_CONTROLS_WITH_MANA_VALUE_2_OR_LESS: TargetSpec =
     target(nonland_permanent_an_opponent_controls_mv2_filter);
+fn creature_or_planeswalker_an_opponent_controls_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    creature_or_planeswalker_filter(q, asker, t) && matches!(t, Target::Object(id) if q.controller(id) != asker.controller)
+}
+
+/// "Target creature or planeswalker an opponent controls" (CR 115.1), worded "you don't control" by Hard-Hitting Question. A
+/// creature or a planeswalker under any other player's control. Compel Brutality and Hard-Hitting Question print it.
+pub const CREATURE_OR_PLANESWALKER_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_or_planeswalker_an_opponent_controls_filter);
 /// "Target creature an opponent controls". Palace Jailer and Mawloc print it.
 pub const CREATURE_AN_OPPONENT_CONTROLS: TargetSpec = target(creature_an_opponent_controls_filter);
 /// "Target land". Candelabra of Tawnos and Strip Mine print it.
