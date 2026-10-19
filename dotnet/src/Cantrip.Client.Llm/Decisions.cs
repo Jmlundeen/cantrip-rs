@@ -1374,7 +1374,10 @@ public sealed class Decisions
             CardChoicePurposeView.Play => $"{source}: choose {many}{kind} card(s) you may play this turn. The card's text says whether you pay its costs.",
             CardChoicePurposeView.Vote => $"{source}: cast your vote.",
             CardChoicePurposeView.TapToPay => $"{source}: tap creatures to pay its cost.",
-            CardChoicePurposeView.ExileToPay => $"{source}: exile {many}{kind} card(s) from your hand to pay for it.",
+            // Permanents you control ("exile a creature you control", CR 118.3) are given up for good: those worth least.
+            CardChoicePurposeView.ExileToPay when ChoiceIsOnBattlefield(client, prompt) =>
+                $"{source}: exile {many}{(kind.Length > 0 ? kind : " permanent")}(s) you control to pay for it. They are exiled for good, so choose those you can best spare.",
+            CardChoicePurposeView.ExileToPay => $"{source}: exile {many}{kind} card(s){(where.Length > 0 ? where : " from your hand")} to pay for it.",
             CardChoicePurposeView.OrderSimultaneous => $"{source}: choose which happens first.",
             CardChoicePurposeView.PayLifeOrPutOnTop => $"{source}: choose {prompt.Count} cards in your hand drawn this turn. For each of them you will then pay {prompt.Life} life to keep it or put it on top of your library; the cards not chosen stay in your hand for free, so choose the ones you care about least.",
             CardChoicePurposeView.PreventDamageFrom => $"{source}: its prevention shield has {prompt.PreventLeft} damage left to prevent, and these sources would deal damage to what it shields at the same time. Choose the source whose damage it prevents first; what is left of the shield goes to the others, and the damage it can't prevent is dealt. Prevent first the damage that would hurt most: from a source with deathtouch or lifelink if the shield can prevent all of it, else the most damage.",
@@ -1386,6 +1389,9 @@ public sealed class Decisions
     }
 
     /// <summary>The zones the cards of a choice are in, as " from your graveyard", " from Alice's hand", " from the battlefield".</summary>
+    private static bool ChoiceIsOnBattlefield(GameClient client, ChooseCardsPromptMessage prompt) =>
+        prompt.Cards.Count > 0 && prompt.Cards.All(card => client.Object(card)?.Zone == ZoneKindView.Battlefield);
+
     private static string Where(GameClient client, ChooseCardsPromptMessage prompt)
     {
         List<string> places = [.. prompt.Cards

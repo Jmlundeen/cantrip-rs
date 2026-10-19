@@ -858,6 +858,15 @@ public sealed partial class TacticalPlay
         yield return new Candidate(option, gain - _model.Card, cost, [], Kick: false, Permanent: false, hostile);
     }
 
+    /// <summary>
+    /// Whether a cost, in plain words, exiles permanents its payer controls ("exile a creature you control"): not the
+    /// source itself ("exile this artifact") nor cards from a hand or graveyard.
+    /// </summary>
+    private static bool ExilesPermanentsItControls(string costText) =>
+        costText.Split(',').Select(part => part.Trim()).Any(part =>
+            part.StartsWith("exile ", StringComparison.Ordinal) && !part.StartsWith("exile this", StringComparison.Ordinal)
+            && part.EndsWith(" you control", StringComparison.Ordinal));
+
     /// <summary>What one activated ability is worth using now, or null for one this seat leaves alone.</summary>
     private Candidate? Activation(GameClient client, PlayerView view, ActionOptionMessage option, ObjectView source)
     {
@@ -891,9 +900,11 @@ public sealed partial class TacticalPlay
         bool sacrificesItself = costText.Contains("sacrifice this", StringComparison.Ordinal)
             || (name.Length > 0 && costText.Contains("sacrifice " + name, StringComparison.Ordinal));
 
-        // A cost paid in other cards is a trade this seat cannot price.
+        // A cost paid in other cards is a trade this seat cannot price: a sacrifice, or an exile of permanents it controls
+        // ("Exile a creature you control", CR 118.3), which gives them up for good as a sacrifice does.
         if (option.SacrificeCandidates.Count > 0
             || (costText.Contains("sacrifice", StringComparison.Ordinal) && !sacrificesItself)
+            || ExilesPermanentsItControls(costText)
             || costText.Contains("discard", StringComparison.Ordinal)
             || option.LifeCost >= Math.Max(LifeOf(view, client.Seat) - 3, 1))
         {
