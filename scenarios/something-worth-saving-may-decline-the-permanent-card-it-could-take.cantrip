@@ -1,0 +1,31 @@
+# Something Worth Saving: "You may put a permanent card from among them into your hand" - Bot1 chooses none (up to one) although
+# an Ornithopter was milled: it stays in the graveyard with the other three, the hand is unchanged and the life is still gained.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Something Worth Saving
+Island x4
+Ornithopter
+Lightning Bolt
+Counterspell
+Brainstorm
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Something Worth Saving.Cast
+Bot1.Pass
+Bot1.Choose()
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Graveyard.Count = 5

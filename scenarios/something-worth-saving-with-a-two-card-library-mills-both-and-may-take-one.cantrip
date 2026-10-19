@@ -1,0 +1,31 @@
+# Something Worth Saving mills "four cards" from a library of only two (CR 701.17b: as many as it has) and may take a permanent card
+# from them: Bot1's library holds Ornithopter and Lightning Bolt, both milled, and Bot1 takes the Ornithopter; the life is gained and
+# Bot1 does not lose for the empty library until it would draw.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Something Worth Saving
+Island x4
+Ornithopter
+Lightning Bolt
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Something Worth Saving.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter)
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand = Island; Island; Island; Island; Ornithopter
+Bot1.Graveyard = Something Worth Saving; Lightning Bolt
+Bot1.Library.Count = 0
+Bot1.Status = (absent)

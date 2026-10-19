@@ -1,0 +1,29 @@
+# Something Worth Saving with no cards in the library: "Mill four cards" mills none (CR 701.17b) - which is not a loss, a player loses
+# only on a draw from an empty library (CR 704.5b) - so there is nothing to take and nothing is asked (refused), and the life is still
+# gained: 21.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Something Worth Saving
+Island x4
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Something Worth Saving.Cast
+Bot1.Pass
+! Bot1.Choose
+
+[Expect]
+Bot1.Life = 21
+Bot1.Library.Count = 0
+Bot1.Status = (absent)
+Bot1.Hand = Island; Island; Island; Island
+Bot1.Graveyard = Something Worth Saving

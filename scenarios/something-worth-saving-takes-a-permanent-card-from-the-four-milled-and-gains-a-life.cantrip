@@ -1,0 +1,36 @@
+# Something Worth Saving: "Mill four cards. You may put a permanent card from among them into your hand. You gain 1 life." The four
+# milled are Lightning Bolt (an instant, not a permanent card: refused), Plains (a land card is a permanent card, CR 110.4a), Ornithopter
+# and Counterspell. Bot1 takes the Plains; the other three stay in the graveyard (CR 701.17a), the library keeps the rest, and the
+# life goes to 21.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Something Worth Saving
+Island x4
+Lightning Bolt
+Plains
+Ornithopter
+Counterspell
+Island x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Something Worth Saving.Cast
+Bot1.Pass
+! Bot1.Choose(Lightning Bolt)
+! Bot1.Choose(Counterspell)
+Bot1.Choose(Plains)
+
+[Expect]
+Bot1.Life = 21
+Bot1.Hand = Island; Island; Island; Island; Plains
+Bot1.Graveyard = Something Worth Saving; Counterspell; Ornithopter; Lightning Bolt
+Bot1.Library.Count = 10
