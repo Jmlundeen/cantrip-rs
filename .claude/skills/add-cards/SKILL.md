@@ -82,8 +82,9 @@ Three layers, kept apart by the compiler (`cantrip-api` is all a card can see):
 
 **Adding to the core or to the mechanics.** A core feature mirrors the rule it implements, cites the CR, works for
 every card the rule describes, and is guarded on the game state - never on "does any card in the card table have X",
-because the table holds every card. It is benchmarked: `cargo run --release -p cantrip-bench -- --games 128`, the
-"engine answering" line, before and after, reported with the change. A non-keyword mechanic names
+because the table holds every card. A core change is benchmarked: `cargo run --release -p cantrip-bench -- --games
+128`, the "engine answering" line, before and after, reported with the change. A mechanics change is not: the
+mechanics are card recipes, outside the decision loop the benchmark measures. A non-keyword mechanic names
 in its doc comment at least two printed cards that use it exactly as written; if only one does, it stays in that card.
 A keyword module cites its CR rule and names the cards that use it. Never widen a central switch to encode a card.
 
@@ -111,7 +112,8 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    silently.
 2. **Claim one card at a time, before any work on it:** `card-issues.py claim --format <format>` takes the next free
    card, or `claim "Card Name"` the one named; the next card is claimed only when this one has landed or been
-   released, and a card waiting on a core gap stays claimed, because a card takes minutes and a pile of claims keeps others off cards nobody is working on. It opens the card's issue
+   released - or is waiting on a core gap, which stays claimed while the next card is worked (never more than those
+   two) - because a card takes minutes and a pile of claims keeps others off cards nobody is working on. It opens the card's issue
    first when it has none (a card named outside every format list gets one too), then claims it with a comment, and
    prints `#N`. Exit status 3 means the card is held by someone else (or they claimed it a moment earlier): leave it
    and take the next. Never work on a card whose live claim is someone else's.
@@ -180,9 +182,12 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    test, in the same commit as the change.
 9. **Verify:** plain `cargo run --profile cards -p cantrip-script --bin corpus` shows `0 fail` and no fewer passing
    than before; `set CANTRIP_VERIFY=1 & cargo test --profile cards --workspace` is green; if the core or mechanics
-   changed, the benchmark and `tools\test.cmd`; if the client, the host or the protocol changed, `tools\test.cmd /noweb`
-   and, only if it added a new user interaction, that interaction's browser scenarios; other wall-clock tests only
-   when the change touches what they cover (CLAUDE.md).
+   changed, `tools\test.cmd`, and if the core changed, the benchmark; if the client, the host or the protocol changed,
+   `tools\test.cmd /noweb` and, only if it added a new user interaction, that interaction's browser scenarios; other
+   wall-clock tests only when the change touches what they cover (CLAUDE.md). A card agent working for a coordinator
+   runs none of the full suites: it runs the scenarios of its card and of every card whose file or shared mechanic it
+   changed (`corpus -- --card "Name"` for each) and the unit tests of a crate it changed; the coordinator's full run
+   at landing is the gate (Many cards, 5).
 10. **Review** (below), then commit: `Card: <Name>` - the content JSON, the card file and its scenarios - one card per
     commit, its message ending with `Closes #N` (the card's issue); core, mechanics and client changes in their own
     commits before it (`Engine: ...`, `Mechanics: ...`, `Client: ...`). Commit and push as CLAUDE.md says; a
@@ -267,16 +272,21 @@ core-feature agents and review agents run on Opus.
    --format <format>`, or the card named), finishes it, then claims the next free one, in list order (never
    pre-sorted by difficulty), until its quota of cards is done. The coordinator's job is the quota and the format, not
    the claims, and it releases nothing the agent has not claimed. A card blocked by the core is never released by the
-   agent: it holds the claim and waits for the gap to be built (3).
-2. **One agent per quota** (a handful of cards), in its own worktree, in the background. Its prompt: this skill's loop for
-   each card, the format, its quota, and that it claims one card at a time (`Closes #N` from the claim's output); the core is closed to it unless the prompt opens it, though a missing keyword module may be added in
-   `cantrip-mechanics`; a card blocked by the core is never faked and never released: the agent keeps the claim,
-   commits nothing for that card's behaviour that the gap would change, and ends its turn with a gap report - the
-   card, its issue, the exact rule (CR) and what `cantrip-api` lacks - then waits to be resumed; the client work a card
-   needs (step 8) is part of the card, not a follow-up; one commit per card; at the end `git rebase main`, the corpus
-   and the verify tests; no push; a report of implemented cards with their coverage and what each needed from the
-   client, and anything odd found in the core. Card agents run no browser tests unless a card added a new user
-   interaction; then one agent at a time runs only that interaction's browser scenarios.
+   agent: it holds the claim while the gap is built (3), and meanwhile claims and works the next card, so it holds at
+   most two - the blocked one and the one in hand. When the gap lands it finishes the blocked card first.
+2. **One agent per quota** (a handful of cards), in its own worktree, in the background. Its prompt points it at this
+   skill and states only what the skill leaves to the coordinator - the format, the quota, which areas are open to
+   it - and adds no requirement the skill does not make. What the skill asks of it: this skill's loop for each card,
+   claiming one card at a time (`Closes #N` from the claim's output); the core is closed to it unless the prompt opens
+   it, though a missing keyword module may be added in `cantrip-mechanics`; a card blocked by the core is never faked
+   and never released: the agent keeps the claim, commits nothing for that card's behaviour that the gap would
+   change, sends the coordinator a gap report - the card, its issue, the exact rule (CR) and what `cantrip-api`
+   lacks - and goes on to its next card (1); the client work a card needs (step 8) is part of the card, not a
+   follow-up; one commit per card, and a short report to the coordinator as each card is committed (its commits,
+   coverage, what it needed from the client, anything odd in the core) so it can be reviewed and landed while the
+   agent works on; the targeted checks of step 9, rebased on `origin/main`; no push. Card agents run no browser tests
+   unless a card added a new user interaction; then one agent at a time runs only that interaction's browser
+   scenarios.
 3. **Gaps.** When a card agent reports a gap, the coordinator starts a core-feature agent (Opus) for it: the core open
    to it, the feature built to its rule for every card the rule describes, the benchmark run, its own commits
    (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents work on
@@ -284,11 +294,13 @@ core-feature agents and review agents run on Opus.
    the waiting card agent (SendMessage) with what landed; the agent rebases on `main` and finishes the card on the
    new core. Other running agents are told what landed so they rebase. Only a gap the coordinator decides not to
    build is released, with its gap recorded on the issue.
-4. **Review agents** (Opus) read the cards of a quota read-only against the review list, before they land. Their
-   prompt points them at correctness, safety and rules adherence, and does not hand them a list of corner cases to
-   demand tests for; the coordinator sends back only the blocking findings.
-5. **Land** each finished branch on `main` (cherry-pick its commits; a conflict stops for a look), then the corpus
-   (0 fail), the verify tests, the benchmark if the core changed; `git fetch` and `git rebase origin/main` right
+4. **Review agents** (Opus) read each card read-only against the review list as soon as its agent reports it
+   committed - card by card, never held for the whole quota - and it lands as soon as it passes. Their prompt points
+   them at correctness, safety and rules adherence, and does not hand them a list of corner cases to demand tests
+   for; the coordinator sends back only the blocking findings.
+5. **Land** each reviewed card or core change on `main` (cherry-pick its commits; a conflict stops for a look), then
+   `tools\test.cmd` (the corpus with 0 fail and the verify tests, among the rest) - one run for everything ready to
+   land together, so two core changes ready at once share a run; `git fetch` and `git rebase origin/main` right
    before every push (other sessions land on `main` too). The full run is needed once, on a rebased `main`; if more
    commits arrive while it runs, rebase again, build, and run only the scenarios of the cards and mechanics the
    landing touches (`corpus -- --card "Name"` for each) before pushing - the session that landed those commits ran
