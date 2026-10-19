@@ -91,6 +91,9 @@ keeps it).
 | [KI-80](#ki-80-a-cast-made-as-an-effect-resolves-never-uses-the-cards-own-alternative-costs) | A cast made as an effect resolves never uses the card's own alternative costs | Low | Open |
 | [KI-81](#ki-81-a-face-down-permanent-that-becomes-a-copy-is-the-copy-while-still-face-down) | A face-down permanent that becomes a copy is the copy while still face down | Medium | Open |
 | [KI-82](#ki-82-a-creature-with-negative-power-counts-as-0-towards-a-crew-saddle-or-teamwork-total) | A creature with negative power counts as 0 towards a crew, saddle or teamwork total | Medium | Open |
+| [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
+| [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
+| [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
 
 ## Issues
 
@@ -1039,3 +1042,40 @@ are `u8`), with the validation, the host prompt and the client's sum.
 
 **Scenarios.** none yet; any implemented crew Vehicle (Shorikai, Genesis Engine) with a creature a -X/-X effect shrank could
 reach it.
+
+### KI-83: Teferi's Protection in the browser shows an empty battlefield
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client, browser scenario | 2026-10-19, a full run of ScenarioInBrowserTests |
+
+**Notes.** The browser scenario fails: the page shows an empty battlefield where the phased-out permanents and the
+player's facts should be. It failed before the declare-blockers test-driver change of 2026-10-19 too (it fails with that
+change switched off), so it is older. Not investigated: it may be the client's drawing of phased-out permanents or the
+scenario driver.
+
+**Scenarios.** `teferis-protection-shows-phased-out-permanents-and-its-player-facts-in-the-browser` (browser).
+
+### KI-84: Trinisphere and Force of Will's alternative cost in the browser show the wrong menu
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | client, browser scenario | 2026-10-19, a full run of ScenarioInBrowserTests |
+
+**Notes.** The browser scenario fails at its line 46 with the wrong menu showing. Like KI-83 it predates the
+declare-blockers test-driver change of 2026-10-19. Not investigated: the cost display of an alternative cost under
+Trinisphere, or the driver's reading of the menu.
+
+**Scenarios.** `trinisphere-cost-of-force-of-wills-alternative-cost-shown-in-the-browser` (browser).
+
+### KI-85: A scenario table test sometimes fails closing a connection
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | server, tests | 2026-10-19, a `tools	est.cmd /noweb` run during the site overhaul |
+
+**Notes.** `ScenarioTableTests.A_client_answering_otherwise_fails_the_scenario_at_the_line` once threw a
+NullReferenceException in `GameServer` while a connection was closing, then passed three reruns and the next full run.
+A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
+
+**Scenarios.** none; the .NET test above.
