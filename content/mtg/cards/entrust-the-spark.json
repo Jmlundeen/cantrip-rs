@@ -1,0 +1,7 @@
+{
+  "name": "Entrust the Spark",
+  "manaCost": "{3}{G}{U}",
+  "type": "Sorcery",
+  "oracleText": "You may sacrifice a planeswalker. If you do, search your library for a planeswalker card, put it onto the battlefield, then shuffle.",
+  "keywords": []
+}
