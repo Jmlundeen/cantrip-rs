@@ -1,0 +1,40 @@
+# "When you discard a nonland card this way": a card discarded with madness (CR 702.35) goes to exile first but is still
+# discarded. Bot1 discards Basking Rootwalla to Glacial Dragonhunt, casts it for its madness cost {0}, and the reflexive
+# ability still deals 3 damage to Bot2's Concealing Curtains (the only creature Bot1 doesn't control).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Glacial Dragonhunt
+Basking Rootwalla
+Island x3
+Island
+Plains
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Concealing Curtains
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glacial Dragonhunt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Basking Rootwalla)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Ruby; Basking Rootwalla
+Bot2.Battlefield.Concealing Curtains.Damage = 3

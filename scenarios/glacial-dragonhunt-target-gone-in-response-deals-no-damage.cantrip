@@ -1,0 +1,52 @@
+# CR 608.2b: the reflexive ability's target is chosen as it goes on the stack, and if it is illegal as the ability resolves the
+# ability does nothing. Bot1 discards Lightning Bolt and targets Bot2's Ornithopter; Bot2 responds by Bolting its own
+# Ornithopter, which dies. The ability fizzles: Concealing Curtains (not the target) is undamaged, and the discard stands.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Glacial Dragonhunt
+Lightning Bolt
+Island x3
+Island
+Plains
+Island x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Concealing Curtains
+Ornithopter
+Lightning Bolt
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glacial Dragonhunt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Glacial Dragonhunt; Lightning Bolt
+Bot2.Graveyard = Ornithopter; Lightning Bolt
+Bot2.Battlefield.Concealing Curtains.Damage = 0

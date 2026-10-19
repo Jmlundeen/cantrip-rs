@@ -1,0 +1,34 @@
+# The reflexive ability (CR 603.12) needs a target as it is put on the stack (CR 603.3d): with no creature on the battlefield
+# at all, discarding a nonland card (Lightning Bolt) triggers it, but it is removed from the stack for lack of a target.
+# Nothing is damaged, no prompt is left, and the Dragonhunt still drew and discarded. (This proves the game carries on with no
+# target and nothing happening; that the trigger fired and was removed is the rule, not something the dump can show.)
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Glacial Dragonhunt
+Lightning Bolt
+Island x3
+Island x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glacial Dragonhunt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+? Stack.Count = 0
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Glacial Dragonhunt; Lightning Bolt
+Bot1.Hand.Count = 5
+Bot2.Life = 20

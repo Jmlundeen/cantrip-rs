@@ -1,0 +1,54 @@
+# "When you discard a nonland card this way": discarding a land does not trigger the reflexive ability, and neither does
+# declining the discard ("you may"). Bot1 casts Glacial Dragonhunt twice (turn 3 and turn 5, off two Moxen): on turn 3 it
+# discards an Island (a land card), on turn 5 it discards nothing. Bot2's Concealing Curtains is never damaged, the
+# Dragonhunt draws a card each time, and with a creature to target the refusal is not for lack of one.
+# The positive control (the nonland discard) is glacial-dragonhunt-discarding-a-nonland-card-deals-three-damage-...
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Ruby
+Glacial Dragonhunt
+Glacial Dragonhunt
+Island x3
+Island
+Island
+Island
+Plains
+Island x12
+
+[Bot2 Deck]
+Mox Jet
+Concealing Curtains
+Plains x14
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glacial Dragonhunt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Island)
+? Stack.Count = 0
+? Bot2.Battlefield.Concealing Curtains.Damage = 0
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Glacial Dragonhunt.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose()
+? Stack.Count = 0
+[T5 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Glacial Dragonhunt; Glacial Dragonhunt; Island
+Bot2.Battlefield.Concealing Curtains.Damage = 0
+Bot1.Hand.Count = 6
