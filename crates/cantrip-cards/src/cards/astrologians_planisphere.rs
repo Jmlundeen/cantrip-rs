@@ -3,11 +3,6 @@ use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::job_select::{HERO, JOB_SELECT};
 use cantrip_oracle as oracle;
 
-/// "Equipped creature is a Wizard in addition to its other types" (layer 4).
-fn wizard(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    chars.subtypes = chars.subtypes.with(view.words(source).subtype(Subtype::Wizard));
-}
-
 /// "Whenever you cast a noncreature spell and whenever you draw your third card each turn" (CR 603.2, 121.2): the
 /// history as it was just before the draw holds the two earlier ones.
 fn cast_noncreature_or_draw_third(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
@@ -32,7 +27,7 @@ pub static CARD: CardDef = CardDef {
     ],
     delayed: &[triggered(when_asked(EventMask(EventMask::SPELL_CAST.0 | EventMask::DREW.0), cast_noncreature_or_draw_third), grow, "Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.")],
     statics: &[
-        static_ability(Layer::Type, attached_object, wizard, "Equipped creature is a Wizard in addition to its other types."),
+        static_ability(Layer::Type, attached_object, cantrip_mechanics::statics::also_a::<{ cantrip_mechanics::lands::sub(Subtype::Wizard) }>, "Equipped creature is a Wizard in addition to its other types."),
         static_ability(Layer::Ability, attached_object, cantrip_mechanics::statics::grant_delayed_ability, "Equipped creature has \"Whenever you cast a noncreature spell and whenever you draw your third card each turn, put a +1/+1 counter on this creature.\"").continues(),
     ],
     ..oracle::ASTROLOGIANS_PLANISPHERE

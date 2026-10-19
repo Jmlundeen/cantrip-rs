@@ -83,6 +83,14 @@ pub fn have_haste(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
     chars.keywords = chars.keywords.with(Keyword::Haste);
 }
 
+/// "... is a [subtype] in addition to its other types" (layer 4) as a static ability's `StaticDef::apply`, `SUBTYPE` a
+/// `Subtype` as `u16` (`lands::sub`). The subtype is a word of the source's text (CR 612.2). Astrologian's Planisphere
+/// (Wizard), Dark Knight's Greatsword (Knight), Samurai's Katana (Samurai) and Laughing Jasper Flint (Mercenary) print it.
+pub fn also_a<const SUBTYPE: u16>(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let printed = Subtype::ALL.into_iter().find(|&s| s as u16 == SUBTYPE).expect("a subtype's number");
+    chars.subtypes = chars.subtypes.with(view.words(source).subtype(printed));
+}
+
 /// "... can't be countered" (CR 101.2, layer 6) as the `StaticDef::apply` of a static ability that covers spells on the
 /// stack (declared `everywhere`). Hexing Squelcher ("Spells you control") and Frenzied Baloth ("Creature spells you
 /// control") print it.
