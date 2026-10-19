@@ -1,0 +1,6 @@
+{
+  "name": "Gardenize",
+  "manaCost": "{1}{G}{G}",
+  "type": "Enchantment",
+  "oracleText": "Whenever a creature you control dies, put a charge counter on this enchantment.\nAt the beginning of your first main phase, add {G} for each charge counter on this enchantment."
+}

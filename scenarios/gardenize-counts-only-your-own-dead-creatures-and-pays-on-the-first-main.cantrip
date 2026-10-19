@@ -1,0 +1,61 @@
+# Gardenize: only a creature its controller controls triggers the charge counter. Bot2's Ornithopter dies to Bot1's Flame
+# Slash on turn 3 and adds none; Bot1's own Ornithopter dies to Bot2's Flame Slash on turn 4 and adds one. On turn 5 the
+# first main phase's trigger adds {G}, which casts Llanowar Elves (charge counters are not removed).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Gardenize
+Ornithopter
+Flame Slash
+Llanowar Elves
+Forest x12
+
+[Bot2 Deck]
+Mountain
+Ornithopter
+Flame Slash
+Flame Slash
+Mountain x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gardenize.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Flame Slash.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Flame Slash.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Forest; Gardenize; Llanowar Elves; Mox Emerald; Mox Pearl; Mox Ruby
+Bot1.Battlefield.Gardenize.Counters.Charge = 1
+Bot1.Battlefield.Llanowar Elves.Power = 1
+Bot1.Graveyard = Ornithopter; Flame Slash
+Bot2.Battlefield = Mountain
+Bot2.Graveyard = Flame Slash; Ornithopter
