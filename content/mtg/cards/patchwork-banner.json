@@ -1,0 +1,6 @@
+{
+  "name": "Patchwork Banner",
+  "manaCost": "{3}",
+  "type": "Artifact",
+  "oracleText": "As this artifact enters, choose a creature type.\nCreatures you control of the chosen type get +1/+1.\n{T}: Add one mana of any color."
+}

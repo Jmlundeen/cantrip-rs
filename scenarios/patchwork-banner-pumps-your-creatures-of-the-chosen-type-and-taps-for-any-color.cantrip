@@ -1,0 +1,46 @@
+# Patchwork Banner (CR 614.12a, 613.4c): Elf is chosen as it enters. Bot1's Elvish Mystic is a 2/2; Bot1's Ornithopter (a Thopter) stays
+# 0/2 and Bot2's Elvish Mystic (an Elf Bot1 does not control) stays 1/1. "{T}: Add one mana of any color" adds red here, not a green
+# the Banner's chosen type or cost would suggest.
+
+[Bot1 Deck]
+Forest
+Elvish Mystic
+Black Lotus
+Patchwork Banner
+Ornithopter
+Forest
+Forest
+Forest x12
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Forest x16
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Patchwork Banner.Cast
+Bot1.Modes(Elf)
+Bot1.Battlefield.Patchwork Banner.Activate(Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield.Patchwork Banner.Tapped = true
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Toughness = 2
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Elvish Mystic.Power = 1
+Bot2.Battlefield.Elvish Mystic.Toughness = 1
