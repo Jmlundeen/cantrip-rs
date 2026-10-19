@@ -1,0 +1,11 @@
+{
+  "name": "Heartstring Puller",
+  "manaCost": "{3}{R}",
+  "type": "Creature - Elf Sorcerer",
+  "power": 3,
+  "toughness": 1,
+  "oracleText": "Trample\nWhen this creature enters, create a 2/2 colorless Wizard Soldier creature token named Cadet.",
+  "keywords": [
+    "Trample"
+  ]
+}
