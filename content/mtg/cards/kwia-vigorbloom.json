@@ -1,0 +1,13 @@
+{
+  "name": "Kwia Vigorbloom",
+  "manaCost": "{3}{G}{W}{W}",
+  "type": "Legendary Creature — Elder Sphinx",
+  "power": 6,
+  "toughness": 6,
+  "oracleText": "Flying, vigilance, lifelink, ward {2}\nWhenever you gain life, create a colorless artifact token named Lotus with \"{T}, Sacrifice this token: Add three mana of any one color.\" This ability triggers only once each turn.",
+  "keywords": [
+    "Flying",
+    "Vigilance",
+    "Lifelink"
+  ]
+}
