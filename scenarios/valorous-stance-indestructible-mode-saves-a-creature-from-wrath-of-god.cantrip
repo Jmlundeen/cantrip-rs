@@ -1,0 +1,42 @@
+# Valorous Stance, first mode: in response to Bot2's Wrath of God, Bot1 gives its Ornithopter indestructible until end of
+# turn (CR 702.12b). The Ornithopter survives the Wrath; Bot2's own Ornithopter is destroyed. Bot1 pays {1}{W} with
+# Mox Pearl and Plains.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Valorous Stance
+Plains x16
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Ornithopter
+Wrath of God
+Plains x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Black Lotus.Cast
+[T2 Bot2.Main2]
+Bot2.Battlefield.Black Lotus.Activate(Color: White)
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Wrath of God.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Valorous Stance.Cast
+Bot1.Modes(Target creature gains indestructible)
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+[T2 Bot2.End]
+
+[Expect]
+Bot1.Battlefield = Plains; Mox Pearl; Ornithopter
+Bot1.Battlefield.Ornithopter.Keywords = Flying; Indestructible
+Bot1.Graveyard = Valorous Stance
+Bot2.Graveyard = Wrath of God; Ornithopter; Black Lotus

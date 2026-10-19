@@ -1,0 +1,41 @@
+# Valorous Stance, second mode: "Destroy target creature with toughness 4 or greater." Bot2 has Crystal Barricade (0/4,
+# exactly the boundary, so a legal target) and Ornithopter (0/2, refused). Bot1 casts Stance on the Barricade after the
+# Ornithopter is refused: the Barricade dies, the Ornithopter stays.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Valorous Stance
+Plains x17
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Crystal Barricade
+Plains x16
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Crystal Barricade.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Valorous Stance.Cast
+Bot1.Modes(Destroy target creature)
+! Bot1.Target(Bot2.Battlefield.Ornithopter)
+Bot1.Target(Bot2.Battlefield.Crystal Barricade)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Crystal Barricade
+Bot2.Battlefield = Plains; Mox Pearl; Ornithopter
+Bot1.Graveyard = Valorous Stance
