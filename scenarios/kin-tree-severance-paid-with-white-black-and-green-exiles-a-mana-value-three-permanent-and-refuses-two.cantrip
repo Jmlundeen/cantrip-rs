@@ -1,0 +1,44 @@
+# "Exile target permanent with mana value 3 or greater." Three Moxen (W, B, G) pay {2/W}{2/B}{2/G} with one mana each:
+# every symbol is announced as its color, none as {2} (CR 107.4e), and the question is answered with no {2}. Bot2 has Brazen
+# Borrower (mana value 3) and Cranial Plating (mana value 2): the Plating is refused, the Borrower - the same action at
+# mana value 3 - is exiled.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Emerald
+Kin-Tree Severance
+Forest x16
+
+[Bot2 Deck]
+Black Lotus
+Black Lotus
+Brazen Borrower
+Cranial Plating
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Brazen Borrower.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Cranial Plating.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+! Bot1.Hand.Kin-Tree Severance.Cast(Cranial Plating)
+Bot1.Hand.Kin-Tree Severance.Cast(Brazen Borrower)
+Bot1.Modes()
+Bot1.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Graveyard = Kin-Tree Severance
+Exile = Brazen Borrower
+Bot2.Battlefield = Cranial Plating

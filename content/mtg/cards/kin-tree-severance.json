@@ -1,0 +1,6 @@
+{
+  "name": "Kin-Tree Severance",
+  "manaCost": "{2/W}{2/B}{2/G}",
+  "type": "Instant",
+  "oracleText": "Exile target permanent with mana value 3 or greater."
+}
