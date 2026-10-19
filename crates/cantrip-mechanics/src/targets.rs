@@ -222,6 +222,12 @@ pub fn player(g: &dyn Game, item: &StackItem, slot: usize) -> Option<PlayerId> {
     if slot < item.target_count as usize && g.target_legal(item, slot) { item.targets[slot].player() } else { None }
 }
 
+/// Every player target of the item that is still legal (CR 608.2b), in the order they were chosen: "any number of target
+/// players each ..." resolves for the ones still legal. Riverchurn Monument and Tinybones Joins Up print it.
+pub fn legal_players(g: &dyn Game, item: &StackItem) -> Vec<PlayerId> {
+    (0..item.target_count as usize).filter_map(|slot| player(g, item, slot)).collect()
+}
+
 /// Every object target of the item that is still legal (CR 608.2b), in slot order. Fiery Confluence-style spells and
 /// Echoing Truth-style "each target" effects read it.
 pub fn legal_objects(g: &dyn Game, item: &StackItem) -> Vec<ObjectId> {

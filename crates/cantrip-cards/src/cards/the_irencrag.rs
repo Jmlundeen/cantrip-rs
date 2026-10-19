@@ -15,20 +15,6 @@ const ASK: Question = Question::new(
     "Don't",
 );
 
-/// "Whenever a legendary creature you control enters" (CR 603.6a): any legendary creature under your control as it entered.
-fn legendary_creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. } if to.is(ZoneKind::Battlefield) && q.controller(*new) == me.controller && {
-            let c = q.chars(*new);
-            c.is(CardType::Creature) && c.supertypes.legendary
-        } =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
-}
-
 /// "You may have The Irencrag become a legendary Equipment artifact named Everflame, Heroes' Legacy. If you do, it gains
 /// equip {3} and 'Equipped creature gets +3/+3' and loses all other abilities." With no duration, for as long as it stays
 /// on the battlefield (the ruling, CR 611.2a). The name is set by a text-changing effect (CR 612.8, layer 3), so it has no
@@ -56,7 +42,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add(Mana::C), "{T}: Add {C}."),
         triggered(
-            when_asked(EventMask::ZONE_CHANGE, legendary_creature_you_control_enters),
+            cantrip_mechanics::triggers::LEGENDARY_CREATURE_YOU_CONTROL_ENTERS,
             become_everflame,
             "Whenever a legendary creature you control enters, you may have The Irencrag become a legendary Equipment artifact named Everflame, Heroes' Legacy. If you do, it gains equip {3} and \"Equipped creature gets +3/+3\" and loses all other abilities.",
         ),

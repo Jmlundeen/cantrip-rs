@@ -7,14 +7,9 @@ const fn any_number_of_players(label: &'static str) -> TargetSpec {
     targets::PLAYER.between(0, TargetSpec::ANY_NUMBER).labelled(label)
 }
 
-/// The targeted players still legal as the ability resolves (CR 608.2b), in the order they were chosen.
-fn legal_players(g: &dyn Game, item: &StackItem) -> Vec<PlayerId> {
-    (0..item.target_count as usize).filter_map(|slot| targets::player(g, item, slot)).collect()
-}
-
 /// "{1}, {T}: Any number of target players each mill two cards." One simultaneous mill (CR 701.17, 101.4).
 fn mill_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    let mills: Vec<(PlayerId, u32)> = legal_players(g, item).into_iter().map(|p| (p, 2)).collect();
+    let mills: Vec<(PlayerId, u32)> = targets::legal_players(g, item).into_iter().map(|p| (p, 2)).collect();
     g.mill_together(&mills);
     Ok(())
 }
@@ -24,7 +19,7 @@ fn mill_two(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// at once (CR 101.4, 701.17).
 fn mill_graveyard_size(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mills: Vec<(PlayerId, u32)> =
-        legal_players(g, item).into_iter().map(|p| (p, g.state().zone(Zone::graveyard(p)).len() as u32)).collect();
+        targets::legal_players(g, item).into_iter().map(|p| (p, g.state().zone(Zone::graveyard(p)).len() as u32)).collect();
     g.mill_together(&mills);
     Ok(())
 }
