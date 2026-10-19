@@ -1,0 +1,80 @@
+# Known bug: a face-down permanent that becomes a copy shows the copy's characteristics while still face down; its face-down status should apply over the copy effect (CR 708.10, 613.2b).
+# A face-down permanent that becomes a copy of another permanent is that permanent's copy once it is turned face up, and
+# the copy effect ends with its duration as on any other permanent (CR 708.8, 708.10, 707.2, 611.2b). While it is face
+# down it is still a nameless 2/2: its face-down status applies after the copy effect (CR 613.2b).
+#
+# Turn 1 is the Abhorrent Oculus opening of the other manifest scenarios, with Mirrorweave and Mox Pearl among the cards
+# Wheel of Fortune draws (and Forest and Haywire Mite among Bot2's). On Bot2's upkeep the Oculus manifests dread:
+# Snapcaster Mage goes onto the battlefield face down, and Bot2 casts Haywire Mite. On Bot1's turn 3 Mirrorweave makes
+# each other creature a copy of the Mite until end of turn, the face-down Mage among them; the Mage is then turned face
+# up for {1}{U}, and it is a Haywire Mite, a 1/1, not a Snapcaster Mage. As the turn ends Mirrorweave's effect ends,
+# and it is a Snapcaster Mage, a 2/1, not a face-down 2/2.
+
+[Bot1 Deck]
+Mountain
+Black Lotus
+Wheel of Fortune
+Island x4
+Mox Sapphire
+Sol Ring
+Abhorrent Oculus
+Mirrorweave
+Mox Pearl
+Island x2
+Snapcaster Mage
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Swamp x7
+Forest
+Haywire Mite
+Swamp x11
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Wheel of Fortune.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Sol Ring.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Abhorrent Oculus.Cast
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Choose(Island; Island; Island; Island; Black Lotus; Wheel of Fortune)
+[T2 Bot2.Upkeep]
+Bot1.Arrange(Snapcaster Mage | Lightning Bolt)
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Haywire Mite.Cast
+[T3 Bot1.Main1]
+? Bot1.Battlefield..FaceDown = true
+? Bot1.Battlefield..FaceDownName = Snapcaster Mage
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mirrorweave.Cast(Haywire Mite)
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+? Bot1.Battlefield..FaceDown = true
+? Bot1.Battlefield..Power = 2
+? Bot1.Battlefield..Toughness = 2
+Bot1.Battlefield.#1.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mountain.Activate
+? Bot1.Battlefield = Haywire Mite; Haywire Mite; Island; Mountain; Mox Pearl; Mox Sapphire; Sol Ring
+? Bot1.Battlefield.Haywire Mite#2.FaceDown = (absent)
+? Bot1.Battlefield.Haywire Mite#2.Power = 1
+? Bot1.Battlefield.Haywire Mite#2.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield = Abhorrent Oculus; Island; Mountain; Mox Pearl; Mox Sapphire; Snapcaster Mage; Sol Ring
+Bot1.Battlefield.Snapcaster Mage.FaceDown = (absent)
+Bot1.Battlefield.Snapcaster Mage.Power = 2
+Bot1.Battlefield.Snapcaster Mage.Toughness = 1
