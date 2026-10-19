@@ -97,8 +97,9 @@ pub fn exile_instead_apply(_: &dyn Query, _: &Asker, proposal: &mut Proposal) {
 }
 
 /// "If a creature an opponent controls would die" (CR 614.1a, 700.4): a creature controlled by an opponent of this
-/// permanent's controller, moving from the battlefield to a graveyard. A token is a creature too.
-fn opponents_creature_would_die(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
+/// effect's controller, moving from the battlefield to a graveyard. A token is a creature too. Garruk, Vren and Malicious
+/// Eclipse (for the turn, as a granted replacement) read it.
+pub fn opponents_creature_would_die(q: &dyn Query, asker: &Asker, proposal: &Proposal) -> bool {
     matches!(proposal, Proposal::ZoneChange(z)
         if z.from.is(ZoneKind::Battlefield)
             && z.to.is(ZoneKind::Graveyard)
