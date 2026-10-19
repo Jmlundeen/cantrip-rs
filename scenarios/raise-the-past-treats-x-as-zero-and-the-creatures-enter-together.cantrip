@@ -1,0 +1,46 @@
+# Raise the Past: mana value is read in the graveyard (CR 202.3), where the {X} of Mockingbird ({X}{U}) is 0, so its mana value is 1 and
+# it returns with Ornithopter (0). Both enter at the same moment (CR 110.2a), so Mockingbird's "you may have this creature enter as a
+# copy" finds no creature already on the battlefield to copy (the Ornithopter enters with it, the ruling of Clone) and asks nothing:
+# it enters as itself, a 1/1 Bird Bard with flying, not as an Ornithopter.
+
+[Bot1 Deck]
+Black Lotus
+Entomb
+Entomb
+Mox Pearl
+Mox Pearl
+Sol Ring
+Plains
+Raise the Past
+Mockingbird
+Ornithopter
+Plains x10
+
+[Bot2 Deck]
+Swamp x16
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Mockingbird)
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Ornithopter)
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Hand.Raise the Past.Cast
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Mox Pearl; Mox Pearl; Sol Ring; Mockingbird; Ornithopter
+Bot1.Battlefield.Mockingbird.Subtypes = Bard; Bird
+Bot1.Battlefield.Mockingbird.Power = 1
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Graveyard = Raise the Past; Entomb; Entomb; Black Lotus
