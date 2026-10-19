@@ -765,6 +765,22 @@ pub fn creature_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> 
     }
 }
 
+/// "Whenever a Dragon you control enters" (CR 603.6a): any permanent that is a Dragon as it enters, under your control; the
+/// word is read through the words of the object whose text says it (CR 612). Sarkhan, Dragon Ascendant and Roiling
+/// Dragonstorm print it.
+pub fn dragon_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::ZoneChange { new, to, .. }
+            if to.is(ZoneKind::Battlefield)
+                && q.controller(*new) == me.controller
+                && q.chars(*new).has_subtype(q.words(me.source).subtype(Subtype::Dragon)) =>
+        {
+            Fired::PLAIN
+        }
+        _ => None,
+    }
+}
+
 /// "Whenever a creature you control attacks" (CR 508.3a, 603.2c): declaring attackers names each attacker in its own event, so
 /// the ability triggers once for each creature of its controller's that attacks, and is about that attacker. A creature put onto
 /// the battlefield attacking was never declared (CR 508.4) and triggers nothing. Shared Animosity, Connecting the Dots and
@@ -1120,6 +1136,7 @@ pub const YOUR_END_STEP: Trigger = when_asked(EventMask::STEP_BEGAN, your_end_st
 pub const EACH_END_STEP: Trigger = when(EventMask::STEP_BEGAN, each_end_step);
 pub const CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, creature_you_control_enters);
 pub const CREATURE_YOU_CONTROL_ATTACKS: Trigger = when_asked(EventMask::ATTACKS, creature_you_control_attacks);
+pub const DRAGON_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, dragon_you_control_enters);
 pub const OPPONENTS_CREATURE_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, opponents_creature_enters);
 pub const ARTIFACT_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, artifact_you_control_enters);
 pub const ANOTHER_CREATURE_YOU_CONTROL_ENTERS: Trigger = when_asked(EventMask::ZONE_CHANGE, another_creature_you_control_enters);

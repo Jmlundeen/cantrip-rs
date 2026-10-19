@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::triggers::THIS_ENTERS;
+use cantrip_mechanics::triggers::{DRAGON_YOU_CONTROL_ENTERS, THIS_ENTERS};
 use cantrip_mechanics::{behold, tokens};
 use cantrip_oracle as oracle;
 
@@ -11,21 +11,6 @@ fn behold_a_dragon(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         tokens::create_treasure(g, item.controller)?;
     }
     Ok(())
-}
-
-/// "Whenever a Dragon you control enters" (CR 603.6a): any permanent that is a Dragon as it enters, under your control (the
-/// word read through Sarkhan's own text, CR 612).
-fn dragon_you_control_enters(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
-    match event {
-        Event::ZoneChange { new, to, .. }
-            if to.is(ZoneKind::Battlefield)
-                && q.controller(*new) == me.controller
-                && q.chars(*new).has_subtype(q.words(me.source).subtype(Subtype::Dragon)) =>
-        {
-            Fired::PLAIN
-        }
-        _ => None,
-    }
 }
 
 /// "Put a +1/+1 counter on Sarkhan. Until end of turn, Sarkhan becomes a Dragon in addition to his other types and gains
@@ -43,7 +28,7 @@ fn grow(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(THIS_ENTERS, behold_a_dragon, "When Sarkhan enters, you may behold a Dragon. If you do, create a Treasure token."),
-        triggered(when_asked(EventMask::ZONE_CHANGE, dragon_you_control_enters), grow, "Whenever a Dragon you control enters, put a +1/+1 counter on Sarkhan. Until end of turn, Sarkhan becomes a Dragon in addition to his other types and gains flying."),
+        triggered(DRAGON_YOU_CONTROL_ENTERS, grow, "Whenever a Dragon you control enters, put a +1/+1 counter on Sarkhan. Until end of turn, Sarkhan becomes a Dragon in addition to his other types and gains flying."),
     ],
     ..oracle::SARKHAN_DRAGON_ASCENDANT
 };

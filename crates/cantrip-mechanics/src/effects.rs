@@ -143,6 +143,14 @@ pub fn loot(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// "Draw two cards, then discard a card" (CR 121.1, 701.9): the controller draws two, then chooses a card of their hand, the
+/// two drawn included, and discards it. Overlord of the Floodpits, Roiling Dragonstorm and Wistfulness print it.
+pub fn draw_two_then_discard(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.draw(item.controller, 2);
+    crate::discard_chosen(g, item.controller, item.object, 1)?;
+    Ok(())
+}
+
 /// "You may discard a card. If you do, draw `n` cards" (CR 701.9, 121.1): the controller chooses a card of their hand to
 /// discard or none; the draw follows a card that was actually discarded, and nothing is asked of an empty hand. Melded
 /// Moxite and Bitter Reunion draw two, Giott, King of the Dwarves and Lorehold, the Historian draw one.
