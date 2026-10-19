@@ -1,0 +1,11 @@
+{
+  "name": "Virulent Emissary",
+  "manaCost": "{G}",
+  "type": "Creature — Elf Assassin",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "Deathtouch\nWhenever another creature you control enters, you gain 1 life.",
+  "keywords": [
+    "Deathtouch"
+  ]
+}

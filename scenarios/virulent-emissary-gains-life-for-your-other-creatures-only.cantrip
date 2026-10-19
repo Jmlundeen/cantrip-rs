@@ -1,0 +1,34 @@
+# "Whenever another creature you control enters, you gain 1 life." The Emissary entering itself gains nothing (20 life, checked);
+# Bot1's Ornithopter enters under its control: 21. Bot2's Ornithopter enters under the opponent's control: Bot1 stays at 21.
+
+[Bot1 Deck]
+Forest
+Virulent Emissary
+Ornithopter
+Forest x17
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Virulent Emissary.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 20
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Bot1.Life = 21
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+
+[Expect]
+Bot1.Life = 21
+Bot2.Life = 20
+Bot1.Battlefield = Forest; Virulent Emissary; Ornithopter
+Bot2.Battlefield = Ornithopter
