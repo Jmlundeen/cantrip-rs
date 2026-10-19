@@ -1,0 +1,12 @@
+{
+  "name": "Holy Cow",
+  "manaCost": "{2}{W}",
+  "type": "Creature — Ox Angel",
+  "power": 2,
+  "toughness": 2,
+  "oracleText": "Flash\nFlying\nWhen this creature enters, you gain 2 life and scry 1. (Look at the top card of your library. You may put that card on the bottom.)",
+  "keywords": [
+    "Flash",
+    "Flying"
+  ]
+}
