@@ -1,0 +1,46 @@
+# Apex Witchstalker gains 2 life when it enters and 2 when it dies (CR 603.6a, 603.10a), and has menace (CR 702.110).
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Apex Witchstalker
+Swamp x13
+
+[Bot2 Deck]
+Mox Ruby
+Mox Ruby
+Lightning Bolt
+Lightning Bolt
+Island x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Battlefield.Mox Jet#5.Activate
+Bot1.Battlefield.Mox Jet#6.Activate
+Bot1.Hand.Apex Witchstalker.Cast
+[T1 Bot1.Main2]
+? Bot1.Battlefield.Apex Witchstalker.Keywords = Menace
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby#1.Activate
+Bot2.Battlefield.Mox Ruby#2.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Apex Witchstalker)
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Apex Witchstalker)
+
+[Expect]
+Bot1.Life = 24
+Bot1.Graveyard = Apex Witchstalker
