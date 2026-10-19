@@ -191,10 +191,8 @@ are on no one's clock.
 
 Nothing waits for someone who is not there. The pick clock drafts for them, deck building's submits for them, and a
 player who does not come to their match's table within three minutes, or is gone from it for five, forfeits the match
-2-0 and is dropped from the rounds after - and if neither came, both lose. A player can also drop on purpose, from the
-standings page (`DropMessage`, `BoosterPod.Drop`): before a round begins it is paired again without them, so nobody is
-handed a match against someone who has gone; once it has begun, their match has to be over first - played out, or its
-games conceded (`ConcedeMessage`, which loses the game being played, never the match). A player's pod ticket always takes them to
+2-0 and is dropped from the rounds after - and if neither came, both lose. A player can also drop on purpose, at any
+stage ([Dropping out](#dropping-out)). A player's pod ticket always takes them to
 where they should be: to their game's table while their match is on, otherwise to the pod's. The match records keep
 each game, its seed, its result, and each player's deck for the match (`MatchRecord.Decks`), so a game cut off by a
 restart is dealt again from its seed, and every clock starts again from the restart.
@@ -203,6 +201,41 @@ restart is dealt again from its seed, and every clock starts again from the rest
 game it asks for (`TablesToOpen`), closed once its players have gone on (`TablesDone`). Where tables are is the host's
 opener - loopback ports locally, the draft ports behind the public address for the Discord bot. The clocks are the
 host's (`BoosterTiming`): a test gives them milliseconds.
+
+## Dropping out
+
+A player can leave any event they are in. On the site it is **Drop** on their own page, asked first
+([discord-bot.md](discord-bot.md#the-draft-queue-page)); at a pod's table it is **Drop** on the pairings page
+(`DropMessage`). Either way the event goes on properly without them, as a tournament has it, and they are free to join
+another event at once (`PodHosts.InDraft` and `DraftHost.InDraft` leave out a player who has dropped).
+
+A **booster pod** (`BoosterPod.Drop`) marks them `Dropped` and, by where it has got to:
+
+- **Taking seats**: nobody waits for them to sit down.
+- **Drafting**: their pick clock runs out at once, every pick, so the clock drafts for them by the pick order and their
+  neighbours are never held up (`BoosterPod.Hurry`); nobody asks them for a card.
+- **Building decks**: their deck is submitted as it stands, made up with basic lands, and once everyone else's is in the
+  first round is paired. Dropped during the draft, theirs is submitted the moment the draft ends.
+- **A round's pairings shown, not yet begun**: the round is paired again without them, to begin when it was going to, so
+  nobody is handed a match against someone who has gone. With an odd number left the bye goes, as ever, to the
+  lowest-placed player who has not had one.
+- **Their match being played**: they concede it. The game being played is their opponent's - its table ends it against
+  them (`ITableEvent.TakeForfeits`), saying "Eve dropped from the event." (`ForfeitReason`), and sends both on - and so
+  is the match, whatever the score, with the games already played standing, as when a match clock runs out. A game of
+  the match not dealt yet is never dealt.
+- **Their match over, or a bye**: they are left out of the pairings from the next round.
+
+Their results stand: every match they played counts, for them and for their opponents' tiebreakers, and the standings
+keep them, last, marked dropped. Once too few are left to pair, the event ends when the round does.
+
+A **Winston or grid draft** (`DraftPod.Drop`) has nothing left to play without its second player. During the game they
+forfeit it - the table ends it against them, and the other player wins the match (`MatchRecord.Forfeit`) - and before
+then the draft is called off for both, "Bob dropped from the draft." (a game not dealt again since a restart is decided
+on the spot, as the table would have). One opened from Discord that nobody has joined yet is simply called off. The table
+stays up a while, as a finished one does, and says why to the player still at it, with a button back to the site.
+
+A table still forming is not an event yet: a player gives their seat up with **Leave Table** there, or **Leave** on the
+site (`DraftQueues.LeaveAsync`).
 
 ## Deck building
 
@@ -226,7 +259,7 @@ card the content no longer has - is refused with the reason, and the event goes 
 taken back, rather than being dealt the same failure again. `TableMessage` says the phase - Setup while
 players take their seats, then Drafting, DeckBuilding and Playing - and names the event.
 
-A player is never released from an event. Their seat waits for them however long they are gone, a browser's saved
+A player is never released from an event but by dropping out of it ([Dropping out](#dropping-out)). Their seat waits for them however long they are gone, a browser's saved
 membership never expires, and their ticket takes them back to it from any computer - taking the seat over from a
 connection that still holds it, which is most likely the same player on the computer they just left; the old window is
 told and closed, and its reconnect proof replaced so it cannot resume its way back. Tickets are kept only as SHA-256
@@ -295,7 +328,8 @@ whose pick it is but not its clock. The JSON behind the page is at `/status/api/
   event they were ever in. A league wants an index of live events, a lock per event and an archive.
 - The Discord bot looks at each draft's stage every two seconds rather than being told.
 - The game in progress is not saved, only re-dealt.
-- No screen in the client lists a player's events. The record is there (`players/{id}.json`); the Discord bot uses it
-  for `/cantrip mydraft` and to keep a player to one live draft.
+- The client itself lists no player's events; the Discord bot's site does, on the player's own page, from their record
+  (`players/{id}.json`, `PlayerEvents`): the events being played and the latest over, with their outcome, record, place
+  and opponents. The bot uses the record for `/cantrip mydraft` too, and to keep a player to one live draft.
 - A ticket is a bearer credential; accounts (Discord OAuth, [discord-integration-plan.md](discord-integration-plan.md))
   will bind a seat to the player themselves.

@@ -727,6 +727,7 @@ public sealed class DraftEventTests : IDisposable
 
         PlayerEventSummary bob = PlayerEvents.Of(store, "bob").Single();
         Assert.Equal(("Won", 1, 0), (bob.Outcome, bob.Wins, bob.Losses));
+        Assert.Equal(["Alice"], bob.Opponents);
         Assert.Equal("Dropped", PlayerEvents.Of(store, "alice").Single().Outcome);
     }
 

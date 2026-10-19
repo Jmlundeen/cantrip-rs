@@ -7,6 +7,7 @@ namespace Cantrip.Server.Events;
 /// <param name="Live">Being played: live in the record and hosted now. An event the host no longer runs is not live.</param>
 /// <param name="Rank">Their place in the standings, from 1, once a round has been played; null before.</param>
 /// <param name="Outcome">How it went or is going for them, in a few words: "Won", "2nd of 8", "Dropped", "Round 2 of 3".</param>
+/// <param name="Opponents">By name: the other player of a draft of two, or whom they were paired with round by round.</param>
 public sealed record PlayerEventSummary(
     string Id,
     string Name,
@@ -25,7 +26,8 @@ public sealed record PlayerEventSummary(
     int Players,
     int Round,
     int Rounds,
-    string Outcome);
+    string Outcome,
+    IReadOnlyList<string> Opponents);
 
 /// <summary>
 /// The events a player is in, from their record in the data directory (<see cref="PlayerRecord.Events"/>): the ones
@@ -83,7 +85,21 @@ public static class PlayerEvents
             record.Participants.Count,
             record.Round,
             rounds,
-            Outcome(record, me, standing, played, live, rounds));
+            Outcome(record, me, standing, played, live, rounds),
+            Opponents(record, playerId));
+    }
+
+    /// <summary>
+    /// Who the player has played or is to play, by name, in the order they met: the other player of a draft of two, the
+    /// opponents of each round of a pod.
+    /// </summary>
+    private static List<string> Opponents(EventRecord record, string playerId)
+    {
+        if (record.Participants.Count <= 2)
+            return [.. record.Participants.Where(participant => participant.PlayerId != playerId).Select(participant => participant.Name)];
+        return [.. record.Matches.Where(match => match.Players.Contains(playerId)).OrderBy(match => match.Round)
+            .SelectMany(match => match.Players.Where(player => player != playerId))
+            .Select(player => record.Participant(player)?.Name ?? player)];
     }
 
     private static string Outcome(EventRecord record, EventParticipant me, SwissStanding? standing, bool played, bool live, int rounds)

@@ -700,6 +700,9 @@ public sealed class GameServer : IAsyncDisposable
         if (_phase is not (TablePhase.Playing or TablePhase.Finished or TablePhase.Abandoned))
         {
             _phase = hosted.Phase;
+
+            // Over with no game of its own to say how - a draft called off - the table says why.
+            if (_phase == TablePhase.Finished) _detail = hosted.Detail;
         }
 
         BroadcastTable();

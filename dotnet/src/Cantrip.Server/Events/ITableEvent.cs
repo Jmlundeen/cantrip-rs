@@ -27,6 +27,12 @@ public interface ITableEvent
     /// </summary>
     TablePhase Phase { get; }
 
+    /// <summary>
+    /// A line on where the event stands or why it ended, which the table says once the event is over without a game of
+    /// its own ending it - a draft called off - so its players are told why.
+    /// </summary>
+    string Detail => string.Empty;
+
     /// <summary>The seat a ticket is for, or zero when it is for none of them.</summary>
     int SeatFor(string ticket);
 

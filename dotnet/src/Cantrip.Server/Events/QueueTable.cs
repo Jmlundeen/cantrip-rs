@@ -499,6 +499,8 @@ public sealed class QueueTable : ITableEvent
     public IReadOnlyList<int> TakeForfeits() => Pod?.TakeForfeits() ?? [];
 
     public string? ForfeitReason(int seat) => Pod?.ForfeitReason(seat);
+
+    public string Detail => Pod?.Detail ?? string.Empty;
 }
 
 /// <summary>How a queue's table forms, and what it becomes.</summary>
