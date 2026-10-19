@@ -1217,6 +1217,8 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn add_counters(&mut self, object: ObjectId, kind: CounterKind, amount: i16) {
+        // Taking counters off is `remove_counters`; a negative amount still removes them in a release build.
+        debug_assert!(amount >= 0, "use remove_counters");
         if amount < 0 {
             counters::remove(self, object, kind, -amount);
             return;
