@@ -1,0 +1,29 @@
+# Returns multiple permanent cards and leaves sorceries in the graveyard (CR 608.2c).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Black Lotus
+Return to the Light Realms
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Return to the Light Realms.Cast
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Black Lotus; Black Lotus; Black Lotus
+Bot1.Graveyard = Return to the Light Realms

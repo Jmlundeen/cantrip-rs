@@ -1,0 +1,6 @@
+{
+  "name": "Return to the Light Realms",
+  "manaCost": "{7}{W}{W}",
+  "type": "Sorcery",
+  "oracleText": "Return all nonland permanent cards from your graveyard to the battlefield."
+}
