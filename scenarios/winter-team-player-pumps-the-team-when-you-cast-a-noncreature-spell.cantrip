@@ -1,0 +1,46 @@
+# Winter, Team Player: "Whenever you cast a noncreature spell, creatures you control get +1/+0 until end of turn."
+# Lightning Bolt, a noncreature spell, pumps Winter and the Ornithopter that is already on the battlefield; their
+# toughness does not change.
+
+[Bot1 Deck]
+Winter, Team Player
+Black Lotus
+Black Lotus
+Mountain
+Ornithopter
+Lightning Bolt
+Mountain x3
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Winter, Team Player.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 17
+Bot1.Battlefield.Winter, Team Player.Power = 4
+Bot1.Battlefield.Winter, Team Player.Toughness = 3
+Bot1.Battlefield.Ornithopter.Power = 1
+Bot1.Battlefield.Ornithopter.Toughness = 2
