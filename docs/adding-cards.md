@@ -346,6 +346,11 @@ shapes have an example:
   `lasting_cost_changes`, made with `g.spells_cost_this_turn(item, player, index)`: it changes `player`'s spells (only
   spells, and only theirs - the core checks that) until the turn ends, whether or not its source is still around, so its
   `change` never asks who controls its `source`; its `text` is shown beside that player's life total while it lasts.
+  A card's own convoke, delve and improvise are characteristics (`pay_with`, from the content JSON); a static ability that
+  gives them to the spells a player casts ("noncreature spells you cast have improvise": Ironheart, Clever Champion; Chief
+  Engineer's convoke; Teval's delve) is a `PayWithGrant` in `CardDef.grants_pay_with`,
+  `fn(q, source, caster, spell) -> PayWith`, asked of the spell as it is cast and of the card (as the face it would be cast
+  as) when the cast is judged; it checks "you cast" itself (`q.controller(source) == caster`).
   "Activate only once" is `.once()`;
   **cast limits and bans** are
   `CardDef.cast_rules` (`fn(&dyn Query, &Asker, caster, from: ZoneKind) -> bool`, false forbids casting from that zone:

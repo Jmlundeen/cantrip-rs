@@ -5,6 +5,9 @@
 //!   the Black Flag's IV, Spellbinding Soprano, Moonrise Towers; Academy Loremaster's "spells they cast this turn cost {2}
 //!   more". It outlives its source, changes only its player's spells of its kind, is applied with the static changes
 //!   (increases, then reductions), and ends with the turn (CR 514.2).
+//! - a static ability that gives the spells a player casts a way of paying besides mana (CR 601.2f-h,
+//!   `CardDef::grants_pay_with`): Ironheart, Clever Champion's "Noncreature spells you cast have improvise" (CR 702.126a),
+//!   Inspiring Statuary, Chief Engineer's convoke, Teval's delve.
 
 use std::sync::OnceLock;
 
@@ -56,18 +59,37 @@ static TAX: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "Noncreature spells you cast have improvise."
+fn noncreature_improvise(q: &dyn Query, source: ObjectId, caster: PlayerId, spell: ObjectId) -> PayWith {
+    if q.controller(source) == caster && !q.chars(spell).is(CardType::Creature) {
+        PayWith { improvise: true, ..PayWith::NONE }
+    } else {
+        PayWith::NONE
+    }
+}
+
+/// An enchantment for {0}: "Noncreature spells you cast have improvise."
+static HEART: CardDef = CardDef { name: "Probe Heart", types: TypeSet::of(&[CardType::Enchantment]), grants_pay_with: &[noncreature_improvise], ..CardDef::BLANK };
+
 /// An artifact for {1}.
 static TRINKET: CardDef = CardDef { name: "Probe Trinket", cost: ONE, types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
 
+/// An artifact for {0}, to be tapped for improvise.
+static BAUBLE: CardDef = CardDef { name: "Probe Bauble", types: TypeSet::of(&[CardType::Artifact]), ..CardDef::BLANK };
+
 /// A sorcery for {1} that does nothing.
 static ROCK: CardDef = CardDef { name: "Probe Rock", cost: ONE, types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], nothing), ..CardDef::BLANK };
+
+/// A 1/1 creature for {1}.
+static BEAST: CardDef =
+    CardDef { name: "Probe Beast", cost: ONE, types: TypeSet::of(&[CardType::Creature]), power: Some(1), toughness: Some(1), ..CardDef::BLANK };
 
 /// A land with no mana ability: nothing here is paid for with mana.
 static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&WARS, &TAX, &TRINKET, &ROCK, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&WARS, &TAX, &HEART, &TRINKET, &BAUBLE, &ROCK, &BEAST, &FILLER]))
 }
 
 /// A two-player game, Bot1 first, each hand the named cards, then Fillers.
@@ -195,4 +217,22 @@ fn an_increase_this_turn_is_applied_before_a_reduction() {
     assert_eq!(cast_total(&game, PlayerId(0), trinket, 0), Some((ONE, ManaCost { generic: 2, ..ManaCost::ZERO }, 0)));
     // Probe Wars costs {0} + {1} now, which nothing pays.
     assert!(!offered(&game, &options, "Probe Wars"));
+}
+
+/// CR 601.2f-h, 702.126a: "noncreature spells you cast have improvise" lets an untapped artifact pay the {1} of a sorcery, where
+/// without it the sorcery can't be cast, and gives a creature spell nothing.
+#[test]
+fn a_granted_improvise_pays_for_a_noncreature_spell_and_not_a_creature_spell() {
+    let mut game = deal(&["Probe Bauble", "Probe Heart", "Probe Rock", "Probe Beast"], &[]);
+    let options = main_phase(&mut game, 1);
+    let options = cast(&mut game, &options, "Probe Bauble");
+    // The control: an untapped artifact, and no improvise yet.
+    assert!(!offered(&game, &options, "Probe Rock"));
+    let options = cast(&mut game, &options, "Probe Heart");
+    assert!(offered(&game, &options, "Probe Rock"));
+    assert!(!offered(&game, &options, "Probe Beast"), "a creature spell is not given improvise");
+    cast(&mut game, &options, "Probe Rock");
+    let bauble = on_battlefield(&game, "Probe Bauble").unwrap();
+    assert!(game.state.obj(bauble).tapped, "the artifact paid for it");
+    assert!(game.state.zone(Zone::graveyard(PlayerId(0))).iter().any(|&id| game.name(id) == "Probe Rock"));
 }

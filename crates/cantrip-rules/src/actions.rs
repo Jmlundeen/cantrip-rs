@@ -1585,6 +1585,8 @@ pub struct Available {
     consume: u32,
     /// The permanents that change what things cost.
     changers: Vec<ObjectId>,
+    /// The permanents that give spells convoke, delve or improvise (`CardDef::grants_pay_with`).
+    grantors: Vec<ObjectId>,
     /// Restricted mana the pool and the mana sources hold, one entry per restriction (CR 106.6): its mana of stated kinds,
     /// and its mana of any one color a mana ability adds (Great Hall of the Biblioplex, Delighted Halfling). Each pays
     /// only what `Available::covers_for` says it may. Mana that pays anything (`GainsHaste`) is in `fixed`.
@@ -1696,7 +1698,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 }
             }
             if def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 {
-                return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), restricted, any_color: false };
+                return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), grantors: pay_with_grantors(cx), restricted, any_color: false };
             }
         }
         if count > 0 {
@@ -1735,7 +1737,16 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
         }
     }
-    Available { fixed, flex, consume, unknown: false, changers: cost_change_sources(cx), restricted, any_color: static_rules::spend_any_color_always(cx, player) }
+    Available {
+        fixed,
+        flex,
+        consume,
+        unknown: false,
+        changers: cost_change_sources(cx),
+        grantors: pay_with_grantors(cx),
+        restricted,
+        any_color: static_rules::spend_any_color_always(cx, player),
+    }
 }
 
 /// The spell a card or face is when cast, as far as the mana limited to some spells is concerned (CR 106.6): advice,
@@ -1812,6 +1823,7 @@ impl Available {
             consume: self.consume,
             unknown: self.unknown,
             changers: Vec::new(),
+            grantors: Vec::new(),
             restricted: Vec::new(),
             any_color: false,
         };
@@ -3069,13 +3081,52 @@ fn has_mana_source(cx: &Cx, id: ObjectId, player: PlayerId) -> bool {
     })
 }
 
+/// The permanents on the battlefield that give spells convoke, delve or improvise (`CardDef::grants_pay_with`, CR 601.2f-h):
+/// found from the board, as the cost changers are, and empty in nearly every game.
+fn pay_with_grantors(cx: &Cx) -> Vec<ObjectId> {
+    cx.s()
+        .battlefield()
+        .iter()
+        .copied()
+        .filter(|&id| cx.cards().pay_with_grants[cx.cards().current(cx.s().obj(id)).0 as usize] && !cx.lost_all_abilities(id))
+        .collect()
+}
+
+/// What besides mana may pay the total cost of `spell`, cast by `player` as `def` (CR 601.2f-h): its own convoke, delve and
+/// improvise (CR 702.51a, 702.66a, 702.126a), and those the permanents `grantors` give it ("noncreature spells you cast have
+/// improvise"), read with its characteristics as that spell - as `face` (`AsFace`) when it is judged in a zone before it is
+/// cast as one of its faces. Several instances of one are redundant (CR 702.51d, 702.66c, 702.126c).
+fn pay_with(cx: &Cx, grantors: &[ObjectId], player: PlayerId, spell: ObjectId, def: &CardDef, face: Option<CardId>) -> PayWith {
+    let mut with = def.pay_with;
+    if grantors.is_empty() {
+        return with;
+    }
+    let view;
+    let q: &dyn Query = match face {
+        Some(face) => {
+            view = AsFace { cx, spell, face };
+            &view
+        }
+        None => cx,
+    };
+    for &source in grantors {
+        for grant in cx.card(cx.cards().current(cx.s().obj(source))).grants_pay_with {
+            let given = grant(q, source, player, spell);
+            with.convoke |= given.convoke;
+            with.delve |= given.delve;
+            with.improvise |= given.improvise;
+        }
+    }
+    with
+}
+
 /// Whether a spell's total cost could be paid (advice, CR 601.2g-h): by the mana at hand, with what else may pay for it
 /// (convoke's creatures, delve's graveyard, improvise's artifacts) each paying their share, or by those alone when no
 /// mana may be spent on it. A permanent that is a mana source is counted as that, not twice. `exiled` is how many
 /// cards another part of the cost exiles from the graveyard, which delve cannot also use.
 fn covers_total(cx: &Cx, a: &Available, player: PlayerId, card: ObjectId, def: &CardDef, cost: ManaCost, exiled: u8) -> bool {
     let no_mana = def.keywords.has(Keyword::CantSpendManaToCast);
-    let with = def.pay_with;
+    let with = pay_with(cx, &a.grantors, player, card, def, face_of(cx, card, def));
     if !with.any() && !no_mana {
         return a.covers_for(&cost, &spell_kind(cx, a, card, def));
     }
@@ -3746,7 +3797,9 @@ fn cast(
         ops::tap(cx, creature);
     }
     let life_owed = cost.life as u32 + extra.life as u32 + life as u32 + x_life as u32;
-    let helpers = Helpers { with: def.pay_with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles, attackers: &[], life: life_owed };
+    // CR 601.2f-h: what besides mana may pay for it, its own convoke, delve and improvise and what a permanent gives the spell.
+    let with = pay_with(cx, &pay_with_grantors(cx), player, spell, def, None);
+    let helpers = Helpers { with, waterbend, creatures: false, no_mana: def.keywords.has(Keyword::CantSpendManaToCast), purpose: Paying::Casting, reserved: &exiles, attackers: &[], life: life_owed };
     let (spent, restrictions) = pay_mana_used(cx, player, spell, cost.mana, &helpers)?;
     // CR 106.6: a creature spell paid for with mana that gives it haste has haste once it resolves; a spell paid for with
     // mana that makes it uncounterable can't be countered.

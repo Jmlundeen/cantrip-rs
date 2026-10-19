@@ -725,6 +725,13 @@ it ends with the turn (CR 514.2). The guards that skip cost-change work when no 
 for one (`lasting_changes`, `spell_cost_changers`). "The next spell you cast this turn costs {1} less" (Hardened Berserker,
 Kaza, Invasion of the Giants), which is used up by the spell it applies to, is not built.
 
+What besides mana may pay a spell's total cost (CR 601.2f-h: convoke 702.51, delve 702.66, improvise 702.126) is the card's
+own `pay_with` together with what the permanents on the battlefield give it (`CardDef.grants_pay_with`: Ironheart, Clever
+Champion's "noncreature spells you cast have improvise", Chief Engineer's convoke, Teval's delve): `actions::pay_with`,
+read by the cast's payment (`Helpers::with`) and by the advice (`covers_total`, with the grantors found once per decision in
+`Available::grantors`). Several instances are redundant (CR 702.51d, 702.66c, 702.126c). "The next spell you cast this turn
+has convoke" (Wand of the Worldsoul, Archway of Innovation's improvise) is not built.
+
 A cost change may set the least the total comes to (`CostDelta::at_least`: Trinisphere's "each spell that would cost less
 than three mana to cast costs three mana to cast"). It is one of the "effects that directly affect the total cost" CR 601.2f
 applies once the total is otherwise determined: after the mana cost or alternative cost, every increase and every reduction

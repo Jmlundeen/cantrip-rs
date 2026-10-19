@@ -338,6 +338,15 @@ pub struct LastingCostChange {
     pub change: CostChange,
 }
 
+/// A static ability that gives spells a way of paying their total cost besides mana (CR 601.2f-h): "noncreature spells you
+/// cast have improvise" (Ironheart, Clever Champion; Inspiring Statuary's nonartifact spells), "artifact spells you cast have
+/// convoke" (Chief Engineer; Dazzling Theater, Eirdu and Caetus's creature or noncreature spells), "spells you cast have
+/// delve" (Teval, Arbiter of Virtue). What it gives the spell `spell` that `caster` is casting, by the permanent `source`
+/// that has it (`PayWith::NONE` when it gives nothing). The spell has the keyword while it is cast (CR 702.51a, 702.66a,
+/// 702.126a), read with its characteristics as a spell; judged before it is cast, `spell` is the card about to be, with
+/// those of the face it would be cast as.
+pub type PayWithGrant = fn(&dyn Query, ObjectId, PlayerId, ObjectId) -> PayWith;
+
 /// A static ability that makes abilities cost less to activate, but never below one mana (CR 601.2f, 118.7): how much
 /// generic mana less the ability `ability` of `permanent` costs `player` to activate, by the permanent `source` that has
 /// it; zero when it does not apply. "Activated abilities of artifacts you control cost {1} less to activate. This effect
@@ -2031,6 +2040,9 @@ pub struct CardDef {
     /// The cost changes its resolving spells and abilities make for a duration (CR 611.2c, 601.2f): `EffectKind::SpellCostChange`
     /// names the nth. Not standing abilities: they function only while such an effect lasts.
     pub lasting_cost_changes: &'static [LastingCostChange],
+    /// Its static abilities that give the spells a player casts convoke, delve or improvise (CR 601.2f-h), while it is on the
+    /// battlefield.
+    pub grants_pay_with: &'static [PayWithGrant],
     /// Its static abilities that make activated abilities cost less, with at least one mana left (CR 601.2f), while it is
     /// on the battlefield.
     pub ability_discounts: &'static [AbilityDiscount],
@@ -2263,6 +2275,7 @@ impl CardDef {
         cost_changes: &[],
         own_cost_changes: &[],
         lasting_cost_changes: &[],
+        grants_pay_with: &[],
         ability_discounts: &[],
         ability_alternatives: &[],
         granted_ways: &[],
@@ -2407,6 +2420,8 @@ pub struct CardTable {
     /// Which cards have cost changes (CR 601.2f): the board is looked at for their sources, never for the card table's
     /// sake (a table holds every card, so "does any card" is always true).
     pub cost_changes: Vec<bool>,
+    /// Which cards give spells convoke, delve or improvise (`CardDef::grants_pay_with`): their sources are found on the board.
+    pub pay_with_grants: Vec<bool>,
     /// Which cards forbid activating abilities (CR 602.5): their sources are found on the board, as cost changes' are.
     pub activation_rules: Vec<bool>,
     /// Which cards stop abilities from triggering (CR 603.2) or make them trigger additional times (CR 603.2d): their sources
@@ -2499,6 +2514,7 @@ impl CardTable {
         let any_replaces = replaces.iter().any(|&r| r);
         let any_cast_limit = cards.iter().any(|c| c.cast_limit > 0);
         let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty() || !c.ability_discounts.is_empty()).collect();
+        let pay_with_grants: Vec<bool> = cards.iter().map(|c| !c.grants_pay_with.is_empty()).collect();
         let activation_rules: Vec<bool> = cards.iter().map(|c| !c.activation_rules.is_empty()).collect();
         let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();
         let designators: Vec<bool> = cards.iter().map(|c| c.ascend || c.storied).collect();
@@ -2537,6 +2553,7 @@ impl CardTable {
             player_keywords,
             mana_triggers,
             cost_changes,
+            pay_with_grants,
             activation_rules,
             trigger_rules,
             designators,
