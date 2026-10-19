@@ -88,6 +88,7 @@ keeps it).
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-79](#ki-79-an-alternative-cost-a-permanent-gives-is-not-offered-beside-a-granted-way-that-casts-for-the-mana-cost) | An alternative cost a permanent gives is not offered beside a granted way that casts for the mana cost | Low | Open |
+| [KI-80](#ki-80-a-cast-made-as-an-effect-resolves-never-uses-the-cards-own-alternative-costs) | A cast made as an effect resolves never uses the card's own alternative costs | Low | Open |
 
 ## Issues
 
@@ -985,5 +986,20 @@ Dracogenesis, Jodah) is offered beside every cast for a face's mana cost, by any
 number names one granted way or one alternative cost, not both. Dracogenesis with Lurrus could not cast a Dragon of mana
 value 2 or less from the graveyard without paying its mana cost. A fix tells such a way apart from one that is an
 alternative cost itself (escape, mayhem, Iroh's flashback), and numbers the pair.
+
+**Scenarios.** none yet.
+
+### KI-80: A cast made as an effect resolves never uses the card's own alternative costs
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | engine | 2026-10-19, review of alternative costs for spells cast |
+
+**Notes.** An effect that has a card cast paying its costs as it resolves (CR 608.2g: Chandra, Torch of Defiance's "you may
+cast that card") lets its caster pay any alternative cost the spell has (CR 601.2b, 118.9). `cast_during_resolution` offers
+the face's mana cost and the alternative costs a static ability gives (`CardDef::spell_alternatives`), but never the card's
+own printed ones (`CardDef::ways`): Force of Will exiled by Chandra can't be cast by exiling a blue card and paying 1 life,
+nor evoke, nor web-slinging. A fix announces those with the others in the cost question (`Label::ManaCost`,
+`Label::AlternativeCost`), each judged as the priority offer judges it (`from_elsewhere`, a way's `condition`).
 
 **Scenarios.** none yet.
