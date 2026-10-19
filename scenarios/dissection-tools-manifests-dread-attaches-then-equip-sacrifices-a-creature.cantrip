@@ -1,0 +1,53 @@
+# Dissection Tools (5): its enters trigger manifests dread (CR 701.62a) - of Llanowar Elves and Lightning Bolt the Elves
+# goes face down as a 2/2 and the Bolt to the graveyard - then attaches the Equipment to that creature (CR 701.3a), so the
+# face-down permanent is a 4/4 with deathtouch and lifelink. Equip is "Sacrifice a creature" with no mana, at sorcery
+# speed: Bot1 sacrifices the face-down creature and the Tools moves to Ornithopter (0/2 -> 2/4).
+
+[Bot1 Deck]
+Black Lotus
+Mox Ruby
+Mox Pearl
+Dissection Tools
+Ornithopter
+Plains x2
+Llanowar Elves
+Lightning Bolt
+Plains x10
+
+[Bot2 Deck]
+Swamp x20
+
+[Actions]
+! Bot1.Hand.Dissection Tools.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Dissection Tools.Cast
+Bot1.Pass
+Bot1.Arrange(Llanowar Elves | Lightning Bolt)
+? Bot1.Graveyard = Lightning Bolt; Black Lotus
+? Bot1.Battlefield..FaceDown = true
+? Bot1.Battlefield..FaceDownName = Llanowar Elves
+? Bot1.Battlefield..Power = 4
+? Bot1.Battlefield..Toughness = 4
+? Bot1.Battlefield..Keywords = Deathtouch; Lifelink
+Bot1.Battlefield.Dissection Tools.Activate(Ornithopter)
+Bot1.Choose(#1)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Black Lotus
+? Bot1.Battlefield.Dissection Tools.AttachedTo = Ornithopter
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying; Lifelink
+
+[Expect]
+Bot1.Graveyard = Llanowar Elves; Lightning Bolt; Black Lotus
+Bot1.Battlefield.Dissection Tools.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
+Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying; Lifelink
