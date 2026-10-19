@@ -832,7 +832,9 @@ pub enum Keyword {
     CanBlockOnlyCreaturesWithFlying = 19,
     /// "This permanent doesn't untap during your untap step" (CR 502.3).
     DoesNotUntap = 20,
-    /// "This creature crews Vehicles as though its power were 2 greater" (CR 702.122b).
+    /// "This creature crews Vehicles as though its power were 2 greater": tapped to pay a crew cost (CR 702.122a-b), it
+    /// counts towards the total power as though its power were 2 greater. Its saddle twin is
+    /// `SaddlesAsThoughPowerTwoGreater`; a Pilot that "saddles Mounts and crews Vehicles" has both.
     CrewsAsThoughPowerTwoGreater = 21,
     /// "This creature can't be blocked" (CR 509.1b).
     CantBeBlocked = 22,
@@ -889,6 +891,10 @@ pub enum Keyword {
     /// damage of the creatures blocking it or blocked by it (CR 702.22j-k). A static ability that modifies the rules for
     /// combat, which the core plays: Benalish Hero, Mesa Pegasus.
     Banding = 40,
+    /// "This creature saddles Mounts as though its power were 2 greater": tapped to pay a saddle cost (CR 702.171a,c), it
+    /// counts towards the total power as though its power were 2 greater. Printed only beside crew's, "saddles Mounts and
+    /// crews Vehicles as though its power were 2 greater" (Defend the Rider's Pilot, Deathless Pilot): both keywords.
+    SaddlesAsThoughPowerTwoGreater = 41,
 }
 
 impl Keyword {

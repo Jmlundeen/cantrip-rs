@@ -614,9 +614,10 @@ pub enum VariableCost {
 #[derive(Clone, Copy)]
 pub struct TapCreatures {
     pub power: u8,
-    /// Crew's, where a creature that "crews Vehicles as though its power were 2 greater" counts for more
-    /// (CR 702.122b). Saddle's does not.
-    pub crew: bool,
+    /// The keyword with which a creature tapped for this cost counts as though its power were 2 greater: crew's
+    /// `CrewsAsThoughPowerTwoGreater` (CR 702.122b), saddle's `SaddlesAsThoughPowerTwoGreater` (CR 702.171c). None for a
+    /// cost that is neither (teamwork).
+    pub greater_with: Option<Keyword>,
 }
 
 /// What a permanents cost does with the permanents it chose (`PermanentCost::action`).

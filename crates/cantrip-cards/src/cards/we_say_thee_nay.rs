@@ -16,7 +16,7 @@ pub static CARD: CardDef = CardDef {
     spell: spell(&[targets::SPELL], effect),
     late_targets: true,
     optional_cost: Some(OptionalCost {
-        cost: Cost { tap_creatures: Some(TapCreatures { power: 2, crew: false }), ..Cost::NONE },
+        cost: Cost { tap_creatures: Some(TapCreatures { power: 2, greater_with: None }), ..Cost::NONE },
     }),
     labels: &["Cast without teamwork", "Teamwork 2: Tap any number of creatures you control with total power 2 or more"],
     ..oracle::WE_SAY_THEE_NAY

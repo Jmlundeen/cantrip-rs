@@ -400,9 +400,10 @@ fn tap_candidates(cx: &Cx, source: ObjectId, controller: PlayerId, t: &TapCreatu
         if !c.is(CardType::Creature) {
             continue;
         }
-        let bonus = if t.crew && c.has(Keyword::CrewsAsThoughPowerTwoGreater) { 2 } else { 0 };
+        // "As though its power were 2 greater": the power it counts with is 2 more than its power, a negative one too.
+        let bonus = if t.greater_with.is_some_and(|k| c.has(k)) { 2 } else { 0 };
         cards.push(id);
-        powers.push((c.power.unwrap_or(0).max(0) + bonus).min(255) as u8);
+        powers.push(c.power.unwrap_or(0).saturating_add(bonus).clamp(0, 255) as u8);
     }
     (cards, powers)
 }

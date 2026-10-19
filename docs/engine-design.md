@@ -954,6 +954,15 @@ the object has left, as it last existed (CR 608.2h). Nothing is pushed for an ab
 benchmark is unchanged. A spell's additional cost is still read from the history (Kazuul's Fury, Broadside Bombardiers'
 boast ability): the cast path does not keep its chosen permanents yet.
 
+### Crewing and saddling as though power were greater
+
+Crew and saddle (CR 702.122a, 702.171a) are the core's `Cost::tap_creatures`, a `TapCreatures` with the total `power` and
+`greater_with`, the keyword with which a creature tapped for it counts as though its power were 2 greater:
+`Keyword::CrewsAsThoughPowerTwoGreater` for crew (`mechanics::crew`), `SaddlesAsThoughPowerTwoGreater` for saddle
+(`mechanics::saddle`), none for teamwork. "This creature saddles Mounts and crews Vehicles as though its power were 2
+greater" is both keywords (`tokens::PILOT_SADDLES_AND_CREWS`); a printed one is a JSON `keywords` entry, a granted one a
+layer-6 grant. Every printed amount is 2. The power counted is the creature's plus 2, a negative power too, and never below 0.
+
 ### What the board was as a spell was cast
 
 "If you controlled a Faerie as you cast this spell" (Faerie Fencing) asks the board as the spell became cast (CR 601.2i), once

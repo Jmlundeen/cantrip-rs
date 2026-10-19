@@ -282,6 +282,21 @@ pub static PILOT: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 colorless Pilot creature token: "This token saddles Mounts and crews Vehicles as though its power were 2
+/// greater." Defend the Rider, the Roads lands (Country Roads, Foul Roads, Reef Roads, Rocky Roads, Wild Roads),
+/// Roadside Assistance, Back on Track, Cloudspire Coordinator and Valor's Flagship make it.
+pub static PILOT_SADDLES_AND_CREWS: CardDef = CardDef {
+    name: "Pilot",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Pilot]),
+    power: Some(1),
+    toughness: Some(1),
+    keywords: Keywords::of(&[Keyword::SaddlesAsThoughPowerTwoGreater, Keyword::CrewsAsThoughPowerTwoGreater]),
+    text: "This token saddles Mounts and crews Vehicles as though its power were 2 greater.",
+    ..CardDef::BLANK
+};
+
 /// The 0/0 colorless Construct artifact creature token with "This token gets +1/+1 for each artifact you control". Urza's Saga
 /// and Urza, Lord High Artificer make it.
 pub static CONSTRUCT: CardDef = CardDef {
