@@ -28,6 +28,20 @@ pub fn this_enters_if_cast(q: &dyn Query, source: ObjectId, event: &Event) -> Op
     }
 }
 
+/// "Whenever this creature attacks for the first time each turn" (CR 508.1, 603.2): it was declared as an attacker and no
+/// earlier declaration this turn had it attack - the history is as it was just before this event, so it holds the earlier
+/// ones only. A trigger condition, not a limit on how often the ability triggers (CR 603.2d: Isshin doubles it). Aurelia, the
+/// Warleader and Fear of Missing Out print it.
+pub fn this_attacks_for_the_first_time_each_turn(q: &dyn Query, me: &Asker, event: &Event) -> Option<Fired> {
+    match event {
+        Event::Attacks { attacker, .. } if *attacker == me.source && !q.history().attacked_this_turn(me.source) => Fired::PLAIN,
+        _ => None,
+    }
+}
+
+/// `this_attacks_for_the_first_time_each_turn` as a trigger condition.
+pub const THIS_ATTACKS_FOR_THE_FIRST_TIME_EACH_TURN: Trigger = when_asked(EventMask::ATTACKS, this_attacks_for_the_first_time_each_turn);
+
 /// Valiant: "Whenever this creature becomes the target of a spell or ability you control for the first time each turn"
 /// (CR 115.10, 603.2): the creature became the target of something its controller controls, and no earlier event this turn
 /// made it the target of something they control - the history is as it was just before this event, so it holds the earlier
