@@ -1,0 +1,28 @@
+# No creatures means no greatest power, no draws, and no life loss (CR 107.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Rise of the Deathbringer
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Rise of the Deathbringer.Cast
+Bot1.Modes(1)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Life = 20
+Bot1.Library.Count = 30

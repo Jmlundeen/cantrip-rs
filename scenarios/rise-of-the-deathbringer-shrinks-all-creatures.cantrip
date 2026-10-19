@@ -1,0 +1,39 @@
+# The second mode affects both players creatures (CR 611.2c, 704.5f).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Rise of the Deathbringer
+Ornithopter
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Ornithopter
+Island
+Island
+Island
+Island
+Island
+Island
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Rise of the Deathbringer.Cast
+Bot1.Modes(2)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Ornithopter; Rise of the Deathbringer; Black Lotus; Black Lotus
+Bot2.Graveyard = Ornithopter
