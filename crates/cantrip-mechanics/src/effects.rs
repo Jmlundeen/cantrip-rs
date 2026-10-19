@@ -61,7 +61,8 @@ pub fn pump_all_creatures(g: &mut dyn Game, source: ObjectId, power: i16, toughn
 
 /// "Creatures you control gain trample and get +P/+T until end of turn" (CR 611.2c): `pump_creatures_you_control` and trample for
 /// each of them, the creatures being those on the battlefield as it resolves. The creatures, for what the rest of the sentence does
-/// to them. Craterclaw Colossus (+X/+0, X the artifacts you control) and Craterhoof Behemoth (+X/+X, X the creatures) print it.
+/// to them. Craterclaw Colossus (+X/+0, X the artifacts you control), Craterhoof Behemoth (+X/+X, X the creatures) and Balmor,
+/// Battlemage Captain (+1/+0) print it.
 pub fn pump_and_trample_creatures_you_control(g: &mut dyn Game, item: &StackItem, power: i16, toughness: i16) -> Vec<ObjectId> {
     let creatures = pump_creatures_you_control(g, item, power, toughness);
     for &creature in &creatures {

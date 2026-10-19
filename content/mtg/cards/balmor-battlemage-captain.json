@@ -1,0 +1,11 @@
+{
+  "name": "Balmor, Battlemage Captain",
+  "manaCost": "{U}{R}",
+  "type": "Legendary Creature — Bird Wizard",
+  "power": 1,
+  "toughness": 3,
+  "oracleText": "Flying\nWhenever you cast an instant or sorcery spell, creatures you control get +1/+0 and gain trample until end of turn.",
+  "keywords": [
+    "Flying"
+  ]
+}

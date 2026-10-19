@@ -1,0 +1,45 @@
+# "Whenever YOU cast": Bot2 casts Lightning Bolt at Bot1 on turn 2; Balmor does not trigger, so it and Bot1's Mystic stay at
+# base power with no trample. Positive control: the same Bolt cast by Bot1 (scenario ...bolt-pumps...) does pump.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Balmor, Battlemage Captain
+Elvish Mystic
+Island x12
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Balmor, Battlemage Captain.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+? Stack.Count = 1
+Bot2.Pass
+Bot1.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Life = 17
+Bot1.Battlefield.Balmor, Battlemage Captain.Power = 1
+Bot1.Battlefield.Balmor, Battlemage Captain.Keywords = Flying
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Elvish Mystic.Keywords = (absent)

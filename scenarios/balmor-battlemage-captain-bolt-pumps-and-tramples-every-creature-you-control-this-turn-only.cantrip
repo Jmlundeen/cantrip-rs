@@ -1,0 +1,59 @@
+# Balmor: "Whenever you cast an instant or sorcery spell, creatures you control get +1/+0 and gain trample until end of turn."
+# Turn 1 Bot1 casts Balmor and an Elvish Mystic (casting a creature spell does not trigger it: both stay at base power).
+# Bot2 has its own Elvish Mystic. On turn 3 Bot1 casts Lightning Bolt at Bot2: the trigger is on the stack above the Bolt, and
+# when it resolves Balmor (1 -> 2) and the Mystic (1 -> 2) have trample, while Bot2's Mystic (an opponent's creature) is
+# untouched (CR 611.2c). On turn 4 the pump is gone (until end of turn, CR 514.2).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Balmor, Battlemage Captain
+Elvish Mystic
+Mox Jet
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Forest
+Elvish Mystic
+Island x12
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Balmor, Battlemage Captain.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Elvish Mystic.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+? Stack.Count = 2
+Bot1.Pass
+[T3 Bot1.Main2]
+? Bot2.Life = 17
+? Bot1.Battlefield.Balmor, Battlemage Captain.Power = 2
+? Bot1.Battlefield.Balmor, Battlemage Captain.Keywords = Flying; Trample
+? Bot1.Battlefield.Elvish Mystic.Power = 2
+? Bot1.Battlefield.Elvish Mystic.Keywords = Trample
+? Bot2.Battlefield.Elvish Mystic.Power = 1
+? Bot2.Battlefield.Elvish Mystic.Keywords = (absent)
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Battlefield.Balmor, Battlemage Captain.Power = 1
+Bot1.Battlefield.Balmor, Battlemage Captain.Keywords = Flying
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Elvish Mystic.Keywords = (absent)
+Bot2.Life = 17

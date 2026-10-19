@@ -1,0 +1,59 @@
+# Ruling: "Balmor's last ability resolves before the spell that caused it to trigger. It resolves even if that spell is countered."
+# Bot1 casts Lightning Bolt at Bot2 on turn 3 with Balmor out; with the trigger above the Bolt, Bot2 counters the Bolt with
+# Counterspell. The trigger resolves anyway: Balmor and the Mystic are pumped (2 power, trample) in Main2, though Bot2 lost no life.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Mox Emerald
+Balmor, Battlemage Captain
+Elvish Mystic
+Mox Jet
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Island
+Mox Sapphire
+Counterspell
+Island x17
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Balmor, Battlemage Captain.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+? Stack.Count = 2
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Counterspell.Cast(Lightning Bolt)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 20
+Bot1.Graveyard.Count = 1
+Bot1.Battlefield.Balmor, Battlemage Captain.Power = 2
+Bot1.Battlefield.Balmor, Battlemage Captain.Keywords = Flying; Trample
+Bot1.Battlefield.Elvish Mystic.Power = 2
+Bot1.Battlefield.Elvish Mystic.Keywords = Trample
