@@ -1,0 +1,44 @@
+# Grim Repriser's graveyard ability (CR 113.6k) needs an opponent to have been dealt noncombat damage this turn: Lightning
+# Bolt (3 noncombat damage to Bot2) satisfies it, and {B}{R} from the Swamp and the Mountain returns the card to the
+# battlefield untapped with a finality counter (CR 614.1c).
+
+[Bot1 Deck]
+Swamp
+Mountain
+Mox Jet
+Mox Ruby
+Entomb
+Lightning Bolt
+Grim Repriser x4
+Swamp x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Entomb.Cast
+Bot1.Search(Grim Repriser)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mountain.Activate
+Bot1.Graveyard.Grim Repriser.Activate
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Grim Repriser.Tapped = false
+Bot1.Battlefield.Grim Repriser.Counters.Finality = 1
+Bot1.Battlefield.Grim Repriser.Power = 2
+Bot1.Battlefield.Grim Repriser.Toughness = 2
+Bot1.Graveyard = Lightning Bolt; Entomb
+Bot2.Life = 17
