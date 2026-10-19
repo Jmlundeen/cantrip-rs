@@ -1,0 +1,48 @@
+# Celestial Armor's enters ability targets Elvish Mystic. With the trigger on the stack Bot2 casts Lightning Bolt at the Mystic (it is not
+# yet hexproof): the Mystic dies, the target is illegal on resolution, and the whole ability does nothing (CR 608.2b). The Armor stays
+# on the battlefield unattached (it is not an Aura) and nothing is attached to or protected by it.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Elvish Mystic
+Celestial Armor
+Island
+Island x12
+
+[Bot2 Deck]
+Island
+Mountain
+Lightning Bolt
+Island x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Celestial Armor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Graveyard = Elvish Mystic
+Bot2.Graveyard = Lightning Bolt
+Bot1.Battlefield.Celestial Armor.AttachedTo = (absent)
+Stack.Count = 0
