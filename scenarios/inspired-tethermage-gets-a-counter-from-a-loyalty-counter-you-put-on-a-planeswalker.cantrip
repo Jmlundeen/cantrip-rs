@@ -1,0 +1,30 @@
+# Inspired Tethermage: "Whenever you put one or more loyalty counters on a planeswalker, put a +1/+1 counter on this
+# creature" (CR 122.6a, 603.2). Ajani's arrival puts two loyalty counters on it for the Tethermage's trigger, and the
+# loyalty counter its own life-gain ability adds is a second.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Inspired Tethermage
+Ajani Resolute
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Inspired Tethermage.Cast
+Bot1.Hand.Ajani Resolute.Cast
+Bot1.Battlefield.Ajani Resolute.Activate(Ability: gain 1 life)
+Bot1.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Inspired Tethermage.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Inspired Tethermage.Power = 5
+Bot1.Battlefield.Ajani Resolute.Counters.Loyalty = 3
+Bot1.Life = 21
