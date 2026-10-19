@@ -1,0 +1,30 @@
+# The graveyard activation requires scry or surveil this turn; return enters with finality (CR 122.1h).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Proctor of Potential
+Lightning Bolt
+Consider
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Proctor of Potential.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Proctor of Potential)
+Bot1.Graveyard.Proctor of Potential.Activate
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Proctor of Potential.Counters.Finality = 1
