@@ -1,0 +1,58 @@
+# Dawn’s Truce gives Bot2 hexproof in response. Twisted Fates still destroys Bot1’s Ornithopter,
+# but puts no counters on Bot2’s creatures (CR 608.2b).
+
+[Bot1 Deck]
+Plains
+Plains
+Black Lotus
+Black Lotus
+Twisted Fates
+Ornithopter
+Island x2
+Island x7
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Ornithopter
+Dawn's Truce
+Plains x3
+Plains x8
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Twisted Fates.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
+Bot1.Target(Bot2)
+Bot1.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Dawn's Truce.Cast
+Bot2.Decline
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Plains; Plains
+Bot1.Graveyard = Twisted Fates; Ornithopter; Black Lotus; Black Lotus
+Bot2.Battlefield.Ornithopter.Power = 0
+Bot2.Battlefield.Ornithopter.Toughness = 2
+Bot2.Battlefield.Ornithopter.Counters.PlusOnePlusOne = (absent)
+Bot2.Graveyard = Dawn's Truce

@@ -1,0 +1,6 @@
+{
+  "name": "Twisted Fates",
+  "manaCost": "{2}{W}{W}{B}",
+  "type": "Sorcery",
+  "oracleText": "Destroy target nonland permanent. Put a +1/+1 counter on each creature target player controls."
+}
