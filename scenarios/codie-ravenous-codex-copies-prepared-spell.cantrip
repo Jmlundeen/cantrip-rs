@@ -1,0 +1,32 @@
+# codie ravenous codex copies prepared spell; deterministic position (CR 608.2).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Codie, Ravenous Codex
+Blossom-Blessed Angel
+Ornithopter
+Plains x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Red)
+Bot1.Hand.Codie, Ravenous Codex.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Battlefield.Black Lotus#1.Activate(Color: White)
+Bot1.Hand.Blossom-Blessed Angel.Cast
+Bot1.Pass
+Bot1.Exile.Seed Suture.Cast(Bot1.Battlefield.Ornithopter)
+
+[Expect]
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Life = 22
+Bot1.Battlefield.Blossom-Blessed Angel.Prepared = (absent)
