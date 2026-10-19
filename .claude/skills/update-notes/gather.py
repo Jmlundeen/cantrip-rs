@@ -1,4 +1,4 @@
-"""Gathers what went into the public repository, jschibel/cantrip-rs, since the last update notes.
+"""Gathers what went into the public repository, cantrip-rs/cantrip-rs, since the last update notes.
 
     python .claude/skills/update-notes/gather.py           prints the facts the notes are written from
     python .claude/skills/update-notes/gather.py --save SHA records SHA as the last commit reported
@@ -13,7 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PUBLIC = "https://github.com/jschibel/cantrip-rs.git"
+PUBLIC = "https://github.com/cantrip-rs/cantrip-rs.git"
 STATE = Path(__file__).with_name("last-reported-commit.txt")
 CARDS = "content/mtg/cards/"
 MECHANICS = "crates/cantrip-mechanics/src/"

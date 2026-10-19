@@ -1,6 +1,6 @@
 param(
     [string] $RepoRoot = (Join-Path $PSScriptRoot '..\..'),
-    [string] $Public = 'https://github.com/jschibel/cantrip-rs.git',
+    [string] $Public = 'https://github.com/cantrip-rs/cantrip-rs.git',
     [string] $Source = 'origin/main',
     [switch] $DryRun,
     [switch] $Yes
