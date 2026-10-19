@@ -39,6 +39,63 @@ fn at_a_table(name: &str, text: &str) -> Result<(), String> {
     Err("the scenario went on too long at the table".into())
 }
 
+/// The client must tap mana sources before choosing the tapped creature returned for web-slinging (CR 601.2g-h).
+#[test]
+fn web_slinging_cast_rows_require_mana_before_the_tapped_creature_cost() {
+    fn check_rows(value: &Value, source: &Value, saw_web: &mut bool, saw_printed: &mut bool) {
+        match value {
+            Value::Object(fields) => {
+                if fields.get("Kind").and_then(Value::as_str) == Some("CastSpell")
+                    && fields.get("Source") == Some(source) {
+                    let web = fields.get("Description").and_then(Value::as_str).is_some_and(|s| s.contains("Web-slinging"));
+                    assert_eq!(fields.get("TappedAfterMana"), Some(&Value::Bool(web)));
+                    if web { *saw_web = true; } else { *saw_printed = true; }
+                }
+                for value in fields.values() { check_rows(value, source, saw_web, saw_printed); }
+            }
+            Value::Array(values) => for value in values { check_rows(value, source, saw_web, saw_printed); },
+            _ => {}
+        }
+    }
+    let (mut saw_web, mut saw_printed) = (false, false);
+    play_looking("spider-sense-web-slinging-returns-the-birds-tapped-for-its-own-mana", |_, views, step| {
+        if let Some(card) = views[0].objects.iter().find(|o| o.name == "Spider-Sense") {
+            check_rows(&step["Requests"], &serde_json::to_value(card.handle).unwrap(), &mut saw_web, &mut saw_printed);
+        }
+        false
+    });
+    assert!(saw_web, "no web-slinging cast row was inspected");
+    assert!(saw_printed, "no printed-cost cast row was inspected");
+}
+
+/// Equal energy payments remain distinguishable because the graveyard permissions have different consequences.
+#[test]
+fn energy_cast_rows_name_the_selected_graveyard_permission() {
+    let name = "primal-prayers-chooses-between-granted-graveyard-permissions";
+    let mut saw_both = false;
+    fn descriptions(value: &Value, out: &mut Vec<String>) {
+        match value {
+            Value::Object(fields) => {
+                if let Some(text) = fields.get("Description").and_then(Value::as_str) {
+                    out.push(text.to_owned());
+                }
+                for value in fields.values() { descriptions(value, out); }
+            }
+            Value::Array(values) => for value in values { descriptions(value, out); },
+            _ => {}
+        }
+    }
+    play_looking(name, |_, _, step| {
+        let mut rows = Vec::new();
+        descriptions(&step["Requests"], &mut rows);
+        let has_permission = |name: &str| rows.iter().any(|text|
+            text.contains("Pay {E}") && text.contains(&format!("Permission: {name}")));
+        saw_both |= has_permission("Lurrus of the Dream-Den") && has_permission("Serra Paragon");
+        false
+    });
+    assert!(saw_both, "no prompt showed both energy routes with their permission sources");
+}
+
 /// Hidden information (CR 406.3, 708.2): Headliner Scarlett exiles Bot2's top card, Firdoch Core, face down. What Bot1's
 /// view says of that card - at the table, in the views as they are sent - carries nothing of what it is: no name, and not
 /// that it is every creature type (Changeling), which would say it.

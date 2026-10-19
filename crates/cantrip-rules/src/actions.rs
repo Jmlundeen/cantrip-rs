@@ -1849,56 +1849,7 @@ pub fn cast_plan_costs(
     plan: CastPlan,
     candidates: &[Target],
 ) -> Vec<(ManaCost, u32)> {
-    let changers = spell_cost_changers(game);
-    let def = game.cards.get(game.state.obj(card).card);
-    if !(changers || !def.own_cost_changes.is_empty()) {
-        return Vec::new();
-    }
-    let Some(base) = cast_plan_cost(game, player, card, plan) else {
-        return Vec::new();
-    };
-    if base.mana.x > 0 {
-        return Vec::new();
-    }
-    let mut copy = crate::Game {
-        state: game.state.clone(),
-        log: game.log.clone(),
-        tree: crate::tree::Tree::new(),
-        at: crate::tree::NodeId::ROOT,
-        cards: game.cards,
-        verify: false,
-    };
-    let cx = Cx {
-        g: &mut copy,
-        frame: usize::MAX,
-        cursor: 0,
-        mana_source: None,
-        entering: None,
-        lineage: Vec::new(),
-        asked_at: None,
-        doer: None,
-    };
-    let face = cast_face(cx.card(cx.s().obj(card).card), plan.way);
-    let face_id = (!std::ptr::eq(face, cx.card(cx.s().obj(card).card))).then(|| cx.card_id(face));
-    let any_type = plan_any_type(&cx, player, card, plan);
-    candidates
-        .iter()
-        .map(|&target| {
-            let (mut mana, life) = change_total(
-                &cx,
-                &cost_change_sources(&cx),
-                player,
-                Costed::Spell(card),
-                base.mana,
-                face_id,
-                &[target],
-            );
-            if any_type {
-                mana = mana.paid_with_any_type();
-            }
-            (mana, base.life as u32 + life)
-        })
-        .collect()
+    cast_plan_price(game, player, card, plan, candidates).map_or_else(Vec::new, |price| price.targets)
 }
 
 /// The face a concrete cast plan puts on the stack.
@@ -1919,58 +1870,9 @@ pub fn cast_plan_total(
     card: ObjectId,
     plan: CastPlan,
 ) -> Option<(Cost, ManaCost, u32)> {
-    let base = cast_plan_cost(game, player, card, plan)?;
-    if base.mana.x > 0 {
-        return None;
-    }
-    let whole = game.cards.get(game.state.obj(card).card);
-    let any_type = match plan.permission {
-        CastPermission::PlayPermission { index } => game
-            .state
-            .permissions
-            .get(index as usize)
-            .is_some_and(|p| p.card == card && p.player == player && p.grant.any_type),
-        CastPermission::ExileCast { source, rule } => game.cards.get(game.chars(source).card)
-            .exile_casts.get(rule as usize).is_some_and(|cast| cast.any_type),
-        _ => false,
-    };
-    let changer = spell_cost_changers(game);
-    if !changer && whole.own_cost_changes.is_empty() && !any_type {
-        return Some((base, base.mana, u32::from(base.life)));
-    }
-    let mut copy = crate::Game {
-        state: game.state.clone(),
-        log: game.log.clone(),
-        tree: crate::tree::Tree::new(),
-        at: crate::tree::NodeId::ROOT,
-        cards: game.cards,
-        verify: false,
-    };
-    let cx = Cx {
-        g: &mut copy,
-        frame: usize::MAX,
-        cursor: 0,
-        mana_source: None,
-        entering: None,
-        lineage: Vec::new(),
-        asked_at: None,
-        doer: None,
-    };
-    let face = cast_face(cx.card(cx.s().obj(card).card), plan.way);
-    let face_id = (!std::ptr::eq(face, cx.card(cx.s().obj(card).card))).then(|| cx.card_id(face));
-    let (mut total, added_life) = change_total(
-        &cx,
-        &cost_change_sources(&cx),
-        player,
-        Costed::Spell(card),
-        base.mana,
-        face_id,
-        &[],
-    );
-    if plan_any_type(&cx, player, card, plan) {
-        total = total.paid_with_any_type();
-    }
-    Some((base, total, u32::from(base.life) + added_life))
+    let price = cast_plan_price(game, player, card, plan, &[])?;
+    let (total, life) = price.total?;
+    Some((price.base, total, life))
 }
 
 /// For a spell being cast whose additional cost sacrifices any number of permanents for a reduction each (CR 601.2b,
@@ -3100,13 +3002,61 @@ fn permission_at(cx: &Cx, card: ObjectId, player: PlayerId, index: u32) -> Optio
     .then_some(permission)
 }
 
-/// Resolve the selected plan's printed or granted cost while the offered position is still intact. This is also used by
-/// the host's cost display, so the row and the action begin from the same specific alternative.
-fn selected_plan_cost(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> Option<Cost> {
+/// Validate an active grant's zone permission on the selected face (CR 601.3). Its callback also supplies the ordinary
+/// cost when this same grant is chosen for payment; checking permission does not spend its use.
+fn granted_permission_cost(
+    q: &dyn Query,
+    asker: &Asker,
+    card: ObjectId,
+    player: PlayerId,
+    grant: &GrantedWay,
+) -> Option<Cost> {
+    let zone = q.state().obj(card).zone;
+    if zone.player != player || zone.kind() != grant.from {
+        return None;
+    }
+    (grant.cost)(q, asker, card, player)
+}
+
+/// A selected plan's resolved payment, and the grants it was resolved through, each found once: the permission grant,
+/// the payment grant and the exile cast. Validation, pricing and the cast that follows share one resolution.
+struct SelectedCast {
+    /// The plan's cost before its additional costs.
+    base: Cost,
+    /// The plan's cost with the face's additional cost and the permission's (an exile cast's, retrace's).
+    cost: Cost,
+    permission_granted: Option<(ObjectId, &'static GrantedWay)>,
+    granted: Option<(ObjectId, &'static GrantedWay)>,
+    exile: Option<(ObjectId, &'static ExileCast)>,
+}
+
+/// Validate the selected permission, resolve its printed or granted payment and its additional costs, and keep the grants
+/// it was resolved through, before casting mutates the position. This also serves host pricing, independently of option
+/// generation, so it repeats the permission check. Within this query each grant is resolved once.
+fn selected_plan(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> Option<SelectedCast> {
     let _face_up = layers::judged_face_up(cx.s(), card);
     let whole = cx.card(cx.s().obj(card).card);
     let face = cast_face(whole, plan.way);
-    let mut cost = match plan.cost {
+    let mut permission_granted = None;
+    let mut exile = None;
+    let permission_cost = if let CastPermission::GrantedWay { source, rule } = plan.permission {
+        let (_, controller, grant) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
+            .into_iter()
+            .find(|(s, _, way)| *s == source && granted_way_rule(cx, *s, way) == Some(rule))?;
+        if !matches!(plan.cost, CastCostChoice::GrantedWay { source: s, rule: r } if s == source && r == rule)
+            && !grant.permission_only
+        {
+            return None;
+        }
+        permission_granted = Some((source, grant));
+        let view = AsFace { cx, spell: card, face: cx.card_id(face) };
+        let q: &dyn Query = if plan.way == 0 { cx } else { &view };
+        Some(granted_permission_cost(q, &Asker { source, controller }, card, player, grant)?)
+    } else {
+        None
+    };
+    let mut granted = None;
+    let mut base = match plan.cost {
         CastCostChoice::SpellAlternative { source, rule } => {
             let (_, controller, alternative) = static_rules::spell_alternatives(cx).into_iter()
                 .find(|(id, _, alternative)| *id == source && cx.cards().get(cx.chars(source).card)
@@ -3121,27 +3071,22 @@ fn selected_plan_cost(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan)
         CastCostChoice::Overload => Cost::mana(whole.overload?),
         CastCostChoice::LifeForManaValue => life_for_mana_value(face),
         CastCostChoice::EffectSpecified => return None,
+        CastCostChoice::GrantedWay { source, rule }
+            if plan.permission == (CastPermission::GrantedWay { source, rule }) => permission_cost?,
         CastCostChoice::GrantedWay { source, rule } => {
-            let (_, controller, granted) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
+            let (_, controller, way) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
                 .into_iter()
                 .find(|(candidate, _, way)| {
-                    *candidate == source
-                        && cx
-                            .cards()
-                            .get(cx.chars(source).card)
-                            .granted_ways
-                            .iter()
-                            .position(|w| std::ptr::eq(w, *way))
-                            == Some(rule as usize)
+                    *candidate == source && granted_way_rule(cx, *candidate, way) == Some(rule)
                 })?;
+            granted = Some((source, way));
             let view = AsFace {
                 cx,
                 spell: card,
                 face: cx.card_id(face),
             };
             let q: &dyn Query = if plan.way == 0 { cx } else { &view };
-            let c = (granted.cost)(q, &Asker { source, controller }, card, player)?;
-            c
+            (way.cost)(q, &Asker { source, controller }, card, player)?
         }
     };
     let object = cx.s().obj(card);
@@ -3237,7 +3182,6 @@ fn selected_plan_cost(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan)
                 || !cx.chars(card).has(Keyword::Retrace)
                 || graveyard_play(cx, player)
                 || whole.keywords.has(Keyword::CastFromYourGraveyard)
-                || !matches!(plan.cost, CastCostChoice::Printed)
             {
                 return None;
             }
@@ -3267,33 +3211,13 @@ fn selected_plan_cost(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan)
                 if !matches!(plan.cost, CastCostChoice::Printed) {
                     return None;
                 }
-                cost = Cost::mana(instead);
+                base = Cost::mana(instead);
             } else if matches!(plan.cost, CastCostChoice::LifeForManaValue) {
                 return None;
             }
-            cost.mana.generic = cost.mana.generic.saturating_add(grant.more);
+            base.mana.generic = base.mana.generic.saturating_add(grant.more);
         }
-        CastPermission::GrantedWay { source, rule } => {
-            if !matches!(plan.cost, CastCostChoice::GrantedWay { source: s, rule: r } if s == source && r == rule)
-            {
-                return None;
-            }
-            let active = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
-                .into_iter()
-                .any(|(s, _, way)| s == source && granted_way_rule(cx, s, way) == Some(rule));
-            if !active
-                || object.zone.player != player
-                || object.zone.kind()
-                    != cx
-                        .cards()
-                        .get(cx.chars(source).card)
-                        .granted_ways
-                        .get(rule as usize)?
-                        .from
-            {
-                return None;
-            }
-        }
+        CastPermission::GrantedWay { .. } => {} // Validated above, with its cost retained for possible reuse.
         CastPermission::ExileCast { source, rule } => {
             if !object.zone.is(ZoneKind::Exile) || object.on_adventure == Some(player) || object.card_copy {
                 return None;
@@ -3313,6 +3237,7 @@ fn selected_plan_cost(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan)
             {
                 return None;
             }
+            exile = Some((source, cast));
             let view = AsFace {
                 cx,
                 spell: card,
@@ -3347,51 +3272,20 @@ fn selected_plan_cost(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan)
             }
         }
     }
-    Some(cost)
-}
-
-fn selected_plan_extra(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> Option<Cost> {
-    let face = cast_face(cx.card(cx.s().obj(card).card), plan.way);
     let mut extra = face.additional_cost.unwrap_or(Cost::NONE);
-    if let CastPermission::ExileCast { source, rule } = plan.permission {
-        let cast = cx
-            .cards()
-            .get(cx.chars(source).card)
-            .exile_casts
-            .get(rule as usize)?;
-        if !exile_casts_of(cx.cards(), cx.s(), &cx.g.log)
-            .iter()
-            .any(|(s, _, active)| {
-                *s == source
-                    && exile_cast_rule(cx, *s, active) == Some(rule)
-                    && std::ptr::eq(*active, cast)
-            })
-        {
-            return None;
-        }
-        let view = AsFace {
-            cx,
-            spell: card,
-            face: cx.card_id(face),
-        };
-        let q: &dyn Query = if plan.way == 0 { cx } else { &view };
-        if !(cast.allows)(
-            q,
-            &Asker {
-                source,
-                controller: cx.s().obj(source).controller,
-            },
-            card,
-            player,
-        ) {
-            return None;
-        }
-        extra = extra.and(cast.additional);
+    if matches!(plan.permission, CastPermission::ExileCast { .. }) {
+        extra = extra.and(exile?.1.additional);
     }
     if matches!(plan.permission, CastPermission::Retrace) {
         extra = extra.and(RETRACE);
     }
-    Some(extra)
+    Some(SelectedCast {
+        base,
+        cost: base.and(extra),
+        permission_granted,
+        granted,
+        exile,
+    })
 }
 
 fn plan_any_type(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> bool {
@@ -3405,16 +3299,8 @@ fn plan_any_type(cx: &Cx, player: PlayerId, card: ObjectId, plan: CastPlan) -> b
     }
 }
 
-/// The selected cast plan's cost before cost changes. Used by adapters that need to explain or price the exact offered route.
-pub fn cast_plan_cost(
-    game: &crate::Game,
-    player: PlayerId,
-    card: ObjectId,
-    plan: CastPlan,
-) -> Option<Cost> {
-    if let Some(cost) = cast_plan_hand_cost(game, player, card, plan) {
-        return Some(cost);
-    }
+/// A copy of the position (no tree) is enough for a rules question that must not change the game.
+fn with_snapshot<R>(game: &crate::Game, f: impl FnOnce(&Cx) -> R) -> R {
     let mut copy = crate::Game {
         state: game.state.clone(),
         log: game.log.clone(),
@@ -3433,10 +3319,94 @@ pub fn cast_plan_cost(
         asked_at: None,
         doer: None,
     };
-    Some(
-        selected_plan_cost(&cx, player, card, plan)?
-            .and(selected_plan_extra(&cx, player, card, plan)?),
-    )
+    f(&cx)
+}
+
+/// The selected cast plan's cost before cost changes. Used by adapters that need to explain or price the exact offered route.
+pub fn cast_plan_cost(
+    game: &crate::Game,
+    player: PlayerId,
+    card: ObjectId,
+    plan: CastPlan,
+) -> Option<Cost> {
+    if let Some(cost) = cast_plan_hand_cost(game, player, card, plan) {
+        return Some(cost);
+    }
+    with_snapshot(game, |cx| selected_plan(cx, player, card, plan).map(|selected| selected.cost))
+}
+
+/// Everything a menu row says about one plan's price, from one query context: the face it casts, its base cost, its
+/// total after the target-independent cost changes (when X leaves it determined), and its total per candidate target.
+pub struct CastPlanPrice {
+    pub face: &'static CardDef,
+    pub base: Cost,
+    pub total: Option<(ManaCost, u32)>,
+    pub targets: Vec<(ManaCost, u32)>,
+}
+
+/// Price one concrete cast plan once for a menu row: `cast_plan_cost`, `cast_plan_total` and `cast_plan_costs` in one
+/// query context.
+pub fn cast_plan_price(
+    game: &crate::Game,
+    player: PlayerId,
+    card: ObjectId,
+    plan: CastPlan,
+    candidates: &[Target],
+) -> Option<CastPlanPrice> {
+    with_snapshot(game, |cx| {
+        let base = selected_plan(cx, player, card, plan)?.cost;
+        let whole = cx.card(cx.s().obj(card).card);
+        let face = cast_face(whole, plan.way);
+        let face_id = (!std::ptr::eq(face, whole)).then(|| cx.card_id(face));
+        let any_type = plan_any_type(cx, player, card, plan);
+        let changed = spell_cost_changers(game) || !whole.own_cost_changes.is_empty();
+        let total = (base.mana.x == 0).then(|| {
+            if !changed && !any_type {
+                return (base.mana, u32::from(base.life));
+            }
+            let (mut mana, added_life) = change_total(
+                cx,
+                &cost_change_sources(cx),
+                player,
+                Costed::Spell(card),
+                base.mana,
+                face_id,
+                &[],
+            );
+            if any_type {
+                mana = mana.paid_with_any_type();
+            }
+            (mana, u32::from(base.life) + added_life)
+        });
+        let targets = if base.mana.x == 0 && changed {
+            candidates
+                .iter()
+                .map(|&target| {
+                    let (mut mana, life) = change_total(
+                        cx,
+                        &cost_change_sources(cx),
+                        player,
+                        Costed::Spell(card),
+                        base.mana,
+                        face_id,
+                        &[target],
+                    );
+                    if any_type {
+                        mana = mana.paid_with_any_type();
+                    }
+                    (mana, base.life as u32 + life)
+                })
+                .collect()
+        } else {
+            Vec::new()
+        };
+        Some(CastPlanPrice {
+            face,
+            base,
+            total,
+            targets,
+        })
+    })
 }
 
 fn cast_plan_hand_cost(
@@ -3466,6 +3436,7 @@ struct ResolvedCastPlan {
     cost: Cost,
     terms: CastTerms,
     granted: Option<(ObjectId, &'static GrantedWay)>,
+    permission_granted: Option<(ObjectId, &'static GrantedWay)>,
     exile: Option<(ObjectId, &'static ExileCast)>,
     retraced: bool,
 }
@@ -3478,12 +3449,15 @@ fn resolve_cast_plan(
     card: ObjectId,
     plan: CastPlan,
 ) -> Option<ResolvedCastPlan> {
-    let cost = selected_plan_cost(cx, player, card, plan)?;
+    let selected = selected_plan(cx, player, card, plan)?;
+    // The additional costs are paid by the payment procedure; this is the cost the plan starts from.
+    let cost = selected.base;
     let mut terms = CastTerms {
         way: Some(plan.way),
         ..CastTerms::default()
     };
     let mut granted = None;
+    let mut permission_granted = None;
     let mut exile = None;
     let retraced = matches!(plan.permission, CastPermission::Retrace);
     match plan.permission {
@@ -3496,39 +3470,22 @@ fn resolve_cast_plan(
                 terms.instead = Some(ManaCost::ZERO);
             }
         }
-        CastPermission::ExileCast { source, rule } => {
-            let (_, _, grant) = exile_casts_of(cx.cards(), cx.s(), &cx.g.log)
-                .into_iter()
-                .find(|(candidate, _, grant)| {
-                    *candidate == source && exile_cast_rule(cx, source, grant) == Some(rule)
-                })?;
-            exile = Some((source, grant));
-        }
+        CastPermission::ExileCast { .. } => exile = selected.exile,
         CastPermission::LibraryTop { .. }
             if matches!(plan.cost, CastCostChoice::LifeForManaValue) =>
         {
             terms.instead = Some(ManaCost::ZERO);
         }
-        CastPermission::GrantedWay { source, rule } => {
-            let (_, _, grant) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
-                .into_iter()
-                .find(|(candidate, _, grant)| {
-                    *candidate == source && granted_way_rule(cx, source, grant) == Some(rule)
-                })?;
+        CastPermission::GrantedWay { .. } => {
+            let (_, grant) = selected.permission_granted?;
             terms.flashback = grant.flashback;
-            granted = Some((source, grant));
+            permission_granted = selected.permission_granted;
         }
         _ => {}
     }
-    if let CastCostChoice::GrantedWay { source, rule } = plan.cost
-        && let Some((_, _, grant)) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)
-            .into_iter()
-            .find(|(candidate, _, grant)| {
-                *candidate == source && granted_way_rule(cx, source, grant) == Some(rule)
-            })
-    {
+    if let Some((_, grant)) = selected.granted {
         terms.flashback |= grant.flashback;
-        granted = Some((source, grant));
+        granted = selected.granted;
     }
     if matches!(plan.cost, CastCostChoice::SpellAlternative { .. }) {
         terms.instead = Some(cost.mana);
@@ -3538,6 +3495,7 @@ fn resolve_cast_plan(
         cost,
         terms,
         granted,
+        permission_granted,
         exile,
         retraced,
     })
@@ -4479,6 +4437,8 @@ fn castable_ways(
                         || def
                             .inset_faces()
                             .all(|(_, _, inset)| exile_for(Some(cx.card_id(inset))).is_none()))
+                    && !(own && granted.get_or_init(|| granted_ways_of(cx.cards(), cx.s(), &cx.g.log))
+                        .iter().any(|(_, _, way)| !way.any_zone && way.from == zone.kind()))
                 {
                     continue;
                 }
@@ -4805,6 +4765,23 @@ fn castable_ways(
                             normal_permission && (any_type || face_exile.is_some_and(|(_, cast)| cast.any_type)),
                             permission_route,
                         );
+                        // A zone permission that imposes no alternative cost can accompany another grant's payment.
+                        // Keep every eligible source as a separate route: its use and consequences differ.
+                        let view = AsFace { cx, spell: id, face: cx.card_id(face_def) };
+                        let q: &dyn Query = if face_way == GRANTED_FACE_WHOLE { cx } else { &view };
+                        for &(source, controller, permission) in ways {
+                            if !permission.permission_only || permission.any_zone
+                                || granted_permission_cost(q, &Asker { source, controller }, id, player, permission).is_none()
+                            {
+                                continue;
+                            }
+                            let Some(rule) = granted_way_rule(cx, source, permission) else { continue; };
+                            offer_granted_casts(
+                                cx, player, available, instants, options, ways, id, face_way,
+                                face_def, face_instant, true, false, Cost::NONE, 0, false,
+                                CastPermission::GrantedWay { source, rule },
+                            );
+                        }
                     }
                 }
                 // What a face cast by the permission costs (CR 118.9, 601.2f): what it names instead, or life equal to the face's
@@ -5144,9 +5121,8 @@ fn castable_ways(
                 }
                 for (way, cost_choice) in costs {
                     let plan = CastPlan { way, permission, cost: cost_choice };
-                    let Some(cost) = selected_plan_cost(cx, player, id, plan) else { continue; };
-                    let Some(extra) = selected_plan_extra(cx, player, id, plan) else { continue; };
-                    let total = cost.and(extra);
+                    let Some(selected) = selected_plan(cx, player, id, plan) else { continue; };
+                    let total = selected.cost;
                     if !can_pay_other(cx, id, player, &total) || !extra_payable(cx, id, player, face) {
                         continue;
                     }
@@ -5181,9 +5157,8 @@ fn offer_spell_alternatives(
         let Some(rule) = cx.cards().get(cx.chars(source).card).spell_alternatives.iter()
             .position(|a| std::ptr::eq(a, alternative)) else { continue; };
         let plan = CastPlan { way, permission, cost: CastCostChoice::SpellAlternative { source, rule: rule as u32 } };
-        let Some(cost) = selected_plan_cost(cx, player, id, plan) else { continue; };
-        let Some(extra) = selected_plan_extra(cx, player, id, plan) else { continue; };
-        let total = cost.and(extra);
+        let Some(selected) = selected_plan(cx, player, id, plan) else { continue; };
+        let total = selected.cost;
         if !can_pay_other(cx, id, player, &total) || !extra_payable(cx, id, player, face) { continue; }
         let a = available.get_or_init(|| self::available(cx, player));
         let covered = |targets: &[Target]| covers_total(cx, a, player, id, face,
@@ -5233,6 +5208,9 @@ fn offer_granted_casts(
         &view
     };
     for (k, &(granter, controller, way)) in ways.iter().enumerate() {
+        if matches!(permission, CastPermission::GrantedWay { .. }) && !way.any_zone {
+            continue;
+        }
         if if way.any_zone {
             !allowed
         } else {
@@ -5668,7 +5646,7 @@ pub fn describe(
                 .get(index as usize)
                 .and_then(|permission| permission.source)
                 .map(|id| cards.get(cards.current(state.obj(id))).name),
-            CastPermission::LibraryTop { source, .. } => {
+            CastPermission::LibraryTop { source, .. } | CastPermission::GrantedWay { source, .. } => {
                 Some(cards.get(cards.current(state.obj(source))).name)
             }
             _ => None,
@@ -6028,90 +6006,24 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
         }
         ActionKind::CastSpell => {
             // Cast from where a permission allows (CR 601.3), for the cost it names instead of the mana cost: the card, or its
-            // Adventure or Omen, which is casting the card too (CR 715.3, 720.3).
-            if let Some(plan) = action.cast_plan {
-                let Some(resolved) = resolve_cast_plan(cx, player, source, plan) else {
-                    return Err(Stop::Cancel);
-                };
-                cast(
-                    cx,
-                    player,
-                    source,
-                    plan.way,
-                    &action.targets,
-                    resolved.terms,
-                    false,
-                    Some(resolved),
-                )?;
-                cx.st().update_turn(|t| {
-                    t.priority = player;
-                    t.passes = 0;
-                });
-                return Ok(Flow::Done);
-            }
-            let permitted = match alternative_slot(action.index).map_or(action.index, |_| face_way(action.index)) {
-                n if granted_slot(n).is_some_and(|(k, _)| {
-                    granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k].2.any_zone
-                }) =>
-                {
-                    permission_for(cx, source, player).filter(|p| {
-                        p.grant.instead.is_none()
-                            && !p.grant.life_for_mana_value
-                            && !p.grant.exile_after
-                    })
-                }
-                0 => permission_for(cx, source, player).filter(|p| !p.grant.adventure_only),
-                WAY_ADVENTURE if !cx.s().obj(source).zone.is(ZoneKind::Hand) => {
-                    permission_for(cx, source, player)
-                }
-                WAY_OMEN | WAY_SPLIT_LEFT | WAY_SPLIT_RIGHT | WAY_BACK_FACE
-                    if !cx.s().obj(source).zone.is(ZoneKind::Hand) =>
-                {
-                    permission_for(cx, source, player).filter(|p| !p.grant.adventure_only)
-                }
-                _ => None,
+            // Adventure or Omen, which is casting the card too (CR 715.3, 720.3). Every offered cast carries its plan; a
+            // client that names only a way has it filled in from the offered option at the host boundary (`answer.rs`).
+            let Some(plan) = action.cast_plan else {
+                return Err(Stop::Cancel);
             };
-            let instead = permitted.and_then(|p| p.grant.instead);
-            let any_type = permitted.is_some_and(|p| p.grant.any_type);
-            let more = permitted.map_or(0, |p| p.grant.more);
-            // Life equal to its mana value instead of the mana cost (CR 118.9, 119.4): by a permission that says so, of the face
-            // cast (CR 715.3a), or from the top of a library by a permanent's rule (Bolas's Citadel).
-            let def = cx.card(cx.s().obj(source).card);
-            let (instead, life) = if permitted.is_some_and(|p| p.grant.life_for_mana_value) {
-                (
-                    Some(ManaCost::ZERO),
-                    life_for_mana_value(face_cast(def, action.index)).life,
-                )
-            } else if action.index == 0
-                && cx.s().obj(source).zone.is(ZoneKind::Library)
-                && land_rules(cx, player).top_for_life
-            {
-                (Some(ManaCost::ZERO), life_for_mana_value(def).life)
-            } else {
-                (instead, 0)
+            let Some(resolved) = resolve_cast_plan(cx, player, source, plan) else {
+                return Err(Stop::Cancel);
             };
-            // A flashback a permission gives (Snapcaster Mage, CR 702.34a).
-            let flashback = permitted.is_some_and(|p| p.grant.exile_after);
             cast(
                 cx,
                 player,
                 source,
-                action.index,
+                plan.way,
                 &action.targets,
-                CastTerms {
-                    instead,
-                    any_type,
-                    life,
-                    more,
-                    less: 0,
-                    exile_after: false,
-                    flashback,
-                    copy: false,
-                    way: None,
-                },
+                resolved.terms,
                 false,
-                None,
-            )?
+                Some(resolved),
+            )?;
         }
         ActionKind::ActivateAbility if action.index >= PLAYER_MANA_ABILITY => {
             activate_mana(cx, player, source, action.index, action.color, false, &[])?;
@@ -6234,7 +6146,8 @@ fn cast(
     } else {
         None
     };
-    let selected_granted = planned.and_then(|plan| plan.granted.map(|(source, way)| (source, way)));
+    let selected_granted = planned.and_then(|plan| plan.granted);
+    let permission_granted = planned.and_then(|plan| plan.permission_granted);
     let granted = legacy_granted;
     let way = planned.map_or_else(
         || face_way(way),
@@ -6369,21 +6282,20 @@ fn cast(
     });
     // A way a permanent gave is noted in the history against it, for a permission "once during each of your turns"
     // (CR 601.3): an activation of `GRANTED_WAY_USED`, past any ability a card prints.
-    if let Some((granter, rule)) = selected_granted {
+    for (i, (granter, rule)) in [permission_granted, selected_granted].into_iter().flatten().enumerate() {
         let ability = AbilityRef {
             card: cx.s().obj(granter).card,
             index: GRANTED_WAY_USED,
         };
-        cx.record(Event::AbilityActivated {
-            source: granter,
-            ability,
-            player,
-        });
+        if i == 0 || !permission_granted.is_some_and(|(source, _)| source == granter) {
+            cx.record(Event::AbilityActivated { source: granter, ability, player });
+        }
         if let Some(n) = rule.gains {
             let ability = AbilityRef::delayed(cx.s().obj(granter).card, n);
             cx.st().update_obj(spell, |o| o.marks.gains = Some(ability));
         }
-    } else if let Some((k, _)) = granted {
+    }
+    if selected_granted.is_none() && permission_granted.is_none() && let Some((k, _)) = granted {
         let (granter, _, _) = granted_ways_of(cx.cards(), cx.s(), &cx.g.log)[k];
         let ability = AbilityRef {
             card: cx.s().obj(granter).card,
@@ -7043,7 +6955,7 @@ fn resolve_resolution_cast_plan(
     } else if let Some((source, rule)) = selected_alternative {
         let plan = CastPlan { way, permission: CastPermission::Resolution,
             cost: CastCostChoice::SpellAlternative { source, rule } };
-        (selected_plan_cost(cx, player, card, plan)?, plan.permission, plan.cost)
+        (selected_plan(cx, player, card, plan)?.base, plan.permission, plan.cost)
     } else if let Some(instead) = terms.instead {
         (
             Cost::mana(instead),
@@ -7070,6 +6982,7 @@ fn resolve_resolution_cast_plan(
         cost,
         terms,
         granted: selected_granted,
+        permission_granted: None,
         exile: None,
         retraced: false,
     })

@@ -1386,6 +1386,9 @@ pub struct GrantedWay {
     /// What the way is called, which a scenario's `Ability:` names it by and a menu row shows beside the cast.
     pub text: &'static str,
     pub cost: GrantedCost,
+    /// This grants zone permission without requiring an alternative cost (Lurrus, Serra Paragon).
+    /// Its callback still checks the selected face and all permission restrictions (CR 601.3, 118.9a).
+    pub permission_only: bool,
     /// The zone of the caster's own the way casts cards from (CR 601.3): their graveyard (Lurrus, escape, mayhem) or their
     /// hand (a way given to cards in a hand, as web-slinging would be). Another zone's rule or permission does not open it.
     /// An alternative cost for spells cast from wherever (Omniscience's, Dracogenesis's) is a `SpellAlternative` instead.
@@ -1411,7 +1414,7 @@ pub struct GrantedWay {
 
 impl GrantedWay {
     /// A way that casts only and grants nothing, for a card's file to start from.
-    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, from: ZoneKind::Graveyard, any_zone: false, instant_speed: false, lands: false, gains: None, flashback: false };
+    pub const CAST: GrantedWay = GrantedWay { text: "", cost: |_, _, _, _| None, permission_only: false, from: ZoneKind::Graveyard, any_zone: false, instant_speed: false, lands: false, gains: None, flashback: false };
 }
 
 /// What a static ability lets a spell be cast for rather than its mana cost (CR 118.9, `SpellAlternative::cost`).

@@ -225,6 +225,7 @@ const fn granted_way(text: &'static str, cost: GrantedCost, flashback: bool) -> 
     GrantedWay {
         text,
         cost,
+        permission_only: false,
         from: ZoneKind::Graveyard,
         any_zone: false,
         instant_speed: true,
@@ -257,6 +258,31 @@ static GRANTOR_5: CardDef = grantor!("Cast Plan Grantor 5", ONE_LIFE_WAY);
 static GRANTOR_6: CardDef = grantor!("Cast Plan Grantor 6", ONE_LIFE_WAY);
 static GRANTOR_7: CardDef = grantor!("Cast Plan Grantor 7", ONE_LIFE_WAY);
 static GRANTOR_8: CardDef = grantor!("Cast Plan Grantor 8", FLASHBACK_WAY);
+
+fn printed_cost(q: &dyn Query, _: &Asker, card: ObjectId, _: PlayerId) -> Option<Cost> {
+    Some(Cost::mana(q.card(q.chars(card).card).cost))
+}
+
+static EXILE_PERMISSION: GrantedWay = GrantedWay {
+    text: "exile permission",
+    cost: printed_cost,
+    from: ZoneKind::Exile,
+    permission_only: true,
+    ..GrantedWay::CAST
+};
+static EXILE_REQUIRED_COST: GrantedWay = GrantedWay {
+    permission_only: false,
+    ..EXILE_PERMISSION
+};
+static LIFE_ALTERNATIVE: GrantedWay = GrantedWay {
+    text: "pay one life",
+    cost: one_life,
+    any_zone: true,
+    ..GrantedWay::CAST
+};
+static EXILE_PERMISSION_SOURCE: CardDef = grantor!("Exile Permission Probe", EXILE_PERMISSION);
+static EXILE_REQUIRED_COST_SOURCE: CardDef = grantor!("Exile Required Cost Probe", EXILE_REQUIRED_COST);
+static LIFE_ALTERNATIVE_SOURCE: CardDef = grantor!("Life Alternative Probe", LIFE_ALTERNATIVE);
 
 static FILLER: CardDef = CardDef {
     name: "Cast Plan Filler",
@@ -292,6 +318,9 @@ fn table() -> &'static CardTable {
             &GRANTOR_6,
             &GRANTOR_7,
             &GRANTOR_8,
+            &EXILE_PERMISSION_SOURCE,
+            &EXILE_REQUIRED_COST_SOURCE,
+            &LIFE_ALTERNATIVE_SOURCE,
         ])
     })
 }
@@ -983,6 +1012,47 @@ fn resolution_cast_cannot_use_a_fixed_zone_grant_on_an_opponents_graveyard_card(
             .collect::<Vec<_>>()
     );
     assert!(game.state.obj(grantor).zone.is(ZoneKind::Battlefield));
+}
+
+/// Independent permission and payment grants compose for any spell type, zone and cost resource (CR 118.9a).
+#[test]
+fn independent_grants_cast_a_noncreature_from_exile_for_life() {
+    for (permission_name, allowed) in [("Exile Permission Probe", true), ("Exile Required Cost Probe", false)] {
+        let (mut game, spell) = game_with_spell_in_graveyard();
+        let player = PlayerId(0);
+        assert!(game.state.zone_remove(Zone::graveyard(player), spell));
+        game.state.update_obj(spell, |object| object.zone = Zone::exile(player));
+        game.state.zone_push(Zone::exile(player), spell);
+        let mut add_source = |name: &str| {
+            let card = game.cards.find(name).unwrap();
+            let id = game.state.push_obj(Obj::new(card, player, Zone::BATTLEFIELD));
+            game.state.zone_push(Zone::BATTLEFIELD, id);
+            id
+        };
+        let permission = add_source(permission_name);
+        let payment = add_source("Life Alternative Probe");
+        game.run();
+        let options = permission_options(&game, spell);
+        let combined = options.iter().find(|option| option.cast_plan.is_some_and(|plan|
+            plan.permission == CastPermission::GrantedWay { source: permission, rule: 0 }
+                && plan.cost == CastCostChoice::GrantedWay { source: payment, rule: 0 }));
+        assert_eq!(combined.is_some(), allowed, "{permission_name}");
+        if let Some(option) = combined {
+            let cost = cast_plan_cost(&game, player, spell, option.cast_plan.unwrap()).unwrap();
+            assert_eq!(cost.life, 1);
+            assert_eq!(cost.mana, ManaCost::ZERO);
+            assert_eq!(cost.energy, 0);
+            let request = game.pending().unwrap().clone();
+            game.answer(request.id, player, Answer::Act(Action::of(option))).unwrap();
+            resolve_free_cast(&mut game);
+            assert_eq!(game.state.player(player).life, 19);
+            for source in [permission, payment] {
+                assert_eq!(game.log.iter().filter(|record| matches!(record.event,
+                    Event::AbilityActivated { source: used, ability, .. }
+                        if used == source && ability.index == GRANTED_WAY_USED)).count(), 1);
+            }
+        }
+    }
 }
 
 /// A ninth granted route keeps its own fixed cost and flashback consequence, and is executed as that route.

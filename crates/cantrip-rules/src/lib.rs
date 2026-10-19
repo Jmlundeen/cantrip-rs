@@ -34,7 +34,7 @@ mod validate;
 use cantrip_api::*;
 use cantrip_state::{Frame, FrameKind, Mark, Rng};
 
-pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_plan_cost, cast_plan_costs, cast_plan_face, cast_plan_total, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction};
+pub use actions::{activation_costs, alternative_cast_total, cast_costs, cast_plan_cost, cast_plan_costs, cast_plan_face, cast_plan_price, cast_plan_total, cast_total, describe, exile_cast_texts, granted_cast_cost, life_for_cast, granted_cast_total, special_action_costs, sacrifices_for_reduction, CastPlanPrice};
 pub use validate::{check as check_answer, distribution_problem, name_problem};
 pub use layers::{chars, live, summoning_sick};
 

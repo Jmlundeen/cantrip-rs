@@ -6,7 +6,7 @@ use std::sync::OnceLock;
 pub mod undo;
 
 pub use cantrip_api::*;
-pub use cantrip_rules::{Game, Rejected, Setup, activation_costs, alternative_cast_total, cast_costs, cast_plan_cost, cast_plan_costs, cast_plan_face, cast_plan_total, cast_total, exile_cast_texts, granted_cast_cost, life_for_cast, chars, check_answer, describe, distribution_problem, live, name_problem, summoning_sick, granted_cast_total, special_action_costs, sacrifices_for_reduction};
+pub use cantrip_rules::{Game, Rejected, Setup, activation_costs, alternative_cast_total, cast_costs, cast_plan_cost, cast_plan_costs, cast_plan_face, cast_plan_price, cast_plan_total, cast_total, exile_cast_texts, granted_cast_cost, life_for_cast, chars, check_answer, describe, distribution_problem, live, name_problem, summoning_sick, granted_cast_total, special_action_costs, sacrifices_for_reduction, CastPlanPrice};
 
 /// The simplest legal distribution of looked-at cards (the C# `CardDistribution.Greedy`): each destination's
 /// minimum first, in order, then each takes what it accepts up to its maximum, cards in the order looked at.

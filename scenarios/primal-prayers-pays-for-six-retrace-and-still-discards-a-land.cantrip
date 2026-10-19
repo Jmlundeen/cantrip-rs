@@ -1,0 +1,47 @@
+# CR 702.81a and 118.9: retrace supplies graveyard permission and an additional land discard;
+# Primal Prayers replaces only the mana cost. The Ornithopter returns and the chosen Forest is discarded.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Show and Tell
+Primal Prayers
+Black Lotus
+Six
+Forest
+Mountain
+Faithless Looting
+Ornithopter
+Forest
+Island x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Show and Tell.Cast
+Bot1.Choose(Primal Prayers)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Six.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Faithless Looting.Cast
+Bot1.Pass
+Bot1.Choose(Ornithopter; Forest)
+Bot1.Graveyard.Ornithopter.Cast(Ability: Pay {E})
+Bot1.Choose(Forest)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Energy = 1
+Bot1.Battlefield = Island; Mountain; Primal Prayers; Six; Ornithopter
+Bot1.Graveyard = Forest; Faithless Looting; Forest; Black Lotus; Show and Tell; Black Lotus

@@ -49,6 +49,7 @@ pub static CARD: CardDef = CardDef {
     granted_ways: &[GrantedWay {
         text: "Once during each of your turns, you may play a land from your graveyard or cast a permanent spell with mana value 3 or less from your graveyard.",
         cost: from_graveyard,
+        permission_only: true,
         lands: true,
         gains: Some(0),
         ..GrantedWay::CAST

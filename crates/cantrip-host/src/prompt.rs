@@ -270,198 +270,109 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
     let def = game.cards.get(game.state.obj(src).card);
     match o.kind {
         ActionKind::CastSpell => {
-            if let Some(plan) = o.cast_plan {
-                let player = game
-                    .pending()
-                    .map_or(game.state.turn.priority, |r| r.player);
-                if let Some(face) = cast_plan_face(game, src, plan)
-                    && let Some(base) = cast_plan_cost(game, player, src, plan)
-                {
-                    // The engine's description names the permission that supplies the route for scripts and logs; the
-                    // row says only what the player chooses between, as it did before routes were distinguished.
+            // Every offered cast carries its plan; a client names the plan it chooses. Price it once for the row.
+            let player = game.pending().map_or(game.state.turn.priority, |r| r.player);
+            if let Some(plan) = o.cast_plan
+                && let Some(price) = cast_plan_price(
+                    game,
+                    player,
+                    src,
+                    plan,
+                    if o.targets_required == 1 { &o.target_candidates } else { &[] },
+                )
+            {
+                let CastPlanPrice {
+                    face,
+                    base,
+                    total,
+                    targets,
+                } = price;
+                // Keep granted permission provenance: equal payments through different sources
+                // have different use limits and consequences, so the player must be able to tell them apart.
+                if !matches!(plan.permission, CastPermission::GrantedWay { .. }) {
                     m.description = m
                         .description
                         .rsplit_once(" — Permission: ")
                         .map_or_else(|| m.description.clone(), |(text, _)| text.to_owned());
-                    if let Some(face) = def.inset_face(plan.way) {
-                        m.spell_name = face.name.to_string();
-                    } else if let Some(face) = granted_slot(o.index).and_then(|(_, face)| match face {
-                        GRANTED_FACE_LEFT => def.split.map(|h| h.0),
-                        GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
-                        GRANTED_FACE_ADVENTURE => def.adventure,
-                        GRANTED_FACE_OMEN => def.omen,
-                        GRANTED_FACE_BACK => def.back,
-                        _ => None,
-                    }) {
-                        m.spell_name = face.name.to_string();
-                    }
-                    m.has_x = base.mana.x > 0;
-                    m.life_cost = i32::from(base.life);
-                    let life_paid = matches!(plan.cost, CastCostChoice::LifeForManaValue);
-                    m.cost_text = if life_paid {
-                        format!("for {} life", base.life)
+                }
+                if let Some(face) = def.inset_face(plan.way) {
+                    m.spell_name = face.name.to_string();
+                } else if let Some(face) = granted_slot(o.index).and_then(|(_, face)| match face {
+                    GRANTED_FACE_LEFT => def.split.map(|h| h.0),
+                    GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
+                    GRANTED_FACE_ADVENTURE => def.adventure,
+                    GRANTED_FACE_OMEN => def.omen,
+                    GRANTED_FACE_BACK => def.back,
+                    _ => None,
+                }) {
+                    m.spell_name = face.name.to_string();
+                }
+                m.tapped_after_mana = base.permanents.is_some_and(|p| p.tapped);
+                m.has_x = base.mana.x > 0;
+                m.life_cost = i32::from(base.life);
+                let life_paid = matches!(plan.cost, CastCostChoice::LifeForManaValue);
+                m.cost_text = if life_paid {
+                    format!("for {} life", base.life)
+                } else {
+                    cost_text_of(&base, face.name)
+                };
+                // Paying life is the alternative cost, not "without paying": the row names the life instead, even 0.
+                m.without_paying_mana_cost = !life_paid
+                    && base.mana == ManaCost::ZERO
+                    && (face.cost != ManaCost::ZERO || !face.has_cost);
+                // A granted cast says what it costs beside the way's text (Iroh's flashback, "equal to that card's
+                // mana cost"), unless that text already names a cost; a face it names shows the cost on its own row.
+                if granted_slot(o.index).is_some()
+                    && m.spell_name.is_empty()
+                    && !life_paid
+                    && !m.cost_text.is_empty()
+                    && !m.description.contains('{')
+                {
+                    m.description = if m.description.is_empty() {
+                        m.cost_text.clone()
                     } else {
-                        cost_text_of(&base, face.name)
+                        format!("{} {}", m.description, m.cost_text)
                     };
-                    // Paying life is the alternative cost, not "without paying": the row names the life instead, even 0.
-                    m.without_paying_mana_cost = !life_paid
-                        && base.mana == ManaCost::ZERO
-                        && (face.cost != ManaCost::ZERO || !face.has_cost);
-                    // A granted cast says what it costs beside the way's text (Iroh's flashback, "equal to that card's
-                    // mana cost"), unless that text already names a cost; a face it names shows the cost on its own row.
-                    if granted_slot(o.index).is_some()
-                        && m.spell_name.is_empty()
-                        && !life_paid
-                        && !m.cost_text.is_empty()
-                        && !m.description.contains('{')
-                    {
+                }
+                if let Some((total, life)) = total {
+                    let mut shown = base;
+                    shown.mana = total;
+                    shown.life = life.min(u32::from(u8::MAX)) as u8;
+                    m.life_cost = life.min(i32::MAX as u32) as i32;
+                    m.cost_text = if life_paid {
+                        format!("for {life} life")
+                    } else {
+                        let text = cost_text_of(&shown, face.name);
+                        if text.is_empty() {
+                            total.to_string()
+                        } else {
+                            text
+                        }
+                    };
+                    if total != base.mana || life != u32::from(base.life) {
+                        let total_text = if life > 0 {
+                            format!("{total} and {life} life")
+                        } else {
+                            total.to_string()
+                        };
                         m.description = if m.description.is_empty() {
-                            m.cost_text.clone()
+                            format!("costs {total_text}")
                         } else {
-                            format!("{} {}", m.description, m.cost_text)
+                            format!("{} (costs {total_text})", m.description)
                         };
                     }
-                    if let Some((_, total, life)) = cast_plan_total(game, player, src, plan) {
-                        let mut shown = base;
-                        shown.mana = total;
-                        shown.life = life.min(u32::from(u8::MAX)) as u8;
-                        m.life_cost = life.min(i32::MAX as u32) as i32;
-                        m.cost_text = if life_paid {
-                            format!("for {life} life")
-                        } else {
-                            let text = cost_text_of(&shown, face.name);
-                            if text.is_empty() {
-                                total.to_string()
-                            } else {
-                                text
-                            }
-                        };
-                        if total != base.mana || life != u32::from(base.life) {
-                            let total_text = if life > 0 {
-                                format!("{total} and {life} life")
-                            } else {
-                                total.to_string()
-                            };
-                            m.description = if m.description.is_empty() {
-                                format!("costs {total_text}")
-                            } else {
-                                format!("{} (costs {total_text})", m.description)
-                            };
-                        }
-                    }
-                    if o.targets_required == 1 && !o.target_candidates.is_empty() {
-                        let costs = cast_plan_costs(game, player, src, plan, &o.target_candidates);
-                        if costs
-                            .iter()
-                            .any(|&(mana, life)| mana != base.mana || life != u32::from(base.life))
-                        {
-                            let each = costs_by_target(game, &o.target_candidates, &costs);
-                            m.description = if m.description.is_empty() {
-                                format!("costs {each}")
-                            } else {
-                                format!("{} (costs {each})", m.description)
-                            };
-                        }
-                    }
                 }
-                m.target_candidates = candidates;
-                return m;
-            }
-            // Cast as its Adventure or its Omen (CR 715.3, 720.3), it is that spell: its name, and its own mana cost.
-            let inset = def.inset_face(o.index);
-            // A cast a permanent grants names the face it casts (a Room's door, an Adventure): its name and its cost.
-            // So does a cast for an alternative cost a static ability gives (CR 118.9: Dracogenesis), of a face it casts.
-            let granted_face = granted_slot(o.index).or(alternative_slot(o.index)).and_then(|(_, face)| match face {
-                GRANTED_FACE_LEFT => def.split.map(|h| h.0),
-                GRANTED_FACE_RIGHT => def.split.map(|h| h.1),
-                GRANTED_FACE_ADVENTURE => def.adventure,
-                GRANTED_FACE_OMEN => def.omen,
-                GRANTED_FACE_BACK => def.back,
-                _ => None,
-            });
-            if let Some(face) = granted_face.or(inset) {
-                m.spell_name = face.name.to_string();
-            }
-            if let Some(face) = inset {
-                m.cost_text = face.cost.to_string();
-            }
-            // A cast a permanent grants (CR 604, 118.9) says what it costs, which the way's text need not: Iroh's flashback
-            // "equal to that card's mana cost", Underworld Breach's escape. A face it casts shows it as its cost; the card
-            // itself, beside the way's text, unless that text already names a cost ("Flashback {1}").
-            // Whoever is asked casts it: a card in an opponent's exile cast under a permission is not its owner's cast.
-            let asked = game.pending().map_or(game.state.turn.priority, |r| r.player);
-            if granted_slot(o.index).is_some()
-                && let Some(cost) = granted_cast_cost(game, asked, src, o.index)
-            {
-                let text = cost_text_of(&cost, def.name);
-                if granted_face.is_some() {
-                    m.cost_text = text;
-                } else if !text.is_empty() && !m.description.contains('{') {
-                    m.description = if m.description.is_empty() { text } else { format!("{} {text}", m.description) };
+                if targets
+                    .iter()
+                    .any(|&(mana, life)| mana != base.mana || life != u32::from(base.life))
+                {
+                    let each = costs_by_target(game, &o.target_candidates, &targets);
+                    m.description = if m.description.is_empty() {
+                        format!("costs {each}")
+                    } else {
+                        format!("{} (costs {each})", m.description)
+                    };
                 }
-            }
-            let player = asked;
-            // A way that casts without paying the mana cost (CR 118.9), whose X is 0 (CR 107.3b), is marked so,
-            // and its row says what it comes to with the cost changes in play before any target ({0}, or {1} under Thalia).
-            let granted = granted_slot(o.index).and_then(|_| granted_cast_total(game, player, src, o.index));
-            // An alternative cost a static ability gives (CR 118.9): "without paying its mana cost" (Omniscience, Dracogenesis) is
-            // marked so; one in mana ({W}{U}{B}{R}{G} rather than the mana cost) is its cost. Either says what it comes to.
-            let alternative = alternative_cast_total(game, player, src, o.index);
-            let cost = if let Some((mana, total)) = alternative {
-                // Rooftop Storm's {0} is nothing paid as well; a face whose own cost is {0} is cast the same either way.
-                let face = granted_face.unwrap_or(def);
-                m.without_paying_mana_cost = mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
-                m.cost_text = total.to_string();
-                mana
-            } else if let Some((way, total)) = granted {
-                let face = granted_face.unwrap_or(def);
-                m.without_paying_mana_cost = way.mana == ManaCost::ZERO && (face.cost != ManaCost::ZERO || !face.has_cost);
-                if m.without_paying_mana_cost {
-                    m.cost_text = total.to_string();
-                }
-                way.mana
-            } else if let Some(face) = granted_face.or(inset) {
-                face.cost
-            } else if o.index == 0 {
-                def.cost
-            } else {
-                def.ways.get(o.index as usize - 1).map_or(def.cost, |w| w.cost.mana)
-            };
-            m.has_x = cost.x > 0;
-            // A way whose cost returns tapped permanents, chosen once the mana is paid (web-slinging, CR 702.188a, 601.2g-h).
-            let way = match granted {
-                Some((way, _)) => Some(way),
-                None if granted_face.or(inset).is_none() && o.index > 0 => def.ways.get(o.index as usize - 1).map(|w| w.cost),
-                None => None,
-            };
-            m.tapped_after_mana = way.is_some_and(|c| c.permanents.is_some_and(|p| p.tapped));
-            // Paid in life rather than its mana cost (CR 118.9, 119.4: Inside Information, Bolas's Citadel): the life is the
-            // cost the row shows and the seats weigh, and no mana cost, which is not paid; an X in it is 0 (CR 107.3).
-            if let Some(life) = life_for_cast(game, game.cards, asked, src, o.index) {
-                m.life_cost = i32::from(life);
-                m.cost_text = format!("for {life} life");
-                m.has_x = false;
-            }
-            // A cost that depends on the target it is cast with (CR 601.2c, 601.2f): the row says what the cast costs with
-            // each candidate, where that is not what it costs otherwise - mana, and life a change adds (CR 118.8).
-            let mut by_target = false;
-            if (o.index == 0 || granted.is_some() || alternative.is_some()) && o.targets_required == 1 && !o.target_candidates.is_empty() {
-                let costs = cast_costs(game, player, src, o.index, &o.target_candidates);
-                if costs.iter().any(|&(c, life)| c != cost || life > 0) {
-                    let each = costs_by_target(game, &o.target_candidates, &costs);
-                    m.description = if m.description.is_empty() { format!("costs {each}") } else { format!("{} (costs {each})", m.description) };
-                    by_target = true;
-                }
-            }
-            // A total the cost changes in play make other than the cost it is cast for (CR 601.2f: Thalia's tax, Helm of
-            // Awakening's discount, Trinisphere's three): the row says it, so the cast says what it costs before it is paid.
-            if !by_target
-                && m.life_cost == 0
-                && let Some((base, total, life)) = cast_total(game, player, src, o.index)
-                && (total != base || life > 0)
-            {
-                let total = if life > 0 { format!("{total} and {life} life") } else { total.to_string() };
-                m.description = if m.description.is_empty() { format!("costs {total}") } else { format!("{} (costs {total})", m.description) };
             }
             m.target_candidates = candidates;
         }

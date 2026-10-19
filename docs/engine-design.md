@@ -820,13 +820,18 @@ clients echo it and never interpret the permission selectors. A missing ID is ac
 
 A `GrantedWay` names the zone of its controller's own it casts from (`GrantedWay::from`): a graveyard (Lurrus, Serra
 Paragon, Underworld Breach's escape, mayhem) or the hand ("you may cast spells from your hand without paying their mana
-costs", Omniscience). Each is judged on the face being cast, offered beside the card's other casts with its own way number,
-and is the one alternative cost of that cast (CR 118.9a); additional costs and cost increases still apply to it (CR 118.9d).
+costs", Omniscience). Each is judged on the face being cast and offered beside the card's other casts with its own way number.
+A grant marked `permission_only` (Lurrus, Serra Paragon) permits casting without requiring an alternative cost; its callback
+checks the chosen face and its own turn and usage restrictions independently of the payment callback. Other grants require
+their own alternative cost (CR 118.9a); additional costs and cost increases still apply (CR 118.9d).
 `any_zone` makes it a zone-neutral alternative cost: it uses another rule or permission's right to cast that face,
 but opens no zone itself (CR 601.3). A permission requiring its own alternative cost cannot be combined with it
 (CR 118.9a). This includes ordinary graveyard permission, Adventure exile, other players' cards in exile, and
 `LibraryTopSpells` permission, evaluated on the face cast. `instant_speed` changes only that way's timing
 (CR 601.3c); casting prohibitions and explicit timing restrictions still apply. Primal Prayers and Aluren use these rules.
+Each eligible granted permission supplies a distinct route for a zone-neutral alternative. Permission and payment grants
+are both frozen before payment, and each distinct source's use is recorded. Serra Paragon's granted consequence travels
+with its permission even when Primal Prayers supplies payment. The host retains their permission names in the menu labels.
 A resolving effect that permits paying the normal mana cost offers printed alternatives, matching fixed-zone grants,
 and zone-neutral alternatives after choosing the face, with `Label::PrintedWay` and `Label::GrantedWay`. A forced alternative
 cost excludes other alternatives (CR 118.9a). `CastWay` still lists faces only; the selected plan retains the cost and its consequences.

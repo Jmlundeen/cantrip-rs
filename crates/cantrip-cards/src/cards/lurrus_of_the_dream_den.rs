@@ -21,6 +21,6 @@ fn cast_cheap_permanent(q: &dyn Query, asker: &Asker, card: ObjectId, player: Pl
 
 /// Companion is a start-of-game action the deck builder owns (CR 702.139).
 pub static CARD: CardDef = CardDef {
-    granted_ways: &[GrantedWay { text: "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your graveyard.", cost: cast_cheap_permanent, ..GrantedWay::CAST }],
+    granted_ways: &[GrantedWay { text: "Once during each of your turns, you may cast a permanent spell with mana value 2 or less from your graveyard.", cost: cast_cheap_permanent, permission_only: true, ..GrantedWay::CAST }],
     ..oracle::LURRUS_OF_THE_DREAM_DEN
 };
