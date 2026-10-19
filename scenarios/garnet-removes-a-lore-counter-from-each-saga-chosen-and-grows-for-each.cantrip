@@ -1,0 +1,51 @@
+# Garnet, Princess of Alexandria: "Whenever Garnet attacks, you may remove a lore counter from each of any number of Sagas you
+# control. Put a +1/+1 counter on Garnet for each lore counter removed this way." Bot1 controls two Songs of Freyalise on
+# turn 3: the first with 2 lore counters (chapter II has just triggered), the second with 1. Garnet attacks; Bot1 chooses
+# both Sagas, so one counter comes off each (the first to 1, the second to 0) and Garnet gets two +1/+1 counters: a 4/4
+# lifelinker that deals 4 damage, so Bot2 is at 16 and Bot1 gains 4. The Sagas keep the counters left (1 and 0): removing lore
+# counters triggers no chapter (CR 714.2b) and a Saga with fewer than its last chapter's number stays (CR 714.4).
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Garnet, Princess of Alexandria
+Song of Freyalise
+Song of Freyalise
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Garnet, Princess of Alexandria.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Song of Freyalise.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Song of Freyalise.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Garnet, Princess of Alexandria > Bot2)
+Bot1.Accept
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Garnet, Princess of Alexandria.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Garnet, Princess of Alexandria.Power = 4
+Bot2.Life = 16
+Bot1.Life = 24
+Bot1.Battlefield.Song of Freyalise#1.Counters.Lore = 1
+Bot1.Battlefield.Song of Freyalise#2.Counters.Lore = (absent)

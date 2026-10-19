@@ -1,0 +1,46 @@
+# Garnet's removal is optional ("you may"): Bot1 declines for both Sagas, so no lore counter comes off and Garnet gets no
+# +1/+1 counter. A 2/2 lifelinker: Bot2 is at 18, Bot1 at 22, and the Songs keep their 2 and 1 lore counters.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Garnet, Princess of Alexandria
+Song of Freyalise
+Song of Freyalise
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Garnet, Princess of Alexandria.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Song of Freyalise.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Song of Freyalise.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Garnet, Princess of Alexandria > Bot2)
+Bot1.Decline
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Garnet, Princess of Alexandria.Power = 2
+Bot2.Life = 18
+Bot1.Life = 22
+Bot1.Battlefield.Song of Freyalise#1.Counters.Lore = 2
+Bot1.Battlefield.Song of Freyalise#2.Counters.Lore = 1

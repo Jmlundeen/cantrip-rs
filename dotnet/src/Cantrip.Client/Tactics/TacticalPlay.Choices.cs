@@ -1081,6 +1081,31 @@ public sealed partial class TacticalPlay
             .Where(permanent => permanent.Zone == ZoneKindView.Battlefield && permanent.Controller != client.Seat)
             .Sum(permanent => Worth(client, permanent)) ?? 0;
 
+    /// <summary>
+    /// Whether the next lore counter the Saga gets would be its last chapter's (CR 714.2b, 714.4): its lore counters are one short of
+    /// the highest chapter number its text prints ("I, II — ...", "III — ...", "I–III — ...").
+    /// </summary>
+    internal static bool SagaIsOneChapterFromItsLast(ObjectView saga)
+    {
+        int lore = saga.Counters.FirstOrDefault(counter => counter.Name == "lore")?.Count ?? 0;
+        int last = 0;
+        foreach (string line in saga.OracleText.Split('\n'))
+        {
+            int dash = line.IndexOf('—', StringComparison.Ordinal);
+            if (dash <= 0)
+            {
+                continue;
+            }
+
+            foreach (string numeral in line[..dash].Split([',', ' ', '–', '-'], StringSplitOptions.RemoveEmptyEntries))
+            {
+                last = Math.Max(last, numeral switch { "I" => 1, "II" => 2, "III" => 3, "IV" => 4, "V" => 5, "VI" => 6, _ => 0 });
+            }
+        }
+
+        return last > 0 && lore == last - 1;
+    }
+
     private AnswerPayload May(GameClient client, PlayerView view, MayPromptMessage prompt)
     {
         int life = LifeOf(view, client.Seat);
@@ -1122,6 +1147,11 @@ public sealed partial class TacticalPlay
             // better mode is to this seat, so those are never promised.
             "PromiseGiftFood" or "PromiseGiftTappedFish" => true,
             "PromiseGiftCard" or "PromiseGiftTreasure" or "PromiseGiftOctopus" or "PromiseGiftExtraTurn" => false,
+
+            // Garnet, Princess of Alexandria: a lore counter off a Saga is a +1/+1 counter on Garnet and, while the Saga stays, a
+            // chapter to run again. It costs the Saga a turn on the way to its final chapter, so it is taken off every Saga
+            // except one a single counter short of that chapter, whose payoff it would delay.
+            "RemoveLoreCounter" => !(client.Object(prompt.Source) is { } saga && SagaIsOneChapterFromItsLast(saga)),
 
             // Each of these is a way to lose to itself, or to hand an opponent something.
             "Sacrifice" or "HaveControllerDraw" or "PutIntoGraveyard" or "PutOnBottom"

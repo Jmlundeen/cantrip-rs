@@ -1,0 +1,46 @@
+# Garnet's ruling: removing a lore counter triggers no earlier chapter, and the chapter triggers again when the Saga gets
+# more lore counters (CR 714.2b). Bot1's Song of Freyalise has 2 lore counters on turn 3; Garnet attacks and takes one
+# (Song to 1, Garnet 3/3). On turn 5 the Saga gets its second lore counter again, so chapter II triggers a second time
+# (Garnet taps for blue mana: the creature gains "{T}: Add one mana of any color"), and chapter III has not come: no
+# +1/+1 counter from it (Garnet keeps exactly the one from the removal) and the Saga is still on the battlefield.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Garnet, Princess of Alexandria
+Song of Freyalise
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Island x24
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Garnet, Princess of Alexandria.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Song of Freyalise.Cast
+Bot1.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Garnet, Princess of Alexandria > Bot2)
+Bot1.Accept
+[T3 Bot1.Main2]
+? Bot1.Battlefield.Song of Freyalise.Counters.Lore = 1
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Battlefield.Garnet, Princess of Alexandria.Activate(Ability: Add; Color: Blue)
+? Bot1.Mana = {U}
+? Bot1.Battlefield.Song of Freyalise.Counters.Lore = 2
+
+[Expect]
+Bot1.Battlefield.Garnet, Princess of Alexandria.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Song of Freyalise.Counters.Lore = 2

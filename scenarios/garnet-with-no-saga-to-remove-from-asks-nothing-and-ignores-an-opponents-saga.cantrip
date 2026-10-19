@@ -1,0 +1,45 @@
+# Garnet's Sagas are "Sagas you control": with none of its own (Bot2 controls a Song of Freyalise, which is not offered), nothing
+# is asked (`! Bot1.Accept`) and Garnet attacks as a 2/2 lifelinker: Bot2 is at 18 and Bot1 gains 2.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Garnet, Princess of Alexandria
+Forest
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Forest
+Song of Freyalise
+Mox Emerald
+Mox Ruby
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Garnet, Princess of Alexandria.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Song of Freyalise.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Garnet, Princess of Alexandria > Bot2)
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Garnet, Princess of Alexandria.Power = 2
+Bot2.Life = 18
+Bot1.Life = 22
+Bot2.Battlefield.Song of Freyalise.Counters.Lore = 1

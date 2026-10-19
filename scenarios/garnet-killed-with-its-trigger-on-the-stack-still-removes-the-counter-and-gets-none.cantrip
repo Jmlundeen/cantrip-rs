@@ -1,0 +1,48 @@
+# Garnet leaves the battlefield before its attack trigger resolves (CR 400.7, 608.2b): Bot2 kills it with Lightning Bolt in
+# response. The ability still resolves and the removal is still offered; Bot1 takes the lore counter off its Song of
+# Freyalise (2 to 1), but there is no Garnet to put a +1/+1 counter on, and the counter is not put on a new object.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Garnet, Princess of Alexandria
+Song of Freyalise
+Forest
+Forest
+Forest x20
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Garnet, Princess of Alexandria.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Song of Freyalise.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Garnet, Princess of Alexandria > Bot2)
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Garnet, Princess of Alexandria)
+Bot2.Pass
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Garnet, Princess of Alexandria
+Bot1.Battlefield.Song of Freyalise.Counters.Lore = 1
+Bot2.Life = 20
