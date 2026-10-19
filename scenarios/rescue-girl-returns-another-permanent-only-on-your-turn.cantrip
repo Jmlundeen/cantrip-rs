@@ -1,0 +1,31 @@
+# Cannot target itself or activate on the opposing turn; can return a land on its own turn (CR 602.5).
+
+[Bot1 Deck]
+Black Lotus
+Rescue Girl, First Responder
+Island
+Island
+Island
+Island
+Island
+Island x30
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Hand.Rescue Girl, First Responder.Cast
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+! Bot1.Battlefield.Rescue Girl, First Responder.Activate(Bot1.Battlefield.Island)
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Rescue Girl, First Responder.Activate(Bot1.Battlefield.Rescue Girl, First Responder)
+Bot1.Battlefield.Rescue Girl, First Responder.Activate(Bot1.Battlefield.Island)
+[Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Rescue Girl, First Responder
+Bot1.Battlefield.Rescue Girl, First Responder.Tapped = true
