@@ -1,0 +1,38 @@
+# With no creature Bot1 controls the enters ability has no legal target (Bot2's Ornithopter is not "a creature you control"; the same
+# ability with a creature of Bot1's on the battlefield is in the other Celestial Armor scenarios), so it is
+# not put on the stack (CR 603.3d) and the Armor stays on the battlefield unattached; Bot2's Ornithopter gains nothing and the
+# stack is empty. Bot1 casts it at instant speed on Bot2's turn 2, which the flash lets it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Jet
+Celestial Armor
+Island x3
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Celestial Armor.Cast
+Bot1.Pass
+Bot2.Pass
+? Stack.Count = 0
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Celestial Armor.AttachedTo = (absent)
+Bot2.Battlefield.Ornithopter.Keywords = Flying

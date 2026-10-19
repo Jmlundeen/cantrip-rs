@@ -42,10 +42,10 @@ Bot2.Pass
 ? Bot1.Battlefield.Elvish Mystic.Keywords = Flying; Hexproof; Indestructible
 ? Bot1.Battlefield.Elvish Mystic.Power = 3
 ? Bot2.Graveyard = Lightning Bolt
+? Bot1.Battlefield.Elvish Mystic.Damage = 0
 [T3 Bot1.Main1]
 
 [Expect]
 Bot1.Battlefield.Celestial Armor.AttachedTo = Elvish Mystic
 Bot1.Battlefield.Elvish Mystic.Keywords = Flying
 Bot1.Battlefield.Elvish Mystic.Power = 3
-Bot1.Battlefield.Elvish Mystic.Damage = 0

@@ -1,0 +1,69 @@
+# Equip {3}{W} (CR 702.6a): "Attach to target creature you control. Equip only as a sorcery." Bot1 casts Celestial Armor on turn 3; entering,
+# it attaches to Elvish Mystic (a 3/1 flier). On turn 5 it is refused while Bot1's own Ornithopter is on the stack (only as a sorcery,
+# CR 702.6a, with the mana to pay for it untapped) and, with the stack empty, onto Bot2's Ornithopter; the control, equipping Llanowar Elves in Bot1's own main phase, moves it: the Mystic is a 1/1
+# without flying again and the Elves are a 3/1 flier.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Pearl
+Mox Ruby
+Mox Jet
+Elvish Mystic
+Llanowar Elves
+Celestial Armor
+Ornithopter
+Forest x12
+
+[Bot2 Deck]
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Celestial Armor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Elvish Mystic)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Celestial Armor.AttachedTo = Elvish Mystic
+[T4 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Ornithopter.Cast
+! Bot1.Battlefield.Celestial Armor.Activate(Ability: Equip; Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Battlefield.Celestial Armor.Activate(Ability: Equip; Bot2.Battlefield.Ornithopter)
+Bot1.Battlefield.Celestial Armor.Activate(Ability: Equip; Bot1.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Celestial Armor.AttachedTo = Llanowar Elves
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Keywords = Flying
+Bot1.Battlefield.Elvish Mystic.Power = 1
+Bot1.Battlefield.Elvish Mystic.Keywords = (absent)

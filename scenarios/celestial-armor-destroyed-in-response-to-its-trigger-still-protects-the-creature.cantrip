@@ -1,0 +1,54 @@
+# The Armor's enters ability is independent of the Armor staying around: with the trigger targeting Elvish Mystic on the stack, Bot2
+# destroys the Armor with Disenchant. On resolution the Armor is gone, so there is nothing to attach, but the Mystic is still a legal
+# target and gains hexproof and indestructible until end of turn. It is a plain 1/1 without flying or the +2/+0, and the Armor is in
+# Bot1's graveyard.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Elvish Mystic
+Celestial Armor
+Island
+Island x12
+
+[Bot2 Deck]
+Plains
+Mox Ruby
+Disenchant
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Celestial Armor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Disenchant.Cast(Bot1.Battlefield.Celestial Armor)
+? Stack.Count = 2
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main2]
+? Bot1.Battlefield.Elvish Mystic.Keywords = Hexproof; Indestructible
+? Bot1.Battlefield.Elvish Mystic.Power = 1
+
+[Expect]
+Bot1.Graveyard = Celestial Armor
+Bot1.Battlefield = Elvish Mystic; Mox Emerald; Mox Jet; Mox Pearl; Mox Ruby

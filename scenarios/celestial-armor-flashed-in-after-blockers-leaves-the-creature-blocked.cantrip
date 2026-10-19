@@ -1,0 +1,48 @@
+# Flash lets the Armor arrive after blockers are declared. Bot1 attacks with Elvish Mystic and Bot2's Ornithopter (0/2 flier) blocks it;
+# Bot1 then flashes in Celestial Armor onto the Mystic, which becomes a 3/1 flier with hexproof and indestructible. Giving it flying
+# after blockers does not remove the block (CR 509.1h): the Mystic stays blocked, deals its 3 damage to the Ornithopter (dies) and none to
+# Bot2, who stays at 20. The Ornithopter deals 0, so the Mystic survives with no damage (it is indestructible anyway).
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Mox Pearl
+Mox Jet
+Elvish Mystic
+Celestial Armor
+Island
+Island x12
+
+[Bot2 Deck]
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Elvish Mystic > Bot2)
+Bot2.Block(Ornithopter > Elvish Mystic)
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Celestial Armor.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Combat.Blocks = Ornithopter > Elvish Mystic
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot2.Graveyard = Ornithopter
+Bot1.Battlefield.Celestial Armor.AttachedTo = Elvish Mystic
+Bot1.Battlefield.Elvish Mystic.Damage = 0
