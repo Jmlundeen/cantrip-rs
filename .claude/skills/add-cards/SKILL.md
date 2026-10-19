@@ -292,3 +292,13 @@ core-feature agents and review agents run on Opus.
    before every push (other sessions land on `main` too), re-running the tests if the rebase brought in new commits;
    push; remove the worktree and its branch.
 6. **Report** what landed, what waited on which core gap and how it was built, and the corpus line.
+7. **Improve the process, always.** The coordinator keeps looking for ways to make this workflow - its own steps
+   and the card, core, review and harness agents' - faster, measured against three pillars in this order, never
+   traded the other way: (1) the code is correct and safe, (2) the Magic rules are enforced exactly, (3) cards are
+   implemented fast. Watch for steps whose cost buys little toward a validated, rules-exact card: work done twice
+   (the same tests run by agent and coordinator), waits (an idle blocked agent, a review held for a whole quota,
+   cold builds, a rebase loop against a moving `main`), demands beyond what the card owes (exhaustive tests, benchmarks
+   that measure nothing the change touched), and prompts that add requirements the skill does not make. Raise each
+   with the user as a concrete change - what it costs now, what it saves, and why pillars 1 and 2 are untouched - and
+   once approved write it into this skill (and `import-cards`, CLAUDE.md or the tools where it belongs) in the same
+   session, so the next run starts from the better process.
