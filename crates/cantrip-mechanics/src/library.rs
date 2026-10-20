@@ -643,3 +643,20 @@ pub fn shuffle_graveyard_into_library(g: &mut dyn Game, player: PlayerId) {
     g.put_into_library(&graveyard, LibraryPlace::Top);
     g.shuffle(player);
 }
+
+const TOP_OR_BOTTOM: Question = Question::new("PutOnTop", "put it on top of its owner's library?", "If you don't, it goes on the bottom", "Top", "Bottom");
+
+/// "Its owner puts it on their choice of the top or bottom of their library": the owner of `object` (CR 108.3), not its
+/// controller, chooses, and yes is the top. A spell on the stack leaves it without being countered (CR 701.6a does not
+/// apply); anything else is put into the library (CR 401.1). Subtlety, Horned Loch-Whale, Plan for All Outcomes and Aether
+/// Gust print it.
+pub fn owner_puts_on_top_or_bottom(g: &mut dyn Game, source: ObjectId, object: ObjectId) -> Result<(), Suspend> {
+    let owner = g.obj(object).owner;
+    let top = crate::effects::ask_may(g, owner, source, Purpose::Ask(&TOP_OR_BOTTOM))?;
+    if g.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == object) {
+        g.remove_spell(object, if top { CounterTo::LibraryTop } else { CounterTo::LibraryBottom });
+    } else {
+        g.put_into_library(&[object], if top { LibraryPlace::Top } else { LibraryPlace::Bottom });
+    }
+    Ok(())
+}

@@ -1,18 +1,12 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::{empower, targets, triggers};
+use cantrip_mechanics::{empower, library, targets, triggers};
 use cantrip_oracle as oracle;
-
-const ASK: Question = Question::new("PutOnTop", "put your permanent on top of your library?", "If you don't, it goes on the bottom", "Top", "Bottom");
 
 /// "The owner of up to one other target nonland permanent puts it on their choice of the top or bottom of their
 /// library" The owner chooses; yes means top.
 fn put_in_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(permanent) = targets::object(g, item, 0) else { return Ok(()) };
-    let owner = g.obj(permanent).owner;
-    let top = ask_may(g, owner, item.object, Purpose::Ask(&ASK))?;
-    g.put_into_library(&[permanent], if top { LibraryPlace::Top } else { LibraryPlace::Bottom });
-    Ok(())
+    library::owner_puts_on_top_or_bottom(g, item.object, permanent)
 }
 
 /// "Empower Jace 1" (CR 701.71a).

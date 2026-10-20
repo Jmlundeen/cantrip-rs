@@ -1,6 +1,6 @@
 # "The OWNER of target attacking creature you don't control puts it on their choice": Bot2 steals Bot1's Ornithopter with a
 # kicked Thieving Skydiver (X 1) on turn 2 and attacks with it on turn 4. Bot1 casts Lagoon Breach on it (Bot1 doesn't control
-# it). Bot1, the owner, is asked (not Bot2, the controller) and puts it on top of ITS OWN library (CR 400.3, 401.4: a card
+# it). Bot1, the owner, is asked (not Bot2, the controller) and puts it on top of ITS OWN library (CR 108.3, 400.3: a card
 # goes to its owner's library); Bot2's library is untouched.
 
 [Bot1 Deck]

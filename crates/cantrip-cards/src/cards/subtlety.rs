@@ -1,10 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::{evoke, targets};
+use cantrip_mechanics::{evoke, library, targets};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
-
-const ASK: Question = Question::new("PutOnTop", "put your spell on top of your library?", "If you don't, it goes on the bottom", "Top", "Bottom");
 
 fn blue_card(q: &dyn Query, asker: &Asker, id: ObjectId) -> bool {
     q.chars(id).colors.has(q.words(asker.source).color(Color::Blue))
@@ -20,13 +17,10 @@ fn creature_or_planeswalker_spell(q: &dyn Query, asker: &Asker, t: Target) -> bo
 }
 
 /// "Its owner puts it on their choice of the top or bottom of their library": the spell leaves the stack without being
-/// countered (CR 400.3), and its owner chooses; yes is the top, as the C# engine asks it.
+/// countered, and its owner (CR 108.3) chooses.
 fn put_into_library(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(spell) = targets::object(g, item, 0) else { return Ok(()) };
-    let owner = g.obj(spell).owner;
-    let top = ask_may(g, owner, item.object, Purpose::Ask(&ASK))?;
-    g.remove_spell(spell, if top { CounterTo::LibraryTop } else { CounterTo::LibraryBottom });
-    Ok(())
+    library::owner_puts_on_top_or_bottom(g, item.object, spell)
 }
 
 pub static CARD: CardDef = CardDef {

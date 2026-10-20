@@ -1,6 +1,6 @@
 # Lagoon Breach (the Adventure, {1}{U}, instant): Bot2's Llanowar Elves attack on turn 4 and Bot1 casts it from hand with two
 # Moxen. "The owner of target attacking creature you don't control puts it on their choice of the top or bottom of their
-# library" (CR 401.4): Bot2, the owner, accepts the top, so the Elves go on top of Bot2's library. The card Bot1
+# library" (CR 108.3): Bot2, the owner, accepts the top, so the Elves go on top of Bot2's library. The card Bot1
 # cast goes to exile "on an adventure" (CR 715.4), from which the Whale can be cast later.
 
 [Bot1 Deck]

@@ -1,10 +1,7 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{library, targets};
 use cantrip_mechanics::triggers::ward;
 use cantrip_oracle as oracle;
-
-const ASK: Question = Question::new("PutOnTop", "put your creature on top of your library?", "If you don't, it goes on the bottom", "Top", "Bottom");
 
 /// "Target attacking creature you don't control" (CR 115.1, 506.4, 109.5): attacking when chosen and when the spell resolves.
 fn attacking_creature_you_dont_control(q: &dyn Query, asker: &Asker, t: Target) -> bool {
@@ -12,14 +9,11 @@ fn attacking_creature_you_dont_control(q: &dyn Query, asker: &Asker, t: Target) 
 }
 
 /// "The owner of target attacking creature you don't control puts it on their choice of the top or bottom of their
-/// library." (CR 401.4, 400.3) The owner, not the controller, chooses; yes is the top. With its target gone the spell does
+/// library." The owner (CR 108.3), not the controller, chooses. With its target gone the spell does
 /// not resolve (CR 608.2b).
 fn lagoon_breach(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(creature) = targets::object(g, item, 0) else { return Ok(()) };
-    let owner = g.obj(creature).owner;
-    let top = ask_may(g, owner, item.object, Purpose::Ask(&ASK))?;
-    g.put_into_library(&[creature], if top { LibraryPlace::Top } else { LibraryPlace::Bottom });
-    Ok(())
+    library::owner_puts_on_top_or_bottom(g, item.object, creature)
 }
 
 /// The Adventure (CR 715).
