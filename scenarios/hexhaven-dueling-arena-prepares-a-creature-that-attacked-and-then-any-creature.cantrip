@@ -1,6 +1,8 @@
 # Hexhaven Dueling Arena: "{2}, {T}: Target creature that attacked this turn becomes prepared. Activate only as a
 # sorcery" and "{4}, {T}: Target creature becomes prepared" (CR 722.3a, 508.1). Bot1 attacks with Bloodline Recollector
-# and prepares it after combat with the first; on its next turn the second prepares it again.
+# and prepares it after combat with the first, then casts the copy of Ancestral Craving, which unprepares it. On its next
+# turn, before any attack, the first ability is not offered (the Recollector has not attacked this turn, so it has no
+# legal target); the second prepares it again.
 
 [Bot1 Deck]
 Hexhaven Dueling Arena
@@ -30,9 +32,16 @@ Bot1.Battlefield.Mox Jet#1.Activate
 Bot1.Battlefield.Mox Jet#2.Activate
 Bot1.Battlefield.Hexhaven Dueling Arena.Activate(Ability: {2}, {T}; Bot1.Battlefield.Bloodline Recollector)
 Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Bloodline Recollector.Prepared = true
+Bot1.Battlefield.Swamp.Activate
+Bot1.Exile.Ancestral Craving.Cast(Bot2)
 Bot1.Pass
+Bot2.Pass
+? Bot2.Life = 15
 [T5 Bot1.Main1]
 Bot1.Hand.Swamp.Play
+! Bot1.Battlefield.Hexhaven Dueling Arena.Activate(Ability: {2}, {T})
 Bot1.Battlefield.Swamp#1.Activate
 Bot1.Battlefield.Swamp#2.Activate
 Bot1.Battlefield.Mox Jet#1.Activate
@@ -43,4 +52,4 @@ Bot1.Pass
 
 [Expect]
 Bot1.Battlefield.Bloodline Recollector.Prepared = true
-Bot2.Life = 18
+Bot2.Life = 15
