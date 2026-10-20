@@ -1,0 +1,62 @@
+# Languish gives all creatures -4/-4 until end of turn: Bot1's own 1/4 Soulbreaker dies (toughness exactly 4 -> 0,
+# CR 704.5f) and so does Bot2's 0/2 Ornithopter, while Bot2's 1/5 Faithmender survives as a -3/1 (both players'
+# creatures are shrunk, and by 4, not 5). The effect ends at cleanup (CR 514.2): Faithmender is a 1/5 again next turn.
+
+[Bot1 Deck]
+Mox Jet
+Mox Jet
+Mox Jet
+Mox Jet
+Screeching Soulbreaker
+Languish
+Island
+Island x13
+
+[Bot2 Deck]
+Mox Pearl
+Mox Pearl
+Mox Pearl
+Mox Jet
+Rhox Faithmender
+Ornithopter
+Island
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Hand.Screeching Soulbreaker.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Battlefield.Mox Pearl#1.Activate
+Bot2.Battlefield.Mox Pearl#2.Activate
+Bot2.Battlefield.Mox Pearl#3.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Rhox Faithmender.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Jet#1.Activate
+Bot1.Battlefield.Mox Jet#2.Activate
+Bot1.Battlefield.Mox Jet#3.Activate
+Bot1.Battlefield.Mox Jet#4.Activate
+Bot1.Hand.Languish.Cast
+? Bot1.Mana =
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Rhox Faithmender.Power = -3
+? Bot2.Battlefield.Rhox Faithmender.Toughness = 1
+[T4 Bot2.Main1]
+
+[Expect]
+Bot1.Graveyard = Screeching Soulbreaker; Languish
+Bot2.Graveyard = Ornithopter
+Bot2.Battlefield.Rhox Faithmender.Power = 1
+Bot2.Battlefield.Rhox Faithmender.Toughness = 5

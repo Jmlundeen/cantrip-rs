@@ -1,0 +1,6 @@
+{
+  "name": "Languish",
+  "manaCost": "{2}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "All creatures get -4/-4 until end of turn."
+}
