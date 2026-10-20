@@ -1,0 +1,6 @@
+{
+  "name": "Go Blank",
+  "manaCost": "{2}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target player discards two cards. Then exile that player's graveyard."
+}
