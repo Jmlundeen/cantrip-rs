@@ -6,21 +6,7 @@ use cantrip_oracle as oracle;
 /// Domain (CR 604.3, 305.6): power and toughness each equal the number of basic land types among lands its controller
 /// controls (its owner, when it is not on the battlefield), a characteristic-defining ability in every zone.
 fn domain(q: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
-    let s = q.state();
-    let you = s.obj(source).controller;
-    let mut types = SubtypeSet::NONE;
-    for &id in s.battlefield() {
-        if s.obj(id).controller != you {
-            continue;
-        }
-        let land = q.chars(id);
-        if land.is(CardType::Land) {
-            for t in land.subtypes.iter().filter(|t| t.basic_mana().is_some()) {
-                types = types.with(t);
-            }
-        }
-    }
-    let n = types.iter().count() as i16;
+    let n = cantrip_mechanics::domain::count_in_layers(q, q.state().obj(source).controller) as i16;
     chars.power = Some(n);
     chars.toughness = Some(n);
 }

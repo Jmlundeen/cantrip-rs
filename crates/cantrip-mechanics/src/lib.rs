@@ -43,6 +43,7 @@ pub mod crew;
 pub mod devoid;
 pub mod double;
 pub mod devotion;
+pub mod domain;
 pub mod dredge;
 pub mod earthbend;
 pub mod empower;
