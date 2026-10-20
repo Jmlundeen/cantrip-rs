@@ -138,10 +138,13 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
 
 1. **Read the rules before any code.**
    - The Oracle text (the card's `content/<dataset>/cards/<card>.json`, or the current Oracle text if the card is new
-     to content) and its official rulings.
+     to content) and its official rulings: `python tools\maintenance\scryfall.py "Card Name"` prints Scryfall's
+     current Oracle text and every ruling, from a daily cache - no fetching by hand.
    - Every CR section its words touch: each keyword and keyword action, each "can't", "instead", "as ... enters",
      "whenever", "at the beginning of", each cost and each kind of target. Write down, for each sentence of the Oracle
-     text, the rule that governs it.
+     text, the rule that governs it. `python tools\maintenance\cr.py 702.21 601.2c "scry"` prints a rule and its
+     subrules by number, or a keyword or keyword action by name, from `docs/rules`; cite what it prints, never a rule
+     number from memory.
    - What the rules make the card do in the odd cases: no legal target, a target that becomes illegal, a source that
      has left the battlefield, a copy, a token, a face-down permanent, an opponent controlling it, two of it, X of
      zero, an empty library or hand, simultaneous events, a replacement effect in the way.
@@ -152,8 +155,11 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    `adventure`, `omen`, `halves`, `aftermath`). Nothing else: what a card does is Rust. The build generates its constant;
    there is no generator to run and no shared file to edit. A card whose Oracle text is only core keywords needs no
    Rust file.
-3. **Start the file.** `python tools\maintenance\new-card.py "Card Name"` prints the JSON, every scenario that holds
-   the card and its prior art, and writes `crates/cantrip-cards/src/cards/<card_name>.rs` over its generated constant.
+3. **Start the file.** `python tools\maintenance\new-card.py "Card Name"` prints the JSON; whether its Oracle text is
+   still Scryfall's (a "DIFFERS" there is fixed in the JSON first) and the card's rulings; the CR rule of each keyword
+   and keyword action on it - the number and where the engine does it, or the whole rule when nothing does yet; every
+   scenario that holds the card; and its prior art. It writes `crates/cantrip-cards/src/cards/<card_name>.rs` over its
+   generated constant.
 4. **Look before writing - prior art first.** The prior art lists, for each ability, the implemented cards that print
    it or its parts (cost, trigger, effect), simplest card first, with the mechanics and verbs each uses and how its
    text differs from yours. Where a line has a match, read that card's file and stop searching for that line: build
@@ -257,7 +263,7 @@ wrong. "0 fail" means no unexpected failures; the known-bug count is reported be
 ## Review
 
 Before a card lands, someone other than its author - a person, or a separate agent that had no part in writing it -
-reads it with the Oracle text, the rulings and the CR open. **Its primary concerns are the code's correctness and
+reads it with the Oracle text, the rulings and the CR open (`scryfall.py "Card Name"`, `cr.py <rule>`). **Its primary concerns are the code's correctness and
 safety and the card's adherence to the rules**; the tests are checked for sufficiency, not exhaustiveness:
 
 - every sentence of the Oracle text against the code, and every line of the code against the text: nothing missing,

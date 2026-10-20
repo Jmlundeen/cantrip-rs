@@ -21,7 +21,9 @@ The `cards` profile is release code with incremental compilation: an edit to one
 The whole corpus runs in a fraction of a second, so run it after every card rather than a part of it.
 
 1. **Read the card**: `new-card.py` prints `content/<dataset>/cards/<name>.json` (its characteristics and Oracle
-   text), the scenarios whose decks hold it, and its prior art: for each ability, the implemented cards that already
+   text), whether that is still Scryfall's current Oracle text and the card's official rulings (`scryfall.py`), the
+   CR rule of each keyword and keyword action on it - the whole rule when the engine has nothing for it yet (`cr.py`),
+   the scenarios whose decks hold it, and its prior art: for each ability, the implemented cards that already
    print it, or each of its parts (cost, trigger condition, effect sentence), matched exactly, then with numbers and
    mana as wildcards, then card types, colours and subtypes too - with the file, the shared mechanics and `Game`
    verbs it uses, and how its text differs (`tools/maintenance/ability-index.py`). A new card's JSON is its characteristics only; the

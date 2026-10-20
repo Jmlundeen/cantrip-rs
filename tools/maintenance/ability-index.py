@@ -21,22 +21,21 @@ failing that the nearest whole abilities by word overlap (TF-IDF cosine). Every 
 two texts, since a match is a model to change, never one to copy blind: "you" and "each opponent", "may", "another" and
 "you control" are kept in every template because each one is different code.
 
-`rank` reads Scryfall's Oracle Cards bulk file (downloaded once a day into target/scryfall/) and prints the cards legal
+`rank` reads Scryfall's Oracle Cards bulk file (scryfall.py: cached once a day in target/scryfall) and prints the cards legal
 in the constructed formats that are not implemented, by how much of them is: every ability matched, every part matched,
 or how many abilities are new; and the missing ability templates the most of them print.
 """
 
 import collections
-import datetime
 import difflib
-import gzip
 import json
 import math
 import os
 import re
 import subprocess
 import sys
-import urllib.request
+
+import scryfall
 
 sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
@@ -56,9 +55,9 @@ ROOT = _root()
 CONTENT = os.path.join(ROOT, "content")
 CARDS = os.path.join(ROOT, "crates", "cantrip-cards", "src", "cards")
 MECHANICS = os.path.join(ROOT, "crates", "cantrip-mechanics", "src")
+API = os.path.join(ROOT, "crates", "cantrip-api", "src")
 SUBTYPES = os.path.join(ROOT, "crates", "cantrip-state", "src", "subtypes.rs")
 ORACLE_BUILD = os.path.join(ROOT, "crates", "cantrip-oracle", "build.rs")
-SCRYFALL = os.path.join(ROOT, "target", "scryfall")
 CONSTRUCTED = ["standard", "pioneer", "modern", "legacy", "vintage", "pauper", "commander"]
 LEVELS = ["exact", "numbers", "types"]
 
@@ -312,22 +311,40 @@ def core_keywords():
         return set()
 
 
+_sources = {}
+
+
+def _crate_sources():
+    """(crate, module path, source) of every file of cantrip-mechanics, then cantrip-api."""
+    if not _sources:
+        for crate, folder in (("cantrip_mechanics", MECHANICS), ("cantrip_api", API)):
+            for file in sorted(os.listdir(folder)):
+                if file.endswith(".rs"):
+                    module = "" if file == "lib.rs" else file[:-3] + "::"
+                    _sources[(crate, module)] = open(os.path.join(folder, file), encoding="utf-8").read()
+    return _sources
+
+
 def mechanics_for(keyword):
-    """Where cantrip-mechanics defines a keyword: its module, or a public item named for it."""
+    """Where a keyword is defined: a cantrip-mechanics module named for it, else a public function, constant,
+    re-export or CardDef field of that name in cantrip-mechanics or cantrip-api ("ward", "equip", "convoke")."""
     stem = file_stem(keyword)
     if not stem:
         return None
     if os.path.exists(os.path.join(MECHANICS, stem + ".rs")):
         return f"cantrip_mechanics::{stem}"
-    upper, lower = stem.upper(), stem
-    for file in sorted(os.listdir(MECHANICS)):
-        if not file.endswith(".rs"):
-            continue
-        src = open(os.path.join(MECHANICS, file), encoding="utf-8").read()
-        m = re.search(r"pub (?:static|const|fn) (" + upper + r"|" + lower + r")\b", src)
+    name = r"(" + stem.upper() + r"|" + stem + r")\b"
+    item = re.compile(r"pub (?:(?:const )?fn|static|const|use [\w:]+::) ?" + name + r"(?!::)")
+    field = re.compile(r"^\s*pub " + stem + r": ", re.M)
+    for (crate, module), src in _crate_sources().items():
+        m = item.search(src)
         if m:
-            module = "" if file == "lib.rs" else file[:-3] + "::"
-            return f"cantrip_mechanics::{module}{m.group(1)}"
+            return f"{crate}::{module}{m.group(1)}"
+    for (crate, module), src in _crate_sources().items():
+        if field.search(src):
+            return f"the `{stem}` field ({crate}::{module.rstrip(':')})"
+    if "_" in stem:  # "Empower Jace" is empower's
+        return mechanics_for(stem.split("_")[0])
     return None
 
 
@@ -482,29 +499,6 @@ def report(index, abilities):
     return "\n".join(lines)
 
 
-def scryfall_cards():
-    """The constructed-legal cards of Scryfall's Oracle Cards bulk file, downloaded at most once a day."""
-    os.makedirs(SCRYFALL, exist_ok=True)
-    path = os.path.join(SCRYFALL, f"oracle-cards-{datetime.date.today():%Y%m%d}.jsonl.gz")
-    if not os.path.exists(path):
-        headers = {"User-Agent": "cantrip-maintenance/1.0", "Accept": "application/json"}
-        meta = json.load(urllib.request.urlopen(urllib.request.Request(
-            "https://api.scryfall.com/bulk-data/oracle-cards", headers=headers)))
-        print(f"downloading {meta['jsonl_download_uri']}", file=sys.stderr)
-        with urllib.request.urlopen(urllib.request.Request(meta["jsonl_download_uri"], headers=headers)) as r:
-            data = r.read()
-        for old in os.listdir(SCRYFALL):
-            os.remove(os.path.join(SCRYFALL, old))
-        open(path, "wb").write(data)
-    for line in gzip.open(path):
-        d = json.loads(line)
-        if d.get("layout") in ("token", "double_faced_token", "emblem", "art_series", "vanguard", "scheme", "planar"):
-            continue
-        if d.get("set_type") in ("funny", "memorabilia", "alchemy"):
-            continue
-        yield d
-
-
 def rank(args):
     formats = CONSTRUCTED
     if "--format" in args:
@@ -515,7 +509,9 @@ def rank(args):
     tiers = collections.Counter()
     missing = collections.defaultdict(set)
     total = 0
-    for d in scryfall_cards():
+    for d in scryfall.oracle_cards():
+        if d.get("set_type") in ("funny", "memorabilia", "alchemy"):
+            continue
         if not any(d.get("legalities", {}).get(f) in ("legal", "restricted") for f in formats):
             continue
         faces = d.get("card_faces") or [d]
