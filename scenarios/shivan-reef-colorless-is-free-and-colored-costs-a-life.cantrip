@@ -1,0 +1,22 @@
+# Shivan Reef has two mana abilities: {C} for free, or {U} or {R} for 1 damage to its controller (CR 605.1a, 106.5).
+# Bot1 taps it for {C} on turn 3 (life stays 20), then for {R} on turn 5, taking 1 damage (the land deals it, once).
+
+[Bot1 Deck]
+Shivan Reef
+Swamp x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Shivan Reef.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Shivan Reef.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Shivan Reef.Activate(Ability: {U} or {R}; Color: Red)
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Life = 19
