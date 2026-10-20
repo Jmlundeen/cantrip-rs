@@ -1,0 +1,25 @@
+# Channel works only from the hand: played as a land, Eiganjo taps for {W} but its damage ability is refused even with
+# plenty of mana and a blocking creature available (Bot2's Ornithopter blocks Bot1's Ornithopter).
+
+[Bot1 Deck]
+Eiganjo, Seat of the Empire
+Ornithopter
+Plains x15
+
+[Bot2 Deck]
+Ornithopter
+Island x19
+
+[Actions]
+Bot1.Hand.Eiganjo, Seat of the Empire.Play
+Bot1.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter > Bot2)
+Bot2.Block(Ornithopter > Ornithopter)
+! Bot1.Battlefield.Eiganjo, Seat of the Empire.Activate(Ability: Channel)
+Bot1.Battlefield.Eiganjo, Seat of the Empire.Activate(Ability: Add)
+
+[Expect]
+Bot1.Mana = {W}
+Bot2.Battlefield = Ornithopter

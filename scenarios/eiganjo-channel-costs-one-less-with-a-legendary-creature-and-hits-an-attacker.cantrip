@@ -1,0 +1,42 @@
+# Eiganjo's channel costs {1} less for each legendary creature Bot1 controls (CR 601.2f): with Ragavan out it costs {1}{W},
+# paid by the Mountain and the Plains. Bot2's Ornithopter blocks Ragavan on turn 3 and the channel kills it. The
+# Ornithopter is 0/2; 4 damage is dealt (it is gone).
+
+[Bot1 Deck]
+Mountain
+Ragavan, Nimble Pilferer
+Eiganjo, Seat of the Empire
+Plains
+Plains
+Plains
+Plains
+Plains x10
+
+[Bot2 Deck]
+Island
+Ornithopter
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Ragavan, Nimble Pilferer.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Attack(Ragavan, Nimble Pilferer > Bot2)
+Bot2.Block(Ornithopter > Ragavan, Nimble Pilferer)
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Eiganjo, Seat of the Empire.Activate(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Graveyard = Ornithopter
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Bot1.Graveyard = Eiganjo, Seat of the Empire
+Bot2.Graveyard = Ornithopter
+Bot1.Mana =
