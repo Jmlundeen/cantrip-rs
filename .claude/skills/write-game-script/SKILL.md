@@ -142,7 +142,9 @@ sweeping seeds (CLAUDE.md).
   action (a refused `Cast` without `Ability:` covers every way to cast it; unaffordable still counts as offered).
   `! Bot2.Block(Blocker > Attacker)` and `! Bot1.Attack(Attacker > Defender)` fail if that player's next declaration
   allows the pair. `! Bot1.Search(Plains)` fails if their next library search may find a Plains. A refusal lands on
-  the *next* question, so place it where the action would otherwise be legal (main phase, empty stack), and give a
+  the *next* question, so place it where the action would otherwise be legal (main phase, empty stack) - a refusal of
+  something asked at a resolution (`! Bot1.Accept`, `! Bot1.Target(..)`) needs `BotN.Pass` lines first, or an earlier
+  priority answers it and it passes without testing anything (break the card to see it fail) - and give a
   targeted spell a target. Pair each refusal with a positive control — the same action taken where the rule under
   test does not apply — or it can pass for the wrong reason.
 - **Refusals that name targets or questions.** `! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Figure of Fable)` refuses only the

@@ -143,6 +143,8 @@ TEST_POINTS = [
      "'{m}': read as it last existed - change it with an effect first and show the result follows"),
     (r"\bcreate (?:two|three|four|five|x|\d+)\b|\bfor each\b", "'{m}': all made / done at once, as one event (never a loop)"),
     (r"\bmay\b", "'may': both answers"),
+    (r"\b(?:combat )?damage to (?:a player|an opponent|target player|each opponent)\b",
+     "'{m}': damage to a planeswalker (or a creature) must not count"),
     (r"\b(?:white|blue|black|red|green|colorless|multicolored|monocolored)\b",
      "the color '{m}': an object of another color refused, one of two colors where it matters"),
 ]
