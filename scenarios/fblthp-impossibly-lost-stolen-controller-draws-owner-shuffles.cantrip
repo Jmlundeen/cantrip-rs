@@ -1,0 +1,45 @@
+# Bot1 takes Bot2's Fblthp with Old Man of the Sea. When Bot1's Elf deals combat damage to Bot2, Bot1 controls the trigger
+# and draws two; the specific Fblthp still goes to its owner's (Bot2's) library (CR 108.3b, 701.24c).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Island
+Old Man of the Sea
+Mox Emerald
+Llanowar Elves
+Forest
+Island x20
+
+[Bot2 Deck]
+Fblthp, Impossibly Lost
+Black Lotus
+Island x7
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Old Man of the Sea.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: U)
+Bot2.Hand.Fblthp, Impossibly Lost.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Old Man of the Sea.Activate(Bot2.Battlefield.Fblthp, Impossibly Lost)
+Bot1.Decline
+Bot1.Attack(Llanowar Elves > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot2.Library = Fblthp, Impossibly Lost
+Bot2.Life = 19
+Result = InProgress

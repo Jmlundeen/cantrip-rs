@@ -1,0 +1,28 @@
+# Fblthp is on the battlefield, but no opponent was dealt combat damage on Bot1's turn. Bot2 makes Bot1 draw from the
+# empty library with Ancestral Recall, so Bot1 loses as usual (CR 704.5b).
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Black Lotus
+Island x5
+
+[Bot2 Deck]
+Ancestral Recall
+Black Lotus
+Island x6
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: U)
+Bot2.Hand.Ancestral Recall.Cast(Bot1)
+
+[Expect]
+Result = Bot2 won
+Bot1.LostTo = EmptyLibrary

@@ -1,0 +1,37 @@
+# Fblthp, Impossibly Lost triggers only when one or more of your opponents are dealt combat damage "during your turn". In a
+# game of three, Bot2 attacks Bot3 - Bot1's opponent - and Bot3 takes the damage on Bot2's turn (turn 5, the third player's
+# and then the second's second turn), so Fblthp's controller is not the active player and nothing triggers: Bot1 draws
+# nothing and Fblthp stays on the battlefield. The positive control is
+# fblthp-impossibly-lost-draws-two-and-shuffles-himself-in, the same damage on Bot1's own turn.
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Island x19
+
+[Bot2 Deck]
+Llanowar Elves
+Forest x19
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T4 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+[T5 Bot2.Main1]
+Bot2.Attack(Llanowar Elves > Bot3)
+[T5 Bot2.Main2]
+
+[Expect]
+Bot3.Life = 19
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard.Count = 0
+Result = InProgress

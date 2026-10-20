@@ -1,0 +1,42 @@
+# Abundance replaces the turn's draw and both draws from Fblthp's trigger while Bot1's library is empty. No card is drawn
+# and no empty-library draw is attempted; the ability still sees the empty library and Bot1 wins.
+
+[Bot1 Deck]
+Abundance
+Black Lotus
+Forest
+Island
+Fblthp, Impossibly Lost
+Island
+Island
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: G)
+Bot1.Hand.Abundance.Cast
+Bot1.Accept
+Bot1.Modes(Land)
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Accept
+Bot1.Modes(Land)
+[T5 Bot1.Main1]
+Bot1.Attack(Fblthp, Impossibly Lost > Bot2)
+Bot1.Accept
+Bot1.Modes(Land)
+Bot1.Accept
+Bot1.Modes(Land)
+
+[Expect]
+Result = Bot1 won
+Bot1.Library.Count = 0
+Bot1.Battlefield.Count = 4
+Bot2.Life = 19

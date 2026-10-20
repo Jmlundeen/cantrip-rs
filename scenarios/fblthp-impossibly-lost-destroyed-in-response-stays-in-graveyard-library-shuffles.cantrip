@@ -1,0 +1,36 @@
+# Fblthp's ability is on the stack already when Shock kills him (CR 603.2), so it still resolves and Bot1 draws two cards.
+# The card in the graveyard is a new object, so it does not move (CR 400.7), but its owner's library is still shuffled
+# because the ability refers to that specific object (CR 701.24c). Fblthp stays in the graveyard. The Shock is
+# cast in the combat damage step, after the damage that triggered the ability has been dealt.
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Island x19
+
+[Bot2 Deck]
+Shock
+Mountain x3
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Attack(Fblthp, Impossibly Lost > Bot2)
+[T5 Bot1.CombatDamage]
+Bot2.Hand.Shock.Cast(Fblthp, Impossibly Lost)
+Bot2.Battlefield.Mountain.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 19
+Bot1.Graveyard = Fblthp, Impossibly Lost
+Bot1.Battlefield.Count = 2
+Bot1.Library.Count = 9
+Result = InProgress

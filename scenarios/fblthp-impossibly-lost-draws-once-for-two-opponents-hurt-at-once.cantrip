@@ -1,0 +1,45 @@
+# "When one or more of your opponents are dealt combat damage" (CR 603.2c): the combat damage dealt at once in one combat
+# damage step is one event, however many of Bot1's opponents it hurt, so Fblthp's ability triggers once and Bot1 draws two
+# cards, not four. Bot1 attacks Bot2 with Llanowar Elves and Bot3 with Elvish Mystic in the same combat, with Fblthp on the
+# battlefield watching; Fblthp's own trigger shuffles him into Bot1's library afterwards.
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Llanowar Elves
+Elvish Mystic
+Mox Sapphire
+Mox Emerald
+Forest
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Bot3 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T4 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Forest.Activate
+[T7 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2; Elvish Mystic > Bot3)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Count = 5
+Bot2.Life = 19
+Bot3.Life = 19
+Bot1.Battlefield.Count = 6
+Bot1.Graveyard.Count = 0
+Result = InProgress

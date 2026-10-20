@@ -1,0 +1,36 @@
+# Fblthp, Impossibly Lost: "When one or more of your opponents are dealt combat damage during your turn, draw two cards.
+# If your library has no cards in it, you win the game. Fblthp's owner shuffles him into their library." Bot1 casts
+# Fblthp and attacks with it on the next turn; the combat damage to Bot2 triggers the ability (CR 510.2, 603.2c), which
+# draws two cards and then shuffles Fblthp into Bot1's library (CR 701.24a), so he is no longer on the battlefield and
+# the library has one card more than the two draws took from it. The library is not empty, so nothing is won.
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Island
+Island
+Island
+Island
+Island
+Island
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Fblthp, Impossibly Lost > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Bot1.Graveyard.Count = 0
+Bot2.Life = 19
+Result = InProgress
+Stack.Count = 0

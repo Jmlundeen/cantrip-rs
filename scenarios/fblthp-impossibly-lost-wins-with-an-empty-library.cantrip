@@ -1,0 +1,31 @@
+# Fblthp, Impossibly Lost: "Draw two cards. If your library has no cards in it, you win the game." Bot1's library holds one
+# card as the trigger resolves: the first draw takes it, the second draws nothing (CR 121.3), and Bot1 wins while the
+# ability is resolving, before state-based actions could make Bot1 lose for the empty-library draw (the card's ruling).
+# CR 104.1 ends the game immediately at the win, so Fblthp stays on the battlefield and the library stays empty.
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Island x9
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot1.Attack(Fblthp, Impossibly Lost > Bot2)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+
+[Expect]
+Result = Bot1 won
+Bot1.Library.Count = 0
+Bot1.Battlefield.Count = 3
+Bot2.Life = 19
