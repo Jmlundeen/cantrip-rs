@@ -3026,12 +3026,14 @@ pub fn loses_to_state_based_actions(cx: &Cx, player: PlayerId) -> Option<LossRea
 }
 
 /// An effect states that a player wins the game (CR 104.2b): every opponent has lost, which ends the game with them
-/// the winner (CR 104.2a). A player who has lost wins nothing; one who is about to lose to a state-based action
-/// (CR 704.5a-c) both wins and loses at once, and loses (CR 104.3f). A player who can't win the game (Platinum Angel's
-/// "your opponents can't win the game") does not, and nor does one with an opponent who can't lose it: winning is every
-/// opponent losing (CR 104.2b, 104.3e).
+/// the winner (CR 104.2a). A player who has lost wins nothing. Nor is one who is about to lose to a state-based action
+/// (CR 704.5a-c) turned away: the win happens as the effect resolves, and those actions are performed only at the next
+/// check, which the end of the game never reaches - the rule that a player who would win and lose simultaneously loses
+/// (CR 104.3f) is about a win and a loss that happen at once, not one that is still waiting (Fblthp, Impossibly Lost's
+/// ruling). A player who can't win the game (Platinum Angel's "your opponents can't win the game") does not, and nor does
+/// one with an opponent who can't lose it: winning is every opponent losing (CR 104.2b, 104.3e).
 pub fn win_game(cx: &mut Cx, player: PlayerId) {
-    if cx.s().player(player).lost || loses_to_state_based_actions(cx, player).is_some() || cx.s().is_over() {
+    if cx.s().player(player).lost || cx.s().is_over() {
         return;
     }
     let opponents: Vec<PlayerId> = cx.s().opponents(player).collect();
