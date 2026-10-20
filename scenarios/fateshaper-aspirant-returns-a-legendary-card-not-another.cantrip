@@ -1,0 +1,51 @@
+# Fateshaper Aspirant's first mode: "Return target legendary card from your graveyard to your hand" (CR 115.1, 205.4a).
+# Bot1's Lightning Bolts kill its own Aunt May and Belladonna Took, so two legendary cards and two Bolts are in its
+# graveyard: a Bolt, not legendary, is refused as the target, and Belladonna Took returns to Bot1's hand.
+
+[Bot1 Deck]
+Mox Pearl x3
+Mox Ruby x2
+Aunt May
+Belladonna Took
+Lightning Bolt
+Lightning Bolt
+Fateshaper Aspirant
+Plains x20
+
+[Bot2 Deck]
+Island x30
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Aunt May.Cast
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Hand.Belladonna Took.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Aunt May)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Belladonna Took)
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Battlefield.Mox Pearl#2.Activate
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Fateshaper Aspirant.Cast
+Bot1.Modes(1)
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Target(Bot1.Graveyard.Belladonna Took)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Hand.Belladonna Took.Power = 2
+Bot1.Graveyard.Aunt May.Toughness = 2
+Bot1.Graveyard.Belladonna Took = (absent)
+Bot1.Battlefield.Fateshaper Aspirant.Counters.PlusOnePlusOne = (absent)
