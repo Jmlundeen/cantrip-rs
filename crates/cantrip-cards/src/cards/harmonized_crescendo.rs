@@ -1,4 +1,5 @@
 use cantrip_api::*;
+use cantrip_mechanics::chosen_type;
 use cantrip_oracle as oracle;
 
 /// "Choose a creature type. Draw a card for each permanent you control of that type." The type is chosen as the spell
@@ -7,10 +8,7 @@ use cantrip_oracle as oracle;
 /// `pay_with`.)
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let choices = Subtype::CREATURE_TYPES.to_vec();
-    let Answer::Subtype(chosen) = g.ask(you, RequestKind::ChooseSubtype { source: item.object, choices, purpose: WordUse::Chosen })? else {
-        return Ok(());
-    };
+    let chosen = chosen_type::creature_type_now(g, you, item.object)?;
     let count = g
         .permanents_of(you)
         .into_iter()

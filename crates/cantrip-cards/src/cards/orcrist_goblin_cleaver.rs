@@ -1,15 +1,14 @@
 use cantrip_api::*;
 use cantrip_mechanics::attach::{attached_object, equip};
 use cantrip_mechanics::statics::have_trample;
-use cantrip_mechanics::tokens;
+use cantrip_mechanics::{chosen_type, tokens};
 use cantrip_oracle as oracle;
 
 /// "Choose a creature type. Create a Treasure token for each creature you control of that type": the type is chosen
 /// as the ability resolves (CR 608.2d), the creatures counted after, and the Treasures created together (CR 101.4).
 fn treasures_for_type(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let you = item.controller;
-    let ask = RequestKind::ChooseSubtype { source: item.object, choices: Subtype::CREATURE_TYPES.to_vec(), purpose: WordUse::Chosen };
-    let Answer::Subtype(chosen) = g.ask(you, ask)? else { return Ok(()) };
+    let chosen = chosen_type::creature_type_now(g, you, item.object)?;
     let count = g
         .permanents_of(you)
         .into_iter()

@@ -18,6 +18,15 @@ pub fn choose_type_among(g: &mut dyn Game, entering: &mut Entering, choices: Vec
     Ok(Some(chosen))
 }
 
+/// "Choose a creature type" as a spell or ability resolves (CR 608.2d): asked of `player`, any creature type, and kept
+/// nowhere - the effect uses it at once. Kindred Judgment, Harmonized Crescendo and Orcrist, Goblin-cleaver ask it.
+pub fn creature_type_now(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<Subtype, Suspend> {
+    let ask = RequestKind::ChooseSubtype { source, choices: Subtype::CREATURE_TYPES.to_vec(), purpose: WordUse::Chosen };
+    // The core holds the answer to the question: one of the creature types offered (`validate`).
+    let Answer::Subtype(chosen) = g.ask(player, ask)? else { unreachable!("the core answers a type choice with a type") };
+    Ok(chosen)
+}
+
 /// `choose_creature_type` as a card's `enters`. Chronicle of Victory, Door of Destinies, Obelisk of Urd and Patchwork Banner print exactly this.
 pub fn enters_choosing_a_creature_type(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
     choose_creature_type(g, entering)?;
