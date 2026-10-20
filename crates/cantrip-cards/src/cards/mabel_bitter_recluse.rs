@@ -4,10 +4,7 @@ use cantrip_oracle as oracle;
 
 /// "Another target creature or planeswalker" (CR 115.1): not Mabel herself.
 fn another_creature_or_planeswalker(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    matches!(t, Target::Object(id) if id != asker.source && targets::permanent(q, id) && {
-        let c = q.chars(id);
-        c.is(CardType::Creature) || c.is(CardType::Planeswalker)
-    })
+    t != Target::Object(asker.source) && (targets::CREATURE_OR_PLANESWALKER.filter)(q, asker, t)
 }
 
 /// "Remove up to three counters from another target creature or planeswalker." (CR 122.1) The counters are chosen as the

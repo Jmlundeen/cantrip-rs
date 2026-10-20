@@ -1,8 +1,11 @@
-# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+# Mabel, Bitter Recluse: "remove up to three counters from another target creature or planeswalker" (CR 115.1, 122.1).
+# Mabel herself is not a legal target, two Ornithopters are; the one targeted has no counters, so nothing is removed and
+# the ability does nothing else.
 
 [Bot1 Deck]
 Swamp
 Mabel, Bitter Recluse
+Ornithopter
 Ornithopter
 Island x4
 Island x20
@@ -13,14 +16,17 @@ Island x30
 [Actions]
 Bot1.Hand.Swamp.Play
 Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
 Bot1.Pass
 Bot1.Battlefield.Swamp.Activate
 Bot1.Hand.Mabel, Bitter Recluse.Cast
+! Bot1.Target(Mabel, Bitter Recluse)
+Bot1.Target(Ornithopter#1)
 Bot1.Pass
 Bot2.Pass
 Bot1.Pass
 Bot2.Pass
 
 [Expect]
-Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter#1.Power = 0
 Bot1.Battlefield.Mabel, Bitter Recluse.Keywords = Deathtouch
