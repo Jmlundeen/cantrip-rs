@@ -1,6 +1,7 @@
 # Theoretical Necromancer's ability is activated from the graveyard (CR 602.2b): exiling the card is the cost, so it is
 # in exile while the ability returns the other creature card to its owner's hand. Thought Scour put both cards there on
-# turn 1; the four mana is floated on turn 3, because mana empties as each step ends (CR 500.4).
+# turn 1; the four mana is floated on turn 3, because mana empties as each step ends (CR 500.4). It cannot target itself
+# ("another", refused beside the legal target).
 
 [Bot1 Deck]
 Thought Scour
@@ -26,6 +27,7 @@ Bot2.Pass
 Bot1.Hand.Swamp.Play
 Bot1.Battlefield.Swamp.Activate
 Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Graveyard.Theoretical Necromancer.Activate(Bot1.Graveyard.Theoretical Necromancer)
 Bot1.Graveyard.Theoretical Necromancer.Activate(Bot1.Graveyard.Hired Blade)
 
 [Expect]
