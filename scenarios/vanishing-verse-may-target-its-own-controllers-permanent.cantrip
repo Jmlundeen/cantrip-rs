@@ -1,0 +1,30 @@
+# "Exile target monocolored permanent" has no controller limit: Bot1 exiles its own Mesa Pegasus (exactly white).
+
+[Bot1 Deck]
+Plains
+Mesa Pegasus
+Swamp
+Plains
+Vanishing Verse
+Plains x12
+
+[Bot2 Deck]
+Swamp x14
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Mesa Pegasus.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Vanishing Verse.Cast(Bot1.Battlefield.Mesa Pegasus)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Mesa Pegasus
+Bot1.Battlefield.Count = 3

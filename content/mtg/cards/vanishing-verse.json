@@ -1,0 +1,6 @@
+{
+  "name": "Vanishing Verse",
+  "manaCost": "{W}{B}",
+  "type": "Instant",
+  "oracleText": "Exile target monocolored permanent."
+}

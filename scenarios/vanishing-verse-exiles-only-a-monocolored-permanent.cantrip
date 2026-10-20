@@ -1,0 +1,53 @@
+# "Exile target monocolored permanent": Bloodtithe Harvester (black and red, two colors), its Blood token, Mox Jet and
+# Ornithopter (colorless) and a Mountain are refused as targets (CR 105.2b, 105.2c); Dark Confidant (exactly black) is
+# the positive control and is exiled, not put into the graveyard. Bot2 gets Dark Confidant out on turn 4 so it is on the
+# battlefield beside the others when Bot1 has W and B on turn 5.
+
+[Bot1 Deck]
+Plains
+Swamp
+Plains
+Vanishing Verse
+Plains x12
+
+[Bot2 Deck]
+Mountain
+Mox Jet
+Bloodtithe Harvester
+Ornithopter
+Swamp
+Dark Confidant
+Mountain x12
+
+[Actions]
+Bot1.Hand.Plains.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Bloodtithe Harvester.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Dark Confidant.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains#1.Activate
+Bot1.Battlefield.Swamp.Activate
+! Bot1.Hand.Vanishing Verse.Cast(Bot2.Battlefield.Bloodtithe Harvester)
+! Bot1.Hand.Vanishing Verse.Cast(Bot2.Battlefield.Blood Token)
+! Bot1.Hand.Vanishing Verse.Cast(Bot2.Battlefield.Mox Jet)
+! Bot1.Hand.Vanishing Verse.Cast(Bot2.Battlefield.Ornithopter)
+! Bot1.Hand.Vanishing Verse.Cast(Bot2.Battlefield.Mountain)
+Bot1.Hand.Vanishing Verse.Cast(Bot2.Battlefield.Dark Confidant)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Dark Confidant
+Bot2.Battlefield.Count = 6
+Bot2.Graveyard.Count = 0
