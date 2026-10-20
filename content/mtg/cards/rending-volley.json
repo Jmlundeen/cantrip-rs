@@ -1,0 +1,9 @@
+{
+  "name": "Rending Volley",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "This spell can't be countered.\nRending Volley deals 4 damage to target white or blue creature.",
+  "keywords": [
+    "CantBeCountered"
+  ]
+}

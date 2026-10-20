@@ -1,0 +1,47 @@
+# Rending Volley deals 4 damage to target white or blue creature (CR 120.3, 115.1). Bot2 has Wojek Investigator (white,
+# toughness exactly 4, so exactly lethal) and Fanatic of Rhonas (green, toughness 4): the green creature is no legal
+# target, the white one is and dies. Cast at instant speed on Bot2's turn.
+
+[Bot1 Deck]
+Mountain
+Rending Volley
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Wojek Investigator
+Fanatic of Rhonas
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Wojek Investigator.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot2.Pass
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+! Bot1.Hand.Rending Volley.Cast(Bot2.Battlefield.Fanatic of Rhonas)
+Bot1.Hand.Rending Volley.Cast(Bot2.Battlefield.Wojek Investigator)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 0
+Bot2.Graveyard = Wojek Investigator
+Bot1.Graveyard = Rending Volley

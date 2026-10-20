@@ -1,0 +1,39 @@
+# Rending Volley's other color: Yargle, Goliath of Otaria is blue with toughness 9, so it survives with exactly 4 damage
+# marked (CR 120.3). Bot2 pays {4}{U} with all five Moxen on its turn; Bot1 responds at instant speed.
+
+[Bot1 Deck]
+Mountain
+Rending Volley
+Island x15
+
+[Bot2 Deck]
+Mox Pearl
+Mox Jet
+Mox Ruby
+Mox Emerald
+Mox Sapphire
+Yargle, Goliath of Otaria
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Yargle, Goliath of Otaria.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Rending Volley.Cast(Bot2.Battlefield.Yargle, Goliath of Otaria)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Yargle, Goliath of Otaria.Damage = 4
+Bot1.Graveyard = Rending Volley
