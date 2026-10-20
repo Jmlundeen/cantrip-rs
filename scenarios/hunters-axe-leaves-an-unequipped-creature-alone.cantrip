@@ -1,0 +1,41 @@
+# Hunter's Axe grants its +2/+0 and its attack trigger only to the creature it is attached to (CR 613.1f, 301.5): with
+# the Axe attached to Llanowar Elves and nothing else, an unequipped Ornithopter is still a 0/2, its attack asks nothing
+# (the ability is not its own), and it deals no damage, so Bot2 is still at 20.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Llanowar Elves
+Ornithopter
+Hunter's Axe
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Hunter's Axe.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hunter's Axe.Activate(Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+? Bot1.Battlefield.Llanowar Elves.Toughness = 1
+? Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Attack(Ornithopter > Bot2)
+? Combat.Attackers = Ornithopter > Bot2
+? Stack.Count = 0
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Battlefield.Count = 5
+Result = InProgress

@@ -1,0 +1,42 @@
+# Two Axes each grant an attack trigger (CR 113.2c). Choose trample for one and deathtouch for the other; the +2/+0 bonuses also add.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Llanowar Elves
+Hunter's Axe
+Hunter's Axe
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Hunter's Axe.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hunter's Axe.Activate(Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Hunter's Axe.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hunter's Axe#2.Activate(Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Modes(Trample)
+Bot1.Modes(Deathtouch)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 15
+Bot1.Battlefield.Llanowar Elves.Power = 5
+Bot1.Battlefield.Llanowar Elves.Keywords = Deathtouch; Trample
+Result = InProgress

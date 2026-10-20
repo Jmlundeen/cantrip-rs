@@ -1,0 +1,45 @@
+# The keyword lasts until cleanup (CR 514.2); it is not granted just by equipping. A later attack can choose the other keyword (CR 608.2d).
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Llanowar Elves
+Ornithopter
+Hunter's Axe
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Hunter's Axe.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hunter's Axe.Activate(Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Modes(Trample)
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+? Bot1.Battlefield.Llanowar Elves.Power = 3
+[T7 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Modes(Deathtouch)
+? Bot1.Battlefield.Llanowar Elves.Keywords = Deathtouch
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Llanowar Elves.Power = 3
+Bot1.Battlefield.Llanowar Elves.Toughness = 1
+Result = InProgress
