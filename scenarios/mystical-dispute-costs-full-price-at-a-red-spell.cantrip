@@ -1,0 +1,38 @@
+# Mystical Dispute costs {2} less only if it targets a blue spell. Against Bot2's red Shock (aimed at Bot1) on turn 6 it
+# costs the full {2}{U}: three Islands tapped, and the pool is empty right after the cast. Bot2 has two Islands left
+# and cannot pay {3}, so Shock is countered and Bot1 takes no damage.
+
+[Bot1 Deck]
+Mystical Dispute
+Island x16
+
+[Bot2 Deck]
+Shock
+Mountain x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Shock.Cast(Bot1)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mystical Dispute.Cast(Stack.Shock)
+? Bot1.Mana =
+Bot1.Pass
+
+[Expect]
+Turn = 6
+Bot1.Life = 20
+Bot1.Graveyard = Mystical Dispute
+Bot2.Graveyard = Shock

@@ -1,0 +1,41 @@
+# Mystical Dispute: "This spell costs {2} less to cast if it targets a blue spell." Bot1 has three Islands tapped on
+# turn 6 when Bot2 casts Opt (blue, with only two Islands left over, so it cannot pay {3}). The Dispute costs {U}
+# (CR 601.2f): two of the three mana are still in the pool right after the cast, and Opt is countered.
+
+[Bot1 Deck]
+Mystical Dispute
+Island x16
+
+[Bot2 Deck]
+Opt
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Opt.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mystical Dispute.Cast(Stack.Opt)
+? Bot1.Mana = {U}{U}
+Bot1.Pass
+# Bot2 makes {U}{U}, enough for {2} but not the {3} asked, so paying is not offered.
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+! Bot2.PayCost
+
+[Expect]
+Turn = 6
+Bot1.Graveyard = Mystical Dispute
+Bot2.Graveyard = Opt

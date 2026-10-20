@@ -1,0 +1,47 @@
+# Mystical Dispute: "Counter target spell unless its controller pays {3}." On turn 8 Bot2 casts Opt with three Islands
+# left untapped, exactly the {3} asked (CR 118.12), taps them while the Dispute resolves and pays: Opt is not countered
+# and resolves. Bot1 pays only {U} for the Dispute, as Opt is blue.
+
+[Bot1 Deck]
+Mystical Dispute
+Island x16
+
+[Bot2 Deck]
+Opt
+Island x16
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T4 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T8 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Opt.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Mystical Dispute.Cast(Stack.Opt)
+? Bot1.Mana =
+# Without this pass Bot2 would tap its Islands before the Dispute resolves.
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Island.Activate
+Bot2.PayCost
+
+[Expect]
+Turn = 8
+Bot1.Graveyard = Mystical Dispute
+Bot2.Graveyard = Opt
+Bot2.Battlefield.Island#1.Tapped = true
+Bot2.Battlefield.Island#4.Tapped = true
+Bot2.Hand.Count = 7
