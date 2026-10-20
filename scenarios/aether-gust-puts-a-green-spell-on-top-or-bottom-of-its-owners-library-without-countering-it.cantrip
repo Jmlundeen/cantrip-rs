@@ -1,0 +1,50 @@
+# Aether Gust targets a spell that's red or green and its owner puts it on the top or the bottom of their library, their
+# choice (CR 108.3, 701.6a). Bot2 casts Llanowar Elves and Elvish Mystic on turn 2; Bot1 Gusts the first (Bot2 accepts: top) and the
+# second (Bot2 declines: bottom). Neither Elves is countered: only the sacrificed Lotus is in the graveyard.
+
+[Bot1 Deck]
+Black Lotus
+Mox Sapphire
+Mox Jet
+Aether Gust
+Aether Gust
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Emerald
+Black Lotus
+Llanowar Elves
+Elvish Mystic
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aether Gust.Cast(Stack.Llanowar Elves)
+Bot2.Accept
+Bot2.Battlefield.Black Lotus.Activate(Color: G)
+Bot2.Hand.Elvish Mystic.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: U)
+Bot1.Hand.Aether Gust.Cast(Stack.Elvish Mystic)
+Bot2.Decline
+
+[Expect]
+Stack.Count = 0
+Bot2.Graveyard = Black Lotus
+Bot2.Battlefield = Mox Emerald
+Bot2.Library = Llanowar Elves; Island; Island; Island; Island; Island; Island; Island; Island; Island; Elvish Mystic

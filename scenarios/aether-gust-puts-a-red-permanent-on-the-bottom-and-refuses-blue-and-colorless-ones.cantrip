@@ -1,0 +1,56 @@
+# Aether Gust on a red permanent: its owner declines and it goes on the bottom of their library (CR 108.3). Refused
+# beside it: a blue creature (Spyglass Siren), a colorless Mox, and a land. Bot2 has the red Monastery Swiftspear, Bot1 the
+# blue Siren, both in play, so the filter must read the color and not the controller.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Aether Gust
+Spyglass Siren
+Island
+Island
+Island
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Monastery Swiftspear
+Island
+Island
+Island
+Island
+Island
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Monastery Swiftspear.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Spyglass Siren.Cast
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Aether Gust.Cast(Bot1.Battlefield.Spyglass Siren)
+! Bot1.Hand.Aether Gust.Cast(Bot2.Battlefield.Mox Ruby)
+! Bot1.Hand.Aether Gust.Cast(Bot1.Battlefield.Island)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Aether Gust.Cast(Bot2.Battlefield.Monastery Swiftspear)
+Bot1.Pass
+Bot2.Pass
+Bot2.Decline
+
+[Expect]
+Bot2.Battlefield = Mox Ruby
+Bot2.Graveyard.Count = 0
+Bot2.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Monastery Swiftspear
+Bot1.Battlefield.Spyglass Siren.Tapped = false
