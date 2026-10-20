@@ -94,6 +94,15 @@ fn attacking_creature_filter(q: &dyn Query, asker: &Asker, t: Target) -> bool {
 /// "Target attacking creature" (CR 115.1, 506.4): a creature on the battlefield that is attacking when it is chosen and
 /// still is as the ability resolves, or the target is illegal. Raffine, Scheming Seer and Raubahn, Bull of Ala Mhigo print it.
 pub const ATTACKING_CREATURE: TargetSpec = target(attacking_creature_filter);
+
+/// "Target attacking or blocking creature" (CR 506.4, 508.1, 509.1): a creature on the battlefield that is attacking or
+/// blocking now. Gideon's Memorial and Eiganjo, Seat of the Empire print it.
+pub fn attacking_or_blocking_creature_filter(q: &dyn Query, _: &Asker, t: Target) -> bool {
+    matches!(t, Target::Object(id) if permanent(q, id)
+        && q.chars(id).is(CardType::Creature)
+        && (q.is_attacking(id) || q.state().blocks.iter().any(|b| b.blocker == id)))
+}
+pub const ATTACKING_OR_BLOCKING_CREATURE: TargetSpec = target(attacking_or_blocking_creature_filter);
 pub const CREATURE_YOU_CONTROL: TargetSpec = target(creature_you_control_filter);
 /// "Another target creature you control", "other target creature you control" (CR 115.1, 109.5): a creature on the battlefield
 /// under your control other than the source. Dour Port Mage, Giver of Runes, Oliphaunt, Flock Impostor and the reconfigure
