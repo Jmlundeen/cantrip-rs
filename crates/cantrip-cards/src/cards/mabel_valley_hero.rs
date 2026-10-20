@@ -1,16 +1,11 @@
 use cantrip_api::*;
-use cantrip_mechanics::targets;
+use cantrip_mechanics::{history, targets};
 use cantrip_oracle as oracle;
 
 /// "Target creature that entered this turn" (CR 603.6a): a creature on the battlefield whose zone change onto it is in
 /// this turn's history.
-fn entered_this_turn(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    let Target::Object(id) = t else { return false };
-    targets::permanent(q, id)
-        && q.chars(id).is(CardType::Creature)
-        && q.history().this_turn().iter().any(|r| {
-            matches!(r.event, Event::ZoneChange { new, to, .. } if new == id && to.is(ZoneKind::Battlefield))
-        })
+fn entered_this_turn(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (targets::CREATURE.filter)(q, asker, t) && matches!(t, Target::Object(id) if history::entered_this_turn(q.history(), id))
 }
 
 /// The self-enter clause also applies when a copy is not a creature (CR 201.5).
