@@ -1,5 +1,5 @@
 # Your Fate Ends Here targets only a creature or planeswalker with mana value 3 or greater (CR 115.1, 202.3): Bot2's
-# Hired Blade ({2}{B}) qualifies and is destroyed; Bot2's Ornithopter (mana value 0) would not be a legal target.
+# Hired Blade ({2}{B}) qualifies and is destroyed; Bot2's Ornithopter (mana value 0) is refused as a target.
 # The surveil 1 is part of the same resolution.
 
 [Bot1 Deck]
@@ -23,13 +23,16 @@ Bot2.Battlefield.Swamp.Activate
 Bot2.Hand.Black Lotus.Cast
 Bot2.Battlefield.Black Lotus.Activate(Color: Black)
 Bot2.Hand.Hired Blade.Cast
+Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Plains.Play
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: White)
+! Bot1.Hand.Your Fate Ends Here.Cast(Bot2.Battlefield.Ornithopter)
 Bot1.Hand.Your Fate Ends Here.Cast(Bot2.Battlefield.Hired Blade)
 
 [Expect]
+Bot2.Battlefield.Ornithopter.Power = 0
 Stack.Count = 0
 Bot2.Graveyard = Hired Blade; Black Lotus
 Bot1.Battlefield.Count = 1
