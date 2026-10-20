@@ -1453,11 +1453,13 @@ fn change_parts(
     let mut less = ManaCost::ZERO;
     let mut life = 0u32;
     let mut least = 0u8;
+    let mut discount = 0u32;
     let mut add = |delta: CostDelta| {
         more += delta.more as u32;
         less = less.plus(&delta.less);
         life += delta.life as u32;
         least = least.max(delta.at_least);
+        discount += delta.less_to_one as u32;
     };
     for change in own {
         add(change(q, id, player, costed, targets));
@@ -1465,17 +1467,11 @@ fn change_parts(
     if let Some(change) = ability_own {
         add(change(q, id, player, costed, targets));
     }
-    let mut discount = 0u32;
     for &source in sources {
         let obj = cx.s().obj(source);
         let def = cx.card(cx.cards().current(obj));
         for change in def.cost_changes {
             add(change(q, source, player, costed, targets));
-        }
-        if let Some(ability) = ability {
-            for d in def.ability_discounts {
-                discount += d(q, source, player, id, ability) as u32;
-            }
         }
     }
     // "[Kind of] spells you cast this turn cost {1} less" (CR 611.2c, 601.2f): each such effect about the caster, whatever has

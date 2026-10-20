@@ -294,11 +294,16 @@ pub struct CostDelta {
     /// cast" (Trinisphere). Applied after every increase and every reduction, by generic mana making up the difference, the
     /// greatest of them where several apply; 0 for none. It changes no mana cost, so no mana value (CR 202.3).
     pub at_least: u8,
+    /// Generic mana taken off "but never to less than one mana" (CR 601.2f, 118.7): "activated abilities of artifacts you
+    /// control cost {1} less to activate. This effect can't reduce the mana in that cost to less than one mana" (Forensic
+    /// Gadgeteer, Zirda, the Dawnwaker). Applied to the cost every other increase and reduction has left, together, and
+    /// leaving at least one mana where there was any; 0 for none.
+    pub less_to_one: u8,
 }
 
 impl CostDelta {
     /// No change.
-    pub const NONE: CostDelta = CostDelta { more: 0, less: ManaCost::ZERO, life: 0, at_least: 0 };
+    pub const NONE: CostDelta = CostDelta { more: 0, less: ManaCost::ZERO, life: 0, at_least: 0, less_to_one: 0 };
 
     /// "Costs {n} more."
     pub const fn more(n: u8) -> CostDelta {
@@ -318,6 +323,11 @@ impl CostDelta {
     /// "Costs {W}{W} less", or "reduced by its mana cost": an amount of mana that may be colored (CR 118.7b-d, f).
     pub const fn less_mana(mana: ManaCost) -> CostDelta {
         CostDelta { less: mana, ..CostDelta::NONE }
+    }
+
+    /// "Costs {n} less ... can't reduce the mana in that cost to less than one mana" (`less_to_one`).
+    pub const fn less_to_one(n: u8) -> CostDelta {
+        CostDelta { less_to_one: n, ..CostDelta::NONE }
     }
 
     /// "Costs [n] mana to cast" where it would cost less: the total cost's least mana (CR 601.2f, `at_least`).
@@ -363,13 +373,6 @@ pub struct LastingCostChange {
 /// 702.126a), read with its characteristics as a spell; judged before it is cast, `spell` is the card about to be, with
 /// those of the face it would be cast as.
 pub type PayWithGrant = fn(&dyn Query, ObjectId, PlayerId, ObjectId) -> PayWith;
-
-/// A static ability that makes abilities cost less to activate, but never below one mana (CR 601.2f, 118.7): how much
-/// generic mana less the ability `ability` of `permanent` costs `player` to activate, by the permanent `source` that has
-/// it; zero when it does not apply. "Activated abilities of artifacts you control cost {1} less to activate. This effect
-/// can't reduce the mana in that cost to less than one mana": Forensic Gadgeteer, Zirda, the Dawnwaker. Mana abilities
-/// are not asked (they use no stack, and are paid for as the cost they are part of is).
-pub type AbilityDiscount = fn(&dyn Query, ObjectId, PlayerId, ObjectId, AbilityRef) -> u8;
 
 /// A static ability that lets a player pay a different mana cost rather than an activated ability's (CR 118.9, 602.2b),
 /// by the permanent `source` that has it: the cost they may pay instead for `activator` activating the ability `def` of
@@ -2150,9 +2153,6 @@ pub struct CardDef {
     /// Its static abilities that give the spells a player casts convoke, delve or improvise (CR 601.2f-h), while it is on the
     /// battlefield.
     pub grants_pay_with: &'static [PayWithGrant],
-    /// Its static abilities that make activated abilities cost less, with at least one mana left (CR 601.2f), while it is
-    /// on the battlefield.
-    pub ability_discounts: &'static [AbilityDiscount],
     /// Its static abilities that let a player pay another mana cost rather than an activated ability's (CR 118.9), while
     /// it is on the battlefield.
     pub ability_alternatives: &'static [AbilityAlternative],
@@ -2403,7 +2403,6 @@ impl CardDef {
         own_cost_changes: &[],
         lasting_cost_changes: &[],
         grants_pay_with: &[],
-        ability_discounts: &[],
         ability_alternatives: &[],
         granted_ways: &[],
         spell_alternatives: &[],
@@ -2660,7 +2659,7 @@ impl CardTable {
         let replaces: Vec<bool> = cards.iter().map(|c| !c.replacements.is_empty() || !c.preventions.is_empty()).collect();
         let any_replaces = replaces.iter().any(|&r| r);
         let any_cast_limit = cards.iter().any(|c| c.cast_limit > 0);
-        let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty() || !c.ability_discounts.is_empty()).collect();
+        let cost_changes: Vec<bool> = cards.iter().map(|c| !c.cost_changes.is_empty()).collect();
         let pay_with_grants: Vec<bool> = cards.iter().map(|c| !c.grants_pay_with.is_empty()).collect();
         let activation_rules: Vec<bool> = cards.iter().map(|c| !c.activation_rules.is_empty()).collect();
         let trigger_rules: Vec<bool> = cards.iter().map(|c| !c.trigger_rules.is_empty() || !c.additional_triggers.is_empty()).collect();

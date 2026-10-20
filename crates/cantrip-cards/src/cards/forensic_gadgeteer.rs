@@ -18,18 +18,20 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 /// "Activated abilities of artifacts you control cost {1} less to activate. This effect can't reduce the mana in that
 /// cost to less than one mana" (CR 601.2f, 118.7).
-fn artifact_abilities(q: &dyn Query, source: ObjectId, player: PlayerId, permanent: ObjectId, _: AbilityRef) -> u8 {
+/// Asked of activated abilities alone (`Costed::Ability`): never of a spell, nor of a special action (CR 116.1).
+fn artifact_abilities(q: &dyn Query, source: ObjectId, player: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
+    let Costed::Ability(permanent, _) = costed else { return CostDelta::NONE };
     let you = q.controller(source);
     if player == you && q.controller(permanent) == you && q.is_on_battlefield(permanent) && q.chars(permanent).is(CardType::Artifact) {
-        1
+        CostDelta::less_to_one(1)
     } else {
-        0
+        CostDelta::NONE
     }
 }
 
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(when(EventMask::SPELL_CAST, you_cast_an_artifact_spell), effect, "Whenever you cast an artifact spell, investigate.")],
-    ability_discounts: &[artifact_abilities],
+    cost_changes: &[artifact_abilities],
     ..oracle::FORENSIC_GADGETEER
 };
 
