@@ -465,6 +465,21 @@ pub fn exile_top_may_play(g: &mut dyn Game, from: PlayerId, count: usize, who: P
     exiled
 }
 
+/// "Exile the top `count` cards of your library. Choose one of them. [Until ...] you may play that card" (CR 406, 305.1,
+/// 601.3): the cards leave together, `player` chooses one of those that really reached exile (a replacement may send one
+/// elsewhere), and only that card can be played, under `grant`; the others stay in exile unplayable. The card chosen, none
+/// when nothing reached exile. Fireglass Mentor (until end of turn) and Heroes' Hangout (until the end of your next turn)
+/// print it.
+pub fn exile_top_choose_one_may_play(g: &mut dyn Game, player: PlayerId, source: ObjectId, count: usize, grant: PlayGrant) -> Result<Option<ObjectId>, Suspend> {
+    let top = top_of_library(g, player, count);
+    let exiled: Vec<ObjectId> = g.exile_all(&top).into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Exile)).collect();
+    let chosen = crate::choose::card(g, player, source, Purpose::Play, exiled)?;
+    if let Some(card) = chosen {
+        g.allow_play(card, player, grant);
+    }
+    Ok(chosen)
+}
+
 /// "Exile the top `count` cards of `from`'s library face down. `who` may look at and play [it / those cards]" under `grant`
 /// (CR 406.3, 601.3, 305.1): the cards leave together face down, `who` looks at each that really reached exile (a
 /// replacement may send it elsewhere), and may play it under the grant. The cards still in exile. Headliner Scarlett (one,
