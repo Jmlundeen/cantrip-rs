@@ -688,6 +688,10 @@ pub mod filters {
     pub fn treasure(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         q.chars(id).has_subtype(Subtype::Treasure)
     }
+    /// A Food (CR 111.10b): Cauldron Familiar's "Sacrifice a Food" and Ygra, Eater of All's ward.
+    pub fn food(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
+        q.chars(id).has_subtype(Subtype::Food)
+    }
     /// A nonland permanent. Bolas's Citadel sacrifices ten; Rottenmouth Viper any number.
     pub fn nonland(q: &dyn Query, _: &Asker, id: ObjectId) -> bool {
         !q.chars(id).is(CardType::Land)

@@ -456,6 +456,14 @@ pub fn may_return_this_card_to_battlefield(g: &mut dyn Game, item: &StackItem) -
     Ok(())
 }
 
+/// "Return this card from your graveyard to the battlefield" (CR 400.7): the ability's own source, put onto the
+/// battlefield untapped under its controller; nothing if it is no longer the object the ability came from (the core skips a
+/// card that changed zones). Darklight Phoenix and Cauldron Familiar print it.
+pub fn return_this_card_to_battlefield(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.put_onto_battlefield(item.object, item.controller, false)?;
+    Ok(())
+}
+
 /// "Return this [permanent or card] to its owner's hand" (CR 400.3): the ability's own source, from the battlefield or a
 /// graveyard. Nothing if it is no longer the object it was by the time the ability resolves (CR 400.7). Altar of the Wretched
 /// and Puppet Crafting ("from your graveyard") and Bramble Familiar ("this creature") print it.

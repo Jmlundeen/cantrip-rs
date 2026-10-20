@@ -579,7 +579,7 @@ fn ward_sacrifice_a_food_effect(g: &mut dyn Game, item: &StackItem) -> Result<()
     let payer = PlayerId(item.data[0] as u8);
     // A cost is paid only with what it needs (CR 118.3): a player who controls no Food can't pay and is not asked, nor is one
     // whom the ward's controller's abilities can't make sacrifice (CR 101.2). The payer chooses which Food among theirs.
-    let foods: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| g.chars(id).has_subtype(Subtype::Food)).collect();
+    let foods: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| crate::targets::filters::food(&*g, &Asker { source: item.object, controller: payer }, id)).collect();
     if !foods.is_empty()
         && may_cause_discard_or_sacrifice(&*g, item.controller, payer, true)
         && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_SACRIFICE_FOOD) })? == Answer::Yes
