@@ -17,13 +17,8 @@ fn eight_lands(q: &dyn Query, asker: &Asker) -> bool {
     cantrip_mechanics::lands_you_control(q, asker.controller) >= 8
 }
 
-fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.become_prepared(item.object);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(triggers::THIS_ATTACKS, become_prepared, "Whenever this creature attacks, if you control eight or more lands, this creature becomes prepared.")
+    abilities: &[triggered(triggers::THIS_ATTACKS, cantrip_mechanics::prepare::become_prepared, "Whenever this creature attacks, if you control eight or more lands, this creature becomes prepared.")
         .condition(eight_lands)],
     enters: Some(cantrip_mechanics::prepare::enters_prepared),
     prepare: Some(&REGROWTH),

@@ -249,6 +249,11 @@ pub fn gain_life(g: &mut dyn Game, item: &StackItem, n: i32) -> Result<(), Suspe
     Ok(())
 }
 
+/// "You gain 1 life" as a triggered or activated ability. Koth of the Homestead and Medic's Kitesail use this callback.
+pub fn gain_one_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    gain_life(g, item, 1)
+}
+
 /// "Each opponent loses 1 life and you gain 1 life" (CR 119.3): every opponent still in the game loses it together, and the
 /// ability's controller gains 1. Bontus's Monument, Doom Reigns Supreme, Grave Venerations, Raven of Fell Omens, Thunder of
 /// Unity, Tithing Blade, Witherbloom Apprentice and Dream Beavers print it.

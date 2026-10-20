@@ -10,6 +10,13 @@ pub fn enters_prepared(_: &mut dyn Game, entering: &mut Entering) -> Result<(), 
     Ok(())
 }
 
+/// "This creature becomes prepared" during resolution (CR 722.3a). Bloodline Recollector, Emeritus of Abundance,
+/// Paradox Shaper and Stingerquill Voxmancer use it.
+pub fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    g.become_prepared(item.object);
+    Ok(())
+}
+
 /// Whether this object is a prepare spell (CR 722.3c-d), including copies. The
 /// exile-only `prepared_from` link belongs to the old object after casting, so
 /// follow the history's zone-change and copy provenance rather than a card name.

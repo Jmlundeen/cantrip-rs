@@ -26,15 +26,10 @@ fn this_is_not_prepared(q: &dyn Query, me: &Asker) -> bool {
 }
 
 /// "It becomes prepared" (CR 722.3a): nothing if it left the battlefield, or already is prepared.
-fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.become_prepared(item.object);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[triggered(
         YOUR_UPKEEP,
-        become_prepared,
+        cantrip_mechanics::prepare::become_prepared,
         "At the beginning of your upkeep, if this creature isn't prepared, it becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
     )
     .condition(this_is_not_prepared)],

@@ -21,11 +21,6 @@ fn this_is_not_prepared(q: &dyn Query, me: &Asker) -> bool {
     !q.obj(me.source).prepared
 }
 
-fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.become_prepared(item.object);
-    Ok(())
-}
-
 /// "{2}: Put target card from your graveyard on the bottom of your library." The card is put on the bottom as the
 /// ability resolves, if its target is still there (CR 608.2b).
 fn bottom_target(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
@@ -39,7 +34,7 @@ pub static CARD: CardDef = CardDef {
     abilities: &[
         triggered(
             YOUR_UPKEEP,
-            become_prepared,
+            cantrip_mechanics::prepare::become_prepared,
             "At the beginning of your upkeep, if this creature isn't prepared, it becomes prepared. (While it's prepared, you may cast a copy of its spell. Doing so unprepares it.)",
         )
         .condition(this_is_not_prepared),
