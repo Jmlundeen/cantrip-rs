@@ -1,0 +1,71 @@
+# Path of Peril cast for its cleave cost {4}{W}{B}: the words in brackets are gone, so "Destroy all creatures" - the
+# mana value 3 creatures of both players die with the mana value 2 ones. All six sources are tapped and the cost is
+# {4}{W}{B}, so the cast would fail if the cleave cost were higher. CR 702.148a.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Woodland Changeling
+Elvish Spirit Guide
+Path of Peril
+Swamp
+Plains
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Woodland Changeling
+Elvish Spirit Guide
+Island
+Island
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elvish Spirit Guide.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Elvish Spirit Guide.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Woodland Changeling.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Woodland Changeling.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Path of Peril.Cast(Ability: Cleave)
+? Bot1.Mana = 
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Forest; Mox Emerald; Mox Jet; Mox Ruby; Plains; Swamp
+Bot2.Battlefield = Forest; Forest; Mox Emerald; Mox Ruby
+Bot1.Graveyard.Count = 3
+Bot2.Graveyard.Count = 2

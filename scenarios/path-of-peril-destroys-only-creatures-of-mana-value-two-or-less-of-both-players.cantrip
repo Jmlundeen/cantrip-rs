@@ -1,0 +1,70 @@
+# Path of Peril cast for its mana cost: "Destroy all creatures with mana value 2 or less" (the bracketed words stay).
+# Each player has a mana value 2 creature (Woodland Changeling, exactly at the limit: destroyed) and a mana value 3
+# one (Elvish Spirit Guide, just past it: survives), so a limit read as < , or one that looks at only one side, fails.
+# Four sources are tapped for the {1}{B}{B} cost so the pool left ({G}) proves the cost was not lower. CR 702.148, 701.8.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Mox Ruby
+Woodland Changeling
+Elvish Spirit Guide
+Path of Peril
+Swamp
+Plains
+Forest x12
+
+[Bot2 Deck]
+Forest
+Mox Emerald
+Mox Ruby
+Woodland Changeling
+Elvish Spirit Guide
+Island
+Island
+Forest x12
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Elvish Spirit Guide.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Elvish Spirit Guide.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Woodland Changeling.Cast
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Woodland Changeling.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Path of Peril.Cast
+? Bot1.Mana = {G}
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Elvish Spirit Guide; Forest; Mox Emerald; Mox Jet; Mox Ruby; Plains; Swamp
+Bot2.Battlefield = Elvish Spirit Guide; Forest; Forest; Mox Emerald; Mox Ruby
+Bot1.Graveyard = Path of Peril; Woodland Changeling
+Bot2.Graveyard = Woodland Changeling
