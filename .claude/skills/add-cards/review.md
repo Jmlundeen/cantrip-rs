@@ -31,14 +31,16 @@ checked for sufficiency, not exhaustiveness:
   it offers is clickable with its cost, and a browser scenario proves each new user interaction (`client.md`) - or the
   card needs nothing the client did not already do, and no browser scenario is owed. The tactical bot is never checked.
 
-A reviewer runs only the card's scenarios and coverage (`corpus -- --card "Name"`, `card-coverage`), and those of a
+A reviewer runs only the card's scenarios and coverage (`corpus -- --card "Name"`, `python tools/maintenance/card-coverage.py "Name"`), and those of a
 card whose shared code the change touched - nothing wider - and, in another's worktree, changes no files, checks out
 nothing and cleans nothing.
 
 The reviewer changes nothing silently: each finding is fixed by the author or recorded as the reason the card does not
-land. Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect, an
-item on the "never" list, or a test that is obviously insufficient; the rest (wording, citations, optional sharing)
-does not hold the card, and is fixed in the same pass only if it is quick. A suspected bug elsewhere, or a path no
+land. Self-reported "exact" is not proof. A finding **blocks** the card when it is a rules deviation, a code defect
+(an overflow included), an item on the "never" list, or a test that is obviously insufficient - and a decision of the
+card's own code (a number, a limit, a narrowing, whose objects) that no expectation would catch being wrong is
+obviously insufficient, however small. A wrong citation is fixed in the same pass; the rest (wording, optional
+sharing) does not hold the card. A suspected bug elsewhere, or a path no
 scenario can reach, gets an entry in `docs/known-issues.md`.
 
 Report briefly: PASS, or the blocking findings - each with file:line, what is wrong and the rule - then any

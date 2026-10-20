@@ -141,11 +141,19 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
 4. **Write the card.** Behaviour by struct update over the generated constant (`CardDef { spell: Some(..),
    ..oracle::LIGHTNING_BOLT }`). Ask questions with `g.ask(..)` in the order the rules ask them, offering options in
    the order the engine and the implemented cards do. Doc comments quote the Oracle sentence each function implements
-   and cite the CR.
+   and cite the CR. A replacement that does another thing "instead" leaves its event at nothing and does the other
+   thing in its `then` (`ReplacementThen`; Hullbreacher, Soul-Scar Mage) - that is the design, not a workaround. If
+   the engine cannot express the text as the rules have it, and the code would need a stand-in that only behaves
+   alike (a value faked to get an effect), stop: that is a core gap -
+   keep the claim, log `blocked --rule <CR>` and report the gap, as the non-negotiables say.
 5. **Write the scenarios** (below; the `write-game-script` skill) and run them until they pass:
-   `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`.
-6. **Coverage:** `tools\card-coverage.cmd "Card Name"` (`python tools\maintenance\card-coverage.py "Name"` for a name
-   with a comma) reports every line of the card's file executed. A line no scenario can reach is wrong code or a
+   `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`. Then **break the card**, once
+   for each thing its own code decides (a number, a limit, a condition, whose objects): change it, see a scenario go
+   red, restore it. A break no scenario catches is a missing expectation. Say in the report what you broke and that it
+   failed.
+6. **Coverage:** `python tools/maintenance/card-coverage.py "Card Name"` reports every line of the card's file
+   executed (from a bash shell call it so, not through `tools\card-coverage.cmd`, whose quoting `cmd //c` breaks; a
+   file of statics alone has no lines to measure). A line no scenario can reach is wrong code or a
    missing scenario, never an exception.
 7. **The client.** Everything the card puts into the game must be shown, every question it asks captioned truly, and
    every action it offers clickable with its cost. A card that only uses prompts, actions and state the client already
@@ -182,8 +190,8 @@ scenarios, together:
   complex enough to need very specific testing gets it. Corner cases the engine handles for every card (a fizzled
   target, a source gone, cleanup) are not retested;
 - **verify the rules**: each ends with an `[Expect]` of the state the Oracle text, rulings and CR require - **never
-  copied from what the engine produced** - at least one of which fails if the card is wrong (the break-the-card check:
-  break the card, see it fail, restore it); `?` checks where the position matters before the end;
+  copied from what the engine produced** - at least one of which fails if the card is wrong (the loop's step 5 breaks
+  it to see); `?` checks where the position matters before the end;
 - **assert precisely**: the keys that prove the behaviour and no others.
 
 Name each scenario for what it proves (`wrath-of-god-destroys-a-creature-regenerated-in-response`) and start it with a
