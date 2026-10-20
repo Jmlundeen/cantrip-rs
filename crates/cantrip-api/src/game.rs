@@ -599,15 +599,15 @@ pub trait Game: Query {
     /// Puts cards already in a player's library on its bottom in a random order (CR 401.4), drawn from the game's own
     /// random source: "put the rest on the bottom of your library in a random order". Nothing changes zones.
     fn bottom_in_random_order(&mut self, player: PlayerId, cards: &[ObjectId]);
-    /// Whether the spell or ability resolving may cause `searcher` to search the library of `library` (CR 701.23, 701.23f)
+    /// Whether the spell or ability resolving may cause `searcher` to search the library of `library` (CR 701.23)
     /// now: false when a rule forbids it (CR 101.2: "can't" wins, `CardDef.cause_rules` with `CauseKind::Search`, as Ashiok,
     /// Dream Render's "can't cause their controller to search their library"). A search that can't be made finds nothing
     /// and records no search, but a "then shuffle" still shuffles; a "you may search" is not offered (Ashiok's rulings).
     /// The library recipes ask it (`cantrip_mechanics::search_library`, `library::ask_may_search`): a card that picks
     /// cards out of a library some other way asks it itself (Doomsday).
     fn may_search(&self, searcher: PlayerId, library: PlayerId) -> bool;
-    /// Records that `player` searched the library of `library` (CR 701.23, 701.23f: a player may search another
-    /// player's library, and "searches their library" is only the case where the two are the same), for whatever
+    /// Records that `player` searched the library of `library` (CR 701.23: a player may search another player's
+    /// library, and "searches their library" is only the case where the two are the same), for whatever
     /// watches searches.
     fn searched(&mut self, player: PlayerId, library: PlayerId);
     /// Records that `player` scried `count`, having looked at `looked` cards (CR 701.22a, 701.22d), for whatever watches

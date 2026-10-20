@@ -49,7 +49,7 @@ pub fn ask_may_search(g: &mut dyn Game, player: PlayerId, source: ObjectId, ques
     crate::effects::ask_may(g, player, source, Purpose::Ask(question))
 }
 
-/// "Search [a player's] library for [cards] and exile them, then that player shuffles" (CR 701.23, 701.23f, 406.2):
+/// "Search [a player's] library for [cards] and exile them, then that player shuffles" (CR 701.23, 406.2):
 /// `searcher` searches the library of `owner` (the same player, or another), and the cards found, together with `also`
 /// (cards the same search found in other zones, such as the graveyard and hand: CR 701.23a lets a search span zones),
 /// go to exile at once, `also` first, as an exile (`ZoneReason::Exile`): the search only finds the cards, and "exile
