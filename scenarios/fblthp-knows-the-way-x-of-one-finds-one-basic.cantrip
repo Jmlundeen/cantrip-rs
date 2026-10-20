@@ -1,0 +1,27 @@
+# X=1 finds one basic with two distinct eligible names in the library (CR 107.3, 701.23).
+# A positive one-card search and the exact hand prove the result; a multi-card refusal tests the wrong thing here.
+[Bot1 Deck]
+Fblthp, Knows the Way
+Mox Emerald
+Black Lotus
+Island x3
+Mountain
+Forest
+Plains
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Fblthp, Knows the Way.Cast(X: 1)
+Bot1.Search(Plains)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island; Island; Island; Mountain; Plains
+Bot1.Revealed = Plains
+Bot1.Library = Forest

@@ -1,0 +1,45 @@
+# Ashiok forbids Fblthp's distinct-name search (CR 101.2, 701.23). Even finding nothing would be a search event, so
+# Wan Shi Tong's absent counter proves the forbidden search was skipped, rather than merely answered with no cards.
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Ashiok, Dream Render
+Wan Shi Tong, Librarian
+Island x3
+Island x20
+
+[Bot2 Deck]
+Black Lotus
+Fblthp, Knows the Way
+Mox Emerald
+Island x4
+Island
+Forest x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Ashiok, Dream Render.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 0)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Hand.Fblthp, Knows the Way.Cast(X: 1)
+Bot2.Pass
+[Bot2.Main2]
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = (absent)
+Bot2.Battlefield.Fblthp, Knows the Way.Power = 0
+Bot2.Hand = Island; Island; Island; Island; Island
+Bot2.Library.Count = 10
