@@ -3,9 +3,9 @@ use cantrip_mechanics::{library::object_has_name, targets, top_of_library};
 use cantrip_oracle as oracle;
 
 /// "Spells and abilities your opponents control can't cause you to discard cards or sacrifice permanents" (CR 101.2):
-/// allowed unless it is her controller who would, and an opponent who causes it.
-fn opponents_cant_cause_you(_: &dyn Query, asker: &Asker, causer: PlayerId, player: PlayerId, _sacrifice: bool) -> bool {
-    !(player == asker.controller && causer != asker.controller)
+/// allowed unless it is her controller who would, and an opponent who causes it. A search is not named, so it is allowed.
+fn opponents_cant_cause_you(_: &dyn Query, asker: &Asker, causer: PlayerId, player: PlayerId, kind: CauseKind) -> bool {
+    matches!(kind, CauseKind::Search { .. }) || !(player == asker.controller && causer != asker.controller)
 }
 
 /// +1: choose a nonland card name, then reveal the top four cards of your library; all cards with that name from among

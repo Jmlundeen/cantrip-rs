@@ -36,6 +36,19 @@ fn find(g: &mut dyn Game, player: PlayerId, source: ObjectId, destination: Searc
     Ok(found)
 }
 
+/// "[Player] may search their library for [cards] ..." (CR 701.23, 101.2): whether `player` searches, asked with `question`
+/// (verb `SearchLibrary`, the search worded). Not asked, and false, when the spell or ability can't cause the search
+/// (`Game::may_search`: Ashiok, Dream Render's ruling, "your opponents can't choose to search, so they won't shuffle").
+/// Every "may search" is asked here, and the search recipe (with its "then shuffle") runs only on true, so a declined or
+/// forbidden search shuffles nothing. Stoneforge Mystic, Trinket Mage, Golos, Tireless Pilgrim and the basic-land fetches of
+/// Path to Exile and Ghost Quarter (`lands::may_fetch_basic`) ask it.
+pub fn ask_may_search(g: &mut dyn Game, player: PlayerId, source: ObjectId, question: &'static Question) -> Result<bool, Suspend> {
+    if !g.may_search(player, player) {
+        return Ok(false);
+    }
+    crate::effects::ask_may(g, player, source, Purpose::Ask(question))
+}
+
 /// "Search [a player's] library for [cards] and exile them, then that player shuffles" (CR 701.23, 701.23f, 406.2):
 /// `searcher` searches the library of `owner` (the same player, or another), and the cards found, together with `also`
 /// (cards the same search found in other zones, such as the graveyard and hand: CR 701.23a lets a search span zones),

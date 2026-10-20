@@ -5,7 +5,7 @@
 //! The "enters tapped" part of a land is `mana::enters_tapped`, `mana::enters_tapped_unless_pay_two_life` (shock lands) or
 //! `enters_tapped_unless_you_control` or `enters_tapped_unless_you_control_either` below; the card sets it in `enters`.
 
-use crate::library::{search_to_battlefield, search_to_hand, search_to_top, Find};
+use crate::library::{ask_may_search, search_to_battlefield, search_to_hand, search_to_top, Find};
 use crate::{choose, effects, mana, triggers};
 use cantrip_api::*;
 
@@ -115,7 +115,7 @@ pub fn destroy_target_its_controller_may_fetch_basic(g: &mut dyn Game, item: &St
 /// first whether to, and declining skips the search and the shuffle (CR 701.23). Ghost Quarter, Erode and Avengers
 /// Disassembled (through `destroy_target_its_controller_may_fetch_basic`) and Demolition Field's own search print it.
 pub fn may_fetch_basic(g: &mut dyn Game, player: PlayerId, source: ObjectId, tapped: bool) -> Result<(), Suspend> {
-    if !effects::ask_may(g, player, source, Purpose::Ask(if tapped { &FETCH_BASIC_TAPPED } else { &FETCH_BASIC }))? {
+    if !ask_may_search(g, player, source, if tapped { &FETCH_BASIC_TAPPED } else { &FETCH_BASIC })? {
         return Ok(());
     }
     search_basic_land_to_battlefield(g, player, source, tapped)
@@ -154,7 +154,7 @@ pub fn search_basic_land_to_hand(g: &mut dyn Game, player: PlayerId, source: Obj
 /// whether to, and declining skips the search and the shuffle (CR 701.23). Environmental Scientist's enters trigger
 /// (`search_basic_land_to_hand` is Bushwhack's, which does not say "may").
 pub fn may_search_basic_land_to_hand(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
-    if !effects::ask_may(g, player, source, Purpose::Ask(&FETCH_BASIC_TO_HAND))? {
+    if !ask_may_search(g, player, source, &FETCH_BASIC_TO_HAND)? {
         return Ok(());
     }
     search_basic_land_to_hand(g, player, source)
@@ -182,7 +182,7 @@ pub fn search_basic_land_to_top(g: &mut dyn Game, player: PlayerId, source: Obje
 /// "You may search your library for a basic land card, reveal it, then shuffle and put that card on top": asked first whether
 /// to, and declining skips the search and the shuffle (CR 701.23). Fountainport Bell's enters trigger.
 pub fn may_search_basic_land_to_top(g: &mut dyn Game, player: PlayerId, source: ObjectId) -> Result<(), Suspend> {
-    if !effects::ask_may(g, player, source, Purpose::Ask(&FETCH_BASIC_TO_TOP))? {
+    if !ask_may_search(g, player, source, &FETCH_BASIC_TO_TOP)? {
         return Ok(());
     }
     search_basic_land_to_top(g, player, source)

@@ -75,7 +75,8 @@ Three layers, kept apart by the compiler (`cantrip-api` is all a card can see):
 - hand-write a stale-object guard (`targets::permanent`, `cantrip_api::is_live`), or guard `sacrifice`, which already
   skips objects that changed zones (CR 400.7);
 - produce a different event than the rules name: making Clue tokens is not investigating; moving cards to the
-  graveyard is not discarding (and skips madness); moving a card out of a library is not searching.
+  graveyard is not discarding (and skips madness); moving a card out of a library is not searching, and a "you may search" is asked by
+  `library::ask_may_search`, never `ask_may` (a search a spell or ability can't cause is not offered, CR 101.2).
 
 **Adding to the core or to the mechanics.** A core feature mirrors the rule it implements, cites the CR, works for
 every card the rule describes, and is guarded on the game state - never on "does any card in the card table have X",

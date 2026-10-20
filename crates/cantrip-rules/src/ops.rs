@@ -1701,7 +1701,7 @@ pub fn discard_together(cx: &mut Cx, cards: &[ObjectId]) -> Vec<ObjectId> {
     let causer = cx.effect_controller();
     let moves: Vec<Moving> = cards
         .iter()
-        .filter(|&&c| causer.is_none_or(|by| cantrip_api::may_cause_discard_or_sacrifice(&*cx, by, cx.s().obj(c).owner, false)))
+        .filter(|&&c| causer.is_none_or(|by| cantrip_api::may_cause(&*cx, by, cx.s().obj(c).owner, cantrip_api::CauseKind::Discard)))
         .map(|&c| Moving::to(c, Zone::graveyard(cx.s().obj(c).owner)))
         .collect();
     let new = move_together(cx, &moves, ZoneReason::Discard);
@@ -2175,7 +2175,7 @@ pub fn sacrifice(cx: &mut Cx, ids: &[ObjectId]) -> Vec<ObjectId> {
         .iter()
         .copied()
         .filter(|&id| live(cx.s(), id) && cx.s().obj(id).zone.is(ZoneKind::Battlefield))
-        .filter(|&id| causer.is_none_or(|by| cantrip_api::may_cause_discard_or_sacrifice(&*cx, by, cx.s().obj(id).controller, true)))
+        .filter(|&id| causer.is_none_or(|by| cantrip_api::may_cause(&*cx, by, cx.s().obj(id).controller, cantrip_api::CauseKind::Sacrifice)))
         .map(|id| Moving::to(id, Zone::graveyard(cx.s().obj(id).owner)))
         .collect();
     move_together(cx, &moves, ZoneReason::Sacrifice)

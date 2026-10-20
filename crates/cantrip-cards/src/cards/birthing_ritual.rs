@@ -19,7 +19,7 @@ fn ritual(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let mut maximum = None;
     let creatures = g.permanents_of(you).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).collect::<Vec<_>>();
     if !creatures.is_empty()
-        && cantrip_api::may_cause_discard_or_sacrifice(g, you, you, true)
+        && cantrip_api::may_cause(g, you, you, cantrip_api::CauseKind::Sacrifice)
         && effects::ask_may(g, you, item.object, Purpose::Ask(&SACRIFICE))?
     {
         let creature = choose::card(g, you, item.object, Purpose::Sacrifice, creatures)?

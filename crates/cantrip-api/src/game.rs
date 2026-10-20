@@ -5,7 +5,7 @@
 use cantrip_state::*;
 
 use crate::card::{CounterTo, FaceDown, LibraryPlace};
-use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef};
+use crate::card::{AbilityDef, ActivatedDef, Asker, CardDef, CauseKind};
 use crate::chars::Chars;
 use crate::history::{History, Record};
 
@@ -81,10 +81,10 @@ pub struct CastWay {
     pub mana_value: u32,
 }
 
-/// Whether a spell or ability controlled by `causer` may cause `player` to discard (or, with `sacrifice`, to sacrifice)
-/// (CR 101.2): nothing on the battlefield forbids it. Judged when the effect would ask or move, so an impossible discard
-/// or sacrifice is not offered as a choice either.
-pub fn may_cause_discard_or_sacrifice(q: &dyn Query, causer: PlayerId, player: PlayerId, sacrifice: bool) -> bool {
+/// Whether a spell or ability controlled by `causer` may cause `player` to discard, sacrifice or search, as `kind` says
+/// (CR 101.2): nothing on the battlefield forbids it. Judged when the effect would ask or move, so an impossible discard,
+/// sacrifice or search is not offered as a choice either.
+pub fn may_cause(q: &dyn Query, causer: PlayerId, player: PlayerId, kind: CauseKind) -> bool {
     for &id in q.state().battlefield() {
         let o = q.obj(id);
         let def = q.card(o.copy.map_or(o.card, |c| c.card));
@@ -93,7 +93,7 @@ pub fn may_cause_discard_or_sacrifice(q: &dyn Query, causer: PlayerId, player: P
             continue;
         }
         let asker = Asker { source: id, controller: o.controller };
-        if def.cause_rules.iter().any(|rule| !rule(q, &asker, causer, player, sacrifice)) {
+        if def.cause_rules.iter().any(|rule| !rule(q, &asker, causer, player, kind)) {
             return false;
         }
     }
@@ -599,6 +599,13 @@ pub trait Game: Query {
     /// Puts cards already in a player's library on its bottom in a random order (CR 401.4), drawn from the game's own
     /// random source: "put the rest on the bottom of your library in a random order". Nothing changes zones.
     fn bottom_in_random_order(&mut self, player: PlayerId, cards: &[ObjectId]);
+    /// Whether the spell or ability resolving may cause `searcher` to search the library of `library` (CR 701.23, 701.23f)
+    /// now: false when a rule forbids it (CR 101.2: "can't" wins, `CardDef.cause_rules` with `CauseKind::Search`, as Ashiok,
+    /// Dream Render's "can't cause their controller to search their library"). A search that can't be made finds nothing
+    /// and records no search, but a "then shuffle" still shuffles; a "you may search" is not offered (Ashiok's rulings).
+    /// The library recipes ask it (`cantrip_mechanics::search_library`, `library::ask_may_search`): a card that picks
+    /// cards out of a library some other way asks it itself (Doomsday).
+    fn may_search(&self, searcher: PlayerId, library: PlayerId) -> bool;
     /// Records that `player` searched the library of `library` (CR 701.23, 701.23f: a player may search another
     /// player's library, and "searches their library" is only the case where the two are the same), for whatever
     /// watches searches.

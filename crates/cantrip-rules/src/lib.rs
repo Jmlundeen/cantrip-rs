@@ -748,7 +748,7 @@ impl cantrip_api::Game for Cx<'_> {
         // CR 101.2: a discard or sacrifice an opponent's spell or ability can't cause is not offered as a choice.
         if let RequestKind::ChooseCards { purpose: purpose @ (Purpose::Discard | Purpose::Sacrifice), .. } = &kind
             && let Some(causer) = self.effect_controller()
-            && !cantrip_api::may_cause_discard_or_sacrifice(&*self, causer, player, *purpose == Purpose::Sacrifice)
+            && !cantrip_api::may_cause(&*self, causer, player, if *purpose == Purpose::Sacrifice { CauseKind::Sacrifice } else { CauseKind::Discard })
         {
             return Ok(Answer::Cards(Vec::new()));
         }
@@ -1144,6 +1144,11 @@ impl cantrip_api::Game for Cx<'_> {
 
     fn gave_gift(&mut self, player: PlayerId, to: PlayerId, gift: Gift) {
         self.emit(Event::GaveGift { player, to, gift });
+    }
+
+    fn may_search(&self, searcher: PlayerId, library: PlayerId) -> bool {
+        // CR 101.2, 701.23: only a spell or ability can be forbidden to cause a search; outside one there is no causer.
+        self.effect_controller().is_none_or(|causer| cantrip_api::may_cause(self, causer, searcher, CauseKind::Search { library }))
     }
 
     fn searched(&mut self, player: PlayerId, library: PlayerId) {

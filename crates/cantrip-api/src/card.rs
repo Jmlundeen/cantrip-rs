@@ -1790,10 +1790,21 @@ pub struct Lasting {
     pub holds: fn(&dyn Query, &ContinuousEffect) -> bool,
 }
 
-/// A static ability that says whether a spell or ability may cause a player to discard cards or sacrifice permanents
-/// (CR 101.2): true allows it. `causer` is the controller of the spell or ability, `player` who would discard or
-/// sacrifice. "Spells and abilities your opponents control can't cause you to discard cards or sacrifice permanents."
-pub type CauseRule = fn(&dyn Query, &Asker, PlayerId, PlayerId, bool) -> bool;
+/// What a spell or ability may be forbidden to cause a player to do (`CauseRule`, CR 101.2).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CauseKind {
+    /// Discard cards (CR 701.9).
+    Discard,
+    /// Sacrifice permanents (CR 701.21).
+    Sacrifice,
+    /// Search a library (CR 701.23): the one of `library`'s owner.
+    Search { library: PlayerId },
+}
+
+/// A static ability that says whether a spell or ability may cause a player to discard cards, sacrifice permanents or search
+/// a library (CR 101.2): true allows it. `causer` is the controller of the spell or ability, `player` who would do it.
+/// "Spells and abilities your opponents control can't cause you to discard cards or sacrifice permanents."
+pub type CauseRule = fn(&dyn Query, &Asker, PlayerId, PlayerId, CauseKind) -> bool;
 
 /// A static ability that says some damage can't be prevented (CR 615.12): true for the damage a source is about to deal,
 /// `combat` or not. "Combat damage that would be dealt by creatures you control can't be prevented."

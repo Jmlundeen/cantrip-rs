@@ -486,7 +486,7 @@ fn ward_discard_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend
     // discard (CR 101.2; Tamiyo, Collector of Tales's ruling: "something happens unless you discard" can't be paid); one who
     // can is asked whether to, and then which card.
     if !g.state().zone(Zone::hand(payer)).is_empty()
-        && may_cause_discard_or_sacrifice(&*g, item.controller, payer, false)
+        && may_cause(&*g, item.controller, payer, CauseKind::Discard)
         && matches!(g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_DISCARD) })?, Answer::Yes)
     {
         crate::discard_chosen(g, payer, item.object, 1)?;
@@ -547,7 +547,7 @@ fn ward_sacrifice_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Res
     // ruling: "something happens unless you sacrifice" can't be paid). The payer then chooses which N, all sacrificed at once.
     let permanents = g.permanents_of(payer);
     if permanents.len() >= N as usize
-        && may_cause_discard_or_sacrifice(&*g, item.controller, payer, true)
+        && may_cause(&*g, item.controller, payer, CauseKind::Sacrifice)
         && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_sacrifice_question(N)) })? == Answer::Yes
     {
         return crate::sacrifice_one_of(g, payer, item.object, N, permanents).map(drop);
@@ -581,7 +581,7 @@ fn ward_sacrifice_a_food_effect(g: &mut dyn Game, item: &StackItem) -> Result<()
     // whom the ward's controller's abilities can't make sacrifice (CR 101.2). The payer chooses which Food among theirs.
     let foods: Vec<ObjectId> = g.permanents_of(payer).into_iter().filter(|&id| crate::targets::filters::food(&*g, &Asker { source: item.object, controller: payer }, id)).collect();
     if !foods.is_empty()
-        && may_cause_discard_or_sacrifice(&*g, item.controller, payer, true)
+        && may_cause(&*g, item.controller, payer, CauseKind::Sacrifice)
         && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_SACRIFICE_FOOD) })? == Answer::Yes
     {
         return crate::sacrifice_one_of(g, payer, item.object, 1, foods).map(drop);

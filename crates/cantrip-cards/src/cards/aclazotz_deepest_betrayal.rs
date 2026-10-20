@@ -12,7 +12,7 @@ fn each_opponent_discards(g: &mut dyn Game, item: &StackItem) -> Result<(), Susp
     let opponents: Vec<PlayerId> = g.state().apnap().filter(|&p| p != you).collect();
     let cant = opponents
         .iter()
-        .filter(|&&p| g.state().zone(Zone::hand(p)).is_empty() || !may_cause_discard_or_sacrifice(&*g, you, p, false))
+        .filter(|&&p| g.state().zone(Zone::hand(p)).is_empty() || !may_cause(&*g, you, p, CauseKind::Discard))
         .count();
     each_discards_a_card(g, &opponents, item.object)?;
     for _ in 0..cant {
