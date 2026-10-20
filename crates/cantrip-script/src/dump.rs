@@ -636,6 +636,12 @@ impl StateDump {
                 out.push(format!("line {}: {} is not a key the dump has (keys like it: {near:?})", e.line, e.key));
                 continue;
             };
+            if e.negated {
+                if same(self.unordered.contains(&e.key), &e.value, actual) {
+                    out.push(format!("line {}: {} expected not to be \"{}\", and it was", e.line, e.key, e.value));
+                }
+                continue;
+            }
             if !same(self.unordered.contains(&e.key), &e.value, actual) {
                 out.push(format!("line {}: {} expected \"{}\", was \"{actual}\"", e.line, e.key, e.value));
             }

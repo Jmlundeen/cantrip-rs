@@ -468,6 +468,10 @@ kind, place it where the action could otherwise be taken, with a wait or `BotN.P
 Lists use `;`. Library, graveyard and stack are listed top first and compared in order. Hand, battlefield and exile
 are compared as sets.
 
+`Key != Value` holds when the key is in the dump with any other value: `Bot2.Library != Lightning Bolt; Island; ...`, the
+library's order before a "then shuffle", shows the library was shuffled (Ashiok, Dream Render's forbidden search still
+shuffles). Use it only where no positive value can be known; never for a `Client.` key or `(absent)`.
+
 A key described above as absent is asserted absent with `(absent)`: `Bot2.Battlefield.Deep-Cavern Bat.Keywords =
 (absent)` holds when it has no keywords at all, and fails if the key is there. It also fails when the dump has no
 other key on the same object (`Bot2.Battlefield.Deep-Cavern Bat.`, or for a `.Counters.` key the permanent itself),

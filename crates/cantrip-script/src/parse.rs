@@ -49,6 +49,8 @@ pub struct Expectation {
     pub key: String,
     pub value: String,
     pub line: usize,
+    /// `Key != Value`: the key is in the dump and its value is not this one (a library shuffled out of a known order).
+    pub negated: bool,
 }
 
 impl Expectation {
@@ -63,7 +65,7 @@ impl Expectation {
 
 impl fmt::Display for Expectation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} = {}", self.key, self.value)
+        write!(f, "{} {} {}", self.key, if self.negated { "!=" } else { "=" }, self.value)
     }
 }
 
@@ -562,7 +564,15 @@ fn parse_wait(inner: &str, line: &str, number: usize) -> Result<ScriptStep, Pars
 
 pub fn parse_expectation(line: &str, number: usize) -> Result<Expectation, ParseError> {
     let equals = line.find('=').filter(|i| *i > 0).ok_or_else(|| ParseError("expected \"Key = Value\"".into()))?;
-    Ok(Expectation { key: line[..equals].trim().to_string(), value: line[equals + 1..].trim().to_string(), line: number })
+    let (key, negated) = match line[..equals].strip_suffix('!') {
+        Some(key) => (key, true),
+        None => (&line[..equals], false),
+    };
+    let expectation = Expectation { key: key.trim().to_string(), value: line[equals + 1..].trim().to_string(), line: number, negated };
+    if negated && (expectation.is_client() || expectation.value == "(absent)") {
+        return Err(ParseError("\"Key != Value\" is for a key of the game's state with a value: not a Client. key or (absent)".into()));
+    }
+    Ok(expectation)
 }
 
 fn parse_deck_entry(line: &str, number: usize) -> Result<DeckEntry, ParseError> {
@@ -758,6 +768,15 @@ mod tests {
             other => panic!("{other:?}"),
         }
         assert_eq!(script.expectations[0].key, "Bot1.Graveyard");
+    }
+
+    #[test]
+    fn an_expectation_may_be_negated() {
+        let e = parse_expectation("Bot1.Library != Island; Forest", 3).unwrap();
+        assert_eq!((e.key.as_str(), e.value.as_str(), e.negated), ("Bot1.Library", "Island; Forest", true));
+        assert!(!parse_expectation("Bot1.Library = Island", 3).unwrap().negated);
+        assert!(parse_expectation("Client.Bot1.Stack != Island", 3).is_err());
+        assert!(parse_expectation("Monarch != (absent)", 3).is_err());
     }
 
     #[test]
