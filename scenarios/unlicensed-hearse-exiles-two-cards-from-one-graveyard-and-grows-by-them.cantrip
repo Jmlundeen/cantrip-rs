@@ -1,0 +1,68 @@
+# Unlicensed Hearse: "{T}: Exile up to two target cards from a single graveyard" and its power and toughness equal the cards
+# exiled with it (CR 607.2a, 604.3), though it is no creature until crewed. Bot2 Bolts Bot1 twice, so its graveyard holds two
+# Lightning Bolts, and Bot1's own graveyard holds a Bolt. The Hearse taps for Bot2's two Bolts and is 2/2; a card from the other
+# graveyard cannot be the second target (the refusal beside the allowed second card). Crewed by a Bramble Familiar, it is a 2/2
+# creature (the dump shows a power only for creatures).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Unlicensed Hearse
+Lightning Bolt
+Bramble Familiar
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mountain
+Lightning Bolt
+Lightning Bolt
+Mountain x16
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unlicensed Hearse.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bramble Familiar.Cast
+Bot1.Pass
+Bot2.Pass
+[T4 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Unlicensed Hearse.Activate(Ability: Exile up to two)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#1)
+! Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Target(Bot2.Graveyard.Lightning Bolt#2)
+Bot1.Pass
+Bot2.Pass
+? Exile.Count = 2
+Bot1.Battlefield.Unlicensed Hearse.Activate(Ability: Crew 2)
+Bot1.Choose(Bramble Familiar)
+
+[Expect]
+Exile.Count = 2
+Bot1.Battlefield.Unlicensed Hearse.Power = 2
+Bot1.Battlefield.Unlicensed Hearse.Toughness = 2
+Bot1.Battlefield.Unlicensed Hearse.Tapped = True
+Bot2.Graveyard.Count = 0
+Bot1.Graveyard = Lightning Bolt

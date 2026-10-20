@@ -2,21 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
-/// The second of "up to two target cards from a single graveyard" (CR 115.1, 601.2c): a card of the graveyard the first
-/// slot's card is in, and not that card itself. When the first slot chose nothing, any card in any graveyard: one target
-/// is a legal choice of "up to two", and the two slots together allow exactly the choices of zero, one or two cards that
-/// all lie in one graveyard.
-fn other_card_in_the_same_graveyard(q: &dyn Query, asker: &Asker, t: Target) -> bool {
-    let Target::Object(id) = t else { return false };
-    if !(targets::CARD_IN_A_GRAVEYARD.filter)(q, asker, t) {
-        return false;
-    }
-    match q.chosen_targets().first() {
-        Some(&Target::Object(first)) => first != id && q.obj(first).zone == q.obj(id).zone,
-        _ => true,
-    }
-}
-
 /// Cease: "Exile up to two target cards from a single graveyard. Target player gains 2 life and draws a card." The cards
 /// still in that graveyard are exiled together (CR 608.2b: a target that became illegal is left alone and the rest of
 /// the spell still happens), then the player, if still a legal target, gains 2 life and draws.
@@ -53,7 +38,7 @@ pub static CEASE: CardDef = CardDef {
     spell: spell(
         &[
             targets::CARD_IN_A_GRAVEYARD.optional().labelled("First card to exile (up to two, from a single graveyard)"),
-            target(other_card_in_the_same_graveyard).optional().labelled("Second card to exile, from the same graveyard"),
+            targets::ANOTHER_CARD_IN_THE_SAME_GRAVEYARD.optional().labelled("Second card to exile, from the same graveyard"),
             targets::PLAYER.labelled("Player to gain 2 life and draw a card"),
         ],
         cease,

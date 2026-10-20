@@ -1,0 +1,48 @@
+# Unlicensed Hearse: "up to two target cards" may be one. Bot1's Bolt sits in its own graveyard; the Hearse exiles it alone
+# (no other card for the second target) and, crewed by a Bramble Familiar, is a 1/1 (one card exiled with it, CR 607.2a, 604.3).
+
+[Bot1 Deck]
+Mox Jet
+Mox Ruby
+Unlicensed Hearse
+Lightning Bolt
+Bramble Familiar
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Unlicensed Hearse.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Bramble Familiar.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Unlicensed Hearse.Activate(Ability: Exile up to two)
+Bot1.Target(Bot1.Graveyard.Lightning Bolt)
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Unlicensed Hearse.Activate(Ability: Crew 2)
+Bot1.Choose(Bramble Familiar)
+
+[Expect]
+Exile = Lightning Bolt
+Exile.Count = 1
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Unlicensed Hearse.Power = 1
+Bot1.Battlefield.Unlicensed Hearse.Toughness = 1

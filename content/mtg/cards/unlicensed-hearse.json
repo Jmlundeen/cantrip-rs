@@ -1,0 +1,6 @@
+{
+  "name": "Unlicensed Hearse",
+  "manaCost": "{2}",
+  "type": "Artifact — Vehicle",
+  "oracleText": "{T}: Exile up to two target cards from a single graveyard.\nUnlicensed Hearse's power and toughness are each equal to the number of cards exiled with it.\nCrew 2"
+}
