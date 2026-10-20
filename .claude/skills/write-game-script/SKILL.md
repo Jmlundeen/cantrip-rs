@@ -45,7 +45,9 @@ sweeping seeds (CLAUDE.md).
    `Dump = ?`: the mismatch fails the script and prints the dump, with the keys nearest the bogus one. Copy only the
    keys that prove the behaviour, then remove the bogus line. Do this before writing any key you have not used before
    rather than guessing: keywords are the engine's names (`Keywords = FirstStrike`, not "First strike"), counters
-   their kind (`Counters.MinusOneMinusOne`), counts are a zone's (`Bot1.Battlefield.Count`, never `<Name>.Count`).
+   their kind (`Counters.MinusOneMinusOne`, a planeswalker's `Counters.Loyalty`), counts are a zone's
+   (`Bot1.Battlefield.Count`, never `<Name>.Count` or `.Name`), and exile is one list for everyone (`Exile`, not
+   `Bot2.Exile`).
 7. **Check that the script can fail.** Temporarily break an expectation, or the rule under test, and confirm the
    script goes red. A script that passes vacuously is worse than none. Two places a card's test most often passes
    when it should not:
@@ -56,8 +58,9 @@ sweeping seeds (CLAUDE.md).
    - **When it reads** ("this turn", "since your last turn", "the first time each turn"): have the thing happen on an
      earlier turn as well, and show it does not count.
    - **A cost or a cost change**: a refusal can't prove it (an unaffordable cast still counts as offered). Make the
-     mana available before the cast and check the pool with `? Bot1.Mana = ...` **right after the cast, in the same
-     step** - the pool empties between steps, so an `[Expect]` of an empty pool proves nothing. Too high a cost fails
+     mana available before the cast and check the pool with `? Bot1.Mana = ...` **right after the cast or activation
+     has finished, in the same step** (a `?` on the very next line can run while the cost is still being paid: put it
+     after `BotN.Pass` if it reads too early) - the pool empties between steps, so an `[Expect]` of an empty pool proves nothing. Too high a cost fails
      the cast; too low leaves more than the check says.
    - **Every ability the card has, at least once** - a keyword like prowess or flying included: the card's file can
      list it and coverage cannot see it missing (static data runs no lines).

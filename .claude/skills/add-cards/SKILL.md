@@ -84,9 +84,10 @@ because the table holds every card. A core change is benchmarked (`cargo run --r
 mechanic names in its doc comment at least two printed cards that use it exactly as written; with only one it stays in
 that card. A keyword module cites its CR rule and names its cards. Never widen a central switch to encode a card.
 
-**Share what is the same, and only that.** If an existing function does what the card needs, use it. If two or more
-cards already do the same thing in their own code, move it into one shared function and change those cards to call it,
-in the same change. Never stretch a shared function over something that only looks alike: a flag or parameter only one
+**Share what is the same, and only that.** If an existing function does what the card needs, use it. If another card
+already does the same thing in its own code - the prior art shows it, or you come across it - move it into one shared
+function and change every card that has a copy to call it, in this change: it is part of the card, never a note left
+for later. Never stretch a shared function over something that only looks alike: a flag or parameter only one
 caller uses, or a branch on which card is calling, means it was not the same thing.
 
 ## Which card, and claiming it
@@ -148,23 +149,26 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    keep the claim, log `blocked --rule <CR>` and report the gap, as the non-negotiables say.
 5. **Write the scenarios** (below; the `write-game-script` skill) and run them until they pass:
    `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`. Then **break the card**, once
-   for each thing its own code decides (a number, a limit, a condition, whose objects): change it, see a scenario go
-   red, restore it. A break no scenario catches is a missing expectation. Say in the report what you broke and that it
+   for each thing its own code decides (a number, a limit, a condition, whose objects, each narrowing - a card type, a
+   zone, a time): change it, see a scenario go red, restore it. A break no scenario catches is a missing expectation. Say in the report what you broke and that it
    failed.
-6. **Coverage:** `python tools/maintenance/card-coverage.py "Card Name"` reports every line of the card's file
+6. **Citations:** `python tools/maintenance/cr.py check --show <the card's file> <its scenarios>` prints every `CR`
+   citation beside the rule it names. Read each pair: a rule that does not say what the comment claims is fixed or
+   the citation dropped - a number copied from another card's comment is the usual way a wrong one gets in.
+7. **Coverage:** `python tools/maintenance/card-coverage.py "Card Name"` reports every line of the card's file
    executed (from a bash shell call it so, not through `tools\card-coverage.cmd`, whose quoting `cmd //c` breaks; a
    file of statics alone has no lines to measure). A line no scenario can reach is wrong code or a
    missing scenario, never an exception.
-7. **The client.** Everything the card puts into the game must be shown, every question it asks captioned truly, and
+8. **The client.** Everything the card puts into the game must be shown, every question it asks captioned truly, and
    every action it offers clickable with its cost. A card that only uses prompts, actions and state the client already
    has needs no client change and no browser test. One that adds a prompt, an action, a cost display or a piece of
    state the client never had makes the client change in the same work and proves it in the browser: `client.md`.
-8. **Verify.** Working for a coordinator: run the scenarios of your card and of every card whose file or shared
+9. **Verify.** Working for a coordinator: run the scenarios of your card and of every card whose file or shared
    mechanic you changed (`corpus -- --card "Name"` each) and the unit tests of a crate you changed - nothing wider;
    the coordinator's full run at landing is the gate. Working alone: `cargo run --profile cards -p cantrip-script
    --bin corpus` shows `0 fail`, `tools\test.cmd /engine` is green, `tools\test.cmd` if the core, host, protocol or
    client changed, and the benchmark if the core did.
-9. **Review, then commit.** `review.md` - by someone who did not write it. Then `Card: <Name>` - the content JSON, the
+10. **Review, then commit.** `review.md` - by someone who did not write it. Then `Card: <Name>` - the content JSON, the
    card file and its scenarios - one card per commit, ending `Closes #N`; core, mechanics and client changes in their
    own commits before it (`Engine: ...`, `Mechanics: ...`, `Client: ...`), then `card-issues.py log <N> committed
    --commit <sha>`. A card agent working for a coordinator does not push; otherwise commit and push as CLAUDE.md says, or open a pull request with the coverage report and the
@@ -184,7 +188,7 @@ scenarios, together:
 - **show what the text does**, with a refusal (`! Bot1.Hand.Card.Cast`, `! Bot1.Choose(..)`) beside the allowed case
   for each limit the card's own code enforces ("only", "up to", "another", a mana value or type) - an object exactly at
   each numeric limit, both players' objects for whatever "each", "target" or "you control" reads, the same thing on an
-  earlier turn for "this turn", and exact mana with an empty pool after for a cost (`write-game-script`, step 7). A limit the
+  earlier turn for "this turn", and for a cost the pool checked right after the cast, in the same step (`write-game-script`, step 7). A limit the
   engine or a shared mechanic enforces (targeting, timing, equip) is tested there already;
 - **test a corner case only where the card's own code could plausibly get an interaction wrong**: it reads a value
   that can change before use, holds last-known information, or combines with another rule in its own code; a card

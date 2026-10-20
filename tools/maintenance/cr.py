@@ -4,6 +4,7 @@
     python tools/maintenance/cr.py 601.2c          # one subrule
     python tools/maintenance/cr.py trample "scry"  # a keyword (702) or keyword action (701) by name
     python tools/maintenance/cr.py check FILE...   # the citations in files that name no current rule
+    python tools/maintenance/cr.py check --show FILE...  # every citation beside the rule it names, to read
 
     import cr
     cr.rule("702.21")            # the text, or None
@@ -92,10 +93,11 @@ def terms_in(text):
     return sorted(set(found), key=lambda nt: tuple(int(x) for x in nt[0].split(".")))
 
 
-def check(paths):
-    """The `CR <number>` citations in files that name no rule of the current CR: a rule renumbered or mistyped. It
-    cannot tell a real rule cited for the wrong thing - read each citation's rule for that. Exit 1 if any."""
-    _, where = _rules()
+def check(paths, show=False):
+    """The `CR <number>` citations in files that name no rule of the current CR: a rule renumbered or mistyped. With
+    `show`, every citation too, the comment beside the first words of the rule it names, to read whether the rule says
+    what the comment claims - a real rule cited for the wrong thing passes the plain check. Exit 1 if any is missing."""
+    lines, where = _rules()
     bad = 0
     for path in paths:
         for n, line in enumerate(open(path, encoding="utf-8", errors="replace"), 1):
@@ -104,6 +106,9 @@ def check(paths):
                     if number not in where:
                         bad += 1
                         print(f"{path}:{n}: CR {number} is no rule of the current Comprehensive Rules")
+                    elif show:
+                        said = re.sub(r"^\s*(?:///?|#)\s*", "", line.strip())
+                        print(f"{path}:{n}: {said[:150]}\n    CR {lines[where[number]][:220]}")
     print(f"{bad} citation{'' if bad == 1 else 's'} to check" if bad else "every cited rule exists")
     sys.exit(1 if bad else 0)
 
@@ -113,7 +118,8 @@ def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     if sys.argv[1] == "check":
-        return check(sys.argv[2:])
+        show = "--show" in sys.argv
+        return check([a for a in sys.argv[2:] if a != "--show"], show)
     for arg in sys.argv[1:]:
         number = arg if re.match(r"^\d{3}", arg) else (section(arg) or (None,))[0]
         text = rule(number) if number else None

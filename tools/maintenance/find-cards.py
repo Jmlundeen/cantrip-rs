@@ -94,7 +94,8 @@ def main():
         if (args.mv is not None and mv != args.mv) or (args.max_mv is not None and mv > args.max_mv):
             continue
         if args.color:
-            want = set() if args.color == "colorless" else {COLORS[args.color]}
+            color = args.color.lower()
+            want = set() if color in ("colorless", "c") else {COLORS.get(color) or color.upper()}
             if colors_of(card) != want:
                 continue
         keywords = {k.lower() for k in card.get("keywords", [])}
