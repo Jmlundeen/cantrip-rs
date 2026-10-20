@@ -1,0 +1,40 @@
+# CR 608.2h: the toughness is the sacrificed creature's as it last was on the battlefield, not its printed one. Karn is
+# printed 1/3, but Snakeskin Veil's +1/+1 counter made it 2/4, so sacrificing it makes two Food tokens.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Mox Jet
+Witch's Oven
+Karn, Argent Defender
+Snakeskin Veil
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Witch's Oven.Cast
+Bot1.Pass
+Bot1.Hand.Karn, Argent Defender.Cast
+Bot1.Pass
+Bot1.Hand.Snakeskin Veil.Cast(Karn, Argent Defender)
+Bot1.Pass
+Bot1.Battlefield.Witch's Oven.Activate
+Bot1.Choose(Karn, Argent Defender)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Karn, Argent Defender; Snakeskin Veil
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Emerald; Mox Jet; Witch's Oven; Food Token; Food Token

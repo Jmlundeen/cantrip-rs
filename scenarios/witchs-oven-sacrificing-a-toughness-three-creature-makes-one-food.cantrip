@@ -1,0 +1,33 @@
+# One short of the limit: Karn (1/3) is toughness 3, so the Oven makes one Food token, not two (CR 608.2h).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Witch's Oven
+Karn, Argent Defender
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witch's Oven.Cast
+Bot1.Pass
+Bot1.Hand.Karn, Argent Defender.Cast
+Bot1.Pass
+Bot1.Battlefield.Witch's Oven.Activate
+Bot1.Choose(Karn, Argent Defender)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Karn, Argent Defender
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Emerald; Witch's Oven; Food Token

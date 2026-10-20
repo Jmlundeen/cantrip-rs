@@ -1,0 +1,35 @@
+# CR 608.2h: the sacrificed creature's toughness is read as it last was: Spellskite (0/4) is exactly the limit, so two Food
+# tokens replace the one.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Pearl
+Mox Emerald
+Witch's Oven
+Spellskite
+Plains x12
+
+[Bot2 Deck]
+Ornithopter
+Plains x15
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Witch's Oven.Cast
+Bot1.Pass
+Bot1.Hand.Spellskite.Cast
+Bot1.Pass
+Bot1.Battlefield.Witch's Oven.Activate
+Bot1.Choose(Spellskite)
+Bot1.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Spellskite
+Bot1.Battlefield.Witch's Oven.Tapped = true
+Bot1.Battlefield = Mox Ruby; Mox Pearl; Mox Emerald; Witch's Oven; Food Token; Food Token
