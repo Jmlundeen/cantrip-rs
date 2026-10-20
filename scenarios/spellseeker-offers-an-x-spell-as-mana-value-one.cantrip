@@ -22,6 +22,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Spellseeker.Cast
 Bot1.Pass
+Bot1.Accept
 Bot1.Search(Repeal)
 [Bot1.Main2]
 

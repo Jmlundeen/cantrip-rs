@@ -1,5 +1,6 @@
-# "You may search": Bot1 takes no card, the Spellseeker still enters, and the Lightning Bolt in the library, a legal find, stays
-# there (CR 701.23b: a search for a quality may find nothing). The finding branches are the other scenarios.
+# "You may search ... then shuffle": Bot1 declines the search, so nothing is searched or shuffled (CR 701.23): the Spellseeker
+# still enters, and the Lightning Bolt in the library, a legal find, stays where it was, on top. The finding branches are the
+# other scenarios.
 
 [Bot1 Deck]
 Mox Sapphire
@@ -22,10 +23,10 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Spellseeker.Cast
 Bot1.Pass
-Bot1.Search()
+Bot1.Decline
 [Bot1.Main2]
 
 [Expect]
 Bot1.Hand = Plains; Plains; Plains
-Bot1.Library.Count = 13
+Bot1.Library = Lightning Bolt; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains
 Bot1.Battlefield.Spellseeker.Power = 1

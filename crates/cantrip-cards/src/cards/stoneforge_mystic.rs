@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::choose;
-use cantrip_mechanics::library::{Find, search_to_hand};
+use cantrip_mechanics::library::{ask_may_search, Find, search_to_hand};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -8,9 +8,14 @@ fn equipment(q: &dyn Query, id: ObjectId) -> bool {
     q.chars(id).has_subtype(Subtype::Equipment)
 }
 
-/// "You may search your library for an Equipment card, reveal it, put it into your hand, then shuffle." Declining the
-/// search ("you may") is choosing no card.
+const ASK: Question = Question::new("SearchLibrary", "search your library for an Equipment card?", "Reveal it and put it into your hand, then shuffle", "Search", "Don't search");
+
+/// "You may search your library for an Equipment card, reveal it, put it into your hand, then shuffle" (CR 701.23): asked
+/// first; declining skips the search and the shuffle.
 fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    if !ask_may_search(g, item.controller, item.object, &ASK)? {
+        return Ok(());
+    }
     search_to_hand(g, item.controller, item.object, Find::ONE.revealed(), equipment)?;
     Ok(())
 }

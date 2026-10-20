@@ -19,6 +19,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Stoneforge Mystic.Cast
 Bot1.Pass
+Bot1.Accept
 Bot1.Search()
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mox Pearl.Activate

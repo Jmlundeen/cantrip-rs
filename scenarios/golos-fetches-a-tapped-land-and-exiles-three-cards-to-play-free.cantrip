@@ -36,6 +36,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Golos, Tireless Pilgrim.Cast
 Bot1.Pass
+Bot1.Accept
 Bot1.Search(Forest)
 ? Bot1.Battlefield.Forest.Tapped = true
 [T3 Bot1.Main1]

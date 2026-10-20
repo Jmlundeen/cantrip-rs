@@ -1,0 +1,29 @@
+# "You may search your library for an Equipment card, reveal it, put it into your hand, then shuffle": Bot1 declines, so nothing
+# is searched or shuffled (CR 701.23). The Bone Sabres, a legal find, stays on top of the library, the Plains under it in order.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Ruby
+Stoneforge Mystic
+Plains x4
+Bone Sabres
+Plains x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Stoneforge Mystic.Cast
+Bot1.Pass
+Bot1.Decline
+[T1 Bot1.Main2]
+
+[Expect]
+Turn = 1
+Bot1.Battlefield = Mox Pearl; Mox Ruby; Stoneforge Mystic
+Bot1.Hand = Plains; Plains; Plains; Plains
+Bot1.Library = Bone Sabres; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains; Plains

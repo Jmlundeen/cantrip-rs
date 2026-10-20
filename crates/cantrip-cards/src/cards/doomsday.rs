@@ -9,15 +9,23 @@ use cantrip_oracle as oracle;
 /// revealed: exactly five, or all of them when there are fewer (CR 701.23d). The last picked ends on top, as with
 /// Brainstorm. Everything else in both zones is exiled at once, the chosen graveyard cards move to the library, and
 /// the five end on top in order; nothing is shuffled. A life total of zero or less has no half to lose (CR 107.1b).
+///
+/// A library search the spell can't cause (`Game::may_search`, CR 101.2: an opponent's Ashiok, Dream Render) is not made:
+/// the five are chosen from the graveyard alone, and "the rest" is still every other card of both zones, as it is when a
+/// search may see only part of the library (Aven Mindcensor).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let who = item.controller;
     let mut all: Vec<ObjectId> = g.state().zone(Zone::library(who)).to_vec();
     all.reverse();
+    let searches = g.may_search(who, who);
+    let unsearched = if searches { 0 } else { all.len() };
     all.extend_from_slice(g.state().zone(Zone::graveyard(who)));
     // The library is searched whatever is in it or chosen.
-    g.searched(who, who);
+    if searches {
+        g.searched(who, who);
+    }
     if !all.is_empty() {
-        let chosen = choose::cards(g, who, item.object, Purpose::PutOnTop, all.clone(), 5, false)?;
+        let chosen = choose::cards(g, who, item.object, Purpose::PutOnTop, all[unsearched..].to_vec(), 5, false)?;
         let rest: Vec<ObjectId> = all.iter().copied().filter(|c| !chosen.contains(c)).collect();
         g.exile_all(&rest);
 

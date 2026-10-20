@@ -1,6 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects::ask_may;
-use cantrip_mechanics::library::{Find, search_to_hand};
+use cantrip_mechanics::library::{ask_may_search, Find, search_to_hand};
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
 
@@ -10,7 +9,7 @@ const ASK: Question = Question::new("SearchLibrary", "search your library for an
 /// shuffle (CR 701.23). The "may" is asked first; declining skips the search and the shuffle.
 fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    if !ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
+    if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());
     }
     search_to_hand(g, player, item.object, Find::ONE.revealed(), |q, c| {

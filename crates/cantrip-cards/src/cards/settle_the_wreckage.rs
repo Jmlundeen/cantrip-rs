@@ -1,6 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects;
-use cantrip_mechanics::library::{Find, search_to_battlefield};
+use cantrip_mechanics::library::{ask_may_search, Find, search_to_battlefield};
 use cantrip_mechanics::targets;
 use cantrip_oracle as oracle;
 
@@ -22,7 +21,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         .collect();
     let count = g.exile_all(&attackers).len().min(u8::MAX as usize) as u8;
     // With "that many" zero the player is still asked, and a search for zero cards is still a search and a shuffle.
-    if !effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
+    if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());
     }
     search_to_battlefield(g, player, item.object, Find::ONE.up_to(count), true, |q, c| {

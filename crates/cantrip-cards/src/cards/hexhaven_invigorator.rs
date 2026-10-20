@@ -1,6 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::effects;
-use cantrip_mechanics::library::{Find, search_to_battlefield};
+use cantrip_mechanics::library::{ask_may_search, Find, search_to_battlefield};
 use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
@@ -12,7 +11,7 @@ const ASK: Question = Question::new("SearchLibrary", "search your library for up
 /// gone. Any land cards, not only basic ones. Declining skips the search and the shuffle; a search for up to that many may
 /// find fewer (CR 701.23d), and the library is shuffled either way.
 fn search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    if !effects::ask_may(g, item.controller, item.object, Purpose::Ask(&ASK))? {
+    if !ask_may_search(g, item.controller, item.object, &ASK)? {
         return Ok(());
     }
     let count = item.data[0].min(u8::MAX as u32) as u8;

@@ -1,5 +1,5 @@
 use cantrip_api::*;
-use cantrip_mechanics::{channel, targets, effects, library::{search_to_battlefield, Find}};
+use cantrip_mechanics::{channel, targets, library::{ask_may_search, search_to_battlefield, Find}};
 use cantrip_oracle as oracle;
 
 const ASK: Question = Question::new("SearchLibrary", "search your library for a land card with a basic land type?", "It goes onto the battlefield, then you shuffle", "Search", "Don't search");
@@ -20,7 +20,7 @@ fn destroy_and_search(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend>
     let Some(target) = targets::object(g, item, 0) else { return Ok(()) };
     let player = g.controller(target);
     g.destroy(target);
-    if !effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
+    if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());
     }
     search_to_battlefield(g, player, item.object, Find::ONE, false, |q, c| {

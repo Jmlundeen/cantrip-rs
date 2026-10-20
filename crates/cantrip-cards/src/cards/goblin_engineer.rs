@@ -1,6 +1,6 @@
 use cantrip_api::*;
 use cantrip_mechanics::targets;
-use cantrip_mechanics::library::{search_to_graveyard, Find};
+use cantrip_mechanics::library::{ask_may_search, search_to_graveyard, Find};
 use cantrip_mechanics::targets::card_in_graveyard;
 use cantrip_mechanics::triggers::THIS_ENTERS;
 use cantrip_oracle as oracle;
@@ -11,7 +11,7 @@ const ASK: Question = Question::new("SearchLibrary", "search your library for an
 /// shuffle. Declining skips the search and the shuffle.
 fn search_artifact(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let player = item.controller;
-    if !cantrip_mechanics::effects::ask_may(g, player, item.object, Purpose::Ask(&ASK))? {
+    if !ask_may_search(g, player, item.object, &ASK)? {
         return Ok(());
     }
     search_to_graveyard(g, player, item.object, Find::ONE, |q, c| q.chars(c).is(CardType::Artifact))?;

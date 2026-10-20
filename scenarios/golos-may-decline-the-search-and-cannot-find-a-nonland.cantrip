@@ -1,5 +1,5 @@
 # "You may search your library for a land card": the library holds a Forest and Lightning Bolts, and only the Forest is a legal find
-# (refusal for the Bolt, 701.23). Bot1 declines to take it (`Search()`), so no land arrives and the Forest stays in the library
+# (refusal for the Bolt, 701.23). Bot1 searches and takes nothing (`Search()`, CR 701.23b), so no land arrives and the Forest stays in the library
 # (the existing scenario takes it, the positive control). Cast with the same Moxen sequence the existing scenario uses.
 
 [Bot1 Deck]
@@ -36,6 +36,7 @@ Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Golos, Tireless Pilgrim.Cast
 Bot1.Pass
+Bot1.Accept
 ! Bot1.Search(Lightning Bolt)
 Bot1.Search()
 [T2 Bot2.Upkeep]
