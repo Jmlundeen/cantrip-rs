@@ -1,0 +1,45 @@
+# Den of the Bugbear is played as the first land, so it enters untapped. On turn 3 Bot1 pays {3}{R} with four Moxen and
+# animates it: until end of turn a 3/2 red Goblin land creature (CR 613.1d, 613.4b) with the attack trigger. Attacking
+# makes a 1/1 red Goblin token tapped and attacking (CR 508.4): Bot2 takes 3 + 1. On turn 4 the effect is gone.
+
+[Bot1 Deck]
+Den of the Bugbear
+Mox Ruby
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Den of the Bugbear.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Den of the Bugbear.Activate(Ability: Until end of turn)
+Bot1.Attack(Den of the Bugbear > Bot2)
+? Bot1.Battlefield.Den of the Bugbear.Types = Land; Creature
+? Bot1.Battlefield.Den of the Bugbear.Subtypes = Goblin
+? Bot1.Battlefield.Den of the Bugbear.Colors = Red
+? Bot1.Battlefield.Den of the Bugbear.Power = 3
+? Bot1.Battlefield.Den of the Bugbear.Toughness = 2
+[T3 Bot1.Main2]
+? Bot2.Life = 16
+? Bot1.Battlefield.Goblin.Power = 1
+? Bot1.Battlefield.Goblin.Tapped = true
+[T4 Bot2.Main1]
+
+[Expect]
+Turn = 4
+Bot2.Life = 16
+Bot1.Battlefield.Den of the Bugbear.Types = Land
+Bot1.Battlefield.Den of the Bugbear.Colors = (absent)
+Bot1.Battlefield.Goblin.Colors = Red

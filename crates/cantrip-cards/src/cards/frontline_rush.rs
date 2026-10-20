@@ -2,21 +2,9 @@ use cantrip_api::*;
 use cantrip_mechanics::{creatures_you_control, pump, targets, tokens};
 use cantrip_oracle as oracle;
 
-/// The 1/1 red Goblin creature token.
-pub static GOBLIN: CardDef = CardDef {
-    name: "Goblin",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::Red)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Goblin]),
-    power: Some(1),
-    toughness: Some(1),
-    ..CardDef::BLANK
-};
-
 /// "Create two 1/1 red Goblin creature tokens."
 fn goblins(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &GOBLIN, 2)?;
+    tokens::create(g, item.controller, &tokens::GOBLIN, 2)?;
     Ok(())
 }
 
@@ -39,4 +27,4 @@ static MODAL: ModalDef = modes(&[
 
 pub static CARD: CardDef = CardDef { spell: Some(SpellDef::MODAL), modal: Some(&MODAL), ..oracle::FRONTLINE_RUSH };
 
-pub static EXTRA: &[&CardDef] = &[&GOBLIN];
+pub static EXTRA: &[&CardDef] = &[&tokens::GOBLIN];

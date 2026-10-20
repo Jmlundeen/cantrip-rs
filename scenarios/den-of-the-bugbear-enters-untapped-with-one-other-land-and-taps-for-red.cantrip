@@ -1,0 +1,20 @@
+# Den of the Bugbear: with one other land (fewer than two) it enters untapped (CR 614.1c) and taps for {R}.
+
+[Bot1 Deck]
+Island
+Den of the Bugbear
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Den of the Bugbear.Play
+? Bot1.Battlefield.Den of the Bugbear.Tapped = false
+Bot1.Battlefield.Den of the Bugbear.Activate
+
+[Expect]
+Bot1.Battlefield.Den of the Bugbear.Tapped = true
+Bot1.Mana = {R}

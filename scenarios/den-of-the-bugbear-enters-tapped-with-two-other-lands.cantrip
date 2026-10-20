@@ -1,0 +1,20 @@
+# Den of the Bugbear: with two other lands it enters tapped - the boundary of its "two or more other lands" (CR 614.1c).
+
+[Bot1 Deck]
+Island
+Island
+Den of the Bugbear
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Den of the Bugbear.Play
+
+[Expect]
+Bot1.Battlefield.Den of the Bugbear.Tapped = true

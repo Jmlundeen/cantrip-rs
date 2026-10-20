@@ -490,6 +490,18 @@ pub static ALLY: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 1/1 red Goblin creature token. Frontline Rush and Den of the Bugbear make it.
+pub static GOBLIN: CardDef = CardDef {
+    name: "Goblin",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::Red)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Goblin]),
+    power: Some(1),
+    toughness: Some(1),
+    ..CardDef::BLANK
+};
+
 /// The 1/1 white Soldier creature token. Hero of Bladehold, Elspeth, Storm Slayer and Torsten, Founder of Benalia make
 /// it. (Third Path Iconoclast's is an artifact Soldier of the same name.)
 pub static SOLDIER: CardDef = CardDef {
