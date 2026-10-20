@@ -2422,16 +2422,33 @@ pub fn bottom_in_random_order(cx: &mut Cx, player: PlayerId, cards: &[ObjectId])
 
 /// Puts objects into their owners' libraries together and arranges them there (CR 401.4).
 pub fn put_into_library(cx: &mut Cx, ids: &[ObjectId], place: LibraryPlace) -> Vec<ObjectId> {
+    // Shuffling specific objects is a separate instruction from moving them. CR 701.24c requires the referenced
+    // owners' libraries to be shuffled even when an object has left, or a replacement prevents it from arriving.
+    // Shuffling the owner's library doesn't affect a phased-out permanent, so its owner is still a shuffle reference.
+    let mut shuffle_owners: Vec<PlayerId> = Vec::new();
+    if place == LibraryPlace::ShuffledIn {
+        for &id in ids {
+            let obj = cx.s().obj(id);
+            if !shuffle_owners.contains(&obj.owner) {
+                shuffle_owners.push(obj.owner);
+            }
+        }
+    }
     let moves: Vec<Moving> = live_ones(cx, ids).into_iter().map(|id| Moving::to(id, Zone::library(cx.s().obj(id).owner))).collect();
     let new = move_together(cx, &moves, ZoneReason::Other);
     let arrived: Vec<ObjectId> = new.iter().copied().filter(|&n| cx.s().obj(n).zone.is(ZoneKind::Library)).collect();
-    let mut owners: Vec<PlayerId> = Vec::new();
-    for &n in &arrived {
-        let owner = cx.s().obj(n).owner;
-        if !owners.contains(&owner) {
-            owners.push(owner);
+    let owners: Vec<PlayerId> = if place == LibraryPlace::ShuffledIn {
+        shuffle_owners
+    } else {
+        let mut owners = Vec::new();
+        for &n in &arrived {
+            let owner = cx.s().obj(n).owner;
+            if !owners.contains(&owner) {
+                owners.push(owner);
+            }
         }
-    }
+        owners
+    };
     for owner in owners {
         let mine: Vec<ObjectId> = arrived.iter().copied().filter(|&n| cx.s().obj(n).owner == owner).collect();
         match place {
@@ -3340,5 +3357,58 @@ mod tests {
         assert_eq!(minus_counters(&[]), [("Grown", 1), ("Grown Relic", 1)]);
         assert_eq!(minus_counters(&[&BAN]), [("Grown", 0), ("Grown Relic", 1)]);
         assert_eq!(minus_counters(&[&BAN, &ANIMATOR]), [("Grown", 0), ("Grown Relic", 0)]);
+    }
+
+    /// CR 701.24c: both a stale specific reference and a move replacement still shuffle the referenced owner's library.
+    #[test]
+    fn shuffled_in_shuffles_the_referenced_library_when_the_object_does_not_arrive() {
+        fn game_with_library() -> (Game, ObjectId) {
+            let cards: &'static CardTable = Box::leak(Box::new(CardTable::new([&GROWN])));
+            let deck = vec![cards.id_of(&GROWN); 12];
+            let game = Game::new(cards, &Setup { decks: vec![deck, Vec::new()], ..Setup::default() });
+            let source = game.state.zone(Zone::hand(PlayerId(0)))[0];
+            (game, source)
+        }
+
+        // The object left its zone before the effect resolves: its old reference no longer moves anything, but the
+        // owner's library is still shuffled.
+        let (mut game, source) = game_with_library();
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        put_into_graveyard(&mut cx, &[source]);
+        let rng = cx.s().rng;
+        put_into_library(&mut cx, &[source], LibraryPlace::ShuffledIn);
+        assert!(cx.s().obj(source).became.is_some());
+        assert_eq!(cx.s().zone(Zone::graveyard(PlayerId(0))).len(), 1);
+        assert_ne!(cx.s().rng, rng);
+
+        // A battlefield object would move, but a replacement sends it elsewhere. Its owner's library is still shuffled.
+        let (mut game, source) = game_with_library();
+        let hand = Zone::hand(PlayerId(0));
+        let timestamp = game.state.timestamp();
+        game.state.zone_remove(hand, source);
+        game.state.update_obj(source, |o| {
+            o.zone = Zone::BATTLEFIELD;
+            o.timestamp = timestamp;
+            o.exile_on_leave = true;
+        });
+        game.state.zone_push(Zone::BATTLEFIELD, source);
+        game.state.see_statics();
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let rng = cx.s().rng;
+        let moved = put_into_library(&mut cx, &[source], LibraryPlace::ShuffledIn);
+        assert_eq!(cx.s().obj(moved[0]).zone, Zone::exile(PlayerId(0)));
+        assert_ne!(cx.s().rng, rng);
+
+        // Phasing leaves the same object, but does not make the library shuffle impossible.
+        let (mut game, source) = game_with_library();
+        let hand = Zone::hand(PlayerId(0));
+        game.state.zone_remove(hand, source);
+        game.state.update_obj(source, |o| o.zone = Zone::PHASED_OUT);
+        game.state.zone_push(Zone::PHASED_OUT, source);
+        let mut cx = Cx { g: &mut game, frame: usize::MAX, cursor: 0, mana_source: None, entering: None, lineage: Vec::new(), asked_at: None, doer: None };
+        let rng = cx.s().rng;
+        put_into_library(&mut cx, &[source], LibraryPlace::ShuffledIn);
+        assert_eq!(cx.s().obj(source).zone, Zone::PHASED_OUT);
+        assert_ne!(cx.s().rng, rng);
     }
 }
