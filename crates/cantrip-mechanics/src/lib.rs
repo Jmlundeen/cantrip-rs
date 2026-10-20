@@ -642,6 +642,35 @@ pub fn search_library(
     optional: bool,
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
+    search_library_inner(g, searcher, owner, source, destination, count, optional, false, eligible)
+}
+
+/// Search in one operation, requiring the cards found to have different names (CR 201.2b). Fblthp, Knows the Way uses
+/// this constraint for its basic land search.
+pub fn search_library_with_distinct_names(
+    g: &mut dyn Game,
+    searcher: PlayerId,
+    owner: PlayerId,
+    source: ObjectId,
+    destination: SearchDestination,
+    count: u32,
+    eligible: impl Fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<ObjectId>, Suspend> {
+    // "With different names" is a quality of the cards found, so the searcher may fail to find (CR 701.23b).
+    search_library_inner(g, searcher, owner, source, destination, count, true, true, eligible)
+}
+
+fn search_library_inner(
+    g: &mut dyn Game,
+    searcher: PlayerId,
+    owner: PlayerId,
+    source: ObjectId,
+    destination: SearchDestination,
+    count: u32,
+    optional: bool,
+    distinct_names: bool,
+    eligible: impl Fn(&dyn Query, ObjectId) -> bool,
+) -> Result<Vec<ObjectId>, Suspend> {
     if !g.may_search(searcher, owner) {
         return Ok(Vec::new());
     }
@@ -652,7 +681,7 @@ pub fn search_library(
     } else {
         let can: Vec<ObjectId> = library.iter().copied().filter(|&c| eligible(g, c)).collect();
         let count = if optional { count.max(1) } else { count.max(1).min(u32::try_from(can.len()).unwrap_or(u32::MAX)) };
-        match g.ask(searcher, RequestKind::SearchLibrary { source, library, eligible: can, count, optional, destination })? {
+        match g.ask(searcher, RequestKind::SearchLibrary { source, library, eligible: can, count, optional, distinct_names, destination })? {
             Answer::Cards(cards) => cards,
             _ => Vec::new(),
         }
@@ -835,11 +864,11 @@ pub fn animate(g: &mut dyn Game, source: ObjectId, permanent: ObjectId, a: &Anim
 
 /// Whether two objects share a name (CR 201.2): an object with two names (a split or double-faced card, "A // B") shares
 /// one with anything that has either, a Room on the battlefield has those of its unlocked doors alone (CR 709.5), and a
-/// copy has the name it copies (`library::object_names`). Echoing Return, Echoing Ruin and Echoing Truth print "all other
+/// copy has the name it copies (`object_names`). Echoing Return, Echoing Ruin and Echoing Truth print "all other
 /// [things] with the same name as that [thing]", and Bloodbond March and Deadly Cover-Up "with the same name".
 pub fn same_name(q: &dyn Query, a: ObjectId, b: ObjectId) -> bool {
-    let theirs = library::object_names(q, b);
-    library::object_names(q, a).iter().any(|name| theirs.contains(name))
+    let theirs = object_names(q, b);
+    object_names(q, a).iter().any(|name| theirs.contains(name))
 }
 
 /// Explore (CR 701.44): the permanent's controller reveals the top card of their library; a land goes into their hand,

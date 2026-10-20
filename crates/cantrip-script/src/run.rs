@@ -1112,8 +1112,22 @@ impl<'s> Run<'s> {
             RequestKind::DistributeCards { cards, destinations, .. } => {
                 Answer::Placements { placements: greedy_distribution(cards, destinations), shuffle: false }
             }
-            RequestKind::SearchLibrary { eligible, count, optional, .. } => {
-                if *optional { Answer::Cards(Vec::new()) } else { Answer::Cards(eligible.iter().take(*count as usize).copied().collect()) }
+            RequestKind::SearchLibrary { eligible, count, optional, distinct_names, .. } => {
+                if *optional { Answer::Cards(Vec::new()) } else {
+                    let mut names = std::collections::HashSet::new();
+                    let cards = eligible.iter().copied().filter(|&card| {
+                        if !*distinct_names {
+                            return true;
+                        }
+                        let current = object_names(&self.game, card);
+                        if current.is_empty() || current.iter().any(|name| names.contains(name)) {
+                            return false;
+                        }
+                        names.extend(current);
+                        true
+                    }).take(*count as usize).collect();
+                    Answer::Cards(cards)
+                }
             }
         })
     }
@@ -1739,15 +1753,33 @@ impl<'s> Run<'s> {
                     }
                 }
             }
-            RequestKind::SearchLibrary { library, eligible, .. } => {
+            RequestKind::SearchLibrary { library, eligible, distinct_names, .. } => {
+                if !distinct_names {
+                    for spec in action.positional() {
+                        let in_library = self.objects(action, spec.trim(), library)?;
+                        if in_library.is_empty() {
+                            return fail(format!("line {line}: {text} proves nothing: no such card is in the library searched"));
+                        }
+                        if in_library.iter().any(|card| eligible.contains(card)) {
+                            return fail(format!("line {line} says {text} must not be findable, but it is"));
+                        }
+                    }
+                    return Ok(());
+                }
+
+                let mut found = Vec::new();
                 for spec in action.positional() {
                     let in_library = self.objects(action, spec.trim(), library)?;
                     if in_library.is_empty() {
                         return fail(format!("line {line}: {text} proves nothing: no such card is in the library searched"));
                     }
-                    if in_library.iter().any(|c| eligible.contains(c)) {
-                        return fail(format!("line {line} says {text} must not be findable, but it is"));
-                    }
+                    let choice = in_library.iter().copied().find(|card| !found.contains(card)).unwrap_or(in_library[0]);
+                    found.push(choice);
+                }
+                // A distinct-name scenario needs a combined answer to prove that the name constraint
+                // itself rejects duplicate names.
+                if check_answer(&self.game, request, &Answer::Cards(found)).is_ok() {
+                    return fail(format!("line {line} says {text} must be an answer the question refuses, but it is allowed"));
                 }
             }
             // `! Bot1.Arrange(A; B | )`: the distribution is one the question refuses (too many to the hand, a card

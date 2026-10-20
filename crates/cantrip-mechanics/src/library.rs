@@ -1,26 +1,35 @@
 //! Library recipes (CR 401, 701.23): searching, looking at the top, exiling it to play.
 
-use crate::{search_library, top_of_library};
+use crate::{search_library, search_library_with_distinct_names, top_of_library};
 use cantrip_api::*;
 
+pub use cantrip_api::object_names;
+
 /// What a library search looks for (CR 701.23): how many cards, whether finding fewer is allowed, whether the cards
-/// found are revealed. `Find::ONE` is "a [quality] card", which a player may fail to find (CR 701.23b); `Find::ANY` is
+/// found are revealed, and whether their names must differ. `Find::ONE` is "a [quality] card", which a player may fail to find (CR 701.23b); `Find::ANY` is
 /// "a card" with nothing to fail at, so the searcher must take one.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Find {
     pub count: u32,
     pub optional: bool,
     pub reveal: bool,
+    pub distinct_names: bool,
 }
 
 impl Find {
     /// "Search your library for a [quality] card": one card, which may not be found.
-    pub const ONE: Find = Find { count: 1, optional: true, reveal: false };
+    pub const ONE: Find = Find { count: 1, optional: true, reveal: false, distinct_names: false };
     /// "Search your library for a card": one card, taken if there is any.
-    pub const ANY: Find = Find { count: 1, optional: false, reveal: false };
+    pub const ANY: Find = Find { count: 1, optional: false, reveal: false, distinct_names: false };
     /// The cards found are revealed ("reveal it").
     pub const fn revealed(self) -> Find {
         Find { reveal: true, ..self }
+    }
+    /// The cards found must have different names.
+    pub const fn with_distinct_names(self) -> Find {
+        // "With different names" is a quality of the cards found, so the searcher may always fail to find a
+        // matching card (CR 701.23b).
+        Find { distinct_names: true, optional: true, ..self }
     }
     /// Up to `count` cards instead of one.
     pub const fn up_to(self, count: u32) -> Find {
@@ -29,7 +38,11 @@ impl Find {
 }
 
 fn find(g: &mut dyn Game, player: PlayerId, source: ObjectId, destination: SearchDestination, find: Find, eligible: impl Fn(&dyn Query, ObjectId) -> bool) -> Result<Vec<ObjectId>, Suspend> {
-    let found = search_library(g, player, player, source, destination, find.count, find.optional, eligible)?;
+    let found = if find.distinct_names {
+        search_library_with_distinct_names(g, player, player, source, destination, find.count, eligible)?
+    } else {
+        search_library(g, player, player, source, destination, find.count, find.optional, eligible)?
+    };
     if find.reveal {
         g.reveal(player, &found);
     }
@@ -67,7 +80,11 @@ pub fn search_to_exile(
     also: &[ObjectId],
     eligible: impl Fn(&dyn Query, ObjectId) -> bool,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let found = search_library(g, searcher, owner, source, SearchDestination::Exile, how.count, how.optional, eligible)?;
+    let found = if how.distinct_names {
+        search_library_with_distinct_names(g, searcher, owner, source, SearchDestination::Exile, how.count, eligible)?
+    } else {
+        search_library(g, searcher, owner, source, SearchDestination::Exile, how.count, how.optional, eligible)?
+    };
     if how.reveal {
         g.reveal(searcher, &found);
     }
@@ -562,30 +579,6 @@ pub fn card_has_name(q: &dyn Query, card: CardId, wanted: CardId) -> bool {
     let name = q.card(wanted).name;
     let def = q.card(card);
     def.name == name || def.split.is_some_and(|(left, right)| left.name == name || right.name == name)
-}
-
-/// The names the object `id` has (CR 201.2a): a Room on the battlefield those of its unlocked doors alone, and none at all
-/// with neither unlocked (CR 709.5); any other split card both halves' (CR 709.4a); a copy that says "except its name is X"
-/// only that (CR 707.9b), and so has one whose name an effect set (CR 612.8); and anything else its own name, one for each
-/// of the two faces' names of a card written "A // B".
-pub fn object_names(q: &dyn Query, id: ObjectId) -> Vec<&'static str> {
-    let c = q.chars(id);
-    let obj = q.obj(id);
-    if c.name_set || (obj.face_down_values().is_none() && obj.copy.as_ref().is_some_and(|copy| copy.name.is_some())) {
-        return vec![c.name];
-    }
-    let def = q.card(c.card);
-    if def.is_room() && obj.zone.is(ZoneKind::Battlefield) {
-        return def.unlocked_doors(obj.marks.doors).map(|half| half.name).collect();
-    }
-    // One that has left is as it last was (CR 608.2h): a Room the names of the doors it had unlocked, "A // B" both.
-    if def.is_room() && q.state().last_known(id).is_some() {
-        return c.name.split(" // ").filter(|name| !name.is_empty()).collect();
-    }
-    if let Some((left, right)) = def.split {
-        return vec![left.name, right.name];
-    }
-    c.name.split(" // ").filter(|name| !name.is_empty()).collect()
 }
 
 /// Whether the object `id` has the name `wanted` (CR 201.2a, 709.4a): "an object has the chosen name if one of its names is

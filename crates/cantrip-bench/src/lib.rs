@@ -274,9 +274,24 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
         RequestKind::DistributeCards { cards, destinations, .. } => {
             Answer::Placements { placements: greedy_distribution(cards, destinations), shuffle: false }
         }
-        RequestKind::SearchLibrary { eligible, count, optional, .. } => {
+        RequestKind::SearchLibrary { eligible, count, optional, distinct_names, .. } => {
             let n = if *optional { random.below(*count as usize + 1) } else { (*count as usize).min(eligible.len()) };
-            Answer::Cards(random.some(eligible, n))
+            if !*distinct_names {
+                return Answer::Cards(random.some(eligible, n));
+            }
+            let mut names = std::collections::HashSet::new();
+            let choices: Vec<_> = eligible.iter().copied().filter(|&card| {
+                let current = object_names(game, card);
+                if current.is_empty() {
+                    return false;
+                }
+                if current.iter().any(|name| names.contains(name)) {
+                    return false;
+                }
+                names.extend(current);
+                true
+            }).collect();
+            Answer::Cards(random.some(&choices, n.min(choices.len())))
         }
         RequestKind::OrderTriggers { sources, .. } => {
             let all: Vec<u8> = (0..sources.len() as u8).collect();
