@@ -1,0 +1,35 @@
+# Redcap Melee deals 4 damage to Bot2's Llanowar Elves, a green (nonred) permanent: it dies and, because a nonred permanent
+# was dealt damage this way, Bot1 sacrifices a land of their choice - the Island, not the Mountain that paid for the spell.
+# The sacrifice is only for the controller of the spell (CR 701.21a); Bot2 loses no land.
+
+[Bot1 Deck]
+Island
+Mountain
+Redcap Melee
+Mountain x12
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Redcap Melee.Cast(Llanowar Elves)
+Bot1.Choose(Island)
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves
+Bot2.Battlefield = Forest
+Bot1.Graveyard = Redcap Melee; Island
+Bot1.Battlefield = Mountain

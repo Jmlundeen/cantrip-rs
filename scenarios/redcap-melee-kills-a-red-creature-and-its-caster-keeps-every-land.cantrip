@@ -1,0 +1,32 @@
+# Redcap Melee deals 4 damage to Bot2's Blazing Rootwalla, a red permanent: it dies, but only a nonred permanent dealt
+# damage makes the caster sacrifice a land, so Bot1 keeps both lands and is not asked to choose one.
+
+[Bot1 Deck]
+Island
+Mountain
+Redcap Melee
+Mountain x12
+
+[Bot2 Deck]
+Mountain
+Blazing Rootwalla
+Mountain x12
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Blazing Rootwalla.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Redcap Melee.Cast(Blazing Rootwalla)
+Bot1.Pass
+
+[Expect]
+Bot2.Graveyard = Blazing Rootwalla
+Bot1.Graveyard = Redcap Melee
+Bot1.Battlefield = Island; Mountain
