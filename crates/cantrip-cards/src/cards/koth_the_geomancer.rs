@@ -16,11 +16,12 @@ fn a_land_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> 
 }
 
 /// "Koth deals 1 damage to each opponent. If that land is a Mountain, add {R}." The damage is dealt whether or not the
-/// land has left; its last known characteristics determine whether it was a Mountain (CR 608.2h).
+/// land has left; its last known characteristics determine whether it was a Mountain (CR 608.2h), the word read through
+/// Koth's own words (CR 612).
 fn landfall(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     effects::damage_each_opponent(g, item, 1);
     if let Target::Object(land) = item.subject
-        && g.chars(land).has_subtype(Subtype::Mountain)
+        && g.chars(land).has_subtype(g.words(item.object).subtype(Subtype::Mountain))
     {
         g.add_mana(item.controller, Mana::R, 1);
     }

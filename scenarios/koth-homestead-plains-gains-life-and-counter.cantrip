@@ -1,4 +1,6 @@
-# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+# Koth of the Homestead: a Plains entering under Bot1's control triggers both abilities - Landfall gains 1 life and the
+# Plains ability puts a +1/+1 counter on target creature (Koth, the only one: 3/3) - while a Forest, a land but not a
+# Plains, triggers only Landfall (CR 207.2c, 305.6, 603.2). Bot1 ends at 22 life with a single counter.
 
 [Bot1 Deck]
 Black Lotus

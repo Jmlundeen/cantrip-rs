@@ -1,4 +1,6 @@
-# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+# Koth, the Geomancer: Landfall deals 1 damage to each opponent for every land Bot1 plays (CR 207.2c), a Mountain and
+# then a Forest, so Bot2 ends at 18; the Mountain also adds {R} (checked by koth-geomancer-remembers-sacrificed-mountain),
+# the Forest none, so Bot1's pool is empty after it.
 
 [Bot1 Deck]
 Black Lotus
@@ -29,3 +31,4 @@ Bot2.Pass
 
 [Expect]
 Bot2.Life = 18
+Bot1.Mana = 

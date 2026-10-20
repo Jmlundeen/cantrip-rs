@@ -2,13 +2,14 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
-/// "Whenever a Plains you control enters" (CR 305.6): a permanent with the Plains land type, by any means.
+/// "Whenever a Plains you control enters" (CR 305.6): a permanent with the Plains land type, by any means; the word is
+/// read through Koth's own words (CR 612).
 fn a_plains_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
         Event::ZoneChange { new, to, .. }
             if to.is(ZoneKind::Battlefield)
                 && q.controller(*new) == q.controller(source)
-                && q.chars(*new).has_subtype(Subtype::Plains) =>
+                && q.chars(*new).has_subtype(q.words(source).subtype(Subtype::Plains)) =>
         {
             Fired::PLAIN
         }
