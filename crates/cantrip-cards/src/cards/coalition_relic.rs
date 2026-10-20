@@ -25,8 +25,8 @@ fn release(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 pub static CARD: CardDef = CardDef {
     abilities: &[
         mana_ability(TAP, add_any_color(1), "{T}: Add one mana of any color."),
-        ability(TAP, store, "{T}: Put a charge counter on Coalition Relic."),
-        triggered(cantrip_mechanics::triggers::YOUR_FIRST_MAIN_PHASE, release, "At the beginning of your precombat main phase, remove all charge counters from Coalition Relic. Add one mana of any color for each charge counter removed this way."),
+        ability(TAP, store, "{T}: Put a charge counter on this artifact."),
+        triggered(cantrip_mechanics::triggers::YOUR_FIRST_MAIN_PHASE, release, "At the beginning of your first main phase, remove all charge counters from this artifact. Add one mana of any color for each charge counter removed this way."),
     ],
     ..oracle::COALITION_RELIC
 };

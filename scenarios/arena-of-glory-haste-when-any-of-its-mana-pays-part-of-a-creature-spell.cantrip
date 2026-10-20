@@ -1,0 +1,35 @@
+# "If any of that mana is spent on a creature spell, it gains haste until end of turn" (CR 106.6): part of the cost is
+# enough. The Arena's {R}{R} pays a Lightning Bolt with one; then Embereth Shieldbreaker ({1}{R}) is cast with the
+# Arena's other {R} and a Mountain's plain {R} together, and it has haste - one of the two mana that paid it was the
+# Arena's.
+
+[Bot1 Deck]
+Mountain
+Mountain
+Arena of Glory
+Lightning Bolt
+Embereth Shieldbreaker
+Island
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Arena of Glory.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Arena of Glory.Activate(Ability: Exert)
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Hand.Embereth Shieldbreaker.Cast
+[T5 Bot1.Main2]
+
+[Expect]
+Turn = 5
+Bot2.Life = 17
+Bot1.Battlefield.Embereth Shieldbreaker.Keywords = Haste
+Bot1.Battlefield.Embereth Shieldbreaker.SummoningSick = false
