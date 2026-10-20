@@ -9,13 +9,9 @@ fn surveil_one(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     effects::surveil(g, item, 1)
 }
 
-/// "You've scried or surveilled this turn" (CR 701.22, 701.25): an intervening condition on the activation, read when
-/// the ability is activated.
+/// "Activate only if you've scried or surveilled this turn" (CR 602.5b), read when the ability is activated.
 fn scried_or_surveilled_this_turn(q: &dyn Query, asker: &Asker) -> bool {
-    let you = asker.controller;
-    q.history().this_turn().iter().any(|r| {
-        matches!(r.event, Event::Scried { player, .. } | Event::Surveilled { player, .. } if player == you)
-    })
+    cantrip_mechanics::history::scried_or_surveilled_this_turn(q, asker.controller)
 }
 
 /// "{W}{U}: Return this card from your graveyard to the battlefield with a finality counter on it" (CR 122.6, 614.1c):

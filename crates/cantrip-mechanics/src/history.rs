@@ -220,3 +220,12 @@ pub fn in_your_first_turns(q: &dyn Query, player: PlayerId, n: u16) -> bool {
 pub fn first_noncreature_spell_this_turn(q: &dyn Query, spell: ObjectId, player: PlayerId) -> bool {
     !q.history().casts_by(player).any(|c| c.spell != spell && !c.is(CardType::Creature))
 }
+
+/// "If you've scried or surveilled this turn" (CR 701.22, 701.25): `player` completed a scry or a surveil this turn, of any
+/// number of cards. Desperate Futurescribe and Proctor of Potential ask it.
+pub fn scried_or_surveilled_this_turn(q: &dyn Query, player: PlayerId) -> bool {
+    q.history()
+        .this_turn()
+        .iter()
+        .any(|r| matches!(r.event, Event::Scried { player: p, .. } | Event::Surveilled { player: p, .. } if p == player))
+}
