@@ -170,12 +170,11 @@ COLOR_NAMES = {"W": "White", "U": "Blue", "B": "Black", "R": "Red", "G": "Green"
 
 
 def _core_keywords():
-    """{"first strike": "FirstStrike", ...}: the Oracle keywords that are the core's (crates/cantrip-oracle/build.rs)."""
+    """{"first strike": "FirstStrike", "daybound": "Daybound", ...}: every core keyword (crates/cantrip-oracle/build.rs's
+    KEYWORDS) by the words Oracle prints it as; the ones no keyword line says (CantBeBlocked) never match."""
     src = open(os.path.join(ROOT, "crates", "cantrip-oracle", "build.rs"), encoding="utf-8").read()
     names = re.findall(r'"([^"]+)"', re.search(r"const KEYWORDS[^=]*=\s*\[(.*?)\];", src, re.S).group(1))
-    words = re.findall(r'"([^"]+)"', re.search(r"const KEYWORD_WORDS[^=]*=\s*\[(.*?)\];", src, re.S).group(1))
-    by_key = {n.lower(): n for n in names}
-    return {w: by_key[w.replace(" ", "")] for w in words if w.replace(" ", "") in by_key}
+    return {re.sub(r"(?<!^)(?=[A-Z])", " ", n).lower(): n for n in names}
 
 
 def _stat(value):

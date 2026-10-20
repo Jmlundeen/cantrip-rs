@@ -474,6 +474,9 @@ def describe(name, mine, theirs, indent, label=""):
     d = diff(mine, theirs)
     if d:
         line += "\n" + indent + f"    differs: {d}  (theirs: {theirs!r})"
+        # A model that acts on one object, for a text that acts on several: its loop must not be copied.
+        if re.search(r"\b(?:one|a|an|target)\b[^;]*-> [^;]*\b(?:two|three|four|five|each|all|any number|cards|creatures|permanents)\b", d):
+            line += "\n" + indent + "    yours acts on more than theirs: act on them all at once (exile_all, destroy_all ... - CR 101.4, 608.2), never one by one"
     return line
 
 
@@ -518,7 +521,7 @@ def report(index, abilities):
             else:
                 lines.append("      new")
                 new = True
-        near = [n for n in index.nearest(ab.text) if n[0] >= 0.35] if new else []
+        near = [n for n in index.nearest(ab.text) if n[0] >= 0.5] if new else []
         if near:
             lines.append("    nearest abilities:")
             for score, name, text in near:

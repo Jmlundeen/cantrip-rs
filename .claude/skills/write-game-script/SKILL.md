@@ -103,6 +103,7 @@ sweeping seeds (CLAUDE.md).
   - Same-named cards in one zone are interchangeable, and the first one offered is used.
   - A target name matching permanents of both players must be qualified (`Bot2.Battlefield.Grizzly Bears`).
   - In `[Expect]`, a name that appears more than once in a zone needs an index: `Bot1.Battlefield.Island#1.Tapped`.
+    So do two same-named cards chosen together in one answer: `Bot1.Target(Ornithopter#1; Ornithopter#2)`.
   - A nameless object (a face-down permanent) is `#1`: `Bot1.Battlefield.#1.Activate`.
   - A permanent with several abilities needs `Ability: <part of its text>`, such as `Ability: {U}` for Tundra.
   - A cast for an alternative cost names it the same way (`Cast(Duress; Ability: Return)` for Daze).
