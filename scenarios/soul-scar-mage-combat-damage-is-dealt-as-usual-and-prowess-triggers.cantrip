@@ -1,0 +1,45 @@
+# Only noncombat damage is replaced (CR 120.2): Bot1's Soul-Scar Mage attacks on turn 3 and is blocked by Bot2's Fanatic of Rhonas
+# (1/4), which is dealt 2 combat damage (Damage = 2, no counters) because Shock made the Mage a 2/3 (prowess, CR 702.108a) before
+# damage. The Shock is cast at Bot2's face (20 -> 18) to pump it.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Soul-Scar Mage
+Shock
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Fanatic of Rhonas
+Forest x4
+Forest x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Soul-Scar Mage.Cast
+Bot1.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot1.Attack(Soul-Scar Mage > Bot2)
+Bot2.Block(Fanatic of Rhonas > Soul-Scar Mage)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot2.Life = 18
+Bot2.Battlefield.Fanatic of Rhonas.Damage = 2
+Bot2.Battlefield.Fanatic of Rhonas.Counters.MinusOneMinusOne = (absent)
+Bot1.Battlefield.Soul-Scar Mage.Damage = 1
