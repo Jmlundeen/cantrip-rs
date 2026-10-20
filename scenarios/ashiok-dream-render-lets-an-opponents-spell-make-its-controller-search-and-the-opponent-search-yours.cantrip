@@ -1,0 +1,64 @@
+# Ashiok, Dream Render forbids only a spell that makes its own controller search their own library. Two controls for the
+# edges of that text (Bot1 controls Ashiok; Bot2 is the opponent). Bot2's Winds of Abandon exiles Bot1's Ornithopter, so Bot1,
+# not the spell's controller, searches Bot1's library for a basic land: allowed (the ruling: opponents' spells "may cause other
+# players to search their libraries"). Then, on turn 4 (the Moxen untapped), Bot2's Ancient Vendetta names Island, so Bot2 searches Bot1's library, not
+# its own ("their library"): allowed, and it finds two Islands in the
+# library and, by default, the one in Bot1's hand, which are exiled with the Ornithopter.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Ashiok, Dream Render
+Ornithopter
+Plains x2
+Plains x4
+Island x2
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Winds of Abandon
+Ancient Vendetta
+Plains x3
+Plains x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Hand.Ashiok, Dream Render.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Winds of Abandon.Cast(Bot1.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Search(Plains)
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Hand.Ancient Vendetta.Cast(Bot1)
+Bot2.Name(Island)
+Bot2.Search(Island; Island)
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Battlefield = Ashiok, Dream Render; Mox Jet; Mox Ruby; Mox Sapphire; Plains
+Exile = Island; Island; Island; Ornithopter

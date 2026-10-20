@@ -1,0 +1,55 @@
+# Ashiok, Dream Render: "Spells and abilities your opponents control can't cause their controller to search their library"
+# (CR 101.2, 701.23). Bot1 casts Ashiok on turn 1; Bot2's Demonic Tutor on turn 2 is never asked to search, so
+# no card reaches its hand, while Bot1's own Demonic Tutor on turn 3 searches and finds Lightning Bolt (the control).
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Ashiok, Dream Render
+Demonic Tutor
+Island x2
+Island x3
+Lightning Bolt
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Demonic Tutor
+Island x4
+Lightning Bolt
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ashiok, Dream Render.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Demonic Tutor.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Demonic Tutor.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Search(Lightning Bolt)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Graveyard = Demonic Tutor
+Bot2.Hand.Count = 5
+Bot2.Library.Count = 10
+Bot1.Hand = Island; Island; Island; Lightning Bolt

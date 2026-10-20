@@ -1,0 +1,57 @@
+# Ashiok, Dream Render: "If an effect says 'Search your library . . . then shuffle your library,' your opponents shuffle
+# their libraries even though they can't search" (2019-05-03 ruling). Bot2's Demonic Tutor under Bot1's Ashiok asks no
+# search (a search for "a card" would take one, and Bot2's hand keeps only Islands), and Bot2's library, ten different cards
+# in a known order, is shuffled out of it all the same (`!=`); its count is unchanged.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Ashiok, Dream Render
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Demonic Tutor
+Island x4
+Island
+Lightning Bolt
+Plains
+Swamp
+Mountain
+Forest
+Counterspell
+Mana Leak
+Time Walk
+Sol Ring
+Ancestral Recall
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ashiok, Dream Render.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+? Bot2.Library = Lightning Bolt; Plains; Swamp; Mountain; Forest; Counterspell; Mana Leak; Time Walk; Sol Ring; Ancestral Recall
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Demonic Tutor.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Graveyard = Demonic Tutor
+Bot2.Hand = Island; Island; Island; Island; Island
+Bot2.Library.Count = 10
+Bot2.Library != Lightning Bolt; Plains; Swamp; Mountain; Forest; Counterspell; Mana Leak; Time Walk; Sol Ring; Ancestral Recall

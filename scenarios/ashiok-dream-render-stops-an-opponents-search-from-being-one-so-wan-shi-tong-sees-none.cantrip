@@ -1,0 +1,61 @@
+# Ashiok, Dream Render: a search it forbids is not a search (CR 101.2, 701.23), so "whenever an opponent searches their
+# library" (Wan Shi Tong, Librarian, also Bot1's) does not see it. Bot1 casts Ashiok and a Wan Shi Tong with X = 0 on turn 1. Bot2's Demonic
+# Tutor on turn 2 is forbidden: no counter. Bot1's own Winds of Abandon on turn 3 exiles Bot2's Ornithopter, and Bot2 searches
+# for a basic land on Bot1's spell (allowed): one counter, so the two differ only in whose spell it was.
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Ashiok, Dream Render
+Wan Shi Tong, Librarian
+Winds of Abandon
+Mox Pearl
+Mox Ruby
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Mox Jet
+Ornithopter
+Demonic Tutor
+Island x3
+Lightning Bolt
+Plains
+Island x10
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Black)
+Bot1.Hand.Ashiok, Dream Render.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Wan Shi Tong, Librarian.Cast(X: 0)
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot2.Hand.Demonic Tutor.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Pass
+? Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = (absent)
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Winds of Abandon.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Search(Plains)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield.Wan Shi Tong, Librarian.Counters.PlusOnePlusOne = 1
+Bot2.Graveyard = Demonic Tutor

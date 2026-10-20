@@ -1,0 +1,43 @@
+# Ashiok, Dream Render -1 targets any player: Bot1 mills itself four cards and they stay (its own graveyard is not an
+# opponent's), while the card already in Bot2's graveyard (a Lightning Bolt it cast) is exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Ashiok, Dream Render
+Island x3
+Island x10
+
+[Bot2 Deck]
+Mox Ruby
+Lightning Bolt
+Island x5
+Island x10
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Ashiok, Dream Render.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot1.Battlefield.Ashiok, Dream Render.Activate(Bot1)
+Bot1.Pass
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Graveyard.Count = 4
+Bot2.Graveyard.Count = 0
+Exile = Lightning Bolt

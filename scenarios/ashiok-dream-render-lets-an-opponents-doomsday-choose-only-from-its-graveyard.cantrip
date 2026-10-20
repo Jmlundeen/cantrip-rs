@@ -1,0 +1,58 @@
+# Ashiok, Dream Render: Bot2's Doomsday ("Search your library and graveyard for five cards and exile the rest") can't make
+# Bot2 search its library (CR 101.2, 701.23), so the five are chosen from the graveyard alone - the refused Mana Leak is in
+# the library - and with two there (the Lightning Bolt and the spent Black Lotus) both are chosen. "The rest" is still every
+# other card of both zones: the whole library is exiled, the two chosen go on top in order, and Bot2 loses half its life.
+# doomsday-exiles-the-graveyard-it-did-not-choose-and-rounds-half-of-an-odd-life-total-up is the same spell unforbidden.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Ashiok, Dream Render
+Island x3
+Island x10
+
+[Bot2 Deck]
+Doomsday
+Black Lotus
+Mox Ruby
+Lightning Bolt
+Swamp x3
+Counterspell
+Mana Leak
+Time Walk
+Sol Ring
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ashiok, Dream Render.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Doomsday.Cast
+Bot2.Pass
+! Bot2.Choose(Mana Leak)
+Bot2.Choose(Black Lotus; Lightning Bolt)
+
+[Expect]
+Turn = 2
+Stack.Count = 0
+Bot2.Library = Lightning Bolt; Black Lotus
+Bot2.Graveyard = Doomsday
+Exile = Mana Leak; Time Walk; Sol Ring
+Bot2.Hand = Counterspell; Swamp; Swamp; Swamp
+Bot2.Life = 10
+Bot1.Life = 17
