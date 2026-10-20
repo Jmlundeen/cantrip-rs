@@ -1,0 +1,60 @@
+# The Glutton's "exile up to two target cards from graveyards" is one simultaneous exile (CR 101.4, 608.2), so Hardened Academic's
+# "whenever one or more cards leave your graveyard" (CR 603.2c, 603.10a) triggers once, not once per card: one +1/+1 counter.
+# Turn 1: Academic, an Ornithopter and a Shock that kills it (graveyard: Ornithopter, Shock). The Trespasser (turn 3) enters with
+# no target; night comes on turn 7 (Bot2 casts nothing on turn 6), and the attacking Glutton exiles both cards.
+# The Ornithopter is the one creature card, so the drain is 1 (20 - 1 - 4 = 15).
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Pearl
+Mox Jet
+Ornithopter
+Shock
+Hardened Academic
+Graveyard Trespasser
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Hardened Academic.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard.Count = 2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Graveyard Trespasser.Cast
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+? DayNight = Night
+? Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = (absent)
+Bot1.Attack(Graveyard Glutton > Bot2)
+Bot1.Target(Bot1.Graveyard.Ornithopter; Bot1.Graveyard.Shock)
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Hardened Academic)
+[T7 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Shock
+Bot1.Battlefield.Hardened Academic.Counters.PlusOnePlusOne = 1
+Bot1.Life = 21
+Bot2.Life = 15

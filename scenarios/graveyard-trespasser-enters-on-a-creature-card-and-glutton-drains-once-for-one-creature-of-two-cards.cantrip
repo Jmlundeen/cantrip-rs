@@ -1,0 +1,58 @@
+# Graveyard Trespasser (turn 3): its enters trigger exiles an Ornithopter, a creature card, so Bot2 loses 1 and Bot1 gains 1
+# (20 -> 19, 20 -> 21). On turn 5 it is night and the Trespasser is Graveyard Glutton; its attack trigger takes an Ornithopter
+# and a Shock, only one of them a creature card, so the drain is 1 again, not 2 for two cards (CR 608.2c). Combat deals 4:
+# Bot2 19 - 1 - 4 = 14, Bot1 21 + 1 = 22; the other Ornithopter and Shock stay in the graveyard.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Jet
+Ornithopter
+Ornithopter
+Shock
+Shock
+Graveyard Trespasser
+Mountain x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Shock.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Graveyard Trespasser.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Target(Bot1.Graveyard.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+? Exile = Ornithopter
+? Bot1.Life = 21
+? Bot2.Life = 19
+[T5 Bot1.Main1]
+Bot1.Attack(Graveyard Glutton > Bot2)
+Bot1.Target(Bot1.Graveyard.Ornithopter; Bot1.Graveyard.Shock)
+[T5 Bot1.Main2]
+
+[Expect]
+Exile = Ornithopter; Ornithopter; Shock
+Bot1.Graveyard = Shock
+Bot1.Life = 22
+Bot2.Life = 14

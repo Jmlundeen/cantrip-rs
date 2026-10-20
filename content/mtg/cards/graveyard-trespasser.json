@@ -1,0 +1,24 @@
+{
+  "name": "Graveyard Trespasser",
+  "manaCost": "{2}{B}",
+  "type": "Creature — Human Werewolf",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Ward—Discard a card.\nWhenever this creature enters or attacks, exile up to one target card from a graveyard. If a creature card was exiled this way, each opponent loses 1 life and you gain 1 life.\nDaybound (If a player casts no spells during their own turn, it becomes night next turn.)",
+  "backFace": {
+    "name": "Graveyard Glutton",
+    "colorIndicator": [
+      "Black"
+    ],
+    "type": "Creature — Werewolf",
+    "power": 4,
+    "toughness": 4,
+    "oracleText": "Ward—Discard a card.\nWhenever this creature enters or attacks, exile up to two target cards from graveyards. For each creature card exiled this way, each opponent loses 1 life and you gain 1 life.\nNightbound (If a player casts at least two spells during their own turn, it becomes day next turn.)",
+    "keywords": [
+      "Nightbound"
+    ]
+  },
+  "keywords": [
+    "Daybound"
+  ]
+}
