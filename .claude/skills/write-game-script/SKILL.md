@@ -51,6 +51,14 @@ sweeping seeds (CLAUDE.md).
      limit on the side that qualifies and one just past it on the side that does not, so `<` for `<=` fails.
    - **Whose things it reads** ("each", "all", "target", "you control", "an opponent controls"): give both players
      something it could apply to, so a filter that reads only one side (or the wrong one) fails.
+   - **When it reads** ("this turn", "since your last turn", "the first time each turn"): have the thing happen on an
+     earlier turn as well, and show it does not count.
+   - **A cost or a cost change**: a refusal can't prove it (an unaffordable cast still counts as offered). Make the
+     mana available before the cast and check the pool with `? Bot1.Mana = ...` **right after the cast, in the same
+     step** - the pool empties between steps, so an `[Expect]` of an empty pool proves nothing. Too high a cost fails
+     the cast; too low leaves more than the check says.
+   - **Every ability the card has, at least once** - a keyword like prowess or flying included: the card's file can
+     list it and coverage cannot see it missing (static data runs no lines).
 8. **If the change added a shared mechanic or a core feature, write a second script for a second composition** — a
    different card, or a different arrangement of the same one, going through the same code. One caller never
    demonstrates that a capability is general.

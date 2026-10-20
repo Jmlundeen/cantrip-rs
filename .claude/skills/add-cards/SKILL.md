@@ -183,7 +183,8 @@ scenarios, together:
   return, mode, way to cast, cost, ability and face (coverage checks the lines; the branches are on you);
 - **show what the text does**, with a refusal (`! Bot1.Hand.Card.Cast`, `! Bot1.Choose(..)`) beside the allowed case
   for each limit the card's own code enforces ("only", "up to", "another", a mana value or type) - an object exactly at
-  each numeric limit, and both players' objects for whatever "each", "target" or "you control" reads. A limit the
+  each numeric limit, both players' objects for whatever "each", "target" or "you control" reads, the same thing on an
+  earlier turn for "this turn", and exact mana with an empty pool after for a cost (`write-game-script`, step 7). A limit the
   engine or a shared mechanic enforces (targeting, timing, equip) is tested there already;
 - **test a corner case only where the card's own code could plausibly get an interaction wrong**: it reads a value
   that can change before use, holds last-known information, or combines with another rule in its own code; a card
