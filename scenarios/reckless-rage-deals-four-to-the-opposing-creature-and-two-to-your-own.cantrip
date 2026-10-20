@@ -1,0 +1,53 @@
+# Reckless Rage deals 4 damage to target creature you don't control and 2 damage to target creature you control. Both are
+# Fanatic of Rhonas (1/4), so the amounts show: Bot2's takes 4 and dies, Bot1's takes only 2 and survives with it marked.
+# Rage is cast with Bot1's own Fanatic as the second target (CR 115.1) and an opponent's as the first.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Fanatic of Rhonas
+Reckless Rage
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Fanatic of Rhonas
+Mountain x4
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Fanatic of Rhonas.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Reckless Rage.Cast
+! Bot1.Target(Bot1.Battlefield.Fanatic of Rhonas)
+Bot1.Target(Bot2.Battlefield.Fanatic of Rhonas)
+! Bot1.Target(Bot2.Battlefield.Fanatic of Rhonas)
+Bot1.Target(Bot1.Battlefield.Fanatic of Rhonas)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Fanatic of Rhonas
+Bot1.Battlefield = Mox Emerald; Mox Jet; Mox Ruby; Fanatic of Rhonas
+Bot1.Graveyard = Reckless Rage

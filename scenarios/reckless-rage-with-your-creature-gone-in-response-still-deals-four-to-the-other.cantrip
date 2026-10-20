@@ -1,0 +1,56 @@
+# A target that has become illegal is left out and the other is still dealt its damage (CR 608.2b): Bot1's Llanowar Elves, the
+# creature it controls, is Lightning Bolted by Bot2 in response, so only Bot2's Fanatic of Rhonas (1/4) is dealt the 4 and dies.
+
+[Bot1 Deck]
+Mox Emerald
+Mox Ruby
+Llanowar Elves
+Reckless Rage
+Mountain
+Mountain
+Mountain
+Mountain x13
+
+[Bot2 Deck]
+Mox Emerald
+Mox Jet
+Mox Ruby
+Fanatic of Rhonas
+Lightning Bolt
+Mountain
+Mountain
+Mountain x13
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Fanatic of Rhonas.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Reckless Rage.Cast
+Bot1.Target(Bot2.Battlefield.Fanatic of Rhonas)
+Bot1.Target(Bot1.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Llanowar Elves)
+? Stack = Lightning Bolt; Reckless Rage
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Fanatic of Rhonas; Lightning Bolt
+Bot1.Graveyard = Reckless Rage; Llanowar Elves

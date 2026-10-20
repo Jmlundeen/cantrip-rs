@@ -1,0 +1,6 @@
+{
+  "name": "Reckless Rage",
+  "manaCost": "{R}",
+  "type": "Instant",
+  "oracleText": "Reckless Rage deals 4 damage to target creature you don't control and 2 damage to target creature you control."
+}
