@@ -1,0 +1,28 @@
+# Heroes' Hangout, Date Night: the chosen Lightning Bolt is not cast on turn 3, and on turn 5 - after the end of Bot1's
+# next turn (CR 514.2) - it is still in exile but can no longer be cast, though Bot2 is a legal target and Bot1 has a Mountain.
+[Bot1 Deck]
+Mountain
+Heroes' Hangout
+Mountain x5
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Heroes' Hangout.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Lightning Bolt)
+[T5 Bot1.Main1]
+! Bot1.Exile.Lightning Bolt.Cast(Bot2)
+
+[Expect]
+Turn = 5
+Bot2.Life = 20
+Exile = Lightning Bolt; Mountain

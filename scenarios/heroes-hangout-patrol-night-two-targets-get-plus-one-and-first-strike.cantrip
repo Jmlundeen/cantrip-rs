@@ -1,0 +1,40 @@
+# Heroes' Hangout, Patrol Night with two targets, one of each player's: Bot1's first Ornithopter (0/2) and Bot2's
+# Ornithopter each get +1/+0 and first strike until end of turn; Bot1's second Ornithopter, not targeted, stays 0/2 with
+# no keywords (the control).
+[Bot1 Deck]
+Mountain
+Ornithopter
+Ornithopter
+Heroes' Hangout
+Mountain x20
+
+[Bot2 Deck]
+Ornithopter
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Heroes' Hangout.Cast
+Bot1.Modes(2)
+Bot1.Target(Bot1.Battlefield.Ornithopter#1; Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter#1.Power = 1
+Bot1.Battlefield.Ornithopter#1.Keywords = FirstStrike; Flying
+Bot2.Battlefield.Ornithopter.Power = 1
+Bot2.Battlefield.Ornithopter.Keywords = FirstStrike; Flying
+Bot1.Battlefield.Ornithopter#2.Power = 0
+Bot1.Battlefield.Ornithopter#2.Keywords = Flying

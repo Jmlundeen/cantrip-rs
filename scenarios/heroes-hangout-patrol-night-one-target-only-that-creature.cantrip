@@ -1,0 +1,32 @@
+# Heroes' Hangout, Patrol Night with a single target ("one or two"): only the targeted Ornithopter gets +1/+0 and first
+# strike; the other, untargeted, does not.
+[Bot1 Deck]
+Mountain
+Ornithopter
+Ornithopter
+Heroes' Hangout
+Mountain x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Heroes' Hangout.Cast
+Bot1.Modes(2)
+Bot1.Target(Ornithopter#2)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ornithopter#2.Power = 1
+Bot1.Battlefield.Ornithopter#2.Keywords = FirstStrike; Flying
+Bot1.Battlefield.Ornithopter#1.Power = 0
+Bot1.Battlefield.Ornithopter#1.Keywords = Flying

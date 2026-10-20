@@ -1,0 +1,30 @@
+# Heroes' Hangout, Date Night: Bot1 chooses the Mountain (land drop already used on turn 1), which it plays from exile as
+# its turn-3 land drop (CR 305.1, 601.3); that uses the drop, so a land from hand is then refused, and the Bolt not
+# chosen is never playable.
+[Bot1 Deck]
+Mountain
+Heroes' Hangout
+Mountain x5
+Mountain
+Lightning Bolt
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Heroes' Hangout.Cast
+Bot1.Modes(1)
+Bot1.Pass
+Bot2.Pass
+Bot1.Choose(Mountain)
+[T3 Bot1.Main1]
+Bot1.Exile.Mountain.Play
+! Bot1.Hand.Mountain.Play
+! Bot1.Exile.Lightning Bolt.Cast
+
+[Expect]
+Bot1.Battlefield.Count = 2
+Exile = Lightning Bolt
