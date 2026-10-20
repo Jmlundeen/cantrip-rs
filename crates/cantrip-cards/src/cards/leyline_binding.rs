@@ -9,9 +9,7 @@ fn domain(q: &dyn Query, _: ObjectId, player: PlayerId, costed: Costed, _: &[Tar
     if !matches!(costed, Costed::Spell(_)) {
         return CostDelta::NONE;
     }
-    let lands: Vec<Chars> = q.permanents_of(player).into_iter().map(|id| q.chars(id)).filter(|c| c.is(CardType::Land)).collect();
-    let basic = [Subtype::Plains, Subtype::Island, Subtype::Swamp, Subtype::Mountain, Subtype::Forest];
-    CostDelta::less(basic.iter().filter(|&&t| lands.iter().any(|c| c.subtypes.has(t))).count() as u8)
+    CostDelta::less(cantrip_mechanics::domain::count(q, player))
 }
 
 /// "Exile target nonland permanent an opponent controls until this enchantment leaves the battlefield" (CR 610.3).
