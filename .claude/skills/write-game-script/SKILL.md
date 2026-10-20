@@ -75,7 +75,8 @@ sweeping seeds (CLAUDE.md).
   instant, a `? Stack.Count` check, a counterspell's `Target` - sees everything still there, the Moxen included. So
   put `BotN.Pass` after a cast that must have resolved before the next line is answered. Only an instant, or a
   spell with flash, can be cast onto a non-empty stack: a sorcery-speed line waits while everything under it
-  resolves. To set up several spells for one response (a counterspell choosing among targets), resolve the mana
+  resolves. A refusal (`!`) is answered at once too: one naming a permanent that was just cast ("nothing is named")
+  needs a `Pass` by each player after the cast, so it is on the battlefield first. To set up several spells for one response (a counterspell choosing among targets), resolve the mana
   first, cast the sorcery-speed spell, then the instants, then the response. A line left waiting for something that
   already happened shows in the trace as "the game ended before line N".
 - **Targets gate matching.** A cast waits until every named target is a legal candidate. A spell with no legal

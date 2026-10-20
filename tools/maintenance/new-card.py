@@ -195,6 +195,11 @@ def _face(face, names, index, core):
     out["oracleText"] = face["oracle_text"]
     words = [ab.keyword for ab in index.split_abilities(face["oracle_text"], names) if ab.keyword]
     keywords = [core[w] for w in dict.fromkeys(words) if w in core]
+    # Whole lines the core plays as a keyword of its own (every card in content that prints one has it).
+    for line in index.clean(face["oracle_text"], names).split("\n"):
+        for pattern, keyword in index.TEXT_KEYWORDS:
+            if re.fullmatch(pattern, line.strip(), re.I) and keyword not in keywords:
+                keywords.append(keyword)
     if keywords:
         out["keywords"] = keywords
     for flag in ("convoke", "delve", "improvise"):

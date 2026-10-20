@@ -133,6 +133,14 @@ def template(text, level):
 
 # ---------------------------------------------------------------------------------------------------------- abilities
 
+TEXT_KEYWORDS = [  # whole lines (name as ~, no reminder text) the core plays as a keyword of its own
+    (r"(?:this spell|~) can't be countered\.", "CantBeCountered"),
+    (r"~ can't be blocked\.", "CantBeBlocked"),
+    (r"you can't spend mana to cast (?:this spell|~)\.", "CantSpendManaToCast"),
+    (r"you may cast ~ from your graveyard\.", "CastFromYourGraveyard"),
+]
+
+
 ABILITY_WORD = re.compile(r"^[A-Z][\w' ,\-]*? — (?=[A-Z{])")
 TRIGGER = re.compile(r"^(when|whenever|at) ", re.I)
 
@@ -206,8 +214,27 @@ def split_abilities(oracle, names):
                 parts.append(("modal" if modal else "effect", sentence.strip()))
         for bullet in block[1:]:
             parts.append(("effect", bullet.lstrip("• ").strip()))
+        # Each "target ..." phrase is a part of its own: a target filter is the code most often copied between cards
+        # whose effects differ ("target green or white creature" is Deathmark's and Rending Volley's at once).
+        for kind, text in list(parts):
+            if kind in ("effect", "cost"):
+                parts += [("target", phrase) for phrase in target_phrases(text)]
         out.append(Ability(" ".join([head] + block[1:]), parts))
     return out
+
+
+TARGET = re.compile(r"\b((?:up to (?:one|two|three|four|five|x|\d+) )?(?:other |another )?targets? )([^.,;:]+)", re.I)
+# Where a target's noun phrase ends: the verb or preposition that follows it.
+TARGET_END = re.compile(
+    r" (?:to|from|into|onto|on|until|this|for|as|is|are|and|unless|that|can|can't|doesn't|its owner's|their owners'|"
+    r"(?:get|gain|lose|deal|discard|draw|sacrifice|mill|put|reveal|shuffle|search|exile|return|create|attack|block|"
+    r"fight|become|transform|untap|tap|phase|explore|connive|scrie|surveil)s?|has|have)\b.*$", re.I)
+
+
+def target_phrases(text):
+    """The target phrases of a sentence, each cut where its noun phrase ends: "target creature an opponent controls",
+    "up to two target cards from graveyards" -> "up to two target cards", "Target player discards" -> "Target player"."""
+    return [(m.group(1) + TARGET_END.sub("", m.group(2))).strip() for m in TARGET.finditer(text)]
 
 
 def card_texts(card):
@@ -399,6 +426,11 @@ class Index:
         return None, []
 
     def keyword_home(self, ab):
+        for pattern, keyword in TEXT_KEYWORDS:
+            if re.fullmatch(pattern, ab.text.strip(), re.I):
+                return f"core keyword {keyword} (in the content JSON's keywords; no code)"
+        if ab.keyword is None:
+            return None
         if ab.keyword in self.core:
             return "core keyword (Keywords::of in the content JSON; no code)"
         return mechanics_for(ab.keyword)
@@ -494,7 +526,7 @@ def report(index, abilities):
             continue
         seen[ab.text] = i
         lines.append(f"[{i}] {ab.text}")
-        home = index.keyword_home(ab) if ab.keyword is not None else None
+        home = index.keyword_home(ab)
         if home:
             lines.append(f"    keyword: {home}")
             if home.startswith("core"):
