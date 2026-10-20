@@ -1,0 +1,34 @@
+# Moon-Circuit Hacker cast on turn 1 (Mox Sapphire and Mox Jet pay {1}{U}) did not enter this turn when it connects on
+# turn 3: Bot1 draws, then discards a card (the Island it chooses), so the hand is the same size and the Island is in
+# the graveyard. Bot2 takes 2.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Moon-Circuit Hacker
+Swamp
+Island x4
+Forest x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Moon-Circuit Hacker.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Moon-Circuit Hacker)
+Bot1.Accept
+Bot1.Choose(Swamp)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Swamp
+Bot1.Hand.Count = 5

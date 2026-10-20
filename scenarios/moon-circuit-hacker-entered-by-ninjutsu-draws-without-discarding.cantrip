@@ -1,0 +1,38 @@
+# Moon-Circuit Hacker: "you may draw a card. If you do, discard a card unless this creature entered this turn." Bot1 attacks
+# on turn 3 with Ornithopter (power 0), unblocked; in the declare blockers step Mox Sapphire pays Ninjutsu {U} and the Hacker
+# comes in tapped and attacking in its place (CR 702.49a). It deals 2 to Bot2 the turn it entered: Bot1 draws and discards
+# nothing (hand 6 -> 7, graveyard empty). The control, a Hacker that entered on an earlier turn, is
+# moon-circuit-hacker-on-a-later-turn-loots.
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Moon-Circuit Hacker
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Moon-Circuit Hacker.Activate(Ability: Ninjutsu)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Hand.Count = 6
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Count = 7
+Bot1.Graveyard.Count = 0
+Bot1.Battlefield.Moon-Circuit Hacker.Tapped = true

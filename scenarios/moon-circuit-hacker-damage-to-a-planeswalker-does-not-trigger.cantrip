@@ -1,0 +1,52 @@
+# Moon-Circuit Hacker: "Whenever this creature deals combat damage to a player" - not to a planeswalker. The Hacker (2/1)
+# attacks Bot2's Liliana of the Veil (3 loyalty) on turn 3, unblocked: she drops to 1, Bot2's life is untouched, and Bot1 is
+# offered no draw (a refusal; hand stays at 5 and the library at 9).
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Moon-Circuit Hacker
+Island x4
+Island x10
+
+[Bot2 Deck]
+Swamp
+Mox Jet
+Mox Ruby
+Liliana of the Veil
+Swamp
+Swamp
+Swamp
+Swamp x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Moon-Circuit Hacker.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Swamp.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Battlefield.Swamp.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Moon-Circuit Hacker > Bot2.Battlefield.Liliana of the Veil)
+Bot1.Pass
+Bot1.Pass
+Bot1.Pass
+! Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Battlefield.Liliana of the Veil.Counters.Loyalty = 1
+Bot2.Life = 20
+Bot1.Hand.Count = 5
+Bot1.Library.Count = 9

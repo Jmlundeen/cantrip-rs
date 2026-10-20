@@ -1,0 +1,8 @@
+{
+  "name": "Moon-Circuit Hacker",
+  "manaCost": "{1}{U}",
+  "type": "Enchantment Creature — Human Ninja",
+  "power": 2,
+  "toughness": 1,
+  "oracleText": "Ninjutsu {U} ({U}, Return an unblocked attacker you control to hand: Put this card onto the battlefield from your hand tapped and attacking.)\nWhenever this creature deals combat damage to a player, you may draw a card. If you do, discard a card unless this creature entered this turn."
+}

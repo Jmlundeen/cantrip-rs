@@ -1,0 +1,34 @@
+# Moon-Circuit Hacker, entered this turn by ninjutsu (see moon-circuit-hacker-entered-by-ninjutsu-draws-without-discarding):
+# Bot1 declines the "may": no card is drawn, and nothing is discarded (hand stays at 6, graveyard empty).
+
+[Bot1 Deck]
+Mox Sapphire
+Ornithopter
+Moon-Circuit Hacker
+Island x4
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Attack(Ornithopter)
+[T3 Bot1.Blockers]
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Moon-Circuit Hacker.Activate(Ability: Ninjutsu)
+Bot1.Choose(Ornithopter)
+Bot1.Pass
+Bot1.Pass
+Bot1.Decline
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Count = 6
+Bot1.Graveyard.Count = 0
+Bot1.Library.Count = 9
