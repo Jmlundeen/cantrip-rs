@@ -212,8 +212,9 @@ def split_abilities(oracle, names):
                 # "Choose one -" over bullets is the modal frame (CR 700.2), matched against other modal abilities.
                 modal = len(block) > 1 and re.match(r"choose\b", sentence.strip(), re.I)
                 parts.append(("modal" if modal else "effect", sentence.strip()))
-        for bullet in block[1:]:
-            parts.append(("effect", bullet.lstrip("• ").strip()))
+        for bullet in block[1:]:  # each mode's sentences, without its name ("Date Night - ", CR 700.2h)
+            mode = ABILITY_WORD.sub("", bullet.lstrip("• ").strip())
+            parts += [("effect", s.strip()) for s in re.split(r"(?<=\.)\s+(?=[A-Z~])", mode) if s.strip()]
         # Each "target ..." phrase is a part of its own: a target filter is the code most often copied between cards
         # whose effects differ ("target green or white creature" is Deathmark's and Rending Volley's at once).
         for kind, text in list(parts):
@@ -223,10 +224,11 @@ def split_abilities(oracle, names):
     return out
 
 
-TARGET = re.compile(r"\b((?:up to (?:one|two|three|four|five|x|\d+) )?(?:other |another )?targets? )([^.,;:]+)", re.I)
+TARGET = re.compile(r"\b((?:(?:up to |one or )?(?:one|two|three|four|five|x|\d+) |one or more |any number of )?"
+                    r"(?:other |another )?targets? )([^.,;:]+)", re.I)
 # Where a target's noun phrase ends: the verb or preposition that follows it.
 TARGET_END = re.compile(
-    r" (?:to|from|into|onto|on|until|this|for|as|is|are|and|unless|that|can|can't|doesn't|its owner's|their owners'|"
+    r" (?:to|from|into|onto|on|until|this|for|as|is|are|and|unless|that|each|can|can't|doesn't|its owner's|their owners'|"
     r"(?:get|gain|lose|deal|discard|draw|sacrifice|mill|put|reveal|shuffle|search|exile|return|create|attack|block|"
     r"fight|become|transform|untap|tap|phase|explore|connive|scrie|surveil)s?|has|have)\b.*$", re.I)
 
@@ -465,7 +467,8 @@ class Index:
 
     @staticmethod
     def _mode_heads(t):
-        return {" ".join(m.split()[:2]) for m in t.split("•")[1:]}
+        modes = (re.sub(r"^[^—]*— ", "", m.strip()) for m in t.split("•")[1:])  # without a mode's name
+        return {" ".join(m.split()[:2]) for m in modes}
 
     @staticmethod
     def _grams(t):

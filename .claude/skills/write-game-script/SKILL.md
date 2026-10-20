@@ -43,7 +43,9 @@ sweeping seeds (CLAUDE.md).
    the full state dump.
 6. **Write the expectations from the dump.** To see the dump of a passing script, add a bogus expectation such as
    `Dump = ?`: the mismatch fails the script and prints the dump, with the keys nearest the bogus one. Copy only the
-   keys that prove the behaviour, then remove the bogus line.
+   keys that prove the behaviour, then remove the bogus line. Do this before writing any key you have not used before
+   rather than guessing: keywords are the engine's names (`Keywords = FirstStrike`, not "First strike"), counters
+   their kind (`Counters.MinusOneMinusOne`), counts are a zone's (`Bot1.Battlefield.Count`, never `<Name>.Count`).
 7. **Check that the script can fail.** Temporarily break an expectation, or the rule under test, and confirm the
    script goes red. A script that passes vacuously is worse than none. Two places a card's test most often passes
    when it should not:
