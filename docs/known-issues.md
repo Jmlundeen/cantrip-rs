@@ -1093,3 +1093,18 @@ dealt the damage, so a player targeted but not dealt it still gets "can't gain l
 does not. The recipient is the one in the `Event::Damage` the resolution recorded (as Redcap Melee reads it).
 
 **Scenarios.** none.
+
+### KI-89: Worded attacking tokens always enter tapped
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Unexercised | engine | 2026-10-20, review of Parhelion II |
+
+**Notes.** `create_tokens_worded` (crates/cantrip-rules/src/lib.rs, around line 1207) taps every token it puts onto the
+battlefield attacking (`tapped || attacking.is_some()`). CR 508.4 taps a permanent put onto the battlefield attacking only
+when the effect says so; Parhelion II's change made `create_tokens_attacking` follow that, but the worded path still
+cannot make an untapped attacking token. Its only attacking caller today is mobilize, which is "tapped and attacking", so
+nothing misbehaves; a worded token that enters attacking but untapped would. Fix: take `tapped` as given, as
+`create_tokens_attacking` now does, with the mobilize caller passing `true`.
+
+**Scenarios.** None (no card reaches it).
