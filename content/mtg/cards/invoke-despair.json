@@ -1,0 +1,6 @@
+{
+  "name": "Invoke Despair",
+  "manaCost": "{1}{B}{B}{B}{B}",
+  "type": "Sorcery",
+  "oracleText": "Target opponent sacrifices a creature of their choice. If they can't, they lose 2 life and you draw a card. Then repeat this process for an enchantment and a planeswalker."
+}

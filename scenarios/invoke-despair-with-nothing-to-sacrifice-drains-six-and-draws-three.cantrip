@@ -1,0 +1,33 @@
+# Invoke Despair at an opponent who controls no creature, enchantment or planeswalker: all three sacrifices are impossible, so
+# each time they lose 2 life and Bot1 draws a card (CR 701.21a, the spell's text). Bot2 loses 6 and Bot1 draws 3. The process is
+# repeated whether or not the earlier sacrifice was possible.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Invoke Despair
+Island x3
+Island x20
+
+[Bot2 Deck]
+Plains
+Plains x27
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Invoke Despair.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Life = 20
+Bot1.Hand.Count = 7
+Bot1.Graveyard = Invoke Despair; Black Lotus

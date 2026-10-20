@@ -1,0 +1,49 @@
+# Invoke Despair at an opponent who controls Tamiyo, Collector of Tales and a creature: Tamiyo stops the opponent's spells
+# making Bot2 sacrifice permanents (CR 101.2), so the creature stays although there was one to choose, and "if they can't"
+# still applies to it, as to the enchantment step (none) and the planeswalker step (Tamiyo herself stays). Three times Bot2
+# loses 2 and Bot1 draws: 14 life, and Bot1's hand is 4 plus 3.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Invoke Despair
+Island x3
+Island x20
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Emerald
+Mox Jet
+Mox Ruby
+Tamiyo, Collector of Tales
+Ornithopter
+Plains
+Plains x21
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Battlefield.Mox Sapphire.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Tamiyo, Collector of Tales.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Invoke Despair.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Hand.Count = 7
+Bot2.Battlefield.Ornithopter.Types = Artifact; Creature
+Bot2.Battlefield.Tamiyo, Collector of Tales.Types = Planeswalker

@@ -1,0 +1,42 @@
+# Invoke Despair at an opponent with a creature and a planeswalker but no enchantment: the creature and the planeswalker are
+# sacrificed, and only the enchantment step cannot be done, so exactly that one costs Bot2 2 life and gives Bot1 one card.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Invoke Despair
+Island x3
+Island x20
+
+[Bot2 Deck]
+Plains
+Black Lotus
+Liliana of the Veil
+Mox Emerald
+Ornithopter
+Plains x23
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Invoke Despair.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Hand.Count = 5
+Bot2.Battlefield = Plains; Mox Emerald
+Bot2.Graveyard = Liliana of the Veil; Ornithopter; Black Lotus

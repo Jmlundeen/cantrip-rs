@@ -1,0 +1,49 @@
+# Invoke Despair at an opponent who controls a creature, an enchantment and a planeswalker: each sacrifices the one permanent
+# (CR 701.21a) and, because each sacrifice happened, nobody loses life and Bot1 draws nothing. Bot2's Moxen and land stay.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Black Lotus
+Invoke Despair
+Island x3
+Island x20
+
+[Bot2 Deck]
+Plains
+Mox Pearl
+Black Lotus
+Liliana of the Veil
+Glorious Anthem
+Mox Emerald
+Ornithopter
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Black)
+Bot2.Hand.Liliana of the Veil.Cast
+Bot2.Battlefield.Plains.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Glorious Anthem.Cast
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+? Bot2.Battlefield = Glorious Anthem; Liliana of the Veil; Mox Emerald; Ornithopter; Mox Pearl; Plains
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Invoke Despair.Cast(Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 20
+Bot1.Hand.Count = 4
+Bot2.Battlefield = Plains; Mox Pearl; Mox Emerald
+Bot2.Graveyard = Liliana of the Veil; Glorious Anthem; Ornithopter; Black Lotus
