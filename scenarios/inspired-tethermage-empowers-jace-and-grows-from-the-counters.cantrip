@@ -1,0 +1,32 @@
+# Inspired Tethermage: "{6}: Empower Jace 2" (CR 701.71a). With no Jace token, a blue Jace planeswalker token is created and
+# Bot1 puts two loyalty counters on it - putting loyalty counters on a planeswalker, so the Tethermage's own first ability
+# triggers once (CR 122.6, 603.2) and it gets a +1/+1 counter (4/3).
+
+[Bot1 Deck]
+Black Lotus
+Black Lotus
+Black Lotus
+Inspired Tethermage
+Island x16
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus#1.Activate(Color: Green)
+Bot1.Hand.Inspired Tethermage.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Inspired Tethermage.Activate
+[T1 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Jace.Token = true
+Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Battlefield.Inspired Tethermage.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Inspired Tethermage.Power = 4
