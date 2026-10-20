@@ -1,0 +1,33 @@
+# X=2 can find Forest and Snow-Covered Forest: names, not basic land types, must differ (CR 201.2).
+# A second Forest makes the duplicate-name refusal meaningful beside the successful two-card search.
+[Bot1 Deck]
+Fblthp, Knows the Way
+Mox Emerald
+Mox Pearl
+Black Lotus
+Island x2
+Mountain
+Forest
+Snow-Covered Forest
+Forest
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Fblthp, Knows the Way.Cast(X: 2)
+! Bot1.Search(Forest; Forest)
+Bot1.Search(Forest; Snow-Covered Forest)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island; Island; Mountain; Forest; Snow-Covered Forest
+Bot1.Revealed = Forest; Snow-Covered Forest
+Bot1.Library = Forest

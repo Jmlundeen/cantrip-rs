@@ -1,0 +1,52 @@
+# Fblthp's enters trigger is independent of its source (CR 603.3, 113.7a). Bot2 Bolts Fblthp in response to the trigger;
+# the trigger still searches for two lands using the X announced as Fblthp was cast.
+
+[Bot1 Deck]
+Fblthp, Knows the Way
+Mox Emerald
+Mox Pearl
+Black Lotus
+Island x2
+Mountain
+Forest
+Plains
+Tropical Island
+Llanowar Elves
+Forest x8
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Lightning Bolt
+Mountain x17
+
+[Actions]
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Fblthp, Knows the Way.Cast(X: 2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mountain.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Fblthp, Knows the Way)
+Bot2.Pass
+Bot1.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Search(Forest; Plains)
+[T3 Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Graveyard = Fblthp, Knows the Way; Black Lotus
+Bot1.Revealed = Forest; Plains

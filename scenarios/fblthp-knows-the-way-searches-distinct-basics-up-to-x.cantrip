@@ -1,0 +1,41 @@
+# X=2 searches once for up to two basic land cards, reveals them, and puts them in hand (CR 701.23).
+# The two Islands already in hand do not limit the search; Fblthp finds just one of the two allowed cards.
+[Bot1 Deck]
+Fblthp, Knows the Way
+Mox Emerald
+Mox Pearl
+Black Lotus
+Island
+Island
+Mountain
+Forest
+Plains
+Tropical Island
+Llanowar Elves
+Island
+Forest x7
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Fblthp, Knows the Way.Cast(X: 2)
+! Bot1.Search(Tropical Island)
+! Bot1.Search(Llanowar Elves)
+! Bot1.Search(Forest; Forest)
+Bot1.Search(Island)
+[Bot1.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand = Island; Island; Island; Mountain
+Bot1.Revealed = Island
+Bot1.Library.Count = 11
+Bot1.Battlefield.Fblthp, Knows the Way.Power = 0
+Bot1.Battlefield.Fblthp, Knows the Way.Toughness = 2

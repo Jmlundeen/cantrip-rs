@@ -1,0 +1,40 @@
+# X=0 still resolves the enters ability and shuffles, without asking for any cards (CR 107.3, 701.23).
+# Domain counts types among your lands, including both Tropical Island types and each type only once.
+# Opponent's Tundra contributes nothing. The ability also defines Fblthp's power in hand (CR 604.3).
+[Bot1 Deck]
+Forest
+Mox Emerald
+Fblthp, Knows the Way
+Tropical Island
+Island
+Plains
+Mountain
+Island x16
+
+[Bot2 Deck]
+Tundra
+Island x19
+
+[Actions]
+? Bot1.Hand.Fblthp, Knows the Way.Power = 0
+Bot1.Hand.Forest.Play
+? Bot1.Hand.Fblthp, Knows the Way.Power = 1
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Fblthp, Knows the Way.Cast(X: 0)
+[T2 Bot2.Main1]
+Bot2.Hand.Tundra.Play
+[T3 Bot1.Main1]
+? Bot1.Battlefield.Fblthp, Knows the Way.Power = 1
+Bot1.Hand.Tropical Island.Play
+? Bot1.Battlefield.Fblthp, Knows the Way.Power = 2
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+
+[Expect]
+Turn = 5
+Stack.Count = 0
+Bot1.Battlefield.Fblthp, Knows the Way.Power = 2
+Bot1.Battlefield.Fblthp, Knows the Way.Toughness = 2
+Bot2.Battlefield = Tundra
