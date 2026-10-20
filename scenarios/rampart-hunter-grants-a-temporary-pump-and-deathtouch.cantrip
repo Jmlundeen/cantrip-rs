@@ -1,10 +1,12 @@
-# The enters trigger may target its source; the pump expires at cleanup (CR 611.2a).
+# Rampart Hunter: "When this creature enters, target creature gets +2/+2 and gains deathtouch until end of turn." It targets
+# Bot1's Ornithopter (0/2, flying, no deathtouch of its own), which is 2/4 with deathtouch for the turn; at cleanup the
+# effect ends (CR 514.2, 611.2a) and it is a 0/2 flyer again, and the Hunter itself was never pumped.
 
 [Bot1 Deck]
 Black Lotus
 Black Lotus
 Rampart Hunter
-Island
+Ornithopter
 Island
 Island
 Island
@@ -15,17 +17,22 @@ Island x30
 
 [Actions]
 [Bot1.Main1]
+Bot1.Hand.Ornithopter.Cast
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Black)
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Black)
 Bot1.Hand.Rampart Hunter.Cast
+Bot1.Target(Bot1.Battlefield.Ornithopter)
 [Bot1.Main2]
-? Bot1.Battlefield.Rampart Hunter.Power = 5
-? Bot1.Battlefield.Rampart Hunter.Toughness = 5
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Toughness = 4
+? Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying
+? Bot1.Battlefield.Rampart Hunter.Power = 3
 [T2 Bot2.Main1]
 
 [Expect]
+Bot1.Battlefield.Ornithopter.Power = 0
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying
 Bot1.Battlefield.Rampart Hunter.Power = 3
-Bot1.Battlefield.Rampart Hunter.Toughness = 3
-Bot1.Battlefield.Rampart Hunter.Keywords = Deathtouch
