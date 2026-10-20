@@ -1,0 +1,16 @@
+# Nykthos, Shrine to Nyx: "{T}: Add {C}." Tapping it adds exactly one colorless mana, checked in the pool right after.
+
+[Bot1 Deck]
+Nykthos, Shrine to Nyx
+Forest x25
+
+[Bot2 Deck]
+Forest x30
+
+[Actions]
+Bot1.Hand.Nykthos, Shrine to Nyx.Play
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: Add {C})
+? Bot1.Mana = {C}
+
+[Expect]
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Tapped = true

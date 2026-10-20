@@ -1,0 +1,47 @@
+# Nykthos, Shrine to Nyx: "{2}, {T}: Choose a color. Add an amount of mana of that color equal to your devotion to that
+# color." Bot1 controls Llanowar Elves {G} (1), Figure of Fable {G/W} (hybrid counts, 1) and Woodland Changeling {1}{G}
+# (the generic {1} does not count, 1): devotion to green 3 (CR 700.5). Bot2's Llanowar Elves is not Bot1's devotion.
+# Figure is paid with Mox Emerald; Nykthos pays {2} with a Forest and Bot1's Elves; the three green mana are in the pool right after (CR 605.3b).
+
+[Bot1 Deck]
+Nykthos, Shrine to Nyx
+Mox Emerald
+Black Lotus
+Llanowar Elves
+Figure of Fable
+Woodland Changeling
+Forest
+Forest x20
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Forest x25
+
+[Actions]
+Bot1.Hand.Nykthos, Shrine to Nyx.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Hand.Woodland Changeling.Cast
+Bot1.Pass
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Figure of Fable.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Pass
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: Green)
+? Bot1.Mana = {G}{G}{G}
+
+[Expect]
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Tapped = true

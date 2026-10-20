@@ -1,0 +1,28 @@
+# Nykthos, Shrine to Nyx: devotion counts only the chosen color's symbols (CR 700.5). Bot1's one permanent with a colored
+# symbol is Llanowar Elves {G}, so choosing blue adds nothing; the Lotus's {G}{G}{G} and Mox Emerald's {G} pay the Elves and the {2}, one {G} left.
+
+[Bot1 Deck]
+Nykthos, Shrine to Nyx
+Mox Emerald
+Black Lotus
+Llanowar Elves
+Forest x25
+
+[Bot2 Deck]
+Forest x30
+
+[Actions]
+Bot1.Hand.Nykthos, Shrine to Nyx.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Activate(Ability: {2}; Color: Blue)
+? Bot1.Mana = {G}
+
+[Expect]
+Bot1.Battlefield.Nykthos, Shrine to Nyx.Tapped = true
