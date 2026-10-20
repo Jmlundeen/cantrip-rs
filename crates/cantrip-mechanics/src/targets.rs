@@ -554,6 +554,25 @@ pub const fn creature_or_planeswalker_of_either_color<const A: u8, const B: u8>(
     target(creature_or_planeswalker_of_either_color_filter::<A, B>)
 }
 
+/// "Target [color A] or [color B] creature" (CR 115.1, 105.2): a creature that is either color, or both. The color words
+/// are those of the targeting spell's own text (CR 612); `A` and `B` are `Color`s as `u8`. Deathmark (green or white) and
+/// Rending Volley (white or blue) print it.
+fn creature_of_either_color_filter<const A: u8, const B: u8>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    if !(CREATURE.filter)(q, asker, t) {
+        return false;
+    }
+    let Target::Object(id) = t else { return false };
+    let words = q.words(asker.source);
+    let colors = q.chars(id).colors;
+    colors.has(words.color(Color::ALL[A as usize])) || colors.has(words.color(Color::ALL[B as usize]))
+}
+
+/// "Target [color A] or [color B] creature": see `creature_of_either_color_filter`. Used as
+/// `targets::creature_of_either_color::<{ Color::Green as u8 }, { Color::White as u8 }>()`.
+pub const fn creature_of_either_color<const A: u8, const B: u8>() -> TargetSpec {
+    target(creature_of_either_color_filter::<A, B>)
+}
+
 /// Whether a target is a card of one of these types in the asker's own graveyard ("target creature card in your
 /// graveyard", CR 115.1). Eternal Witness takes any card (`types` empty); Recurring Nightmare and Metamorphosis Fanatic
 /// take a creature card.
