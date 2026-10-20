@@ -2,11 +2,6 @@ use cantrip_api::*;
 use cantrip_mechanics::{targets, triggers};
 use cantrip_oracle as oracle;
 
-fn gain_one_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.gain_life(item.controller, 1);
-    Ok(())
-}
-
 /// "Whenever a Plains you control enters" (CR 305.6): a permanent with the Plains land type, by any means.
 fn a_plains_you_control_enters(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
     match event {
@@ -30,7 +25,7 @@ fn add_counter(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 
 pub static CARD: CardDef = CardDef {
     abilities: &[
-        triggered(triggers::LANDFALL, gain_one_life, "Landfall \u{2014} Whenever a land you control enters, you gain 1 life."),
+        triggered(triggers::LANDFALL, cantrip_mechanics::effects::gain_one_life, "Landfall \u{2014} Whenever a land you control enters, you gain 1 life."),
         triggered(
             when(EventMask::ZONE_CHANGE, a_plains_you_control_enters),
             add_counter,

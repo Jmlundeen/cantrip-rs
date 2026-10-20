@@ -5,16 +5,11 @@ use cantrip_mechanics::triggers;
 use cantrip_oracle as oracle;
 
 /// "Whenever this creature attacks, you gain 1 life.", the ability the Equipment grants the equipped creature.
-fn gain_one_life(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.gain_life(item.controller, 1);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
     abilities: &[equip(mana("{2}"), "Equip {2}")],
     delayed: &[triggered(
         triggers::THIS_ATTACKS,
-        gain_one_life,
+        cantrip_mechanics::effects::gain_one_life,
         "Whenever this creature attacks, you gain 1 life.",
     )],
     statics: &[

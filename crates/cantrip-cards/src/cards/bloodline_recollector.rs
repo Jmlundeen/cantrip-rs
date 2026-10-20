@@ -26,13 +26,8 @@ fn three_creatures_died(q: &dyn Query, _: &Asker) -> bool {
     history::creatures_died_this_turn(q, None) >= 3
 }
 
-fn become_prepared(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.become_prepared(item.object);
-    Ok(())
-}
-
 pub static CARD: CardDef = CardDef {
-    abilities: &[triggered(triggers::EACH_END_STEP, become_prepared, "At the beginning of each end step, if three or more creatures died this turn, this creature becomes prepared.")
+    abilities: &[triggered(triggers::EACH_END_STEP, cantrip_mechanics::prepare::become_prepared, "At the beginning of each end step, if three or more creatures died this turn, this creature becomes prepared.")
         .condition(three_creatures_died)],
     prepare: Some(&ANCESTRAL_CRAVING),
     ..oracle::BLOODLINE_RECOLLECTOR

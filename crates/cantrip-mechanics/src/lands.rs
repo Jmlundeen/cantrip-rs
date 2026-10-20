@@ -60,6 +60,20 @@ pub fn enters_tapped_unless_you_control<const TYPE: u16>(g: &mut dyn Game, enter
     Ok(())
 }
 
+/// "This land enters tapped unless you control a planeswalker" (CR 614.1c): read on the battlefield as it is while the land
+/// enters, through the layers; a planeswalker entering simultaneously is not counted, and only the controller's own
+/// planeswalkers count. The ten lands in the Annex and Commons cycle print it.
+pub fn enters_tapped_unless_you_control_a_planeswalker(g: &mut dyn Game, entering: &mut Entering) -> Result<(), Suspend> {
+    let controls_planeswalker = g
+        .permanents_of(entering.controller)
+        .into_iter()
+        .any(|id| g.obj(id).became.is_none() && g.chars(id).is(CardType::Planeswalker));
+    if !controls_planeswalker {
+        entering.tapped = true;
+    }
+    Ok(())
+}
+
 /// "This land enters tapped unless you control a basic land" (CR 614.1c, 205.4a): the supertype, not a land type, read
 /// on the battlefield as it is while the land enters, so the land itself is not counted. Abandoned Air Temple and Agna
 /// Qel'a print it.
