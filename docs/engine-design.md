@@ -232,6 +232,9 @@ would go over unclickable.
   effect that sets a name (612.8, "named Everflame, Heroes' Legacy") is `EffectKind::SetName`, in layer 3: the object
   has that name alone (`Chars::name_set`), for the legend rule and every "same name" or chosen-name question
   (`library::object_names`).
+  A distinct-name library search sends each eligible object’s current name tokens to the client in eligible-handle order;
+  clients enforce intersections using those tokens, while the rules validator remains authoritative. Ordinary searches carry
+  no name metadata. Display names are not parsed to infer rules names.
 - **Dependency (613.8)**: within each layer and sublayer, the effects that may apply to the object are merged in timestamp
   order (`layers::Merge`: a source's static abilities, those granted to others, resolved effects, the object's own granted
   abilities). An effect whose reach can change - a static ability's "affects", a text change (only where its word is) and

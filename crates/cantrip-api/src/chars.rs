@@ -44,6 +44,30 @@ pub struct Chars {
     pub name_set: bool,
 }
 
+/// The names an object `id` has (CR 201.2a): a Room on the battlefield has those of its unlocked doors alone, and none at
+/// all with neither unlocked (CR 709.5); any other split card has both halves' names (CR 709.4a); a copy that says
+/// "except its name is X" only that name (CR 707.9b); and anything else its current name, including each printed name of
+/// a card written "A // B".
+pub fn object_names(q: &dyn crate::Query, id: ObjectId) -> Vec<&'static str> {
+    let chars = q.chars(id);
+    let object = q.obj(id);
+    if chars.name_set || (object.face_down_values().is_none() && object.copy.as_ref().is_some_and(|copy| copy.name.is_some())) {
+        return vec![chars.name];
+    }
+    let card = q.card(chars.card);
+    if card.is_room() && object.zone.is(ZoneKind::Battlefield) {
+        return card.unlocked_doors(object.marks.doors).map(|half| half.name).collect();
+    }
+    // One that has left is as it last was (CR 608.2h): a Room the names of the doors it had unlocked, "A // B" both.
+    if card.is_room() && q.state().last_known(id).is_some() {
+        return chars.name.split(" // ").filter(|name| !name.is_empty()).collect();
+    }
+    if let Some((left, right)) = card.split {
+        return vec![left.name, right.name];
+    }
+    chars.name.split(" // ").filter(|name| !name.is_empty()).collect()
+}
+
 /// The words `id`'s text has now (CR 612): the ones its copiable values changed (a token made by changed text), then
 /// each text-changing effect on it in timestamp order. Printed, for nearly every object. An object that has ceased to be
 /// itself - changed zones or ceased to exist - has the words it last had (CR 400.7, 113.7a, 608.2h): a fetch land

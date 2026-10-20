@@ -1,3 +1,4 @@
+using Cantrip.Client;
 using Cantrip.Client.Presentation;
 using Cantrip.Protocol;
 using Microsoft.UI.Text;
@@ -1668,6 +1669,12 @@ public sealed partial class MainPage
 
         OpenChoices(title, closable: false, Math.Max(1, slots), viewControls: true, headings: headings);
         ShowPicked(client, prompt.Count);
+        Dictionary<int, List<string>> namesByHandle = prompt.DistinctNames
+            ? prompt.Eligible.Zip(prompt.EligibleNames).ToDictionary(pair => pair.First.Value, pair => pair.Second)
+            : [];
+        HashSet<string> pickedNames = prompt.DistinctNames
+            ? [.. _picked.Where(namesByHandle.ContainsKey).SelectMany(handle => namesByHandle[handle])]
+            : [];
 
         if (shown.Count == 0)
         {
@@ -1685,12 +1692,15 @@ public sealed partial class MainPage
             {
                 int handle = card.Handle.Value;
                 bool canTake = eligible.Contains(handle);
+                bool alreadyPicked = _picked.Contains(handle);
+                bool distinctNameAvailable = !prompt.DistinctNames || alreadyPicked ||
+                    (namesByHandle.TryGetValue(handle, out List<string>? names) && names.Count > 0 && !names.Any(pickedNames.Contains));
 
                 AddChoice(card, new CardLook(
-                    Selected: _picked.Contains(handle),
-                    Dimmed: !canTake,
-                    Actionable: canTake && !_picked.Contains(handle) && _selection.CanPick(prompt.Count),
-                    Clicked: canTake && (_picked.Contains(handle) || _selection.CanPick(prompt.Count)) ? () => Pick(handle, prompt.Count) : null));
+                    Selected: alreadyPicked,
+                    Dimmed: !canTake || !distinctNameAvailable,
+                    Actionable: canTake && distinctNameAvailable && !alreadyPicked && _selection.CanPick(prompt.Count),
+                    Clicked: canTake && distinctNameAvailable && (alreadyPicked || _selection.CanPick(prompt.Count)) ? () => Pick(handle, prompt.Count) : null));
             }
         }
 

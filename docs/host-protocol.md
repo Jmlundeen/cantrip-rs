@@ -65,3 +65,8 @@ so a resumed game replays it.
 The cards a host knows are the ones the native engine has ported (`docs/adding-cards.md`); a deck naming any other
 is refused at the deal. The decks under `decks/demo` and `decks/spike` are kept to ported cards, and
 `NativeHostGameTests` deals them through the real binary.
+
+`SearchLibraryPromptMessage` carries `DistinctNames` when selections must have distinct names. Only then, `EligibleNames`
+contains one list of current object-name tokens per `Eligible` handle, in the same order. The client uses those tokens to
+prevent conflicting picks; the engine validates the answer against the objects' authoritative names. Ordinary searches
+leave `EligibleNames` empty.

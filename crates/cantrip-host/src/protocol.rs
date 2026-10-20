@@ -974,6 +974,10 @@ pub struct SearchLibraryPrompt {
     pub player: i32,
     pub count: i32,
     pub optional: bool,
+    #[serde(default)]
+    pub distinct_names: bool,
+    #[serde(default)]
+    pub eligible_names: Vec<Vec<String>>,
     pub library: Vec<ViewHandle>,
     pub eligible: Vec<ViewHandle>,
     pub destination: SearchDestinationView,

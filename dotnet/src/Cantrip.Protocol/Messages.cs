@@ -3027,6 +3027,14 @@ public sealed class SearchLibraryPromptMessage : PromptPayload
     [Key(2)]
     public bool Optional { get; set; }
 
+    /// <summary>Whether the selected cards must have different names.</summary>
+    [Key(7)]
+    public bool DistinctNames { get; set; }
+
+    /// <summary>Current object name tokens corresponding to <see cref="Eligible"/>, in the same order.</summary>
+    [Key(8)]
+    public List<List<string>> EligibleNames { get; set; } = [];
+
     [Key(3)]
     public List<ViewHandle> Library { get; set; } = [];
 

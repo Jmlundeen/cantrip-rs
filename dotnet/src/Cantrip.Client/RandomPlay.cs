@@ -728,7 +728,14 @@ public sealed class RandomPlay : IAutoPlayer
     private AnswerPayload Search(SearchLibraryPromptMessage prompt)
     {
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
-        return new CardsChosenAnswer { Cards = Some(prompt.Eligible, prompt.Optional ? _random.Next(most + 1) : most) };
+        IEnumerable<ViewHandle> eligible = prompt.Eligible;
+        if (prompt.DistinctNames)
+        {
+            eligible = DistinctCardNames.Keep(prompt.Eligible.Zip(prompt.EligibleNames), pair => pair.Second).Select(pair => pair.First);
+        }
+        List<ViewHandle> choices = [.. eligible];
+        int count = Math.Min(most, choices.Count);
+        return new CardsChosenAnswer { Cards = Some(choices, prompt.Optional ? _random.Next(count + 1) : count) };
     }
 
     /// <summary>Drawn colors, repeats and all where the choice allows them.</summary>

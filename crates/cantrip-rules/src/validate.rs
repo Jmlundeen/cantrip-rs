@@ -332,11 +332,16 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
                 None => Ok(()),
             }
         }
-        (RequestKind::SearchLibrary { eligible, count, optional, .. }, Answer::Cards(found)) => {
+        (RequestKind::SearchLibrary { eligible, count, optional, distinct_names, .. }, Answer::Cards(found)) => {
             let n = found.len();
             let wanted = (*count as usize).min(eligible.len());
             if !distinct(found) || !found.iter().all(|c| eligible.contains(c)) {
                 no("not among the cards the search may find")
+            } else if *distinct_names && found.iter().enumerate().any(|(i, &card)| {
+                let current = object_names(game, card);
+                current.is_empty() || found[..i].iter().any(|&previous| object_names(game, previous).iter().any(|name| current.contains(name)))
+            }) {
+                no("the cards found do not have different names")
             } else if (*optional && n > *count as usize) || (!*optional && n != wanted) {
                 no(format!("{n} found, {wanted} wanted"))
             } else {

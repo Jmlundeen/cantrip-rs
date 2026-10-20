@@ -90,7 +90,12 @@ public static class AutoPlay
             case SearchLibraryPromptMessage search:
                 // Takes the first cards it is allowed to. Which card is worth having is strategy this does not have,
                 // and taking the most allowed is legal whether or not the search was optional.
-                client.Answer(new CardsChosenAnswer { Cards = [.. search.Eligible.Take(search.Count)] });
+                IEnumerable<ViewHandle> choices = search.Eligible;
+                if (search.DistinctNames)
+                {
+                    choices = DistinctCardNames.Keep(search.Eligible.Zip(search.EligibleNames), pair => pair.Second).Select(pair => pair.First);
+                }
+                client.Answer(new CardsChosenAnswer { Cards = [.. choices.Take(search.Count)] });
                 return true;
 
             case ChooseTargetPromptMessage target:

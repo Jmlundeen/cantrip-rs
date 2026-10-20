@@ -1,3 +1,4 @@
+using Cantrip.Client;
 using Cantrip.Protocol;
 
 namespace Cantrip.Client.Tactics;
@@ -976,11 +977,16 @@ public sealed partial class TacticalPlay
     {
         _ = view;
         List<ObjectView> eligible = [.. prompt.Eligible.Select(client.Object).OfType<ObjectView>()];
+        if (prompt.DistinctNames)
+        {
+            eligible = [.. DistinctCardNames.Keep(prompt.Eligible.Zip(prompt.EligibleNames), pair => pair.Second)
+                .Select(pair => client.Object(pair.First)).OfType<ObjectView>()];
+        }
         int most = Math.Min(prompt.Count, prompt.Eligible.Count);
 
         if (eligible.Count == 0 || most <= 0)
         {
-            return new CardsChosenAnswer { Cards = [.. prompt.Eligible.Take(most)] };
+            return new CardsChosenAnswer { Cards = [] };
         }
 
         if (eligible.TrueForAll(IsLand))
@@ -1019,7 +1025,7 @@ public sealed partial class TacticalPlay
             };
         }
 
-        return new CardsChosenAnswer { Cards = [.. Ranked(client, prompt.Eligible).Take(most)] };
+        return new CardsChosenAnswer { Cards = [.. Ranked(client, eligible.Select(card => card.Handle)).Take(most)] };
     }
 
     /// <summary>

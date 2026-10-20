@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Cantrip.Client;
 using Cantrip.Protocol;
 
 namespace Cantrip.Client.Llm;
@@ -1501,7 +1502,12 @@ public sealed class Decisions
             UpTo = prompt.Optional,
         });
 
-        return new CardsChosenAnswer { Cards = [.. picks.Select(pick => prompt.Eligible[pick])] };
+        IEnumerable<ViewHandle> selected = picks.Select(pick => prompt.Eligible[pick]);
+        if (prompt.DistinctNames)
+        {
+            selected = DistinctCardNames.Keep(picks, pick => prompt.EligibleNames[pick]).Select(pick => prompt.Eligible[pick]);
+        }
+        return new CardsChosenAnswer { Cards = [.. selected] };
     }
 
     private static string Destination(SearchDestinationView destination) => destination switch

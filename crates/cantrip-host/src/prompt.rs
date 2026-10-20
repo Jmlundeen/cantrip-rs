@@ -1228,7 +1228,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 may_shuffle: *may_shuffle,
             })
         }
-        RequestKind::SearchLibrary { source, library, eligible, count, optional, destination } => {
+        RequestKind::SearchLibrary { source, library, eligible, count, optional, distinct_names, destination } => {
             let _ = source;
             // Whose library it is: the cards in it are all its owner's.
             let owner = library.first().map_or(request.player, |c| game.state.obj(*c).owner);
@@ -1236,6 +1236,12 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 player,
                 count: wire(*count),
                 optional: *optional,
+                distinct_names: *distinct_names,
+                eligible_names: if *distinct_names {
+                    eligible.iter().map(|&card| object_names(game, card).into_iter().map(str::to_owned).collect()).collect()
+                } else {
+                    Vec::new()
+                },
                 library: handles_of(handles, library),
                 eligible: handles_of(handles, eligible),
                 destination: match destination {
@@ -1292,6 +1298,40 @@ mod tests {
         let seat = game.state.seats().next().expect("a seat");
         let hand = game.state.zone(Zone::hand(seat)).to_vec();
         (game, hand)
+    }
+
+    #[test]
+    fn distinct_search_projects_authoritative_names_in_eligible_order_only_when_needed() {
+        let (game, hand) = game_with(&["Bedeck // Bedazzle", "Forest"]);
+        let player = game.state.seats().next().expect("a seat");
+        let library = game.state.zone(Zone::library(player)).to_vec();
+        assert!(!library.is_empty());
+        let split = hand.iter().copied().find(|&card| object_names(&game, card).len() > 1).expect("split card in hand");
+        let eligible = vec![library[0], split];
+        let searched = [library.as_slice(), std::slice::from_ref(&split)].concat();
+        let request = |distinct_names| Request {
+            id: 1,
+            player,
+            kind: RequestKind::SearchLibrary {
+                source: hand[0], library: searched.clone(), eligible: eligible.clone(), count: 2,
+                optional: true, distinct_names, destination: SearchDestination::Hand,
+            },
+            may_cancel: false,
+        };
+
+        let mut handles = HandleSpace::new();
+        let (PromptPayload::SearchLibraryPromptMessage(distinct), _) = prompt(&game, &request(true), &mut handles).unwrap() else {
+            panic!("search prompt");
+        };
+        assert_eq!(distinct.eligible_names, vec![vec!["Forest".to_string()], vec!["Bedeck".to_string(), "Bedazzle".to_string()]]);
+        assert_eq!(distinct.eligible.len(), distinct.eligible_names.len());
+        assert_eq!(handles.object(distinct.eligible[0]), Some(eligible[0]));
+        assert_eq!(handles.object(distinct.eligible[1]), Some(eligible[1]));
+
+        let (PromptPayload::SearchLibraryPromptMessage(ordinary), _) = prompt(&game, &request(false), &mut HandleSpace::new()).unwrap() else {
+            panic!("search prompt");
+        };
+        assert!(ordinary.eligible_names.is_empty());
     }
 
     /// A choice is worded as its card words it, not as the cards that happen to be eligible: a hand with only creatures left is
