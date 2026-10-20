@@ -1,0 +1,5 @@
+{
+  "name": "Ramunap Ruins",
+  "type": "Land — Desert",
+  "oracleText": "{T}: Add {C}.\n{T}, Pay 1 life: Add {R}.\n{2}{R}{R}, {T}, Sacrifice a Desert: This land deals 2 damage to each opponent."
+}
