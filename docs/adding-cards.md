@@ -21,7 +21,10 @@ The `cards` profile is release code with incremental compilation: an edit to one
 The whole corpus runs in a fraction of a second, so run it after every card rather than a part of it.
 
 1. **Read the card**: `new-card.py` prints `content/<dataset>/cards/<name>.json` (its characteristics and Oracle
-   text) and the scenarios whose decks hold it. A new card's JSON is its characteristics only; the
+   text), the scenarios whose decks hold it, and its prior art: for each ability, the implemented cards that already
+   print it, or each of its parts (cost, trigger condition, effect sentence), matched exactly, then with numbers and
+   mana as wildcards, then card types, colours and subtypes too - with the file, the shared mechanics and `Game`
+   verbs it uses, and how its text differs (`tools/maintenance/ability-index.py`). A new card's JSON is its characteristics only; the
    build generates the Rust constant from it, so there is nothing to run. The scenarios say what has to be true, and they name the
    options of a question in the order the engine offers them ("the first one offered"), so a card asks its questions
    in the order the rules and the cards already implemented do.

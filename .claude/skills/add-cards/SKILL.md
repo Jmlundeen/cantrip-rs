@@ -91,8 +91,8 @@ A keyword module cites its CR rule and names the cards that use it. Never widen 
 
 **Look for overlap before writing anything that could be shared.** When a card needs a mechanic that another card
 might also have - a keyword, a recipe, a choice, a history question, a target filter - first search the existing card
-files, `cantrip-mechanics` and `cantrip-api` for the same thing (grep the Oracle wording in `content/*/cards/*.json`
-too, to find the cards that print it). If an existing function does it, use it. If two or more cards already do the
+files, `cantrip-mechanics` and `cantrip-api` for the same thing (`new-card.py`'s prior art lists the cards that print
+the same ability or part; grep the Oracle wording in `content/*/cards/*.json` for wording it splits differently). If an existing function does it, use it. If two or more cards already do the
 same thing in their own code, move it into one shared function and change those cards to call it, in the same change.
 Share what is functionally identical, when sharing makes each card's code simpler. Never stretch a shared function to
 cover something that only looks alike: a flag or parameter that only one caller uses, or a branch on which card is
@@ -152,12 +152,17 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    `adventure`, `omen`, `halves`, `aftermath`). Nothing else: what a card does is Rust. The build generates its constant;
    there is no generator to run and no shared file to edit. A card whose Oracle text is only core keywords needs no
    Rust file.
-3. **Start the file.** `python tools\maintenance\new-card.py "Card Name"` prints the JSON and every scenario that holds
-   the card, and writes `crates/cantrip-cards/src/cards/<card_name>.rs` over its generated constant.
-4. **Look before writing.** Read `crates/cantrip-api/src/game.rs` (the verbs) and grep `crates/cantrip-mechanics/src`
-   (the keyword modules, `targets`, `triggers`, `library`, `lands`, `effects`, `tokens`, `delayed`, `copy`, `hand`,
-   `chosen_type`, `history`, `combat`, `replacements`), and read two or three implemented cards with similar text. Most
-   cards need nothing new.
+3. **Start the file.** `python tools\maintenance\new-card.py "Card Name"` prints the JSON, every scenario that holds
+   the card and its prior art, and writes `crates/cantrip-cards/src/cards/<card_name>.rs` over its generated constant.
+4. **Look before writing - prior art first.** The prior art lists, for each ability, the implemented cards that print
+   it or its parts (cost, trigger, effect), simplest card first, with the mechanics and verbs each uses and how its
+   text differs from yours. Where a line has a match, read that card's file and stop searching for that line: build
+   it the same way, changing what the "differs" note names - and check each difference, since "you"/"each opponent",
+   "may", "another" and "you control" are different code. Search only for the lines marked `new`: read
+   `crates/cantrip-api/src/game.rs` (the verbs), grep `crates/cantrip-mechanics/src` (the keyword modules, `targets`,
+   `triggers`, `library`, `lands`, `effects`, `tokens`, `delayed`, `copy`, `hand`, `chosen_type`, `history`,
+   `combat`, `replacements`), and start from the nearest abilities listed. Text with no card file yet:
+   `ability-index.py --text "..."`. Most cards need nothing new.
 5. **Write the card.** Its file adds behaviour with struct update syntax over the generated constant
    (`CardDef { spell: Some(..), ..oracle::LIGHTNING_BOLT }`). Ask questions with `g.ask(..)` in the order the rules ask
    them, offering options in the order the engine and the implemented cards do (scenarios answer by name and position).

@@ -60,6 +60,7 @@ Each drafts, builds a deck from what was taken, and plays the games. Events are 
 | `push-public.cmd` | replays the commits on `origin/main` since the last publish onto the public `cantrip-rs/cantrip-rs` (`-DryRun` lists them) |
 | `card-coverage.py "Card"` (or `tools\card-coverage.cmd`) | the lines of a card's Rust file its scenarios never run; exits 1 if any (`cargo-llvm-cov`) |
 | `new-card.py "Card"` | everything to read before adding a card, and its file to start from (`docs/adding-cards.md`) |
+| `ability-index.py "Card"` (or `--text "..."`) | each ability of a card and the implemented cards that already do it or its parts (cost, trigger, effect), with what they use and how their text differs; `rank` sorts the constructed pool's missing cards by how much of them is implemented and lists the missing ability templates the most of them print (Scryfall bulk data cached in `target/scryfall`). `new-card.py` prints its report |
 | `rebuild-card-test-deck.ps1` | regenerates the card-test deck from the card files |
 | `card-list.py` | any list of cards (a decklist, a set, a Scryfall search, a text file, a pasted list) as the names the card files use, checked against Scryfall (the `import-cards` skill) |
 | `missing-cards.py` | cards on the cube lists, or on one list or file (`--list`, `--file`), that have no card file yet |

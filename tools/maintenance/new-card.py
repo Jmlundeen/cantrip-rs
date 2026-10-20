@@ -2,7 +2,8 @@
 
     python tools/maintenance/new-card.py "Mind Stone" [--no-write]
 
-Prints the card's content JSON and the scenarios that use it, and writes
+Prints the card's content JSON, the scenarios that use it and, for each of its abilities, the implemented cards that
+already do it (ability-index.py), and writes
 crates/cantrip-cards/src/cards/<card_name>.rs over the card's generated constant if the
 file does not exist yet. Then the loop is: write the behavior, and
 
@@ -11,6 +12,7 @@ file does not exist yet. Then the loop is: write the behavior, and
 which runs only that card's scenarios and prints the full report of any that fail (docs/adding-cards.md).
 """
 
+import importlib.util
 import json
 import os
 import re
@@ -90,6 +92,12 @@ def main():
     for file in sorted(os.listdir(SCRIPTS)):
         if file.endswith(".cantrip") and pattern.search(open(os.path.join(SCRIPTS, file), encoding="utf-8-sig").read()):
             print(f"  scenarios/{file}")
+
+    print("\n=== Prior art: the implemented cards that already do each ability (tools/maintenance/ability-index.py)")
+    spec = importlib.util.spec_from_file_location("ability_index", os.path.join(os.path.dirname(__file__), "ability-index.py"))
+    index = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(index)
+    print(index.report(index.Index(exclude=[name]), index.card_abilities(card)) or "  (no rules text)")
 
     target = os.path.join(CARDS, file_stem(name) + ".rs")
     if os.path.exists(target):
