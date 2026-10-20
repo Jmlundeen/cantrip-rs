@@ -34,7 +34,7 @@ fn gambit(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn pay_the_price(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     discard_chosen(g, item.controller, item.object, 1)?;
     g.lose_life(item.controller, 2);
-    sacrifice_chosen(g, item.controller, item.object, 1, is_creature)
+    sacrifice_chosen(g, item.controller, item.object, 1, is_creature).map(drop)
 }
 
 /// "You discard three cards, lose 6 life, and sacrifice three creatures", in that order. Fewer cards or creatures than that
@@ -42,7 +42,7 @@ fn pay_the_price(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn pay_the_bill(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     discard_chosen(g, item.controller, item.object, 3)?;
     g.lose_life(item.controller, 6);
-    sacrifice_chosen(g, item.controller, item.object, 3, is_creature)
+    sacrifice_chosen(g, item.controller, item.object, 3, is_creature).map(drop)
 }
 
 pub static CARD: CardDef = CardDef {

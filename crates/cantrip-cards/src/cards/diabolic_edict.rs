@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// so a creature's hexproof does not matter. A target that is no longer legal leaves the effect nothing to do (CR 608.2b).
 fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let Some(victim) = targets::player(g, item, 0) else { return Ok(()) };
-    sacrifice_chosen(g, victim, item.object, 1, |c| c.is(CardType::Creature))
+    sacrifice_chosen(g, victim, item.object, 1, |c| c.is(CardType::Creature)).map(drop)
 }
 
 pub static CARD: CardDef = CardDef { spell: spell(&[targets::PLAYER], effect), ..oracle::DIABOLIC_EDICT };

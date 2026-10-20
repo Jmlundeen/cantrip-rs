@@ -12,7 +12,7 @@ fn sacrifice_unless_gained_life(g: &mut dyn Game, item: &StackItem) -> Result<()
     if gained_life_this_turn(g, item.controller) {
         return Ok(());
     }
-    sacrifice_chosen(g, item.controller, item.object, 1, |_| true)
+    sacrifice_chosen(g, item.controller, item.object, 1, |_| true).map(drop)
 }
 
 pub static CARD: CardDef = CardDef {

@@ -356,7 +356,7 @@ fn annihilate<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
 /// own `triggered(ANNIHILATOR, ..)`.
 pub fn annihilate_n(g: &mut dyn Game, item: &StackItem, n: u8) -> Result<(), Suspend> {
     let Some(defending) = g.defending_player(item.subject) else { return Ok(()) };
-    crate::sacrifice_chosen(g, defending, item.object, n, |_| true)
+    crate::sacrifice_chosen(g, defending, item.object, n, |_| true).map(drop)
 }
 
 /// Annihilator's trigger (CR 702.86a): "whenever this creature attacks", about the player or permanent it attacks.
@@ -550,7 +550,7 @@ fn ward_sacrifice_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Res
         && may_cause_discard_or_sacrifice(&*g, item.controller, payer, true)
         && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(ward_sacrifice_question(N)) })? == Answer::Yes
     {
-        return crate::sacrifice_one_of(g, payer, item.object, N, permanents);
+        return crate::sacrifice_one_of(g, payer, item.object, N, permanents).map(drop);
     }
     g.counter_item(by, item.data[1] as usize);
     Ok(())
@@ -584,7 +584,7 @@ fn ward_sacrifice_a_food_effect(g: &mut dyn Game, item: &StackItem) -> Result<()
         && may_cause_discard_or_sacrifice(&*g, item.controller, payer, true)
         && g.ask(payer, RequestKind::May { source: by, purpose: Purpose::Ask(&WARD_SACRIFICE_FOOD) })? == Answer::Yes
     {
-        return crate::sacrifice_one_of(g, payer, item.object, 1, foods);
+        return crate::sacrifice_one_of(g, payer, item.object, 1, foods).map(drop);
     }
     g.counter_item(by, item.data[1] as usize);
     Ok(())
