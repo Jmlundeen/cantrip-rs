@@ -7,7 +7,7 @@ use cantrip_oracle as oracle;
 /// cast.
 fn free_spells_from_hand(q: &dyn Query, asker: &Asker, spell: ObjectId, player: PlayerId) -> bool {
     player == asker.controller
-        && q.obj(spell).zone.is(ZoneKind::Hand)
+        && q.obj(spell).zone == Zone::hand(player)
         && q.mana_value(spell) as usize <= creatures_you_control(q, player)
 }
 
