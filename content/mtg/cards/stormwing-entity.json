@@ -1,0 +1,11 @@
+{
+  "name": "Stormwing Entity",
+  "manaCost": "{3}{U}{U}",
+  "type": "Creature — Elemental",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "This spell costs {2}{U} less to cast if you've cast an instant or sorcery spell this turn.\nFlying\nProwess (Whenever you cast a noncreature spell, this creature gets +1/+1 until end of turn.)\nWhen this creature enters, scry 2.",
+  "keywords": [
+    "Flying"
+  ]
+}

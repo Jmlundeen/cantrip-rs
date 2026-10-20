@@ -1,0 +1,37 @@
+# Stormwing Entity (CR 601.2f): Preordain was cast this turn, so Stormwing costs {3}{U}{U} less {2}{U}, which is {1}{U}. Three Islands
+# are tapped on Bot1's third turn: one pays for Preordain, the other two pay exactly Stormwing, which could not be cast at full price.
+# It enters, scrying 2 (the top cards stay), and is a 3/3 with flying.
+
+[Bot1 Deck]
+Island x3
+Preordain
+Stormwing Entity
+Island x3
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Stormwing Entity.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Stormwing Entity.Power = 3
+Bot1.Battlefield.Stormwing Entity.Keywords = Flying

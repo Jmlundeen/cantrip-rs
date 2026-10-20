@@ -1,0 +1,50 @@
+# Stormwing Entity (CR 601.2f): "if you've cast an instant or sorcery spell this turn". Bot1 cast Consider on an
+# earlier turn and Bot2 casts Consider in response to Bot1's Mox Sapphire this turn, but Bot1 has cast neither an
+# instant nor a sorcery this turn, so Stormwing costs all {3}{U}{U}: four Islands and the Mox pay exactly that.
+
+[Bot1 Deck]
+Island x4
+Consider
+Mox Sapphire
+Stormwing Entity
+Island x10
+
+[Bot2 Deck]
+Island
+Consider
+Island x18
+
+[Actions]
+Bot1.Hand.Island.Play
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot2.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Consider.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Island#4.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stormwing Entity.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Stormwing Entity.Power = 3

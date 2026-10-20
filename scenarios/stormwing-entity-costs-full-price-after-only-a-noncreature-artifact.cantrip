@@ -1,0 +1,46 @@
+# Stormwing Entity (CR 601.2f): only an artifact (Mox Sapphire, neither an instant nor a sorcery) was cast this turn,
+# so no reduction: Stormwing costs all {3}{U}{U}. Four Islands and the Mox are exactly five mana, and none is left
+# over, which a wrongly reduced cost would leave. Its enters trigger scries 2: Plains and Swamp are both put on the
+# bottom (CR 701.22), so neither is left on top.
+
+[Bot1 Deck]
+Island x4
+Mox Sapphire
+Stormwing Entity
+Island x4
+Plains
+Swamp
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Battlefield.Island#4.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Stormwing Entity.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(| Plains; Swamp)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Stormwing Entity.Power = 3
+Bot1.Mana = 
+Bot1.Library.Count = 12
+Bot1.Library = Island; Island; Island; Island; Island; Island; Island; Island; Island; Island; Plains; Swamp

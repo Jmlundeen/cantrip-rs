@@ -1,0 +1,49 @@
+# Stormwing Entity (CR 601.2f, 118.7): Consider, an instant, was cast this turn, so Stormwing costs {3}{U}{U} less
+# {2}{U}, which is {1}{U}. Three Islands are tapped on Bot1's third turn: {U} pays Consider and exactly {1}{U} pays
+# Stormwing, which could not be cast at full price, leaving the pool empty (a larger reduction would leave mana over).
+# It is a 3/3 with flying. Then, with it on the battlefield, Preordain cast on the next Bot1 turn triggers prowess: it
+# is 4/4 once the trigger has resolved (CR 702.108a).
+
+[Bot1 Deck]
+Island x4
+Consider
+Stormwing Entity
+Preordain
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Island#3.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Stormwing Entity.Cast
+? Bot1.Mana = 
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#4.Activate
+Bot1.Hand.Preordain.Cast
+Bot1.Pass
+? Bot1.Battlefield.Stormwing Entity.Power = 3
+Bot2.Pass
+? Bot1.Battlefield.Stormwing Entity.Power = 4
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield.Stormwing Entity.Power = 4
+Bot1.Battlefield.Stormwing Entity.Keywords = Flying
