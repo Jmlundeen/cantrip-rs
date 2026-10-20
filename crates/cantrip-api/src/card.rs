@@ -2154,7 +2154,7 @@ pub struct CardDef {
     /// Its back face (CR 711): the characteristics of the object when it is transformed. A double-faced card's
     /// back face is not a card of its own: nothing can be drawn or cast as it.
     pub back: Option<&'static CardDef>,
-    /// Its back face is a land that may be played from where the card could be played as a land (CR 712.4, 305.1): a
+    /// Its back face is a land that may be played from where the card could be played as a land (CR 712.12, 305.1): a
     /// modal double-faced card. The land enters as the back face (CR 712.14a).
     pub back_land: bool,
     /// Its printed basic land types' mana, in printed order: the order its intrinsic mana abilities have (CR 305.6).

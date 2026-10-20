@@ -1127,7 +1127,7 @@ impl<'a> Projector<'a> {
             text.push_str(", then exiled");
         }
         // What the permission adds to playing it, for what the card can be played as: a spell's extra cost (CR 601.2f), a land's
-        // entering tapped (CR 614.1c). A modal double-faced card may be either (CR 712.4).
+        // entering tapped (CR 614.1c). A modal double-faced card may be either (CR 712.3, 712.12).
         let chars = self.game.chars(permission.card);
         let def = self.game.cards.get(chars.card);
         let land = chars.is(CardType::Land) || def.back_land;

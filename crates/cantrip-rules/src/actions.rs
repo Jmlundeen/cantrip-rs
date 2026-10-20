@@ -2287,7 +2287,7 @@ fn land_plays(cx: &Cx, player: PlayerId, options: &mut Vec<ActionOption>) {
         return;
     }
     // A land card is played as itself; a modal double-faced card whose back face is a land may be played as that
-    // (CR 712.4, 712.14a), from wherever a land could be played.
+    // (CR 712.12), from wherever a land could be played.
     let offer = |id: ObjectId, options: &mut Vec<ActionOption>| {
         // A card exiled face down is judged as the land it would be (CR 406.3a).
         let _face_up = layers::judged_face_up(cx.s(), id);
