@@ -1199,8 +1199,8 @@ impl cantrip_api::Game for Cx<'_> {
         ops::fight(self, first, second);
     }
 
-    fn create_tokens_attacking(&mut self, tokens: &[(CardId, PlayerId)], defender: Target) -> Result<Vec<ObjectId>, Suspend> {
-        ops::create_tokens_attacking(self, tokens, defender).map_err(|_| Suspend)
+    fn create_tokens_attacking(&mut self, tokens: &[(CardId, PlayerId)], tapped: bool, defender: Target) -> Result<Vec<ObjectId>, Suspend> {
+        ops::create_tokens_attacking(self, tokens, tapped, defender).map_err(|_| Suspend)
     }
 
     fn create_tokens_worded(&mut self, tokens: &[(CardId, PlayerId)], tapped: bool, attacking: Option<Target>, words: Words) -> Result<Vec<ObjectId>, Suspend> {

@@ -8,7 +8,7 @@ use cantrip_oracle as oracle;
 /// enters.
 fn soldiers(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let soldier = g.card_id(&SOLDIER);
-    create_attacking_of_your_choice(g, item.controller, item.object, soldier, 2)?;
+    create_attacking_of_your_choice(g, item.controller, item.object, soldier, 2, true)?;
     Ok(())
 }
 

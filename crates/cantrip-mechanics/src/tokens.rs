@@ -534,6 +534,19 @@ pub static SOLDIER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// The 4/4 white Angel creature token with flying and vigilance. Resplendent Angel and Parhelion II make it.
+pub static ANGEL: CardDef = CardDef {
+    name: "Angel",
+    has_cost: false,
+    colors: Some(ColorSet::of(Color::White)),
+    types: TypeSet::of(&[CardType::Creature]),
+    subtypes: SubtypeSet::of(&[Subtype::Angel]),
+    power: Some(4),
+    toughness: Some(4),
+    keywords: Keywords::of(&[Keyword::Flying, Keyword::Vigilance]),
+    ..CardDef::BLANK
+};
+
 /// The 2/1 green Spider creature token with reach. Spiders-Man, Heroic Horde and Peter Parker make it.
 pub static SPIDER: CardDef = CardDef {
     name: "Spider",

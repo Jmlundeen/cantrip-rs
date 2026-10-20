@@ -13,7 +13,7 @@ fn rebels(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.give_experience(you, 1);
     let count = g.state().player(you).experience() as usize;
     let rebel = g.card_id(&REBEL);
-    create_attacking_of_your_choice(g, you, item.object, rebel, count)?;
+    create_attacking_of_your_choice(g, you, item.object, rebel, count, true)?;
     Ok(())
 }
 

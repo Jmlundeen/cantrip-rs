@@ -2510,10 +2510,10 @@ pub fn fight(cx: &mut Cx, first: ObjectId, second: ObjectId) {
     damage_together(cx, &[(first, Target::Object(second), a), (second, Target::Object(first), b)]);
 }
 
-/// Creates tokens tapped and attacking (CR 508.4): they enter together, then are attacking `defender` without having
-/// been declared as attackers, so no "whenever attacks" ability sees them. Outside combat they are only tapped tokens.
-pub fn create_tokens_attacking(cx: &mut Cx, tokens: &[(CardId, PlayerId)], defender: Target) -> R<Vec<ObjectId>> {
-    let created = create_tokens_batch(cx, tokens, true, None, &[])?;
+/// Creates tokens attacking, tapped when `tapped` (CR 508.4): they enter together, then are attacking `defender` without
+/// having been declared as attackers, so no "whenever attacks" ability sees them. Outside combat they are only tokens.
+pub fn create_tokens_attacking(cx: &mut Cx, tokens: &[(CardId, PlayerId)], tapped: bool, defender: Target) -> R<Vec<ObjectId>> {
+    let created = create_tokens_batch(cx, tokens, tapped, None, &[])?;
     attack_with_tokens(cx, &created, defender);
     Ok(created)
 }

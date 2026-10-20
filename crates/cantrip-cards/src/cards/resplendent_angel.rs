@@ -5,22 +5,9 @@ use cantrip_mechanics::triggers::EACH_END_STEP;
 use cantrip_mechanics::{pump, tokens};
 use cantrip_oracle as oracle;
 
-/// The 4/4 white Angel creature token with flying and vigilance it makes.
-pub static ANGEL: CardDef = CardDef {
-    name: "Angel",
-    has_cost: false,
-    colors: Some(ColorSet::of(Color::White)),
-    types: TypeSet::of(&[CardType::Creature]),
-    subtypes: SubtypeSet::of(&[Subtype::Angel]),
-    power: Some(4),
-    toughness: Some(4),
-    keywords: Keywords::of(&[Keyword::Flying, Keyword::Vigilance]),
-    ..CardDef::BLANK
-};
-
 /// "Create a 4/4 white Angel creature token with flying and vigilance."
 fn create_angel(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    tokens::create(g, item.controller, &ANGEL, 1)?;
+    tokens::create(g, item.controller, &tokens::ANGEL, 1)?;
     Ok(())
 }
 
@@ -31,7 +18,7 @@ fn pump_and_lifelink(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> 
     Ok(())
 }
 
-pub static EXTRA: &[&CardDef] = &[&ANGEL];
+pub static EXTRA: &[&CardDef] = &[&tokens::ANGEL];
 
 pub static CARD: CardDef = CardDef {
     abilities: &[

@@ -638,10 +638,10 @@ pub trait Game: Query {
     /// itself deals twice its power to itself (CR 701.14c). Nothing happens unless both are creatures on the battlefield
     /// (CR 701.14b).
     fn fight(&mut self, first: ObjectId, second: ObjectId);
-    /// Creates tokens that enter tapped and attacking `defender` (CR 508.4): attacking, but never declared as
+    /// Creates tokens that enter attacking `defender` (CR 508.4), tapped when `tapped` ("tapped and attacking"; otherwise they enter untapped): attacking, but never declared as
     /// attackers, so nothing that watches attackers being declared sees them. They are put onto the battlefield
-    /// together, as one instruction. Outside combat they are just tapped tokens.
-    fn create_tokens_attacking(&mut self, tokens: &[(CardId, PlayerId)], defender: Target) -> Result<Vec<ObjectId>, Suspend>;
+    /// together, as one instruction. Outside combat they are just tokens, tapped or not as `tapped` says.
+    fn create_tokens_attacking(&mut self, tokens: &[(CardId, PlayerId)], tapped: bool, defender: Target) -> Result<Vec<ObjectId>, Suspend>;
     /// Creates tokens together whose text has `words` (CR 612.4), tapped, or tapped and attacking `attacking`. Every other
     /// way of creating tokens gives them the words of the text making them, so a text change reaches the colors and
     /// creature types it names (CR 612.2a); a keyword's own token is the rules' (its reminder text is no rules text),

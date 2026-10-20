@@ -32,7 +32,7 @@ fn skeleton(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let token = g.card_id(&SKELETON);
     match choose_attack_target(g, you, gut)? {
         Some(defender) => {
-            g.create_tokens_attacking(&[(token, you)], defender)?;
+            g.create_tokens_attacking(&[(token, you)], true, defender)?;
         }
         None => {
             g.create_tokens(token, you, 1, true)?;

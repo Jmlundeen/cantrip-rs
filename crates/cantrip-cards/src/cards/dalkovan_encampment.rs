@@ -19,7 +19,7 @@ fn attack_this_turn(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// their color and creature type (CR 612.2a).
 fn warriors(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let warrior = g.card_id(&mobilize::WARRIOR);
-    let created = create_attacking_of_your_choice(g, item.controller, item.object, warrior, 2)?;
+    let created = create_attacking_of_your_choice(g, item.controller, item.object, warrior, 2, true)?;
     delayed::at_next_end_step_about(g, item, 1, &created);
     Ok(())
 }

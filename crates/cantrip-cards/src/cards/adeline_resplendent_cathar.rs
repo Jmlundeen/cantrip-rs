@@ -38,7 +38,7 @@ fn human_for_each_opponent(g: &mut dyn Game, item: &StackItem) -> Result<(), Sus
         let candidates = player_or_their_planeswalkers(g, opponent);
         chosen.extend(choose_among(g, item.controller, item.object, &candidates)?);
     }
-    create_attacking(g, item.controller, human, &chosen)?;
+    create_attacking(g, item.controller, human, true, &chosen)?;
     Ok(())
 }
 

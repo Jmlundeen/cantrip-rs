@@ -37,7 +37,7 @@ fn becomes_creature(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Create a 1/1 red Goblin creature token that's tapped and attacking" (CR 508.4): its controller chooses what it attacks.
 fn goblin(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let goblin = g.card_id(&tokens::GOBLIN);
-    create_attacking_of_your_choice(g, item.controller, item.object, goblin, 1)?;
+    create_attacking_of_your_choice(g, item.controller, item.object, goblin, 1, true)?;
     Ok(())
 }
 

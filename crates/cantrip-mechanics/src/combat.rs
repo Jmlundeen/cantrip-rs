@@ -46,7 +46,7 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
         0 => None,
         1 => Some(candidates[0]),
         _ => {
-            let ask = RequestKind::ChooseTarget { label: "Choose what it attacks as it enters tapped and attacking: a player, a planeswalker or a battle.", slot_player: None, total: None,
+            let ask = RequestKind::ChooseTarget { label: "Choose what it attacks as it enters attacking: a player, a planeswalker or a battle.", slot_player: None, total: None,
                 source,
                 purpose: Purpose::EnterAttacking,
                 candidates: candidates.to_vec(),
@@ -63,11 +63,11 @@ pub fn choose_among(g: &mut dyn Game, you: PlayerId, source: ObjectId, candidate
     })
 }
 
-/// `count` of `token`, each tapped and attacking what its controller chooses for it (CR 508.4): `choose_attack_target` once per
+/// `count` of `token`, each attacking (tapped when `tapped`) what its controller chooses for it (CR 508.4): `choose_attack_target` once per
 /// token, asked only when there is a choice and before any token is made, and the ones that attack the same thing created
 /// together (CR 101.4). Nothing is made when there is nothing to attack. Hero of Bladehold and Dalkovan Encampment print it
-/// with two, Otharri, Suns' Glory with one for each experience counter.
-pub fn create_attacking_of_your_choice(g: &mut dyn Game, you: PlayerId, source: ObjectId, token: CardId, count: usize) -> Result<Vec<ObjectId>, Suspend> {
+/// with two, Otharri, Suns' Glory with one for each experience counter, all tapped; Parhelion II's Angels are not.
+pub fn create_attacking_of_your_choice(g: &mut dyn Game, you: PlayerId, source: ObjectId, token: CardId, count: usize, tapped: bool) -> Result<Vec<ObjectId>, Suspend> {
     let mut chosen: Vec<Target> = Vec::new();
     for _ in 0..count {
         match choose_attack_target(g, you, source)? {
@@ -75,7 +75,7 @@ pub fn create_attacking_of_your_choice(g: &mut dyn Game, you: PlayerId, source: 
             None => break,
         }
     }
-    create_attacking(g, you, token, &chosen)
+    create_attacking(g, you, token, tapped, &chosen)
 }
 
 /// A player and the planeswalkers they control: what "that player or a planeswalker they control" can be attacked as
@@ -94,10 +94,10 @@ pub fn player_or_their_planeswalkers(g: &dyn Game, player: PlayerId) -> Vec<Targ
     out
 }
 
-/// One `token` of `you`'s for each of `attacking`, tapped and attacking what that entry names (CR 508.4): the tokens that
+/// One `token` of `you`'s for each of `attacking`, attacking (tapped when `tapped`) what that entry names (CR 508.4): the tokens that
 /// attack the same thing are created together (CR 101.4). The chosen targets come from `choose_among` or
 /// `choose_attack_target`, asked before any token is made. Hero of Bladehold and Adeline, Resplendent Cathar print it.
-pub fn create_attacking(g: &mut dyn Game, you: PlayerId, token: CardId, attacking: &[Target]) -> Result<Vec<ObjectId>, Suspend> {
+pub fn create_attacking(g: &mut dyn Game, you: PlayerId, token: CardId, tapped: bool, attacking: &[Target]) -> Result<Vec<ObjectId>, Suspend> {
     let mut made = Vec::new();
     let mut done: Vec<Target> = Vec::new();
     for &target in attacking {
@@ -107,7 +107,7 @@ pub fn create_attacking(g: &mut dyn Game, you: PlayerId, token: CardId, attackin
         done.push(target);
         let n = attacking.iter().filter(|&&t| t == target).count();
         let tokens = vec![(token, you); n];
-        made.extend(g.create_tokens_attacking(&tokens, target)?);
+        made.extend(g.create_tokens_attacking(&tokens, tapped, target)?);
     }
     Ok(made)
 }

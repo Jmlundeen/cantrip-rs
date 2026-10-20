@@ -26,7 +26,7 @@ fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
         for _ in 0..3 {
             chosen.extend(choose_attack_target(g, item.controller, item.object)?);
         }
-        create_attacking(g, item.controller, token, &chosen)?;
+        create_attacking(g, item.controller, token, true, &chosen)?;
         // With nothing to attack (no defender is left to choose) they still enter tapped, as the sneak cost says.
         g.create_tokens(token, item.controller, 3 - chosen.len() as u32, true)?;
     } else {
