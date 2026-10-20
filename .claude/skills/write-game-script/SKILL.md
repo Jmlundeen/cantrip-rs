@@ -41,7 +41,12 @@ sweeping seeds (CLAUDE.md).
    `Dump = ?`: the mismatch fails the script and prints the dump, with the keys nearest the bogus one. Copy only the
    keys that prove the behaviour, then remove the bogus line.
 7. **Check that the script can fail.** Temporarily break an expectation, or the rule under test, and confirm the
-   script goes red. A script that passes vacuously is worse than none.
+   script goes red. A script that passes vacuously is worse than none. Two places a card's test most often passes
+   when it should not:
+   - **A numeric limit** ("mana value 2 or less", "power 4 or greater", "up to three"): put an object exactly at the
+     limit on the side that qualifies and one just past it on the side that does not, so `<` for `<=` fails.
+   - **Whose things it reads** ("each", "all", "target", "you control", "an opponent controls"): give both players
+     something it could apply to, so a filter that reads only one side (or the wrong one) fails.
 8. **If the change added a shared mechanic or a core feature, write a second script for a second composition** — a
    different card, or a different arrangement of the same one, going through the same code. One caller never
    demonstrates that a capability is general.
@@ -120,6 +125,10 @@ sweeping seeds (CLAUDE.md).
 - **Refusals that name targets or questions.** `! Bot2.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Figure of Fable)` refuses only the
   option announceable with that target (how a hexproof or protection limit is proved). A bare `! Bot1.Choose` (also `Decline`,
   `Colors`, `Name`, `Arrange`, `ChoosePlayer`, `Modes`, `Target`) fails if that question is asked before the player's next priority.
+- **Zone lists in `[Expect]` have an order.** `Graveyard` and `Library` are top first: the card put into a graveyard
+  last comes first, so a spell that resolved and went to the graveyard is listed before what it destroyed, and two
+  cards destroyed together keep the order they arrived in, newest first. `Hand`, `Battlefield` and the other lists are
+  sorted by name. When the order is not what the test is about, assert `.Count` and the per-card keys instead.
 - **Asserting a key is missing.** `Bot2.Battlefield.Bat.Keywords = (absent)`; it fails unless the dump has some
   other key on that object, so a typo cannot pass. A counter kind at zero is absent from the dump.
 
