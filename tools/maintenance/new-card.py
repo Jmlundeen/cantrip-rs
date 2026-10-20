@@ -2,7 +2,8 @@
 
     python tools/maintenance/new-card.py "Mind Stone" [--no-write]
 
-Prints the card's content JSON, the scenarios that use it and, for each of its abilities, the implemented cards that
+Writes the card's content JSON from Scryfall when content/ has none (a single face, a double-faced card, an adventure;
+any other layout is written by hand), then prints the card's content JSON, the scenarios that use it and, for each of its abilities, the implemented cards that
 already do it (ability-index.py), and writes
 crates/cantrip-cards/src/cards/<card_name>.rs over the card's generated constant if the
 file does not exist yet. Then the loop is: write the behavior, and
@@ -19,6 +20,7 @@ import re
 import sys
 
 import subprocess
+import unicodedata
 
 import cr
 import scryfall
@@ -162,17 +164,96 @@ def cr_report(card, abilities, index):
     return "\n".join(lines) or "  none"
 
 
+# Scryfall layouts a content file says as one face, a back face or an adventure; the rest are written by hand.
+SINGLE = {"normal", "leveler", "class", "saga", "case", "mutate"}
+COLOR_NAMES = {"W": "White", "U": "Blue", "B": "Black", "R": "Red", "G": "Green"}
+
+
+def _core_keywords():
+    """{"first strike": "FirstStrike", ...}: the Oracle keywords that are the core's (crates/cantrip-oracle/build.rs)."""
+    src = open(os.path.join(ROOT, "crates", "cantrip-oracle", "build.rs"), encoding="utf-8").read()
+    names = re.findall(r'"([^"]+)"', re.search(r"const KEYWORDS[^=]*=\s*\[(.*?)\];", src, re.S).group(1))
+    words = re.findall(r'"([^"]+)"', re.search(r"const KEYWORD_WORDS[^=]*=\s*\[(.*?)\];", src, re.S).group(1))
+    by_key = {n.lower(): n for n in names}
+    return {w: by_key[w.replace(" ", "")] for w in words if w.replace(" ", "") in by_key}
+
+
+def _stat(value):
+    return int(value) if re.fullmatch(r"-?\d+", value or "") else value
+
+
+def _face(face, names, index, core):
+    """One face as a content file has it: its characteristics, and the core keywords its Oracle text has."""
+    out = {"name": face["name"]}
+    if face.get("mana_cost"):
+        out["manaCost"] = face["mana_cost"]
+    if face.get("color_indicator"):
+        out["colorIndicator"] = [COLOR_NAMES[c] for c in face["color_indicator"]]
+    out["type"] = face["type_line"]
+    for key in ("power", "toughness", "loyalty", "defense"):
+        if face.get(key):
+            out[key] = _stat(face[key])
+    out["oracleText"] = face["oracle_text"]
+    words = [ab.keyword for ab in index.split_abilities(face["oracle_text"], names) if ab.keyword]
+    keywords = [core[w] for w in dict.fromkeys(words) if w in core]
+    if keywords:
+        out["keywords"] = keywords
+    for flag in ("convoke", "delve", "improvise"):
+        if flag in words:
+            out[flag] = True
+    return out
+
+
+def draft_content(name, index):
+    """Writes content/mtg/cards/<slug>.json for a card new to content, from Scryfall's current characteristics; for a
+    layout a file can't be written from directly (split, omen, prototype ...), prints what Scryfall has and exits."""
+    found = scryfall.card(name)
+    if found is None:
+        sys.exit(f"no card named {name!r} in content/ or on Scryfall; spell it as printed")
+    faces, layout = found["faces"], found.get("layout", "normal")
+    names = [f["name"] for f in faces] + [found["name"]]
+    core = _core_keywords()
+    if layout in SINGLE and len(faces) == 1:
+        card = _face(faces[0], names, index, core)
+    elif layout in ("transform", "modal_dfc") and len(faces) == 2:
+        card = _face(faces[0], names, index, core) | {"backFace": _face(faces[1], names, index, core)}
+    elif layout == "adventure" and len(faces) == 2:
+        card = _face(faces[0], names, index, core) | {"adventure": _face(faces[1], names, index, core)}
+    else:
+        print(f"{found['name']} is a {layout} card: write content/mtg/cards/<name>.json by hand (the add-cards skill, step 2),")
+        print("then run new-card.py again. What Scryfall has:\n")
+        for face in faces:
+            print(f"{face['name']}  {face.get('mana_cost', '')}  {face.get('type_line', '')}\n{face['oracle_text']}\n")
+        sys.exit(1)
+    slug = re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", unicodedata.normalize("NFKD", card["name"])
+                                     .encode("ascii", "ignore").decode().lower().replace("'", ""))).strip("-")
+    path = os.path.join(CONTENT, "mtg", "cards", slug + ".json")
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(card, indent=2, ensure_ascii=False) + "\n")
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
         sys.exit(__doc__)
     found = find_card(args[0])
+    spec = importlib.util.spec_from_file_location("ability_index", os.path.join(os.path.dirname(__file__), "ability-index.py"))
+    index = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(index)
+    drafted = False
     if found is None:
-        sys.exit(f"no card named {args[0]!r} in content/")
+        if "--no-write" in sys.argv:
+            sys.exit(f"no card named {args[0]!r} in content/ (run without --no-write to write it from Scryfall)")
+        draft_content(args[0], index)
+        found = find_card(args[0])
+        drafted = True
     dataset, path, text, card = found
     name = card["name"]
 
     print(f"=== {name}  ({os.path.relpath(path, ROOT)})  oracle::{ident(name)}")
+    if drafted:
+        print("    written just now from Scryfall: check it against the card (the core keywords besides Oracle's -")
+        print("    CantBeBlocked, CantBeCountered ... in crates/cantrip-oracle/build.rs - are yours to add where the text says so)")
     print(text.strip())
 
     print("\n=== Scenarios naming it")
@@ -181,9 +262,6 @@ def main():
         if file.endswith(".cantrip") and pattern.search(open(os.path.join(SCRIPTS, file), encoding="utf-8-sig").read()):
             print(f"  scenarios/{file}")
 
-    spec = importlib.util.spec_from_file_location("ability_index", os.path.join(os.path.dirname(__file__), "ability-index.py"))
-    index = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(index)
     abilities = index.card_abilities(card)
 
     print("\n=== Scryfall: current Oracle text and official rulings (tools/maintenance/scryfall.py)")

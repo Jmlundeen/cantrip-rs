@@ -32,7 +32,9 @@ The repository is origin's (--repo owner/name to override); gh is the GitHub cli
 """
 
 import argparse
+import concurrent.futures
 import datetime
+import functools
 import importlib.util
 import json
 import os
@@ -115,9 +117,17 @@ def when(text):
     return datetime.datetime.fromisoformat(text.replace("Z", "+00:00"))
 
 
+# Open issues with their claim comments; closed ones (a card done, or dropped) need no comments, which are most of
+# what a page of issues costs.
 ISSUES = """query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
-issues(first:50,after:$endCursor,labels:["card"]){pageInfo{hasNextPage endCursor}nodes{number title state
-labels(first:20){nodes{name}}comments(last:50){nodes{author{login}body createdAt}}}}}}"""
+issues(first:100,after:$endCursor,labels:["card"],states:OPEN){pageInfo{hasNextPage endCursor}nodes{number title state
+labels(first:20){nodes{name}}comments(last:20){nodes{author{login}body createdAt}}}}}}"""
+CLOSED = """query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
+issues(first:100,after:$endCursor,labels:["card"],states:CLOSED){pageInfo{hasNextPage endCursor}nodes{number title
+state labels(first:20){nodes{name}}}}}}"""
+ONE_ISSUE = """query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){
+issue(number:$number){number title state labels(first:20){nodes{name}}comments(last:50){nodes{author{login}body
+createdAt}}}}}"""
 PULLS = """query($owner:String!,$name:String!,$endCursor:String){repository(owner:$owner,name:$name){
 pullRequests(first:50,after:$endCursor,states:OPEN){pageInfo{hasNextPage endCursor}nodes{number createdAt
 headRefName author{login}closingIssuesReferences(first:5){nodes{number}}commits(last:30){nodes{commit{committedDate}}}}}}}"""
@@ -130,23 +140,36 @@ def title(name):
     return f"Card: {name}"
 
 
-def read_state(repo):
-    """The issues about cards, with what is known of who holds each: {number: issue}, and each issue's events."""
+def with_events(issue):
+    """An issue as GitHub gives it, its labels a set and its claim and release comments as events."""
+    issue["labels"] = {label["name"] for label in issue["labels"]["nodes"]}
+    issue["events"] = []
+    for comment in (issue.get("comments") or {}).get("nodes", []):
+        user = (comment["author"] or {}).get("login")
+        kind = "claim" if CLAIM in comment["body"] else "release" if RELEASE in comment["body"] else None
+        if kind and user:
+            tag = CLAIMANT_RE.search(comment["body"])
+            issue["events"].append((when(comment["createdAt"]), kind, identity(user, tag and tag.group(1))))
+    issue["from_comments"] = len(issue["events"])  # pull request and branch events come after
+    return issue
+
+
+_state = {}
+
+
+def read_state(repo, fresh=False):
+    """The issues about cards, with what is known of who holds each: {number: issue}, and each issue's events. Read
+    once a run (`fresh` reads again); its four queries go to GitHub at once, each taking seconds."""
+    if repo in _state and not fresh:
+        return _state[repo]
+    with concurrent.futures.ThreadPoolExecutor(4) as pool:
+        opened, closed, pulls, branches = pool.map(lambda q: graphql(q, repo), (ISSUES, CLOSED, PULLS, BRANCHES))
     issues = {}
-    for page in graphql(ISSUES, repo):
+    for page in opened + closed:
         for issue in page["data"]["repository"]["issues"]["nodes"]:
-            issue["labels"] = {label["name"] for label in issue["labels"]["nodes"]}
-            issue["events"] = []
-            for comment in issue["comments"]["nodes"]:
-                user = (comment["author"] or {}).get("login")
-                kind = "claim" if CLAIM in comment["body"] else "release" if RELEASE in comment["body"] else None
-                if kind and user:
-                    tag = CLAIMANT_RE.search(comment["body"])
-                    issue["events"].append((when(comment["createdAt"]), kind,
-                                            identity(user, tag and tag.group(1))))
-            issues[issue["number"]] = issue
+            issues[issue["number"]] = with_events(issue)
     by_slug = {slug_of(i["title"]): i for i in issues.values() if i["title"].startswith("Card: ")}
-    for page in graphql(PULLS, repo):
+    for page in pulls:
         for pull in page["data"]["repository"]["pullRequests"]["nodes"]:
             user = (pull["author"] or {}).get("login")
             linked = [n["number"] for n in pull["closingIssuesReferences"]["nodes"]]
@@ -156,13 +179,25 @@ def read_state(repo):
                 issues[number]["events"].append((when(pull["createdAt"]), "claim", user))
                 for node in pull["commits"]["nodes"]:
                     issues[number]["events"].append((when(node["commit"]["committedDate"]), "ping", user))
-    for page in graphql(BRANCHES, repo):
+    for page in branches:
         for ref in page["data"]["repository"]["refs"]["nodes"]:
             issue = by_slug.get(ref["name"])
             if issue and ref["target"]:
                 user = ((ref["target"].get("author") or {}).get("user") or {}).get("login")
                 issue["events"].append((when(ref["target"]["committedDate"]), "ping", user))
+    _state[repo] = issues
     return issues
+
+
+def read_issue(repo, issue):
+    """One issue's claim and release comments read again (after claiming it, to see whose claim came first), its
+    pull request and branch events as they were."""
+    owner, name = repo.split("/")
+    data = gh("api", "graphql", "-f", f"query={ONE_ISSUE}", "-F", f"owner={owner}", "-F", f"name={name}",
+              "-F", f"number={issue['number']}")
+    again = with_events(data["data"]["repository"]["issue"])
+    again["events"] += issue["events"][issue["from_comments"]:]
+    return again
 
 
 def slug_of(issue_title):
@@ -207,18 +242,15 @@ missing = load("missing-cards")
 slug = missing.slug
 
 
+@functools.cache
 def done_anywhere():
     """Every card done in this checkout or on any local branch of the repository: a card is given out to nobody once
     its content file exists, landed or not (a reviewed card waiting on a land/ branch, another worktree's slot)."""
     done = missing.implemented()
-    git = ["git", "-C", ROOT]
-    base = subprocess.run(git + ["rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-    refs = subprocess.run(git + ["for-each-ref", "--format=%(refname)", "refs/heads"],
-                          capture_output=True, text=True).stdout.split()
-    for ref in refs:
-        added = subprocess.run(git + ["diff", "--name-only", "--diff-filter=A", f"{base}...{ref}", "--",
-                                      "content/*/cards/*.json"], capture_output=True, text=True).stdout.split()
-        done.update(slug(os.path.basename(path)[: -len(".json")]) for path in added)
+    # One walk of every commit on a local branch that this checkout lacks, for the card files they add.
+    added = subprocess.run(["git", "-C", ROOT, "log", "--branches", "--not", "HEAD", "--diff-filter=A", "--name-only",
+                            "--format=", "--", "content/*/cards/*.json"], capture_output=True, text=True).stdout.split()
+    done.update(slug(os.path.basename(path)[: -len(".json")]) for path in added)
     return done
 
 
@@ -402,9 +434,8 @@ def take(repo, issues, me, name):
     gh("api", "-X", "POST", f"repos/{repo}/issues/{issue['number']}/comments", "--input", "-",
        body={"body": f"{CLAIM}\n{CLAIMANT.format(tag)}\nClaimed by {named(me)}{note}. Held 24 hours from the last "
                      f"push or commit on its pull request or `card/{slug(name)}` branch; claim again to renew."})
-    issue["events"].append((datetime.datetime.now(datetime.timezone.utc), "claim", me))
-    fresh = {i["number"]: i for i in read_state(repo).values()}.get(issue["number"])
-    winner = holder(fresh) if fresh else None
+    fresh = read_issue(repo, issue)
+    winner = holder(fresh)
     if winner and winner[0] != me:
         print(f"{name}: #{issue['number']} - {named(winner[0])} claimed it first")
         return False
@@ -427,13 +458,16 @@ def claim(args, repo):
         sys.exit("name the cards to claim, or --format to claim the format's next free card")
     args.n = args.n or BATCH
     got = 0
-    for card, _, mine in available(args, repo)[0]:
-        if mine:
-            continue  # already ours: claim a new card
+    free = [card for card, _, mine in available(args, repo)[0] if not mine]  # one already ours: claim a new card
+    for card in free:
         if got == args.n:
             break
         got += take(repo, issues, me, card["name"])
-    print(f"{got} of {args.n} claimed; they are yours for 24 hours")
+    if not free:
+        print(f"nothing claimed: no card in {args.format} is free (every missing card is implemented on a branch or "
+              f"held live by someone; `status` lists the holds)")
+    else:
+        print(f"{got} of {args.n} claimed; {'they are' if got != 1 else 'it is'} yours for 24 hours")
     sys.exit(0 if got == args.n else 3)
 
 

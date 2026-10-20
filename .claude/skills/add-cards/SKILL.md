@@ -148,7 +148,10 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    - What the rules make the card do in the odd cases: no legal target, a target that becomes illegal, a source that
      has left the battlefield, a copy, a token, a face-down permanent, an opponent controlling it, two of it, X of
      zero, an empty library or hand, simultaneous events, a replacement effect in the way.
-2. **The card's content file.** If it does not exist, write `content/<dataset>/cards/<card-name>.json` with the
+2. **The card's content file.** If it does not exist, `new-card.py "Card Name"` (step 3) writes it from Scryfall's
+   current characteristics for a single-faced card, a transform or modal double-faced card and an adventure, and says
+   so; check it, and add any core keyword the text implies beyond Oracle's keywords (`CantBeBlocked`, ...). For any
+   other layout it prints what Scryfall has, and you write `content/<dataset>/cards/<card-name>.json` by hand, with the
    characteristics only: `name`, `manaCost`, `type`, `power`/`toughness`, `loyalty` or `defense`, `oracleText` exactly
    as current Oracle text, core `keywords` (`Flying`, `FirstStrike`, ... - the list is in
    `crates/cantrip-oracle/build.rs`), `colorIndicator`, `convoke`/`delve`/`improvise`, and faces (`backFace`,
