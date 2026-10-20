@@ -1,0 +1,78 @@
+# Greasefang's beginning-of-combat trigger targets a Vehicle card in its controller's own graveyard only: Bot2's
+# Smuggler's Copter and Bot1's own Bloodforged Battle-Axe (an artifact that is no Vehicle) are in graveyards too and are
+# refused, while two Vehicles of Bot1's are candidates, so the target is asked. The Copter comes back with haste, and at
+# the beginning of Bot1's end step returns to its owner's hand. Bot1's Duress puts Bot2's Copter in Bot2's graveyard;
+# Bot2's three Duresses put Bot1's Copter, Reckoner Bankbuster and Axe in Bot1's.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Jet
+Mox Sapphire
+Duress
+Smuggler's Copter
+Reckoner Bankbuster
+Bloodforged Battle-Axe
+Greasefang, Okiba Boss
+Plains x15
+
+[Bot2 Deck]
+Smuggler's Copter
+Mox Jet
+Mox Jet
+Swamp
+Duress
+Duress
+Duress
+Swamp x15
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Duress.Cast(Bot2)
+Bot1.Choose(Smuggler's Copter)
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Swamp.Play
+Bot2.Battlefield.Swamp.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Smuggler's Copter)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Reckoner Bankbuster)
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Duress.Cast(Bot1)
+Bot2.Choose(Bloodforged Battle-Axe)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Greasefang, Okiba Boss.Cast
+Bot1.Pass
+! Bot1.Target(Bot2.Graveyard.Smuggler's Copter)
+! Bot1.Target(Bot1.Graveyard.Bloodforged Battle-Axe)
+Bot1.Target(Bot1.Graveyard.Smuggler's Copter)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Battlefield.Smuggler's Copter.Keywords = Flying; Haste
+? Bot1.Graveyard = Bloodforged Battle-Axe; Reckoner Bankbuster; Duress
+? Bot2.Graveyard.Count = 4
+[T3 Bot1.End]
+Bot1.Pass
+Bot1.Pass
+[T4 Bot2.Upkeep]
+
+[Expect]
+Turn = 4
+Stack.Count = 0
+Bot1.Hand = Smuggler's Copter
+Bot1.Battlefield = Greasefang, Okiba Boss; Mox Jet; Mox Pearl; Mox Sapphire
+Bot1.Graveyard = Bloodforged Battle-Axe; Reckoner Bankbuster; Duress
+Bot2.Graveyard = Duress; Duress; Duress; Smuggler's Copter
