@@ -117,7 +117,8 @@ pub enum LibraryPlace {
     Bottom,
     /// On the bottom in a random order, drawn from the game's own random source (CR 401.4).
     BottomInRandomOrder,
-    /// Into the library, which is then shuffled (CR 701.24a).
+    /// Into the library, which is then shuffled. The referenced owners' libraries are shuffled even when a referenced
+    /// object has left its expected zone or a replacement prevents it from arriving (CR 701.24c).
     ShuffledIn,
     /// This many cards down from the top (0 is the top): "second from the top" is `FromTop(1)`. The cards given go in
     /// order, the first highest.

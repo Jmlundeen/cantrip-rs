@@ -1,0 +1,58 @@
+# Bot2 takes Bot1's Fblthp with Old Man of the Sea. It controls the trigger and draws exactly its last two cards. Bot1's
+# Platinum Angel prevents Bot2 from winning, and Fblthp reaches its owner's library while the game remains in progress
+# (CR 104.2b, 701.24c); no failed draw occurs, so Bot2 does not lose to a state-based action.
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Platinum Angel
+Sol Ring
+Black Lotus
+Mox Sapphire
+Mox Pearl
+Island
+Island x20
+
+[Bot2 Deck]
+Old Man of the Sea
+Black Lotus
+Island x10
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Island.Activate
+Bot2.Battlefield.Black Lotus.Activate(Color: U)
+Bot2.Hand.Old Man of the Sea.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: W)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Platinum Angel.Cast
+[T4 Bot2.Main1]
+Bot2.Battlefield.Old Man of the Sea.Activate(Bot1.Battlefield.Fblthp, Impossibly Lost)
+Bot2.Decline
+[T6 Bot2.Main1]
+Bot2.Attack(Fblthp, Impossibly Lost > Bot1)
+[T6 Bot2.CombatDamage]
+
+[Expect]
+Bot1.Library.Fblthp, Impossibly Lost.Power = 1
+Bot1.Library.Count = 19
+Bot2.Hand.Count = 9
+Bot2.Library.Count = 0
+Bot2.LostTo = (absent)
+Bot1.Life = 19
+Result = InProgress

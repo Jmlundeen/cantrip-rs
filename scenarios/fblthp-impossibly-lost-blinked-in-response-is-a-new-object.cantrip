@@ -1,0 +1,31 @@
+# Ephemerate moves Fblthp out of the zone its trigger remembers, then returns a new object. The trigger still draws two,
+# but it cannot move the returned Fblthp (CR 400.7); the old reference still requires Bot1's library to be shuffled (701.24c).
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Ephemerate
+Tundra x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Tundra.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Battlefield.Tundra#1.Activate(Ability: {U})
+Bot1.Battlefield.Tundra#2.Activate(Ability: {U})
+[T5 Bot1.Main1]
+Bot1.Hand.Tundra.Play
+Bot1.Attack(Fblthp, Impossibly Lost > Bot2)
+[T5 Bot1.CombatDamage]
+Bot1.Hand.Ephemerate.Cast(Fblthp, Impossibly Lost)
+Bot1.Battlefield.Tundra#3.Activate(Ability: {W})
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Library.Count = 11
+Bot2.Life = 19
+Result = InProgress

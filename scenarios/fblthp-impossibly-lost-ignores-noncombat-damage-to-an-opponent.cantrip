@@ -1,0 +1,32 @@
+# Fblthp, Impossibly Lost watches for combat damage (CR 510.2). Lightning Bolt at Bot2 on Bot1's own turn deals three damage
+# to an opponent of Fblthp's controller, and it is not combat damage, so nothing triggers: Bot1 draws nothing, Fblthp stays
+# on the battlefield, and Bot2 is at 17. The positive control is
+# fblthp-impossibly-lost-draws-two-and-shuffles-himself-in, the same turn and the same opponent with combat damage.
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Lightning Bolt
+Mountain
+Island x17
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+Bot1.Battlefield.Mountain.Activate
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 17
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Lightning Bolt
+Result = InProgress

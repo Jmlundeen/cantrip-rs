@@ -1,0 +1,33 @@
+# Bot1 has already drawn this turn. Spirit of the Labyrinth prevents both draws from Fblthp's trigger; its library remains
+# nonempty, so Bot1 does not win and Fblthp is still shuffled into that library (CR 121.2, 701.24c).
+
+[Bot1 Deck]
+Fblthp, Impossibly Lost
+Spirit of the Labyrinth
+Mox Pearl
+Island x8
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Spirit of the Labyrinth.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Fblthp, Impossibly Lost.Cast
+[T5 Bot1.Main1]
+Bot1.Attack(Fblthp, Impossibly Lost > Bot2)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Library.Count = 3
+Bot1.LostTo = (absent)
+Bot2.Life = 19
+Result = InProgress
