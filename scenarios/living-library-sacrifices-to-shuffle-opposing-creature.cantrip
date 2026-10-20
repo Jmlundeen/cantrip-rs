@@ -1,4 +1,7 @@
-# Deterministic spell and ability coverage (CR 608).
+# Living Library: "{6}, Sacrifice this creature: Choose target creature or planeswalker an opponent controls. Its owner
+# shuffles it into their library" (CR 701.24a). Bot2's Ornithopter goes into Bot2's library - not the graveyard or exile -
+# and the Library is in Bot1's graveyard, sacrificed as a cost.
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]
@@ -42,3 +45,5 @@ Bot2.Pass
 [Expect]
 Bot1.Graveyard = Living Library; Black Lotus
 Bot2.Battlefield.Count = 0
+Bot2.Library.Ornithopter.Power = 0
+Bot2.Graveyard = 

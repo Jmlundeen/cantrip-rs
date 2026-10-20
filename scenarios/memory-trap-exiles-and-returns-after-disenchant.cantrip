@@ -1,4 +1,6 @@
-# Deterministic spell and ability coverage (CR 608).
+# Memory Trap exiles Bot2's Ornithopter until it leaves the battlefield (CR 610.3); Disenchant destroys the Trap and the
+# Ornithopter returns to the battlefield.
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]

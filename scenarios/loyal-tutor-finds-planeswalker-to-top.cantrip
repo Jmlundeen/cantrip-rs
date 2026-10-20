@@ -1,4 +1,5 @@
-# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+# Loyal Tutor: Bot1 searches for Jace, the Mind Sculptor, a planeswalker card; after the shuffle it is put on top (CR
+# 701.23), so Bot1 draws it on turn 3.
 
 [Bot1 Deck]
 Plains

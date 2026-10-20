@@ -1,6 +1,6 @@
-# Kiora of Salt and Sand: with Jace's loyalty ability activated this turn, the attack trigger untaps the attacking
-# Kiora and it can't be blocked (CR 611.2c). The static gives planeswalkers you control the -8 ability: Jace climbs
-# to nine loyalty over three turns, and on turn 9 the granted ability makes the 8/8 blue Leviathan token.
+# Kiora of Salt and Sand: "Whenever you attack, if you've activated a loyalty ability this turn, ..." (CR 603.4). Bot1
+# attacks with Kiora having activated no loyalty ability this turn, so the ability does not trigger: Kiora stays tapped
+# from attacking and gains no "can't be blocked".
 
 [Bot1 Deck]
 Black Lotus

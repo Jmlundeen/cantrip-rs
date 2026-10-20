@@ -1,4 +1,5 @@
-# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+# Marwyn, the Clearcutter: "{2}, {T}, Sacrifice an artifact or land: Draw a card." Bot1 sacrifices Ornithopter, an
+# artifact, as the cost and draws a card: five cards in hand after the turn-3 draw and this one (CR 602.2, 121.1).
 
 [Bot1 Deck]
 Mountain
@@ -30,3 +31,4 @@ Bot2.Pass
 [Expect]
 Bot1.Graveyard = Ornithopter; Black Lotus
 Bot1.Battlefield.Marwyn, the Clearcutter.Tapped = true
+Bot1.Hand.Count = 5

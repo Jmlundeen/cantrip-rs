@@ -1,4 +1,6 @@
-# Deterministic spell and ability coverage (CR 608).
+# Kwia Vigorbloom: "This ability triggers only once each turn" (CR 603.2h). Bot1 gains life twice on turn 3 - Healing
+# Salve's 3, then Kwia's lifelink 6 (29) - and gets one Lotus token only; that Lotus makes {G}{G}{G}.
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]

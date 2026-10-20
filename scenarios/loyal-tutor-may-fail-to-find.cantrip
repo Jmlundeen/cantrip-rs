@@ -1,4 +1,5 @@
-# Focused recovered-card scenario: resolves real spells and abilities (CR 608).
+# Loyal Tutor: a search for a card with a stated quality may find nothing (CR 701.23b). Bot1 finds nothing; the library
+# is shuffled and nothing is put on top, and Bot1's hand is the turn-3 draw plus what it kept.
 
 [Bot1 Deck]
 Plains

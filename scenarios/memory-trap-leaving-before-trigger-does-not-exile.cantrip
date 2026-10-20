@@ -1,4 +1,6 @@
-# Deterministic spell and ability coverage (CR 608).
+# Memory Trap leaves the battlefield (Disenchant, in response to its enters trigger) before the trigger resolves, so the
+# Ornithopter is not exiled at all (CR 610.3c).
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]

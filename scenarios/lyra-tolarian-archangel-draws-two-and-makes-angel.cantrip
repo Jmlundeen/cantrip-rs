@@ -1,4 +1,8 @@
-# Deterministic spell and ability coverage (CR 608).
+# Lyra, Tolarian Archangel: on turn 3 Bot1 activates "{3}{U}{U}: Until end of turn, whenever Lyra deals combat damage to a
+# player, draw two cards" (CR 603.7b), and Lyra hits Bot2 for 3. The two cards drawn, with the turn's draw, make three, so
+# at the end step "if you've drawn three or more cards this turn" holds (CR 603.4) and a 3/3 flying Angel is made. On
+# turn 1 (no draw) and turn 2 (Bot1 drew nothing) the end-step ability did not trigger: there is only the one Angel.
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]
@@ -46,3 +50,4 @@ Bot2.Pass
 Bot1.Battlefield.Angel.Power = 3
 Bot1.Battlefield.Angel.Keywords = Flying
 Bot2.Life = 17
+Bot1.Battlefield.Count = 7

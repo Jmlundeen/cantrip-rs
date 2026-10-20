@@ -1,4 +1,6 @@
-# Deterministic spell and ability coverage (CR 608).
+# Medic's Kitesail equipped to an Ornithopter: +1/+0 and flying, and the granted "Whenever this creature attacks, you gain
+# 1 life" - the Ornithopter attacks for 1 (Bot2 19) and Bot1 gains 1 (21) (CR 301.5, 613.1f).
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]

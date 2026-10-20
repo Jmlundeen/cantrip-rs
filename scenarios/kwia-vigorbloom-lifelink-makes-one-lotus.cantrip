@@ -1,4 +1,6 @@
-# Deterministic spell and ability coverage (CR 608).
+# Kwia Vigorbloom: its lifelink combat damage gains Bot1 6 life (26), which triggers "whenever you gain life" and makes a
+# Lotus token; the Lotus then taps and sacrifices for three mana of one chosen color, {G}{G}{G} (CR 702.15b, 106.5).
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]

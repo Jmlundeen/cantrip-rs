@@ -1,4 +1,7 @@
-# Deterministic spell and ability coverage (CR 608).
+# Massacre Girl, Most Wanted: Bot1 Bolts its own Ornithopter, another creature it controls dying, so Massacre Girl deals 1
+# damage to target opponent (Bot2 19) and Bot1 gains 1 life (21). That damage is noncombat damage to an opponent, so her
+# second ability triggers and she gets a +1/+1 counter (5/4) (CR 603.10a, 120.3).
+
 [Dice]
 1; 1; 1; 1; 1; 1
 [Bot1 Deck]
