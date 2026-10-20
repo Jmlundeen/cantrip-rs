@@ -118,7 +118,7 @@ those are part of this run too. Cards on other lists are not part of it. If none
 ## 3. Implement them
 
 Invoke the `add-cards` skill with the missing names, `<agents>` agents at a time, and follow it **completely**, as its
-coordinator: dispatch, gaps, landing, review and its *Finishing* report. A card it skips for a core gap is listed in
+coordinator (`.claude/skills/add-cards/coordinator.md`): dispatch, gaps, review, landing and its report. A card it skips for a core gap is listed in
 the final report with the gap. The names go to the agents in the order `missing-cards.py` prints them. Never sort them
 by difficulty.
 
