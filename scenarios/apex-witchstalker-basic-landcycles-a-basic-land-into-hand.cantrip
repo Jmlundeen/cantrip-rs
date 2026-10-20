@@ -1,5 +1,6 @@
 # Basic landcycling {2} (CR 702.29e): "{2}, Discard this card: Search your library for a basic land card, reveal it, put
-# it into your hand, then shuffle." The discarded card is in the graveyard and the found basic land is in hand.
+# it into your hand, then shuffle." The discarded card is in the graveyard and the found basic land is in hand. Tropical
+# Island, a land with basic land types but not the basic supertype, is not a card the search may find (CR 205.4c).
 
 [Bot1 Deck]
 Mox Jet
@@ -7,6 +8,7 @@ Mox Jet
 Apex Witchstalker
 Swamp x4
 Island
+Tropical Island
 Swamp x12
 
 [Bot2 Deck]
@@ -18,9 +20,10 @@ Bot1.Hand.Mox Jet.Cast
 Bot1.Battlefield.Mox Jet#1.Activate
 Bot1.Battlefield.Mox Jet#2.Activate
 Bot1.Hand.Apex Witchstalker.Activate
+! Bot1.Search(Tropical Island)
 Bot1.Search(Island)
 
 [Expect]
 Bot1.Graveyard = Apex Witchstalker
 Bot1.Hand = Swamp; Swamp; Swamp; Swamp; Island
-Bot1.Library.Count = 12
+Bot1.Library.Count = 13

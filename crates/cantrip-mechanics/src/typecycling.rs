@@ -1,7 +1,8 @@
 //! Typecycling [cost] (CR 702.29e): "[Type]cycling [cost]" means "[Cost], Discard this card: Search your library for a
 //! [type] card, reveal it, put it into your hand. Then shuffle." Eagles of the North (Plainscycling), Generous Ent
 //! (Forestcycling), L\u{f3}rien Revealed (Islandcycling), Oliphaunt (Mountaincycling) and Troll of Khazad-d\u{fb}m
-//! (Swampcycling) print it. Plain cycling (CR 702.29a) is `triggers::cycling`.
+//! (Swampcycling) print it. Plain cycling (CR 702.29a) is `triggers::cycling`; basic landcycling, whose type is the
+//! basic supertype, is `basic_landcycling`.
 //!
 //! A card with typecycling lists `ability(subtype, cost, text)` among its `abilities`; `subtype` is the basic land type
 //! it searches for.
@@ -44,16 +45,17 @@ pub const fn ability(subtype: Subtype, mana: ManaCost, text: &'static str) -> Ab
         .from(ZoneKind::Hand)
 }
 
-/// Basic landcycling (CR 702.29e): a shared keyword used by Apex Witchstalker, Hexhaven Battalion,
-/// Undulating Witness and Vinelasher Adept. The basic supertype, rather than a basic land type,
-/// is the printed restriction; Wastes qualifies and a nonbasic Forest does not.
+/// Basic landcycling (CR 702.29e): "Search your library for a basic land card, reveal it, put it into your hand, then
+/// shuffle." The basic supertype, not a basic land type, is what it looks for (CR 205.4c): Wastes qualifies and a
+/// nonbasic Forest does not.
 fn search_basic_land(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     crate::library::search_to_hand(g, item.controller, item.object,
         crate::library::Find::ONE.revealed(), crate::lands::is_basic_land_card)?;
     Ok(())
 }
 
-/// The activated ability from hand, including discarding its source as a cost (CR 702.29e).
+/// The basic landcycling ability, from the hand (CR 702.29e). Apex Witchstalker, Awaken the Inferno, Hexhaven Battalion,
+/// Undulating Witness and Vinelasher Adept print it.
 pub const fn basic_landcycling(mana: ManaCost, text: &'static str) -> AbilityDef {
     cantrip_api::ability(Cost::mana(mana).and(DISCARD_THIS), search_basic_land, text).from(ZoneKind::Hand)
 }
