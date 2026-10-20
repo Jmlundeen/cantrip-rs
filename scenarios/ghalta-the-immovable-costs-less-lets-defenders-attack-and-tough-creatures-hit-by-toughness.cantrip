@@ -1,0 +1,52 @@
+# Ghalta the Immovable. Turn 1, Bot1 casts Sylvan Caryatid (0/3, defender, its toughest creature) and Hired Blade (3/2).
+# Turn 5, "This spell costs {X} less to cast, where X is the greatest toughness among creatures you control" (CR 601.2f):
+# Ghalta's {8}{W} costs {5}{W}, and six mana (four Moxen, the Forest and the Caryatid) pay it with nothing left over.
+# Turn 7, "Creatures you control can attack as though they didn't have defender" (CR 702.3b): the Caryatid attacks beside
+# the Blade. "Each creature you control with toughness greater than its power assigns combat damage equal to its toughness"
+# (CR 510.1a): the Caryatid deals 3, and the Blade, its toughness not greater than its power, its 3 power (not its 2
+# toughness) - Bot2 goes from 20 to 14.
+
+[Bot1 Deck]
+Forest
+Mox Emerald
+Mox Jet
+Black Lotus
+Sylvan Caryatid
+Hired Blade
+Ghalta the Immovable
+Mox Pearl
+Mox Sapphire
+Plains x20
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Sylvan Caryatid.Cast
+Bot1.Hand.Hired Blade.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Pearl.Cast
+[T5 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Sylvan Caryatid.Activate(Color: Green)
+Bot1.Hand.Ghalta the Immovable.Cast
+? Bot1.Mana =
+[T7 Bot1.Main1]
+Bot1.Attack(Sylvan Caryatid; Hired Blade > Bot2)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Ghalta the Immovable.Toughness = 7
+Bot2.Life = 14
