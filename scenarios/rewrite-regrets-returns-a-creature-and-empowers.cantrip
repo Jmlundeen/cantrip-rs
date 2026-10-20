@@ -1,4 +1,7 @@
-# Returns a creature card then creates or empowers Jace (CR 701.71).
+# Rewrite Regrets: "Return target creature or planeswalker card with mana value 6 or less from your graveyard to the
+# battlefield. Empower Jace 2." Thought Scour mills Platinum Angel (mana value 7), which is refused as a target (CR 115.1,
+# 202.3); the Bolted Ornithopter (mana value 0) returns, and with no Jace in play a Jace token is created with two loyalty
+# counters (CR 701.71).
 
 [Bot1 Deck]
 Black Lotus
@@ -6,8 +9,9 @@ Black Lotus
 Rewrite Regrets
 Ornithopter
 Lightning Bolt
-Island
-Island
+Thought Scour
+Mox Ruby
+Platinum Angel
 Island x30
 
 [Bot2 Deck]
@@ -16,14 +20,22 @@ Island x30
 [Actions]
 [Bot1.Main1]
 Bot1.Hand.Ornithopter.Cast
-Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
 Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Thought Scour.Cast(Bot1)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Graveyard = Thought Scour; Island; Platinum Angel; Black Lotus; Ornithopter; Lightning Bolt
+Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+! Bot1.Hand.Rewrite Regrets.Cast(Graveyard.Platinum Angel)
 Bot1.Hand.Rewrite Regrets.Cast(Graveyard.Ornithopter)
 [Bot1.Main2]
 
 [Expect]
 Bot1.Battlefield.Ornithopter.Toughness = 2
 Bot1.Battlefield.Jace.Counters.Loyalty = 2
+Bot1.Graveyard = Rewrite Regrets; Black Lotus; Thought Scour; Island; Platinum Angel; Black Lotus; Lightning Bolt
