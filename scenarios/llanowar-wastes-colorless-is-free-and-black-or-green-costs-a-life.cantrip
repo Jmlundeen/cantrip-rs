@@ -1,0 +1,26 @@
+# Llanowar Wastes has two mana abilities: {C} for free, or {B} or {G} for 1 damage to its controller (CR 605.1a, 106.5).
+# Bot1 taps it for {C} on turn 3 (life stays 20), then for {G} on turn 5, taking 1 damage; then for {B} on turn 7, taking another.
+
+[Bot1 Deck]
+Llanowar Wastes
+Swamp x15
+
+[Bot2 Deck]
+Island x16
+
+[Actions]
+Bot1.Hand.Llanowar Wastes.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Llanowar Wastes.Activate(Ability: {C})
+? Bot1.Mana = {C}
+? Bot1.Life = 20
+[T5 Bot1.Main1]
+Bot1.Battlefield.Llanowar Wastes.Activate(Ability: {B} or {G}; Color: Green)
+? Bot1.Mana = {G}
+? Bot1.Life = 19
+[T7 Bot1.Main1]
+Bot1.Battlefield.Llanowar Wastes.Activate(Ability: {B} or {G}; Color: Black)
+? Bot1.Mana = {B}
+
+[Expect]
+Bot1.Life = 18

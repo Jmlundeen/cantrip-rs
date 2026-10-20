@@ -1,0 +1,5 @@
+{
+  "name": "Llanowar Wastes",
+  "type": "Land",
+  "oracleText": "{T}: Add {C}.\n{T}: Add {B} or {G}. This land deals 1 damage to you."
+}
