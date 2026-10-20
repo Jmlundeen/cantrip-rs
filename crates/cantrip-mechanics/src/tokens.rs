@@ -728,7 +728,8 @@ pub static GOBLIN_ARMY: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
-/// The 5/5 red flying Dragon token made by Sarkhan, Fireblood and Kiora of Fire and Ashes.
+/// A 5/5 red Dragon creature token with flying. Sarkhan, Fireblood and Kiora of Fire and Ashes make it, and Draconic
+/// Visitor makes it instead of artifact tokens.
 pub static DRAGON_5_5: CardDef = CardDef {
     name: "Dragon",
     has_cost: false,
@@ -741,4 +742,3 @@ pub static DRAGON_5_5: CardDef = CardDef {
     text: "Flying",
     ..CardDef::BLANK
 };
-
