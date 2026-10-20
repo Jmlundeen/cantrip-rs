@@ -1,0 +1,117 @@
+# Kumano Faces Kakkazan chapter III (turn 5) exiles the Saga and returns it transformed as Etching of Kumano, a 2/2 haste
+# Enchantment Creature (CR 712.14a). Its replacement exiles a creature that dies after a source its controller controlled
+# dealt it damage THIS turn (CR 614.1a, 700.4): Bot1's Lightning Bolt kills Bot2's Ornithopter on turn 5 -> exiled. Not
+# when the damage was dealt on an earlier turn: Spellskite was Bolted for 3 on turn 3 (it has 4 toughness and survives),
+# and destroyed by Cut Down (no damage) on turn 9 -> graveyard. Not when the damaging source was Bot2's: on turn 6 Bot2's
+# own Lightning Bolt kills its other Ornithopter -> graveyard. Only a creature is exiled: Bot1's Bolt also kills Bot2's
+# Wrenn and Six (3 loyalty) on turn 5, which goes to the graveyard. Only a creature that dies: Bot2's second Spellskite is
+# Bolted for 3 on turn 7 and then returned to hand by Unsummon, not exiled.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Sapphire
+Kumano Faces Kakkazan
+Lightning Bolt
+Lightning Bolt
+Lightning Bolt
+Black Lotus
+Lightning Bolt
+Unsummon
+Cut Down
+Island x13
+
+[Bot2 Deck]
+Mox Jet
+Mox Ruby
+Spellskite
+Spellskite
+Ornithopter
+Ornithopter
+Lightning Bolt
+Mox Emerald
+Wrenn and Six
+Island x13
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Kumano Faces Kakkazan.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Spellskite.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Spellskite)
+Bot1.Pass
+Bot2.Pass
+? Bot2.Battlefield.Spellskite.Damage = 3
+[T4 Bot2.Main1]
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Wrenn and Six.Cast
+Bot2.Pass
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Etching of Kumano.Types = Enchantment; Creature
+? Bot1.Battlefield.Etching of Kumano.Power = 2
+? Bot1.Battlefield.Etching of Kumano.Keywords = Haste
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Wrenn and Six)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T6 Bot2.Main1]
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Hand.Spellskite.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+Bot2.Pass
+Bot1.Pass
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Spellskite#2)
+Bot1.Pass
+Bot2.Pass
+Bot1.Hand.Unsummon.Cast(Bot2.Battlefield.Spellskite#2)
+Bot1.Pass
+Bot2.Pass
+[T9 Bot1.Main1]
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Cut Down.Cast(Bot2.Battlefield.Spellskite)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield = Etching of Kumano; Mox Jet; Mox Ruby; Mox Sapphire
+Exile = Ornithopter
+Bot2.Hand = Island; Island; Spellskite
+Bot2.Graveyard.Count = 4
+Bot2.Battlefield = Mox Emerald; Mox Jet; Mox Ruby
