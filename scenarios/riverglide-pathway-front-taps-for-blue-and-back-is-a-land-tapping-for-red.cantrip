@@ -1,0 +1,22 @@
+# Riverglide Pathway is a modal double-faced card (CR 712.4) whose faces are both lands: one copy is played as its front
+# face (taps for {U}), the other as its back face Lavaglide Pathway (taps for {R}); neither enters tapped.
+
+[Bot1 Deck]
+Riverglide Pathway
+Riverglide Pathway
+Forest x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Riverglide Pathway.Play(Ability: #1)
+Bot1.Battlefield.Riverglide Pathway.Activate
+? Bot1.Mana = {U}
+[T3 Bot1.Main1]
+Bot1.Hand.Riverglide Pathway.Play(Ability: back face)
+Bot1.Battlefield.Lavaglide Pathway.Activate
+? Bot1.Mana = {R}
+
+[Expect]
+Bot1.Battlefield = Lavaglide Pathway; Riverglide Pathway

@@ -1,0 +1,11 @@
+{
+  "name": "Riverglide Pathway",
+  "type": "Land",
+  "oracleText": "{T}: Add {U}.",
+  "backFacePlayableAsLand": true,
+  "backFace": {
+    "name": "Lavaglide Pathway",
+    "type": "Land",
+    "oracleText": "{T}: Add {R}."
+  }
+}
