@@ -1,0 +1,47 @@
+# Cauldron Familiar drains an opponent 1 and gains 1 when it enters (CR 603.6a), and "Sacrifice a Food" returns it from the
+# graveyard (CR 113.6b). Cut Down puts it in the graveyard on turn 3. With only a Mox Emerald (an artifact, not a Food) the
+# ability is refused; Pawpatch Formation then makes a Food, and sacrificing it returns the Familiar, which drains again.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Cauldron Familiar
+Mox Emerald
+Cut Down
+Pawpatch Formation
+Swamp
+Forest x4
+Island x10
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Hand.Cauldron Familiar.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Battlefield.Swamp#1.Activate
+Bot1.Hand.Cut Down.Cast(Bot1.Battlefield.Cauldron Familiar)
+Bot1.Pass
+Bot1.Pass
+? Bot1.Graveyard = Cut Down; Cauldron Familiar
+? Bot1.Life = 21
+? Bot2.Life = 19
+! Bot1.Graveyard.Cauldron Familiar.Activate
+Bot1.Hand.Pawpatch Formation.Cast
+Bot1.Modes(3)
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Swamp#2.Activate
+Bot1.Pass
+Bot1.Graveyard.Cauldron Familiar.Activate
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Cauldron Familiar; Mox Emerald; Swamp; Swamp
+Bot1.Graveyard = Pawpatch Formation; Cut Down
+Bot1.Life = 22
+Bot2.Life = 18

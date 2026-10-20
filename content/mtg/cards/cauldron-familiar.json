@@ -1,0 +1,8 @@
+{
+  "name": "Cauldron Familiar",
+  "manaCost": "{B}",
+  "type": "Creature — Cat",
+  "power": 1,
+  "toughness": 1,
+  "oracleText": "When this creature enters, each opponent loses 1 life and you gain 1 life.\nSacrifice a Food: Return this card from your graveyard to the battlefield."
+}
