@@ -112,8 +112,9 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
 ## The loop for one card
 
 1. **`python tools\maintenance\new-card.py "Card Name"` first.** For a card new to content it writes the content JSON
-   from Scryfall's current characteristics (one face; a transform or modal double-faced card's `backFace`; an
-   adventure; the Oracle keywords the core plays as `keywords`) - check it, and add any core keyword its text implies
+   from Scryfall's current characteristics (one face; a transform or modal double-faced card's `backFace`, with
+   `backFacePlayableAsLand` for a modal one whose back is a land; an adventure; the Oracle keywords the core plays as
+   `keywords`) - check it, and add any core keyword its text implies
    beyond Oracle's keywords (`CantBeBlocked`, ...); any other layout it prints, and you write
    `content/<dataset>/cards/<card-name>.json` by hand (characteristics only: `name`, `manaCost`, `type`,
    `power`/`toughness`, `loyalty`/`defense`, `oracleText`, core `keywords` from `crates/cantrip-oracle/build.rs`,

@@ -464,11 +464,12 @@ def diff(mine, theirs):
 
 # ---------------------------------------------------------------------------------------------------------- reports
 
-def describe(name, mine, theirs, indent, label=""):
+def describe(name, mine, theirs, indent, label="", only=None):
+    """A match: the card, its file, what it builds with (only the items naming `only`, when given) and how it differs."""
     path = card_file(name)
     where = os.path.relpath(path, ROOT).replace("\\", "/") if path else "no file (characteristics only)"
     line = f"{indent}{label}{name}  {where}"
-    uses = card_uses(name)
+    uses = [u for u in card_uses(name) if only is None or only in u]
     if uses:
         line += "\n" + indent + "    uses " + ", ".join(uses)
     d = diff(mine, theirs)
@@ -486,8 +487,12 @@ def matched(level, hits):
 
 def report(index, abilities):
     """Each ability and the implemented cards that already do it, simplest first, as new-card.py prints it."""
-    lines = []
+    lines, seen = [], {}
     for i, ab in enumerate(abilities, 1):
+        if ab.text in seen:  # the same ability on another face
+            lines.append(f"[{i}] {ab.text}  - as [{seen[ab.text]}]")
+            continue
+        seen[ab.text] = i
         lines.append(f"[{i}] {ab.text}")
         home = index.keyword_home(ab) if ab.keyword is not None else None
         if home:
@@ -497,7 +502,7 @@ def report(index, abilities):
         level, hits = index.match_whole(ab)
         if hits:
             lines.append("    " + matched(level, hits))
-            for name, text in hits[:3]:
+            for name, text in hits[:2]:
                 lines.append(describe(name, ab.text, text, "      "))
             continue
         if home:
@@ -516,8 +521,12 @@ def report(index, abilities):
             level, hits = index.match_part(kind, text)
             if hits:
                 lines.append("      " + matched(level, hits))
-                for name, theirs in hits[:1 if len(hits) > 50 else 2]:  # a common part needs one model
-                    lines.append(describe(name, text, theirs, "        "))
+                # A part many cards print needs one model, and of a common trigger only the matcher it uses.
+                common = len(hits) > 5
+                if common and kind == "trigger":  # a model that names its matcher (`triggers::THIS_ENTERS`)
+                    hits = sorted(hits, key=lambda h: not any(u.startswith("triggers::") for u in card_uses(h[0])))
+                for name, theirs in hits[:1 if common else 2]:
+                    lines.append(describe(name, text, theirs, "        ", only="triggers::" if common and kind == "trigger" else None))
             else:
                 lines.append("      new")
                 new = True

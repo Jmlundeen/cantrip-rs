@@ -106,6 +106,8 @@ sweeping seeds (CLAUDE.md).
     So do two same-named cards chosen together in one answer: `Bot1.Target(Ornithopter#1; Ornithopter#2)`.
   - A nameless object (a face-down permanent) is `#1`: `Bot1.Battlefield.#1.Activate`.
   - A permanent with several abilities needs `Ability: <part of its text>`, such as `Ability: {U}` for Tundra.
+  - A modal double-faced card with two land faces is played by face: `Play(Ability: #1)` the front, `Play(Ability: back
+    face)` the back (its option reads "as its back face").
   - A cast for an alternative cost names it the same way (`Cast(Duress; Ability: Return)` for Daze).
   - Mana of any one color needs `Color:` (`Color: C` for colorless).
 - **Fixed dice.** A `[Dice]` section fixes the faces rolled, in order (README).

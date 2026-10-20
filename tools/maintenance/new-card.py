@@ -215,7 +215,10 @@ def draft_content(name, index):
     if layout in SINGLE and len(faces) == 1:
         card = _face(faces[0], names, index, core)
     elif layout in ("transform", "modal_dfc") and len(faces) == 2:
-        card = _face(faces[0], names, index, core) | {"backFace": _face(faces[1], names, index, core)}
+        card = _face(faces[0], names, index, core)
+        if layout == "modal_dfc" and "Land" in faces[1]["type_line"].split(" — ")[0].split():
+            card["backFacePlayableAsLand"] = True  # CR 712.12: a modal double-faced card may be played as its back face
+        card["backFace"] = _face(faces[1], names, index, core)
     elif layout == "adventure" and len(faces) == 2:
         card = _face(faces[0], names, index, core) | {"adventure": _face(faces[1], names, index, core)}
     else:

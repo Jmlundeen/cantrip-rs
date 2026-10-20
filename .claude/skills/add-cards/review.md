@@ -14,6 +14,9 @@ checked for sufficiency, not exhaustiveness:
 - every sentence of the Oracle text against the code, and every line of the code against the text: nothing missing,
   nothing extra, nothing approximate, nothing deviating from the rules;
 - the content JSON against Scryfall's current card;
+- every `CR` citation in the card's file and scenarios: `cr.py check <files>` flags a number the current rules don't
+  have, and each cited rule, printed with `cr.py <number>`, says what the comment says it does - citations copied from
+  older code can name a rule that was renumbered (CR 712.4 is meld cards, not modal double-faced cards);
 - the "never" list, line by line;
 - the scenarios: every line covered (the coverage report), each `[Expect]` correct by the rules and able to fail - a
   limit the card's own code enforces met exactly at the limit, and both players' objects where the text reads "each",
