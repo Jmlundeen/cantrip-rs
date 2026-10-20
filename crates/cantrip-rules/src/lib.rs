@@ -48,9 +48,17 @@ pub struct Game {
     pub tree: tree::Tree,
     pub at: tree::NodeId,
     pub cards: &'static CardTable,
-    /// Check that every rollback restores the state exactly (slow; for tests).
+    /// Check that every rollback restores the state exactly (slow; for tests). See [`Game::verifying`].
     pub verify: bool,
 }
+
+/// With `verify`, every rollback is checked while a game has no more objects than this: twice the most any scenario but
+/// a loop played out reaches (about 300).
+const VERIFY_EVERY_ONE_UP_TO: usize = 512;
+/// Past that, one rollback in this many is checked. A loop played to a draw makes thousands of objects (CR 400.7: every
+/// zone change is a new one), and copying them all at every step made a quarter-hour of the test suite out of four
+/// scenarios that play in a fraction of a second; one in 32 still checks them thousands of times.
+const VERIFY_STRIDE: u32 = 32;
 
 /// A whole copy of a game, its path's journal and the tree with it: one that can go on, or move through the tree,
 /// exactly as the original would.
@@ -208,7 +216,7 @@ impl Game {
                 frame.mark = mark.0;
                 frame.log_mark = log_mark;
             }
-            let before = if self.verify { Some(self.state.clone()) } else { None };
+            let before = if self.verifying(mark.0) { Some(self.state.clone()) } else { None };
 
             let kind = self.state.agenda[at].kind;
             let (flow, asked_at) = {
@@ -322,15 +330,28 @@ impl Game {
         }
         self.run();
         self.at = child;
-        if self.verify {
-            // Up to the node the answer was given at and back: the working state must come back exactly.
-            let (state, log) = (self.state.clone(), self.log.clone());
+        if self.verifying(child.0) {
+            // Up to the node the answer was given at and back: the working state must come back exactly. The step
+            // takes the history back only to where the child began (`goto` splits it off there) and puts it back, so
+            // its length and that tail are what can change; copying the whole history at every answer made a long
+            // game quadratic (a 256-round loop to a draw took a minute).
+            let from = self.tree.start(child).1;
+            let (state, len, tail) = (self.state.clone(), self.log.len(), self.log[from.min(self.log.len())..].to_vec());
             let parent = self.tree.parent(child).expect("a parent");
             self.goto(parent);
             self.goto(child);
-            assert!(self.state == state && self.log == log, "moving through the game tree did not restore the position");
+            assert!(
+                self.state == state && self.log.len() == len && self.log[from.min(len)..] == tail[..],
+                "moving through the game tree did not restore the position"
+            );
         }
         Ok(())
+    }
+
+    /// Whether this rollback is checked (`verify`): every one in a game of ordinary size, one in `VERIFY_STRIDE` in a
+    /// bigger one, picked by `tick` (the journal mark or the node), so a run checks the same ones every time.
+    fn verifying(&self, tick: u32) -> bool {
+        self.verify && (self.state.objects.len() <= VERIFY_EVERY_ONE_UP_TO || tick % VERIFY_STRIDE == 0)
     }
 
     /// Where the working state's path ends now: the journal mark and the history's length.

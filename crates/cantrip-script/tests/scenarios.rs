@@ -1,7 +1,8 @@
 //! Every scenario of `scenarios/*.cantrip` against the engine, one test each (see build.rs). A scenario whose decks
 //! name a card the engine does not have yet is skipped with a note; one that can run must pass - unless it carries a
 //! `# Known bug:` marker, in which case it must fail (a panic counts), and passing is the error: the bug is fixed and
-//! the marker has to come off.
+//! the marker has to come off. A scenario that passes is played again with its seats driven (`driven`), and must end
+//! the same.
 
 use std::path::{Path, PathBuf};
 
@@ -24,8 +25,15 @@ fn scenario(name: &str) {
     }
     match known_bug(&text) {
         None => {
-            if let Err(failure) = run(&script) {
-                panic!("\n{}", failure.report);
+            let alone = match run(&script) {
+                Ok(result) => result.dump.render(),
+                Err(failure) => panic!("\n{}", failure.report),
+            };
+            // Driven seats change nothing: it ends the same when each seat answers what the script means as when the
+            // runner answers alone.
+            let through = driven(script);
+            if through.as_ref() != Ok(&alone) {
+                panic!("{name} ends differently with its seats driven: {}", through.err().unwrap_or_else(|| "the final state differs".into()));
             }
         }
         Some(bug) => {
@@ -64,30 +72,6 @@ fn driven(script: GameScript) -> Result<String, String> {
             Advance::Done => return table.verdict().map(|dump| dump.render()).map_err(|f| f.message),
         }
     }
-}
-
-/// Driven seats change nothing: every scenario that runs ends the same when each of its seats answers what the script
-/// means as when the runner answers alone.
-#[test]
-fn every_scenario_ends_the_same_with_its_seats_driven() {
-    let mut differ = Vec::new();
-    let mut entries: Vec<PathBuf> = std::fs::read_dir(scripts()).unwrap().map(|e| e.unwrap().path()).filter(|p| p.extension().is_some_and(|e| e == "cantrip")).collect();
-    entries.sort();
-    for path in entries {
-        let Ok(script) = GameScript::load(&path) else { continue };
-        if script.cards().into_iter().any(|c| cantrip_engine::card(&c).is_none()) {
-            continue;
-        }
-        let alone = run(&script).map(|r| r.dump.render()).map_err(|f| f.message);
-        if alone.is_err() {
-            continue;
-        }
-        let through = driven(script);
-        if through != alone {
-            differ.push(format!("{}: {:?}", path.file_name().unwrap().to_string_lossy(), through.err()));
-        }
-    }
-    assert!(differ.is_empty(), "{} scenarios end differently driven:\n{}", differ.len(), differ.join("\n"));
 }
 
 /// A driven seat that answers other than the script means fails at the line.

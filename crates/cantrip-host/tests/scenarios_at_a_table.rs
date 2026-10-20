@@ -303,24 +303,45 @@ fn every_scenario_passes_at_a_table_with_bot1_driven() {
     let mut entries: Vec<PathBuf> =
         std::fs::read_dir(scripts()).unwrap().map(|e| e.unwrap().path()).filter(|p| p.extension().is_some_and(|e| e == "cantrip")).collect();
     entries.sort();
-    let mut failed = Vec::new();
-    let mut played = 0;
-    for path in entries {
-        let text = std::fs::read_to_string(&path).unwrap();
+    // Each scenario: None when it does not run alone, else whether it passed at the table.
+    let outcomes: Vec<Option<Result<(), String>>> = on_every_core(&entries, |path| {
+        let text = std::fs::read_to_string(path).unwrap();
         let name = path.file_stem().unwrap().to_string_lossy().to_string();
-        let Ok(script) = GameScript::parse(&text, &name) else { continue };
+        let script = GameScript::parse(&text, &name).ok()?;
         if known_bug(&text).is_some() || script.cards().into_iter().any(|c| cantrip_engine::card(&c).is_none()) {
-            continue;
+            return None;
         }
-        if run(&script).is_err() {
-            continue;
-        }
-        played += 1;
-        if let Err(report) = at_a_table(&name, &text) {
-            failed.push(format!("{name}: {}", report.lines().take(3).collect::<Vec<_>>().join(" | ")));
-        }
-    }
+        run(&script).ok()?;
+        Some(at_a_table(&name, &text).map_err(|report| format!("{name}: {}", report.lines().take(3).collect::<Vec<_>>().join(" | "))))
+    });
+    let played = outcomes.iter().flatten().count();
+    let failed: Vec<String> = outcomes.into_iter().flatten().filter_map(Result::err).collect();
     assert!(failed.is_empty(), "{} of {played} scenarios fail at a table:\n{}", failed.len(), failed.join("\n"));
+}
+
+/// `each` of `paths`, run on every core: a loop over every scenario on one thread takes minutes. The results in the
+/// order of `paths`.
+fn on_every_core<T: Send>(paths: &[PathBuf], each: impl Fn(&Path) -> T + Sync) -> Vec<T> {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    let next = AtomicUsize::new(0);
+    let threads = std::thread::available_parallelism().map_or(1, |n| n.get());
+    let mut done: Vec<(usize, T)> = std::thread::scope(|s| {
+        let workers: Vec<_> = (0..threads)
+            .map(|_| {
+                s.spawn(|| {
+                    let mut mine = Vec::new();
+                    loop {
+                        let i = next.fetch_add(1, Ordering::Relaxed);
+                        let Some(path) = paths.get(i) else { return mine };
+                        mine.push((i, each(path)));
+                    }
+                })
+            })
+            .collect();
+        workers.into_iter().flat_map(|w| w.join().unwrap()).collect()
+    });
+    done.sort_by_key(|&(i, _)| i);
+    done.into_iter().map(|(_, t)| t).collect()
 }
 
 /// A spell being announced and paid for (CR 601.2a-h) is the caster's alone until it is cast (CR 601.2i), as the events
