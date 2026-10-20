@@ -3,11 +3,9 @@ use cantrip_mechanics::statics;
 use cantrip_oracle as oracle;
 
 /// "This spell costs {X} less to cast, where X is the greatest power among creatures you control" (CR 601.2f, 118.7a): a
-/// generic reduction, read as the cost is determined.
+/// generic reduction, read as the cost is determined; only casting the spell is reduced, never a special action taken for
+/// the card (CR 116.2).
 fn reduction(q: &dyn Query, _: ObjectId, p: PlayerId, costed: Costed, _: &[Target]) -> CostDelta {
-    if !matches!(costed, Costed::Spell(_)) {
-        return CostDelta::NONE;
-    }
     let x = q
         .permanents_of(p)
         .into_iter()
@@ -16,7 +14,7 @@ fn reduction(q: &dyn Query, _: ObjectId, p: PlayerId, costed: Costed, _: &[Targe
         .max()
         .unwrap_or(0)
         .max(0);
-    CostDelta::less(x.min(255) as u8)
+    if matches!(costed, Costed::Spell(_)) { CostDelta::less(x.min(255) as u8) } else { CostDelta::NONE }
 }
 
 pub static CARD: CardDef = CardDef {
