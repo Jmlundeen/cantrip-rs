@@ -99,6 +99,10 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
 - **Claim one card:** `card-issues.py claim --format <format>` (or `claim "Card Name"`) prints `#N`; the commit ends
   with `Closes #N`. Exit status 3: someone else holds it or nothing is free - the message says which; never work on a
   card another holds live.
+- **Log progress on the issue** with `card-issues.py log <N> <event>` - a fixed comment, nothing to write; its time is
+  the measurement (`claims.md`, "The progress log"). The author logs `committed --commit <sha>` when the card is
+  committed, `fixes-committed --commit <sha>` after review fixes, `blocked --rule <CR>` when the card waits on an
+  engine change, and `unblocked` when work on it resumes.
 - **A card that already exists is validated, not rebuilt.** If it already has a content file (here, on a local branch,
   or `claim` says "already implemented"), look for a minute or two: where its text needs code, the card file exists
   and plainly does what the text reads, and its JSON's text is the card's. If so, close the issue as already
@@ -153,8 +157,8 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    client changed, and the benchmark if the core did.
 9. **Review, then commit.** `review.md` - by someone who did not write it. Then `Card: <Name>` - the content JSON, the
    card file and its scenarios - one card per commit, ending `Closes #N`; core, mechanics and client changes in their
-   own commits before it (`Engine: ...`, `Mechanics: ...`, `Client: ...`). A card agent working for a coordinator does
-   not push; otherwise commit and push as CLAUDE.md says, or open a pull request with the coverage report and the
+   own commits before it (`Engine: ...`, `Mechanics: ...`, `Client: ...`), then `card-issues.py log <N> committed
+   --commit <sha>`. A card agent working for a coordinator does not push; otherwise commit and push as CLAUDE.md says, or open a pull request with the coverage report and the
    review in its description, saying `Closes #N`.
 
 ## Scenarios: what a card owes

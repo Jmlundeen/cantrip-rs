@@ -31,7 +31,9 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    output it used, what was noise, what it searched for by hand and what cost it failed runs (the coordinator's
    material for step 7). A card blocked by the core is never faked and never released: the agent keeps the claim,
    commits nothing the gap would change, sends a gap report - the card, its issue, the exact rule (CR), what
-   `cantrip-api` lacks and what it learned - and ends; the slot takes the next card meanwhile.
+   `cantrip-api` lacks and what it learned - and ends; the slot takes the next card meanwhile. The agent logs its
+   points on the card's issue (`claims.md`, "The progress log": `committed`, `fixes-committed`, `blocked`); a fresh
+   agent finishing a card that waited logs `unblocked`.
 3. **Gaps.** For a reported gap the coordinator starts a core-feature agent (Opus) in a free slot: the core open to it,
    the feature built to its rule for every card the rule describes, the benchmark run, its own commits
    (`Engine: ...`), no card work. Gaps several waiting cards share go to one feature agent; feature agents work on
@@ -41,7 +43,8 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    with the gap recorded on the issue.
 4. **Review agents** (Opus) review inside the implementing agent's slot - by absolute path as in (0), on the commit as
    it stands, using its warm build - never in a worktree of their own, and change no files, check out nothing and clean
-   nothing there. Their prompt points them at `review.md`, the commit, the card's Oracle text and the CR rules it
+   nothing there; they log `review-started` and their verdict on the card's issue. Their prompt points them at
+   `review.md`, the card's issue number, the commit, the card's Oracle text and the CR rules it
    touches, and at correctness, safety and rules adherence; it hands them no list of corner cases to demand tests for.
    The implementing agent waits while it is reviewed; each card is reviewed as soon as it is committed. The
    coordinator sends back the blocking findings, and a non-blocking note that is a real test gap (a limit not met
@@ -53,9 +56,11 @@ core-feature agents and review agents run on Opus. Agents read only what their w
    `cantrip-rules`, `cantrip-api`), the host, the protocol, the client or anything under `dotnet/`, and otherwise at a
    much lower cadence (the last landing of a session, or every ten or so). `git fetch` and `git rebase origin/main`
    right before every push. If more commits arrive while the run goes, rebase, build, and run only the scenarios of
-   the cards and mechanics this landing touches before pushing. Push; end the slot's agent; the slot takes its next
-   card (1).
-6. **Report** what landed, what waited on which core gap and how it was built, and the corpus line.
+   the cards and mechanics this landing touches before pushing. Push, then `card-issues.py log <N> landed --commit
+   <sha>` for each card (and `review-passed` first where the coordinator verified review fixes itself); end the slot's
+   agent; the slot takes its next card (1).
+6. **Report** what landed, what waited on which core gap and how it was built, the corpus line, and
+   `card-issues.py times` for the cards of the run.
 7. **Improve the process, always.** After each card, read the agent's report and the review for friction - a search by
    hand the tools could have answered, a failed run the skills could have prevented, a finding the agent could have
    caught itself - and fix the tool or the skill before the next card. Weigh every change against three pillars in

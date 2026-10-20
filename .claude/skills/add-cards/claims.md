@@ -25,3 +25,25 @@ card. `python tools/maintenance/card-issues.py` does all of it (`--help` for the
    means the work stopped. A card that is abandoned - nobody will build its gap, or the work stops - is released
    (`card-issues.py release "Card Name"`) with its gap reported on the issue.
 5. **Landing it closes the issue:** the commit message (and a pull request description) ends with `Closes #N`.
+
+## The progress log
+
+Every card's issue carries a log of where its work stands, so how long cards take is measured, not guessed: each point
+is one fixed comment, `python tools/maintenance/card-issues.py log <N> <event> [input]`, and the comment's time is the
+event's. Nothing is written by hand - an event takes at most one input.
+
+| Event | Who logs it | When |
+| --- | --- | --- |
+| (the claim) | the author | `claim` - the start |
+| `committed --commit <sha>` | the author | the card is committed and waits for review |
+| `review-started` | the reviewer | review begins |
+| `review-blocked --findings <n>` | the reviewer | review ends with blocking findings |
+| `fixes-committed --commit <sha>` | the author | the fixes are committed |
+| `review-passed` | the reviewer (or the coordinator, verifying the fixes) | review ends, nothing blocking |
+| `blocked --rule <CR>` | the author | the card waits on an engine change |
+| `unblocked` | whoever resumes the card | the engine change is ready |
+| `landed --commit <sha>` | whoever lands it | it is on `main` |
+
+`card-issues.py times [--days 30]` reads the logs back: per card, the minutes from claim to commit (implementing),
+commit to review passed (review and fixes), passed to landed, the whole, and the time it waited on the engine, with
+medians - the numbers a change to the process is judged by.

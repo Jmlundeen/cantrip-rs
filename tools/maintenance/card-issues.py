@@ -6,6 +6,8 @@
     python tools/maintenance/card-issues.py claim --format <format> [-n 1]
     python tools/maintenance/card-issues.py release "Card Name" ["Other Card" ...]
     python tools/maintenance/card-issues.py status
+    python tools/maintenance/card-issues.py log <N> <event> [--commit SHA | --findings N | --rule CR]
+    python tools/maintenance/card-issues.py times [--days 30]
 
 The cards a format plays are docs/formats/<format>.json, best-played first (format-scrape.py makes it). Each card
 that has no card file yet is one issue, "Card: <Name>", labelled `card`, `format:<format>` (a card several formats
@@ -57,6 +59,20 @@ CLAIMANT = "<!-- cantrip-claimant: {} -->"
 CLAIMANT_RE = re.compile(r"<!-- cantrip-claimant: (\S+) -->")
 RELEASE = "<!-- cantrip-release -->"
 CARD = "<!-- cantrip-card: {} -->"
+# The progress log: fixed comments an agent posts as a card passes each point (`log`), read back by `times`. Each is
+# {event: (text, the one input it takes or None)}; the comment's own time is the event's.
+PROGRESS = "<!-- cantrip-progress: {} -->"
+PROGRESS_RE = re.compile(r"<!-- cantrip-progress: ([\w-]+) -->")
+EVENTS = {
+    "committed": ("Implementation committed in {commit}; waiting for review.", "commit"),
+    "review-started": ("Review started.", None),
+    "review-passed": ("Review passed.", None),
+    "review-blocked": ("Review found {findings} blocking finding(s); back to the author.", "findings"),
+    "fixes-committed": ("Review fixes committed in {commit}.", "commit"),
+    "blocked": ("Waiting on an engine change (CR {rule}).", "rule"),
+    "unblocked": ("Engine change ready; implementation resumed.", None),
+    "landed": ("Landed on main in {commit}.", "commit"),
+}
 # A card's priority label: the first tier whose score it reaches. The score is the percent of the format's decks
 # that play the card (format-scrape.py).
 TIERS = [(10.0, "priority:high"), (3.0, "priority:medium"), (0.0, "priority:low")]
@@ -484,6 +500,76 @@ def release(args, repo):
         print(f"{name}: #{issue['number']} released")
 
 
+def log(args, repo):
+    """Posts one progress event on a card's issue: its fixed text, filled with the one input it takes."""
+    text, needs = EVENTS[args.event]
+    value = getattr(args, needs) if needs else None
+    if needs and value is None:
+        sys.exit(f"{args.event} takes --{needs}")
+    number = args.issue.lstrip("#")
+    if not number.isdigit():  # a card's name: find its open issue (slower: reads every card issue)
+        issue = next((i for i in read_state(repo).values() if i["title"] == title(args.issue) and i["state"] == "OPEN"), None)
+        if issue is None:
+            sys.exit(f"{args.issue}: no open issue")
+        number = str(issue["number"])
+    tag = claimant(args).partition("/")[2]
+    body = f"{PROGRESS.format(args.event)}\n{CLAIMANT.format(tag)}\n" + text.format(**{needs: value} if needs else {})
+    gh("api", "-X", "POST", f"repos/{repo}/issues/{number}/comments", "--input", "-", body={"body": body})
+    print(f"#{number}: {args.event}")
+
+
+TIMES = """query($owner:String!,$name:String!,$endCursor:String,$since:DateTime){repository(owner:$owner,name:$name){
+issues(first:50,after:$endCursor,labels:["card"],filterBy:{since:$since}){pageInfo{hasNextPage endCursor}nodes{number
+title state closedAt comments(last:60){nodes{body createdAt}}}}}}"""
+
+
+def times(args, repo):
+    """How long each card took, from the progress log on its issue: claim to commit (implementing), commit to review
+    passed (waiting for and in review, fixes included), passed to landed, the whole, and the time it waited on the
+    engine. Cards claimed since --days ago, newest first, then the medians."""
+    since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=args.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rows = []
+    for page in graphql(TIMES, repo, since=since):
+        for issue in page["data"]["repository"]["issues"]["nodes"]:
+            marks = {}
+            blocked, since_blocked = 0.0, None
+            for comment in issue["comments"]["nodes"]:
+                at = when(comment["createdAt"])
+                event = "claimed" if CLAIM in comment["body"] else (PROGRESS_RE.search(comment["body"]) or [None, None])[1]
+                if event is None:
+                    continue
+                if event == "claimed" and "landed" in marks:
+                    marks = {}  # claimed again after it landed: a new piece of work
+                marks.setdefault(event, at)  # the first of each, but the last review verdict
+                if event in ("review-passed", "landed"):
+                    marks[event] = at
+                if event == "blocked":
+                    since_blocked = at
+                elif event == "unblocked" and since_blocked:
+                    blocked += (at - since_blocked).total_seconds()
+                    since_blocked = None
+            if "claimed" not in marks or "committed" not in marks:
+                continue
+            landed = marks.get("landed") or (when(issue["closedAt"]) if issue.get("closedAt") else None)
+            minutes = lambda a, b: (b - a).total_seconds() / 60 if a and b else None
+            rows.append((marks["claimed"], issue["number"], issue["title"][len("Card: "):],
+                         minutes(marks["claimed"], marks["committed"]), minutes(marks["committed"], marks.get("review-passed")),
+                         minutes(marks.get("review-passed"), landed), minutes(marks["claimed"], landed), blocked / 60,
+                         "review-blocked" in marks))
+    if not rows:
+        print(f"no card with a progress log in the last {args.days} days")
+        return
+    fmt = lambda m: f"{m:6.1f}" if m is not None else "     -"
+    print(f"{'card':34s} {'implement':>9s} {'review':>7s} {'land':>6s} {'total':>6s} {'engine':>7s}  (minutes)")
+    for _, number, name, impl, review, land, total, engine, sent_back in sorted(rows, reverse=True):
+        print(f"#{number:<4d} {name[:28]:28s} {fmt(impl):>9s} {fmt(review):>7s} {fmt(land):>6s} {fmt(total):>6s} "
+              f"{fmt(engine) if engine else '      ':>7s}{'  sent back' if sent_back else ''}")
+    for label, column in (("implement", 3), ("review", 4), ("land", 5), ("total", 6)):
+        values = sorted(r[column] for r in rows if r[column] is not None)
+        if values:
+            print(f"median {label}: {values[len(values) // 2]:.1f} min over {len(values)} cards")
+
+
 def status(args, repo):
     me = claimant(args)
     rows = []
@@ -519,9 +605,17 @@ def main():
     one = commands.add_parser("release")
     one.add_argument("names", nargs="+")
     commands.add_parser("status")
+    one = commands.add_parser("log", help="post a progress event on a card's issue (fixed text)")
+    one.add_argument("issue", help="the issue number (#N from the claim), or the card's name (slower)")
+    one.add_argument("event", choices=sorted(EVENTS))
+    one.add_argument("--commit", help="for committed, fixes-committed, landed")
+    one.add_argument("--findings", type=int, help="for review-blocked")
+    one.add_argument("--rule", help="for blocked: the CR rule the engine lacks")
+    one = commands.add_parser("times", help="how long each card took, from the progress logs")
+    one.add_argument("--days", type=int, default=30)
     args = parser.parse_args()
     repo = repository(args.repo)
-    {"sync": sync, "next": next_cards, "claim": claim, "release": release, "status": status}[args.command](args, repo)
+    {"sync": sync, "next": next_cards, "claim": claim, "release": release, "status": status, "log": log, "times": times}[args.command](args, repo)
 
 
 if __name__ == "__main__":

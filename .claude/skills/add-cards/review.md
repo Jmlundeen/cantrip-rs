@@ -5,6 +5,9 @@ reviews it against `SKILL.md` beside this file: its non-negotiables, its "Where 
 and "Scenarios: what a card owes". Read those, then review with the Oracle text, the rulings and the CR open
 (`python tools\maintenance\scryfall.py "Card Name"`, `python tools\maintenance\cr.py <rule>`).
 
+Log it on the card's issue: `python tools\maintenance\card-issues.py log <N> review-started` first, and at the end
+`log <N> review-passed`, or `log <N> review-blocked --findings <how many blocking>` - fixed comments, nothing to write.
+
 **The primary concerns are the code's correctness and safety and the card's adherence to the rules**; the tests are
 checked for sufficiency, not exhaustiveness:
 
