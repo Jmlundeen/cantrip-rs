@@ -1,0 +1,36 @@
+# Icy Reception's first mode targets a creature or legendary spell (CR 115.1, 205.4d): Mox Amber, a legendary artifact
+# spell, can be targeted and is countered when its controller declines to pay {3} (CR 118.12); Lightning Bolt, cast in
+# response to it and neither a creature nor legendary, cannot be targeted, and still resolves.
+
+[Bot1 Deck]
+Black Lotus
+Icy Reception
+Island x30
+
+[Bot2 Deck]
+Mox Ruby
+Mox Amber
+Lightning Bolt
+Island x30
+
+[Actions]
+[Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Amber.Cast
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Lightning Bolt.Cast(Bot1)
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Icy Reception.Cast
+Bot1.Modes(1)
+! Bot1.Target(Stack.Lightning Bolt)
+Bot1.Target(Stack.Mox Amber)
+Bot2.Decline
+[Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Lightning Bolt; Mox Amber
+Bot2.Battlefield = Mox Ruby
+Bot1.Life = 17

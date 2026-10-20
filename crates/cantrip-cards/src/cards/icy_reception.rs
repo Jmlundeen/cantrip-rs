@@ -3,11 +3,9 @@ use cantrip_mechanics::{counter_unless_pays, pump, targets};
 use cantrip_oracle as oracle;
 
 /// "Target creature or legendary spell" (CR 115.1): a spell on the stack that is a creature spell or a legendary spell.
-fn creature_or_legendary_spell(q: &dyn Query, _: &Asker, t: Target) -> bool {
-    let Target::Object(id) = t else { return false };
-    let is_spell = q.state().stack.iter().any(|i| i.kind == StackKind::Spell && i.object == id);
-    let c = q.chars(id);
-    is_spell && (c.is(CardType::Creature) || c.supertypes.legendary)
+fn creature_or_legendary_spell(q: &dyn Query, asker: &Asker, t: Target) -> bool {
+    (targets::SPELL.filter)(q, asker, t)
+        && matches!(t, Target::Object(id) if { let c = q.chars(id); c.is(CardType::Creature) || c.supertypes.legendary })
 }
 
 /// "Counter target creature or legendary spell unless its controller pays {3}" (CR 118.12, 701.6): the spell's controller
