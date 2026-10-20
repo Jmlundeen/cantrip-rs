@@ -1,4 +1,6 @@
-# Cannot target itself or activate on the opposing turn; can return a land on its own turn (CR 602.5).
+# Rescue Girl, First Responder: "{T}: Return another target permanent you control to its owner's hand. Activate only during
+# your turn." On turn 3 (no longer summoning sick) she cannot target herself ("another", refused). On Bot2's turn 4, untapped
+# and able to tap, she still cannot be activated (CR 602.5b: only during your turn). On turn 5 she returns Bot1's Island.
 
 [Bot1 Deck]
 Black Lotus
@@ -19,10 +21,12 @@ Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: White)
 Bot1.Hand.Rescue Girl, First Responder.Cast
 Bot1.Hand.Island.Play
-[T2 Bot2.Main1]
-! Bot1.Battlefield.Rescue Girl, First Responder.Activate(Bot1.Battlefield.Island)
 [T3 Bot1.Main1]
 ! Bot1.Battlefield.Rescue Girl, First Responder.Activate(Bot1.Battlefield.Rescue Girl, First Responder)
+[T4 Bot2.Main1]
+? Bot1.Battlefield.Rescue Girl, First Responder.Tapped = false
+! Bot1.Battlefield.Rescue Girl, First Responder.Activate(Bot1.Battlefield.Island)
+[T5 Bot1.Main1]
 Bot1.Battlefield.Rescue Girl, First Responder.Activate(Bot1.Battlefield.Island)
 [Bot1.Main2]
 
