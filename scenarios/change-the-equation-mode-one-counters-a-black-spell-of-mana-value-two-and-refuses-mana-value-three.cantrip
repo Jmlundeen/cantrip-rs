@@ -1,0 +1,53 @@
+# Change the Equation, first mode: "Counter target spell with mana value 2 or less" (CR 202.3, 115.1) - any color. Bot2
+# stacks Frantic Search (blue, mana value 3), then Diabolic Edict (black, mana value 2) above it. Bot1's first mode is not
+# offered the mana value 3 spell (the refusal) and counters the Edict (the boundary), so Bot1 keeps its Ornithopter.
+# Frantic Search resolves: Bot2 draws two and discards two.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Ornithopter
+Change the Equation
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Jet
+Mox Pearl
+Frantic Search
+Diabolic Edict
+Swamp x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Hand.Frantic Search.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Diabolic Edict.Cast(Bot1)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Change the Equation.Cast
+Bot1.Modes(1)
+! Bot1.Target(Stack.Frantic Search)
+Bot1.Target(Stack.Diabolic Edict)
+[T2 Bot2.Main2]
+
+[Expect]
+Stack.Count = 0
+Bot1.Battlefield = Mox Sapphire; Mox Jet; Ornithopter
+Bot1.Graveyard = Change the Equation
+Bot2.Graveyard.Count = 5
+Bot2.Graveyard.Diabolic Edict.Colors.Count = 1

@@ -1,0 +1,52 @@
+# Change the Equation, second mode: the limit is mana value 6 or less (CR 202.3). Gigantic Big Bear is green with mana value
+# 7, so neither mode is offered it as a target and Change the Equation cannot be cast against it (the refusal); the Bear
+# resolves. The accepted side of the limit, mana value 6, is change-the-equation-mode-two-counters-a-red-spell-of-mana-value-six-
+# and-refuses-a-black-one.
+
+[Bot1 Deck]
+Mox Sapphire
+Mox Jet
+Change the Equation
+Island x12
+
+[Bot2 Deck]
+Black Lotus
+Mox Emerald
+Mox Ruby
+Mox Jet
+Mox Pearl
+Gigantic Big Bear
+Forest x12
+
+[Actions]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Black Lotus.Cast
+Bot2.Pass
+Bot2.Hand.Mox Emerald.Cast
+Bot2.Pass
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Pass
+Bot2.Hand.Mox Jet.Cast
+Bot2.Pass
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Pass
+Bot2.Battlefield.Black Lotus.Activate(Color: Green)
+Bot2.Battlefield.Mox Emerald.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Gigantic Big Bear.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+! Bot1.Hand.Change the Equation.Cast(Stack.Gigantic Big Bear)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Stack.Count = 0
+Bot2.Battlefield.Gigantic Big Bear.Power = 10
+Bot1.Hand.Change the Equation.Colors.Count = 1
