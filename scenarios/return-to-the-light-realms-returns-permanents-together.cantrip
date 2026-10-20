@@ -1,12 +1,14 @@
-# Returns multiple permanent cards and leaves sorceries in the graveyard (CR 608.2c).
+# Return to the Light Realms: "Return all nonland permanent cards from your graveyard to the battlefield." The three Black
+# Lotuses that paid for it return together; Consider's instant card and the Island it surveilled into the graveyard stay
+# there (a land card is a permanent card, but not a nonland one), and so does the sorcery itself.
 
 [Bot1 Deck]
 Black Lotus
 Black Lotus
 Black Lotus
-Black Lotus
+Mox Sapphire
 Return to the Light Realms
-Island
+Consider
 Island
 Island x30
 
@@ -15,6 +17,13 @@ Island x30
 
 [Actions]
 [Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Consider.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange( | Island)
+? Bot1.Graveyard = Consider; Island
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: White)
 Bot1.Hand.Black Lotus.Cast
@@ -25,5 +34,5 @@ Bot1.Hand.Return to the Light Realms.Cast
 [Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield = Black Lotus; Black Lotus; Black Lotus
-Bot1.Graveyard = Return to the Light Realms
+Bot1.Battlefield = Mox Sapphire; Black Lotus; Black Lotus; Black Lotus
+Bot1.Graveyard = Return to the Light Realms; Consider; Island
