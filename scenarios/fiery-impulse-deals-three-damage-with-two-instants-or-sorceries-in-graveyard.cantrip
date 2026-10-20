@@ -1,0 +1,54 @@
+# Spell mastery (CR 207.2c): Fiery Impulse deals 3 instead of 2 once two or more instant and/or sorcery cards are in its
+# controller's graveyard when it resolves. Bot1 casts Shock at Bot2 (graveyard: 1 card), then Fiery Impulse on Concealing
+# Curtains (toughness 4): one card is not enough, so only 2 damage is marked. The Impulse and Shock now make two, so a
+# second Fiery Impulse deals 3 and kills Drannith Magistrate (toughness 3), which 2 damage would not. The spell itself
+# is on the stack, not in the graveyard, while it resolves.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Mox Ruby
+Shock
+Fiery Impulse
+Fiery Impulse
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Mox Pearl
+Concealing Curtains
+Drannith Magistrate
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Hand.Mox Pearl.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Hand.Concealing Curtains.Cast
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Drannith Magistrate.Cast
+Bot1.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Shock.Cast(Bot2)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Fiery Impulse.Cast(Bot2.Battlefield.Concealing Curtains)
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+? Bot2.Battlefield.Concealing Curtains.Damage = 2
+Bot1.Hand.Fiery Impulse.Cast(Bot2.Battlefield.Drannith Magistrate)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Graveyard = Drannith Magistrate
+Bot2.Battlefield.Concealing Curtains.Damage = 2
+Bot2.Life = 18
+Bot1.Graveyard = Fiery Impulse; Fiery Impulse; Shock

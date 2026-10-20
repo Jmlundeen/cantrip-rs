@@ -1,0 +1,30 @@
+# Fiery Impulse deals 2 damage to target creature (CR 120.3) when spell mastery is off: Bot1's graveyard is empty, so
+# Drannith Magistrate (toughness 3) survives with exactly 2 damage marked. Cast at instant speed on Bot2's turn.
+
+[Bot1 Deck]
+Mountain
+Fiery Impulse
+Island x15
+
+[Bot2 Deck]
+Plains
+Mox Jet
+Drannith Magistrate
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Plains.Play
+Bot2.Hand.Mox Jet.Cast
+Bot2.Battlefield.Mox Jet.Activate
+Bot2.Battlefield.Plains.Activate
+Bot2.Hand.Drannith Magistrate.Cast
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Fiery Impulse.Cast(Bot2.Battlefield.Drannith Magistrate)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot2.Battlefield.Drannith Magistrate.Damage = 2
+Bot1.Graveyard = Fiery Impulse
