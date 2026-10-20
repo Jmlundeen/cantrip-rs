@@ -1,13 +1,16 @@
-# The graveyard activation requires scry or surveil this turn; return enters with finality (CR 122.1h).
+# Proctor of Potential: "{W}{U}: Return this card from your graveyard to the battlefield with a finality counter on it.
+# Activate only if you've scried or surveilled this turn." Turn 1 it enters (its own trigger surveils 1) and Lightning Bolt
+# kills it. Turn 3, with {W}{U} floating but no scry or surveil yet that turn, the activation is refused (CR 602.5b); after
+# Consider surveils, it returns with a finality counter (CR 122.1h), and its enters trigger surveils again.
 
 [Bot1 Deck]
-Black Lotus
+Mox Pearl
+Mox Sapphire
 Black Lotus
 Black Lotus
 Proctor of Potential
 Lightning Bolt
 Consider
-Island
 Island x30
 
 [Bot2 Deck]
@@ -15,14 +18,23 @@ Island x30
 
 [Actions]
 [Bot1.Main1]
-Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: White)
-Bot1.Hand.Black Lotus.Cast
-Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
 Bot1.Hand.Proctor of Potential.Cast
 Bot1.Hand.Black Lotus.Cast
 Bot1.Battlefield.Black Lotus.Activate(Color: Red)
 Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Proctor of Potential)
+[Bot1.Main2]
+? Bot1.Graveyard = Proctor of Potential; Lightning Bolt; Black Lotus
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+! Bot1.Graveyard.Proctor of Potential.Activate
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Consider.Cast
 Bot1.Graveyard.Proctor of Potential.Activate
 [Bot1.Main2]
 
