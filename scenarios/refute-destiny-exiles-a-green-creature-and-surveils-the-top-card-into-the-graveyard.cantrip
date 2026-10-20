@@ -1,5 +1,5 @@
 # Refute Destiny: "Exile target creature or planeswalker that's green or blue. Surveil 1." Bot2's Llanowar Elves (green) is
-# exiled by Refute Destiny on turn 3, then Bot1 surveils 1 (CR 701.46a) and puts the top card, Lightning Bolt, into the
+# exiled by Refute Destiny on turn 3, then Bot1 surveils 1 (CR 701.25a) and puts the top card, Lightning Bolt, into the
 # graveyard, so the next card, Black Lotus, is on top. The refusals: Ornithopter (colorless) and Ragavan (red) are not legal
 # targets, beside the allowed green creature.
 

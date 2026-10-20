@@ -1,4 +1,4 @@
-# Consider: "Surveil 1. Draw a card." in that order, so a library of one card is surveilled before it is drawn (CR 701.46a).
+# Consider: "Surveil 1. Draw a card." in that order, so a library of one card is surveilled before it is drawn (CR 701.25a).
 # Bot1 puts the only card, Lightning Bolt, into the graveyard; the draw that follows is from an empty library, and the
 # state-based action makes Bot1 lose the game (CR 704.5b) with Consider already resolved.
 

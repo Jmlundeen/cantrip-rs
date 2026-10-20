@@ -12,7 +12,7 @@ pub fn harnessed(q: &dyn LayerQuery, id: ObjectId) -> bool {
 }
 
 /// It becomes harnessed, a designation that stays with the permanent. Harnessing a permanent that already is does nothing
-/// (CR 701.64c).
+/// (CR 701.64a).
 fn harness(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let id = item.object;
     let already = g.state().effects.iter().any(|e| e.affected == id && e.kind == EffectKind::Harnessed);

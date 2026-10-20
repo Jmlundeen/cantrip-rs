@@ -3,7 +3,7 @@
 # and Goblin Bombardment (one), it has nine besides its own trigger. The last of them, granted after the other eight, are
 # usable: on turn 11 Bot1 activates the Bombardment's (Bot2 takes 1, and 1 from the copy), then Mind Stone's
 # "{1}, {T}, Sacrifice this artifact: Draw a card", which sacrifices Locus as its cost: Locus is gone by the time the
-# ability is activated (CR 602.2i), so it does not trigger (the Rings of Brighthearth ruling) and Bot1 draws one.
+# ability is activated (CR 602.2b, 601.2i), so it does not trigger (the Rings of Brighthearth ruling) and Bot1 draws one.
 
 [Bot1 Deck]
 Island

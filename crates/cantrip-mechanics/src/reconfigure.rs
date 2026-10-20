@@ -32,7 +32,7 @@ pub const fn unattach(cost: ManaCost, text: &'static str) -> AbilityDef {
         .condition(is_attached)
 }
 
-/// "While attached, this isn't a creature" (CR 702.151e).
+/// "While attached, this isn't a creature" (CR 702.151b).
 fn attached(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, _: &Chars) -> bool {
     source == affected && q.state().obj(source).attached_to.is_some()
 }

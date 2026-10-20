@@ -1,6 +1,6 @@
 # High Noon's {4}{R}, Sacrifice: 5 damage to any target, at the boundary: Bot2's Troll of Khazad-dum is 6/5, so exactly
 # 5 damage destroys it (CR 704.5g). Bot1 casts High Noon on turn 3 and sacrifices it the same turn; High Noon has gone to
-# the graveyard as the cost (CR 602.2c), and its limit with it.
+# the graveyard as the cost (CR 602.2b, 601.2h), and its limit with it.
 
 [Bot1 Deck]
 Plains

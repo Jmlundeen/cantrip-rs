@@ -1106,7 +1106,7 @@ pub fn opponent_activates_ability_of_artifact_creature_or_land(q: &dyn Query, me
 
 /// The ability an activation put on the stack (CR 602.2a), as a `Target::Ability` naming it there, for "copy that ability"
 /// (`Game::copy_ability`): the topmost activated ability of that source and ability, which, as triggers are collected the
-/// moment the activation is complete (CR 602.2i, 603.2), is the one just activated. Rings of Brighthearth, Kurkesh,
+/// moment the activation is complete (CR 602.2b, 601.2i, 603.2), is the one just activated. Rings of Brighthearth, Kurkesh,
 /// Illusionist's Bracers, Battlemage's Bracers and Locus of Enlightenment copy it.
 pub fn activated_ability_on_stack(q: &dyn Query, event: &Event) -> Option<Target> {
     let Event::AbilityActivated { source, ability, .. } = *event else { return None };

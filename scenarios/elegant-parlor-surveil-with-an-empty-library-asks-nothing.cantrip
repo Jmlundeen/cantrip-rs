@@ -1,4 +1,4 @@
-# Surveil looks at the top card, and there is none (CR 701.46a): with a seven-card deck the library is empty when the Parlor
+# Surveil looks at the top card, and there is none (CR 701.25a): with a seven-card deck the library is empty when the Parlor
 # enters on turn one, so no placement question is asked (`! Bot1.Arrange`) and the land simply stays tapped on the battlefield.
 
 [Bot1 Deck]

@@ -1,4 +1,4 @@
-# Discover 4 finds Life // Death: a split card's mana value is the two halves added (1 + 2 = 3, CR 708.4b), so it is found,
+# Discover 4 finds Life // Death: a split card's mana value is the two halves added (1 + 2 = 3, CR 709.4b), so it is found,
 # and either half may be cast (each is 4 or less; Death has a target, the Ornithopter Bot2 Bolted into Bot1's graveyard): Bot1 is
 # asked which, chooses Death, and it returns the Ornithopter (mana value 0, no life lost). Only that half is cast (CR 701.57a,
 # 709.3). Quintorius triggers on the cast from exile.

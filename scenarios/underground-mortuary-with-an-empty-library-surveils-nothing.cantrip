@@ -1,4 +1,4 @@
-# Surveil 1 with no card in the library looks at nothing and asks nothing (CR 701.46a, 701.46b): Bot1's deck is exactly its
+# Surveil 1 with no card in the library looks at nothing and asks nothing (CR 701.25a, 609.3): Bot1's deck is exactly its
 # opening hand, so on turn 1 the Mortuary's enters trigger gives no placement to choose (a refusal; the other scenario asks).
 # The land is still a tapped Swamp Forest. (The turn-3 draw would lose, so the script ends in turn 1.)
 
