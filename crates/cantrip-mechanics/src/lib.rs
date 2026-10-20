@@ -41,6 +41,7 @@ pub mod craft;
 pub mod crew;
 pub mod devoid;
 pub mod double;
+pub mod devotion;
 pub mod dredge;
 pub mod earthbend;
 pub mod empower;
