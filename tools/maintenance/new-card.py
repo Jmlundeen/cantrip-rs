@@ -124,7 +124,13 @@ TEST_POINTS = [
     (r"\b(?:\d+|one|two|three|four|five|six|seven|x) or (?:more|less|greater|fewer)\b",
      "the limit '{m}': an object exactly at it qualifies, one just past it doesn't"),
     (r"\bup to (?:one|two|three|four|five|x|\d+)\b", "'{m}': fewer than the most (or none) as well as the most"),
-    (r"\btarget\b", "'target': a legal target of each player's (yours and an opponent's), and one just outside the filter refused"),
+    (r"\btarget\b", "'target': one of your own (or you) accepted as a target"),
+    (r"\btarget\b", "'target': one of an opponent's (or the opponent) accepted as a target"),
+    (r"\btarget\b", "'target': one just outside the filter refused"),
+    (r"\bwhenever\b[^,]*\b(?:dies|die|sacrifices?|leaves?|put into a graveyard|is exiled)\b",
+     "'{m}': several at once trigger it as many times, and this permanent leaving in the same event still sees them"),
+    (r"\b(?:return|exile|sacrifice|put) (?:it|them|that \w+|those \w+)\b[^.]*\bat the beginning of\b",
+     "'{m}': the delayed part touches only the same object(s), and only while still where the text left them (CR 603.7c, 400.7)"),
     (r"\b(?:each|all)\b(?! (?:opponent|player))", "'{m}': both players' objects it could apply to, so one side left out fails"),
     (r"\byou control\b|\ban opponent controls\b|\byour opponents? control\b", "'{m}': the other side's object must not count"),
     (r"\b(?:this turn|until end of turn|until (?:the end of )?your next turn|next turn|last turn)\b",
@@ -153,12 +159,15 @@ def test_points(abilities):
                 seen.add(line)
                 out.append(line)
             continue
+        before = len(out)
         for pattern, what in TEST_POINTS:
             for m in dict.fromkeys(x.group(0) for x in re.finditer(pattern, text, re.I)):
                 line = f"  [{i}] " + what.format(m=m)
                 if line not in seen:
                     seen.add(line)
                     out.append(line)
+        if len(out) == before:  # an ability no word above names still has to be seen working
+            out.append(f"  [{i}] {ab.text[:80]}: shown working (a mana ability or other static entry runs no lines)")
     return "\n".join(out)
 
 

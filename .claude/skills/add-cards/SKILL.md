@@ -167,7 +167,8 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    has needs no client change and no browser test. One that adds a prompt, an action, a cost display or a piece of
    state the client never had makes the client change in the same work and proves it in the browser: `client.md`.
 9. **Verify.** Working for a coordinator: run the scenarios of your card and of every card whose file or shared
-   mechanic you changed (`corpus -- --card "Name"` each) and the unit tests of a crate you changed - nothing wider;
+   mechanic you changed (`corpus -- --card "Name"` each) and the unit tests of a crate you changed - nothing wider -
+   and the build shows no warning from your files;
    the coordinator's full run at landing is the gate. Working alone: `cargo run --profile cards -p cantrip-script
    --bin corpus` shows `0 fail`, `tools\test.cmd /engine` is green, `tools\test.cmd` if the core, host, protocol or
    client changed, and the benchmark if the core did.
