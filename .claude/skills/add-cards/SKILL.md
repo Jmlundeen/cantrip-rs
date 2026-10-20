@@ -166,7 +166,9 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    every action it offers clickable with its cost. A card that only uses prompts, actions and state the client already
    has needs no client change and no browser test. One that adds a prompt, an action, a cost display or a piece of
    state the client never had makes the client change in the same work and proves it in the browser: `client.md`.
-9. **Verify.** Working for a coordinator: run the scenarios of your card and of every card whose file or shared
+9. **Verify.** (Working for a coordinator, the core - `cantrip-state`, `cantrip-rules`, `cantrip-api` - is closed to
+   you: a card that needs a change there is a gap, `blocked --rule <CR>` and a report, never a change you make.)
+   Working for a coordinator: run the scenarios of your card and of every card whose file or shared
    mechanic you changed (`corpus -- --card "Name"` each) and the unit tests of a crate you changed - nothing wider -
    and the build shows no warning from your files;
    the coordinator's full run at landing is the gate. Working alone: `cargo run --profile cards -p cantrip-script
