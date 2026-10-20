@@ -116,6 +116,52 @@ def scryfall_report(card, index):
     return "\n".join(lines)
 
 
+# The words of Oracle text a scenario most often fails to pin down, each with what pins it. Found by what reviews sent
+# back: an amount no expectation checked, one player's side never shown, a value read after an effect changed it.
+TEST_POINTS = [
+    (r"\b(?:\d+|one|two|three|four|five|six|seven|x)\b(?! or more| or less| or greater)|\{\d+\}",
+     "the amount {m}: an expectation that a value one off would fail (paying exactly, dealing exactly)"),
+    (r"\b(?:\d+|one|two|three|four|five|six|seven|x) or (?:more|less|greater|fewer)\b",
+     "the limit '{m}': an object exactly at it qualifies, one just past it doesn't"),
+    (r"\bup to (?:one|two|three|four|five|x|\d+)\b", "'{m}': fewer than the most (or none) as well as the most"),
+    (r"\btarget\b", "'target': a legal target of each player's (yours and an opponent's), and one just outside the filter refused"),
+    (r"\b(?:each|all)\b(?! (?:opponent|player))", "'{m}': both players' objects it could apply to, so one side left out fails"),
+    (r"\byou control\b|\ban opponent controls\b|\byour opponents? control\b", "'{m}': the other side's object must not count"),
+    (r"\b(?:this turn|until end of turn|until (?:the end of )?your next turn|next turn|last turn)\b",
+     "'{m}': the same thing on another turn, and the effect checked after it should have ended"),
+    (r"\binstead\b", "'instead': the replaced event must not also happen"),
+    (r"\bunless\b[^.]*\bpays?\b", "'unless ... pays': paid exactly (the effect doesn't happen) and unpayable (it does)"),
+    (r"\bcosts? \{[^}]+\}(?:\{[^}]+\})* (?:less|more)\b",
+     "the cost change: the pool checked right after the cast, both with and without the condition"),
+    (r"\b(?:sacrificed|exiled|destroyed|discarded|that) (?:creature|permanent|card)'s (?:power|toughness|mana value)\b",
+     "'{m}': read as it last existed - change it with an effect first and show the result follows"),
+    (r"\bcreate (?:two|three|four|five|x|\d+)\b|\bfor each\b", "'{m}': all made / done at once, as one event (never a loop)"),
+    (r"\bmay\b", "'may': both answers"),
+    (r"\b(?:white|blue|black|red|green|colorless|multicolored|monocolored)\b",
+     "the color '{m}': an object of another color refused, one of two colors where it matters"),
+]
+
+
+def test_points(abilities):
+    """The test points of a card's abilities: for each word above its text uses, what an expectation must pin down."""
+    out, seen = [], set()
+    for i, ab in enumerate(abilities, 1):
+        text = re.sub(r"\([^)]*\)", "", ab.text)
+        if ab.keyword is not None:
+            line = f"  [{i}] {ab.text}: shown at least once (a keyword's file entry runs no lines)"
+            if line not in seen:
+                seen.add(line)
+                out.append(line)
+            continue
+        for pattern, what in TEST_POINTS:
+            for m in dict.fromkeys(x.group(0) for x in re.finditer(pattern, text, re.I)):
+                line = f"  [{i}] " + what.format(m=m)
+                if line not in seen:
+                    seen.add(line)
+                    out.append(line)
+    return "\n".join(out)
+
+
 # Keyword actions the core does in its own procedures (casting, activating, searching ...): their number is enough.
 BASIC_ACTIONS = {"activate", "attach", "cast", "counter", "create", "destroy", "discard", "double", "exchange", "exile",
                  "play", "reveal", "sacrifice", "search", "shuffle", "tap and untap", "transform", "fight", "mill"}
@@ -279,6 +325,10 @@ def main():
 
     print("\n=== Prior art: the implemented cards that already do each ability (tools/maintenance/ability-index.py)")
     print(index.report(index.Index(exclude=[name]), abilities) or "  (no rules text)")
+
+    print("\n=== Test points: each needs an expectation that fails if the card gets it wrong (list the line that catches")
+    print("    each in your report; the reviewer checks the list)")
+    print(test_points(abilities) or "  none beyond showing each ability")
 
     target = os.path.join(CARDS, file_stem(name) + ".rs")
     if os.path.exists(target):

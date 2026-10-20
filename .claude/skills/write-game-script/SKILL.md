@@ -95,7 +95,8 @@ sweeping seeds (CLAUDE.md).
 - **Targets gate matching.** A cast waits until every named target is a legal candidate. A spell with no legal
   target is not offered at all, so a line like `Counterspell.Cast(Bot2)` never matches and fails after 4 turns.
 - **Paying.**
-  - Tap before casting, or follow the cast with `Activate` lines, which answer the payment prompt.
+  - Tap before casting, or follow the cast with `Activate` lines, which answer the payment prompt - for Bot2's casts
+    as much as Bot1's.
   - `X: n` is handled automatically.
   - If a spell is left owing mana, the script fails; it is never quietly cancelled.
 - **Defaults.** When the cursor's line doesn't apply, bots:
@@ -119,6 +120,7 @@ sweeping seeds (CLAUDE.md).
   - In `[Expect]`, a name that appears more than once in a zone needs an index: `Bot1.Battlefield.Island#1.Tapped`.
     So do two same-named cards chosen together in one answer: `Bot1.Target(Ornithopter#1; Ornithopter#2)`.
   - A nameless object (a face-down permanent) is `#1`: `Bot1.Battlefield.#1.Activate`.
+  - A token is named as its dump shows it, which can differ from its subtype: `Blood Token`, `Food Token`.
   - A permanent with several abilities needs `Ability: <part of its text>`, such as `Ability: {U}` for Tundra.
   - A modal double-faced card with two land faces is played by face: `Play(Ability: #1)` the front, `Play(Ability: back
     face)` the back (its option reads "as its back face").

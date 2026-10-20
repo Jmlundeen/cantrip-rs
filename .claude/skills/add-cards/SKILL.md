@@ -148,10 +148,13 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
    alike (a value faked to get an effect), stop: that is a core gap -
    keep the claim, log `blocked --rule <CR>` and report the gap, as the non-negotiables say.
 5. **Write the scenarios** (below; the `write-game-script` skill) and run them until they pass:
-   `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`. Then **break the card**, once
-   for each thing its own code decides (a number, a limit, a condition, whose objects, each narrowing - a card type, a
-   zone, a time): change it, see a scenario go red, restore it. A break no scenario catches is a missing expectation. Say in the report what you broke and that it
-   failed.
+   `cargo run --profile cards -p cantrip-script --bin corpus -- --card "Card Name"`. `new-card.py`'s **test points**
+   list what its Oracle text makes a scenario pin down (an amount, a limit, each player's side, a time, "instead", a
+   value read as it last existed, things done at once); every one needs an expectation that fails if the card gets it
+   wrong. Then **break the card**, once for each test point and each thing its own code decides (a number, a limit, a
+   condition, whose objects, each narrowing - a card type, a zone, a time): change it, see a scenario go red, restore
+   it (`git add` the card file first, and `git checkout -- <file>` restores it). A break no scenario catches is a
+   missing expectation. The report lists each test point with the scenario line that catches it, and what you broke.
 6. **Citations:** `python tools/maintenance/cr.py check --show <the card's file> <its scenarios>` prints every `CR`
    citation beside the rule it names. Read each pair: a rule that does not say what the comment claims is fixed or
    the citation dropped - a number copied from another card's comment is the usual way a wrong one gets in.

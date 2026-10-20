@@ -18,6 +18,8 @@ checked for sufficiency, not exhaustiveness:
   names (and flags a number the current rules don't have) - each rule says what the comment says it does - citations copied from
   older code can name a rule that was renumbered (CR 712.4 is meld cards, not modal double-faced cards);
 - the "never" list, line by line;
+- the test points (`new-card.py "Card Name" --no-write` prints them): the author's report pairs each with the
+  scenario line that catches it - check each pair, and look past the list for anything the text decides that it missed;
 - the scenarios: every line covered (the coverage report), each `[Expect]` correct by the rules and able to fail - a
   limit the card's own code enforces met exactly at the limit, and both players' objects where the text reads "each",
   "target" or "you control". More tests are asked for only when the scenarios are obviously insufficient (code no
