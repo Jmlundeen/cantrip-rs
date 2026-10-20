@@ -318,6 +318,12 @@ pub fn delirium(q: &dyn Query, player: PlayerId) -> bool {
     card_types_in_graveyard(q, player) >= 4
 }
 
+/// Spell mastery (an ability word, CR 207.2c): two or more instant and/or sorcery cards in `player`'s graveyard. Fiery Impulse reads
+/// it as it resolves; Ghitu Lavarunner's static ability asks the same of a `LayerQuery` with `statics::spell_mastery`.
+pub fn spell_mastery(q: &dyn Query, player: PlayerId) -> bool {
+    q.state().zone(Zone::graveyard(player)).iter().filter(|&&c| q.chars(c).is(CardType::Instant) || q.chars(c).is(CardType::Sorcery)).count() >= 2
+}
+
 /// How many card types are among the cards in `player`'s graveyard (CR 205.2a, 702.138a): each type counted once however many
 /// cards have it, a card with several types giving each of them. Delirium reads it against four; Omnivorous Flytrap's "six or
 /// more card types among cards in your graveyard" reads it again against six as its ability resolves.

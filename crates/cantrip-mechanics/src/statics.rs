@@ -138,6 +138,15 @@ pub fn delirium(view: &dyn LayerQuery, source: ObjectId) -> bool {
     seen.iter().count() >= 4
 }
 
+/// Spell mastery (an ability word, CR 207.2c) for a static ability's condition: two or more instant and/or sorcery cards in the
+/// graveyard of `source`'s controller, judged on the cards' characteristics as the layers made them. `mechanics::spell_mastery`
+/// is the same question outside the layers. Ghitu Lavarunner uses it; Fiery Impulse asks the other.
+pub fn spell_mastery(view: &dyn LayerQuery, source: ObjectId) -> bool {
+    let state = view.state();
+    let you = state.obj(source).controller;
+    state.zone(Zone::graveyard(you)).iter().filter(|&&c| view.chars(c).is(CardType::Instant) || view.chars(c).is(CardType::Sorcery)).count() >= 2
+}
+
 /// "... has vigilance" (CR 702.20, layer 6) as a static ability's `StaticDef::apply`. Ori, Keeper of Songs, Gideon's Memorial's
 /// creature tokens and Teysa Karlov's print it.
 pub fn have_vigilance(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
