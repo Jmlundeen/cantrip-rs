@@ -68,6 +68,7 @@ pub mod max_speed;
 pub mod miracle;
 pub mod melee;
 pub mod mobilize;
+pub mod next_creature_counter;
 pub mod ninjutsu;
 pub mod offspring;
 pub mod outlaw;
