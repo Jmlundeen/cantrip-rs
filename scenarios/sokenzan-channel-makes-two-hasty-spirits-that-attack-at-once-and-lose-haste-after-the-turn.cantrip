@@ -1,0 +1,40 @@
+# Sokenzan's channel ({3}{R}, from the hand; four Moxen pay it) makes two 1/1 colorless Spirits that have haste this turn:
+# both attack on the turn they are made and deal 2. On Bot2's turn the haste is gone (until end of turn, CR 514.2), so
+# the Spirits stay Spirits with no keywords. Sokenzan is in the graveyard (discarded as a cost).
+
+[Bot1 Deck]
+Sokenzan, Crucible of Defiance
+Mox Ruby
+Mox Sapphire
+Mox Jet
+Mox Pearl
+Island x2
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Sokenzan, Crucible of Defiance.Activate
+Bot1.Pass
+Bot1.Attack(Spirit; Spirit > Bot2)
+[T2 Bot2.Upkeep]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Graveyard = Sokenzan, Crucible of Defiance
+Bot1.Battlefield.Spirit#1.Keywords = (absent)
+Bot1.Battlefield.Spirit#2.Keywords = (absent)
+Bot1.Battlefield.Spirit#1.Power = 1
