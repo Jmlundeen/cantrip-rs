@@ -1,0 +1,35 @@
+# Culling Ritual cast on turn 7 with only four lands in play: lands are not destroyed (it says nonland), nothing is
+# destroyed, so no mana is added and no color is asked for.
+
+[Bot1 Deck]
+Swamp
+Swamp
+Forest
+Forest
+Culling Ritual
+Swamp x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Swamp.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Forest.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Culling Ritual.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+[T7 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Count = 4
+Bot1.Graveyard = Culling Ritual

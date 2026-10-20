@@ -1,0 +1,6 @@
+{
+  "name": "Culling Ritual",
+  "manaCost": "{2}{B}{G}",
+  "type": "Sorcery",
+  "oracleText": "Destroy each nonland permanent with mana value 2 or less. Add {B} or {G} for each permanent destroyed this way."
+}
