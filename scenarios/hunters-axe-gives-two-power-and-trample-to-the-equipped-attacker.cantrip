@@ -1,0 +1,46 @@
+# Hunter's Axe: "Equipped creature gets +2/+0 and has 'Whenever this creature attacks, it gains your choice of trample or
+# deathtouch until end of turn.'" Bot1 equips Llanowar Elves, a 1/1, which is a 3/1 with the Axe (CR 613.1f, layer 7c). It
+# attacks; the Axe's granted ability triggers, and Bot1 chooses trample as it resolves (CR 608.2d), so the Elves deal 1 to
+# the 1/1 blocker Bot2 puts in the way and 2 trample over to Bot2 (CR 702.19b, 510.1c).
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Llanowar Elves
+Hunter's Axe
+Forest
+Forest
+Forest x13
+
+[Bot2 Deck]
+Llanowar Elves
+Forest x19
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Hunter's Axe.Cast
+Bot1.Battlefield.Forest#1.Activate
+Bot1.Battlefield.Hunter's Axe.Activate(Llanowar Elves)
+Bot1.Battlefield.Forest#2.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+[T4 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Battlefield.Forest.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Modes(Trample)
+Bot2.Block(Llanowar Elves > Llanowar Elves)
+[T5 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Count = 3
+Bot1.Graveyard = Llanowar Elves
+Bot2.Graveyard = Llanowar Elves; Forest
+Result = InProgress

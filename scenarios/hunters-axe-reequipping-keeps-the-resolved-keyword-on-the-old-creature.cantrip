@@ -1,0 +1,53 @@
+# Re-equipping moves the power bonus and future attack triggers (CR 301.5), but a resolved effect
+# stays on the old creature until cleanup (CR 611.2a). The new wearer gets no keyword until it attacks.
+
+[Bot1 Deck]
+Forest
+Forest
+Forest
+Llanowar Elves
+Ornithopter
+Hunter's Axe
+Forest x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Battlefield.Forest.Activate
+[T3 Bot1.Main1]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Ornithopter.Cast
+Bot1.Hand.Hunter's Axe.Cast
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Hunter's Axe.Activate(Llanowar Elves)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Llanowar Elves.Activate
+[T5 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2)
+Bot1.Modes(Trample)
+[T5 Bot1.Main2]
+Bot1.Battlefield.Hunter's Axe.Activate(Ornithopter)
+Bot1.Battlefield.Forest.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Llanowar Elves.Power = 1
+? Bot1.Battlefield.Llanowar Elves.Keywords = Trample
+? Bot1.Battlefield.Ornithopter.Power = 2
+? Bot1.Battlefield.Ornithopter.Keywords = Flying
+[T6 Bot2.Main1]
+? Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+[T7 Bot1.Main1]
+Bot1.Attack(Llanowar Elves > Bot2; Ornithopter > Bot2)
+Bot1.Modes(Deathtouch)
+[T7 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 14
+Bot1.Battlefield.Llanowar Elves.Keywords = (absent)
+Bot1.Battlefield.Ornithopter.Keywords = Deathtouch; Flying
+Bot1.Battlefield.Hunter's Axe.AttachedTo = Ornithopter
+Result = InProgress
