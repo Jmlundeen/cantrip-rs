@@ -24,7 +24,11 @@ sweeping seeds (CLAUDE.md).
    turn at the earliest.
 2. **Build the decks top first.** The first 7 lines are the opening hand, and the next lines are the draws in order.
    Give each deck at least 7 cards plus one per draw step the script reaches, and pad generously (`Island x10`). A
-   player who draws from an empty library loses and fails the script.
+   player who draws from an empty library loses and fails the script. For the other cards on the board - a blocker
+   of toughness 4, a creature with flying and nothing else, a cheap colorless artifact - take the plainest implemented
+   card: `python tools\maintenance\find-cards.py --type creature --toughness 4` (also `--power`, `--mv`, `--color`,
+   `--keyword`, `--text`, `--vanilla`) lists them least rules text first. Free mana for a test: the Moxen and Black
+   Lotus, cast for nothing.
 3. **Write the action list.** Include only what the test needs: land plays, mana taps, casts and choices. Everything
    else passes by default.
 4. **Run it:**
