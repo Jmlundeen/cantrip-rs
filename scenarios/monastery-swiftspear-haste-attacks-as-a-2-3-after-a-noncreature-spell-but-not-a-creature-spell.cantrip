@@ -1,0 +1,30 @@
+# Haste (CR 702.10): the Swiftspear attacks the turn it is cast. Prowess (CR 702.108a) triggers on casting a noncreature
+# spell (Mox Emerald) and gives +1/+1, but not on casting a creature spell (Ornithopter): so it attacks as a 2/3 and Bot2
+# takes 2 (a second pump would make it 3). On Bot2's turn the pump has worn off (CR 514.2): toughness is back to 2.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Emerald
+Monastery Swiftspear
+Ornithopter
+Mountain x16
+
+[Bot2 Deck]
+Island x18
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Monastery Swiftspear.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Attack(Monastery Swiftspear > Bot2)
+[T2 Bot2.Main1]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Monastery Swiftspear.Toughness = 2
