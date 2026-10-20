@@ -1,4 +1,6 @@
-# codie ravenous codex copies prepared spell; deterministic position (CR 608.2).
+# Codie, Ravenous Codex: "Whenever you cast a prepared spell, copy it" (CR 722.3c-d, 707.10). Blossom-Blessed Angel, cast
+# from hand with Codie out, is no prepare spell and is not copied (no token Angel); the Seed Suture cast from exile is,
+# so the Ornithopter gets two +1/+1 counters and Bot1 gains 1 life twice.
 
 [Bot1 Deck]
 Black Lotus
@@ -27,6 +29,7 @@ Bot1.Pass
 Bot1.Exile.Seed Suture.Cast(Bot1.Battlefield.Ornithopter)
 
 [Expect]
+Bot1.Battlefield = Ornithopter; Codie, Ravenous Codex; Blossom-Blessed Angel
 Bot1.Battlefield.Ornithopter.Power = 2
 Bot1.Life = 22
 Bot1.Battlefield.Blossom-Blessed Angel.Prepared = (absent)
