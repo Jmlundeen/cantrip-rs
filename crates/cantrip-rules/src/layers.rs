@@ -38,7 +38,9 @@ pub fn chars_as_face(cards: &CardTable, state: &GameState, log: &[Record], id: O
 }
 
 /// Token characteristics at creation: copiable values and intrinsic type abilities, without battlefield or
-/// stack effects (CR 614.12, 707.2).
+/// stack effects (CR 614.12, 707.2). A token-creation replacement reads this, the token as it is created, never as it
+/// would enter: Draconic Visitor's ruling (2026-08-21) has it ignore a nonartifact token Mycosynth Lattice would make an
+/// artifact as it enters (scenario draconic-visitor-ignores-a-token-mycosynth-lattice-makes-an-artifact).
 pub fn token_chars(cards: &CardTable, card: CardId, copy: Option<Copiable>) -> Chars {
     let def = cards.get(card);
     let mut chars = initial(cards, card, copy.as_ref());

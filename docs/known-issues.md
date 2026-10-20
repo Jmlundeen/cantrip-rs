@@ -94,7 +94,6 @@ keeps it).
 | [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
-| [KI-86](#ki-86-a-token-creation-replacement-reads-the-token-without-the-effects-already-in-place) | A token-creation replacement reads the token without the effects already in place | Low | Suspected |
 
 ## Issues
 
@@ -1080,22 +1079,3 @@ NullReferenceException in `GameServer` while a connection was closing, then pass
 A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
 
 **Scenarios.** none; the .NET test above.
-
-### KI-86: A token-creation replacement reads the token without the effects already in place
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine | 2026-10-20, review of PR #538 (Draconic Visitor) |
-
-**Notes.** A replacement that asks what a token about to be created would be ("if one or more artifact tokens would be
-created", Draconic Visitor) reads `Query::token_chars` (`layers::token_chars`): the token's copiable values with its copy
-exceptions and its intrinsic abilities, but none of the continuous effects already in place. By analogy with CR 614.12 -
-"check the characteristics of the permanent as it would exist on the battlefield, taking into account ... continuous
-effects that already exist and would apply to the permanent" - Mycosynth Lattice ("all permanents are artifacts") or
-March of the Machines would make every token Draconic Visitor's controller creates an artifact token, so a Dragon. CR
-614.12 speaks of effects that modify how a permanent enters, which a token-creation replacement is not strictly, and no
-ruling settles it. A fix computes the token's characteristics as an entering object under the layers (as
-`judged_entering` does for entering replacements) instead of from its definition alone.
-
-**Scenarios.** none yet; Draconic Visitor with Mycosynth Lattice out and Command the Stage making a (nonartifact) Cadet
-would reach it.

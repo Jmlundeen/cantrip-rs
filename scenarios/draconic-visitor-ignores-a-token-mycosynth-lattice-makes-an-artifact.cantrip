@@ -1,0 +1,60 @@
+# Draconic Visitor's replacement ("If one or more artifact tokens would be created under your control, that many 5/5 red
+# Dragon creature tokens with flying are created instead") sees a token as it would be created, not as it would enter the
+# battlefield. Its ruling (2026-08-21): "If you create a nonartifact token that will be an artifact as it enters the
+# battlefield, such as a token that will be an artifact because of Mycosynth Lattice, Draconic Visitor's effect doesn't
+# apply to that token's creation" - the Visitor modifies how tokens are created, the Lattice applies only once they are
+# entering. So CR 614.12's look-ahead, which counts continuous effects already in place, is not what the Visitor asks.
+# Bot1 casts Mycosynth Lattice (turn 1), Draconic Visitor (turn 3) and Command the Stage (turn 5): its colorless Cadet is
+# created as it is, enters as an artifact (the Lattice), and no Dragon token is made.
+# (draconic-visitor-turns-a-blood-token-into-a-dragon is the control: a token that is an artifact as created.)
+
+[Bot1 Deck]
+Mountain
+Sol Ring
+Mox Ruby
+Black Lotus
+Mycosynth Lattice
+Draconic Visitor
+Command the Stage
+Mountain
+Mountain
+Island x10
+
+[Bot2 Deck]
+Island x15
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Mycosynth Lattice.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Draconic Visitor.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Mountain.Play
+Bot1.Battlefield.Mountain#1.Activate
+Bot1.Battlefield.Mountain#2.Activate
+Bot1.Battlefield.Mountain#3.Activate
+Bot1.Hand.Command the Stage.Cast
+Bot1.Pass
+[T5 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield = Cadet; Draconic Visitor; Mountain; Mountain; Mountain; Mox Ruby; Mycosynth Lattice; Sol Ring
+Bot1.Battlefield.Cadet.Types = Creature; Artifact
+Bot1.Battlefield.Cadet.Subtypes = Soldier; Wizard
+Bot1.Battlefield.Cadet.Power = 2
+Bot1.Battlefield.Cadet.Toughness = 2
+Bot1.Graveyard = Command the Stage; Black Lotus
