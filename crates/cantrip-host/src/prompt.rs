@@ -191,6 +191,9 @@ fn cost_text_of(cost: &Cost, name: &str) -> String {
     if cost.tap {
         parts.push("{T}".to_string());
     }
+    if cost.energy > 0 {
+        parts.push(format!("Pay {}", "{E}".repeat(cost.energy as usize)));
+    }
     if cost.life > 0 {
         parts.push(format!("Pay {} life", cost.life));
     }

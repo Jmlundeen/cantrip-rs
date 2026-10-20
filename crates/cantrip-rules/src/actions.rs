@@ -91,7 +91,8 @@ fn can_pay_other(cx: &Cx, source: ObjectId, controller: PlayerId, cost: &Cost) -
     if cost.put_counters.is_some_and(|(kind, n)| n > 0 && banned(kind)) {
         return false;
     }
-    if !can_pay_life(cx, controller, cost.life) {
+    // Energy is paid from the payer's counters (CR 107.14, 118.3): payable only with at least that many.
+    if cx.s().player(controller).energy() < cost.energy || !can_pay_life(cx, controller, cost.life) {
         return false;
     }
     if cost.return_self && !obj.zone.is(ZoneKind::Battlefield) {
@@ -656,6 +657,9 @@ fn pay_discards(cx: &mut Cx, chosen: &[ObjectId]) {
 
 /// Pays the life and counters parts of a cost.
 fn pay_life_and_counters(cx: &mut Cx, player: PlayerId, source: ObjectId, cost: &Cost) {
+    if cost.energy > 0 {
+        ops::change_energy(cx, player, -i32::from(cost.energy), player);
+    }
     if cost.life > 0 {
         ops::change_life(cx, player, -(cost.life as i32));
     }
@@ -6153,6 +6157,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
     let Cost {
         mana,
         life: _,
+        energy,
         tap,
         sacrifice_self,
         discard_self,
@@ -6183,6 +6188,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
         materials,
     } = *cost;
     mana.x == 0
+        && energy == 0
         && !(tap || sacrifice_self || discard_self || remove_any_counter || exile_self || pay_x_life || exert || emerge)
         && !(tap_permanents || unattach_self || return_self || discard_hand || tap_to_reduce)
         && permanents.is_none()
