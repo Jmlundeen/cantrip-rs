@@ -1,0 +1,13 @@
+{
+  "name": "Parhelion II",
+  "manaCost": "{6}{W}{W}",
+  "type": "Legendary Artifact — Vehicle",
+  "power": 5,
+  "toughness": 5,
+  "oracleText": "Flying, first strike, vigilance\nWhenever Parhelion II attacks, create two 4/4 white Angel creature tokens with flying and vigilance that are attacking.\nCrew 4 (Tap any number of creatures you control with total power 4 or more: This Vehicle becomes an artifact creature until end of turn.)",
+  "keywords": [
+    "Flying",
+    "FirstStrike",
+    "Vigilance"
+  ]
+}

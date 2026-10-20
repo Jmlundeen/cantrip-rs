@@ -1,0 +1,66 @@
+# Parhelion II (cast on turn 1 for 8 with Black Lotus and the five Moxen): on turn 3 She-Hulk (power exactly 4) crews it (Crew 4)
+# and it attacks. Its trigger makes two 4/4 white Angels with flying and vigilance that are attacking, and the Angels were
+# never declared as attackers (ruling 2019-05-03): Bot2's life is 20 - 5 (Parhelion II) - 4 - 4 = 7. Vigilance keeps Parhelion II
+# and both Angels untapped; the keywords are shown on the Vehicle and on the tokens. Bot2 controls no creature, so each
+# Angel can only attack Bot2 and no choice is asked.
+
+[Bot1 Deck]
+Mox Pearl
+Mox Sapphire
+Mox Jet
+Mox Ruby
+Mox Emerald
+Black Lotus
+Parhelion II
+She-Hulk, Jade Defender
+Mountain x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Parhelion II.Cast
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.She-Hulk, Jade Defender.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Parhelion II.Activate(Ability: Crew)
+Bot1.Pass
+Bot2.Pass
+Bot1.Attack(Parhelion II > Bot2)
+Bot1.Pass
+Bot2.Pass
+[Bot1.Main2]
+
+[Expect]
+Bot2.Life = 7
+Bot1.Battlefield.Parhelion II.Keywords = FirstStrike; Flying; Vigilance
+Bot1.Battlefield.Parhelion II.Tapped = false
+Bot1.Battlefield.She-Hulk, Jade Defender.Tapped = true
+Bot1.Battlefield.Angel#1.Colors = White
+Bot1.Battlefield.Angel#1.Power = 4
+Bot1.Battlefield.Angel#1.Toughness = 4
+Bot1.Battlefield.Angel#1.Keywords = Flying; Vigilance
+Bot1.Battlefield.Angel#1.Tapped = false
+Bot1.Battlefield.Angel#2.Power = 4
+Bot1.Battlefield.Angel#2.Tapped = false
