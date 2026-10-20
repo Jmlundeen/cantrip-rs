@@ -1,0 +1,33 @@
+# Monstrous Rage can target any creature. Bot1 casts it at Bot2's Ornithopter and, in response, Lightning Bolts that
+# Ornithopter. The spell's only target is gone, so it does not resolve (CR 608.2b)
+
+[Bot1 Deck]
+Mox Ruby
+Mox Ruby
+Monstrous Rage
+Lightning Bolt
+Island x16
+
+[Bot2 Deck]
+Ornithopter
+Mountain x19
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby#1.Activate
+Bot1.Battlefield.Mox Ruby#2.Activate
+Bot1.Hand.Monstrous Rage.Cast(Bot2.Battlefield.Ornithopter)
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot2.Battlefield.Count = 0
+Bot1.Battlefield = Mox Ruby; Mox Ruby
+Bot2.Graveyard = Ornithopter
+Bot1.Graveyard = Monstrous Rage; Lightning Bolt
+LeftBattlefield = Ornithopter

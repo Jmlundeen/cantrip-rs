@@ -34,6 +34,24 @@ pub static ROYAL_ROLE: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// A Monster Role token (CR 111.10k, 303.7): "a colorless Aura Role enchantment token named Monster with enchant creature
+/// and 'Enchanted creature gets +1/+1 and has trample.'" Monstrous Rage makes it, attached to a creature
+/// (`create_role`).
+pub static MONSTER_ROLE: CardDef = CardDef {
+    name: "Monster",
+    has_cost: false,
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Aura, Subtype::Role]),
+    enchant: Some(crate::targets::CREATURE),
+    statics: &[
+        static_ability(Layer::PtModify, crate::attach::attached_object, crate::statics::plus_pt::<1, 1>, "Enchanted creature gets +1/+1."),
+        static_ability(Layer::Ability, crate::attach::attached_object, crate::statics::have_trample, "Enchanted creature has trample."),
+    ],
+    text: "Enchant creature
+Enchanted creature gets +1/+1 and has trample.",
+    ..CardDef::BLANK
+};
+
 /// "Create a [Role] token attached to [a creature]" (CR 111.10j-r, 303.7, 303.4): a Role token `role` under `controller`,
 /// entering attached to `creature`, which the effect names and does not target; not created if the Role could not
 /// enchant it (CR 303.4i). If `controller` already controls a Role on it, the state-based action puts the older one into
