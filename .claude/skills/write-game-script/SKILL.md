@@ -60,6 +60,15 @@ sweeping seeds (CLAUDE.md).
   the spot. Add the turn: `[T7 Bot1.Main1]`.
 - **The caster keeps priority after casting.** The opponent's response line fires once the caster passes, which
   happens automatically when the next line isn't the caster's.
+- **Building a stack.** Every spell waits on the stack while its caster holds priority, permanent spells too: a Mox or
+  a Black Lotus is not on the battlefield until both players pass. A line that is not offered yet (tapping that Lotus)
+  is reached by default passes, which resolve the stack until it is; but a line that is offered at once - another
+  instant, a `? Stack.Count` check, a counterspell's `Target` - sees everything still there, the Moxen included. So
+  put `BotN.Pass` after a cast that must have resolved before the next line is answered. Only an instant, or a
+  spell with flash, can be cast onto a non-empty stack: a sorcery-speed line waits while everything under it
+  resolves. To set up several spells for one response (a counterspell choosing among targets), resolve the mana
+  first, cast the sorcery-speed spell, then the instants, then the response. A line left waiting for something that
+  already happened shows in the trace as "the game ended before line N".
 - **Targets gate matching.** A cast waits until every named target is a legal candidate. A spell with no legal
   target is not offered at all, so a line like `Counterspell.Cast(Bot2)` never matches and fails after 4 turns.
 - **Paying.**

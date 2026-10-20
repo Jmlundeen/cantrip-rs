@@ -201,7 +201,9 @@ def split_abilities(oracle, names):
             parts.append(("trigger", condition))
         for sentence in re.split(r"(?<=\.)\s+(?=[A-Z~])", rest):
             if sentence.strip():
-                parts.append(("effect", sentence.strip()))
+                # "Choose one -" over bullets is the modal frame (CR 700.2), matched against other modal abilities.
+                modal = len(block) > 1 and re.match(r"choose\b", sentence.strip(), re.I)
+                parts.append(("modal" if modal else "effect", sentence.strip()))
         for bullet in block[1:]:
             parts.append(("effect", bullet.lstrip("• ").strip()))
         out.append(Ability(" ".join([head] + block[1:]), parts))
@@ -355,6 +357,7 @@ class Index:
         self.whole = {level: collections.defaultdict(list) for level in LEVELS}
         self.part = {level: collections.defaultdict(list) for level in LEVELS}
         self.texts = {}  # numbers-level whole template -> (card, ability text) for similarity
+        self.modal = set()  # the templates of self.texts that are modal abilities
         self.cards = {}
         for name, card in self.content.items():
             if name.lower() in exclude:
@@ -367,6 +370,8 @@ class Index:
                     for kind, text in ab.parts:
                         self.part[level][(kind, template(text, level))].append((name, text))
                 self.texts.setdefault(template(ab.text, "numbers"), (name, ab.text))
+                if any(kind == "modal" for kind, _ in ab.parts):
+                    self.modal.add(template(ab.text, "numbers"))
         self.core = core_keywords()
         self._idf = None
 
@@ -398,8 +403,9 @@ class Index:
             return "core keyword (Keywords::of in the content JSON; no code)"
         return mechanics_for(ab.keyword)
 
-    def nearest(self, text, count=3):
-        """The implemented abilities nearest a text by TF-IDF cosine over words and word pairs."""
+    def nearest(self, text, count=3, modal=False):
+        """The implemented abilities nearest a text by TF-IDF cosine over words and word pairs; only the modal ones
+        with `modal`."""
         if self._idf is None:
             self._docs = {t: self._grams(t) for t in self.texts}
             df = collections.Counter(g for grams in self._docs.values() for g in set(grams))
@@ -409,11 +415,25 @@ class Index:
         q = self._vec(self._grams(template(text, "numbers")))
         scored = []
         for t, v in self._vecs.items():
+            if modal and t not in self.modal:
+                continue
             dot = sum(w * v.get(g, 0.0) for g, w in q.items())
             if dot > 0:
                 scored.append((dot, t))
         scored.sort(reverse=True)
         return [(score, *self.texts[t]) for score, t in scored[:count]]
+
+    def nearest_modal(self, text, count=2):
+        """The implemented modal abilities most like a modal text: most modes that open with the same two words
+        ("counter target", "destroy target"), what a mode does, then the nearest by TF-IDF."""
+        heads = self._mode_heads(template(text, "numbers"))
+        tfidf = {t: s for s, *_, t in ((s, n, x, template(x, "numbers")) for s, n, x in self.nearest(text, 10 ** 6, modal=True))}
+        scored = sorted(((len(heads & self._mode_heads(t)), tfidf.get(t, 0.0), t) for t in self.modal), reverse=True)
+        return [(shared, *self.texts[t]) for shared, _, t in scored[:count] if shared or tfidf.get(t, 0.0) > 0]
+
+    @staticmethod
+    def _mode_heads(t):
+        return {" ".join(m.split()[:2]) for m in t.split("•")[1:]}
 
     @staticmethod
     def _grams(t):
@@ -482,8 +502,15 @@ def report(index, abilities):
         lines.append("    no implemented card prints this ability; by part:")
         new = False
         for kind, text in ab.parts:
-            level, hits = index.match_part(kind, text)
             lines.append(f"    {kind}: {text}")
+            if kind == "modal":  # every modal card shares the frame; the ones like this one are the model
+                level, hits = index.match_part(kind, text)
+                near = index.nearest_modal(ab.text)
+                lines.append(f"      {len(hits)} modal abilities say {text!r}" + ("; the most like this one:" if near else ""))
+                for shared, name, theirs in near:
+                    lines.append(describe(name, ab.text, theirs, "        ", f"{shared} mode{'' if shared == 1 else 's'} alike: "))
+                continue
+            level, hits = index.match_part(kind, text)
             if hits:
                 lines.append("      " + matched(level, hits))
                 for name, theirs in hits[:1 if len(hits) > 50 else 2]:  # a common part needs one model

@@ -1,10 +1,11 @@
 """Scryfall's bulk data, cached once a day for every worktree of the repository: each card's current Oracle text and
 its official rulings, by name.
 
-    python tools/maintenance/scryfall.py "Card Name"     # its Oracle text and rulings
+    python tools/maintenance/scryfall.py "Card Name"     # each face's cost, type line, stats and Oracle text; rulings
 
     import scryfall
-    scryfall.card("Card Name")   # {"name", "faces": [{"name", "oracle_text"}], "rulings": [{"date", "text"}]} or None
+    scryfall.card("Card Name")   # {"name", "layout", "faces": [{"name", "mana_cost", "type_line", "power", "toughness",
+                                 #  "loyalty", "defense", "color_indicator", "oracle_text"}], "rulings": [...]} or None
     scryfall.oracle_cards()      # every Oracle Cards object, for whole-pool reports (ability-index.py rank)
 
 The bulk files go to target/scryfall in the main checkout (a worktree's git common directory), so the pool's slots
@@ -22,6 +23,9 @@ import urllib.request
 
 HEADERS = {"User-Agent": "cantrip-maintenance/1.0", "Accept": "application/json"}
 SKIPPED_LAYOUTS = {"token", "double_faced_token", "emblem", "art_series", "vanguard", "scheme", "planar"}
+# What by-name.json keeps of each face; FORMAT changes whenever it does, so an older cache is rebuilt.
+FACE_KEYS = ("mana_cost", "type_line", "power", "toughness", "loyalty", "defense", "color_indicator")
+FORMAT = 2
 
 
 def _main_checkout():
@@ -95,7 +99,7 @@ def _load():
     if oracle is None:
         _index = {}
         return _index
-    stamp = os.path.basename(oracle) + "+" + (os.path.basename(rulings) if rulings else "")
+    stamp = f"v{FORMAT}+" + os.path.basename(oracle) + "+" + (os.path.basename(rulings) if rulings else "")
     built = os.path.join(CACHE, "by-name.json")
     try:
         with open(built, encoding="utf-8") as f:
@@ -118,7 +122,10 @@ def _load():
         faces = d.get("card_faces") or [d]
         card = {
             "name": d["name"],
-            "faces": [{"name": f["name"], "oracle_text": f.get("oracle_text", "")} for f in faces],
+            "layout": d.get("layout", ""),
+            "faces": [{key: f.get(key, d.get(key, "") if key in ("mana_cost", "type_line") and len(faces) == 1 else "")
+                       for key in FACE_KEYS} | {"name": f["name"], "oracle_text": f.get("oracle_text", "")}
+                      for f in faces],
             "rulings": sorted(by_oracle.get(d.get("oracle_id") or faces[0].get("oracle_id"), []), key=lambda r: r["date"]),
         }
         order = lesser.get(d.get("set_type"), 0)
@@ -145,8 +152,14 @@ def main():
     found = card(sys.argv[1])
     if found is None:
         sys.exit(f"no card named {sys.argv[1]!r} on Scryfall")
+    if found.get("layout") not in (None, "", "normal"):
+        print(f"layout: {found['layout']}\n")
     for face in found["faces"]:
-        print(f"{face['name']}\n{face['oracle_text']}\n")
+        stats = "/".join(str(face[k]) for k in ("power", "toughness") if face.get(k))
+        stats = stats or (f"loyalty {face['loyalty']}" if face.get("loyalty") else f"defense {face['defense']}" if face.get("defense") else "")
+        header = "  ".join(x for x in (face["name"], face.get("mana_cost", ""), face.get("type_line", ""), stats) if x)
+        indicator = f"\ncolor indicator: {''.join(face['color_indicator'])}" if face.get("color_indicator") else ""
+        print(f"{header}{indicator}\n{face['oracle_text']}\n")
     for r in found["rulings"]:
         print(f"{r['date']}  {r['text']}")
 
