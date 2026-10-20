@@ -1,0 +1,8 @@
+{
+  "name": "Mayhem Devil",
+  "manaCost": "{1}{B}{R}",
+  "type": "Creature — Devil",
+  "power": 3,
+  "toughness": 3,
+  "oracleText": "Whenever a player sacrifices a permanent, this creature deals 1 damage to any target."
+}
