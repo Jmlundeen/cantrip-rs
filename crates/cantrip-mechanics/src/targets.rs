@@ -537,7 +537,8 @@ pub const fn spell_of_either_color<const A: u8, const B: u8>() -> TargetSpec {
 
 /// "Target creature or planeswalker that's [color A] or [color B]" (CR 115.1, 105.2): a creature or planeswalker that is
 /// either color, or both. The color words are those of the targeting spell's own text (CR 612); `A` and `B` are `Color`s as
-/// `u8`. Devout Decree (black or red) and Refute Destiny (green or blue) print it.
+/// `u8`. Devout Decree (black or red), Refute Destiny (green or blue), Terminal Criticism (blue or red) and, worded
+/// "target black or green creature or planeswalker", Essence Burn print it.
 fn creature_or_planeswalker_of_either_color_filter<const A: u8, const B: u8>(q: &dyn Query, asker: &Asker, t: Target) -> bool {
     if !(CREATURE_OR_PLANESWALKER.filter)(q, asker, t) {
         return false;
