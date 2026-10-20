@@ -1,6 +1,7 @@
 # Blessed Ghoul: lifelink is a core keyword (CR 702.15); "{2}{W/B}: Return this card from your graveyard to your hand"
 # works only in the graveyard (CR 113.6k). Ghoul (1/1) attacks, trades with Elvish Mystic (1/1) and dies; the lifelink
-# gains 1 life, then the ability returns the card to hand. Its ability is refused while it is on the battlefield.
+# gains 1 life, then the ability returns the card to hand. Its ability is refused while it is on the battlefield, with the
+# three mana it costs untapped.
 
 [Bot1 Deck]
 Swamp
@@ -29,10 +30,10 @@ Bot2.Battlefield.Forest.Activate
 Bot2.Hand.Elvish Mystic.Cast
 [T3 Bot1.Main1]
 Bot1.Hand.Swamp.Play
-! Bot1.Battlefield.Blessed Ghoul.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Hand.Blessed Ghoul.Cast
 [T5 Bot1.Main1]
+! Bot1.Battlefield.Blessed Ghoul.Activate
 Bot1.Attack(Blessed Ghoul)
 Bot2.Block(Elvish Mystic > Blessed Ghoul)
 [T5 Bot1.Main2]
