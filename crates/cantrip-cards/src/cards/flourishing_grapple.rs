@@ -1,13 +1,33 @@
 use cantrip_api::*;
-use cantrip_mechanics::{targets,fight};
+use cantrip_mechanics::{fight, targets};
 use cantrip_oracle as oracle;
-/// Red or white opposing creature or planeswalker; both targeting restrictions remain checked on resolution (CR 608.2b).
-fn opposing(q:&dyn Query,me:&Asker,t:Target)->bool{
- (targets::CREATURE_OR_PLANESWALKER.filter)(q,me,t)&&matches!(t,Target::Object(id) if q.controller(id)!=me.controller && (q.chars(id).colors.has(Color::Red)||q.chars(id).colors.has(Color::White)))
+
+/// "Target creature or planeswalker an opponent controls that's red or white" (CR 115.1, 105.2): the colors as it is now,
+/// the color words read through this spell's words (CR 612.2), and checked again as it resolves (CR 608.2b).
+fn red_or_white_opposing(q: &dyn Query, me: &Asker, t: Target) -> bool {
+    let words = q.words(me.source);
+    (targets::CREATURE_OR_PLANESWALKER_AN_OPPONENT_CONTROLS.filter)(q, me, t)
+        && matches!(t, Target::Object(id) if {
+            let colors = q.chars(id).colors;
+            colors.has(words.color(Color::Red)) || colors.has(words.color(Color::White))
+        })
 }
-fn effect(g:&mut dyn Game,i:&StackItem)->Result<(),Suspend>{
- let victim=targets::object(g,i,0);
- if let Some(id)=victim{g.add_effect(i.object,id,EffectKind::LoseAllAbilities,Duration::EndOfTurn);}
- if let (Some(a),Some(b))=(targets::object(g,i,1),victim){fight::bite(g,a,b);}Ok(())
+
+/// "... loses all abilities until end of turn. Target creature you control deals damage equal to its power to that
+/// permanent" (CR 613.1f, 120.3): each target judged on its own (CR 608.2b) - with the first gone nothing is dealt
+/// damage, and with the second gone the first still loses its abilities.
+fn effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
+    let victim = targets::object(g, item, 0);
+    if let Some(id) = victim {
+        g.add_effect(item.object, id, EffectKind::LoseAllAbilities, Duration::EndOfTurn);
+    }
+    if let (Some(creature), Some(victim)) = (targets::object(g, item, 1), victim) {
+        fight::bite(g, creature, victim);
+    }
+    Ok(())
 }
-pub static CARD:CardDef=CardDef{spell:spell(&[target(opposing),targets::CREATURE_YOU_CONTROL],effect),..oracle::FLOURISHING_GRAPPLE};
+
+pub static CARD: CardDef = CardDef {
+    spell: spell(&[target(red_or_white_opposing), targets::CREATURE_YOU_CONTROL], effect),
+    ..oracle::FLOURISHING_GRAPPLE
+};
