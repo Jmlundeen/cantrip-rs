@@ -1,9 +1,15 @@
-# Deterministic printed-card behavior (CR 603, 608).
+# Danitha, Sword of Hope: "Whenever you cast an Equipment spell or a spell that targets a creature you control, draw a
+# card. This ability triggers only once each turn" (CR 603.2, 603.2h). Skullclamp draws on turn 3, Academic Ascent
+# targeting Danitha draws on turn 5 but not the second time that turn, and a Lightning Bolt at Bot2 on turn 7 does not.
+
 [Bot1 Deck]
 Danitha, Sword of Hope
 Mox Pearl x4
 Skullclamp
 Academic Ascent
+Mox Ruby
+Academic Ascent
+Lightning Bolt
 Plains x20
 
 [Bot2 Deck]
@@ -18,13 +24,27 @@ Bot1.Battlefield.Mox Pearl#1.Activate
 Bot1.Battlefield.Mox Pearl#2.Activate
 Bot1.Battlefield.Mox Pearl#3.Activate
 Bot1.Hand.Danitha, Sword of Hope.Cast
+? Bot1.Library.Count = 23
 [T3 Bot1.Main1]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Pearl#1.Activate
+Bot1.Hand.Skullclamp.Cast
+[T3 Bot1.Main2]
+? Bot1.Library.Count = 21
+[T5 Bot1.Main1]
 Bot1.Battlefield.Mox Pearl#1.Activate
 Bot1.Battlefield.Mox Pearl#2.Activate
-Bot1.Battlefield.Mox Pearl#3.Activate
-Bot1.Hand.Skullclamp.Cast
 Bot1.Hand.Academic Ascent.Cast(Bot1.Battlefield.Danitha, Sword of Hope)
+Bot1.Battlefield.Mox Pearl#3.Activate
+Bot1.Battlefield.Mox Pearl#4.Activate
+Bot1.Hand.Academic Ascent.Cast(Bot1.Battlefield.Danitha, Sword of Hope)
+[T5 Bot1.Main2]
+? Bot1.Library.Count = 19
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T7 Bot1.Main2]
 
 [Expect]
 Bot1.Library.Count = 18
-Bot1.Battlefield.Danitha, Sword of Hope.Power = 4
+Bot2.Life = 17

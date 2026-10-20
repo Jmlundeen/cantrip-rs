@@ -1,12 +1,17 @@
-# Deterministic printed-card behavior (CR 603, 608).
+# Danitha, Spear of Agony: "Whenever you cast a spell that targets an opponent or a creature an opponent controls, put a
+# +1/+1 counter on Danitha" (CR 601.2c, 603.2). Bot1's Lightning Bolts at itself and at its own Ornithopter add nothing;
+# the one at Bot2 and the one at Bot2's Ornithopter each add a counter.
+
 [Bot1 Deck]
 Danitha, Spear of Agony
 Mox Jet x3
 Mox Ruby
-Lightning Bolt x2
+Ornithopter
+Lightning Bolt x4
 Swamp x20
 
 [Bot2 Deck]
+Ornithopter
 Island x30
 
 [Actions]
@@ -14,6 +19,7 @@ Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
 Bot1.Battlefield.Mox Jet#1.Activate
 Bot1.Battlefield.Mox Jet#2.Activate
 Bot1.Battlefield.Mox Jet#3.Activate
@@ -21,12 +27,25 @@ Bot1.Hand.Danitha, Spear of Agony.Cast
 Bot1.Pass
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Lightning Bolt.Cast(Bot1)
+[T2 Bot2.Main1]
+Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 ? Bot1.Battlefield.Danitha, Spear of Agony.Counters.PlusOnePlusOne = (absent)
 Bot1.Battlefield.Mox Ruby.Activate
 Bot1.Hand.Lightning Bolt.Cast(Bot2)
+[T5 Bot1.Main1]
+? Bot1.Battlefield.Danitha, Spear of Agony.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot1.Battlefield.Ornithopter)
+[T7 Bot1.Main1]
+? Bot1.Battlefield.Danitha, Spear of Agony.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Ornithopter)
+[T7 Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield.Danitha, Spear of Agony.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Danitha, Spear of Agony.Counters.PlusOnePlusOne = 2
+Bot1.Graveyard.Ornithopter.Power = 0
+Bot2.Graveyard.Ornithopter.Power = 0
 Bot1.Life = 17
 Bot2.Life = 17
