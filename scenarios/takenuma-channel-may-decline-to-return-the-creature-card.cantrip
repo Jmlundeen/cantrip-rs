@@ -1,0 +1,32 @@
+# The return is a "may": with Ornithopter milled and eligible, Bot1 chooses nothing and it stays in the graveyard with the
+# other two milled cards, the discarded Takenuma and the sacrificed Black Lotus.
+
+[Bot1 Deck]
+Takenuma, Abandoned Mire
+Black Lotus
+Mox Jet
+Island x4
+Ornithopter
+Island x2
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Takenuma, Abandoned Mire.Activate
+Bot1.Choose()
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 4
+Bot1.Graveyard.Count = 5
+Bot1.Graveyard = Island; Island; Ornithopter; Takenuma, Abandoned Mire; Black Lotus
+Bot1.Hand = Island; Island; Island; Island

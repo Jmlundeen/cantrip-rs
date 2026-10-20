@@ -1,5 +1,5 @@
-//! Channel (CR 207.2c ability word): an ability activated from a hand by discarding the card. Otawara, Soaring City and
-//! Boseiju, Who Endures print its reduction.
+//! Channel (CR 207.2c ability word): an ability activated from a hand by discarding the card. Otawara, Soaring City,
+//! Boseiju, Who Endures and Takenuma, Abandoned Mire print its reduction.
 
 use cantrip_api::*;
 

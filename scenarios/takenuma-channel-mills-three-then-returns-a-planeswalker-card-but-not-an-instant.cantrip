@@ -1,0 +1,34 @@
+# Channel ({3}{B}, from the hand: Black Lotus and Mox Jet pay it) mills the top three - Ornithopter, Chandra, Lightning
+# Bolt - and then Bot1 may return a creature or planeswalker card from the whole graveyard: Chandra, milled by this very
+# resolution, is returned; the Lightning Bolt is shown but refused.
+
+[Bot1 Deck]
+Takenuma, Abandoned Mire
+Black Lotus
+Mox Jet
+Island x4
+Ornithopter
+Chandra, Torch of Defiance
+Lightning Bolt
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Takenuma, Abandoned Mire.Activate
+! Bot1.Choose(Lightning Bolt)
+Bot1.Choose(Chandra, Torch of Defiance)
+Bot1.Pass
+[Bot1.Main1]
+
+[Expect]
+Stack.Count = 0
+Bot1.Hand.Count = 5
+Bot1.Hand = Chandra, Torch of Defiance; Island; Island; Island; Island
+Bot1.Graveyard.Count = 4
+Bot1.Library.Count = 13
