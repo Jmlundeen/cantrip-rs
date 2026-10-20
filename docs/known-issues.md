@@ -94,6 +94,7 @@ keeps it).
 | [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
+| [KI-87](#ki-87-screaming-nemesis-judges-a-player-is-dealt-damage-this-way-on-the-target-not-the-recipient) | Screaming Nemesis judges "a player is dealt damage this way" on the target, not the recipient | Low | Suspected |
 
 ## Issues
 
@@ -1079,3 +1080,16 @@ NullReferenceException in `GameServer` while a connection was closing, then pass
 A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
 
 **Scenarios.** none; the .NET test above.
+
+### KI-87: Screaming Nemesis judges "a player is dealt damage this way" on the target, not the recipient
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Suspected | card | 2026-10-20, review of Redcap Melee |
+
+**Notes.** `retaliate` in `screaming_nemesis.rs` checks the damage dealt to `item.targets[0]`. A redirection replacement
+(CR 614.1a, 120.3: Ancient Adamantoise sends damage dealt to its controller, "you", as well as to their other permanents, to itself) can change who is
+dealt the damage, so a player targeted but not dealt it still gets "can't gain life", and the player a redirect reaches
+does not. The recipient is the one in the `Event::Damage` the resolution recorded (as Redcap Melee reads it).
+
+**Scenarios.** none.
