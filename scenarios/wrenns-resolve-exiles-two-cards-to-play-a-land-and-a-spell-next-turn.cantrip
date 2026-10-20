@@ -1,0 +1,41 @@
+# Wrenn's Resolve exiles the top two cards (Island, Lightning Bolt) and leaves both playable until the end of the caster's
+# next turn: on turn 3 Bot1 plays the exiled Island as its land drop and casts the exiled Bolt at Bot2 (CR 701.18, 514.2).
+# The Island in hand is refused as a second land play afterwards - the exiled one used the drop.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Wrenn's Resolve
+Island
+Island
+Island
+Island
+Island
+Lightning Bolt
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mountain.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Wrenn's Resolve.Cast
+Bot1.Pass
+Bot2.Pass
+? Exile = Island; Lightning Bolt
+[T3 Bot1.Main1]
+Bot1.Exile.Island.Play
+Bot1.Battlefield.Mountain.Activate
+Bot1.Exile.Lightning Bolt.Cast(Bot2)
+Bot1.Pass
+Bot2.Pass
+! Bot1.Hand.Island.Play
+
+[Expect]
+Bot2.Life = 17
+Exile.Count = 0

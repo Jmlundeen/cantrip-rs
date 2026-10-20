@@ -1,0 +1,6 @@
+{
+  "name": "Wrenn's Resolve",
+  "manaCost": "{1}{R}",
+  "type": "Sorcery",
+  "oracleText": "Exile the top two cards of your library. Until the end of your next turn, you may play those cards."
+}
