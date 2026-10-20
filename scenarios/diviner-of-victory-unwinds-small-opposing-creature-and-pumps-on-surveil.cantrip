@@ -1,4 +1,5 @@
-# Diviner of Victory: the printed abilities and resulting state (CR 608.2, 722).
+# Diviner of Victory enters prepared; its Unwind History returns Bot2's Ornithopter (mana value 0) to hand and surveils 1,
+# which pumps the Diviner (CR 722.3, 701.25). Bot2's Displacer Kitten, mana value 4, is refused as the target.
 
 [Bot1 Deck]
 Diviner of Victory
@@ -8,6 +9,8 @@ Island x20
 
 [Bot2 Deck]
 Ornithopter
+Black Lotus
+Displacer Kitten
 Island x20
 
 [Actions]
@@ -19,13 +22,20 @@ Bot1.Hand.Mox Sapphire.Cast
 Bot1.Battlefield.Mox Sapphire#1.Activate
 Bot1.Hand.Diviner of Victory.Cast
 [T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Black Lotus.Cast
+Bot2.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Displacer Kitten.Cast
 Bot2.Hand.Ornithopter.Cast
 [T3 Bot1.Main1]
 Bot1.Battlefield.Mox Sapphire#1.Activate
 Bot1.Battlefield.Mox Sapphire#2.Activate
+! Bot1.Exile.Unwind History.Cast(Bot2.Battlefield.Displacer Kitten)
 Bot1.Exile.Unwind History.Cast(Bot2.Battlefield.Ornithopter)
 
 [Expect]
 Bot1.Battlefield.Diviner of Victory.Power = 2
 Bot1.Battlefield.Diviner of Victory.Prepared = (absent)
 Bot2.Hand.Ornithopter.Power = 0
+Bot2.Battlefield.Displacer Kitten.Power = 2
