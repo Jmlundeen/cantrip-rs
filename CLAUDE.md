@@ -12,6 +12,21 @@ touches what they cover: `test.cmd /filter "..."` for those, `/noweb` for all bu
 Never run them as a habit or to time the suite; a new test that waits on time takes a fake `TimeProvider` instead,
 unless real time is what it is about.
 
+## No rules deviations
+
+**No automated agent ever allows a change that lets, or risks letting, the engine or a card deviate from the game's
+rules (the Comprehensive Rules and the official rulings).** Not to save time, not for performance, not "until a card
+needs it", and not as a documented known issue. That includes representations that lose information the rules keep: a
+count that clamps or floors, a fixed-size list that drops or cuts down, an approximation that only holds for today's
+cards. A deviation found in review blocks the change; one found in existing code is fixed, or reported to a human at
+once - never filed away as accepted.
+
+Allowing a deviation is a human-only decision, and the answer is almost always no. A human is asked only when the rule
+is nonsensical for this domain (paper-only rules such as ante), when it is extremely niche and extremely complicated to
+build (sub-games, stickers), or when it affects only cards banned in every format Cantrip supports. Every deviation a
+human allows is written in `docs/rules-exceptions.md`, with its rule, its reason and who decided; those decisions may be
+applied to later cases of the same kind, and nothing outside that file is an exception.
+
 ## Engine and cards: bricks, and what is built with them
 
 The design is `docs/engine-design.md`; the card loop is `docs/adding-cards.md`. Three layers, kept apart
@@ -127,5 +142,8 @@ is pushed from there. Card art never goes in: `content/*/images/` is gitignored 
   games), `play-release-build.cmd` (the shipping build), and the bot labs. Generators are in `tools/maintenance/`
   (`new-card.py`); `tools/README.md` lists everything.
 - `docs/engine-design.md` — the engine's design and plan; keep it current when it moves.
-- `docs/known-issues.md` — every known, suspected or unexercised bug, with its severity, notes and the scenarios that
-  show it; an entry is added when a bug is found and not fixed, and deleted by the fix.
+- `docs/known-issues.md` — bugs being tracked: client, tooling and harness problems, and paths no scenario runs yet,
+  with severity, notes and the scenarios that show them. A rules deviation is listed there only while its fix is under
+  way, never as accepted ("No rules deviations" above).
+- `docs/rules-exceptions.md` — the only deviations from the game's rules a human has allowed, each with its rule,
+  reason and who decided.

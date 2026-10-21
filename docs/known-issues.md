@@ -1,10 +1,15 @@
 # Known issues
 
-Everything known to be wrong, suspected to be wrong, or unproven in the engine, the client and the harness, in one
-place. A scenario that shows a bug is still committed with a `# Known bug:` line (`scenarios/README.md`, "Known bugs");
-this file is where that bug is described, ranked and followed. Add an entry when a bug, a suspicion or an unexercised
-path is found and not fixed in the same change; when it is fixed, delete the entry in the fixing commit (the history
-keeps it).
+Problems being tracked in the client, the tooling and the harness, and engine paths no scenario runs yet, in one place.
+A scenario that shows a bug is still committed with a `# Known bug:` line (`scenarios/README.md`, "Known bugs"); this
+file is where that bug is described, ranked and followed. When it is fixed, delete the entry in the fixing commit (the
+history keeps it).
+
+**This file never accepts a deviation from the game's rules** (`CLAUDE.md`, "No rules deviations"). A rules deviation
+found in review blocks the change that has it. One found in existing code is fixed, or reported to a human at once; it
+appears here only while its fix is under way, marked as such, and is never left to wait for "a card that needs it". A
+path no scenario runs gets a test - a Rust test with test-only cards when no printed card reaches it - rather than an
+entry. The only allowed deviations are the human decisions in `docs/rules-exceptions.md`.
 
 ## Severity
 

@@ -108,8 +108,8 @@ Every card worked on is a GitHub issue, claimed before any work on it (`claims.m
 - **A card that already exists is validated, not rebuilt.** If it already has a content file (here, on a local branch,
   or `claim` says "already implemented"), look for a minute or two: where its text needs code, the card file exists
   and plainly does what the text reads, and its JSON's text is the card's. If so, close the issue as already
-  implemented with a comment and take the next card. Anything doubtful goes into `docs/known-issues.md`, not a rebuild;
-  only code that is missing or plainly wrong sends it through the loop below.
+  implemented with a comment and take the next card. A doubt about its rules is reported to the coordinator to be
+  checked and fixed, not filed away; only code that is missing or plainly wrong sends it through the loop below.
 
 ## The loop for one card
 
@@ -212,5 +212,6 @@ needs, extend the harness (`crates/cantrip-script`) and its README; never weaken
 
 **A scenario that shows a bug is committed, not dropped.** If the engine or another card gets something wrong that
 this change cannot fix, commit the scenario asserting the rules-correct outcome with `# Known bug: <what, and the
-rule>` at the top (`scenarios/README.md`, "Known bugs"), and an entry in `docs/known-issues.md`; the fix removes both.
-Never delete, weaken or rewrite a scenario to pass because the engine is wrong.
+rule>` at the top (`scenarios/README.md`, "Known bugs"), and an entry in `docs/known-issues.md`, and report it to the
+coordinator: a rules deviation is fixed next, never left waiting (`CLAUDE.md`, "No rules deviations"); the fix removes
+both. Never delete, weaken or rewrite a scenario to pass because the engine is wrong.
