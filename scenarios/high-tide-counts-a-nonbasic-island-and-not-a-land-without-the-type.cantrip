@@ -1,13 +1,17 @@
-# High Tide reads the land type, not the name (its rulings: "any land with the land type Island"; CR 305.6): Bot1's
-# Tropical Island, an Island Forest, tapped for {G} still adds the additional {U}, while a Forest adds nothing more. Each
-# additional {U} is added at once with the stack empty (CR 605.4a).
+# High Tide reads the land type, not the name (its rulings: "any land with the land type Island"; CR 305.6), and its
+# additional {U} comes at once, even in the middle of paying a cost (CR 605.4a). Turn 7: with High Tide resolved, Bot1
+# casts Lord of Atlantis ({U}{U}) and taps one Island while paying: the Island's {U} and High Tide's pay the whole cost,
+# so Tropical Island, the other source of {U}, stays untapped. Tapped later for {G}, Tropical Island, an Island Forest,
+# still adds the additional {U}, while a Forest adds nothing more.
 
 [Bot1 Deck]
 Island
 High Tide
 Tropical Island
 Forest
-Island x16
+Lord of Atlantis
+Island
+Island x14
 
 [Bot2 Deck]
 Island x20
@@ -18,8 +22,15 @@ Bot1.Hand.Island.Play
 Bot1.Hand.Tropical Island.Play
 [T5 Bot1.Main1]
 Bot1.Hand.Forest.Play
-Bot1.Battlefield.Island.Activate
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
 Bot1.Hand.High Tide.Cast
+Bot1.Pass
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Battlefield.Island#2.Activate
+? Stack = Lord of Atlantis
+? Bot1.Mana =
 Bot1.Pass
 Bot1.Battlefield.Tropical Island.Activate(Ability: {G})
 ? Stack.Count = 0
@@ -29,3 +40,4 @@ Bot1.Battlefield.Forest.Activate
 
 [Expect]
 Bot1.Graveyard = High Tide
+Bot1.Battlefield = Forest; Island; Island; Lord of Atlantis; Tropical Island
