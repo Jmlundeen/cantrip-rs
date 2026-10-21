@@ -2479,9 +2479,10 @@ pub fn end_lapsed_durations(cx: &mut Cx, id: ObjectId) {
         if cx.s().effects.len() < effects_before {
             cx.state_changed();
         }
-        // A control-changing effect that ended gives the permanent back as it ends (CR 613.1b).
+        // A control-changing effect that ended gives the permanent back as it ends (CR 613.1b), and whatever its controller
+        // decides with it.
         if control {
-            refresh_control(cx, id);
+            settle_control(cx);
         }
     }
 }
@@ -2756,18 +2757,8 @@ fn attackable(cx: &Cx, attacking: PlayerId, defender: Target) -> bool {
     }
 }
 
-/// Settles who controls a permanent from the control-changing effects (CR 613.1b, layer 2): what layer 2's order makes of
-/// it (`layers::control_order`), else whoever controlled it before any of them did. Control that is new is new for summoning
-/// sickness (CR 302.6) and takes the permanent out of combat (CR 506.4). Whether its controller changed.
-pub fn refresh_control(cx: &mut Cx, id: ObjectId) -> bool {
-    if !live(cx.s(), id) || !cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
-        return false;
-    }
-    settle_controller(cx, id)
-}
-
-/// `refresh_control` of a permanent on the battlefield or phased out: a phased-out one is settled only where the rules ask
-/// who controls it though it is treated as not existing (CR 800.4a, 702.26n: a player leaving).
+/// Settles one phased-out permanent from layer 2's order (`layers::control_order`): settled only where the rules ask who
+/// controls it though it is treated as not existing (CR 800.4a, 702.26n: a player leaving).
 fn settle_controller(cx: &mut Cx, id: ObjectId) -> bool {
     let order = layers::control_order(cx.cards(), cx.s(), &cx.g.log);
     match order.into_iter().find(|&(of, _, _)| of == id) {
@@ -2833,7 +2824,7 @@ pub fn duration_begins(cx: &Cx, e: &cantrip_state::ContinuousEffect) -> bool {
 
 /// Whether any control-changing effect could apply, or have applied: the guard of `settle_control`, free in nearly every
 /// position.
-fn control_may_change(cx: &Cx) -> bool {
+pub(crate) fn control_may_change(cx: &Cx) -> bool {
     let s = cx.s();
     let cards = cx.cards();
     s.effects.iter().any(|e| matches!(e.kind, EffectKind::Control(_)))
@@ -2851,15 +2842,25 @@ pub fn settle_at_once(cx: &mut Cx) {
     if cx.s().settle_held.get() > 0 {
         return;
     }
-    let (lasting, control) = cx.s().effects.iter().fold((false, false), |(l, c), e| {
-        (l || matches!(e.duration, Duration::AsLongAs(..)), c || matches!(e.kind, EffectKind::Control(_)))
-    });
-    if lasting {
-        end_lapsed_conditions(cx);
+    settle_lasting_and_control(cx);
+}
+
+/// Ends the "for as long as" effects whose condition is false (CR 611.2b) and settles control (CR 613.1b), again and again
+/// while either changes anything: a change of control can end an effect "for as long as you control [it]", whose end
+/// changes control again. It ends, as each round but the last ends an effect or changes nothing. Whether anything changed.
+pub fn settle_lasting_and_control(cx: &mut Cx) -> bool {
+    let mut changed = false;
+    // Each round that goes on ended an effect; there are no more rounds than effects, and one to see nothing more changes.
+    for _ in 0..=cx.s().effects.len() {
+        let lasting = cx.s().effects.iter().any(|e| matches!(e.duration, Duration::AsLongAs(..)));
+        let ended = lasting && end_lapsed_conditions(cx);
+        let moved = control_may_change(cx) && settle_control(cx);
+        changed |= ended || moved;
+        if !ended && !(moved && lasting) {
+            break;
+        }
     }
-    if control || control_may_change(cx) {
-        settle_control(cx);
-    }
+    changed
 }
 
 /// Runs `f` as one instruction (CR 608.2c): what continuous effects say of control and "for as long as" durations is

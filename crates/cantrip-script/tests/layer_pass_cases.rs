@@ -416,8 +416,6 @@ const INERT: &[(&str, &str)] = &[
         "Wretched Bonemass",
         "its effect gives the keywords of the cards used to craft it, read through the view (`LayerQuery::chars`), a link no synthetic state makes",
     ),
-    ("Mind Control", "a control-changing ability (layer 2): it changes no characteristic, so `apply` does nothing by design"),
-    ("Treachery", "a control-changing ability (layer 2): it changes no characteristic, so `apply` does nothing by design"),
 ];
 
 /// The contract of every static ability's effect (`StaticApply`), across the whole card table: applied to synthetic objects
@@ -454,4 +452,27 @@ fn a_static_ability_that_takes_a_value_from_its_object_is_found() {
     let breaches = apply_contract_check(table).breaches;
     assert_eq!(breaches.len(), 1, "{}", breaches.join("\n"));
     assert!(breaches[0].starts_with("Probe Bad Doubler"));
+}
+
+fn creature_an_opponent_stores(q: &dyn LayerQuery, source: ObjectId, id: ObjectId, c: &Chars) -> bool {
+    // Against the contract of a control-changing reach: the stored controllers, not `LayerQuery::controller`.
+    c.is(CardType::Creature) && q.state().obj(id).controller != q.state().obj(source).controller
+}
+
+/// "You control each creature an opponent controls", control read from the state: the check finds it.
+static BAD_USURPER: CardDef = CardDef {
+    name: "Probe Bad Usurper",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    statics: &[control_changing(creature_an_opponent_stores, "You control each creature an opponent controls.")],
+    ..CardDef::BLANK
+};
+
+#[test]
+fn a_control_changing_reach_that_reads_the_stored_controller_is_found() {
+    static TABLE: OnceLock<CardTable> = OnceLock::new();
+    let table = TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BAD_USURPER])));
+    let breaches = apply_contract_check(table).breaches;
+    assert_eq!(breaches.len(), 1, "{}", breaches.join("
+"));
+    assert!(breaches[0].starts_with("Probe Bad Usurper"));
 }

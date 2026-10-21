@@ -589,7 +589,7 @@ struct Stage<'a> {
 }
 
 /// Whether `CANTRIP_VERIFY` is set: the layers check themselves.
-fn verifying() -> bool {
+pub(crate) fn verifying() -> bool {
     static VERIFY: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *VERIFY.get_or_init(|| std::env::var_os("CANTRIP_VERIFY").is_some())
 }
@@ -2248,6 +2248,35 @@ pub fn apply_contract_check(cards: &'static CardTable) -> ApplyContract {
             }))
             .collect();
         for st in statics {
+            // A control-changing ability's reach reads control through the view (`LayerQuery::controller`), which in layer 2
+            // is the controller the effects applied so far leave: asked with the stored controllers swapped and the view's
+            // held, its answer must not move.
+            if st.layer == Layer::Control {
+                for scene in 0..SCENES {
+                    let (mut state, source, object) = contract_scene(cards, card, objects.first().copied().unwrap_or(card), scene);
+                    let first = chars_before(cards, &state, &[], object, Layer::Control);
+                    let held: std::collections::HashMap<ObjectId, PlayerId, Quick> =
+                        [(source, PlayerId(0)), (object, PlayerId(1))].into_iter().collect();
+                    let ask = |state: &GameState| {
+                        let view = View { controllers: Some(&held), ..View::new(cards, state, &[], Layer::Control) };
+                        (st.affects)(&view, source, object, &first)
+                    };
+                    let before = ask(&state);
+                    let flip = |p: PlayerId| PlayerId(1 - p.0.min(1));
+                    let mut moved = false;
+                    for id in [source, object] {
+                        let was = state.obj(id).controller;
+                        state.update_obj(id, |x| x.controller = flip(was));
+                        moved |= ask(&state) != before;
+                        state.update_obj(id, |x| x.controller = was);
+                    }
+                    if moved {
+                        breaches.push(format!("{} ({}): its reach read the stored controller, not `LayerQuery::controller`", def.name, st.text));
+                        break;
+                    }
+                }
+                continue;
+            }
             let mut changed = false;
             let mut broke = None;
             'scenes: for scene in 0..SCENES {
@@ -2362,7 +2391,13 @@ pub fn control_order(cards: &CardTable, state: &GameState, log: &[Record]) -> Ve
                 objects
                     .iter()
                     .copied()
-                    .filter(|&id| id != source && firsts.get(&id).is_some_and(|first| (st.affects)(&view, source, id, first)))
+                    // A phased-out permanent is treated as though it doesn't exist (CR 702.26b, 702.26d): no static ability
+                    // reaches it; it keeps its controller and the resolved effects on it.
+                    .filter(|&id| {
+                        id != source
+                            && state.obj(id).zone.is(ZoneKind::Battlefield)
+                            && firsts.get(&id).is_some_and(|first| (st.affects)(&view, source, id, first))
+                    })
                     .map(|id| (id, who))
                     .collect()
             }

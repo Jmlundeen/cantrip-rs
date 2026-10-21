@@ -213,9 +213,13 @@ would go over unclickable.
   controller the effects applied so far leave) or whom it gives control to (its source's controller), a dependency loop is
   broken by timestamp order (RX-3), and each permanent starts from whoever controlled it before any effect did. Its result
   is written to the stored controller (`ops::write_controller`); new control is new for summoning sickness and takes the
-  permanent out of combat. `ops::settle_control` writes it at every event and added effect and at the end of each
-  instruction (`ops::settle_at_once`), and as the state-based actions are checked; free while nothing has ever changed
-  control. Every reader of a controller reads the stored one, which layer 2 settled, so layers 3 to 7 see it. A layer-2 ability applies though its source
+  permanent out of combat. `ops::settle_control` writes it for every permanent at every event and added effect and at the
+  end of each instruction, at cleanup, in the untap step and as permanents phase in, and as the state-based actions are
+  checked - with the "for as long as" effects ended in turn until neither changes anything
+  (`ops::settle_lasting_and_control`: a change of control can end "for as long as you control [it]"); free while nothing
+  has ever changed control. A phased-out permanent is reached by no control-changing static ability (702.26b). With
+  `CANTRIP_VERIFY`, every trigger collection checks that each stored controller is what layer 2 says, and the contract
+  check asks each control-changing reach with the stored controllers moved and the view's held. Every reader of a controller reads the stored one, which layer 2 settled, so layers 3 to 7 see it. A layer-2 ability applies though its source
   loses its abilities in layer 6 (CR 613.1). Durations end it as they end any effect: end of turn (`turn.rs`), a source
   leaving, a permanent untapping (`ops::end_lapsed_durations`), or a card's own "for as long as" condition
   (`Duration::AsLongAs(card, index)` naming one of `CardDef::lasting`, asked by `ops::end_lapsed_conditions` at each check

@@ -471,8 +471,7 @@ pub(crate) fn untap_step(cx: &mut Cx, active: PlayerId) -> R<()> {
     // No player gets priority in the untap step (CR 502.4), so no state-based actions are checked before the upkeep begins:
     // an effect "for as long as [it] remains tapped" ends the moment its source untaps (CR 611.2b), and the controller it
     // gave back is the one the upkeep's "at the beginning of your upkeep" abilities see (CR 613.1b).
-    ops::end_lapsed_conditions(cx);
-    ops::settle_control(cx);
+    ops::settle_lasting_and_control(cx);
     // That untap step has now happened for everything its player exerted, whoever controls it now (CR 701.43a).
     for id in cx.s().battlefield().to_vec() {
         if cx.s().obj(id).marks.exerted_by == Some(active) {
@@ -1165,7 +1164,7 @@ fn blocker_division(cx: &Cx, blocker: ObjectId) -> Option<DamageDivision> {
 }
 
 /// Cleanup (CR 514): discard to hand size, then damage wears off and "until end of turn" effects end.
-fn cleanup(cx: &mut Cx) -> R<()> {
+pub(crate) fn cleanup(cx: &mut Cx) -> R<()> {
     let active = cx.s().turn.active;
     // CR 514.1: "sacrifice it at the beginning of the next cleanup step", for the permanents whose card says so, each by its
     // controller, together.
@@ -1219,20 +1218,13 @@ fn cleanup(cx: &mut Cx) -> R<()> {
         }
     }
     if cx.s().effects.iter().any(|e| e.duration == Duration::EndOfTurn) {
-        // A permanent whose control was only taken until end of turn goes back (CR 613.1b).
-        let controlled: Vec<ObjectId> = cx
-            .s()
-            .effects
-            .iter()
-            .filter(|e| e.duration == Duration::EndOfTurn && matches!(e.kind, EffectKind::Control(_)))
-            .map(|e| e.affected)
-            .collect();
         // A permanent that was only a copy until end of turn is what it was again (CR 707.2, 611.2b), as far as the copy
         // effects that are left say: the state undoes a copy effect as it removes it (`GameState::effect_remove`).
         cx.st().effects_retain(|e| e.duration != Duration::EndOfTurn);
-        for id in controlled {
-            ops::refresh_control(cx, id);
-        }
+        // Control is settled for every permanent: an effect that ended may have decided another's controller too (a copy
+        // effect that made a permanent an Aura that gives control), before anything reads it (the untap step's "untap all
+        // permanents you control").
+        ops::settle_lasting_and_control(cx);
     }
     // Permissions to play cards end with the turn they name (CR 514.2), "this turn" or "your next turn"; one for a
     // card that has since moved is gone with the old object (CR 400.7).

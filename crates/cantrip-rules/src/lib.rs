@@ -1587,7 +1587,7 @@ impl cantrip_api::Game for Cx<'_> {
             self.g.state.see_statics();
         }
         if matches!(kind, EffectKind::Control(_)) {
-            ops::refresh_control(self, affected);
+            ops::settle_control(self);
         }
         // What it changes may end a "for as long as" (Old Man of the Sea's "that creature's power remains less than or
         // equal to"), and with it the control it gave, at once (CR 611.2b).

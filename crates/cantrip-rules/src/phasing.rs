@@ -139,8 +139,10 @@ fn phase_in(cx: &mut Cx, permanents: &[ObjectId]) {
             cx.st().update_obj(id, |o| o.attached_player = None);
         }
     }
+    // Control is settled for every permanent: one that phased in may decide another's controller (an Aura that gives
+    // control phasing in on its own, CR 702.26).
+    crate::ops::settle_control(cx);
     for &id in &all {
-        crate::ops::refresh_control(cx, id);
         // CR 722.3c: one that phases in prepared has its prepare spell's copy made in exile again, its old one having
         // ceased to exist while it was phased out (no becoming prepared: nothing that watches that sees it) - unless the
         // state-based actions have not yet ended the old one, which then stays the one copy.

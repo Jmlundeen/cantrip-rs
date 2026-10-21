@@ -1,6 +1,6 @@
 //! "For as long as it has a [kind] counter on it" (CR 611.2b, `Duration::WhileCounter`) ended by the last such counter coming off
 //! in the ways no printed card in the engine pairs with the duration: a stun counter removed in place of an untap (CR 122.1d),
-//! ending a control-changing effect (`ops::end_counter_durations`, `refresh_control`), counters removed as a cost (CR 118.3:
+//! ending a control-changing effect (`ops::end_counter_durations`, `settle_control`), counters removed as a cost (CR 118.3:
 //! Loch Mare's), and damage removing a planeswalker's last loyalty counters (CR 120.3c). Test cards make the effects, beside the
 //! printed cards and every other card the engine has.
 

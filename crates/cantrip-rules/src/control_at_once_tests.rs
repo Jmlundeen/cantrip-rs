@@ -228,3 +228,87 @@ fn a_control_effect_does_not_reach_a_land_animated_in_layer_four() {
     assert_eq!(cx.s().obj(field).controller, YOU);
     assert_eq!(cx.s().obj(bear).controller, THEM);
 }
+
+static PLAIN: CardDef = CardDef { name: "Control Test Plain", types: TypeSet::of(&[CardType::Enchantment]), ..CardDef::BLANK };
+
+/// "... for as long as you control [this]": the effect's source.
+fn you_control_its_source(q: &dyn Query, e: &ContinuousEffect) -> bool {
+    q.state().obj(e.source).controller == e.controller
+}
+
+static HOLDER: CardDef = CardDef {
+    name: "Control Test Holder",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    lasting: &[Lasting { text: "", holds: you_control_its_source }],
+    ..CardDef::BLANK
+};
+
+fn more_game() -> (Game, &'static CardTable) {
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&LEASH, &TYRANT, &PLAIN, &HOLDER, &BEAR])));
+    (Game::new(table, &Setup { decks: vec![Vec::new(), Vec::new()], ..Default::default() }), table)
+}
+
+/// CR 611.2b, 613.1b: their plain enchantment on your Bear is a copy of a Leash until end of turn, and so gives them the
+/// Bear. At cleanup the copy effect ends, and the Bear is yours again at once - before the untap step reads who controls it.
+#[test]
+fn a_copy_effect_ending_at_cleanup_gives_back_what_its_copy_controlled() {
+    let (mut game, table) = more_game();
+    let bear = put(&mut game, table, &BEAR, YOU);
+    let plain = put(&mut game, table, &PLAIN, THEM);
+    game.state.update_obj(plain, |o| o.attached_to = Some(bear));
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::become_copy(&mut cx, plain, plain, Copiable::of(table.id_of(&LEASH)), Duration::EndOfTurn);
+    crate::ops::settle_control(&mut cx);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+    crate::turn::cleanup(&mut cx).expect("a cleanup with nothing to ask");
+    assert_eq!(cx.s().obj(bear).controller, YOU);
+}
+
+/// CR 702.26, 613.1b: their Leash on your Bear phases out (the Bear is yours), and phases in during their untap step: the
+/// Bear is theirs again as it does.
+#[test]
+fn an_aura_phasing_in_gives_control_of_its_creature() {
+    let (mut game, table) = more_game();
+    let bear = put(&mut game, table, &BEAR, YOU);
+    let leash = put(&mut game, table, &LEASH, THEM);
+    game.state.update_obj(leash, |o| o.attached_to = Some(bear));
+    let mut cx = cx(&mut game);
+    crate::ops::settle_control(&mut cx);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+    crate::phasing::phase_out(&mut cx, &[leash], None, false);
+    crate::ops::settle_control(&mut cx);
+    assert_eq!(cx.s().obj(bear).controller, YOU);
+    crate::phasing::untap_step(&mut cx, THEM);
+    assert_eq!(cx.s().obj(leash).zone, Zone::BATTLEFIELD);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+}
+
+/// CR 611.2b, 613.1b: you control their Bear for as long as you control your Holder. Their Leash takes the Holder; that
+/// ends the effect, and the Bear is theirs again - settled at once, the one change after the other.
+#[test]
+fn a_for_as_long_as_you_control_effect_ends_when_control_of_its_source_changes() {
+    let (mut game, table) = more_game();
+    let holder = put(&mut game, table, &HOLDER, YOU);
+    let bear = put(&mut game, table, &BEAR, THEM);
+    let mut cx = cx(&mut game);
+    cantrip_api::Game::add_effect(&mut cx, holder, bear, EffectKind::Control(YOU), Duration::AsLongAs(table.id_of(&HOLDER), 0));
+    assert_eq!(cx.s().obj(bear).controller, YOU);
+    let leash = put(cx.g, table, &LEASH, THEM);
+    cx.st().update_obj(leash, |o| o.attached_to = Some(holder));
+    crate::ops::settle_at_once(&mut cx);
+    assert_eq!(cx.s().obj(holder).controller, THEM);
+    assert_eq!(cx.s().obj(bear).controller, THEM);
+}
+
+/// CR 702.26b, 702.26d: a phased-out permanent is treated as though it doesn't exist; "you control all creatures" does not
+/// reach your phased-out Bear.
+#[test]
+fn a_phased_out_permanent_is_untouched_by_a_control_changing_ability() {
+    let (mut game, table) = more_game();
+    put(&mut game, table, &TYRANT, THEM);
+    let bear = put(&mut game, table, &BEAR, YOU);
+    let mut cx = cx(&mut game);
+    crate::phasing::phase_out(&mut cx, &[bear], None, false);
+    let order = crate::layers::control_order(cx.cards(), cx.s(), &cx.g.log);
+    assert!(order.contains(&(bear, YOU, false)), "{order:?}");
+}

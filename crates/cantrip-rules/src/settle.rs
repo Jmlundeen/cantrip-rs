@@ -70,8 +70,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
     // CR 611.2b: an effect "for as long as" a condition ends once it is false; then, CR 613.1b: who controls each permanent
     // is what the control-changing effects that apply now say, before anything that asks it (the legend rule, an Aura's
     // legality, "you control").
-    ops::end_lapsed_conditions(cx);
-    ops::settle_control(cx);
+    ops::settle_lasting_and_control(cx);
 
     // CR 704.5a, 704.5b, 704.5c: a player at 0 life, who attempted to draw from an empty library since the last check, or
     // with ten or more poison counters loses - unless a static ability says they don't lose that way (CR 104.3: Platinum
@@ -444,7 +443,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         acted |= ops::settle_control(cx);
     }
     // "For as long as you control [this permanent]" permissions end with the permanent's leaving (CR 611.2b, 400.7); a
-    // change of control or phasing out ends them as it happens (`refresh_control`, `phase_out`).
+    // change of control or phasing out ends them as it happens (`settle_control`, `phase_out`).
     if !cx.s().permissions.is_empty() {
         cx.st().end_lapsed_permissions();
     }
@@ -1039,6 +1038,15 @@ pub fn collect_triggers(cx: &mut Cx, event: &Event, before: Option<Before>, star
 /// members the subjects of the events it matched; a limited one ("triggers only N times each turn", no numbered rule; CR 603.2h is "do this only once each turn") stops triggering once it has used up its
 /// turn, a triggering that happens being noted in the history.
 pub fn collect_batch(cx: &mut Cx, events: &[Event], before: Option<Before>, start: usize) {
+    // With `CANTRIP_VERIFY`: every permanent's stored controller is what layer 2 says (`layers::control_order`), outside an
+    // instruction that holds settling - a write path that skipped a settle is found here.
+    if crate::layers::verifying() && cx.s().settle_held.get() == 0 && crate::ops::control_may_change(cx) {
+        for (id, controller, _) in crate::layers::control_order(cx.cards(), cx.s(), &cx.g.log) {
+            if cx.s().obj(id).zone.is(ZoneKind::Battlefield) {
+                assert_eq!(cx.s().obj(id).controller, controller, "{id:?}'s stored controller is not what layer 2 says");
+            }
+        }
+    }
     // A designation the events gave is had before anything they trigger is looked for, and the continuous effects that
     // read it apply to that look (CR 702.131d, 702.195c): Bifur, Melodic Rider entering for the third storied permanent
     // makes its own enters ability trigger an additional time.
