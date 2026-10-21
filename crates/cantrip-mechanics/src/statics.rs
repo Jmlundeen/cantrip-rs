@@ -54,7 +54,7 @@ pub const ANY_SPELL: u16 = 0;
 /// static ability declared `.everywhere()`: a spell on the stack (an ability on the stack has no card types) controlled by the
 /// source's controller that has one of the card types in `TYPES`, a bitset of `CardType as u16` positions (`TypeSet.0`), judged on
 /// what the earlier layers made it; `TYPES` of 0 is every spell. Frenzied Baloth (creature spells), Hexing Squelcher (spells) and
-/// Sphinx of the Final Word (instant and sorcery spells) print it before "can't be countered".
+/// Sphinx of the Final Word and Samut, Tyrant of Naktamun (instant and sorcery spells) print it before "can't be countered".
 pub fn your_spells_of_types<const TYPES: u16>(q: &dyn LayerQuery, source: ObjectId, affected: ObjectId, so_far: &Chars) -> bool {
     let o = q.state().obj(affected);
     let of_a_type = if TYPES == 0 { so_far.types != TypeSet::NONE } else { so_far.types.0 & TYPES != 0 };
