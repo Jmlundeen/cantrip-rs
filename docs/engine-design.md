@@ -316,7 +316,8 @@ would go over unclickable.
   Priest exiles a card entering transformed into a creature) - asked only where a replacement effect could apply
   (`replace::possible`) or a counter ban could limit its counters. A resolved effect that sets a land's
   subtype ("target land becomes an Island until end of turn") has no `EffectKind` yet; the copiable values a copy effect gave
-  such a land other than abilities stay (KI-51).
+  such a land other than abilities stay: CR 305.7 lists copiable effects among the sources of the abilities it loses,
+  against the abilities other effects granted, which it keeps.
 - **A face-down permanent is what the rule that put it there lists (708.2)**: `Game::put_onto_battlefield_face_down` takes
   `FaceDown::Manifested` (701.40a, a 2/2) or `FaceDown::Cloaked` (701.58a, a 2/2 with ward {2}), and gives the card those
   copiable values (`intrinsic::FACE_DOWN`, `intrinsic::CLOAKED`) before it enters (708.3). On the battlefield they are its

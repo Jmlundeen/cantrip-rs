@@ -53,7 +53,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
-| [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-61](#ki-61-a-land-whose-own-layer-4-ability-and-a-subtype-setting-ability-depend-on-each-other-is-judged-by-a-capped-fixpoint) | A land whose own layer-4 ability and a subtype-setting ability depend on each other is judged by a capped fixpoint | Pri-1 | Fix under way |
@@ -164,29 +163,6 @@ client shows poison on the player rail and the language-model client in its text
 affected.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome; a bot-lab duel with infect decks would show it.
-
-### KI-51: A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Exercised; the reading is the CR's grammar, no ruling | engine | 2026-10-17, Magus of the Moon |
-
-**Notes.** CR 305.7: a land whose subtype an effect sets "loses all abilities generated from its rules text, its old land types,
-and any copiable effects affecting that land". The engine reads the sentence as naming the three sources of the abilities the land
-loses - its rules text, its old land types (their mana abilities, CR 305.6) and any copiable effects (a copied card's abilities
-and keywords, a copy's "except it has ...") - so `Chars::set_land_subtypes` takes, in layer 4, every ability the land has by
-then, and what else a copy effect made of it (the name, supertypes, card types, colors, power and toughness of what it copies,
-CR 707.2) stays, as layer 1 applied it. The sentence's first clause already says the land "no longer has its old land type", so
-"loses ... its old land types" read as a list of things lost would repeat it; read as sources of abilities it does not. The
-other reading - the copy effect itself is lost - has the land stop being what made it a land at all in the case of a Clone
-copying a Dryad Arbor, and no ruling of Blood Moon, Magus of the Moon, Vesuva or Thespian's Stage says so; the judges' articles
-consulted (Blood Moon, Progenitor of Dependency; a 2013 Judge Forum thread on Thespian's Stage under Blood Moon, which predates
-the "copiable effects" wording and kept the Stage's ability) settle nothing either way. A ruling that the copy effect goes
-entirely would start the land's characteristics from its own card when `layers::land_text_lost` holds it.
-
-**Scenarios.** vesuva-copying-dark-depths-under-blood-moon-is-a-legendary-mountain-named-dark-depths-with-no-abilities,
-thespians-stage-copying-urborg-under-blood-moon-keeps-the-name-and-loses-the-ability-it-kept,
-clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: they assert this reading and pass.
 
 ### KI-54: A loop a player could stop is shortcut after a fixed number of rounds, not one the players name
 
