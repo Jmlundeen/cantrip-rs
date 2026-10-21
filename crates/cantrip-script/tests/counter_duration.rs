@@ -5,7 +5,9 @@
 //!
 //! - a counter of the kind put on again after the last one came off does not bring the ended effect back (CR 611.2b: an effect
 //!   that has ended stays ended);
-//! - the effect never begins on an object without such a counter.
+//! - the effect never begins on an object without such a counter;
+//! - nor does "for as long as it remains tapped" (`Duration::WhileTapped`) on an untapped one. Braided Net, the one printed
+//!   card with it, always taps the permanent first.
 
 use std::sync::OnceLock;
 
@@ -54,6 +56,18 @@ fn refill(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
     Ok(())
 }
 
+/// Target land's activated abilities can't be activated for as long as it remains tapped (it is not tapped).
+fn netless(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    g.add_effect(item.object, the_land(item), EffectKind::CantActivateAbilities, Duration::WhileTapped);
+    Ok(())
+}
+
+/// Tap target land. Its activated abilities can't be activated for as long as it remains tapped (Braided Net's).
+fn net(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
+    g.tap(the_land(item));
+    netless(g, item)
+}
+
 static LAND: [TargetSpec; 1] = [target(land)];
 
 const fn probe(name: &'static str, effect: fn(&mut dyn Rules, &StackItem) -> Result<(), Suspend>) -> CardDef {
@@ -64,13 +78,15 @@ static FLOOD: CardDef = probe("Probe Flood", flood);
 static BARE: CardDef = probe("Probe Bare", bare);
 static DRAIN: CardDef = probe("Probe Drain", drain);
 static REFILL: CardDef = probe("Probe Refill", refill);
+static NETLESS: CardDef = probe("Probe Netless", netless);
+static NET: CardDef = probe("Probe Net", net);
 
 /// A land with no land type, to fill hands and libraries.
 static FILLER: CardDef = CardDef { name: "Filler", has_cost: false, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
 
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new([&FLOOD, &BARE, &DRAIN, &REFILL, &FILLER]))
+    TABLE.get_or_init(|| CardTable::new([&FLOOD, &BARE, &DRAIN, &REFILL, &NETLESS, &NET, &FILLER]))
 }
 
 /// A two-player game: the first seat's hand is a Filler, then the named cards; the rest are Fillers.
@@ -171,4 +187,17 @@ fn the_effect_never_begins_on_an_object_without_the_counter() {
     play(&mut game, &["Probe Bare", "Probe Refill"], |g, name| seen.push((name.to_string(), the_filler(g))));
     assert_eq!(seen, vec![("Probe Bare".to_string(), (false, 0)), ("Probe Refill".to_string(), (false, 1))]);
     assert!(game.state.effects.iter().all(|e| e.duration != Duration::WhileCounter(CounterKind::Flood)));
+}
+
+/// CR 611.2b: "for as long as it remains tapped" never begins on an untapped land, where it does on one the same effect has
+/// just tapped (Braided Net's order).
+#[test]
+fn an_effect_while_tapped_never_begins_on_an_untapped_permanent() {
+    let while_tapped = |game: &Game| game.state.effects.iter().filter(|e| e.duration == Duration::WhileTapped).count();
+    let mut game = deal(&["Probe Netless"]);
+    play(&mut game, &["Probe Netless"], |_, _| {});
+    assert_eq!(while_tapped(&game), 0);
+    let mut game = deal(&["Probe Net"]);
+    play(&mut game, &["Probe Net"], |_, _| {});
+    assert_eq!(while_tapped(&game), 1);
 }

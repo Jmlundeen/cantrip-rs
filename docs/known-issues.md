@@ -45,7 +45,6 @@ keeps it).
 | [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
-| [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-50](#ki-50-an-animation-that-replaces-creature-types-is-unexercised) | An animation that replaces creature types is unexercised | Low | Unexercised |
@@ -230,22 +229,6 @@ counters, which are events. A fix asks the conditions after every change to the 
 an event.
 
 **Scenarios.** None can be written with the cards in content.
-
-### KI-40: A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-16, review of Royal Treatment and Eluge, the Shoreless Sea |
-
-**Notes.** `create_tokens_onto` in `crates/cantrip-rules/src/ops.rs` does not create an Aura token "attached to" a
-permanent it could not legally enchant (CR 303.4i), and attaches an Equipment token only to what it could equip (CR
-301.5e); `add_effect` in `crates/cantrip-rules/src/lib.rs` refuses a `Duration::WhileCounter`/`WhileTapped` effect whose
-condition is already false (CR 611.2b). No card in content gives protection from enchantments or keeps a counter from
-being put on a land, and none creates an Equipment token attached to something, so those arms run in no scenario. The day
-such a card exists each needs a scenario (Royal Treatment on a creature with protection from enchantments; Eluge's flood
-counter on a land that can't have counters put on it), and this entry is deleted.
-
-**Scenarios.** None yet.
 
 ### KI-41: A dependency through another object is judged on the object being worked out
 

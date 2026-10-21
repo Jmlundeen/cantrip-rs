@@ -1,0 +1,37 @@
+# "Create a Monster Role token attached to it": a Role is a colorless Aura token, and an Aura token "attached to" a permanent
+# it could not legally enchant is not created at all (CR 303.4i; protection from colorless, CR 702.16c). Bot1 casts
+# Monstrous Rage on its Ornithopter and, in response, has Giver of Runes give the Ornithopter protection from colorless. The
+# red spell still resolves and pumps it (+2/+0), but no Monster Role is created, so there is no trample and no +1/+1.
+
+[Bot1 Deck]
+Plains
+Mox Ruby
+Giver of Runes
+Ornithopter
+Monstrous Rage
+Plains x15
+
+[Bot2 Deck]
+Mountain x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Ornithopter.Cast
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Giver of Runes.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Monstrous Rage.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Battlefield.Giver of Runes.Activate(Ornithopter)
+Bot1.Accept
+[T3 Bot1.Main2]
+
+[Expect]
+Turn = 3
+Stack.Count = 0
+Bot1.Battlefield = Giver of Runes; Mox Ruby; Ornithopter; Plains
+Bot1.Graveyard = Monstrous Rage
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 2
+Bot1.Battlefield.Ornithopter.Keywords = Flying
