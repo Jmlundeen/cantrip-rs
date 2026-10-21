@@ -1921,6 +1921,13 @@ pub fn available(cx: &Cx, player: PlayerId) -> Available {
 /// What `player` has to pay with, `skip` apart: a permanent whose own {T} is in the cost being paid cannot also be
 /// tapped for mana to pay it (CR 602.2b, 605.3b).
 fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Available {
+    available_as(cx, player, skip, false)
+}
+
+/// `available_without`. `defer`: each source's own abilities are kept until those that could tap it are known
+/// (`Repeat::Tap`); without it they are counted as they are found, and finding such an ability starts over with it - so a
+/// board with none pays nothing for them.
+fn available_as(cx: &Cx, player: PlayerId, skip: Option<ObjectId>, defer: bool) -> Available {
     let mut fixed = cx.s().player(player).pool.0;
     let mut restricted: Vec<(ManaRestriction, [u32; 6], u32)> = Vec::new();
     for (restriction, pool) in cx.s().restricted_of(player) {
@@ -1958,7 +1965,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     // each with the source and what one activation spends (`Repeat`).
     let mut repeatable: Vec<(Alternative, ObjectId, Repeat)> = Vec::new();
     // Each source's own mana abilities, kept until the repeatable ones that could tap it are known (`Repeat::Tap`).
-    let mut own: Vec<(ObjectId, Vec<Alternative>)> = Vec::new();
+    // Kept in one list, each source's a run of it: no list of its own for each source.
+    let mut kept: Vec<Alternative> = Vec::new();
+    let mut own: Vec<(ObjectId, usize, usize)> = Vec::new();
     let mut spent: Vec<ObjectId> = Vec::new();
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
@@ -2023,13 +2032,19 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
             alternative.tapped = def.cost.tap;
             if let Some(repeat) = Repeat::of(&def.cost, def.colors_from_sacrifice) {
+                if !defer && matches!(repeat, Repeat::Tap(..)) {
+                    return available_as(cx, player, skip, true);
+                }
                 repeatable.push((alternative, id, repeat));
                 continue;
             }
             alternatives.push(alternative);
         }
-        if !alternatives.is_empty() {
-            own.push((id, alternatives.clone()));
+        if !defer {
+            account(&alternatives, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
+        } else if !alternatives.is_empty() {
+            own.push((id, kept.len(), kept.len() + alternatives.len()));
+            kept.extend_from_slice(&alternatives);
         }
     }
     // An ability that taps an untapped permanent of its controller's (Urza, Lord High Artificer's "Tap an untapped artifact
@@ -2052,19 +2067,22 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             .map(|&(a, ..)| a)
             .collect()
     };
-    for (id, mut alternatives) in own.iter().cloned() {
+    for &(id, from, to) in &own {
+        let alternatives = &kept[from..to];
         if !taps.is_empty() && alternatives.iter().all(|a| a.tapped) {
             let outlets = tapping(id);
             if !outlets.is_empty() {
                 spent.push(id);
+                let both: Vec<Alternative> = alternatives.iter().copied().chain(outlets).collect();
+                account(&both, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
+                continue;
             }
-            alternatives.extend(outlets);
         }
-        account(&alternatives, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
+        account(alternatives, 1, &mut fixed, &mut flex, &mut restricted, &mut linked, &mut complex);
     }
     if !taps.is_empty() {
         for target in cx.permanents_of(player) {
-            if skip == Some(target) || own.iter().any(|(id, alternatives)| *id == target && alternatives.iter().all(|a| a.tapped)) {
+            if skip == Some(target) || own.iter().any(|&(id, from, to)| id == target && kept[from..to].iter().all(|a| a.tapped)) {
                 continue;
             }
             let outlets = tapping(target);
