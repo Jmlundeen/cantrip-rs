@@ -1,0 +1,47 @@
+# A permission to play a card from exile lets a modal double-faced card be cast as either face (CR 601.3, 712.11b): Norman
+# Osborn // Green Goblin is a modal double-faced card whose faces each have a mana cost (CR 712.3: it may still have an
+# ability that transforms it). Gwen Stacy exiles Norman Osborn from the top of Bot1's library ("You may play that card for
+# as long as you control this creature"), and Bot1 casts it as Green Goblin for {1}{U}{B}{R}. It enters back face up
+# (CR 712.13), a 3/3 flier with menace.
+
+[Bot1 Deck]
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mox Sapphire
+Black Lotus
+Gwen Stacy
+Island
+Norman Osborn
+Island x10
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Gwen Stacy.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+? Exile = Norman Osborn
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Black Lotus.Activate(Color: Red)
+Bot1.Exile.Norman Osborn.Cast(Ability: back face)
+Bot1.Pass
+Bot2.Pass
+[T1 Bot1.Main2]
+
+[Expect]
+Exile.Count = 0
+Bot1.Battlefield.Green Goblin.Power = 3
+Bot1.Battlefield.Green Goblin.Toughness = 3
+Bot1.Battlefield.Green Goblin.Keywords = Flying; Menace

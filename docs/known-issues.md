@@ -54,7 +54,6 @@ keeps it).
 | [KI-23](#ki-23-a-creature-fighting-itself-cr-70114c-is-implemented-but-no-scenario-can-reach-it) | A creature fighting itself (CR 701.14c) is implemented but no scenario can reach it | Low | Unexercised |
 | [KI-40](#ki-40-a-role-that-could-not-enchant-its-creature-and-a-for-as-long-as-duration-false-from-the-start-are-not-exercised) | A Role that could not enchant its creature, and a "for as long as" duration false from the start, are not exercised | Low | Unexercised |
 | [KI-41](#ki-41-a-dependency-through-another-object-is-judged-on-the-object-being-worked-out) | A dependency through another object is judged on the object being worked out | Low | Open |
-| [KI-43](#ki-43-a-modal-double-faced-cards-back-face-cast-by-a-permission-is-not-exercised) | A modal double-faced card's back face cast by a permission is not exercised | Low | Unexercised |
 | [KI-44](#ki-44-no-emblem-gives-a-way) | No emblem gives a way | Low | Open |
 | [KI-45](#ki-45-the-number-a-cost-sacrifices-is-kept-as-the-spells-x) | The number a cost sacrifices is kept as the spell's X | Low | Suspected |
 | [KI-48](#ki-48-emperor-of-bones-puts-its-finality-counter-on-after-the-creature-enters) | Emperor of Bones puts its finality counter on after the creature enters | Low | Unexercised |
@@ -420,22 +419,6 @@ effects that set types (Oko's Elk) name their object. A fix asks the question ov
 at the cost of their characteristics part-way through the layer.
 
 **Scenarios.** None: no pair of implemented cards reaches it.
-
-### KI-43: A modal double-faced card's back face cast by a permission is not exercised
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-16, review of Inside Information |
-
-**Notes.** A permission to cast a card from where it is (CR 601.3) now lets a modal double-faced card be cast as its back face
-(CR 712.11b) and a split card as either half (CR 709.3, an aftermath half only from a graveyard), for what the permission says
-to pay (`actions::castable`, `cast_face`). The split halves are proven (Inside Information with Life // Death); no card in
-content is a modal double-faced card whose back face is a spell rather than a land, so the back-face cast from exile runs in no
-scenario. (Two transforming cards, Jennifer Walters and Norman Osborn, give their back faces a mana cost in content, which makes
-`back.has_cost` true for them; whether that offers a back-face cast it should not is worth a look.) A scenario is owed when a
-spell-backed modal double-faced card is added.
-
-**Scenarios.** None yet.
 
 ### KI-44: No emblem gives a way
 
