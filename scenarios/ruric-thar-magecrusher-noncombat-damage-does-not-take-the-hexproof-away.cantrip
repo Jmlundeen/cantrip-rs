@@ -1,0 +1,54 @@
+# "... as long as they haven't dealt combat damage yet": only combat damage counts. Pyroclasm deals two to every
+# creature (CR 120.3e) without targeting, so hexproof does not stop it, but the damage is noncombat and the hexproof stays:
+# Bot2's Unsummon is still refused afterwards. "Yet" lasts the whole game, not one turn.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Sapphire
+Ruric Thar, Magecrusher
+Giant Growth
+Forest x13
+
+[Bot2 Deck]
+Mountain
+Mox Ruby
+Mox Sapphire
+Pyroclasm
+Unsummon
+Island x15
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ruric Thar, Magecrusher.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mountain.Play
+Bot2.Hand.Mox Ruby.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Battlefield.Mountain.Activate
+Bot2.Battlefield.Mox Ruby.Activate
+Bot2.Hand.Pyroclasm.Cast
+Bot2.Pass
+Bot1.Pass
+? Bot1.Battlefield.Ruric Thar, Magecrusher.Damage = 2
+Bot2.Battlefield.Mox Sapphire.Activate
+! Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ruric Thar, Magecrusher)
+[T2 Bot2.Main2]
+
+[Expect]
+Bot1.Battlefield.Ruric Thar, Magecrusher.Damage = 2
+Bot1.Battlefield.Ruric Thar, Magecrusher.Toughness = 7
+Bot2.Graveyard = Pyroclasm

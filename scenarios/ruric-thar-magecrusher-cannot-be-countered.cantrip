@@ -1,0 +1,62 @@
+# "This spell can't be countered" (CR 101.2, 701.6a): the spell is still a legal target, so Bot2 casts its
+# Counterspell at it on turn three and the spell is simply not countered (CR 701.6a, 101.2). Bot2's four Mox
+# Sapphires are cast on its own turn two, so they are untapped when Ruric Thar is cast on turn three. The second
+# Counterspell, aimed at a creature spell that can be countered, puts that spell into its owner's graveyard (the
+# positive control).
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Sapphire
+Ruric Thar, Magecrusher
+Ornithopter
+Forest x13
+
+[Bot2 Deck]
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Mox Sapphire
+Counterspell
+Counterspell
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ruric Thar, Magecrusher.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire#1.Activate
+Bot2.Battlefield.Mox Sapphire#2.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Ruric Thar, Magecrusher)
+Bot2.Pass
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot2.Battlefield.Mox Sapphire#3.Activate
+Bot2.Battlefield.Mox Sapphire#4.Activate
+Bot2.Hand.Counterspell.Cast(Stack.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Ruric Thar, Magecrusher.Toughness = 7
+Bot1.Graveyard = Ornithopter; Black Lotus
+Bot2.Graveyard = Counterspell; Counterspell

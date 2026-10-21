@@ -1,0 +1,72 @@
+# Ruric Thar, Magecrusher's "Ruric Thar has hexproof as long as they haven't dealt combat damage yet" (CR 702.11,
+# 604.1, 611.3a). Before any combat damage, Bot2's Unsummon cannot target it, while the same Unsummon targeting Bot2's
+# own Ornithopter works (the positive control). Bot1's own Giant Growth does target it, hexproof stopping only opponents.
+# On turn three it attacks with vigilance (untapped) and trample: the Ornithopter blocks for two and the other eight go to
+# Bot2, so it has dealt combat damage. On turn six the second Unsummon now targets it.
+
+[Bot1 Deck]
+Forest
+Black Lotus
+Mox Emerald
+Mox Emerald
+Mox Sapphire
+Ruric Thar, Magecrusher
+Giant Growth
+Forest x13
+
+[Bot2 Deck]
+Island
+Island
+Ornithopter
+Ornithopter
+Unsummon
+Unsummon
+Island x14
+
+[Actions]
+Bot1.Hand.Forest.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Green)
+Bot1.Battlefield.Mox Emerald#1.Activate
+Bot1.Battlefield.Mox Emerald#2.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Ruric Thar, Magecrusher.Cast
+Bot1.Pass
+Bot2.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Hand.Ornithopter.Cast
+Bot2.Hand.Ornithopter.Cast
+Bot2.Pass
+Bot1.Pass
+Bot2.Battlefield.Island.Activate
+! Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ruric Thar, Magecrusher)
+Bot2.Hand.Unsummon.Cast(Bot2.Battlefield.Ornithopter#2)
+[T3 Bot1.Main1]
+Bot1.Battlefield.Forest.Activate
+Bot1.Hand.Giant Growth.Cast(Bot1.Battlefield.Ruric Thar, Magecrusher)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.DeclareAttackers]
+Bot1.Attack(Ruric Thar, Magecrusher > Bot2)
+Bot2.Block(Ornithopter > Ruric Thar, Magecrusher)
+? Bot1.Battlefield.Ruric Thar, Magecrusher.Tapped = false
+[T3 Bot1.Main2]
+? Bot2.Life = 12
+? Bot1.Battlefield.Ruric Thar, Magecrusher.Damage = 0
+[T6 Bot2.Main1]
+Bot2.Hand.Island.Play
+Bot2.Battlefield.Island#2.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ruric Thar, Magecrusher)
+[T6 Bot2.Main2]
+
+[Expect]
+Bot1.Hand.Count = 3
+Bot1.Battlefield.Count = 4
+Bot1.Battlefield.Ruric Thar, Magecrusher = (absent)
+Bot2.Graveyard = Unsummon; Ornithopter; Unsummon
+Bot2.Life = 12

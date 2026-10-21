@@ -1,0 +1,14 @@
+{
+  "name": "Ruric Thar, Magecrusher",
+  "manaCost": "{5}{G}{G}",
+  "type": "Legendary Creature — Ogre Warrior",
+  "power": 7,
+  "toughness": 7,
+  "oracleText": "This spell can't be countered.\nReach, vigilance, trample\nRuric Thar has hexproof as long as they haven't dealt combat damage yet. (They can't be the target of spells or abilities your opponents control.)",
+  "keywords": [
+    "Reach",
+    "Vigilance",
+    "Trample",
+    "CantBeCountered"
+  ]
+}
