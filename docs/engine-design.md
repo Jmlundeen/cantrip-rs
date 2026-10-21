@@ -942,10 +942,10 @@ passing and declining are never refused, and nothing is answered for them. Any o
 going by choice - one player's, or one whose players decline what its objects offer (`docs/rules-exceptions.md`, RX-2) - is never cut
 off, capped or made to change: the engine supports no loop shortcuts (CR 732.2), players perform every loop action by hand,
 and a combination may go round as many times as it needs; a person is held to the match clock, and a seat nobody drives
-stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes, declines and picks each answer in turn, and past a
-million it concedes, CR 104.3a). A game whose history reaches `MAX_GAME_EVENTS` (2,097,152 events) is a draw, checked
-between two frames (`Game::run`; RX-1): a run of play that never repeats exactly is neither a loop the rules can find nor
-ever ended by them. The watch keeps each question of a busy step once (`GameState::loop_keys`, found through a hashed
+stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes, declines and picks each answer in turn). A game
+whose history reaches `MAX_GAME_EVENTS` (2,097,152 events) is a draw, checked between two frames (`Game::run`; RX-1): a
+run of play that never repeats exactly is neither a loop the rules can find nor ever ended by them, and an automated seat
+whose passive answers cannot end a run reaches that draw rather than conceding. The watch keeps each question of a busy step once (`GameState::loop_keys`, found through a hashed
 index, journalled an entry at a time: a round of a priority and an answer given are small undo entries), so a loop played
 by hand costs the watch nothing more per round; past `KEPT` questions it starts over. A normal game
 pays a comparison per priority and a count per read of the history.

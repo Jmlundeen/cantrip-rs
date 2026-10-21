@@ -64,7 +64,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-57](#ki-57-the-tactical-bot-does-not-know-islandwalk) | The tactical bot does not know islandwalk | Pri-3 | Open |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Pri-3 | Open |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Pri-3 | Open |
-| [KI-109](#ki-109-an-automated-player-concedes-after-a-million-questions-in-one-step) | An automated player concedes after a million questions in one step | Pri-3 | Fix queued |
 | [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
 | [KI-100](#ki-100-a-choice-search-or-sacrifice-of-more-than-232-cards) | A choice, search or sacrifice of more than 2^32 cards | Won't fix | Won't fix: beyond practical scale |
 
@@ -395,15 +394,3 @@ alone: three Mana Confluences at 1 or 2 life count as three mana, so Raffine is 
 falls back to offering the cast on rare heavy boards.
 
 **Scenarios.** None yet.
-
-### KI-109: An automated player concedes after a million questions in one step
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-3 | Fix queued | client | 2026-10-21, review of the loop work |
-
-**Notes.** `LoopGuard` makes an automated seat concede past a million questions in one step, so that no table of bots can
-hang. The event cap (RX-1) already ends such a game in a draw, so the concession can turn that draw into a loss. A fix
-removes the concession in the event-cap sweep.
-
-**Scenarios.** None.

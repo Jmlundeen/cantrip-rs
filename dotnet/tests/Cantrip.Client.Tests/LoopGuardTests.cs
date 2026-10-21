@@ -33,26 +33,27 @@ public sealed class LoopGuardTests
 
     /// <summary>
     /// A seat that keeps a loop going, asked the same priority over and over in one step: the guard lets it answer the first
-    /// questions, answers passively after that, and past its last limit concedes (CR 104.3a), so the table cannot go on for ever.
+    /// questions and answers passively after that, however long the step goes on. It never concedes: a run the passive
+    /// answers cannot end is a draw once the game reaches the most events the engine records (RX-1).
     /// </summary>
     [Fact]
-    public void Concedes_past_its_last_limit_in_one_step()
+    public void Answers_passively_past_its_limit_and_never_concedes()
     {
         var table = new TacticsBoard.Table([]);
         var looping = new Looping();
-        var guard = new LoopGuard(looping, answersPerStep: 3, concedeAfter: 6);
+        var guard = new LoopGuard(looping, answersPerStep: 3);
 
-        for (int request = 1; request <= 7; request++)
+        for (int request = 1; request <= 20; request++)
         {
             table.Ask(request, new PriorityPromptMessage { Player = TacticsBoard.Me });
             Assert.True(guard.Act(table.Client));
         }
 
         Assert.Equal(3, looping.Asked);
-        Assert.Equal(6, table.Sent.OfType<AnswerMessage>().Count());
+        Assert.Equal(20, table.Sent.OfType<AnswerMessage>().Count());
         Assert.Equal(3, table.Sent.OfType<AnswerMessage>().Count(a => a.Answer is TakeActionAnswer));
-        Assert.Single(table.Sent.OfType<ConcedeMessage>());
-        Assert.IsType<ConcedeMessage>(table.Sent[^1]);
+        Assert.Equal(17, table.Sent.OfType<AnswerMessage>().Count(a => a.Answer is PassAnswer));
+        Assert.Empty(table.Sent.OfType<ConcedeMessage>());
     }
 
     /// <summary>A seat that acts every time it is asked: the loop goes on as long as it is the one answering.</summary>
