@@ -306,7 +306,8 @@ impl std::hash::Hash for Journal {
     fn hash<H: std::hash::Hasher>(&self, _: &mut H) {}
 }
 
-/// How to undo one write.
+/// How to undo one write. A position in a list is a `u32`: every list is of objects or entries the game's events made,
+/// which the event cap bounds (`docs/rules-exceptions.md`, RX-1) far inside it.
 #[derive(Clone, Debug)]
 pub enum Undo {
     Object(ObjectId, Box<Obj>),
@@ -315,30 +316,30 @@ pub enum Undo {
     Player(PlayerId, Player),
     RestrictedManaSet(Vec<RestrictedMana>),
     ManaFromPushed,
-    ManaFromSet(u16, ManaFrom),
-    ManaFromRemoved(u16, ManaFrom),
-    ManaFromInserted(u16),
+    ManaFromSet(u32, ManaFrom),
+    ManaFromRemoved(u32, ManaFrom),
+    ManaFromInserted(u32),
     ManaFromAll(Vec<ManaFrom>),
     CounterStampsSet(Vec<CounterStamp>),
     Turn(Turn),
-    ZoneInserted { slot: u16, at: u16 },
-    ZoneRemoved { slot: u16, at: u16, id: ObjectId },
+    ZoneInserted { slot: u32, at: u32 },
+    ZoneRemoved { slot: u32, at: u32, id: ObjectId },
     StackPushed,
     StackPopped(Box<StackItem>),
-    StackSet(u16, Box<StackItem>),
+    StackSet(u32, Box<StackItem>),
     EffectPushed,
-    EffectRemoved(u16, Box<ContinuousEffect>),
-    EffectInserted(u16),
-    EffectSet(u16, Box<ContinuousEffect>),
+    EffectRemoved(u32, Box<ContinuousEffect>),
+    EffectInserted(u32),
+    EffectSet(u32, Box<ContinuousEffect>),
     PermissionPushed,
-    PermissionRemoved(u16, PlayPermission),
-    PermissionInserted(u16),
+    PermissionRemoved(u32, PlayPermission),
+    PermissionInserted(u32),
     TriggerPushed,
-    TriggerRemoved(u16, PendingTrigger),
-    TriggerInserted(u16),
+    TriggerRemoved(u32, PendingTrigger),
+    TriggerInserted(u32),
     DelayedPushed,
-    DelayedRemoved(u16, Delayed),
-    DelayedInserted(u16),
+    DelayedRemoved(u32, Delayed),
+    DelayedInserted(u32),
     LastKnownPushed,
     LastKnownPopped(Box<LastKnown>),
     LeftStackPushed,
@@ -366,9 +367,9 @@ pub enum Undo {
     StaticsSeen(bool),
     FramePushed,
     FramePopped(Frame),
-    FrameRemoved(u16, Frame),
-    FrameInserted(u16),
-    FrameSet(u16, Frame),
+    FrameRemoved(u32, Frame),
+    FrameInserted(u32),
+    FrameSet(u32, Frame),
     Rng(Rng),
     Timestamp(u32),
     Outcome(Outcome),
@@ -640,7 +641,7 @@ impl GameState {
             Some(at) => {
                 let old = self.mana_from[at];
                 self.mana_from[at].pool.0[m] += n;
-                self.log(Undo::ManaFromSet(at as u16, old));
+                self.log(Undo::ManaFromSet(at as u32, old));
             }
             None => {
                 let mut pool = ManaPool::default();
@@ -677,11 +678,11 @@ impl GameState {
                     after.pool.0[m] -= u32::from(take);
                     if after.pool.is_empty() {
                         self.mana_from.remove(at);
-                        self.log(Undo::ManaFromRemoved(at as u16, e));
+                        self.log(Undo::ManaFromRemoved(at as u32, e));
                         continue;
                     }
                     self.mana_from[at] = after;
-                    self.log(Undo::ManaFromSet(at as u16, e));
+                    self.log(Undo::ManaFromSet(at as u32, e));
                 }
                 at += 1;
             }
@@ -782,7 +783,7 @@ impl GameState {
     pub fn zone_insert(&mut self, zone: Zone, at: usize, id: ObjectId) {
         let slot = zone.slot(self.players.len());
         self.zones[slot].insert(at, id);
-        self.log(Undo::ZoneInserted { slot: slot as u16, at: at as u16 });
+        self.log(Undo::ZoneInserted { slot: slot as u32, at: at as u32 });
         self.set_unsettled();
     }
 
@@ -797,7 +798,7 @@ impl GameState {
             return false;
         };
         self.zones[slot].remove(at);
-        self.log(Undo::ZoneRemoved { slot: slot as u16, at: at as u16, id });
+        self.log(Undo::ZoneRemoved { slot: slot as u32, at: at as u32, id });
         self.set_unsettled();
         true
     }
@@ -823,7 +824,7 @@ impl GameState {
     pub fn stack_set(&mut self, at: usize, item: StackItem) {
         let old = self.stack[at];
         self.stack[at] = item;
-        self.log(Undo::StackSet(at as u16, Box::new(old)));
+        self.log(Undo::StackSet(at as u32, Box::new(old)));
     }
 
     /// Removes the item at `at`, keeping the order of the rest (a countered spell below the top).
@@ -853,7 +854,7 @@ impl GameState {
     /// Replaces the effect at `at` with `effect`, in its place: a prevention shield reduced (CR 615.7).
     pub fn effect_set(&mut self, at: usize, effect: ContinuousEffect) {
         let old = std::mem::replace(&mut self.effects[at], effect);
-        self.log(Undo::EffectSet(at as u16, Box::new(old)));
+        self.log(Undo::EffectSet(at as u32, Box::new(old)));
         self.set_unsettled();
     }
 
@@ -889,7 +890,7 @@ impl GameState {
     /// phased out (CR 400.7: an object that has left keeps what it last was).
     fn effect_remove(&mut self, at: usize) {
         let effect = self.effects.remove(at);
-        self.log(Undo::EffectRemoved(at as u16, Box::new(effect)));
+        self.log(Undo::EffectRemoved(at as u32, Box::new(effect)));
         self.set_unsettled();
         let EffectKind::RestoreCopy(prior) = effect.kind else { return };
         let above = self
@@ -951,7 +952,7 @@ impl GameState {
             i -= 1;
             if !keep(&self.permissions[i]) {
                 let p = self.permissions.remove(i);
-                self.log(Undo::PermissionRemoved(i as u16, p));
+                self.log(Undo::PermissionRemoved(i as u32, p));
             }
         }
     }
@@ -963,7 +964,7 @@ impl GameState {
 
     pub fn trigger_remove(&mut self, at: usize) -> PendingTrigger {
         let trigger = self.triggers.remove(at);
-        self.log(Undo::TriggerRemoved(at as u16, trigger));
+        self.log(Undo::TriggerRemoved(at as u32, trigger));
         trigger
     }
 
@@ -974,7 +975,7 @@ impl GameState {
 
     pub fn delayed_remove(&mut self, at: usize) -> Delayed {
         let d = self.delayed.remove(at);
-        self.log(Undo::DelayedRemoved(at as u16, d));
+        self.log(Undo::DelayedRemoved(at as u32, d));
         d
     }
 
@@ -997,7 +998,7 @@ impl GameState {
         }
         self.members.extend_from_slice(objects);
         self.log(Undo::MembersPushed(start as u32));
-        Span { start: start as u32, len: objects.len() as u16 }
+        Span { start: start as u32, len: objects.len() as u32 }
     }
 
     /// The objects a span names.
@@ -1235,7 +1236,7 @@ impl GameState {
     /// Removes the frame at `at`, below any its run pushed.
     pub fn frame_remove(&mut self, at: usize) -> Frame {
         let frame = self.agenda.remove(at);
-        self.log(Undo::FrameRemoved(at as u16, frame.clone()));
+        self.log(Undo::FrameRemoved(at as u32, frame.clone()));
         frame
     }
 
@@ -1244,7 +1245,7 @@ impl GameState {
         let old = self.agenda[at].clone();
         f(&mut self.agenda[at]);
         if self.agenda[at] != old {
-            self.log(Undo::FrameSet(at as u16, old));
+            self.log(Undo::FrameSet(at as u32, old));
         }
     }
 
@@ -1501,7 +1502,7 @@ impl GameState {
             Undo::Turn(_) => Undo::Turn(self.turn),
             Undo::RestrictedManaSet(_) => Undo::RestrictedManaSet(self.restricted_mana.clone()),
             Undo::ManaFromPushed => {
-                Undo::ManaFromRemoved(self.mana_from.len() as u16 - 1, *self.mana_from.last().expect("mana"))
+                Undo::ManaFromRemoved(self.mana_from.len() as u32 - 1, *self.mana_from.last().expect("mana"))
             }
             Undo::ManaFromSet(at, _) => Undo::ManaFromSet(*at, self.mana_from[*at as usize]),
             Undo::ManaFromRemoved(at, _) => Undo::ManaFromInserted(*at),
@@ -1515,19 +1516,19 @@ impl GameState {
             Undo::StackPushed => Undo::StackPopped(Box::new(*self.stack.last().expect("an item"))),
             Undo::StackPopped(_) => Undo::StackPushed,
             Undo::StackSet(at, _) => Undo::StackSet(*at, Box::new(self.stack[*at as usize])),
-            Undo::EffectPushed => Undo::EffectRemoved(self.effects.len() as u16 - 1, Box::new(*self.effects.last().expect("an effect"))),
+            Undo::EffectPushed => Undo::EffectRemoved(self.effects.len() as u32 - 1, Box::new(*self.effects.last().expect("an effect"))),
             Undo::EffectRemoved(at, _) => Undo::EffectInserted(*at),
             Undo::EffectInserted(at) => Undo::EffectRemoved(*at, Box::new(self.effects[*at as usize])),
             Undo::EffectSet(at, _) => Undo::EffectSet(*at, Box::new(self.effects[*at as usize])),
             Undo::PermissionPushed => {
-                Undo::PermissionRemoved(self.permissions.len() as u16 - 1, *self.permissions.last().expect("a permission"))
+                Undo::PermissionRemoved(self.permissions.len() as u32 - 1, *self.permissions.last().expect("a permission"))
             }
             Undo::PermissionRemoved(at, _) => Undo::PermissionInserted(*at),
             Undo::PermissionInserted(at) => Undo::PermissionRemoved(*at, self.permissions[*at as usize]),
-            Undo::TriggerPushed => Undo::TriggerRemoved(self.triggers.len() as u16 - 1, *self.triggers.last().expect("a trigger")),
+            Undo::TriggerPushed => Undo::TriggerRemoved(self.triggers.len() as u32 - 1, *self.triggers.last().expect("a trigger")),
             Undo::TriggerRemoved(at, _) => Undo::TriggerInserted(*at),
             Undo::TriggerInserted(at) => Undo::TriggerRemoved(*at, self.triggers[*at as usize]),
-            Undo::DelayedPushed => Undo::DelayedRemoved(self.delayed.len() as u16 - 1, *self.delayed.last().expect("delayed")),
+            Undo::DelayedPushed => Undo::DelayedRemoved(self.delayed.len() as u32 - 1, *self.delayed.last().expect("delayed")),
             Undo::DelayedRemoved(at, _) => Undo::DelayedInserted(*at),
             Undo::DelayedInserted(at) => Undo::DelayedRemoved(*at, self.delayed[*at as usize]),
             Undo::LastKnownPushed => Undo::LastKnownPopped(Box::new(*self.last_known.last().expect("a row"))),
@@ -1638,6 +1639,28 @@ mod tests {
         assert!(!s.spill_targets.is_empty());
         s.rollback(before);
         assert!(s.spill_targets.is_empty() && s.spill_specs.is_empty() && s.share_arena.is_empty(), "the arena outlived its journal");
+    }
+
+    /// Lists longer than 2^16 - a zone of 70,000 tokens, a batch of 70,000 objects - are reachable under the event cap
+    /// (RX-1): a batch keeps its whole length, and a write at a position past 65,535 is rolled back at that position.
+    #[test]
+    fn a_list_past_65535_entries_keeps_its_length_and_rolls_back_exactly() {
+        const N: u32 = 70_000;
+        let mut s = GameState::new(2, 1);
+        let ids: Vec<ObjectId> = (0..N).map(ObjectId).collect();
+        let span = s.members_push(&ids);
+        assert_eq!(s.members(span).len(), N as usize);
+        let field = Zone::BATTLEFIELD;
+        for &id in &ids {
+            s.zone_push(field, id);
+        }
+        let before = s.clone_with_journal();
+        let mark = s.mark();
+        assert!(s.zone_remove(field, ObjectId(N - 2)));
+        s.zone_insert(field, 66_000, ObjectId(N - 2));
+        assert_eq!(s.zone(field)[66_000], ObjectId(N - 2));
+        s.rollback(mark);
+        assert!(s == before, "a write past 65,535 was not undone where it was made");
     }
 
     /// A pool has no limit (CR 106.4): 300 black mana added one at a time, from 300 sources and from one, is all there,

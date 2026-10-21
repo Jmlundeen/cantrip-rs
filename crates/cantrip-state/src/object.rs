@@ -1019,11 +1019,11 @@ pub struct PendingTrigger {
 }
 
 /// A run of `GameState::members`: the objects of one batch of simultaneous events, kept for the ability they
-/// triggered (CR 603.2c, 608.2h).
+/// triggered (CR 603.2c, 608.2h). Its length is a `u32`, as a batch can hold every object of the game (RX-1).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct Span {
     pub start: u32,
-    pub len: u16,
+    pub len: u32,
 }
 
 /// A delayed triggered ability waiting for its moment (CR 603.7).
