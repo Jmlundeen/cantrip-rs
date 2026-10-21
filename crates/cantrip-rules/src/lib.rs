@@ -38,6 +38,8 @@ mod leave_game_tests;
 #[cfg(test)]
 mod concession_tests;
 #[cfg(test)]
+mod count_width_tests;
+#[cfg(test)]
 mod left_player_choice_tests;
 #[cfg(test)]
 mod look_back_tests;
