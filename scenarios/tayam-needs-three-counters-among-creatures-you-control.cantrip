@@ -1,17 +1,24 @@
-# Tayam, Luminous Enigma's "{3}, Remove three counters from among creatures you control" (CR 118.3, 602.2b): with {3} open,
-# Bot1's only counter is its Ornithopter's vigilance counter, and Bot2's Walking Ballista's +1/+1 counter is not on a
-# creature Bot1 controls, so the ability can't be activated: two counters in all, one of them Bot1's.
+# Tayam, Luminous Enigma's "{3}, Remove three counters from among creatures you control" (CR 118.3, 602.2b). On turn 5 Bot1's
+# creatures have two counters (Ornithopter's and Birds of Paradise's vigilance counters); its Chalice of the Void's two charge
+# counters are not on a creature, and Bot2's Walking Ballista's +1/+1 counter is not on a creature Bot1 controls. So with four
+# mana open the ability can't be activated - one short under the right reading, enough under either wrong one. On turn 7
+# Llanowar Elves enters with a third, and the ability is activated for exactly {3}: three Moxen tapped, nothing left in the
+# pool, Mox Sapphire untapped. The counters come off the three creatures and the Chalice keeps its two. The mill finds three
+# Lightning Bolts, none a permanent card, so nothing returns.
 
 [Bot1 Deck]
 Mox Pearl
 Mox Jet
 Mox Emerald
 Mox Ruby
+Mox Sapphire
 Tayam, Luminous Enigma
 Ornithopter
-Mox Sapphire
-Plains
-Plains x12
+Chalice of the Void
+Birds of Paradise
+Llanowar Elves
+Lightning Bolt x3
+Plains x10
 
 [Bot2 Deck]
 Forest
@@ -24,6 +31,7 @@ Bot1.Hand.Mox Pearl.Cast
 Bot1.Hand.Mox Jet.Cast
 Bot1.Hand.Mox Emerald.Cast
 Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Sapphire.Cast
 Bot1.Battlefield.Mox Pearl.Activate
 Bot1.Battlefield.Mox Jet.Activate
 Bot1.Battlefield.Mox Emerald.Activate
@@ -37,13 +45,39 @@ Bot2.Battlefield.Forest.Activate
 Bot2.Battlefield.Mox Emerald.Activate
 Bot2.Hand.Walking Ballista.Cast(X: 1)
 [T3 Bot1.Main1]
-Bot1.Hand.Plains.Play
-Bot1.Hand.Mox Sapphire.Cast
-? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Hand.Chalice of the Void.Cast(X: 2)
+[T5 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Birds of Paradise.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Chalice of the Void.Counters.Charge = 2
 ? Bot1.Battlefield.Ornithopter.Counters.Vigilance = 1
+? Bot1.Battlefield.Birds of Paradise.Counters.Vigilance = 1
+? Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
 ! Bot1.Battlefield.Tayam, Luminous Enigma.Activate
-[T3 Bot1.Main2]
+[T7 Bot1.Main1]
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Hand.Llanowar Elves.Cast
+Bot1.Pass
+Bot2.Pass
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Tayam, Luminous Enigma.Activate
+? Bot1.Mana = 
+Bot1.Pass
+[T7 Bot1.Main2]
 
 [Expect]
-Bot1.Battlefield.Ornithopter.Counters.Vigilance = 1
-Bot1.Library.Count = 12
+Bot1.Battlefield.Mox Sapphire.Tapped = false
+Bot1.Battlefield.Chalice of the Void.Counters.Charge = 2
+Bot1.Battlefield.Ornithopter.Counters.Vigilance = (absent)
+Bot1.Battlefield.Birds of Paradise.Counters.Vigilance = (absent)
+Bot1.Battlefield.Llanowar Elves.Counters.Vigilance = (absent)
+Bot2.Battlefield.Walking Ballista.Counters.PlusOnePlusOne = 1
+Bot1.Graveyard = Lightning Bolt; Lightning Bolt; Lightning Bolt
