@@ -1658,6 +1658,10 @@ pub struct Available {
     restricted: Vec<(ManaRestriction, [u32; 6], u32)>,
     /// The player may spend mana as though it were mana of any color for every payment (CR 609.4b: Mycosynth Lattice).
     any_color: bool,
+    /// Mana that comes in groups of one type chosen once, by the mana types it may be and how many: a tap whose type the
+    /// player chooses (Shivan Reef's {U} or {R}) and the "one mana of any type that land produced" it triggers (Mana Flare)
+    /// are one choice, {U}{U} or {R}{R} and never {U}{R} (CR 106.12a, 605.1b). Empty unless such a trigger waits.
+    linked: Vec<(u8, u32)>,
 }
 
 /// Adds restricted mana to the entry of its restriction in `Available::restricted`.
@@ -1712,6 +1716,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
     let forbidders = static_rules::activation_forbidders(cx);
     // The triggered mana abilities waiting on a tap (CR 605.1b): nearly always none, and then nothing more is asked.
     let waiting = waiting_mana_triggers(cx);
+    let mut linked: Vec<(u8, u32)> = Vec::new();
     for &id in cx.s().battlefield() {
         if cx.s().obj(id).controller != player || skip == Some(id) {
             continue;
@@ -1722,6 +1727,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         // How many of its mana abilities tap it, and whether one of them lets the player choose the type of what it adds: a
         // tap that adds one chosen type is one choice with the "one mana of any type that land produced" it triggers.
         let (mut taps, mut tap_chooses) = (0u32, false);
+        // Whether every mana ability it has taps it for one unrestricted mana: then a tap is one mana of a type chosen from
+        // `tapped_types`, which a "one mana of any type that land produced" doubles as one choice (`Available::linked`).
+        let mut single_taps = true;
         let mut only: Option<&ActivatedDef> = None;
         let mut count = 0;
         // The most any one ability adds, for the abilities that are not restricted and for each kind of restriction: they
@@ -1758,6 +1766,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 taps += 1;
                 tap_chooses |= def.adds_any > 0;
             }
+            single_taps &= def.cost.tap
+                && matches!(def.restricted, None | Some(ManaRestriction::GainsHaste))
+                && def.adds.0.iter().sum::<u32>() + def.adds_any as u32 == 1;
             spent = spent.max(def.cost.mana.mana_value());
             let adds = def.adds.0.iter().map(|&n| n as u32).sum::<u32>() + def.adds_any as u32;
             match def.restricted {
@@ -1776,13 +1787,25 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 }
             }
             if def.adds.0.iter().all(|&n| n == 0) && def.adds_any == 0 {
-                return Available { fixed, flex, consume: 0, unknown: true, changers: cost_change_sources(cx), grantors: pay_with_grantors(cx), restricted, any_color: false };
+                return Available {
+                    fixed,
+                    flex,
+                    consume: 0,
+                    unknown: true,
+                    changers: cost_change_sources(cx),
+                    grantors: pay_with_grantors(cx),
+                    restricted,
+                    any_color: false,
+                    linked,
+                };
             }
         }
+        // Of the triggered mana that adds one of the types the tap produced, how much goes with a tap whose type is chosen.
+        let mut chosen_with_tap = 0u32;
         if count > 0 {
             consume += spent;
             if !waiting.is_empty() && tapped_types != 0 {
-                tap_triggers(cx, &waiting, id, player, tapped_types, taps > 1 || tap_chooses, &mut fixed, &mut flex);
+                chosen_with_tap = tap_triggers(cx, &waiting, id, player, tapped_types, taps > 1 || tap_chooses, &mut fixed, &mut flex);
             }
         }
         match (count, only) {
@@ -1817,6 +1840,12 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
                 }
             }
         }
+        // The tap's one mana of a chosen type, counted above as mana of any of its types, and the triggered mana of the same
+        // type, are one group of one type (`Available::linked`).
+        if chosen_with_tap > 0 && single_taps && flex[tapped_types as usize] > 0 {
+            flex[tapped_types as usize] -= 1;
+            linked.push((tapped_types, 1 + chosen_with_tap));
+        }
     }
     Available {
         fixed,
@@ -1827,6 +1856,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         grantors: pay_with_grantors(cx),
         restricted,
         any_color: static_rules::spend_any_color_always(cx, player),
+        linked,
     }
 }
 
@@ -1865,9 +1895,9 @@ fn waiting_mana_triggers(cx: &Cx) -> Vec<(Asker, &'static TriggeredDef)> {
 /// once, by what it says it adds (`TriggeredMana`).
 ///
 /// "One mana of any type that land produced" is the type the tap made: where the player chose it (two abilities, or "any
-/// color"), the tap's mana and the trigger's are one choice, both of one type, which the advice's independent mana cannot
-/// say; it is counted only where that choice is of one type, so a cast is never offered that the tap could not pay (Mana
-/// Flare and Shivan Reef make {U}{U} or {R}{R}, never {U}{R}).
+/// color"), the tap's mana and the trigger's are one choice, both of one type - Mana Flare and Shivan Reef make {U}{U} or
+/// {R}{R}, never {U}{R} - so that mana is returned, for the caller to count with the tap's own as one group
+/// (`Available::linked`).
 #[allow(clippy::too_many_arguments)]
 fn tap_triggers(
     cx: &Cx,
@@ -1878,7 +1908,8 @@ fn tap_triggers(
     chosen: bool,
     fixed: &mut [u32; 6],
     flex: &mut [u32; 64],
-) {
+) -> u32 {
+    let mut with_tap = 0u32;
     let first = (0..6).find(|&m| types & (1 << m) != 0).unwrap_or(5);
     let mut produced = ManaTally([0; 6]);
     produced.0[first] = 1;
@@ -1890,7 +1921,8 @@ fn tap_triggers(
         match t.mana_yield {
             TriggeredMana::One(mana) => fixed[mana as usize] = fixed[mana as usize].saturating_add(1),
             TriggeredMana::OneOfProduced if !chosen || types.count_ones() == 1 => flex[types as usize] += 1,
-            TriggeredMana::OneOfProduced => {}
+            // One of the type the player chose for the tap: counted with the tap's own mana (`Available::linked`).
+            TriggeredMana::OneOfProduced => with_tap += 1,
             TriggeredMana::ChosenColor => {
                 if let Some(color) = cx.s().obj(asker.source).chosen_color {
                     let mana = color.mana() as usize;
@@ -1900,6 +1932,7 @@ fn tap_triggers(
             TriggeredMana::Unstated => {}
         }
     }
+    with_tap
 }
 
 /// The spell a card or face is when cast, as far as the mana limited to some spells is concerned (CR 106.6): advice,
@@ -1988,6 +2021,7 @@ impl Available {
             grantors: Vec::new(),
             restricted: Vec::new(),
             any_color: false,
+            linked: self.linked.clone(),
         };
         for (r, fixed, flex) in &self.restricted {
             if r.may_pay(payment) {
@@ -2006,7 +2040,7 @@ impl Available {
         if self.unknown {
             return u16::MAX;
         }
-        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>();
+        let total = self.fixed.iter().map(|&n| n as u32).sum::<u32>() + self.flex.iter().sum::<u32>() + self.linked.iter().map(|&(_, n)| n).sum::<u32>();
         total.saturating_sub(self.consume).min(u16::MAX as u32) as u16
     }
 
@@ -2015,7 +2049,42 @@ impl Available {
         if self.unknown || cost.mana_value() == 0 {
             return true;
         }
-        let fixed = self.fixed;
+        if self.linked.is_empty() {
+            return self.covers_with(cost, self.fixed);
+        }
+        // Each group of one chosen type is that many of one of its types: covered if some choice for every group is. Groups
+        // alike are interchangeable, so only how many of them choose each type is tried.
+        let mut kinds: Vec<((u8, u32), u32)> = Vec::new();
+        for &group in &self.linked {
+            match kinds.iter_mut().find(|(g, _)| *g == group) {
+                Some((_, n)) => *n += 1,
+                None => kinds.push((group, 1)),
+            }
+        }
+        fn choose(this: &Available, cost: &ManaCost, kinds: &[((u8, u32), u32)], fixed: [u32; 6]) -> bool {
+            let Some((&((types, each), count), rest)) = kinds.split_first() else { return this.covers_with(cost, fixed) };
+            let options: Vec<usize> = (0..6).filter(|&m| types & (1 << m) != 0).collect();
+            // `count` groups among `options`' types, as many to each as `share` says.
+            fn spread(this: &Available, cost: &ManaCost, rest: &[((u8, u32), u32)], fixed: [u32; 6], options: &[usize], left: u32, each: u32) -> bool {
+                let Some((&m, others)) = options.split_first() else { return left == 0 && choose(this, cost, rest, fixed) };
+                if others.is_empty() {
+                    let mut with = fixed;
+                    with[m] = with[m].saturating_add(left.saturating_mul(each));
+                    return choose(this, cost, rest, with);
+                }
+                (0..=left).any(|here| {
+                    let mut with = fixed;
+                    with[m] = with[m].saturating_add(here.saturating_mul(each));
+                    spread(this, cost, rest, with, others, left - here, each)
+                })
+            }
+            spread(this, cost, rest, fixed, &options, count, each)
+        }
+        choose(self, cost, &kinds, self.fixed)
+    }
+
+    /// `covers` with this mana of fixed types.
+    fn covers_with(&self, cost: &ManaCost, fixed: [u32; 6]) -> bool {
         let flex: u32 = self.flex.iter().sum();
         // What a mana ability costs is paid from what is already there.
         if flex > 0 && fixed.iter().sum::<u32>() < self.consume {
@@ -2099,6 +2168,10 @@ fn any_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 
 /// could buy. Mana of a kind nothing of theirs makes is still none; every cost but the mana's is judged as it is.
 pub fn could_act_with_more_mana(cx: &Cx, player: PlayerId) -> bool {
     let mut more = available(cx, player);
+    // A tap whose type is chosen, taken again and again, makes as much of each of its types as is wanted.
+    for (types, _) in std::mem::take(&mut more.linked) {
+        more.flex[types as usize] += 1;
+    }
     for n in more.fixed.iter_mut().filter(|n| **n > 0) {
         *n = u16::MAX as u32;
     }

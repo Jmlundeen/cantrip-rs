@@ -1,7 +1,8 @@
 # Mana Flare adds "one mana of any type that land produced": tapped for {U}, Shivan Reef makes {U}{U}, and for {R}, {R}{R} -
 # never {U}{R} (CR 106.12a, 605.1b). With Mana Flare out and only the Reef untapped, Bot1 can't pay Expressive Iteration's
-# {U}{R}, so it is not offered (CR 601.2g-h). Turn 3, with Mox Sapphire untapped too (the control), it is, and is paid with
-# the Reef's {R} and the Mox's {U}.
+# {U}{R}, so it is not offered (CR 601.2g-h), while Lord of Atlantis's {U}{U} is offered with nothing tapped yet, and paid by
+# the one tap (the Reef's 1 damage too). Turn 3, with Mox Sapphire untapped too (the control), Expressive Iteration is
+# offered, and paid with the Reef's {R} and the Mox's {U}.
 
 [Bot1 Deck]
 Shivan Reef
@@ -10,6 +11,7 @@ Mox Jet
 Mox Pearl
 Mana Flare
 Expressive Iteration
+Lord of Atlantis
 Mox Sapphire
 Island x12
 
@@ -29,6 +31,12 @@ Bot1.Pass
 Bot2.Pass
 ? Bot1.Mana =
 ! Bot1.Hand.Expressive Iteration.Cast
+Bot1.Hand.Lord of Atlantis.Cast
+Bot1.Battlefield.Shivan Reef.Activate(Ability: {U} or {R}; Color: Blue)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Lord of Atlantis.Tapped = false
+? Bot1.Life = 19
 [T3 Bot1.Main1]
 Bot1.Hand.Mox Sapphire.Cast
 Bot1.Hand.Expressive Iteration.Cast
