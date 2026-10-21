@@ -45,7 +45,6 @@ keeps it).
 | [KI-30](#ki-30-a-permanents-name-is-not-part-of-its-last-known-information) | A permanent's name is not part of its last-known information | Low | Open |
 | [KI-34](#ki-34-a-skip-effects-source-that-has-left-may-go-unnamed-in-the-turn-would-begin-prompt) | A skip effect's source that has left may go unnamed in the "Your turn would begin" prompt | Low | Open |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
-| [KI-37](#ki-37-a-sideboard-card-the-engine-does-not-have-is-left-out-of-the-game) | A sideboard card the engine does not have is left out of the game | Low | Open |
 | [KI-38](#ki-38-an-activated-ability-whose-cost-removes-counters-from-among-permanents-is-unexercised) | An activated ability whose cost removes counters from among permanents is unexercised | Low | Unexercised |
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
 | [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
@@ -306,21 +305,6 @@ them out, so it plans with less mana than it has. The view has no word for the p
 a source when the actions offered for it include a mana ability, or the view says its {T} abilities may be activated.
 
 **Scenarios.** none: a bot's plan is not scenario'd. Shang-Chi's scenarios show the engine side.
-
-### KI-37: A sideboard card the engine does not have is left out of the game
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-16, review of cards outside the game |
-
-**Notes.** A seat's sideboard is the cards it owns outside the game (CR 400.11a), which North Wind Avatar chooses among. The
-host refuses a deck naming a card the engine has not ported, but leaves such a card out of a sideboard instead
-(`Session::new`, with a line on stderr), so that a constructed decklist whose sideboard names one (`decks/standard/jeskai-lessons.txt`'s
-Riverchurn Monument, `mono-black-combo.txt`'s Rottenmouth Viper) is still played. In such a game a card that brings one in from
-outside the game cannot choose it. Limited pools are the cube's ported cards, so an event's games are whole. A fix ports the
-card, or has the deck loader refuse the list.
-
-**Scenarios.** `cantrip-host`'s `a_sideboard_card_the_engine_does_not_have_is_left_out`.
 
 ### KI-38: An activated ability whose cost removes counters from among permanents is unexercised
 

@@ -114,20 +114,15 @@ impl Session {
         let mut sideboards = Vec::new();
         let mut decklists = Vec::new();
         for (name, deck, sideboard) in &deal.seats {
-            // A sideboard card the engine does not have is left out of the game rather than refusing the deal, so a decklist
-            // whose sideboard names one is still played (docs/known-issues.md, KI-37).
-            sideboards.push(
-                sideboard
-                    .iter()
-                    .filter_map(|c| match card(c) {
-                        Some(id) => Some(cards.fronts[id.0 as usize].unwrap_or(id)),
-                        None => {
-                            eprintln!("cantrip-native-host: {name}'s sideboard names {c}, which is not a card the engine has; it is left out");
-                            None
-                        }
-                    })
-                    .collect(),
-            );
+            // A sideboard is the cards the seat owns outside the game (CR 400.11a), which a card may bring in: a card the
+            // engine does not have refuses the deal as one in the deck does.
+            let mut outside = Vec::new();
+            for card_name in sideboard {
+                let id = card(card_name)
+                    .ok_or_else(|| Rejection::new("InvalidSetup", format!("{name}'s sideboard names {card_name}, which is not a card the engine has")))?;
+                outside.push(cards.fronts[id.0 as usize].unwrap_or(id));
+            }
+            sideboards.push(outside);
             let mut list = Vec::new();
             let mut shown = Vec::new();
             for card_name in deck {
@@ -817,15 +812,14 @@ mod tests {
         assert_eq!(sideboard(&theirs, 2).count, 0);
     }
 
-    /// A sideboard naming a card the engine does not have is dealt without it (KI-37), where a deck naming one is refused.
+    /// A sideboard naming a card the engine does not have refuses the deal, as a deck naming one does: a card that brings a
+    /// card in from outside the game chooses among the whole sideboard (CR 400.11a).
     #[test]
-    fn a_sideboard_card_the_engine_does_not_have_is_left_out() {
+    fn a_sideboard_card_the_engine_does_not_have_refuses_the_deal() {
         let mut dealt = deal(&[], "Island", 20);
         dealt.seats[1].2 = vec!["No Such Card".into(), "Shock".into()];
-        let mut session = Session::new(dealt).ok().unwrap();
-        let view = session.view(2).ok().unwrap();
-        let sideboard = view.zones.iter().find(|z| z.kind == Some(ZoneKindView::Sideboard) && z.owner == 2).unwrap();
-        assert_eq!(sideboard.count, 1);
+        let refused = Session::new(dealt).err().unwrap();
+        assert!(refused.detail.contains("sideboard names No Such Card"), "{}", refused.detail);
     }
 
     fn options_of(step: &Value) -> Vec<ActionOptionMessage> {

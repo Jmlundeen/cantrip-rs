@@ -1460,8 +1460,8 @@ shows its contents to that seat alone (a `ZoneKindView::Sideboard` zone per seat
 Limited sideboard also holds any number of basic lands (Magic Tournament Rules, and North Wind Avatar's ruling):
 `Setup::basic_lands_outside` names the event's basics, each sideboard gets one of each, and one brought in is replaced
 there by another (`GameState::outside_supply`, fixed at the deal). The server sends each seat's sideboard with its deck, and
-the Limited events (`BoosterPod`, `DraftPod`) the five basics; a sideboard card the engine does not have is left out of the
-game (KI-37), where a deck card it does not have refuses the deal. `cantrip_mechanics::outside::may_put_card_into_hand` is North Wind Avatar's and Death Wish's "you may
+the Limited events (`BoosterPod`, `DraftPod`) the five basics; a card the engine does not have refuses the deal, in the
+sideboard as in the deck. `cantrip_mechanics::outside::may_put_card_into_hand` is North Wind Avatar's and Death Wish's "you may
 put a card you own from outside the game into your hand", asked as `Purpose::PutIntoHand` over the sideboard's cards, which
 the client captions as coming from outside the game. Not built, because no card in content needs them: a revealed fetch of
 a quality (Burning Wish, Living Wish, Karn, the Great Creator), learn (CR 701.48: a Lesson card from outside the game,
