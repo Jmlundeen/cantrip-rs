@@ -46,7 +46,6 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | ID | Issue | Severity | Status |
 | --- | --- | --- | --- |
 | [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
-| [KI-25](#ki-25-a-spacecrafts-power-and-toughness-box-is-not-drawn-before-it-is-a-creature) | A Spacecraft's power and toughness box is not drawn before it is a creature | Low | Open |
 | [KI-26](#ki-26-an-exile-that-a-replacement-sends-elsewhere-is-not-exercised-by-hex-magic-fireglass-mentor-or-esper-origins) | An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins | Low | Unexercised |
 | [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
 | [KI-39](#ki-39-a-state-that-is-true-only-in-the-middle-of-a-resolution-with-no-event-misses-its-state-trigger) | A state that is true only in the middle of a resolution, with no event, misses its state trigger | Low | Unexercised |
@@ -61,6 +60,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
+| [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 
 ## Issues
 
@@ -81,22 +81,6 @@ no printed card can reach it.
 | A fused split spell no longer allowed once its proposal is complete (CR 601.6: `actions::cast` asks `CardDef::spell_rules` again of the spell on the stack), its mana value the sum of its halves' | the check before the cast (every Gaddock Teeg scenario); a back face cast transformed, whose spell has its front face's mana value (CR 712.8c), in a Rust test (`transformed_cast_tests.rs`) | Fuse (CR 702.102) is not built: `CardDef` has no fuse, so no card can be cast fused (KI-76 is its effect-cast half). |
 
 **Scenarios.** None, by definition.
-
-### KI-25: A Spacecraft's power and toughness box is not drawn before it is a creature
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | client | 2026-10-16, station (Wurmwall Sweeper) |
-
-**Notes.** A station card's [P/T] box belongs to its striation (CR 721.2b): the permanent has that base power and
-toughness only while it has N or more charge counters, and a station card has none in any other zone (CR 721.2c). So its
-content file prints no `power`/`toughness`, and the striation's static gives them (`station::base_pt`). The page draws the
-2/2 once the Sweeper is a creature, but a player looking at it in hand, or on the battlefield below the threshold, reads only
-"It's an artifact creature at 4+" and "4+ | Flying" - not what size it will be. A fix carries the box to the client as
-presentation (a `stationPt` beside the Oracle text, drawn in the striation), never as a characteristic.
-
-**Scenarios.**
-- [`scenarios/wurmwall-sweeper-is-a-flying-artifact-creature-only-while-it-has-four-charge-counters.cantrip`](../scenarios/wurmwall-sweeper-is-a-flying-artifact-creature-only-while-it-has-four-charge-counters.cantrip) - the engine side (no power below four, 2/2 at four).
 
 ### KI-26: An exile that a replacement sends elsewhere is not exercised by Hex Magic, Fireglass Mentor or Esper Origins
 
@@ -383,3 +367,19 @@ may attack into a protected player for nothing and leave itself open. A fix tell
 protected from (a field on `PlayerSummaryView` rather than the text), and has the attack plan count no damage to them.
 
 **Scenarios.** none yet.
+
+### KI-98: A station permanent lists its reached striation's keyword again, as granted
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | client / host | 2026-10-20, Wurmwall Sweeper's browser scenario (KI-25) |
+
+**Notes.** A wrong display of a right game state. A station card's striation abilities (CR 721.2a) are its own static
+abilities, which give the permanent the keyword while it has the charge counters (`station::charged`,
+`statics::have_flying`). The host's `ability_changes` counts every keyword the permanent has and its card definition does
+not as granted, so Wurmwall Sweeper at four or more charge counters reads "... / 4+ | Flying | 2/2 / Flying": the
+striation's flying said a second time, as though another effect gave it. A fix leaves out of `granted_abilities` what the
+permanent's own reached striation prints.
+
+**Scenarios.** `wurmwall-sweeper-shows-its-striation-power-and-toughness-in-the-browser` (browser) checks the face in hand and
+below the threshold only, for this reason.

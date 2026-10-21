@@ -22,7 +22,7 @@ namespace Cantrip.Protocol;
 public sealed class PlayerView
 {
     /// <summary>Protocol version, checked at the handshake so mismatched builds fail loudly.</summary>
-    public const int ProtocolVersion = 196;
+    public const int ProtocolVersion = 197;
 
     [Key(0)]
     public int Version { get; set; } = ProtocolVersion;
@@ -616,6 +616,14 @@ public sealed class ObjectView
     /// </summary>
     [Key(57)]
     public bool PhasedOut { get; set; }
+
+    /// <summary>
+    /// The power and toughness box a station card prints in its striation (CR 721.2b), "2/2": the base power and toughness it
+    /// has as a creature once it has enough charge counters, drawn in the striation in any zone. Presentation, never a
+    /// characteristic (CR 721.2c: it has none until then); empty for any other card.
+    /// </summary>
+    [Key(59)]
+    public string StationPt { get; set; } = string.Empty;
 
     /// <summary>
     /// What is printed on this card besides what it shows, to be read beside it: its other face, then its prepare spell,

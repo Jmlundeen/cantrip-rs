@@ -246,8 +246,13 @@ def _face(face, names, index, core):
     if face.get("color_indicator"):
         out["colorIndicator"] = [COLOR_NAMES[c] for c in face["color_indicator"]]
     out["type"] = face["type_line"]
+    # A station card's [P/T] box is printed in its striation (CR 721.2b) and is no characteristic until it has the counters
+    # (CR 721.2c): kept as the box it is, for the client to draw there, never as power and toughness.
+    station = re.search(r"^\d+\+ \|", face.get("oracle_text", ""), re.M) and face.get("power") and face.get("toughness")
+    if station:
+        out["stationPt"] = f"{face['power']}/{face['toughness']}"
     for key in ("power", "toughness", "loyalty", "defense"):
-        if face.get(key):
+        if face.get(key) and not (station and key in ("power", "toughness")):
             out[key] = _stat(face[key])
     out["oracleText"] = face["oracle_text"]
     words = [ab.keyword for ab in index.split_abilities(face["oracle_text"], names) if ab.keyword]

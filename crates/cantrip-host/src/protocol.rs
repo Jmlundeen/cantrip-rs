@@ -536,6 +536,9 @@ pub struct ObjectView {
     /// A phased-out permanent (CR 702.26b): still a permanent, known to the players, but treated as though it does not exist
     /// until it phases in.
     pub phased_out: bool,
+    /// The power and toughness box a station card prints in its striation (CR 721.2b), "2/2": what it will be once it has
+    /// enough charge counters, drawn there in any zone. Presentation, not a characteristic (CR 721.2c); empty for any other card.
+    pub station_pt: String,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]

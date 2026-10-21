@@ -42,6 +42,7 @@ name = "cantrip-host"
 version = "0.1.0"
 dependencies = [
  "cantrip-engine",
+ "cantrip-oracle",
  "cantrip-script",
  "serde",
  "serde_json",

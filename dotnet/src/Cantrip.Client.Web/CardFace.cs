@@ -322,11 +322,15 @@ public static partial class CardFace
         if (card.OracleText.Length > 0)
         {
             string[] printed = card.OracleText.Split('\n');
+            // A station card's [P/T] box is printed in its last striation (CR 721.2b), the size it will be once it is a
+            // creature: drawn there, in any zone, since the card has no power or toughness until then (CR 721.2c).
+            int box = card.StationPt.Length == 0 ? -1
+                : Array.FindLastIndex(printed, line => Cantrip.Client.Tactics.CardReading.LastStationThreshold(line) > 0);
             for (int i = 0; i < printed.Length; i++)
             {
                 // A printed line an effect has taken away (CR 613.1f) stays as printed, greyed: said once, not twice. So does a
                 // station card's striation its charge counters have not reached (CR 721.2a).
-                lines.Add((printed[i], card.SpentLines.Contains(i) || Cantrip.Client.Tactics.CardReading.TakenAway(printed[i], card.LostAbilities, found)
+                lines.Add((i == box ? $"{printed[i]} | {card.StationPt}" : printed[i], card.SpentLines.Contains(i) || Cantrip.Client.Tactics.CardReading.TakenAway(printed[i], card.LostAbilities, found)
                     || Cantrip.Client.Tactics.CardReading.StationUnreached(card, printed[i])));
             }
         }

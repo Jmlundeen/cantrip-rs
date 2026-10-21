@@ -15,6 +15,7 @@ path = "src/bin/host.rs"
 
 [dependencies]
 cantrip-engine.workspace = true
+cantrip-oracle.workspace = true
 cantrip-script.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

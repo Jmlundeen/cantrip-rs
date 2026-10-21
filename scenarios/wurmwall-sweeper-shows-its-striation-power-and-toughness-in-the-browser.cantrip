@@ -1,0 +1,62 @@
+# Browser
+# Wurmwall Sweeper's [P/T] box is printed in its 4+ striation (CR 721.2b), and the card has no power or toughness until it has
+# four charge counters (CR 721.2c), so its content prints none: the page draws the 2/2 in the striation instead, in hand, greyed
+# on the battlefield at three charge counters, one short. Once the Warg stations it to six it is a 2/2 flier (its face at
+# six is not checked: it lists the striation's flying a second time, KI-98).
+
+[Bot1 Deck]
+Wurmwall Sweeper
+Bejeweled Warg
+Mox Sapphire
+Mox Jet
+Mox Emerald
+Mox Ruby
+Island x14
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+? Client.Bot1.Hand.Wurmwall Sweeper.Rules = When this Spacecraft enters, surveil 2. / Station (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 4+.) / 4+ | Flying | 2/2
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Pass
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Pass
+Bot1.Hand.Wurmwall Sweeper.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Arrange(Island; Island |)
+Bot1.Hand.Bejeweled Warg.Cast
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Pass
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Bejeweled Warg)
+Bot1.Pass
+Bot2.Pass
+? Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = 3
+? Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact
+? Bot1.Battlefield.Wurmwall Sweeper.Power = (absent)
+? Bot1.Battlefield.Wurmwall Sweeper.Keywords = (absent)
+? Client.Bot1.Battlefield.Wurmwall Sweeper.Rules = When this Spacecraft enters, surveil 2. / Station (Tap another creature you control: Put charge counters equal to its power on this Spacecraft. Station only as a sorcery. It's an artifact creature at 4+.) / (grey) 4+ | Flying | 2/2
+[T3 Bot1.Main1]
+Bot1.Battlefield.Wurmwall Sweeper.Activate(Ability: Station)
+Bot1.Choose(Bejeweled Warg)
+Bot1.Pass
+Bot2.Pass
+
+[Expect]
+Bot1.Battlefield.Wurmwall Sweeper.Counters.Charge = 6
+Bot1.Battlefield.Wurmwall Sweeper.Types = Artifact; Creature
+Bot1.Battlefield.Wurmwall Sweeper.Power = 2
+Bot1.Battlefield.Wurmwall Sweeper.Toughness = 2
+Bot1.Battlefield.Wurmwall Sweeper.Keywords = Flying
+Bot1.Battlefield.Bejeweled Warg.Tapped = true

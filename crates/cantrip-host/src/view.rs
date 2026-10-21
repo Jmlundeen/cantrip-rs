@@ -358,6 +358,7 @@ pub fn printed(def: &CardDef) -> ObjectView {
         toughness: def.toughness.map(i32::from),
         produces_mana: def.abilities.iter().any(|a| matches!(a, AbilityDef::Activated(d) if d.is_mana_ability())),
         starting_counter: def.loyalty.map(i32::from),
+        station_pt: cantrip_oracle::station_pt(def.name).unwrap_or_default().to_string(),
         other_face: def.back.map(|back| Box::new(printed(back))),
         halves: def.split.map_or_else(Vec::new, |(left, right)| vec![printed(left), printed(right)]),
         inset_spell: inset_spell(def),
@@ -1218,6 +1219,7 @@ impl<'a> Projector<'a> {
             solved: on_battlefield && obj.marks.solved,
             suspected: on_battlefield && effect(EffectKind::Suspected),
             phased_out,
+            station_pt: cantrip_oracle::station_pt(def.name).unwrap_or_default().to_string(),
             exerted: obj.marks.exerted_by.is_some(),
             saddled: game.is_saddled(id),
             goaded: effect(EffectKind::Goaded),
@@ -1367,6 +1369,7 @@ impl<'a> Projector<'a> {
                 view.other_face = None;
                 view.inset_spell = None;
                 view.starting_counter = None;
+                view.station_pt = String::new();
                 // Nothing the layers or the printed card say about it crosses either (CR 406.3): not that it is every creature
                 // type, nor what it was granted or has lost.
                 view.every_creature_type = false;
