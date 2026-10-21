@@ -1,6 +1,7 @@
 //! A permanent that has lost all its abilities (CR 613.1f) at the sites that ask whether it has: Ghalta the Immovable's "Creatures
 //! you control can attack as though they didn't have defender" and its combat damage by toughness, Forge Anew's equip any time
-//! you could cast an instant, and Ocelot Pride's ascend.
+//! you could cast an instant, and Ocelot Pride's ascend; and a Case's "Solved" static abilities - one of the layers and a play
+//! rule, which no printed Case in the engine has both of - before and after the Case loses all its abilities.
 //! No printed card in the engine takes the abilities of these permanents alone (Tishana's Tidebinder needs an ability of
 //! theirs to counter, Humility makes every creature 1/1 and takes defender too), so a test card does here, beside the printed
 //! cards and every other card the engine has.
@@ -38,9 +39,37 @@ fn trinkets(g: &mut dyn Rules, item: &StackItem) -> Result<(), Suspend> {
 /// A zero-cost sorcery: create ten Probe Trinkets.
 static TRINKETS: CardDef = CardDef { name: "Probe Trinkets", types: TypeSet::of(&[CardType::Sorcery]), spell: spell(&[], trinkets), ..CardDef::BLANK };
 
+fn always(_: &dyn Query, _: &Asker) -> bool {
+    true
+}
+
+/// "Solved - Creatures you control get +1/+1" (CR 702.169b): a static ability of the layers, while its source is solved.
+fn your_creatures_while_solved(view: &dyn LayerQuery, source: ObjectId, affected: ObjectId, chars: &Chars) -> bool {
+    cantrip_mechanics::solved::solved_in_layers(view, source)
+        && view.state().obj(affected).controller == view.state().obj(source).controller
+        && chars.is(CardType::Creature)
+}
+
+fn plus_one(_: &dyn LayerQuery, _: ObjectId, chars: &mut Chars) {
+    chars.power = chars.power.map(|v| v + 1);
+    chars.toughness = chars.toughness.map(|v| v + 1);
+}
+
+/// A zero-cost Case: "To solve - (always). Solved - Creatures you control get +1/+1. Solved - You may look at the top card of
+/// your library any time."
+static CASE: CardDef = CardDef {
+    name: "Probe Case",
+    types: TypeSet::of(&[CardType::Enchantment]),
+    subtypes: SubtypeSet::of(&[Subtype::Case]),
+    abilities: &[cantrip_mechanics::solved::to_solve(always, "To solve - Always.")],
+    statics: &[static_ability(Layer::PtModify, your_creatures_while_solved, plus_one, "Solved - Creatures you control get +1/+1.")],
+    play_rules: &[cantrip_mechanics::solved::play_rules(&[PlayRule::LookAtLibraryTop])],
+    ..CardDef::BLANK
+};
+
 fn table() -> &'static CardTable {
     static TABLE: OnceLock<CardTable> = OnceLock::new();
-    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&SILENCE, &TRINKET, &TRINKETS, &PAUSE])))
+    TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&SILENCE, &TRINKET, &TRINKETS, &PAUSE, &CASE])))
 }
 
 /// What Bot1 does, in order, each as soon as it is offered and its turn has come: cast a card (at a permanent named, for
@@ -221,4 +250,41 @@ fn an_ocelot_pride_that_lost_its_abilities_gives_no_citys_blessing() {
     };
     assert!(blessed(false), "ten permanents and Ocelot Pride give no city's blessing");
     assert!(!blessed(true), "an Ocelot Pride that lost its abilities gives the city's blessing");
+}
+
+/// The Probe Case is solved at Bot1's first end step; on turn 3 it may first lose all its abilities. Whether it is solved, the
+/// Ornithopter's power and toughness, and whether Bot1 may look at the top of its library.
+fn case_on_turn_three(silenced: bool) -> (bool, (i32, i32), bool) {
+    let mut steps = vec![Step::Cast(1, "Probe Case", None), Step::Cast(1, "Ornithopter", None)];
+    if silenced {
+        steps.push(Step::Cast(3, "Probe Silence", Some("Probe Case")));
+    }
+    let mut before = None;
+    let game = play(&["Probe Case", "Ornithopter", "Probe Silence"], steps, 3, |game, _| {
+        if let Some(thopter) = game.state.battlefield().iter().copied().find(|&id| game.name(id) == "Ornithopter")
+            && game.state.turn.number == 1
+            && before.is_none()
+        {
+            before = Some(game.chars(thopter).power);
+        }
+    });
+    assert_eq!(before, Some(Some(0)), "the Ornithopter is a 0/2 before the Case is solved");
+    let case = *game.state.battlefield().iter().find(|&&id| game.name(id) == "Probe Case").expect("the Case");
+    let thopter = *game.state.battlefield().iter().find(|&&id| game.name(id) == "Ornithopter").expect("the Ornithopter");
+    let c = game.chars(thopter);
+    (game.state.obj(case).marks.solved, (i32::from(c.power.unwrap()), i32::from(c.toughness.unwrap())), game.may_look_at_library_top(PlayerId(0)))
+}
+
+/// CR 702.169b, 719.3c: once the Case is solved, its "Solved" static ability of the layers gives +1/+1 (`solved_in_layers`) and
+/// its "Solved" play rule lets Bot1 look at the top of its library.
+#[test]
+fn a_solved_cases_static_abilities_apply() {
+    assert_eq!(case_on_turn_three(false), (true, (1, 3), true));
+}
+
+/// CR 719.3b, 613.1f: a Case that loses all its abilities stays solved - a designation, not an ability - and its "Solved" static
+/// abilities are gone with the rest: no +1/+1, and no look at the top of the library (`each_play_rule`).
+#[test]
+fn a_solved_case_that_lost_its_abilities_stays_solved_and_its_solved_abilities_are_gone() {
+    assert_eq!(case_on_turn_three(true), (true, (0, 2), false));
 }
