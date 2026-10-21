@@ -23,8 +23,9 @@ beyond practical scale" with the limit, what happens past it, and why play canno
 | Pri-3 | Cosmetic, a harness or tooling gap, or a path no scenario runs yet. |
 
 Pri-0 and pri-1 are fixed before any other work is started or landed (`CLAUDE.md`, "Bug priority"); one is listed here
-only while its fix is under way, and the list of them is kept at zero. The older entries' Critical / High / Medium /
-Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result is pri-1 whatever it says.
+only while its fix is under way ("Fix queued" or "Fix under way"), and the list of them is kept at zero. A limit of scale
+beyond any practical game or card is "Won't fix" (`CLAUDE.md`, "Scale is the one standing exception"). The tactical bot's
+own judgement is pri-3: the engine is right, and the bot only plays less well.
 
 ## Entry template
 
@@ -45,21 +46,27 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 
 ## Summary
 
-| ID | Issue | Severity | Status |
+| ID | Issue | Priority | Status |
 | --- | --- | --- | --- |
-| [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Low | Unexercised |
-| [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Low | Open |
-| [KI-10](#ki-10-a-lone-action-whose-cost-depends-on-its-target-shows-only-the-printed-cost-until-the-payment) | A lone action whose cost depends on its target shows only the printed cost until the payment | Low | Open |
-| [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
-| [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
-| [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
-| [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
-| [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
+| [KI-102](#ki-102-a-mana-ability-that-doesnt-tap-and-can-be-activated-again-is-counted-once-in-what-can-be-cast) | A mana ability that doesn't tap and can be activated again is counted once in what can be cast | Pri-1 | Fix queued |
+| [KI-103](#ki-103-mana-costs-x-kicker-and-the-mana-a-cast-records-are-narrower-than-play-reaches) | Mana costs, X, kicker and the mana a cast records are narrower than play reaches | Pri-1 | Fix queued |
+| [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
+| [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
+| [KI-106](#ki-106-some-answers-and-counts-are-compared-or-kept-in-eight-bits) | Some answers and counts are compared or kept in eight bits | Pri-1 | Fix queued |
+| [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
+| [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
+| [KI-108](#ki-108-what-can-be-cast-is-over-offered-where-a-mana-abilitys-yield-is-unknown-or-its-cost-is-shared) | What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared | Pri-2 | Open |
+| [KI-3](#ki-3-engine-paths-no-scenario-runs) | Engine paths no scenario runs | Pri-3 | Fix queued |
+| [KI-35](#ki-35-the-tactical-bot-counts-no-summoning-sick-creature-as-a-mana-source-under-shang-chi) | The tactical bot counts no summoning-sick creature as a mana source under Shang-Chi | Pri-3 | Open |
+| [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Pri-3 | Open |
+| [KI-57](#ki-57-the-tactical-bot-does-not-know-islandwalk) | The tactical bot does not know islandwalk | Pri-3 | Open |
+| [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Pri-3 | Open |
+| [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Pri-3 | Open |
+| [KI-109](#ki-109-an-automated-player-concedes-after-a-million-questions-in-one-step) | An automated player concedes after a million questions in one step | Pri-3 | Fix queued |
 | [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
 | [KI-100](#ki-100-a-choice-search-or-sacrifice-of-more-than-232-cards) | A choice, search or sacrifice of more than 2^32 cards | Won't fix | Won't fix: beyond practical scale |
-| [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 
 ## Issues
 
@@ -67,7 +74,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-15/16, fixes in the U-B-R-G Prowess run and the known-bug fixes |
+| Pri-3 | Fix queued | engine | 2026-10-15/16, fixes in the U-B-R-G Prowess run and the known-bug fixes |
 
 **Notes.** Code written for every card the rule describes, where no implemented card reaches it yet. Each is a
 candidate bug until something runs it; when a card that reaches one is implemented, its scenarios cover the path and
@@ -77,7 +84,7 @@ no printed card can reach it.
 
 | Path | Covered instead by | Why no scenario |
 | --- | --- | --- |
-| A fused split spell no longer allowed once its proposal is complete (CR 601.6: `actions::cast` asks `CardDef::spell_rules` again of the spell on the stack), its mana value the sum of its halves' | the check before the cast (every Gaddock Teeg scenario); a back face cast transformed, whose spell has its front face's mana value (CR 712.8c), in a Rust test (`transformed_cast_tests.rs`) | No scenario casts a fused spell (Turn // Burn, mana value 5) that a rule forbids by its whole mana value, such as Gaddock Teeg's. |
+| A fused split spell no longer allowed once its proposal is complete (CR 601.6: `actions::cast` asks `CardDef::spell_rules` again of the spell on the stack), its mana value the sum of its halves' | the check before the cast (every Gaddock Teeg scenario); a back face cast transformed, whose spell has its front face's mana value (CR 712.8c), in a Rust test (`transformed_cast_tests.rs`) | Fuse is built (Turn // Burn): a scenario casting it fused under Gaddock Teeg-style rule now covers this, queued. |
 
 **Scenarios.** None, by definition.
 
@@ -85,7 +92,7 @@ no printed card can reach it.
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open | client | 2026-10-16, review of Shang-Chi, Master of Kung Fu |
+| Pri-3 | Open | client | 2026-10-16, review of Shang-Chi, Master of Kung Fu |
 
 **Notes.** Under Shang-Chi, Master of Kung Fu ("You may activate abilities of creatures you control as though those creatures
 had haste", CR 302.6; `CardDef::activate_as_though_haste`) the engine offers the {T} mana abilities of creatures that came
@@ -100,7 +107,7 @@ a source when the actions offered for it include a mana ability, or the view say
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open | client | 2026-10-17, review of Inkmoth Nexus |
+| Pri-3 | Open | client | 2026-10-17, review of Inkmoth Nexus |
 
 **Notes.** The engine is right: damage from a source with infect is -1/-1 counters to a creature and poison counters to a
 player (CR 702.90b-c, 120.3b, 120.3d), and ten poison counters lose the game (CR 704.5c). The tactical bot
@@ -112,29 +119,6 @@ client shows poison on the player rail and the language-model client in its text
 affected.
 
 **Scenarios.** none: a bot's judgement is not a rules outcome; a bot-lab duel with infect decks would show it.
-
-### KI-51: A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Exercised; the reading is the CR's grammar, no ruling | engine | 2026-10-17, Magus of the Moon |
-
-**Notes.** CR 305.7: a land whose subtype an effect sets "loses all abilities generated from its rules text, its old land types,
-and any copiable effects affecting that land". The engine reads the sentence as naming the three sources of the abilities the land
-loses - its rules text, its old land types (their mana abilities, CR 305.6) and any copiable effects (a copied card's abilities
-and keywords, a copy's "except it has ...") - so `Chars::set_land_subtypes` takes, in layer 4, every ability the land has by
-then, and what else a copy effect made of it (the name, supertypes, card types, colors, power and toughness of what it copies,
-CR 707.2) stays, as layer 1 applied it. The sentence's first clause already says the land "no longer has its old land type", so
-"loses ... its old land types" read as a list of things lost would repeat it; read as sources of abilities it does not. The
-other reading - the copy effect itself is lost - has the land stop being what made it a land at all in the case of a Clone
-copying a Dryad Arbor, and no ruling of Blood Moon, Magus of the Moon, Vesuva or Thespian's Stage says so; the judges' articles
-consulted (Blood Moon, Progenitor of Dependency; a 2013 Judge Forum thread on Thespian's Stage under Blood Moon, which predates
-the "copiable effects" wording and kept the Stage's ability) settle nothing either way. A ruling that the copy effect goes
-entirely would start the land's characteristics from its own card when `layers::land_text_lost` holds it.
-
-**Scenarios.** vesuva-copying-dark-depths-under-blood-moon-is-a-legendary-mountain-named-dark-depths-with-no-abilities,
-thespians-stage-copying-urborg-under-blood-moon-keeps-the-name-and-loses-the-ability-it-kept,
-clone-copying-dryad-arbor-under-blood-moon-is-a-green-dryad-creature-mountain: they assert this reading and pass.
 
 ### KI-54: Where the loop watch's judgement is not the rules'
 
@@ -180,7 +164,7 @@ round, is refused. Every other loop goes on for as long as its players choose (n
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open | client | 2026-10-17, adding Lord of Atlantis |
+| Pri-3 | Open | client | 2026-10-17, adding Lord of Atlantis |
 
 **Notes.** The engine is right: a creature with islandwalk can't be blocked while the defending player controls an Island
 (CR 702.14c, `turn::can_block`), and the blockers question offers only the pairs the rules allow, which the bots follow. The
@@ -196,7 +180,7 @@ seat controls a land of its type. The web client shows the keyword on the card, 
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open | client | 2026-10-17, review of banding |
+| Pri-3 | Open | client | 2026-10-17, review of banding |
 
 **Notes.** The engine is right (CR 702.22h-k). The tactical bot's blocks and attacks (`TacticalPlay.Combat.cs`, `Combat`) are
 judged pair by pair: it does not know that blocking one member of a band blocks all of it, nor that the opponent divides its
@@ -209,7 +193,7 @@ divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's spari
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
-| Low | Open | client | 2026-10-18, Absolute Virtue |
+| Pri-3 | Open | client | 2026-10-18, Absolute Virtue |
 
 **Notes.** The engine is right: damage from an opponent's sources to a player with protection from them, or from everything,
 is prevented (CR 702.16e, 702.16j, 702.16k: Absolute Virtue, Teferi's Protection, The One Ring), and the host tells both seats
@@ -288,3 +272,138 @@ has left its own view at once, as the answering seat's is.
 
 **Scenarios.** None; `TableClockTests.In_a_game_of_four_a_player_out_of_time_leaves_and_the_others_play_on` answers the others'
 questions until the departed seat is told.
+
+### KI-102: A mana ability that doesn't tap and can be activated again is counted once in what can be cast
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-21, review of the exact payability check |
+
+**Notes.** Whether a spell or ability is offered is judged from the mana its controller could make (`actions::Available`,
+the exact search behind `covers`). A mana ability without {T} in its cost can be activated again as long as its cost can
+be paid (CR 605, 602.2): Ashnod's Altar or Phyrexian Altar once per creature sacrificed, Krark-Clan Ironworks once per
+artifact, Cryptic Trilobite once per counter. Each is counted as one activation, so a cast the player could pay for is not
+offered (Ashnod's Altar with four creatures makes 8 mana; Myr Battlesphere is not offered). A fix counts such an ability
+as many times as its cost can be paid, sharing the resources it spends with the rest of the search.
+
+**Scenarios.** None yet: Ashnod's Altar, four creatures and Myr Battlesphere.
+
+### KI-103: Mana costs, X, kicker and the mana a cast records are narrower than play reaches
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine / mechanics / cards | 2026-10-21, the engine-wide audit (workstream W1, parked on `pool5-w1`) |
+
+**Notes.** Mana doubling reaches these within a timed game, so each is a rules violation, not a limit of scale:
+- A mana cost's counts are `u8` (`ManaCost`, `crates/cantrip-state/src/vocab.rs:281`): a total past 255 stops at 255, so
+  Fireball with X = 300 costs {255}{R}.
+- Multikicker's count is a `u8` and its cost is added in `u8`: Everflowing Chalice kicked 128 times costs {0}.
+- An activated ability's X is multiplied into the generic cost in `u8`: Kessig Wolf Run with X = 256 costs {R}{G} (and
+  panics in a debug build).
+- X is a `u16` (`StackItem::x`, `Obj::x`), and X paid in life stops at 1000 (`actions.rs`,
+  `payable_life(..).clamp(0, 1000)`).
+- Splice onto an Arcane spell takes at most two cards (`eligible.len().min(2)`, `actions.rs:4850`; CR 702.47 allows any
+  number), and twobrid symbols at most eight.
+- The mana a cast records per kind is a `u8` (`ManaTally`, `vocab.rs:250`): Dyadrine counts at most 255 spent.
+- Cards narrow their own reductions with `.min(255) as u8` (Eddymurk Crab, Embercleave, Affinity, Ghalta and others).
+A fix widens these to `u32` with saturating arithmetic, and a cost that saturates is judged unpayable, never cheap.
+
+**Scenarios.** None yet; each needs a test that fails on today's code (Everflowing Chalice kicked 128 times, Kessig Wolf
+Run at X = 256, Fireball at X = 300).
+
+### KI-104: Counters, power, toughness and damage are narrower than play reaches
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine / mechanics / cards | 2026-10-21, the engine-wide audit (workstream W2) |
+
+**Notes.** Counter and damage doublers reach these within a timed game:
+- An object's counters are `i16` (`Obj::counters`), and a doubling replacement (`*n *= 2`, Doubling Season) wraps
+  negative, after which the counters are dropped.
+- Power and toughness are `i16` (`Chars`, `Pump`, `Copiable::pt`), and the layers add them with plain `+`, which wraps.
+- Damage is a `u16` (`Obj::damage`, `ops::damage`, `Event::Damage`); `damage as i16 >= toughness` (`settle.rs`,
+  `turn.rs`) lets a creature dealt more than 32,767 damage survive it.
+- A player's poison, energy and experience counters are `u8` (`object.rs:1137-1139`, `pay_energy`).
+- A divided share of damage or counters is cut to the damage and counter widths (`damage_divided`, `counters_divided`).
+A fix widens these to `i32`/`u32` with saturating arithmetic.
+
+**Scenarios.** None yet: Doubling Season past 32,767 counters; a creature past 32,767 power; more than 65,535 damage to
+a creature.
+
+### KI-105: An object's abilities, text changes and chosen modes are held in fixed lists
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-21, the engine-wide audit (workstream W3, part on `pool-4-w3-wip`) |
+
+**Notes.**
+- An object holds at most 32 abilities (`MAX_ABILITIES`, `object.rs:1083`); a grant past it is not given, which stacked
+  grants or a chain of Thespian's Stage copies reach.
+- A copy holds at most six distinct abilities added by exceptions (`Copiable::EXTRA_ABILITIES`), and a seventh panics
+  (`with_ability`'s `expect`): a crash, pri-0 if reached.
+- An object keeps at most four text-changing effects (`Words::MAX`, `vocab.rs:709`); a fifth is ignored.
+- The modes chosen for a spell are a `u8` mask (`StackItem::modes`, `object.rs:575`) with two bits a mode where modes
+  repeat, so a fourth pick of a mode carries into the next (the Seasons choose up to five).
+- The bands of `AbilityRef::index` are guarded only by `debug_assert`.
+A fix gives each a capacity past practical play, handled gracefully at its bound; a check of every card's lists at table
+construction for the bands; and the modes kept as the chosen indices in order.
+
+**Scenarios.** None yet.
+
+### KI-106: Some answers and counts are compared or kept in eight bits
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine / host | 2026-10-21, the engine-wide audit (workstream W4) |
+
+**Notes.**
+- Three answer checks compare `len() as u8` (`validate.rs:159` colors, `:320` discard to hand size, `:349` trigger
+  order), so an answer whose length wraps past 255 is accepted though it is not legal.
+- Extra combats are a `u8` that stops at 255 (`Turn::extra_combats`), and lands played a `u8` that wraps
+  (`Player::lands_played`).
+- Who has seen an object is a `u8` mask (`Obj::seen_by`), one bit a player, so more than eight players overflow it.
+- A library search has no "any number" flag; the clients read a count of 255 or more as "any number".
+Counts of things that happen are bounded by the event cap (RX-1, 2^21 events), which the event-cap sweep uses to retire
+bounds play cannot reach.
+
+**Scenarios.** None yet.
+
+### KI-107: A layer-1 copy static ability is not counted among what could give a look-back ability
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix queued | engine | 2026-10-21, review of the look-back record |
+
+**Notes.** Before a move that can trigger a look-back ability (CR 603.10a), the engine records the characteristics of each
+permanent that could have one (`settle::Then::now`). The set is built from each card's own abilities, copy exceptions,
+abilities that static abilities give, and effects. A static ability of layer 1 that makes a permanent a copy of another
+card (Volrath's Shapeshifter's kind) is not counted, so a look-back ability it gives would not be recorded. No card in
+content has such a static. A fix counts layer-1 copy statics in the set.
+
+**Scenarios.** None yet: needs a test card.
+
+### KI-108: What can be cast is over-offered where a mana ability's yield is unknown or its cost is shared
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | engine | 2026-10-21, review of the exact payability check |
+
+**Notes.** A choice the client offers that cannot be made; the payment takes the cast back (CR 733.1), so no game state is
+wrong. A mana ability whose yield is not stated (Sunken Ruins, X costs, Phyrexian or {2/W} symbols in its cost) makes
+every cost count as payable. Life, energy and sacrifices that several mana abilities would share are judged for each
+alone: three Mana Confluences at 1 or 2 life count as three mana, so Raffine is offered. And the search's time budget
+falls back to offering the cast on rare heavy boards.
+
+**Scenarios.** None yet.
+
+### KI-109: An automated player concedes after a million questions in one step
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-3 | Fix queued | client | 2026-10-21, review of the loop work |
+
+**Notes.** `LoopGuard` makes an automated seat concede past a million questions in one step, so that no table of bots can
+hang. The event cap (RX-1) already ends such a game in a draw, so the concession can turn that draw into a loss. A fix
+removes the concession in the event-cap sweep.
+
+**Scenarios.** None.
