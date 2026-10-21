@@ -55,8 +55,8 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-49](#ki-49-the-tactical-bot-does-not-know-infect-or-poison) | The tactical bot does not know infect or poison | Low | Open |
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-a-loop-a-player-could-stop-is-shortcut-after-a-fixed-number-of-rounds-not-one-the-players-name) | A loop a player could stop is shortcut after a fixed number of rounds, not one the players name | Low | Open |
-| [KI-61](#ki-61-limits-of-judging-a-permanent-as-it-would-exist-and-a-land-as-layer-4-leaves-it) | Limits of judging a permanent as it would exist, and a land as layer 4 leaves it | Low | Unexercised |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
+| [KI-61](#ki-61-a-land-whose-own-layer-4-ability-and-a-subtype-setting-ability-depend-on-each-other-is-judged-by-a-capped-fixpoint) | A land whose own layer-4 ability and a subtype-setting ability depend on each other is judged by a capped fixpoint | Pri-1 | Fix under way |
 | [KI-76](#ki-76-a-fused-cast-is-not-among-the-ways-an-effect-can-cast-a-split-card-from-a-hand) | A fused cast is not among the ways an effect can cast a split card from a hand | Low | Unexercised |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
@@ -255,33 +255,6 @@ seat controls a land of its type. The web client shows the keyword on the card, 
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
 
-### KI-61: Limits of judging a permanent as it would exist, and a land as layer 4 leaves it
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Unexercised | engine | 2026-10-17, review of the CR 614.12 change |
-
-**Notes.** `ops::as_it_would_exist` (CR 614.12) and `layers::land_text_lost` (CR 305.7) leave these cases, none of which an
-implemented card reaches:
-- `ops::judged_entering` works the entering permanent out once, before its zone-change replacements apply, so one that changes
-  how it enters ("enters under your control instead") is not taken into account by those after it (614.12: "taking into
-  account replacement effects that have already modified how it enters"), and one that sends it elsewhere (Containment Priest)
-  leaves the rest still judging a permanent.
-- A permanent leaving at the same moment as one enters (`sacrifice_and_return`, Goblin Welder) is still on the battlefield
-  while the entering one is judged, so its static abilities count among those that would apply to it.
-- The trial object does not carry its `tapped`, a Room's cast door (CR 709.5d) or a battle's protector, and a token copy of a
-  permanent spell is judged without the text change `carry_effects` gives it.
-- `prepare_entry`'s guard (`layers::abilities_may_be_lost`) looks at the battlefield only: a permanent whose own static
-  ability would take its own abilities or set its own land subtype is not asked.
-- A replacement of the entering object's own that functions from every zone (`own_everywhere`) is read off its card where it
-  is, while `Query::lost_all_abilities` of it answers as it would exist.
-- `land_text_lost` judges a land-subtype-setting ability on the object as layer 4 leaves it. For an ability keyed on the subtype
-  it overwrites ("All Mountains are Plains": Conversion, Glaciers) that misses the lands it applied to; in a dependency loop
-  (CR 613.8b) the ability may have applied before an effect that changed the object's land-ness; and while the question is
-  being answered (`finding`), the layer-4 abilities of lands that lose their text still apply. A fix records which setting
-  abilities applied to the object as its layer 4 is worked out.
-
-**Scenarios.** none: no implemented card reaches them.
 ### KI-71: The tactical bot's combat planning ignores bands
 
 | Priority | Status | Area | Found |
@@ -294,6 +267,25 @@ blocker's damage among the band (702.22k) or its attacker's damage among banding
 divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's sparing suggestion).
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
+
+### KI-61: A land whose own layer-4 ability and a subtype-setting ability depend on each other is judged by a capped fixpoint
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-1 | Fix under way | engine | 2026-10-17, review of the CR 614.12 change; narrowed 2026-10-21 |
+
+**Notes.** `layers::land_text_lost` finds the lands whose rules text a land-subtype-setting ability takes (CR 305.7) by
+judging each land with every layer-4 effect but the setting abilities, then again with the layer-4 abilities of the lands
+found so far removed, until the set stops changing - capped at four rounds. That is exact whenever the set settles. It is
+not in a dependency loop (CR 613.8b) between a land's own layer-4 ability and a setting ability keyed on what it adds: a
+land L with "each land is an X in addition" and an ability "All Xs are Ys" depend on each other (each changes the other's
+existence or what it applies to, CR 613.8a), so they apply in timestamp order - L's ability may apply before the setting
+ability takes L's text, which the fixpoint never models, and the rounds may alternate until the cap stops on a wrong set.
+No printed card in content reaches it. The fix under way decides layer 4's order once, on the pair-based dependency
+judgment of KI-41 (`layers::through_others`, the `layer_dependencies` cache), with loops applied in timestamp order, and
+has a test card for each loop case; the cap goes with it.
+
+**Scenarios.** None; a Rust test with test cards comes with the fix.
 
 ### KI-76: A fused cast is not among the ways an effect can cast a split card from a hand
 

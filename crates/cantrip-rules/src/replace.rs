@@ -79,6 +79,16 @@ fn madness_applies(cx: &Cx, z: &ZoneChange) -> bool {
         && !cx.lost_all_abilities(z.object)
 }
 
+/// The card whose replacement effects `id` has: `card_of`, but for a permanent about to enter, judged as it would exist on
+/// the battlefield (CR 614.12), the card it would have there (a copy's), as whether it would have lost its abilities is
+/// (`Query::lost_all_abilities`).
+fn source_card(cx: &Cx, id: ObjectId) -> CardId {
+    match cx.entering {
+        Some(w) if w.object == id => w.chars.card,
+        _ => card_of(cx, id),
+    }
+}
+
 /// The card whose definition a permanent's abilities come from: the card it copies, if it copies one, or the face that is up
 /// (CR 712.8d-f: a double-faced permanent with its back face up has only that face's abilities).
 fn card_of(cx: &Cx, id: ObjectId) -> CardId {
@@ -97,7 +107,7 @@ pub(crate) fn possible(cx: &Cx, subject: Option<ObjectId>) -> bool {
     if !cards.any_replaces {
         return false;
     }
-    subject.is_some_and(|id| cards.replaces[card_of(cx, id).0 as usize])
+    subject.is_some_and(|id| cards.replaces[source_card(cx, id).0 as usize])
         || cx.s().battlefield().iter().any(|&id| cards.replaces[card_of(cx, id).0 as usize])
 }
 
@@ -188,7 +198,10 @@ fn candidates(cx: &Cx, proposal: &Proposal, applied: &[Applied]) -> Vec<Candidat
         Graveyard,
     }
     let mut consider = |id: ObjectId, at: At| {
-        let card = card_of(cx, id);
+        // A permanent about to enter is judged as it would exist on the battlefield (CR 614.12): the card its replacements
+        // of its own are read from is the one it would have there (a copy's), as its abilities are whether it would have
+        // lost them (`Query::lost_all_abilities`).
+        let card = source_card(cx, id);
         // A permanent that has lost all its abilities has no replacement effects (CR 613.1f).
         if !cards.replaces[card.0 as usize] || cx.lost_all_abilities(id) {
             return;
@@ -404,6 +417,10 @@ fn note_counters_by(before: &Proposal, after: &mut Proposal, controller: PlayerI
 fn apply(cx: &mut Cx, proposal: &mut Proposal) {
     let mut applied: Vec<Applied> = cx.lineage.clone();
     loop {
+        // An entering permanent is judged as it would exist with the changes of the replacements applied so far (CR 614.12).
+        if let Proposal::ZoneChange(z) = *proposal {
+            crate::ops::rejudge_entering(cx, &z);
+        }
         let found = candidates(cx, proposal, &applied);
         if found.is_empty() {
             return;
@@ -413,7 +430,7 @@ fn apply(cx: &mut Cx, proposal: &mut Proposal) {
         applied.push((source, index, origin));
         match origin {
             Origin::Printed => {
-                let def = &cx.cards().get(card_of(cx, source)).replacements[index as usize];
+                let def = &cx.cards().get(source_card(cx, source)).replacements[index as usize];
                 let (apply, then, optional, in_graveyard) = (def.apply, def.then, def.optional, def.in_graveyard);
                 // Declined, it has had its opportunity, and the event goes on as it was (CR 614.5, 616.1).
                 if let Some(question) = optional

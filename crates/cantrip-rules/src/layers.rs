@@ -1051,13 +1051,16 @@ impl<'a> Merge<'a> {
                     let on_battlefield = self.on_battlefield;
                     let (gone, applying) = self.lost;
                     let begun = self.begun;
+                    // While the lands that lose their rules text are being found (`land_text_lost`), each object is judged
+                    // as the effects that set land subtypes leave it before any of them applies.
+                    let no_setters = layer == Layer::Type && self.state.land_text_lost.borrow().finding;
                     // CR 613.1f, 613.8a: a permanent that has lost all its abilities has no static abilities from layer 6
                     // on. CR 613.6: an effect that started to apply before then goes on applying in the layers after -
                     // one whose first part is of layers 1 to 5, or the "loses all abilities" ability that took its own
                     // source's (Humility made a creature) and its later parts - and a later part applies only to what its
                     // first part applied to (`Begun`).
                     let skip = |i: usize, st: &StaticDef| {
-                        if st.own || st.layer != layer || st.from != from || !(on_battlefield || st.everywhere) {
+                        if st.own || st.layer != layer || st.from != from || !(on_battlefield || st.everywhere) || (no_setters && st.sets_land_subtypes) {
                             return true;
                         }
                         let first = &statics[first_part(statics, i)];
@@ -1610,12 +1613,15 @@ pub fn lost_all_abilities(cards: &CardTable, state: &GameState, log: &[Record], 
 ///
 /// Each such ability applies in layer 4 to what its `affects` accepts (CR 613.1d). Every other layer-4 effect that would
 /// change whether it applies to an object - one that makes the object a land (Life and Limb's Saprolings, Hydro-Man) or
-/// stops it being one - is one it depends on, and applies before it (CR 613.8a); and once it has applied, the object is
-/// still a land of the kind it names. So it is judged on the object as layer 4 leaves it: a Firdoch Core that Life and
-/// Limb makes a Forest land is a nonbasic land Blood Moon makes a Mountain, and loses its rules text with it. That reading
-/// holds for every such ability in content; it would not for one keyed on the subtype it overwrites ("All Mountains are
-/// Plains"), nor in a dependency loop (CR 613.8b), nor while the question is being answered for a land's own layer-4 ability
-/// whose text is lost (`finding`) (KI-61). It applies
+/// stops it being one - is one it depends on, and applies before it (CR 613.8a). A land loses its rules text if any such
+/// ability applies to it, so it is judged on the object as layer 4 leaves it with every effect but these (the layers skip
+/// them while `finding`): the first of them to apply, in whatever order dependencies and timestamps give, sees the land so,
+/// and one that applies only after another has changed the land's subtypes finds its text lost already. So a Firdoch Core
+/// that Life and Limb makes a Forest land is a nonbasic land Blood Moon makes a Mountain, and loses its rules text with it,
+/// and an ability keyed on the subtype it overwrites ("All Mountains are Plains") takes the text of the Mountains it
+/// applied to. The layer-4 abilities of the lands that lose their text depend on the setting abilities too, so they are
+/// found again with those of the lands found so far no longer applying, until the answer stands: Urborg under Blood Moon
+/// makes no land a Swamp that "All Swamps are Plains" could reach. It applies
 /// whatever its source loses in layer 6 (CR 613.6: Magus of the Moon's ruling). One that would
 /// take the abilities of another such ability's source - a land - is applied first, since the other's existence depends
 /// on it (CR 613.8a), and the abilities it takes no longer apply; where each would take the other's, the earlier timestamp
@@ -1628,15 +1634,20 @@ fn land_text_lost(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<O
     let key = (state.epoch, log.len());
     {
         let have = state.land_text_lost.borrow();
+        // While they are being found, the lands found so far: their own layer-4 abilities no longer apply.
         if have.finding {
-            return Vec::new();
+            return have.objects.clone();
         }
         if have.key == key {
             return have.objects.clone();
         }
     }
     let setters = static_sources(cards, state).setters.clone();
-    state.land_text_lost.borrow_mut().finding = true;
+    {
+        let mut have = state.land_text_lost.borrow_mut();
+        have.finding = true;
+        have.objects.clear();
+    }
     let view = View { cards, state, log, stop: Layer::Type };
     let strips = |(source, from): (ObjectId, ZoneKind), id: ObjectId| -> bool {
         let obj = state.obj(id);
@@ -1647,17 +1658,28 @@ fn land_text_lost(cards: &CardTable, state: &GameState, log: &[Record]) -> Vec<O
         so_far.is(CardType::Land)
             && cards.get(cards.current(state.obj(source))).statics.iter().any(|s| s.sets_land_subtypes && s.from == from && (s.affects)(&view, source, id, &so_far))
     };
-    let mut pending = setters;
-    let mut applied: Vec<(ObjectId, ZoneKind)> = Vec::new();
-    while !pending.is_empty() {
-        // The first, in timestamp order, that no other one still waiting would take away; failing that, the first.
-        let next = (0..pending.len()).find(|&i| !pending.iter().any(|&other| other.0 != pending[i].0 && strips(other, pending[i].0))).unwrap_or(0);
-        let ability = pending.remove(next);
-        pending.retain(|&other| !strips(ability, other.0));
-        applied.push(ability);
+    // Found again with the lands found so far having lost their own layer-4 abilities (CR 613.8a: those depend on the
+    // setting abilities, which apply first), until the answer stands; a land's ability that would decide the answer
+    // both ways (a dependency loop, CR 613.8b) stops it after a few rounds.
+    let mut objects: Vec<ObjectId> = Vec::new();
+    for _ in 0..4 {
+        let mut pending = setters.clone();
+        let mut applied: Vec<(ObjectId, ZoneKind)> = Vec::new();
+        while !pending.is_empty() {
+            // The first, in timestamp order, that no other one still waiting would take away; failing that, the first.
+            let next = (0..pending.len()).find(|&i| !pending.iter().any(|&other| other.0 != pending[i].0 && strips(other, pending[i].0))).unwrap_or(0);
+            let ability = pending.remove(next);
+            pending.retain(|&other| !strips(ability, other.0));
+            applied.push(ability);
+        }
+        let found: Vec<ObjectId> =
+            state.battlefield().iter().copied().filter(|&id| applied.iter().any(|&ability| ability.0 != id && strips(ability, id))).collect();
+        if found == objects {
+            break;
+        }
+        objects = found;
+        state.land_text_lost.borrow_mut().objects = objects.clone();
     }
-    let objects: Vec<ObjectId> =
-        state.battlefield().iter().copied().filter(|&id| applied.iter().any(|&ability| ability.0 != id && strips(ability, id))).collect();
     let mut have = state.land_text_lost.borrow_mut();
     have.key = key;
     have.objects = objects.clone();

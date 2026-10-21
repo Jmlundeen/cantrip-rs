@@ -143,6 +143,11 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
     // entering with Gev gets none of his counters) and those leaving together still see one another - and only then do
     // they all move. The last-known information of each permanent leaving is taken before any of them leaves (CR 603.10a).
     let mut plans: Vec<Plan> = Vec::with_capacity(moves.len());
+    let together = moves.iter().any(|m| m.entering.is_some()) && moves.iter().any(|m| cx.s().obj(m.id).zone.is(ZoneKind::Battlefield));
+    let leaving: Vec<ObjectId> =
+        if together { moves.iter().map(|m| m.id).filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Battlefield)).collect() } else { Vec::new() };
+    // Saved and put back as this move is done, so a move made while it is worked out (a replacement's) leaves it as it was.
+    let outer_leaving = std::mem::replace(&mut *cx.s().leaving_together.borrow_mut(), leaving);
     for m in moves {
         let reason = m.reason.unwrap_or(reason);
         let old = *cx.s().obj(m.id);
@@ -229,13 +234,17 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         // What the replacements left of its arrival: tapped, and the counters they give it, a void counter on a card
         // exiled in place of a graveyard as much as those of a permanent (CR 122.6).
         new.tapped = entering && change.tapped;
+        if entering {
+            new.controller = change.controller;
+        }
         let mut counts = change.counters;
         let mut counts_by = change.counters_by;
         if let Some(e) = m.entering.filter(|_| entering) {
             for (n, with) in counts.iter_mut().zip(e.counters) {
                 *n += with;
             }
-            new.controller = e.controller;
+            // Under the player its replacements left it entering under ("enters under your control instead", CR 614.1c).
+            new.controller = change.controller;
             new.copy = e.copy;
             new.chosen_color = e.chosen_color;
             new.chosen_subtype = e.chosen_subtype;
@@ -264,7 +273,8 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
             counts_by = controller;
             let with = counts;
             counts = match m.entering {
-                Some(e) => judged_entering(cx, &Entering { counters: with, ..e }, with.iter().any(|&n| n > 0), |cx| {
+                // Judged as the replacements left its entry: under whom and whether tapped (CR 614.12).
+                Some(e) => judged_entering(cx, &Entering { counters: with, controller: change.controller, tapped: change.tapped, ..e }, with.iter().any(|&n| n > 0), |cx| {
                     counters::entering(cx, m.id, controller, controller, with)
                 }),
                 None => counters::entering(cx, m.id, controller, controller, with),
@@ -272,6 +282,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         }
         plans.push(Plan { m: *m, reason, old, from, to, change, madness, entering, new, counts, counts_by, last_known });
     }
+    *cx.s().leaving_together.borrow_mut() = outer_leaving;
     for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known } in plans {
         let m = &m;
         let row = cx.st().last_known_push(last_known);
@@ -651,8 +662,12 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
     if cx.s().obj(entering.object).copy.is_some_and(|c| cx.card(c.card).face_down) {
         return Ok(());
     }
-    // Most positions have no static ability that could take an entering permanent's abilities: then it has its own.
-    let may_lose = layers::abilities_may_be_lost(cx.cards(), cx.s());
+    // Most positions have no static ability that could take an entering permanent's abilities: then it has its own. Its
+    // own static abilities count among them (a "loses all abilities" or land-type-setting ability it would have there).
+    let own = cx.cards().get(cx.cards().face(cx.s().obj(entering.object).card, entering.transformed));
+    let may_lose = layers::abilities_may_be_lost(cx.cards(), cx.s())
+        || own.statics.iter().any(|s| s.loses_all || s.sets_land_subtypes)
+        || entering.copy.is_some_and(|c| cx.card(c.card).statics.iter().any(|s| s.loses_all || s.sets_land_subtypes));
     let lost = |cx: &mut Cx, entering: &Entering| may_lose && as_it_would_exist(cx, entering).lost;
     // CR 702.145b: at night a daybound card enters transformed - daybound's static ability, of the permanent as it would
     // exist on the battlefield front face up (CR 614.12), which a "loses all abilities" effect takes.
@@ -686,6 +701,8 @@ pub fn prepare_entry(cx: &mut Cx, entering: &mut Entering) -> R<()> {
 #[derive(Clone, Copy)]
 pub(crate) struct WouldExist {
     pub object: ObjectId,
+    /// How it enters, as the replacements applied so far have made it: what it is judged again from when one changes it.
+    pub entering: Entering,
     pub chars: Chars,
     /// It would have lost all its abilities there (CR 613.1f), or a land the abilities of its rules text (CR 305.7).
     pub lost: bool,
@@ -704,11 +721,24 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
     let id = entering.object;
     let mark = cx.s().mark();
     let from = cx.s().obj(id).zone;
+    // The permanents leaving the battlefield in the same move (CR 101.4: Goblin Welder's sacrifice) are gone as it arrives.
+    let leaving = cx.s().leaving_together.borrow().clone();
+    for gone in leaving {
+        if gone != id && cx.s().obj(gone).zone.is(ZoneKind::Battlefield) && cx.s().battlefield().contains(&gone) {
+            cx.st().zone_remove(Zone::BATTLEFIELD, gone);
+            cx.st().update_obj(gone, |o| o.zone = Zone::GONE);
+        }
+    }
     cx.st().zone_remove(from, id);
     let timestamp = cx.st().timestamp();
+    // A Room spell enters with the door it was cast for unlocked (CR 709.5d).
+    let door = if from.is(ZoneKind::Stack) && cx.cards().get(cx.s().obj(id).card).is_room() { cast_door(cx.s().obj(id).cast_way) } else { 0 };
     cx.st().update_obj(id, |o| {
         o.zone = Zone::BATTLEFIELD;
         o.controller = entering.controller;
+        o.tapped = entering.tapped;
+        o.marks.doors = door;
+        o.marks.protector = entering.protector;
         o.transformed = entering.transformed;
         o.timestamp = timestamp;
         counters::hypothetical(o, &entering.counters);
@@ -735,7 +765,7 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
     let chars = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
     let lost = layers::lost_all_abilities(cx.cards(), cx.s(), &cx.g.log, id);
     cx.st().revert(mark);
-    WouldExist { object: id, chars, lost }
+    WouldExist { object: id, entering: *entering, chars, lost }
 }
 
 /// Runs `f` with `entering` judged as it would exist on the battlefield (CR 614.12) by every effect that reads it
@@ -745,10 +775,11 @@ pub(crate) fn as_it_would_exist(cx: &mut Cx, entering: &Entering) -> WouldExist 
 /// card's own values where it is: a static ability that could apply to it there (its own or another's), a copy effect or a
 /// face it enters with, an effect on it, or a Room (CR 709.5: on the battlefield only its unlocked doors).
 ///
-/// Judged once, before the replacements apply: one that changes how it enters ("enters under your control") is not taken
-/// into account by those after it (KI-61).
+/// Judged again after each replacement that changes how it enters (`rejudge_entering`).
 fn judged_entering<T>(cx: &mut Cx, entering: &Entering, counters: bool, f: impl FnOnce(&mut Cx) -> T) -> T {
-    if !(crate::replace::possible(cx, Some(entering.object)) || (counters && crate::static_rules::counter_bans_possible(cx.s(), cx.cards()))) {
+    let copy_replaces = entering.copy.is_some_and(|c| cx.cards().replaces[c.card.0 as usize]);
+    if !(copy_replaces || crate::replace::possible(cx, Some(entering.object)) || (counters && crate::static_rules::counter_bans_possible(cx.s(), cx.cards())))
+    {
         return f(cx);
     }
     let id = entering.object;
@@ -768,6 +799,23 @@ fn judged_entering<T>(cx: &mut Cx, entering: &Entering, counters: bool, f: impl 
     let done = f(cx);
     cx.entering = outer;
     done
+}
+
+/// After a replacement has modified how a permanent enters (CR 614.12: "taking into account replacement effects that have
+/// already modified how it enters"), the ones after it judge it as it would exist now: under the player it now enters
+/// under, tapped or not; and one that sends it elsewhere (Containment Priest) leaves it no permanent to judge, so the rest
+/// see the card it is. Called by `replace::apply` after each replacement of a zone change.
+pub(crate) fn rejudge_entering(cx: &mut Cx, change: &ZoneChange) {
+    let Some(would) = cx.entering.filter(|w| w.object == change.object) else { return };
+    if !change.to.is(ZoneKind::Battlefield) {
+        cx.entering = None;
+        return;
+    }
+    if change.controller != would.entering.controller || change.tapped != would.entering.tapped {
+        let entering = Entering { controller: change.controller, tapped: change.tapped, ..would.entering };
+        cx.entering = None;
+        cx.entering = Some(as_it_would_exist(cx, &entering));
+    }
 }
 
 /// Who may protect a battle `controller` controls (CR 310.9a, 310.12a), in turn order: for a Siege each opponent still in
@@ -837,6 +885,18 @@ pub fn put_onto_battlefield_along(
     with: &[(CounterKind, i16)],
 ) -> R<Vec<ObjectId>> {
 
+    // What leaves the battlefield in this move is gone as each entering permanent is judged (CR 101.4, 614.12).
+    let leaving: Vec<ObjectId> = moves.iter().map(|m| m.id).filter(|&id| cx.s().obj(id).zone.is(ZoneKind::Battlefield)).collect();
+    let outer_leaving = std::mem::replace(&mut *cx.s().leaving_together.borrow_mut(), leaving);
+    let prepared = prepare_entries(cx, &mut moves, objects, with);
+    *cx.s().leaving_together.borrow_mut() = outer_leaving;
+    prepared?;
+    crate::attach::choose_aura_hosts(cx, &mut moves)?;
+    Ok(move_together(cx, &moves, reason))
+}
+
+/// Each of `objects` prepared to enter (`prepare_entry`) and added to `moves`.
+fn prepare_entries(cx: &mut Cx, moves: &mut Vec<Moving>, objects: &[(ObjectId, PlayerId, bool)], with: &[(CounterKind, i16)]) -> R<()> {
     for &(id, controller, tapped) in objects {
         // A card that has changed zones since it was chosen is a new object, not the one to put onto the battlefield
         // (CR 400.7), as for the other moves of a chosen object.
@@ -848,8 +908,7 @@ pub fn put_onto_battlefield_along(
         prepare_entry(cx, &mut entering)?;
         moves.push(Moving { id, to: Zone::BATTLEFIELD, entering: Some(entering), reason: None });
     }
-    crate::attach::choose_aura_hosts(cx, &mut moves)?;
-    Ok(move_together(cx, &moves, reason))
+    Ok(())
 }
 
 /// Sacrifices permanents and returns cards to the battlefield at the same moment (CR 101.4, 701.21): Goblin Welder's "simultaneously
@@ -1209,6 +1268,8 @@ fn create_tokens_onto(
             continue;
         }
         entering.tapped = change.tapped;
+        entering.controller = change.controller;
+        let controller = change.controller;
         for (n, with) in entering.counters.iter_mut().zip(change.counters) {
             *n += with;
         }
@@ -1224,6 +1285,7 @@ fn create_tokens_onto(
     for (id, controller, entering) in arriving {
         cx.st().update_obj(id, |o| {
             o.zone = Zone::BATTLEFIELD;
+            o.controller = entering.controller;
             o.tapped = entering.tapped;
             o.copy = entering.copy;
             // What the token chose as it entered (CR 614.12): a copy of Painter's Servant picks its own color.
