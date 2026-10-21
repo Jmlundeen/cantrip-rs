@@ -1460,7 +1460,7 @@ impl cantrip_api::Game for Cx<'_> {
         let player = self.g.state.obj(permanent).controller;
         let ability = AbilityRef { card: self.g.state.obj(permanent).card, index: actions::EXTRA_LOYALTY_ALLOWED };
         for _ in 0..times {
-            self.record(Event::AbilityActivated { source: permanent, ability, player });
+            self.record(Event::AbilityActivated { source: permanent, ability, player, by: Grant::NONE });
         }
     }
 

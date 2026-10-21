@@ -59,7 +59,6 @@ keeps it).
 | [KI-83](#ki-83-teferis-protection-in-the-browser-shows-an-empty-battlefield) | Teferi's Protection in the browser shows an empty battlefield | Low | Open |
 | [KI-84](#ki-84-trinisphere-and-force-of-wills-alternative-cost-in-the-browser-show-the-wrong-menu) | Trinisphere and Force of Will's alternative cost in the browser show the wrong menu | Low | Open |
 | [KI-85](#ki-85-a-scenario-table-test-sometimes-fails-closing-a-connection) | A scenario table test sometimes fails closing a connection | Low | Open |
-| [KI-92](#ki-92-an-activation-records-nothing-of-what-gave-it-and-its-alternative-cost-is-found-first) | An activation records nothing of what gave it, and its alternative cost is found first | Low | Open |
 | [KI-93](#ki-93-the-browser-shows-no-phased-out-permanents) | The browser shows no phased-out permanents | Medium | Open |
 | [KI-94](#ki-94-a-browser-scenarios-clientmenu-check-reads-a-menu-of-a-card-long-gone) | A browser scenario's `Client.Menu` check reads a menu of a card long gone | Low | Open |
 
@@ -495,23 +494,6 @@ NullReferenceException in `GameServer` while a connection was closing, then pass
 A race in closing a table's connections, in code the change being tested did not touch. Not investigated.
 
 **Scenarios.** none; the .NET test above.
-
-### KI-92: An activation records nothing of what gave it, and its alternative cost is found first
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Open | engine | 2026-10-20, the action model |
-
-**Notes.** A cast or a land play is offered by every permission that would allow it, each with what made it possible
-(`ActionOption::granted_by`), and is recorded with it. An activation is not: an ability another permanent gives (Cryptolith
-Rite's mana ability, a static's granted activated ability) is an entry of the object's computed ability list, the layers
-knowing the giving card and not the giving object, so `Event::AbilityActivated` records nothing of it and two such givers are
-one option. And `actions::activate` asks for an alternative cost of the ability (`static_rules::activation_alternative`, CR
-118.9, 602.2b: Forge Anew's {0} equip) as a "you may" while it is announced, found first among the permanents that give one,
-rather than offering each as an option of its own. To be brought onto the cast's model (`granted_by`, `paid_by`) when a
-printed card needs it: two givers of one ability, or a history question about one.
-
-**Scenarios.** None.
 
 ### KI-93: The browser shows no phased-out permanents
 

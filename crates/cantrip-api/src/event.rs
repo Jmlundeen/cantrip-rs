@@ -41,7 +41,10 @@ pub enum Event {
     /// Cards were revealed to every player (CR 701.20a).
     Revealed { player: PlayerId, card: ObjectId },
     Countered { spell: ObjectId },
-    AbilityActivated { source: ObjectId, ability: AbilityRef, player: PlayerId },
+    /// An ability was activated (CR 602.2, 605.3): `ability` of `source`, by `player`; `by` names the other object whose effect
+    /// gave the source that ability (CR 113.2c, 613.1f: Chromatic Lantern's mana ability on a land, an Equipment's ability on
+    /// the creature), with the ability, or is `Grant::NONE` for one of the source's own (`Grant::some` reads it).
+    AbilityActivated { source: ObjectId, ability: AbilityRef, player: PlayerId, by: Grant },
     /// A creature was declared as an attacker (CR 508.1).
     Attacks { attacker: ObjectId, defender: Target },
     /// A Class became a level (CR 716.2a).

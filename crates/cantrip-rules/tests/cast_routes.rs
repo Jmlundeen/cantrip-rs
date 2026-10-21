@@ -236,6 +236,44 @@ static ENERGY_SPELL: CardDef = CardDef {
     ..PROBE_SPELL
 };
 
+fn nothing_happens(_: &mut dyn cantrip_api::Game, _: &StackItem) -> Result<(), Suspend> {
+    Ok(())
+}
+
+/// "{2}: nothing", an activated ability that isn't a mana ability.
+static TWO_ABILITY: [AbilityDef; 1] = [cantrip_api::ability(Cost::mana(ManaCost { generic: 2, ..ManaCost::ZERO }), nothing_happens, "{2}: Nothing.")];
+
+static ABILITY_PROBE: CardDef = CardDef { name: "Route Ability Probe", types: TypeSet::of(&[CardType::Artifact]), abilities: &TWO_ABILITY, ..CardDef::BLANK };
+
+fn free_for_you(_: &dyn Query, asker: &Asker, activator: PlayerId, _: ObjectId, _: &ActivatedDef) -> Option<ManaCost> {
+    (activator == asker.controller).then_some(ManaCost::ZERO)
+}
+
+/// "You may pay {0} rather than pay the mana cost of abilities you activate" (Forge Anew's and Kili's kind, CR 118.9).
+static ABILITY_FREE: CardDef =
+    CardDef { name: "Route Ability Free", types: TypeSet::of(&[CardType::Artifact]), ability_alternatives: &[free_for_you], ..CardDef::BLANK };
+
+fn your_lands(view: &dyn LayerQuery, source: ObjectId, id: ObjectId, chars: &Chars) -> bool {
+    chars.is(CardType::Land) && view.state().obj(id).zone.is(ZoneKind::Battlefield) && view.state().obj(id).controller == view.state().obj(source).controller
+}
+
+fn grant_first_delayed(view: &dyn LayerQuery, source: ObjectId, chars: &mut Chars) {
+    let card = view.state().obj(source).card;
+    if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+        chars.abilities[slot] = Some(AbilityRef::delayed(card, 0));
+    }
+}
+
+/// "Lands you control have '{0}: Nothing.'" (Chromatic Lantern's kind, CR 613.1f): the land is the ability's source, and the
+/// permanent that gives it is what gave it (CR 113.2c: two of them, two abilities).
+static GIVER: CardDef = CardDef {
+    name: "Route Ability Giver",
+    types: TypeSet::of(&[CardType::Artifact]),
+    delayed: &[cantrip_api::ability(Cost::mana(ManaCost::ZERO), nothing_happens, "{0}: Nothing.")],
+    statics: &[static_ability(Layer::Ability, your_lands, grant_first_delayed, "Lands you control have \"{0}: Nothing.\"")],
+    ..CardDef::BLANK
+};
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -273,6 +311,9 @@ fn table() -> &'static CardTable {
             &FREE_ALTERNATIVE,
             &FREE_EMBLEM,
             &SUSPEND_PROBE,
+            &ABILITY_PROBE,
+            &ABILITY_FREE,
+            &GIVER,
             &ENERGY_SOURCE,
             &ENERGY_SPELL,
             &SUSPEND_NEVER,
@@ -723,6 +764,63 @@ fn an_energy_cost_is_judged_again_after_the_mana_abilities() {
             assert_eq!(game.state.player(ME).energy(), 0);
         }
     }
+}
+
+/// CR 118.9, 602.2b: each cost a permanent lets a player pay rather than an ability's mana cost is an activation of its own,
+/// made by that permanent (`paid_by`), beside the ability for its own cost where that can be paid; the one chosen is paid.
+#[test]
+fn each_alternative_cost_of_an_ability_is_an_activation_of_its_own() {
+    for pool in [0u8, 2] {
+        let (mut game, _) = game_with("Route Filler", Zone::hand, pool);
+        let ability = put(&mut game, "Route Ability Probe", ME);
+        let (first, second) = (put(&mut game, "Route Ability Free", ME), put(&mut game, "Route Ability Free", ME));
+        put(&mut game, "Route Ability Free", PlayerId(1));
+        game.run();
+        let options = activations_of(&game, ability);
+        let payers: Vec<Option<ObjectId>> = options.iter().map(|o| o.paid_by.map(|g| g.object)).collect();
+        let own = if pool == 0 { vec![] } else { vec![None] };
+        assert_eq!(payers, [own, vec![Some(first), Some(second)]].concat(), "the opponent's gives nothing to this player");
+        let texts: Vec<String> = options.iter().map(|o| describe(&game, o)).collect();
+        assert!(texts.iter().filter(|t| t.contains("paying {0} rather than its mana cost (Route Ability Free)")).count() == 2, "{texts:?}");
+        let chosen = options.iter().find(|o| o.paid_by.is_some_and(|g| g.object == second)).unwrap().clone();
+        let request = game.pending().unwrap().clone();
+        game.answer(request.id, request.player, Answer::Act(Action::of(&chosen))).unwrap();
+        game.run();
+        assert!(game.state.stack.iter().any(|i| i.object == ability), "activated without being asked anything more");
+        assert_eq!(game.state.player(ME).pool.0[Mana::C as usize], pool, "for nothing");
+    }
+}
+
+/// CR 113.2c, 613.1f: an ability another permanent gives is offered and recorded with that permanent (`granted_by`, the
+/// history's `AbilityActivated::by`): two givers of one ability are two abilities, each its own. The land's own abilities
+/// name nothing.
+#[test]
+fn an_ability_another_permanent_gives_is_activated_by_it() {
+    let (mut game, _) = game_with("Route Filler", Zone::hand, 0);
+    let land = put(&mut game, "Route Land", ME);
+    let (first, second) = (put(&mut game, "Route Ability Giver", ME), put(&mut game, "Route Ability Giver", ME));
+    game.state.see_statics();
+    game.run();
+    let options = activations_of(&game, land);
+    let by: Vec<Option<ObjectId>> = options.iter().map(|o| o.granted_by.map(|g| g.object)).collect();
+    assert_eq!(by, [Some(first), Some(second)], "{options:?}");
+    let chosen = options[1].clone();
+    let request = game.pending().unwrap().clone();
+    game.answer(request.id, request.player, Answer::Act(Action::of(&chosen))).unwrap();
+    game.run();
+    let recorded: Vec<Option<ObjectId>> = game
+        .log
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::AbilityActivated { source, by, .. } if source == land => Some(by.some().map(|g| g.object)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(recorded, [Some(second)]);
+}
+
+fn describe(game: &RulesGame, option: &ActionOption) -> String {
+    cantrip_rules::describe(game.cards, &game.state, &game.log, option).to_string()
 }
 
 fn emblem(game: &mut RulesGame, name: &str, player: PlayerId) -> ObjectId {

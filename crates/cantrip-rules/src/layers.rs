@@ -18,6 +18,68 @@ pub fn chars(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId)
     chars_before(cards, state, log, id, Layer::End)
 }
 
+/// How many threads are working out an object's abilities' givers now (`ability_givers`): read first, so the layers pay one
+/// relaxed load per entry for the watching the rest of the time.
+static WATCHING: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
+
+thread_local! {
+    /// The object whose abilities' givers are being worked out (`ability_givers`), `ObjectId::NONE` the rest of the time.
+    static WATCHED: std::cell::Cell<ObjectId> = const { std::cell::Cell::new(ObjectId::NONE) };
+    /// For each of the watched object's ability slots, the object whose effect put the ability there.
+    static GIVERS: std::cell::Cell<[ObjectId; cantrip_state::MAX_ABILITIES]> = const { std::cell::Cell::new([ObjectId::NONE; cantrip_state::MAX_ABILITIES]) };
+}
+
+/// For each of `id`'s abilities (`Chars::abilities`, slot for slot), the other object whose effect gave it the ability (CR
+/// 113.2c, 613.1f): the static ability's source (Chromatic Lantern, an Equipment), or the source of the resolved spell or
+/// ability that did; `ObjectId::NONE` for one of its own (printed, copied, its own static's, a basic land type's). Its
+/// characteristics are worked out again, watching each entry of layer 6 that applies to it: asked only of an object that has
+/// an ability another card's, which is rare, so nothing is paid for it the rest of the time.
+pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId) -> [ObjectId; cantrip_state::MAX_ABILITIES] {
+    GIVERS.with(|g| g.set([ObjectId::NONE; cantrip_state::MAX_ABILITIES]));
+    let outer = WATCHED.with(|w| w.replace(id));
+    WATCHING.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let _ = chars(cards, state, log, id);
+    WATCHING.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
+    WATCHED.with(|w| w.set(outer));
+    GIVERS.with(|g| g.get())
+}
+
+/// The givers noted so far, where `id`'s are being worked out.
+fn watched_givers(id: ObjectId) -> Option<[ObjectId; cantrip_state::MAX_ABILITIES]> {
+    if WATCHING.load(std::sync::atomic::Ordering::Relaxed) == 0 {
+        return None;
+    }
+    (WATCHED.with(|w| w.get()) == id).then(|| GIVERS.with(|g| g.get()))
+}
+
+/// Applies `f`, an entry of the layers, to `id`'s characteristics, and while its abilities' givers are being worked out
+/// (`ability_givers`), notes `giver` beside each ability the entry put there (an ability the entry only moved keeps its
+/// giver).
+fn watching_givers(id: ObjectId, giver: ObjectId, chars: &mut Chars, f: impl FnOnce(&mut Chars)) {
+    let Some(givers) = watched_givers(id) else { return f(chars) };
+    let before = chars.abilities;
+    f(chars);
+    let mut after = givers;
+    // An ability that left a slot and is now in another was moved (the abilities kept by "loses all abilities except mana
+    // abilities", packed together): it keeps its giver. Any other new one is the entry's.
+    let mut moved = [false; cantrip_state::MAX_ABILITIES];
+    for (slot, ability) in chars.abilities.iter().enumerate() {
+        if *ability == before[slot] {
+            continue;
+        }
+        let from = (0..before.len()).find(|&from| !moved[from] && before[from].is_some() && before[from] == *ability && chars.abilities[from] != before[from]);
+        after[slot] = match from {
+            Some(from) => {
+                moved[from] = true;
+                givers[from]
+            }
+            None if giver == id => ObjectId::NONE,
+            None => giver,
+        };
+    }
+    GIVERS.with(|g| g.set(after));
+}
+
 /// An object's characteristics as if it were the face `face` of its card (CR 715.4, 709.3, 712.8a): a card in hand
 /// judged as the Adventure, Omen, half or back face it would be cast as. The face's own printed values replace the card's.
 pub fn chars_as_face(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, face: CardId) -> Chars {
@@ -674,7 +736,7 @@ impl Noted {
         match *entry {
             Entry::Static(source, st) if self.on => {
                 if (st.affects)(view, source, id, chars) {
-                    apply_static(st, view, source, id, chars);
+                    watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars));
                     self.parts.push((source, st));
                 }
             }
@@ -748,6 +810,7 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, char
         return;
     }
     let before = *chars;
+    let givers_before = watched_givers(id);
     let noted_before = noted.parts.len();
     // Bit `k` of `conditional`: the `k`th entry's reach can change; of `reached`: it applied when its turn came.
     let mut conditional = 0u64;
@@ -769,7 +832,7 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, char
                 // And those that applied, of the object as they found it with this one applied.
                 for &(a, as_found) in found.iter() {
                     let mut then = as_found;
-                    entry.apply(view, id, &mut then);
+                    entry.apply_raw(view, id, &mut then);
                     if !entries[a].reach(view, id, &then) {
                         break 'apply true;
                     }
@@ -794,6 +857,9 @@ fn in_order(view: &View, id: ObjectId, mut merge: Merge, noted: &mut Noted, char
     SNAPSHOTS.with(|pool| pool.borrow_mut().push(found));
     if depends {
         *chars = before;
+        if let Some(givers) = givers_before {
+            GIVERS.with(|g| g.set(givers));
+        }
         noted.parts.truncate(noted_before);
         by_dependency(view, id, entries.clone(), noted, chars);
     }
@@ -851,13 +917,15 @@ impl Entry {
     /// Applies it to the object, which `reach` has said it applies to.
     fn apply_reached(&self, view: &View, id: ObjectId, chars: &mut Chars) {
         match *self {
-            Entry::Effect(e) => apply_effect(&e, view.stop, chars),
-            Entry::Granted(st) => (st.apply)(view, id, chars),
-            Entry::Static(source, st) | Entry::Continued(source, st) => apply_static(st, view, source, id, chars),
+            Entry::Effect(e) => watching_givers(id, e.source, chars, |chars| apply_effect(&e, view.stop, chars)),
+            Entry::Granted(st) => watching_givers(id, id, chars, |chars| (st.apply)(view, id, chars)),
+            Entry::Static(source, st) | Entry::Continued(source, st) => watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars)),
         }
     }
 
-    fn apply(&self, view: &View, id: ObjectId, chars: &mut Chars) {
+    /// Applies it to a trial copy of the object (the dependency system's question of what applying it would change): the
+    /// abilities' givers are not watched.
+    fn apply_raw(&self, view: &View, id: ObjectId, chars: &mut Chars) {
         match *self {
             Entry::Effect(e) => apply_effect(&e, view.stop, chars),
             Entry::Granted(st) => (st.apply)(view, id, chars),
@@ -865,6 +933,20 @@ impl Entry {
             Entry::Static(source, st) => {
                 if (st.affects)(view, source, id, chars) {
                     apply_static(st, view, source, id, chars);
+                }
+            }
+        }
+    }
+
+    /// Applies it to the object being worked out.
+    fn apply(&self, view: &View, id: ObjectId, chars: &mut Chars) {
+        match *self {
+            Entry::Effect(e) => watching_givers(id, e.source, chars, |chars| apply_effect(&e, view.stop, chars)),
+            Entry::Granted(st) => watching_givers(id, id, chars, |chars| (st.apply)(view, id, chars)),
+            Entry::Continued(source, st) => watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars)),
+            Entry::Static(source, st) => {
+                if (st.affects)(view, source, id, chars) {
+                    watching_givers(id, source, chars, |chars| apply_static(st, view, source, id, chars));
                 }
             }
         }
@@ -1078,7 +1160,7 @@ fn ready(view: &View, id: ObjectId, pending: &[Entry], chars: &Chars) -> usize {
     // Whether `a` depends on `b` with the object as `before`: applying `b` changes whether `a` applies to it.
     let changes = |a: usize, b: usize, before: &Chars| {
         let mut after = *before;
-        pending[b].apply(view, id, &mut after);
+        pending[b].apply_raw(view, id, &mut after);
         pending[a].reach(view, id, before) != pending[a].reach(view, id, &after)
     };
     let mut direct: Vec<Vec<bool>> =
@@ -1115,7 +1197,7 @@ fn ready(view: &View, id: ObjectId, pending: &[Entry], chars: &Chars) -> usize {
                 let mut first = *chars;
                 for (c, entry) in pending.iter().enumerate() {
                     if through[b][c] && c != a && c != b {
-                        entry.apply(view, id, &mut first);
+                        entry.apply_raw(view, id, &mut first);
                     }
                 }
                 if changes(a, b, &first) {

@@ -377,7 +377,7 @@ pub type PayWithGrant = fn(&dyn Query, ObjectId, PlayerId, ObjectId) -> PayWith;
 /// A static ability that lets a player pay a different mana cost rather than an activated ability's (CR 118.9, 602.2b),
 /// by the permanent `source` that has it: the cost they may pay instead for `activator` activating the ability `def` of
 /// `permanent`, or none. "You may pay {0} rather than pay the equip cost of the first equip ability you activate during
-/// each of your turns": Forge Anew. Offered as a "you may" as the ability is announced.
+/// each of your turns": Forge Anew. Each one that applies is an activation of its own (`ActionOption::paid_by`).
 pub type AbilityAlternative = fn(&dyn Query, &Asker, PlayerId, ObjectId, &ActivatedDef) -> Option<ManaCost>;
 
 /// A mana ability's effect: it resolves at once, never on the stack (CR 605.3). The color is the one chosen for an

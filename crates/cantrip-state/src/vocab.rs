@@ -1328,6 +1328,8 @@ impl AbilityRef {
     pub const EXILE_CAST: u8 = 72;
     pub const SPELL_ALTERNATIVE: u8 = 80;
     pub const PLAY_RULE: u8 = 88;
+    /// The kth of a card's `ability_alternatives`: a cost it lets a player pay rather than an activated ability's (CR 118.9).
+    pub const ABILITY_ALTERNATIVE: u8 = 104;
     const BAND: u8 = 8;
     const PLAY_RULES: u8 = 16;
     /// The history's marker of extra loyalty activations allowed this turn (`actions::EXTRA_LOYALTY_ALLOWED`).
@@ -1348,6 +1350,15 @@ impl AbilityRef {
     pub fn spell_alternative(card: CardId, k: usize) -> AbilityRef {
         debug_assert!(k < Self::BAND as usize);
         AbilityRef { card, index: Self::SPELL_ALTERNATIVE + k as u8 }
+    }
+
+    pub fn ability_alternative(card: CardId, k: usize) -> AbilityRef {
+        debug_assert!(k < Self::BAND as usize);
+        AbilityRef { card, index: Self::ABILITY_ALTERNATIVE + k as u8 }
+    }
+
+    pub fn as_ability_alternative(self) -> Option<usize> {
+        self.band(Self::ABILITY_ALTERNATIVE, Self::BAND)
     }
 
     pub fn play_rule(card: CardId, k: usize) -> AbilityRef {

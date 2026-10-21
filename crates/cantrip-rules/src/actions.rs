@@ -11,15 +11,6 @@ use cantrip_state::Span;
 use crate::layers::{self, live, summoning_sick};
 use crate::{Cx, Flow, R, Stop, counters, ops, static_rules};
 
-/// What a static ability that offers another cost for an activated ability asks (CR 118.9, 602.2b): Forge Anew.
-const ALTERNATIVE_ACTIVATION_COST: Question = Question::new(
-    "AlternativeCost",
-    "pay its alternative cost instead of the ability's mana cost?",
-    "",
-    "Use the alternative cost",
-    "Pay the mana cost",
-);
-
 pub fn sorcery_timing(cx: &Cx, player: PlayerId) -> bool {
     let s = cx.s();
     s.turn.active == player && s.turn.step().is_main() && s.stack.is_empty()
@@ -845,6 +836,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
             continue;
         }
         let chars = cx.chars(id);
+        let givers = std::cell::OnceCell::new();
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
             if !def.is_mana_ability()
@@ -874,6 +866,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                 }
             }
             let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
+            option.granted_by = granted_by(cx, id, Some(&chars), index, ability, &givers);
             option.restriction = def.restricted.map(|r| restriction_from(cx, id, r));
             if let Some(p) = def.cost.permanents {
                 let asker = Asker { source: id, controller: player };
@@ -2120,11 +2113,14 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
         .chain(cx.s().zone(Zone::graveyard(player)).iter().copied())
         .collect();
     let forbidders = static_rules::activation_forbidders(cx);
+    // The permanents that let a player pay another cost for an ability (CR 118.9, 602.2b): none, nearly always.
+    let alternative_sources = static_rules::activation_alternative_sources(cx);
     // Split second (CR 702.61a-b): no activated ability but a special action (turning a face-down creature face up, CR 116.2b).
     let split = split_second(cx);
     for id in sources {
         let zone = cx.s().obj(id).zone.kind();
         let chars = cx.chars(id);
+        let givers = std::cell::OnceCell::new();
         for (index, ability) in chars.abilities().enumerate() {
             let Some(def) = activated(cx, ability) else { continue };
             if def.is_mana_ability()
@@ -2190,10 +2186,13 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             let a = judged.then(|| own.as_ref().unwrap_or_else(|| available.get_or_init(|| self::available(cx, player))));
             // A special action is no ability, so mana limited to activating abilities can't pay for it (CR 116.2, 106.6).
             let payment = if def.special_action { ManaPayment::Other } else { ManaPayment::Ability { source: chars.types, subtypes: chars.subtypes } };
-            let covered = |a: &Available, targets: &[Target]| {
+            let covered = |a: &Available, owed: ManaCost, targets: &[Target]| {
                 // A special action is no activated ability (CR 116.2): what changes the cost of activating abilities does not
                 // touch it; what changes its own cost is already in `owed` (`special_action_cost`), which `special_action`
                 // pays.
+                if owed.mana_value() == 0 && owed.x == 0 {
+                    return true;
+                }
                 let mut cost =
                     if def.special_action { owed } else { change_with(cx, &a.changers, player, Costed::Ability(id, ability), owed, None, targets) };
                 // Mana of any color pays for it (CR 609.4b): every symbol is paid as generic mana.
@@ -2213,14 +2212,23 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                     && def.modal.is_none()
                     && (!a.changers.is_empty() || def.cost_change.is_some() || !own_cost_changes(cx, id).is_empty())
             });
-            if let Some(a) = a
-                && !each_target
-                && !covered(a, &[])
-                && static_rules::activation_alternative(cx, player, id, def).is_none()
-            {
+            // The ability for its own cost, and for each cost a static ability lets the player pay rather than its mana cost
+            // (CR 118.9, 602.2b: Forge Anew's, Kili's {0} equip), each an option of its own, made by that permanent
+            // (`ActionOption::paid_by`).
+            let alternatives: Vec<(Grant, ManaCost)> = if alternative_sources.is_empty() || def.special_action {
+                Vec::new()
+            } else {
+                static_rules::activation_alternatives(cx, &alternative_sources, player, id, def).into_iter().filter(|&(_, c)| c != owed).collect()
+            };
+            let ways = || {
+                std::iter::once((None, owed))
+                    .chain(alternatives.iter().map(|&(g, c)| (Some(g), c)))
+                    .filter(|&(_, cost)| a.is_none_or(|a| each_target || covered(a, cost, &[])))
+            };
+            if ways().next().is_none() {
                 continue;
             }
-            let mut option = ActionOption::on(ActionKind::ActivateAbility, id, index as u8);
+            let mut option = ActionOption { granted_by: granted_by(cx, id, Some(&chars), index, ability, &givers), ..ActionOption::on(ActionKind::ActivateAbility, id, index as u8) };
             let possible = match def.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
                 None if def.late_targets => slots_satisfiable(cx, &asker, def.targets),
@@ -2229,19 +2237,53 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
             if !possible {
                 continue;
             }
-            // A static ability that lets the player pay another cost instead (CR 118.9) leaves every target on offer.
-            if let Some(a) = a.filter(|_| each_target) {
-                let kept: Vec<Target> = option.target_candidates.iter().copied().filter(|&t| covered(a, &[t])).collect();
-                if kept.len() != option.target_candidates.len() && static_rules::activation_alternative(cx, player, id, def).is_none() {
-                    if kept.is_empty() && !(option.targets_optional && covered(a, &[])) {
-                        continue;
+            for (paid_by, cost) in ways() {
+                let mut option = ActionOption { paid_by, ..option.clone() };
+                if let Some(a) = a.filter(|_| each_target) {
+                    let kept: Vec<Target> = option.target_candidates.iter().copied().filter(|&t| covered(a, cost, &[t])).collect();
+                    if kept.len() != option.target_candidates.len() {
+                        if kept.is_empty() && !(option.targets_optional && covered(a, cost, &[])) {
+                            continue;
+                        }
+                        option.target_candidates = kept;
                     }
-                    option.target_candidates = kept;
                 }
+                options.push(option);
             }
-            options.push(option);
         }
     }
+}
+
+/// What gave `id` the ability `ability` it has `index`th (as `Chars::abilities()` counts them), where another object's effect
+/// did (CR 113.2c, 613.1f): Chromatic Lantern for the mana ability it gives a land, an Equipment for the ability it gives the
+/// creature. Asked only of an ability that is not of the object's own card (its face, the card it copies) nor a rule's
+/// (a basic land type's), so nearly never; `givers` keeps the object's givers once worked out (`layers::ability_givers`).
+fn granted_by(
+    cx: &Cx,
+    id: ObjectId,
+    chars: Option<&Chars>,
+    index: usize,
+    ability: AbilityRef,
+    givers: &std::cell::OnceCell<[ObjectId; cantrip_state::MAX_ABILITIES]>,
+) -> Option<Grant> {
+    let obj = cx.s().obj(id);
+    if ability.card == cx.cards().intrinsic || ability.card == obj.card || obj.copy.is_some_and(|c| c.card == ability.card) {
+        return None;
+    }
+    let worked_out;
+    let chars = match chars {
+        Some(chars) => chars,
+        None => {
+            worked_out = cx.chars(id);
+            &worked_out
+        }
+    };
+    if ability.card == chars.card {
+        return None;
+    }
+    let slot = chars.abilities.iter().enumerate().filter(|(_, a)| a.is_some()).nth(index)?.0;
+    let giver = givers.get_or_init(|| layers::ability_givers(cx.cards(), cx.s(), &cx.g.log, id))[slot];
+    (giver != ObjectId::NONE && giver != id).then_some(Grant { object: giver, ability })
 }
 
 /// The marker in the history of an effect having allowed one more loyalty activation this turn (CR 606.3): an
@@ -3619,6 +3661,21 @@ pub fn describe(cards: &CardTable, state: &GameState, log: &[Record], option: &A
                 _ => printed.into(),
             }
         }
+        // An ability activated for a cost another permanent lets be paid rather than its mana cost (CR 118.9, 602.2b): the
+        // ability's text, the cost and the permanent, so it reads apart from the ability for its own cost.
+        ActionKind::ActivateAbility if let Some(g) = option.paid_by => {
+            let printed = describe_way(cards, state, log, option, source);
+            let reader = crate::resolve::Reader { cards, state, events: log };
+            let ability = layers::chars(cards, state, log, source).abilities().nth(option.index as usize);
+            let cost = ability.and_then(|a| match cards.ability(a) {
+                AbilityDef::Activated(def) => static_rules::named_activation_alternative(&reader, g, asked_player(state), source, def),
+                _ => None,
+            });
+            match cost {
+                Some(cost) => format!("{printed} - paying {cost} rather than its mana cost ({})", permission_name(cards, state, g)).into(),
+                None => format!("{printed} ({})", permission_name(cards, state, g)).into(),
+            }
+        }
         _ => describe_way(cards, state, log, option, source).into(),
     }
 }
@@ -3826,7 +3883,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             } else if def.special_action {
                 special_action(cx, player, source, ability)?;
             } else {
-                activate(cx, player, source, ability, action.index, &action.targets)?;
+                activate(cx, player, source, ability, action.index, &action.targets, action.paid_by)?;
             }
         }
         _ => unreachable!("not a priority action"),
@@ -5226,16 +5283,17 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
 }
 
 /// Activating a non-mana ability (CR 602.2): on the stack, then its costs.
-fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, index: u8, targets: &[Target]) -> R<()> {
+fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, index: u8, targets: &[Target], paid_by: Option<Grant>) -> R<()> {
     let def = activated(cx, ability).expect("activated");
     let mut item = stack_item(StackKind::Activated, source, ability, player, targets);
     let mut mana = def.cost.mana;
-    // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost.
-    if let Some((granter, alternative)) = static_rules::activation_alternative(cx, player, source, def)
-        && alternative != mana
-        && matches!(cx.ask_core(player, RequestKind::May { source: granter, purpose: Purpose::Ask(&ALTERNATIVE_ACTIVATION_COST) }, true)?, Answer::Yes)
-    {
-        mana = alternative;
+    // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost: the
+    // option it was offered as names which (`ActionOption::paid_by`), and it is paid if it still applies.
+    if let Some(g) = paid_by {
+        match static_rules::named_activation_alternative(&*cx, g, player, source, def) {
+            Some(alternative) => mana = alternative,
+            None => return Err(Stop::Cancel),
+        }
     }
 
     // CR 602.2b, 601.2b: a modal ability's modes first, then X, then the Phyrexian symbols paid with life.
@@ -5404,7 +5462,8 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         assert!(def.cost.exile_self, "craft exiles its source with its materials (CR 702.167a)");
         pay_materials(cx, source, &materials);
     }
-    cx.emit(Event::AbilityActivated { source, ability, player });
+    let by = Grant::of(granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
+    cx.emit(Event::AbilityActivated { source, ability, player, by });
     ops::became_targets(cx, targets.iter().copied(), source, player);
     ops::commit_crime(cx, player, source, &targets);
     Ok(())
@@ -5526,7 +5585,8 @@ pub fn activate_mana(
     // that trigger on activations name loyalty abilities or abilities that aren't mana abilities; one that triggers on a
     // mana ability's activation too ("an ability of a creature": Elrond, Moon-Reader) needs it emitted, its trigger
     // waiting for the next time a player would receive priority (CR 603.3).
-    cx.record(Event::AbilityActivated { source, ability, player });
+    let by = Grant::of(granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
+    cx.record(Event::AbilityActivated { source, ability, player, by });
     // {T} is paid on the permanent before any other part of the cost moves it (CR 605.3a, 601.2h, 118.3): see `activate`.
     if def.cost.tap {
         ops::tap(cx, source);

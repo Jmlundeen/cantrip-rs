@@ -828,8 +828,11 @@ play a land (CR 116.2a, 305.1) - and an offered action (`ActionOption`) names fo
   card cast or played from its owner's hand, a card on an Adventure (CR 715.3d), a prepare spell's copy (CR 722.3) and a
   card's own "you may cast this card from your graveyard".
 - **paid_by** (`Option<Grant>`): the alternative cost another object gives that a cast pays rather than its mana cost (CR
-  118.9: Omniscience, Jodah, Primal Prayers' energy). A permission and a cost are two things (CR 601.2b, 601.3), so a cast by
-  Lurrus's permission for Primal Prayers' {E} names both.
+  118.9: Omniscience, Jodah, Primal Prayers' energy), or an activation rather than its ability's (CR 602.2b: Forge Anew's and
+  Kili's {0} equip, `AbilityRef::ability_alternative`). A permission and a cost are two things (CR 601.2b, 601.3), so a cast
+  by Lurrus's permission for Primal Prayers' {E} names both.
+- An activation's **granted_by** is the other object whose effect gave the source that ability (CR 113.2c, 613.1f:
+  Chromatic Lantern's mana ability on a land, an Equipment's on the creature), with the ability.
 
 **Every open combination is its own option.** `castable_ways` (`Offer`) offers each card by each `Route` that lets it be
 cast from where it is - the rules for the hand; each play permission; each permanent's permission to cast from exile; the
@@ -859,9 +862,15 @@ cost). Nothing is re-derived and no permission is searched for again, so what th
 each cast and land play was made by, so "once during each of your turns" is a history question
 (`cantrip_mechanics::history::permission_used_this_turn`, which Lurrus and Serra Paragon share) and "if you cast it this
 way" can be one. Riders that outlive the cast are attached at cast from the action's grant (Serra Paragon's "it gains", a
-way's flashback). The activation side has no grants yet: an ability another permanent gives (Cryptolith Rite's mana
-ability) is offered as an entry of the creature's computed ability list, and `AbilityActivated` does not record its giver;
-an ability's alternative cost is still found first and asked as it is announced (KI-92).
+way's flashback). An activation is the same: `AbilityActivated { by }` records the object that gave the source the ability,
+where another did. The layers know the giving card of an ability (its `AbilityRef`), not the giving object, so
+`layers::ability_givers` works the object's characteristics out again watching each entry of layer 6 that puts an ability on
+it (not the dependency system's trial copies) - asked only for an ability whose card is not the object's own, so nothing is
+paid for it the rest of the time; two Chromatic Lanterns give a land two abilities, each its own option made by its
+Lantern. Each cost a static ability lets a player pay rather than an ability's mana cost (`CardDef::ability_alternatives`)
+is an activation of its own (`paid_by`), offered beside the ability for its own cost where that can be paid, described with
+the cost and the permanent ("Equip {2} - paying {0} rather than its mana cost (Forge Anew)"), and paid as offered: nothing
+is asked as it is announced.
 
 **Cost changes are one list** matched against what is costed (`Costed`: a spell, an ability, a special action, CR 116.1),
 asked once the targets and X are announced (CR 601.2f): "can't reduce the mana in that cost to less than one mana"

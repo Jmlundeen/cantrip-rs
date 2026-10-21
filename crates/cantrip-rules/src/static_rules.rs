@@ -286,18 +286,46 @@ pub fn grants_flash(q: &dyn Query, granters: &[(ObjectId, PlayerId, &'static Car
     })
 }
 
-/// The cost a static ability lets `player` pay rather than the mana cost of this ability of `permanent` (CR 118.9, 602.2b),
-/// with the permanent that offers it.
-pub fn activation_alternative(cx: &Cx, player: PlayerId, permanent: ObjectId, def: &ActivatedDef) -> Option<(ObjectId, ManaCost)> {
-    for (id, controller, card) in sources(cx, |d| !d.ability_alternatives.is_empty()) {
+/// The permanents on the battlefield with a static ability that lets a player pay another cost rather than an activated
+/// ability's mana cost (`CardDef::ability_alternatives`, CR 118.9, 602.2b), with their controllers: empty, so unallocated,
+/// in nearly every game.
+pub fn activation_alternative_sources(cx: &Cx) -> Vec<(ObjectId, PlayerId, &'static CardDef)> {
+    sources(cx, |d| !d.ability_alternatives.is_empty()).collect()
+}
+
+/// Each cost one of `alternative_sources` lets `player` pay rather than the mana cost of this ability of `permanent`
+/// (CR 118.9, 602.2b), with the `Grant` that names it (the permanent and `AbilityRef::ability_alternative`): each a way of
+/// activating it of its own.
+pub fn activation_alternatives(
+    cx: &Cx,
+    alternative_sources: &[(ObjectId, PlayerId, &'static CardDef)],
+    player: PlayerId,
+    permanent: ObjectId,
+    def: &ActivatedDef,
+) -> Vec<(Grant, ManaCost)> {
+    let mut all = Vec::new();
+    for &(id, controller, card) in alternative_sources {
         let asker = Asker { source: id, controller };
-        for rule in card.ability_alternatives {
+        let card_id = cx.cards().current(cx.s().obj(id));
+        for (k, rule) in card.ability_alternatives.iter().enumerate() {
             if let Some(cost) = rule(cx, &asker, player, permanent, def) {
-                return Some((id, cost));
+                all.push((Grant { object: id, ability: AbilityRef::ability_alternative(card_id, k) }, cost));
             }
         }
     }
-    None
+    all
+}
+
+/// The cost the alternative `grant` names (`activation_alternatives`) lets `player` pay for this ability of `permanent`
+/// now, read from the permanent's card: none where it no longer offers one.
+pub fn named_activation_alternative(q: &dyn Query, grant: Grant, player: PlayerId, permanent: ObjectId, def: &ActivatedDef) -> Option<ManaCost> {
+    let k = grant.ability.as_ability_alternative()?;
+    let rule = q.card(grant.ability.card).ability_alternatives.get(k)?;
+    let obj = q.state().obj(grant.object);
+    if !obj.zone.is(ZoneKind::Battlefield) || q.lost_all_abilities(grant.object) {
+        return None;
+    }
+    rule(q, &Asker { source: grant.object, controller: obj.controller }, player, permanent, def)
 }
 
 /// Whether a static ability lets `player` activate this sorcery-speed ability whenever they could cast an instant.
