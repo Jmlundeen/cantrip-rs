@@ -184,9 +184,6 @@ impl LayerQuery for View<'_> {
     }
 }
 
-/// More permanents with static abilities than any game has at once; past it, the rest are not looked at.
-const MAX_STATIC_SOURCES: usize = 32;
-
 const LAYERS: [Layer; 8] =
     [Layer::Text, Layer::Type, Layer::Color, Layer::Ability, Layer::PtDefine, Layer::PtSet, Layer::PtModify, Layer::PtSwitch];
 
@@ -427,7 +424,7 @@ fn static_sources<'a>(cards: &CardTable, state: &'a GameState) -> std::cell::Ref
         let note = |list: &mut Vec<(ObjectId, ZoneKind, bool)>, source: ObjectId, from: ZoneKind| {
             let sobj = state.obj(source);
             let scard = cards.current(sobj);
-            if cards.statics[scard.0 as usize] && list.len() < MAX_STATIC_SOURCES && live(state, source) {
+            if cards.statics[scard.0 as usize] && live(state, source) {
                 list.push((source, from, state.lost_all_abilities_to_an_effect(source)));
             }
         };

@@ -31,6 +31,8 @@ mod leave_game_tests;
 mod play_permission_tests;
 #[cfg(test)]
 mod remove_up_to_tests;
+#[cfg(test)]
+mod many_static_sources_tests;
 mod replace;
 mod resolve;
 mod settle;
