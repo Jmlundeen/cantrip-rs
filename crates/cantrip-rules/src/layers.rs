@@ -52,6 +52,23 @@ pub fn ability_givers(cards: &CardTable, state: &GameState, log: &[Record], id: 
     GIVERS.with(|g| g.get())
 }
 
+/// `ability_givers` within a pass (`chars_in`).
+fn givers_in(cx: &Ctx, id: ObjectId) -> [ObjectId; cantrip_state::MAX_ABILITIES] {
+    struct Watch(ObjectId);
+    impl Drop for Watch {
+        fn drop(&mut self) {
+            WATCHING.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
+            WATCHED.with(|w| w.set(self.0));
+        }
+    }
+    let outer = GIVERS.with(|g| g.replace([ObjectId::NONE; cantrip_state::MAX_ABILITIES]));
+    let watch = Watch(WATCHED.with(|w| w.replace(id)));
+    WATCHING.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let _ = chars_in(cx, id, Layer::PtDefine);
+    drop(watch);
+    GIVERS.with(|g| g.replace(outer))
+}
+
 /// The givers noted so far, where `id`'s are being worked out.
 fn watched_givers(id: ObjectId) -> Option<[ObjectId; cantrip_state::MAX_ABILITIES]> {
     if WATCHING.load(std::sync::atomic::Ordering::Relaxed) == 0 {
@@ -176,6 +193,14 @@ impl<'a> View<'a> {
         View { cards, state, log, stop, stage: None, reads: None, pass: None }
     }
 
+    /// An object with the layers before `stop` done, in the pass at hand or the position's.
+    fn before(&self, id: ObjectId, stop: Layer) -> Chars {
+        match self.pass {
+            Some(pass) => chars_in(&Ctx { cards: self.cards, state: self.state, log: self.log, pass }, id, stop),
+            None => chars_before(self.cards, self.state, self.log, id, stop),
+        }
+    }
+
     /// An object at `stage`, in the pass at hand or the position's.
     fn at(&self, id: ObjectId, stage: &Stage) -> Chars {
         let owned;
@@ -209,7 +234,7 @@ impl LayerQuery for View<'_> {
         }
         match &self.stage {
             Some(stage) => self.at(id, stage),
-            None => chars_before(self.cards, self.state, self.log, id, self.stop),
+            None => self.before(id, self.stop),
         }
     }
 
@@ -221,20 +246,30 @@ impl LayerQuery for View<'_> {
             reads.borrow_mut().push(id);
         }
         let seventh = LAYERS.iter().position(|&l| l == Layer::PtDefine).unwrap_or(0);
+        // An object whose own characteristic-defining abilities of 7a are being applied, asked again from within them (two
+        // such abilities each reading the other's object - no printed card does): it is answered as it stands before them,
+        // so the question ends.
+        if DEFINING.with(|d| d.borrow().contains(&id)) {
+            return self.before(id, Layer::PtDefine);
+        }
         match (self.stop.cmp(&Layer::PtDefine), &self.stage) {
-            (std::cmp::Ordering::Greater, _) => chars_before(self.cards, self.state, self.log, id, Layer::PtSet),
+            (std::cmp::Ordering::Greater, _) => self.before(id, Layer::PtSet),
             (_, Some(stage)) => self.at(id, stage),
             (std::cmp::Ordering::Equal, None) => {
                 let start = Stage { li: seventh, entries: &[], order: &[], len: 0, extra: None, keep: true };
                 self.at(id, &start)
             }
-            (_, None) => chars_before(self.cards, self.state, self.log, id, self.stop),
+            (_, None) => self.before(id, self.stop),
         }
     }
 
-    /// The words of an object's text (CR 612), a read of the object like any other.
+    /// The words of an object's text (CR 612), a read of the object like any other (recorded as `chars` records). The words come
+    /// from the text-changing effects of the state in their own order (`cantrip_api::words`), which no entry of a layer
+    /// after 3 changes, so they are the same at every stage that reads them.
     fn words(&self, id: ObjectId) -> Words {
-        let _ = self.chars(id);
+        if let Some(reads) = self.reads {
+            reads.borrow_mut().push(id);
+        }
         cantrip_api::words(self.state, id)
     }
 }
@@ -257,6 +292,14 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
             let cx = Ctx { cards, state, log, pass: &pass };
             // While its abilities' givers are being worked out (`ability_givers`), the object is worked out afresh, watched.
             let watch = watched_givers(id).is_some();
+            // Nothing in any layer: what the rules give the object alone, nothing kept.
+            if layers_with_entries(&cx) == 0 {
+                let mut snap = Snap { chars: o.start(cards), parts: Vec::new() };
+                for li in 0..layers {
+                    through(&cx, &o, li, &mut snap, watch);
+                }
+                return snap.chars;
+            }
             let reads = cantrip_api::history::reads_total();
             let chars = before(&cx, &o, layers, watch).chars;
             // A static ability asked about the past: what the pass holds is for this history.
@@ -268,6 +311,18 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
             }
             chars
         }
+    }
+}
+
+/// `chars_before` within a pass: what every read inside the layers uses, so that a pass of its own (`cross_check`) is fresh
+/// all through.
+fn chars_in(cx: &Ctx, id: ObjectId, stop: Layer) -> Chars {
+    let layers = LAYERS.iter().take_while(|&&l| l < stop).count();
+    match object(cx.cards, cx.state, id) {
+        Object::Fixed(chars) => *chars,
+        Object::Bare(card, spell) => bare(cx.cards, card, spell, stop),
+        Object::Full(o) if layers == 0 => o.start(cx.cards),
+        Object::Full(o) => before(cx, &o, layers, watched_givers(id).is_some()).chars,
     }
 }
 
@@ -414,14 +469,13 @@ struct Pass {
     occupied: std::cell::Cell<Option<u16>>,
     /// Whether anything could take an object's abilities, once found (`strips`).
     strips: std::cell::Cell<Option<bool>>,
-    /// A layer's order was asked for while it was being made, and answered by timestamp alone (`plan`): what is kept here
-    /// may rest on that answer, so the pass is used no more.
-    poisoned: std::cell::Cell<bool>,
     /// Characteristics worked out: (object, layer index, step, entry applied beyond the step) to what they are there, and
     /// (object, LAYERS.len() + layers done, 0, 0) to what they are once that many layers are done.
     memo: std::cell::RefCell<Memo>,
+    /// For each object, what it is once each number of layers is done.
+    done: std::cell::RefCell<std::collections::HashMap<ObjectId, [Option<std::rc::Rc<Snap>>; LAYERS.len() + 1], Quick>>,
     /// For each object and layer index, the furthest step kept in `memo`.
-    furthest: std::cell::RefCell<std::collections::HashMap<(ObjectId, u8), u16, Quick>>,
+    furthest: std::cell::RefCell<std::collections::HashMap<(ObjectId, u8), u32, Quick>>,
 }
 
 /// A quick hash for the pass's small keys (the default one guards against inputs chosen to collide, which these are not).
@@ -470,15 +524,17 @@ impl Pass {
             building: std::cell::Cell::new(0),
             occupied: std::cell::Cell::new(None),
             strips: std::cell::Cell::new(None),
-            poisoned: std::cell::Cell::new(false),
             memo: std::cell::RefCell::new(std::collections::HashMap::default()),
             furthest: std::cell::RefCell::new(std::collections::HashMap::default()),
+            done: std::cell::RefCell::new(std::collections::HashMap::default()),
         }
     }
 }
 
+/// The counts in these keys - a layer's entries, its steps - are `u32`: no layer of a game the engine plays to its end
+/// (`MAX_GAME_EVENTS`, 2^21 events, RX-1) can have as many entries as that holds, so they never wrap.
 /// The pass's characteristics worked out, by (object, layer, step, entry beyond the step).
-type Memo = std::collections::HashMap<(ObjectId, u8, u16, u16), std::rc::Rc<Snap>, Quick>;
+type Memo = std::collections::HashMap<(ObjectId, u8, u32, u32), std::rc::Rc<Snap>, Quick>;
 
 /// What a pass is made for: the position as the layers read it (`GameState::chars_epoch`, which every write and undo that
 /// could change a characteristic moves), and the face-down card being judged as the card it is, if one is
@@ -499,7 +555,7 @@ struct Snap {
 /// One layer's entries, in timestamp order (CR 613.7), and the order the layer applies them in (CR 613.8).
 struct Plan {
     entries: Vec<GEntry>,
-    order: Vec<u16>,
+    order: Vec<u32>,
 }
 
 /// The work under way: the state, the history, and the pass for them.
@@ -515,9 +571,9 @@ struct Ctx<'a> {
 struct Stage<'a> {
     li: usize,
     entries: &'a [GEntry],
-    order: &'a [u16],
+    order: &'a [u32],
     len: usize,
-    extra: Option<u16>,
+    extra: Option<u32>,
     /// Whether what is worked out here may be kept: not in a plan made only for a question asked while the layer's own plan
     /// was being made.
     keep: bool,
@@ -535,10 +591,9 @@ fn pass(cards: &CardTable, state: &GameState, log: &[Record]) -> std::rc::Rc<Pas
     let key = PassKey { epoch: state.chars_epoch, judged: state.judged_face_up.get() };
     {
         let cache = state.layer_pass.0.borrow();
-        for kept in cache.iter() {
+        for kept in cache.iter().rev() {
             if let Ok(found) = std::rc::Rc::downcast::<Pass>(kept.clone())
                 && found.key == key
-                && !found.poisoned.get()
                 && found.log.get().is_none_or(|len| len == log.len())
             {
                 return found;
@@ -560,13 +615,11 @@ fn pass(cards: &CardTable, state: &GameState, log: &[Record]) -> std::rc::Rc<Pas
 /// The object with its first `layers` layers done (`chars_before` of the layer after them): from the furthest layer kept,
 /// each layer in turn, and only the last kept.
 fn before(cx: &Ctx, o: &ObjCtx, layers: usize, watch: bool) -> std::rc::Rc<Snap> {
-    let done = |layers: usize| (o.id, (LAYERS.len() + layers) as u8, 0u16, 0u16);
     let mut from = 0;
     let mut snap = None;
-    if !watch {
-        let memo = cx.pass.memo.borrow();
+    if !watch && let Some(kept) = cx.pass.done.borrow().get(&o.id) {
         for k in (1..=layers).rev() {
-            if let Some(found) = memo.get(&done(k)) {
+            if let Some(found) = &kept[k] {
                 from = k;
                 snap = Some(found.clone());
                 break;
@@ -580,22 +633,22 @@ fn before(cx: &Ctx, o: &ObjCtx, layers: usize, watch: bool) -> std::rc::Rc<Snap>
     }
     let mut snap = snap.map_or_else(|| Snap { chars: o.start(cx.cards), parts: Vec::new() }, |s| (*s).clone());
     for li in from..layers {
-        snap = through(cx, o, li, snap, watch);
+        through(cx, o, li, &mut snap, watch);
     }
     let snap = std::rc::Rc::new(snap);
     if !watch && layers > 0 {
-        cx.pass.memo.borrow_mut().insert(done(layers), snap.clone());
+        cx.pass.done.borrow_mut().entry(o.id).or_insert_with(Default::default)[layers] = Some(snap.clone());
     }
     snap
 }
 
 /// The object through layer `li`, from `snap`, what the layers before it left it.
-fn through(cx: &Ctx, o: &ObjCtx, li: usize, snap: Snap, watch: bool) -> Snap {
-    let mut snap = starting(cx, o, li, snap);
+fn through(cx: &Ctx, o: &ObjCtx, li: usize, snap: &mut Snap, watch: bool) {
+    starting(cx, o, li, snap);
     let plan = plan(cx, li);
     if !plan.order.is_empty() {
         let stage = Stage { li, entries: &plan.entries, order: &plan.order, len: plan.order.len(), extra: None, keep: true };
-        apply_steps(cx, o, &stage, 0, &mut snap, watch);
+        apply_steps(cx, o, &stage, 0, snap, watch);
     }
     // CR 702.147a, 116.2b: what the rules give an object for what layer 6 left it.
     if LAYERS[li] == Layer::Ability {
@@ -604,7 +657,6 @@ fn through(cx: &Ctx, o: &ObjCtx, li: usize, snap: Snap, watch: bool) -> Snap {
             turn_face_up_action(cx.cards, o.obj, &mut snap.chars);
         }
     }
-    snap
 }
 
 /// Any object at `stage` of its layer (what `View::chars` reads while the layer is applied or judged).
@@ -620,7 +672,7 @@ fn chars_at(cx: &Ctx, id: ObjectId, stage: &Stage, watch: bool) -> std::rc::Rc<S
 /// characteristic-defining abilities (CR 613.3), and then the entries of the stage that apply to it, each as it stands.
 fn at(cx: &Ctx, o: &ObjCtx, stage: &Stage, watch: bool) -> std::rc::Rc<Snap> {
     let keep = stage.keep && !watch;
-    let key = |len: usize, extra: Option<u16>| (o.id, stage.li as u8, len as u16, extra.map_or(0, |e| e + 1));
+    let key = |len: usize, extra: Option<u32>| (o.id, stage.li as u8, len as u32, extra.map_or(0, |e| e + 1));
     if keep && let Some(found) = cx.pass.memo.borrow().get(&key(stage.len, stage.extra)) {
         return found.clone();
     }
@@ -640,7 +692,8 @@ fn at(cx: &Ctx, o: &ObjCtx, stage: &Stage, watch: bool) -> std::rc::Rc<Snap> {
     let mut snap = match snap {
         Some(snap) => snap,
         None => {
-            let start = starting(cx, o, stage.li, (*before(cx, o, stage.li, watch)).clone());
+            let mut start = (*before(cx, o, stage.li, watch)).clone();
+            starting(cx, o, stage.li, &mut start);
             if keep {
                 cx.pass.memo.borrow_mut().insert(key(0, None), std::rc::Rc::new(start.clone()));
                 cx.pass.furthest.borrow_mut().entry((o.id, stage.li as u8)).or_insert(0);
@@ -658,7 +711,7 @@ fn at(cx: &Ctx, o: &ObjCtx, stage: &Stage, watch: bool) -> std::rc::Rc<Snap> {
         }
         let mut furthest = cx.pass.furthest.borrow_mut();
         let kept = furthest.entry((o.id, stage.li as u8)).or_insert(0);
-        *kept = (*kept).max(stage.len as u16);
+        *kept = (*kept).max(stage.len as u32);
         drop(furthest);
         return cx.pass.memo.borrow().get(&key(stage.len, None)).cloned().unwrap_or_else(|| std::rc::Rc::new(snap));
     }
@@ -690,7 +743,7 @@ fn apply_steps(cx: &Ctx, o: &ObjCtx, stage: &Stage, from: usize, snap: &mut Snap
 /// The object as the layers before `li` leave it (`snap`), with what the rules give it as layer `li` begins (a basic land type's
 /// mana ability and a Siege's defeat ability in layer 6, counters in 7c) and its own characteristic-defining abilities of the
 /// layer, which apply first (CR 613.3).
-fn starting(cx: &Ctx, o: &ObjCtx, li: usize, mut snap: Snap) -> Snap {
+fn starting(cx: &Ctx, o: &ObjCtx, li: usize, snap: &mut Snap) {
     let layer = LAYERS[li];
     let chars = &mut snap.chars;
     // CR 305.6: the abilities a basic land type carries follow from the types layer 4 settled, as the object's
@@ -706,10 +759,14 @@ fn starting(cx: &Ctx, o: &ObjCtx, li: usize, mut snap: Snap) -> Snap {
     }
     if o.has_hone && layer == Layer::PtModify {
         let honed = static_sources(cx.cards, cx.state).honed.clone();
-        hone(cx.cards, cx.state, cx.log, o.id, &honed, chars);
+        hone(cx, o.id, &honed, chars);
     }
     own_statics(cx, o, layer, chars);
-    snap
+}
+
+thread_local! {
+    /// The objects whose own characteristic-defining abilities of layer 7a are being applied (`View::chars_with_defined_pt`).
+    static DEFINING: std::cell::RefCell<Vec<ObjectId>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 
 /// The object's own characteristic-defining abilities of `layer` (CR 604.3, 613.3): they apply first, and depend only on
@@ -726,12 +783,16 @@ fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
     if (layer == Layer::Color && colors) || (layer == Layer::PtDefine && pt) {
         return;
     }
-    let view = View::new(cx.cards, cx.state, cx.log, layer);
+    let view = View { pass: Some(cx.pass), ..View::new(cx.cards, cx.state, cx.log, layer) };
     // CR 604.3, 613.1f: its own characteristic-defining abilities are static abilities, so layer 6 takes them away, and the layers
     // after it (a power and toughness one, 613.4a) find them gone. Those of layers 4 and 5 were applied before, and stay (CR 613.6).
     // CR 305.7: a land whose subtype an effect sets has lost them in layer 4, after its own characteristic-defining
     // abilities of layer 4 applied first (CR 613.3).
     let lost = (layer >= Layer::Ability && chars.lost_all) || (layer > Layer::Type && chars.text_lost);
+    let defining = layer == Layer::PtDefine;
+    if defining {
+        DEFINING.with(|d| d.borrow_mut().push(o.id));
+    }
     for st in own {
         if lost {
             if let Some((power, toughness)) = st.lost_pt {
@@ -741,6 +802,9 @@ fn own_statics(cx: &Ctx, o: &ObjCtx, layer: Layer, chars: &mut Chars) {
         } else {
             (st.apply)(&view, o.id, chars);
         }
+    }
+    if defining {
+        DEFINING.with(|d| d.borrow_mut().pop());
     }
 }
 
@@ -1168,26 +1232,19 @@ impl GEntry {
     }
 }
 
-/// The plan of layer `li`, made if there is none. A layer is made once per pass; a question that needs the very layer
-/// being made (an ability's effect reading what that layer makes of an object) is a bug: `CANTRIP_VERIFY` stops at it, and
-/// otherwise the layer is made again in a pass of its own, and the pass that asked is used no more.
+/// The plan of layer `li`, made if there is none, once per pass.
 fn plan(cx: &Ctx, li: usize) -> std::rc::Rc<Plan> {
     if let Some(plan) = cx.pass.plans.borrow()[li].clone() {
         return plan;
     }
     let bit = 1u16 << li;
+    // Unreachable, an invariant of the reads the layers make: while layer `li` is being ordered, every read is of an earlier
+    // layer (`chars_in` with a `stop` at or before it: a layer's start, collect_entries' holders through layer 6 only for
+    // the layers after it, `hone` through layer 4) or of `li` itself at a stage (`View` with a stage, and
+    // `View::chars_with_defined_pt`, which reads 7a at the stage until 7a is done). Nothing asks for the whole of a layer
+    // that is being ordered.
     if cx.pass.building.get() & bit != 0 {
-        assert!(!verifying(), "the layers asked for layer {:?} while making its order", LAYERS[li]);
-        // Made again, exactly, in a pass of its own; this one may rest on what was asked in the middle, and is used no more.
-        cx.pass.poisoned.set(true);
-        thread_local! {
-            static AGAIN: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
-        }
-        assert!(!AGAIN.with(|a| a.replace(true)), "the layers asked for layer {:?} while making its order, twice", LAYERS[li]);
-        let fresh = Pass::new(cx.pass.key, cx.state.epoch);
-        let plan = plan(&Ctx { pass: &fresh, ..*cx }, li);
-        AGAIN.with(|a| a.set(false));
-        return plan;
+        unreachable!("the layers asked for layer {:?} while ordering it", LAYERS[li]);
     }
     if layers_with_entries(cx) & bit == 0 {
         let plan = std::rc::Rc::new(Plan { entries: Vec::new(), order: Vec::new() });
@@ -1271,7 +1328,7 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
         }
         // The static abilities effects gave permanents that affect other objects, in their timestamp order (CR 613.7a).
         for holder in granted_holders {
-            for (timestamp, holder, st) in granted_to_others(cards, state, cx.log, holder, layer) {
+            for (timestamp, holder, st) in granted_to_others(cx, holder, layer) {
                 entries.push(GEntry { kind: GKind::Given { holder, st, ability: None }, timestamp, seq: 1 });
             }
         }
@@ -1315,7 +1372,7 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
                 continue;
             }
             let fx: Vec<ContinuousEffect> = state.effects.iter().filter(|e| e.affected == holder).copied().collect();
-            let chars = chars_before(cards, state, cx.log, holder, Layer::PtDefine);
+            let chars = chars_in(cx, holder, Layer::PtDefine);
             for (timestamp, st) in granted_statics(cards, obj.timestamp, &fx, &chars) {
                 if st.layer == layer {
                     entries.push(GEntry { kind: GKind::Granted { holder, st, ability: None }, timestamp, seq: 3 });
@@ -1327,7 +1384,7 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
         // some static ability could give abilities.
         if static_grants_present(cards, state) {
             for &holder in state.battlefield() {
-                let chars = chars_before(cards, state, cx.log, holder, Layer::PtDefine);
+                let chars = chars_in(cx, holder, Layer::PtDefine);
                 let statics: Vec<(usize, AbilityRef, &'static StaticDef)> = chars
                     .abilities
                     .iter()
@@ -1347,7 +1404,7 @@ fn collect_entries(cx: &Ctx, li: usize) -> Vec<GEntry> {
                     if by_effect(ability) {
                         continue;
                     }
-                    let givers = *givers.get_or_insert_with(|| ability_givers(cards, state, cx.log, holder));
+                    let givers = *givers.get_or_insert_with(|| givers_in(cx, holder));
                     if givers[slot] == ObjectId::NONE {
                         continue;
                     }
@@ -1504,14 +1561,14 @@ fn candidates(cx: &Ctx, entry: &GEntry) -> Vec<ObjectId> {
 /// Within layer 6 an entry can come into being: a static ability one entry gives an object (Rune of Flight's "equipped
 /// creature has flying", given to an Equipment) exists once that entry has applied (CR 613.1f, 613.7a), and joins the
 /// entries still to apply at the later of its holder's timestamp and its giver's.
-fn order_entries(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>) -> Vec<u16> {
+fn order_entries(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>) -> Vec<u32> {
     let n = entries.len();
     let grants = LAYERS[li] == Layer::Ability && grants_in_layer_six(cx);
     if !grants && (n < 2 || !entries.iter().any(GEntry::dependent)) {
-        return (0..n as u16).collect();
+        return (0..n as u32).collect();
     }
-    let mut remaining: Vec<u16> = (0..n as u16).collect();
-    let mut order: Vec<u16> = Vec::with_capacity(n);
+    let mut remaining: Vec<u32> = (0..n as u32).collect();
+    let mut order: Vec<u32> = Vec::with_capacity(n);
     while !remaining.is_empty() {
         // The judge follows the layer step by step, asking again only of the objects each step changes (613.8c); made anew
         // when entries come into being (`appear`).
@@ -1606,7 +1663,7 @@ fn grants_in_layer_six(cx: &Ctx) -> bool {
 /// Entry `e` applies after `order`: the static abilities of layer 6 it gave objects come into being (CR 613.1f), each an
 /// entry at the later of its holder's timestamp and `e`'s (CR 613.7a), put among `remaining` in timestamp order. Whether
 /// any did.
-fn appear(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>, order: &[u16], e: u16, remaining: &mut Vec<u16>) -> bool {
+fn appear(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>, order: &[u32], e: u32, remaining: &mut Vec<u32>) -> bool {
     let found: Vec<GEntry> = {
         let judge = Judge::new(cx, li, entries, order.to_vec());
         let stage = judge.stage();
@@ -1637,7 +1694,7 @@ fn appear(cx: &Ctx, li: usize, entries: &mut Vec<GEntry>, order: &[u16], e: u16,
     };
     let any = !found.is_empty();
     for entry in found {
-        let index = entries.len() as u16;
+        let index = entries.len() as u32;
         entries.push(entry);
         let at = remaining.partition_point(|&r| {
             let g = &entries[r as usize];
@@ -1691,15 +1748,15 @@ struct Judge<'a> {
     cx: &'a Ctx<'a>,
     li: usize,
     entries: &'a [GEntry],
-    order: Vec<u16>,
-    reaches: std::cell::RefCell<std::collections::HashMap<u16, std::rc::Rc<Vec<ObjectId>>>>,
-    evals: std::cell::RefCell<std::collections::HashMap<u16, (usize, std::rc::Rc<EvalSet>)>>,
+    order: Vec<u32>,
+    reaches: std::cell::RefCell<std::collections::HashMap<u32, std::rc::Rc<Vec<ObjectId>>>>,
+    evals: std::cell::RefCell<std::collections::HashMap<u32, (usize, std::rc::Rc<EvalSet>)>>,
     /// The objects each step changed, in order: what an entry asked at an earlier step must be asked again of.
     steps: Vec<Vec<ObjectId>>,
 }
 
 impl<'a> Judge<'a> {
-    fn new(cx: &'a Ctx<'a>, li: usize, entries: &'a [GEntry], order: Vec<u16>) -> Judge<'a> {
+    fn new(cx: &'a Ctx<'a>, li: usize, entries: &'a [GEntry], order: Vec<u32>) -> Judge<'a> {
         Judge { cx, li, entries, order, reaches: Default::default(), evals: Default::default(), steps: Vec::new() }
     }
 
@@ -1732,7 +1789,7 @@ impl<'a> Judge<'a> {
     }
 
     /// Entry `e` asked of every object it could apply to at this stage.
-    fn eval(&self, e: u16) -> std::rc::Rc<EvalSet> {
+    fn eval(&self, e: u32) -> std::rc::Rc<EvalSet> {
         let entry = &self.entries[e as usize];
         let kept = self.evals.borrow().get(&e).cloned();
         if let Some((at_step, found)) = kept {
@@ -1771,7 +1828,7 @@ impl<'a> Judge<'a> {
     }
 
     /// The objects entry `e` applies to at this stage, sorted: asked of each object whether it applies, no more.
-    fn reach(&self, e: u16) -> std::rc::Rc<Vec<ObjectId>> {
+    fn reach(&self, e: u32) -> std::rc::Rc<Vec<ObjectId>> {
         if let Some(found) = self.reaches.borrow().get(&e) {
             return found.clone();
         }
@@ -1793,7 +1850,7 @@ impl<'a> Judge<'a> {
 
     /// Entry `e` applies: the stage moves on. What was asked is asked again of the objects `e` changed and of those whose
     /// question read one of them; the rest stands. Whether `e` changed anything.
-    fn advance(&mut self, e: u16) -> bool {
+    fn advance(&mut self, e: u32) -> bool {
         let touched: Vec<ObjectId> = {
             let stage = self.stage();
             let after = Stage { extra: Some(e), ..stage };
@@ -1826,7 +1883,7 @@ impl<'a> Judge<'a> {
     /// to it, or - judged on what `a` would do to the object as it is, so that two effects that each set the same thing do
     /// not depend on each other through it (CR 613.9's flying and "loses flying") - what `a` does there. Only the objects
     /// `b` applies to can be changed by it: `a` is asked of those, and of any object whose question read one of them.
-    fn depends(&self, a: u16, b: u16) -> bool {
+    fn depends(&self, a: u32, b: u32) -> bool {
         let changed = self.reach(b);
         if changed.is_empty() {
             return false;
@@ -1872,7 +1929,7 @@ impl<'a> Judge<'a> {
                 if verifying() && on_it && there.chars != v.here.chars {
                     let mut after = there.chars;
                     apply_raw(&view_b, layer, v.id, entry, &mut after);
-                    if let Some(field) = takes_from_its_object(&v.here.chars, &does, &there.chars, &after) {
+                    if let Some(field) = takes_from_its_object(&v.here.chars, &does, &there.chars, &after, false) {
                         panic!(
                             "an effect of layer {:?} ({}) read its object's {field} through its `chars` and not `view.chars(id)`",
                             LAYERS[self.li],
@@ -1889,67 +1946,338 @@ impl<'a> Judge<'a> {
     }
 }
 
-/// Whether an effect applied to `x` (making `ax`) and to `y` (making `ay`) did, field by field, what one instruction does to
-/// any object: the same result, or the same change, or nothing on one side. The field that breaks it, if one does: the
-/// effect took a value from the object it was applied to.
-fn takes_from_its_object(x: &Chars, ax: &Chars, y: &Chars, ay: &Chars) -> Option<&'static str> {
-    fn bits(x: &[u64], ax: &[u64], y: &[u64], ay: &[u64]) -> bool {
-        ax == ay || ax == x || ay == y || x.iter().zip(ax).zip(y.iter().zip(ay)).all(|((x, ax), (y, ay))| (x ^ ax) == (y ^ ay))
-    }
-    fn plain<T: PartialEq>(x: &T, ax: &T, y: &T, ay: &T) -> bool {
-        ax == ay || ax == x || ay == y
-    }
-    fn number(x: Option<i16>, ax: Option<i16>, y: Option<i16>, ay: Option<i16>) -> bool {
-        plain(&x, &ax, &y, &ay)
-            || matches!((x, ax, y, ay), (Some(x), Some(ax), Some(y), Some(ay)) if i32::from(ax) - i32::from(x) == i32::from(ay) - i32::from(y))
-    }
-    fn abilities(x: &[Option<AbilityRef>], ax: &[Option<AbilityRef>], y: &[Option<AbilityRef>], ay: &[Option<AbilityRef>]) -> bool {
-        let change = |from: &[Option<AbilityRef>], to: &[Option<AbilityRef>]| {
-            // As multisets: an ability given twice is two instances (CR 113.2c).
-            let (mut added, mut removed): (Vec<AbilityRef>, Vec<AbilityRef>) = (to.iter().flatten().copied().collect(), Vec::new());
-            for a in from.iter().flatten() {
-                match added.iter().position(|b| b == a) {
+/// One field of `Chars` as the contract check compares it.
+#[derive(PartialEq, Clone)]
+enum Field {
+    /// A set of bits: the same change is the same bits flipped.
+    Bits(Vec<u64>),
+    /// A number: the same change is the same difference.
+    Number(Option<i16>),
+    /// The abilities: the same change is the same ones added and removed, as multisets (CR 113.2c: an ability given twice
+    /// is two instances).
+    Abilities(Vec<AbilityRef>),
+    /// Anything else, which changes only by being set.
+    Plain(u64),
+}
+
+fn fields(c: &Chars) -> [(&'static str, Field); 17] {
+    use std::hash::{Hash, Hasher};
+    let plain = |v: &dyn Fn(&mut std::collections::hash_map::DefaultHasher)| {
+        let mut h = std::collections::hash_map::DefaultHasher::new();
+        v(&mut h);
+        Field::Plain(h.finish())
+    };
+    let bits = |v: u64| Field::Bits(vec![v]);
+    [
+        ("types", bits(c.types.0.into())),
+        ("supertypes", bits(u64::from(c.supertypes.basic) | u64::from(c.supertypes.legendary) << 1 | u64::from(c.supertypes.snow) << 2)),
+        ("subtypes", Field::Bits(c.subtypes.0.to_vec())),
+        ("colors", bits(c.colors.0.into())),
+        ("power", Field::Number(c.power)),
+        ("toughness", Field::Number(c.toughness)),
+        ("keywords", bits(c.keywords.0)),
+        ("protection", bits(c.protection.0.into())),
+        ("protection from types", bits(c.protection_types.0.into())),
+        ("protection from players", bits(c.protection_players.into())),
+        ("hexproof from", bits(c.hexproof_from.0.into())),
+        ("abilities", Field::Abilities(c.abilities.iter().flatten().copied().collect())),
+        ("name", plain(&|h| c.name.hash(h))),
+        (
+            "protections",
+            bits(
+                u64::from(c.protection_colorless)
+                    | u64::from(c.protection_colored_spells) << 1
+                    | u64::from(c.protection_everything) << 2
+                    | u64::from(c.must_attack) << 3,
+            ),
+        ),
+        ("losses", bits(u64::from(c.lost_all) | u64::from(c.text_lost) << 1)),
+        ("marks", bits(u64::from(c.spell) | u64::from(c.no_cost) << 1 | u64::from(c.name_set) << 2)),
+        ("card", plain(&|h| c.card.hash(h))),
+    ]
+}
+
+/// The change from `from` to `to` of one field, where a change has a shape (`Field`).
+fn change(from: &Field, to: &Field) -> Option<Field> {
+    match (from, to) {
+        (Field::Bits(a), Field::Bits(b)) => Some(Field::Bits(a.iter().zip(b).map(|(a, b)| a ^ b).collect())),
+        (Field::Number(Some(a)), Field::Number(Some(b))) => Some(Field::Number(Some((*b).saturating_sub(*a)))),
+        (Field::Abilities(a), Field::Abilities(b)) => {
+            let mut added = b.clone();
+            let mut removed = Vec::new();
+            for x in a {
+                match added.iter().position(|y| y == x) {
                     Some(at) => {
                         added.remove(at);
                     }
-                    None => removed.push(*a),
+                    None => removed.push(*x),
                 }
             }
             added.sort_by_key(|a| (a.card.0, a.index));
             removed.sort_by_key(|a| (a.card.0, a.index));
-            (added, removed)
-        };
-        plain(&x, &ax, &y, &ay) || change(x, ax) == change(y, ay)
+            added.push(AbilityRef { card: CardId(u16::MAX), index: 0 });
+            added.extend(removed);
+            Some(Field::Abilities(added))
+        }
+        _ => None,
     }
-    let w = |v: u64| [v];
-    let supers = |s: &Supertypes| [u64::from(s.basic) | u64::from(s.legendary) << 1 | u64::from(s.snow) << 2];
-    let checks: [(&'static str, bool); 16] = [
-        ("types", bits(&w(x.types.0.into()), &w(ax.types.0.into()), &w(y.types.0.into()), &w(ay.types.0.into()))),
-        ("supertypes", bits(&supers(&x.supertypes), &supers(&ax.supertypes), &supers(&y.supertypes), &supers(&ay.supertypes))),
-        ("subtypes", bits(&x.subtypes.0, &ax.subtypes.0, &y.subtypes.0, &ay.subtypes.0)),
-        ("colors", bits(&w(x.colors.0.into()), &w(ax.colors.0.into()), &w(y.colors.0.into()), &w(ay.colors.0.into()))),
-        ("power", number(x.power, ax.power, y.power, ay.power)),
-        ("toughness", number(x.toughness, ax.toughness, y.toughness, ay.toughness)),
-        ("keywords", bits(&w(x.keywords.0), &w(ax.keywords.0), &w(y.keywords.0), &w(ay.keywords.0))),
-        ("protection", bits(&w(x.protection.0.into()), &w(ax.protection.0.into()), &w(y.protection.0.into()), &w(ay.protection.0.into()))),
-        ("protection from types", bits(&w(x.protection_types.0.into()), &w(ax.protection_types.0.into()), &w(y.protection_types.0.into()), &w(ay.protection_types.0.into()))),
-        ("protection from players", bits(&w(x.protection_players.into()), &w(ax.protection_players.into()), &w(y.protection_players.into()), &w(ay.protection_players.into()))),
-        ("hexproof from", bits(&w(x.hexproof_from.0.into()), &w(ax.hexproof_from.0.into()), &w(y.hexproof_from.0.into()), &w(ay.hexproof_from.0.into()))),
-        ("abilities", abilities(&x.abilities, &ax.abilities, &y.abilities, &ay.abilities)),
-        ("name", plain(&x.name, &ax.name, &y.name, &ay.name)),
-        (
-            "protections",
-            plain(
-                &(x.protection_colorless, x.protection_colored_spells, x.protection_everything, x.must_attack),
-                &(ax.protection_colorless, ax.protection_colored_spells, ax.protection_everything, ax.must_attack),
-                &(y.protection_colorless, y.protection_colored_spells, y.protection_everything, y.must_attack),
-                &(ay.protection_colorless, ay.protection_colored_spells, ay.protection_everything, ay.must_attack),
-            ),
-        ),
-        ("losses", plain(&(x.lost_all, x.text_lost), &(ax.lost_all, ax.text_lost), &(y.lost_all, y.text_lost), &(ay.lost_all, ay.text_lost))),
-        ("the rest", plain(&(x.card, x.spell, x.no_cost, x.name_set), &(ax.card, ax.spell, ax.no_cost, ax.name_set), &(y.card, y.spell, y.no_cost, y.name_set), &(ay.card, ay.spell, ay.no_cost, ay.name_set))),
-    ];
-    checks.into_iter().find(|&(_, fine)| !fine).map(|(field, _)| field)
+}
+
+/// Whether an effect applied to `x` (making `ax`) and to `y` (making `ay`) did, field by field, what one instruction does to
+/// any object: the same result, or the same change, or - in a field `x` and `y` agree in, where only a guard on another
+/// field can have told them apart - nothing on one side. Nothing on one side in a field they differ in does not excuse a
+/// value worked out from it ("+X/+0, where X is its power" does nothing to a 0-power object). Where `x` and `y` differ in
+/// more than one field (`strict` off: two objects as the game made them), nothing on one side is excused as well if they
+/// differ in another field, which a guard may have read. The field that breaks it, if one does: the effect took a value
+/// from the object it was applied to.
+fn takes_from_its_object(x: &Chars, ax: &Chars, y: &Chars, ay: &Chars, strict: bool) -> Option<&'static str> {
+    let (fx, fax, fy, fay) = (fields(x), fields(ax), fields(y), fields(ay));
+    for i in 0..fx.len() {
+        let (name, x_i) = &fx[i];
+        let (ax_i, y_i, ay_i) = (&fax[i].1, &fy[i].1, &fay[i].1);
+        if ax_i == ay_i {
+            continue;
+        }
+        // A set of bits is judged bit by bit: each bit is a thing of its own an instruction sets, clears or leaves.
+        if let (Field::Bits(x_b), Field::Bits(ax_b), Field::Bits(y_b), Field::Bits(ay_b)) = (x_i, ax_i, y_i, ay_i) {
+            let others = !strict && (0..fx.len()).any(|j| j != i && fx[j].1 != fy[j].1);
+            let fine = (0..x_b.len()).all(|w| {
+                (0..64).all(|k| {
+                    let bit = |v: &Vec<u64>| (v[w] >> k) & 1;
+                    let (x, ax, y, ay) = (bit(x_b), bit(ax_b), bit(y_b), bit(ay_b));
+                    ax == ay || (x ^ ax) == (y ^ ay) || ((ax == x || ay == y) && (x == y || others))
+                })
+            });
+            if fine {
+                continue;
+            }
+            return Some(name);
+        }
+        if let (Some(dx), Some(dy)) = (change(x_i, ax_i), change(y_i, ay_i))
+            && dx == dy
+        {
+            continue;
+        }
+        // Nothing on both sides: the effect does not touch the field.
+        if ax_i == x_i && ay_i == y_i {
+            continue;
+        }
+        let nothing = ax_i == x_i || ay_i == y_i;
+        // A power or toughness an object does not have is not changed (CR 208.3): nothing there is a guard.
+        let undefined = matches!(x_i, Field::Number(None)) || matches!(y_i, Field::Number(None));
+        let guarded = x_i == y_i || undefined || (!strict && (0..fx.len()).any(|j| j != i && fx[j].1 != fy[j].1));
+        if nothing && guarded {
+            continue;
+        }
+        return Some(name);
+    }
+    None
+}
+
+/// The objects the contract of `apply` (`StaticApply`) is checked on: `base` against copies differing from it in one field
+/// each, every field `fields` lists in turn, power and toughness by two amounts.
+fn contract_pairs(base: Chars, ability: AbilityRef) -> Vec<(Chars, Chars)> {
+    let mut pairs = Vec::new();
+    let mut vary = |f: &dyn Fn(&mut Chars)| {
+        let mut y = base;
+        f(&mut y);
+        if y != base {
+            pairs.push((base, y));
+        }
+    };
+    // types
+    vary(&|c| c.types = c.types.with(CardType::Artifact));
+    vary(&|c| c.types = c.types.with(CardType::Creature));
+    vary(&|c| c.types = c.types.with(CardType::Land));
+    vary(&|c| c.types = TypeSet(c.types.0 & !TypeSet::of(&[CardType::Creature]).0));
+    vary(&|c| c.types = TypeSet(c.types.0 & !TypeSet::of(&[CardType::Land]).0));
+    // supertypes
+    vary(&|c| c.supertypes.basic = !c.supertypes.basic);
+    vary(&|c| c.supertypes.legendary = !c.supertypes.legendary);
+    vary(&|c| c.supertypes.snow = !c.supertypes.snow);
+    // subtypes
+    vary(&|c| c.subtypes = c.subtypes.with(Subtype::Goblin));
+    vary(&|c| c.subtypes = c.subtypes.with(Subtype::Swamp));
+    vary(&|c| c.subtypes = c.subtypes.with(Subtype::Equipment));
+    vary(&|c| c.subtypes = SubtypeSet::NONE);
+    // colors
+    vary(&|c| c.colors = ColorSet::of(Color::Black));
+    vary(&|c| c.colors = ColorSet::NONE);
+    // power and toughness, by two amounts
+    for amount in [1, 10] {
+        vary(&|c| c.power = Some(c.power.unwrap_or(0) + amount));
+        vary(&|c| c.toughness = Some(c.toughness.unwrap_or(0) + amount));
+    }
+    // keywords
+    vary(&|c| c.keywords = c.keywords.with(Keyword::Flying));
+    vary(&|c| c.keywords = Keywords::NONE);
+    vary(&|c| c.keywords = Keywords(u64::MAX));
+    // protection
+    vary(&|c| c.protection = ColorSet::of(Color::Red));
+    vary(&|c| c.protection_types = TypeSet::of(&[CardType::Creature]));
+    vary(&|c| c.protection_players = 0b10);
+    vary(&|c| c.hexproof_from = HexproofFrom(1));
+    // abilities
+    vary(&|c| {
+        if let Some(slot) = c.abilities.iter().position(|a| a.is_none()) {
+            c.abilities[slot] = Some(ability);
+        }
+    });
+    vary(&|c| c.abilities = [None; MAX_ABILITIES]);
+    // name
+    vary(&|c| c.name = "Another Name");
+    // the other protections and attack requirement
+    vary(&|c| c.protection_colorless = !c.protection_colorless);
+    vary(&|c| c.protection_colored_spells = !c.protection_colored_spells);
+    vary(&|c| c.protection_everything = !c.protection_everything);
+    vary(&|c| c.must_attack = !c.must_attack);
+    // losses
+    vary(&|c| c.lost_all = !c.lost_all);
+    vary(&|c| c.text_lost = !c.text_lost);
+    // the rest
+    vary(&|c| c.spell = !c.spell);
+    vary(&|c| c.no_cost = !c.no_cost);
+    vary(&|c| c.name_set = !c.name_set);
+    pairs
+}
+
+/// The raw state a static ability's effect may check before it does anything, varied: the source attached to the object or
+/// not, a counter of every kind on both, the source at its highest class level and with choices made (a creature type, a
+/// color, a player), the object under the other player's control, and life totals high; a crowded game (another of the
+/// source's card, an artifact, a black and a white permanent, an Equipment attached to the source, creature cards in the
+/// graveyards and cards in hand); and the source in a hand.
+const SCENES: usize = 7;
+
+fn contract_scene(cards: &CardTable, card: CardId, target: CardId, scene: usize) -> (GameState, ObjectId, ObjectId) {
+    let mut state = GameState::new(2, 0);
+    let mut source = Obj::new(card, PlayerId(0), Zone::BATTLEFIELD);
+    source.timestamp = 1;
+    let mut object = Obj::new(target, PlayerId(if scene == 3 { 1 } else { 0 }), Zone::BATTLEFIELD);
+    object.timestamp = 2;
+    if scene == 2 {
+        let every = [1; CounterKind::COUNT];
+        crate::counters::hypothetical(&mut source, &every);
+        crate::counters::hypothetical(&mut object, &every);
+    }
+    if scene == 4 {
+        source.class_level = 3;
+        source.chosen_subtype = Some(Subtype::Goblin);
+        source.chosen_color = Some(Color::Black);
+        source.marks.chosen_player = Some(PlayerId(1));
+    }
+    let source = state.push_obj(source);
+    state.zone_push(Zone::BATTLEFIELD, source);
+    let object = state.push_obj(object);
+    state.zone_push(Zone::BATTLEFIELD, object);
+    if scene != 1 {
+        state.update_obj(source, |o| o.attached_to = Some(object));
+    }
+    if scene == 4 {
+        for p in [PlayerId(0), PlayerId(1)] {
+            state.update_player(p, |pl| pl.life = 40);
+        }
+    }
+    if scene == 5 {
+        let mut put = |name_or: Option<CardId>, zone: Zone, attached: Option<ObjectId>| {
+            if let Some(c) = name_or {
+                let mut o = Obj::new(c, PlayerId(0), zone);
+                o.timestamp = 3;
+                o.attached_to = attached;
+                let id = state.push_obj(o);
+                state.zone_push(zone, id);
+            }
+        };
+        put(Some(card), Zone::BATTLEFIELD, None);
+        for name in ["Sol Ring", "Bloodghast", "White Knight"] {
+            put(cards.find(name), Zone::BATTLEFIELD, None);
+        }
+        put(cards.find("Colossus Hammer"), Zone::BATTLEFIELD, Some(source));
+        for p in [PlayerId(0), PlayerId(1)] {
+            for _ in 0..8 {
+                put(Some(target), Zone::graveyard(p), None);
+            }
+            for _ in 0..3 {
+                put(Some(target), Zone::hand(p), None);
+            }
+        }
+    }
+    if scene == 6 {
+        state.zone_remove(Zone::BATTLEFIELD, source);
+        state.update_obj(source, |o| o.zone = Zone::hand(PlayerId(0)));
+        state.zone_push(Zone::hand(PlayerId(0)), source);
+    }
+    state.see_statics();
+    (state, source, object)
+}
+
+/// What the contract check of every static ability in a card table found (`apply_contract_check`).
+pub struct ApplyContract {
+    /// One line for each static ability whose effect takes a value from the object it is given.
+    pub breaches: Vec<String>,
+    /// One line for each that changed nothing on any object, raw state or pair it was tried on: its contract went untested.
+    pub inert: Vec<String>,
+}
+
+/// The contract of every static ability's `apply` in `cards` (`StaticApply`), checked on synthetic objects (`contract_pairs`):
+/// the static abilities cards print and those they give, each applied with its source on the battlefield, in each raw state
+/// of `contract_scene`, to a creature, a land and an artifact and to copies differing from each in one field.
+pub fn apply_contract_check(cards: &'static CardTable) -> ApplyContract {
+    let mut breaches = Vec::new();
+    let mut inert = Vec::new();
+    let objects: Vec<CardId> =
+        ["Grizzly Bears", "Llanowar Elves", "Taiga", "Forest", "Sol Ring", "Mox Ruby"].iter().filter_map(|name| cards.find(name)).collect();
+    let bases: Vec<Chars> = objects.iter().map(|&card| *printed(cards, card, true)).collect();
+    let ability = AbilityRef { card: cards.intrinsic, index: Mana::W as u8 };
+    for (index, def) in cards.cards.iter().enumerate() {
+        let card = CardId(index as u16);
+        let statics: Vec<&'static StaticDef> = def
+            .statics
+            .iter()
+            .chain(def.abilities.iter().chain(def.delayed).filter_map(|a| match a {
+                AbilityDef::Static(st) => Some(st),
+                _ => None,
+            }))
+            .collect();
+        for st in statics {
+            let mut changed = false;
+            let mut broke = None;
+            'scenes: for scene in 0..SCENES {
+                for &target in objects.iter().take(1) {
+                    let (state, source, object) = contract_scene(cards, card, target, scene);
+                    let view = View::new(cards, &state, &[], st.layer);
+                    let id = if st.own { source } else { object };
+                    let apply = |c: &Chars| {
+                        let mut c = *c;
+                        match st.apply_each {
+                            Some(each) => each(&view, source, id, &mut c),
+                            None => (st.apply)(&view, if st.own { id } else { source }, &mut c),
+                        }
+                        c
+                    };
+                    for &base in &bases {
+                        for (x, y) in contract_pairs(base, ability) {
+                            let (ax, ay) = (apply(&x), apply(&y));
+                            changed |= ax != x || ay != y;
+                            if let Some(field) = takes_from_its_object(&x, &ax, &y, &ay, true) {
+                                broke = Some(field);
+                                break 'scenes;
+                            }
+                        }
+                    }
+                }
+            }
+            if let Some(field) = broke {
+                breaches.push(format!("{} ({}): its object's {field}", def.name, st.text));
+            } else if !changed {
+                inert.push(format!("{} ({})", def.name, st.text));
+            }
+        }
+    }
+    breaches.sort();
+    breaches.dedup();
+    inert.sort();
+    inert.dedup();
+    ApplyContract { breaches, inert }
 }
 
 /// Whether a static ability that could give an object an ability functions anywhere now (CR 613.1f): one of layer 6 that
@@ -2029,7 +2357,8 @@ fn effect_layer(kind: EffectKind) -> Option<Layer> {
 /// The static abilities of `layer` effects have given `holder` that affect other objects (CR 613.1f), each with its
 /// timestamp (CR 613.7a: the later of the holder's and the granting effect's), that it still has once its abilities are
 /// settled: a later "loses all abilities" takes them, as a static ability that removes abilities does.
-fn granted_to_others(cards: &CardTable, state: &GameState, log: &[Record], holder: ObjectId, layer: Layer) -> Vec<(u32, ObjectId, &'static StaticDef)> {
+fn granted_to_others(cx: &Ctx, holder: ObjectId, layer: Layer) -> Vec<(u32, ObjectId, &'static StaticDef)> {
+    let (cards, state) = (cx.cards, cx.state);
     // Whether it has the ability is settled by layer 6, so only abilities of the layers after it can be told apart without
     // asking the layers of the very object being worked out (`granted_static_ability`).
     if layer < Layer::PtDefine {
@@ -2054,7 +2383,7 @@ fn granted_to_others(cards: &CardTable, state: &GameState, log: &[Record], holde
     if found.is_empty() {
         return Vec::new();
     }
-    let has = chars_before(cards, state, log, holder, Layer::PtDefine);
+    let has = chars_in(cx, holder, Layer::PtDefine);
     found.into_iter().filter(|(_, ability, _)| has.abilities.contains(&Some(*ability))).map(|(t, _, s)| (t, holder, s)).collect()
 }
 
@@ -2172,11 +2501,12 @@ fn counters(obj: &Obj, chars: &mut Chars) {
 /// lost its abilities still gives it, and one that mentions no hone counter does too (the rulings). Each permanent with hone
 /// counters attached to `id` gives one +1/+0 per counter while it is an Equipment; a creature gets nothing from a power it
 /// lacks.
-fn hone(cards: &CardTable, state: &GameState, log: &[Record], id: ObjectId, honed: &[ObjectId], chars: &mut Chars) {
+fn hone(cx: &Ctx, id: ObjectId, honed: &[ObjectId], chars: &mut Chars) {
+    let state = cx.state;
     for &equipment in honed {
         let e = state.obj(equipment);
         // Its types are settled by layer 4, before any power is: what it is attached to cannot change them.
-        if e.attached_to == Some(id) && chars_before(cards, state, log, equipment, Layer::Color).has_subtype(Subtype::Equipment) {
+        if e.attached_to == Some(id) && chars_in(cx, equipment, Layer::Color).has_subtype(Subtype::Equipment) {
             let bonus = e.counters(CounterKind::Hone);
             chars.power = chars.power.map(|v| v + bonus);
         }
@@ -2839,18 +3169,21 @@ mod tests {
             c
         };
         let (x, y) = (creature_chars(2, true), creature_chars(2, false));
-        assert_eq!(takes_from_its_object(&x, &flying(x), &y, &flying(y)), None, "has flying");
+        assert_eq!(takes_from_its_object(&x, &flying(x), &y, &flying(y), true), None, "has flying");
         let pump = |mut c: Chars| {
             c.power = c.power.map(|p| p + 1);
             c
         };
         let (x, y) = (creature_chars(2, false), creature_chars(5, false));
-        assert_eq!(takes_from_its_object(&x, &pump(x), &y, &pump(y)), None, "+1/+1");
+        assert_eq!(takes_from_its_object(&x, &pump(x), &y, &pump(y), true), None, "+1/+1");
         let its_power = |mut c: Chars| {
             c.power = c.power.map(|p| p + p);
             c
         };
-        assert_eq!(takes_from_its_object(&x, &its_power(x), &y, &its_power(y)), Some("power"), "+X/+0, X its power");
+        assert_eq!(takes_from_its_object(&x, &its_power(x), &y, &its_power(y), true), Some("power"), "+X/+0, X its power");
+        // On a 0-power object it does nothing, which does not excuse the value it takes from its object.
+        let (x, y) = (creature_chars(0, false), creature_chars(2, false));
+        assert_eq!(takes_from_its_object(&x, &its_power(x), &y, &its_power(y), true), Some("power"), "+X/+0 on a 0-power object");
     }
 
     // --- A face-down card judged as the card it is (CR 406.3a-b): what is worked out then is kept apart.

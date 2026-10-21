@@ -54,7 +54,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-51](#ki-51-a-land-whose-subtype-is-set-keeps-the-copiable-values-other-than-abilities-a-copy-effect-gave-it) | A land whose subtype is set keeps the copiable values other than abilities a copy effect gave it | Low | Exercised; reading unconfirmed |
 | [KI-54](#ki-54-where-the-loop-watchs-judgement-is-not-the-rules) | Where the loop watch's judgement is not the rules' | Pri-1 | Fix queued |
 | [KI-56](#ki-56-a-counter-ban-judges-an-entering-permanent-as-the-object-it-was-before-it-moved) | A counter ban judges an entering permanent as the object it was before it moved | Low | Unexercised |
-| [KI-63](#ki-63-control-layer-2-is-settled-by-the-core-not-by-the-layer-pass) | Control (layer 2) is settled by the core, not by the layer pass | Pri-1 | Fix queued |
+| [KI-63](#ki-63-control-layer-2-is-not-ordered-by-the-layer-pass) | Control (layer 2) is not ordered by the layer pass | Pri-1 | Fix queued |
 | [KI-64](#ki-64-control-changing-effects-that-decide-one-another-are-settled-by-a-capped-fixpoint) | Control-changing effects that decide one another are settled by a capped fixpoint | Pri-1 | Fix queued |
 | [KI-71](#ki-71-the-tactical-bots-combat-planning-ignores-bands) | The tactical bot's combat planning ignores bands | Low | Open |
 | [KI-78](#ki-78-the-tactical-bot-attacks-a-player-whom-protection-keeps-from-being-dealt-damage) | The tactical bot attacks a player whom protection keeps from being dealt damage | Low | Open |
@@ -207,21 +207,19 @@ divisions it makes are on purpose (`TacticalPlay.Choices.cs`, the engine's spari
 
 **Scenarios.** none: a bot's judgement is not a rules outcome.
 
-### KI-63: Control (layer 2) is settled by the core, not by the layer pass
+### KI-63: Control (layer 2) is not ordered by the layer pass
 
 | Priority | Status | Area | Found |
 | --- | --- | --- | --- |
 | Pri-1 | Fix queued | engine | 2026-10-17, review of the control-changing static abilities; restated 2026-10-21 with the layer pass |
 
-**Notes.** A controller is stored state (`Obj::controller`), settled by the core: a resolved control effect as it is created,
-and static control-changing abilities and "for as long as" conditions by `ops::settle_control` and
-`ops::end_lapsed_conditions` as each event happens (`ops::settle_at_once`) and as state-based actions are checked. The layer
-pass orders layers 3 to 7 by CR 613.8 over the whole game, but layer 2 is not in it: control is read from the state, not
-through the layers (static abilities read `obj.controller`, not a characteristic at a stage), so a control effect whose reach
-or effect another control effect changes is not ordered by 613.8 (CR 613.1b, 613.8a), and what is read between an event and
-the settling sees the old controller. The fix (the layer-pass design, `docs/engine-design.md`, "Layers 1 and 2"): a
-`controller` characteristic computed in layer 2 in the pass, read through `LayerQuery` by every "you control" reach and
-effect, and the core's settling written from it. Waits on the user's sequencing decision.
+**Notes.** When control is settled is right: at every event and added effect and at the end of each instruction
+(`ops::settle_at_once`, 0e36d26bc). How it is settled is not CR 613.8's: `ops::settle_controller` gives each permanent to the
+latest control-changing effect that applies to it, judging a control effect's reach on the object as layer 1 left it, and
+`ops::settle_control` repeats that until nothing changes. The rules order layer 2's effects like any layer's: one control
+effect depending on another (applying the other changes what it applies to, or whom it gives control to) waits for it, a
+dependency loop applies in timestamp order (613.8b; RX-3), and a control effect's reach is judged on the characteristics
+as they stand at layer 2. The fix: layer 2 in the layer pass, its order writing the stored controller.
 
 **Scenarios.** None that reach the difference.
 

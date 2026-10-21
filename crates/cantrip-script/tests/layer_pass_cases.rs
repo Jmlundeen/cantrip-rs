@@ -401,3 +401,57 @@ fn a_continued_part_depends_through_what_it_does() {
     pump(&mut game, ids[2], 30);
     assert_eq!(game.chars(ids[1]).power, Some(1), "the pumped Bird no longer counts");
 }
+
+/// The static abilities whose effect changes nothing on any object or raw state the check tries, each with why.
+const INERT: &[(&str, &str)] = &[
+    (
+        "Agatha's Soul Cauldron",
+        "its effect gives the abilities of the creature cards exiled with it (`Obj::exiled`), a link no synthetic state makes; it reads them through the view and writes abilities only",
+    ),
+    (
+        "Locus of Enlightenment",
+        "its effect gives the activated abilities of the cards used to craft it, a link no synthetic state makes; it writes abilities only",
+    ),
+    (
+        "Wretched Bonemass",
+        "its effect gives the keywords of the cards used to craft it, read through the view (`LayerQuery::chars`), a link no synthetic state makes",
+    ),
+    ("Mind Control", "a control-changing ability (layer 2): it changes no characteristic, so `apply` does nothing by design"),
+    ("Treachery", "a control-changing ability (layer 2): it changes no characteristic, so `apply` does nothing by design"),
+];
+
+/// The contract of every static ability's effect (`StaticApply`), across the whole card table: applied to synthetic objects
+/// that differ in one field, each effect does what one instruction does to any object - it takes no value from the
+/// object it is given. The corpus checks the effects it reaches under `CANTRIP_VERIFY`; this checks every one.
+#[test]
+fn no_static_ability_takes_a_value_from_its_object() {
+    let found = apply_contract_check(more_table());
+    assert!(found.breaches.is_empty(), "{}", found.breaches.join("\n"));
+    let untested: Vec<&str> =
+        found.inert.iter().map(|s| s.as_str()).filter(|line| !INERT.iter().any(|(name, _)| line.starts_with(name))).collect();
+    assert!(untested.is_empty(), "changed nothing anywhere it was tried, so untested:\n{}", untested.join("\n"));
+}
+
+fn plus_its_power_from_chars(_: &dyn LayerQuery, _: ObjectId, c: &mut Chars) {
+    // Against the contract: its power read from the object it is given.
+    c.power = c.power.map(|p| p + p);
+}
+
+/// "+X/+0, where X is its power", its power read from the object it is given: the check finds it.
+static BAD_DOUBLER: CardDef = CardDef {
+    name: "Probe Bad Doubler",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(2),
+    toughness: Some(2),
+    statics: &[static_ability(Layer::PtModify, itself, plus_its_power_from_chars, "This creature gets +X/+0, where X is its power.")],
+    ..CardDef::BLANK
+};
+
+#[test]
+fn a_static_ability_that_takes_a_value_from_its_object_is_found() {
+    static TABLE: OnceLock<CardTable> = OnceLock::new();
+    let table = TABLE.get_or_init(|| CardTable::new(cantrip_cards::all().into_iter().chain([&BAD_DOUBLER])));
+    let breaches = apply_contract_check(table).breaches;
+    assert_eq!(breaches.len(), 1, "{}", breaches.join("\n"));
+    assert!(breaches[0].starts_with("Probe Bad Doubler"));
+}
