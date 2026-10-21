@@ -36,6 +36,9 @@ pub struct Obj {
     /// The new object it became when it changed zones (CR 400.7), so that a reference to the old one can be
     /// followed where the rules allow ("exile that card").
     pub became: Option<ObjectId>,
+    /// Its last-known information, once it has ceased to be this object (CR 400.7, 608.2h, 113.7a): the row of
+    /// `GameState::last_known` taken as it changed zones or ceased to exist, whatever zone it left.
+    pub last_known: Option<u32>,
     /// If it would leave the battlefield, it is exiled instead (unearth, CR 702.84a; and the like).
     pub exile_on_leave: bool,
     /// How many times its kicker (or squad, or multikicker) cost was paid as it was cast (CR 702.33d), carried from
@@ -210,6 +213,7 @@ impl Obj {
             copy: None,
             loyalty_turn: 0,
             became: None,
+            last_known: None,
             exile_on_leave: false,
             kicked: 0,
             paid: 0,

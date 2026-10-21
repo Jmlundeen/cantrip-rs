@@ -85,7 +85,7 @@ struct Plan {
     /// The counters it arrives with (CR 122.6), once the replacements have applied, and the player putting them.
     counts: [i16; CounterKind::COUNT],
     counts_by: PlayerId,
-    last_known: Option<LastKnown>,
+    last_known: LastKnown,
 }
 
 /// Moves objects at once (CR 400.7: each arrives as a new object). Leaves-the-battlefield abilities are judged on
@@ -183,23 +183,9 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         // still discarded, and the linked ability is queued below, once the exiled card exists - if no later effect sent
         // it on elsewhere, so that it was "exiled this way".
         let madness = change.madness && to.is(ZoneKind::Exile);
-        let last_known = if from.is(ZoneKind::Battlefield) {
-            let c = layers::chars(cx.cards(), cx.s(), &cx.g.log, m.id);
-            let words = cantrip_api::words(cx.s(), m.id);
-            Some(LastKnown {
-                id: m.id,
-                types: c.types,
-                subtypes: c.subtypes,
-                colors: c.colors,
-                power: c.power,
-                toughness: c.toughness,
-                keywords: c.keywords,
-                abilities: c.abilities,
-                words,
-            })
-        } else {
-            None
-        };
+        // Whatever it leaves, it is as it last existed there (CR 400.7, 608.2h, 113.7a): what an ability of it, or one it
+        // created, reads once it is gone.
+        let last_known = last_known_of(cx, m.id);
         let turn = cx.s().turn.number;
         let entering = to.is(ZoneKind::Battlefield);
         let from_stack = entering && from.is(ZoneKind::Stack);
@@ -273,9 +259,7 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
     }
     for Plan { m, reason, old, from, to, change, madness, entering, mut new, counts, counts_by, last_known } in plans {
         let m = &m;
-        if let Some(last_known) = last_known {
-            cx.st().last_known_push(last_known);
-        }
+        let row = cx.st().last_known_push(last_known);
         cx.st().zone_remove(from, m.id);
         // A spell that leaves the stack by any move other than resolving or being countered (exiled, bounced) does not
         // resolve: it is gone from the stack.
@@ -295,7 +279,10 @@ pub fn move_together(cx: &mut Cx, moves: &[Moving], reason: ZoneReason) -> Vec<O
         } else {
             cx.st().zone_push(to, new_id);
         }
-        cx.st().update_obj(m.id, |o| o.became = Some(new_id));
+        cx.st().update_obj(m.id, |o| {
+            o.became = Some(new_id);
+            o.last_known = Some(row);
+        });
         // "Reveal it and shuffle it into its owner's library instead" (CR 701.20a, 701.24a).
         if change.reveal {
             cx.emit(Event::Revealed { player: old.owner, card: new_id });
@@ -995,6 +982,37 @@ pub fn create_token_copies(cx: &mut Cx, values: Copiable, controller: PlayerId, 
     create_tokens_as(cx, values.card, controller, count, false, if values.has_exceptions() { Some(values) } else { None }, &[])
 }
 
+/// An object that ceases to exist where it is, in no zone it can be in (CR 111.7, 111.8, 707.10a, 704.5d, 800.4a), as it
+/// last existed there (CR 608.2h).
+pub fn cease_to_exist(cx: &mut Cx, zone: Zone, id: ObjectId) {
+    let row = last_known_of(cx, id);
+    let row = cx.st().last_known_push(row);
+    cx.st().zone_remove(zone, id);
+    cx.st().update_obj(id, |o| {
+        o.zone = Zone::GONE;
+        o.last_known = Some(row);
+    });
+}
+
+/// `id` as it is now, for last-known information once it has ceased to be this object (CR 400.7, 608.2h, 113.7a): it
+/// changed zones, whatever zone it left, or ceased to exist. Its characteristics and words (CR 612) are what an ability of
+/// it, or a delayed ability it created, reads after (High Tide whose "Island" Magical Hack made "Swamp" watches Swamps;
+/// CR 603.7d). Nothing hidden reaches a player through it: it is read only where the rules read the object itself.
+pub fn last_known_of(cx: &Cx, id: ObjectId) -> LastKnown {
+    let c = layers::chars(cx.cards(), cx.s(), &cx.g.log, id);
+    LastKnown {
+        id,
+        types: c.types,
+        subtypes: c.subtypes,
+        colors: c.colors,
+        power: c.power,
+        toughness: c.toughness,
+        keywords: c.keywords,
+        abilities: c.abilities,
+        words: cantrip_api::words(cx.s(), id),
+    }
+}
+
 /// Creates tokens (CR 111.2): each a new object on the battlefield, from no zone.
 /// The effects of resolved spells and abilities that change a permanent spell's characteristics go on applying to the
 /// permanent it becomes (CR 400.7a): a spell whose text was changed is a permanent with that text. Only text changes
@@ -1584,8 +1602,7 @@ pub fn change_spell_controller(cx: &mut Cx, spell: ObjectId, player: PlayerId) {
 pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> {
     let spell = *cx.s().obj(item.object);
     cx.st().stack_remove(at);
-    cx.st().zone_remove(Zone::STACK, item.object);
-    cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
+    cease_to_exist(cx, Zone::STACK, item.object);
     // A copy of a Room spell keeps the choice of door and the characteristics of both (CR 709.5b); the token it becomes is a
     // Room that enters with that door unlocked (CR 709.5d, 707.10f).
     let door = if cx.cards().get(spell.card).is_room() { cast_door(spell.cast_way) } else { 0 };
@@ -2805,8 +2822,7 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
         let obj = *cx.s().obj(item.object);
         if obj.owner == player || (item.controller == player && obj.card_copy) {
             cx.st().stack_remove(at);
-            cx.st().zone_remove(Zone::STACK, item.object);
-            cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
+            cease_to_exist(cx, Zone::STACK, item.object);
         } else if item.controller == player {
             cx.st().stack_remove(at);
             exiled.push(item.object);
@@ -2834,8 +2850,7 @@ pub fn leave_game(cx: &mut Cx, player: PlayerId) {
         .map(|id| (cx.s().obj(id).zone, id))
         .collect();
     for (zone, id) in owned {
-        cx.st().zone_remove(zone, id);
-        cx.st().update_obj(id, |o| o.zone = Zone::GONE);
+        cease_to_exist(cx, zone, id);
     }
     let gone = |cx: &Cx, id: ObjectId| cx.s().obj(id).zone.is(ZoneKind::Gone);
     if cx.s().attackers.iter().any(|a| gone(cx, a.id)) {

@@ -1,0 +1,41 @@
+# A delayed triggered ability has the text of the spell that created it as that spell resolved (CR 603.7d, 612.1, 608.2):
+# Bot1 casts High Tide and, in response, Magical Hack changes "Island" in it to "Swamp". Once High Tide has resolved and
+# left the stack, its ability watches Swamps: Bot1's Swamp makes {B}{U} - the additional mana is still {U}, a mana symbol
+# being no word (CR 612.2) - and an Island makes {U} alone.
+
+[Bot1 Deck]
+Island
+Swamp
+Island
+High Tide
+Magical Hack
+Island x15
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+[T5 Bot1.Main1]
+Bot1.Hand.Island.Play
+[T7 Bot1.Main1]
+Bot1.Hand.Island.Play
+Bot1.Battlefield.Island#1.Activate
+Bot1.Hand.High Tide.Cast
+Bot1.Battlefield.Island#2.Activate
+Bot1.Hand.Magical Hack.Cast(High Tide)
+Bot1.Modes(Island)
+Bot1.Modes(Swamp)
+Bot1.Pass
+Bot1.Pass
+Bot1.Battlefield.Swamp.Activate
+? Stack.Count = 0
+? Bot1.Mana = {U}{B}
+Bot1.Battlefield.Island#3.Activate
+? Bot1.Mana = {U}{U}{B}
+
+[Expect]
+Bot1.Graveyard = High Tide; Magical Hack
+Delayed = High Tide

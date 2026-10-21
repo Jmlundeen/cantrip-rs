@@ -45,13 +45,14 @@ pub struct Chars {
 }
 
 /// The words `id`'s text has now (CR 612): the ones its copiable values changed (a token made by changed text), then
-/// each text-changing effect on it in timestamp order. Printed, for nearly every object. An object that has left the
-/// battlefield has the words it last had there (CR 113.7a, 608.2h): a fetch land sacrificed to its own ability searches
-/// for the land types its text named.
+/// each text-changing effect on it in timestamp order. Printed, for nearly every object. An object that has ceased to be
+/// itself - changed zones or ceased to exist - has the words it last had (CR 400.7, 113.7a, 608.2h): a fetch land
+/// sacrificed to its own ability searches for the land types its text named, and the delayed ability of a High Tide whose
+/// "Island" was changed to "Swamp" watches Swamps once High Tide is in the graveyard.
 pub fn words(state: &GameState, id: ObjectId) -> Words {
     let obj = state.obj(id);
-    if obj.became.is_some() {
-        return state.last_known(id).map_or(Words::NONE, |l| l.words);
+    if let Some(last) = state.last_known(id) {
+        return last.words;
     }
     let mut words = obj.copy.map_or(Words::NONE, |c| c.words);
     for e in &state.effects {

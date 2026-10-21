@@ -122,8 +122,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         .map(|id| (cx.s().obj(id).zone, id))
         .collect();
     for (zone, id) in stale {
-        cx.st().zone_remove(zone, id);
-        cx.st().update_obj(id, |o| o.zone = Zone::GONE);
+        ops::cease_to_exist(cx, zone, id);
         acted = true;
     }
 
@@ -138,8 +137,7 @@ fn state_based_actions(cx: &mut Cx) -> R<bool> {
         .map(|id| (cx.s().obj(id).zone, id))
         .collect();
     for (zone, id) in gone {
-        cx.st().zone_remove(zone, id);
-        cx.st().update_obj(id, |o| o.zone = Zone::GONE);
+        ops::cease_to_exist(cx, zone, id);
         acted = true;
     }
 

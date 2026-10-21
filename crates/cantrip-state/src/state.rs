@@ -199,7 +199,7 @@ impl GameState {
         &Vec<StackItem>,
         &Turn,
         &Vec<ContinuousEffect>,
-        (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<LastKnown>, &Vec<PlayPermission>),
+        (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<PlayPermission>),
         (&Vec<Attacker>, &Vec<Block>, &Vec<ExtraTurn>, &LoopWatch),
         &Vec<Frame>,
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>),
@@ -211,7 +211,7 @@ impl GameState {
             &self.stack,
             &self.turn,
             &self.effects,
-            (&self.triggers, &self.delayed, &self.last_known, &self.permissions),
+            (&self.triggers, &self.delayed, &self.permissions),
             (&self.attackers, &self.blocks, &self.extra_turns, &self.loop_watch),
             &self.agenda,
             (&self.rng, self.next_timestamp, &self.outcome, self.unsettled, &self.members, &self.left_stack),
@@ -222,7 +222,9 @@ impl GameState {
 /// Two states are the same position whatever their journals and request counters hold.
 impl PartialEq for GameState {
     fn eq(&self, other: &GameState) -> bool {
-        self.position() == other.position()
+        // Last-known rows are named by the objects that left (`Obj::last_known`), which the position hashes; the rows
+        // themselves are compared, not hashed, since every move adds one.
+        self.position() == other.position() && self.last_known == other.last_known
     }
 }
 
@@ -863,9 +865,11 @@ impl GameState {
         d
     }
 
-    pub fn last_known_push(&mut self, row: LastKnown) {
+    /// Keeps an object's last-known information (CR 608.2h), returning the row its `Obj::last_known` names.
+    pub fn last_known_push(&mut self, row: LastKnown) -> u32 {
         self.last_known.push(row);
         self.log(Undo::LastKnownPushed);
+        self.last_known.len() as u32 - 1
     }
 
     /// Records a fact of this turn.
@@ -898,9 +902,10 @@ impl GameState {
         self.left_stack.iter().rev().find(|i| i.kind == StackKind::Activated && i.serial == serial)
     }
 
-    /// The characteristics an object last had on the battlefield, if it left it.
+    /// The characteristics an object last had where it was, once it has ceased to be that object - left any zone, or
+    /// ceased to exist (CR 400.7, 608.2h, 113.7a).
     pub fn last_known(&self, id: ObjectId) -> Option<&LastKnown> {
-        self.last_known.iter().rev().find(|l| l.id == id)
+        self.objects[id.index()].last_known.map(|row| &self.last_known[row as usize])
     }
 
     pub fn set_attackers(&mut self, attackers: Vec<Attacker>) {

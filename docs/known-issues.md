@@ -1157,18 +1157,3 @@ the engine side of the cast passes.
 
 **Scenarios.** `trinisphere-cost-of-force-of-wills-alternative-cost-shown-in-the-browser` (browser suite; fails at
 line 46).
-
-### KI-95: A delayed triggered mana ability reads its land type through its spell's words as they are now
-
-| Severity | Status | Area | Found |
-| --- | --- | --- | --- |
-| Low | Suspected | engine / mechanics | 2026-10-20, delayed triggered mana abilities (High Tide, Bubbling Muck, Molten Tide) |
-
-**Notes.** `mana::you_tap_a_land_type_for_mana` and `a_player_taps_a_land_type_for_mana` read the land type through
-`q.words(asker.source)` (CR 612.2). For a delayed ability the source is the spell that created it, which has left the
-stack by the time it triggers; a text change made to the spell while it was on the stack (Magical Hack on High Tide,
-"Island" to "Swamp") may no longer apply to the object then, so the ability would watch Islands again. The words the
-delayed ability was created with should be kept with it (CR 603.7, 612). No scenario runs a text change on one, and
-none of the three cards is in a deck that plays a text-changing effect.
-
-**Scenarios.** None.

@@ -152,10 +152,9 @@ pub fn chars_before(cards: &CardTable, state: &GameState, log: &[Record], id: Ob
         chars
     };
 
-    // An object that has left the battlefield is as it last was there (CR 608.2h, 603.10).
-    if obj.became.is_some()
-        && let Some(last) = state.last_known(id)
-    {
+    // An object that has ceased to be itself - changed zones or ceased to exist - is as it last was (CR 400.7, 608.2h,
+    // 603.10).
+    if let Some(last) = state.last_known(id) {
         let mut chars = start();
         chars.types = last.types;
         chars.subtypes = last.subtypes;

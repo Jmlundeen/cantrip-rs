@@ -1223,7 +1223,14 @@ controller as "you" (CR 603.7d-e), stopped as any delayed ability is but never m
 its source, the spell that made it, wherever that has gone (CR 106.3); settle's delayed abilities skip a mana ability, so
 it never goes on the stack (CR 605.4a). "Whenever [you tap / a player taps] a [land type] for mana, [that player] add[s]
 an additional [mana]" is `mana::you_tap_a_land_type_for_mana` or `a_player_taps_a_land_type_for_mana` with
-`mana::that_player_adds_an_additional`, the type read through the source's words (Nissa, Who Shakes the World too).
+`mana::that_player_adds_an_additional`, the type read through the source's words (Nissa, Who Shakes the World too). Every
+object leaves last-known information as it ceases to be that object (CR 400.7, 608.2h, 113.7a) - a move out of any
+zone (`move_together`) or ceasing to exist (`ops::cease_to_exist`: a token or a copy of a spell, CR 111.7, 707.10a, a
+player's objects as the player leaves, CR 800.4a) - a row of `GameState::last_known` that the old object names
+(`Obj::last_known`), so `last_known(id)` is one index and no reader needs to know which zone it left. So the delayed
+ability of a High Tide whose "Island" Magical Hack made "Swamp" reads "Swamp" through High Tide's words once the effects
+on the spell are gone (CR 603.7d, 611.2c, 612.1). The rows are compared with the position but not hashed: the objects
+naming them are.
 
 "You may activate abilities of creatures you control as though those creatures had haste" (CR 302.6) is
 `CardDef::activate_as_though_haste`, asked (`static_rules::activates_as_though_haste`) only where a summoning-sick

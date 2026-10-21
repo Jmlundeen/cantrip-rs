@@ -654,6 +654,7 @@ impl<'a> Canon<'a> {
         let mut o = *s.obj(id);
         o.timestamp = 0;
         o.became = None;
+        o.last_known = None;
         o.attached_to = None;
         o.entered_with = None;
         o.prepared_from = None;

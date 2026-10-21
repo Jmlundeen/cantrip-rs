@@ -286,8 +286,7 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
     // 707.10a, 704.5e).
     if item.way == WAY_OMEN && reason == ZoneReason::Resolve {
         if obj.card_copy {
-            cx.st().zone_remove(Zone::STACK, item.object);
-            cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
+            ops::cease_to_exist(cx, Zone::STACK, item.object);
         } else {
             ops::move_to_for(cx, item.object, Zone::library(obj.owner), reason);
         }
@@ -296,8 +295,7 @@ fn leave_stack(cx: &mut Cx, item: &StackItem, reason: ZoneReason) {
     }
     // A copy of a card leaves the stack for nowhere: it ceases to exist (CR 707.10a, 722.3c).
     if obj.card_copy {
-        cx.st().zone_remove(Zone::STACK, item.object);
-        cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
+        ops::cease_to_exist(cx, Zone::STACK, item.object);
         return;
     }
     // A spell cast as its Adventure that resolves is exiled by its controller, who may play the card from there later
@@ -523,8 +521,7 @@ fn send_spell(cx: &mut Cx, at: usize, to: CounterTo, reason: ZoneReason) {
     let item = cx.st().stack_remove(at);
     let obj = *cx.s().obj(item.object);
     if obj.card_copy {
-        cx.st().zone_remove(Zone::STACK, item.object);
-        cx.st().update_obj(item.object, |o| o.zone = Zone::GONE);
+        ops::cease_to_exist(cx, Zone::STACK, item.object);
         return;
     }
     // Flashback (CR 702.34a): exiled instead of going anywhere else as it leaves the stack, so a flashed-back spell sent to
