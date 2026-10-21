@@ -1,0 +1,46 @@
+# Room of Refuge's target leaves the battlefield before the ability resolves: Unsummon returns the Ornithopter to Bot1's
+# hand, and the ability, still resolving, has no legal target and does nothing (CR 608.2b). The land was already
+# sacrificed as a cost, so it stays in the graveyard and no counters are put anywhere.
+
+[Bot1 Deck]
+Room of Refuge
+Black Lotus
+Sol Ring
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Unsummon
+Island x19
+
+[Actions]
+Bot1.Hand.Room of Refuge.Play
+Bot1.Colors(Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Island.Play
+[T3 Bot1.Main1]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Room of Refuge.Activate(Ability: Sacrifice this land; Bot1.Battlefield.Ornithopter)
+Bot2.Battlefield.Island.Activate
+Bot2.Hand.Unsummon.Cast(Bot1.Battlefield.Ornithopter)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Room of Refuge; Black Lotus
+Bot1.Hand = Island; Ornithopter
+Bot1.Battlefield.Ornithopter = (absent)

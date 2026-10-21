@@ -1,0 +1,28 @@
+# Room of Refuge: "This land enters tapped. As it enters, choose a color. {T}: Add one mana of the chosen color."
+# (CR 614.1c, 605.1a, 607.2d). Red is chosen as it enters; it makes one red mana and never blue, the other colors
+# being outside the choice rather than merely unpicked.
+
+[Bot1 Deck]
+Room of Refuge
+Island
+Island x18
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Room of Refuge.Play
+Bot1.Colors(Red)
+? Bot1.Battlefield.Room of Refuge.Tapped = true
+? Bot1.Battlefield.Room of Refuge.ChosenColor = Red
+[T2 Bot2.Main1]
+[T3 Bot1.Main1]
+! Bot1.Battlefield.Room of Refuge.Activate(Color: Blue)
+! Bot1.Battlefield.Room of Refuge.Activate(Color: Green)
+Bot1.Battlefield.Room of Refuge.Activate(Color: Red)
+? Bot1.Mana = {R}
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Room of Refuge.ChosenColor = Red
+Bot1.Mana =

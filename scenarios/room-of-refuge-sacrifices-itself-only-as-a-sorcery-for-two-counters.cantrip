@@ -1,0 +1,43 @@
+# Room of Refuge's "{5}, {T}, Sacrifice this land: Put two +1/+1 counters on target creature. Activate only as a sorcery."
+# (CR 118.3, 701.21a, 608.2c): the activation is not offered in the beginning of combat, the land is sacrificed as a cost
+# and is in the graveyard before the ability resolves, and exactly two +1/+1 counters go on the chosen creature.
+
+[Bot1 Deck]
+Room of Refuge
+Black Lotus
+Sol Ring
+Mox Jet
+Mox Emerald
+Mox Sapphire
+Ornithopter
+Island x13
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Room of Refuge.Play
+Bot1.Colors(Red)
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Black)
+Bot1.Hand.Sol Ring.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Emerald.Cast
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+[T3 Bot1.BeginCombat]
+! Bot1.Battlefield.Room of Refuge.Activate(Ability: Sacrifice this land)
+[T3 Bot1.Main2]
+Bot1.Battlefield.Sol Ring.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Emerald.Activate
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Room of Refuge.Activate(Ability: Sacrifice this land; Bot1.Battlefield.Ornithopter)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Room of Refuge; Black Lotus
+Bot1.Battlefield.Ornithopter.Counters.PlusOnePlusOne = 2
+Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Ornithopter.Toughness = 4
