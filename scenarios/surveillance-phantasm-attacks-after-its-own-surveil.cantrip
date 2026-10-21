@@ -1,0 +1,39 @@
+# Its own "{3}{U}: Surveil 1" is a scry or surveil by its controller, so later that turn it may attack as though it didn't
+# have defender - and it is a vigilant flyer, so it attacks without tapping and a ground creature cannot block it.
+
+[Bot1 Deck]
+Island
+Black Lotus
+Surveillance Phantasm
+Black Lotus
+Island x20
+
+[Bot2 Deck]
+Forest
+Basking Rootwalla
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Hand.Surveillance Phantasm.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Basking Rootwalla.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Black Lotus.Cast
+Bot1.Battlefield.Black Lotus.Activate(Color: Blue)
+Bot1.Battlefield.Island.Activate
+Bot1.Battlefield.Surveillance Phantasm.Activate
+Bot1.Arrange(| Island)
+? Stack.Count = 0
+Bot1.Attack(Surveillance Phantasm > Bot2)
+! Bot2.Block(Basking Rootwalla > Surveillance Phantasm)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Life = 18
+Bot1.Battlefield.Surveillance Phantasm.Tapped = false
+Bot1.Graveyard = Island; Black Lotus; Black Lotus

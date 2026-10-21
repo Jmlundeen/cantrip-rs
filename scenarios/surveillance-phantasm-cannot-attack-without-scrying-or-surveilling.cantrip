@@ -1,0 +1,36 @@
+# "As long as you've scried or surveilled this turn, this creature can attack as though it didn't have defender"
+# (CR 702.3b, 609.4). With no scry or surveil this turn it keeps defender: the declaration refuses it (CR 508.1c) while
+# Ornithopter attacks (the control).
+
+[Bot1 Deck]
+Island
+Mox Sapphire
+Surveillance Phantasm
+Ornithopter
+Island x20
+
+[Bot2 Deck]
+Forest
+Basking Rootwalla
+Island x20
+
+[Actions]
+Bot1.Hand.Island.Play
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Battlefield.Island.Activate
+Bot1.Hand.Surveillance Phantasm.Cast
+Bot1.Hand.Ornithopter.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Basking Rootwalla.Cast
+[T3 Bot1.Main1]
+! Bot1.Attack(Surveillance Phantasm > Bot2)
+Bot1.Attack(Ornithopter > Bot2)
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Battlefield.Surveillance Phantasm.Tapped = false
+Bot1.Battlefield.Ornithopter.Tapped = true
+Bot2.Life = 20
