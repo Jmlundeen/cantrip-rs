@@ -1,5 +1,5 @@
-//! Combat with more creatures than eight or sixteen bits count, which the event cap (RX-1) lets a game reach: 300 Grizzly
-//! Bears attack, the attack is recorded as 300 attackers (CR 508.1), and 300 Llanowar Elves block one of them, which is legal
+//! Combat with more creatures than eight bits count, which the event cap (RX-1) lets a game reach: 300 Llanowar Elves
+//! attack, the attack is recorded as 300 attackers (CR 508.1), and 300 Llanowar Elves block one of them, which is legal
 //! (CR 509.1b: a creature with no restriction can be blocked by any number of creatures).
 
 use std::sync::OnceLock;

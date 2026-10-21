@@ -258,8 +258,9 @@ as many times as its cost can be paid, sharing the resources it spends with the 
 - A mana cost's counts are `u8` (`ManaCost`, `crates/cantrip-state/src/vocab.rs:281`): a total past 255 stops at 255, so
   Fireball with X = 300 costs {255}{R}.
 - Multikicker's count is a `u8` and its cost is added in `u8`: Everflowing Chalice kicked 128 times costs {0}.
-- An activated ability's X is multiplied into the generic cost in `u8`: Kessig Wolf Run with X = 256 costs {R}{G} (and
-  panics in a debug build).
+- An activated ability's X is multiplied into the generic cost in `u8` (`actions.rs`, where an activation announces X:
+  `(n * x).min(255) as u8`): Kessig Wolf Run with X = 300 costs {255}{R}{G}. It saturates since the event-cap sweep, so it
+  no longer wraps or panics, but it still stops at 255.
 - X is a `u16` (`StackItem::x`, `Obj::x`), and X paid in life stops at 1000 (`actions.rs`,
   `payable_life(..).clamp(0, 1000)`).
 - Splice onto an Arcane spell takes at most two cards (`eligible.len().min(2)`, `actions.rs:4850`; CR 702.47 allows any
@@ -281,6 +282,9 @@ Run at X = 256, Fireball at X = 300).
 - An object's counters are `i16` (`Obj::counters`), and a doubling replacement (`*n *= 2`, Doubling Season) wraps
   negative, after which the counters are dropped.
 - Power and toughness are `i16` (`Chars`, `Pump`, `Copiable::pt`), and the layers add them with plain `+`, which wraps.
+  Some thirty cards and mechanics make a power or toughness from a count of objects with `count() as i16` or
+  `len() as i16` (Cranial Plating, Nethergoyf, Ms. Marvel, Yuriko, `goyf`, `melee`, `lands.rs` and others), which wraps
+  negative past 32,767 objects.
 - Damage is a `u16` (`Obj::damage`, `ops::damage`, `Event::Damage`); `damage as i16 >= toughness` (`settle.rs`,
   `turn.rs`) lets a creature dealt more than 32,767 damage survive it.
 - A player's poison, energy and experience counters are `u8` (`object.rs:1137-1139`, `pay_energy`).
