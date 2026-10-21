@@ -355,6 +355,10 @@ impl Game {
         if pending.player != player {
             return Err(Rejected(format!("request {request} is not for {player:?}")));
         }
+        // A player who must stop a loop (CR 732.3) asked a "may" where taking it would end their round as the last one ended.
+        if loops::refuses(&self.state, request, &pending, &answer) {
+            return Err(Rejected("a player who must stop a loop may not give that answer there again (CR 732.3)".into()));
+        }
         // An answer given here before leads to the node it made: the working state goes there, nothing is replayed.
         if let Some(child) = self.tree.child(self.at, request, player, &answer) {
             self.goto(child);
@@ -593,17 +597,8 @@ impl<'a> Cx<'a> {
     pub fn ask_core(&mut self, player: PlayerId, kind: RequestKind, may_cancel: bool) -> R<Answer> {
         // A real choice, asked or answered on a re-run, means no loop through here is a mandatory one (CR 104.4b); and a loop
         // of choices is watched, and a player who must stop it made to choose otherwise (CR 732.3).
-        let replayed = self.g.state.agenda[self.frame].answers.get(self.cursor).cloned();
-        let (kind, key) = match loops::asked(self, player, kind, true, replayed.as_ref()) {
-            loops::Asked::Ask { kind, key } => (kind, key),
-            loops::Asked::Answered(answer) => {
-                // Given as an answer is, so the frame played out again gives it again, and the questions after it theirs.
-                let at = self.frame;
-                self.g.state.update_frame(at, |f| f.answers.push(answer.clone()));
-                self.cursor += 1;
-                return Ok(answer);
-            }
-        };
+        let replaying = self.cursor < self.g.state.agenda[self.frame].answers.len();
+        let (kind, key) = loops::asked(self, player, kind, replaying);
         let frame = &self.g.state.agenda[self.frame];
         if self.cursor < frame.answers.len() {
             let answer = frame.answers[self.cursor].clone();
@@ -861,10 +856,7 @@ impl cantrip_api::Game for Cx<'_> {
     }
 
     fn ask_then(&mut self, next: u16, player: PlayerId, kind: RequestKind) -> Suspend {
-        let (kind, key) = match loops::asked(self, player, kind, false, None) {
-            loops::Asked::Ask { kind, key } => (kind, key),
-            loops::Asked::Answered(_) => unreachable!("a staged question is always asked"),
-        };
+        let (kind, key) = loops::asked(self, player, kind, false);
         let id = self.g.state.request_id();
         let at = self.frame;
         self.g.state.update_frame(at, |f| {

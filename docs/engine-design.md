@@ -713,14 +713,17 @@ poison, counters, damage, mana, libraries), and a position seen again is the loo
 event history is not in the fingerprint; every read of it is counted instead (`cantrip_api::history::note_read`, made by
 `History::new`), and a read clears the positions seen, so a loop that "the third time this turn" or "only once each turn"
 could end is never found by its positions (`loops::settled_read` asks a question whose answer the rest of the turn can't
-change without counting it). Once a step has `BUSY_STEP` events in it, every question is kept by its exact position with
-the answers given there, and each player's choices to act are counted (an action at priority, a "may" taken, anything chosen
-but passing, declining or choosing nothing). A priority asked again in the same position with nothing reading the history
-between is a round of a loop; if two or more players acted in it, it is a fragmented loop (CR 732.3): the active player, or
-the first involved in turn order, is designated, and is no longer offered, at a question in a position they answered before,
-what they answered there (an action at priority, a single target, card, mode or player; a "may" they took is declined for
-them), until they answer such a question otherwise. A pass or a decline is never refused. Any other loop its players keep
-going by choice - one player's, or one whose players only pass and decline (`docs/rules-exceptions.md`, RX-2) - is never cut
+change without counting it). Once a step has `BUSY_STEP` events in it, every question is kept by its exact position, every
+answer to a kept question is kept in order, and each player's choices to act are counted (an action at priority, a "may"
+taken, anything chosen but passing, declining or choosing nothing). A priority asked again in the same position with nothing
+reading the history between is a round of a loop. If every answer of the round was a pass at priority, it is a loop of
+mandatory actions (CR 732.4-5: no player can be made to cast an instant no loop object calls for), a draw; a round with a
+"may" declined in it is not (RX-2). If two or more players acted in it, it is a fragmented loop (CR 732.3): the active
+player, or the first involved in turn order, is designated and chooses where to differ - their answers of the last round
+are followed in order, and only at their last action of it, every answer before it the same, is that answer refused (not
+offered at priority or among single picks; a "may" taken is turned down and asked again). Any different answer ends it;
+passing and declining are never refused, and nothing is answered for them. Any other loop its players keep
+going by choice - one player's, or one whose players decline what its objects offer (`docs/rules-exceptions.md`, RX-2) - is never cut
 off, capped or made to change: the engine supports no loop shortcuts (CR 732.2), players perform every loop action by hand,
 and a combination may go round as many times as it needs; a person is held to the match clock, and a seat nobody drives
 stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes, declines and picks each answer in turn, and past a

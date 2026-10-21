@@ -27,22 +27,28 @@
 //! this turn already") is asked through `settled_read`, which counts it only while it could still change.
 //!
 //! **A loop its players keep going** (CR 732). Once a step has a great deal in it (`BUSY_STEP` events, which a step outside
-//! a loop rarely has), every question asked in it is kept by its exact position, with the answers given to it there, and
-//! every player's choices to act are counted (an action at priority, a "may" taken, anything chosen of several but passing,
-//! declining or choosing nothing). A priority asked again in the same position, with nothing asking the history in between,
-//! is a round of a loop; if two or more players chose to act in it, it is a fragmented loop, and the active player (or, if
-//! they are not involved, the first involved in turn order) must make a different game choice (CR 732.3): from then on
-//! they are not offered, at a question in a position they have answered before, what they answered there - an action at
-//! priority, a target, card, mode or player chosen alone - and a "may" they took there is declined for them, until they
-//! answer such a question otherwise. A pass or a decline is never refused (CR 732.5 lets a player be held to an action a
-//! loop object calls for, but no rule requires it). A loop only one player keeps going, or one whose players only pass and
-//! decline, goes on for as long as they choose: the engine supports no shortcut (CR 732.2), every round is played by hand,
-//! and nothing here cuts it off or caps it - a combination may need hundreds of rounds. A seat nobody drives stops by
-//! itself (the C# client's `LoopGuard`), a person by the match clock, and a game that reaches `MAX_GAME_EVENTS` events is a
-//! draw (`Game::run`; `docs/rules-exceptions.md`, RX-1).
+//! a loop rarely has), every question asked in it is kept by its exact position, every answer given to a kept question is
+//! kept in order, and each player's choices to act are counted (an action at priority, a "may" taken, anything chosen of
+//! several but passing, declining or choosing nothing). A priority asked again in the same position, with nothing asking
+//! the history in between, is a round of a loop:
+//! - if every answer of the round was a pass at priority, the loop's own actions are all mandatory, and no player can be made
+//!   to take an action that would end it but those its objects call for (CR 732.5: an instant held in hand): it is a loop
+//!   of mandatory actions, and a draw (CR 732.4, 104.4b). A round with any other choice in it - a "may" a loop object
+//!   offers, declined - is not (`docs/rules-exceptions.md`, RX-2).
+//! - if two or more players chose to act in it, it is a fragmented loop, and the active player (or, if they are not
+//!   involved, the first involved in turn order) must make a different game choice (CR 732.3). They choose where: their
+//!   answers of the last round are followed in order, and only at their last action of it, once every answer of theirs
+//!   before it this round was the same, is the same answer refused - an action at priority or a single target, card, mode
+//!   or player is not offered, and a "may" taken there is turned down and asked again. Any answer that differs anywhere
+//!   ends it. A pass or a decline is never refused, and nothing is answered for them.
+//!
+//! Any other loop - one player's, or one whose players decline what its objects offer - goes on for as long as they choose:
+//! the engine supports no shortcut (CR 732.2), every round is played by hand, and nothing here cuts it off or caps it. A seat
+//! nobody drives stops by itself (the C# client's `LoopGuard`), a person by the match clock, and a game that reaches
+//! `MAX_GAME_EVENTS` events is a draw (`Game::run`; RX-1).
 //!
 //! **What the watch keeps.** Each question of a busy step once (`GameState::loop_keys`, found by its key in a hashed index,
-//! journalled an entry at a time), with the answers given to it and, for a priority, the round it was last asked in: a loop
+//! journalled an entry at a time), with, for a priority, the round it was last asked in, and the answers in order: a loop
 //! played by hand for any number of rounds costs it nothing more per round. Past `KEPT` questions it starts over, so a loop
 //! is found again within two of its rounds.
 //!
@@ -54,7 +60,7 @@ use std::hash::{Hash, Hasher};
 
 use cantrip_api::history::{note_read, take_reads};
 use cantrip_api::*;
-use cantrip_state::{GameState, LastKnown, LoopRound, LoopWatch};
+use cantrip_state::{GameState, LastKnown, LoopAnswer, LoopRound, LoopWatch};
 
 use crate::Cx;
 
@@ -118,65 +124,49 @@ pub fn settled_read<T>(cx: &Cx, ask: impl FnOnce(&History) -> T, settled: impl F
     answer
 }
 
-/// What a question comes to once the watch has seen it.
-pub enum Asked {
-    /// Ask it, as it now is (with what a player who must choose otherwise answered it before taken out), `key` its place in
-    /// the watch when it is kept.
-    Ask { kind: RequestKind, key: Option<u64> },
-    /// A "may" the player must now decline (CR 732.3), answered without asking.
-    Answered(Answer),
-}
-
 /// A question other than priority is about to be asked (or asked again, on a re-run): one with more than one legal answer
 /// clears the watch of mandatory actions; in a step being watched it is kept with its position, and a player who must make
-/// a different choice (CR 732.3) is not offered what they answered it before. Priority is `at_priority`'s. A question
-/// that can be answered without asking (`may_answer`: not a staged one) may be answered here; it is then given as any
-/// answer is, and `replayed` with the frame. A question `replayed` (a frame played out again with the answers it had) is
-/// kept but never changed, its answer given to it as it was first asked: a player who must choose otherwise and chose so
-/// there no longer must.
-pub fn asked(cx: &mut Cx, player: PlayerId, kind: RequestKind, may_answer: bool, replayed: Option<&Answer>) -> Asked {
+/// a different choice (CR 732.3) is not offered, where their round would otherwise end as the last did, what they chose
+/// there (`refused`). Priority is `at_priority`'s. A question being `replayed` (a frame played out again with the answers
+/// it had) is kept but never changed: its answer was given to it as it was first asked. The question as it is to be asked,
+/// and its key in the watch when it is kept.
+pub fn asked(cx: &mut Cx, player: PlayerId, kind: RequestKind, replayed: bool) -> (RequestKind, Option<u64>) {
     if matches!(kind, RequestKind::Priority { .. }) || forced(&kind) {
-        return Asked::Ask { kind, key: None };
+        return (kind, None);
     }
     clear_forced(cx);
     if !busy(cx) {
-        return Asked::Ask { kind, key: None };
-    }
-    let key = {
-        let canon = Canon::new(cx.s());
-        question_key(&canon, position(cx.s(), &canon), player, cx.frame, cx.cursor, &kind)
-    };
-    let at = entry(cx.st(), key);
-    if !designated(cx.s(), player) {
-        return Asked::Ask { kind, key: Some(key) };
+        return (kind, None);
     }
     let canon = Canon::new(cx.s());
-    if let Some(answer) = replayed {
-        let given = &cx.s().loop_keys[at].given;
-        let this = answer_hash(&canon, answer);
-        if !given.is_empty() && !given.contains(&this) {
-            let watch = LoopWatch { designated: cx.s().loop_watch.designated & !bit(player), ..cx.s().loop_watch.clone() };
-            cx.st().set_loop_watch(watch);
-        }
-        return Asked::Ask { kind, key: Some(key) };
-    }
-    match otherwise(&canon, kind, &cx.s().loop_keys[at].given, may_answer) {
-        Asked::Ask { kind, .. } => Asked::Ask { kind, key: Some(key) },
-        // Declining is the different choice (CR 732.3); and noted again if the frame is played out again with it.
-        answered => {
-            let watch = LoopWatch { designated: cx.s().loop_watch.designated & !bit(player), ..cx.s().loop_watch.clone() };
-            cx.st().set_loop_watch(watch);
-            answered
-        }
-    }
+    let key = question_key(&canon, position(cx.s(), &canon), player, cx.frame, cx.cursor, &kind);
+    let kind = match refused(cx.s(), player, key) {
+        Some(answer) if !replayed => otherwise(&canon, kind, answer),
+        _ => kind,
+    };
+    drop(canon);
+    entry(cx.st(), key);
+    (kind, Some(key))
 }
 
-/// The question with the answers in `given` taken out, where what is left is still a question with an answer: a target,
-/// card, mode or player chosen alone; and a "may" taken before is declined without asking, if `may_answer`. A player made
-/// to choose otherwise is only ever made to choose another of the same, or to decline: declining is never refused. Any
-/// other question is asked as it is.
-fn otherwise(canon: &Canon, mut kind: RequestKind, given: &[u64], may_answer: bool) -> Asked {
-    let out = |a: Answer| given.contains(&answer_hash(canon, &a));
+/// What `player`, made to choose otherwise (CR 732.3), may not answer the question `key`: what they answered at the last
+/// action of their part of the loop's last round, once every answer of theirs before it this round was the same as then.
+/// They choose where to differ - any earlier answer of theirs may be another, and then nothing is refused - but the round
+/// can't end as the last did.
+fn refused(s: &GameState, player: PlayerId, key: u64) -> Option<u64> {
+    let w = &s.loop_watch;
+    if w.designated != Some(player.0) || w.next != w.refuse_at {
+        return None;
+    }
+    let &(expected, answer) = w.expect.get(w.next as usize)?;
+    (expected == key).then_some(answer)
+}
+
+/// The question with the answer `refused` taken out, where what is left is still a question with an answer: a target,
+/// card, mode or player chosen alone. Any other question is asked as it is, and the refused answer turned down if given
+/// (`refuses`); declining or choosing nothing is never refused.
+fn otherwise(canon: &Canon, mut kind: RequestKind, refused: u64) -> RequestKind {
+    let out = |a: Answer| answer_hash(canon, &a) == refused;
     match &mut kind {
         RequestKind::ChooseTarget { candidates, least, count: 1, any_number: false, .. } => {
             let left: Vec<Target> = candidates.iter().copied().filter(|&t| !out(Answer::Targets(vec![t]))).collect();
@@ -202,10 +192,18 @@ fn otherwise(canon: &Canon, mut kind: RequestKind, given: &[u64], may_answer: bo
                 *eligible = left;
             }
         }
-        RequestKind::May { .. } if may_answer && out(Answer::Yes) => return Asked::Answered(Answer::No),
         _ => {}
     }
-    Asked::Ask { kind, key: None }
+    kind
+}
+
+/// Whether `answer` to the waiting request `id` is one its player, made to choose otherwise (CR 732.3), may not give
+/// (`refused`): a "may" taken again where it would end their round as the last one ended. The player is asked again.
+pub fn refuses(s: &GameState, id: u32, request: &Request, answer: &Answer) -> bool {
+    let Some((asked, key)) = s.loop_watch.asking else { return false };
+    asked == id
+        && !matches!(answer, Answer::Pass | Answer::No | Answer::Cancel)
+        && refused(s, request.player, key).is_some_and(|r| answer_hash(&Canon::new(s), answer) == r)
 }
 
 /// Whether giving `answer` to a question of `kind` is choosing to act (CR 732.3): anything but passing, declining, or
@@ -234,28 +232,39 @@ pub fn answering(s: &GameState, id: u32, request: &Request, answer: &Answer) -> 
     Some((key, answer_hash(&canon, answer), acts(&request.kind, answer)))
 }
 
-/// The answer noted by `answering` is given, by `player`: it is kept with its question, a player who chose to act is
-/// counted (`LoopWatch::acts`), and a player who had to choose otherwise and has (CR 732.3) no longer must.
+/// The answer noted by `answering` is given, by `player` (see `note`).
 pub fn answered(s: &mut GameState, player: PlayerId, (key, answer, acted): (u64, u64, bool)) {
-    let at = entry(s, key);
-    note(s, at, player, answer, acted);
+    note(s, LoopAnswer { player: player.0, key, answer, acted, priority: false });
 }
 
-/// `player` gives `answer` to the kept question at `at` (see `answered`).
-fn note(s: &mut GameState, at: usize, player: PlayerId, answer: u64, acted: bool) {
-    let given = &s.loop_keys[at].given;
-    let differs = !given.is_empty() && !given.contains(&answer);
+/// An answer is given to a kept question: it is kept, in order, a player who chose to act is counted (`LoopWatch::acts`),
+/// and a player made to choose otherwise (CR 732.3) is followed through their round - one who answers as in the last round
+/// goes on to their next answer, one who answers otherwise has made the different choice and no longer must.
+fn note(s: &mut GameState, given: LoopAnswer) {
     let mut watch = s.loop_watch.clone();
-    if differs {
-        watch.designated &= !bit(player);
-    }
-    if acted && let Some(n) = watch.acts.get_mut(player.0 as usize) {
+    if given.acted
+        && let Some(n) = watch.acts.get_mut(given.player as usize)
+    {
         *n = n.saturating_add(1);
+    }
+    if watch.designated == Some(given.player) {
+        if watch.expect.get(watch.next as usize) == Some(&(given.key, given.answer)) {
+            watch.next = watch.next.saturating_add(1);
+        } else {
+            undesignate(&mut watch);
+        }
     }
     if watch != s.loop_watch {
         s.set_loop_watch(watch);
     }
-    s.give_loop_answer(at, answer);
+    s.loop_answer_push(given);
+}
+
+fn undesignate(watch: &mut LoopWatch) {
+    watch.designated = None;
+    watch.expect.clear();
+    watch.next = 0;
+    watch.refuse_at = 0;
 }
 
 /// A question with request id `id` and watch key `key` is now waiting.
@@ -264,14 +273,6 @@ pub fn waiting(s: &mut GameState, id: u32, key: Option<u64>) {
         let watch = LoopWatch { asking: Some((id, key)), ..s.loop_watch.clone() };
         s.set_loop_watch(watch);
     }
-}
-
-fn bit(p: PlayerId) -> u8 {
-    1u8.checked_shl(p.0 as u32).unwrap_or(0)
-}
-
-fn designated(s: &GameState, p: PlayerId) -> bool {
-    s.loop_watch.designated & bit(p) != 0
 }
 
 /// The step the game is in, as the watch names it.
@@ -329,20 +330,18 @@ fn draw(cx: &mut Cx) {
 }
 
 /// `player` is about to be given priority, with `options` besides passing. `None` if the game has just come round a loop
-/// of mandatory actions and is a draw (CR 104.4b): the draw is then made, and nobody is asked anything. Otherwise the
-/// options to offer: all of them, but for what a player who must make a different choice (CR 732.3) did here before.
+/// of mandatory actions and is a draw (CR 104.4b, 732.4-5): the draw is then made, and nobody is asked anything. Otherwise
+/// the options to offer: all of them, but for what a player who must make a different choice (CR 732.3) may not do here.
 pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>) -> Option<Vec<ActionOption>> {
     // The step being watched for loops of choices begins with its first priority.
     let step = step_id(cx.s());
     if cx.s().loop_watch.step != step {
         let watch = LoopWatch {
+            forced: cx.s().loop_watch.forced,
+            seen: cx.s().loop_watch.seen.clone(),
             step,
             step_log: cx.g.log.len() as u32,
-            reads: 0,
-            acts: [0; 8],
-            designated: 0,
-            asking: None,
-            ..cx.s().loop_watch.clone()
+            ..LoopWatch::default()
         };
         cx.st().set_loop_watch(watch);
         cx.st().loop_keys_clear();
@@ -363,28 +362,47 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
     drop(canon);
     let at = entry(cx.st(), key);
     let mut watch = cx.s().loop_watch.clone();
-    // The same position, with nothing asking the history since it was last here: a round of a loop. Two players or more
-    // chose to act in it: a fragmented loop (CR 732.3), which one of them must now stop.
+    // The same position, with nothing asking the history since it was last here: a round of a loop.
     let round = cx.s().loop_keys[at].round;
-    if round.asked && round.reads == watch.reads {
-        let involved = |p: PlayerId| watch.acts.get(p.0 as usize).zip(round.acts.get(p.0 as usize)).is_some_and(|(now, then)| now > then);
+    let answers = cx.s().loop_answers.len() as u32;
+    if round.asked
+        && round.reads == watch.reads
+        && let Some(since) = cx.s().loop_answers.get(round.answers as usize..)
+        && !since.is_empty()
+    {
+        let involved = |p: PlayerId| since.iter().any(|a| a.player == p.0 && a.acted);
         let order: Vec<PlayerId> = cx.s().turn_order_from(cx.s().turn.active).filter(|&p| involved(p)).collect();
+        if since.iter().all(|a| a.priority && !a.acted) {
+            // Every player only passed, the loop's own actions all mandatory: no player can be made to take an action
+            // that would end it but those its objects call for (CR 732.5), so it is a loop of mandatory actions, a draw
+            // (CR 732.4, 104.4b). A round with any other choice in it - a "may" a loop object offers, declined - is not.
+            draw(cx);
+            return None;
+        }
         if order.len() >= 2 {
-            watch.designated |= bit(order[0]);
+            // Two players or more chose to act in it: a fragmented loop (CR 732.3), which one of them must now stop - the
+            // active player, or the first in turn order involved - by choosing otherwise somewhere in their part of it.
+            let p = order[0];
+            let theirs: Vec<&LoopAnswer> = since.iter().filter(|a| a.player == p.0).collect();
+            if let Some(last) = theirs.iter().rposition(|a| a.acted) {
+                watch.designated = Some(p.0);
+                watch.expect = theirs.iter().map(|a| (a.key, a.answer)).collect();
+                watch.next = 0;
+                watch.refuse_at = last as u32;
+            }
         }
     }
-    cx.st().set_loop_round(at, LoopRound { asked: true, reads: watch.reads, acts: watch.acts });
+    cx.st().set_loop_round(at, LoopRound { asked: true, reads: watch.reads, acts: watch.acts, answers });
     if watch != cx.s().loop_watch {
         cx.st().set_loop_watch(watch);
     }
-    if designated(cx.s(), player) {
+    if let Some(refused) = refused(cx.s(), player, key) {
         let canon = Canon::new(cx.s());
-        let given = &cx.s().loop_keys[at].given;
-        options.retain(|o| !given.contains(&option_hash(&canon, o)));
+        options.retain(|o| option_hash(&canon, o) != refused);
     }
     if let Some(answer) = replayed {
         let this = answer_hash(&Canon::new(cx.s()), &answer);
-        note(cx.st(), at, player, this, matches!(answer, Answer::Act(_)));
+        note(cx.st(), LoopAnswer { player: player.0, key, answer: this, acted: matches!(answer, Answer::Act(_)), priority: true });
     }
     Some(options)
 }
@@ -757,7 +775,7 @@ mod tests {
             flicker(&mut game);
             // Somebody chooses between two players each time round: never a draw.
             let two = RequestKind::ChoosePlayer { source: ObjectId(0), candidates: vec![PlayerId(0), PlayerId(1)], verb: "", amount: 0 };
-            let _ = asked(&mut cx(&mut game), PlayerId(0), two, true, None);
+            let _ = asked(&mut cx(&mut game), PlayerId(0), two, false);
             for p in [PlayerId(0), PlayerId(1)] {
                 game.state.update_turn(|t| t.priority = p);
                 drawn |= at_priority(&mut cx(&mut game), p, Vec::new()).is_none();
@@ -879,38 +897,122 @@ mod tests {
         game
     }
 
-    /// A kept question of a player's choice between two players (each `cursor` its own), answered acting or not.
-    fn choose(game: &mut Game, player: PlayerId, cursor: usize, acting: bool) {
-        let two = RequestKind::ChoosePlayer { source: ObjectId(0), candidates: vec![PlayerId(0), PlayerId(1)], verb: "", amount: 0 };
-        let Asked::Ask { key: Some(key), .. } = asked(&mut Cx { cursor, ..cx(game) }, player, two, true, None) else { panic!("kept") };
-        let answer = answer_hash(&Canon::new(&game.state), &Answer::Player(PlayerId(1)));
+    fn two() -> RequestKind {
+        RequestKind::ChoosePlayer { source: ObjectId(0), candidates: vec![PlayerId(0), PlayerId(1)], verb: "", amount: 0 }
+    }
+
+    /// A kept question of a player's choice between two players (each `cursor` its own), answered `answer`, acting or not.
+    fn choose_as(game: &mut Game, player: PlayerId, cursor: usize, answer: PlayerId, acting: bool) -> u64 {
+        let (_, Some(key)) = asked(&mut Cx { cursor, ..cx(game) }, player, two(), false) else { panic!("kept") };
+        let answer = answer_hash(&Canon::new(&game.state), &Answer::Player(answer));
         answered(&mut game.state, player, (key, answer, acting));
+        key
+    }
+
+    fn choose(game: &mut Game, player: PlayerId, cursor: usize, acting: bool) -> u64 {
+        choose_as(game, player, cursor, PlayerId(1), acting)
+    }
+
+    /// A "may" of `player`'s kept (each `cursor` its own) and waiting as request 7: whether taking it is refused.
+    fn may_waiting(game: &mut Game, player: PlayerId, cursor: usize) -> (Request, bool) {
+        let source = game.state.battlefield()[0];
+        let may = RequestKind::May { source, purpose: Purpose::Optional };
+        let (_, Some(key)) = asked(&mut Cx { cursor, ..cx(game) }, player, may.clone(), false) else { panic!("kept") };
+        waiting(&mut game.state, 7, Some(key));
+        let request = Request { id: 7, player, kind: may, may_cancel: false };
+        let refused = refuses(&game.state, 7, &request, &Answer::Yes);
+        (request, refused)
+    }
+
+    /// The waiting "may" `request` is answered `answer`.
+    fn answer_may(game: &mut Game, request: &Request, answer: Answer) {
+        let watched = answering(&game.state, 7, request, &answer).expect("kept");
+        answered(&mut game.state, request.player, watched);
     }
 
     /// CR 732.3: a priority asked again in the same position is a round of a loop. With only the active player choosing to
-    /// act in it, it goes on; once both players have, it is a fragmented loop, and the active player must choose otherwise.
+    /// act in it, it goes on; once both players have, it is a fragmented loop, and the active player must choose otherwise:
+    /// at their last action of the round, what they chose then is not offered, and choosing anything else ends it.
     #[test]
     fn a_loop_two_players_act_in_makes_the_active_player_choose_otherwise() {
         let mut game = busy_game();
         assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
         choose(&mut game, PlayerId(0), 1, true);
         assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
-        assert_eq!(game.state.loop_watch.designated, 0, "one player kept the loop going");
+        assert_eq!(game.state.loop_watch.designated, None, "one player kept the loop going");
         choose(&mut game, PlayerId(1), 2, false);
         assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
-        assert_eq!(game.state.loop_watch.designated, 0, "declining is no action");
+        assert_eq!(game.state.loop_watch.designated, None, "declining is no action, and no draw");
         choose(&mut game, PlayerId(1), 2, true);
         choose(&mut game, PlayerId(0), 1, true);
         assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
-        assert_eq!(game.state.loop_watch.designated, 1, "the active player");
+        assert_eq!(game.state.loop_watch.designated, Some(0), "the active player");
         assert_eq!(game.state.outcome, Outcome::InProgress, "never a draw");
-        // Asked the choice they made before, they are offered the other player alone; choosing it, they chose otherwise.
-        let two = RequestKind::ChoosePlayer { source: ObjectId(0), candidates: vec![PlayerId(0), PlayerId(1)], verb: "", amount: 0 };
-        let other = answer_hash(&Canon::new(&game.state), &Answer::Player(PlayerId(0)));
-        let Asked::Ask { kind, key: Some(key) } = asked(&mut Cx { cursor: 1, ..cx(&mut game) }, PlayerId(0), two, true, None) else { panic!("kept") };
+        let (kind, _) = asked(&mut Cx { cursor: 1, ..cx(&mut game) }, PlayerId(0), two(), false);
         assert!(matches!(kind, RequestKind::ChoosePlayer { candidates, .. } if candidates == vec![PlayerId(0)]));
-        answered(&mut game.state, PlayerId(0), (key, other, true));
-        assert_eq!(game.state.loop_watch.designated, 0, "a different choice ends it");
+        choose_as(&mut game, PlayerId(0), 1, PlayerId(0), true);
+        assert_eq!(game.state.loop_watch.designated, None, "a different choice ends it");
+    }
+
+    /// CR 732.3: the player made to choose otherwise chooses where. Their round was a "may" taken and then a choice; taking
+    /// the "may" again is never refused, and the choice after it is then the one that must differ.
+    #[test]
+    fn a_player_made_to_choose_otherwise_may_take_the_may_and_differ_later() {
+        let mut game = busy_game();
+        assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
+        {
+            let (request, refused) = may_waiting(&mut game, PlayerId(0), 3);
+            assert!(!refused);
+            answer_may(&mut game, &request, Answer::Yes);
+            choose(&mut game, PlayerId(0), 1, true);
+            choose(&mut game, PlayerId(1), 2, true);
+            assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
+        }
+        assert_eq!(game.state.loop_watch.designated, Some(0));
+        let (request, refused) = may_waiting(&mut game, PlayerId(0), 3);
+        assert!(!refused, "the may is not their last action: taking it again is theirs to choose");
+        answer_may(&mut game, &request, Answer::Yes);
+        assert_eq!(game.state.loop_watch.designated, Some(0));
+        let (kind, _) = asked(&mut Cx { cursor: 1, ..cx(&mut game) }, PlayerId(0), two(), false);
+        assert!(matches!(kind, RequestKind::ChoosePlayer { candidates, .. } if candidates == vec![PlayerId(0)]), "the choice must differ");
+        choose_as(&mut game, PlayerId(0), 1, PlayerId(0), true);
+        assert_eq!(game.state.loop_watch.designated, None);
+    }
+
+    /// CR 732.3: when the "may" is their last action of the round, taking it again there is turned down; declining is not.
+    #[test]
+    fn a_may_that_ends_the_round_as_the_last_did_is_refused() {
+        let mut game = busy_game();
+        assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
+        {
+            choose(&mut game, PlayerId(1), 2, true);
+            let (request, refused) = may_waiting(&mut game, PlayerId(0), 3);
+            assert!(!refused);
+            answer_may(&mut game, &request, Answer::Yes);
+            assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
+        }
+        assert_eq!(game.state.loop_watch.designated, Some(0));
+        choose(&mut game, PlayerId(1), 2, true);
+        let (request, refused) = may_waiting(&mut game, PlayerId(0), 3);
+        assert!(refused);
+        assert!(!refuses(&game.state, 7, &request, &Answer::No));
+    }
+
+    /// CR 732.4-5: the same position at priority again with every player only passing in between - holding an action no
+    /// object of the loop calls for - is a loop of mandatory actions, a draw; with a "may" declined in between it is not.
+    #[test]
+    fn a_loop_its_players_only_pass_in_is_a_draw_but_not_one_with_a_may_declined() {
+        let mut game = busy_game();
+        assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
+        let (request, _) = may_waiting(&mut game, PlayerId(1), 3);
+        answer_may(&mut game, &request, Answer::No);
+        assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some(), "a may declined: no draw");
+        for p in [PlayerId(0), PlayerId(1)] {
+            note(&mut game.state, LoopAnswer { player: p.0, key: 9, answer: 1, acted: false, priority: true });
+        }
+        assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_none());
+        assert_eq!(game.state.outcome, Outcome::Draw);
+        assert!(game.log.iter().any(|r| r.event == Event::GameDrawn { reason: DrawReason::MandatoryLoop }));
     }
 
     /// A history read between two visits of a position makes them different rounds (see the module): no fragmented loop.
@@ -925,6 +1027,6 @@ mod tests {
         let log = game.log.len();
         after_frame(&mut game.state, log);
         assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
-        assert_eq!(game.state.loop_watch.designated, 0);
+        assert_eq!(game.state.loop_watch.designated, None);
     }
 }
