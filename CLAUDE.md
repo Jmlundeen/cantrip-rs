@@ -27,6 +27,14 @@ build (sub-games, stickers), or when it affects only cards banned in every forma
 human allows is written in `docs/rules-exceptions.md`, with its rule, its reason and who decided; those decisions may be
 applied to later cases of the same kind, and nothing outside that file is an exception.
 
+**Scale is the one standing exception.** Where following a rule perfectly is only a question of scale - a count, a
+size, a depth - and the engine stops being exact only at a scale beyond any practical game (players perform every
+action by hand) and beyond what any card needs, that case may be left unhandled. Judge the scale by how fast play can
+reach it, not by the number alone: doubling counters or damage each round reaches 2^16 in sixteen manual rounds, so a
+16-bit count is within reach where a 64-bit one is not. Each such limit is an entry in `docs/known-issues.md` marked
+"Won't fix: beyond practical scale", naming the limit, what happens past it, and why play cannot reach it; it is fixed
+when a practical reason appears.
+
 **Bug priority.** Pri-0 is a crash, a hang, a desync or a game that cannot go on. Pri-1 is any rules violation, however
 rare the interaction and whether or not a printed card reaches it today. Both are blockers: one found is fixed before
 any other work is started or landed, and they are never allowed to accumulate. Everything else - the client's display,

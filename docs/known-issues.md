@@ -9,7 +9,9 @@ history keeps it).
 found in review blocks the change that has it. One found in existing code is fixed, or reported to a human at once; it
 appears here only while its fix is under way, marked as such, and is never left to wait for "a card that needs it". A
 path no scenario runs gets a test - a Rust test with test-only cards when no printed card reaches it - rather than an
-entry. The only allowed deviations are the human decisions in `docs/rules-exceptions.md`.
+entry. The only allowed deviations are the human decisions in `docs/rules-exceptions.md`, and limits of scale beyond
+any practical game or card (`CLAUDE.md`, "Scale is the one standing exception"), each listed here as "Won't fix:
+beyond practical scale" with the limit, what happens past it, and why play cannot reach it.
 
 ## Priority
 
