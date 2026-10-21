@@ -333,6 +333,16 @@ static TAPPED_MANA_CREATURE: CardDef = CardDef {
 /// A {G} instant.
 static GREEN_SPELL: CardDef = CardDef { name: "Route Green Spell", cost: ManaCost { symbols: [0, 0, 0, 0, 1, 0], ..ManaCost::ZERO }, ..PROBE_SPELL };
 
+/// "Lands you control have 'Sacrifice [this]: Nothing.'" (Deconstruction Hammer's kind, CR 201.5a): each instance sacrifices
+/// the permanent that gave it.
+static SACRIFICING_GIVER: CardDef = CardDef {
+    name: "Route Sacrificing Giver",
+    types: TypeSet::of(&[CardType::Artifact]),
+    delayed: &[cantrip_api::ability(Cost { sacrifice_granter: true, ..Cost::NONE }, nothing_happens, "Sacrifice Route Sacrificing Giver: Nothing.")],
+    statics: &[static_ability(Layer::Ability, your_lands, grant_first_delayed, "Lands you control have \"Sacrifice Route Sacrificing Giver: Nothing.\"")],
+    ..CardDef::BLANK
+};
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -373,6 +383,7 @@ fn table() -> &'static CardTable {
             &ABILITY_PROBE,
             &ABILITY_FREE,
             &GIVER,
+            &SACRIFICING_GIVER,
             &ENERGY_SOURCE,
             &ENERGY_SPELL,
             &ENERGY_GAIN,
@@ -883,6 +894,35 @@ fn an_ability_another_permanent_gives_is_activated_by_it() {
     let request = game.pending().unwrap().clone();
     game.answer(request.id, request.player, Answer::Act(Action::of(&chosen))).unwrap();
     game.run();
+    let recorded: Vec<Option<ObjectId>> = game
+        .log
+        .iter()
+        .filter_map(|r| match r.event {
+            Event::AbilityActivated { source, by, .. } if source == land => Some(by.some().map(|g| g.object)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(recorded, [Some(second)]);
+}
+
+/// CR 201.5a, 113.2c: "Sacrifice [the card that gives this ability]" in an ability two permanents give is each instance's own
+/// giver. Activating the second instance sacrifices the second giver, the first stays, and the history records the
+/// sacrificed one as what gave it, read before the cost moved it.
+#[test]
+fn an_ability_that_sacrifices_what_gave_it_sacrifices_its_own_giver() {
+    let (mut game, _) = game_with("Route Filler", Zone::hand, 0);
+    let land = put(&mut game, "Route Land", ME);
+    let (first, second) = (put(&mut game, "Route Sacrificing Giver", ME), put(&mut game, "Route Sacrificing Giver", ME));
+    game.state.see_statics();
+    game.run();
+    let options = activations_of(&game, land);
+    assert_eq!(options.iter().map(|o| o.granted_by.map(|g| g.object)).collect::<Vec<_>>(), [Some(first), Some(second)]);
+    let chosen = options[1].clone();
+    let request = game.pending().unwrap().clone();
+    game.answer(request.id, request.player, Answer::Act(Action::of(&chosen))).unwrap();
+    game.run();
+    assert!(game.state.obj(first).zone.is(ZoneKind::Battlefield), "the other giver stays");
+    assert!(!game.state.battlefield().contains(&second), "its own giver is sacrificed");
     let recorded: Vec<Option<ObjectId>> = game
         .log
         .iter()

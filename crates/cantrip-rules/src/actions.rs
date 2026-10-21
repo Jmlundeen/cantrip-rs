@@ -2251,6 +2251,10 @@ fn activated_options(cx: &Cx, player: PlayerId, available: &std::cell::OnceCell<
                 continue;
             }
             let mut option = ActionOption { granted_by: granted_by(cx, id, Some(&chars), index, ability, &givers), ..ActionOption::on(ActionKind::ActivateAbility, id, index as u8) };
+            // "Sacrifice [the card that gives this ability]" (CR 201.5a, 701.21a): only with that permanent the player's.
+            if def.cost.sacrifice_granter && !option.granted_by.is_some_and(|g| cx.s().obj(g.object).controller == player) {
+                continue;
+            }
             let possible = match def.modal {
                 Some(modal) => modes_possible(cx, &asker, modal),
                 None if def.late_targets => slots_satisfiable(cx, &asker, def.targets),
@@ -3905,7 +3909,7 @@ pub fn act(cx: &mut Cx, player: PlayerId) -> R<Flow> {
             } else if def.special_action {
                 special_action(cx, player, source, ability)?;
             } else {
-                activate(cx, player, source, ability, action.index, &action.targets, action.paid_by)?;
+                activate(cx, player, source, ability, action.index, &action.targets, action.granted_by, action.paid_by)?;
             }
         }
         _ => unreachable!("not a priority action"),
@@ -5305,8 +5309,30 @@ fn announce_x(cx: &mut Cx, player: PlayerId, spell: ObjectId, base: ManaCost, ki
 }
 
 /// Activating a non-mana ability (CR 602.2): on the stack, then its costs.
-fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef, index: u8, targets: &[Target], paid_by: Option<Grant>) -> R<()> {
+#[allow(clippy::too_many_arguments)]
+fn activate(
+    cx: &mut Cx,
+    player: PlayerId,
+    source: ObjectId,
+    ability: AbilityRef,
+    index: u8,
+    targets: &[Target],
+    granted: Option<Grant>,
+    paid_by: Option<Grant>,
+) -> R<()> {
     let def = activated(cx, ability).expect("activated");
+    // What gave the source this ability (CR 113.2c, 613.1f): the option names it; read now, before any cost moves it (a cost
+    // may sacrifice the very permanent that gave it).
+    let granted = granted.or_else(|| granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
+    // "Sacrifice [the card that gives this ability]" (CR 201.5a): that permanent, which the payer must control.
+    let granter = if def.cost.sacrifice_granter {
+        match granted.map(|g| g.object).filter(|&g| live(cx.s(), g) && cx.s().obj(g).zone.is(ZoneKind::Battlefield) && cx.s().obj(g).controller == player) {
+            Some(g) => Some(g),
+            None => return Err(Stop::Cancel),
+        }
+    } else {
+        None
+    };
     let mut item = stack_item(StackKind::Activated, source, ability, player, targets);
     let mut mana = def.cost.mana;
     // CR 118.9, 602.2b: a static ability may let the player pay another cost rather than the ability's mana cost: the
@@ -5477,6 +5503,9 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
     if def.cost.sacrifice_self {
         ops::sacrifice(cx, &[source]);
     }
+    if let Some(granter) = granter {
+        ops::sacrifice(cx, &[granter]);
+    }
     if def.cost.return_self {
         ops::move_to_for(cx, source, Zone::hand(cx.s().obj(source).owner), ZoneReason::Other);
     }
@@ -5484,8 +5513,7 @@ fn activate(cx: &mut Cx, player: PlayerId, source: ObjectId, ability: AbilityRef
         assert!(def.cost.exile_self, "craft exiles its source with its materials (CR 702.167a)");
         pay_materials(cx, source, &materials);
     }
-    let by = Grant::of(granted_by(cx, source, None, index as usize, ability, &std::cell::OnceCell::new()));
-    cx.emit(Event::AbilityActivated { source, ability, player, by });
+    cx.emit(Event::AbilityActivated { source, ability, player, by: Grant::of(granted) });
     ops::became_targets(cx, targets.iter().copied(), source, player);
     ops::commit_crime(cx, player, source, &targets);
     Ok(())
@@ -6649,6 +6677,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
         energy,
         tap,
         sacrifice_self,
+        sacrifice_granter,
         discard_self,
         permanents,
         loyalty,
@@ -6678,7 +6707,7 @@ fn only_mana_and_life(cost: &Cost) -> bool {
     } = *cost;
     mana.x == 0
         && energy == 0
-        && !(tap || sacrifice_self || discard_self || remove_any_counter || exile_self || pay_x_life || exert || emerge)
+        && !(tap || sacrifice_self || sacrifice_granter || discard_self || remove_any_counter || exile_self || pay_x_life || exert || emerge)
         && !(tap_permanents || unattach_self || return_self || discard_hand || tap_to_reduce)
         && permanents.is_none()
         && loyalty.is_none()

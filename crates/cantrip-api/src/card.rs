@@ -480,6 +480,11 @@ pub struct Cost {
     /// {T} (CR 107.5).
     pub tap: bool,
     pub sacrifice_self: bool,
+    /// "Sacrifice [the card that gives this ability]" in an ability another permanent gives (CR 201.5a: the name means that
+    /// object, not any of that name): Deconstruction Hammer's "{3}, {T}, Sacrifice Deconstruction Hammer", which the Hammer
+    /// gives the equipped creature. Paid by sacrificing the permanent the activation names as what gave the ability
+    /// (`ActionOption::granted_by`), which the payer must control (CR 701.21a); an ability no permanent gave can't pay it.
+    pub sacrifice_granter: bool,
     /// Discard this card (cycling, CR 702.29a).
     pub discard_self: bool,
     /// Choose this many permanents you control that pass the filter, and sacrifice them, return them to their owners'
@@ -659,6 +664,7 @@ impl Cost {
             mana,
             tap,
             sacrifice_self,
+            sacrifice_granter,
             discard_self,
             permanents,
             loyalty,
@@ -690,6 +696,7 @@ impl Cost {
         } = *self;
         tap && mana.is_zero() && mana.x == 0
             && !sacrifice_self
+            && !sacrifice_granter
             && !discard_self
             && permanents.is_none()
             && loyalty.is_none()
@@ -771,6 +778,7 @@ impl Cost {
         c.mana.x += other.mana.x;
         c.tap |= other.tap;
         c.sacrifice_self |= other.sacrifice_self;
+        c.sacrifice_granter |= other.sacrifice_granter;
         c.discard_self |= other.discard_self;
         c.exile_self |= other.exile_self;
         c.pay_x_life |= other.pay_x_life;
@@ -852,6 +860,7 @@ impl Cost {
             mana: ManaCost::ZERO,
             tap: false,
             sacrifice_self: false,
+            sacrifice_granter: false,
             discard_self: false,
             permanents: None,
             loyalty: None,

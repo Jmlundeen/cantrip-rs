@@ -1,0 +1,58 @@
+# Two Deconstruction Hammers on the Ornithopter give it two instances of "{3}, {T}, Sacrifice Deconstruction Hammer:
+# Destroy target artifact or enchantment" (CR 113.2c). In each, "Deconstruction Hammer" means the Hammer that gave it (CR
+# 201.5a), so activating one sacrifices that Hammer with no choice of which to sacrifice; the other stays attached, and the
+# Ornithopter is a 1/3 with one instance left.
+
+[Bot1 Deck]
+Plains
+Mox Pearl
+Mox Jet
+Mox Ruby
+Sol Ring
+Ornithopter
+Deconstruction Hammer
+Deconstruction Hammer
+Island x12
+
+[Bot2 Deck]
+Mox Sapphire
+Island x20
+
+[Actions]
+Bot1.Hand.Plains.Play
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Sol Ring.Cast
+Bot1.Pass
+Bot1.Hand.Ornithopter.Cast
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+[T2 Bot2.Main1]
+Bot2.Hand.Mox Sapphire.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Deconstruction Hammer.Cast
+Bot1.Pass
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Deconstruction Hammer#1.Activate(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Deconstruction Hammer#2.Activate(Ornithopter)
+Bot1.Pass
+Bot1.Battlefield.Sol Ring.Activate
+? Bot1.Battlefield.Ornithopter.Power = 2
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Ornithopter.Activate(Bot2.Battlefield.Mox Sapphire; Ability: #2)
+! Bot1.Choose
+Bot1.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Mox Sapphire
+Bot1.Graveyard = Deconstruction Hammer
+Bot1.Battlefield.Deconstruction Hammer.AttachedTo = Ornithopter
+Bot1.Battlefield.Ornithopter.Power = 1
