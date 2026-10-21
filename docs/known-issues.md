@@ -54,7 +54,6 @@ own judgement is pri-3: the engine is right, and the bot only plays less well.
 | [KI-104](#ki-104-counters-power-toughness-and-damage-are-narrower-than-play-reaches) | Counters, power, toughness and damage are narrower than play reaches | Pri-1 | Fix queued |
 | [KI-105](#ki-105-an-objects-abilities-text-changes-and-chosen-modes-are-held-in-fixed-lists) | An object's abilities, text changes and chosen modes are held in fixed lists | Pri-1 | Fix queued |
 | [KI-107](#ki-107-a-layer-1-copy-static-ability-is-not-counted-among-what-could-give-a-look-back-ability) | A layer-1 copy static ability is not counted among what could give a look-back ability | Pri-1 | Fix queued |
-| [KI-111](#ki-111-a-rooms-unlock-is-an-ability-and-its-doors-name-overwrite-a-copys-exceptions) | A Room's unlock is an ability, and its doors' name overwrite a copy's exceptions | Pri-1 | Fix queued |
 | [KI-112](#ki-112-a-creature-cast-with-suspend-does-not-gain-haste) | A creature cast with suspend does not gain haste | Pri-1 | Fix queued |
 | [KI-115](#ki-115-a-fuse-card-cannot-be-cast-fused-while-a-spell-or-ability-resolves) | A fuse card cannot be cast fused while a spell or ability resolves | Pri-1 | Fix queued |
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
@@ -316,21 +315,6 @@ a creature.
 - The bands of `AbilityRef::index` are guarded only by `debug_assert`.
 A fix gives each a capacity past practical play, handled gracefully at its bound; a check of every card's lists at table
 construction for the bands; and the modes kept as the chosen indices in order.
-
-**Scenarios.** None yet.
-
-### KI-111: A Room's unlock is an ability, and its doors' name overwrite a copy's exceptions
-
-| Priority | Status | Area | Found |
-| --- | --- | --- | --- |
-| Pri-1 | Fix queued | engine | 2026-10-21, moved from `docs/engine-design.md`'s known gaps |
-
-**Notes.**
-- The unlock special action is an intrinsic ability entry per locked door (`intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, given
-  by `layers::doors`), so an effect that removes abilities (Humility) removes it, though CR 709.5e says unlocking a door
-  is a special action, not an ability.
-- A copy effect's "except its name is X" is overwritten by `layers::doors`, which names a Room by its unlocked doors.
-- `resolve_copy_as_token` drops the copy exceptions of a Room spell's copy.
 
 **Scenarios.** None yet.
 

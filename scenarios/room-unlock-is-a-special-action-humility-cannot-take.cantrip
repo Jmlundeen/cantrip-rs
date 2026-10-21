@@ -1,0 +1,74 @@
+# Unlocking a Room's door is a special action (CR 709.5e, 116.2), not an ability of the Room, so an effect that takes all
+# abilities cannot take it. Opalescence makes Unholy Annex a creature, and Humility takes all its abilities: Annex's end
+# step ability is gone (no card drawn and no life lost at the end of turns 5 and 7), yet the right door is still offered
+# and unlocked for its {3}{B}{B}. The Room has no abilities once it is unlocked either, so Ritual Chamber's "when you
+# unlock this door" does not trigger (CR 603.2): no Demon. Under Humility the Room is a 1/1, its name both doors' and its
+# mana value 8 (CR 709.5, 709.4b).
+
+[Bot1 Deck]
+Black Lotus
+Mox Pearl
+Mox Jet
+Mox Jet
+Opalescence
+Humility
+Unholy Annex // Ritual Chamber
+Plains
+Swamp
+Swamp
+Swamp x15
+
+[Bot2 Deck]
+Plains x20
+
+[Actions]
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Mox Jet.Cast
+Bot1.Pass
+Bot1.Hand.Black Lotus.Cast
+Bot1.Pass
+Bot1.Battlefield.Black Lotus.Activate(Color: White)
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Opalescence.Cast
+Bot1.Pass
+[T3 Bot1.Main1]
+Bot1.Hand.Plains.Play
+Bot1.Battlefield.Plains.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Humility.Cast
+Bot1.Pass
+[T5 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Hand.Unholy Annex // Ritual Chamber.Cast(Ability: Unholy Annex)
+Bot1.Pass
+[T5 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex.Types = Enchantment; Creature
+? Bot1.Battlefield.Unholy Annex.Power = 1
+[T7 Bot1.Main1]
+Bot1.Hand.Swamp.Play
+Bot1.Battlefield.Unholy Annex.Activate(Ability: right door)
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Swamp.Activate
+Bot1.Battlefield.Plains.Activate
+? Stack.Count = 0
+[T7 Bot1.Main2]
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.Doors = Unholy Annex; Ritual Chamber
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.ManaValue = 8
+? Bot1.Battlefield.Unholy Annex // Ritual Chamber.Power = 1
+[T8 Bot2.Upkeep]
+
+[Expect]
+Bot1.Battlefield = Humility; Mox Jet; Mox Jet; Mox Pearl; Opalescence; Plains; Swamp; Swamp; Unholy Annex // Ritual Chamber
+Bot1.Life = 20
+Bot1.Hand.Count = 0
+Bot2.Life = 20

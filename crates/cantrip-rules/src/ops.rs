@@ -1759,9 +1759,14 @@ pub fn resolve_copy_as_token(cx: &mut Cx, item: &StackItem, at: usize) -> R<()> 
     cx.st().stack_remove(at);
     cease_to_exist(cx, Zone::STACK, item.object);
     // A copy of a Room spell keeps the choice of door and the characteristics of both (CR 709.5b); the token it becomes is a
-    // Room that enters with that door unlocked (CR 709.5d, 707.10f).
+    // Room that enters with that door unlocked (CR 709.5d, 707.10f). Its copiable values are the whole card's, with the
+    // exceptions the spell's had (CR 707.9b, 707.10): the door it was cast as is only the face it was on the stack.
     let door = if cx.cards().get(spell.card).is_room() { cast_door(spell.cast_way) } else { 0 };
-    let values = if door != 0 { Copiable::of(spell.card) } else { spell.copy.unwrap_or_else(|| Copiable::of(spell.card)) };
+    let values = match spell.copy {
+        Some(copy) if door != 0 => Copiable { card: spell.card, ..copy },
+        Some(copy) => copy,
+        None => Copiable::of(spell.card),
+    };
     let words = if values.has_exceptions() { Words::NONE } else { cantrip_api::words(cx.s(), item.object) };
     let copy = if values.has_exceptions() { Some(values) } else { None };
     // A copy keeps the alternative cost paid for the original (CR 707.10): a copy of a spell cast for sneak becomes a token

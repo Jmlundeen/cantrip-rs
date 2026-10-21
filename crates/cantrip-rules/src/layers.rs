@@ -397,7 +397,7 @@ impl ObjCtx<'_> {
         };
         chars.spell = self.spell;
         if self.room {
-            doors(cards, self.card, self.obj.marks.doors, self.copy.is_some_and(|c| c.colors.is_some()), &mut chars);
+            doors(cards, self.card, self.obj.marks.doors, self.copy, &mut chars);
         }
         chars
     }
@@ -659,11 +659,14 @@ fn through(cx: &Ctx, o: &ObjCtx, li: usize, snap: &mut Snap, watch: bool) {
         let stage = Stage { li, entries: &plan.entries, order: &plan.order, len: plan.order.len(), extra: None, keep: true };
         apply_steps(cx, o, &stage, 0, snap, watch);
     }
-    // CR 702.147a, 116.2b: what the rules give an object for what layer 6 left it.
+    // CR 702.147a, 116.2b, 709.5e: what the rules give an object for what layer 6 left it.
     if LAYERS[li] == Layer::Ability {
         intrinsic_keyword_abilities(cx.cards, &mut snap.chars);
         if o.obj.face_down && !o.obj.face_down_card() {
             turn_face_up_action(cx.cards, o.obj, &mut snap.chars);
+        }
+        if o.room {
+            unlock_actions(cx.cards, o.obj.marks.doors, &mut snap.chars);
         }
     }
 }
@@ -1083,20 +1086,24 @@ fn changeling(chars: &mut Chars) {
 
 /// What a Room's unlocked designations leave of it (CR 709.5): "as long as this permanent doesn't have the 'left half
 /// unlocked' designation, it doesn't have the name, mana cost, or rules text of this object's left half", and the same of
-/// the right. The name is that of the unlocked doors (none, one, or both), its colors those of their mana costs unless a
-/// copy effect says otherwise (CR 707.9b), its abilities the unlocked doors', then any a copy effect added, and last the
-/// unlock special action (CR 709.5e) of each door still locked.
-fn doors(cards: &CardTable, card: CardId, unlocked: u8, colors_stated: bool, chars: &mut Chars) {
+/// the right. The name is that of the unlocked doors (none, one, or both), unless a copy effect's exception says what it
+/// is (CR 707.9b: "except its name is X"), which is no half's name for the rule to take away. Its colors are those of
+/// the unlocked doors' mana costs unless a copy effect says otherwise (CR 707.9b), and its abilities the unlocked doors',
+/// then any a copy effect added. The unlock special action (CR 709.5e) is no ability of it: the rules give it once
+/// layer 6 is done (`unlock_actions`).
+fn doors(cards: &CardTable, card: CardId, unlocked: u8, copy: Option<&Copiable>, chars: &mut Chars) {
     let def = cards.get(card);
     let (left, right) = def.split.expect("a Room has two doors");
     let (left_id, right_id) = cards.halves[card.0 as usize].expect("a Room's doors are in the card table");
-    chars.name = match unlocked & (DOOR_LEFT | DOOR_RIGHT) {
-        0 => "",
-        DOOR_LEFT => left.name,
-        DOOR_RIGHT => right.name,
-        _ => def.name,
-    };
-    if !colors_stated {
+    if copy.is_none_or(|c| c.name.is_none()) {
+        chars.name = match unlocked & (DOOR_LEFT | DOOR_RIGHT) {
+            0 => "",
+            DOOR_LEFT => left.name,
+            DOOR_RIGHT => right.name,
+            _ => def.name,
+        };
+    }
+    if copy.is_none_or(|c| c.colors.is_none()) {
         chars.colors = def.room_cost(unlocked).colors();
     }
     let mut abilities = [None; MAX_ABILITIES];
@@ -1117,12 +1124,23 @@ fn doors(cards: &CardTable, card: CardId, unlocked: u8, colors_stated: bool, cha
     for ability in chars.abilities.into_iter().flatten() {
         push(ability);
     }
+    chars.abilities = abilities;
+}
+
+/// Unlocking a Room's locked door is a special action the rules give its controller (CR 709.5e, 116.2), not an ability
+/// the permanent has, so an effect that takes its abilities (Humility over an Opalescence-animated Room) does not take
+/// it. It is carried as `intrinsic::UNLOCK_LEFT`/`UNLOCK_RIGHT`, one per door still locked, given once layer 6 is done,
+/// as turning a face-down permanent face up is (`turn_face_up_action`).
+fn unlock_actions(cards: &CardTable, unlocked: u8, chars: &mut Chars) {
     for (door, index) in [(DOOR_LEFT, cantrip_api::intrinsic::UNLOCK_LEFT), (DOOR_RIGHT, cantrip_api::intrinsic::UNLOCK_RIGHT)] {
-        if unlocked & door == 0 {
-            push(AbilityRef { card: cards.intrinsic, index });
+        let action = AbilityRef { card: cards.intrinsic, index };
+        if unlocked & door != 0 || chars.abilities.contains(&Some(action)) {
+            continue;
+        }
+        if let Some(slot) = chars.abilities.iter().position(|a| a.is_none()) {
+            chars.abilities[slot] = Some(action);
         }
     }
-    chars.abilities = abilities;
 }
 
 /// A token's name under changed text (CR 612.2a): a token named for its creature type ("Spirit") is named for the type

@@ -48,6 +48,8 @@ mod play_permission_tests;
 #[cfg(test)]
 mod remove_up_to_tests;
 #[cfg(test)]
+mod room_copy_tests;
+#[cfg(test)]
 mod many_static_sources_tests;
 mod replace;
 mod resolve;
