@@ -1525,7 +1525,7 @@ impl Player {
 
     pub fn spend_mana(&mut self, mana: Mana, n: u8) {
         let at = mana as usize;
-        self.pool.0[at] -= n;
+        self.pool.0[at] -= u32::from(n);
         self.lasting.0[at] = self.lasting.0[at].min(self.pool.0[at]);
     }
 }

@@ -30,7 +30,7 @@ fn drain(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "Add an amount of {C} equal to that spell's mana value": the spell's, as it was on the stack (CR 608.2h).
 fn add_mana(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     if let Target::Object(spell) = item.subject {
-        let value = g.mana_value(spell).min(u8::MAX as u32) as u8;
+        let value = g.mana_value(spell);
         if value > 0 {
             g.add_mana(item.controller, Mana::C, value);
         }

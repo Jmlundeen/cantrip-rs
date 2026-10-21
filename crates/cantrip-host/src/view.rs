@@ -574,7 +574,7 @@ impl<'a> Projector<'a> {
             ..Default::default()
         };
         for mana in Mana::ALL {
-            summary.mana[mana as usize] = i32::from(player.pool.get(mana));
+            summary.mana[mana as usize] = count(player.pool.get(mana));
         }
         // Ordinary mana a rule tells apart by the source that produced it (CR 106.3) is a kind of its own, as restricted mana
         // is: that source's, shown apart from the rest and named by it.
@@ -583,13 +583,13 @@ impl<'a> Projector<'a> {
                 for mana in Mana::ALL {
                     let n = e.pool.get(mana);
                     if n > 0 {
-                        summary.mana[mana as usize] -= i32::from(n);
+                        summary.mana[mana as usize] -= count(n);
                         let handle = handles.handle(source);
                         match summary.restricted_mana.iter_mut().find(|r| r.source == handle && r.r#type == Some(mana_view(mana))) {
-                            Some(r) => r.amount += i32::from(n),
+                            Some(r) => r.amount += count(n),
                             None => summary.restricted_mana.push(RestrictedManaView {
                                 r#type: Some(mana_view(mana)),
-                                amount: i32::from(n),
+                                amount: count(n),
                                 source: handle,
                                 ..Default::default()
                             }),
@@ -605,7 +605,7 @@ impl<'a> Projector<'a> {
                     let (filter, effect, spend_subtypes, spend_mana_value) = restriction_view(restriction);
                     summary.restricted_mana.push(RestrictedManaView {
                         r#type: Some(mana_view(mana)),
-                        amount: i32::from(n),
+                        amount: count(n),
                         filter,
                         effect,
                         spend_subtypes,
@@ -1422,6 +1422,11 @@ impl<'a> Projector<'a> {
         }
         view
     }
+}
+
+/// A count of mana in a pool, which has no limit (CR 106.4), as the protocol's `int`: past `i32::MAX` it shows that.
+fn count(n: u32) -> i32 {
+    i32::try_from(n).unwrap_or(i32::MAX)
 }
 
 #[cfg(test)]

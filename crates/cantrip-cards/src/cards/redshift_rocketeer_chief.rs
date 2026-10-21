@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 /// 106.6): the power as the ability resolves, at once (CR 605.3b); none for a power of 0 or less. The color is always
 /// named, the ability offering all five.
 fn power_in_mana(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Result<(), Suspend> {
-    let power = g.chars(asker.source).power.unwrap_or(0).clamp(0, 255) as u8;
+    let power = g.chars(asker.source).power.unwrap_or(0).max(0) as u32;
     g.add_restricted_mana(asker.controller, color.unwrap_or(Color::White).mana(), power, ManaRestriction::ABILITIES);
     Ok(())
 }

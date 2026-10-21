@@ -14,7 +14,7 @@ fn harvest(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     }
     let sacrificed = g.sacrifice(&chosen).len();
     if sacrificed > 0 {
-        g.add_mana(you, Color::Black.mana(), (2 * sacrificed).min(255) as u8);
+        g.add_mana(you, Color::Black.mana(), 2 * sacrificed as u32);
     }
     Ok(())
 }

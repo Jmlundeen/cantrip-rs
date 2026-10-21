@@ -501,15 +501,15 @@ impl GameState {
     /// Adds `n` mana of one kind that `source` produced (CR 106.3) to `player`'s pool (CR 106.4): mana `restriction` limits,
     /// if it has one (CR 106.6), kept apart; mana that lasts until end of combat if `lasting` (CR 500.5a), which no
     /// restricted mana does.
-    pub fn add_mana(&mut self, player: PlayerId, mana: Mana, n: u8, source: ObjectId, restriction: Option<ManaRestriction>, lasting: bool) {
+    pub fn add_mana(&mut self, player: PlayerId, mana: Mana, n: u32, source: ObjectId, restriction: Option<ManaRestriction>, lasting: bool) {
         let m = mana as usize;
-        // A pool holds at most `u8::MAX` of each kind (of each restriction): what more there would be is not added, so that
-        // the count never wraps round and the sources' entries still add up to it (`docs/known-issues.md`, KI-62).
+        // A pool has no limit (CR 106.4); its counts are `u32`, past any number of rounds a loop is let run, and saturate
+        // rather than wrap so that the sources' entries still add up to them.
         let held = match restriction {
             Some(r) => self.restricted_mana.iter().find(|e| e.player == player && e.restriction == r).map_or(0, |e| e.pool.0[m]),
             None => self.player(player).pool.0[m],
         };
-        let n = n.min(u8::MAX - held);
+        let n = n.min(u32::MAX - held);
         if n == 0 {
             return;
         }
@@ -557,11 +557,11 @@ impl GameState {
             while left > 0 && at < self.mana_from.len() {
                 let e = self.mana_from[at];
                 if e.player == player && e.restriction == restriction && e.lasting == lasting && e.pool.0[m] > 0 && pick.takes(e.source) {
-                    let take = e.pool.0[m].min(left);
+                    let take = e.pool.0[m].min(u32::from(left)) as u8;
                     left -= take;
                     taken.push((e.source, mana, take));
                     let mut after = e;
-                    after.pool.0[m] -= take;
+                    after.pool.0[m] -= u32::from(take);
                     if after.pool.is_empty() {
                         self.mana_from.remove(at);
                         self.log(Undo::ManaFromRemoved(at as u16, e));
@@ -582,10 +582,10 @@ impl GameState {
                 self.spend_restricted_mana(player, r, mana, spent);
             }
             None => {
-                let lasting: u8 =
+                let lasting: u32 =
                     self.mana_from.iter().filter(|e| e.player == player && e.restriction.is_none() && e.lasting).map(|e| e.pool.0[m]).sum();
                 self.update_player(player, |p| {
-                    p.pool.0[m] -= spent;
+                    p.pool.0[m] -= u32::from(spent);
                     p.lasting.0[m] = lasting;
                 });
             }
@@ -611,7 +611,7 @@ impl GameState {
     }
 
     /// Adds `n` mana of one kind under `restriction` to `player`'s pool: the pool alone, without its source (`add_mana`).
-    fn add_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u8) {
+    fn add_restricted_mana(&mut self, player: PlayerId, restriction: ManaRestriction, mana: Mana, n: u32) {
         if n == 0 {
             return;
         }
@@ -633,12 +633,12 @@ impl GameState {
         let Some(at) = self.restricted_mana.iter().position(|r| r.player == player && r.restriction == restriction) else {
             return 0;
         };
-        let take = self.restricted_mana[at].pool.get(mana).min(n);
+        let take = self.restricted_mana[at].pool.get(mana).min(u32::from(n)) as u8;
         if take == 0 {
             return 0;
         }
         let old = self.restricted_mana.clone();
-        self.restricted_mana[at].pool.0[mana as usize] -= take;
+        self.restricted_mana[at].pool.0[mana as usize] -= u32::from(take);
         if self.restricted_mana[at].pool.is_empty() {
             self.restricted_mana.remove(at);
         }
@@ -1269,16 +1269,24 @@ impl GameState {
 mod tests {
     use super::*;
 
-    /// A pool holds at most 255 of a kind (KI-62): mana past that is not added, and the sources' shares still add up to it.
+    /// A pool has no limit (CR 106.4): 300 black mana added one at a time, from 300 sources and from one, is all there,
+    /// the sources' shares adding up to it, and what is spent comes out of both.
     #[test]
-    fn mana_past_what_a_pool_holds_is_not_added() {
+    fn a_pool_holds_more_than_255_of_a_kind() {
         let mut s = GameState::new(2, 1);
         let p = PlayerId(0);
         for i in 0..300u32 {
             s.add_mana(p, Mana::B, 1, ObjectId(i), None, false);
         }
-        assert_eq!(s.player(p).pool.get(Mana::B), u8::MAX);
-        let shares: u32 = s.mana_from_of(p).map(|e| e.pool.get(Mana::B) as u32).sum();
-        assert_eq!(shares, u8::MAX as u32);
+        for _ in 0..300u32 {
+            s.add_mana(p, Mana::B, 1, ObjectId(1000), None, false);
+        }
+        assert_eq!(s.player(p).pool.get(Mana::B), 600);
+        let shares: u32 = s.mana_from_of(p).map(|e| e.pool.get(Mana::B)).sum();
+        assert_eq!(shares, 600);
+        let mut taken = Vec::new();
+        assert_eq!(s.spend_mana(p, None, Mana::B, 200, ManaPick::Any, &mut taken), 200);
+        assert_eq!(s.player(p).pool.get(Mana::B), 400);
+        assert_eq!(s.mana_from_of(p).map(|e| e.pool.get(Mana::B)).sum::<u32>(), 400);
     }
 }

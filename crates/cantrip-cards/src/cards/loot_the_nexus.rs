@@ -14,7 +14,7 @@ fn add_for_each_power(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> 
         }
     }
     if !powers.is_empty() {
-        g.add_mana(asker.controller, color.unwrap_or(Color::White).mana(), powers.len() as u8);
+        g.add_mana(asker.controller, color.unwrap_or(Color::White).mana(), powers.len() as u32);
     }
     Ok(())
 }

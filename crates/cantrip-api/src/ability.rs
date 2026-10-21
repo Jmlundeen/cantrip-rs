@@ -377,14 +377,14 @@ pub const fn add(mana: Mana) -> Adds {
 
 /// "Add {C}{C}." is `add_n(Mana::C, 2)`.
 pub const fn add_n(mana: Mana, n: u8) -> Adds {
-    let mut pool = [0u8; 6];
-    pool[mana as usize] = n;
+    let mut pool = [0u32; 6];
+    pool[mana as usize] = n as u32;
     Adds { pool: ManaPool(pool), ..Adds::NOTHING }
 }
 
 /// "Add {W}{U}." is `add_each(&[Mana::W, Mana::U])`.
 pub const fn add_each(mana: &[Mana]) -> Adds {
-    let mut pool = [0u8; 6];
+    let mut pool = [0u32; 6];
     let mut i = 0;
     while i < mana.len() {
         pool[mana[i] as usize] += 1;
@@ -420,7 +420,7 @@ pub const fn add_by(effect: ManaEffect) -> Adds {
 pub fn add_listed(g: &mut dyn Game, controller: PlayerId, def: &ActivatedDef, chosen: Option<Mana>) {
     let mut pool = def.adds;
     if let Some(m) = chosen {
-        pool.0[m as usize] += def.adds_any;
+        pool.0[m as usize] += def.adds_any as u32;
     }
     for m in Mana::ALL {
         let n = pool.get(m);

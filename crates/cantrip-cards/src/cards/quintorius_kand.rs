@@ -40,7 +40,7 @@ fn discover_four(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 fn exile_and_play(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let cards: Vec<ObjectId> = (0..item.target_count as usize).filter_map(|slot| targets::object(g, item, slot)).collect();
     let exiled: Vec<ObjectId> = g.exile_all(&cards).into_iter().filter(|&c| g.obj(c).zone.is(ZoneKind::Exile)).collect();
-    g.add_mana(item.controller, Mana::R, exiled.len() as u8);
+    g.add_mana(item.controller, Mana::R, exiled.len() as u32);
     for card in exiled {
         g.allow_play(card, item.controller, PlayGrant { lands: true, expiry: Expiry::EndOfTurn, ..PlayGrant::CAST });
     }

@@ -222,15 +222,15 @@ impl Mana {
 
 /// Mana in a pool, by kind.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
-pub struct ManaPool(pub [u8; 6]);
+pub struct ManaPool(pub [u32; 6]);
 
 impl ManaPool {
-    pub fn get(&self, mana: Mana) -> u8 {
+    pub fn get(&self, mana: Mana) -> u32 {
         self.0[mana as usize]
     }
 
     pub fn total(&self) -> u32 {
-        self.0.iter().map(|&n| n as u32).sum()
+        self.0.iter().sum()
     }
 
     pub fn is_empty(&self) -> bool {

@@ -13,7 +13,7 @@ fn attacks(_: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
 }
 
 fn firebend<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    g.add_mana_until_end_of_combat(item.controller, Mana::R, N);
+    g.add_mana_until_end_of_combat(item.controller, Mana::R, u32::from(N));
     Ok(())
 }
 

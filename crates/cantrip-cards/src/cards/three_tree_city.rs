@@ -23,7 +23,7 @@ fn add_for_chosen_type(g: &mut dyn Game, asker: &Asker, color: Option<Color>) ->
         })
         .count();
     if count > 0 {
-        g.add_mana(asker.controller, color.unwrap_or(Color::White).mana(), count as u8);
+        g.add_mana(asker.controller, color.unwrap_or(Color::White).mana(), count as u32);
     }
     Ok(())
 }

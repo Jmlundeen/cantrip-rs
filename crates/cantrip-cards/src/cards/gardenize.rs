@@ -11,7 +11,7 @@ fn add_charge(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
 /// "At the beginning of your first main phase, add {G} for each charge counter on this enchantment" (CR 106.4).
 fn add_green(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     let n = g.obj(item.object).counters(CounterKind::Charge);
-    g.add_mana(item.controller, Mana::G, n.max(0) as u8);
+    g.add_mana(item.controller, Mana::G, n.max(0) as u32);
     Ok(())
 }
 

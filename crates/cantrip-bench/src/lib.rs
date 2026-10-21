@@ -76,10 +76,10 @@ fn affordable(game: &Game, player: PlayerId, options: &[ActionOption], cost: &Ma
         }
     }
     for mana in Mana::ALL {
-        let need = cost.symbols[mana as usize];
+        let need = u32::from(cost.symbols[mana as usize]);
         let take = need.min(have[mana as usize]);
         have[mana as usize] -= take;
-        let short = (need - take) as u32;
+        let short = need - take;
         if short > any {
             return false;
         }

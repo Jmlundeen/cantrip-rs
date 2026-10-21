@@ -1233,7 +1233,7 @@ impl cantrip_api::Game for Cx<'_> {
         ops::change_life(self, player, total - life);
     }
 
-    fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u8) {
+    fn add_mana(&mut self, player: PlayerId, mana: Mana, amount: u32) {
         let source = self.mana_source();
         self.g.state.add_mana(player, mana, amount, source, None, false);
     }
@@ -1251,12 +1251,12 @@ impl cantrip_api::Game for Cx<'_> {
         self.record(Event::Done { source, ability, player });
     }
 
-    fn add_mana_until_end_of_combat(&mut self, player: PlayerId, mana: Mana, amount: u8) {
+    fn add_mana_until_end_of_combat(&mut self, player: PlayerId, mana: Mana, amount: u32) {
         let source = self.mana_source();
         self.g.state.add_mana(player, mana, amount, source, None, true);
     }
 
-    fn add_restricted_mana(&mut self, player: PlayerId, mana: Mana, amount: u8, restriction: ManaRestriction) {
+    fn add_restricted_mana(&mut self, player: PlayerId, mana: Mana, amount: u32, restriction: ManaRestriction) {
         let source = self.mana_source();
         self.g.state.add_mana(player, mana, amount, source, Some(restriction), false);
     }

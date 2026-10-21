@@ -1619,7 +1619,7 @@ pub fn can_afford(cx: &Cx, player: PlayerId, source: ObjectId, cost: &ManaCost) 
 
 /// The mana a player has to pay with: the pool and what their mana abilities add, summed once for every cost judged.
 pub struct Available {
-    fixed: [u8; 6],
+    fixed: [u32; 6],
     /// Mana of a type to be chosen, by the mana types it may be (a bit for each `Mana`, W U B R G C): a land with
     /// "{T}: Add {W}" and "{T}: Add {R}" is one mana that is white or red, never blue.
     flex: [u32; 64],
@@ -1635,13 +1635,13 @@ pub struct Available {
     /// Restricted mana the pool and the mana sources hold, one entry per restriction (CR 106.6): its mana of stated kinds,
     /// and its mana of any one color a mana ability adds (Great Hall of the Biblioplex, Delighted Halfling). Each pays
     /// only what `Available::covers_for` says it may. Mana that pays anything (`GainsHaste`) is in `fixed`.
-    restricted: Vec<(ManaRestriction, [u8; 6], u32)>,
+    restricted: Vec<(ManaRestriction, [u32; 6], u32)>,
     /// The player may spend mana as though it were mana of any color for every payment (CR 609.4b: Mycosynth Lattice).
     any_color: bool,
 }
 
 /// Adds restricted mana to the entry of its restriction in `Available::restricted`.
-fn add_available(list: &mut Vec<(ManaRestriction, [u8; 6], u32)>, restriction: ManaRestriction, fixed: [u8; 6], flex: u32) {
+fn add_available(list: &mut Vec<(ManaRestriction, [u32; 6], u32)>, restriction: ManaRestriction, fixed: [u32; 6], flex: u32) {
     let at = match list.iter().position(|(r, ..)| *r == restriction) {
         Some(at) => at,
         None => {
@@ -1663,7 +1663,7 @@ pub fn available(cx: &Cx, player: PlayerId) -> Available {
 /// tapped for mana to pay it (CR 602.2b, 605.3b).
 fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Available {
     let mut fixed = cx.s().player(player).pool.0;
-    let mut restricted: Vec<(ManaRestriction, [u8; 6], u32)> = Vec::new();
+    let mut restricted: Vec<(ManaRestriction, [u32; 6], u32)> = Vec::new();
     for (restriction, pool) in cx.s().restricted_of(player) {
         if restriction == ManaRestriction::GainsHaste {
             // Mana that pays anything is not a limit (CR 106.6): it is spent as ordinary mana is.
@@ -1685,7 +1685,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         {
             let times = (payable_life(cx, player).max(0) as u32 / def.cost.life as u32).min(100);
             for m in 0..6 {
-                fixed[m] = fixed[m].saturating_add((def.adds.0[m] as u32 * times).min(255) as u8);
+                fixed[m] = fixed[m].saturating_add(def.adds.0[m].saturating_mul(times));
             }
         }
     }
@@ -1910,7 +1910,7 @@ impl Available {
         let fixed = self.fixed;
         let flex: u32 = self.flex.iter().sum();
         // What a mana ability costs is paid from what is already there.
-        if flex > 0 && (fixed.iter().map(|&n| n as u32).sum::<u32>()) < self.consume {
+        if flex > 0 && fixed.iter().sum::<u32>() < self.consume {
             return false;
         }
         let mut left = fixed;
@@ -1918,13 +1918,13 @@ impl Available {
         let mut unpaid = [0u32; 64];
         let mut flex_needed: u32 = 0;
         for m in 0..6 {
-            let need = cost.symbols[m];
+            let need = u32::from(cost.symbols[m]);
             let have = left[m];
             let used = need.min(have);
             left[m] -= used;
             if need > used {
-                unpaid[1 << m] += (need - used) as u32;
-                flex_needed += (need - used) as u32;
+                unpaid[1 << m] += need - used;
+                flex_needed += need - used;
             }
         }
         for (a, b) in cost.hybrid.iter().flatten() {
@@ -1992,14 +1992,14 @@ fn any_types(cx: &Cx, id: ObjectId, player: PlayerId, def: &ActivatedDef) -> u8 
 pub fn could_act_with_more_mana(cx: &Cx, player: PlayerId) -> bool {
     let mut more = available(cx, player);
     for n in more.fixed.iter_mut().filter(|n| **n > 0) {
-        *n = u8::MAX;
+        *n = u16::MAX as u32;
     }
     for n in more.flex.iter_mut().filter(|n| **n > 0) {
         *n = u16::MAX as u32;
     }
     for (_, fixed, flex) in more.restricted.iter_mut() {
         for n in fixed.iter_mut().filter(|n| **n > 0) {
-            *n = u8::MAX;
+            *n = u16::MAX as u32;
         }
         if *flex > 0 {
             *flex = u16::MAX as u32;
@@ -5713,9 +5713,9 @@ fn uncovered(pool: &ManaPool, owed: &ManaCost) -> ManaCost {
     let mut out = *owed;
     for mana in Mana::ALL {
         let i = mana as usize;
-        let take = left[i].min(out.symbols[i]);
+        let take = left[i].min(u32::from(out.symbols[i]));
         left[i] -= take;
-        out.symbols[i] -= take;
+        out.symbols[i] -= take as u8;
     }
     for slot in out.hybrid.iter_mut() {
         if let Some((a, b)) = *slot {
@@ -5726,11 +5726,11 @@ fn uncovered(pool: &ManaPool, owed: &ManaCost) -> ManaCost {
         }
     }
     for (i, n) in out.phyrexian.iter_mut().enumerate() {
-        let take = left[i].min(*n);
+        let take = left[i].min(u32::from(*n));
         left[i] -= take;
-        *n -= take;
+        *n -= take as u8;
     }
-    let spare: u32 = left.iter().map(|&n| n as u32).sum();
+    let spare: u32 = left.iter().sum();
     out.generic = out.generic.saturating_sub(spare.min(255) as u8);
     out
 }
@@ -5740,10 +5740,10 @@ fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
     let mut spent = [0u8; 6];
     for mana in Mana::ALL {
         let need = owed.symbols[mana as usize];
-        if left[mana as usize] < need {
+        if left[mana as usize] < u32::from(need) {
             return Ways::None;
         }
-        left[mana as usize] -= need;
+        left[mana as usize] -= u32::from(need);
         spent[mana as usize] += need;
     }
     // A hybrid symbol is paid one way when only one of its colors is in the pool, and is a choice when both are.
@@ -5762,7 +5762,7 @@ fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
         }
     }
     let generic = owed.generic;
-    let spare: u32 = left.iter().map(|&n| n as u32).sum();
+    let spare: u32 = left.iter().sum();
     if spare < generic as u32 {
         return Ways::None;
     }
@@ -5770,7 +5770,7 @@ fn ways(pool: &ManaPool, owed: &ManaCost) -> Ways {
     if generic == 0 || spare == generic as u32 || kinds == 1 {
         let mut g = generic;
         for mana in Mana::ALL {
-            let take = left[mana as usize].min(g);
+            let take = left[mana as usize].min(u32::from(g)) as u8;
             spent[mana as usize] += take;
             g -= take;
         }
@@ -5805,7 +5805,7 @@ fn assign_options(pool: &ManaPool, restricted: &[(ManaRestriction, ManaPool)], t
             if kind != pass || pool.get(mana) == 0 || !pays(owed, mana) {
                 continue;
             }
-            let apart: u8 = told.iter().map(|(_, p)| p.get(mana)).sum();
+            let apart: u32 = told.iter().map(|(_, p)| p.get(mana)).sum();
             if pool.get(mana) > apart {
                 let mut option = ActionOption::simple(ActionKind::AssignMana);
                 option.mana = Some(mana);
@@ -5851,7 +5851,7 @@ fn record_spent(cx: &mut Cx, player: PlayerId, on: ObjectId, cast: bool, taken: 
                 by.len() - 1
             }
         };
-        by[at].1 .0[mana as usize] += n;
+        by[at].1 .0[mana as usize] += u32::from(n);
     }
     for (source, mana) in by {
         cx.record(Event::ManaSpent { player, source, on, cast, mana });
@@ -6206,9 +6206,9 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         {
             let plain = cx.s().player(player).pool;
             let split = Mana::ALL.iter().any(|&m| {
-                let apart: u8 = told_mana.iter().map(|(_, p)| p.get(m)).sum();
+                let apart: u32 = told_mana.iter().map(|(_, p)| p.get(m)).sum();
                 let groups = told_mana.iter().filter(|(_, p)| p.get(m) > 0).count() + usize::from(plain.get(m) > apart);
-                groups > 1 && spent[m as usize] > 0 && spent[m as usize] < pool.get(m)
+                groups > 1 && spent[m as usize] > 0 && u32::from(spent[m as usize]) < pool.get(m)
             });
             if split {
                 decided = Ways::Many;
@@ -6218,11 +6218,11 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
             let player_state = cx.s().player(player);
             let restricted = restricted_for(cx, player, source, helpers.purpose);
             let mixed = Mana::ALL.iter().any(|&m| {
-                let held_restricted: u8 = restricted.iter().map(|(_, p)| p.get(m)).sum();
+                let held_restricted: u32 = restricted.iter().map(|(_, p)| p.get(m)).sum();
                 held_restricted > 0
                     && player_state.pool.get(m) > 0
                     && spent[m as usize] > 0
-                    && spent[m as usize] < player_state.pool.get(m) + held_restricted
+                    && u32::from(spent[m as usize]) < player_state.pool.get(m) + held_restricted
             });
             if mixed {
                 decided = Ways::Many;
@@ -6231,7 +6231,7 @@ pub(crate) fn pay_mana_used(cx: &mut Cx, player: PlayerId, source: ObjectId, mut
         let spend_pool = |cx: &mut Cx, paid: &mut ManaPool, used: &mut u8, taken: &mut Vec<(ObjectId, Mana, u8)>, spent: [u8; 6]| {
             *used |= take_mana(cx, player, source, helpers.purpose, &spent, taken);
             for mana in Mana::ALL {
-                paid.0[mana as usize] += spent[mana as usize];
+                paid.0[mana as usize] += u32::from(spent[mana as usize]);
             }
         };
         if let Ways::One(spent) = decided

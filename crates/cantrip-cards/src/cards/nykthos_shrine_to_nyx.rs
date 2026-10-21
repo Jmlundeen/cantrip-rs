@@ -8,7 +8,7 @@ fn add_devotion(g: &mut dyn Game, asker: &Asker, color: Option<Color>) -> Result
     let Some(color) = color else { return Ok(()) };
     let amount = devotion(g, asker.controller, color);
     if amount > 0 {
-        g.add_mana(asker.controller, color.mana(), amount.min(u8::MAX as u32) as u8);
+        g.add_mana(asker.controller, color.mana(), amount);
     }
     Ok(())
 }

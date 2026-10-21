@@ -11,7 +11,7 @@ use cantrip_oracle as oracle;
 fn opus(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     g.add_counters(item.object, CounterKind::PlusOne, 1);
     if spent::five_or_more_mana_spent_on_the_spell(g, item) {
-        let power = g.chars(item.object).power.unwrap_or(0).clamp(0, u8::MAX as i16) as u8;
+        let power = g.chars(item.object).power.unwrap_or(0).max(0) as u32;
         g.add_mana(item.controller, Mana::R, power);
     }
     Ok(())

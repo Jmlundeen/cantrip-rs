@@ -296,7 +296,7 @@ fn begin(game: &mut RulesGame, colorless: u8) {
         t.set_step(Step::PrecombatMain);
         t.began = true;
     });
-    game.state.update_player(ME, |p| p.pool.0[Mana::C as usize] = colorless);
+    game.state.update_player(ME, |p| p.pool.0[Mana::C as usize] = u32::from(colorless));
     game.state.frame_push(Frame::new(FrameKind::Priority));
 }
 

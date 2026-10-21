@@ -6,7 +6,7 @@ use cantrip_oracle as oracle;
 fn add_per_charge_counter(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
     let counters = g.obj(asker.source).counters(CounterKind::Charge);
     if counters > 0 {
-        g.add_mana(asker.controller, Mana::C, counters as u8);
+        g.add_mana(asker.controller, Mana::C, counters as u32);
     }
     Ok(())
 }

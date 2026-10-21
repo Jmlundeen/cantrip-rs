@@ -8,7 +8,7 @@ use cantrip_api::*;
 pub fn add_blue_for_each_artifact(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
     let artifacts = crate::artifacts_you_control(g, asker.controller);
     if artifacts > 0 {
-        g.add_mana(asker.controller, Mana::U, artifacts.min(255) as u8);
+        g.add_mana(asker.controller, Mana::U, artifacts as u32);
     }
     Ok(())
 }
@@ -18,7 +18,7 @@ pub fn add_blue_for_each_artifact(g: &mut dyn Game, asker: &Asker, _: Option<Col
 pub fn add_green_for_each_creature(g: &mut dyn Game, asker: &Asker, _: Option<Color>) -> Result<(), Suspend> {
     let creatures = g.permanents_of(asker.controller).into_iter().filter(|&id| g.chars(id).is(CardType::Creature)).count();
     if creatures > 0 {
-        g.add_mana(asker.controller, Mana::G, creatures.min(255) as u8);
+        g.add_mana(asker.controller, Mana::G, creatures as u32);
     }
     Ok(())
 }
