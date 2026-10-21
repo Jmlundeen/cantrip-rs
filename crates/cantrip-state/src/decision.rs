@@ -159,7 +159,7 @@ pub struct ActionOption {
     pub paid_by: Option<Grant>,
     /// Targets the action is announced with, and who may be chosen for them (CR 601.2c): the candidates of every
     /// target slot together.
-    pub targets_required: u8,
+    pub targets_required: u32,
     pub targets_optional: bool,
     pub target_candidates: Vec<Target>,
     /// A mana ability's colors to choose from, when it adds one mana of any one color (CR 106.5).
@@ -320,7 +320,7 @@ pub enum RequestKind {
     /// chosen together are limited to a total mana value ("any number of target creature cards with total mana value X or
     /// less", `TargetSpec::total_mana_value`), is that limit, its values index for index with `candidates`: the core refuses
     /// a choice whose mana values add up to more.
-    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u8, count: u8, any_number: bool, label: &'static str, slot_player: Option<PlayerId>, total: Option<TotalAtMost> },
+    ChooseTarget { source: ObjectId, purpose: Purpose, candidates: Vec<Target>, optional: bool, least: u32, count: u32, any_number: bool, label: &'static str, slot_player: Option<PlayerId>, total: Option<TotalAtMost> },
     /// One or more of these labelled options (a pile, a mode), by index.
     /// `count` to `at_most` of them when `at_most` is more than `count` (zero `count` is "up to"). `affordable` is
     /// the eligible modes whose own cost the chooser could pay as well, advice for a default; `additional_cost`
@@ -365,7 +365,7 @@ pub enum RequestKind {
     /// The targets of a slot that divides a total among them, and each one's share (CR 601.2d): "distribute two +1/+1
     /// counters among up to two target creatures". At most `max_targets` of `candidates` (any number when 0), each with a
     /// share of at least 1, adding up to `total`; none at all when the slot is `optional`.
-    ChooseDividedTargets { source: ObjectId, candidates: Vec<Target>, total: u16, max_targets: u8, optional: bool },
+    ChooseDividedTargets { source: ObjectId, candidates: Vec<Target>, total: u16, max_targets: u32, optional: bool },
     /// Declare attackers (CR 508.1): any of `eligible`, each at one of `players`; every one of `requirements` must
     /// attack (CR 508.1d).
     /// Who attacks what (CR 508.1): each attacker names a player, a planeswalker a defending player controls, or a battle a defending player protects (`battles`,
@@ -566,8 +566,8 @@ impl DamageDivision {
 /// (`RequestKind::ChooseTarget::total`, its values index for index with the candidates).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct TotalAtMost {
-    pub values: Vec<u16>,
-    pub most: u16,
+    pub values: Vec<u32>,
+    pub most: u32,
 }
 
 impl TotalAtMost {
@@ -576,7 +576,7 @@ impl TotalAtMost {
         chosen
             .iter()
             .filter_map(|c| eligible.iter().position(|e| e == c))
-            .map(|i| u32::from(self.values.get(i).copied().unwrap_or(0)))
+            .map(|i| self.values.get(i).copied().unwrap_or(0))
             .sum()
     }
 

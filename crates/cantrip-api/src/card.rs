@@ -401,8 +401,8 @@ pub struct Asker {
 /// One target slot (CR 115.1).
 #[derive(Clone, Copy)]
 pub struct TargetSpec {
-    pub min: u8,
-    pub max: u8,
+    pub min: u32,
+    pub max: u32,
     pub filter: TargetFilter,
     /// What the slot is for, said to the player choosing it: "Spell or permanent to return to its owner's hand". Empty when the card's one slot says
     /// it all. "{player}" stands for the opponent whose slot it is (`EACH_OPPONENT`).
@@ -410,21 +410,21 @@ pub struct TargetSpec {
     /// "If this spell was kicked, instead choose ..." (CR 702.33a, 601.2b-c): the slot's smallest and largest number of
     /// targets when the spell or the ability's source was kicked, in place of `min` and `max`. The kicker is announced
     /// before the targets are chosen, so the slot is asked once it is known (`TargetSpec::when_kicked`).
-    pub if_kicked: Option<(u8, u8)>,
+    pub if_kicked: Option<(u32, u32)>,
     /// "Any number of target creature cards with total mana value X or less" (CR 601.2c, 603.3d, 202.3): the targets
     /// chosen for the slot together have mana values adding up to at most this, judged as they are chosen (and as they
     /// are chosen anew, CR 115.7). `COUNTED` is the slot's count: the X announced, or what a reflexive ability was given
-    /// (`Game::reflexive_trigger_counted`), so a printed limit of 255 cannot be said. A candidate worth more than the limit
+    /// (`Game::reflexive_trigger_counted`). A candidate worth more than the limit
     /// by itself is no legal target. Once
     /// chosen, each target is checked on its own as the spell or ability resolves (CR 608.2b): one gone leaves the
     /// others. `None` limits nothing.
-    pub total_mana_value: Option<u8>,
+    pub total_mana_value: Option<u32>,
 }
 
 impl TargetSpec {
     /// The most the slot's targets' mana values may add up to (`total_mana_value`), with `counted` read for `COUNTED`.
-    pub fn total_limit(&self, counted: u16) -> Option<u16> {
-        self.total_mana_value.map(|v| if v == TargetSpec::COUNTED { counted } else { u16::from(v) })
+    pub fn total_limit(&self, counted: u32) -> Option<u32> {
+        self.total_mana_value.map(|v| if v == TargetSpec::COUNTED { counted } else { v })
     }
 
     /// The same slot with `label` as what it is for.
@@ -436,16 +436,16 @@ impl TargetSpec {
     /// "X target lands" is `min` and `max` both `COUNTED`, "up to X targets" is `min` 0 and `max` `COUNTED`. For a
     /// reflexive triggered ability given a count (`Game::reflexive_trigger_counted`), it is that count: "up to that
     /// many target creatures" (CR 603.12).
-    pub const COUNTED: u8 = u8::MAX;
+    pub const COUNTED: u32 = u32::MAX;
 
-    /// "Any number of targets" (CR 115.1d): as many as a stack item holds.
-    pub const ANY_NUMBER: u8 = cantrip_state::MAX_TARGETS as u8;
+    /// "Any number of targets" (CR 115.1d): as many as there are legal ones to choose - no stack item holds fewer.
+    pub const ANY_NUMBER: u32 = u32::MAX - 3;
 
     /// A `max` of this is "for each opponent, up to one target ...": the slot stands for one slot of its own for each
     /// opponent of the controller (CR 601.2c, 115.1), at most one target each, in seat order. It is not valid inside a mode (a modal slot reads a `max` above 1 as a range). The slot for an opponent
     /// is asked about `Query::slot_opponent`, and an opponent who has left the game keeps their slot, with nothing to
     /// choose, so the others keep their places (CR 800.4a). Its `min` is 0.
-    pub const EACH_OPPONENT: u8 = u8::MAX - 2;
+    pub const EACH_OPPONENT: u32 = u32::MAX - 2;
 
     /// Whether a legal target must exist to announce at all (CR 601.2c): a counted slot may be of zero.
     pub const fn required(&self) -> bool {
@@ -461,14 +461,14 @@ impl TargetSpec {
         }
     }
 
-    /// Whether the slot is "any number of targets" (CR 115.1d): none at least, and as many as an item holds or more.
+    /// Whether the slot is "any number of targets" (CR 115.1d).
     pub const fn is_any_number(&self) -> bool {
-        self.min == 0 && self.max >= TargetSpec::ANY_NUMBER && self.max != TargetSpec::COUNTED && self.max != TargetSpec::EACH_OPPONENT
+        self.min == 0 && self.max == TargetSpec::ANY_NUMBER
     }
 
     /// The slot's smallest and largest number of targets, with `counted` read for a bound that is `COUNTED`.
-    pub fn bounds(&self, counted: u16) -> (u8, u8) {
-        let of = |v: u8| if v == TargetSpec::COUNTED { counted.min(254) as u8 } else { v };
+    pub fn bounds(&self, counted: u32) -> (u32, u32) {
+        let of = |v: u32| if v == TargetSpec::COUNTED { counted } else { v };
         (of(self.min), of(self.max))
     }
 }
@@ -1293,7 +1293,7 @@ pub struct ExtraCost {
 #[derive(Clone, Copy)]
 pub struct Divide {
     /// The total to divide, or `TargetSpec::COUNTED` for the X announced.
-    pub total: u8,
+    pub total: u32,
     /// The total as a function of the X announced, where it is not `total` itself: "if X is 6 or more, twice X damage
     /// divided instead" (Shatterskull Smashing).
     pub of_x: Option<fn(u16) -> u16>,

@@ -1427,7 +1427,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
             let earlier = if item.target_count > 1 { &targets[..run.start] } else { &[][..] };
             let candidates = crate::actions::target_candidates_given(cx, &asker, &spec, earlier, item.subject, slot_player);
             // "With total mana value X or less" holds of the new targets together (CR 115.7d, 601.2c), X as it was.
-            let (candidates, total) = crate::actions::within_total(cx, &spec, item.x, candidates);
+            let (candidates, total) = crate::actions::within_total(cx, &spec, u32::from(item.x), candidates);
             if candidates.len() <= current.len() && candidates.iter().all(|c| current.contains(c)) {
                 continue;
             }
@@ -1436,8 +1436,8 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
                 purpose: Purpose::Targets,
                 candidates: candidates.clone(),
                 optional: false,
-                least: current.len() as u8,
-                count: current.len() as u8,
+                least: current.len() as u32,
+                count: current.len() as u32,
                 any_number: false,
                 total: total.clone(),
             };
@@ -1464,7 +1464,7 @@ fn retarget(cx: &mut Cx, top: usize, object: ObjectId, asked_about: ObjectId, ch
 /// Whether target `slot` of `item`, its targets being `targets`, changed to `to` keeps the targets of its slot within the slot's total mana value
 /// (`TargetSpec::total_mana_value`, CR 115.7a, 601.2c), the X the item was put on the stack with; true for a slot with none.
 fn fits_total(cx: &Cx, item: &StackItem, targets: &[Target], slot: usize, spec: &TargetSpec, to: Target) -> bool {
-    let Some(most) = spec.total_limit(item.x) else { return true };
+    let Some(most) = spec.total_limit(u32::from(item.x)) else { return true };
     let value = |t: Target| match t {
         Target::Object(id) => cx.mana_value(id),
         _ => 0,
@@ -2445,7 +2445,7 @@ pub fn proliferate(cx: &mut Cx, player: PlayerId, source: ObjectId) -> R<()> {
     let ask = RequestKind::ChooseTarget { label: "", slot_player: None, total: None,
         source,
         purpose: Purpose::Targets,
-        count: candidates.len().min(255) as u8,
+        count: u32::try_from(candidates.len()).expect("candidates are counted in a u32"),
         candidates,
         optional: true,
             least: 0,

@@ -30,7 +30,7 @@ pub struct Cast {
     /// questions about the types of earlier casts ("noncreature spells you've cast this turn") need no state.
     pub types: TypeSet,
     /// Its mana value on the stack (CR 202.3e: X counted).
-    pub value: u8,
+    pub value: u32,
     /// The zone it was cast from (CR 601.2a).
     pub from: ZoneKind,
     /// Which of the card's own options it was cast by (`ActionOption::index`): 0 its mana cost, n its nth printed way, or

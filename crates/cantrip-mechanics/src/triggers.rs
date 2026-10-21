@@ -437,12 +437,10 @@ pub use cantrip_api::intrinsic::ward;
 
 /// Ward's life cost, paid or not (CR 702.21a, 118.12a): the payer may pay `amount` life when they have that much (CR
 /// 119.4), in one payment, and the spell or ability that targeted is countered unless they do.
-fn ward_pay_life(g: &mut dyn Game, item: &StackItem, amount: i32) -> Result<(), Suspend> {
+fn ward_pay_life(g: &mut dyn Game, item: &StackItem, life: u16) -> Result<(), Suspend> {
     let Target::Object(by) = item.subject else { return Ok(()) };
     let payer = PlayerId(item.data[0] as u8);
-    // A power is at most i16::MAX, so the whole of it is one cost.
-    let life = u16::try_from(amount.max(0)).unwrap_or(u16::MAX);
-    let paid = g.state().player(payer).life >= amount
+    let paid = g.state().player(payer).life >= i32::from(life)
         && g.may_pay(payer, item.object, by, Cost { life, ..Cost::NONE }, &crate::COUNTERED_UNLESS_PAID)?;
     if !paid {
         g.counter_item(by, item.data[1] as usize);
@@ -451,7 +449,7 @@ fn ward_pay_life(g: &mut dyn Game, item: &StackItem, amount: i32) -> Result<(), 
 }
 
 fn ward_life_effect<const N: u8>(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
-    ward_pay_life(g, item, N as i32)
+    ward_pay_life(g, item, u16::from(N))
 }
 
 /// Ward--Pay N life (CR 702.21a): "Whenever this becomes the target of a spell or ability an opponent controls, counter it
@@ -463,8 +461,9 @@ pub const fn ward_life<const N: u8>(text: &'static str) -> AbilityDef {
 
 fn ward_life_equal_to_power_effect(g: &mut dyn Game, item: &StackItem) -> Result<(), Suspend> {
     // The ward source's power as the ward ability resolves, or as it last was on the battlefield (CR 113.7a, 608.2h).
-    let power = i32::from(g.chars(item.object).power.unwrap_or(0)).max(0);
-    ward_pay_life(g, item, power)
+    // A power below 0 is 0 life (CR 107.1b); any other is a cost of that much life exactly, whatever a power can be.
+    let power = g.chars(item.object).power.unwrap_or(0).max(0);
+    ward_pay_life(g, item, power.unsigned_abs())
 }
 
 /// Ward--Pay life equal to this creature's power (CR 702.21a, 118.12): "Whenever this becomes the target of a spell or

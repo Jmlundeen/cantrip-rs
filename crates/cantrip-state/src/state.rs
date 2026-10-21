@@ -915,7 +915,7 @@ impl GameState {
 
     /// The run of the target arena a stack item with more than `INLINE_TARGETS` targets names.
     fn spilled(item: &StackItem) -> std::ops::Range<usize> {
-        item.spill.start as usize..item.spill.start as usize + item.spill.len as usize
+        item.spill as usize..item.spill as usize + item.target_count as usize
     }
 
     /// A stack item's targets, in the order chosen (CR 601.2c): those it holds, or all of them from the arena.
@@ -961,8 +961,8 @@ impl GameState {
     /// specs and shares are 0. Past `INLINE_TARGETS` targets the lists are put in the target arena, journaled, and the item
     /// names them (the first ones are in the item too).
     pub fn set_item_targets(&mut self, item: &mut StackItem, targets: &[Target], spec_of: &[u8], shares: &[u8]) {
-        let n = targets.len().min(crate::MAX_TARGETS);
-        item.target_count = n as u8;
+        let n = targets.len();
+        item.target_count = u32::try_from(n).expect("a stack item's targets are counted in a u32");
         item.inline_targets = [Target::None; INLINE_TARGETS];
         item.inline_spec_of = [0; INLINE_TARGETS];
         item.inline_shares = [0; INLINE_TARGETS];
@@ -972,14 +972,15 @@ impl GameState {
             item.inline_spec_of[i] = spec_of.get(i).copied().unwrap_or(0);
             item.inline_shares[i] = shares.get(i).copied().unwrap_or(0);
         }
-        item.spill = Span::default();
+        item.spill = 0;
         if n > INLINE_TARGETS {
             let start = self.spill_targets.len();
             self.spill_targets.extend_from_slice(&targets[..n]);
             self.spill_specs.extend((0..n).map(|i| spec_of.get(i).copied().unwrap_or(0)));
             self.spill_shares.extend((0..n).map(|i| shares.get(i).copied().unwrap_or(0)));
-            self.log(Undo::TargetsSpilled(start as u32));
-            item.spill = Span { start: start as u32, len: n as u16 };
+            let start = u32::try_from(start).expect("the target arena is indexed by a u32");
+            self.log(Undo::TargetsSpilled(start));
+            item.spill = start;
         }
     }
 
@@ -1425,7 +1426,7 @@ mod tests {
             serial: 0,
             gift: None,
             inline_shares: [0; INLINE_TARGETS],
-            spill: Span::default(),
+            spill: 0,
             exile_after: false,
             flashback: false,
             since: 0,

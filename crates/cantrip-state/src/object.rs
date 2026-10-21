@@ -531,13 +531,9 @@ impl Target {
 }
 
 /// How many targets a stack item holds in itself; past that, all of them are held in `GameState`'s journaled target arena
-/// (`GameState::spill_targets`), which the item names by a `Span`, so an ordinary item stays small to copy and the rules set
+/// (`GameState::spill_targets`), where the item says they start, so an ordinary item stays small to copy and the rules set
 /// no limit (CR 115.1d: "any number of target ...", Appa; X targets).
 pub const INLINE_TARGETS: usize = 16;
-
-/// The most targets one spell or ability can have: more than any board holds legal targets for, and below the bounds a target
-/// slot reserves for "X", "each opponent" and the like (`TargetSpec`), which are counted in a `u8`.
-pub const MAX_TARGETS: usize = 250;
 
 
 /// What kind of thing is on the stack (CR 405).
@@ -560,7 +556,7 @@ pub struct StackItem {
     /// The first `INLINE_TARGETS` targets: read them through `GameState::targets` (or `target` for one of the first), and write
     /// them through `GameState::set_item_targets`, which keeps the spill of a longer list.
     pub inline_targets: [Target; INLINE_TARGETS],
-    pub target_count: u8,
+    pub target_count: u32,
     /// For each target, parallel to `targets`, the target slot it was chosen for (CR 601.2c): the index of its spec in the
     /// spell's or ability's printed list (a modal item's: in the list of its chosen modes' specs, in printed order, CR
     /// 700.2c). So a slot that takes a variable number of targets ("attach any number of target Equipment you control to
@@ -596,9 +592,9 @@ pub struct StackItem {
     /// For a spell or ability that divides a total among its targets (CR 601.2d): each target's share, parallel to
     /// `targets`.
     pub inline_shares: [u8; INLINE_TARGETS],
-    /// For an item with more than `INLINE_TARGETS` targets, where all of them, their slots and shares are in the game's target
-    /// arena (`GameState::targets`); empty otherwise.
-    pub spill: Span,
+    /// For an item with more than `INLINE_TARGETS` targets, where all `target_count` of them, their slots and shares start in
+    /// the game's target arena (`GameState::targets`); 0 otherwise.
+    pub spill: u32,
     /// For an instant or sorcery spell: if it would be put into a graveyard as it leaves the stack, it is exiled
     /// instead (Bilbo's "cast this way").
     pub exile_after: bool,
@@ -623,13 +619,13 @@ impl StackItem {
     /// Target `slot` among the first `INLINE_TARGETS`, which the item holds itself, or `Target::None` past the targets
     /// announced. A later one is read through `GameState::target`.
     pub fn target(&self, slot: usize) -> Target {
-        assert!(slot < INLINE_TARGETS || self.spill.len == 0, "target {slot} of a stack item is read through the game state");
+        assert!(slot < INLINE_TARGETS || self.holds_its_targets(), "target {slot} of a stack item is read through the game state");
         if slot < self.target_count as usize { self.inline_targets[slot] } else { Target::None }
     }
 
     /// Whether its targets are all in the item itself, so `inline` is the whole list.
     pub fn holds_its_targets(&self) -> bool {
-        self.spill.len == 0
+        self.target_count as usize <= INLINE_TARGETS
     }
 }
 

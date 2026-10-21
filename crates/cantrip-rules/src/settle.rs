@@ -509,7 +509,7 @@ fn choose_trigger_targets(
             // A bound that is the "that many" of a reflexive ability (CR 603.12), or else the number of times the source
             // was kicked, or its X (CR 702.33d, 107.3m).
             let source = cx.s().obj(trigger.source);
-            let counted = trigger.count.unwrap_or(if source.x > 0 { source.x } else { source.kicked as u16 });
+            let counted = u32::from(trigger.count.unwrap_or(if source.x > 0 { source.x } else { source.kicked as u16 }));
             let (candidates, total) = crate::actions::within_total(cx, spec, counted, candidates);
             let (least, most) = spec.bounds(counted);
             if candidates.len() < least as usize {
@@ -528,17 +528,15 @@ fn choose_trigger_targets(
                 targets.push(candidates[0]);
                 break 'slot;
             }
-            if all_of_few && spec.min > 0 && candidates.len() <= spec.max as usize && total.is_none() {
+            if all_of_few && least > 0 && candidates.len() <= most as usize && total.is_none() {
                 targets.extend(candidates);
                 break 'slot;
             }
             if most == 0 {
                 break 'slot;
             }
-            // A stack item holds at most MAX_TARGETS targets, more than any board has legal targets for: a count past what is left
-            // of them is cut to it.
-            let room = cantrip_state::MAX_TARGETS.saturating_sub(targets.len());
-            let count = (most as usize).min(candidates.len()).min(room) as u8;
+            // No more than there are candidates to choose (CR 601.2c: each target is a different object or player).
+            let count = most.min(u32::try_from(candidates.len()).expect("candidates are counted in a u32"));
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source: trigger.source,
                 purpose: Purpose::Targets,
@@ -628,7 +626,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         let total = match divide.of_x {
             Some(of_x) => of_x(x),
             None if divide.total == TargetSpec::COUNTED => x,
-            None => divide.total as u16,
+            None => u16::try_from(divide.total).expect("a printed total to divide fits the shares asked"),
         };
         match crate::actions::ask_divided(cx, trigger.controller, trigger.source, spec, total, false)? {
             crate::actions::Divided::Chosen(chosen, given) => {
@@ -663,7 +661,7 @@ fn put_trigger(cx: &mut Cx, trigger: PendingTrigger) -> R<()> {
         // give its gift after the permanent has left.
         gift: cx.s().obj(trigger.source).gift,
         inline_shares: [0; cantrip_state::INLINE_TARGETS],
-        spill: cantrip_state::Span::default(),
+        spill: 0,
         exile_after: false,
         flashback: false,
         // Put on the stack now, or, a delayed triggered ability, created when its `Delayed` was (CR 701.27f).

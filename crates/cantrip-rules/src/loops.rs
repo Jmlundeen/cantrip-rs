@@ -852,7 +852,7 @@ fn position(s: &GameState, canon: &Canon) -> Position {
         i.inline_targets = [Target::None; cantrip_state::INLINE_TARGETS];
         i.inline_spec_of = [0; cantrip_state::INLINE_TARGETS];
         i.inline_shares = [0; cantrip_state::INLINE_TARGETS];
-        i.spill = cantrip_state::Span::default();
+        i.spill = 0;
         i.subject = Target::None;
         i.members = cantrip_state::Span::default();
         i.serial = 0;

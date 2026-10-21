@@ -74,9 +74,6 @@ fn recorded_spec(state: &GameState, item: &StackItem, specs: &[TargetSpec], slot
 /// target was chosen for (`recorded_spec`), among the item's printed specs or, for a modal item, the specs of its chosen modes
 /// in printed order (CR 700.2c, 601.2c).
 pub(crate) fn slot_spec(cards: &CardTable, state: &GameState, item: &StackItem, slot: usize) -> Option<(TargetSpec, Option<PlayerId>)> {
-    if slot >= cantrip_state::MAX_TARGETS {
-        return None;
-    }
     if let Some(modal) = modal_of(cards, state, item) {
         return recorded_spec(state, item, &crate::actions::mode_specs(modal, item.modes), slot);
     }

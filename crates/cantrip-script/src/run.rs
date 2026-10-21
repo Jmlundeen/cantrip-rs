@@ -1936,7 +1936,7 @@ impl<'s> Run<'s> {
         Ok(Answer::Divided(shares))
     }
 
-    fn choose_target(&self, step: &ActionStep, candidates: &[Target], least: u8, count: u8) -> R<Option<Answer>> {
+    fn choose_target(&self, step: &ActionStep, candidates: &[Target], least: u32, count: u32) -> R<Option<Answer>> {
         let specs: Vec<&str> = step.positional().collect();
         if specs.is_empty() {
             if least > 0 {

@@ -257,7 +257,7 @@ fn option_message(game: &Game, handles: &mut HandleSpace, o: &ActionOption) -> A
             m.spell_name = door.name.to_string();
         }
     }
-    m.targets_required = i32::from(o.targets_required);
+    m.targets_required = wire(o.targets_required);
     m.targets_optional = o.targets_optional;
     m.color_choices = colors_view(o.color_choices);
     m.description = describe(game.cards, &game.state, &game.log, o).to_string();
@@ -839,8 +839,8 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                     _ => 0,
                 },
                 // "With total mana value N or less": each eligible card's mana value, and the most they may add up to.
-                mana_values: total.as_ref().map_or_else(Vec::new, |t| t.values.iter().map(|&v| i32::from(v)).collect()),
-                maximum_total_mana_value: total.as_ref().map(|t| i32::from(t.most)),
+                mana_values: total.as_ref().map_or_else(Vec::new, |t| t.values.iter().map(|&v| wire(v)).collect()),
+                maximum_total_mana_value: total.as_ref().map(|t| wire(t.most)),
                 prevent_left: match purpose {
                     Purpose::PreventDamageFrom(n) => i32::from(*n),
                     _ => 0,
@@ -918,7 +918,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 .iter()
                 .enumerate()
                 .filter_map(|(i, t)| {
-                    let value = total.as_ref().map_or(0, |t| i32::from(t.values.get(i).copied().unwrap_or(0)));
+                    let value = total.as_ref().map_or(0, |t| wire(t.values.get(i).copied().unwrap_or(0)));
                     target_message(handles, *t).map(|m| (m, value))
                 })
                 .collect();
@@ -930,13 +930,13 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 // "With total mana value X or less" (CR 601.2c, 202.3): each candidate's mana value, index for index, and the
                 // most the targets chosen may add up to.
                 mana_values: if total.is_some() { sent.iter().map(|&(_, v)| v).collect() } else { Vec::new() },
-                maximum_total_mana_value: total.as_ref().map(|t| i32::from(t.most)),
+                maximum_total_mana_value: total.as_ref().map(|t| wire(t.most)),
                 candidates: sent.into_iter().map(|(m, _)| m).collect(),
                 optional: *optional,
-                count: i32::from(*count),
+                count: wire(*count),
                 targeted: *purpose == Purpose::Targets,
                 // Only a printed range has a minimum (the wire's zero is "exactly count, or none where optional").
-                minimum: if *least > 0 && least < count { i32::from(*least) } else { 0 },
+                minimum: if *least > 0 && least < count { wire(*least) } else { 0 },
                 any_number: *any_number,
                 for_player: slot_player.map_or(0, seat),
             })
@@ -1097,7 +1097,7 @@ pub fn prompt(game: &Game, request: &Request, handles: &mut HandleSpace) -> Resu
                 text: String::new(),
                 candidates: candidates.iter().filter_map(|t| target_message(handles, *t)).collect(),
                 total: i32::from(*total),
-                max_targets: i32::from(*max_targets),
+                max_targets: wire(*max_targets),
                 optional: *optional,
             })
         }
@@ -1554,4 +1554,9 @@ fn subtype_heading(source: &str, choices: &[Subtype], purpose: WordUse) -> Strin
         WordUse::Replaced => format!("{source}: choose the {kind} to replace"),
         WordUse::Replacing => format!("{source}: choose the {kind} that replaces it"),
     }
+}
+
+/// A count or mana value as the protocol's `int`: exactly, or not at all.
+fn wire(n: u32) -> i32 {
+    i32::try_from(n).expect("a count or mana value past the protocol's int")
 }

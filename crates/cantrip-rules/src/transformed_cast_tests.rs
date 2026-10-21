@@ -127,7 +127,7 @@ fn a_back_face_cast_transformed_is_recorded_with_its_front_faces_mana_value() {
     assert_eq!(crate::actions::cast_transformed_during_resolution(&mut cx(&mut game), card).ok(), Some(true));
     let spell = game.state.stack.last().expect("the spell").object;
     assert_eq!(cantrip_api::Query::mana_value(&game, spell), 4);
-    let recorded: Vec<u8> = game.log.iter().filter_map(|r| match r.event {
+    let recorded: Vec<u32> = game.log.iter().filter_map(|r| match r.event {
         Event::Cast(c) if c.spell == spell => Some(c.value),
         _ => None,
     }).collect();

@@ -57,16 +57,12 @@ pub fn cards_within_total(
     count: u8,
     most: u32,
 ) -> Result<Vec<ObjectId>, Suspend> {
-    let (eligible, values): (Vec<ObjectId>, Vec<u16>) = eligible
-        .into_iter()
-        .map(|c| (c, g.mana_value(c)))
-        .filter(|&(_, value)| value <= most)
-        .map(|(c, value)| (c, value.min(u32::from(u16::MAX)) as u16))
-        .unzip();
+    let (eligible, values): (Vec<ObjectId>, Vec<u32>) =
+        eligible.into_iter().map(|c| (c, g.mana_value(c))).filter(|&(_, value)| value <= most).unzip();
     if eligible.is_empty() || count == 0 {
         return Ok(Vec::new());
     }
-    let total = Some(TotalAtMost { values, most: most.min(u32::from(u16::MAX)) as u16 });
+    let total = Some(TotalAtMost { values, most });
     ask_cards(g, player, RequestKind::ChooseCards { source, purpose, cards: shown, eligible, count, up_to: true, kind, total })
 }
 

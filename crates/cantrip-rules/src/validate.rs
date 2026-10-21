@@ -42,8 +42,8 @@ fn fits(option: &ActionOption, action: &Action) -> bool {
             }
         }
     }
-    let n = action.targets.len() as u8;
-    if n > option.targets_required || (!option.targets_optional && n < option.targets_required) {
+    let (n, required) = (action.targets.len(), option.targets_required as usize);
+    if n > required || (!option.targets_optional && n < required) {
         return false;
     }
     distinct(&action.targets) && action.targets.iter().all(|t| option.target_candidates.contains(t))
@@ -130,10 +130,10 @@ pub fn check(game: &Game, request: &Request, answer: &Answer) -> Result<(), Reje
             }
         }
         (RequestKind::ChooseTarget { candidates, least, count, total, .. }, Answer::Targets(targets)) => {
-            let n = targets.len() as u8;
+            let n = targets.len();
             if !distinct(targets) || !targets.iter().all(|t| candidates.contains(t)) {
                 no("not among the candidates")
-            } else if n > *count || n < *least {
+            } else if n > *count as usize || n < *least as usize {
                 no(format!("{n} chosen, {least} to {count} wanted (CR 601.2c)"))
             } else if let Some(t) = total.as_ref().filter(|t| !t.allows(candidates, targets)) {
                 no(format!("total mana value {}, {} or less wanted (CR 601.2c, 202.3)", t.of(candidates, targets), t.most))

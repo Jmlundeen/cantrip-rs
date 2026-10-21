@@ -876,7 +876,7 @@ pub fn mana_ability_options(cx: &Cx, player: PlayerId, options: &mut Vec<ActionO
                     .filter(|&o| pays_permanents(cx, &def.cost, &p, &asker, o))
                     .map(Target::Object)
                     .collect();
-                option.targets_required = p.count;
+                option.targets_required = u32::from(p.count);
             }
             if def.colors_from_sacrifice {
                 // The types any land it could sacrifice could produce; the activation then names one of that land's.
@@ -3950,7 +3950,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
         serial: 0,
         gift: None,
         inline_shares: [0; cantrip_state::INLINE_TARGETS],
-        spill: Span::default(),
+        spill: 0,
         exile_after: false,
         flashback: false,
         since: 0,
@@ -3959,7 +3959,7 @@ pub(crate) fn stack_item(kind: StackKind, object: ObjectId, ability: AbilityRef,
     };
     // Targets announced with the action are one at most (`targets_with_action`); more are set by `set_item_targets`.
     assert!(targets.len() <= cantrip_state::INLINE_TARGETS, "a stack item made with more targets than it holds");
-    item.target_count = targets.len() as u8;
+    item.target_count = targets.len() as u32;
     item.inline_targets[..targets.len()].copy_from_slice(targets);
     item
 }
@@ -4275,7 +4275,7 @@ fn cast(
 
     // CR 601.2c: targets slot by slot, where they were not announced with the action; a slot counted by X or by the
     // times it was kicked is judged by what was announced.
-    let counted = if item.x > 0 { item.x } else { item.kicked as u16 };
+    let counted = u32::from(if item.x > 0 { item.x } else { u16::from(item.kicked) });
     let mut targets: Vec<Target> = targets.to_vec();
     let mut of: Vec<u8> = Vec::new();
     if let Some(modal) = def.modal {
@@ -4288,7 +4288,7 @@ fn cast(
         let total = match divide.of_x {
             Some(of_x) => of_x(item.x),
             None if divide.total == TargetSpec::COUNTED => item.x,
-            None => divide.total as u16,
+            None => u16::try_from(divide.total).expect("a printed total to divide fits the shares asked"),
         };
         match ask_divided(cx, player, spell, spec, total, true)? {
             Divided::Chosen(chosen, shares) => {
@@ -4525,7 +4525,7 @@ fn cast(
     // Its mana value on the stack (`Query::mana_value`): X counted once for each {X} in its mana cost (CR 202.3e), none for an
     // X a cost defined without one (Immoral Bargain's, a number of permanents sacrificed), and a spell cast transformed its front
     // face's (CR 712.8c).
-    let value = cx.mana_value(spell).min(255) as u8;
+    let value = cx.mana_value(spell);
     // "As you cast this spell": the board once the costs are paid (CR 601.2i), asked of the face being cast.
     let fact = def.cast_fact.map_or(0, |f| f(cx, &Asker { source: spell, controller: player }));
     let known = ops::last_known_from(cx, spell, &as_cast);
@@ -4847,13 +4847,13 @@ pub fn cast_transformed_during_resolution(cx: &mut Cx, card: ObjectId) -> R<bool
 /// count: the candidates less any worth more than the limit by itself, which no legal choice could include, and the limit
 /// with each remaining candidate's mana value, index for index, for the question (the core refuses an answer over it).
 /// A slot without one keeps its candidates and asks nothing of them.
-pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u16, candidates: Vec<Target>) -> (Vec<Target>, Option<TotalAtMost>) {
+pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u32, candidates: Vec<Target>) -> (Vec<Target>, Option<TotalAtMost>) {
     let Some(most) = spec.total_limit(counted) else { return (candidates, None) };
     let value = |t: Target| match t {
-        Target::Object(id) => cx.mana_value(id).min(u32::from(u16::MAX)) as u16,
+        Target::Object(id) => cx.mana_value(id),
         _ => 0,
     };
-    let (kept, values): (Vec<Target>, Vec<u16>) = candidates.into_iter().map(|t| (t, value(t))).filter(|&(_, v)| v <= most).unzip();
+    let (kept, values): (Vec<Target>, Vec<u32>) = candidates.into_iter().map(|t| (t, value(t))).filter(|&(_, v)| v <= most).unzip();
     (kept, Some(TotalAtMost { values, most }))
 }
 
@@ -4861,7 +4861,7 @@ pub(crate) fn within_total(cx: &Cx, spec: &TargetSpec, counted: u16, candidates:
 /// chosen for two slots). A slot that chose nothing ("up to") keeps its place with `Target::None` among the slots, so
 /// every target stays at the index of its slot (CR 601.2c, 115.1), as far as the last one that chose. Each target comes
 /// with the index of the spec it was chosen for (`StackItem::spec_of`), so a slot of several targets may stand anywhere.
-fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u16, kicked: u8) -> R<(Vec<Target>, Vec<u8>)> {
+fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[TargetSpec], counted: u32, kicked: u8) -> R<(Vec<Target>, Vec<u8>)> {
     let asker = Asker { source, controller: player };
     let slots = crate::resolve::expand_specs(cx.s(), player, specs);
     let mut targets = Vec::new();
@@ -4888,10 +4888,8 @@ fn choose_slots(cx: &mut Cx, player: PlayerId, source: ObjectId, specs: &[Target
             if most == 0 {
                 break 'slot;
             }
-            // A stack item holds at most MAX_TARGETS targets, more than any board has legal targets for: a count past what is left
-            // of them is cut to it.
-            let room = cantrip_state::MAX_TARGETS.saturating_sub(targets.len());
-            let count = (most as usize).min(candidates.len()).min(room) as u8;
+            // No more than there are candidates to choose (CR 601.2c: each target is a different object or player).
+            let count = most.min(u32::try_from(candidates.len()).expect("candidates are counted in a u32"));
             let ask = RequestKind::ChooseTarget { label: spec.label, slot_player: *slot_player,
                 source,
                 purpose: Purpose::Targets,
@@ -4942,7 +4940,8 @@ pub(crate) fn ask_divided(cx: &mut Cx, player: PlayerId, source: ObjectId, spec:
     if candidates.is_empty() {
         return Ok(if spec.min == 0 { Divided::Skipped } else { Divided::Impossible });
     }
-    let max_targets = if spec.max == TargetSpec::COUNTED { 0 } else { spec.max };
+    // 0 is no limit but the candidates: a slot counted by X (the total divided is X too) or of any number of targets.
+    let max_targets = if spec.max >= TargetSpec::ANY_NUMBER { 0 } else { spec.max };
     let ask = RequestKind::ChooseDividedTargets { source, candidates, total, max_targets, optional: spec.min == 0 };
     match cx.ask_core(player, ask, may_cancel)? {
         Answer::Divided(shares) if shares.is_empty() => Ok(Divided::Skipped),
@@ -5387,13 +5386,13 @@ fn activate(
     let mut targets: Vec<Target> = targets.to_vec();
     if let Some(modal) = def.modal {
         let of;
-        (targets, of) = choose_slots(cx, player, source, &mode_specs(modal, mask), item.x, 0)?;
+        (targets, of) = choose_slots(cx, player, source, &mode_specs(modal, mask), u32::from(item.x), 0)?;
         set_item_targets(cx, &targets, &of);
     } else if !targets_with_activation(def) && !def.targets.is_empty() {
         // CR 601.2c by way of 602.2b: slots that are not announced with the action are chosen now, after X (a slot
         // counted by X, as Candelabra of Tawnos's "untap X target lands", reads the X just announced).
         let of;
-        (targets, of) = choose_slots(cx, player, source, def.targets, item.x, 0)?;
+        (targets, of) = choose_slots(cx, player, source, def.targets, u32::from(item.x), 0)?;
         set_item_targets(cx, &targets, &of);
     }
     // CR 601.2f by way of 602.2b: the total cost, with what increases or reduces it, once the targets are announced: a

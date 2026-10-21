@@ -178,7 +178,7 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             // "With total mana value N or less": a random choice over it is cut back to the cards that fit, in the order drawn.
             match total {
                 Some(t) => {
-                    let values: Vec<u16> = chosen.iter().map(|c| t.values[eligible.iter().position(|e| e == c).unwrap_or(0)]).collect();
+                    let values: Vec<u32> = chosen.iter().map(|c| t.values[eligible.iter().position(|e| e == c).unwrap_or(0)]).collect();
                     Answer::Cards(TotalAtMost { values, most: t.most }.first_fitting(&chosen, chosen.len()))
                 }
                 None => Answer::Cards(chosen),
@@ -190,7 +190,7 @@ pub fn decide(game: &Game, random: &mut Random, request: &Request) -> Answer {
             // "With total mana value X or less": a random choice over it is cut back to the targets that fit, in the order drawn.
             match total {
                 Some(t) => {
-                    let values: Vec<u16> = chosen.iter().map(|c| t.values[candidates.iter().position(|e| e == c).unwrap_or(0)]).collect();
+                    let values: Vec<u32> = chosen.iter().map(|c| t.values[candidates.iter().position(|e| e == c).unwrap_or(0)]).collect();
                     Answer::Targets(TotalAtMost { values, most: t.most }.first_fitting(&chosen, chosen.len()))
                 }
                 None => Answer::Targets(chosen),

@@ -644,7 +644,7 @@ pub const fn up_to_one(filter: TargetFilter) -> TargetSpec {
 }
 
 /// "Up to N targets" (CR 115.1d).
-pub const fn up_to(n: u8, filter: TargetFilter) -> TargetSpec {
+pub const fn up_to(n: u32, filter: TargetFilter) -> TargetSpec {
     TargetSpec { min: 0, max: n, filter, label: "", if_kicked: None, total_mana_value: None }
 }
 
@@ -655,7 +655,7 @@ impl TargetSpec {
     }
 
     /// The same slot, with between `min` and `max` targets; either may be `TargetSpec::COUNTED`.
-    pub const fn between(self, min: u8, max: u8) -> TargetSpec {
+    pub const fn between(self, min: u32, max: u32) -> TargetSpec {
         TargetSpec { min, max, ..self }
     }
 
@@ -666,13 +666,13 @@ impl TargetSpec {
 
     /// "If this spell was kicked, instead choose between `min` and `max` of these targets" (CR 702.33a, 601.2c): The
     /// Eagles Are Coming!'s and Divine Resilience's "instead choose any number of target creatures" is `if_kicked(0, n)`.
-    pub const fn if_kicked(self, min: u8, max: u8) -> TargetSpec {
+    pub const fn if_kicked(self, min: u32, max: u32) -> TargetSpec {
         TargetSpec { if_kicked: Some((min, max)), ..self }
     }
 
     /// "With total mana value `most` or less" (CR 601.2c, 202.3): the targets chosen for the slot together; `COUNTED` reads
     /// the slot's count, "total mana value X or less" (`TargetSpec::total_mana_value`).
-    pub const fn total_mana_value_at_most(self, most: u8) -> TargetSpec {
+    pub const fn total_mana_value_at_most(self, most: u32) -> TargetSpec {
         TargetSpec { total_mana_value: Some(most), ..self }
     }
 }
