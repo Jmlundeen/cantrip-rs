@@ -147,12 +147,18 @@ public sealed partial class MainPage
 
     /// <summary>
     /// What took each player out, one sentence each, in the order they went, and why a drawn game is drawn: the log's own
-    /// lines for it, since the outcome says only which team won.
+    /// lines for it, since the outcome says only which team won. A draw the game's rules did not make - its players agreed to
+    /// it - has no line of the log's, and is said as the table says it (<see cref="TableMessage.Detail"/>).
     /// </summary>
-    private static string WhyItEnded(GameClient client) =>
-        string.Join(
+    private static string WhyItEnded(GameClient client)
+    {
+        string why = string.Join(
             " ",
             client.Log
                 .Where(entry => entry.Kind is LogEntryKind.PlayerLost or LogEntryKind.GameDrawn)
                 .Select(entry => entry.Text));
+        return why.Length == 0 && client.Outcome?.Outcome == GameOutcomeView.Draw && client.Table is { Phase: TablePhase.Finished, Detail.Length: > 0 } table
+            ? table.Detail
+            : why;
+    }
 }

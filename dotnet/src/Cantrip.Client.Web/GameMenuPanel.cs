@@ -3,10 +3,10 @@ using Microsoft.UI.Text;
 namespace Cantrip.Client.Web;
 
 /// <summary>
-/// The game tab of the side panel: what a player can do to the game as a whole rather than within it. For now that is
-/// conceding, which asks once more before it is sent - a concession cannot be taken back, and the button is one stray
-/// click from the log tab - and, once the game is over at a table that names the page its player came from, going back
-/// there (MainPage.Outcome).
+/// The game tab of the side panel: what a player can do to the game as a whole rather than within it - the same as the game
+/// menu's (MainPage.GameMenu). Conceding, which asks once more before it is sent - a concession cannot be taken back, and the
+/// button is one stray click from the log tab; offering a draw, or accepting one offered (docs/rules-exceptions.md, RX-4);
+/// and, once the game is over at a table that names the page its player came from, going back there (MainPage.Outcome).
 /// </summary>
 public sealed class GameMenuPanel : ScrollViewer
 {
@@ -14,6 +14,8 @@ public sealed class GameMenuPanel : ScrollViewer
     private readonly TextBlock _note;
     private readonly StackPanel _confirm;
     private readonly DockButton _return;
+    private readonly DockButton _draw;
+    private readonly TextBlock _drawNote;
     private bool _playing;
 
     public GameMenuPanel()
@@ -84,6 +86,14 @@ public sealed class GameMenuPanel : ScrollViewer
         _confirm.Children.Add(answers);
         rows.Children.Add(_confirm);
 
+        _draw = new DockButton("Offer Draw", primary: false).Filling();
+        _draw.Tooltip = "Offer the other players a draw, passing priority. It stands until you do anything else with priority.";
+        _draw.Clicked += () => DrawRequested?.Invoke();
+        rows.Children.Add(_draw);
+
+        _drawNote = new TextBlock { FontSize = 12, Foreground = Theme.Brush(Theme.FgMuted), TextWrapping = TextWrapping.Wrap };
+        rows.Children.Add(_drawNote);
+
         _return = new DockButton("Back", primary: true) { Visibility = Visibility.Collapsed }.Filling();
         _return.Clicked += () => ReturnRequested?.Invoke();
         rows.Children.Add(_return);
@@ -101,6 +111,36 @@ public sealed class GameMenuPanel : ScrollViewer
         if (caption is not null && _return.Caption != caption)
         {
             _return.Caption = caption;
+        }
+    }
+
+    /// <summary>Raised when the player asks to offer a draw, or to accept the one offered.</summary>
+    public event Action? DrawRequested;
+
+    /// <summary>
+    /// The draw button as it stands: "Offer Draw" or "Accept Draw", whether it can be pressed now, and a line under it saying
+    /// where the offer stands.
+    /// </summary>
+    public void ShowDraw(string caption, bool enabled, string note)
+    {
+        if (_draw.Caption != caption)
+        {
+            _draw.Caption = caption;
+        }
+
+        _draw.Enabled = enabled;
+        if (_drawNote.Text != note)
+        {
+            _drawNote.Text = note;
+        }
+    }
+
+    /// <summary>Asks whether to concede, as the button does: from the game menu, which opens this tab to ask it.</summary>
+    public void AskConcede()
+    {
+        if (_playing)
+        {
+            Confirming(true);
         }
     }
 

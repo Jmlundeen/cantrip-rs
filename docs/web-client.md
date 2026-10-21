@@ -353,10 +353,22 @@ table. A retraction - a mana ability taken back - removes lines by number. Clien
 and step headings (`GameJournal`); the game-over panel reads its "why" from the log's loss lines.
 
 The log is the first of the side panel's tabs (`SidePanel`): **Game log**, **Settings**, and **Menu**
-(`GameMenuPanel`), which holds **Concede**. Conceding asks again before it sends `ConcedeMessage`, and is only offered
+(`GameMenuPanel`), which holds **Concede** and **Offer Draw**. Conceding asks again before it sends `ConcedeMessage`, and is only offered
 when it would end the game - every other player still in is of one team - since a multiplayer game going on without the
 player (CR 800.4a) is not supported yet (`GameEngine.CanConcede`). The test state names each tab as a control of kind
 `tab`.
+
+The **game menu** (`MainPage.GameMenu.cs`) is the same at a click: a button of three lines (named "Game menu" to the test
+state) beside the panel's hide arrow, and beside the arrow that opens the panel again while it is hidden, opening a short
+menu (`CardMenu`) of **Concede Game** - which opens the Menu tab to ask once more - and **Offer Draw**
+(`docs/rules-exceptions.md`, RX-4). A row that cannot be taken now is drawn faint: a draw is offered only while the player
+has priority, and offering passes it (`GameClient.OfferDraw`, `OfferDrawMessage`). When another player offers one
+(`DrawOfferMessage`), the dock asks **Accept Draw** or **Decline** over whatever else it is asking - neither is the Pass
+key's - and the menu buttons are lit until it is answered; the entry then reads **Accept Draw** while the offer is open, so a
+player who declined may accept at any priority of theirs (`GameClient.CanAcceptDraw`). The Menu tab's line under the
+button says where the offer stands, and to its player who has declined it. A draw agreed is said over the board as the
+table says it (`TableMessage.Detail`, "The players agreed to a draw."). `GameMenuTests` opens the menu, has the other seat
+offer a draw, and accepts it from the dock.
 
 ## When the game is over
 

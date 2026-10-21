@@ -31,7 +31,8 @@ public sealed class CardMenu
 
     /// <summary>Opens at a point in <paramref name="over"/>'s coordinates, with one row per choice.</summary>
     /// <param name="fontSize">The rows' type size: 13 for a card's menu, 12 for a drop-down's list.</param>
-    public void Open(UIElement over, Point at, IReadOnlyList<(string Text, Action OnChosen)> choices, double fontSize = 13, IReadOnlyList<int>? abilities = null, IReadOnlyList<int>? optionIds = null)
+    /// <param name="enabled">Which rows can be chosen now, index for index; a row that cannot is drawn faint and does nothing. All of them when null.</param>
+    public void Open(UIElement over, Point at, IReadOnlyList<(string Text, Action OnChosen)> choices, double fontSize = 13, IReadOnlyList<int>? abilities = null, IReadOnlyList<int>? optionIds = null, IReadOnlyList<bool>? enabled = null)
     {
         ArgumentNullException.ThrowIfNull(choices);
 
@@ -40,16 +41,25 @@ public sealed class CardMenu
         int index = 0;
         foreach ((string text, Action onChosen) in choices)
         {
+            bool on = enabled is null || index >= enabled.Count || enabled[index];
             var row = new Border
             {
                 CornerRadius = new CornerRadius(4),
                 Padding = new Thickness(12, 5, 12, 5),
                 Background = Theme.Brush(Color.FromArgb(0, 0, 0, 0)),
-                Child = new SymbolText(fontSize, Theme.Fg) { Text = text },
+                Child = new SymbolText(fontSize, on ? Theme.Fg : Theme.FgMuted) { Text = text },
                 // Which ability of the card the row is, for a page driven by a test to tell rows that read alike.
                 Tag = new RowIdentity(abilities is not null && index < abilities.Count ? abilities[index] : -1,
                     optionIds is not null && index < optionIds.Count ? optionIds[index] : 0),
             };
+
+            if (!on)
+            {
+                row.Tapped += (_, e) => e.Handled = true;
+                _rows.Children.Add(row);
+                index++;
+                continue;
+            }
 
             row.PointerEntered += (_, _) => row.Background = Theme.Brush(Theme.ControlHover);
             row.PointerExited += (_, _) => row.Background = Theme.Brush(Color.FromArgb(0, 0, 0, 0));

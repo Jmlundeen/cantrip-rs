@@ -190,12 +190,18 @@ public sealed class SidePanel : Grid
             _tabs[tab] = (button, label, page);
         }
 
+        // The game menu (MainPage.GameMenu), beside the arrow that hides the panel.
+        MenuButton = MainPage.GameMenuButton(quiet: true);
+        MenuButton.VerticalAlignment = VerticalAlignment.Center;
+        MenuButton.Clicked += () => MenuRequested?.Invoke();
+
         DockButton hide = new DockButton("›", primary: false, fontSize: 18).Quiet();
         hide.VerticalAlignment = VerticalAlignment.Center;
         hide.Tooltip = "Hide the panel" + Hotkeys.Suffix(Hotkeys.TogglePanel);
         hide.Clicked += () => HideRequested?.Invoke();
-        Grid.SetColumn(hide, 2);
-        header.Children.Add(hide);
+        var corner = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2, Children = { MenuButton, hide } };
+        Grid.SetColumn(corner, 2);
+        header.Children.Add(corner);
 
         Select(Tab.Log);
     }
@@ -210,6 +216,12 @@ public sealed class SidePanel : Grid
 
     /// <summary>Raised when the player presses the panel's own hide button.</summary>
     public event Action? HideRequested;
+
+    /// <summary>The game menu's button, beside the hide button.</summary>
+    public DockButton MenuButton { get; }
+
+    /// <summary>Raised when the player presses the game menu's button.</summary>
+    public event Action? MenuRequested;
 
     public void Select(Tab tab)
     {

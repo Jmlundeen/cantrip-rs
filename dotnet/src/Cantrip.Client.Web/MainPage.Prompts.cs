@@ -57,6 +57,12 @@ public sealed partial class MainPage
             return;
         }
 
+        // A draw another player offered is answered before anything else is (RX-4).
+        if (AskDraw(client))
+        {
+            return;
+        }
+
         if (_targeting is { } announced)
         {
             int candidates = announced.TargetCandidates.Count;

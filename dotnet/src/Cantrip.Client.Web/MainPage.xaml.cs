@@ -90,6 +90,10 @@ public sealed partial class MainPage : Page
     /// <summary>The side panel's slot, whose width slides between the panel's and nothing as it opens and closes.</summary>
     private Grid _sideSlot = null!;
     private Border _sideTab = null!;
+
+    /// <summary>The side tab and the game menu's button beside it, in the table's top right corner while the panel is hidden.</summary>
+    private StackPanel _sideCorner = null!;
+    private DockButton _cornerMenu = null!;
     private bool _sideOpen = PlayerSettings.PanelOpen;
     private readonly DispatcherTimer _sideSlide = new() { Interval = TimeSpan.FromMilliseconds(8) };
     private double _sideFrom;
@@ -172,6 +176,8 @@ public sealed partial class MainPage : Page
         _log = new LogPanelControl();
         _side = new SidePanel(_log, new SettingsPanel(), new GameMenuPanel());
         _side.Menu.ConcedeRequested += () => _gameClient?.Concede();
+        _side.Menu.DrawRequested += OfferOrAcceptDraw;
+        _side.MenuRequested += () => OpenGameMenu(_side.MenuButton);
         _side.Menu.ReturnRequested += GoBack;
         _side.HideRequested += () => SetSideOpen(false);
         _sideSlot = new Grid { Width = _sideOpen ? SidePanel.PanelWidth : 0, Children = { _side } };
@@ -762,7 +768,7 @@ public sealed partial class MainPage : Page
     {
         _sideOpen = open;
         PlayerSettings.PanelOpen = open;
-        _sideTab.Visibility = open ? Visibility.Collapsed : Visibility.Visible;
+        _sideCorner.Visibility = open ? Visibility.Collapsed : Visibility.Visible;
 
         if (!open)
         {
@@ -807,10 +813,6 @@ public sealed partial class MainPage : Page
             Padding = new Thickness(11, 0, 11, 2),
             CornerRadius = new CornerRadius(6),
             BorderThickness = new Thickness(1),
-            HorizontalAlignment = HorizontalAlignment.Right,
-            VerticalAlignment = VerticalAlignment.Top,
-            Margin = new Thickness(0, 10, 12, 0),
-            Visibility = Visibility.Collapsed,
         };
 
         void Paint(bool hovered, bool pressed)
@@ -831,8 +833,22 @@ public sealed partial class MainPage : Page
             SetSideOpen(true);
         };
 
-        Grid.SetRowSpan(_sideTab, 3);
-        _table.Children.Add(_sideTab);
+        // The game menu beside it, as the panel's own header has it, so the menu is a click away with the panel hidden too.
+        _cornerMenu = GameMenuButton(quiet: false);
+        _cornerMenu.Clicked += () => OpenGameMenu(_cornerMenu);
+        _sideCorner = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(0, 10, 12, 0),
+            Visibility = Visibility.Collapsed,
+            Children = { _cornerMenu, _sideTab },
+        };
+
+        Grid.SetRowSpan(_sideCorner, 3);
+        _table.Children.Add(_sideCorner);
     }
 
     /// <summary>The two halves split by a hairline, sharing the height between them, with the stack floating over both.</summary>
@@ -1459,6 +1475,7 @@ public sealed partial class MainPage : Page
         ShowEvent(client);
         ShowPairings(client);
         _side.Menu.ShowPlaying(CanConcede(client));
+        ShowDrawOffer(client);
         _deckLoading.Show(client);
         ShowOutcome(client);
         BrowserTitle.Show(PageTitle.For(client.Table, client.Seat, client.Draft, client.DeckBuilding, client.Pairings));
