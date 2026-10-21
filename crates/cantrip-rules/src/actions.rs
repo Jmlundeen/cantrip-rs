@@ -1713,6 +1713,9 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         let chars = cx.chars(id);
         // The mana types its mana abilities could produce, for the triggered mana abilities its tap would trigger.
         let mut tapped_types = 0u8;
+        // How many of its mana abilities tap it, and whether one of them lets the player choose the type of what it adds: a
+        // tap that adds one chosen type is one choice with the "one mana of any type that land produced" it triggers.
+        let (mut taps, mut tap_chooses) = (0u32, false);
         let mut only: Option<&ActivatedDef> = None;
         let mut count = 0;
         // The most any one ability adds, for the abilities that are not restricted and for each kind of restriction: they
@@ -1743,8 +1746,11 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
             }
             count += 1;
             only = Some(def);
-            if !waiting.is_empty() {
+            // Only a mana ability with {T} in its cost taps the permanent for mana (CR 106.12).
+            if !waiting.is_empty() && def.cost.tap {
                 tapped_types |= yield_types(cx, id, player, def);
+                taps += 1;
+                tap_chooses |= def.adds_any > 0;
             }
             spent = spent.max(def.cost.mana.mana_value());
             let adds = def.adds.0.iter().map(|&n| n as u32).sum::<u32>() + def.adds_any as u32;
@@ -1770,7 +1776,7 @@ fn available_without(cx: &Cx, player: PlayerId, skip: Option<ObjectId>) -> Avail
         if count > 0 {
             consume += spent;
             if !waiting.is_empty() && tapped_types != 0 {
-                tap_triggers(cx, &waiting, id, player, tapped_types, &mut fixed, &mut flex);
+                tap_triggers(cx, &waiting, id, player, tapped_types, taps > 1 || tap_chooses, &mut fixed, &mut flex);
             }
         }
         match (count, only) {
@@ -1851,7 +1857,22 @@ fn waiting_mana_triggers(cx: &Cx) -> Vec<(Asker, &'static TriggeredDef)> {
 /// 605.4a: they resolve at once, as part of the mana ability): advice, added to what the permanent itself adds, so a cast
 /// High Tide's extra {U} pays for is offered before the Islands are tapped. Each one that would trigger on the tap counts
 /// once, by what it says it adds (`TriggeredMana`).
-fn tap_triggers(cx: &Cx, waiting: &[(Asker, &'static TriggeredDef)], id: ObjectId, player: PlayerId, types: u8, fixed: &mut [u8; 6], flex: &mut [u32; 64]) {
+///
+/// "One mana of any type that land produced" is the type the tap made: where the player chose it (two abilities, or "any
+/// color"), the tap's mana and the trigger's are one choice, both of one type, which the advice's independent mana cannot
+/// say; it is counted only where that choice is of one type, so a cast is never offered that the tap could not pay (Mana
+/// Flare and Shivan Reef make {U}{U} or {R}{R}, never {U}{R}).
+#[allow(clippy::too_many_arguments)]
+fn tap_triggers(
+    cx: &Cx,
+    waiting: &[(Asker, &'static TriggeredDef)],
+    id: ObjectId,
+    player: PlayerId,
+    types: u8,
+    chosen: bool,
+    fixed: &mut [u8; 6],
+    flex: &mut [u32; 64],
+) {
     let first = (0..6).find(|&m| types & (1 << m) != 0).unwrap_or(5);
     let mut produced = ManaPool([0; 6]);
     produced.0[first] = 1;
@@ -1862,7 +1883,8 @@ fn tap_triggers(cx: &Cx, waiting: &[(Asker, &'static TriggeredDef)], id: ObjectI
         }
         match t.mana_yield {
             TriggeredMana::One(mana) => fixed[mana as usize] = fixed[mana as usize].saturating_add(1),
-            TriggeredMana::OneOfProduced => flex[types as usize] += 1,
+            TriggeredMana::OneOfProduced if !chosen || types.count_ones() == 1 => flex[types as usize] += 1,
+            TriggeredMana::OneOfProduced => {}
             TriggeredMana::ChosenColor => {
                 if let Some(color) = cx.s().obj(asker.source).chosen_color {
                     let mana = color.mana() as usize;

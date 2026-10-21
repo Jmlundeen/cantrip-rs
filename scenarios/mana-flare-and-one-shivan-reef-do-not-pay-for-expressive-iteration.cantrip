@@ -1,0 +1,42 @@
+# Mana Flare adds "one mana of any type that land produced": tapped for {U}, Shivan Reef makes {U}{U}, and for {R}, {R}{R} -
+# never {U}{R} (CR 106.12a, 605.1b). With Mana Flare out and only the Reef untapped, Bot1 can't pay Expressive Iteration's
+# {U}{R}, so it is not offered (CR 601.2g-h). Turn 3, with Mox Sapphire untapped too (the control), it is, and is paid with
+# the Reef's {R} and the Mox's {U}.
+
+[Bot1 Deck]
+Shivan Reef
+Mox Ruby
+Mox Jet
+Mox Pearl
+Mana Flare
+Expressive Iteration
+Mox Sapphire
+Island x12
+
+[Bot2 Deck]
+Island x20
+
+[Actions]
+Bot1.Hand.Shivan Reef.Play
+Bot1.Hand.Mox Ruby.Cast
+Bot1.Hand.Mox Jet.Cast
+Bot1.Hand.Mox Pearl.Cast
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Battlefield.Mox Jet.Activate
+Bot1.Battlefield.Mox Pearl.Activate
+Bot1.Hand.Mana Flare.Cast
+Bot1.Pass
+Bot2.Pass
+? Bot1.Mana =
+! Bot1.Hand.Expressive Iteration.Cast
+[T3 Bot1.Main1]
+Bot1.Hand.Mox Sapphire.Cast
+Bot1.Hand.Expressive Iteration.Cast
+Bot1.Battlefield.Shivan Reef.Activate(Ability: {U} or {R}; Color: Red)
+Bot1.Battlefield.Mox Sapphire.Activate
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot1.Graveyard = Expressive Iteration

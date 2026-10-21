@@ -287,6 +287,52 @@ static ENERGY_GAIN: CardDef = CardDef {
     ..PROBE_SPELL
 };
 
+fn creature_tapped_for_mana(q: &dyn Query, source: ObjectId, event: &Event) -> Option<Fired> {
+    match *event {
+        Event::TappedForMana { permanent, player, .. } if player == q.controller(source) && q.chars(permanent).is(CardType::Creature) => {
+            Fired::about(Target::Object(permanent))
+        }
+        _ => None,
+    }
+}
+
+fn add_green(g: &mut dyn cantrip_api::Game, item: &StackItem) -> Result<(), Suspend> {
+    g.add_mana(item.controller, Mana::G, 1);
+    Ok(())
+}
+
+/// "Whenever you tap a creature for mana, add an additional {G}" (Badgermole Cub's kind, CR 605.1b).
+static CREATURE_TAP_EXTRA: CardDef = CardDef {
+    name: "Route Creature Tap Extra",
+    types: TypeSet::of(&[CardType::Artifact]),
+    abilities: &[triggered(when(EventMask::TAPPED, creature_tapped_for_mana), add_green, "Whenever you tap a creature for mana, add an additional {G}.")
+        .mana_ability(TriggeredMana::One(Mana::G))],
+    ..CardDef::BLANK
+};
+
+/// A creature whose mana ability doesn't tap it ("Pay 1 life: Add {C}"): no tap for mana (CR 106.12).
+static UNTAPPED_MANA_CREATURE: CardDef = CardDef {
+    name: "Route Untapped Mana Creature",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[mana_ability(Cost { life: 1, ..Cost::NONE }, add(Mana::C), "Pay 1 life: Add {C}.")],
+    ..CardDef::BLANK
+};
+
+/// One that taps: "{T}: Add {C}".
+static TAPPED_MANA_CREATURE: CardDef = CardDef {
+    name: "Route Tapped Mana Creature",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[mana_ability(TAP, add(Mana::C), "{T}: Add {C}.")],
+    ..CardDef::BLANK
+};
+
+/// A {G} instant.
+static GREEN_SPELL: CardDef = CardDef { name: "Route Green Spell", cost: ManaCost { symbols: [0, 0, 0, 0, 1, 0], ..ManaCost::ZERO }, ..PROBE_SPELL };
+
 static FILLER: CardDef = CardDef { name: "Route Filler", has_cost: false, ..CardDef::BLANK };
 
 static LAND: CardDef = CardDef { name: "Route Land", oracle: true, types: TypeSet::of(&[CardType::Land]), ..CardDef::BLANK };
@@ -330,6 +376,10 @@ fn table() -> &'static CardTable {
             &ENERGY_SOURCE,
             &ENERGY_SPELL,
             &ENERGY_GAIN,
+            &CREATURE_TAP_EXTRA,
+            &UNTAPPED_MANA_CREATURE,
+            &TAPPED_MANA_CREATURE,
+            &GREEN_SPELL,
             &SUSPEND_NEVER,
             &SUSPEND_FORBIDDER,
             &SPLIT_SECOND_PROBE,
@@ -846,6 +896,23 @@ fn an_ability_another_permanent_gives_is_activated_by_it() {
 
 fn describe(game: &RulesGame, option: &ActionOption) -> String {
     cantrip_rules::describe(game.cards, &game.state, &game.log, option).to_string()
+}
+
+/// CR 106.12, 605.1b: a triggered mana ability that waits on a tap counts towards what can be paid only for a mana ability
+/// that taps its permanent. "Whenever you tap a creature for mana, add an additional {G}" makes a {G} spell castable from a
+/// creature's "{T}: Add {C}" (the {G} pays it), and not from its "Pay 1 life: Add {C}".
+#[test]
+fn a_tap_trigger_counts_only_for_a_mana_ability_that_taps() {
+    for (creature, offered) in [("Route Untapped Mana Creature", false), ("Route Tapped Mana Creature", true)] {
+        let (mut game, spell) = game_with("Route Green Spell", Zone::hand, 0);
+        let id = put(&mut game, creature, ME);
+        // Under its controller's control since before their turn began: no summoning sickness (CR 302.6).
+        game.state.update_player(ME, |p| p.turn_began = 1);
+        game.state.update_obj(id, |o| o.controlled_since = 0);
+        put(&mut game, "Route Creature Tap Extra", ME);
+        game.run();
+        assert_eq!(!casts_of(&game, spell).is_empty(), offered, "{creature}");
+    }
 }
 
 fn emblem(game: &mut RulesGame, name: &str, player: PlayerId) -> ObjectId {
