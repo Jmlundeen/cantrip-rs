@@ -608,9 +608,12 @@ fn pay_exiles(cx: &mut Cx, chosen: &[ObjectId]) {
 /// Whether `id` may pay a permanents cost now: it passes the cost's filter, and is tapped if the cost asks for tapped
 /// permanents ("return a tapped creature you control", CR 702.188a). When the cost taps permanents and also has {T}
 /// ("{T}, Tap an untapped creature you control"), the source is not one of them: it is tapped by the {T} part of the same
-/// cost, and one permanent can't be tapped to pay both (CR 118.3, 602.2b).
+/// cost, and one permanent can't be tapped to pay both (CR 118.3, 602.2b). When it asks for tapped permanents and has {T},
+/// the source is one: the parts of a cost are paid in any order (CR 601.2h by way of 602.2b), so {T} may tap it first
+/// ("{T}, Return a tapped creature you control" may return itself), as `activate` and `activate_mana` pay it.
 fn pays_permanents(cx: &Cx, cost: &Cost, p: &PermanentCost, asker: &Asker, id: ObjectId) -> bool {
-    !(cost.tap && cost.tap_permanents && id == asker.source) && (!p.tapped || cx.s().obj(id).tapped) && (p.filter)(cx, asker, id)
+    let tapped = cx.s().obj(id).tapped || cost.tap && id == asker.source;
+    !(cost.tap && cost.tap_permanents && id == asker.source) && (!p.tapped || tapped) && (p.filter)(cx, asker, id)
 }
 
 /// The untapped permanents `player`'s mana abilities could tap as they are activated now (CR 601.2g, 605.3a): each one

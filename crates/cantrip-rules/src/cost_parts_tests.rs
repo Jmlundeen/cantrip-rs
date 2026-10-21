@@ -68,6 +68,16 @@ static RETURNER: CardDef = CardDef {
     ..CardDef::BLANK
 };
 
+/// "{T}, Return a tapped creature you control to its owner's hand: You gain 3 life."
+static RECOILER: CardDef = CardDef {
+    name: "Cost Test Recoiler",
+    types: TypeSet::of(&[CardType::Creature]),
+    power: Some(1),
+    toughness: Some(1),
+    abilities: &[ability(TAP.and(Cost::return_tapped_to_hand(1, is_creature)), gain_three, "{T}, Return a tapped creature you control to its owner's hand: You gain 3 life.")],
+    ..CardDef::BLANK
+};
+
 const PAY: Question = Question::new("Sacrifice", "pay {cost}?", "", "Pay", "Don't");
 
 fn may_pay_with(g: &mut dyn cantrip_api::Game, item: &StackItem, cost: Cost) -> Result<(), Suspend> {
@@ -104,7 +114,7 @@ static VOW: CardDef = CardDef { name: "Cost Test Vow", types: TypeSet::of(&[Card
 
 /// Your precombat main phase with priority, nothing anywhere.
 fn game() -> Game {
-    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW])));
+    let table: &'static CardTable = Box::leak(Box::new(CardTable::new([&FILLER, &BEAR, &DORK, &SEER, &GAZER, &RETURNER, &OFFER, &RECALL, &TITHE, &VOW, &RECOILER])));
     let deck = || vec![table.id_of(&FILLER); 20];
     let mut g = Game::new(table, &Setup { decks: vec![deck(), deck()], ..Default::default() });
     while !g.state.agenda.is_empty() {
@@ -393,4 +403,25 @@ fn a_resolving_spell_never_pays_a_part_only_an_activation_has() {
     let r = resolve_all(&mut g);
     assert!(matches!(r.kind, RequestKind::Priority { .. }) && g.state.stack.is_empty());
     assert_eq!(g.state.player(YOU).life, life);
+}
+
+/// "{T}, Return a tapped creature you control": the parts are paid in any order (CR 601.2h by way of 602.2b), so {T} taps
+/// the Recoiler and it is the tapped creature returned - offered with no other creature, and the only one to choose.
+#[test]
+fn a_cost_with_its_own_tap_returns_its_source_as_the_tapped_creature() {
+    let mut g = game();
+    let recoiler = put(&mut g, &RECOILER, Zone::BATTLEFIELD);
+    let r = next(&mut g);
+    let option = option_of(&g, &r, recoiler).expect("offered: its own {T} taps it");
+    answer(&mut g, &r, Answer::Act(Action::of(&option)));
+    let r = next(&mut g);
+    match &r.kind {
+        RequestKind::ChooseCards { purpose: Purpose::ReturnToHand, eligible, .. } => assert_eq!(eligible, &vec![recoiler]),
+        other => panic!("expected the tapped creature, got {other:?}"),
+    }
+    answer(&mut g, &r, Answer::Cards(vec![recoiler]));
+    let life = g.state.player(YOU).life;
+    resolve_all(&mut g);
+    assert_eq!(g.state.player(YOU).life, life + 3);
+    assert!(g.state.zone(Zone::hand(YOU)).iter().any(|&c| g.state.obj(c).card == g.cards.id_of(&RECOILER)), "it went back to the hand");
 }
