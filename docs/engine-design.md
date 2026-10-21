@@ -924,8 +924,9 @@ mandatory actions is a draw (CR 104.4b, 732.4). A question with more than one le
 watch of mandatory actions; a priority with nothing to do but pass - and tap a mana ability whose whole cost is {T}, when
 nothing more mana could buy is castable - is none. After `WATCH_AFTER` such priorities in a row with something on the
 stack, each priority's position is fingerprinted up to the identity of objects (objects numbered by where they are,
-references to objects that left followed to what they became, timestamps by their order), every amount in it (life,
-poison, counters, damage, mana, libraries), and a position seen again is the loop going round: the game is a draw. The
+references to objects that left followed one move to what they became - no rule follows `became` further - and named
+past that by what they still say, timestamps by their order), every amount in it (life, poison, counters, damage, mana,
+libraries), and a position seen again is the loop going round: the game is a draw. The
 event history is not in the fingerprint; every read of it is counted instead (`cantrip_api::history::note_read`, made by
 `History::new`), and a read clears the positions seen, so a loop that "the third time this turn" or "only once each turn"
 could end is never found by its positions (`loops::settled_read` asks a question whose answer the rest of the turn can't

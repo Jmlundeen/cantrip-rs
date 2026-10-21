@@ -15,8 +15,9 @@
 //!
 //! **What a position is.** Whatever the game's future depends on, up to the identity of objects (CR 400.7: an exiled card
 //! that returns is a new object, so object ids and timestamps grow round a loop although nothing else changes): each object
-//! is numbered by where it is, a reference to an object that has left is followed to what it became (with what its row and
-//! last-known information still say), and timestamps are replaced by their order. Every amount is in it - life totals,
+//! is numbered by where it is, a reference to an object that has left is followed one move to what it became, as far as
+//! any rule follows it (`Obj::became`), with what its row and last-known information still say - past that, by those alone
+//! - and timestamps are replaced by their order. Every amount is in it - life totals,
 //! poison, counters on objects, damage, mana in pools, the cards in each library - so a loop that changes one each time
 //! round never comes back to the same position: it goes on until the amount runs out (a player at 0 life, CR 704.5a; a
 //! draw from an empty library, CR 704.5b) or reaches what a card waits for. The event history is not in the fingerprint, as
@@ -457,9 +458,6 @@ fn mandatory(cx: &mut Cx, player: PlayerId, options: &[ActionOption], seen_posit
 struct Canon<'a> {
     s: &'a GameState,
     number: Vec<u32>,
-    /// For each object, the last object its `became` chain reaches and how many moves on that is: itself and 0 for one
-    /// that never left.
-    last: Vec<(u32, u32)>,
 }
 
 impl<'a> Canon<'a> {
@@ -472,19 +470,7 @@ impl<'a> Canon<'a> {
                 n += 1;
             }
         }
-        // One pass from the newest object back: what an object became is always newer than it (CR 400.7, a new id), so its
-        // own last object is already known.
-        let mut last = vec![(0u32, 0u32); s.objects.len()];
-        for i in (0..s.objects.len()).rev() {
-            last[i] = match s.objects[i].became {
-                Some(next) if next.index() > i && next.index() < last.len() => {
-                    let (end, moves) = last[next.index()];
-                    (end, moves.saturating_add(1))
-                }
-                _ => (i as u32, 0),
-            };
-        }
-        Canon { s, number, last }
+        Canon { s, number }
     }
 
     /// What an object that left still says (CR 608.2h: an ability of it reads it as it last was): its row and its
@@ -505,19 +491,22 @@ impl<'a> Canon<'a> {
         h.finish()
     }
 
-    /// An object as the position names it: by where it is, or, for one that left, by what it became, how many moves ago, and
-    /// what it still says.
+    /// An object as the position names it: by where it is; for one that left once, by where the object it became is and what
+    /// it still says; for one further gone, by what it still says alone.
     fn id(&self, id: ObjectId) -> u64 {
-        if id == ObjectId::NONE || id.index() >= self.last.len() {
+        if id == ObjectId::NONE || id.index() >= self.number.len() {
             return u64::MAX;
         }
-        let (end, moves) = self.last[id.index()];
-        let at = self.number[end as usize];
-        if at == u32::MAX {
-            return self.departed(id);
+        match self.s.obj(id).became {
+            None if self.number[id.index()] != u32::MAX => u64::from(self.number[id.index()]),
+            // One move on, the object it became and where that is: what the rules may still follow (`Obj::became`).
+            Some(next) if self.s.obj(next).became.is_none() && self.number[next.index()] != u32::MAX => {
+                (1u64 << 32 | u64::from(self.number[next.index()])) ^ self.departed(id).rotate_left(17)
+            }
+            // Two moves or more, or gone: no rule follows it that far, so only what it still says counts - and a reference
+            // whose object moves every round of a loop names the same thing each round.
+            _ => self.departed(id),
         }
-        let here = u64::from(moves) << 32 | u64::from(at);
-        if moves == 0 { here } else { here ^ self.departed(id).rotate_left(17) }
     }
 
     fn target(&self, t: Target) -> (u8, u64) {
@@ -1032,17 +1021,18 @@ mod tests {
         assert_eq!(game.state.loop_watch.designated, None);
     }
 
-    /// An object named after it has left, however many moves ago, is followed to the object it is now: two that each left
-    /// twenty times are told apart by where they ended up, not by the rows they left behind.
+    /// A reference is named by the object it became one move on, as the rules follow it; past that only by what it still
+    /// says, so two positions that differ only in how far past two moves a reference's object has gone are the same - a
+    /// loop that moves the object every round comes round again.
     #[test]
-    fn an_object_twenty_moves_on_is_named_by_where_it_is_now() {
-        let mut game = game();
+    fn a_reference_two_moves_or_more_on_is_named_alike_however_far() {
+        let game = game();
         let card = game.state.obj(game.state.battlefield()[0]).card;
-        let chain = |game: &mut Game| {
+        let chain = |game: &mut Game, moves: usize| {
             let first = game.state.push_obj(Obj::new(card, PlayerId(0), Zone::BATTLEFIELD));
             game.state.zone_push(Zone::BATTLEFIELD, first);
             let mut now = first;
-            for _ in 0..20 {
+            for _ in 0..moves {
                 let next = game.state.push_obj(Obj::new(card, PlayerId(0), Zone::BATTLEFIELD));
                 game.state.zone_remove(Zone::BATTLEFIELD, now);
                 game.state.update_obj(now, |o| o.became = Some(next));
@@ -1051,10 +1041,14 @@ mod tests {
             }
             first
         };
-        let (a, b) = (chain(&mut game), chain(&mut game));
-        let canon = Canon::new(&game.state);
-        assert_eq!(canon.last[a.index()].1, 20);
-        assert_ne!(canon.id(a), canon.id(b), "two objects that ended in different places are different");
-        assert_eq!(canon.id(a), Canon::new(&game.state).id(a));
+        let names = |moves: usize| {
+            let mut g = game.clone();
+            let first = chain(&mut g, moves);
+            Canon::new(&g.state).id(first)
+        };
+        assert_eq!(names(2), names(3));
+        assert_eq!(names(2), names(20));
+        assert_ne!(names(1), names(2), "one move on, the object it became is named");
+        assert_ne!(names(0), names(1));
     }
 }

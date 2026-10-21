@@ -36,7 +36,10 @@ pub struct Obj {
     /// The turn a loyalty ability of it was last activated (CR 606.3), zero for never.
     pub loyalty_turn: u32,
     /// The new object it became when it changed zones (CR 400.7), so that a reference to the old one can be
-    /// followed where the rules allow ("exile that card").
+    /// followed where the rules allow ("exile that card"). No rule follows it past one move: an effect finds the object a
+    /// card or spell became where it went (CR 400.7a-c, 608.2h, dash's and warp's "it"), never what that object became in
+    /// turn. The loop watch's fingerprint relies on it (`cantrip_rules::loops`, `Canon::id`): past one move a reference is
+    /// named only by what it still says.
     pub became: Option<ObjectId>,
     /// Its last-known information, once it has ceased to be this object (CR 400.7, 608.2h, 113.7a): the row of
     /// `GameState::last_known` taken as it changed zones or ceased to exist, whatever zone it left.
