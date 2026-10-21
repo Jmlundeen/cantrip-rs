@@ -457,6 +457,9 @@ fn mandatory(cx: &mut Cx, player: PlayerId, options: &[ActionOption], seen_posit
 struct Canon<'a> {
     s: &'a GameState,
     number: Vec<u32>,
+    /// For each object, the last object its `became` chain reaches and how many moves on that is: itself and 0 for one
+    /// that never left.
+    last: Vec<(u32, u32)>,
 }
 
 impl<'a> Canon<'a> {
@@ -469,7 +472,19 @@ impl<'a> Canon<'a> {
                 n += 1;
             }
         }
-        Canon { s, number }
+        // One pass from the newest object back: what an object became is always newer than it (CR 400.7, a new id), so its
+        // own last object is already known.
+        let mut last = vec![(0u32, 0u32); s.objects.len()];
+        for i in (0..s.objects.len()).rev() {
+            last[i] = match s.objects[i].became {
+                Some(next) if next.index() > i && next.index() < last.len() => {
+                    let (end, moves) = last[next.index()];
+                    (end, moves.saturating_add(1))
+                }
+                _ => (i as u32, 0),
+            };
+        }
+        Canon { s, number, last }
     }
 
     /// What an object that left still says (CR 608.2h: an ability of it reads it as it last was): its row and its
@@ -493,24 +508,16 @@ impl<'a> Canon<'a> {
     /// An object as the position names it: by where it is, or, for one that left, by what it became, how many moves ago, and
     /// what it still says.
     fn id(&self, id: ObjectId) -> u64 {
-        if id == ObjectId::NONE {
+        if id == ObjectId::NONE || id.index() >= self.last.len() {
             return u64::MAX;
         }
-        let mut at = id;
-        for moves in 0..16u64 {
-            if at.index() >= self.number.len() {
-                break;
-            }
-            if self.number[at.index()] != u32::MAX {
-                let here = moves << 32 | self.number[at.index()] as u64;
-                return if moves == 0 { here } else { here ^ self.departed(id).rotate_left(17) };
-            }
-            match self.s.obj(at).became {
-                Some(next) => at = next,
-                None => break,
-            }
+        let (end, moves) = self.last[id.index()];
+        let at = self.number[end as usize];
+        if at == u32::MAX {
+            return self.departed(id);
         }
-        self.departed(id)
+        let here = u64::from(moves) << 32 | u64::from(at);
+        if moves == 0 { here } else { here ^ self.departed(id).rotate_left(17) }
     }
 
     fn target(&self, t: Target) -> (u8, u64) {
@@ -1023,5 +1030,31 @@ mod tests {
         after_frame(&mut game.state, log);
         assert!(at_priority(&mut cx(&mut game), PlayerId(0), Vec::new()).is_some());
         assert_eq!(game.state.loop_watch.designated, None);
+    }
+
+    /// An object named after it has left, however many moves ago, is followed to the object it is now: two that each left
+    /// twenty times are told apart by where they ended up, not by the rows they left behind.
+    #[test]
+    fn an_object_twenty_moves_on_is_named_by_where_it_is_now() {
+        let mut game = game();
+        let card = game.state.obj(game.state.battlefield()[0]).card;
+        let mut chain = |game: &mut Game| {
+            let first = game.state.push_obj(Obj::new(card, PlayerId(0), Zone::BATTLEFIELD));
+            game.state.zone_push(Zone::BATTLEFIELD, first);
+            let mut now = first;
+            for _ in 0..20 {
+                let next = game.state.push_obj(Obj::new(card, PlayerId(0), Zone::BATTLEFIELD));
+                game.state.zone_remove(Zone::BATTLEFIELD, now);
+                game.state.update_obj(now, |o| o.became = Some(next));
+                game.state.zone_push(Zone::BATTLEFIELD, next);
+                now = next;
+            }
+            first
+        };
+        let (a, b) = (chain(&mut game), chain(&mut game));
+        let canon = Canon::new(&game.state);
+        assert_eq!(canon.last[a.index()].1, 20);
+        assert_ne!(canon.id(a), canon.id(b), "two objects that ended in different places are different");
+        assert_eq!(canon.id(a), Canon::new(&game.state).id(a));
     }
 }
