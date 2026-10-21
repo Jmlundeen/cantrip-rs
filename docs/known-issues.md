@@ -96,6 +96,8 @@ keeps it).
 | [KI-90](#ki-90-a-land-played-somewhere-other-than-the-battlefield-or-by-an-effect-records-no-land-play) | A land played somewhere other than the battlefield, or by an effect, records no land play | Low | Unexercised |
 | [KI-91](#ki-91-an-energy-cost-is-not-judged-again-once-mana-abilities-have-been-activated) | An energy cost is not judged again once mana abilities have been activated | Low | Unexercised |
 | [KI-92](#ki-92-an-activation-records-nothing-of-what-gave-it-and-its-alternative-cost-is-found-first) | An activation records nothing of what gave it, and its alternative cost is found first | Low | Open |
+| [KI-93](#ki-93-the-browser-shows-no-phased-out-permanents) | The browser shows no phased-out permanents | Medium | Open |
+| [KI-94](#ki-94-a-browser-scenarios-clientmenu-check-reads-a-menu-of-a-card-long-gone) | A browser scenario's `Client.Menu` check reads a menu of a card long gone | Low | Open |
 
 ## Issues
 
@@ -1124,3 +1126,34 @@ rather than offering each as an option of its own. To be brought onto the cast's
 printed card needs it: two givers of one ability, or a history question about one.
 
 **Scenarios.** None.
+
+### KI-93: The browser shows no phased-out permanents
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Medium | Open | client | 2026-10-20, review of PR #147 (fails the same on a clean main) |
+
+**Notes.** After Teferi's Protection resolves, Bot1's Plains, Mox Pearl, Mox Jet and Ornithopter are phased out
+(`Bot1.PhasedOut` passes in the engine), but Bot1's page draws none of them: `Client.Bot1.Battlefield` reads "" where
+"Plains; Mox Pearl; Mox Jet; Ornithopter" is expected. Phased-out permanents are treated as though they don't exist
+(CR 702.26b) but are not hidden; the players know of them, and the client is meant to keep them in sight with PHASED OUT
+at their foot. Either the projection stopped sending them or the table stopped drawing them; not yet bisected.
+
+**Scenarios.** `teferis-protection-shows-phased-out-permanents-and-its-player-facts-in-the-browser` (browser suite;
+fails at line 35).
+
+### KI-94: A browser scenario's `Client.Menu` check reads a menu of a card long gone
+
+| Severity | Status | Area | Found |
+| --- | --- | --- | --- |
+| Low | Open | harness / client | 2026-10-20, review of PR #147 (fails the same on a clean main) |
+
+**Notes.** Under Trinisphere, Bot1 casts Force of Will for its alternative cost from its card menu, and the check after it
+expects that menu: "Cast Force of Will; Cast Force of Will — Pay 1 life, exile a blue card from your hand (costs {3})".
+The page reports instead the five mana abilities of Black Lotus, which was sacrificed on turn 1 and is no longer on the
+battlefield. So `Client.Bot1.Menu` returns a stale menu (the first one opened in the game) rather than the one just used.
+Whether the page keeps publishing an old menu in `cantripTest` or `ScenarioPlayer` reads the wrong one is not yet known;
+the engine side of the cast passes.
+
+**Scenarios.** `trinisphere-cost-of-force-of-wills-alternative-cost-shown-in-the-browser` (browser suite; fails at
+line 46).
