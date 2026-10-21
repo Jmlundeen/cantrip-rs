@@ -166,9 +166,6 @@ then the player CR 732.3 names must choose otherwise; one whose players only pas
   answer counts as passing) and at last by twice `STEP_LIMIT` events in the step, a draw by the engine's judgement and no
   rule's - each slower as the zones grow. An amount going down from far away (a million life lost one at a time) is played
   out to its end.
-- Cost: in a step being watched every question clones and journals the watch (its kept questions and answers), so a loop
-  that runs to `ROUNDS` costs seconds, and a minute or more under `CANTRIP_VERIFY` (the growth and Fecundity draw
-  scenarios). A fix keeps the questions in smaller journal entries.
 - A mana ability whose whole cost is {T} is treated as no choice when nothing more mana could pay for is castable, even when
   its effect does more than add mana (a painland's damage).
 

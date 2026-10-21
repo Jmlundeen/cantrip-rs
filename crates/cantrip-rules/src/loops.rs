@@ -64,7 +64,7 @@ use std::hash::{Hash, Hasher};
 
 use cantrip_api::history::{note_read, take_reads};
 use cantrip_api::*;
-use cantrip_state::{GameState, LastKnown, LoopKey, LoopRound, LoopWatch};
+use cantrip_state::{GameState, LastKnown, LoopRound, LoopWatch};
 
 use crate::Cx;
 
@@ -163,24 +163,22 @@ pub fn asked(cx: &mut Cx, player: PlayerId, kind: RequestKind, may_answer: bool,
     }
     clear_forced(cx);
     let Some(records) = busy(cx) else { return Asked::Ask { kind, key: None } };
-    let mut watch = cx.s().loop_watch.clone();
-    let asked = {
+    let key = {
         let canon = Canon::new(cx.s());
-        let key = question_key(&canon, &position(cx.s(), &canon).shape, player, cx.frame, cx.cursor, &kind);
-        let at = keep(&mut watch, key).0;
-        if !replaying && (watch.designated & bit(player) != 0 || records >= STEP_LIMIT) {
-            // Past the limit, every "may" is declined (see the module).
-            let given = if records >= STEP_LIMIT { vec![answer_hash(&canon, &Answer::Yes)] } else { watch.keys[at].given.clone() };
-            match otherwise(&canon, kind, &given, may_answer) {
-                Asked::Ask { kind, .. } => Asked::Ask { kind, key: Some(key) },
-                answered => answered,
-            }
-        } else {
-            Asked::Ask { kind, key: Some(key) }
-        }
+        question_key(&canon, &position(cx.s(), &canon).shape, player, cx.frame, cx.cursor, &kind)
     };
-    cx.st().set_loop_watch(watch);
-    asked
+    let at = keep(cx.st(), key).0;
+    if !replaying && (cx.s().loop_watch.designated & bit(player) != 0 || records >= STEP_LIMIT) {
+        let canon = Canon::new(cx.s());
+        // Past the limit, every "may" is declined (see the module).
+        let given = if records >= STEP_LIMIT { vec![answer_hash(&canon, &Answer::Yes)] } else { cx.s().loop_keys[at].given.clone() };
+        match otherwise(&canon, kind, &given, may_answer) {
+            Asked::Ask { kind, .. } => Asked::Ask { kind, key: Some(key) },
+            answered => answered,
+        }
+    } else {
+        Asked::Ask { kind, key: Some(key) }
+    }
 }
 
 /// The question with the answers in `given` taken out, where what is left is still a question with an answer: a target,
@@ -245,7 +243,7 @@ pub fn answering(s: &GameState, id: u32, request: &Request, answer: &Answer) -> 
     }
     let canon = Canon::new(s);
     let this = answer_hash(&canon, answer);
-    let given = s.loop_watch.keys.iter().find(|k| k.key == key).map_or(&[][..], |k| &k.given[..]);
+    let given = s.loop_keys.iter().find(|k| k.key == key).map_or(&[][..], |k| &k.given[..]);
     let acts = !forced(&request.kind)
         && match (&request.kind, answer) {
             (_, Answer::Pass | Answer::No) => false,
@@ -265,19 +263,19 @@ pub fn answering(s: &GameState, id: u32, request: &Request, answer: &Answer) -> 
 /// start, its watch with it, so a player acting at priority joins `involved` only as that priority is watched again
 /// (`acted`).
 pub fn answered(s: &mut GameState, player: PlayerId, priority: bool, (key, answer, acts): (u64, u64, bool)) {
-    let mut watch = s.loop_watch.clone();
-    let at = entry(&mut watch, key);
-    if let Some(k) = watch.keys.get_mut(at)
-        && !k.given.contains(&answer)
-    {
-        k.given.push(answer);
+    let at = entry(s, key);
+    if !s.loop_keys[at].given.contains(&answer) {
+        s.update_loop_key(at, |k| k.given.push(answer));
     }
-    if acts && priority {
-        watch.acted |= bit(player);
-    } else if acts {
-        watch.involved |= bit(player);
+    if acts {
+        let mut watch = s.loop_watch.clone();
+        if priority {
+            watch.acted |= bit(player);
+        } else {
+            watch.involved |= bit(player);
+        }
+        s.set_loop_watch(watch);
     }
-    s.set_loop_watch(watch);
 }
 
 /// A question with request id `id` and watch key `key` is now waiting.
@@ -306,25 +304,21 @@ fn busy(cx: &Cx) -> Option<u32> {
     (w.step == step_id(cx.s()) && records > BUSY_STEP).then_some(records)
 }
 
-/// The question `key` is asked: its entry in the watch (made if it has none), and whether it was asked before.
-fn keep(watch: &mut LoopWatch, key: u64) -> (usize, bool) {
-    let at = entry(watch, key);
-    let k = &mut watch.keys[at];
-    k.asked = k.asked.saturating_add(1);
-    (at, k.asked > 1)
+/// The question `key` is asked: its entry among the kept questions (made if it has none), and whether it was asked before.
+fn keep(s: &mut GameState, key: u64) -> (usize, bool) {
+    let at = entry(s, key);
+    s.update_loop_key(at, |k| k.asked = k.asked.saturating_add(1));
+    (at, s.loop_keys[at].asked > 1)
 }
 
-/// The watch's entry for `key`, made if it has none.
-fn entry(watch: &mut LoopWatch, key: u64) -> usize {
-    if let Some(at) = watch.keys.iter().position(|k| k.key == key) {
-        return at;
+/// The kept question `key`'s entry, made if it has none. Past `KEPT` of them every one is forgotten, and the round followed.
+fn entry(s: &mut GameState, key: u64) -> usize {
+    let (at, forgot) = s.loop_key_entry(key, KEPT);
+    if forgot && s.loop_watch.round.is_some() {
+        let watch = LoopWatch { round: None, ..s.loop_watch.clone() };
+        s.set_loop_watch(watch);
     }
-    if watch.keys.len() >= KEPT {
-        watch.keys.clear();
-        watch.round = None;
-    }
-    watch.keys.push(LoopKey { key, asked: 0, given: Vec::new() });
-    watch.keys.len() - 1
+    at
 }
 
 /// The run of mandatory actions is broken: a real choice.
@@ -367,7 +361,6 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
         let mut watch = cx.s().loop_watch.clone();
         watch.step = step;
         watch.step_log = cx.g.log.len() as u32;
-        watch.keys.clear();
         watch.round = None;
         watch.involved = 0;
         watch.designated = 0;
@@ -375,6 +368,7 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
         watch.priority_key = None;
         watch.acted = 0;
         cx.st().set_loop_watch(watch);
+        cx.st().loop_keys_clear();
     }
     let mut seen_position = None;
     if mandatory(cx, player, &options, &mut seen_position) {
@@ -391,15 +385,19 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
         draw(cx);
         return None;
     }
-    let mut watch = cx.s().loop_watch.clone();
     let active = cx.s().turn.active;
     let order: Vec<PlayerId> = cx.s().turn_order_from(active).collect();
-    let (drawn, options) = {
+    let (here, key) = {
         let canon = Canon::new(cx.s());
         let here = seen_position.take().unwrap_or_else(|| position(cx.s(), &canon));
         let key = question_key(&canon, &here.shape, player, cx.frame, cx.cursor, &RequestKind::Priority { options: Vec::new() });
+        (here, key)
+    };
+    let (at, again) = keep(cx.st(), key);
+    let mut watch = cx.s().loop_watch.clone();
+    let (drawn, options) = {
+        let canon = Canon::new(cx.s());
         watch.priority_key = Some(key);
-        let (at, again) = keep(&mut watch, key);
         // A loop that has gone elsewhere is followed from the next position that comes round.
         if let Some(round) = &mut watch.round
             && round.key != key
@@ -419,7 +417,7 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, mut options: Vec<ActionOption>
         if records >= STEP_LIMIT {
             options.clear();
         } else if watch.designated & bit(player) != 0 {
-            let given = &watch.keys[at].given;
+            let given = &cx.s().loop_keys[at].given;
             options.retain(|o| !given.contains(&option_hash(&canon, o)));
         }
         (drawn, options)

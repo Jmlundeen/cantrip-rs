@@ -58,6 +58,9 @@ pub struct GameState {
     pub extra_turns: Vec<ExtraTurn>,
     /// What the rules watch to find a loop of mandatory actions (CR 104.4b, 732.4): see `LoopWatch`.
     pub loop_watch: LoopWatch,
+    /// The questions kept in a step watched for loops of choices, each with the answers given it there (see `LoopWatch`):
+    /// apart from the watch, and changed an entry at a time, so a question asked journals one entry, not all of them.
+    pub loop_keys: Vec<LoopKey>,
     /// The basic land cards a Limited event supplies (Magic Tournament Rules: a Limited sideboard holds any number of basic
     /// lands), of which each player always has one more outside the game (`Zone::sideboard`): one brought into the game is
     /// replaced there. Empty for a constructed game. Fixed at the deal, so no part of the journal.
@@ -115,7 +118,7 @@ pub struct GameState {
 /// go on.
 ///
 /// A step with a great deal in it: from `step_log` (the history's length as the step `step` began) on, each question's
-/// position is kept in `keys` with the answers given to it, and `round` follows a position at priority that comes round
+/// position is kept in `GameState::loop_keys` with the answers given to it, and `round` follows a position at priority that comes round
 /// again: `involved` is the players who chose to act since it last did, `designated` those who must now choose otherwise
 /// (CR 732.3). `asking` is the request waiting and its key, `priority_key` the key of the priority about to be asked, and
 /// `acted` the players who chose to act at the priority being played out with its answer, not yet among `involved`.
@@ -126,7 +129,6 @@ pub struct LoopWatch {
     pub far: Vec<i32>,
     pub step: u32,
     pub step_log: u32,
-    pub keys: Vec<LoopKey>,
     pub round: Option<LoopRound>,
     pub involved: u8,
     pub designated: u8,
@@ -216,7 +218,7 @@ impl GameState {
         &Turn,
         &Vec<ContinuousEffect>,
         (&Vec<PendingTrigger>, &Vec<Delayed>, &Vec<PlayPermission>),
-        (&Vec<Attacker>, &Vec<Block>, &Vec<ExtraTurn>, &LoopWatch),
+        (&Vec<Attacker>, &Vec<Block>, &Vec<ExtraTurn>, (&LoopWatch, &Vec<LoopKey>)),
         &Vec<Frame>,
         (&Rng, u32, &Outcome, bool, &Vec<ObjectId>, &Vec<StackItem>, (&Vec<Target>, &Vec<u8>, &Vec<u32>)),
     ) {
@@ -228,7 +230,7 @@ impl GameState {
             &self.turn,
             &self.effects,
             (&self.triggers, &self.delayed, &self.permissions),
-            (&self.attackers, &self.blocks, &self.extra_turns, &self.loop_watch),
+            (&self.attackers, &self.blocks, &self.extra_turns, (&self.loop_watch, &self.loop_keys)),
             &self.agenda,
             (&self.rng, self.next_timestamp, &self.outcome, self.unsettled, &self.members, &self.left_stack, (&self.spill_targets, &self.spill_specs, &self.share_arena)),
         )
@@ -342,6 +344,10 @@ pub enum Undo {
     BlocksSet(Vec<Block>),
     ExtraTurnsSet(Vec<ExtraTurn>),
     LoopWatchSet(LoopWatch),
+    LoopKeyPushed,
+    LoopKeyPopped(LoopKey),
+    LoopKeySet(u32, LoopKey),
+    LoopKeysSet(Vec<LoopKey>),
     StaticsSeen(bool),
     FramePushed,
     FramePopped(Frame),
@@ -383,6 +389,7 @@ impl GameState {
             blocks: Vec::new(),
             extra_turns: Vec::new(),
             loop_watch: LoopWatch::default(),
+            loop_keys: Vec::new(),
             outside_supply: Vec::new(),
             statics_seen: false,
             agenda: Vec::new(),
@@ -1098,6 +1105,38 @@ impl GameState {
         }
     }
 
+    /// The kept question `key`'s entry, made if there is none - after forgetting every kept question first if `kept` are kept
+    /// already. Its index, and whether the others were forgotten.
+    pub fn loop_key_entry(&mut self, key: u64, kept: usize) -> (usize, bool) {
+        if let Some(at) = self.loop_keys.iter().position(|k| k.key == key) {
+            return (at, false);
+        }
+        let forgot = self.loop_keys.len() >= kept;
+        if forgot {
+            self.loop_keys_clear();
+        }
+        self.loop_keys.push(LoopKey { key, asked: 0, given: Vec::new() });
+        self.log(Undo::LoopKeyPushed);
+        (self.loop_keys.len() - 1, forgot)
+    }
+
+    /// Changes the kept question at `at`, journalling that entry alone.
+    pub fn update_loop_key(&mut self, at: usize, f: impl FnOnce(&mut LoopKey)) {
+        let old = self.loop_keys[at].clone();
+        f(&mut self.loop_keys[at]);
+        if self.loop_keys[at] != old {
+            self.log(Undo::LoopKeySet(at as u32, old));
+        }
+    }
+
+    /// Forgets every kept question.
+    pub fn loop_keys_clear(&mut self) {
+        if !self.loop_keys.is_empty() {
+            let old = std::mem::take(&mut self.loop_keys);
+            self.log(Undo::LoopKeysSet(old));
+        }
+    }
+
     pub fn set_extra_turns(&mut self, turns: Vec<ExtraTurn>) {
         let old = std::mem::replace(&mut self.extra_turns, turns);
         self.log(Undo::ExtraTurnsSet(old));
@@ -1317,6 +1356,12 @@ impl GameState {
             Undo::BlocksSet(old) => self.blocks = old,
             Undo::ExtraTurnsSet(old) => self.extra_turns = old,
             Undo::LoopWatchSet(old) => self.loop_watch = old,
+            Undo::LoopKeyPushed => {
+                self.loop_keys.pop();
+            }
+            Undo::LoopKeyPopped(key) => self.loop_keys.push(key),
+            Undo::LoopKeySet(at, old) => self.loop_keys[at as usize] = old,
+            Undo::LoopKeysSet(old) => self.loop_keys = old,
             Undo::StaticsSeen(old) => self.statics_seen = old,
             Undo::FramePushed => {
                 self.agenda.pop();
@@ -1407,6 +1452,10 @@ impl GameState {
             Undo::BlocksSet(_) => Undo::BlocksSet(self.blocks.clone()),
             Undo::ExtraTurnsSet(_) => Undo::ExtraTurnsSet(self.extra_turns.clone()),
             Undo::LoopWatchSet(_) => Undo::LoopWatchSet(self.loop_watch.clone()),
+            Undo::LoopKeyPushed => Undo::LoopKeyPopped(self.loop_keys.last().expect("a key").clone()),
+            Undo::LoopKeyPopped(_) => Undo::LoopKeyPushed,
+            Undo::LoopKeySet(at, _) => Undo::LoopKeySet(*at, self.loop_keys[*at as usize].clone()),
+            Undo::LoopKeysSet(_) => Undo::LoopKeysSet(self.loop_keys.clone()),
             Undo::StaticsSeen(_) => Undo::StaticsSeen(self.statics_seen),
             Undo::FramePushed => Undo::FramePopped(self.agenda.last().expect("a frame").clone()),
             Undo::FramePopped(_) => Undo::FramePushed,
