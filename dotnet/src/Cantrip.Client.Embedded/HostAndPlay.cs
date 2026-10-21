@@ -28,12 +28,19 @@ public static class HostAndPlay
     /// The cards are the native engine's own: nothing under <c>content/</c> is loaded, and a card the engine has not
     /// ported is the host's refusal to deal (<see cref="RulesRejectedException"/>).
     /// </para>
+    /// <para>
+    /// The game has the chess clocks every table has (docs/events.md, "Clocks"), on <paramref name="time"/> - the system's
+    /// unless a test gives one it moves itself: each player's <paramref name="playerClock"/>, an hour by default, running
+    /// while the game waits on them. Whoever plays the game charges them as it goes (<see cref="HostedGame.Tick"/>).
+    /// </para>
     /// </summary>
     public static HostedGame StartTable(
         IRulesHostFactory rules,
         IReadOnlyList<DeckList> decks,
         ulong seed,
-        IReadOnlyList<string> playerNames)
+        IReadOnlyList<string> playerNames,
+        TimeProvider? time = null,
+        TimeSpan? playerClock = null)
     {
         ArgumentNullException.ThrowIfNull(rules);
         ArgumentNullException.ThrowIfNull(decks);
@@ -52,7 +59,8 @@ public static class HostAndPlay
 
         IRulesHost game = rules.Create(seats, seed, new RulesGameOptions());
 
-        return Host(new GameSession(game), Listed(decks));
+        var clocks = new HostedClocks(time ?? TimeProvider.System, playerClock ?? MatchClocks.DefaultPlayerClock);
+        return Host(new GameSession(game), Listed(decks), clocks);
     }
 
     /// <summary>
@@ -77,7 +85,7 @@ public static class HostAndPlay
         return listed;
     }
 
-    private static HostedGame Host(GameSession session, Dictionary<int, string> decks)
+    private static HostedGame Host(GameSession session, Dictionary<int, string> decks, HostedClocks clocks)
     {
         Dictionary<int, IGameTransport> transports = [];
         foreach (PlayerId seat in session.Seats)
@@ -85,9 +93,12 @@ public static class HostAndPlay
             transports[seat.Value] = new LoopbackTransport(session, seat);
         }
 
-        return new HostedGame(session, transports, decks);
+        return new HostedGame(session, transports, decks, clocks);
     }
 }
+
+/// <summary>What a game in one process is clocked by: its time, and each player's clock.</summary>
+internal sealed record HostedClocks(TimeProvider Time, TimeSpan PlayerClock);
 
 /// <summary>A game running in this process, with a transport per seat.</summary>
 public sealed class HostedGame : IDisposable
@@ -97,20 +108,50 @@ public sealed class HostedGame : IDisposable
     internal HostedGame(
         GameSession session,
         Dictionary<int, IGameTransport> transports,
-        IReadOnlyDictionary<int, string> decks)
+        IReadOnlyDictionary<int, string> decks,
+        HostedClocks clocking)
     {
         _session = session;
         _transports = transports;
         Decks = decks;
+        _clocking = clocking;
     }
+
+    private readonly HostedClocks _clocking;
+
+    /// <summary>The game's clocks once it has started (docs/events.md, "Clocks").</summary>
+    public MatchClocks? Clocks { get; private set; }
 
     /// <summary>What each seat was dealt, as a decklist of names and counts.</summary>
     public IReadOnlyDictionary<int, string> Decks { get; }
 
     private readonly GameSession _session;
 
-    /// <summary>Start the hosted authority without exposing its implementation to presentation.</summary>
-    public void Start() => _session.Start();
+    /// <summary>Start the hosted authority without exposing its implementation to presentation, and its clocks.</summary>
+    public void Start()
+    {
+        _session.Start();
+        Clocks = new MatchClocks(_session.Seats.ToDictionary(seat => seat.Value, _ => _clocking.PlayerClock), _clocking.Time.GetUtcNow());
+    }
+
+    /// <summary>
+    /// Charges the game's clocks for the time since the last look, as a table does: a player out of time loses and leaves
+    /// the game through its rules (CR 104.3a, 800.4a), the others playing on. Called by whatever plays the game, as often as
+    /// it looks at it.
+    /// </summary>
+    public void Tick()
+    {
+        if (Clocks is null || _session.IsOver)
+        {
+            return;
+        }
+
+        ClockTick tick = Clocks.Tick(_clocking.Time.GetUtcNow(), _session.WaitingOn);
+        if (tick.RanOut.Count > 0)
+        {
+            _session.TimeOut(tick.RanOut);
+        }
+    }
 
     public IGameTransport TransportFor(int seat) => _transports[seat];
 

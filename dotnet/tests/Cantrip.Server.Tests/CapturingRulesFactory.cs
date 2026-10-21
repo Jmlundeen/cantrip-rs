@@ -39,6 +39,8 @@ internal sealed class CapturingRulesFactory : IRulesHostFactory
 
     private sealed class InertHost : IRulesHost
     {
+        public RulesStep Leave(int seat) => throw new NotSupportedException("An inert host plays no game.");
+
         private readonly IReadOnlyList<RulesSeat> _seats;
 
         public InertHost(IReadOnlyList<RulesSeat> seats)

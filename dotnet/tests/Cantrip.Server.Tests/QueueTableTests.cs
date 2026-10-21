@@ -107,7 +107,7 @@ public sealed class QueueTableTests : IDisposable
         table.Tick(_clock.GetUtcNow());
         Assert.True(table.ReadyToDeal);
         table.Deal(["Alice", "Bob"], new CapturingRulesFactory());
-        Assert.Equal(TimeSpan.FromMinutes(25), table.ClockAtDeal(1));
+        Assert.Equal(TimeSpan.FromHours(1), table.ClockAtDeal(1));
 
         // Both had the table open from before the draft began: neither is taken for a no-show.
         _clock.Advance(TimeSpan.FromMinutes(4));

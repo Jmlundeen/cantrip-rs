@@ -19,9 +19,10 @@ public class MatchTiming
 
     /// <summary>
     /// Each player's match clock: a chess clock across every game of a match, running while the game waits on them -
-    /// priority, the mulligans, every choice. A player whose clock runs out loses the match. Zero plays without one.
+    /// priority, the mulligans, every choice. A player whose clock runs out loses the match, whatever the score. An hour, as
+    /// every table's (docs/events.md, "Clocks"); zero leaves the players the table's own.
     /// </summary>
-    public TimeSpan MatchClock { get; init; } = TimeSpan.FromMinutes(25);
+    public TimeSpan MatchClock { get; init; } = TimeSpan.FromHours(1);
 
     /// <summary>How long the end of a game is shown before its players are taken on to the next game, or back.</summary>
     public TimeSpan AfterGame { get; init; } = TimeSpan.FromSeconds(6);
@@ -82,4 +83,10 @@ internal interface IMatchHost
 
     /// <summary>A player's match clock ran out: they lose the match.</summary>
     void TimedOut(MatchGame game, string loser);
+
+    /// <summary>
+    /// Both players' match clocks ran out at the same moment: neither is preferred, so the game being played and the match are
+    /// drawn, and nothing more is dealt.
+    /// </summary>
+    void TimedOutTogether(MatchGame game);
 }

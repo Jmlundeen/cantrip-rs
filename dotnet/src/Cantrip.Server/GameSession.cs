@@ -151,6 +151,66 @@ public sealed class GameSession : IDisposable
         }
     }
 
+    /// <summary>
+    /// The seats still in the game: every seat that has not lost, conceded or left. Judged from every seat's view of the last
+    /// position published - a seat any of them shows out is out, since a seat not answering may be shown a position from
+    /// before the run being played (the host shows a run to its answering seat alone) - and from the seats this session
+    /// has itself taken out (<see cref="Leave"/>).
+    /// </summary>
+    public IReadOnlyList<int> InGame =>
+    [
+        .. Seats.Select(seat => seat.Value)
+            .Where(seat => !_left.Contains(seat))
+            .Where(seat => _latestStep is not { } step || step.Views.Values.All(view =>
+                view.Players.FirstOrDefault(player => player.Seat == seat) is not { } shown || shown.Status == PlayerStatusView.Active)),
+    ];
+
+    /// <summary>The seats this session has taken out of the game from outside it (<see cref="Leave"/>).</summary>
+    private readonly HashSet<int> _left = [];
+
+    /// <summary>
+    /// Seats whose match clocks have run out at once (CR 104.3a, 800.4a): each loses and leaves, through the rules' own
+    /// concession, and a game of more than two goes on for the rest. If every seat still in ran out together, nobody is left
+    /// to win: the game ends as a draw from outside its rules (<see cref="Forfeit"/>).
+    /// </summary>
+    public void TimeOut(IReadOnlyCollection<int> seats)
+    {
+        ArgumentNullException.ThrowIfNull(seats);
+        if (IsOver)
+        {
+            return;
+        }
+
+        List<int> standing = [.. InGame];
+        if (standing.All(seats.Contains))
+        {
+            Forfeit([]);
+            return;
+        }
+
+        foreach (int seat in seats.Order())
+        {
+            if (IsOver)
+            {
+                return;
+            }
+
+            if (standing.Contains(seat))
+            {
+                Leave(new PlayerId(seat));
+            }
+        }
+    }
+
+    /// <summary>A seat loses and leaves the game from outside it (<see cref="IRulesHost.Leave"/>); the rest play on.</summary>
+    public void Leave(PlayerId seat)
+    {
+        _left.Add(seat.Value);
+        RulesStep step = _rules.Leave(seat.Value);
+        _published.Clear();
+        Publish(step);
+    }
+
     /// <summary>Whether a seat can concede now: only when that ends the game (<see cref="IRulesHost.CanConcede"/>).</summary>
     public bool CanConcede(PlayerId seat) => !_forfeited && _latestStep is not null && _rules.CanConcede(seat.Value);
 

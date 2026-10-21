@@ -70,10 +70,23 @@ public interface ITableEvent
     // --- A match clock. An event with none needs none of this. ---
 
     /// <summary>
-    /// How long a seat has left on its match clock as a game is dealt, or null for a game with no clock. Asked of every
-    /// seat once the game is dealt; a clock runs only when every seat has one.
+    /// How long a seat has left on its match clock as a game is dealt - what its earlier games of the match left it - or null
+    /// for none of the event's own: the table then gives that seat its own clock (<c>GameServerOptions.PlayerClock</c>). Asked
+    /// of every seat once the game is dealt.
     /// </summary>
     TimeSpan? ClockAtDeal(int seat) => null;
+
+    /// <summary>
+    /// Every seat's clock at once (<see cref="ClockUsed"/>), as the table tells them whenever whose clock runs changes: an
+    /// event that saves them saves once.
+    /// </summary>
+    void ClocksKept(IReadOnlyDictionary<int, TimeSpan> left)
+    {
+        foreach ((int seat, TimeSpan each) in left)
+        {
+            ClockUsed(seat, each);
+        }
+    }
 
     /// <summary>What is left on a seat's clock now, to be kept for the match's next game - and a restart.</summary>
     void ClockUsed(int seat, TimeSpan left)
@@ -86,6 +99,18 @@ public interface ITableEvent
     /// </summary>
     void ClockRanOut(int seat)
     {
+    }
+
+    /// <summary>
+    /// The seats whose clocks ran out at the same look, all at once (<see cref="ClockRanOut"/> for each, unless the event
+    /// says otherwise): an event's match whose every player ran out together is a draw, neither preferred.
+    /// </summary>
+    void ClocksRanOut(IReadOnlyList<int> seats)
+    {
+        foreach (int seat in seats)
+        {
+            ClockRanOut(seat);
+        }
     }
 
     /// <summary>

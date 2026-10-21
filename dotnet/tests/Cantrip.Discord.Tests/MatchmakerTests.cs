@@ -292,6 +292,40 @@ public sealed class MatchmakerTests
         }
     }
 
+    /// <summary>
+    /// A constructed game has the chess clocks every table has (an hour each): a player the game
+    /// waits on who never acts runs out of time and loses, so nobody can hold the table open by sitting at it.
+    /// </summary>
+    [Fact]
+    public async Task A_constructed_game_has_player_clocks_and_whoever_never_acts_runs_out_of_time()
+    {
+        var clock = new Clock();
+        await using Matchmaker matchmaker = Create(tables: 1, clock);
+        Seating hosted = await matchmaker.HostAsync(Alice);
+        HostedGame game = hosted.Game!;
+        Seating joined = await matchmaker.JoinAsync(game.Id, Bob);
+        GameClient alice = await Connect(game, hosted.Ticket!);
+        GameClient bob = await Connect(game, joined.Ticket!);
+        try
+        {
+            await Settle(() => game.Stage == GameStage.Playing);
+            await Settle(() =>
+            {
+                alice.Pump();
+                return alice.Clock is { Clocks.Count: 2 } clocks && clocks.Clocks.All(each => each.LeftMs == 60 * 60 * 1000);
+            });
+
+            clock.Advance(TimeSpan.FromMinutes(61));
+            await Settle(() => game.Stage == GameStage.Ended);
+            Assert.Contains("ran out of time", game.Detail, StringComparison.Ordinal);
+        }
+        finally
+        {
+            alice.Disconnect();
+            bob.Disconnect();
+        }
+    }
+
     [Fact]
     public void Discord_names_become_names_a_table_accepts()
     {

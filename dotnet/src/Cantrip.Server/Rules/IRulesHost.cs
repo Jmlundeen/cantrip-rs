@@ -49,6 +49,12 @@ public interface IRulesHost : IDisposable
     /// <summary>The seat concedes; the game ends with everyone else winning.</summary>
     RulesStep Concede(int seat);
 
+    /// <summary>
+    /// The seat loses and leaves the game from outside it - its match clock has run out - as a concession does (CR 104.3a),
+    /// whether or not that ends the game: in a game of more than two, the others play on without it (CR 800.4a).
+    /// </summary>
+    RulesStep Leave(int seat);
+
     /// <summary>A seat's current view, for a client being brought back up to date. Nothing advances.</summary>
     PlayerView View(int seat);
 

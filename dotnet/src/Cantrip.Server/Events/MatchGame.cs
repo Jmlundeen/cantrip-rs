@@ -330,14 +330,37 @@ public sealed class MatchGame : ITableEvent
         }
     }
 
-    public void ClockRanOut(int seat)
+    public void ClocksKept(IReadOnlyDictionary<int, TimeSpan> left)
     {
         lock (_pod.Gate)
         {
-            if (_ended || seat is not (1 or 2)) return;
+            foreach ((int seat, TimeSpan each) in left.Where(clock => clock.Key is 1 or 2))
+            {
+                Match.ClockMs[Match.Players[seat - 1]] = Math.Max(0, (long)each.TotalMilliseconds);
+            }
+
+            _pod.Save();
+        }
+    }
+
+    public void ClockRanOut(int seat) => ClocksRanOut([seat]);
+
+    public void ClocksRanOut(IReadOnlyList<int> seats)
+    {
+        lock (_pod.Gate)
+        {
+            List<int> out_ = [.. seats.Where(seat => seat is 1 or 2).Distinct()];
+            if (_ended || out_.Count == 0) return;
             _ended = true;
             _endedAt = _pod.Now;
-            _pod.TimedOut(this, Match.Players[seat - 1]);
+            if (out_.Count == 2)
+            {
+                _pod.TimedOutTogether(this);
+            }
+            else
+            {
+                _pod.TimedOut(this, Match.Players[out_[0] - 1]);
+            }
         }
     }
 

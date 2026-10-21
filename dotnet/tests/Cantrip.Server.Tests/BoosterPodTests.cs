@@ -183,10 +183,10 @@ public sealed class BoosterPodTests : IDisposable
             await Task.Delay(10);
         }
 
-        Assert.Equal(25 * 60 * 1000, eve.Clock!.Clocks[1].LeftMs, tolerance: 1000);
+        Assert.Equal(60 * 60 * 1000, eve.Clock!.Clocks[1].LeftMs, tolerance: 1000);
         Assert.NotNull(eve.Prompt);
 
-        clock.Advance(TimeSpan.FromMinutes(26));
+        clock.Advance(TimeSpan.FromMinutes(61));
         await annPlays;
         Assert.False(stop.IsCancellationRequested, "Ann's game never ended.");
 
@@ -423,6 +423,103 @@ public sealed class BoosterPodTests : IDisposable
         EventRecord record = store.LoadEvent(created.Record.Id)!;
         Assert.Empty(record.Matches);
         Assert.All(record.Participants, participant => Assert.True(participant.Deck.Submitted));
+    }
+
+    /// <summary>
+    /// A player whose match clock runs out loses the whole match, whatever the score (docs/events.md, "Clocks"): Ann wins game
+    /// one, then runs out of time in game two, and her opponent wins the match - its game two too - with nothing more dealt,
+    /// and the standings count it as his match win and her match loss.
+    /// </summary>
+    [Fact]
+    public void A_player_up_a_game_who_runs_out_of_time_loses_the_match()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = Create(store, packSize: 5);
+        BoosterPod pod = BoosterPod.Open(store, created.Record.Id, Content, clock);
+        pod.Hosted(new Uri("ws://localhost:8999/game"));
+        for (int seat = 1; seat <= 8; seat++) pod.Seated(seat);
+        while (pod.Stage == EventStage.Drafting)
+        {
+            clock.Advance(TimeSpan.FromSeconds(30));
+            pod.Tick(clock.GetUtcNow());
+        }
+
+        clock.Advance(TimeSpan.FromMinutes(10));
+        pod.Tick(clock.GetUtcNow());
+        clock.Advance(TimeSpan.FromSeconds(15));
+        pod.Tick(clock.GetUtcNow());
+
+        MatchGame first = pod.TablesToOpen().Single(game => game.NameAt(1) == "Ann" || game.NameAt(2) == "Ann");
+        first.Opened(new Uri("ws://localhost:9100/game"));
+        int ann = first.NameAt(1) == "Ann" ? 1 : 2;
+        string opponent = first.Match.Players[2 - ann];
+        first.Match.Games.Add(new GameRecord { Number = 1, Seed = 1, Started = clock.GetUtcNow() });
+        first.GameEnded(abandoned: false, [ann], "won");
+
+        MatchGame second = pod.TablesToOpen().Single(game => game.Match == first.Match);
+        second.Opened(new Uri("ws://localhost:9101/game"));
+        second.Match.Games.Add(new GameRecord { Number = 2, Seed = 2, Started = clock.GetUtcNow() });
+        second.ClockRanOut(ann);
+        second.GameEnded(abandoned: false, [3 - ann], "Ann ran out of time.");
+
+        MatchRecord match = store.LoadEvent(created.Record.Id)!.Matches.Single(each => each.Id == first.Match.Id);
+        Assert.True(match.Complete);
+        Assert.Equal([opponent], match.Winners);
+        Assert.Equal("ann", match.TimedOut);
+        Assert.Equal("won", match.Games.Single(game => game.Number == 2).Ending);
+        Assert.Equal([opponent], match.Games.Single(game => game.Number == 2).Winners);
+        Assert.False(second.ReadyToDeal);
+        Assert.DoesNotContain(pod.TablesToOpen(), game => game.Match.Id == match.Id);
+
+        EventRecord record = store.LoadEvent(created.Record.Id)!;
+        IReadOnlyList<SwissStanding> standings = Swiss.Standings([.. record.Participants.Select(p => p.PlayerId)], record.Matches, new HashSet<string>());
+        SwissStanding annStanding = standings.Single(standing => standing.PlayerId == "ann");
+        SwissStanding theirs = standings.Single(standing => standing.PlayerId == opponent);
+        Assert.Equal((0, 1, 0), (annStanding.Wins, annStanding.Losses, annStanding.Points));
+        Assert.Equal((1, 0, 3), (theirs.Wins, theirs.Losses, theirs.Points));
+    }
+
+    /// <summary>
+    /// Both players' clocks run out at the same look (ITableEvent.ClocksRanOut): neither is preferred, so the game and the match
+    /// are drawn, nothing more is dealt, and the standings count a drawn match - a point each.
+    /// </summary>
+    [Fact]
+    public void Both_players_out_of_time_together_draw_the_match()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = Create(store, packSize: 5);
+        BoosterPod pod = BoosterPod.Open(store, created.Record.Id, Content, clock);
+        pod.Hosted(new Uri("ws://localhost:8999/game"));
+        for (int seat = 1; seat <= 8; seat++) pod.Seated(seat);
+        while (pod.Stage == EventStage.Drafting)
+        {
+            clock.Advance(TimeSpan.FromSeconds(30));
+            pod.Tick(clock.GetUtcNow());
+        }
+
+        clock.Advance(TimeSpan.FromMinutes(10));
+        pod.Tick(clock.GetUtcNow());
+        clock.Advance(TimeSpan.FromSeconds(15));
+        pod.Tick(clock.GetUtcNow());
+
+        MatchGame game = pod.TablesToOpen().Single(each => each.NameAt(1) == "Ann" || each.NameAt(2) == "Ann");
+        game.Opened(new Uri("ws://localhost:9100/game"));
+        game.Match.Games.Add(new GameRecord { Number = 1, Seed = 1, Started = clock.GetUtcNow() });
+        game.ClocksRanOut([1, 2]);
+        game.GameEnded(abandoned: false, [], "Ann and her opponent ran out of time.");
+
+        EventRecord record = store.LoadEvent(created.Record.Id)!;
+        MatchRecord match = record.Matches.Single(each => each.Id == game.Match.Id);
+        Assert.True(match.Complete);
+        Assert.Empty(match.Winners);
+        Assert.Null(match.TimedOut);
+        Assert.Equal("draw", Assert.Single(match.Games).Ending);
+        Assert.False(game.ReadyToDeal);
+        Assert.DoesNotContain(pod.TablesToOpen(), each => each.Match.Id == match.Id);
+        IReadOnlyList<SwissStanding> standings = Swiss.Standings([.. record.Participants.Select(p => p.PlayerId)], record.Matches, new HashSet<string>());
+        Assert.All(match.Players, player => Assert.Equal((0, 0, 1, 1), standings.Single(s => s.PlayerId == player) is { } st ? (st.Wins, st.Losses, st.Draws, st.Points) : default));
     }
 
     [Fact]

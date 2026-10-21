@@ -227,6 +227,17 @@ public sealed class NativeRulesHost : IRulesHost
         return Take(Send<StepReply>(new { Cmd = "Concede", GameId, Seat = seat }));
     }
 
+    public RulesStep Leave(int seat)
+    {
+        if (!_started || _finished || !StillIn(seat))
+        {
+            throw new InvalidOperationException($"Seat {seat} is not in the game.");
+        }
+
+        // The host's concession (CR 104.3a): the player loses; the game ends if one player is left, and goes on otherwise.
+        return Take(Send<StepReply>(new { Cmd = "Concede", GameId, Seat = seat }));
+    }
+
     public PlayerView View(int seat)
     {
         if (!_started)
@@ -268,6 +279,13 @@ public sealed class NativeRulesHost : IRulesHost
             // Closing is a courtesy to a host that is still there; one that has gone has nothing to close.
         }
     }
+
+    /// <summary>
+    /// Whether a seat is still in the game, by every seat's view of the last step: a seat any of them shows out is out, since a
+    /// seat not answering may be shown a position from before the run being played.
+    /// </summary>
+    private bool StillIn(int seat) => _views.Count > 0 && _views.Values.All(view =>
+        view.Players.FirstOrDefault(player => player.Seat == seat) is not { } shown || shown.Status == PlayerStatusView.Active);
 
     private PlayerSummaryView? Summary(int seat) =>
         _views.Values.FirstOrDefault()?.Players.FirstOrDefault(player => player.Seat == seat);

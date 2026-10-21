@@ -39,6 +39,14 @@ public sealed class GameServerOptions
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
 
     /// <summary>
+    /// Each player's chess clock at a table (docs/events.md, "Clocks"), as Magic Online keeps one: it runs only while the game
+    /// waits on its player, and whoever's runs out loses. For every seat of a table without an event, and any seat its event
+    /// gives none (<see cref="ITableEvent.ClockAtDeal"/>, which carries a player's clock across a match's games). Every table
+    /// has one, so a player who never acts cannot hold a game open. An hour unless a table says otherwise.
+    /// </summary>
+    public TimeSpan PlayerClock { get; init; } = MatchClocks.DefaultPlayerClock;
+
+    /// <summary>
     /// The address to listen on. Loopback unless the host deliberately exposes the table to other machines, as a
     /// Discord-hosted table must; the transport is still plaintext, so anything beyond a trusted network wants TLS in
     /// front of it.
@@ -108,16 +116,8 @@ public sealed class GameServer : IAsyncDisposable
     /// <summary>The event's <see cref="ITableEvent.Version"/> last shown, so a change made from outside is shown again.</summary>
     private int _eventVersion;
 
-    /// <summary>
-    /// Each seat's match clock while a game with one is played: how long it has left, as of <see cref="_clockAt"/>. Empty
-    /// for a game with no clock.
-    /// </summary>
-    private readonly Dictionary<int, TimeSpan> _clock = [];
-
-    /// <summary>The seats whose clocks are running: the ones the game is waiting on.</summary>
-    private HashSet<int> _running = [];
-
-    private DateTimeOffset _clockAt;
+    /// <summary>The clocks of the game being played: each seat's and the match's. Null before a game is dealt.</summary>
+    private MatchClocks? _clocks;
 
     /// <summary>
     /// What the pump is doing right now, and the last few things that happened to the table. Both exist for one
@@ -183,6 +183,8 @@ public sealed class GameServer : IAsyncDisposable
         // or one player, changing a league deck.
         int most = options.Event is null ? 4 : 8;
         int least = options.Event is null ? 2 : 1;
+        if (options.PlayerClock <= TimeSpan.Zero)
+            throw new ArgumentException("Every table has a player clock of more than no time.", nameof(options));
         if (options.Players < least || options.Players > most || options.ReconnectGrace <= TimeSpan.Zero || options.ReconnectGrace > TimeSpan.FromHours(1))
             throw new ArgumentException($"A table needs {least}–{most} players and a reconnect grace between zero and one hour.", nameof(options));
         if (options.Decks.Count > 128 || options.Decks.Any(deck => string.IsNullOrWhiteSpace(deck.Name)
@@ -672,7 +674,7 @@ public sealed class GameServer : IAsyncDisposable
         hosted.Connected(seat, true);
         FollowEvent();
         _session?.Resynchronize(new PlayerId(seat));
-        if (_clock.Count > 0) connection.Send(Clocks());
+        if (_clocks is not null) connection.Send(_clocks.Message());
     }
 
     /// <summary>
@@ -746,7 +748,7 @@ public sealed class GameServer : IAsyncDisposable
         _options.Event?.Connected(member.Seat, true);
         BroadcastTable();
         if (_options.Event?.ViewFor(member.Seat) is { } view) connection.Send(view);
-        if (_clock.Count > 0) connection.Send(Clocks());
+        if (_clocks is not null) connection.Send(_clocks.Message());
     }
 
     private static bool ValidName(string? name) => name is not null && name.Trim().Length is >= 1 and <= 32 && !name.Any(char.IsControl);
@@ -791,13 +793,14 @@ public sealed class GameServer : IAsyncDisposable
         if (_options.Event is { } hosted)
         {
             hosted.Tick(now);
-            if (_phase == TablePhase.Playing && _session is not null && hosted.TakeForfeits() is { Count: > 0 } forfeits)
+            // Not once the game is over: a game just won stays won, though a forfeit is taken in the same look.
+            if (_phase == TablePhase.Playing && _session is { IsOver: false } && hosted.TakeForfeits() is { Count: > 0 } forfeits)
             {
                 Note($"seat(s) {string.Join(", ", forfeits)} forfeited");
                 string absent = string.Join(" and ", forfeits.Select(hosted.NameAt));
                 string why = forfeits.Select(hosted.ForfeitReason).OfType<string>().FirstOrDefault()
                     ?? $"{absent} {(forfeits.Count == 1 ? "was" : "were")} not at the table.";
-                EndAgainst(forfeits, why, ranOut: false);
+                EndAgainst(forfeits, why);
             }
 
             FollowVacated(hosted);
@@ -867,6 +870,7 @@ public sealed class GameServer : IAsyncDisposable
         }
         Note($"the table started with {members.Count} seat(s)");
         _phase = TablePhase.Playing;
+        StartClocks(null);
         BroadcastTable();
         _started.TrySetResult();
     }
@@ -904,6 +908,7 @@ public sealed class GameServer : IAsyncDisposable
 
         Note($"the scenario {scenario.Name} started");
         _phase = TablePhase.Playing;
+        StartClocks(null);
         BroadcastTable();
         _started.TrySetResult();
     }
@@ -949,92 +954,103 @@ public sealed class GameServer : IAsyncDisposable
     }
 
     /// <summary>
-    /// Starts the match clocks for a game just dealt, when the event gives every seat one: running for the seats the game
-    /// is waiting on from the first question - the mulligans - on.
+    /// Starts the clocks for a game just dealt, running for the seats the game is waiting on from the first question - the
+    /// mulligans - on. Each seat takes what its event has left on its clock for the match, or the table's own (<see
+    /// cref="GameServerOptions.PlayerClock"/>) for a seat the event gives none: one seat without a record never stops the
+    /// others' clocks.
     /// </summary>
-    private void StartClocks(ITableEvent hosted)
+    private void StartClocks(ITableEvent? hosted)
     {
-        _clock.Clear();
-        List<(int Seat, TimeSpan? Left)> clocks = [.. Enumerable.Range(1, _options.Players).Select(seat => (seat, hosted.ClockAtDeal(seat)))];
-        if (clocks.Any(clock => clock.Left is null)) return;
-        foreach ((int seat, TimeSpan? left) in clocks) _clock[seat] = left!.Value;
-        _clockAt = _options.TimeProvider.GetUtcNow();
-        _running = [];
+        Dictionary<int, TimeSpan> left = Enumerable.Range(1, _options.Players)
+            .ToDictionary(seat => seat, seat => hosted?.ClockAtDeal(seat) ?? _options.PlayerClock);
+        _clocks = new MatchClocks(left, _options.TimeProvider.GetUtcNow());
     }
 
     /// <summary>
-    /// Charges the time since the last look to every running clock, as a chess clock does, and runs the clocks of whoever
-    /// the game is waiting on now. A clock that reaches zero ends the game: its seat loses (<see cref="TimeOut"/>).
+    /// Charges the time since the last look to every running clock, as a chess clock does, and runs the clocks of whoever the
+    /// game is waiting on now. A seat whose clock reaches zero loses and leaves (<see cref="TimeOut"/>). Nothing once the game
+    /// is over: a game just won stays won, though its clocks are charged in the same look.
     /// </summary>
     private void TickClocks()
     {
-        if (_clock.Count == 0 || _session is null || _phase != TablePhase.Playing) return;
-        DateTimeOffset now = _options.TimeProvider.GetUtcNow();
-        TimeSpan elapsed = now - _clockAt;
-        _clockAt = now;
-        foreach (int seat in _running) _clock[seat] -= elapsed;
-
-        List<int> out_ = [.. _clock.Where(clock => clock.Value <= TimeSpan.Zero).Select(clock => clock.Key).Order()];
-        if (out_.Count > 0)
+        if (_clocks is null || _session is null || _session.IsOver || _phase != TablePhase.Playing) return;
+        ClockTick tick = _clocks.Tick(_options.TimeProvider.GetUtcNow(), _session.WaitingOn);
+        if (tick.RanOut.Count > 0)
         {
-            TimeOut(out_);
+            TimeOut(tick.RanOut);
             return;
         }
 
-        HashSet<int> waiting = [.. _session.WaitingOn];
-        if (waiting.SetEquals(_running)) return;
-        _running = waiting;
-        foreach ((int seat, TimeSpan left) in _clock) _options.Event?.ClockUsed(seat, left);
-        ClockMessage clocks = Clocks();
+        if (tick.Changed)
+        {
+            KeepClocks();
+            SendClocks();
+        }
+    }
+
+    /// <summary>Tells every seat the clocks.</summary>
+    private void SendClocks()
+    {
+        if (_clocks is null) return;
+        ClockMessage clocks = _clocks.Message();
         foreach (Member member in _members.Values) member.Connection?.Send(clocks);
     }
 
-    private ClockMessage Clocks() => new()
+    /// <summary>Gives the event what is left on each clock, to keep for the match's next game and a restart, in one save.</summary>
+    private void KeepClocks()
     {
-        Clocks = [.. _clock.OrderBy(clock => clock.Key).Select(clock => new SeatClockView
-        {
-            Seat = clock.Key, LeftMs = Math.Max(0, (long)clock.Value.TotalMilliseconds), Running = _running.Contains(clock.Key),
-        })],
-    };
+        if (_clocks is null || _options.Event is not { } hosted) return;
+        hosted.ClocksKept(_clocks.Left.ToDictionary(clock => clock.Key, clock => clock.Value < TimeSpan.Zero ? TimeSpan.Zero : clock.Value));
+    }
 
     /// <summary>
-    /// Seats whose clocks ran out lose: the event is told first, so it can take the match from them as well as the game,
-    /// then the game ends with everyone else winning - or nobody, when every clock ran out at once.
+    /// Seats whose clocks ran out lose: the event is told first, so it can take the match from them as well as the game.
+    /// Each leaves the game through its rules (<see cref="GameSession.TimeOut"/>, CR 104.3a, 800.4a): a game of more than two
+    /// goes on for the rest, a game of two is won by the other, and a game whose every remaining seat ran out at once is a
+    /// draw.
     /// </summary>
     private void TimeOut(IReadOnlyList<int> losers)
     {
         Note($"the clock ran out for seat(s) {string.Join(", ", losers)}");
         string names = string.Join(" and ", losers.Select(seat => _members.TryGetValue(seat, out Member? member) ? member.Name : _options.Event?.NameAt(seat) ?? $"Seat {seat}"));
-        EndAgainst(losers, $"{names} ran out of time.", ranOut: true);
+        foreach (int seat in losers)
+        {
+            _options.Event?.ClockUsed(seat, TimeSpan.Zero);
+        }
+
+        // All at once: an event's match whose every player ran out together is a draw, neither preferred.
+        _options.Event?.ClocksRanOut(losers);
+
+        _session!.TimeOut(losers);
+        if (!_session.IsOver)
+        {
+            KeepClocks();
+            SendClocks();
+            Flush();
+            return;
+        }
+
+        _detail = $"{names} ran out of time.";
+        _phase = TablePhase.Finished;
+        _clocks!.Stop(_options.TimeProvider.GetUtcNow());
+        SendClocks();
+        Flush();
+        BroadcastTable();
+        Finish();
     }
 
     /// <summary>
-    /// Ends the game being played against some seats - their clocks ran out, or they forfeited it - with everyone else
-    /// winning, or nobody when it is everyone.
+    /// Ends the game being played from outside its rules against some seats - they forfeited it, not being at the table - with
+    /// every other seat still in winning, or nobody when it is all of them.
     /// </summary>
-    private void EndAgainst(IReadOnlyList<int> losers, string detail, bool ranOut)
+    private void EndAgainst(IReadOnlyList<int> losers, string detail)
     {
-        if (ranOut)
-        {
-            foreach (int seat in losers)
-            {
-                _clock[seat] = TimeSpan.Zero;
-                _options.Event?.ClockUsed(seat, TimeSpan.Zero);
-                _options.Event?.ClockRanOut(seat);
-            }
-        }
-
-        List<int> winners = [.. Enumerable.Range(1, _options.Players).Where(seat => !losers.Contains(seat))];
-        _running = [];
-        _session!.Forfeit(winners);
+        List<int> winners = [.. _session!.InGame.Where(seat => !losers.Contains(seat))];
+        _session.Forfeit(winners);
         _detail = detail;
         _phase = TablePhase.Finished;
-        if (_clock.Count > 0)
-        {
-            ClockMessage clocks = Clocks();
-            foreach (Member member in _members.Values) member.Connection?.Send(clocks);
-        }
-
+        _clocks?.Stop(_options.TimeProvider.GetUtcNow());
+        SendClocks();
         Flush();
         BroadcastTable();
         Finish(winners);
@@ -1047,14 +1063,8 @@ public sealed class GameServer : IAsyncDisposable
     private void Finish(IReadOnlyList<int>? decided = null)
     {
         // What is left on each clock is kept for the match's next game, charged up to the end of this one.
-        if (_clock.Count > 0)
-        {
-            DateTimeOffset now = _options.TimeProvider.GetUtcNow();
-            foreach (int seat in _running) _clock[seat] -= now - _clockAt;
-            _clockAt = now;
-            _running = [];
-            foreach ((int seat, TimeSpan left) in _clock) _options.Event?.ClockUsed(seat, left < TimeSpan.Zero ? TimeSpan.Zero : left);
-        }
+        _clocks?.Stop(_options.TimeProvider.GetUtcNow());
+        KeepClocks();
 
         List<int> winners = decided is null ? [] : [.. decided];
         if (decided is null && _phase == TablePhase.Finished) winners = [.. _session!.WinningSeats];

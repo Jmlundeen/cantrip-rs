@@ -18,6 +18,9 @@
 # a bad move rather than the game. Its questions and answers are written to a transcript its log names
 # (%TEMP%\cantrip-seat-2.log).
 #
+# Each player's chess clock is 90 minutes rather than a table's hour: the model takes a second or two over each decision,
+# and a long game asks it many (docs/events.md, "Clocks").
+#
 # This is tools\scripts\play-game.ps1 with you in seat 1 and the model in seat 2:
 #
 #   -Model ID      the OpenRouter model (default: the client's own default)
@@ -35,7 +38,7 @@ param(
     [switch] $NoBuild
 )
 
-$arguments = @{ Player1 = 'Human'; Player2 = 'Llm'; Seed = $Seed }
+$arguments = @{ Player1 = 'Human'; Player2 = 'Llm'; Seed = $Seed; Clock = 90 }
 if ($Mine) { $arguments.Deck1 = $Mine }
 if ($Theirs) { $arguments.Deck2 = $Theirs }
 if ($Model) { $arguments.Model = $Model }

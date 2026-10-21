@@ -64,6 +64,7 @@ Low read as pri-0 / pri-1 / pri-2 / pri-3, except that every wrong game result i
 | [KI-98](#ki-98-a-station-permanent-lists-its-reached-striations-keyword-again-as-granted) | A station permanent lists its reached striation's keyword again, as granted | Pri-2 | Open |
 | [KI-99](#ki-99-a-spell-or-ability-with-more-than-232-targets-or-a-question-of-more-than-231-candidates) | A spell or ability with more than 2^32 targets, or a question of more than 2^31 candidates | Won't fix | Won't fix: beyond practical scale |
 | [KI-100](#ki-100-a-choice-search-or-sacrifice-of-more-than-232-cards) | A choice, search or sacrifice of more than 2^32 cards | Won't fix | Won't fix: beyond practical scale |
+| [KI-101](#ki-101-a-player-out-of-a-game-that-goes-on-sees-it-a-step-late) | A player out of a game that goes on sees it a step late | Pri-2 | Open |
 
 ## Issues
 
@@ -312,3 +313,20 @@ answer of more cards than asked is refused (`an_answer_of_257_cards_to_choose_on
 bound: each card counted is an object in memory, 2^31 of them hundreds of gigabytes, chosen by hand; tokens doubling each
 round pass 255 in eight rounds - why the counts are no longer `u8` - but 2^31 takes thirty-one, in a timed game. No card
 needs more.
+
+### KI-101: A player out of a game that goes on sees it a step late
+
+| Priority | Status | Area | Found |
+| --- | --- | --- | --- |
+| Pri-2 | Open | host / client | 2026-10-21, a player out of time in a game of four (`TableClockTests`) |
+
+**Notes.** A wrong display of a right game state. When a player of a game of more than two leaves it - their clock ran out
+(`GameSession.TimeOut`), or they lost - the game goes on for the rest (CR 800.4a), but that player's own page is told only
+once the run being played is published: the host shows a run in progress to its answering seat alone, and every other seat
+keeps the position from before it (`session.rs`, `view_for`). Until then the page shows the player still in, and its last
+question; `GameClient` drops the question once its own view shows it out. The server judges who is still in from every
+seat's view and its own leaves, so the rules are unaffected (`GameSession.InGame`, `TimeOutTests`). A fix sends a seat that
+has left its own view at once, as the answering seat's is.
+
+**Scenarios.** None; `TableClockTests.In_a_game_of_four_a_player_out_of_time_leaves_and_the_others_play_on` answers the others'
+questions until the departed seat is told.

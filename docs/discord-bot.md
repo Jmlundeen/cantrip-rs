@@ -88,8 +88,8 @@ forms and the draft is played exactly as a Winston queue's.
 `/cantrip queue cube:LSVCube format:Booster [packs:3] [pack-size:15] [rounds:3] [min-deck:40]` makes a channel a queue
 for a booster draft of a pod of eight. The table forms the same way, eight seats instead of two, and when all eight are
 ready the pod drafts at that table: packs passed round with a pick clock, then deck building on a ten-minute clock, then
-three Swiss rounds of best-of-three, each player with a 25-minute chess clock for the match - running while the game
-waits on them, and losing them the match if it runs out. Each game is played at a table of its own; the page goes there by itself, comes back
+three Swiss rounds of best-of-three, each player with an hour on a chess clock for the match - running while the game
+waits on them, and losing them the match, whatever the score, if it runs out. Each game is played at a table of its own; the page goes there by itself, comes back
 to the pairings when the match is over, and shows the final standings at the end ([events.md](events.md)).
 `/cantrip mydraft` gives a player a link back into their pod - to their game if one is on, otherwise the pod's table.
 Pods are kept in the data directory and taken up again after a restart.
@@ -219,8 +219,9 @@ A player signed in with Discord, exactly as on the queue page, presses **New Gam
 (the page remembers their last one in that browser; **Random deck** picks one), and the page goes straight to their
 seat. The game is a `/cantrip host` game in all but its decks - the same ports, one game per player across Discord and
 the page, dealt once both players have the table open, expiring if it never is - and the table shows each player the
-deck their opponent brought only as the game shows it. **Open my game** gives a seat back; **Call off** calls off a game
-of one's own that nobody has joined.
+deck their opponent brought only as the game shows it. Each player has an hour on a chess clock, as every table has
+([events.md](events.md#clocks)): it runs while the game waits on them, and a player whose clock runs out loses. **Open my game** gives a seat back; **Call off** calls off a game of one's own that
+nobody has joined.
 
 ## Drafts
 

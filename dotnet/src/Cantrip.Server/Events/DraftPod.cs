@@ -99,9 +99,10 @@ public sealed class DraftTiming
 
     /// <summary>
     /// Each player's clock for the game: a chess clock, running while the game waits on them - the mulligans, priority,
-    /// every choice. A player whose clock runs out loses. Zero plays without one.
+    /// every choice. A player whose clock runs out loses. An hour, as every table's (docs/events.md, "Clocks"); zero leaves
+    /// the players the table's own.
     /// </summary>
-    public TimeSpan MatchClock { get; init; } = TimeSpan.FromMinutes(25);
+    public TimeSpan MatchClock { get; init; } = TimeSpan.FromHours(1);
 }
 
 /// <summary>What a draft played at one table keeps of its own, whatever the format: what each seat has taken, and whose turn it is.</summary>
@@ -968,11 +969,32 @@ public sealed class DraftPod : ITableEvent
         }
     }
 
-    public void ClockRanOut(int seat)
+    public void ClocksKept(IReadOnlyDictionary<int, TimeSpan> left)
     {
         lock (_gate)
         {
-            if (_record.Matches.LastOrDefault() is { } match && _record.AtSeat(seat) is { } participant) match.TimedOut = participant.PlayerId;
+            if (_record.Matches.LastOrDefault() is not { } match) return;
+            foreach ((int seat, TimeSpan each) in left)
+            {
+                if (_record.AtSeat(seat) is { } participant) match.ClockMs[participant.PlayerId] = Math.Max(0, (long)each.TotalMilliseconds);
+            }
+
+            Save();
+        }
+    }
+
+    public void ClockRanOut(int seat) => ClocksRanOut([seat]);
+
+    /// <summary>
+    /// The players whose clocks ran out: one alone loses the match (<see cref="MatchRecord.TimedOut"/>); both together, and
+    /// neither is preferred - the game ends as a draw, and with it the match.
+    /// </summary>
+    public void ClocksRanOut(IReadOnlyList<int> seats)
+    {
+        lock (_gate)
+        {
+            List<string> out_ = [.. seats.Select(seat => _record.AtSeat(seat)?.PlayerId).OfType<string>().Distinct()];
+            if (out_.Count == 1 && _record.Matches.LastOrDefault() is { } match) match.TimedOut = out_[0];
         }
     }
 

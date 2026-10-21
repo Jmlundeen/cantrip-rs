@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Builder;
 // A player-hosted server. Players choose names/decks/sets and explicitly ready over a loopback WebSocket.
 //
 // Usage: cantrip-server [--port N] [--players N] [--seed N] [--content PATH] [--decks PATH] [--deck NAME]...
-//                       [--auto-start] [--art-port N] [--art-cache PATH] [--art-log]
+//                       [--auto-start] [--art-port N] [--art-cache PATH] [--art-log] [--clock MINUTES]
+//
+// Every table has chess clocks (docs/events.md, "Clocks"): each player's runs while the game waits on them, and whoever's
+// runs out loses (--clock, an hour by default).
 //
 // Every game is dealt through the native Rust engine, in the cantrip-native-host sidecar (CANTRIP_NATIVE_HOST names it).
 //
@@ -120,6 +123,7 @@ await using GameServer server = await GameServer.StartAsync(new GameServerOption
     Decks = catalog,
     AutoStart = autoStart,
     Art = ArtAddress(art),
+    PlayerClock = TimeSpan.FromMinutes(Math.Max(1, IntArg(args, "--clock", (int)MatchClocks.DefaultPlayerClock.TotalMinutes))),
 });
 
 Console.WriteLine($"Join with: ws://localhost:{server.Port}/game");

@@ -29,6 +29,8 @@
 #   -Port N     the port the server listens on (default 7777); its card art is served on the next one
 #               The server deals through the native Rust engine (cantrip-native-host, built here with cargo from
 #               the workspace at the repository root), so the decks' card names must be cards it has ported
+#   -Clock N    each player's chess clock, in minutes (default: the table's hour); every game has the clocks every table
+#               has (docs/events.md, "Clocks"), whoever's runs out loses
 #   -NoBuild    skip the build and use the web client already being served, if there is one
 
 [CmdletBinding()]
@@ -40,6 +42,7 @@ param(
     [uint64] $Seed = 0,
     [int] $Port = 7777,
     [string] $Model,
+    [int] $Clock = 0,
     [switch] $Defaults,
     [switch] $SimpleBot,
     [switch] $NoBuild
@@ -203,7 +206,7 @@ Write-Host 'Rules: native (the cantrip-native-host sidecar; its log is in the se
 Write-Host ''
 
 $serverArgs = "run --project `"$serverProject`" --no-build -- --port $Port --players 2 --seed $Seed " +
-    "--auto-start --deck `"$($decks[1])`" --deck `"$($decks[2])`""
+    "--auto-start --deck `"$($decks[1])`" --deck `"$($decks[2])`"" + $(if ($Clock -gt 0) { " --clock $Clock" } else { '' })
 
 # In a window of its own that stays open after the game, because the server log is where you find out why it ended.
 Start-Process -FilePath 'cmd.exe' -ArgumentList "/k title Cantrip server & dotnet $serverArgs" -WorkingDirectory $root

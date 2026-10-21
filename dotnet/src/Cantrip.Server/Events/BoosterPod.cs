@@ -940,6 +940,30 @@ public sealed class BoosterPod : ITableEvent, IMatchHost
         Save();
     }
 
+    /// <summary>
+    /// Both players' match clocks ran out at the same moment: neither is preferred, so the game being played is a draw and so
+    /// is the match.
+    /// </summary>
+    public void TimedOutTogether(MatchGame game)
+    {
+        MatchRecord match = game.Match;
+        if (match.Complete) return;
+        if (match.Games.FirstOrDefault(each => each.Number == game.Number && each.Ending.Length == 0) is { } record)
+        {
+            record.Ended = Now;
+            record.Ending = "draw";
+            record.Winners = [];
+            record.Detail = "Both players ran out of time.";
+        }
+
+        match.Complete = true;
+        match.Winners = [];
+        match.Detail = "Drawn: both players ran out of time.";
+        RoundOver();
+        Changed();
+        Save();
+    }
+
     /// <summary>When the round's last match is over, the next round is paired - or the event ends.</summary>
     private void RoundOver()
     {

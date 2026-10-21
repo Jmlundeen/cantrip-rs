@@ -342,6 +342,64 @@ public sealed class LeagueTests : IDisposable
         Assert.Equal(2, first.TakeVacated().Count(vacated => vacated.Farewell is TableMoveMessage));
     }
 
+    /// <summary>
+    /// A player whose match clock runs out loses the whole match, whatever the score (docs/events.md, "Clocks"): Ann, a game
+    /// up in a best of three, runs out of time in game two, and Ben wins the match - its game two too - with no third game,
+    /// and their runs count it as his win and her loss.
+    /// </summary>
+    [Fact]
+    public void A_player_up_a_game_who_runs_out_of_time_loses_the_match()
+    {
+        League league = Make(rules => rules.GamesToWin = 2);
+        Enter(league, "ann");
+        Enter(league, "ben");
+        MatchGame first = Pair(league, "ann", "ben");
+        int ann = first.PlayerAt(1) == "ann" ? 1 : 2;
+        Dealt(first);
+        first.GameEnded(abandoned: false, [ann], "won");
+        MatchGame second = Assert.Single(league.TablesToOpen());
+        second.Opened(new Uri("ws://localhost:9301/game"));
+        Dealt(second);
+
+        second.ClockRanOut(ann);
+        second.GameEnded(abandoned: false, [3 - ann], "Ann ran out of time.");
+
+        MatchRecord match = second.Match;
+        Assert.True(match.Complete);
+        Assert.Equal(["ben"], match.Winners);
+        Assert.Equal("ann", match.TimedOut);
+        Assert.Equal(["ben"], match.Games.Single(game => game.Number == 2).Winners);
+        Assert.False(second.ReadyToDeal);
+        Assert.Empty(league.TablesToOpen());
+        Assert.Equal((0, 1), (Current(league, "ann").Wins, Current(league, "ann").Losses));
+        Assert.Equal((1, 0), (Current(league, "ben").Wins, Current(league, "ben").Losses));
+    }
+
+    /// <summary>
+    /// Both players' clocks run out at the same look: neither is preferred, so the game and the match are drawn, and no further
+    /// game is dealt.
+    /// </summary>
+    [Fact]
+    public void Both_players_out_of_time_together_draw_the_match()
+    {
+        League league = Make(rules => rules.GamesToWin = 2);
+        Enter(league, "ann");
+        Enter(league, "ben");
+        MatchGame game = Pair(league, "ann", "ben");
+        Dealt(game);
+
+        game.ClocksRanOut([1, 2]);
+        game.GameEnded(abandoned: false, [], "Ann and Ben ran out of time.");
+
+        MatchRecord match = game.Match;
+        Assert.True(match.Complete);
+        Assert.Empty(match.Winners);
+        Assert.Null(match.TimedOut);
+        Assert.Equal("draw", Assert.Single(match.Games).Ending);
+        Assert.False(game.ReadyToDeal);
+        Assert.Empty(league.TablesToOpen());
+    }
+
     [Fact]
     public void A_match_cut_off_by_a_restart_is_played_again_and_the_runs_are_as_they_were()
     {

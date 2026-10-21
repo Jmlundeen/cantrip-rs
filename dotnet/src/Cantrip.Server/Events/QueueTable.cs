@@ -496,6 +496,10 @@ public sealed class QueueTable : ITableEvent
 
     public void ClockRanOut(int seat) => Pod?.ClockRanOut(seat);
 
+    public void ClocksRanOut(IReadOnlyList<int> seats) => Pod?.ClocksRanOut(seats);
+
+    public void ClocksKept(IReadOnlyDictionary<int, TimeSpan> left) => Pod?.ClocksKept(left);
+
     public IReadOnlyList<int> TakeForfeits() => Pod?.TakeForfeits() ?? [];
 
     public string? ForfeitReason(int seat) => Pod?.ForfeitReason(seat);

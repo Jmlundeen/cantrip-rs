@@ -585,6 +585,13 @@ public sealed class GameClient
 
                 KeepUnchanged(state.View);
                 View = state.View;
+
+                // A seat out of a game that goes on - it lost, conceded or ran out of time (CR 800.4a) - is asked nothing more.
+                if (state.View.Players.FirstOrDefault(player => player.Seat == Seat) is { Status: not PlayerStatusView.Active })
+                {
+                    Prompt = null;
+                }
+
                 break;
 
             case PromptMessage prompt:

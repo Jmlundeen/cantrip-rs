@@ -148,6 +148,8 @@ public static class Match
 
         while (true)
         {
+            // The game's clocks, as a table's (docs/events.md, "Clocks"): a seat out of time loses, a match out of time is a draw.
+            hosted.Tick();
             try
             {
                 foreach ((GameClient client, IAutoPlayer _) in seats)

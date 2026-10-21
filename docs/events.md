@@ -104,7 +104,7 @@ A Winston or grid draft is covered as a booster draft is, every stage on a clock
 - **Drafting**: the pick clocks above.
 - **Deck building**: ten minutes, then every deck not submitted is submitted as it stands, made up to the minimum with
   basic lands, and the game is dealt. A deal that fails sends everyone back to building with a fresh ten minutes.
-- **The game**: each player has a 25-minute match clock, running whenever the game waits on them (`ClockAtDeal`,
+- **The game**: each player has an hour on a match clock, running whenever the game waits on them (`ClockAtDeal`,
   kept in `MatchRecord.ClockMs`); a clock that runs out loses. A player not at the table when the game is dealt has
   three minutes to come to it, and one who leaves has five to come back, or forfeits (`ITableEvent.TakeForfeits`):
   the table ends the game with the other player winning, and the match is marked `Forfeit`.
@@ -181,7 +181,7 @@ it refuses such a deck, so a saved pool holding a card since removed from conten
 that card left in the sideboard - until the pool is fixed. The pod's table shows the pairings and how each match stands (`PairingsMessage`)
 whenever a player is there, and the final standings at the end.
 
-Every match has a **match clock**, a chess clock for each player across all its games: 25 minutes each by default
+Every match has a **match clock**, a chess clock for each player across all its games: an hour each by default
 (`BoosterTiming.MatchClock`). A player's clock runs while the game is waiting on them - priority, the mulligans, every
 choice - and both run while the game waits on both. The table (`GameServer`) keeps it: it asks the event for each
 seat's time as a game is dealt (`ITableEvent.ClockAtDeal`), charges the time to whoever the session is waiting on
@@ -189,7 +189,7 @@ seat's time as a game is dealt (`ITableEvent.ClockAtDeal`), charges the time to 
 back to the event to keep (`ClockUsed`, `MatchRecord.ClockMs`), so it carries into the next game and through a restart.
 A player whose clock reaches zero loses the **whole match**, whatever the score: the game ends with their opponent the
 winner (`GameSession.Forfeit`), and the match is theirs (`MatchRecord.TimedOut`). Sideboarding and the time between games
-are on no one's clock.
+are on no one's clock (see [Clocks](#clocks)).
 
 Nothing waits for someone who is not there. The pick clock drafts for them, deck building's submits for them, and a
 player who does not come to their match's table within three minutes, or is gone from it for five, forfeits the match
@@ -197,7 +197,37 @@ player who does not come to their match's table within three minutes, or is gone
 stage ([Dropping out](#dropping-out)). A player's pod ticket always takes them to
 where they should be: to their game's table while their match is on, otherwise to the pod's. The match records keep
 each game, its seed, its result, and each player's deck for the match (`MatchRecord.Decks`), so a game cut off by a
-restart is dealt again from its seed, and every clock starts again from the restart.
+restart is dealt again from its seed. Each player's match clock carries through the restart with what it had left as last
+saved (`MatchRecord.ClockMs`), not running while the server was down; the pick clocks and the absences start again from
+the restart.
+
+### Clocks
+
+Every game has chess clocks, as Magic Online keeps them, at any table - a lobby's table (`tools\play-game.cmd`,
+`play-vs-bot.cmd`, the page's `?bots=2`), a Discord constructed game, a scenario's table, an event's - and in a game played
+in one process (`HostAndPlay`: the bot labs, the language-model games, the playtests). There is no other limit: no time for
+the match as a whole, only each player's.
+
+- **Each player has a clock**, an hour by default (`GameServerOptions.PlayerClock`, `MatchClocks.DefaultPlayerClock`; an
+  event's `MatchClock`), running only while the game waits on that player - priority, the mulligans, every choice
+  (`MatchClocks`). A seat takes what its event has left on it for the match (`ITableEvent.ClockAtDeal`), so in an event's
+  match the clock carries across its games and through a restart (`MatchRecord.ClockMs`) and does not run between games or
+  while the server is down; a seat the event gives no clock - and every seat of a table with no event - takes the table's
+  own: one seat without a record never stops the others' clocks. A player dealt a game with no time left on their clock runs
+  out at the table's first look and loses at once.
+- **A player whose clock runs out loses.** In an event's match they lose the **whole match**, whatever the score - a game
+  up and about to win the next, they still lose it: the game being played is their opponent's, the match too
+  (`MatchRecord.TimedOut`), with the event's own win and loss counted for it and nothing more dealt. In a game of two at a
+  table with no event, they lose the game. In a game of more than two, they lose and leave it through its rules, as a
+  concession does (`GameSession.TimeOut`, the engine's `Game::concede`; CR 104.3a, 800.4a), and the others play on. When
+  every player still in runs out at the same look nobody is left to win, and the game is a draw; in an event's match both
+  players out together draw the match as well, neither preferred, with nothing more dealt (`ITableEvent.ClocksRanOut`,
+  `IMatchHost.TimedOutTogether`).
+
+`cantrip-server` sets the clock for its lobby's table with `--clock MINUTES` (`play-game.ps1 -Clock`; `play-vs-llm` gives
+each player 90 minutes, a model being slower than a person). A scenario's table (`ScenarioTable.StartAsync`) and a game in
+one process (`HostAndPlay.StartTable`) take the `TimeProvider` their clocks run on, so a test moves the time itself
+(`TableClockTests`, `TimeOutTests`).
 
 `BoosterPod` is the pod's event and `PodHost` (`Cantrip.Server.Host`) hosts it: the pod's table, and a table for each
 game it asks for (`TablesToOpen`), closed once its players have gone on (`TablesDone`). Where tables are is the host's

@@ -671,6 +671,25 @@ public sealed class League : IMatchHost
         Save();
     }
 
+    public void TimedOutTogether(MatchGame game)
+    {
+        MatchRecord match = game.Match;
+        if (match.Complete) return;
+        if (match.Games.FirstOrDefault(each => each.Number == game.Number && each.Ending.Length == 0) is { } record)
+        {
+            record.Ended = Now;
+            record.Ending = "draw";
+            record.Winners = [];
+            record.Detail = "Both players ran out of time.";
+        }
+
+        match.Winners = [];
+        match.Detail = "Drawn: both players ran out of time.";
+        Decided(match);
+        Changed();
+        Save();
+    }
+
     /// <summary>A match is decided: each of its runs ends if that was its last.</summary>
     private void Decided(MatchRecord match)
     {

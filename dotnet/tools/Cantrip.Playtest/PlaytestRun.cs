@@ -168,6 +168,8 @@ public sealed class PlaytestRun
 
         while (true)
         {
+            // The game's clocks, as a table's (docs/events.md, "Clocks"): a seat out of time loses, a match out of time is a draw.
+            hosted.Tick();
             // Every seat drains its mailbox before anyone is asked whether it is over: an answer runs the session
             // inside the send, so the message that ends the game lands in one seat's mailbox while another has not
             // looked yet, and a seat that has not looked has neither a prompt nor an outcome.

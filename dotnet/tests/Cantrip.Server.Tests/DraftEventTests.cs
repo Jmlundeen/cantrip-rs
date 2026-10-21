@@ -631,6 +631,36 @@ public sealed class DraftEventTests : IDisposable
         Assert.Equal(20 * 60_000, match.ClockMs["bob"]);
     }
 
+    /// <summary>
+    /// Both players' clocks run out at the same look: neither is preferred, the match is pinned on neither, and the game - the
+    /// match's one - ends as a draw.
+    /// </summary>
+    [Fact]
+    public void Both_players_out_of_time_together_draw_the_match()
+    {
+        var store = new EventStore(_data);
+        var clock = new Clock();
+        CreatedEvent created = Create(store);
+        DraftPod pod = DraftPod.Open(store, created.Record.Id, Content, clock, new DraftTiming());
+        pod.Seated(1);
+        pod.Seated(2);
+        DraftOut(pod);
+        clock.Advance(TimeSpan.FromMinutes(10));
+        pod.Tick(clock.GetUtcNow());
+        pod.Deal(["Alice", "Bob"], new CapturingRulesFactory());
+
+        pod.ClocksRanOut([1, 2]);
+        pod.GameEnded(false, [], "Alice and Bob ran out of time.");
+
+        EventRecord ended = store.LoadEvent(created.Record.Id)!;
+        Assert.Equal(EventStage.Complete, ended.Stage);
+        MatchRecord match = ended.Matches.Single();
+        Assert.Empty(match.Winners);
+        Assert.Null(match.TimedOut);
+        Assert.Equal("draw", match.Games.Single().Ending);
+        Assert.False(pod.ReadyToDeal);
+    }
+
     [Fact]
     public void A_player_gone_from_the_game_too_long_forfeits_it()
     {
