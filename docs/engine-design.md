@@ -719,12 +719,15 @@ left to run out. In such a step every question is kept with its shape and the an
 choosing to act (an action at priority, a "may" taken, a pick with another answer still untried in that shape) from one
 passing or declining. A loop its players keep going by choice is never cut off, capped or made to change: the engine
 supports no loop shortcuts (CR 732.2), players perform every loop action by hand, and a combination may go round as many
-times as it needs; a seat nobody drives stops itself (`LoopGuard`, C#: past a number of questions in one step it passes,
-declines and picks each answer in turn, so a loop that goes on whatever it picks becomes one of passes). A loop whose
+times as it needs; a seat nobody drives stops itself (`LoopGuard`, C#: past 4096 questions in one step it passes,
+declines and picks each answer in turn, so a loop that goes on whatever it picks becomes one of passes, and past a million
+it concedes, CR 104.3a, so no table of automated seats goes on for ever). A loop whose
 players only pass or decline can't be stopped by making them act (CR 732.5) and is a draw after `ROUNDS` (CR 732.4).
 `FORCED_LIMIT` ends a run of mandatory actions that long with no life, poison or library moving towards its end: a draw.
-The watch keeps at most `KEPT` positions and questions (`GameState::loop_keys`, journalled an entry at a time), so a loop
-played by hand for thousands of rounds costs the watch no more memory than its first `KEPT` questions. A normal game
+The watch keeps each question of a busy step once (`GameState::loop_keys`, found through a hashed index, journalled an
+entry at a time), and every priority position follows its own round, so a loop is found however many questions a round
+asks and whichever position it comes back to, and a loop played by hand costs the watch nothing more per round. Past
+`KEPT` (a million) questions it stops growing and forgets nothing. A normal game
 pays a comparison per priority and a count per read of the history.
 
 ### Casting: when a cost's choices are made

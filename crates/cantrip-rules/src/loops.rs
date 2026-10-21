@@ -47,8 +47,13 @@
 //!
 //! **That every loop of mandatory actions ends.** A run of mandatory actions `FORCED_LIMIT` priorities long whose life
 //! totals, poison and libraries have gone nowhere for half of it is a loop that never comes back to a position (an amount or
-//! a list growing for ever), a draw, unless the stack or the board shrank in it too (a long chain that ends). The watch keeps
-//! at most `KEPT` positions and questions, so a loop played by hand for any number of rounds costs it no more.
+//! a list growing for ever), a draw, unless the stack or the board shrank in it too (a long chain that ends).
+//!
+//! **What the watch keeps.** Each question of a busy step once (`GameState::loop_keys`, found by its key in a hashed index,
+//! journalled an entry at a time), with the answers given to it and, for a priority, the round it follows: a loop played by
+//! hand for any number of rounds costs it nothing more per round. Every priority position is its own round, so a loop is
+//! followed whichever of its positions it comes back to, however many questions a round has, and nothing seen earlier in the
+//! step stands in the way of a later loop. Past `KEPT` questions (a million) it stops growing and forgets nothing.
 //!
 //! A normal game pays a comparison per priority and a count per read of the history: the fingerprinting starts only after
 //! a long run of priorities in which nobody could do anything, or in a step far longer than a game outside a loop has.
@@ -58,7 +63,7 @@ use std::hash::{Hash, Hasher};
 
 use cantrip_api::history::{note_read, take_reads};
 use cantrip_api::*;
-use cantrip_state::{GameState, LastKnown, LoopRound, LoopWatch};
+use cantrip_state::{GameState, LastKnown, LoopWatch};
 
 use crate::Cx;
 
@@ -77,8 +82,13 @@ pub const ROUNDS: u16 = 256;
 /// Events in a step before its questions are kept with their positions: far more than a step outside a loop has.
 pub const BUSY_STEP: u32 = 1024;
 
-/// The most positions or questions the watch keeps: past it, a loop that long is not looked for (it is started over).
-const KEPT: usize = 1024;
+/// The most questions the watch keeps in a step: far past any loop's - a million positions and questions. Past it the watch
+/// stops growing and forgets nothing: a question it has no room for is not watched.
+const KEPT: usize = 1 << 20;
+
+/// The most positions a run of mandatory actions is fingerprinted at before the run is started over (its positions are
+/// compared again from there): a loop of mandatory actions longer than that is found by `FORCED_LIMIT` instead.
+const SEEN: usize = 1024;
 
 /// Whether `kind` has exactly one legal answer, so that answering it is no choice (CR 104.4b). Errs towards "a choice":
 /// any question not known to have one answer counts as one. Priority is judged by `priority_forced`.
@@ -142,7 +152,8 @@ pub fn asked(cx: &mut Cx, player: PlayerId, kind: &RequestKind) -> Option<u64> {
         let canon = Canon::new(cx.s());
         question_key(&canon, &position(cx.s(), &canon).shape, player, cx.frame, cx.cursor, kind)
     };
-    keep(cx.st(), key);
+    // A question past what the watch can keep is not watched.
+    keep(cx.st(), key)?;
     Some(key)
 }
 
@@ -171,7 +182,7 @@ pub fn answering(s: &GameState, id: u32, request: &Request, answer: &Answer) -> 
     }
     let canon = Canon::new(s);
     let this = answer_hash(&canon, answer);
-    let given = s.loop_keys.iter().find(|k| k.key == key).map_or(&[][..], |k| &k.given[..]);
+    let given = s.loop_index.get(&key).map_or(&[][..], |&at| &s.loop_keys[at as usize].given[..]);
     let acts = !forced(&request.kind)
         && match (&request.kind, answer) {
             (_, Answer::Pass | Answer::No) => false,
@@ -186,12 +197,13 @@ pub fn answering(s: &GameState, id: u32, request: &Request, answer: &Answer) -> 
 }
 
 /// The answer noted by `answering` is given, by `player`, to a question of this `kind`: it is kept with its question, and a
-/// player who chose to act is among those involved in the loop (CR 732.4-5: a loop nobody acts in is a draw). Priority is played out again from the frame's
-/// start, its watch with it, so a player acting at priority joins `involved` only as that priority is watched again
-/// (`acted`).
+/// player who chose to act is counted (`LoopWatch::acts`, CR 732.4-5: a loop nobody acts in is a draw). Priority is played
+/// out again from the frame's start, its watch with it, so a player acting at priority is counted only as that priority is
+/// watched again (`acted`).
 pub fn answered(s: &mut GameState, player: PlayerId, priority: bool, (key, answer, acts): (u64, u64, bool)) {
-    let at = entry(s, key);
-    if !s.loop_keys[at].given.contains(&answer) {
+    if let Some(at) = s.loop_key_entry(key, KEPT)
+        && !s.loop_keys[at].given.contains(&answer)
+    {
         s.update_loop_key(at, |k| k.given.push(answer));
     }
     if acts {
@@ -199,7 +211,7 @@ pub fn answered(s: &mut GameState, player: PlayerId, priority: bool, (key, answe
         if priority {
             watch.acted |= bit(player);
         } else {
-            watch.involved |= bit(player);
+            watch.acts = watch.acts.saturating_add(1);
         }
         s.set_loop_watch(watch);
     }
@@ -231,21 +243,12 @@ fn busy(cx: &Cx) -> Option<u32> {
     (w.step == step_id(cx.s()) && records > BUSY_STEP).then_some(records)
 }
 
-/// The question `key` is asked: its entry among the kept questions (made if it has none), and whether it was asked before.
-fn keep(s: &mut GameState, key: u64) -> (usize, bool) {
-    let at = entry(s, key);
+/// The question `key` is asked: its entry among the kept questions (made if it has none and the watch is not full), and
+/// whether it was asked before.
+fn keep(s: &mut GameState, key: u64) -> Option<(usize, bool)> {
+    let at = s.loop_key_entry(key, KEPT)?;
     s.update_loop_key(at, |k| k.asked = k.asked.saturating_add(1));
-    (at, s.loop_keys[at].asked > 1)
-}
-
-/// The kept question `key`'s entry, made if it has none. Past `KEPT` of them every one is forgotten, and the round followed.
-fn entry(s: &mut GameState, key: u64) -> usize {
-    let (at, forgot) = s.loop_key_entry(key, KEPT);
-    if forgot && s.loop_watch.round.is_some() {
-        let watch = LoopWatch { round: None, ..s.loop_watch.clone() };
-        s.set_loop_watch(watch);
-    }
-    at
+    Some((at, s.loop_keys[at].asked > 1))
 }
 
 /// The run of mandatory actions is broken: a real choice.
@@ -288,8 +291,7 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, options: Vec<ActionOption>) ->
         let mut watch = cx.s().loop_watch.clone();
         watch.step = step;
         watch.step_log = cx.g.log.len() as u32;
-        watch.round = None;
-        watch.involved = 0;
+        watch.acts = 0;
         watch.asking = None;
         watch.priority_key = None;
         watch.acted = 0;
@@ -313,57 +315,44 @@ pub fn at_priority(cx: &mut Cx, player: PlayerId, options: Vec<ActionOption>) ->
         let key = question_key(&canon, &here.shape, player, cx.frame, cx.cursor, &RequestKind::Priority { options: Vec::new() });
         (here, key)
     };
-    let again = keep(cx.st(), key).1;
-    let mut watch = cx.s().loop_watch.clone();
-    let drawn = {
-        watch.priority_key = Some(key);
-        // A loop that has gone elsewhere is followed from the next position that comes round.
-        if let Some(round) = &mut watch.round
-            && round.key != key
-        {
-            round.since = round.since.saturating_add(1);
-            if round.since as usize > KEPT / 2 {
-                watch.round = None;
-            }
+    // Every priority position is followed as it comes round, each its own round, so a loop is found whichever of its
+    // positions it comes back to and however long it is, and no earlier position stands in the way of a later loop.
+    let acts = cx.s().loop_watch.acts;
+    let drawn = match cx.st().loop_key_entry(key, KEPT) {
+        Some(at) => {
+            let k = &cx.s().loop_keys[at];
+            let again = k.asked > 0;
+            // Round and round with the amounts gone nowhere and nobody choosing to act: no player can be made to stop it
+            // (CR 732.5), and it is a loop of mandatory actions (CR 732.4). One a player keeps going by choosing to act goes on
+            // for as long as they choose: the engine cuts nothing off.
+            let passes = if !again || !gone_nowhere(&k.amounts, &here.amounts) {
+                0
+            } else if k.acts == acts {
+                k.passes.saturating_add(1)
+            } else {
+                0
+            };
+            cx.st().update_loop_key(at, |k| {
+                k.asked = k.asked.saturating_add(1);
+                k.acts = acts;
+                k.passes = passes;
+                k.amounts = here.amounts;
+            });
+            passes >= ROUNDS
         }
-        let drawn = again && round_comes(&mut watch, key, here.amounts);
-        watch.involved |= std::mem::take(&mut watch.acted);
-        drawn
+        None => false,
     };
+    let mut watch = cx.s().loop_watch.clone();
+    watch.priority_key = Some(key);
+    if std::mem::take(&mut watch.acted) != 0 {
+        watch.acts = watch.acts.saturating_add(1);
+    }
     cx.st().set_loop_watch(watch);
     if drawn {
         draw(cx);
         return None;
     }
     Some(options)
-}
-
-/// A position at priority, `key`, has come round again in a step being watched, with these `amounts`. Whether the loop is one
-/// of mandatory actions and the game a draw.
-fn round_comes(watch: &mut LoopWatch, key: u64, amounts: Vec<(u32, i32)>) -> bool {
-    let Some(round) = &mut watch.round else {
-        watch.round = Some(LoopRound { key, amounts, ..LoopRound::default() });
-        return false;
-    };
-    if round.key != key {
-        return false;
-    }
-    round.since = 0;
-    let mut drawn = false;
-    if gone_nowhere(&round.amounts, &amounts) {
-        round.rounds = round.rounds.saturating_add(1);
-        round.passes = if watch.involved == 0 { round.passes.saturating_add(1) } else { 0 };
-        // Round and round with nobody choosing to act: no player can be made to stop it (CR 732.5), and it is a loop of
-        // mandatory actions (CR 732.4).
-        // A loop a player keeps going by choosing to act goes on for as long as they choose: the engine cuts nothing off.
-        drawn = round.passes >= ROUNDS;
-    } else {
-        round.rounds = 0;
-        round.passes = 0;
-    }
-    round.amounts = amounts;
-    watch.involved = 0;
-    drawn
 }
 
 /// The watch of a run of mandatory actions, at a priority: whether it has come round a loop and the game is a draw. The
@@ -404,7 +393,7 @@ fn mandatory(cx: &mut Cx, player: PlayerId, options: &[ActionOption], seen_posit
         draw(cx);
         return true;
     }
-    if watch.seen.len() >= KEPT {
+    if watch.seen.len() >= SEEN {
         watch.seen.clear();
     }
     watch.seen.push(here.exact);
@@ -1038,5 +1027,48 @@ mod tests {
         let id = game.state.agenda[0].pending.as_ref().expect("the question").id;
         assert_eq!(game.state.player(PlayerId(0)).life, 20, "what the run did after the question is undone");
         assert!(matches!(game.state.loop_watch.asking, Some((asked, _)) if asked == id), "the watch still waits for its answer");
+    }
+
+    /// A busy step (`BUSY_STEP` events in it) with the Loop Test's ability on the stack.
+    fn busy_game() -> Game {
+        let mut game = game();
+        let mut watch = game.state.loop_watch.clone();
+        watch.step = step_id(&game.state);
+        watch.step_log = 0;
+        game.state.set_loop_watch(watch);
+        let source = game.state.battlefield()[0];
+        let mut cx = cx(&mut game);
+        for _ in 0..=BUSY_STEP {
+            cx.record(Event::Drew { player: PlayerId(0), card: source });
+        }
+        game
+    }
+
+    /// One round of a loop: `questions` choices of a player (each its own shape, by where it is asked), answered acting or not,
+    /// then the same priority again. Whether the game was drawn there.
+    fn round_of(game: &mut Game, questions: usize, acting: bool) -> bool {
+        let two = RequestKind::ChoosePlayer { source: ObjectId(0), candidates: vec![PlayerId(0), PlayerId(1)], verb: "", amount: 0 };
+        for i in 0..questions {
+            let key = asked(&mut Cx { cursor: i + 1, ..cx(game) }, PlayerId(0), &two).expect("kept");
+            answered(&mut game.state, PlayerId(0), false, (key, 1, acting && i == questions / 2));
+        }
+        at_priority(&mut cx(game), PlayerId(0), Vec::new()).is_none()
+    }
+
+    /// CR 732.4-5: a loop whose rounds ask more questions than any earlier bound of the watch (here 1100 a round), every one
+    /// answered without acting, is still found and drawn after `ROUNDS` rounds.
+    #[test]
+    fn a_loop_of_passes_with_many_questions_a_round_is_a_draw() {
+        let mut game = busy_game();
+        let rounds = (0..=ROUNDS as usize + 1).position(|_| round_of(&mut game, 1100, false));
+        assert_eq!(rounds, Some(ROUNDS as usize), "drawn once it has come round ROUNDS times with nobody acting");
+    }
+
+    /// CR 104.4b: the same loop with a player choosing to act once a round is never drawn, however long it goes on.
+    #[test]
+    fn a_loop_of_choices_with_many_questions_a_round_is_no_draw() {
+        let mut game = busy_game();
+        assert!((0..2 * ROUNDS as usize).all(|_| !round_of(&mut game, 1100, true)));
+        assert!(game.state.outcome != Outcome::Draw);
     }
 }

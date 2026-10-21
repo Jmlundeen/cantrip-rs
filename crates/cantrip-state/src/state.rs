@@ -61,6 +61,8 @@ pub struct GameState {
     /// The questions kept in a step watched for loops of choices, each with the answers given it there (see `LoopWatch`):
     /// apart from the watch, and changed an entry at a time, so a question asked journals one entry, not all of them.
     pub loop_keys: Vec<LoopKey>,
+    /// Where each of `loop_keys` is, by its key: derived from them, no part of the position, kept as they change.
+    pub loop_index: std::collections::HashMap<u64, u32>,
     /// The basic land cards a Limited event supplies (Magic Tournament Rules: a Limited sideboard holds any number of basic
     /// lands), of which each player always has one more outside the game (`Zone::sideboard`): one brought into the game is
     /// replaced there. Empty for a constructed game. Fixed at the deal, so no part of the journal.
@@ -118,9 +120,11 @@ pub struct GameState {
 /// go on.
 ///
 /// A step with a great deal in it: from `step_log` (the history's length as the step `step` began) on, each question's
-/// position is kept in `GameState::loop_keys` with the answers given to it, and `round` follows a position at priority that comes round
-/// again: `involved` is the players who chose to act since it last did. `asking` is the request waiting and its key, `priority_key` the key of the priority about to be asked, and
-/// `acted` the players who chose to act at the priority being played out with its answer, not yet among `involved`.
+/// position is kept in `GameState::loop_keys` with the answers given to it, and each priority's entry follows that position
+/// as it comes round again. `acts` counts the times a player chose to act in the step, so that a position come round with
+/// the count unchanged was gone round with nobody acting. `asking` is the request waiting and its key, `priority_key` the key
+/// of the priority about to be asked, and `acted` the players who chose to act at the priority being played out with its
+/// answer, not yet counted in `acts`.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LoopWatch {
     pub forced: u32,
@@ -128,30 +132,23 @@ pub struct LoopWatch {
     pub far: Vec<i32>,
     pub step: u32,
     pub step_log: u32,
-    pub round: Option<LoopRound>,
-    pub involved: u8,
+    pub acts: u64,
     pub asking: Option<(u32, u64)>,
     pub priority_key: Option<u64>,
     pub acted: u8,
 }
 
 /// A question asked in a position (its shape, by `cantrip_rules::loops`): how many times, and the answers given to it there.
+/// For a priority, the round it follows, should the game come back to it: the players' count of actions (`LoopWatch::acts`)
+/// and the amounts of things as it last came round, and how many times in a row it has come round with the amounts gone
+/// nowhere and nobody acting (`passes`).
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct LoopKey {
     pub key: u64,
     pub asked: u16,
     pub given: Vec<u64>,
-}
-
-/// A position at priority that has come round again: how many times since the players last acted differently (`rounds`),
-/// how many of those in a row nobody chose to act (`passes`), the priorities since it last came round (`since`), and the
-/// amounts of things as it last did.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
-pub struct LoopRound {
-    pub key: u64,
-    pub rounds: u16,
+    pub acts: u64,
     pub passes: u16,
-    pub since: u16,
     pub amounts: Vec<(u32, i32)>,
 }
 
@@ -388,6 +385,7 @@ impl GameState {
             extra_turns: Vec::new(),
             loop_watch: LoopWatch::default(),
             loop_keys: Vec::new(),
+            loop_index: std::collections::HashMap::new(),
             outside_supply: Vec::new(),
             statics_seen: false,
             agenda: Vec::new(),
@@ -1103,19 +1101,19 @@ impl GameState {
         }
     }
 
-    /// The kept question `key`'s entry, made if there is none - after forgetting every kept question first if `kept` are kept
-    /// already. Its index, and whether the others were forgotten.
-    pub fn loop_key_entry(&mut self, key: u64, kept: usize) -> (usize, bool) {
-        if let Some(at) = self.loop_keys.iter().position(|k| k.key == key) {
-            return (at, false);
+    /// The kept question `key`'s entry, made if there is none and fewer than `kept` are kept. Its index, if it has one.
+    pub fn loop_key_entry(&mut self, key: u64, kept: usize) -> Option<usize> {
+        if let Some(&at) = self.loop_index.get(&key) {
+            return Some(at as usize);
         }
-        let forgot = self.loop_keys.len() >= kept;
-        if forgot {
-            self.loop_keys_clear();
+        // Past the bound nothing more is kept: the watch stops growing, and forgets nothing it has.
+        if self.loop_keys.len() >= kept {
+            return None;
         }
-        self.loop_keys.push(LoopKey { key, asked: 0, given: Vec::new() });
+        self.loop_keys.push(LoopKey { key, ..LoopKey::default() });
+        self.loop_index.insert(key, (self.loop_keys.len() - 1) as u32);
         self.log(Undo::LoopKeyPushed);
-        (self.loop_keys.len() - 1, forgot)
+        Some(self.loop_keys.len() - 1)
     }
 
     /// Changes the kept question at `at`, journalling that entry alone.
@@ -1131,6 +1129,7 @@ impl GameState {
     pub fn loop_keys_clear(&mut self) {
         if !self.loop_keys.is_empty() {
             let old = std::mem::take(&mut self.loop_keys);
+            self.loop_index.clear();
             self.log(Undo::LoopKeysSet(old));
         }
     }
@@ -1355,11 +1354,19 @@ impl GameState {
             Undo::ExtraTurnsSet(old) => self.extra_turns = old,
             Undo::LoopWatchSet(old) => self.loop_watch = old,
             Undo::LoopKeyPushed => {
-                self.loop_keys.pop();
+                if let Some(key) = self.loop_keys.pop() {
+                    self.loop_index.remove(&key.key);
+                }
             }
-            Undo::LoopKeyPopped(key) => self.loop_keys.push(key),
+            Undo::LoopKeyPopped(key) => {
+                self.loop_index.insert(key.key, self.loop_keys.len() as u32);
+                self.loop_keys.push(key);
+            }
             Undo::LoopKeySet(at, old) => self.loop_keys[at as usize] = old,
-            Undo::LoopKeysSet(old) => self.loop_keys = old,
+            Undo::LoopKeysSet(old) => {
+                self.loop_index = old.iter().enumerate().map(|(at, k)| (k.key, at as u32)).collect();
+                self.loop_keys = old;
+            }
             Undo::StaticsSeen(old) => self.statics_seen = old,
             Undo::FramePushed => {
                 self.agenda.pop();
