@@ -1,0 +1,50 @@
+# Torch the Tower: "If a permanent dealt damage by Torch the Tower would die this turn, exile it instead." Bot2 answers it
+# with Healing Salve's shield on its Llanowar Elves, so all 2 of Torch's damage is prevented and the Elves were never dealt
+# damage by it (CR 615.1). When Bot1's Lightning Bolt then kills the Elves (1 of its 3 prevented, 2 dealt), they die and go
+# to the graveyard - not to exile.
+
+[Bot1 Deck]
+Mountain
+Mox Ruby
+Torch the Tower
+Lightning Bolt
+Island x16
+
+[Bot2 Deck]
+Forest
+Llanowar Elves
+Mox Pearl
+Healing Salve
+Island x16
+
+[Actions]
+Bot1.Hand.Mountain.Play
+Bot1.Hand.Mox Ruby.Cast
+[T2 Bot2.Main1]
+Bot2.Hand.Forest.Play
+Bot2.Battlefield.Forest.Activate
+Bot2.Hand.Llanowar Elves.Cast
+Bot2.Hand.Mox Pearl.Cast
+[T3 Bot1.Main1]
+Bot1.Battlefield.Mountain.Activate
+Bot1.Hand.Torch the Tower.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot2.Battlefield.Mox Pearl.Activate
+Bot2.Hand.Healing Salve.Cast
+Bot2.Modes(Prevent the next 3 damage)
+Bot2.Target(Bot2.Battlefield.Llanowar Elves)
+Bot2.Pass
+Bot1.Pass
+Bot2.Pass
+Bot1.Pass
+? Stack.Count = 0
+? Bot2.Battlefield.Llanowar Elves.Damage = 0
+Bot1.Battlefield.Mox Ruby.Activate
+Bot1.Hand.Lightning Bolt.Cast(Bot2.Battlefield.Llanowar Elves)
+Bot1.Pass
+Bot2.Pass
+[T3 Bot1.Main2]
+
+[Expect]
+Bot2.Graveyard = Llanowar Elves; Healing Salve
+Exile.Count = 0
+Prevented = 2 Torch the Tower > Llanowar Elves by Healing Salve; 1 Lightning Bolt > Llanowar Elves by Healing Salve
