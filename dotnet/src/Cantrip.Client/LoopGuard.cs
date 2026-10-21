@@ -12,21 +12,38 @@ namespace Cantrip.Client;
 /// each in turn - a different answer each time round, so that a choice that would end the loop is tried. A loop that goes on
 /// whatever is picked is then one of passes and declines, which the engine makes a draw (CR 732.4-5).
 /// </para>
+/// <para>
+/// And past <see cref="ConcedeAfter"/> questions in one step - a loop the passive answers could not end, which the engine
+/// does not judge a draw - the seat concedes (CR 104.3a), so that no table of automated seats ever goes on for ever.
+/// </para>
 /// </summary>
 public sealed class LoopGuard : IAutoPlayer
 {
     /// <summary>More questions than a step outside a loop asks a seat.</summary>
     public const int AnswersPerStep = 4096;
 
+    /// <summary>Far past what the passive answers need to end any loop that can be ended: a million questions in one step.</summary>
+    public const int ConcedeAfter = 1_000_000;
+
     private readonly IAutoPlayer _inner;
+    private readonly int _answersPerStep;
+    private readonly int _concedeAfter;
     private (int Turn, TurnStepView Step) _step;
     private int _answers;
     private int _turn;
 
     public LoopGuard(IAutoPlayer inner)
+        : this(inner, AnswersPerStep, ConcedeAfter)
+    {
+    }
+
+    /// <summary>A guard with its own limits, for a test.</summary>
+    public LoopGuard(IAutoPlayer inner, int answersPerStep, int concedeAfter)
     {
         ArgumentNullException.ThrowIfNull(inner);
         _inner = inner is LoopGuard guard ? guard._inner : inner;
+        _answersPerStep = answersPerStep;
+        _concedeAfter = Math.Max(concedeAfter, answersPerStep);
     }
 
     /// <summary>The seat it guards.</summary>
@@ -51,15 +68,21 @@ public sealed class LoopGuard : IAutoPlayer
             _answers = 0;
         }
 
-        // Counted no further than past the limit: the count stops there, and never wraps back below it.
-        if (_answers <= AnswersPerStep)
+        // Counted no further than past the last limit: the count stops there, and never wraps back below it.
+        if (_answers <= _concedeAfter)
         {
             _answers++;
         }
 
-        if (_answers <= AnswersPerStep || _inner.Thinking)
+        if (_answers <= _answersPerStep || _inner.Thinking)
         {
             return _inner.Act(client);
+        }
+
+        if (_answers > _concedeAfter)
+        {
+            client.Concede();
+            return true;
         }
 
         client.Answer(Passive(client.Prompt!.Prompt, _turn));
